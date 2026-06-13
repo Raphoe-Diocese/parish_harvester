@@ -1,0 +1,411 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Parish Trainer</title>
+    <style>
+      :root { color-scheme: dark; }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: #111827;
+        color: #f9fafb;
+        font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+        font-size: 12px;
+      }
+      .wrap { padding: 10px 12px; }
+      h1 { margin: 0 0 4px; font-size: 15px; display: flex; align-items: center; gap: 6px; }
+      .sp-tabs { display: flex; gap: 4px; margin: 0 0 8px; }
+      .sp-tab {
+        border: 1px solid #374151;
+        border-radius: 6px;
+        background: #1e293b;
+        color: #cbd5e1;
+        font-size: 11px;
+        line-height: 1.2;
+        padding: 6px 8px;
+        width: auto;
+      }
+      .sp-tab.active {
+        background: #1d4ed8;
+        color: #ffffff;
+      }
+      .sp-panel { display: none; }
+      .sp-panel.active { display: block; }
+      .guided-badge {
+        background: #16a34a; color: #fff; border-radius: 4px;
+        padding: 1px 5px; font-size: 9px; font-weight: 600;
+      }
+      #status {
+        margin: 0 0 8px; opacity: 0.92; line-height: 1.35; font-size: 11px;
+        padding: 4px 6px; border-radius: 4px; display: none;
+      }
+      #status.ok  { background: #14532d; color: #86efac; display: block; }
+      #status.err { background: #7f1d1d; color: #fca5a5; display: block; }
+      #status.warn { background: #78350f; color: #fcd34d; display: block; }
+      #status.info { background: #1e3a5f; color: #93c5fd; display: block; }
+      .section {
+        background: #1e293b; border: 1px solid #374151; border-radius: 6px;
+        padding: 7px 8px; margin-bottom: 7px;
+      }
+      .operator-hidden { display: none !important; }
+      .section-title {
+        font-size: 10px; font-weight: 600; color: #93c5fd; margin-bottom: 5px;
+      }
+      .btn-col { display: flex; flex-direction: column; gap: 5px; }
+      button {
+        border: none; border-radius: 6px; padding: 6px 10px;
+        background: #2563eb; color: #fff; cursor: pointer;
+        font-size: 11px; text-align: left; line-height: 1.3;
+        font-family: inherit; width: 100%;
+      }
+      button:hover { filter: brightness(1.15); }
+      button.green { background: #16a34a; }
+      button.grey  { background: #374151; }
+      .note { margin: 8px 0 0; line-height: 1.35; font-size: 10px; color: #6b7280; }
+      details summary { cursor: pointer; font-size: 10px; color: #6b7280; margin-top: 6px; }
+      details .inner { margin-top: 5px; }
+
+      /* ── Parish Directory ── */
+      #parish-dir-content { max-height: 420px; overflow-y: auto; }
+      .pd-diocese { margin-bottom: 6px; }
+      .pd-diocese-accordion {
+        margin-bottom: 6px;
+        border: 1px solid #374151;
+        border-radius: 6px;
+        background: #0f172a;
+        overflow: hidden;
+      }
+      .pd-diocese-title {
+        font-size: 10px; font-weight: 700; color: #fbbf24;
+        padding: 6px 8px; border-bottom: 1px solid #374151; margin-bottom: 0; cursor: pointer;
+        list-style: none;
+      }
+      .pd-diocese-title::-webkit-details-marker { display: none; }
+      .pd-diocese-title::before { content: "▸ "; color: #93c5fd; }
+      .pd-diocese-accordion[open] .pd-diocese-title::before { content: "▾ "; }
+      .pd-diocese-content { padding: 4px; }
+      .pd-subfolder {
+        margin: 2px 0 6px;
+        padding: 6px;
+        border: 1px dashed #334155;
+        border-radius: 4px;
+        background: #111827;
+        font-size: 9px;
+        line-height: 1.45;
+        color: #d1d5db;
+      }
+      .pd-subfolder-row { margin-bottom: 4px; word-break: break-word; }
+      .pd-subfolder-row:last-child { margin-bottom: 0; }
+      .pd-subfolder-label { color: #93c5fd; font-weight: 600; }
+      .pd-subfolder a { color: #93c5fd; text-decoration: underline; }
+      .pd-subfolder-toggle { width: auto; font-size: 9px; padding: 2px 5px; background: #1d4ed8; }
+      .pd-subfolder-loading { color: #93c5fd; }
+      .pd-subfolder-muted { color: #9ca3af; }
+      .pd-subfolder-list { margin: 0; padding-left: 14px; }
+      .pd-subfolder-list li { margin: 1px 0; }
+      .pd-subfolder-time { color: #fbbf24; }
+      .pd-subfolder-error { color: #fca5a5; }
+      .pd-subfolder-ok { color: #86efac; }
+      .pd-subfolder-empty { color: #6b7280; font-style: italic; }
+      .pd-subfolder-url {
+        display: inline-block;
+        max-width: 100%;
+        overflow-wrap: anywhere;
+      }
+      .pd-row {
+        display: flex; align-items: center; gap: 4px;
+        padding: 3px 2px; border-radius: 4px; font-size: 10px;
+      }
+      .pd-row:hover { background: #1e293b; }
+      .pd-status { font-size: 10px; flex-shrink: 0; }
+      .pd-name {
+        flex: 1; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+        color: #f9fafb; cursor: pointer;
+      }
+      .pd-name:hover { text-decoration: underline; color: #93c5fd; }
+      .pd-name.disabled { color: #6b7280; font-style: italic; }
+      .pd-btn {
+        border: none; border-radius: 4px; padding: 2px 5px; cursor: pointer;
+        font-size: 9px; font-family: inherit; flex-shrink: 0; line-height: 1.4; width: auto;
+        background: #374151; color: #d1d5db;
+      }
+      .pd-btn:hover { background: #4b5563; }
+      .pd-btn.red { background: #7f1d1d; color: #fca5a5; }
+      .pd-btn.red:hover { background: #991b1b; }
+      .pd-excl { accent-color: #f59e0b; cursor: pointer; flex-shrink: 0; }
+      .pd-edit-row {
+        display: flex; flex-direction: column; gap: 3px;
+        background: #0f172a; border-radius: 4px; padding: 5px; margin: 2px 0;
+      }
+      .pd-edit-row input {
+        border: 1px solid #374151; border-radius: 4px; padding: 3px 5px;
+        background: #1e293b; color: #f9fafb; font-size: 10px; font-family: inherit; width: 100%;
+      }
+      .pd-edit-btns { display: flex; gap: 4px; }
+      .pd-edit-btns button { width: auto; font-size: 9px; padding: 3px 8px; }
+      #pd-refresh { width: auto; font-size: 9px; padding: 2px 7px; background: #374151; }
+      #pd-search {
+        width: 100%; border: 1px solid #374151; border-radius: 4px;
+        padding: 4px 6px; background: #0f172a; color: #f9fafb;
+        font-size: 10px; margin-bottom: 6px; font-family: inherit;
+      }
+      .pd-broken-banner {
+        display: none;
+        align-items: center;
+        gap: 6px;
+        padding: 5px 6px;
+        margin-bottom: 6px;
+        border-radius: 4px;
+        border: 1px solid #7f1d1d;
+        background: #450a0a;
+        color: #fecaca;
+        font-size: 10px;
+      }
+      #pd-broken-toggle {
+        width: auto;
+        margin-left: auto;
+        padding: 2px 7px;
+        font-size: 9px;
+        background: #991b1b;
+      }
+      .pd-excl-label { font-size: 9px; color: #9ca3af; flex-shrink: 0; }
+      #problems-warning {
+        display: none;
+        margin-bottom: 6px;
+        border: 1px solid #854d0e;
+        background: #713f12;
+        color: #fde68a;
+        border-radius: 4px;
+        padding: 5px 6px;
+        font-size: 10px;
+      }
+      .problems-table-wrap {
+        max-height: 520px;
+        overflow: auto;
+        border: 1px solid #374151;
+        border-radius: 6px;
+      }
+      #problems-table {
+        width: 100%;
+        border-collapse: collapse;
+        font-size: 10px;
+      }
+      #problems-table th, #problems-table td {
+        border-bottom: 1px solid #334155;
+        padding: 5px 6px;
+        text-align: left;
+        vertical-align: top;
+      }
+      #problems-table th {
+        position: sticky;
+        top: 0;
+        background: #0f172a;
+        color: #93c5fd;
+      }
+      .problems-empty {
+        color: #9ca3af;
+        font-size: 10px;
+        padding: 8px 0;
+      }
+      .problems-fix-btn {
+        width: auto;
+        padding: 3px 7px;
+        font-size: 9px;
+        background: #b45309;
+      }
+      .ai-note {
+        margin: 0 0 8px;
+        font-size: 10px;
+        line-height: 1.45;
+        color: #cbd5e1;
+      }
+      .ai-banner {
+        display: none;
+        margin-bottom: 8px;
+        padding: 7px 8px;
+        border-radius: 6px;
+        border: 1px solid #14532d;
+        background: #052e16;
+        color: #bbf7d0;
+        font-size: 10px;
+        line-height: 1.45;
+      }
+      .ai-banner-actions {
+        display: flex;
+        gap: 6px;
+        margin-top: 6px;
+      }
+      .ai-banner-actions button {
+        width: auto;
+        padding: 4px 8px;
+        font-size: 10px;
+      }
+      #ai-missing-key {
+        display: none;
+        margin-bottom: 8px;
+        padding: 7px 8px;
+        border-radius: 6px;
+        border: 1px solid #854d0e;
+        background: #451a03;
+        color: #fde68a;
+        font-size: 10px;
+        line-height: 1.45;
+      }
+      #ai-chat {
+        min-height: 220px;
+        max-height: 340px;
+        overflow-y: auto;
+        background: #0f172a;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        padding: 8px;
+      }
+      .ai-msg {
+        margin-bottom: 8px;
+        padding: 7px 8px;
+        border-radius: 8px;
+        font-size: 10px;
+        line-height: 1.5;
+        white-space: pre-wrap;
+      }
+      .ai-msg.user {
+        background: #1d4ed8;
+        color: #eff6ff;
+        margin-left: 20px;
+      }
+      .ai-msg.assistant {
+        background: #1e293b;
+        color: #e5e7eb;
+        margin-right: 20px;
+      }
+      .ai-msg.system {
+        background: #111827;
+        border: 1px dashed #334155;
+        color: #9ca3af;
+      }
+      .ai-controls {
+        display: flex;
+        gap: 6px;
+        margin-top: 8px;
+      }
+      #ai-input {
+        width: 100%;
+        border: 1px solid #374151;
+        border-radius: 6px;
+        padding: 8px 9px;
+        background: #0f172a;
+        color: #f9fafb;
+        font-size: 11px;
+        font-family: inherit;
+      }
+      #ai-analyse {
+        background: #0f766e;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <h1>Parish Trainer <span class="guided-badge">Guided ✓</span></h1>
+
+      <p id="status">Ready.</p>
+
+      <div class="sp-tabs">
+        <button id="tab-trainer" class="sp-tab active" type="button">🛠️ Trainer</button>
+        <button id="tab-problems" class="sp-tab" type="button">🚨 Problems</button>
+      </div>
+
+      <div id="panel-trainer" class="sp-panel active">
+
+      <!-- Guided mode wizard — 3 simple choices -->
+      <div class="section operator-hidden" aria-hidden="true">
+        <div class="section-title">What do you see on screen?</div>
+        <div class="btn-col">
+          <button id="wizard-pdf" class="green">📄 Get a PDF (recommended)</button>
+          <button id="wizard-image">🖼️ Get an image (newsletter screenshot)</button>
+          <button id="wizard-pick-image">🖼️ Pick an image on this page</button>
+          <button id="wizard-link">🔗 I need to click something first</button>
+        </div>
+      </div>
+
+      <!-- Advanced / More options -->
+      <details class="operator-hidden" aria-hidden="true">
+        <summary>⚙️ Advanced / More options</summary>
+        <div class="inner section">
+          <div class="btn-col">
+            <button id="mark-element" type="button">✨ Mark this element</button>
+            <button id="crop-btn"  type="button">Crop Bulletin Image</button>
+          </div>
+          <p class="note">Auto-detects PDF/link/image/frame. Use Crop for drag-select screenshots.</p>
+        </div>
+      </details>
+
+      <!-- GitHub Settings -->
+      <details id="gh-settings-details">
+        <summary>🔑 GitHub Settings (one-time setup)</summary>
+        <div class="inner section">
+          <p class="note" style="margin-bottom:5px;">Enter your GitHub Personal Access Token (PAT) and repository to enable pushing recipes directly to GitHub without running train.py.</p>
+          <label style="font-size:10px;color:#93c5fd;display:block;margin-bottom:2px;">Personal Access Token</label>
+          <input id="gh-pat" type="password" placeholder="ghp_…" style="width:100%;border:1px solid #374151;border-radius:4px;padding:4px 6px;background:#0f172a;color:#f9fafb;font-size:10px;margin-bottom:5px;box-sizing:border-box;font-family:inherit;" />
+          <label style="font-size:10px;color:#93c5fd;display:block;margin-bottom:2px;">Repository (owner/repo)</label>
+          <input id="gh-repo" type="text" placeholder="Frankytyrone/parish_harvester" style="width:100%;border:1px solid #374151;border-radius:4px;padding:4px 6px;background:#0f172a;color:#f9fafb;font-size:10px;margin-bottom:5px;box-sizing:border-box;font-family:inherit;" />
+          <p class="note" style="margin-top:4px;">📚 Site patterns are learned automatically when you push recipes (saved to parishes/site_patterns.json on GitHub).</p>
+          <button id="gh-save" type="button" class="green">💾 Save settings</button>
+          <p id="gh-save-status" class="note" style="margin-top:4px;"></p>
+        </div>
+      </details>
+
+      <div id="stale-banner" style="display:none; background:#450a0a; border:1px solid #7f1d1d; border-radius:4px; padding:6px 8px; margin-bottom:8px; font-size:10px; color:#fecaca;">
+        <div style="display:flex;align-items:center;gap:6px;margin-bottom:4px;">
+          <span id="stale-banner-text">⚠️ 0 bulletins may be stale</span>
+          <button id="stale-banner-toggle" type="button" style="margin-left:auto;font-size:9px;padding:2px 7px;background:#991b1b;">Show</button>
+        </div>
+        <div id="stale-list" style="display:none;margin-top:4px;max-height:120px;overflow-y:auto;"></div>
+      </div>
+
+      <!-- Parish Directory -->
+      <details id="parish-dir-details">
+        <summary>📋 Parish Directory</summary>
+        <div class="inner section">
+          <div style="display:flex;align-items:center;gap:5px;margin-bottom:5px;">
+            <span style="font-size:10px;color:#6b7280;flex:1;">Browse parishes, open bulletin pages, update links, and control the mega PDF.</span>
+            <button id="pd-refresh" type="button">↺ Refresh</button>
+          </div>
+          <div id="pd-broken-banner" class="pd-broken-banner">
+            <span id="pd-broken-text">⚠️ 0 Parishes need attention</span>
+            <button id="pd-broken-toggle" type="button">Show Broken Only</button>
+          </div>
+          <input id="pd-search" type="search" placeholder="Search parish name…" />
+          <div id="parish-dir-loading" style="font-size:10px;color:#6b7280;display:none;">⏳ Loading…</div>
+          <div id="parish-dir-error"  style="font-size:10px;color:#fca5a5;display:none;"></div>
+          <div id="parish-dir-content"></div>
+          <p class="note" style="margin-top:4px;">📌 saves a parish bulletin override from the active tab URL. ☑ skips a parish in this week's mega PDF. 📁 opens parish details (URL, recipe changes, repo/mega timestamps).</p>
+        </div>
+      </details>
+      </div>
+
+      <div id="panel-problems" class="sp-panel">
+        <div class="section">
+          <div id="problems-warning">⚠️ Could not load latest report (offline?)</div>
+          <div class="problems-table-wrap">
+            <table id="problems-table">
+              <thead>
+                <tr>
+                  <th>Parish</th>
+                  <th>Failure category</th>
+                  <th>Last seen</th>
+                  <th>Consecutive failures</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="problems-body"></tbody>
+            </table>
+          </div>
+          <div id="problems-empty" class="problems-empty">Loading…</div>
+        </div>
+      </div>
+    </div>
+    <script src="sidepanel.js"></script>
+  </body>
+</html>

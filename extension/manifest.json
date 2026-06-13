@@ -1,0 +1,38 @@
+{
+  "manifest_version": 3,
+  "name": "Parish Trainer",
+  "version": "1.34.1",
+  "update_url": "https://frankytyrone.github.io/parish_harvester/updates.xml",
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "scripting",
+    "contextMenus",
+    "storage"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Parish Trainer",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "pattern_library.js",
+        "click-chain.js",
+        "isolated.js",
+        "content.js"
+      ],
+      "run_at": "document_idle",
+      "world": "ISOLATED"
+    }
+  ]
+}

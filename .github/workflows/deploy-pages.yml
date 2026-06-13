@@ -1,0 +1,220 @@
+name: Deploy mega PDFs to GitHub Pages
+# Core release workflow. Keep independent from advisory Copilot workflows,
+# which can be rate-limited (HTTP 429) and should not block pages publishing.
+
+on:
+  workflow_run:
+    workflows: ["Harvest Parish Bulletins"]
+    types:
+      - completed
+  push:
+    branches: [main]
+    paths:
+      - docs/**
+      - extension/**
+      - mega_pdf/**
+      - updates.xml
+      - .github/workflows/deploy-pages.yml
+  workflow_dispatch:
+
+permissions:
+  pages: write
+  id-token: write
+  contents: write
+
+jobs:
+  deploy:
+    if: github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Download mega PDF artifacts from harvest run
+        if: github.event_name == 'workflow_run'
+        uses: actions/download-artifact@v4.1.3
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ github.event.workflow_run.id }}
+          pattern: "*-mega-bulletin-pdf"
+          path: _harvest_artifacts
+          merge-multiple: true
+
+      - name: Verify mega PDFs for Pages deploy
+        env:
+          EVENT_NAME: ${{ github.event_name }}
+          WORKFLOW_RUN_ID: ${{ github.event.workflow_run.id || '' }}
+        run: |
+          set -euo pipefail
+          mkdir -p mega_pdf
+          find mega_pdf -maxdepth 1 -type f -name '*_mega_bulletin.pdf' -delete
+          if [ -d _harvest_artifacts ]; then
+            while IFS= read -r -d '' pdf; do
+              dest="mega_pdf/$(basename "${pdf}")"
+              if [ -e "${dest}" ]; then
+                echo "Error: duplicate mega PDF filename downloaded: ${dest}"
+                exit 1
+              fi
+              cp "${pdf}" "${dest}"
+            done < <(find _harvest_artifacts -type f -name '*_mega_bulletin.pdf' -print0)
+          fi
+          shopt -s nullglob
+          pdfs=(mega_pdf/*_mega_bulletin.pdf)
+          if [ "${EVENT_NAME}" = "workflow_run" ] && [ ${#pdfs[@]} -eq 0 ]; then
+            echo "::warning::Error: no mega PDF artifacts were downloaded from workflow run ${WORKFLOW_RUN_ID:-unknown}."
+            echo "This usually means the harvest produced only HTML-only links this week, or the harvest itself failed."
+            echo "Skipping Pages deploy — the previously-deployed Pages site remains live."
+            echo "DEPLOY_SKIP_NO_ARTIFACTS=true" >> "$GITHUB_ENV"
+          fi
+          for pdf in "${pdfs[@]}"; do
+            if [ ! -s "${pdf}" ]; then
+              echo "Error: mega PDF is missing or empty: ${pdf}"
+              exit 1
+            fi
+            if ! python3 -c "import sys; sig=open(sys.argv[1],'rb').read(5); sys.exit(0 if sig==b'%PDF-' else 1)" "${pdf}"; then
+              echo "Error: file does not look like a PDF: ${pdf}"
+              exit 1
+            fi
+            ls -lh "${pdf}"
+          done
+
+      - name: Build Pages site (mega PDFs + extension updates)
+        if: env.DEPLOY_SKIP_NO_ARTIFACTS != 'true'
+        env:
+          CHROME_EXTENSION_APP_ID: ${{ vars.CHROME_EXTENSION_APP_ID }}
+          EVENT_NAME: ${{ github.event_name }}
+        run: |
+          set -euo pipefail
+          rm -rf _site
+          mkdir -p _site
+          if [ -d docs ]; then
+            cp -a docs/. _site/
+          fi
+          if [ -d mega_pdf ]; then
+            mkdir -p _site/mega_pdf
+            cp -a mega_pdf/. _site/mega_pdf/
+          fi
+
+          mkdir -p _site/extension
+          zip -qr _site/extension/parish_trainer.zip extension
+          if [ ! -s _site/extension/parish_trainer.zip ]; then
+            echo "Error: extension package was not generated or is empty."
+            exit 1
+          fi
+
+          VERSION=$(python3 -c "import json,pathlib; m=json.loads(pathlib.Path('extension/manifest.json').read_text()); print(m.get('version','0.0.0'))")
+          PREV_VERSION="unknown"
+          MANIFEST_BUMPED="false"
+          if git rev-parse --verify HEAD^ >/dev/null 2>&1; then
+            PREV_VERSION=$(python3 -c "import json,subprocess; r=subprocess.run(['git','show','HEAD^:extension/manifest.json'],capture_output=True,text=True); print(json.loads(r.stdout).get('version','unknown') if r.returncode==0 and r.stdout.strip() else 'unknown')" 2>/dev/null || echo "unknown")
+            if git diff --name-only HEAD^ HEAD | grep -qx 'extension/manifest.json'; then
+              MANIFEST_BUMPED="true"
+            fi
+          fi
+
+          if [ -z "${CHROME_EXTENSION_APP_ID:-}" ]; then
+            echo "Warning: CHROME_EXTENSION_APP_ID not set, using placeholder." >&2
+            APP_ID="REPLACE_WITH_EXTENSION_ID"
+          else
+            APP_ID="${CHROME_EXTENSION_APP_ID}"
+          fi
+
+          PAGES_BASE="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}"
+
+          python3 -c "import sys; a,b,v=sys.argv[1],sys.argv[2],sys.argv[3]; open('_site/updates.xml','w').write('<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<gupdate xmlns=\"http://www.google.com/update2/response\" protocol=\"2.0\">\n  <app appid=\"'+a+'\">\n    <updatecheck codebase=\"'+b+'/extension/parish_trainer.zip\" version=\"'+v+'\" />\n  </app>\n</gupdate>\n')" "${APP_ID}" "${PAGES_BASE}" "${VERSION}"
+
+          if ! grep -Fq "version=\"${VERSION}\"" _site/updates.xml; then
+            echo "Error: generated updates.xml does not contain extension version ${VERSION}."
+            exit 1
+          fi
+
+          {
+            echo "EXTENSION_PREV_VERSION=${PREV_VERSION}"
+            echo "EXTENSION_NEW_VERSION=${VERSION}"
+            echo "EXTENSION_MANIFEST_BUMPED=${MANIFEST_BUMPED}"
+            echo "EXTENSION_PACKAGE_URL=${PAGES_BASE}/extension/parish_trainer.zip"
+            echo "EXTENSION_UPDATES_URL=${PAGES_BASE}/updates.xml"
+          } >> "$GITHUB_ENV"
+
+      - name: Upload Pages artifact
+        if: env.DEPLOY_SKIP_NO_ARTIFACTS != 'true'
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: _site/
+
+      - name: Deploy to GitHub Pages
+        if: env.DEPLOY_SKIP_NO_ARTIFACTS != 'true'
+        id: deployment
+        uses: actions/deploy-pages@v4
+
+      - name: Publish deploy summary
+        if: env.DEPLOY_SKIP_NO_ARTIFACTS != 'true'
+        run: |
+          set -euo pipefail
+          {
+            echo "## 🚀 Pages deploy summary"
+            echo ""
+            echo "| Field | Value |"
+            echo "|---|---|"
+            echo "| Previous extension version | ${EXTENSION_PREV_VERSION:-unknown} |"
+            echo "| New extension version | ${EXTENSION_NEW_VERSION:-unknown} |"
+            echo "| Manifest changed in commit | ${EXTENSION_MANIFEST_BUMPED:-false} |"
+            echo "| Extension package URL | ${EXTENSION_PACKAGE_URL:-not-set} |"
+            echo "| Update manifest URL | ${EXTENSION_UPDATES_URL:-not-set} |"
+            echo "| Deployed Pages URL | ${{ steps.deployment.outputs.page_url }} |"
+          } >> "$GITHUB_STEP_SUMMARY"
+
+      - name: Clean mega PDFs from repository after deploy
+        if: github.event_name == 'workflow_run' && env.DEPLOY_SKIP_NO_ARTIFACTS != 'true'
+        run: |
+          set -euo pipefail
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          mkdir -p mega_pdf Bulletins/current
+          find mega_pdf -maxdepth 1 -type f -name '*.pdf' -delete || true
+          find Bulletins/current -maxdepth 1 -type f -name '*.pdf' -delete || true
+          find Bulletins -maxdepth 1 -type f -name 'all_bulletins_*.pdf' -delete || true
+          touch mega_pdf/.gitkeep Bulletins/current/.gitkeep
+          shopt -s nullglob
+          pdfs=(Bulletins/all_bulletins_*.pdf)
+          if [ ${#pdfs[@]} -gt 0 ]; then
+            git add -A mega_pdf Bulletins/current "${pdfs[@]}"
+          else
+            git add -A mega_pdf Bulletins/current
+          fi
+          if git diff --cached --quiet; then
+            echo "ℹ️  No staged cleanup changes — skipping commit."
+            exit 0
+          fi
+          git commit -m "chore: clean deployed PDFs [skip ci]"
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD:main; then
+              echo "✅ Cleanup pushed on attempt ${attempt}"
+              exit 0
+            fi
+            echo "⚠️  Cleanup push attempt ${attempt} failed; pulling --rebase and retrying…"
+            git pull --rebase origin main || {
+              echo "❌ Rebase failed during cleanup; aborting."
+              git rebase --abort || true
+              exit 1
+            }
+          done
+          echo "❌ Could not push cleanup commit after 5 attempts."
+          exit 1
+
+      - name: Publish skip summary
+        if: env.DEPLOY_SKIP_NO_ARTIFACTS == 'true'
+        env:
+          WORKFLOW_RUN_ID: ${{ github.event.workflow_run.id || '' }}
+        run: |
+          set -euo pipefail
+          {
+            echo "## ⏭️ Pages deploy skipped"
+            echo ""
+            echo "No mega PDF artifacts were downloaded from workflow run ${WORKFLOW_RUN_ID:-unknown}."
+            echo "Harvest likely produced only HTML-only links this week, or the upstream harvest failed."
+            echo "Skipping deploy intentionally — the previously-deployed Pages site remains live."
+          } >> "$GITHUB_STEP_SUMMARY"

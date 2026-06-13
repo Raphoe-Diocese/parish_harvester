@@ -1,0 +1,1492 @@
+const statusEl = document.getElementById("status");
+
+function setStatus(text, type) {
+  statusEl.textContent = text;
+  statusEl.className = type || "ok";
+  statusEl.dataset.status =
+    type === "err"
+      ? "error"
+      : (type === "warn" ? "warning" : (String(text || "").startsWith("⏳") ? "pending" : "success"));
+}
+
+const _spPanels = {
+  trainer: {
+    tab: document.getElementById("tab-trainer"),
+    panel: document.getElementById("panel-trainer"),
+  },
+  problems: {
+    tab: document.getElementById("tab-problems"),
+    panel: document.getElementById("panel-problems"),
+  },
+};
+
+function _spShowPanel(name) {
+  for (const [key, refs] of Object.entries(_spPanels)) {
+    const active = key === name;
+    refs.tab.classList.toggle("active", active);
+    refs.panel.classList.toggle("active", active);
+  }
+  if (name === "problems") {
+    void loadProblemsDashboard();
+  }
+}
+
+const _spStorageGet = (keys) => new Promise((resolve) => {
+  chrome.storage.local.get(keys, (result) => resolve(result || {}));
+});
+
+const _spStorageSet = (payload) => new Promise((resolve) => {
+  chrome.storage.local.set(payload, () => resolve(!chrome.runtime?.lastError));
+});
+
+const _clearElement = (el) => {
+  if (el) el.replaceChildren();
+};
+
+async function withActiveTab(callback) {
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  if (!tab?.id) {
+    setStatus("No active tab.", "err");
+    return;
+  }
+  callback(tab);
+}
+
+function _dispatchErrorText(result) {
+  if (!result) return "Could not communicate with page. Try refreshing.";
+  if (result.reason === "unsupported_url") {
+    return "This tab cannot be scripted. Open a normal http/https page.";
+  }
+  if (result.reason === "inject_failed") {
+    return "Page script bridge failed to load. Refresh the page and try again.";
+  }
+  if (result.reason === "receiver_unavailable") {
+    return "Page bridge not responding. Refresh the tab and try again.";
+  }
+  return result.error || "Could not communicate with page.";
+}
+
+async function sendToActiveTab(message, successText) {
+  console.log("[PH-SAVE]", { action: message?.type || "unknown", request: message, phase: "request" });
+  await withActiveTab((tab) => {
+    if (!/^https?:\/\//i.test(tab.url || "")) {
+      setStatus("This tab is not scriptable. Open a normal http/https page.", "err");
+      return;
+    }
+    chrome.runtime.sendMessage({
+      type: "dispatch_to_tab",
+      tabId: tab.id,
+      payload: message,
+      allowInject: true,
+    }, (result) => {
+      console.log("[PH-SAVE]", { action: message?.type || "unknown", request: message, response: result || null });
+      if (chrome.runtime.lastError) {
+        setStatus(`Could not communicate with extension background: ${chrome.runtime.lastError.message}`, "err");
+        return;
+      }
+      if (!result?.ok) {
+        setStatus(`❌ ${result?.reason || _dispatchErrorText(result)}`, "err");
+        return;
+      }
+      setStatus(result?.reason ? `✅ ${result.reason}` : successText, "ok");
+    });
+  });
+}
+
+// ── Guided Mode wizard ────────────────────────────────────────────────────
+
+document.getElementById("wizard-pdf").addEventListener("click", () => {
+  void sendToActiveTab({ type: "mark_file" }, "✅ Bulletin PDF URL recorded.");
+});
+
+document.getElementById("wizard-image").addEventListener("click", () => {
+  void sendToActiveTab(
+    { type: "start_crop" },
+    "🖼️ Draw a rectangle around the bulletin image…"
+  );
+});
+
+document.getElementById("wizard-link").addEventListener("click", () => {
+  void sendToActiveTab(
+    { type: "start_pick_link" },
+    "🎯 Hover over a link and click to select it…"
+  );
+});
+
+document.getElementById("wizard-pick-image").addEventListener("click", () => {
+  void sendToActiveTab(
+    { type: "start_pick_image" },
+    "🖼️ Hover over an image and click to select it…"
+  );
+});
+
+// ── Advanced / fallback buttons ───────────────────────────────────────────
+
+document.getElementById("mark-element").addEventListener("click", () => {
+  void sendToActiveTab({ type: "mark_element" }, "✅ Element marked.");
+});
+
+document.getElementById("crop-btn").addEventListener("click", async () => {
+  await sendToActiveTab(
+    { type: "start_crop" },
+    "Click and drag to select the bulletin area…"
+  );
+});
+
+// ── GitHub Settings ────────────────────────────────────────────────────────
+
+// Load saved settings on open
+chrome.storage.local.get(["gh_pat", "gh_repo"], (r) => {
+  const patInput  = document.getElementById("gh-pat");
+  const repoInput = document.getElementById("gh-repo");
+  if (patInput  && r.gh_pat)  patInput.value  = r.gh_pat;
+  if (repoInput && r.gh_repo) repoInput.value = r.gh_repo;
+});
+
+document.getElementById("gh-save").addEventListener("click", () => {
+  const pat  = (document.getElementById("gh-pat").value  || "").trim();
+  const repo = (document.getElementById("gh-repo").value || "").trim();
+  const status = document.getElementById("gh-save-status");
+  chrome.storage.local.set({
+    gh_pat: pat,
+    gh_repo: repo,
+  }, () => {
+    if (chrome.runtime.lastError) {
+      status.textContent = `❌ Save failed: ${chrome.runtime.lastError.message}`;
+      status.style.color = "#fca5a5";
+      setTimeout(() => { status.textContent = ""; }, 4000);
+      return;
+    }
+    if (!pat || !repo) {
+      status.textContent = "⚠️ Saved. Add GitHub PAT + repo to enable recipe push.";
+      status.style.color = "#fde68a";
+    } else {
+      status.textContent = "✅ Settings saved.";
+      status.style.color = "#86efac";
+    }
+    if (pat && repo) {
+      const details = document.getElementById("parish-dir-details");
+      if (details?.open) loadParishDirectory();
+    }
+    setTimeout(() => { status.textContent = ""; }, 3000);
+  });
+});
+
+
+
+
+// ── Parish Directory ───────────────────────────────────────────────────────
+//
+// Shows all parishes grouped by diocese with:
+//   • Click name  → open the parish bulletin page
+//   • ✏️  button  → edit the # page: URL in the evidence file
+//   • ☠️  button  → push a dead recipe to GitHub
+//   • exclude ☑   → add / remove the parish key from parishes/mega_excludes.json
+
+const PD_EVIDENCE_FILES = {
+  "Derry Diocese":         "parishes/derry_diocese_bulletin_urls.txt",
+  "Down & Connor Diocese": "parishes/down_and_connor_bulletin_urls.txt",
+  "Raphoe Diocese":        "parishes/raphoe_diocese_bulletin_urls.txt",
+};
+const MEGA_EXCLUDES_PATH = "parishes/mega_excludes.json";
+const MANUAL_OVERRIDES_PATH = "parishes/manual_overrides.json";
+const LAST_INCLUDED_PATH = "parishes/last_included.json";
+const CONSECUTIVE_FAILURES_PATH = "parishes/consecutive_failures.json";
+const STALE_BULLETINS_PATH = "parishes/stale_bulletins.json";
+const CURRENT_BULLETINS_PATH_PREFIX = "Bulletins/current";
+const _pdParishDetailsCache = {}; // key -> details payload
+const PROBLEMS_REPORT_URL = "https://raw.githubusercontent.com/Frankytyrone/parish_harvester/main/Bulletins/report.json";
+const PROBLEMS_CONSECUTIVE_URL = "https://raw.githubusercontent.com/Frankytyrone/parish_harvester/main/parishes/consecutive_failures.json";
+
+// Replicate Python's _url_to_key logic
+function _pdUrlToKey(url, headerName = "") {
+  try {
+    const parsed = new URL(url);
+    let hostname = parsed.hostname.toLowerCase().replace(/^www\d*\./, "");
+    if (/\bi\d+\.wp\.com\b/.test(hostname)) {
+      const parts = parsed.pathname.replace(/^\//, "").split("/");
+      if (parts.length > 0) {
+        const real = parts[0].toLowerCase().replace(/^www\d*\./, "");
+        const segs = real.split(".");
+        if (segs.length >= 2) return segs[0];
+      }
+    }
+    if (hostname === "filesafe.space" || hostname.endsWith(".filesafe.space") || hostname === "google.com" || hostname.endsWith(".google.com")) {
+      if (headerName) return headerName.toLowerCase().split("(")[0].trim().replace(/[^a-z0-9]/g, "");
+      return hostname.split(".")[0].replace(/[^a-z0-9]/g, "");
+    }
+    return hostname.split(".")[0] || hostname;
+  } catch (_e) {
+    return "";
+  }
+}
+
+function _pdParseEvidence(text, dioceseName) {
+  const parishes = [];
+  let cur = null;
+
+  for (const rawLine of text.split("\n")) {
+    const line = rawLine.trim();
+    const nameMatch = line.match(/^#\s*---\s*(.+?)\s*---\s*$/);
+    if (nameMatch) {
+      if (cur) parishes.push(cur);
+      cur = { name: nameMatch[1], diocese: dioceseName, pageUrl: null, keyOverride: null, bulletinUrls: [], disabled: false, key: null };
+      continue;
+    }
+    if (!cur) continue;
+    const pageMatch = line.match(/^#\s*page:\s*(.+)$/i);
+    if (pageMatch) { cur.pageUrl = pageMatch[1].trim(); continue; }
+    const keyMatch = line.match(/^#\s*key:\s*(.+)$/i);
+    if (keyMatch) { cur.keyOverride = keyMatch[1].trim(); continue; }
+    if (/^#\s*DISABLED/i.test(line)) { cur.disabled = true; }
+    if (line.startsWith("#") || !line) continue;
+    cur.bulletinUrls.push(line);
+  }
+  if (cur) parishes.push(cur);
+
+  for (const p of parishes) {
+    const firstUrl = p.bulletinUrls[0] || p.pageUrl || "";
+    p.key = p.keyOverride || (firstUrl ? _pdUrlToKey(firstUrl, p.name) : "");
+  }
+  return parishes;
+}
+
+// Update the # page: URL for a named parish in an evidence file text blob
+function _pdUpdatePageUrl(fileText, parishName, newUrl) {
+  const lines = fileText.split("\n");
+  const escaped = parishName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const headerRe = new RegExp(`^#\\s*---\\s*${escaped}\\s*---`, "i");
+  let inSection = false;
+  let replaced  = false;
+  let headerIdx = -1;
+
+  for (let i = 0; i < lines.length; i++) {
+    if (headerRe.test(lines[i].trim())) {
+      inSection = true; headerIdx = i; continue;
+    }
+    if (inSection) {
+      if (/^#\s*---/.test(lines[i].trim())) {
+        if (!replaced && headerIdx >= 0) { lines.splice(headerIdx + 1, 0, `# page: ${newUrl}`); replaced = true; }
+        break;
+      }
+      if (/^#\s*page:/i.test(lines[i].trim())) {
+        lines[i] = `# page: ${newUrl}`; replaced = true; break;
+      }
+    }
+  }
+  if (!replaced && headerIdx >= 0) lines.splice(headerIdx + 1, 0, `# page: ${newUrl}`);
+  return lines.join("\n");
+}
+
+// ── Communication helpers ─────────────────────────────────────────────────
+
+function _pdDecodeGithubContent(data) {
+  return decodeURIComponent(
+    atob(String(data?.content || "").replace(/\n/g, ""))
+      .split("")
+      .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+      .join("")
+  );
+}
+
+async function _pdGhFetch(path) {
+  const cfg = await _pdGetGithubConfig();
+  if (!cfg) throw new Error("GitHub PAT or repo not configured.");
+
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 25000);
+  try {
+    const apiUrl = `https://api.github.com/repos/${cfg.ghRepo}/contents/${path}`;
+    const resp = await fetch(apiUrl, {
+      signal: controller.signal,
+      headers: {
+        Authorization: `token ${cfg.ghPat}`,
+        Accept: "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+      },
+    });
+    if (resp.status === 404) throw new Error(`File not found: ${path}`);
+    if (!resp.ok) throw new Error(`GitHub ${resp.status}: ${resp.statusText}`);
+    const data = await resp.json();
+    return { content: _pdDecodeGithubContent(data), sha: data.sha };
+  } catch (err) {
+    if (err?.name === "AbortError") {
+      throw new Error(`Timed out loading ${path} from GitHub.`);
+    }
+    throw err;
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+function _pdGhPush(path, content, commitMsg) {
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage({ type: "push_github_file", path, content, commitMessage: commitMsg }, (res) => {
+      if (chrome.runtime.lastError) { reject(new Error(chrome.runtime.lastError.message)); return; }
+      resolve(res);
+    });
+  });
+}
+
+// ── Harvest workflow dispatch ──────────────────────────────────────────────
+
+async function _pdDispatchHarvest(parishKey) {
+  const cfg = await _pdGetGithubConfig();
+  if (!cfg) return { ok: false, error: "GitHub not configured." };
+  try {
+    const resp = await fetch(
+      `https://api.github.com/repos/${cfg.ghRepo}/actions/workflows/harvest.yml/dispatches`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `token ${cfg.ghPat}`,
+          Accept: "application/vnd.github+json",
+          "Content-Type": "application/json",
+          "X-GitHub-Api-Version": "2022-11-28",
+        },
+        body: JSON.stringify({ ref: "main", inputs: { diocese: "all", target_parish: parishKey } }),
+      }
+    );
+    if (resp.status === 204) return { ok: true };
+    if (resp.status === 403) return { ok: false, error: "PAT missing 'workflow' scope." };
+    return { ok: false, error: `Dispatch failed (${resp.status}).` };
+  } catch (err) {
+    return { ok: false, error: String(err) };
+  }
+}
+
+// ── Mega-excludes helpers ─────────────────────────────────────────────────
+
+let _pdExcludes = null; // cached array of parish keys
+
+async function _pdLoadExcludes() {
+  if (_pdExcludes !== null) return _pdExcludes;
+  try {
+    const { content } = await _pdGhFetch(MEGA_EXCLUDES_PATH);
+    _pdExcludes = JSON.parse(content);
+  } catch (_e) {
+    _pdExcludes = [];
+  }
+  return _pdExcludes;
+}
+
+async function _pdSaveExcludes(excludes) {
+  _pdExcludes = excludes;
+  const content = JSON.stringify(excludes.sort(), null, 2);
+  return _pdGhPush(MEGA_EXCLUDES_PATH, content, "excludes: update mega PDF exclude list [from extension]");
+}
+
+// ── Manual bulletin overrides ───────────────────────────────────────────────
+
+let _pdOverrides = null; // key -> {url,type,updated_at,source}
+
+function _pdInferOverrideType(url) {
+  const lower = (url || "").toLowerCase();
+  if (lower.endsWith(".docx")) return "docx";
+  if (lower.match(/\.(jpg|jpeg|png|webp)(\?|$)/)) return "image";
+  if (lower.endsWith(".pdf") || lower.includes(".pdf?")) return "download";
+  return "html";
+}
+
+async function _pdLoadOverrides() {
+  if (_pdOverrides !== null) return _pdOverrides;
+  try {
+    const { content } = await _pdGhFetch(MANUAL_OVERRIDES_PATH);
+    const parsed = JSON.parse(content);
+    _pdOverrides = parsed && typeof parsed === "object" ? parsed : {};
+  } catch (_e) {
+    _pdOverrides = {};
+  }
+  return _pdOverrides;
+}
+
+async function _pdSaveOverrides(overrides) {
+  _pdOverrides = overrides;
+  const content = JSON.stringify(overrides, null, 2);
+  return _pdGhPush(
+    MANUAL_OVERRIDES_PATH,
+    content,
+    "overrides: update manual bulletin URL overrides [from extension]"
+  );
+}
+
+function _pdGetOverride(parishKey) {
+  if (!_pdOverrides || !parishKey) return null;
+  const raw = _pdOverrides[parishKey];
+  if (!raw || typeof raw !== "object") return null;
+  if (typeof raw.url !== "string" || !/^https?:\/\//i.test(raw.url)) return null;
+  return raw;
+}
+
+// ── Last-included timestamps ───────────────────────────────────────────────
+
+let _pdLastIncluded = null; // key -> ISO string
+
+async function _pdLoadLastIncluded() {
+  if (_pdLastIncluded !== null) return _pdLastIncluded;
+  try {
+    const { content } = await _pdGhFetch(LAST_INCLUDED_PATH);
+    const parsed = JSON.parse(content);
+    _pdLastIncluded = (parsed && typeof parsed === "object") ? parsed : {};
+  } catch (_e) {
+    _pdLastIncluded = {};
+  }
+  return _pdLastIncluded;
+}
+
+function _pdDioceseSlug(dioceseName) {
+  const info = _pdDioceseTexts[dioceseName];
+  if (!info?.path) return "";
+  const m = info.path.match(/^parishes\/(.+)_bulletin_urls\.txt$/);
+  if (!m) return "";
+  const slug = m[1];
+  if (slug === "derry_diocese") return "derry";
+  if (slug === "down_and_connor_diocese") return "down_and_connor";
+  if (slug === "raphoe_diocese") return "raphoe";
+  return slug;
+}
+
+async function _pdGetGithubConfig() {
+  try {
+    const cfg = await chrome.storage.local.get(["gh_pat", "gh_repo"]);
+    const ghPat = String(cfg?.gh_pat || "").trim();
+    const ghRepo = String(cfg?.gh_repo || "").trim();
+    if (!ghPat || !ghRepo) return null;
+    return { ghPat, ghRepo };
+  } catch (_e) {
+    return null;
+  }
+}
+
+function _pdFormatTime(ts) {
+  if (!ts) return "—";
+  const d = new Date(ts);
+  if (Number.isNaN(d.getTime())) return "—";
+  return formatUkDate(d.toISOString().slice(0, 10));
+}
+
+function formatUkDate(isoDate) {
+  const value = String(isoDate || "").trim();
+  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (!match) return "—";
+  return `${match[3]}/${match[2]}/${match[1]}`;
+}
+
+async function _pdFetchLatestCommitTime(path) {
+  const cfg = await _pdGetGithubConfig();
+  if (!cfg) return "";
+  const endpoint = `https://api.github.com/repos/${cfg.ghRepo}/commits?path=${encodeURIComponent(path)}&per_page=1`;
+  try {
+    const resp = await fetch(endpoint, {
+      headers: {
+        Authorization: `token ${cfg.ghPat}`,
+        Accept: "application/vnd.github+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+      },
+    });
+    if (!resp.ok) return "";
+    const data = await resp.json();
+    const first = Array.isArray(data) ? data[0] : null;
+    return first?.commit?.committer?.date || first?.commit?.author?.date || "";
+  } catch (_e) {
+    return "";
+  }
+}
+
+async function _pdLoadRecipeForParish(parish) {
+  const key = parish.key;
+  if (!key) return { recipe: null, path: "" };
+  const slug = _pdDioceseSlug(parish.diocese);
+  const candidates = [
+    slug ? `parishes/recipes/${slug}/${key}.json` : "",
+    `parishes/recipes/${key}.json`,
+    `parishes/recipes/unknown/${key}.json`,
+  ].filter(Boolean);
+  for (const path of candidates) {
+    try {
+      const { content } = await _pdGhFetch(path);
+      return { recipe: JSON.parse(content), path };
+    } catch (_e) {
+      // try next
+    }
+  }
+  return { recipe: null, path: "" };
+}
+
+function _pdRecipeTerminalUrl(recipe) {
+  const steps = Array.isArray(recipe?.steps) ? recipe.steps : [];
+  for (let i = steps.length - 1; i >= 0; i -= 1) {
+    const step = steps[i] || {};
+    const action = String(step.action || "");
+    if (!["download", "image", "html"].includes(action)) continue;
+    const url = String(step.captured_url || step.url || "").trim();
+    if (/^https?:\/\//i.test(url)) return { url, action };
+  }
+  return { url: "", action: "" };
+}
+
+function _pdConfirmedChangesList(parish, override, recipe, recipePath) {
+  const updates = [];
+  if (override?.updated_at) {
+    updates.push(`Manual override updated ${_pdFormatTime(override.updated_at)}`);
+  } else if (override?.url) {
+    updates.push("Manual override URL saved");
+  }
+  if (recipe?.recorded_date) {
+    updates.push(`Recipe updated ${formatUkDate(recipe.recorded_date)}`);
+  }
+  if (recipePath) {
+    updates.push(`Recipe file: ${recipePath}`);
+  }
+  return updates;
+}
+
+async function _pdBuildParishDetails(parish) {
+  const cached = _pdParishDetailsCache[parish.key];
+  if (cached) return cached;
+  const override = _pdGetOverride(parish.key);
+  const { recipe, path: recipePath } = await _pdLoadRecipeForParish(parish);
+  const terminal = _pdRecipeTerminalUrl(recipe);
+  const currentUrl = (override?.url || terminal.url || parish.bulletinUrls[0] || parish.pageUrl || "").trim();
+  const changes = _pdConfirmedChangesList(parish, override, recipe, recipePath);
+  const lastUpdatedRepoIso = await _pdFetchLatestCommitTime(recipePath || _pdDioceseTexts[parish.diocese]?.path || "");
+  const lastIncludedIso = (_pdLastIncluded && _pdLastIncluded[parish.key]) || "";
+  const details = {
+    currentUrl,
+    terminalAction: terminal.action,
+    changes,
+    lastUpdatedRepoIso,
+    lastIncludedIso,
+  };
+  _pdParishDetailsCache[parish.key] = details;
+  return details;
+}
+
+function _pdRenderSubfolder(container, details) {
+  _clearElement(container);
+
+  const rowUrl = document.createElement("div");
+  rowUrl.className = "pd-subfolder-row";
+  const rowUrlLabel = document.createElement("span");
+  rowUrlLabel.className = "pd-subfolder-label";
+  rowUrlLabel.textContent = "Current bulletin URL:";
+  rowUrl.appendChild(rowUrlLabel);
+  rowUrl.appendChild(document.createTextNode(" "));
+  if (details.currentUrl) {
+    const link = document.createElement("a");
+    link.className = "pd-subfolder-url";
+    link.href = details.currentUrl;
+    link.target = "_blank";
+    link.rel = "noopener noreferrer";
+    link.textContent = details.currentUrl;
+    rowUrl.appendChild(link);
+  } else {
+    const none = document.createElement("span");
+    none.className = "pd-subfolder-empty";
+    none.textContent = "Not available";
+    rowUrl.appendChild(none);
+  }
+  container.appendChild(rowUrl);
+
+  const rowChanges = document.createElement("div");
+  rowChanges.className = "pd-subfolder-row";
+  const rowChangesLabel = document.createElement("span");
+  rowChangesLabel.className = "pd-subfolder-label";
+  rowChangesLabel.textContent = "Confirmed changes:";
+  rowChanges.appendChild(rowChangesLabel);
+  rowChanges.appendChild(document.createTextNode(" "));
+  if (details.changes.length > 0) {
+    const list = document.createElement("ul");
+    list.className = "pd-subfolder-list";
+    details.changes.forEach((item) => {
+      const li = document.createElement("li");
+      li.textContent = item;
+      list.appendChild(li);
+    });
+    rowChanges.appendChild(list);
+  } else {
+    const none = document.createElement("span");
+    none.className = "pd-subfolder-empty";
+    none.textContent = "No user-confirmed changes recorded";
+    rowChanges.appendChild(none);
+  }
+  container.appendChild(rowChanges);
+
+  const rowRepo = document.createElement("div");
+  rowRepo.className = "pd-subfolder-row";
+  const rowRepoLabel = document.createElement("span");
+  rowRepoLabel.className = "pd-subfolder-label";
+  rowRepoLabel.textContent = "Last updated in harvester repo:";
+  const rowRepoTime = document.createElement("span");
+  rowRepoTime.className = "pd-subfolder-time";
+  rowRepoTime.textContent = _pdFormatTime(details.lastUpdatedRepoIso);
+  rowRepo.appendChild(rowRepoLabel);
+  rowRepo.appendChild(document.createTextNode(" "));
+  rowRepo.appendChild(rowRepoTime);
+  container.appendChild(rowRepo);
+
+  const rowMega = document.createElement("div");
+  rowMega.className = "pd-subfolder-row";
+  const rowMegaLabel = document.createElement("span");
+  rowMegaLabel.className = "pd-subfolder-label";
+  rowMegaLabel.textContent = "Last included in mega bulletin:";
+  const rowMegaTime = document.createElement("span");
+  rowMegaTime.className = "pd-subfolder-time";
+  rowMegaTime.textContent = _pdFormatTime(details.lastIncludedIso);
+  rowMega.appendChild(rowMegaLabel);
+  rowMega.appendChild(document.createTextNode(" "));
+  rowMega.appendChild(rowMegaTime);
+  container.appendChild(rowMega);
+}
+
+// ── Consecutive failures ────────────────────────────────────────────────────
+
+let _pdConsecutiveFailures = {}; // key -> number
+let _pdShowBrokenOnly = false;
+
+function _pdFailureCount(parishKey) {
+  return Number(_pdConsecutiveFailures[parishKey] || 0);
+}
+
+function _pdIsBroken(parishKey) {
+  return _pdFailureCount(parishKey) >= 2;
+}
+
+async function _pdLoadConsecutiveFailures() {
+  try {
+    const { content } = await _pdGhFetch(CONSECUTIVE_FAILURES_PATH);
+    const parsed = JSON.parse(content);
+    if (!parsed || typeof parsed !== "object") return {};
+    const normalized = {};
+    for (const [key, value] of Object.entries(parsed)) {
+      const n = Number(value);
+      normalized[key] = Number.isFinite(n) && n > 0 ? Math.floor(n) : 0;
+    }
+    return normalized;
+  } catch (_e) {
+    return {};
+  }
+}
+
+async function _pdLoadStaleBulletins() {
+  try {
+    const { content } = await _pdGhFetch(STALE_BULLETINS_PATH);
+    const parsed = JSON.parse(content);
+    const stale = Array.isArray(parsed?.stale) ? parsed.stale : [];
+    const unknown_date = Array.isArray(parsed?.unknown_date) ? parsed.unknown_date : [];
+    return { stale, unknown_date };
+  } catch (_e) {
+    return { stale: [], unknown_date: [] };
+  }
+}
+
+// ── Recipe status cache ────────────────────────────────────────────────────
+const _pdRecipeCache = {}; // key → "ok" | "dead" | "none"
+
+async function _pdCheckRecipe(key) {
+  if (_pdRecipeCache[key]) return _pdRecipeCache[key];
+  const candidates = [
+    `parishes/recipes/derry/${key}.json`,
+    `parishes/recipes/down_and_connor/${key}.json`,
+    `parishes/recipes/raphoe/${key}.json`,
+    `parishes/recipes/${key}.json`,
+    `parishes/recipes/unknown/${key}.json`,
+  ];
+  for (const path of candidates) {
+    try {
+      const { content } = await _pdGhFetch(path);
+      const data = JSON.parse(content);
+      _pdRecipeCache[key] = (data.status === "dead_url" || data.status === "inactive") ? "dead" : "ok";
+      return _pdRecipeCache[key];
+    } catch (_e) {
+      // try next path
+    }
+  }
+  _pdRecipeCache[key] = "none";
+  return "none";
+}
+
+// ── Rendering ─────────────────────────────────────────────────────────────
+
+let _pdAllParishes  = [];
+let _pdDioceseTexts = {}; // dioceseName → { text, path }
+
+function _pdStatusDot(parish) {
+  if (parish.disabled) return "⚫";
+  if (_pdGetOverride(parish.key)) return "📌";
+  const rs = _pdRecipeCache[parish.key];
+  if (rs === "dead") return "🔴";
+  if (rs === "ok")   return "🟢";
+  if (rs === "none") return "🟡";
+  return "⬜";
+}
+
+function _problemsCategory(errorText) {
+  const text = String(errorText || "");
+  if (/getaddrinfo|Name or service not known|ENOTFOUND|Could not resolve host/i.test(text)) return "dns";
+  if (/SSL|certificate/i.test(text)) return "ssl";
+  if (/timeout|Timeout|TimeoutError/i.test(text)) return "timeout";
+  if (/Recipe download step did not find|Recipe finished without downloading/i.test(text)) return "recipe_drift";
+  if (/no PDF|html_link/i.test(text)) return "no_pdf";
+  return "other";
+}
+
+function _problemsRenderRows(rows) {
+  const tbody = document.getElementById("problems-body");
+  const empty = document.getElementById("problems-empty");
+  if (!tbody || !empty) return;
+  _clearElement(tbody);
+  if (!rows.length) {
+    empty.textContent = "No current problem rows.";
+    return;
+  }
+  empty.textContent = "";
+  for (const row of rows) {
+    const tr = document.createElement("tr");
+
+    const parish = document.createElement("td");
+    parish.textContent = row.display_name || row.parish || "Unknown";
+    tr.appendChild(parish);
+
+    const category = document.createElement("td");
+    category.textContent = row.category;
+    tr.appendChild(category);
+
+    const lastSeen = document.createElement("td");
+    lastSeen.textContent = row.last_seen;
+    tr.appendChild(lastSeen);
+
+    const consecutive = document.createElement("td");
+    consecutive.textContent = String(row.consecutive_failures);
+    tr.appendChild(consecutive);
+
+    const action = document.createElement("td");
+    const fixBtn = document.createElement("button");
+    fixBtn.type = "button";
+    fixBtn.className = "problems-fix-btn";
+    fixBtn.textContent = "🔧 Fix now";
+    fixBtn.addEventListener("click", () => {
+      const startUrl = String(row.start_url || row.url || "").trim();
+      if (!/^https?:\/\//i.test(startUrl)) {
+        setStatus("❌ No valid start URL for this parish.", "err");
+        return;
+      }
+      const match = _pdAllParishes.find((p) => p.key === row.parish);
+      if (match) {
+        chrome.storage.local.set({
+          ph_training_parish: {
+            key: match.key,
+            name: match.name,
+            diocese: match.diocese,
+            hostname: (() => {
+              try { return new URL(startUrl).hostname.toLowerCase(); } catch (_e) { return ""; }
+            })(),
+          },
+        });
+      }
+      chrome.tabs.create({ url: startUrl, active: true }, (tab) => {
+        const tabId = tab?.id;
+        if (!tabId) return;
+        const onUpdated = (updatedTabId, changeInfo) => {
+          if (updatedTabId !== tabId || changeInfo.status !== "complete") return;
+          chrome.tabs.onUpdated.removeListener(onUpdated);
+          chrome.runtime.sendMessage({
+            type: "dispatch_to_tab",
+            tabId,
+            allowInject: true,
+            payload: { type: "ph_show_toolbar", reason: "fix_now", parish_key: row.parish },
+          });
+        };
+        chrome.tabs.onUpdated.addListener(onUpdated);
+      });
+    });
+    action.appendChild(fixBtn);
+    tr.appendChild(action);
+
+    tbody.appendChild(tr);
+  }
+}
+
+async function loadProblemsDashboard() {
+  const warning = document.getElementById("problems-warning");
+  const empty = document.getElementById("problems-empty");
+  if (warning) warning.style.display = "none";
+  if (empty) empty.textContent = "Loading…";
+  try {
+    const [reportResp, failuresResp] = await Promise.all([
+      fetch(PROBLEMS_REPORT_URL, { cache: "no-store" }),
+      fetch(PROBLEMS_CONSECUTIVE_URL, { cache: "no-store" }),
+    ]);
+    if (!reportResp.ok || !failuresResp.ok) {
+      throw new Error("Could not fetch live report data");
+    }
+    const report = await reportResp.json();
+    const consecutive = await failuresResp.json();
+    const consecutiveFailures = (consecutive && typeof consecutive === "object") ? consecutive : {};
+    const targetDate = String(report?.target_date || "");
+    const lastSeen = formatUkDate(targetDate);
+    const failed = Array.isArray(report?.failed) ? report.failed : [];
+    const htmlLinks = Array.isArray(report?.html_links) ? report.html_links : [];
+    const rows = [
+      ...failed.map((item) => ({
+        parish: String(item?.parish || ""),
+        display_name: String(item?.display_name || item?.parish || ""),
+        start_url: String(item?.start_url || item?.url || ""),
+        url: String(item?.url || ""),
+        category: _problemsCategory(item?.error || ""),
+        last_seen: lastSeen,
+        consecutive_failures: Number(consecutiveFailures[item?.parish] || 0),
+      })),
+      ...htmlLinks.map((item) => ({
+        parish: String(item?.parish || ""),
+        display_name: String(item?.display_name || item?.parish || ""),
+        start_url: String(item?.start_url || item?.url || ""),
+        url: String(item?.url || ""),
+        category: "no_pdf",
+        last_seen: lastSeen,
+        consecutive_failures: Number(consecutiveFailures[item?.parish] || 0),
+      })),
+    ];
+    _problemsRenderRows(rows);
+  } catch (_e) {
+    if (warning) warning.style.display = "block";
+    _problemsRenderRows([]);
+  } finally {
+    if (empty && !empty.textContent) {
+      empty.textContent = "";
+    }
+  }
+}
+
+const _PD_DOT_TITLES = { "🟢": "Recipe trained", "🟡": "Needs training", "🔴": "Dead website", "⚫": "Disabled", "📌": "Manual override URL set", "⬜": "Checking…" };
+
+function _pdRenderAll(searchTerm, excludes) {
+  const container = document.getElementById("parish-dir-content");
+  _clearElement(container);
+  const lc = (searchTerm || "").toLowerCase();
+
+  const byDiocese = {};
+  for (const p of _pdAllParishes) {
+    if (lc && !p.name.toLowerCase().includes(lc) && !(p.key || "").includes(lc)) continue;
+    if (_pdShowBrokenOnly && !_pdIsBroken(p.key)) continue;
+    if (!byDiocese[p.diocese]) byDiocese[p.diocese] = [];
+    byDiocese[p.diocese].push(p);
+  }
+
+  for (const [diocese, parishes] of Object.entries(byDiocese)) {
+    const dioceseEl = document.createElement("div");
+    dioceseEl.className = "pd-diocese";
+    const accordion = document.createElement("details");
+    accordion.className = "pd-diocese-accordion";
+    const title = document.createElement("summary");
+    title.className = "pd-diocese-title";
+    title.textContent = `${diocese} (${parishes.length})`;
+    accordion.appendChild(title);
+    const content = document.createElement("div");
+    content.className = "pd-diocese-content";
+    for (const parish of parishes) content.appendChild(_pdBuildRow(parish, excludes));
+    accordion.appendChild(content);
+    dioceseEl.appendChild(accordion);
+    container.appendChild(dioceseEl);
+  }
+
+  if (!container.children.length) {
+    let emptyMessage = "No parishes loaded.";
+    if (lc) emptyMessage = "No matching parishes.";
+    else if (_pdShowBrokenOnly) emptyMessage = "No broken parishes found.";
+    container.textContent = emptyMessage;
+    container.style.color = "#6b7280";
+    container.style.fontSize = "10px";
+  }
+}
+
+function _pdUpdateBrokenInboxUi() {
+  const banner = document.getElementById("pd-broken-banner");
+  const text = document.getElementById("pd-broken-text");
+  const toggleBtn = document.getElementById("pd-broken-toggle");
+  if (!banner || !text || !toggleBtn) return;
+
+  const brokenCount = _pdAllParishes.filter((p) => _pdIsBroken(p.key)).length;
+  if (brokenCount > 0) {
+    banner.style.display = "flex";
+    text.textContent = `⚠️ ${brokenCount} Parish${brokenCount === 1 ? "" : "es"} ${brokenCount === 1 ? "needs" : "need"} attention`;
+    toggleBtn.textContent = _pdShowBrokenOnly ? "Show All" : "Show Broken Only";
+  } else {
+    banner.style.display = "none";
+    _pdShowBrokenOnly = false;
+    toggleBtn.textContent = "Show Broken Only";
+  }
+}
+
+function _pdUpdateStaleBannerUi(staleBulletins) {
+  const banner = document.getElementById("stale-banner");
+  const text = document.getElementById("stale-banner-text");
+  const list = document.getElementById("stale-list");
+  const toggleBtn = document.getElementById("stale-banner-toggle");
+  if (!banner || !text || !list || !toggleBtn) return;
+
+  const stale = Array.isArray(staleBulletins?.stale) ? staleBulletins.stale : [];
+  const unknown = Array.isArray(staleBulletins?.unknown_date) ? staleBulletins.unknown_date : [];
+  list.style.display = "none";
+  toggleBtn.textContent = "Show";
+
+  if (stale.length > 0) {
+    banner.style.display = "block";
+    banner.style.background = "#450a0a";
+    banner.style.borderColor = "#7f1d1d";
+    banner.style.color = "#fecaca";
+    text.textContent = `⚠️ ${stale.length} bulletin(s) are stale — click Show to review`;
+    toggleBtn.style.background = "#991b1b";
+
+    _clearElement(list);
+    const formatDaysOld = (days) => `${days} day${days === 1 ? "" : "s"}`;
+    for (const item of stale) {
+      const row = document.createElement("div");
+      row.style.cssText = "display:flex;align-items:center;gap:6px;padding:3px 0;border-bottom:1px solid rgba(127,29,29,0.5);";
+
+      const label = document.createElement("div");
+      const daysOld = Number(item?.days_old);
+      label.textContent = `${item?.display_name || item?.key || "Unknown"}${Number.isFinite(daysOld) ? ` — ${formatDaysOld(daysOld)}` : ""}`;
+      label.style.cssText = "font-size:10px;line-height:1.3;flex:1;";
+      row.appendChild(label);
+
+      const fixBtn = document.createElement("button");
+      fixBtn.type = "button";
+      fixBtn.className = "pd-btn";
+      fixBtn.textContent = "Fix";
+      fixBtn.style.background = "#991b1b";
+      fixBtn.style.color = "#fee2e2";
+      fixBtn.addEventListener("click", () => {
+        if (item?.url) chrome.tabs.create({ url: item.url });
+      });
+      row.appendChild(fixBtn);
+      list.appendChild(row);
+    }
+    return;
+  }
+
+  if (unknown.length > 0) {
+    banner.style.display = "block";
+    banner.style.background = "#0f172a";
+    banner.style.borderColor = "#334155";
+    banner.style.color = "#bfdbfe";
+    text.textContent = `ℹ️ ${unknown.length} bulletins have unknown dates`;
+    toggleBtn.style.background = "#1d4ed8";
+    _clearElement(list);
+    for (const item of unknown) {
+      const row = document.createElement("div");
+      row.style.cssText = "padding:3px 0;font-size:10px;line-height:1.3;border-bottom:1px solid rgba(51,65,85,0.7);";
+      row.textContent = item?.display_name || item?.key || "Unknown";
+      list.appendChild(row);
+    }
+    return;
+  }
+
+  banner.style.display = "none";
+  _clearElement(list);
+  list.style.display = "none";
+  toggleBtn.textContent = "Show";
+}
+
+function _pdBuildRow(parish, excludes) {
+  const wrap = document.createElement("div");
+  wrap.dataset.key = parish.key;
+
+  const row = document.createElement("div");
+  row.className = "pd-row";
+
+  const dot = document.createElement("span");
+  dot.className = "pd-status";
+  dot.textContent = _pdStatusDot(parish);
+  dot.title = _PD_DOT_TITLES[dot.textContent] || "";
+  row.appendChild(dot);
+
+  const nameEl = document.createElement("span");
+  nameEl.className = "pd-name" + (parish.disabled ? " disabled" : "");
+  nameEl.textContent = parish.name;
+  nameEl.title = parish.pageUrl || parish.bulletinUrls[0] || parish.key;
+  if (parish.pageUrl || parish.bulletinUrls[0]) {
+    nameEl.addEventListener("click", () => {
+      chrome.storage.local.set({
+        ph_training_parish: {
+          key: parish.key,
+          name: parish.name,
+          diocese: parish.diocese,
+          hostname: (() => {
+            const u = parish.pageUrl || parish.bulletinUrls[0] || "";
+            try { return new URL(u).hostname.toLowerCase(); } catch (_e) { return ""; }
+          })(),
+        },
+      });
+      chrome.tabs.create({ url: parish.pageUrl || parish.bulletinUrls[0] });
+    });
+  }
+  row.appendChild(nameEl);
+
+  const editBtn = document.createElement("button");
+  editBtn.className = "pd-btn";
+  editBtn.textContent = "✏️";
+  editBtn.title = "Edit bulletin page URL";
+  editBtn.addEventListener("click", () => _pdShowEditRow(wrap, parish));
+  row.appendChild(editBtn);
+
+  const overrideBtn = document.createElement("button");
+  overrideBtn.className = "pd-btn";
+  overrideBtn.textContent = "📌";
+  overrideBtn.title = "Set manual bulletin override from active tab URL";
+  overrideBtn.addEventListener("click", () => _pdSetOverrideFromActiveTab(parish, dot, clearOverrideBtn));
+  row.appendChild(overrideBtn);
+
+  const clearOverrideBtn = document.createElement("button");
+  clearOverrideBtn.className = "pd-btn";
+  clearOverrideBtn.textContent = "🧹";
+  clearOverrideBtn.title = "Clear manual bulletin override";
+  clearOverrideBtn.disabled = !_pdGetOverride(parish.key);
+  clearOverrideBtn.style.opacity = clearOverrideBtn.disabled ? "0.4" : "1";
+  clearOverrideBtn.addEventListener("click", () => _pdClearOverride(parish, dot, clearOverrideBtn));
+  row.appendChild(clearOverrideBtn);
+
+  const detailsBtn = document.createElement("button");
+  detailsBtn.className = "pd-btn pd-subfolder-toggle";
+  detailsBtn.textContent = "📁";
+  detailsBtn.title = "Show parish details";
+  row.appendChild(detailsBtn);
+
+  if (!parish.disabled) {
+    const deadBtn = document.createElement("button");
+    deadBtn.className = "pd-btn red";
+    deadBtn.textContent = "☠";
+    deadBtn.title = "Mark as dead website";
+    deadBtn.addEventListener("click", () => _pdMarkDead(parish, dot, deadBtn));
+    row.appendChild(deadBtn);
+  }
+
+  const excl = document.createElement("input");
+  excl.type = "checkbox";
+  excl.className = "pd-excl";
+  excl.title = "Exclude from mega PDF this week";
+  excl.checked = excludes.includes(parish.key);
+  excl.addEventListener("change", async () => {
+    excl.disabled = true;
+    try {
+      const current = await _pdLoadExcludes();
+      const updated = excl.checked
+        ? [...new Set([...current, parish.key])]
+        : current.filter((k) => k !== parish.key);
+      const res = await _pdSaveExcludes(updated);
+      if (!res?.ok) { excl.checked = !excl.checked; setStatus(`❌ ${res?.error || "Save failed."}`, "err"); }
+      else setStatus(`✅ ${parish.name} ${excl.checked ? "excluded from" : "included in"} mega PDF.`, "ok");
+    } catch (err) {
+      excl.checked = !excl.checked; setStatus(`❌ ${err.message}`, "err");
+    } finally {
+      excl.disabled = false;
+    }
+  });
+  row.appendChild(excl);
+
+  const exclLabel = document.createElement("span");
+  exclLabel.className = "pd-excl-label";
+  exclLabel.textContent = "skip";
+  row.appendChild(exclLabel);
+
+  wrap.appendChild(row);
+  const detailsWrap = document.createElement("div");
+  detailsWrap.className = "pd-subfolder";
+  detailsWrap.style.display = "none";
+  wrap.appendChild(detailsWrap);
+  detailsBtn.addEventListener("click", async () => {
+    const opening = detailsWrap.style.display === "none";
+    if (!opening) {
+      detailsWrap.style.display = "none";
+      detailsBtn.title = "Show parish details";
+      return;
+    }
+    detailsWrap.style.display = "block";
+    detailsBtn.title = "Hide parish details";
+    _clearElement(detailsWrap);
+    const loadingEl = document.createElement("div");
+    loadingEl.className = "pd-subfolder-loading";
+    loadingEl.textContent = "⏳ Loading parish details…";
+    detailsWrap.appendChild(loadingEl);
+    try {
+      const details = await _pdBuildParishDetails(parish);
+      _pdRenderSubfolder(detailsWrap, details);
+    } catch (_e) {
+      _clearElement(detailsWrap);
+      const errorEl = document.createElement("div");
+      errorEl.className = "pd-subfolder-error";
+      errorEl.textContent = "Could not load parish details.";
+      detailsWrap.appendChild(errorEl);
+    }
+  });
+  return wrap;
+}
+
+function _pdShowEditRow(wrap, parish) {
+  const existing = wrap.querySelector(".pd-edit-row");
+  if (existing) { existing.remove(); return; }
+
+  const info = _pdDioceseTexts[parish.diocese];
+  const editRow = document.createElement("div");
+  editRow.className = "pd-edit-row";
+
+  const label = document.createElement("div");
+  label.style.cssText = "font-size:9px;color:#93c5fd;";
+  label.textContent = "Bulletin listing page URL:";
+  editRow.appendChild(label);
+
+  const inp = document.createElement("input");
+  inp.type = "url";
+  inp.value = parish.pageUrl || "";
+  inp.placeholder = "https://parish.com/bulletins";
+  editRow.appendChild(inp);
+
+  const btnRow = document.createElement("div");
+  btnRow.className = "pd-edit-btns";
+
+  const inlineStatus = document.createElement("div");
+  inlineStatus.style.cssText = "font-size:9px;margin-top:3px;min-height:12px;";
+  const setInlineStatus = (msg, type) => {
+    inlineStatus.textContent = msg;
+    inlineStatus.style.color = type === "err" ? "#fca5a5" : "#86efac";
+  };
+
+  const saveBtn = document.createElement("button");
+  saveBtn.type = "button";
+  saveBtn.className = "green";
+  saveBtn.textContent = "💾 Save";
+  saveBtn.addEventListener("click", async () => {
+    const newUrl = inp.value.trim();
+    if (!newUrl) { setInlineStatus("❌ URL is required.", "err"); setStatus("❌ URL is required.", "err"); return; }
+    if (!info)   { setInlineStatus("❌ Evidence file not loaded.", "err"); setStatus("❌ Evidence file not loaded.", "err"); return; }
+    saveBtn.disabled = true; saveBtn.textContent = "⏳ Saving…";
+    setInlineStatus("Saving…", "ok");
+    try {
+      const updated = _pdUpdatePageUrl(info.text, parish.name, newUrl);
+      const res = await _pdGhPush(info.path, updated, `evidence: update page URL for ${parish.name} [from extension]`);
+      if (res?.ok) {
+        info.text = updated;
+        parish.pageUrl = newUrl;
+        delete _pdParishDetailsCache[parish.key];
+        setInlineStatus("✅ Saved. Triggering harvest rebuild…", "ok");
+        setStatus(`✅ Saved page URL for ${parish.name}. Triggering harvest…`, "ok");
+        editRow.remove();
+        _pdDispatchHarvest(parish.key).then((d) => {
+          if (d?.ok) {
+            setStatus(`✅ Saved page URL for ${parish.name} and triggered harvest rebuild.`, "ok");
+          } else {
+            setStatus(
+              `⚠️ Recipe saved OK. Harvest trigger failed — check GitHub token has workflow scope. (${d?.error || "unknown"})`,
+              "warn"
+            );
+          }
+        });
+      } else {
+        const errMsg = res?.error || "Save failed.";
+        setInlineStatus(`❌ ${errMsg}`, "err");
+        setStatus(`❌ ${errMsg}`, "err");
+      }
+    } catch (err) {
+      setInlineStatus(`❌ ${err.message}`, "err");
+      setStatus(`❌ ${err.message}`, "err");
+    } finally {
+      saveBtn.disabled = false; saveBtn.textContent = "💾 Save";
+    }
+  });
+  btnRow.appendChild(saveBtn);
+
+  const cancelBtn = document.createElement("button");
+  cancelBtn.type = "button";
+  cancelBtn.style.cssText = "background:#374151;color:#d1d5db;";
+  cancelBtn.textContent = "✕ Cancel";
+  cancelBtn.addEventListener("click", () => editRow.remove());
+  btnRow.appendChild(cancelBtn);
+
+  editRow.appendChild(btnRow);
+  editRow.appendChild(inlineStatus);
+  wrap.appendChild(editRow);
+  inp.focus();
+}
+
+async function _pdSetOverrideFromActiveTab(parish, dotEl, clearBtn) {
+  let tab;
+  try {
+    [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  } catch (err) {
+    setStatus(`❌ Could not read active tab: ${err.message}`, "err");
+    return;
+  }
+  const url = (tab?.url || "").trim();
+  if (!/^https?:\/\//i.test(url)) {
+    setStatus("❌ Active tab URL must be http/https.", "err");
+    return;
+  }
+  const type = _pdInferOverrideType(url);
+  const overrides = await _pdLoadOverrides();
+  overrides[parish.key] = {
+    url,
+    type,
+    updated_at: new Date().toISOString(),
+    source: "extension-sidepanel",
+  };
+  const res = await _pdSaveOverrides(overrides);
+  if (!res?.ok) {
+    setStatus(`❌ ${res?.error || "Failed to save override."}`, "err");
+    return;
+  }
+  dotEl.textContent = "📌";
+  dotEl.title = _PD_DOT_TITLES["📌"];
+  clearBtn.disabled = false;
+  clearBtn.style.opacity = "1";
+  delete _pdParishDetailsCache[parish.key];
+  setStatus(`✅ Saved manual override for ${parish.name}.`, "ok");
+}
+
+async function _pdClearOverride(parish, dotEl, clearBtn) {
+  const overrides = await _pdLoadOverrides();
+  if (!overrides[parish.key]) {
+    setStatus(`ℹ️ ${parish.name} has no override set.`, "info");
+    return;
+  }
+  delete overrides[parish.key];
+  const res = await _pdSaveOverrides(overrides);
+  if (!res?.ok) {
+    setStatus(`❌ ${res?.error || "Failed to clear override."}`, "err");
+    return;
+  }
+  dotEl.textContent = _pdStatusDot(parish);
+  dotEl.title = _PD_DOT_TITLES[dotEl.textContent] || "";
+  clearBtn.disabled = true;
+  clearBtn.style.opacity = "0.4";
+  delete _pdParishDetailsCache[parish.key];
+  setStatus(`✅ Cleared override for ${parish.name}.`, "ok");
+}
+
+async function _pdMarkDead(parish, dotEl, btnEl) {
+  if (!confirm(`Mark "${parish.name}" as a dead website?\nThis pushes a dead recipe to GitHub.`)) return;
+  btnEl.disabled = true;
+  setStatus(`⏳ Marking ${parish.name} as dead…`, "ok");
+  try {
+    const recipe = {
+      parish: parish.name,
+      url: parish.pageUrl || parish.bulletinUrls[0] || "",
+      status: "dead_url",
+      dead_reason: "Marked dead from browser extension.",
+    };
+    const res = await new Promise((resolve, reject) => {
+      chrome.runtime.sendMessage({ type: "push_recipe", parish_key: parish.key, recipe }, (r) => {
+        if (chrome.runtime.lastError) { reject(new Error(chrome.runtime.lastError.message)); return; }
+        resolve(r);
+      });
+    });
+    if (res?.ok) {
+      _pdRecipeCache[parish.key] = "dead";
+      dotEl.textContent = "🔴";
+      dotEl.title = "Dead website";
+      setStatus(`✅ ${parish.name} marked as dead.`, "ok");
+    } else {
+      setStatus(`❌ ${res?.error || "Failed."}`, "err");
+    }
+  } catch (err) {
+    setStatus(`❌ ${err.message}`, "err");
+  } finally {
+    btnEl.disabled = false;
+  }
+}
+
+// ── Auto-detect active tab's parish ──────────────────────────────────────
+// After evidence is loaded, match the active tab URL against known parishes
+// and store the result in chrome.storage so the toolbar push form auto-fills.
+
+async function _pdAutoDetectFromActiveTab() {
+  if (_pdAllParishes.length === 0) return;
+  let tab;
+  try {
+    [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  } catch (_e) { return; }
+  if (!tab?.url || !/^https?:\/\//i.test(tab.url)) return;
+
+  const tabKey = _pdUrlToKey(tab.url);
+  if (!tabKey) return;
+
+  const match = _pdAllParishes.find((p) => {
+    if (p.key === tabKey) return true;
+    const allUrls = [p.pageUrl, ...p.bulletinUrls].filter(Boolean);
+    return allUrls.some((u) => _pdUrlToKey(u) === tabKey);
+  });
+
+  if (match) {
+    try {
+      await chrome.storage.local.set({
+        ph_training_parish: {
+          key: match.key,
+          name: match.name,
+          diocese: match.diocese,
+          hostname: (() => {
+            try { return new URL(tab.url).hostname.toLowerCase(); } catch (_e) { return ""; }
+          })(),
+        },
+      });
+      setStatus(`✅ Active tab auto-detected as: ${match.name}`, "ok");
+    } catch (_e) {
+      // Storage write failure is non-fatal.
+    }
+  }
+}
+
+// ── Main load ─────────────────────────────────────────────────────────────
+
+async function loadParishDirectory() {
+  const loadingEl = document.getElementById("parish-dir-loading");
+  const errorEl   = document.getElementById("parish-dir-error");
+  const container = document.getElementById("parish-dir-content");
+  if (!loadingEl || !errorEl || !container) return;
+
+  loadingEl.style.display = "block";
+  errorEl.style.display   = "none";
+  errorEl.textContent = "";
+  _clearElement(container);
+  _pdAllParishes = []; _pdDioceseTexts = {}; _pdExcludes = null; _pdOverrides = null; _pdLastIncluded = null;
+  Object.keys(_pdParishDetailsCache).forEach((k) => delete _pdParishDetailsCache[k]);
+  _pdConsecutiveFailures = {};
+  _pdShowBrokenOnly = false;
+  _pdUpdateBrokenInboxUi();
+  _pdUpdateStaleBannerUi({ stale: [], unknown_date: [] });
+
+  try {
+    const [excludes, _overrides, consecutiveFailures, staleBulletins, _lastIncluded, ...evidenceResults] = await Promise.all([
+      _pdLoadExcludes(),
+      _pdLoadOverrides(),
+      _pdLoadConsecutiveFailures(),
+      _pdLoadStaleBulletins(),
+      _pdLoadLastIncluded(),
+      ...Object.entries(PD_EVIDENCE_FILES).map(([diocese, path]) =>
+        _pdGhFetch(path)
+          .then(({ content }) => ({ diocese, path, content }))
+          .catch((e) => ({ diocese, path, error: e.message }))
+      ),
+    ]);
+
+    for (const r of evidenceResults) {
+      if (r.error) { console.warn(`Parish Directory: ${r.diocese}: ${r.error}`); continue; }
+      _pdDioceseTexts[r.diocese] = { text: r.content, path: r.path };
+      _pdAllParishes.push(..._pdParseEvidence(r.content, r.diocese));
+    }
+    _pdConsecutiveFailures = consecutiveFailures || {};
+
+    if (_pdAllParishes.length === 0) {
+      loadingEl.style.display = "none";
+      const failed = evidenceResults.filter((r) => r.error).map((r) => `${r.diocese}: ${r.error}`);
+      errorEl.textContent = failed.length
+        ? `⚠️ No parishes loaded. ${failed.join(" | ")}`
+        : "⚠️ No parishes loaded — check GitHub settings.";
+      errorEl.style.display = "block";
+      return;
+    }
+
+    loadingEl.style.display = "none";
+    _pdUpdateBrokenInboxUi();
+    _pdUpdateStaleBannerUi(staleBulletins);
+    _pdRenderAll("", excludes);
+
+    // Asynchronously load recipe status and refresh dots
+    (async () => {
+      await Promise.all(_pdAllParishes.map((p) => p.key ? _pdCheckRecipe(p.key) : Promise.resolve()));
+      const c = document.getElementById("parish-dir-content");
+      for (const p of _pdAllParishes) {
+        if (!p.key) continue;
+        const el = c.querySelector(`[data-key="${CSS.escape(p.key)}"] .pd-status`);
+        if (el) { el.textContent = _pdStatusDot(p); el.title = _PD_DOT_TITLES[el.textContent] || ""; }
+      }
+    })();
+
+    // Auto-detect parish from the currently active tab and persist as
+    // ph_training_parish so the toolbar push form can auto-fill without manual entry.
+    _pdAutoDetectFromActiveTab();
+
+  } catch (err) {
+    loadingEl.style.display = "none";
+    errorEl.textContent = `❌ ${err.message}`;
+    errorEl.style.display = "block";
+  }
+}
+
+const _pdDetailsEl = document.getElementById("parish-dir-details");
+if (_pdDetailsEl) {
+  _pdDetailsEl.addEventListener("toggle", function () {
+    if (this.open) loadParishDirectory();
+  });
+  if (_pdDetailsEl.open) loadParishDirectory();
+}
+document.getElementById("pd-refresh").addEventListener("click", () => {
+  Object.keys(_pdRecipeCache).forEach((k) => delete _pdRecipeCache[k]);
+  _pdExcludes = null;
+  _pdOverrides = null;
+  _pdConsecutiveFailures = {};
+  _pdShowBrokenOnly = false;
+  loadParishDirectory();
+});
+document.getElementById("pd-search").addEventListener("input", function () {
+  if (_pdAllParishes.length > 0) _pdRenderAll(this.value, _pdExcludes || []);
+});
+document.getElementById("pd-broken-toggle").addEventListener("click", function () {
+  if (_pdAllParishes.length === 0) return;
+  _pdShowBrokenOnly = !_pdShowBrokenOnly;
+  _pdUpdateBrokenInboxUi();
+  _pdRenderAll(document.getElementById("pd-search").value || "", _pdExcludes || []);
+});
+document.getElementById("stale-banner-toggle").addEventListener("click", function () {
+  const list = document.getElementById("stale-list");
+  if (!list) return;
+  const isOpen = list.style.display !== "none";
+  list.style.display = isOpen ? "none" : "block";
+  this.textContent = isOpen ? "Show" : "Hide";
+});
+
+_spPanels.trainer.tab.addEventListener("click", () => _spShowPanel("trainer"));
+_spPanels.problems.tab.addEventListener("click", () => _spShowPanel("problems"));
+void loadProblemsDashboard();
+
+// ── Crop done notification ─────────────────────────────────────────────────
+
+chrome.runtime.onMessage.addListener((message) => {
+  if (message?.type !== "crop_done") return;
+  const x = Number(message.x ?? 0);
+  const y = Number(message.y ?? 0);
+  const width = Number(message.width ?? 0);
+  const height = Number(message.height ?? 0);
+  const pageX = Number(message.pageX ?? x);
+  const pageY = Number(message.pageY ?? y);
+  const elementSelector = message.element_selector || "";
+
+  void withActiveTab((tab) => {
+    const payload = {
+      type: "mark_crop",
+      x,
+      y,
+      width,
+      height,
+      pageX,
+      pageY,
+      element_selector: elementSelector,
+    };
+    console.log("[PH-SAVE]", { action: "mark_crop", request: payload, phase: "request" });
+    chrome.runtime.sendMessage({
+      type: "dispatch_to_tab",
+      tabId: tab.id,
+      payload,
+      allowInject: true,
+    }, (result) => {
+      console.log("[PH-SAVE]", { action: "mark_crop", request: payload, response: result || null });
+      if (chrome.runtime.lastError) {
+        setStatus(`❌ Could not save crop: ${chrome.runtime.lastError.message}`, "err");
+        return;
+      }
+      if (!result?.ok) {
+        setStatus(`❌ ${result?.reason || _dispatchErrorText(result)}`, "err");
+        return;
+      }
+      setStatus(`✂️ Crop saved (${Math.round(width)}×${Math.round(height)})`, "ok");
+    });
+  });
+});

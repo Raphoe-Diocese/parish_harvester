@@ -1,0 +1,151 @@
+"""
+report.py — Simple report generator for the Parish Bulletin Harvester.
+
+Moves downloaded PDFs to current/, writes report.json with
+downloaded/html_links/failed counts.
+"""
+from __future__ import annotations
+
+import json
+import shutil
+from datetime import date
+from pathlib import Path
+from typing import TYPE_CHECKING
+
+if TYPE_CHECKING:
+    from .fetcher import FetchResult
+
+
+def generate_report(
+    results: list["FetchResult"],
+    raw_dir: Path,
+    current_dir: Path,
+    report_json: Path,
+    report_txt: Path,
+    target: date,
+) -> dict:
+    """
+    Move downloaded PDFs from raw_dir to current_dir, write report files.
+
+    Returns a summary dict with keys: downloaded, html_links, skipped, failed.
+    """
+    current_dir.mkdir(parents=True, exist_ok=True)
+
+    # Purge stale PDFs from previous runs so the mega PDF only contains
+    # this week's bulletins (fixes "mega PDF includes all previous weeks").
+    for stale in current_dir.glob("*.pdf"):
+        try:
+            stale.unlink()
+        except OSError:
+            pass
+
+    downloaded: list[dict] = []
+    html_links: list[dict] = []
+    skipped: list[dict] = []
+    failed: list[dict] = []
+    stale_rejected: list[dict] = []
+
+    for r in results:
+        if r.is_stale:
+            stale_rejected.append({
+                "parish": r.key,
+                "display_name": r.display_name,
+                "url": r.url,
+                "reason": r.stale_reason,
+                "retry_strategy": r.retry_strategy,
+                "error": r.error,
+            })
+            continue
+        if r.status == "ok" and r.file_path and r.file_path.exists():
+            dest = current_dir / r.file_path.name
+            shutil.copy2(r.file_path, dest)
+            entry = {
+                "parish": r.key,
+                "display_name": r.display_name,
+                "url": r.url,
+                "file": dest.name,
+                "file_type": r.file_type,
+            }
+            downloaded.append(entry)
+        elif r.status == "html_link":
+            html_links.append({
+                "parish": r.key,
+                "display_name": r.display_name,
+                "url": r.url,
+            })
+        elif r.status == "skipped":
+            skipped.append({
+                "parish": r.key,
+                "display_name": r.display_name,
+                "url": r.url,
+                "reason": r.error,
+            })
+        else:
+            failed.append({
+                "parish": r.key,
+                "display_name": r.display_name,
+                "url": r.url,
+                "error": r.error,
+            })
+
+    report = {
+        "target_date": str(target),
+        "summary": {
+            "downloaded": len(downloaded),
+            "html_links": len(html_links),
+            "skipped": len(skipped),
+            "failed": len(failed),
+            "stale_rejected": len(stale_rejected),
+        },
+        "downloaded": downloaded,
+        "html_links": html_links,
+        "skipped": skipped,
+        "failed": failed,
+        "stale_rejected": stale_rejected,
+    }
+
+    report_json.parent.mkdir(parents=True, exist_ok=True)
+    report_json.write_text(json.dumps(report, indent=2), encoding="utf-8")
+
+    lines = [
+        f"Parish Bulletin Harvest Report — {target}",
+        "=" * 50,
+        f"Downloaded : {len(downloaded)}",
+        f"HTML links : {len(html_links)}",
+        f"Skipped    : {len(skipped)}",
+        f"Failed     : {len(failed)}",
+        f"Stale rej. : {len(stale_rejected)}",
+        "",
+    ]
+    if downloaded:
+        lines += ["Downloaded bulletins:", ""]
+        for d in downloaded:
+            lines.append(f"  ✅ {d['display_name']} — {d['file']}")
+        lines.append("")
+    if html_links:
+        lines += ["HTML-only parishes (clickable links in mega PDF):", ""]
+        for h in html_links:
+            lines.append(f"  🔗 {h['display_name']} — {h['url']}")
+        lines.append("")
+    if skipped:
+        lines += ["Skipped parishes:", ""]
+        for s in skipped:
+            lines.append(f"  ⏭️  {s['display_name']} — {s['reason']}")
+        lines.append("")
+    if stale_rejected:
+        lines += ["Stale bulletins rejected from mega PDF:", ""]
+        for s in stale_rejected:
+            lines.append(
+                f"  🕐 {s['display_name']} — {s['error']} "
+                f"(retry: {s['retry_strategy']})"
+            )
+        lines.append("")
+    if failed:
+        lines += ["Failed parishes:", ""]
+        for f_item in failed:
+            lines.append(f"  ❌ {f_item['display_name']} — {f_item['error']}")
+        lines.append("")
+
+    report_txt.write_text("\n".join(lines), encoding="utf-8")
+
+    return report

@@ -1,0 +1,98 @@
+name: Release Parish Trainer extension
+
+# This workflow builds and releases the Parish Trainer Chrome/Brave extension
+# when a version tag is pushed. The extension is signed with the private key
+# stored in GitHub Secrets and published as a GitHub Release.
+
+on:
+  push:
+    tags:
+      - 'v*.*.*'  # Triggers on version tags like v1.30.110
+  workflow_dispatch:  # Manual trigger for emergency releases
+    inputs:
+      version:
+        description: 'Extension version to release (must match manifest.json)'
+        required: true
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Extract version from tag or input
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            VERSION="${{ github.event.inputs.version }}"
+          else
+            VERSION="${GITHUB_REF#refs/tags/v}"
+          fi
+          echo "version=${VERSION}" >> "$GITHUB_OUTPUT"
+          echo "tag=v${VERSION}" >> "$GITHUB_OUTPUT"
+
+      - name: Verify manifest.json version matches
+        run: |
+          MANIFEST_VERSION=$(grep -oP '"version":\s*"\K[^"]+' extension/manifest.json)
+          TAG_VERSION="${{ steps.version.outputs.version }}"
+          if [ "${MANIFEST_VERSION}" != "${TAG_VERSION}" ]; then
+            echo "Error: manifest.json version (${MANIFEST_VERSION}) does not match tag version (${TAG_VERSION})"
+            exit 1
+          fi
+          echo "✓ Version ${MANIFEST_VERSION} verified"
+
+      - name: Package extension as .zip
+        run: |
+          cd extension
+          zip -qr ../parish_trainer.zip .
+          cd ..
+          if [ ! -s parish_trainer.zip ]; then
+            echo "Error: parish_trainer.zip was not created or is empty"
+            exit 1
+          fi
+          ls -lh parish_trainer.zip
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v1
+        with:
+          tag_name: ${{ steps.version.outputs.tag }}
+          name: Parish Trainer ${{ steps.version.outputs.version }}
+          body: |
+            ## Parish Trainer Extension v${{ steps.version.outputs.version }}
+            
+            ### Installation
+            
+            1. Download `parish_trainer.zip`
+            2. Extract the ZIP file
+            3. Open `brave://extensions` (or `chrome://extensions`)
+            4. Enable **Developer mode**
+            5. Click **Load unpacked**
+            6. Select the extracted folder
+            
+            ### Auto-Update Setup
+            
+            For Brave users with the extension already installed, updates will be delivered automatically via the self-hosted update channel at:
+            `https://frankytyrone.github.io/parish_harvester/updates.xml`
+            
+            See [AUTO_UPDATE_SETUP.md](docs/AUTO_UPDATE_SETUP.md) for details.
+            
+            ---
+            
+            **Note**: This extension is for private use only. No Chrome Web Store distribution.
+          files: |
+            parish_trainer.zip
+          draft: false
+          prerelease: false
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Trigger Pages deployment
+        run: |
+          echo "✓ Release created successfully"
+          echo "✓ GitHub Pages will update updates.xml via deploy-pages workflow"
+          echo "✓ Auto-update will work once Pages deploys"
