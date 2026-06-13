@@ -1,0 +1,720 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Down &amp; Connor Diocese Bulletin Viewer — 13/06/2026</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f7f8fb;
+      color: #1a1a2e;
+      line-height: 1.6;
+    }
+    a { color: #1a6b6b; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .page { max-width: 1400px; margin: 0 auto; padding: 20px 16px 40px; }
+    .back-link { display: inline-block; margin-bottom: 14px; font-weight: 700; color: #1a6b6b; }
+    .header { text-align: center; margin-bottom: 24px; }
+    .diocese-label { margin: 0 0 6px; color: #c0392b; font-size: 0.95rem; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 800; }
+    h1 { margin: 0 0 8px; color: #1a6b6b; font-size: clamp(1.8rem, 3vw, 2.5rem); }
+    .meta { color: #6b7280; font-size: 0.95rem; }
+    
+    /* Tabs */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 0 0 20px;
+      padding: 16px 0;
+      background: #e8edf5;
+      border-bottom: 2px solid #c7d2e8;
+    }
+    .tab-btn {
+      padding: 12px 28px;
+      border: 2px solid #1a6b6b;
+      border-radius: 8px;
+      background: white;
+      color: #1a6b6b;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover {
+      background: #f0f4f8;
+    }
+    .tab-btn.active {
+      background: #1a6b6b;
+      color: white;
+    }
+    
+    /* Panel container */
+    .panel-container { position: relative; }
+    .view-panel {
+      display: none;
+      background: white;
+      border: 1px solid #d6ecea;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(26, 107, 107, 0.08);
+    }
+    .view-panel.active { display: block; }
+    
+    /* Toolbar */
+    .panel-toolbar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .toolbar-btn {
+      padding: 8px 16px;
+      border: 2px solid #1a6b6b;
+      border-radius: 6px;
+      background: white;
+      color: #1a6b6b;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .toolbar-btn:hover {
+      background: #1a6b6b;
+      color: white;
+      text-decoration: none;
+    }
+    
+    /* PDF View */
+    .pdf-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 12px 0;
+      font-weight: 700;
+      flex-wrap: wrap;
+    }
+    .pdf-controls button {
+      border: 0;
+      border-radius: 6px;
+      background: #1a6b6b;
+      color: white;
+      font-weight: 700;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 0.95rem;
+    }
+    .pdf-controls button:disabled { background: #9bbfbd; cursor: not-allowed; }
+    .pdf-canvas-wrap {
+      height: 75vh;
+      min-height: 500px;
+      overflow: auto;
+      border: 1px solid #c7dcda;
+      border-radius: 10px;
+      background: #f2f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 10px;
+    }
+    #pdf-canvas { display: block; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 100%; }
+    
+    /* OCR View */
+    .ocr-search-bar {
+      position: relative;
+      margin-bottom: 12px;
+    }
+    .search-input {
+      width: 100%;
+      border: 1px solid #bdd7d5;
+      border-radius: 8px;
+      padding: 12px 44px 12px 16px;
+      font-size: 1rem;
+    }
+    .search-clear {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: #6b7280;
+      font-size: 1.3rem;
+      cursor: pointer;
+    }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 0;
+      border-radius: 6px;
+      background: #1a6b6b;
+      color: white;
+      font-weight: 600;
+      padding: 7px 14px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { background: #9bbfbd; cursor: not-allowed; }
+    .match-count {
+      color: #6b7280;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    #ocr-panel {
+      height: 70vh;
+      min-height: 500px;
+      overflow-y: auto;
+      border: 1px solid #d9e4e3;
+      border-radius: 10px;
+      padding: 24px;
+      background: white;
+      font-size: 17px;
+      line-height: 1.8;
+      color: #1a1a2e;
+    }
+    #ocr-panel h1, #ocr-panel h2, #ocr-panel h3 {
+      color: #1a6b6b;
+      margin-top: 16px;
+      margin-bottom: 10px;
+    }
+    #ocr-panel h3.ocr-page-heading {
+      font-size: 1rem;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      margin-top: 24px;
+    }
+    #ocr-panel hr { border: 0; border-top: 1px solid #d4dfde; margin: 20px 0; }
+    #ocr-panel p { margin: 0 0 12px; white-space: pre-wrap; }
+    #ocr-panel mark { background: #fef08a; padding: 1px 3px; border-radius: 2px; }
+    #ocr-panel mark.search-active { background: #fde047; outline: 2px solid #0f5e5e; }
+    #ocr-panel a { color: #1a6b6b; font-weight: 600; }
+    .note-box {
+      margin-top: 16px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    
+    /* Parish Section */
+    .parish-section {
+      margin-top: 32px;
+      background: white;
+      border: 1px solid #d6ecea;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 12px rgba(26, 107, 107, 0.06);
+    }
+    .parish-section h2 {
+      margin: 0 0 18px;
+      color: #1a6b6b;
+      font-size: 1.4rem;
+      font-weight: 800;
+      text-align: center;
+    }
+    .parish-filter {
+      width: 100%;
+      border: 1px solid #bdd7d5;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 1rem;
+      margin-bottom: 16px;
+    }
+    ul.parish-grid {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      padding: 0;
+      margin: 0;
+    }
+    .parish-item { margin: 0; }
+    .parish-link {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: #1a6b6b;
+      font-size: 1rem;
+      font-weight: 700;
+      background: #f9fcfc;
+      border: 1px solid #d9ecea;
+      border-radius: 8px;
+      padding: 10px 14px;
+      transition: all 0.15s;
+    }
+    .parish-link:hover {
+      background: #e8f4f4;
+      text-decoration: none;
+      transform: translateY(-1px);
+    }
+    .empty-state { margin: 0 0 12px; color: #6b7280; font-size: 0.95rem; }
+    
+    /* Footer */
+    footer {
+      margin-top: 32px;
+      background: #114b4b;
+      color: white;
+      padding: 16px 20px;
+    }
+    .footer-inner {
+      max-width: 1400px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 0.9rem;
+    }
+    .footer-inner a { color: #d8f0ee; font-weight: 700; }
+    .footer-inner a:hover { text-decoration: underline; }
+    
+    /* Responsive */
+    @media (max-width: 900px) {
+      ul.parish-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .tabs { flex-direction: column; align-items: stretch; padding: 12px; }
+      .tab-btn { width: 100%; }
+    }
+    @media (max-width: 600px) {
+      .page { padding: 16px 12px; }
+      ul.parish-grid { grid-template-columns: 1fr; }
+      .pdf-controls, .ocr-search-tools { flex-direction: column; }
+      .pdf-canvas-wrap, #ocr-panel {
+        height: auto;
+        min-height: 55vh;
+        max-height: 70vh;
+      }
+      .pdf-controls button, .ocr-search-tools button, .tab-btn {
+        min-height: 48px;
+        width: 100%;
+      }
+      .panel-toolbar { justify-content: stretch; }
+      .toolbar-btn { flex: 1; justify-content: center; min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <a class="back-link" href="index.html">← Back to bulletin archive</a>
+    <header class="header">
+      <p class="diocese-label">DOWN &amp; CONNOR</p>
+      <h1>DOWN &amp; CONNOR DIOCESE BIG BULLETIN</h1>
+      <p class="meta">Generated for 13/06/2026.</p>
+    </header>
+
+    <!-- Tabs -->
+    <div class="tabs" role="tablist" aria-label="Bulletin view">
+      <button class="tab-btn active" type="button" role="tab" aria-selected="true" data-tab="pdf" onclick="switchTab('pdf', this)">📄 Parish Bulletin (PDF)</button>
+      <button class="tab-btn" type="button" role="tab" aria-selected="false" data-tab="ocr" onclick="switchTab('ocr', this)">📝 Searchable Bulletin Text</button>
+    </div>
+
+    <!-- Panel Container -->
+    <div class="panel-container">
+      
+      <!-- PDF Panel -->
+      <div id="panel-pdf" class="view-panel active">
+        <div class="panel-toolbar">
+          <a class="toolbar-btn" href="../mega_pdf/down_and_connor_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer">↗ Open PDF in new tab</a>
+          <a class="toolbar-btn" href="../mega_pdf/down_and_connor_mega_bulletin.pdf" download>⬇ Download PDF</a>
+        </div>
+        <div class="pdf-controls" data-controls="top">
+          <button data-action="prev" type="button" aria-label="Previous PDF page">← Previous page</button>
+          <span data-role="page-indicator">Page 1 of 55</span>
+          <button data-action="next" type="button" aria-label="Next PDF page">Next page →</button>
+        </div>
+        <div id="pdf-canvas-wrap" class="pdf-canvas-wrap">
+          <canvas id="pdf-canvas" title="Down &amp; Connor Diocese bulletin PDF"></canvas>
+        </div>
+        <div class="pdf-controls" data-controls="bottom">
+          <button data-action="prev" type="button" aria-label="Previous PDF page">← Previous page</button>
+          <span data-role="page-indicator">Page 1 of 55</span>
+          <button data-action="next" type="button" aria-label="Next PDF page">Next page →</button>
+        </div>
+      </div>
+
+      <!-- OCR Panel -->
+      <div id="panel-ocr" class="view-panel">
+        <div class="panel-toolbar">
+          <a class="toolbar-btn" href="down_and_connor-2026-06-13-ocr.html" target="_blank" rel="noopener noreferrer">↗ Open bulletin text in new tab</a>
+        </div>
+        <div class="ocr-search-bar">
+          <input id="ocr-search" class="search-input" type="search" placeholder="🔍 Search OCR text..." aria-label="Search OCR text" />
+          <button id="clear-search" class="search-clear" type="button" aria-label="Clear OCR search" hidden>×</button>
+        </div>
+        <div class="ocr-search-tools">
+          <span id="ocr-match-count" class="match-count">0 matches</span>
+          <div>
+            <button id="ocr-prev" type="button" disabled aria-label="Previous search match">← Prev match</button>
+            <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
+          </div>
+        </div>
+        <div id="ocr-panel"><section id="ocr-page-1">
+<h3 class="ocr-page-heading">PAGE 1</h3>
+<p><strong>OCR text is temporarily unavailable.</strong> Vision OCR failed and no embedded PDF text was found.</p>
+<p>Please use the original PDF until the next harvest run completes.</p>
+</section></div>
+        <div class="note-box">This bulletin text is auto-generated from the PDF. Irish (Gaeilge) and English are kept as printed. Please verify mass times and names against the original PDF.</div>
+      </div>
+
+    </div>
+
+    <!-- Parish Links Section -->
+    <section class="parish-section">
+      <h2>DOWN &amp; CONNOR Parishes with Working Bulletin Links</h2>
+      <input id="parish-filter" class="parish-filter" type="search" placeholder="🔍 Filter parishes..." aria-label="Filter parishes" />
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="https://www.aghagallonandballinderryparish.ie" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Aghagallon and Ballinderry</span></a></li><li class="parish-item" data-name="antrim"><a class="parish-link" href="https://www.antrimparish.com/bulletinpage/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Antrim</span></a></li><li class="parish-item" data-name="ballycastle"><a class="parish-link" href="https://www.ballycastleparish.com/s/12th-April-2026.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Ballycastle</span></a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="https://ballyclareballygowan.com/notice%20board.htm" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Ballyclare and Ballygowan</span></a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="https://ballymenaparish.org" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Ballymena</span></a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="https://www.ballymoneyparish.com" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Ballymoney</span></a></li><li class="parish-item" data-name="bangor"><a class="parish-link" href="https://www.bangorparish.com" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Bangor</span></a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="https://parishofbright.net/wp-content/uploads/2026/04/Bulletin-5-04-2026.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Bright</span></a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="https://www.carrickparish.org" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Carrickfergus</span></a></li><li class="parish-item" data-name="christ the redeemer"><a class="parish-link" href="https://www.christtheredeemer.co.uk/parish-bulletin" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Christ the Redeemer</span></a></li><li class="parish-item" data-name="corpus christi belfast"><a class="parish-link" href="https://www.corpuschristiparishbelfast.com/news" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Corpus Christi Belfast</span></a></li><li class="parish-item" data-name="derriaghy"><a class="parish-link" href="https://derriaghycatholicparish.com" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Derriaghy</span></a></li><li class="parish-item" data-name="drumbo and carryduff"><a class="parish-link" href="https://www.drumbocarryduff.ie/#sbp-bulletin" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Drumbo and Carryduff</span></a></li><li class="parish-item" data-name="dunsford and ardglass"><a class="parish-link" href="https://www.dunsfordandardglassparish.com/?page_id=623" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Dunsford and Ardglass</span></a></li><li class="parish-item" data-name="glenariffe"><a class="parish-link" href="https://glenariffeparish.org/whats-on" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Glenariffe</span></a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="https://www.glenavyandkilleadparish.com" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Glenavy and Killead</span></a></li><li class="parish-item" data-name="hannahstown"><a class="parish-link" href="https://www.parishofhannahstown.com/weekly-bulletins" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Hannahstown</span></a></li><li class="parish-item" data-name="holy cross belfast"><a class="parish-link" href="http://www.holycrossparishbelfast.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Holy Cross Belfast</span></a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="https://www.holy-familyparish.com/bulletin/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Holy Family</span></a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="https://www.holyrosaryparishbelfast.net/weekly-bulletin" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Holy Rosary Belfast</span></a></li><li class="parish-item" data-name="holy trinity belfast"><a class="parish-link" href="https://holytrinityparishbelfast.com/newsletters/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Holy Trinity Belfast</span></a></li><li class="parish-item" data-name="kilmore and killyleagh"><a class="parish-link" href="https://www.kilmoreandkillyleagh.com" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Kilmore and Killyleagh</span></a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="https://parishoflisburn.org" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Lisburn</span></a></li><li class="parish-item" data-name="loughshore"><a class="parish-link" href="https://www.loughshoreparishes.org/sunday-bulletin/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Loughshore</span></a></li><li class="parish-item" data-name="maghera"><a class="parish-link" href="https://www.parishofmaghera.com/copy-of-sunday-missalette" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Maghera</span></a></li><li class="parish-item" data-name="nativity"><a class="parish-link" href="https://www.nativityparish.com/news" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Nativity</span></a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="https://www.ourladyqueenofpeacekilwee.com/bulletins" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Our Lady Queen of Peace</span></a></li><li class="parish-item" data-name="port glenone"><a class="parish-link" href="https://stmarysportglenone.co.uk/?page_id=40" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Port Glenone</span></a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="https://portaferryparish.com/bulletin" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Portaferry</span></a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="https://portstewartparish.website/mdocs-posts/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Portstewart</span></a></li><li class="parish-item" data-name="sacred heart belfast"><a class="parish-link" href="https://www.sacredheartparishbelfast.com/gallery/Parish%20Bulletin%2012th%20April%202026.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Sacred Heart Belfast</span></a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="https://www.saintannesparish.net" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Saint Annes</span></a></li><li class="parish-item" data-name="saint anthony"><a class="parish-link" href="http://www.saintanthony.co.uk" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Saint Anthony</span></a></li><li class="parish-item" data-name="saint malachy&#x27;s"><a class="parish-link" href="https://www.saintmalachysparish.com/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Saint Malachy&#x27;s</span></a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="https://www.saulandballeeparish.com" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Saul and Ballee</span></a></li><li class="parish-item" data-name="st agnes belfast"><a class="parish-link" href="https://www.stagnesbelfast.com/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Agnes Belfast</span></a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="https://www.stbernadettesparish.org/bulletin/uploaded/Parish%20Bulletin%2012th%20April%202026.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Bernadettes</span></a></li><li class="parish-item" data-name="st brigids belfast"><a class="parish-link" href="https://stbrigidsparishbelfast.org" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Brigids Belfast</span></a></li><li class="parish-item" data-name="st colmcilles"><a class="parish-link" href="https://st-colmcilles.net/weekly-bulletins/past-weeks-bulletins/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Colmcilles</span></a></li><li class="parish-item" data-name="st gerards"><a class="parish-link" href="https://stgerardsparish.org/parish-news-events/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Gerards</span></a></li><li class="parish-item" data-name="st luke&#x27;s belfast"><a class="parish-link" href="https://www.stlukesparishbelfast.com/news" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Luke&#x27;s Belfast</span></a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="https://www.stmacnissirandalstown.com/bulletin" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St MacNissi Randalstown</span></a></li><li class="parish-item" data-name="st mary&#x27;s belfast"><a class="parish-link" href="https://www.stmarysbelfast.org/news" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Mary&#x27;s Belfast</span></a></li><li class="parish-item" data-name="st mary&#x27;s on the hill"><a class="parish-link" href="https://www.stmarysonthehill.online/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Mary&#x27;s on the Hill</span></a></li><li class="parish-item" data-name="st matthew&#x27;s"><a class="parish-link" href="https://www.stmatthewsparish.com/news" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Matthew&#x27;s</span></a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="https://saintmichaelthearchangel.godaddysites.com/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Michael the Archangel</span></a></li><li class="parish-item" data-name="st oliver plunkett"><a class="parish-link" href="https://stoliverplunkettparish.ie" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Oliver Plunkett</span></a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="https://stpatricksdownpatrick.com/parish-bulletins/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Patrick&#x27;s Downpatrick</span></a></li><li class="parish-item" data-name="st patricks belfast"><a class="parish-link" href="https://www.stpatricksbelfast.org/category/weekly-bulletins/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Patricks Belfast</span></a></li><li class="parish-item" data-name="st teresas"><a class="parish-link" href="https://stteresasparish.church/parish-news/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Teresas</span></a></li><li class="parish-item" data-name="st vincent de paul belfast"><a class="parish-link" href="https://www.stvincentdepaulparishbelfast.com/news" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Vincent de Paul Belfast</span></a></li></ul>
+    </section>
+  </div>
+  <!-- Support Banner -->
+  <div style="max-width:1400px;margin:24px auto 0;padding:0 16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;background:#fff;border:1px solid #d6ecea;border-radius:12px;padding:14px 18px;">
+      <span style="font-size:0.95rem;color:#4b5563;">📊 <span id="view-count">–</span> views this week</span>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <a href="https://github.com/Frankytyrone/parish_harvester" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#24292e;color:#fff;border-radius:8px;font-weight:600;font-size:0.9rem;text-decoration:none;">⭐ Star on GitHub</a>
+        <a href="https://buymeacoffee.com/frankytyrone" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#FFDD00;color:#000;border-radius:8px;font-weight:700;font-size:0.9rem;text-decoration:none;">☕ Buy Me a Coffee</a>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <div class="footer-inner">
+      <span>© 2026 Parish Press — Free forever for all Irish parishes</span>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <a href="https://github.com/Frankytyrone/parish_harvester" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://buymeacoffee.com/frankytyrone" target="_blank" rel="noopener noreferrer">☕ Donate</a>
+      </div>
+    </div>
+  </footer>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+  <script>
+    // Tab Switching
+    function switchTab(tabName, button) {
+      document.querySelectorAll('.view-panel').forEach(function(panel) {
+        panel.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-btn').forEach(function(btn) {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-selected', 'false');
+      });
+      document.getElementById('panel-' + tabName).classList.add('active');
+      button.classList.add('active');
+      button.setAttribute('aria-selected', 'true');
+    }
+
+    (function () {
+      const pdfHref = '../mega_pdf/down_and_connor_mega_bulletin.pdf';
+      const initialPages = 55;
+      const canvas = document.getElementById('pdf-canvas');
+      const canvasWrap = document.getElementById('pdf-canvas-wrap');
+      const context = canvas.getContext('2d');
+      const ocrPanel = document.getElementById('ocr-panel');
+      const indicators = Array.from(document.querySelectorAll('[data-role="page-indicator"]'));
+      const prevButtons = Array.from(document.querySelectorAll('button[data-action="prev"]'));
+      const nextButtons = Array.from(document.querySelectorAll('button[data-action="next"]'));
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      const parishFilter = document.getElementById('parish-filter');
+      const parishItems = Array.from(document.querySelectorAll('.parish-item'));
+      const parishEmpty = document.getElementById('parish-empty');
+      const originalOcrHtml = ocrPanel.innerHTML;
+      const pdfjs = window['pdfjs-dist/build/pdf'] || window.pdfjsLib;
+      let currentPage = 1;
+      let totalPages = initialPages;
+      let pdfDoc = null;
+      let isRendering = false;
+      let pendingPage = null;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+
+      if (!pdfjs) {
+        return;
+      }
+
+      pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+      function escapeRegExp(text) {
+        const specials = new Set(['\\', '^', '$', '.', '|', '?', '*', '+', '(', ')', '[', ']', '{', '}']);
+        return Array.from(text).map((ch) => specials.has(ch) ? `\\${ch}` : ch).join('');
+      }
+
+      function updateControls() {
+        indicators.forEach((indicator) => {
+          indicator.textContent = `Page ${currentPage} of ${totalPages}`;
+        });
+        prevButtons.forEach((button) => {
+          button.disabled = currentPage <= 1 || !pdfDoc;
+        });
+        nextButtons.forEach((button) => {
+          button.disabled = currentPage >= totalPages || !pdfDoc;
+        });
+      }
+
+      function queueRender(pageNumber) {
+        if (isRendering) {
+          pendingPage = pageNumber;
+          return;
+        }
+        renderPage(pageNumber);
+      }
+
+      async function renderPage(pageNumber) {
+        if (!pdfDoc) {
+          return;
+        }
+        isRendering = true;
+        currentPage = pageNumber;
+        updateControls();
+        const page = await pdfDoc.getPage(pageNumber);
+        const viewport = page.getViewport({ scale: 1 });
+        const availableWidth = Math.max(canvasWrap.clientWidth - 16, 100);
+        const scale = availableWidth / viewport.width;
+        const scaledViewport = page.getViewport({ scale });
+        canvas.width = Math.floor(scaledViewport.width);
+        canvas.height = Math.floor(scaledViewport.height);
+        canvas.style.width = '100%';
+        canvas.style.height = 'auto';
+        await page.render({
+          canvasContext: context,
+          viewport: scaledViewport,
+        }).promise;
+        // PDF page changes do not scroll the bulletin text panel.
+        isRendering = false;
+        if (pendingPage !== null) {
+          const queued = pendingPage;
+          pendingPage = null;
+          queueRender(queued);
+        }
+      }
+
+      function goToPage(nextPage) {
+        if (!pdfDoc) {
+          return;
+        }
+        const clamped = Math.min(Math.max(nextPage, 1), totalPages);
+        if (clamped === currentPage && !isRendering) {
+          return;
+        }
+        queueRender(clamped);
+      }
+
+      prevButtons.forEach((button) => {
+        button.addEventListener('click', function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          goToPage(currentPage - 1);
+        });
+      });
+      nextButtons.forEach((button) => {
+        button.addEventListener('click', function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          goToPage(currentPage + 1);
+        });
+      });
+
+      new ResizeObserver(function () {
+        if (pdfDoc) {
+          queueRender(currentPage);
+        }
+      }).observe(canvasWrap);
+
+      pdfjs.getDocument(pdfHref).promise.then(function (doc) {
+        pdfDoc = doc;
+        totalPages = doc.numPages || initialPages;
+        updateControls();
+        queueRender(currentPage);
+      }).catch(function () {
+        updateControls();
+      });
+
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        const target = ocrMatches[idx];
+        target.classList.add('search-active');
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      function updateMatchUi() {
+        if (!matchCount || !prevMatchBtn || !nextMatchBtn) return;
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} / ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+
+      function applyOcrSearch(query) {
+        ocrPanel.innerHTML = originalOcrHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrPanel, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) {
+            nodes.push(node);
+          }
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) {
+            return;
+          }
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match = null;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) {
+              fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            }
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) {
+            fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          }
+          node.parentNode.replaceChild(fragment, node);
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+
+      ocrSearch.addEventListener('input', function (event) {
+        applyOcrSearch(event.target.value.trim());
+      });
+      clearSearch.addEventListener('click', function () {
+        ocrSearch.value = '';
+        applyOcrSearch('');
+        ocrSearch.focus();
+      });
+      prevMatchBtn.addEventListener('click', function () {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', function () {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' && ocrMatches.length) {
+          event.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+
+      parishFilter.addEventListener('input', function (event) {
+        const term = event.target.value.trim().toLowerCase();
+        let visibleCount = 0;
+        parishItems.forEach((item) => {
+          const matches = item.dataset.name.includes(term);
+          item.hidden = !matches;
+          if (matches) {
+            visibleCount += 1;
+          }
+        });
+        if (parishEmpty) {
+          parishEmpty.hidden = visibleCount !== 0;
+        }
+      });
+
+      updateControls();
+      updateMatchUi();
+    })();
+
+    // ── View Counter (localStorage) ──────────────────────────────────
+    (function() {
+      var key = 'ph_views_' + location.pathname;
+      var weekKey = 'ph_views_week';
+      var now = new Date();
+      var weekId = now.getFullYear() + '-W' + String(Math.ceil((now - new Date(now.getFullYear(),0,1)) / 86400000 / 7)).padStart(2,'0');
+      try {
+        var views = JSON.parse(localStorage.getItem(key) || '{}'  );
+        if (views.week !== weekId) { views = { week: weekId, count: 0 }; }
+        views.count += 1;
+        localStorage.setItem(key, JSON.stringify(views));
+        // Update total weekly views across all pages
+        var total = JSON.parse(localStorage.getItem(weekKey) || '{}'  );
+        if (total.week !== weekId) { total = { week: weekId, count: 0 }; }
+        total.count += 1;
+        localStorage.setItem(weekKey, JSON.stringify(total));
+        var el = document.getElementById('view-count');
+        if (el) el.textContent = total.count;
+      } catch(e) {}
+    })();
+
+    // ── Self-Check: Is this week's bulletin available? ───────────────
+    (function() {
+      var generated = document.querySelector('.meta');
+      if (!generated) return;
+      var text = generated.textContent || '';
+      var match = text.match(/(\d{4})-(\d{2})-(\d{2})/);
+      if (!match) {
+        match = text.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+        if (match) match = [null, match[3], match[2], match[1]];
+      }
+      if (!match) return;
+      var bulletinDate = new Date(match[1] + '-' + match[2] + '-' + match[3]);
+      var now = new Date();
+      var daysSince = Math.floor((now - bulletinDate) / 86400000);
+      if (daysSince > 8) {
+        var banner = document.createElement('div');
+        banner.style.cssText = 'max-width:1400px;margin:12px auto;padding:0 16px;';
+        banner.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px 16px;color:#991b1b;font-weight:600;text-align:center;">⚠️ This bulletin is ' + daysSince + ' days old. A newer version may be available — check back after Sunday\'s harvest run.</div>';
+        var page = document.querySelector('.page');
+        if (page) page.insertBefore(banner, page.firstChild);
+      }
+    })();
+  </script>
+</body>
+</html>
