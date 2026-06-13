@@ -33,6 +33,7 @@ Harvest (per-parish errors isolated)
 | `harvester/recipe_health.py` | Auto-inactivate recipes from DNS health |
 | `harvester/html_capture.py` | Archive-aware HTML → PDF (dated link + content column) |
 | `harvester/cloud_urls.py` | Google Drive + OneDrive URL normalization |
+| `harvester/browser_launch.py` | Anti-bot browser settings + headful CI fallback |
 | `scripts/run_site_health.py` | CLI to probe evidence URLs |
 
 ## What we deliberately did NOT delete

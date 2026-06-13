@@ -46,8 +46,14 @@ from .config import (
     TOTAL_TIMEOUT_S,
 )
 from . import learned_recipes
-from .cloud_urls import normalize_document_url, unwrap_docs_viewer_url
+from .browser_launch import (
+    headful_fallback_enabled,
+    launch_harvester_browser,
+    looks_like_bot_block,
+    new_harvester_context,
+)
 from .bulletin_freshness import check_bulletin_freshness, mark_result_stale, suggest_retry_strategy
+from .cloud_urls import normalize_document_url
 from .html_capture import capture_html_page_as_pdf
 from .replay import RecipeReplayError, _print_page_to_pdf, recipe_path_for, replay_recipe
 from .pattern_detector import detect_pattern, save_pattern_change
@@ -458,6 +464,7 @@ def _get_host_profile(start_url: str) -> dict:
         "wait_after_load_ms": int(merged.get("wait_after_load_ms", 1500)),
         "max_retries": int(merged.get("max_retries", _MAX_ATTEMPTS - 1)),
         "retry_backoff_ms": int(merged.get("retry_backoff_ms", int(_RETRY_DELAY_S * 1000))),
+        "prefer_headful": bool(merged.get("prefer_headful", False)),
     }
 
 
@@ -532,7 +539,7 @@ async def _try_force_html_to_pdf(
     key = entry.key
     navigation_timeout_ms = int(host_profile.get("navigation_timeout_ms", PAGE_LOAD_TIMEOUT_MS))
     wait_after_load_ms = int(host_profile.get("wait_after_load_ms", 3000))
-    context = await browser.new_context()
+    context = await new_harvester_context(browser)
     page = await context.new_page()
     try:
         encoded = url.replace(" ", "%20")
@@ -877,7 +884,7 @@ async def _scrape_and_download(
     host_profile: dict | None = None,
 ) -> FetchResult:
     """Scrape a page for bulletin document links and download the best match."""
-    context = await browser.new_context()
+    context = await new_harvester_context(browser)
     page = await context.new_page()
     key = entry.key
     last_err = "No downloadable bulletin links found"
@@ -1115,7 +1122,7 @@ async def _download_pdf(
     # Convert Google Drive viewer links to direct-download URLs
     url = _rewrite_gdrive_url(url)
 
-    context = await browser.new_context()
+    context = await new_harvester_context(browser)
     try:
         # Pre-download size check via HEAD request
         try:
@@ -1195,7 +1202,7 @@ async def _download_docx_as_pdf(
     timeout_ms: int = PAGE_LOAD_TIMEOUT_MS,
 ) -> None:
     """Download a .docx file and convert it to PDF via LibreOffice or python-docx."""
-    context = await browser.new_context()
+    context = await new_harvester_context(browser)
     try:
         page = await context.new_page()
         response = await page.request.get(url, timeout=timeout_ms)
@@ -1278,7 +1285,7 @@ async def _download_image_as_pdf(
     """Download a JPEG/PNG image and convert it to a single-page PDF."""
     from PIL import Image  # type: ignore[import]
 
-    context = await browser.new_context()
+    context = await new_harvester_context(browser)
     try:
         page = await context.new_page()
         response = await page.request.get(url, timeout=timeout_ms)
@@ -1436,7 +1443,7 @@ async def _extract_condensed_page_links(
     browser: Browser,
     host_profile: dict | None = None,
 ) -> tuple[str, list[tuple[str, str]]]:
-    context = await browser.new_context()
+    context = await new_harvester_context(browser)
     page = await context.new_page()
     host_profile = host_profile or _get_host_profile(scrape_url)
     navigation_timeout_ms = int(host_profile.get("navigation_timeout_ms", PAGE_LOAD_TIMEOUT_MS))
@@ -2053,6 +2060,55 @@ async def _fetch_entry(
     )
 
 
+async def _retry_entry_headful(
+    entry: ParishEntry,
+    output_dir: Path,
+    target: date,
+    manual_overrides: dict[str, dict[str, str]] | None,
+) -> FetchResult:
+    """One headful-browser attempt for hosts that block headless CI."""
+    recipe_meta = _load_recipe_metadata(recipe_path_for(entry.key, PARISHES_DIR))
+    host_profile = _get_host_profile(
+        _recipe_start_url(entry, recipe_meta, entry.bulletin_page or entry.example_url)
+    )
+    async with async_playwright() as pw:
+        browser = await launch_harvester_browser(pw, headless=False)
+        try:
+            async with asyncio.timeout(TOTAL_TIMEOUT_S):
+                result = await _fetch_entry(
+                    entry,
+                    output_dir,
+                    target,
+                    browser,
+                    manual_overrides=manual_overrides,
+                )
+            if result.status == "ok":
+                dest = output_dir / safe_filename(entry.key, ".pdf")
+                result = await _recover_stale_bulletin(
+                    result,
+                    entry,
+                    target,
+                    dest,
+                    browser,
+                    recipe_meta,
+                    host_profile,
+                )
+            return result
+        except TimeoutError:
+            return FetchResult(
+                key=entry.key,
+                display_name=entry.display_name,
+                status="error",
+                url=calculate_url(entry, target),
+                error="Headful fallback timed out",
+            )
+        finally:
+            try:
+                await browser.close()
+            except Exception:
+                pass
+
+
 async def fetch_parish(
     entry: ParishEntry,
     output_dir: Path,
@@ -2120,6 +2176,18 @@ async def fetch_parish(
             )
             await asyncio.to_thread(time.sleep, retry_backoff_ms / 1000)
 
+    if headful_fallback_enabled() and (
+        host_profile.get("prefer_headful") or looks_like_bot_block(last_error)
+    ):
+        print(f"  🖥️  {entry.key}: trying headful browser fallback")
+        headful_result = await _retry_entry_headful(
+            entry, output_dir, target, manual_overrides
+        )
+        if headful_result.status == "ok":
+            return headful_result
+        if headful_result.error:
+            last_error = f"{last_error}; headful fallback: {headful_result.error}"
+
     return FetchResult(
         key=entry.key, display_name=entry.display_name,
         status="error",
@@ -2148,7 +2216,7 @@ async def fetch_all(
             )
 
     async with async_playwright() as pw:
-        browser = await pw.chromium.launch(headless=True)
+        browser = await launch_harvester_browser(pw, headless=True)
         tasks = [_bounded(e, browser) for e in entries]
         results = list(await asyncio.gather(*tasks, return_exceptions=True))
 

@@ -83,7 +83,7 @@ jobs:
           if [ -n "${{ github.event.inputs.target_parish }}" ]; then
             ARGS="$ARGS --target-parish ${{ github.event.inputs.target_parish }}"
           fi
-          python main.py $ARGS
+          xvfb-run -a python main.py $ARGS
         env:
           HARVEST_EMAIL_TO: ${{ secrets.HARVEST_EMAIL_TO }}
           HARVEST_EMAIL_FROM: ${{ secrets.HARVEST_EMAIL_FROM }}
