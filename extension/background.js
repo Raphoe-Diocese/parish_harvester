@@ -599,6 +599,41 @@ function _normalizeRecipeTerminalSteps(recipe) {
   return { ...recipe, steps: normalizedSteps };
 }
 
+function _preserveTrainedClickRecipe(existingRecipe, incoming, mergedRecipe) {
+  if (!existingRecipe || !Array.isArray(existingRecipe.steps)) return mergedRecipe;
+  const existingHasClick = existingRecipe.steps.some(
+    (step) => String(step?.action || "").trim() === "click"
+  );
+  if (!existingHasClick) return mergedRecipe;
+
+  const incomingSteps = Array.isArray(incoming.steps) ? incoming.steps : [];
+  const incomingHasNavigation = incomingSteps.some((step) => {
+    const action = String(step?.action || "").trim();
+    return action === "goto" || action === "click";
+  });
+  const incomingIsDownloadOnly = incomingSteps.length > 0 && incomingSteps.every((step) => {
+    const action = String(step?.action || "").trim();
+    return action === "download" || action === "image" || action === "html";
+  });
+  if (!incomingIsDownloadOnly || incomingHasNavigation) return mergedRecipe;
+
+  const preservedSteps = existingRecipe.steps.filter((step) => {
+    const action = String(step?.action || "").trim();
+    return action === "goto" || action === "click";
+  });
+  if (!preservedSteps.length) return mergedRecipe;
+
+  return {
+    ...mergedRecipe,
+    playbook_type: existingRecipe.playbook_type || mergedRecipe.playbook_type,
+    site_type: existingRecipe.site_type || mergedRecipe.site_type,
+    start_url: existingRecipe.start_url || mergedRecipe.start_url,
+    disable_html_render_fallback:
+      existingRecipe.disable_html_render_fallback ?? mergedRecipe.disable_html_render_fallback,
+    steps: preservedSteps,
+  };
+}
+
 function _canonicalDioceseSlug(value) {
   const raw = String(value || "").trim().toLowerCase();
   if (!raw) return "";
@@ -753,7 +788,8 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         display_name: (incoming.display_name && incoming.display_name.trim()) ? incoming.display_name.trim() : existingRecipe.display_name,
         diocese:      (incoming.diocese      && incoming.diocese.trim())      ? incoming.diocese.trim()      : existingRecipe.diocese,
       } : incoming;
-      const normalizedRecipe = _normalizeRecipeTerminalSteps(recipe);
+      const mergedRecipe = _preserveTrainedClickRecipe(existingRecipe, incoming, recipe);
+      const normalizedRecipe = _normalizeRecipeTerminalSteps(mergedRecipe);
       const recipeStatus = String(normalizedRecipe.status || "").toLowerCase();
       if (recipeStatus === "dead_url" || recipeStatus === "inactive" || normalizedRecipe.skip) {
         normalizedRecipe.skip = true;

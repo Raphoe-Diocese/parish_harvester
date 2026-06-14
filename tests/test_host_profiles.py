@@ -15,6 +15,29 @@ class HostProfilesTests(unittest.TestCase):
         self.assertEqual(profile["navigation_timeout_ms"], 60000)
         self.assertEqual(profile["max_retries"], 3)
 
+    def test_get_host_profile_threepatrons_has_long_timeout(self) -> None:
+        profile = fetcher._get_host_profile("https://www.threepatrons.org/")
+
+        self.assertEqual(profile["navigation_timeout_ms"], 60000)
+        self.assertEqual(profile["total_timeout_s"], 120)
+        self.assertTrue(profile["prefer_headful"])
+
+    def test_recipe_uses_trained_click_download(self) -> None:
+        recipe = {
+            "playbook_type": "weekly_bulletin_download",
+            "steps": [{"action": "goto", "url": "https://threepatrons.org/"}],
+        }
+        self.assertTrue(fetcher._recipe_uses_trained_click_download(recipe))
+
+        click_recipe = {
+            "steps": [
+                {"action": "goto", "url": "https://example.org/"},
+                {"action": "click", "selector": "a"},
+            ]
+        }
+        self.assertTrue(fetcher._recipe_uses_trained_click_download(click_recipe))
+        self.assertFalse(fetcher._recipe_uses_trained_click_download({"steps": [{"action": "download"}]}))
+
     def test_get_host_profile_returns_defaults_for_unlisted_host(self) -> None:
         profile = fetcher._get_host_profile("https://example.org/bulletins")
 

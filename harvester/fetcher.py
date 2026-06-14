@@ -480,7 +480,40 @@ def _get_host_profile(start_url: str) -> dict:
         "max_retries": int(merged.get("max_retries", _MAX_ATTEMPTS - 1)),
         "retry_backoff_ms": int(merged.get("retry_backoff_ms", int(_RETRY_DELAY_S * 1000))),
         "prefer_headful": bool(merged.get("prefer_headful", False)),
+        "total_timeout_s": int(merged.get("total_timeout_s", TOTAL_TIMEOUT_S)),
     }
+
+
+def _recipe_uses_trained_click_download(recipe_meta: dict | None) -> bool:
+    """True when a parish should be harvested via trained click steps, not URL guessing."""
+    if not isinstance(recipe_meta, dict):
+        return False
+    if str(recipe_meta.get("playbook_type") or "").strip() == "weekly_bulletin_download":
+        return True
+    steps = recipe_meta.get("steps")
+    if not isinstance(steps, list):
+        return False
+    return any(
+        isinstance(step, dict) and str(step.get("action") or "").strip() == "click"
+        for step in steps
+    )
+
+
+def _failure_report_url(
+    entry: ParishEntry,
+    recipe_meta: dict | None,
+    target: date,
+) -> str:
+    """URL to record on failure — avoid Pattern H guesses for click-trained parishes."""
+    if _recipe_uses_trained_click_download(recipe_meta):
+        start_url = _recipe_start_url(
+            entry,
+            recipe_meta or {},
+            entry.bulletin_page or entry.example_url,
+        )
+        if start_url:
+            return start_url
+    return calculate_url(entry, target)
 
 
 def _rendered_pdf_looks_usable(path: Path) -> bool:
@@ -1985,7 +2018,10 @@ async def _fetch_entry(
             if dest.exists() and not _is_real_pdf(dest, key):
                 dest.unlink(missing_ok=True)
         elif entry.content_type != "html_link":
-            print(f"  ↪️  {key}: recipe failed — trying direct URL download")
+            if _recipe_uses_trained_click_download(recipe_meta):
+                print(f"  ↪️  {key}: trained click recipe failed — skipping Pattern H URL guess")
+            else:
+                print(f"  ↪️  {key}: recipe failed — trying direct URL download")
             if dest.exists() and not _is_real_pdf(dest, key):
                 dest.unlink(missing_ok=True)
         else:
@@ -1998,8 +2034,8 @@ async def _fetch_entry(
         if printed is not None:
             return printed
 
-    # Non-html entries keep URL prediction first.
-    if entry.content_type != "html_link":
+    # Non-html entries keep URL prediction first — unless a click recipe is trained.
+    if entry.content_type != "html_link" and not _recipe_uses_trained_click_download(recipe_meta):
         primary_is_404 = False
         docx_candidates = [target_url]
         if entry.content_type == "docx" and "newsletter" in entry.example_url.lower():
@@ -2174,10 +2210,11 @@ async def _retry_entry_headful(
     host_profile = _get_host_profile(
         _recipe_start_url(entry, recipe_meta, entry.bulletin_page or entry.example_url)
     )
+    parish_timeout_s = max(TOTAL_TIMEOUT_S, int(host_profile.get("total_timeout_s", TOTAL_TIMEOUT_S)))
     async with async_playwright() as pw:
         browser = await launch_harvester_browser(pw, headless=False)
         try:
-            async with asyncio.timeout(TOTAL_TIMEOUT_S):
+            async with asyncio.timeout(parish_timeout_s):
                 result = await _fetch_entry(
                     entry,
                     output_dir,
@@ -2202,7 +2239,7 @@ async def _retry_entry_headful(
                 key=entry.key,
                 display_name=entry.display_name,
                 status="error",
-                url=calculate_url(entry, target),
+                url=_failure_report_url(entry, recipe_meta, target),
                 error="Headful fallback timed out",
             )
         finally:
@@ -2228,9 +2265,10 @@ async def fetch_parish(
     max_retries = max(0, int(host_profile.get("max_retries", _MAX_ATTEMPTS - 1)))
     retry_backoff_ms = max(0, int(host_profile.get("retry_backoff_ms", int(_RETRY_DELAY_S * 1000))))
     total_attempts = max_retries + 1
+    parish_timeout_s = max(TOTAL_TIMEOUT_S, int(host_profile.get("total_timeout_s", TOTAL_TIMEOUT_S)))
     for attempt in range(total_attempts):
         try:
-            async with asyncio.timeout(TOTAL_TIMEOUT_S):
+            async with asyncio.timeout(parish_timeout_s):
                 result = await _fetch_entry(
                     entry,
                     output_dir,
@@ -2294,7 +2332,7 @@ async def fetch_parish(
     return FetchResult(
         key=entry.key, display_name=entry.display_name,
         status="error",
-        url=calculate_url(entry, target),
+        url=_failure_report_url(entry, recipe_meta, target),
         error=last_error,
     )
 
@@ -2332,10 +2370,11 @@ async def fetch_all(
     final: list[FetchResult] = []
     for entry, result in zip(entries, results):
         if isinstance(result, Exception):
+            recipe_meta = _load_recipe_metadata(recipe_path_for(entry.key, PARISHES_DIR))
             final.append(FetchResult(
                 key=entry.key, display_name=entry.display_name,
                 status="error",
-                url=calculate_url(entry, target),
+                url=_failure_report_url(entry, recipe_meta, target),
                 error=str(result),
             ))
         else:
