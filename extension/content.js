@@ -918,7 +918,11 @@
     const hasFullDate = d !== null && d.month > 0 && d.day > 0;
     const hasDate = d !== null && d.year > 0;
     // tieBreaker does NOT include domIdx — position is handled by the sort comparator
-    const tieBreaker = keywordBonus + pdfBonus + docxBonus + uploadsBonus;
+    let tieBreaker = keywordBonus + pdfBonus + docxBonus + uploadsBonus;
+    const phrase = window.ph_copilot?.scorePhrase?.(url, label);
+    if (phrase) {
+      tieBreaker += phrase.bonus - phrase.penalty;
+    }
     return { dateScore, tieBreaker, hasDate, hasFullDate, total: dateScore * 100 + tieBreaker };
   };
 
@@ -3605,26 +3609,30 @@
           } found)`,
           "#16a34a",
           () => {
-            // Score each link using extracted date + keyword/filetype tie-breakers.
+            // Score each link — copilot rules prefer current newsletter + skip admin PDFs.
             const scored = pickableLinks.map((el, idx) => {
               const url = el.getAttribute("href") || "";
               const label = _getEnrichedLinkLabel(el);
               const s = scoreUrlCandidateStr(url, label, idx);
-              return { el, url, label, domIdx: idx, ...s };
+              const phrase = window.ph_copilot?.scorePhrase?.(url, label);
+              const adminSkip = phrase && phrase.penalty >= 120 && phrase.bonus < 40;
+              return { el, url, label, domIdx: idx, ...s, adminSkip };
             });
-            scored.sort(_bulletinDateSortFn);
+            const viable = scored.filter((c) => !c.adminSkip);
+            const pool = viable.length ? viable : scored;
+            pool.sort(_bulletinDateSortFn);
 
             // Ambiguous: no dates found at all, or top two candidates share the
             // same date score (cannot tell which is newer).
-            const hasAnyDate = scored.some((c) => c.hasDate);
+            const hasAnyDate = pool.some((c) => c.hasDate);
             const ambiguous =
               !hasAnyDate ||
-              (scored.length > 1 && scored[0].dateScore === scored[1].dateScore);
+              (pool.length > 1 && pool[0].dateScore === pool[1].dateScore);
 
             if (!ambiguous) {
-              showPickConfirmation(scored[0].el);
+              showPickConfirmation(pool[0].el);
             } else {
-              showPickMultipleChoice(scored.slice(0, 3), hasAnyDate);
+              showPickMultipleChoice(pool.slice(0, 3), hasAnyDate);
             }
           },
           "Automatically selects the most recent bulletin link for you to confirm"
@@ -5351,6 +5359,191 @@
     return { ok: false, reason: "Unsupported action." };
   };
 
+  // ── Training Copilot ─────────────────────────────────────────────────────
+
+  let _copilotPick = null;
+  let _copilotRingEl = null;
+
+  const _copilotClearRing = () => {
+    if (_copilotRingEl?.parentNode) _copilotRingEl.parentNode.removeChild(_copilotRingEl);
+    _copilotRingEl = null;
+  };
+
+  const _copilotCollectLinks = () => {
+    const detected = detectPageType();
+    const elements = detected.links?.length
+      ? Array.from(detected.links)
+      : _filterBulletinCandidates(document.querySelectorAll("a[href]"));
+    return elements.map((el, domIdx) => {
+      const href = el.getAttribute("href") || "";
+      let absUrl = href;
+      try { absUrl = new URL(href, window.location.href).href; } catch (_e) { /* keep raw */ }
+      const label = _getEnrichedLinkLabel(el);
+      return {
+        el,
+        domIdx,
+        url: absUrl,
+        label,
+        selector: buildStableLinkSelector(el),
+      };
+    });
+  };
+
+  const _copilotGetPins = () => new Promise((resolve) => {
+    const key = window.ph_copilot?.PINS_KEY || "ph_copilot_pins";
+    if (typeof chrome === "undefined" || !chrome.storage?.local) {
+      resolve({});
+      return;
+    }
+    chrome.storage.local.get([key], (r) => resolve(r?.[key] && typeof r[key] === "object" ? r[key] : {}));
+  });
+
+  const _copilotSavePin = (pin) => new Promise((resolve) => {
+    const key = window.ph_copilot?.PINS_KEY || "ph_copilot_pins";
+    const host = window.ph_copilot?.normHost?.(window.location.href) || "";
+    if (!host || typeof chrome === "undefined" || !chrome.storage?.local) {
+      resolve(false);
+      return;
+    }
+    _copilotGetPins().then((pins) => {
+      const next = { ...pins, [host]: { ...pin, pinnedAt: new Date().toISOString() } };
+      chrome.storage.local.set({ [key]: next }, () => resolve(!chrome.runtime?.lastError));
+    });
+  });
+
+  const _copilotRingElement = (el) => {
+    _copilotClearRing();
+    if (!el) return;
+    const ring = document.createElement("div");
+    ring.id = "ph-copilot-ring";
+    Object.assign(ring.style, {
+      position: "fixed",
+      pointerEvents: "none",
+      border: "3px solid #22d3ee",
+      background: "rgba(34,211,238,0.15)",
+      borderRadius: "6px",
+      zIndex: "2147483646",
+      boxSizing: "border-box",
+      boxShadow: "0 0 12px rgba(34,211,238,0.5)",
+    });
+    const place = () => {
+      const r = el.getBoundingClientRect();
+      Object.assign(ring.style, {
+        left: `${r.left - 3}px`,
+        top: `${r.top - 3}px`,
+        width: `${r.width + 6}px`,
+        height: `${r.height + 6}px`,
+        display: r.width > 0 ? "block" : "none",
+      });
+    };
+    place();
+    document.documentElement.appendChild(ring);
+    _copilotRingEl = ring;
+    const onScroll = () => place();
+    window.addEventListener("scroll", onScroll, true);
+    ring._cleanup = () => window.removeEventListener("scroll", onScroll, true);
+  };
+
+  const _copilotRecordPick = (pick) => {
+    if (!pick?.el) return { ok: false, reason: "No link selected." };
+    _ensureToolbar(true);
+    const clickStep = {
+      action: "click",
+      selector: pick.selector,
+      href: pick.url,
+      text: pick.label,
+    };
+    const clickLabel = `🔗 Click: "${pick.label || pick.selector}"`;
+    if (_inStandaloneMode()) {
+      standaloneAddStep(clickStep, "click", clickLabel);
+      void _persistRecordingSession();
+      return { ok: true, reason: "Recorded in recipe." };
+    }
+    if (typeof window.ph_record_click === "function") {
+      try {
+        window.ph_record_click({
+          tag: (pick.el.tagName || "").toLowerCase(),
+          role: (pick.el.getAttribute("role") || "").toLowerCase(),
+          text: (pick.el.innerText || pick.el.textContent || "").trim().slice(0, 200),
+          href: pick.el.getAttribute("href") || "",
+          css_path: cssPath(pick.el),
+        });
+        addSessionStep("click", clickLabel);
+        return { ok: true, reason: "Recorded in recipe." };
+      } catch (_e) {
+        return { ok: false, reason: "Could not record click." };
+      }
+    }
+    return { ok: false, reason: "Open the floating toolbar first." };
+  };
+
+  const _handleCopilotMessage = async (message) => {
+    const type = message?.type || "";
+    if (type === "copilot_scan") {
+      const pins = await _copilotGetPins();
+      const links = _copilotCollectLinks();
+      const ranked = window.ph_copilot?.rankLinks?.(links, {
+        pageUrl: window.location.href,
+        pins,
+        dateScorer: scoreUrlCandidateStr,
+      }) || { best: null, alternatives: [] };
+      const detected = detectPageType();
+      const host = window.ph_copilot?.normHost?.(window.location.href) || "";
+      if (ranked.best) {
+        const match = links.find((l) => l.domIdx === ranked.best.domIdx) || links[0];
+        _copilotPick = match || null;
+        if (_copilotPick?.el) _copilotRingElement(_copilotPick.el);
+      } else {
+        _copilotPick = null;
+        _copilotClearRing();
+      }
+      const advice = window.ph_copilot?.advise?.({
+        pageType: detected.type,
+        best: ranked.best,
+        alternatives: ranked.alternatives,
+        pin: pins[host] || null,
+        pageUrl: window.location.href,
+      }) || "No links found.";
+      const context = {
+        best: ranked.best,
+        alternatives: ranked.alternatives,
+        advice,
+        pageType: detected.type,
+      };
+      return { ok: true, advice, context };
+    }
+    if (type === "copilot_highlight") {
+      if (!_copilotPick?.el) return { ok: false, reason: "Run Analyse page first." };
+      _copilotRingElement(_copilotPick.el);
+      _copilotPick.el.scrollIntoView({ block: "center", behavior: "smooth" });
+      return { ok: true };
+    }
+    if (type === "copilot_record") {
+      return _copilotRecordPick(_copilotPick);
+    }
+    if (type === "copilot_pin") {
+      if (!_copilotPick) return { ok: false, reason: "Analyse page first." };
+      const ok = await _copilotSavePin({
+        text: _copilotPick.label,
+        href: _copilotPick.url,
+        selector: _copilotPick.selector,
+      });
+      return ok ? { ok: true } : { ok: false, reason: "Could not save pin." };
+    }
+    if (type === "copilot_click") {
+      if (!_copilotPick?.el) return { ok: false, reason: "Analyse page first." };
+      _ensureToolbar(true);
+      try {
+        _copilotPick.el.click();
+      } catch (_e) {
+        return { ok: false, reason: "Could not click element." };
+      }
+      const recorded = _copilotRecordPick(_copilotPick);
+      return recorded.ok ? { ok: true, reason: "Clicked and recorded." } : recorded;
+    }
+    return { ok: false, reason: "Unknown copilot action." };
+  };
+
   window.addEventListener("message", (event) => {
     if (event.source !== window) return;
     if (event.data && event.data.direction === "from-isolated") {
@@ -5388,6 +5581,10 @@
           }
         }
         sendResponse({ ok: true });
+        return true;
+      }
+      if (String(message?.type || "").startsWith("copilot_")) {
+        void _handleCopilotMessage(message).then((result) => sendResponse(result));
         return true;
       }
       const result = _handleIncomingMessage(message);

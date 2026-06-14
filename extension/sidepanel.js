@@ -10,6 +10,10 @@ function setStatus(text, type) {
 }
 
 const _spPanels = {
+  copilot: {
+    tab: document.getElementById("tab-copilot"),
+    panel: document.getElementById("panel-copilot"),
+  },
   trainer: {
     tab: document.getElementById("tab-trainer"),
     panel: document.getElementById("panel-trainer"),
@@ -19,6 +23,8 @@ const _spPanels = {
     panel: document.getElementById("panel-problems"),
   },
 };
+
+window._spSetStatus = setStatus;
 
 function _spShowPanel(name) {
   for (const [key, refs] of Object.entries(_spPanels)) {
@@ -1528,6 +1534,7 @@ document.getElementById("stale-banner-toggle").addEventListener("click", functio
   this.textContent = isOpen ? "Show" : "Hide";
 });
 
+_spPanels.copilot.tab.addEventListener("click", () => _spShowPanel("copilot"));
 _spPanels.trainer.tab.addEventListener("click", () => _spShowPanel("trainer"));
 _spPanels.problems.tab.addEventListener("click", () => _spShowPanel("problems"));
 void loadProblemsDashboard();

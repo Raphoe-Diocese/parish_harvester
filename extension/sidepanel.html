@@ -312,13 +312,29 @@
       <p id="status">Ready.</p>
 
       <div class="sp-tabs">
-        <button id="tab-trainer" class="sp-tab active" type="button">🛠️ Trainer</button>
+        <button id="tab-copilot" class="sp-tab active" type="button">🤖 Copilot</button>
+        <button id="tab-trainer" class="sp-tab" type="button">🛠️ Trainer</button>
         <button id="tab-problems" class="sp-tab" type="button">🚨 Problems</button>
       </div>
 
-      <div id="panel-trainer" class="sp-panel active">
+      <div id="panel-copilot" class="sp-panel active">
+        <p class="ai-note">Chat while you train. Copilot scans the parish page, finds the bulletin link, and can highlight or record it. No API key needed.</p>
+        <div id="ai-chat"></div>
+        <div class="ai-controls">
+          <input id="ai-input" type="text" placeholder="e.g. which link is the bulletin?" />
+          <button id="ai-send" type="button">Send</button>
+        </div>
+        <div class="ai-banner-actions" style="margin-top:8px;">
+          <button id="ai-analyse" type="button">🔍 Analyse page</button>
+          <button id="copilot-highlight" type="button" class="grey" disabled>🟡 Highlight</button>
+          <button id="copilot-record" type="button" class="green" disabled>✅ Record step</button>
+          <button id="copilot-pin" type="button" class="grey" disabled>📌 Pin</button>
+          <button id="copilot-click" type="button" disabled>👆 Click for me</button>
+        </div>
+        <p class="note">Workflow: open parish page → Analyse → Highlight to check → Record step (or Pin if it's always the same button).</p>
+      </div>
 
-      <!-- Guided mode wizard — 3 simple choices -->
+      <div id="panel-trainer" class="sp-panel">
       <div class="section operator-hidden" aria-hidden="true">
         <div class="section-title">What do you see on screen?</div>
         <div class="btn-col">
@@ -406,6 +422,8 @@
         </div>
       </div>
     </div>
+    <script src="copilot.js"></script>
+    <script src="copilot_panel.js"></script>
     <script src="sidepanel.js"></script>
   </body>
 </html>
