@@ -1,5 +1,5 @@
 /**
- * Training Copilot — lives on the floating toolbar ON the parish website.
+ * Optional page help — collapsed by default. No chat; one-click analyse only.
  */
 (() => {
   const EVIDENCE_FILES = {
@@ -70,20 +70,28 @@
   };
 
   const buildToolbarCopilot = (mountEl, api) => {
-    const wrap = document.createElement("div");
+    const wrap = document.createElement("details");
     wrap.id = "ph-toolbar-copilot";
+    wrap.open = false;
     wrap.style.cssText = [
       "background:#0f172a",
-      "border:1px solid #0e7490",
+      "border:1px solid #334155",
       "border-radius:8px",
-      "padding:8px",
-      "margin-bottom:6px",
+      "margin-top:6px",
     ].join(";");
 
-    const title = document.createElement("div");
-    title.style.cssText = "font-size:11px;font-weight:700;color:#67e8f9;margin-bottom:6px;";
-    title.textContent = "🤖 Copilot — on this page";
-    wrap.appendChild(title);
+    const summary = document.createElement("summary");
+    summary.style.cssText = "padding:8px;cursor:pointer;font-size:10px;font-weight:600;color:#9ca3af;list-style-position:inside;";
+    summary.textContent = "Need help finding the bulletin? (optional)";
+    wrap.appendChild(summary);
+
+    const inner = document.createElement("div");
+    inner.style.cssText = "padding:0 8px 8px;";
+
+    const tipLine = document.createElement("div");
+    tipLine.style.cssText = "font-size:10px;color:#cbd5e1;line-height:1.45;margin-bottom:6px;";
+    tipLine.textContent = "Use the green buttons above first. Open this only if you are stuck.";
+    inner.appendChild(tipLine);
 
     const parishRow = document.createElement("div");
     parishRow.style.cssText = "display:flex;gap:4px;margin-bottom:6px;flex-wrap:wrap;";
@@ -96,39 +104,11 @@
     parishLoad.style.cssText = "width:auto;padding:4px 8px;font-size:10px;background:#374151;border:none;border-radius:4px;color:#fff;cursor:pointer;";
     parishRow.appendChild(parishSelect);
     parishRow.appendChild(parishLoad);
-    wrap.appendChild(parishRow);
+    inner.appendChild(parishRow);
 
-    const memoryLine = document.createElement("div");
-    memoryLine.style.cssText = "font-size:9px;color:#fde68a;margin-bottom:6px;display:none;line-height:1.4;";
-    wrap.appendChild(memoryLine);
-
-    const chatEl = document.createElement("div");
-    chatEl.style.cssText = "max-height:140px;overflow-y:auto;background:#111827;border:1px solid #334155;border-radius:6px;padding:6px;margin-bottom:6px;font-size:10px;line-height:1.45;";
-    wrap.appendChild(chatEl);
-
-    const appendMsg = (role, text) => {
-      const div = document.createElement("div");
-      div.style.cssText = role === "user"
-        ? "margin:0 0 6px 12px;padding:5px 6px;background:#1d4ed8;color:#eff6ff;border-radius:6px;"
-        : "margin:0 0 6px 0;padding:5px 6px;background:#1e293b;color:#e5e7eb;border-radius:6px;";
-      div.textContent = text;
-      chatEl.appendChild(div);
-      chatEl.scrollTop = chatEl.scrollHeight;
-    };
-
-    const inputRow = document.createElement("div");
-    inputRow.style.cssText = "display:flex;gap:4px;margin-bottom:6px;";
-    const inputEl = document.createElement("input");
-    inputEl.type = "text";
-    inputEl.placeholder = "Ask: where is the bulletin?";
-    inputEl.style.cssText = "flex:1;border:1px solid #374151;border-radius:4px;padding:5px;background:#0f172a;color:#f9fafb;font-size:10px;font-family:inherit;";
-    const sendBtn = document.createElement("button");
-    sendBtn.type = "button";
-    sendBtn.textContent = "Send";
-    sendBtn.style.cssText = "width:auto;padding:5px 8px;font-size:10px;background:#2563eb;border:none;border-radius:4px;color:#fff;cursor:pointer;";
-    inputRow.appendChild(inputEl);
-    inputRow.appendChild(sendBtn);
-    wrap.appendChild(inputRow);
+    const adviceLine = document.createElement("div");
+    adviceLine.style.cssText = "font-size:10px;color:#e5e7eb;background:#111827;border:1px solid #334155;border-radius:6px;padding:6px;margin-bottom:6px;line-height:1.45;display:none;";
+    inner.appendChild(adviceLine);
 
     const btnRow = document.createElement("div");
     btnRow.style.cssText = "display:flex;gap:4px;flex-wrap:wrap;";
@@ -140,13 +120,15 @@
       b.style.cssText = `width:auto;padding:4px 7px;font-size:9px;background:${bg};border:none;border-radius:4px;color:#fff;cursor:pointer;opacity:${disabled ? 0.5 : 1};`;
       return b;
     };
-    const analyseBtn = mkBtn("🔍 Analyse", "#0f766e");
+    const analyseBtn = mkBtn("🔍 Analyse page", "#0f766e");
     const highlightBtn = mkBtn("🟡 Highlight", "#374151", true);
-    const recordBtn = mkBtn("✅ Record", "#16a34a", true);
-    const pinBtn = mkBtn("📌 Pin", "#374151", true);
-    const clickBtn = mkBtn("👆 Click", "#7c3aed", true);
+    const recordBtn = mkBtn("✅ Record pick", "#16a34a", true);
+    const pinBtn = mkBtn("📌 Pin link", "#374151", true);
+    const clickBtn = mkBtn("👆 Click pick", "#7c3aed", true);
     [analyseBtn, highlightBtn, recordBtn, pinBtn, clickBtn].forEach((b) => btnRow.appendChild(b));
-    wrap.appendChild(btnRow);
+    inner.appendChild(btnRow);
+
+    wrap.appendChild(inner);
 
     let _ctx = null;
     let _parishes = [];
@@ -159,17 +141,18 @@
     };
 
     const runAnalyse = async () => {
-      appendMsg("system", "⏳ Looking at this page…");
+      adviceLine.style.display = "block";
+      adviceLine.textContent = "⏳ Looking at links on this page…";
       const res = await api.scan();
       if (!res?.ok) {
-        appendMsg("assistant", "❌ Could not scan — refresh the page.");
+        adviceLine.textContent = "Could not scan — refresh the page and try again.";
         setActions(false);
         return;
       }
       _ctx = res.context || null;
-      appendMsg("assistant", res.advice || res.context?.advice || "Done.");
+      adviceLine.textContent = res.advice || res.context?.advice || "Done.";
       setActions(Boolean(_ctx?.best || _ctx?.pageBrief?.bulletinOnPage));
-      if (api.showStatus) api.showStatus("✅ Copilot analysed this page.", "info");
+      if (api.showStatus) api.showStatus("✅ Page analysed.", "info");
     };
 
     const fillParishSelect = (parishes, selectedKey) => {
@@ -200,51 +183,34 @@
       try {
         const p = JSON.parse(parishSelect.value);
         api.onParishPicked?.(p);
-        void window.ph_copilot?.getMemory?.(p.key).then((mem) => {
-          if (mem?.lastIssue) {
-            memoryLine.style.display = "block";
-            memoryLine.textContent = `⚠️ Last problem: ${mem.lastIssue}`;
-          } else {
-            memoryLine.style.display = "none";
-          }
-        });
       } catch (_e) { /* ignore */ }
     });
 
     parishLoad.addEventListener("click", () => { void refreshParishes(); });
-
-    sendBtn.addEventListener("click", () => {
-      const t = inputEl.value.trim();
-      if (!t) return;
-      inputEl.value = "";
-      appendMsg("user", t);
-      appendMsg("assistant", window.ph_copilot?.replyToChat?.(t, _ctx) || "Click Analyse.");
-      if (/analyse|look|help|see|bulletin|confus/i.test(t)) void runAnalyse();
-    });
-    inputEl.addEventListener("keydown", (e) => {
-      if (e.key === "Enter") { e.preventDefault(); sendBtn.click(); }
-    });
-
     analyseBtn.addEventListener("click", () => { void runAnalyse(); });
     highlightBtn.addEventListener("click", () => { void api.highlight(); });
     recordBtn.addEventListener("click", async () => {
       const r = await api.record();
-      appendMsg("system", r?.ok ? "✅ Recorded in recipe." : `❌ ${r?.reason || "failed"}`);
+      if (api.showStatus) {
+        api.showStatus(r?.ok ? "✅ Recorded in recipe." : `❌ ${r?.reason || "failed"}`, r?.ok ? "ok" : "error");
+      }
     });
     pinBtn.addEventListener("click", async () => {
       const r = await api.pin();
-      appendMsg("system", r?.ok ? "📌 Pinned." : `❌ ${r?.reason || "failed"}`);
+      if (api.showStatus) {
+        api.showStatus(r?.ok ? "📌 Link pinned." : `❌ ${r?.reason || "failed"}`, r?.ok ? "ok" : "error");
+      }
       if (r?.ok) void runAnalyse();
     });
     clickBtn.addEventListener("click", async () => {
       const r = await api.click();
-      appendMsg("system", r?.ok ? "✅ Clicked." : `❌ ${r?.reason || "failed"}`);
+      if (api.showStatus) {
+        api.showStatus(r?.ok ? "✅ Clicked." : `❌ ${r?.reason || "failed"}`, r?.ok ? "ok" : "error");
+      }
     });
 
     mountEl.appendChild(wrap);
-    appendMsg("system", "I'm on the page with you. Click Analyse when ready.");
     void refreshParishes();
-    void runAnalyse();
 
     return { refreshParishes, runAnalyse };
   };

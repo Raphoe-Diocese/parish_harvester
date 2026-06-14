@@ -1066,7 +1066,7 @@
       return {
         emoji: "📄",
         summary: "This page IS a PDF document.",
-        advice: "Click \"Yes, it's a PDF\" to record this URL as the bulletin file.",
+        advice: "Tap the green 📄 Save this PDF button, then Push Recipe below.",
         type: "direct_pdf",
       };
     }
@@ -2657,6 +2657,7 @@
     };
 
     // ── GUIDED MODE WIZARD ─────────────────────────────────────────────────
+    let clickFirstBtn = null;
     const guidedPanel = document.createElement("div");
     guidedPanel.style.cssText = [
       "background:#1e293b",
@@ -2766,19 +2767,86 @@
       _refreshGuidedContext();
     };
 
+    const _pdfTerminalActions = new Set(["download", "image", "print_to_pdf", "crop_screenshot"]);
+
+    const _ensureTerminalPdfStep = () => {
+      const recorded = _standaloneRecipeSteps();
+      const last = recorded[recorded.length - 1];
+      if (last && _pdfTerminalActions.has(String(last.action || "").toLowerCase())) {
+        return { ok: true, added: false };
+      }
+      const pageUrl = window.location.href;
+      const pageCtx = detectPageType();
+      if (
+        pageCtx.type === "direct_pdf" ||
+        isDocumentUrl(pageUrl) ||
+        /\.pdf(\?|$)/i.test(pageUrl)
+      ) {
+        standaloneAddStep(
+          { action: "download", url: pageUrl },
+          "mark_file",
+          `📄 Download: ${pageUrl.slice(-50)}`
+        );
+        if (_stepsListEl) _renderSessionSteps();
+        if (_refreshRecipeCount) _refreshRecipeCount();
+        void _persistRecordingSession();
+        _refreshGuidedContext();
+        return { ok: true, added: true, action: "download" };
+      }
+      if (
+        pageCtx.type === "wix_html" ||
+        (pageCtx.type === "html" && _pathLooksLikeNewsletterPage())
+      ) {
+        standaloneAddStep({ action: "print_to_pdf" }, "print_to_pdf", "📰 Save page as PDF");
+        if (_stepsListEl) _renderSessionSteps();
+        if (_refreshRecipeCount) _refreshRecipeCount();
+        void _persistRecordingSession();
+        _refreshGuidedContext();
+        return { ok: true, added: true, action: "print_to_pdf" };
+      }
+      return { ok: false, added: false };
+    };
+
     const _refreshGuidedContext = () => {
       const stepCount = _standaloneRecipeSteps().length;
       const pageCtx = detectPageType();
       compactPageHint.textContent = pageCtx.summary || "";
       compactPageHint.style.display = pageCtx.summary ? "block" : "none";
 
-      if (stepCount > 0) {
+      const onDirectPdf = pageCtx.type === "direct_pdf";
+      if (clickFirstBtn) {
+        clickFirstBtn.style.display = onDirectPdf ? "none" : "block";
+      }
+
+      if (onDirectPdf) {
+        const recorded = _standaloneRecipeSteps();
+        const hasTerminal = recorded.some((s) =>
+          _pdfTerminalActions.has(String(s?.action || "").toLowerCase())
+        );
+        nextStepBanner.style.display = "block";
+        nextStepBanner.textContent = hasTerminal
+          ? "✅ PDF saved — scroll down and tap Push Recipe to GitHub."
+          : "👇 Tap the green Save this PDF button, then Push.";
+        wizardQ.textContent = "You are on the bulletin PDF";
+        if (contextPrimaryBtn) {
+          contextPrimaryBtn.style.display = "block";
+          contextPrimaryBtn.style.background = "#16a34a";
+          contextPrimaryBtn.textContent = "📄 Save this PDF";
+        }
+        if (moreOptionsSection) moreOptionsSection.style.display = "none";
+        if (stuckLink) stuckLink.style.display = "none";
+      } else if (stepCount > 0) {
+        if (contextPrimaryBtn) contextPrimaryBtn.style.background = "#2563eb";
+        if (moreOptionsSection) moreOptionsSection.style.display = "";
+        if (stuckLink) stuckLink.style.display = "";
         nextStepBanner.style.display = "block";
         nextStepBanner.textContent =
           `✅ ${stepCount} step${stepCount === 1 ? "" : "s"} saved. ` +
           "Use Follow a link again if you need another click, or finish with PDF / frame / image below.";
         wizardQ.textContent = `Step ${stepCount + 1} — what is on this page?`;
       } else {
+        if (moreOptionsSection) moreOptionsSection.style.display = "";
+        if (stuckLink) stuckLink.style.display = "";
         nextStepBanner.style.display = "none";
         wizardQ.textContent = "Step 1 — follow a menu link to reach the bulletin";
       }
@@ -3372,7 +3440,7 @@
     // Wizard buttons — link-first flow; PDF/frame only when page context needs them
     let contextPrimaryBtn = null;
 
-    const clickFirstBtn = makeSmallBtn(
+    clickFirstBtn = makeSmallBtn(
       "🔗 Follow a link (most parishes)",
       "#16a34a",
       () => startPickLinkMode(showPickConfirmation, showStatus),
@@ -3899,11 +3967,10 @@
       recipeToggleEl.textContent = recipeOpen ? "▼" : "▶";
     });
 
+    body.appendChild(guidedPanel);
     body.appendChild(recipeSection);
 
     const copilotMount = document.createElement("div");
-    body.insertBefore(copilotMount, body.firstChild);
-    body.appendChild(guidedPanel);
 
     // ── ADVANCED SECTION ───────────────────────────────────────────────────
     // These buttons keep their original labels so existing tests still pass.
@@ -4465,8 +4532,15 @@
               harvestStatusLine.style.color = "#86efac";
             } else if (failed) {
               const reason = String(failed.reason || failed.error || "failed").slice(0, 90);
-              line = `❌ Last harvest: ${reason}`;
-              harvestStatusLine.style.color = "#fca5a5";
+              const training = _standaloneRecipeSteps().length > 0;
+              const onPdf = detectPageType().type === "direct_pdf";
+              if (training || onPdf) {
+                line = `ℹ️ Last Sunday's run failed (${reason}) — push this recipe to fix it`;
+                harvestStatusLine.style.color = "#fde68a";
+              } else {
+                line = `❌ Last harvest: ${reason}`;
+                harvestStatusLine.style.color = "#fca5a5";
+              }
               if (window.ph_copilot?.rememberIssue) {
                 window.ph_copilot.rememberIssue(key, { lastIssue: reason });
               }
@@ -4892,10 +4966,20 @@
           return;
         }
         if (_standaloneRecipeSteps().length === 0) { showStatus("⚠️ No steps recorded yet.", "warn"); return; }
-        const pdfTerminal = new Set(["download", "image", "print_to_pdf", "crop_screenshot"]);
+        const ensured = _ensureTerminalPdfStep();
+        if (!ensured.ok) {
+          showStatus(
+            "❌ Finish with PDF capture first — tap 📄 Save this PDF, 📰 Save page as PDF, or 🖼️ image.",
+            "error"
+          );
+          return;
+        }
+        if (ensured.added) {
+          showStatus("✅ PDF step added automatically — pushing…", "info");
+        }
         const recorded = _standaloneRecipeSteps();
         const lastStep = recorded[recorded.length - 1];
-        if (!lastStep || !pdfTerminal.has(String(lastStep.action || "").toLowerCase())) {
+        if (!lastStep || !_pdfTerminalActions.has(String(lastStep.action || "").toLowerCase())) {
           showStatus(
             "❌ Recipe must end with PDF capture: download, image, print_to_pdf, or crop_screenshot.",
             "error"
@@ -5058,6 +5142,7 @@
     }
 
     if (window.ph_buildToolbarCopilot && copilotMount) {
+      body.appendChild(copilotMount);
       window.ph_buildToolbarCopilot(copilotMount, {
         scan: () => _handleCopilotMessage({ type: "copilot_scan" }),
         highlight: () => _handleCopilotMessage({ type: "copilot_highlight" }),
