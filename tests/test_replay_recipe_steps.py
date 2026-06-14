@@ -234,6 +234,48 @@ class ClaudyBulletinFilterTests(unittest.TestCase):
             self.assertGreater(dest.stat().st_size, 0)
             self.assertTrue(context.closed)
 
+    def test_replay_auto_goto_start_url_before_click(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            recipe_path = Path(tmp) / "threepatrons.json"
+            recipe_path.write_text(
+                json.dumps(
+                    {
+                        "start_url": "https://threepatrons.org/",
+                        "steps": [
+                            {"action": "click", "selector": "a.mod_downloadlink"},
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            dest = Path(tmp) / "threepatrons.pdf"
+            context = _FakeContext()
+            browser = _FakeBrowser(context)
+            page = context.page
+
+            async def _fake_dropfiles(_page, _dest, _timeout):
+                _dest.write_bytes(b"%PDF-1.4\n%fake-bulletin\n")
+                return "https://threepatrons.org/files/10/Weekly-Bulletins/104/", "pdf"
+
+            with patch(
+                "harvester.replay._try_joomla_dropfiles_click_download",
+                new=AsyncMock(side_effect=_fake_dropfiles),
+            ):
+                import asyncio
+
+                out_path, file_type, source_url = asyncio.run(
+                    replay_recipe(
+                        recipe_path=recipe_path,
+                        dest=dest,
+                        browser=browser,
+                    )
+                )
+
+            self.assertEqual(page.goto_calls, 1)
+            self.assertEqual(page.url, "https://threepatrons.org/")
+            self.assertEqual(file_type, "pdf")
+            self.assertIn("Weekly-Bulletins", source_url)
+
 
 if __name__ == "__main__":
     unittest.main()

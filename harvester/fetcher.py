@@ -62,7 +62,13 @@ from .cloud_folders import (
     recipe_uses_cloud_folder,
 )
 from .html_capture import capture_html_page_as_pdf
-from .replay import RecipeReplayError, _print_page_to_pdf, recipe_path_for, replay_recipe
+from .replay import (
+    RecipeReplayError,
+    _print_page_to_pdf,
+    _try_joomla_dropfiles_click_download,
+    recipe_path_for,
+    replay_recipe,
+)
 from .pattern_detector import detect_pattern, save_pattern_change
 from .utils import (
     extract_date_from_slug,
@@ -952,6 +958,22 @@ async def _scrape_and_download(
         except PlaywrightTimeoutError:
             pass
         await _page_wait(page, wait_after_load_ms)
+
+        dropfiles_pick = await _try_joomla_dropfiles_click_download(
+            page, dest, navigation_timeout_ms
+        )
+        if dropfiles_pick and _is_real_pdf(dest, key):
+            source_url, file_type = dropfiles_pick
+            return FetchResult(
+                key=key,
+                display_name=entry.display_name,
+                status="ok",
+                url=source_url,
+                file_path=dest,
+                file_type=file_type,
+            )
+        if dest.exists() and not _is_real_pdf(dest, key):
+            dest.unlink(missing_ok=True)
 
         if is_cloud_folder_url(page.url):
             picked = await _try_cloud_folder_pick(

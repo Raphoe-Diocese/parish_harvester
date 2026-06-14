@@ -27,6 +27,11 @@ DOCX_CONVERSION_TIMEOUT_S = 60
 RECIPE_STEP_TIMEOUT_MS = 15_000
 POST_CLICK_WAIT_TIMEOUT_MS = 3_000
 MAX_SELECTOR_ERRORS = 3
+DROPFILES_DOWNLOAD_SELECTORS = (
+    "a.mod_downloadlink[href]",
+    ".mod_dropfiles_latest a.mod_downloadlink[href]",
+    ".mod_dropfiles_list a.mod_downloadlink[href]",
+)
 PDFEMB_SELECTOR = "a.pdfemb-viewer[href]"
 PDFEMB_HREF_EXTRACT_JS = "(els) => els.map(el => el.getAttribute('href')).filter(Boolean)"
 
@@ -280,6 +285,76 @@ async def _download_document_url(page: Page, raw_url: str, dest: Path) -> tuple[
     return raw_url, "pdf"
 
 
+async def _try_joomla_dropfiles_click_download(
+    page: Page,
+    dest: Path,
+    timeout_ms: int,
+) -> tuple[str, str] | None:
+    """Click the first Joomla Dropfiles cloud-download link and save the file."""
+    for selector in DROPFILES_DOWNLOAD_SELECTORS:
+        locator = page.locator(selector).first
+        try:
+            await locator.wait_for(state="visible", timeout=min(timeout_ms, 10_000))
+            href = (await locator.get_attribute("href") or "").strip()
+            async with page.expect_download(timeout=timeout_ms) as dl_info:
+                await locator.click(timeout=timeout_ms)
+            download = await dl_info.value
+            file_type = await _save_download_to_pdf(download, dest)
+            source = urljoin(page.url, href) if href else page.url
+            return source, file_type
+        except Exception:
+            continue
+    return None
+
+
+async def _try_browser_nav_download(
+    page: Page,
+    dest: Path,
+    raw_url: str,
+    timeout_ms: int,
+) -> tuple[str, str] | None:
+    """Navigate in a real browser tab — required when bare HTTP gets 403."""
+    url = (raw_url or "").strip()
+    if not url:
+        return None
+
+    try:
+        async with page.expect_download(timeout=timeout_ms) as dl_info:
+            response = await page.goto(url, timeout=timeout_ms, wait_until="commit")
+        download = await dl_info.value
+        file_type = await _save_download_to_pdf(download, dest)
+        return url, file_type
+    except Exception:
+        pass
+
+    response = None
+    try:
+        response = await page.goto(url, timeout=timeout_ms, wait_until="domcontentloaded")
+    except Exception:
+        return None
+
+    if response is not None:
+        try:
+            body = await response.body()
+            if _is_pdf_content(body):
+                dest.write_bytes(body)
+                return url, "pdf"
+        except Exception:
+            pass
+
+    picked = await _try_joomla_dropfiles_click_download(page, dest, timeout_ms)
+    if picked:
+        return picked
+
+    if _is_document_url(page.url):
+        try:
+            return await _download_document_url(page, page.url, dest)
+        except RecipeReplayError:
+            pass
+
+    return None
+
+
 async def _try_download_page_url(page: Page, dest: Path, raw_url: str | None = None) -> tuple[str, str] | None:
     """Download a URL that serves PDF bytes without a .pdf suffix (e.g. cappaghparish.com/b/2)."""
     url = (raw_url or page.url or "").strip()
@@ -288,7 +363,8 @@ async def _try_download_page_url(page: Page, dest: Path, raw_url: str | None = N
     try:
         return await _download_document_url(page, url, dest)
     except RecipeReplayError:
-        return None
+        pass
+    return await _try_browser_nav_download(page, dest, url, PAGE_LOAD_TIMEOUT_MS)
 
 
 async def _download_image_url_as_pdf(page: Page, raw_url: str, dest: Path) -> tuple[str, str]:
@@ -415,6 +491,13 @@ async def replay_recipe(
     downloads: list = []
     page.on("download", lambda d: downloads.append(d))
 
+    start_url = (recipe.get("start_url") or "").strip()
+    if not start_url:
+        start_url = (target_url or "").strip()
+    first_action = (steps[0].get("action") if steps else "") or ""
+    if start_url and first_action != "goto":
+        await page.goto(start_url, timeout=step_timeout_ms, wait_until="domcontentloaded")
+
     try:
         for step in steps:
             action = step.get("action")
@@ -433,6 +516,9 @@ async def replay_recipe(
                     file_type = await _save_download_to_pdf(downloads.pop(0), dest)
                     source_url = page.url
                     return dest, file_type, source_url
+                picked = await _try_joomla_dropfiles_click_download(page, dest, step_timeout_ms)
+                if picked:
+                    return dest, picked[1], picked[0]
                 if _is_document_url(page.url):
                     source_url, file_type = await _download_document_url(page, page.url, dest)
                     return dest, file_type, source_url
