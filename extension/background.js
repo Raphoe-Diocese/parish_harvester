@@ -290,6 +290,8 @@ async function _upsertSitePattern(gh_pat, gh_repo, parishKey, displayName, recip
   const recipeFp = sitePattern.recipe;
   const combined = `${pageFp.page_type || "unknown"}+${recipeFp.recipe_flow || "mixed"}`;
   const startUrl = String(recipe.start_url || "").trim();
+  const existingPattern = library.patterns[combined];
+  const existingParish = library.parishes[parishKey];
 
   library.parishes[parishKey] = {
     page_type: pageFp.page_type,
@@ -304,9 +306,10 @@ async function _upsertSitePattern(gh_pat, gh_repo, parishKey, displayName, recip
     playbook_type: String(recipe.playbook_type || "").trim() || undefined,
     operator_notes: Array.isArray(recipe.operator_notes) ? recipe.operator_notes : undefined,
     do_not: Array.isArray(recipe.do_not) ? recipe.do_not : undefined,
+    html_fingerprint: sitePattern.html?.fingerprint_id || existingParish?.html_fingerprint,
+    html_markers: sitePattern.html?.html_markers || existingParish?.html_markers,
   };
 
-  const existingPattern = library.patterns[combined];
   const recipeAdvice = Array.isArray(recipe.operator_notes) && recipe.operator_notes.length
     ? recipe.operator_notes.join(" ")
     : "";
@@ -329,6 +332,8 @@ async function _upsertSitePattern(gh_pat, gh_repo, parishKey, displayName, recip
     advice: recipeAdvice || existingPattern?.advice || adviceByType[pageFp.page_type] || "",
     operator_notes: Array.isArray(recipe.operator_notes) ? recipe.operator_notes : existingPattern?.operator_notes,
     do_not: Array.isArray(recipe.do_not) ? recipe.do_not : existingPattern?.do_not,
+    html_fingerprint: sitePattern.html?.fingerprint_id || existingPattern?.html_fingerprint,
+    html_markers: sitePattern.html?.html_markers || existingPattern?.html_markers,
     example_parishes: Array.from(new Set([
       ...(Array.isArray(existingPattern?.example_parishes) ? existingPattern.example_parishes : []),
       parishKey,

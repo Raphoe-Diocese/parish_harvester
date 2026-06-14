@@ -16,7 +16,7 @@ from playwright.async_api import Browser, Page, TimeoutError as PlaywrightTimeou
 from .cloud_folders import is_cloud_folder_click_step, rewrite_cloud_folder_click_step
 from .cloud_urls import is_cloud_document_url, normalize_document_url, unwrap_docs_viewer_url
 from .config import PAGE_LOAD_TIMEOUT_MS, PARISHES_DIR
-from .utils import oneweb_newsletter_download_urls, rewrite_date_url
+from .utils import oneweb_newsletter_download_urls, rewrite_date_url, rewrite_newsletter_number_for_target
 
 
 class RecipeReplayError(RuntimeError):
@@ -454,6 +454,8 @@ async def replay_recipe(
                     if target_date:
                         if "newsletter" in step_url.lower() and "onewebmedia" in step_url.lower():
                             download_candidates = oneweb_newsletter_download_urls(step_url, target_date)
+                        elif re.search(r"/(?:Newsletters|Weekly-Bulletins)/\d+/", step_url, re.I):
+                            download_candidates = [rewrite_newsletter_number_for_target(step_url, target_date)]
                         else:
                             download_candidates = [rewrite_date_url(step_url, target_date)]
                     else:

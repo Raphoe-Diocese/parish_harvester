@@ -206,7 +206,7 @@ async function runDiagnostics() {
 
   const patLine = `GitHub PAT present: ${pat ? "yes" : "no"}${ghLogin ? ` (authenticated user: ${ghLogin})` : ""}`;
   const repoLine = `GitHub repo configured: ${repo || "n/a"}`;
-  const patternLine = "Pattern learning: rule-based (parishes/site_patterns.json on GitHub)";
+  const patternLine = "Pattern learning: HTML fingerprint scan + parishes/site_patterns.json on GitHub";
 
   const debug = allLocalStorage.ph_parish_detect_debug;
   const parishDetectLines = [];

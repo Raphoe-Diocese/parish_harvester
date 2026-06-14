@@ -108,6 +108,15 @@
       ],
       pin: false,
     },
+    weekly_bulletin_download: {
+      title: "Weekly bulletin list — cloud download",
+      steps: [
+        "Click the cloud ↓ icon on this Sunday's row (PDF downloads automatically).",
+        "Wait for green ✅ — download step should auto-record.",
+        "Push Recipe.",
+      ],
+      pin: false,
+    },
     html: {
       title: "Normal web page",
       steps: [

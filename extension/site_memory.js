@@ -48,6 +48,25 @@
       ],
       do_not: ["Do not pick admin PDFs from the widget list."],
     },
+    weekly_bulletin_download: {
+      playbook_type: "weekly_bulletin_download",
+      site_type: "sequential_bulletin_number",
+      page_type: "weekly_bulletin_download",
+      recipe_flow: "direct_download",
+      label: "Weekly bulletin list with auto-download",
+      auto_direct: true,
+      skip_goto_on_push: true,
+      operator_notes: [
+        "Homepage shows dated rows — click the cloud download on this Sunday's bulletin.",
+        "PDF downloads automatically; trainer records the download URL.",
+        "Harvester advances /Weekly-Bulletins/NNN/ by weeks since the example date.",
+        "Joomla Dropfiles widget: cloud icon is a.mod_downloadlink — clicking the icon inside still counts.",
+      ],
+      do_not: [
+        "Do not use Pick bulletin image — this is a PDF download site.",
+        "Do not stop at click-only — need a download capture step.",
+      ],
+    },
   };
 
   const getForPageType = (pageType) => {
@@ -92,6 +111,7 @@
       operator_notes: memory?.operator_notes || recipe.operator_notes || [],
       do_not: memory?.do_not || recipe.do_not || [],
       label: memory?.label || "",
+      html: globalThis.PhHtmlFingerprint?.toPatternPayload?.(pageCtx.fingerprintScan) || undefined,
     };
   };
 

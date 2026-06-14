@@ -892,6 +892,120 @@
     return scored[0]?.url || "";
   };
 
+  const _pickBestWeeklyBulletinUrl = () => {
+    const scored = [];
+    const addCandidate = (rawUrl, label, domIdx, bonus = 0) => {
+      if (!rawUrl) return;
+      let abs = "";
+      try {
+        abs = new URL(rawUrl, window.location.href).href;
+      } catch (_e) {
+        return;
+      }
+      const lower = abs.toLowerCase();
+      const looksWeekly =
+        /weekly-bulletins|\/newsletters\/|\/files\/\d+\/[^/?#]*sunday/i.test(lower);
+      if (!looksWeekly && !_looksLikeBulletinDownloadUrl(abs, label)) return;
+      const scoredItem = { url: abs, ...scoreUrlCandidateStr(abs, label, domIdx) };
+      scoredItem.total = (scoredItem.total || 0) + bonus;
+      scored.push(scoredItem);
+    };
+
+    const downloadLinks = Array.from(document.querySelectorAll("a.mod_downloadlink[href]"));
+    for (let i = 0; i < downloadLinks.length; i++) {
+      const el = downloadLinks[i];
+      const href = el.getAttribute("href") || el.href || "";
+      const row = el.closest(".mod_file");
+      const title =
+        row?.querySelector(".mod_dropfiles_downloadlink")?.getAttribute("title") ||
+        row?.querySelector(".mod_dropfiles_downloadlink")?.textContent ||
+        el.getAttribute("aria-label") ||
+        "";
+      addCandidate(href, String(title || "").trim(), i, 25);
+    }
+
+    const links = Array.from(document.querySelectorAll("a[href], [data-href], [data-url], [data-file]"));
+    for (let i = 0; i < links.length; i++) {
+      const el = links[i];
+      if (el.matches("a.mod_downloadlink")) continue;
+      const href =
+        el.getAttribute("href") ||
+        el.getAttribute("data-href") ||
+        el.getAttribute("data-url") ||
+        el.getAttribute("data-file") ||
+        el.href ||
+        "";
+      const label = (el.innerText || el.textContent || el.getAttribute("title") || "").trim();
+      addCandidate(href, label, i + downloadLinks.length);
+    }
+    scored.sort(_bulletinDateSortFn);
+    return scored[0]?.url || "";
+  };
+
+  const _hrefFromBulletinClick = (el) => {
+    if (!(el instanceof Element)) return "";
+    const downloadLink = el.closest("a.mod_downloadlink[href]");
+    if (downloadLink) {
+      try {
+        return new URL(downloadLink.getAttribute("href") || downloadLink.href || "", window.location.href).href;
+      } catch (_e) {
+        return "";
+      }
+    }
+    const modFile = el.closest(".mod_file");
+    if (modFile) {
+      const rowDownload = modFile.querySelector("a.mod_downloadlink[href]");
+      if (rowDownload) {
+        try {
+          return new URL(rowDownload.getAttribute("href") || rowDownload.href || "", window.location.href).href;
+        } catch (_e2) {
+          return "";
+        }
+      }
+    }
+    const direct = el.closest(
+      'a[href*="Weekly-Bulletins"], a[href*="weekly-bulletins"], a[href*="/Newsletters/"], a[href*="/files/"]'
+    );
+    if (direct) {
+      try {
+        return new URL(direct.getAttribute("href") || direct.href || "", window.location.href).href;
+      } catch (_e) {
+        return "";
+      }
+    }
+    const row =
+      el.closest("li, tr, article, section, [class*='bulletin'], [class*='Bulletin']") ||
+      el.parentElement;
+    if (row) {
+      const nearby = row.querySelector(
+        'a[href*="Weekly-Bulletins"], a[href*="weekly-bulletins"], a[href*="/Newsletters/"], a[href*="/files/"]'
+      );
+      if (nearby) {
+        try {
+          return new URL(nearby.getAttribute("href") || nearby.href || "", window.location.href).href;
+        } catch (_e2) {
+          return "";
+        }
+      }
+      const dataEl = row.querySelector("[data-href], [data-url], [data-file]");
+      if (dataEl) {
+        const raw =
+          dataEl.getAttribute("data-href") ||
+          dataEl.getAttribute("data-url") ||
+          dataEl.getAttribute("data-file") ||
+          "";
+        if (raw) {
+          try {
+            return new URL(raw, window.location.href).href;
+          } catch (_e3) {
+            return "";
+          }
+        }
+      }
+    }
+    return "";
+  };
+
   const _NAMED_BULLETIN_SCORES = {
     "easter sunday": { month: 4, day: 15 },
     "palm sunday": { month: 4, day: 8 },
@@ -985,6 +1099,7 @@
     if (isDocumentUrl(url)) return true;
     if (/\/files\/\d+\/weekly-bulletins\//i.test(url)) return true;
     if (/\/weekly-bulletins\//i.test(url)) return true;
+    if (/\/files\/\d+\/[^/?#]*sunday/i.test(url)) return true;
     if (
       /\/wp-content\/uploads\//i.test(url) &&
       /bulletin|newsletter|\d{4}/i.test(combined)
@@ -1164,6 +1279,52 @@
   const detectPageType = () => {
     const url = window.location.href.toLowerCase();
 
+    const _htmlFingerprintDetect = () => {
+      const lib = globalThis.PhHtmlFingerprint;
+      if (!lib?.scanPage) return null;
+      const scan = lib.scanPage(document);
+      const b = scan?.best;
+      if (!b || !b.pageType) return null;
+
+      const typeMap = {
+        wp_pdfemb_list: "pdfemb",
+        image_bulletin: "image",
+        iframe_viewer: "iframe_maybe",
+        parish_messenger_embed: "parish_messenger",
+        wix_pdf_viewer: "wix_viewer",
+      };
+      const type = typeMap[b.pageType] || b.pageType;
+      const emojiMap = {
+        weekly_bulletin_download: "📥",
+        oneweb_docx: "📄",
+        pdfemb: "🔗",
+        parish_messenger: "📰",
+        wix_html: "📰",
+        wix_viewer: "📐",
+        cloud_folder: "☁️",
+        iframe_maybe: "📐",
+        pdf_links: "🔗",
+        image: "🖼️",
+      };
+
+      const result = {
+        emoji: emojiMap[type] || "🔍",
+        summary: b.label,
+        advice: b.advice,
+        type,
+        htmlFingerprint: b.id,
+        fingerprintScore: b.score,
+        fingerprintMarkers: b.markersFound,
+        fingerprintScan: scan,
+      };
+      if (b.bestDownloadUrl) {
+        result.autoDownloadUrl = b.bestDownloadUrl;
+        if (type === "oneweb_docx") result.autoNewsletterUrl = b.bestDownloadUrl;
+      }
+      if (b.doNot?.length) result.fingerprintDoNot = b.doNot;
+      return result;
+    };
+
     // 1. Current page IS a PDF (URL suffix, extensionless route, or Chrome PDF viewer)
     if (
       url.endsWith(".pdf") ||
@@ -1197,7 +1358,19 @@
       };
     }
 
-    // 1c. Parish Services / Parish Messenger embed (dmaparish, ardstraw, culdaff, etc.)
+    // 1d. Full HTML fingerprint scan (CMS / plugin markers in page source)
+    const fpDetect = _htmlFingerprintDetect();
+    if (fpDetect) {
+      const skipCloud = fpDetect.type === "cloud_folder" && !_isCloudFolderUrl(url);
+      const skipImage =
+        fpDetect.type === "image" &&
+        !hasPickableImageInContentAreas(MIN_CONTENT_IMAGE_WIDTH);
+      if (!skipCloud && !skipImage) {
+        return fpDetect;
+      }
+    }
+
+    // 1e. Parish Services / Parish Messenger embed (dmaparish, ardstraw, culdaff, etc.)
     const parishMessengerScript = document.querySelector(
       'script[src*="theparishmessenger.com"]'
     );
@@ -1430,6 +1603,37 @@
         type: "pdf_links",
         links: bulletinLinks.length > 0 ? bulletinLinks : pdfLinks,
         bulletinLinks,
+      };
+    }
+
+    // 5b. Three Patrons / Banagher-style weekly bulletin list (cloud auto-download)
+    const pageHost = (() => {
+      try {
+        return new URL(window.location.href).hostname.toLowerCase();
+      } catch (_e) {
+        return "";
+      }
+    })();
+    const bodyText = String(document.body?.innerText || "");
+    const dropfilesWidget = document.querySelector(".mod_dropfiles_latest, .mod_dropfiles_list");
+    const dropfilesDownloads = Array.from(document.querySelectorAll("a.mod_downloadlink[href]"));
+    const weeklyBulletinLinks = Array.from(
+      document.querySelectorAll('a[href*="Weekly-Bulletins"], a[href*="weekly-bulletins"], a[href*="/Newsletters/"]')
+    );
+    const hasWeeklySection =
+      Boolean(dropfilesWidget) ||
+      dropfilesDownloads.length > 0 ||
+      /weekly\s+bulletins/i.test(bodyText) ||
+      weeklyBulletinLinks.length > 0 ||
+      /threepatrons\.org|banagherparish\.com/i.test(pageHost);
+    if (hasWeeklySection && (dropfilesDownloads.length > 0 || /weekly\s+bulletin|sunday\s+\d/i.test(bodyText))) {
+      return {
+        emoji: "📥",
+        summary: "Weekly bulletin list — Joomla Dropfiles cloud download.",
+        advice:
+          "Click the cloud ↓ (a.mod_downloadlink) on this Sunday's row. PDF downloads automatically — trainer records it. Then Push.",
+        type: "weekly_bulletin_download",
+        sitePlugin: dropfilesWidget ? "joomla_dropfiles" : "",
       };
     }
 
@@ -2975,6 +3179,51 @@
         return { ok: true, added: true, action: "download" };
       }
       if (
+        pageCtx.autoDownloadUrl &&
+        (pageCtx.type === "weekly_bulletin_download" ||
+          pageCtx.htmlFingerprint === "joomla_dropfiles_weekly" ||
+          pageCtx.htmlFingerprint === "sequential_weekly_bulletins")
+      ) {
+        standaloneAddStep(
+          { action: "download", url: pageCtx.autoDownloadUrl },
+          "mark_file",
+          `📄 Download: ${pageCtx.autoDownloadUrl.slice(-50)}`
+        );
+        if (_stepsListEl) _renderSessionSteps();
+        if (_refreshRecipeCount) _refreshRecipeCount();
+        void _persistRecordingSession();
+        _refreshGuidedContext();
+        return { ok: true, added: true, action: "download" };
+      }
+      if (pageCtx.type === "weekly_bulletin_download") {
+        const bulletinUrl = _pickBestWeeklyBulletinUrl();
+        if (bulletinUrl) {
+          standaloneAddStep(
+            { action: "download", url: bulletinUrl },
+            "mark_file",
+            `📄 Download: ${bulletinUrl.slice(-50)}`
+          );
+          if (_stepsListEl) _renderSessionSteps();
+          if (_refreshRecipeCount) _refreshRecipeCount();
+          void _persistRecordingSession();
+          _refreshGuidedContext();
+          return { ok: true, added: true, action: "download" };
+        }
+      }
+      const fallbackBulletinUrl = _pickBestWeeklyBulletinUrl();
+      if (fallbackBulletinUrl) {
+        standaloneAddStep(
+          { action: "download", url: fallbackBulletinUrl },
+          "mark_file",
+          `📄 Download: ${fallbackBulletinUrl.slice(-50)}`
+        );
+        if (_stepsListEl) _renderSessionSteps();
+        if (_refreshRecipeCount) _refreshRecipeCount();
+        void _persistRecordingSession();
+        _refreshGuidedContext();
+        return { ok: true, added: true, action: "download" };
+      }
+      if (
         pageCtx.type === "wix_html" ||
         (pageCtx.type === "html" && _pathLooksLikeNewsletterPage())
       ) {
@@ -3036,6 +3285,7 @@
         const showContext =
           pageCtx.type === "direct_pdf" ||
           pageCtx.type === "oneweb_docx" ||
+          pageCtx.type === "weekly_bulletin_download" ||
           pageCtx.type === "iframe" ||
           pageCtx.type === "iframe_maybe" ||
           pageCtx.type === "wix_viewer" ||
@@ -3054,6 +3304,10 @@
           contextPrimaryBtn.textContent = pageCtx.autoNewsletterUrl
             ? "📄 2. Save newsletter (auto)"
             : "📐 2. Bulletin in frame";
+        } else if (pageCtx.type === "weekly_bulletin_download") {
+          contextPrimaryBtn.style.display = "block";
+          contextPrimaryBtn.style.background = "#2563eb";
+          contextPrimaryBtn.textContent = "📥 2. Click cloud download";
         } else if (pageCtx.type === "wix_html" || (pageCtx.type === "html" && _pathLooksLikeNewsletterPage())) {
           contextPrimaryBtn.style.display = "block";
           contextPrimaryBtn.textContent = "📰 2. Save page as PDF";
@@ -3726,6 +3980,22 @@
           );
           return;
         }
+        if (pageCtx.type === "weekly_bulletin_download") {
+          const bulletinUrl = pageCtx.autoDownloadUrl || _pickBestWeeklyBulletinUrl();
+          if (bulletinUrl) {
+            markDownloadUrlSafe(bulletinUrl, showStatus, true);
+            showStatus(
+              "✅ Bulletin download URL recorded — click cloud ↓ on page or Push Recipe now.",
+              "ok"
+            );
+            return;
+          }
+          showStatus(
+            "⚠️ Could not find a bulletin link — click the cloud ↓ icon on this Sunday's row.",
+            "warn"
+          );
+          return;
+        }
         if (pageCtx.type === "wix_html") {
           standaloneAddStep({ action: "print_to_pdf" }, "print_to_pdf", "📰 Save page as PDF");
           showStatus("✅ Recorded: page will print into the mega bulletin.", "ok");
@@ -4163,12 +4433,15 @@
       } else if (lib.predictWixSlugUrl && _hasWixDateSlug(window.location.href)) {
         pageFp.predicted_url = lib.predictWixSlugUrl(window.location.href, _nextSundayDate());
       }
+      const htmlFp = globalThis.PhHtmlFingerprint;
+      const htmlSummary = htmlFp?.formatScanSummary?.(detected.fingerprintScan || htmlFp.scanPage?.());
       _safeSendMessage({ type: "fetch_site_patterns" }, (resp, _err) => {
         if (!resp?.ok) return;
         const matches = lib.findSimilar(pageFp, resp.patterns || {});
-        const text = lib.buildHintText(pageFp, matches);
+        const lines = [lib.buildHintText(pageFp, matches)];
+        if (htmlSummary) lines.push(htmlSummary);
         patternHintWrap.style.display = "block";
-        patternHintBanner.textContent = text;
+        patternHintBanner.textContent = lines.join("\n\n");
       });
     };
     const recipeSection = document.createElement("div");
@@ -4972,6 +5245,13 @@
             diocese: p.diocese,
           }));
         }
+        const seenKeys = new Set();
+        items = items.filter((p) => {
+          const k = String(p.key || "").toLowerCase();
+          if (!k || seenKeys.has(k)) return false;
+          seenKeys.add(k);
+          return true;
+        });
         parishSearchCombo.setItems(items.sort((a, b) => a.label.localeCompare(b.label)));
       };
 
@@ -6255,7 +6535,9 @@
       } else if (_inStandaloneMode() && _getToolbarNode() && _getToolbarNode().style.display !== "none") {
         // Standalone mode: record the navigation click for the recipe
         const text = clickData.text;
-        const href = clickData.href;
+        let href = clickData.href;
+        const bulletinHref = _hrefFromBulletinClick(target);
+        if (bulletinHref) href = bulletinHref;
         const selector = text && text.length >= 3 && text.length <= 60
           ? `${clickData.tag}:has-text("${text.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}")`
           : clickData.css_path;
@@ -6265,6 +6547,17 @@
         else if (href && href.toLowerCase().endsWith(".docx")) fallbacks.push("a[href$='.docx']");
         if (clickData.css_path && clickData.css_path !== selector) fallbacks.push(clickData.css_path);
         if (fallbacks.length) step.fallback_selectors = fallbacks;
+
+        if (href && _looksLikeBulletinDownloadUrl(href, text)) {
+          _standaloneAddClickAndDownload(step, href, label, null);
+          _ensureToolbar(true);
+          window.dispatchEvent(
+            new CustomEvent("ph-recording-continued", {
+              detail: { stepCount: _standaloneRecipeSteps().length },
+            })
+          );
+          return;
+        }
         standaloneAddStep(step, "click", label);
       }
     },

@@ -50,6 +50,10 @@
       label: "One.com Word bulletin (slow Google preview iframes)",
       steps: "Automatic — read newsletter URL from page HTML. Tap Save newsletter (auto) or Push. Harvester downloads onewebmedia/NEWSLETTER directly.",
     },
+    weekly_bulletin_download: {
+      label: "Weekly bulletin list (cloud auto-download)",
+      steps: "Click cloud ↓ on this Sunday's row — PDF downloads automatically. Trainer records download, then Push.",
+    },
     parish_messenger_embed: {
       label: "Parish Messenger widget (parishservices.co)",
       steps: "Wait for the page to load → Follow a link → pick newest View Newsletter / May 2026 row. Ignore Gift Aid and Data Entry PDFs.",
@@ -102,6 +106,7 @@
     else if (type === "wix_html" || type === "wix_date_grid") pageType = "wix_html";
     else if (type === "parish_messenger") pageType = "parish_messenger_embed";
     else if (type === "oneweb_docx") pageType = "oneweb_docx";
+    else if (type === "weekly_bulletin_download") pageType = "weekly_bulletin_download";
     else if (type === "cloud_folder") pageType = "cloud_folder";
     else if (type === "image") pageType = "image_bulletin";
     else if (type === "html" || type === "unknown") pageType = "html_click_chain";
@@ -129,6 +134,11 @@
     let recipeFlow = "mixed";
     if (String(recipe.site_type || "").includes("oneweb") || String(recipe.playbook_type || "") === "oneweb_docx") {
       recipeFlow = "direct_docx";
+    } else if (
+      String(recipe.playbook_type || "") === "weekly_bulletin_download" ||
+      String(recipe.site_type || "") === "sequential_bulletin_number"
+    ) {
+      recipeFlow = "direct_download";
     } else if (hasHtml) recipeFlow = "html_capture";
     else if (hasImage) recipeFlow = "image_capture";
     else if (hasClick && hasDownload) recipeFlow = "click_then_pdf";

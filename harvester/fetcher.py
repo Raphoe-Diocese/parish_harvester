@@ -73,6 +73,7 @@ from .utils import (
     rewrite_clonleigh_url,
     rewrite_date_url,
     rewrite_greenlough_url,
+    rewrite_newsletter_number_for_target,
     rewrite_newsletter_number_url,
     safe_filename,
 )
@@ -355,7 +356,7 @@ def calculate_url(entry: ParishEntry, target: date) -> str:
     if pattern == "clonleigh":
         return rewrite_clonleigh_url(target)
     if pattern == "H":
-        return rewrite_newsletter_number_url(url)
+        return rewrite_newsletter_number_for_target(url, target)
     # Patterns A, B, C, D, E (and G) — generic date rewrite
     return rewrite_date_url(url, target)
 

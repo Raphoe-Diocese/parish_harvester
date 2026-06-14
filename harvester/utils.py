@@ -640,6 +640,28 @@ def rewrite_newsletter_number_url(url: str, increment: int = 1) -> str:
     return url[: m.start()] + m.group(1) + f"{new_number}/"
 
 
+def rewrite_newsletter_number_for_target(url: str, target: date) -> str:
+    """
+    Advance a Pattern H bulletin number by whole weeks between the example slug date
+    and *target* (harvest Sunday).
+
+    Falls back to +1 increment when no date can be parsed from the example URL.
+    """
+    m = _NEWSLETTER_NUM_RE.search(url)
+    if not m:
+        return url
+    base_number = int(m.group(2))
+    path = unquote(urlparse(url).path)
+    slug = path.split("/")[-1] if path else ""
+    ref_date = extract_date_from_slug(slug) or extract_date_from_string(slug)
+    if ref_date:
+        weeks = (target - ref_date).days // 7
+        new_number = base_number + max(0, weeks)
+    else:
+        new_number = base_number + 1
+    return url[: m.start()] + m.group(1) + f"{new_number}/"
+
+
 def safe_filename(prefix: str, suffix: str) -> str:
     """Combine a sanitized parish prefix with a file suffix."""
     prefix = re.sub(r"[^a-z0-9_-]", "_", prefix.lower())
