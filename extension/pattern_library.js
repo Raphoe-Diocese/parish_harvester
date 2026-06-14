@@ -27,7 +27,7 @@
       steps: "Use Find bulletin — Wix often hides the real PDF URL in the viewer.",
     },
     wix_html: {
-      label: "Wix HTML bulletin page",
+      label: "HTML text bulletin (WordPress / Wix)",
       steps: "Click Save page as PDF — harvester prints this page into the mega bulletin every Sunday.",
     },
     wix_date_grid: {

@@ -186,6 +186,45 @@ def update_consecutive_failures(
     return counts
 
 
+def prune_inactive_consecutive_failures(
+    failures_path: Path | None = None,
+    parishes_dir: Path | None = None,
+) -> dict[str, int]:
+    """Remove failure counts for parishes marked inactive/dead in recipes."""
+    from .report import _load_recipe_meta_for_key, _recipe_is_inactive
+
+    path = failures_path or _CONSECUTIVE_FAILURES_PATH
+    parishes_dir = parishes_dir or (
+        Path(__file__).resolve().parent.parent / "parishes"
+    )
+    if not path.exists():
+        return {}
+
+    try:
+        counts = json.loads(path.read_text(encoding="utf-8"))
+        if not isinstance(counts, dict):
+            counts = {}
+    except (json.JSONDecodeError, OSError):
+        counts = {}
+
+    pruned: dict[str, int] = {}
+    for key, value in counts.items():
+        parish_key = str(key or "").strip()
+        if not parish_key:
+            continue
+        meta = _load_recipe_meta_for_key(parish_key, parishes_dir)
+        if _recipe_is_inactive(meta):
+            continue
+        try:
+            pruned[parish_key] = max(0, int(value))
+        except (TypeError, ValueError):
+            pruned[parish_key] = 0
+
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(json.dumps(pruned, indent=2, ensure_ascii=False), encoding="utf-8")
+    return pruned
+
+
 def _extract_date_from_url(url: str) -> date | None:
     """Extract a date from *url* using common bulletin filename patterns.
 

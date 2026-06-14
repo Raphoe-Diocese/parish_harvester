@@ -67,6 +67,22 @@
         "Do not stop at click-only — need a download capture step.",
       ],
     },
+    wix_html: {
+      playbook_type: "wix_html",
+      site_type: "html_text_bulletin",
+      page_type: "wix_html",
+      recipe_flow: "html_capture",
+      label: "HTML text bulletin (WordPress, Wix, or similar)",
+      operator_notes: [
+        "Bulletin text is on the web page — not a downloadable PDF file.",
+        "Use Save page as PDF on the newsletter article page.",
+        "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs).",
+      ],
+      do_not: [
+        "Do not use Pick bulletin image when the page is mostly text paragraphs.",
+        "Do not stop at click-only — need print_to_pdf as the final step.",
+      ],
+    },
   };
 
   const getForPageType = (pageType) => {

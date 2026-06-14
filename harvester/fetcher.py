@@ -1820,6 +1820,33 @@ async def _fetch_entry(
     recipe_meta = _load_recipe_metadata(recipe_path) if recipe_path.exists() else {}
     host_profile = _get_host_profile(_recipe_start_url(entry, recipe_meta, target_url))
 
+    if recipe_path.exists():
+        recipe_status = str(recipe_meta.get("status", "")).strip().lower()
+        should_skip = bool(recipe_meta.get("skip")) or recipe_status in {"dead_url", "inactive"}
+        needs_retraining = bool(recipe_meta.get("needs_retraining")) or recipe_status == "needs_retraining"
+        if should_skip or needs_retraining:
+            reason = (
+                str(
+                    recipe_meta.get("reason")
+                    or recipe_meta.get("dead_reason")
+                    or recipe_meta.get("retraining_reason")
+                    or (
+                        "Recipe marked inactive"
+                        if should_skip
+                        else "Recipe marked for manual retraining"
+                    )
+                ).strip()
+            )
+            print(f"  ⏭️  {key}: skipping — {reason}")
+            return FetchResult(
+                key=key,
+                display_name=entry.display_name,
+                status="skipped",
+                url=str(recipe_meta.get("start_url") or recipe_meta.get("url") or target_url),
+                file_type="skipped",
+                error=reason,
+            )
+
     manual_override = (manual_overrides or {}).get(key)
     if manual_override:
         print(f"  📌 {key}: using manual override URL first")
@@ -1876,31 +1903,6 @@ async def _fetch_entry(
     recipe_diocese = str((recipe_meta or {}).get("diocese") or "").strip()
     navigation_timeout_ms = int(host_profile.get("navigation_timeout_ms", PAGE_LOAD_TIMEOUT_MS))
     if recipe_path.exists():
-        recipe_status = str(recipe_meta.get("status", "")).strip().lower()
-        should_skip = bool(recipe_meta.get("skip")) or recipe_status in {"dead_url", "inactive"}
-        needs_retraining = bool(recipe_meta.get("needs_retraining")) or recipe_status == "needs_retraining"
-        if should_skip or needs_retraining:
-            reason = (
-                str(
-                    recipe_meta.get("reason")
-                    or recipe_meta.get("dead_reason")
-                    or recipe_meta.get("retraining_reason")
-                    or (
-                        "Recipe marked inactive"
-                        if should_skip
-                        else "Recipe marked for manual retraining"
-                    )
-                ).strip()
-            )
-            print(f"  ⏭️  {key}: skipping — {reason}")
-            return FetchResult(
-                key=key,
-                display_name=entry.display_name,
-                status="skipped",
-                url=str(recipe_meta.get("url") or target_url),
-                file_type="skipped",
-                error=reason,
-            )
         try:
             replayed_path, replay_file_type, replay_url = await replay_recipe(
                 recipe_path=recipe_path,

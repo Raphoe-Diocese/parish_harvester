@@ -2,8 +2,97 @@
  * Full-page HTML/DOM fingerprint scanner — no AI keys.
  * Reads live page source (same data as view-source, plus post-JS DOM)
  * to detect CMS plugins and the easiest capture path.
+ *
+ * DOM validators prevent false positives from og:image meta tags and logos.
  */
 (() => {
+  const CONTENT_SELECTOR =
+    ".entry-content, .post-content, article .entry-content, article.post, [role='main'] article";
+  const BULLETIN_IMG_ALT_RE = /bulletin|newsletter|notice|weekly/i;
+  const DECORATIVE_IMG_RE = /logo|icon|avatar|gravatar|emoji|spinner|badge|social|wp-smiley/i;
+
+  const _imageWidth = (img) => {
+    const widthAttr = Number(img.getAttribute("width") || 0);
+    if (Number.isFinite(widthAttr) && widthAttr > 0) return widthAttr;
+    const renderWidth = Number(img.width || 0);
+    if (Number.isFinite(renderWidth) && renderWidth > 0) return renderWidth;
+    const naturalWidth = Number(img.naturalWidth || 0);
+    if (Number.isFinite(naturalWidth) && naturalWidth > 0) return naturalWidth;
+    return 0;
+  };
+
+  const _entryContentRoot = (doc) => {
+    try {
+      return (
+        doc.querySelector(".entry-content") ||
+        doc.querySelector(".post-content") ||
+        doc.querySelector("article.post") ||
+        doc.querySelector("article") ||
+        null
+      );
+    } catch (_e) {
+      return null;
+    }
+  };
+
+  const _plainTextLen = (el) => {
+    if (!el) return 0;
+    return String(el.innerText || el.textContent || "")
+      .replace(/\s+/g, " ")
+      .trim().length;
+  };
+
+  /** WordPress (or similar) HTML text newsletter — not a JPEG bulletin. */
+  const isWordPressHtmlBulletinPage = (doc = document) => {
+    const root = _entryContentRoot(doc);
+    if (!root) return false;
+    const textLen = _plainTextLen(root);
+    if (textLen < 400) return false;
+
+    const paragraphCount = root.querySelectorAll(
+      "p, .wp-block-paragraph, li"
+    ).length;
+    if (paragraphCount < 4 && textLen < 800) return false;
+
+    const html = doc.documentElement?.innerHTML || "";
+    const path = doc.location?.pathname || "";
+    const title = doc.title || "";
+    const hasWpSignals =
+      /wp-block-paragraph|wp-content|wordpress|wp-json/i.test(html) ||
+      /wp-content/i.test(path);
+    const hasNewsletterSignals =
+      /newsletter|bulletin|pastoral area/i.test(`${title} ${path}`) ||
+      /category-newsletter|tag-newsletter/i.test(html);
+
+    if (!hasWpSignals && !hasNewsletterSignals) return false;
+
+    const largeContentImages = Array.from(root.querySelectorAll("img")).filter(
+      (img) => _imageWidth(img) >= 500 && !DECORATIVE_IMG_RE.test(
+        `${img.className} ${img.alt || ""} ${img.src || ""}`
+      )
+    );
+    if (largeContentImages.length === 1 && textLen < 600) return false;
+
+    return true;
+  };
+
+  /** True only when a large bulletin-like image is in the article body (not og:meta). */
+  const hasBulletinImageInContent = (doc = document, minWidth = 400) => {
+    const root = _entryContentRoot(doc);
+    if (!root) return false;
+
+    const candidates = Array.from(root.querySelectorAll("img")).filter((img) => {
+      const blob = `${img.className} ${img.alt || ""} ${img.src || ""} ${img.id || ""}`;
+      if (DECORATIVE_IMG_RE.test(blob)) return false;
+      if (_imageWidth(img) < minWidth) return false;
+      if (BULLETIN_IMG_ALT_RE.test(blob)) return true;
+      if (/\/wp-content\/uploads\//i.test(img.src || "")) return true;
+      return false;
+    });
+
+    return candidates.length > 0;
+  };
+
   const FINGERPRINTS = [
     {
       id: "joomla_dropfiles_weekly",
@@ -275,35 +364,69 @@
       doNot: ["Do not stop at click-only — need a download capture step."],
     },
     {
+      id: "wordpress_html_post",
+      label: "WordPress HTML newsletter (text on page)",
+      pageType: "wix_html",
+      captureMethod: "html_capture",
+      playbookType: "wix_html",
+      minScore: 30,
+      domRequired: true,
+      domValidate: isWordPressHtmlBulletinPage,
+      markers: [
+        { re: /wp-block-paragraph|class="entry-content/i, weight: 14, label: "WP entry content blocks" },
+        { re: /wordpress|wp-json|wp-content\/themes/i, weight: 10, label: "WordPress signals" },
+        { re: /newsletter|bulletin|pastoral area/i, weight: 12, label: "newsletter in title/slug" },
+        { re: /category-newsletter|tag-newsletter/i, weight: 8, label: "newsletter taxonomy" },
+      ],
+      pickDownloadUrl: () => "",
+      advice:
+        "WordPress HTML newsletter — Save page as PDF. Harvester prints this page each Sunday (not an image bulletin).",
+      doNot: ["Do not use Pick bulletin image — the bulletin is text on this page."],
+    },
+    {
       id: "image_bulletin_wp",
       label: "Image bulletin (WordPress uploads)",
       pageType: "image_bulletin",
       captureMethod: "image_capture",
       playbookType: "image",
       minScore: 24,
+      domRequired: true,
+      domValidate: (doc) => hasBulletinImageInContent(doc, 400),
       markers: [
-        { re: /wp-content\/uploads\/.*\.(jpg|jpeg|png|webp)/i, weight: 14, label: "WP uploaded images" },
+        {
+          re: /wp-content\/uploads\/.*\.(jpg|jpeg|png|webp)/i,
+          weight: 14,
+          label: "WP uploaded images in body",
+          scope: "body",
+        },
         { re: /bulletin|newsletter|notice/i, weight: 10, label: "bulletin keywords" },
       ],
       pickDownloadUrl: () => "",
-      advice: "Bulletin may be a large image — use Pick an image on this page.",
-      doNot: [],
+      advice: "Bulletin is a large image — use Pick an image on this page.",
+      doNot: ["Do not use Save page as PDF when the bulletin is a single JPEG/PNG."],
     },
   ];
 
   const _collectHtmlBlob = (doc) => {
     const head = doc.head?.innerHTML?.slice(0, 40000) || "";
-    const body = doc.body?.innerHTML?.slice(0, 80000) || "";
+    const body = doc.body?.innerHTML?.slice(0, 120000) || "";
     const generator =
       doc.querySelector('meta[name="generator"]')?.getAttribute("content") || "";
     return { head, body, combined: `${head}\n${body}`, generator };
+  };
+
+  const _markerHaystack = (blob, marker) => {
+    if (marker.scope === "body") return blob.body;
+    if (marker.scope === "head") return blob.head;
+    return blob.combined;
   };
 
   const _scoreFingerprint = (fp, blob) => {
     const markersFound = [];
     let score = 0;
     for (const m of fp.markers || []) {
-      if (m.re.test(blob.combined) || m.re.test(blob.generator)) {
+      const haystack = _markerHaystack(blob, m);
+      if (m.re.test(haystack) || m.re.test(blob.generator)) {
         score += Number(m.weight) || 10;
         markersFound.push(m.label || m.re.source);
       }
@@ -316,7 +439,19 @@
     const matches = [];
 
     for (const fp of FINGERPRINTS) {
-      const { score, markersFound } = _scoreFingerprint(fp, blob);
+      let { score, markersFound } = _scoreFingerprint(fp, blob);
+      if (fp.domValidate) {
+        let domOk = false;
+        try {
+          domOk = Boolean(fp.domValidate(doc));
+        } catch (_e) {
+          domOk = false;
+        }
+        if (!domOk) {
+          if (fp.domRequired) continue;
+          score = Math.floor(score * 0.35);
+        }
+      }
       if (score < (fp.minScore || 20)) continue;
       let bestDownloadUrl = "";
       try {
@@ -403,6 +538,9 @@
     scanPage,
     formatScanSummary,
     toPatternPayload,
+    isWordPressHtmlBulletinPage,
+    hasBulletinImageInContent,
+    imageWidth: _imageWidth,
   };
 
   if (typeof globalThis !== "undefined") {

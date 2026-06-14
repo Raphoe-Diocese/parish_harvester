@@ -52,10 +52,10 @@
       pin: true,
     },
     wix_html: {
-      title: "Wix page — bulletin is the web page",
+      title: "HTML text bulletin (WordPress / Wix)",
       steps: [
         "If you need a menu click first → Follow a link.",
-        "On the newsletter page → Save page as PDF → Push.",
+        "On the newsletter article page → Save page as PDF → Push.",
       ],
       pin: false,
     },

@@ -88,12 +88,12 @@ chrome.storage.local.get(["gh_pat", "gh_repo"], (r) => {
   const patInput  = document.getElementById("gh-pat");
   const repoInput = document.getElementById("gh-repo");
   if (patInput  && r.gh_pat)  patInput.value  = r.gh_pat;
-  if (repoInput && r.gh_repo) repoInput.value = r.gh_repo;
+  if (repoInput) repoInput.value = phResolveGhRepo(r.gh_repo);
 });
 
 document.getElementById("gh-save").addEventListener("click", () => {
   const pat  = (document.getElementById("gh-pat").value  || "").trim();
-  const repo = (document.getElementById("gh-repo").value || "").trim();
+  const repo = phResolveGhRepo((document.getElementById("gh-repo").value || "").trim());
   const ghStatusEl = document.getElementById("gh-save-status");
   chrome.storage.local.set({
     gh_pat: pat,
@@ -105,11 +105,11 @@ document.getElementById("gh-save").addEventListener("click", () => {
       setTimeout(() => { ghStatusEl.textContent = ""; }, 4000);
       return;
     }
-    if (!pat || !repo) {
-      ghStatusEl.textContent = "⚠️ Saved. Add GitHub PAT + repo to enable recipe push.";
+    if (!pat) {
+      ghStatusEl.textContent = "⚠️ Saved. Add your GitHub PAT to enable recipe push.";
       ghStatusEl.style.color = "#fde68a";
     } else {
-      ghStatusEl.textContent = "✅ Settings saved.";
+      ghStatusEl.textContent = `✅ Settings saved for ${repo}.`;
       ghStatusEl.style.color = "#86efac";
     }
     setTimeout(() => { ghStatusEl.textContent = ""; }, 3000);
@@ -201,11 +201,11 @@ async function runDiagnostics() {
 
   const allLocalStorage = await new Promise((resolve) => chrome.storage.local.get(null, resolve));
   const pat = typeof allLocalStorage.gh_pat === "string" ? allLocalStorage.gh_pat.trim() : "";
-  const repo = typeof allLocalStorage.gh_repo === "string" ? allLocalStorage.gh_repo.trim() : "";
+  const repo = phResolveGhRepo(allLocalStorage.gh_repo);
   const ghLogin = await _fetchGitHubUserLogin(pat);
 
   const patLine = `GitHub PAT present: ${pat ? "yes" : "no"}${ghLogin ? ` (authenticated user: ${ghLogin})` : ""}`;
-  const repoLine = `GitHub repo configured: ${repo || "n/a"}`;
+  const repoLine = `GitHub repo configured: ${repo}`;
   const patternLine = "Pattern learning: HTML fingerprint scan + parishes/site_patterns.json on GitHub";
 
   const debug = allLocalStorage.ph_parish_detect_debug;

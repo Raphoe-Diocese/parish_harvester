@@ -602,7 +602,7 @@
     if (!key && !host) return "";
     if (!_contactsCache.loaded) {
       const settings = await _storageGet(["gh_repo"]);
-      const ghRepo = String(settings.gh_repo || "").trim();
+      const ghRepo = String(settings.gh_repo || "Raphoe-Diocese/parish_harvester").trim();
       if (!ghRepo) return "";
       const files = [
         "parishes/derry_diocese_contacts.json",
@@ -1220,12 +1220,43 @@
   const MIN_CONTENT_IMAGE_WIDTH = 200;
 
   const getImageWidth = (img) => {
+    const lib = globalThis.PhHtmlFingerprint;
+    if (lib?.imageWidth) return lib.imageWidth(img);
     const widthAttr = Number(img.getAttribute("width") || 0);
     if (Number.isFinite(widthAttr) && widthAttr > 0) return widthAttr;
     const renderWidth = Number(img.width || 0);
     if (Number.isFinite(renderWidth) && renderWidth > 0) return renderWidth;
     const rectWidth = Number(img.getBoundingClientRect?.().width || 0);
     return Number.isFinite(rectWidth) ? rectWidth : 0;
+  };
+
+  const _isWordPressHtmlBulletinPage = () => {
+    try {
+      return Boolean(globalThis.PhHtmlFingerprint?.isWordPressHtmlBulletinPage?.(document));
+    } catch (_e) {
+      return false;
+    }
+  };
+
+  const _hasBulletinImageInContent = (minWidth = MIN_CONTENT_IMAGE_WIDTH) => {
+    try {
+      return Boolean(
+        globalThis.PhHtmlFingerprint?.hasBulletinImageInContent?.(document, minWidth)
+      );
+    } catch (_e) {
+      return false;
+    }
+  };
+
+  const DECORATIVE_IMG_RE =
+    /logo|icon|avatar|gravatar|emoji|spinner|badge|social|wp-smiley/i;
+
+  const isLikelyBulletinImage = (img) => {
+    const blob = `${img.className} ${img.alt || ""} ${img.src || ""} ${img.id || ""}`;
+    if (DECORATIVE_IMG_RE.test(blob)) return false;
+    if (/bulletin|newsletter|notice|weekly/i.test(blob)) return true;
+    if (img.closest(".entry-content, .post-content, article")) return true;
+    return false;
   };
 
   const isLargeImage = (img, threshold = 400) => {
@@ -1244,14 +1275,10 @@
     return false;
   };
 
-  const hasPickableImageInContentAreas = (minWidth = MIN_CONTENT_IMAGE_WIDTH) =>
-    Array.from(document.querySelectorAll(`${IMAGE_CONTENT_AREA_SELECTOR} img`)).some(
-      (img) => {
-        const rawWidthAttr = (img.getAttribute("width") || "").trim();
-        if (/^\d+$/.test(rawWidthAttr) && Number(rawWidthAttr) < minWidth) return false;
-        return true;
-      }
-    );
+  const hasPickableImageInContentAreas = (minWidth = MIN_CONTENT_IMAGE_WIDTH) => {
+    if (_isWordPressHtmlBulletinPage()) return false;
+    return _hasBulletinImageInContent(minWidth);
+  };
 
   // Detect what kind of bulletin page we are on and give plain-language guidance.
   const WIX_SLUG_DATE_RE = /(\d{1,2})(?:st|nd|rd|th)?[_-](jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[_-](\d{4})/i;
@@ -1364,10 +1391,21 @@
       const skipCloud = fpDetect.type === "cloud_folder" && !_isCloudFolderUrl(url);
       const skipImage =
         fpDetect.type === "image" &&
-        !hasPickableImageInContentAreas(MIN_CONTENT_IMAGE_WIDTH);
+        (!_hasBulletinImageInContent(MIN_CONTENT_IMAGE_WIDTH) || _isWordPressHtmlBulletinPage());
       if (!skipCloud && !skipImage) {
         return fpDetect;
       }
+    }
+
+    // 1c. WordPress HTML text newsletter (Clonleigh-style) before loose image heuristics
+    if (_isWordPressHtmlBulletinPage()) {
+      return {
+        emoji: "📰",
+        summary: "WordPress HTML newsletter — bulletin text is on this page.",
+        advice: 'Click "Save page as PDF" — Sunday harvest prints this into the mega bulletin.',
+        type: "wix_html",
+        htmlFingerprint: "wordpress_html_post",
+      };
     }
 
     // 1e. Parish Services / Parish Messenger embed (dmaparish, ardstraw, culdaff, etc.)
@@ -1637,51 +1675,27 @@
       };
     }
 
-    // 6. Pickable images in content areas (common on WordPress bulletin pages)
-    if (hasPickableImageInContentAreas(MIN_CONTENT_IMAGE_WIDTH)) {
+    // 6. Image bulletins — only when a large bulletin image is actually in the article body
+    if (_hasBulletinImageInContent(400)) {
+      const bulletinImages = Array.from(
+        document.querySelectorAll(".entry-content img, .post-content img, article img")
+      ).filter(
+        (img) => isLikelyBulletinImage(img) && isLargeImage(img, 400)
+      );
       return {
         emoji: "🖼️",
-        summary: "Found large content image(s) that may be the bulletin.",
+        summary:
+          bulletinImages.length > 0
+            ? `Found ${bulletinImages.length} bulletin image(s) in the article.`
+            : "Found a large bulletin image on this page.",
         advice: 'Use "Pick an image on this page" to select the bulletin image.',
-        type: "image",
-      };
-    }
-
-    // 6. Image bulletins
-    const bulletinImages = Array.from(document.querySelectorAll("img")).filter(
-      (img) => {
-        const srcAttr = img.getAttribute("src") || "";
-        const srcAlt = (
-          srcAttr +
-          " " +
-          (img.getAttribute("alt") || "")
-        ).toLowerCase();
-        const src = srcAttr.toLowerCase();
-        const inContentArea =
-          img.closest(IMAGE_CONTENT_AREA_SELECTOR) || isInClassHintedContentArea(img);
-        return (
-          srcAlt.includes("bulletin") ||
-          srcAlt.includes("newsletter") ||
-          srcAlt.includes("notice") ||
-          src.includes("/uploads/") ||
-          src.includes("/wp-content/") ||
-          isLargeImage(img, 400) ||
-          Boolean(inContentArea)
-        );
-      }
-    );
-    if (bulletinImages.length > 0) {
-      return {
-        emoji: "🖼️",
-        summary: `Found ${bulletinImages.length} possible image bulletin(s).`,
-        advice: "Click \"Yes, it's an image\" to crop or mark the image bulletin.",
         type: "image",
       };
     }
 
     const allLinks = document.querySelectorAll("a[href],button");
 
-    // Wix HTML bulletin — text newsletter on page (no PDF file)
+    // HTML text bulletin — Wix sites with dated slug
     if (_isWixSite()) {
       const path = window.location.pathname || "";
       if (_hasWixDateSlug(path)) {
@@ -2096,9 +2110,12 @@
 
   const _pathLooksLikeNewsletterPage = () => {
     try {
-      return /\/(news|newsletter|bulletin|parishnews|nuacht)/i.test(
-        new URL(_pageUrlForParishDetection()).pathname || ""
-      );
+      const path = new URL(_pageUrlForParishDetection()).pathname || "";
+      if (/\/(news|newsletter|bulletin|parishnews|nuacht)(\/|$)/i.test(path)) return true;
+      if (/\/\d{4}\/\d{2}\/\d{2}\//i.test(path) && /newsletter|bulletin|pastoral/i.test(path)) {
+        return true;
+      }
+      return /newsletter|bulletin|pastoral-area/i.test(path);
     } catch (_e) {
       return false;
     }
@@ -4050,13 +4067,13 @@
       "Only when you are already looking at the PDF file"
     );
     const savePagePdfBtn = makeSmallBtn(
-      "📰 Save page as PDF (Wix/HTML bulletin)",
+      "📰 Save page as PDF (HTML text bulletin)",
       "#7c3aed",
       () => {
         standaloneAddStep({ action: "print_to_pdf" }, "print_to_pdf", "📰 Save page as PDF");
         showStatus("✅ Recorded: this page will be printed into the mega bulletin on Sunday.", "ok");
       },
-      "The bulletin is a web page (Wix/text) — harvester prints it to PDF, not just a link"
+      "Bulletin is text on the page (WordPress/Wix/HTML) — harvester prints it to PDF"
     );
     const imageCropBtn = makeSmallBtn(
       "🖼️ Get an image (newsletter screenshot)",
@@ -5029,16 +5046,17 @@
         try {
           chrome.storage.local.get(["gh_pat", "gh_repo"], (r) => {
             if (chrome.runtime?.lastError) return;
-            if (!r.gh_pat || !r.gh_repo) {
+            const repo = String(r.gh_repo || "Raphoe-Diocese/parish_harvester").trim();
+            if (!r.gh_pat) {
               ghConfigNote.style.display = "block";
               ghConfigNote.style.background = "#7f1d1d";
               ghConfigNote.style.color = "#fca5a5";
-              ghConfigNote.textContent = "⚠️ GitHub PAT / repo not set — open the extension popup → ⚙️ Settings before pushing.";
+              ghConfigNote.textContent = "⚠️ GitHub PAT not set — open the extension popup → ⚙️ Settings before pushing.";
             } else {
               ghConfigNote.style.display = "block";
               ghConfigNote.style.background = "#14532d";
               ghConfigNote.style.color = "#86efac";
-              ghConfigNote.textContent = `✓ GitHub configured for ${r.gh_repo}`;
+              ghConfigNote.textContent = `✓ GitHub configured for ${repo}`;
             }
           });
         } catch (_e) {}
@@ -5537,7 +5555,7 @@
       const loadRecipeFromRawGithub = async (key, diocese) => {
         if (!key) return null;
         const settings = await _storageGet(["gh_repo", "gh_pat"]);
-        const ghRepo = String(settings.gh_repo || "").trim();
+        const ghRepo = String(settings.gh_repo || "Raphoe-Diocese/parish_harvester").trim();
         if (!ghRepo) return null;
         const headers = {};
         const pat = String(settings.gh_pat || "").trim();

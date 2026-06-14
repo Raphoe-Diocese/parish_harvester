@@ -1,4 +1,25 @@
 const SCRIPTABLE_PROTOCOLS = new Set(["http:", "https:"]);
+const PROBLEMS_RECIPE_RETRAINED_KEY = "ph_recipe_retrained";
+
+try {
+  importScripts("github_defaults.js");
+} catch (_importErr) {
+  // Fallback when loaded in a context without importScripts.
+  globalThis.PH_DEFAULT_GH_REPO = "Raphoe-Diocese/parish_harvester";
+  globalThis.phResolveGhRepo = (storedRepo) => {
+    const value = String(storedRepo || "").trim();
+    return value || globalThis.PH_DEFAULT_GH_REPO;
+  };
+}
+
+chrome.runtime.onInstalled.addListener(() => {
+  chrome.storage.local.get(["gh_repo"], (data) => {
+    if (chrome.runtime.lastError) return;
+    if (!String(data?.gh_repo || "").trim()) {
+      chrome.storage.local.set({ gh_repo: phResolveGhRepo("") });
+    }
+  });
+});
 
 function _tabUrlIsScriptable(url) {
   if (!url || typeof url !== "string") return false;
@@ -320,7 +341,7 @@ async function _upsertSitePattern(gh_pat, gh_repo, parishKey, displayName, recip
     iframe_viewer: "Click It's in a frame / viewer and choose the bulletin frame.",
     oneweb_docx: "One.com + Google previews: auto-detect newsletter from HTML. Direct download only — never wait for iframes. See Claudy recipe.",
     wix_pdf_viewer: "Use Find bulletin — Wix often hides the real PDF URL in the viewer.",
-    wix_html: "Save page as PDF — harvester prints the Wix/HTML bulletin into the mega PDF each Sunday.",
+    wix_html: "Save page as PDF — harvester prints HTML text bulletins (WordPress/Wix) into the mega PDF each Sunday.",
     parish_messenger_embed: "Follow a link → pick newest View Newsletter (ignore Gift Aid / Data Entry PDFs).",
     image_bulletin: "Click Get an image or Pick an image on this page.",
     html_click_chain: "Click Follow a link to reach the bulletin, then Get a PDF or Mark as HTML.",
@@ -355,9 +376,10 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type !== "fetch_site_patterns") return false;
   (async () => {
     try {
-      const { gh_pat, gh_repo } = await chrome.storage.local.get(["gh_pat", "gh_repo"]);
-      if (!gh_pat || !gh_repo) {
-        sendResponse({ ok: false, error: "GitHub not configured." });
+      const { gh_pat, gh_repo: storedGhRepo } = await chrome.storage.local.get(["gh_pat", "gh_repo"]);
+      const gh_repo = phResolveGhRepo(storedGhRepo);
+      if (!gh_pat) {
+        sendResponse({ ok: false, error: "GitHub PAT not configured." });
         return;
       }
       const loaded = await _fetchGithubJsonFile(gh_pat, gh_repo, SITE_PATTERNS_PATH);
@@ -384,7 +406,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 //
 // Required storage keys:
 //   gh_pat   — personal access token with repo write scope
-//   gh_repo  — owner/repo  (e.g. "Frankytyrone/parish_harvester")
+//   gh_repo  — owner/repo  (default: Raphoe-Diocese/parish_harvester)
 //
 // Message shape:
 //   { type: "push_recipe", parish_key: string, recipe: object }
@@ -403,9 +425,10 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
   (async () => {
     try {
-      const { gh_pat, gh_repo } = await chrome.storage.local.get(["gh_pat", "gh_repo"]);
-      if (!gh_pat || !gh_repo) {
-        sendResponse({ ok: false, error: "GitHub PAT or repo not configured." });
+      const { gh_pat, gh_repo: storedGhRepo } = await chrome.storage.local.get(["gh_pat", "gh_repo"]);
+      const gh_repo = phResolveGhRepo(storedGhRepo);
+      if (!gh_pat) {
+        sendResponse({ ok: false, error: "GitHub PAT not configured." });
         return;
       }
       const apiUrl = `https://api.github.com/repos/${gh_repo}/contents/${message.path}`;
@@ -448,9 +471,10 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
   (async () => {
     try {
-      const { gh_pat, gh_repo } = await chrome.storage.local.get(["gh_pat", "gh_repo"]);
-      if (!gh_pat || !gh_repo) {
-        sendResponse({ ok: false, error: "GitHub PAT or repo not configured." });
+      const { gh_pat, gh_repo: storedGhRepo } = await chrome.storage.local.get(["gh_pat", "gh_repo"]);
+      const gh_repo = phResolveGhRepo(storedGhRepo);
+      if (!gh_pat) {
+        sendResponse({ ok: false, error: "GitHub PAT not configured." });
         return;
       }
 
@@ -500,9 +524,10 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type !== "delete_github_file") return false;
   (async () => {
     try {
-      const { gh_pat, gh_repo } = await chrome.storage.local.get(["gh_pat", "gh_repo"]);
-      if (!gh_pat || !gh_repo) {
-        sendResponse({ ok: false, error: "GitHub PAT or repo not configured." });
+      const { gh_pat, gh_repo: storedGhRepo } = await chrome.storage.local.get(["gh_pat", "gh_repo"]);
+      const gh_repo = phResolveGhRepo(storedGhRepo);
+      if (!gh_pat) {
+        sendResponse({ ok: false, error: "GitHub PAT not configured." });
         return;
       }
       const filePath = (message.path || "").trim();
@@ -597,9 +622,10 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
   (async () => {
     try {
-      const { gh_pat, gh_repo } = await chrome.storage.local.get(["gh_pat", "gh_repo"]);
-      if (!gh_pat || !gh_repo) {
-        sendResponse({ ok: false, error: "GitHub PAT or repo not configured. Open the extension popup → ⚙️ Settings and enter your PAT and repo." });
+      const { gh_pat, gh_repo: storedGhRepo } = await chrome.storage.local.get(["gh_pat", "gh_repo"]);
+      const gh_repo = phResolveGhRepo(storedGhRepo);
+      if (!gh_pat) {
+        sendResponse({ ok: false, error: "GitHub PAT not configured. Open the extension popup → ⚙️ Settings and enter your PAT." });
         return;
       }
 
@@ -728,6 +754,13 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         diocese:      (incoming.diocese      && incoming.diocese.trim())      ? incoming.diocese.trim()      : existingRecipe.diocese,
       } : incoming;
       const normalizedRecipe = _normalizeRecipeTerminalSteps(recipe);
+      const recipeStatus = String(normalizedRecipe.status || "").toLowerCase();
+      if (recipeStatus === "dead_url" || recipeStatus === "inactive" || normalizedRecipe.skip) {
+        normalizedRecipe.skip = true;
+        if (!normalizedRecipe.reason) {
+          normalizedRecipe.reason = normalizedRecipe.dead_reason || "Marked inactive";
+        }
+      }
 
       // Set recorded_date to today.
       normalizedRecipe.recorded_date = new Date().toISOString().slice(0, 10);
@@ -824,6 +857,21 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         patternLearned,
         patternLearnError,
       });
+
+      try {
+        const stored = await chrome.storage.local.get([PROBLEMS_RECIPE_RETRAINED_KEY]);
+        const retrained = (stored?.[PROBLEMS_RECIPE_RETRAINED_KEY] && typeof stored[PROBLEMS_RECIPE_RETRAINED_KEY] === "object")
+          ? stored[PROBLEMS_RECIPE_RETRAINED_KEY]
+          : {};
+        if (recipeStatus === "dead_url" || recipeStatus === "inactive" || normalizedRecipe.skip) {
+          delete retrained[key];
+        } else {
+          retrained[key] = normalizedRecipe.recorded_date || new Date().toISOString().slice(0, 10);
+        }
+        await chrome.storage.local.set({ [PROBLEMS_RECIPE_RETRAINED_KEY]: retrained });
+      } catch (_storeErr) {
+        console.warn("Parish Trainer: could not store recipe retrained marker", _storeErr);
+      }
     } catch (err) {
       sendResponse({ ok: false, error: `Unexpected error: ${String(err)}. Try reloading the extension.` });
     }
