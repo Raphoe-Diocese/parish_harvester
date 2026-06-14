@@ -333,29 +333,28 @@
   // Mirrors the _pdUrlToKey() logic used in sidepanel.js so the push form can
   // auto-populate fields without requiring manual entry.
   const _inferParishKeyFromUrl = (url) => {
+    if (window.ph_parish_pickers?.inferParishKeyFromUrl) {
+      return window.ph_parish_pickers.inferParishKeyFromUrl(url);
+    }
     if (!url) return "";
     try {
       const parsed = new URL(url);
-      let hostname = parsed.hostname.toLowerCase().replace(/^www\d*\./, "");
-      if (/\bi\d+\.wp\.com\b/.test(hostname)) {
-        const parts = parsed.pathname.replace(/^\//, "").split("/");
-        if (parts.length > 0) {
-          const real = parts[0].toLowerCase().replace(/^www\d*\./, "");
-          const segs = real.split(".");
-          if (segs.length >= 2) return segs[0];
-        }
-      }
-      if (
-        hostname === "filesafe.space" || hostname.endsWith(".filesafe.space") ||
-        hostname === "google.com"     || hostname.endsWith(".google.com")
-      ) {
-        return "";
-      }
+      const hostname = parsed.hostname.toLowerCase().replace(/^www\d*\./, "");
       return hostname.split(".")[0] || "";
     } catch (_e) {
       return "";
     }
   };
+
+  const _siteCacheKeyForUrl = (url) =>
+    window.ph_parish_pickers?.siteCacheKey?.(url) ||
+    (() => {
+      try {
+        return new URL(url).hostname.toLowerCase();
+      } catch (_e) {
+        return "";
+      }
+    })();
 
   const _inferDisplayNameFromUrl = (url) => {
     const key = _inferParishKeyFromUrl(url);
@@ -367,42 +366,12 @@
   // ph_training_parish from a different website (e.g. bellaghyparish bleeding
   // into threepatrons.org).
   const _resolveParishContextForPage = (pageUrl, storageData = {}) => {
-    const hostname = (() => {
-      try {
-        return new URL(pageUrl || window.location.href).hostname.toLowerCase();
-      } catch (_e) {
-        return _currentHostname();
-      }
-    })();
+    if (window.ph_parish_pickers?.resolveFromPage) {
+      return window.ph_parish_pickers.resolveFromPage(pageUrl || window.location.href, storageData);
+    }
     const inferredKey = _inferParishKeyFromUrl(pageUrl || window.location.href);
     const inferredName = _inferDisplayNameFromUrl(pageUrl || window.location.href);
-    const hostnameCtx =
-      hostname && storageData.ph_hostname_map && typeof storageData.ph_hostname_map === "object"
-        ? storageData.ph_hostname_map[hostname]
-        : null;
-
-    let key = inferredKey || "";
-    let name = inferredName || "";
-    let diocese = "";
-
-    if (hostnameCtx && typeof hostnameCtx === "object") {
-      const mappedKey = String(hostnameCtx.parish_key || hostnameCtx.key || "")
-        .trim()
-        .toLowerCase()
-        .replace(/\s+/g, "_");
-      const mappedName = String(hostnameCtx.display_name || hostnameCtx.name || "").trim();
-      const mappedDiocese = String(hostnameCtx.diocese || "").trim();
-      if (mappedDiocese) diocese = mappedDiocese;
-      if (mappedName) name = mappedName;
-      // Only trust cached key when URL gives nothing, or cache agrees with URL.
-      if (mappedKey && !inferredKey) {
-        key = mappedKey;
-      } else if (mappedKey && inferredKey && mappedKey === inferredKey) {
-        key = mappedKey;
-      }
-    }
-
-    return { key, name, diocese, hostname, inferredKey };
+    return { key: inferredKey, name: inferredName, diocese: "", hostname: "", inferredKey };
   };
 
   const _parishKeyMatchesPageUrl = (key, pageUrl) => {
@@ -413,9 +382,13 @@
     if (!k) return false;
     if (!i) return true;
     if (k === i) return true;
+    const urlHit = window.ph_parish_pickers?.lookupByUrl?.(pageUrl);
+    if (urlHit?.key && norm(urlHit.key) === k) return true;
     try {
       const hostSeg = new URL(pageUrl).hostname.toLowerCase().replace(/^www\d*\./, "").split(".")[0] || "";
-      if (hostSeg && (k === hostSeg || hostSeg.includes(k) || k.includes(hostSeg))) return true;
+      if (hostSeg && hostSeg !== "mcn" && (k === hostSeg || hostSeg.includes(k) || k.includes(hostSeg))) {
+        return true;
+      }
     } catch (_e) {
       // ignore
     }
@@ -423,18 +396,20 @@
   };
 
   const _purgeStaleHostnameMapEntry = (hostname, pageUrl) => {
-    if (!hostname || typeof chrome === "undefined" || !chrome.storage) return;
+    const cacheKey = _siteCacheKeyForUrl(pageUrl);
+    if (!cacheKey || typeof chrome === "undefined" || !chrome.storage) return;
     try {
       chrome.storage.local.get(["ph_hostname_map"], (r) => {
         if (chrome.runtime?.lastError) return;
         const hostnameMap = (r.ph_hostname_map && typeof r.ph_hostname_map === "object")
           ? { ...r.ph_hostname_map }
           : {};
-        const stale = hostnameMap[hostname];
+        const stale = hostnameMap[cacheKey] || (hostname ? hostnameMap[hostname] : null);
         if (!stale) return;
         const staleKey = String(stale.parish_key || stale.key || "").trim().toLowerCase().replace(/\s+/g, "_");
         if (!staleKey || _parishKeyMatchesPageUrl(staleKey, pageUrl)) return;
-        delete hostnameMap[hostname];
+        delete hostnameMap[cacheKey];
+        if (hostname) delete hostnameMap[hostname];
         try { chrome.storage.local.set({ ph_hostname_map: hostnameMap }); } catch (_e) {}
       });
     } catch (_e) {
@@ -444,9 +419,15 @@
 
   // Persist per-domain parish context after a successful push.
   const _cacheParishByDomain = (url, key, name, diocese, startUrl = "") => {
-    const hostname = (() => { try { return new URL(url).hostname; } catch (_e) { return ""; } })();
-    if (!hostname || !key) return;
+    const cacheKey = _siteCacheKeyForUrl(url || startUrl);
+    if (!cacheKey || !key) return;
     if (typeof chrome === "undefined" || !chrome.storage) return;
+    let hostname = "";
+    try {
+      hostname = new URL(url || startUrl).hostname;
+    } catch (_e) {
+      // ignore
+    }
     try {
       chrome.storage.local.get(["ph_parish_by_domain", "ph_hostname_map"], (r) => {
         if (chrome.runtime?.lastError) return;
@@ -464,8 +445,8 @@
           start_url: startUrl || url,
           ts: Date.now(),
         };
-        cache[hostname] = context;
-        hostnameMap[hostname] = context;
+        cache[cacheKey] = context;
+        hostnameMap[cacheKey] = context;
         try { chrome.storage.local.set({ ph_parish_by_domain: cache, ph_hostname_map: hostnameMap }); } catch (_e) {}
       });
     } catch (_e) {}
@@ -4700,14 +4681,64 @@
         return inp;
       };
 
-      const keyInput = makeInput("Parish key (auto-detected if blank)", "ph-parish-key");
-      const nameInput = makeInput("Display name (auto-detected if blank)", "ph-display-name");
+      const inputStyle = [
+        "width:100%",
+        "border:1px solid #374151",
+        "border-radius:4px",
+        "padding:4px 6px",
+        "background:#0f172a",
+        "color:#f9fafb",
+        "font-size:10px",
+        "box-sizing:border-box",
+        "font-family:inherit",
+      ].join(";");
+
+      const trainerTip = document.createElement("div");
+      trainerTip.style.cssText = "font-size:9px;color:#93c5fd;line-height:1.4;margin-bottom:6px;display:none;";
+      pushSection.appendChild(trainerTip);
+
+      let parishPickerTouched = false;
+      let diocesePickerTouched = false;
+
+      const parishSearchCombo = window.ph_parish_pickers?.createSearchCombo
+        ? window.ph_parish_pickers.createSearchCombo({
+            label: "Find parish (type a few letters)",
+            placeholder: "e.g. dunfanaghy, holy-cross, rap…",
+            inputStyle,
+            onChange: (item) => {
+              if (!item) return;
+              parishPickerTouched = true;
+              const key = item.key || item.value || "";
+              if (key) keyInput.value = key;
+              if (item.name) nameInput.value = item.name;
+              if (item.diocese) {
+                resolvedDiocese = item.diocese;
+                dioceseCombo?.setValue(item.diocese, item.diocese.replace(/_/g, " "));
+                refreshDioceseLine();
+              }
+              autoDetectNote.style.display = "block";
+              autoDetectNote.style.color = "#86efac";
+              autoDetectNote.textContent = `✓ You picked: ${item.name || key} (${key})`;
+              parishMismatchBanner.style.display = "none";
+            },
+          })
+        : null;
+      if (parishSearchCombo) pushSection.appendChild(parishSearchCombo.wrap);
+
+      const keyInput = makeInput("Parish key (folder name on GitHub)", "ph-parish-key");
+      const nameInput = makeInput("Display name (shown in mega bulletin)", "ph-display-name");
 
       const harvestStatusLine = document.createElement("div");
       harvestStatusLine.style.cssText = "font-size:9px;color:#93c5fd;margin-bottom:4px;display:none;";
       pushSection.appendChild(harvestStatusLine);
       pushSection.appendChild(keyInput);
       pushSection.appendChild(nameInput);
+      keyInput.addEventListener("input", () => {
+        parishPickerTouched = true;
+      });
+      nameInput.addEventListener("input", () => {
+        parishPickerTouched = true;
+      });
 
       const _refreshHarvestStatusLine = async (parishKey) => {
         const key = String(parishKey || "").trim().toLowerCase();
@@ -4781,61 +4812,125 @@
         }
       };
 
-      const dioceseSelect = document.createElement("select");
-      dioceseSelect.id = "ph-diocese-select";
-      dioceseSelect.style.cssText = [
-        "width:100%",
-        "border:1px solid #374151",
-        "border-radius:4px",
-        "padding:4px 6px",
-        "background:#0f172a",
-        "color:#f9fafb",
-        "font-size:10px",
-        "margin-bottom:6px",
-        "box-sizing:border-box",
-        "font-family:inherit",
-      ].join(";");
-      const dioceseOpts = [
-        { v: "", l: "— select diocese —" },
-        { v: "derry", l: "Derry" },
-        { v: "down_and_connor", l: "Down and Connor" },
-        { v: "raphoe", l: "Raphoe" },
-        { v: "donegal", l: "Donegal (custom)" },
-      ];
-      for (const o of dioceseOpts) {
-        const opt = document.createElement("option");
-        opt.value = o.v;
-        opt.textContent = o.l;
-        dioceseSelect.appendChild(opt);
-      }
-      const dioceseLabel = document.createElement("div");
-      dioceseLabel.style.cssText = "font-size:9px;color:#93c5fd;margin-bottom:2px;";
-      dioceseLabel.textContent = "Diocese (for recipe folder):";
-      pushSection.appendChild(dioceseLabel);
-      pushSection.appendChild(dioceseSelect);
+      let resolvedDiocese = "";
+      let dioceseCombo = null;
+      const NEW_DIOCESE_VALUE = "__new_diocese__";
+      const newDioceseWrap = document.createElement("div");
+      newDioceseWrap.style.display = "none";
+      const newDioceseInput = document.createElement("input");
+      newDioceseInput.type = "text";
+      newDioceseInput.placeholder = "New folder name, e.g. cloyne, killaloe";
+      newDioceseInput.style.cssText = inputStyle + ";margin-bottom:4px;";
+      const newDioceseHint = document.createElement("div");
+      newDioceseHint.style.cssText = "font-size:9px;color:#6b7280;margin-bottom:6px;line-height:1.35;";
+      newDioceseHint.textContent =
+        "Creates parishes/recipes/your_name/ on GitHub when you push. Use lowercase — spaces become underscores.";
+      newDioceseWrap.appendChild(newDioceseInput);
+      newDioceseWrap.appendChild(newDioceseHint);
+
+      const _slugifyDioceseInput = (value) =>
+        String(value || "")
+          .trim()
+          .toLowerCase()
+          .replace(/&/g, "and")
+          .replace(/[^a-z0-9]+/g, "_")
+          .replace(/^_+|_+$/g, "");
 
       const dioceseLine = document.createElement("div");
       dioceseLine.style.cssText = "font-size:9px;color:#9ca3af;margin-bottom:6px;display:none;";
       pushSection.appendChild(dioceseLine);
-      let resolvedDiocese = "";
 
-      // Auto-detect label — shown when fields were filled automatically.
-      const autoDetectNote = document.createElement("div");
-      autoDetectNote.style.cssText = "font-size:9px;color:#86efac;margin-bottom:3px;display:none;";
-      pushSection.appendChild(autoDetectNote);
+      const _refreshParishPickerItems = async () => {
+        if (!parishSearchCombo) return;
+        const settings = await _storageGet(["gh_repo"]);
+        const reg = await window.ph_parish_pickers.loadRegistry(settings.gh_repo);
+        let items = [];
+        if (resolvedDiocese && resolvedDiocese !== NEW_DIOCESE_VALUE && reg.parishesByDiocese[resolvedDiocese]) {
+          items = reg.parishesByDiocese[resolvedDiocese].map((p) => ({
+            value: p.key,
+            key: p.key,
+            name: p.name,
+            label: `${p.name} (${p.key})`,
+            diocese: resolvedDiocese,
+          }));
+        } else {
+          items = Object.values(reg.byKey).map((p) => ({
+            value: p.key,
+            key: p.key,
+            name: p.name,
+            label: `${p.name} (${p.key})`,
+            diocese: p.diocese,
+          }));
+        }
+        parishSearchCombo.setItems(items.sort((a, b) => a.label.localeCompare(b.label)));
+      };
 
       const refreshDioceseLine = () => {
-        if (resolvedDiocese) {
-          dioceseSelect.value = resolvedDiocese;
+        if (resolvedDiocese && resolvedDiocese !== NEW_DIOCESE_VALUE) {
           dioceseLine.style.display = "block";
           dioceseLine.textContent = `Recipe will save to parishes/recipes/${resolvedDiocese}/`;
+        } else if (resolvedDiocese === NEW_DIOCESE_VALUE) {
+          dioceseLine.style.display = "block";
+          dioceseLine.textContent = "Enter new diocese folder name below.";
+        } else {
+          dioceseLine.style.display = "none";
         }
+        void _refreshParishPickerItems();
       };
-      dioceseSelect.addEventListener("change", () => {
-        resolvedDiocese = dioceseSelect.value.trim();
-        refreshDioceseLine();
-        if (resolvedDiocese) void _storageSet({ ph_last_diocese: resolvedDiocese });
-      });
+
+      let dioceseSelect;
+      if (window.ph_parish_pickers?.createSearchCombo) {
+        dioceseCombo = window.ph_parish_pickers.createSearchCombo({
+          label: "Diocese folder (type to search)",
+          placeholder: "Type rap, der, clo…",
+          inputStyle,
+          onChange: (item, val) => {
+            diocesePickerTouched = true;
+            if (val === NEW_DIOCESE_VALUE) {
+              resolvedDiocese = NEW_DIOCESE_VALUE;
+              newDioceseWrap.style.display = "block";
+              refreshDioceseLine();
+              return;
+            }
+            newDioceseWrap.style.display = "none";
+            resolvedDiocese = val || "";
+            if (resolvedDiocese) void _storageSet({ ph_last_diocese: resolvedDiocese });
+            refreshDioceseLine();
+          },
+        });
+        pushSection.appendChild(dioceseCombo.wrap);
+        pushSection.appendChild(newDioceseWrap);
+        dioceseSelect = {
+          get value() {
+            if (resolvedDiocese === NEW_DIOCESE_VALUE) {
+              return _slugifyDioceseInput(newDioceseInput.value);
+            }
+            const raw = resolvedDiocese || dioceseCombo?.getValue() || "";
+            return _slugifyDioceseInput(raw) || raw;
+          },
+          focus: () => dioceseCombo?.input?.focus?.(),
+        };
+      } else {
+        const dioceseSelectEl = document.createElement("select");
+        dioceseSelectEl.id = "ph-diocese-select";
+        dioceseSelectEl.style.cssText = inputStyle + ";margin-bottom:6px;";
+        for (const o of [
+          { v: "", l: "— select diocese —" },
+          { v: "derry", l: "Derry" },
+          { v: "raphoe", l: "Raphoe" },
+        ]) {
+          const opt = document.createElement("option");
+          opt.value = o.v;
+          opt.textContent = o.l;
+          dioceseSelectEl.appendChild(opt);
+        }
+        pushSection.appendChild(dioceseSelectEl);
+        dioceseSelectEl.addEventListener("change", () => {
+          resolvedDiocese = dioceseSelectEl.value.trim();
+          refreshDioceseLine();
+        });
+        dioceseSelect = dioceseSelectEl;
+      }
 
       const parishMismatchBanner = document.createElement("div");
       parishMismatchBanner.style.cssText = [
@@ -4851,6 +4946,35 @@
       ].join(";");
       pushSection.appendChild(parishMismatchBanner);
 
+      const autoDetectNote = document.createElement("div");
+      autoDetectNote.style.cssText = "font-size:9px;color:#86efac;margin-bottom:3px;display:none;";
+      pushSection.appendChild(autoDetectNote);
+
+      const _showTrainerTip = (resolved) => {
+        if (!trainerTip) return;
+        if (resolved?.lowConfidence && !parishPickerTouched) {
+          trainerTip.style.display = "block";
+          trainerTip.textContent =
+            "💡 Not sure this parish is right? Use Find parish above — type a few letters (e.g. holy or dunfanaghy).";
+        } else if (resolved?.urlMatched) {
+          trainerTip.style.display = "none";
+        } else {
+          trainerTip.style.display = "none";
+        }
+      };
+
+      const _loadDioceseComboItems = async () => {
+        if (!dioceseCombo) return;
+        const settings = await _storageGet(["gh_repo"]);
+        const reg = await window.ph_parish_pickers.loadRegistry(settings.gh_repo);
+        const items = (reg.dioceses || []).map((d) => ({
+          value: d,
+          label: d.replace(/_/g, " "),
+        }));
+        items.push({ value: NEW_DIOCESE_VALUE, label: "➕ Create new diocese folder…" });
+        dioceseCombo.setItems(items);
+      };
+
       const _showParishMismatch = (inferredKey, shownKey) => {
         if (!inferredKey || !shownKey || inferredKey === shownKey) {
           parishMismatchBanner.style.display = "none";
@@ -4862,21 +4986,26 @@
           "Using the current page URL.";
       };
 
-      const _applyResolvedParishToPushForm = (resolved, { notePrefix = "Auto-detected" } = {}) => {
+      const _applyResolvedParishToPushForm = (resolved, { notePrefix = "Matched from this page URL" } = {}) => {
         if (!resolved) return;
         const inferred = resolved.inferredKey || resolved.key || "";
-        if (inferred) {
+        if (inferred && !parishPickerTouched) {
           keyInput.value = inferred;
           autoDetectNote.style.display = "block";
-          autoDetectNote.textContent = `✓ ${notePrefix}: ${resolved.name || inferred} (${inferred})`;
+          autoDetectNote.style.color = resolved.lowConfidence ? "#fde68a" : "#86efac";
+          autoDetectNote.textContent = resolved.lowConfidence
+            ? `⚠️ Best guess: ${resolved.name || inferred} (${inferred}) — please confirm in Find parish`
+            : `✓ ${notePrefix}: ${resolved.name || inferred} (${inferred})`;
         }
-        if (resolved.name) nameInput.value = resolved.name;
-        if (resolved.diocese && !resolvedDiocese) {
+        if (resolved.name && !parishPickerTouched) nameInput.value = resolved.name;
+        if (resolved.diocese && !diocesePickerTouched) {
           resolvedDiocese = resolved.diocese;
+          dioceseCombo?.setValue(resolved.diocese, resolved.diocese.replace(/_/g, " "));
           refreshDioceseLine();
         }
         updateParishRecordingLine(nameInput.value || resolved.name, inferred, resolved.hostname);
         _showParishMismatch(inferred, resolved.key && resolved.key !== inferred ? resolved.key : "");
+        _showTrainerTip(resolved);
       };
 
       const _bootstrapParishContext = async () => {
@@ -4886,18 +5015,14 @@
           standaloneStartUrl = pageUrl;
         }
         _purgeStaleHostnameMapEntry(hostname, pageUrl);
-        const r = await _storageGet(["ph_last_diocese", "ph_hostname_map"]);
-        const resolved = _resolveParishContextForPage(pageUrl, r || {});
-        if (!resolved.diocese && r.ph_last_diocese && !resolvedDiocese) {
-          resolvedDiocese = String(r.ph_last_diocese || "").trim();
+        const settings = await _storageGet(["ph_last_diocese", "ph_hostname_map", "gh_repo"]);
+        await window.ph_parish_pickers?.loadRegistry?.(settings.gh_repo);
+        await _loadDioceseComboItems();
+        const resolved = _resolveParishContextForPage(pageUrl, settings || {});
+        if (!resolved.diocese && settings.ph_last_diocese && !resolvedDiocese) {
+          resolvedDiocese = String(settings.ph_last_diocese || "").trim();
+          dioceseCombo?.setValue(resolvedDiocese, resolvedDiocese.replace(/_/g, " "));
           refreshDioceseLine();
-        }
-        const contactName = await _lookupDisplayNameFromContacts(
-          resolved.inferredKey || resolved.key,
-          hostname
-        );
-        if (contactName) {
-          resolved.name = contactName;
         }
         if (resolved.inferredKey) {
           resolved.key = resolved.inferredKey;
@@ -4905,7 +5030,7 @@
         _applyResolvedParishToPushForm(resolved);
         await _writeParishDetectDebug(resolved);
         void _refreshHarvestStatusLine(resolved.inferredKey || resolved.key);
-        await _loadExistingRecipeIfEmpty(resolved, contactName, hostname);
+        await _loadExistingRecipeIfEmpty(resolved, resolved.name, hostname);
         void refreshPatternHints();
       };
 
@@ -5150,16 +5275,28 @@
           .toLowerCase()
           .replace(/\s+/g, "_");
         const manualKey = keyInput.value.trim().toLowerCase().replace(/\s+/g, "_");
-        // Current page URL always wins — stale Bellaghy text in the form cannot override.
-        let key = inferredKey || manualKey;
-        if (inferredKey && manualKey && manualKey !== inferredKey) {
+        let key = parishPickerTouched ? manualKey : (inferredKey || manualKey);
+        if (!parishPickerTouched && inferredKey && manualKey && manualKey !== inferredKey) {
           console.warn(
             `Parish Trainer: ignoring stale manual key "${manualKey}" — page URL says "${inferredKey}"`
           );
           _showParishMismatch(inferredKey, manualKey);
+          key = inferredKey;
         }
         let name = nameInput.value.trim() || resolved.name;
         let diocese = dioceseSelect.value || resolved.diocese || resolvedDiocese;
+        if (diocese === NEW_DIOCESE_VALUE || resolvedDiocese === NEW_DIOCESE_VALUE) {
+          diocese = _slugifyDioceseInput(newDioceseInput.value);
+          if (!diocese) {
+            showStatus("❌ Enter a name for the new diocese folder (e.g. cloyne).", "error");
+            newDioceseInput.focus();
+            return;
+          }
+          if (["recipes", "unknown", "main"].includes(diocese)) {
+            showStatus("❌ That diocese name is reserved — pick another.", "error");
+            return;
+          }
+        }
         if (!diocese) {
           showStatus("❌ Pick a diocese (Derry, etc.) before pushing — recipes must not land in unknown/.", "error");
           dioceseSelect.focus();
@@ -5168,11 +5305,11 @@
         resolvedDiocese = diocese;
         refreshDioceseLine();
 
-        if (inferredKey) {
+        if (!parishPickerTouched && inferredKey) {
           keyInput.value = inferredKey;
           key = inferredKey;
-          const contactName = await _lookupDisplayNameFromContacts(inferredKey, _hostnameFromUrl(pageUrl));
-          if (contactName) name = contactName;
+          const hit = window.ph_parish_pickers?.lookupByKey?.(inferredKey);
+          if (hit?.name && !nameInput.value.trim()) name = hit.name;
           if (!name) name = _inferDisplayNameFromUrl(pageUrl) || inferredKey;
         }
         if (name) nameInput.value = name;
