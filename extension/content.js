@@ -2472,7 +2472,7 @@
     ].join(";");
 
     const title = document.createElement("span");
-    title.textContent = "⠿ Parish Trainer";
+    title.textContent = "⠿ Train bulletin";
     title.style.cssText = "font-weight:600;font-size:11px;opacity:0.9;white-space:nowrap;";
     header.appendChild(title);
 
@@ -2666,8 +2666,18 @@
       "padding:8px",
     ].join(";");
 
+    const playbookPanel = document.createElement("div");
+    playbookPanel.id = "ph-playbook-panel";
+    playbookPanel.style.cssText = [
+      "background:#0c4a6e",
+      "border:1px solid #0284c7",
+      "border-radius:8px",
+      "padding:8px",
+      "margin-bottom:6px",
+    ].join(";");
+
     const wizardQ = document.createElement("div");
-    wizardQ.style.cssText = "font-size:11px;font-weight:600;margin-bottom:6px;color:#93c5fd;";
+    wizardQ.style.cssText = "display:none;font-size:11px;font-weight:600;margin-bottom:6px;color:#93c5fd;";
     wizardQ.textContent = "Step 1 — follow a menu link to reach the bulletin";
 
     const nextStepBanner = document.createElement("div");
@@ -2684,7 +2694,7 @@
     ].join(";");
 
     const compactPageHint = document.createElement("div");
-    compactPageHint.style.cssText = "font-size:10px;color:#9ca3af;line-height:1.4;margin-bottom:6px;";
+    compactPageHint.style.cssText = "display:none;font-size:10px;color:#9ca3af;line-height:1.4;margin-bottom:6px;";
 
     const wizardBtns = document.createElement("div");
     wizardBtns.style.cssText = "display:flex;flex-direction:column;gap:5px;";
@@ -2698,7 +2708,7 @@
       "padding:4px 6px",
     ].join(";");
     const moreOptionsSummary = document.createElement("summary");
-    moreOptionsSummary.textContent = "More options";
+    moreOptionsSummary.textContent = "Extra: image, crop, frame, scan page";
     moreOptionsSummary.style.cssText = [
       "cursor:pointer",
       "font-size:10px",
@@ -2728,6 +2738,7 @@
       "font-family:inherit",
       "display:inline-block",
     ].join(";");
+    stuckLink.style.display = "none";
     stuckLink.textContent = "I'm stuck — show all options";
     stuckLink.title = "Open the advanced section with all manual controls";
     stuckLink.addEventListener("click", () => {
@@ -2757,6 +2768,7 @@
       _clearElement(guidedPanel);
       if (savedPattern) guidedPanel.appendChild(savedPattern);
       if (savedParish) guidedPanel.appendChild(savedParish);
+      guidedPanel.appendChild(playbookPanel);
       guidedPanel.appendChild(nextStepBanner);
       guidedPanel.appendChild(wizardQ);
       guidedPanel.appendChild(compactPageHint);
@@ -2811,7 +2823,7 @@
       const stepCount = _standaloneRecipeSteps().length;
       const pageCtx = detectPageType();
       compactPageHint.textContent = pageCtx.summary || "";
-      compactPageHint.style.display = pageCtx.summary ? "block" : "none";
+      compactPageHint.style.display = "none";
 
       const onDirectPdf = pageCtx.type === "direct_pdf";
       if (clickFirstBtn) {
@@ -2831,14 +2843,14 @@
         if (contextPrimaryBtn) {
           contextPrimaryBtn.style.display = "block";
           contextPrimaryBtn.style.background = "#16a34a";
-          contextPrimaryBtn.textContent = "📄 Save this PDF";
+          contextPrimaryBtn.textContent = "📄 2. Save this PDF";
         }
         if (moreOptionsSection) moreOptionsSection.style.display = "none";
         if (stuckLink) stuckLink.style.display = "none";
       } else if (stepCount > 0) {
         if (contextPrimaryBtn) contextPrimaryBtn.style.background = "#2563eb";
         if (moreOptionsSection) moreOptionsSection.style.display = "";
-        if (stuckLink) stuckLink.style.display = "";
+        if (stuckLink) stuckLink.style.display = "none";
         nextStepBanner.style.display = "block";
         nextStepBanner.textContent =
           `✅ ${stepCount} step${stepCount === 1 ? "" : "s"} saved. ` +
@@ -2846,7 +2858,7 @@
         wizardQ.textContent = `Step ${stepCount + 1} — what is on this page?`;
       } else {
         if (moreOptionsSection) moreOptionsSection.style.display = "";
-        if (stuckLink) stuckLink.style.display = "";
+        if (stuckLink) stuckLink.style.display = "none";
         nextStepBanner.style.display = "none";
         wizardQ.textContent = "Step 1 — follow a menu link to reach the bulletin";
       }
@@ -2861,22 +2873,43 @@
           pageCtx.type === "parish_messenger" ||
           (pageCtx.type === "html" && _pathLooksLikeNewsletterPage()) ||
           pageCtx.type === "pdf_links";
-        contextPrimaryBtn.style.display = showContext ? "block" : "none";
         if (pageCtx.type === "direct_pdf") {
-          contextPrimaryBtn.textContent = "📄 Save this PDF";
+          contextPrimaryBtn.style.display = "block";
+          contextPrimaryBtn.style.background = "#16a34a";
+          contextPrimaryBtn.textContent = "📄 2. Save this PDF";
         } else if (pageCtx.type === "wix_html" || (pageCtx.type === "html" && _pathLooksLikeNewsletterPage())) {
-          contextPrimaryBtn.textContent = "📰 Save page as PDF";
-        } else if (pageCtx.type === "parish_messenger") {
-          contextPrimaryBtn.textContent = "🔗 Pick View Newsletter link";
-        } else if (pageCtx.type === "pdf_links") {
-          contextPrimaryBtn.textContent = "🔗 Pick bulletin PDF link";
+          contextPrimaryBtn.style.display = "block";
+          contextPrimaryBtn.textContent = "📰 2. Save page as PDF";
+        } else if (pageCtx.type === "parish_messenger" || pageCtx.type === "pdf_links" || pageCtx.type === "pdfemb") {
+          contextPrimaryBtn.style.display = "block";
+          contextPrimaryBtn.textContent = "🔗 2. Pick bulletin link";
         } else if (
           pageCtx.type === "iframe" ||
           pageCtx.type === "iframe_maybe" ||
           pageCtx.type === "wix_viewer"
         ) {
-          contextPrimaryBtn.textContent = "📐 Bulletin is in a frame";
+          contextPrimaryBtn.style.display = "block";
+          contextPrimaryBtn.textContent = "📐 2. Bulletin in frame";
+        } else if (pageCtx.type === "image") {
+          contextPrimaryBtn.style.display = "block";
+          contextPrimaryBtn.textContent = "🖼️ 2. Pick bulletin image";
+        } else {
+          contextPrimaryBtn.style.display = showContext ? "block" : "none";
         }
+      }
+      if (playbookPanel && window.ph_playbook?.render) {
+        const recorded = _standaloneRecipeSteps();
+        const hasTerminal = recorded.some((s) =>
+          _pdfTerminalActions.has(String(s?.action || "").toLowerCase())
+        );
+        window.ph_playbook.render(playbookPanel, pageCtx, {
+          stepCount: recorded.length,
+          hasTerminal,
+        });
+      }
+      if (pinLinkBtn) {
+        const hidePin = pageCtx.type === "direct_pdf" || pageCtx.type === "wix_html";
+        pinLinkBtn.style.display = hidePin ? "none" : "block";
       }
     };
 
@@ -3439,16 +3472,40 @@
 
     // Wizard buttons — link-first flow; PDF/frame only when page context needs them
     let contextPrimaryBtn = null;
+    let pinLinkBtn = null;
 
     clickFirstBtn = makeSmallBtn(
-      "🔗 Follow a link (most parishes)",
+      "🔗 1. Follow a link",
       "#16a34a",
       () => startPickLinkMode(showPickConfirmation, showStatus),
-      "Click through menus/links to reach the bulletin — use Record & open link after each pick"
+      "Click menus (News, Newsletter…) — then pick the bulletin link on the page."
+    );
+
+    pinLinkBtn = makeSmallBtn(
+      "📌 Pin bulletin link (optional)",
+      "#6d28d9",
+      async () => {
+        showStatus("⏳ Finding best bulletin link on this page…", "info");
+        const scan = await _handleCopilotMessage({ type: "copilot_scan" });
+        if (!scan?.ok || !scan.context?.best) {
+          showStatus("❌ Could not find a bulletin link — use Follow a link and pick it yourself.", "error");
+          return;
+        }
+        const pin = await _handleCopilotMessage({ type: "copilot_pin" });
+        if (pin?.ok) {
+          showStatus(
+            "📌 Pinned for this website. You still open that link and finish with Save PDF / Save page.",
+            "ok"
+          );
+        } else {
+          showStatus(`❌ ${pin?.reason || "Could not pin."}`, "error");
+        }
+      },
+      "Remember which link is the bulletin here. Does NOT replace opening it and saving the capture step."
     );
 
     contextPrimaryBtn = makeSmallBtn(
-      "📐 Bulletin is in a frame",
+      "📄 2. Save bulletin (PDF / page / frame)",
       "#2563eb",
       () => {
         const pageCtx = detectPageType();
@@ -3474,11 +3531,20 @@
           startPickLinkMode(showPickConfirmation, showStatus);
           return;
         }
+        if (pageCtx.type === "image") {
+          pickedImages = [];
+          startPickImageMode(showPickImageConfirmation, showStatus);
+          return;
+        }
         window.dispatchEvent(new CustomEvent("ph-start-pick-iframe"));
       },
-      "Finish on this page — PDF, Wix/HTML print, or embedded frame"
+      "Finish capture on this page — PDF download, print HTML, or pick embedded frame"
     );
     contextPrimaryBtn.style.display = "none";
+
+    wizardBtns.appendChild(clickFirstBtn);
+    wizardBtns.appendChild(pinLinkBtn);
+    wizardBtns.appendChild(contextPrimaryBtn);
 
     const pdfBtn = makeSmallBtn(
       "📄 Get a PDF",
@@ -3529,9 +3595,6 @@
       "Record that this parish has no bulletin and skip it"
     );
 
-    wizardBtns.appendChild(clickFirstBtn);
-    wizardBtns.appendChild(contextPrimaryBtn);
-
     moreOptionsBody.appendChild(pdfBtn);
     moreOptionsBody.appendChild(savePagePdfBtn);
     moreOptionsBody.appendChild(imageCropBtn);
@@ -3547,6 +3610,7 @@
       "margin-bottom:6px",
     ].join(";");
     guidedPanel.appendChild(parishRecordingLine);
+    guidedPanel.appendChild(playbookPanel);
     guidedPanel.appendChild(nextStepBanner);
     guidedPanel.appendChild(wizardQ);
     guidedPanel.appendChild(compactPageHint);
@@ -3970,7 +4034,7 @@
     body.appendChild(guidedPanel);
     body.appendChild(recipeSection);
 
-    const copilotMount = document.createElement("div");
+    // Copilot chat UI removed — playbook + pin cover training without API cost.
 
     // ── ADVANCED SECTION ───────────────────────────────────────────────────
     // These buttons keep their original labels so existing tests still pass.
@@ -4943,7 +5007,14 @@
           _showParishMismatch(inferredKey, manualKey);
         }
         let name = nameInput.value.trim() || resolved.name;
-        let diocese = resolved.diocese || resolvedDiocese;
+        let diocese = dioceseSelect.value || resolved.diocese || resolvedDiocese;
+        if (!diocese) {
+          showStatus("❌ Pick a diocese (Derry, etc.) before pushing — recipes must not land in unknown/.", "error");
+          dioceseSelect.focus();
+          return;
+        }
+        resolvedDiocese = diocese;
+        refreshDioceseLine();
 
         if (inferredKey) {
           keyInput.value = inferredKey;
@@ -5139,40 +5210,6 @@
       void checkStartUrlDrift();
 
       body.appendChild(pushSection);
-    }
-
-    if (window.ph_buildToolbarCopilot && copilotMount) {
-      body.appendChild(copilotMount);
-      window.ph_buildToolbarCopilot(copilotMount, {
-        scan: () => _handleCopilotMessage({ type: "copilot_scan" }),
-        highlight: () => _handleCopilotMessage({ type: "copilot_highlight" }),
-        record: () => _handleCopilotMessage({ type: "copilot_record" }),
-        pin: () => _handleCopilotMessage({ type: "copilot_pin" }),
-        click: () => _handleCopilotMessage({ type: "copilot_click" }),
-        showStatus,
-        getParishKey: () => (document.getElementById("ph-parish-key")?.value || "").trim().toLowerCase(),
-        getGhRepo: async () => {
-          const r = await _storageGet(["gh_repo"]);
-          return r.gh_repo || "Raphoe-Diocese/parish_harvester";
-        },
-        onParishPicked: (p) => {
-          const keyInput = document.getElementById("ph-parish-key");
-          const nameInput = document.getElementById("ph-display-name");
-          const dioceseSelect = document.getElementById("ph-diocese-select");
-          if (keyInput && p.key) keyInput.value = p.key;
-          if (nameInput && p.name) nameInput.value = p.name;
-          if (dioceseSelect && p.diocese) dioceseSelect.value = p.diocese;
-          void _storageSet({
-            ph_training_parish: {
-              key: p.key,
-              name: p.name,
-              diocese: p.diocese || "",
-            },
-            ph_last_diocese: p.diocese || "",
-          });
-          updateParishRecordingLine(p.name, p.key, _currentHostname());
-        },
-      });
     }
 
     const scrollContainer = document.createElement("div");
