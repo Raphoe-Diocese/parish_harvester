@@ -208,6 +208,28 @@ async function runDiagnostics() {
   const repoLine = `GitHub repo configured: ${repo || "n/a"}`;
   const patternLine = "Pattern learning: rule-based (parishes/site_patterns.json on GitHub)";
 
+  const debug = allLocalStorage.ph_parish_detect_debug;
+  const parishDetectLines = [];
+  if (debug && typeof debug === "object") {
+    parishDetectLines.push(`Parish page hostname: ${debug.hostname || "n/a"}`);
+    parishDetectLines.push(`Inferred parish key: ${debug.inferredKey || debug.resolvedKey || "n/a"}`);
+    parishDetectLines.push(`Recording start host: ${debug.recordingHost || "n/a"}`);
+    parishDetectLines.push(
+      `Stale-session mismatch: ${debug.mismatch ? "YES (fixed in v1.34.3+)" : "no"}`
+    );
+  } else if (activeTabIsHttp) {
+    try {
+      const host = new URL(activeUrl).hostname.toLowerCase().replace(/^www\d*\./, "");
+      const key = host.split(".")[0] || "";
+      parishDetectLines.push(`Inferred parish key (from tab URL): ${key || "n/a"}`);
+      parishDetectLines.push("Parish detect debug: open the parish page toolbar once, then re-run diagnostics");
+    } catch (_e) {
+      parishDetectLines.push("Parish detect debug: unavailable");
+    }
+  } else {
+    parishDetectLines.push("Parish detect debug: n/a (not on a parish webpage)");
+  }
+
   const dumpLines = _clipLinesTo4000Chars([
     "Parish Trainer diagnostic dump",
     "============================",
@@ -218,6 +240,7 @@ async function runDiagnostics() {
     patLine,
     repoLine,
     patternLine,
+    ...parishDetectLines,
     "Paste this whole block to your AI assistant.",
   ]);
   _diagTextLines = dumpLines;
@@ -228,6 +251,9 @@ async function runDiagnostics() {
   _addDiagRow("🔐", patLine);
   _addDiagRow("📦", repoLine);
   _addDiagRow("📚", patternLine);
+  for (const line of parishDetectLines) {
+    _addDiagRow("📍", line);
+  }
   _addDiagRow("📋", "Diagnostic text is ready to copy.");
 
   if (diagCopyBtn) diagCopyBtn.style.display = "";

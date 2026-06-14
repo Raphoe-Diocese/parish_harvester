@@ -195,8 +195,8 @@ const CONSECUTIVE_FAILURES_PATH = "parishes/consecutive_failures.json";
 const STALE_BULLETINS_PATH = "parishes/stale_bulletins.json";
 const CURRENT_BULLETINS_PATH_PREFIX = "Bulletins/current";
 const _pdParishDetailsCache = {}; // key -> details payload
-const PROBLEMS_REPORT_URL = "https://raw.githubusercontent.com/Frankytyrone/parish_harvester/main/Bulletins/report.json";
-const PROBLEMS_CONSECUTIVE_URL = "https://raw.githubusercontent.com/Frankytyrone/parish_harvester/main/parishes/consecutive_failures.json";
+const PROBLEMS_REPORT_URL = "https://raw.githubusercontent.com/Raphoe-Diocese/parish_harvester/main/Bulletins/report.json";
+const PROBLEMS_CONSECUTIVE_URL = "https://raw.githubusercontent.com/Raphoe-Diocese/parish_harvester/main/parishes/consecutive_failures.json";
 
 // Replicate Python's _url_to_key logic
 function _pdUrlToKey(url, headerName = "") {
@@ -278,7 +278,68 @@ function _pdUpdatePageUrl(fileText, parishName, newUrl) {
   return lines.join("\n");
 }
 
-// ── Communication helpers ─────────────────────────────────────────────────
+// Update the primary bulletin URL line (first https URL in parish section)
+function _pdUpdatePrimaryBulletinUrl(fileText, parishName, newUrl) {
+  const lines = fileText.split("\n");
+  const escaped = parishName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const headerRe = new RegExp(`^#\\s*---\\s*${escaped}\\s*---`, "i");
+  let inSection = false;
+  let replaced = false;
+  let headerIdx = -1;
+
+  for (let i = 0; i < lines.length; i++) {
+    const trimmed = lines[i].trim();
+    if (headerRe.test(trimmed)) {
+      inSection = true;
+      headerIdx = i;
+      continue;
+    }
+    if (inSection) {
+      if (/^#\s*---/.test(trimmed)) break;
+      if (trimmed.startsWith("#") || !trimmed) continue;
+      if (/^https?:\/\//i.test(trimmed)) {
+        lines[i] = newUrl;
+        replaced = true;
+        break;
+      }
+    }
+  }
+  if (!replaced && headerIdx >= 0) {
+    lines.splice(headerIdx + 1, 0, newUrl);
+  }
+  return lines.join("\n");
+}
+
+let _pdHarvestReport = null;
+
+async function _pdLoadHarvestReport() {
+  if (_pdHarvestReport) return _pdHarvestReport;
+  try {
+    const cfg = await _pdGetGithubConfig();
+    if (!cfg) return null;
+    const resp = await fetch(
+      `https://raw.githubusercontent.com/${cfg.ghRepo}/main/Bulletins/report.json`
+    );
+    if (!resp.ok) return null;
+    _pdHarvestReport = await resp.json();
+    return _pdHarvestReport;
+  } catch (_e) {
+    return null;
+  }
+}
+
+function _pdHarvestStatusForKey(parishKey) {
+  if (!_pdHarvestReport || !parishKey) return "";
+  const key = String(parishKey).trim().toLowerCase();
+  const downloaded = (_pdHarvestReport.downloaded || []).some((r) => r.parish === key);
+  if (downloaded) return `✅ Last harvest (${_pdHarvestReport.target_date || ""}): OK`;
+  const failed = (_pdHarvestReport.failed || []).find((r) => r.parish === key);
+  if (failed) {
+    return `❌ Last harvest: ${String(failed.reason || failed.error || "failed").slice(0, 80)}`;
+  }
+  return "";
+}
+
 
 function _pdDecodeGithubContent(data) {
   return decodeURIComponent(
@@ -551,12 +612,14 @@ async function _pdBuildParishDetails(parish) {
   const changes = _pdConfirmedChangesList(parish, override, recipe, recipePath);
   const lastUpdatedRepoIso = await _pdFetchLatestCommitTime(recipePath || _pdDioceseTexts[parish.diocese]?.path || "");
   const lastIncludedIso = (_pdLastIncluded && _pdLastIncluded[parish.key]) || "";
+  const harvestStatus = _pdHarvestStatusForKey(parish.key);
   const details = {
     currentUrl,
     terminalAction: terminal.action,
     changes,
     lastUpdatedRepoIso,
     lastIncludedIso,
+    harvestStatus,
   };
   _pdParishDetailsCache[parish.key] = details;
   return details;
@@ -587,6 +650,14 @@ function _pdRenderSubfolder(container, details) {
     rowUrl.appendChild(none);
   }
   container.appendChild(rowUrl);
+
+  if (details.harvestStatus) {
+    const rowHarvest = document.createElement("div");
+    rowHarvest.className = "pd-subfolder-row";
+    rowHarvest.style.color = details.harvestStatus.startsWith("✅") ? "#86efac" : "#fca5a5";
+    rowHarvest.textContent = details.harvestStatus;
+    container.appendChild(rowHarvest);
+  }
 
   const rowChanges = document.createElement("div");
   rowChanges.className = "pd-subfolder-row";
@@ -1132,13 +1203,22 @@ function _pdShowEditRow(wrap, parish) {
 
   const label = document.createElement("div");
   label.style.cssText = "font-size:9px;color:#93c5fd;";
-  label.textContent = "Bulletin listing page URL:";
+  label.textContent = "Primary bulletin URL (updates evidence file — used by Sunday harvest):";
   editRow.appendChild(label);
+
+  const hint = document.createElement("div");
+  hint.style.cssText = "font-size:8px;color:#9ca3af;margin-bottom:4px;line-height:1.35;";
+  hint.textContent =
+    "Paste the real PDF or listing URL here. For a direct PDF (e.g. parishpress.net/.../bulletin.pdf), this replaces the old Facebook/link line. Use 📌 pin on active tab for a one-off override without editing evidence.";
+  editRow.appendChild(hint);
 
   const inp = document.createElement("input");
   inp.type = "url";
-  inp.value = parish.pageUrl || "";
-  inp.placeholder = "https://parish.com/bulletins";
+  inp.value =
+    parish.bulletinUrls[0] ||
+    parish.pageUrl ||
+    "";
+  inp.placeholder = "https://parish.com/bulletin.pdf";
   editRow.appendChild(inp);
 
   const btnRow = document.createElement("div");
@@ -1162,10 +1242,13 @@ function _pdShowEditRow(wrap, parish) {
     saveBtn.disabled = true; saveBtn.textContent = "⏳ Saving…";
     setInlineStatus("Saving…", "ok");
     try {
-      const updated = _pdUpdatePageUrl(info.text, parish.name, newUrl);
-      const res = await _pdGhPush(info.path, updated, `evidence: update page URL for ${parish.name} [from extension]`);
+      let updated = _pdUpdatePrimaryBulletinUrl(info.text, parish.name, newUrl);
+      updated = _pdUpdatePageUrl(updated, parish.name, newUrl);
+      const res = await _pdGhPush(info.path, updated, `evidence: update bulletin URL for ${parish.name} [from extension]`);
       if (res?.ok) {
         info.text = updated;
+        if (parish.bulletinUrls.length > 0) parish.bulletinUrls[0] = newUrl;
+        else parish.bulletinUrls.push(newUrl);
         parish.pageUrl = newUrl;
         delete _pdParishDetailsCache[parish.key];
         setInlineStatus("✅ Saved. Triggering harvest rebuild…", "ok");
@@ -1373,6 +1456,8 @@ async function loadParishDirectory() {
       _pdAllParishes.push(..._pdParseEvidence(r.content, r.diocese));
     }
     _pdConsecutiveFailures = consecutiveFailures || {};
+    _pdHarvestReport = null;
+    await _pdLoadHarvestReport();
 
     if (_pdAllParishes.length === 0) {
       loadingEl.style.display = "none";

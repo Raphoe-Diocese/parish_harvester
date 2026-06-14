@@ -30,6 +30,28 @@
       return "";
     }
   };
+  const _hostnameFromUrl = (url) => {
+    try {
+      return new URL(url).hostname.toLowerCase().replace(/^www\d*\./, "");
+    } catch (_e) {
+      return "";
+    }
+  };
+  // Parish key/name must always come from the tab you are on — never a stale
+  // recording startUrl from another parish (Bellaghy bleeding into Ballinascreen).
+  const _pageUrlForParishDetection = () => {
+    try {
+      return window.location.href;
+    } catch (_e) {
+      return standaloneStartUrl || "";
+    }
+  };
+  const _hostsMatch = (urlA, urlB) => {
+    const a = _hostnameFromUrl(urlA);
+    const b = _hostnameFromUrl(urlB);
+    return Boolean(a && b && a === b);
+  };
+  let _refreshParishPushForm = null;
   const _storageGet = (keys) =>
     new Promise((resolve) => {
       if (typeof chrome === "undefined" || !chrome.storage) {
@@ -58,7 +80,9 @@
       }
     });
 
-  const RECORDING_SESSION_KEY = "ph_recording_session";
+  const RECORDING_SESSIONS_KEY = "ph_recording_sessions";
+  const LEGACY_RECORDING_SESSION_KEY = "ph_recording_session";
+  const PARISH_DETECT_DEBUG_KEY = "ph_parish_detect_debug";
 
   const _serializeRecipeSteps = () =>
     recipeSteps.map((entry) => ({
@@ -67,24 +91,69 @@
       recipeStep: entry.recipeStep || null,
     }));
 
+  const _getRecordingSessionsMap = async () => {
+    const data = await _storageGet([RECORDING_SESSIONS_KEY, LEGACY_RECORDING_SESSION_KEY]);
+    const map =
+      data[RECORDING_SESSIONS_KEY] && typeof data[RECORDING_SESSIONS_KEY] === "object"
+        ? { ...data[RECORDING_SESSIONS_KEY] }
+        : {};
+    const legacy = data[LEGACY_RECORDING_SESSION_KEY];
+    if (legacy?.active && legacy.startUrl) {
+      const legacyHost = _hostnameFromUrl(legacy.startUrl);
+      if (legacyHost && !map[legacyHost]) {
+        map[legacyHost] = {
+          active: true,
+          hostname: legacyHost,
+          startUrl: legacy.startUrl,
+          steps: Array.isArray(legacy.steps) ? legacy.steps : [],
+          updatedAt: legacy.updatedAt || Date.now(),
+        };
+      }
+    }
+    return map;
+  };
+
+  const _getRecordingSessionForCurrentHost = async () => {
+    const host = _hostnameFromUrl(_pageUrlForParishDetection());
+    if (!host) return null;
+    const map = await _getRecordingSessionsMap();
+    return map[host] || null;
+  };
+
   const _persistRecordingSession = async (extra = {}) => {
     if (!_inStandaloneMode()) return;
-    const data = await _storageGet([RECORDING_SESSION_KEY]);
-    const prev = data[RECORDING_SESSION_KEY] || {};
+    const host = _hostnameFromUrl(_pageUrlForParishDetection());
+    if (!host) return;
+    const map = await _getRecordingSessionsMap();
+    const prev = map[host] || {};
+    const startUrl =
+      standaloneStartUrl && _hostsMatch(standaloneStartUrl, _pageUrlForParishDetection())
+        ? standaloneStartUrl
+        : prev.startUrl && _hostsMatch(prev.startUrl, _pageUrlForParishDetection())
+          ? prev.startUrl
+          : _pageUrlForParishDetection();
+    standaloneStartUrl = startUrl;
+    map[host] = {
+      active: true,
+      hostname: host,
+      startUrl,
+      steps: _serializeRecipeSteps(),
+      updatedAt: Date.now(),
+      ...extra,
+    };
     await _storageSet({
-      [RECORDING_SESSION_KEY]: {
-        active: true,
-        startUrl: standaloneStartUrl || prev.startUrl || window.location.href,
-        steps: _serializeRecipeSteps(),
-        updatedAt: Date.now(),
-        ...extra,
-      },
+      [RECORDING_SESSIONS_KEY]: map,
+      [LEGACY_RECORDING_SESSION_KEY]: { active: false, steps: [], updatedAt: Date.now() },
     });
   };
 
   const _clearRecordingSession = async () => {
+    const host = _hostnameFromUrl(_pageUrlForParishDetection());
+    const map = await _getRecordingSessionsMap();
+    if (host) delete map[host];
     await _storageSet({
-      [RECORDING_SESSION_KEY]: { active: false, steps: [], updatedAt: Date.now() },
+      [RECORDING_SESSIONS_KEY]: map,
+      [LEGACY_RECORDING_SESSION_KEY]: { active: false, steps: [], updatedAt: Date.now() },
     });
   };
 
@@ -129,19 +198,29 @@
 
   const _restoreRecordingSessionFromStorage = async () => {
     if (!_inStandaloneMode()) return false;
-    const data = await _storageGet([RECORDING_SESSION_KEY]);
-    const session = data[RECORDING_SESSION_KEY];
-    if (!session?.active) return false;
+    const pageUrl = _pageUrlForParishDetection();
+    const currentHost = _hostnameFromUrl(pageUrl);
+    const session = await _getRecordingSessionForCurrentHost();
+    if (!session?.active) {
+      standaloneStartUrl = pageUrl;
+      return false;
+    }
+    const sessionHost = String(session.hostname || _hostnameFromUrl(session.startUrl || "")).toLowerCase();
+    if (sessionHost && currentHost && sessionHost !== currentHost) {
+      recipeSteps = [];
+      standaloneStartUrl = pageUrl;
+      await _clearRecordingSession();
+      return false;
+    }
 
     const steps = Array.isArray(session.steps) ? session.steps : [];
-    if (steps.length > 0) {
-      recipeSteps = steps.map((entry) => ({
-        type: entry.type || "",
-        label: entry.label || "",
-        recipeStep: entry.recipeStep || null,
-      }));
-    }
-    if (session.startUrl) standaloneStartUrl = session.startUrl;
+    recipeSteps = steps.map((entry) => ({
+      type: entry.type || "",
+      label: entry.label || "",
+      recipeStep: entry.recipeStep || null,
+    }));
+    standaloneStartUrl =
+      session.startUrl && _hostsMatch(session.startUrl, pageUrl) ? session.startUrl : pageUrl;
 
     _ensureToolbar(true);
     window.dispatchEvent(
@@ -150,6 +229,29 @@
       })
     );
     return true;
+  };
+
+  const _writeParishDetectDebug = async (resolved, extra = {}) => {
+    const pageUrl = _pageUrlForParishDetection();
+    const session = await _getRecordingSessionForCurrentHost();
+    const payload = {
+      pageUrl,
+      hostname: _hostnameFromUrl(pageUrl),
+      inferredKey: _inferParishKeyFromUrl(pageUrl),
+      resolvedKey: resolved?.key || "",
+      resolvedName: resolved?.name || "",
+      recordingStartUrl: standaloneStartUrl || "",
+      recordingHost: _hostnameFromUrl(standaloneStartUrl || ""),
+      sessionSteps: _standaloneRecipeSteps().length,
+      sessionHost: session?.hostname || "",
+      mismatch:
+        Boolean(resolved?.inferredKey && resolved?.key && resolved.inferredKey !== resolved.key) ||
+        Boolean(standaloneStartUrl && !_hostsMatch(standaloneStartUrl, pageUrl)),
+      ts: Date.now(),
+      ...extra,
+    };
+    await _storageSet({ [PARISH_DETECT_DEBUG_KEY]: payload });
+    return payload;
   };
 
   const _markRecordingActive = async () => {
@@ -414,7 +516,9 @@
 
   const buildStandaloneRecipe = (parishKey, displayName, diocese) => {
     const steps = [];
-    const startUrl = standaloneStartUrl || window.location.href;
+    const pageUrl = _pageUrlForParishDetection();
+    const startUrl =
+      standaloneStartUrl && _hostsMatch(standaloneStartUrl, pageUrl) ? standaloneStartUrl : pageUrl;
     if (startUrl) {
       const gotoStep = { action: "goto", url: startUrl };
       if (/(?:\d{1,2})[_-](?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[_-](?:\d{4})/i.test(startUrl)) {
@@ -428,7 +532,7 @@
       parish_key: parishKey,
       display_name: displayName,
       diocese: diocese || "",
-      start_url: standaloneStartUrl || window.location.href,
+      start_url: startUrl,
       steps,
     };
   };
@@ -437,7 +541,7 @@
     recipeSteps = recipeSteps.filter((entry) => !entry?.recipeStep);
     if (_stepsListEl) _renderSessionSteps();
     if (_refreshRecipeCount) _refreshRecipeCount();
-    standaloneStartUrl = "";
+    standaloneStartUrl = _pageUrlForParishDetection();
     void _clearRecordingSession();
   };
 
@@ -566,6 +670,7 @@
     if (visible) {
       node.dataset.phHidden = "false";
       node.style.display = "flex";
+      _notifyRecordingTabActive();
       if (!toolbarReadyLogged) {
         console.log("✅ Parish Trainer toolbar ready");
         toolbarReadyLogged = true;
@@ -849,6 +954,21 @@
   };
 
   // Returns true if the URL looks like a downloadable document.
+  const _looksLikeBulletinDownloadUrl = (url, text = "") => {
+    if (!url) return false;
+    const combined = `${url} ${text}`.toLowerCase();
+    if (isDocumentUrl(url)) return true;
+    if (/\/files\/\d+\/weekly-bulletins\//i.test(url)) return true;
+    if (/\/weekly-bulletins\//i.test(url)) return true;
+    if (
+      /\/wp-content\/uploads\//i.test(url) &&
+      /bulletin|newsletter|\d{4}/i.test(combined)
+    ) {
+      return true;
+    }
+    return false;
+  };
+
   const isDocumentUrl = (url) => {
     if (!url) return false;
     // Check Google Drive / Docs patterns on the full URL (including query string)
@@ -1584,12 +1704,51 @@
 
   // ── Safety-checked mark download URL ─────────────────────────────────────
 
+  const _standaloneAddClickAndDownload = (clickStep, downloadUrl, clickLabel, showStatus) => {
+    standaloneAddStep(clickStep, "click", clickLabel);
+    standaloneAddStep(
+      { action: "download", url: downloadUrl },
+      "mark_file",
+      `📄 Download: ${downloadUrl.slice(-50)}`
+    );
+    void _persistRecordingSession();
+    if (showStatus) {
+      showStatus(
+        "✅ Click + download steps saved. Brave may auto-download the PDF — you can push the recipe now.",
+        "ok"
+      );
+    }
+    if (typeof chrome !== "undefined" && chrome.runtime?.sendMessage) {
+      try {
+        chrome.runtime.sendMessage({ type: "recording_tab_active" });
+      } catch (_e) {}
+    }
+  };
+
+  const _notifyRecordingTabActive = () => {
+    if (typeof chrome !== "undefined" && chrome.runtime?.sendMessage) {
+      try {
+        chrome.runtime.sendMessage({ type: "recording_tab_active" });
+      } catch (_e) {}
+    }
+  };
+
+  const _pathLooksLikeNewsletterPage = () => {
+    try {
+      return /\/(news|newsletter|bulletin|parishnews|nuacht)/i.test(
+        new URL(_pageUrlForParishDetection()).pathname || ""
+      );
+    } catch (_e) {
+      return false;
+    }
+  };
+
   const markDownloadUrlSafe = (url, showStatus, forceConfirm) => {
     if (!url) {
       if (showStatus) showStatus("❌ No URL to mark.", "error");
       return;
     }
-    if (!isDocumentUrl(url) && !forceConfirm) {
+    if (!isDocumentUrl(url) && !_looksLikeBulletinDownloadUrl(url) && !forceConfirm) {
       const preview = url.length > 60 ? url.slice(0, 57) + "…" : url;
       if (showStatus) {
         showStatus(
@@ -2627,14 +2786,18 @@
           pageCtx.type === "iframe_maybe" ||
           pageCtx.type === "wix_viewer" ||
           pageCtx.type === "wix_html" ||
-          pageCtx.type === "parish_messenger";
+          pageCtx.type === "parish_messenger" ||
+          (pageCtx.type === "html" && _pathLooksLikeNewsletterPage()) ||
+          pageCtx.type === "pdf_links";
         contextPrimaryBtn.style.display = showContext ? "block" : "none";
         if (pageCtx.type === "direct_pdf") {
           contextPrimaryBtn.textContent = "📄 Save this PDF";
-        } else if (pageCtx.type === "wix_html") {
+        } else if (pageCtx.type === "wix_html" || (pageCtx.type === "html" && _pathLooksLikeNewsletterPage())) {
           contextPrimaryBtn.textContent = "📰 Save page as PDF";
         } else if (pageCtx.type === "parish_messenger") {
           contextPrimaryBtn.textContent = "🔗 Pick View Newsletter link";
+        } else if (pageCtx.type === "pdf_links") {
+          contextPrimaryBtn.textContent = "🔗 Pick bulletin PDF link";
         } else if (
           pageCtx.type === "iframe" ||
           pageCtx.type === "iframe_maybe" ||
@@ -2748,6 +2911,42 @@
         "🔗 Record & open link",
         "#2563eb",
         () => {
+          const rawHref = selectedEl.getAttribute("href") || "";
+          if (!rawHref) {
+            showStatus("❌ This link has no URL to open.", "error");
+            resetGuidedPanel();
+            return;
+          }
+          let absUrl = "";
+          try {
+            absUrl = new URL(rawHref, window.location.href).href;
+          } catch (_e) {
+            showStatus("❌ Could not open that link.", "error");
+            resetGuidedPanel();
+            return;
+          }
+
+          if (_looksLikeBulletinDownloadUrl(absUrl, text)) {
+            stopPickLinkMode();
+            if (!_recordStandaloneClick()) {
+              showStatus("❌ Could not record click.", "error");
+              return;
+            }
+            standaloneAddStep(
+              { action: "download", url: absUrl },
+              "mark_file",
+              `📄 Download: ${absUrl.slice(-50)}`
+            );
+            void _persistRecordingSession();
+            _notifyRecordingTabActive();
+            showStatus(
+              "✅ Click + download saved. Brave may auto-download — push recipe now.",
+              "ok"
+            );
+            resetGuidedPanel();
+            return;
+          }
+
           if (window.ph_record_click) {
             try {
               window.ph_record_click({
@@ -2766,24 +2965,47 @@
             showStatus("❌ Could not record click.", "error");
             return;
           }
+          stopPickLinkMode();
+          void _navigateRecordingToUrl(absUrl, selectedEl, showStatus);
+        },
+        "Save this step and go to the linked page (for multi-step recipes)"
+      );
+      recordAndOpenBtn.style.width = "auto";
+
+      const autoDownloadBtn = makeSmallBtn(
+        "📄 Link auto-downloads PDF",
+        "#7c3aed",
+        () => {
           const rawHref = selectedEl.getAttribute("href") || "";
           if (!rawHref) {
-            showStatus("❌ This link has no URL to open.", "error");
-            resetGuidedPanel();
+            showStatus("❌ This link has no URL.", "error");
             return;
           }
           try {
             const absUrl = new URL(rawHref, window.location.href).href;
             stopPickLinkMode();
-            void _navigateRecordingToUrl(absUrl, selectedEl, showStatus);
-          } catch (_e) {
-            showStatus("❌ Could not open that link.", "error");
+            _standaloneAddClickAndDownload(clickStep, absUrl, clickLabel, showStatus);
+            _notifyRecordingTabActive();
             resetGuidedPanel();
+          } catch (_e) {
+            showStatus("❌ Could not read link URL.", "error");
           }
         },
-        "Save this step and go to the linked page (for multi-step recipes)"
+        "Brave downloads the PDF without opening a page — saves click + download in one go"
       );
-      recordAndOpenBtn.style.width = "auto";
+      autoDownloadBtn.style.width = "auto";
+      autoDownloadBtn.style.display = _looksLikeBulletinDownloadUrl(
+        (() => {
+          try {
+            return new URL(selectedEl.getAttribute("href") || "", window.location.href).href;
+          } catch (_e) {
+            return "";
+          }
+        })(),
+        text
+      )
+        ? "block"
+        : "none";
 
       const pickAgainBtn = makeSmallBtn(
         "🔄 Pick again",
@@ -2798,6 +3020,7 @@
 
       btnRow.appendChild(looksRightBtn);
       btnRow.appendChild(recordAndOpenBtn);
+      btnRow.appendChild(autoDownloadBtn);
       btnRow.appendChild(pickAgainBtn);
       guidedPanel.appendChild(btnRow);
       guidedPanel.appendChild(stuckLink);
@@ -3166,6 +3389,15 @@
           showStatus("✅ Recorded: page will print into the mega bulletin.", "ok");
           return;
         }
+        if (pageCtx.type === "html" && _pathLooksLikeNewsletterPage()) {
+          standaloneAddStep({ action: "print_to_pdf" }, "print_to_pdf", "📰 Save page as PDF");
+          showStatus("✅ Recorded: this news page will print into the mega bulletin.", "ok");
+          return;
+        }
+        if (pageCtx.type === "pdf_links") {
+          startPickLinkMode(showPickConfirmation, showStatus);
+          return;
+        }
         if (pageCtx.type === "parish_messenger") {
           startPickLinkMode(showPickConfirmation, showStatus);
           return;
@@ -3292,7 +3524,11 @@
     window.addEventListener("ph-document-detected", (e) => {
       const url = (e.detail && e.detail.url) || "";
       const short = url.length > 50 ? url.slice(0, 47) + "…" : url;
-      showStatus(`🔍 Document detected in network: ${short}`, "info");
+      showStatus(`🔍 Document detected: ${short} — tap Advanced → Get a PDF, or it may auto-save if Brave downloads.`, "info");
+      if (_inStandaloneMode() && url && _looksLikeBulletinDownloadUrl(url)) {
+        markDownloadUrlSafe(url, showStatus, true);
+        resetGuidedPanel();
+      }
     });
     window.addEventListener("ph-retraining-hint", () => {
       showStatus("Retraining: follow the steps on this page, then click '⬆ Push Recipe to GitHub'.", "warn");
@@ -3747,7 +3983,7 @@
     (() => {
       const DIOCESE_CACHE_KEY = "ph_diocese_list_cache";
       const DIOCESE_CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
-      const FALLBACK_DIOCESES = ["derry", "down_and_connor"];
+      const FALLBACK_DIOCESES = ["derry", "down_and_connor", "raphoe"];
 
       const _fetchDioceseList = async () => {
         // Try cache first.
@@ -3759,7 +3995,7 @@
         // Fetch live from GitHub Contents API.
         try {
           const settings = await _storageGet(["gh_repo", "gh_pat"]);
-          const ghRepo = String(settings.gh_repo || "Frankytyrone/parish_harvester").trim();
+          const ghRepo = String(settings.gh_repo || "Raphoe-Diocese/parish_harvester").trim();
           const apiUrl = `https://api.github.com/repos/${ghRepo}/contents/parishes/recipes`;
           const headers = { Accept: "application/vnd.github+json" };
           const pat = String(settings.gh_pat || "").trim();
@@ -3849,16 +4085,49 @@
           "font-family:inherit",
         ].join(";");
 
-        // ── Diocese dropdown ──────────────────────────────────────────────
+        // ── Diocese dropdown + optional new diocese field ─────────────────
         const dioceseWrap = makeField("Diocese");
         const dioceseSelect = document.createElement("select");
-        dioceseSelect.style.cssText = inputStyle + ";cursor:pointer;";
+        dioceseSelect.style.cssText = inputStyle + ";cursor:pointer;margin-bottom:6px;";
         const loadingOpt = document.createElement("option");
         loadingOpt.value = "";
         loadingOpt.textContent = "Loading…";
         dioceseSelect.appendChild(loadingOpt);
         dioceseWrap.appendChild(dioceseSelect);
+
+        const newDioceseWrap = document.createElement("div");
+        newDioceseWrap.style.display = "none";
+        const newDioceseLabel = document.createElement("label");
+        newDioceseLabel.style.cssText = "display:block;font-size:10px;color:#93c5fd;margin-bottom:3px;";
+        newDioceseLabel.textContent = "New diocese folder name";
+        newDioceseWrap.appendChild(newDioceseLabel);
+        const newDioceseInput = document.createElement("input");
+        newDioceseInput.type = "text";
+        newDioceseInput.placeholder = "e.g. donegal, cloyne, killaloe";
+        newDioceseInput.style.cssText = inputStyle;
+        newDioceseWrap.appendChild(newDioceseInput);
+        const newDioceseHint = document.createElement("div");
+        newDioceseHint.style.cssText = "font-size:9px;color:#6b7280;margin-top:3px;line-height:1.35;";
+        newDioceseHint.textContent =
+          "Creates parishes/recipes/your_name/ on GitHub. Use lowercase letters — spaces become underscores.";
+        newDioceseWrap.appendChild(newDioceseHint);
+        dioceseWrap.appendChild(newDioceseWrap);
         panel.appendChild(dioceseWrap);
+
+        const NEW_DIOCESE_VALUE = "__new_diocese__";
+        const _slugifyDioceseInput = (value) =>
+          String(value || "")
+            .trim()
+            .toLowerCase()
+            .replace(/&/g, "and")
+            .replace(/[^a-z0-9]+/g, "_")
+            .replace(/^_+|_+$/g, "");
+
+        dioceseSelect.addEventListener("change", () => {
+          const isNew = dioceseSelect.value === NEW_DIOCESE_VALUE;
+          newDioceseWrap.style.display = isNew ? "block" : "none";
+          if (isNew) setTimeout(() => newDioceseInput.focus(), 30);
+        });
 
         // Populate asynchronously.
         _fetchDioceseList().then((list) => {
@@ -3867,12 +4136,23 @@
           placeholder.value = "";
           placeholder.textContent = "— select diocese —";
           dioceseSelect.appendChild(placeholder);
+          const seen = new Set();
           for (const d of list) {
+            if (!d || d === "unknown" || seen.has(d)) continue;
+            seen.add(d);
             const opt = document.createElement("option");
             opt.value = d;
             opt.textContent = d.replace(/_/g, " ");
             dioceseSelect.appendChild(opt);
           }
+          const newOpt = document.createElement("option");
+          newOpt.value = NEW_DIOCESE_VALUE;
+          newOpt.textContent = "➕ Create new diocese…";
+          dioceseSelect.appendChild(newOpt);
+          const unknownOpt = document.createElement("option");
+          unknownOpt.value = "unknown";
+          unknownOpt.textContent = "unknown (last resort)";
+          dioceseSelect.appendChild(unknownOpt);
         });
 
         // ── Parish name ───────────────────────────────────────────────────
@@ -3942,12 +4222,23 @@
         backdrop.addEventListener("click", (e) => { if (e.target === backdrop) backdrop.remove(); });
 
         submitBtn.addEventListener("click", async () => {
-          const diocese = dioceseSelect.value.trim();
+          let diocese = dioceseSelect.value.trim();
+          if (diocese === NEW_DIOCESE_VALUE) {
+            diocese = _slugifyDioceseInput(newDioceseInput.value);
+            if (!diocese) {
+              setModalStatus("⚠ Enter a name for the new diocese (e.g. donegal).");
+              return;
+            }
+            if (["recipes", "unknown", "main"].includes(diocese)) {
+              setModalStatus("⚠ That diocese name is reserved — pick another.");
+              return;
+            }
+          }
           const rawName = nameInput.value.trim();
           const startUrl = urlInput.value.trim();
           const parish_key = _toParishKey(rawName);
 
-          if (!diocese) { setModalStatus("⚠ Please select a diocese."); return; }
+          if (!diocese) { setModalStatus("⚠ Please select a diocese or create a new one."); return; }
           if (!rawName) { setModalStatus("⚠ Please enter a parish name."); return; }
           if (!parish_key) { setModalStatus("⚠ Parish key could not be generated — check the name."); return; }
           if (!startUrl || !/^https?:\/\//i.test(startUrl)) {
@@ -3973,6 +4264,18 @@
                 setModalStatus(`❌ ${resp?.error || err || "Unknown error"}`);
               } else {
                 setModalStatus(`✅ Created! ${resp.filePath || ""}`, true);
+                void (async () => {
+                  if (dioceseSelect.value === NEW_DIOCESE_VALUE && diocese) {
+                    const cached = await _storageGet([DIOCESE_CACHE_KEY]);
+                    const entry = cached[DIOCESE_CACHE_KEY];
+                    const list = Array.isArray(entry?.list) ? [...entry.list] : [];
+                    if (!list.includes(diocese)) {
+                      list.push(diocese);
+                      list.sort();
+                      await _storageSet({ [DIOCESE_CACHE_KEY]: { list, ts: Date.now() } });
+                    }
+                  }
+                })();
                 setTimeout(() => backdrop.remove(), 2500);
               }
             }
@@ -4022,21 +4325,29 @@
     ];
     const captureAreaBtn = makeBtn("📰 Capture newsletter column (auto)", () => {
       let found = null;
+      let usedSelector = "";
       for (const sel of CONTENT_SELECTORS) {
         const el = document.querySelector(sel);
-        if (el) { found = el; break; }
+        if (el) {
+          found = el;
+          usedSelector = sel;
+          break;
+        }
       }
       if (!found) {
-        showStatus("ℹ️ No main content column detected — try crop manually.", "info");
+        standaloneAddStep({ action: "print_to_pdf" }, "print_to_pdf", "📰 Save page as PDF");
+        showStatus("✅ Recorded full-page print (no column found). Push when ready.", "ok");
         return;
       }
       const prevOutline = found.style.outline;
       found.style.outline = "3px solid #f59e0b";
       found.scrollIntoView({ behavior: "smooth", block: "nearest" });
-      showStatus(
-        "📰 Content column highlighted in orange. Use crop (or Add More) to capture it.",
-        "info"
+      standaloneAddStep(
+        { action: "print_to_pdf", selector: usedSelector },
+        "print_to_pdf",
+        `📰 Print column: ${usedSelector}`
       );
+      showStatus(`✅ Recorded print of ${usedSelector}. Push recipe when steps look right.`, "ok");
       setTimeout(() => {
         if (found.style.outline === "3px solid #f59e0b") {
           found.style.outline = prevOutline;
@@ -4113,8 +4424,59 @@
 
       const keyInput = makeInput("Parish key (auto-detected if blank)", "ph-parish-key");
       const nameInput = makeInput("Display name (auto-detected if blank)", "ph-display-name");
+
+      const harvestStatusLine = document.createElement("div");
+      harvestStatusLine.style.cssText = "font-size:9px;color:#93c5fd;margin-bottom:4px;display:none;";
+      pushSection.appendChild(harvestStatusLine);
       pushSection.appendChild(keyInput);
       pushSection.appendChild(nameInput);
+
+      const _refreshHarvestStatusLine = async (parishKey) => {
+        const key = String(parishKey || "").trim().toLowerCase();
+        if (!key) {
+          harvestStatusLine.style.display = "none";
+          return;
+        }
+        const settings = await _storageGet(["gh_repo"]);
+        const ghRepo = String(settings.gh_repo || "Raphoe-Diocese/parish_harvester").trim();
+        try {
+          const [reportResp, failResp] = await Promise.all([
+            fetch(`https://raw.githubusercontent.com/${ghRepo}/main/Bulletins/report.json`),
+            fetch(`https://raw.githubusercontent.com/${ghRepo}/main/parishes/consecutive_failures.json`),
+          ]);
+          let line = "";
+          if (reportResp.ok) {
+            const report = await reportResp.json();
+            const downloaded = (report.downloaded || []).some((r) => r.parish === key);
+            const failed = (report.failed || []).find((r) => r.parish === key);
+            if (downloaded) {
+              line = `✅ Last harvest (${report.target_date || "recent"}): downloaded OK`;
+              harvestStatusLine.style.color = "#86efac";
+            } else if (failed) {
+              const reason = String(failed.reason || failed.error || "failed").slice(0, 90);
+              line = `❌ Last harvest: ${reason}`;
+              harvestStatusLine.style.color = "#fca5a5";
+            }
+          }
+          if (!line && failResp.ok) {
+            const fails = await failResp.json();
+            const count = Number(fails[key] || 0);
+            if (count >= 2) {
+              line = `⚠️ ${count} consecutive harvest failures — retrain this recipe`;
+              harvestStatusLine.style.color = "#fde68a";
+            }
+          }
+          if (line) {
+            harvestStatusLine.textContent = line;
+            harvestStatusLine.style.display = "block";
+          } else {
+            harvestStatusLine.style.display = "none";
+          }
+        } catch (_e) {
+          harvestStatusLine.style.display = "none";
+        }
+      };
+
       const dioceseLine = document.createElement("div");
       dioceseLine.style.cssText = "font-size:10px;color:#d1d5db;margin-bottom:6px;";
       dioceseLine.textContent = "Diocese: (open this parish from the operator console)";
@@ -4132,24 +4494,54 @@
           : "Diocese: (open this parish from the operator console)";
       };
 
+      const parishMismatchBanner = document.createElement("div");
+      parishMismatchBanner.style.cssText = [
+        "display:none",
+        "background:#7f1d1d",
+        "border:1px solid #ef4444",
+        "color:#fecaca",
+        "font-size:10px",
+        "line-height:1.45",
+        "border-radius:6px",
+        "padding:6px 8px",
+        "margin-bottom:6px",
+      ].join(";");
+      pushSection.appendChild(parishMismatchBanner);
+
+      const _showParishMismatch = (inferredKey, shownKey) => {
+        if (!inferredKey || !shownKey || inferredKey === shownKey) {
+          parishMismatchBanner.style.display = "none";
+          return;
+        }
+        parishMismatchBanner.style.display = "block";
+        parishMismatchBanner.textContent =
+          `⚠️ Parish key mismatch — this page is "${inferredKey}" but the form showed "${shownKey}". ` +
+          "Using the current page URL.";
+      };
+
       const _applyResolvedParishToPushForm = (resolved, { notePrefix = "Auto-detected" } = {}) => {
         if (!resolved) return;
-        if (resolved.key) {
-          keyInput.value = resolved.key;
+        const inferred = resolved.inferredKey || resolved.key || "";
+        if (inferred) {
+          keyInput.value = inferred;
           autoDetectNote.style.display = "block";
-          autoDetectNote.textContent = `✓ ${notePrefix}: ${resolved.name || resolved.key} (${resolved.key})`;
+          autoDetectNote.textContent = `✓ ${notePrefix}: ${resolved.name || inferred} (${inferred})`;
         }
         if (resolved.name) nameInput.value = resolved.name;
         if (resolved.diocese && !resolvedDiocese) {
           resolvedDiocese = resolved.diocese;
           refreshDioceseLine();
         }
-        updateParishRecordingLine(nameInput.value || resolved.name, resolved.key, resolved.hostname);
+        updateParishRecordingLine(nameInput.value || resolved.name, inferred, resolved.hostname);
+        _showParishMismatch(inferred, resolved.key && resolved.key !== inferred ? resolved.key : "");
       };
 
       const _bootstrapParishContext = async () => {
-        const hostname = _currentHostname();
-        const pageUrl = standaloneStartUrl || window.location.href;
+        const pageUrl = _pageUrlForParishDetection();
+        const hostname = _hostnameFromUrl(pageUrl);
+        if (standaloneStartUrl && !_hostsMatch(standaloneStartUrl, pageUrl)) {
+          standaloneStartUrl = pageUrl;
+        }
         _purgeStaleHostnameMapEntry(hostname, pageUrl);
         const r = await _storageGet(["ph_last_diocese", "ph_hostname_map"]);
         const resolved = _resolveParishContextForPage(pageUrl, r || {});
@@ -4157,14 +4549,24 @@
           resolvedDiocese = String(r.ph_last_diocese || "").trim();
           refreshDioceseLine();
         }
-        const contactName = await _lookupDisplayNameFromContacts(resolved.key, hostname);
+        const contactName = await _lookupDisplayNameFromContacts(
+          resolved.inferredKey || resolved.key,
+          hostname
+        );
         if (contactName) {
           resolved.name = contactName;
         }
+        if (resolved.inferredKey) {
+          resolved.key = resolved.inferredKey;
+        }
         _applyResolvedParishToPushForm(resolved);
+        await _writeParishDetectDebug(resolved);
+        void _refreshHarvestStatusLine(resolved.inferredKey || resolved.key);
         await _loadExistingRecipeIfEmpty(resolved, contactName, hostname);
         void refreshPatternHints();
       };
+
+      _refreshParishPushForm = _bootstrapParishContext;
 
       let _loadExistingRecipeIfEmpty = async () => {};
 
@@ -4351,12 +4753,15 @@
       }
 
       const checkStartUrlDrift = async () => {
-        const pageUrl = standaloneStartUrl || window.location.href;
-        const hostname = _currentHostname();
+        const pageUrl = _pageUrlForParishDetection();
+        const hostname = _hostnameFromUrl(pageUrl);
         if (!hostname) return;
         const storageData = await _storageGet(["ph_hostname_map"]);
         const resolved = _resolveParishContextForPage(pageUrl, storageData);
-        const key = String(resolved.key || "").trim().toLowerCase().replace(/\s+/g, "_");
+        const key = String(resolved.inferredKey || resolved.key || "")
+          .trim()
+          .toLowerCase()
+          .replace(/\s+/g, "_");
         if (!key) return;
         const diocese = String(resolved.diocese || "").trim();
         const loaded = await loadRecipeFromRawGithub(key, diocese);
@@ -4380,7 +4785,7 @@
       };
 
       pushBtn.addEventListener("click", async () => {
-        const pageUrl = standaloneStartUrl || window.location.href;
+        const pageUrl = _pageUrlForParishDetection();
 
         let storageData = {};
         if (typeof chrome !== "undefined" && chrome.storage) {
@@ -4397,23 +4802,32 @@
         }
 
         const resolved = _resolveParishContextForPage(pageUrl, storageData);
+        const inferredKey = String(resolved.inferredKey || _inferParishKeyFromUrl(pageUrl) || "")
+          .trim()
+          .toLowerCase()
+          .replace(/\s+/g, "_");
         const manualKey = keyInput.value.trim().toLowerCase().replace(/\s+/g, "_");
-        // URL inference first; manual entry only when user typed a different override.
-        let key = resolved.key || manualKey;
-        if (manualKey && resolved.inferredKey && manualKey !== resolved.inferredKey) {
-          key = manualKey;
+        // Current page URL always wins — stale Bellaghy text in the form cannot override.
+        let key = inferredKey || manualKey;
+        if (inferredKey && manualKey && manualKey !== inferredKey) {
+          console.warn(
+            `Parish Trainer: ignoring stale manual key "${manualKey}" — page URL says "${inferredKey}"`
+          );
+          _showParishMismatch(inferredKey, manualKey);
         }
         let name = nameInput.value.trim() || resolved.name;
         let diocese = resolved.diocese || resolvedDiocese;
 
-        if (resolved.key && !manualKey) {
-          keyInput.value = resolved.key;
-          if (!name) name = resolved.name || resolved.key;
+        if (inferredKey) {
+          keyInput.value = inferredKey;
+          key = inferredKey;
+          const contactName = await _lookupDisplayNameFromContacts(inferredKey, _hostnameFromUrl(pageUrl));
+          if (contactName) name = contactName;
+          if (!name) name = _inferDisplayNameFromUrl(pageUrl) || inferredKey;
         }
-        if (!name) {
-          name = _inferDisplayNameFromUrl(pageUrl) || key;
-          if (name) nameInput.value = name;
-        }
+        if (name) nameInput.value = name;
+        updateParishRecordingLine(name, key, _hostnameFromUrl(pageUrl));
+        await _writeParishDetectDebug(resolved, { pushKey: key, pushName: name });
 
         if (diocese && !resolvedDiocese) {
           resolvedDiocese = diocese;
@@ -4714,6 +5128,7 @@
       _ensureToolbar(true);
       void _markRecordingActive();
       window.dispatchEvent(new CustomEvent("ph-retraining-hint", { detail: { parish_key: message.parish_key || "" } }));
+      if (_refreshParishPushForm) void _refreshParishPushForm();
       return { ok: true };
     }
     if (message.type === "restore_recording_session") {
@@ -4949,6 +5364,32 @@
         sendResponse({ ok: true, count: _standaloneRecipeSteps().length });
         return true;
       }
+      if (message?.type === "auto_download_detected") {
+        const url = String(message.url || "").trim();
+        if (url && _inStandaloneMode()) {
+          const steps = _standaloneRecipeSteps();
+          const last = steps[steps.length - 1];
+          const already =
+            last &&
+            String(last.action || "").toLowerCase() === "download" &&
+            String(last.url || "") === url;
+          if (!already) {
+            standaloneAddStep(
+              { action: "download", url },
+              "mark_file",
+              `📄 Auto-download: ${url.slice(-50)}`
+            );
+            _ensureToolbar(true);
+            window.dispatchEvent(
+              new CustomEvent("ph-recording-continued", {
+                detail: { stepCount: _standaloneRecipeSteps().length },
+              })
+            );
+          }
+        }
+        sendResponse({ ok: true });
+        return true;
+      }
       const result = _handleIncomingMessage(message);
       sendResponse(result);
       return true;
@@ -5163,6 +5604,10 @@
   };
 
   _AUTO_SHOW_DELAYS_MS.forEach((delay) => setTimeout(_tryAutoShowToolbar, delay));
+
+  window.addEventListener("pageshow", () => {
+    if (_refreshParishPushForm) void _refreshParishPushForm();
+  });
 
   void _restoreRecordingSessionFromStorage();
 })();

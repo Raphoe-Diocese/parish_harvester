@@ -774,3 +774,33 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
   return true; // keep message channel open for async response
 });
+
+// ── Auto-download PDF detection (Brave / sites that force download) ────────
+const _recordingTabIds = new Set();
+
+chrome.runtime.onMessage.addListener((message, sender) => {
+  if (message?.type === "recording_tab_active") {
+    const tabId = sender?.tab?.id;
+    if (tabId) _recordingTabIds.add(tabId);
+    return;
+  }
+  if (message?.type === "recording_tab_inactive") {
+    const tabId = sender?.tab?.id;
+    if (tabId) _recordingTabIds.delete(tabId);
+    return;
+  }
+});
+
+chrome.downloads.onCreated.addListener((downloadItem) => {
+  const tabId = downloadItem.tabId;
+  if (!tabId || tabId < 0 || !_recordingTabIds.has(tabId)) return;
+  const mime = String(downloadItem.mime || "").toLowerCase();
+  const url = String(downloadItem.url || downloadItem.finalUrl || "").trim();
+  if (!url) return;
+  const looksPdf =
+    mime.includes("pdf") ||
+    url.toLowerCase().includes(".pdf") ||
+    /weekly-bulletins/i.test(url);
+  if (!looksPdf) return;
+  chrome.tabs.sendMessage(tabId, { type: "auto_download_detected", url }).catch(() => {});
+});
