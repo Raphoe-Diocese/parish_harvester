@@ -42,6 +42,10 @@
       label: "HTML page — link chain needed",
       steps: "Click Follow a link to reach the bulletin, then Get a PDF or Mark as HTML.",
     },
+    cloud_folder: {
+      label: "Google Drive / OneDrive dated folder",
+      steps: "Pick this Sunday's YY.MM.DD row → Save this PDF on file preview. Works across 2026, 2027, 2028…",
+    },
     parish_messenger_embed: {
       label: "Parish Messenger widget (parishservices.co)",
       steps: "Wait for the page to load → Follow a link → pick newest View Newsletter / May 2026 row. Ignore Gift Aid and Data Entry PDFs.",
@@ -92,6 +96,7 @@
     else if (type === "wix_viewer") pageType = "wix_pdf_viewer";
     else if (type === "wix_html" || type === "wix_date_grid") pageType = "wix_html";
     else if (type === "parish_messenger") pageType = "parish_messenger_embed";
+    else if (type === "cloud_folder") pageType = "cloud_folder";
     else if (type === "image") pageType = "image_bulletin";
     else if (type === "html" || type === "unknown") pageType = "html_click_chain";
 

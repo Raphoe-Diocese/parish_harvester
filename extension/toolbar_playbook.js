@@ -18,6 +18,15 @@
       ],
       pin: false,
     },
+    cloud_folder: {
+      title: "Google Drive / OneDrive folder",
+      steps: [
+        "Tap Pick this Sunday's PDF row (dated YY.MM.DD, e.g. 26.06.14.pdf).",
+        "On the file preview page → Save this PDF.",
+        "Push Recipe — Sunday auto-picks the right date each week (2026, 2027, 2028…).",
+      ],
+      pin: false,
+    },
     parish_messenger: {
       title: "Parish Messenger site",
       steps: [
@@ -131,7 +140,21 @@
     if (hasTerminal) {
       steps.unshift("✓ Bulletin capture recorded — scroll to Push Recipe.");
     }
-    if (state.lastHarvestIssue) {
+    if (state.needsRetrain) {
+      steps.unshift(
+        "⚠️ RETRAIN NEEDED — last Sunday harvest failed. Re-record steps below, then Push."
+      );
+    }
+    if (type === "cloud_folder" && state.expectedCloudLabel) {
+      if (state.cloudRowVisible === false) {
+        steps.push(
+          `This Sunday's row (${state.expectedCloudLabel}) is not on screen yet — pick the newest dated PDF.`
+        );
+      } else {
+        steps.push(`Looking for row: ${state.expectedCloudLabel}`);
+      }
+    }
+    if (state.lastHarvestIssue && !state.needsRetrain) {
       steps.push(`Last Sunday failed: ${state.lastHarvestIssue.slice(0, 70)}… — this push should fix it.`);
     }
     return {
@@ -172,10 +195,18 @@
     }
 
     const check = document.createElement("div");
-    check.style.cssText = "font-size:9px;color:#86efac;line-height:1.4;";
-    check.textContent = plan.pushReady
-      ? "✅ Ready to push (capture step present)."
-      : "⏳ Not ready to push yet — need a capture step (download / print / image).";
+    check.style.cssText = "font-size:9px;line-height:1.4;";
+    if (state.needsRetrain) {
+      check.style.color = "#fca5a5";
+      check.textContent =
+        "⚠️ Recipe flagged for retrain — Sunday could not pick this week's bulletin automatically.";
+    } else if (plan.pushReady) {
+      check.style.color = "#86efac";
+      check.textContent = "✅ Ready to push (capture step present).";
+    } else {
+      check.style.color = "#fde68a";
+      check.textContent = "⏳ Not ready to push yet — need a capture step (download / print / image).";
+    }
     el.appendChild(check);
   };
 

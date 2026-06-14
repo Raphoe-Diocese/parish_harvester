@@ -7,11 +7,13 @@ import json
 import re
 import subprocess
 import tempfile
+from datetime import date
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urljoin, urlparse
 
 from playwright.async_api import Browser, Page, TimeoutError as PlaywrightTimeoutError
 
+from .cloud_folders import is_cloud_folder_click_step, rewrite_cloud_folder_click_step
 from .cloud_urls import is_cloud_document_url, normalize_document_url, unwrap_docs_viewer_url
 from .config import PAGE_LOAD_TIMEOUT_MS, PARISHES_DIR
 
@@ -194,6 +196,17 @@ async def _download_document_url(page: Page, raw_url: str, dest: Path) -> tuple[
     return raw_url, "pdf"
 
 
+async def _try_download_page_url(page: Page, dest: Path, raw_url: str | None = None) -> tuple[str, str] | None:
+    """Download a URL that serves PDF bytes without a .pdf suffix (e.g. cappaghparish.com/b/2)."""
+    url = (raw_url or page.url or "").strip()
+    if not url or url.startswith(("about:", "chrome:", "blob:", "data:")):
+        return None
+    try:
+        return await _download_document_url(page, url, dest)
+    except RecipeReplayError:
+        return None
+
+
 async def _download_image_url_as_pdf(page: Page, raw_url: str, dest: Path) -> tuple[str, str]:
     response = await page.request.get(raw_url, timeout=PAGE_LOAD_TIMEOUT_MS)
     if not response.ok:
@@ -258,7 +271,16 @@ async def _find_iframe_pdf_url(page: Page) -> str | None:
     return None
 
 
-async def _replay_click(page: Page, step: dict, step_timeout_ms: int) -> None:
+async def _replay_click(
+    page: Page,
+    step: dict,
+    step_timeout_ms: int,
+    *,
+    target_date: date | None = None,
+) -> None:
+    if target_date and is_cloud_folder_click_step(step):
+        step = rewrite_cloud_folder_click_step(step, target_date)
+
     selectors: list[str] = []
     selector = (step.get("selector") or "").strip()
     if selector:
@@ -296,6 +318,7 @@ async def replay_recipe(
     browser: Browser,
     *,
     target_url: str | None = None,
+    target_date: date | None = None,
 ) -> tuple[Path, str, str]:
     recipe = load_recipe(recipe_path)
     step_timeout_ms = _recipe_step_timeout_ms(recipe)
@@ -319,7 +342,7 @@ async def replay_recipe(
                 continue
 
             if action == "click":
-                await _replay_click(page, step, step_timeout_ms)
+                await _replay_click(page, step, step_timeout_ms, target_date=target_date)
                 if downloads:
                     file_type = await _save_download_to_pdf(downloads.pop(0), dest)
                     source_url = page.url
@@ -327,6 +350,9 @@ async def replay_recipe(
                 if _is_document_url(page.url):
                     source_url, file_type = await _download_document_url(page, page.url, dest)
                     return dest, file_type, source_url
+                tried = await _try_download_page_url(page, dest)
+                if tried:
+                    return dest, tried[1], tried[0]
                 continue
 
             if action == "download":
@@ -335,9 +361,19 @@ async def replay_recipe(
                     source_url = page.url
                     return dest, file_type, source_url
 
+                step_url = (step.get("url") or "").strip()
+                if step_url:
+                    tried = await _try_download_page_url(page, dest, step_url)
+                    if tried:
+                        return dest, tried[1], tried[0]
+
                 if _is_document_url(page.url):
                     source_url, file_type = await _download_document_url(page, page.url, dest)
                     return dest, file_type, source_url
+
+                tried = await _try_download_page_url(page, dest)
+                if tried:
+                    return dest, tried[1], tried[0]
 
                 pdfemb_url = await _find_pdfemb_url(page)
                 if pdfemb_url:

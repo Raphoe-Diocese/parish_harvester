@@ -527,6 +527,9 @@
       steps.push(gotoStep);
     }
     steps.push(..._standaloneRecipeSteps());
+    const usesCloudFolder = steps.some(
+      (s) => s && (s.cloud_folder || s.date_format === "YY.MM.DD")
+    );
     return {
       version: 1,
       parish_key: parishKey,
@@ -534,6 +537,7 @@
       diocese: diocese || "",
       start_url: startUrl,
       steps,
+      ...(usesCloudFolder ? { cloud_folder: true, date_format: "YY.MM.DD" } : {}),
     };
   };
 
@@ -994,8 +998,90 @@
     const lowerPath = lowerFull.split("?")[0];
     const docExts = [".pdf", ".docx", ".doc", ".pptx", ".ppt", ".odt", ".ods"];
     if (docExts.some((ext) => lowerPath.endsWith(ext))) return true;
+    // Extensionless PDF routes (server returns application/pdf, e.g. cappaghparish.com/b/2)
+    if (/\/b\/\d+$/i.test(lowerPath)) return true;
     return false;
   };
+
+  // Chrome (and some hosts) serve PDFs without a .pdf suffix in the address bar.
+  const _pageIsNativePdfViewer = () => {
+    try {
+      if (document.contentType === "application/pdf") return true;
+    } catch (_e) {
+      // ignore
+    }
+    const embeds = document.querySelectorAll(
+      'embed[type="application/pdf"], object[type="application/pdf"]'
+    );
+    for (const el of embeds) {
+      const src = (el.getAttribute("src") || el.getAttribute("data") || "").trim();
+      if (!src || src === "about:blank") return true;
+      try {
+        const abs = new URL(src, window.location.href).href;
+        if (abs === window.location.href) return true;
+      } catch (_e) {
+        return true;
+      }
+    }
+    if (document.body && document.body.children.length <= 2) {
+      if (document.body.querySelector('embed[type="application/pdf"]')) return true;
+    }
+    return false;
+  };
+
+  const _urlLooksLikeDirectPdf = (url) => {
+    if (!url) return false;
+    if (isDocumentUrl(url)) return true;
+    if (/\.pdf(\?|$)/i.test(url)) return true;
+    return false;
+  };
+
+  const _CLOUD_DATE_YY_MM_DD_RE = /(?<!\d)(\d{2})\.(\d{2})\.(\d{2})(?:\.pdf)?(?!\d)/i;
+
+  const _isCloudFolderUrl = (url) => {
+    const lower = String(url || "").toLowerCase();
+    if (lower.includes("drive.google.com") && lower.includes("/folders/")) return true;
+    if (lower.includes("onedrive.live.com") && (lower.includes("?id=") || lower.includes("/redir"))) {
+      return true;
+    }
+    if (lower.includes("sharepoint.com") && (lower.includes("/documents") || lower.includes("/shared"))) {
+      return true;
+    }
+    if (lower.includes("1drv.ms")) return true;
+    return false;
+  };
+
+  const _detectCloudDateFormat = (text) => {
+    if (_CLOUD_DATE_YY_MM_DD_RE.test(String(text || ""))) return "YY.MM.DD";
+    return null;
+  };
+
+  const _formatCloudFolderLabel = (d, withPdf = true) => {
+    const yy = String(d.getFullYear() % 100).padStart(2, "0");
+    const mm = String(d.getMonth() + 1).padStart(2, "0");
+    const dd = String(d.getDate()).padStart(2, "0");
+    const bare = `${yy}.${mm}.${dd}`;
+    return withPdf ? `${bare}.pdf` : bare;
+  };
+
+  const _findCloudFolderRowForDate = (targetDate) => {
+    const labelPdf = _formatCloudFolderLabel(targetDate, true);
+    const labelBare = _formatCloudFolderLabel(targetDate, false);
+    const selectors = '[role="row"], [role="gridcell"], tr, [data-id], div[data-tooltip]';
+    const nodes = Array.from(document.querySelectorAll(selectors));
+    for (const el of nodes) {
+      const text = (el.innerText || el.textContent || el.getAttribute("aria-label") || "").trim();
+      if (!text) continue;
+      if (text.includes(labelPdf) || text === labelBare || text.startsWith(labelBare)) {
+        const row = el.closest('[role="row"]') || el;
+        return row;
+      }
+    }
+    return null;
+  };
+
+  let _lastHarvestIssue = "";
+  let _needsRetrain = false;
 
   const IMAGE_CONTENT_AREA_SELECTOR = ".entry-content, article, main, [role='main']";
   const IMAGE_CONTENT_CLASS_HINT_RE = /(entry-content|post-content|article|main)/i;
@@ -1061,8 +1147,14 @@
   const detectPageType = () => {
     const url = window.location.href.toLowerCase();
 
-    // 1. Current page IS a PDF
-    if (url.endsWith(".pdf") || url.includes(".pdf?") || url.includes("/pdf/")) {
+    // 1. Current page IS a PDF (URL suffix, extensionless route, or Chrome PDF viewer)
+    if (
+      url.endsWith(".pdf") ||
+      url.includes(".pdf?") ||
+      url.includes("/pdf/") ||
+      _urlLooksLikeDirectPdf(url) ||
+      _pageIsNativePdfViewer()
+    ) {
       return {
         emoji: "📄",
         summary: "This page IS a PDF document.",
@@ -1071,7 +1163,24 @@
       };
     }
 
-    // 1b. Parish Services / Parish Messenger embed (dmaparish, ardstraw, culdaff, etc.)
+    // 1b. Google Drive / OneDrive folder of dated PDFs
+    if (_isCloudFolderUrl(url)) {
+      const sunday = _nextSundayDate();
+      const expected = _formatCloudFolderLabel(sunday, true);
+      const rowVisible = Boolean(_findCloudFolderRowForDate(sunday));
+      return {
+        emoji: "☁️",
+        summary: "Cloud folder — weekly PDFs listed by date (YY.MM.DD).",
+        advice: rowVisible
+          ? `Tap Pick this Sunday's row (${expected}), then Save this PDF on the file page.`
+          : `This Sunday's file (${expected}) not visible yet — pick the newest dated row, then Save PDF.`,
+        type: "cloud_folder",
+        expectedLabel: expected,
+        rowVisible,
+      };
+    }
+
+    // 1c. Parish Services / Parish Messenger embed (dmaparish, ardstraw, culdaff, etc.)
     const parishMessengerScript = document.querySelector(
       'script[src*="theparishmessenger.com"]'
     );
@@ -2791,8 +2900,8 @@
       const pageCtx = detectPageType();
       if (
         pageCtx.type === "direct_pdf" ||
-        isDocumentUrl(pageUrl) ||
-        /\.pdf(\?|$)/i.test(pageUrl)
+        _urlLooksLikeDirectPdf(pageUrl) ||
+        _pageIsNativePdfViewer()
       ) {
         standaloneAddStep(
           { action: "download", url: pageUrl },
@@ -2871,6 +2980,7 @@
           pageCtx.type === "wix_viewer" ||
           pageCtx.type === "wix_html" ||
           pageCtx.type === "parish_messenger" ||
+          pageCtx.type === "cloud_folder" ||
           (pageCtx.type === "html" && _pathLooksLikeNewsletterPage()) ||
           pageCtx.type === "pdf_links";
         if (pageCtx.type === "direct_pdf") {
@@ -2883,6 +2993,9 @@
         } else if (pageCtx.type === "parish_messenger" || pageCtx.type === "pdf_links" || pageCtx.type === "pdfemb") {
           contextPrimaryBtn.style.display = "block";
           contextPrimaryBtn.textContent = "🔗 2. Pick bulletin link";
+        } else if (pageCtx.type === "cloud_folder") {
+          contextPrimaryBtn.style.display = "block";
+          contextPrimaryBtn.textContent = "📅 2. Pick this Sunday's PDF row";
         } else if (
           pageCtx.type === "iframe" ||
           pageCtx.type === "iframe_maybe" ||
@@ -2905,10 +3018,14 @@
         window.ph_playbook.render(playbookPanel, pageCtx, {
           stepCount: recorded.length,
           hasTerminal,
+          lastHarvestIssue: _lastHarvestIssue,
+          needsRetrain: _needsRetrain,
+          expectedCloudLabel: pageCtx.expectedLabel || "",
+          cloudRowVisible: pageCtx.rowVisible,
         });
       }
       if (pinLinkBtn) {
-        const hidePin = pageCtx.type === "direct_pdf" || pageCtx.type === "wix_html";
+        const hidePin = pageCtx.type === "direct_pdf" || pageCtx.type === "wix_html" || pageCtx.type === "cloud_folder";
         pinLinkBtn.style.display = hidePin ? "none" : "block";
       }
     };
@@ -2925,6 +3042,11 @@
         href,
         text,
       };
+      const cloudFmt = _detectCloudDateFormat(text);
+      if (cloudFmt || _isCloudFolderUrl(window.location.href)) {
+        clickStep.date_format = cloudFmt || "YY.MM.DD";
+        clickStep.cloud_folder = true;
+      }
 
       const _recordStandaloneClick = () => {
         if (_inStandaloneMode()) {
@@ -3529,6 +3651,20 @@
         }
         if (pageCtx.type === "parish_messenger") {
           startPickLinkMode(showPickConfirmation, showStatus);
+          return;
+        }
+        if (pageCtx.type === "cloud_folder") {
+          const sunday = _nextSundayDate();
+          const row = _findCloudFolderRowForDate(sunday);
+          if (!row) {
+            showStatus(
+              `⚠️ Row ${_formatCloudFolderLabel(sunday)} not found — use Follow a link and pick the newest dated PDF.`,
+              "warn"
+            );
+            startPickLinkMode(showPickConfirmation, showStatus);
+            return;
+          }
+          showPickConfirmation(row);
           return;
         }
         if (pageCtx.type === "image") {
@@ -4598,24 +4734,40 @@
               const reason = String(failed.reason || failed.error || "failed").slice(0, 90);
               const training = _standaloneRecipeSteps().length > 0;
               const onPdf = detectPageType().type === "direct_pdf";
+              _lastHarvestIssue = reason;
+              _needsRetrain = false;
+              const cloudFail =
+                /cloud folder|yy\.mm\.dd|html_render|folder listing|re-train/i.test(reason) ||
+                (failed.file_type === "html_render" && _isCloudFolderUrl(pageUrl));
+              if (cloudFail || reason.includes("outdated")) {
+                _needsRetrain = true;
+              }
               if (training || onPdf) {
-                line = `ℹ️ Last Sunday's run failed (${reason}) — push this recipe to fix it`;
-                harvestStatusLine.style.color = "#fde68a";
+                line = _needsRetrain
+                  ? `⚠️ Retrain needed — last harvest: ${reason}`
+                  : `ℹ️ Last Sunday's run failed (${reason}) — push this recipe to fix it`;
+                harvestStatusLine.style.color = _needsRetrain ? "#fca5a5" : "#fde68a";
               } else {
-                line = `❌ Last harvest: ${reason}`;
+                line = _needsRetrain
+                  ? `⚠️ Retrain this recipe — last harvest: ${reason}`
+                  : `❌ Last harvest: ${reason}`;
                 harvestStatusLine.style.color = "#fca5a5";
               }
               if (window.ph_copilot?.rememberIssue) {
-                window.ph_copilot.rememberIssue(key, { lastIssue: reason });
+                window.ph_copilot.rememberIssue(key, { lastIssue: reason, needsRetrain: _needsRetrain });
               }
+              _refreshGuidedContext();
             }
           }
           if (!line && failResp.ok) {
             const fails = await failResp.json();
             const count = Number(fails[key] || 0);
             if (count >= 2) {
+              _needsRetrain = true;
+              _lastHarvestIssue = `${count} consecutive harvest failures`;
               line = `⚠️ ${count} consecutive harvest failures — retrain this recipe`;
               harvestStatusLine.style.color = "#fde68a";
+              _refreshGuidedContext();
             }
           }
           if (line) {
@@ -5653,6 +5805,11 @@
       href: pick.url,
       text: pick.label,
     };
+    const cloudFmt = _detectCloudDateFormat(pick.label);
+    if (cloudFmt || _isCloudFolderUrl(window.location.href)) {
+      clickStep.date_format = cloudFmt || "YY.MM.DD";
+      clickStep.cloud_folder = true;
+    }
     const clickLabel = `🔗 Click: "${pick.label || pick.selector}"`;
     if (_inStandaloneMode()) {
       standaloneAddStep(clickStep, "click", clickLabel);

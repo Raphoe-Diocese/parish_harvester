@@ -54,6 +54,13 @@ from .browser_launch import (
 )
 from .bulletin_freshness import check_bulletin_freshness, mark_result_stale, suggest_retry_strategy
 from .cloud_urls import normalize_document_url
+from .cloud_folders import (
+    cloud_folder_date_tokens,
+    cloud_folder_selector_candidates,
+    format_cloud_folder_label,
+    is_cloud_folder_url,
+    recipe_uses_cloud_folder,
+)
 from .html_capture import capture_html_page_as_pdf
 from .replay import RecipeReplayError, _print_page_to_pdf, recipe_path_for, replay_recipe
 from .pattern_detector import detect_pattern, save_pattern_change
@@ -787,6 +794,8 @@ def _target_date_tokens(target: date) -> list[str]:
         f"{target.day}-{month.lower()}-{yyyy}",
         f"{target.day}{month.lower()}{yyyy}",
         f"{target.day}{mon_abbr.lower()}{yyyy}",
+        format_cloud_folder_label(target, with_pdf=True),
+        format_cloud_folder_label(target, with_pdf=False),
     ]
 
 
@@ -842,6 +851,44 @@ async def _download_candidate(
     if dest.exists():
         _verify_bulletin_pdf(dest)
     return file_type
+
+
+async def _try_cloud_folder_pick(
+    page: Page,
+    target: date,
+    dest: Path,
+    browser: Browser,
+    navigation_timeout_ms: int,
+) -> tuple[str, str] | None:
+    """Click the dated YY.MM.DD row on a Drive/OneDrive folder listing."""
+    if not is_cloud_folder_url(page.url):
+        return None
+    label = format_cloud_folder_label(target, with_pdf=True)
+    last_err = ""
+    for sel in cloud_folder_selector_candidates(target):
+        try:
+            locator = page.locator(sel).first
+            await locator.wait_for(state="visible", timeout=min(navigation_timeout_ms, 12_000))
+            await locator.click(timeout=navigation_timeout_ms)
+            try:
+                await page.wait_for_load_state("domcontentloaded", timeout=3_000)
+            except PlaywrightTimeoutError:
+                pass
+            await _page_wait(page, 1500)
+            file_type = await _download_candidate(
+                page.url,
+                dest,
+                browser,
+                navigation_timeout_ms=navigation_timeout_ms,
+            )
+            if dest.exists() and _is_real_pdf(dest, ""):
+                return page.url, file_type
+        except Exception as exc:
+            last_err = str(exc)
+            continue
+    if last_err:
+        print(f"  ↩️  Cloud folder pick failed for {label}: {last_err}")
+    return None
 
 
 def _scrape_seed_urls(entry: ParishEntry, target_url: str) -> list[str]:
@@ -903,6 +950,21 @@ async def _scrape_and_download(
         except PlaywrightTimeoutError:
             pass
         await _page_wait(page, wait_after_load_ms)
+
+        if is_cloud_folder_url(page.url):
+            picked = await _try_cloud_folder_pick(
+                page, target, dest, browser, navigation_timeout_ms
+            )
+            if picked:
+                source_url, file_type = picked
+                return FetchResult(
+                    key=key,
+                    display_name=entry.display_name,
+                    status="ok",
+                    url=source_url,
+                    file_path=dest,
+                    file_type=file_type,
+                )
 
         preferred_pdfemb = await _find_pdfemb_url(page)
         if preferred_pdfemb:
@@ -1626,6 +1688,7 @@ async def _try_mistral_auto_heal(
                     recipe_path=tmp_recipe,
                     dest=dest,
                     browser=browser,
+                    target_date=target,
                 )
                 if _is_real_pdf(healed_path, entry.key):
                     _write_auto_healed_recipe(entry, recipe_path, ai_url, target)
@@ -1842,6 +1905,7 @@ async def _fetch_entry(
                 dest=dest,
                 browser=browser,
                 target_url=target_url,
+                target_date=target,
             )
             if replay_file_type == "html_link":
                 forced = await _try_force_html_to_pdf(
@@ -2039,6 +2103,18 @@ async def _fetch_entry(
 
     # Last resort: force HTML bulletin URLs to PDF (no bare links in mega PDF).
     if entry.content_type == "html_link":
+        folder_url = entry.example_url or target_url
+        if is_cloud_folder_url(folder_url):
+            return FetchResult(
+                key=key,
+                display_name=entry.display_name,
+                status="error",
+                url=folder_url,
+                error=(
+                    "Cloud folder bulletin not found for this Sunday — open the folder in "
+                    "Parish Trainer, pick the dated PDF row (YY.MM.DD), Save PDF, and push recipe"
+                ),
+            )
         for capture_url in _scrape_seed_urls(entry, target_url):
             forced = await _try_force_html_to_pdf(
                 entry, capture_url, dest, browser, target, host_profile

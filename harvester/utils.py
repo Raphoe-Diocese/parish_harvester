@@ -15,6 +15,7 @@ from urllib.parse import unquote, urlparse
 
 _DDMMYY_RE = re.compile(r"(?<!\d)(\d{2})(\d{2})(\d{2})(?!\d)")      # 310825
 _DDMMYYYY_RE = re.compile(r"(?<!\d)(\d{2})(\d{2})(\d{4})(?!\d)")    # 31082025
+_YY_MM_DD_RE = re.compile(r"(?<!\d)(\d{2})\.(\d{2})\.(\d{2})(?!\d)")  # 26.06.14
 _ISO_RE = re.compile(r"(\d{4})-(\d{2})-(\d{2})")                     # 2025-08-31
 _ISO_NODASH_RE = re.compile(r"(?<!\d)(\d{4})(\d{2})(\d{2})(?!\d)")  # 20250831
 _WP_YEAR_MONTH_RE = re.compile(r"/(\d{4})/(\d{2})/")                 # /2026/04/
@@ -96,6 +97,15 @@ def extract_date_from_string(text: str) -> date | None:
         try:
             year = 2000 + int(m.group(3))
             return date(year, int(m.group(2)), int(m.group(1)))
+        except ValueError:
+            pass
+
+    # YY.MM.DD — Google Drive folder rows (26.06.14 → 2026-06-14, 29.01.05 → 2029-01-05)
+    m = _YY_MM_DD_RE.search(text)
+    if m:
+        try:
+            year = 2000 + int(m.group(1))
+            return date(year, int(m.group(2)), int(m.group(3)))
         except ValueError:
             pass
 
