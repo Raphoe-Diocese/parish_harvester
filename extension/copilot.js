@@ -163,14 +163,66 @@
     return { best, alternatives, all: ranked };
   };
 
-  const advise = ({ pageType = "unknown", best, alternatives, pin, pageUrl = "" }) => {
+  const buildPageBrief = () => {
+    const headings = [];
+    for (const el of document.querySelectorAll("h1,h2,h3,.entry-title,.post-title")) {
+      const t = (el.innerText || el.textContent || "").trim().replace(/\s+/g, " ");
+      if (t && t.length >= 8 && t.length <= 200) headings.push(t);
+      if (headings.length >= 6) break;
+    }
+    const navNewsletter = [];
+    for (const a of document.querySelectorAll("a[href]")) {
+      const text = (a.innerText || a.textContent || "").trim().replace(/\s+/g, " ");
+      if (!text || text.length > 80) continue;
+      if (!/\b(newsletter|bulletin|weekly|parish news)\b/i.test(text)) continue;
+      let href = "";
+      try { href = new URL(a.getAttribute("href") || "", window.location.href).href; } catch (_e) { /* skip */ }
+      navNewsletter.push({ text, href });
+      if (navNewsletter.length >= 8) break;
+    }
+    const path = String(window.location?.pathname || "").toLowerCase();
+    const onNewsPage = /newsletter|bulletin|\/news\b|weekly/i.test(path + " " + document.title);
+    const bulletinOnPage = headings.some((h) => /\b(newsletter|bulletin)\b/i.test(h));
+    return { headings, navNewsletter, onNewsPage, bulletinOnPage };
+  };
+
+  const adviseOnPage = ({ pageType = "unknown", brief = {}, best, pin }) => {
     const lines = [];
-    if (pin) {
+    if (brief.bulletinOnPage || (brief.onNewsPage && pageType === "wix_html")) {
+      lines.push("✅ I see the bulletin on this page.");
+      lines.push("→ Click 📰 Save page as PDF (best for Ardara-style HTML newsletters).");
+      return lines.join("\n");
+    }
+    if (pageType === "wix_html" || pageType === "html") {
+      lines.push("This looks like an HTML newsletter page.");
+      lines.push("→ Use 📰 Save page as PDF after you reach the bulletin.");
+    }
+    if (brief.navNewsletter?.length === 1) {
+      lines.push(`→ Click menu link "${brief.navNewsletter[0].text}" first, then Analyse again.`);
+    } else if (brief.navNewsletter?.length > 1) {
+      const pick = brief.navNewsletter.find((n) => !/archive|past|old/i.test(n.text)) || brief.navNewsletter[0];
+      lines.push(`→ Try "${pick.text}" in the menu (not Archive unless you need an old week).`);
+    }
+    if (pin) lines.push("📌 Using your pinned link for this site.");
+    if (best && !lines.length) return "";
+    return lines.join("\n");
+  };
+
+  const advise = ({ pageType = "unknown", best, alternatives, pin, pageUrl = "", pageBrief = null }) => {
+    const lines = [];
+    const onPage = adviseOnPage({ pageType, brief: pageBrief || {}, best, pin });
+    if (onPage) lines.push(onPage);
+    if (pin && !onPage.includes("pinned")) {
       lines.push("📌 You pinned a link for this site — I'll prefer that.");
     }
-    if (!best) {
-      lines.push("I couldn't find bulletin links on this page.");
-      lines.push("Try: open the newsletter menu, then click Analyse again.");
+    if (!best && !pageBrief?.bulletinOnPage) {
+      if (!lines.length) {
+        lines.push("I couldn't find bulletin links on this page.");
+        lines.push("Try: open the newsletter menu, then click Analyse again.");
+      }
+      return lines.join("\n");
+    }
+    if (pageBrief?.bulletinOnPage && pageType !== "pdf_links") {
       return lines.join("\n");
     }
     if (best.pinBonus) {
@@ -218,12 +270,39 @@
     return context?.advice || "Click Analyse page — I'll scan links and suggest the bulletin.";
   };
 
+  const MEMORY_KEY = "ph_copilot_memory";
+
+  const rememberIssue = (parishKey, payload) => {
+    if (!parishKey || typeof chrome === "undefined" || !chrome.storage?.local) return;
+    chrome.storage.local.get([MEMORY_KEY], (r) => {
+      const mem = r?.[MEMORY_KEY] && typeof r[MEMORY_KEY] === "object" ? r[MEMORY_KEY] : {};
+      mem[parishKey] = { ...mem[parishKey], ...payload, updatedAt: new Date().toISOString() };
+      chrome.storage.local.set({ [MEMORY_KEY]: mem });
+    });
+  };
+
+  const getMemory = (parishKey) => new Promise((resolve) => {
+    if (!parishKey || typeof chrome === "undefined" || !chrome.storage?.local) {
+      resolve(null);
+      return;
+    }
+    chrome.storage.local.get([MEMORY_KEY], (r) => {
+      const mem = r?.[MEMORY_KEY] && typeof r[MEMORY_KEY] === "object" ? r[MEMORY_KEY] : {};
+      resolve(mem[parishKey] || null);
+    });
+  });
+
   window.ph_copilot = {
     PINS_KEY,
+    MEMORY_KEY,
     scorePhrase,
     rankLinks,
+    buildPageBrief,
+    adviseOnPage,
     advise,
     replyToChat,
+    rememberIssue,
+    getMemory,
     matchesPin,
     normHost: _normHost,
   };

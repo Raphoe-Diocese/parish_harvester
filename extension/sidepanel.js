@@ -395,6 +395,103 @@ function _pdGhPush(path, content, commitMsg) {
   });
 }
 
+function _pdGhDelete(path, sha, commitMsg) {
+  return new Promise((resolve, reject) => {
+    chrome.runtime.sendMessage({ type: "delete_github_file", path, sha, commitMessage: commitMsg }, (res) => {
+      if (chrome.runtime.lastError) { reject(new Error(chrome.runtime.lastError.message)); return; }
+      resolve(res);
+    });
+  });
+}
+
+function _pdExtractParishBlock(fileText, parishName) {
+  const lines = fileText.split("\n");
+  const escaped = parishName.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const headerRe = new RegExp(`^#\\s*---\\s*${escaped}\\s*---`, "i");
+  let start = -1;
+  let end = lines.length;
+  for (let i = 0; i < lines.length; i++) {
+    const trimmed = lines[i].trim();
+    if (headerRe.test(trimmed)) {
+      start = i;
+      continue;
+    }
+    if (start >= 0 && /^#\s*---/.test(trimmed)) {
+      end = i;
+      break;
+    }
+  }
+  if (start < 0) return null;
+  const block = lines.slice(start, end).join("\n").trim();
+  const remainder = [...lines.slice(0, start), ...lines.slice(end)].join("\n").replace(/\n{3,}/g, "\n\n");
+  return { block, remainder };
+}
+
+async function _pdMoveParish(parish, targetDioceseName) {
+  const sourceInfo = _pdDioceseTexts[parish.diocese];
+  const targetInfo = _pdDioceseTexts[targetDioceseName];
+  if (!sourceInfo || !targetInfo) throw new Error("Evidence files not loaded.");
+  if (parish.diocese === targetDioceseName) throw new Error("Parish is already in that diocese.");
+  const extracted = _pdExtractParishBlock(sourceInfo.text, parish.name);
+  if (!extracted?.block) throw new Error(`Could not find ${parish.name} in source file.`);
+  const srcRes = await _pdGhPush(
+    sourceInfo.path,
+    extracted.remainder,
+    `evidence: move ${parish.name} out of ${parish.diocese} [from extension]`
+  );
+  if (!srcRes?.ok) throw new Error(srcRes?.error || "Source save failed.");
+  sourceInfo.text = extracted.remainder;
+  const targetText = `${targetInfo.text.trim()}\n\n${extracted.block}\n`;
+  const tgtRes = await _pdGhPush(
+    targetInfo.path,
+    targetText,
+    `evidence: move ${parish.name} into ${targetDioceseName} [from extension]`
+  );
+  if (!tgtRes?.ok) throw new Error(tgtRes?.error || "Target save failed.");
+  targetInfo.text = targetText;
+  const slug = _pdDioceseSlug(targetDioceseName);
+  const oldSlug = _pdDioceseSlug(parish.diocese);
+  const recipePath = `parishes/recipes/${oldSlug}/${parish.key}.json`;
+  const newRecipePath = `parishes/recipes/${slug}/${parish.key}.json`;
+  try {
+    const { content, sha } = await _pdGhFetch(recipePath);
+    const parsed = JSON.parse(content);
+    parsed.diocese = slug;
+    await _pdGhPush(newRecipePath, JSON.stringify(parsed, null, 2), `chore: move recipe ${parish.key} to ${slug} [from extension]`);
+    await _pdGhDelete(recipePath, sha, `chore: remove old recipe path for ${parish.key} [from extension]`);
+  } catch (_e) {
+    // recipe may not exist yet
+  }
+  parish.diocese = targetDioceseName;
+  delete _pdParishDetailsCache[parish.key];
+  return { ok: true };
+}
+
+async function _pdDisableParish(parish) {
+  const info = _pdDioceseTexts[parish.diocese];
+  if (!info) throw new Error("Evidence file not loaded.");
+  const lines = info.text.split("\n");
+  const escaped = parish.name.replace(/[.*+?^${}()|[\]\\]/g, "\\$&");
+  const headerRe = new RegExp(`^#\\s*---\\s*${escaped}\\s*---`, "i");
+  let inserted = false;
+  for (let i = 0; i < lines.length; i++) {
+    if (headerRe.test(lines[i].trim())) {
+      if (!lines[i + 1]?.includes("DISABLED")) {
+        lines.splice(i + 1, 0, "# DISABLED — removed from harvest via extension");
+        inserted = true;
+      }
+      break;
+    }
+  }
+  if (!inserted) throw new Error("Parish section not found.");
+  const updated = lines.join("\n");
+  const res = await _pdGhPush(info.path, updated, `evidence: disable ${parish.name} [from extension]`);
+  if (!res?.ok) throw new Error(res?.error || "Save failed.");
+  info.text = updated;
+  parish.disabled = true;
+  return { ok: true };
+}
+
 // ── Harvest workflow dispatch ──────────────────────────────────────────────
 
 async function _pdDispatchHarvest(parishKey) {
@@ -620,6 +717,7 @@ async function _pdBuildParishDetails(parish) {
   const lastIncludedIso = (_pdLastIncluded && _pdLastIncluded[parish.key]) || "";
   const harvestStatus = _pdHarvestStatusForKey(parish.key);
   const details = {
+    parish,
     currentUrl,
     terminalAction: terminal.action,
     changes,
@@ -714,6 +812,22 @@ function _pdRenderSubfolder(container, details) {
   rowMega.appendChild(document.createTextNode(" "));
   rowMega.appendChild(rowMegaTime);
   container.appendChild(rowMega);
+
+  if (details.parish) {
+    const saveRow = document.createElement("div");
+    saveRow.className = "pd-subfolder-row";
+    const saveBtn = document.createElement("button");
+    saveBtn.type = "button";
+    saveBtn.className = "green";
+    saveBtn.style.cssText = "width:auto;font-size:9px;padding:3px 8px;margin-top:4px;";
+    saveBtn.textContent = "✏️ Edit URL → push to GitHub";
+    saveBtn.addEventListener("click", () => {
+      const wrap = document.querySelector(`[data-key="${details.parish.key}"]`);
+      if (wrap) _pdShowEditRow(wrap, details.parish);
+    });
+    saveRow.appendChild(saveBtn);
+    container.appendChild(saveRow);
+  }
 }
 
 // ── Consecutive failures ────────────────────────────────────────────────────
@@ -1103,21 +1217,21 @@ function _pdBuildRow(parish, excludes) {
   const editBtn = document.createElement("button");
   editBtn.className = "pd-btn";
   editBtn.textContent = "✏️";
-  editBtn.title = "Edit bulletin page URL";
+  editBtn.title = "Edit bulletin URL → Save pushes to GitHub repo";
   editBtn.addEventListener("click", () => _pdShowEditRow(wrap, parish));
   row.appendChild(editBtn);
 
   const overrideBtn = document.createElement("button");
   overrideBtn.className = "pd-btn";
   overrideBtn.textContent = "📌";
-  overrideBtn.title = "Set manual bulletin override from active tab URL";
+  overrideBtn.title = "Quick override: save active tab URL (does not edit evidence file)";
   overrideBtn.addEventListener("click", () => _pdSetOverrideFromActiveTab(parish, dot, clearOverrideBtn));
   row.appendChild(overrideBtn);
 
   const clearOverrideBtn = document.createElement("button");
   clearOverrideBtn.className = "pd-btn";
   clearOverrideBtn.textContent = "🧹";
-  clearOverrideBtn.title = "Clear manual bulletin override";
+  clearOverrideBtn.title = "Clear quick override (📌) only — not evidence file";
   clearOverrideBtn.disabled = !_pdGetOverride(parish.key);
   clearOverrideBtn.style.opacity = clearOverrideBtn.disabled ? "0.4" : "1";
   clearOverrideBtn.addEventListener("click", () => _pdClearOverride(parish, dot, clearOverrideBtn));
@@ -1128,6 +1242,33 @@ function _pdBuildRow(parish, excludes) {
   detailsBtn.textContent = "📁";
   detailsBtn.title = "Show parish details";
   row.appendChild(detailsBtn);
+
+  const moveBtn = document.createElement("button");
+  moveBtn.className = "pd-btn";
+  moveBtn.textContent = "↔";
+  moveBtn.title = "Move parish to another diocese (updates GitHub evidence + recipe)";
+  moveBtn.addEventListener("click", () => _pdShowMoveDialog(parish, dot));
+  row.appendChild(moveBtn);
+
+  const removeBtn = document.createElement("button");
+  removeBtn.className = "pd-btn red";
+  removeBtn.textContent = "🗑";
+  removeBtn.title = "Disable parish in harvest (marks DISABLED in evidence file)";
+  removeBtn.addEventListener("click", async () => {
+    if (!confirm(`Disable ${parish.name} in the harvester repo?`)) return;
+    removeBtn.disabled = true;
+    try {
+      await _pdDisableParish(parish);
+      dot.textContent = "⚫";
+      nameEl.classList.add("disabled");
+      setStatus(`✅ ${parish.name} disabled in evidence file.`, "ok");
+    } catch (err) {
+      setStatus(`❌ ${err.message}`, "err");
+    } finally {
+      removeBtn.disabled = false;
+    }
+  });
+  row.appendChild(removeBtn);
 
   if (!parish.disabled) {
     const deadBtn = document.createElement("button");
@@ -1197,6 +1338,55 @@ function _pdBuildRow(parish, excludes) {
     }
   });
   return wrap;
+}
+
+function _pdShowMoveDialog(parish, dot) {
+  const existing = document.querySelector(".pd-move-row");
+  if (existing) { existing.remove(); return; }
+  const row = document.createElement("div");
+  row.className = "pd-edit-row pd-move-row";
+  const label = document.createElement("div");
+  label.style.cssText = "font-size:9px;color:#93c5fd;";
+  label.textContent = `Move ${parish.name} to diocese:`;
+  row.appendChild(label);
+  const sel = document.createElement("select");
+  sel.style.cssText = "width:100%;border:1px solid #374151;border-radius:4px;padding:4px;background:#1e293b;color:#f9fafb;font-size:10px;";
+  for (const name of Object.keys(_pdDioceseTexts)) {
+    if (name === parish.diocese) continue;
+    const opt = document.createElement("option");
+    opt.value = name;
+    opt.textContent = name;
+    sel.appendChild(opt);
+  }
+  row.appendChild(sel);
+  const btnRow = document.createElement("div");
+  btnRow.className = "pd-edit-btns";
+  const goBtn = document.createElement("button");
+  goBtn.type = "button";
+  goBtn.className = "green";
+  goBtn.textContent = "Move + push to GitHub";
+  const cancelBtn = document.createElement("button");
+  cancelBtn.type = "button";
+  cancelBtn.textContent = "Cancel";
+  cancelBtn.addEventListener("click", () => row.remove());
+  goBtn.addEventListener("click", async () => {
+    goBtn.disabled = true;
+    try {
+      await _pdMoveParish(parish, sel.value);
+      setStatus(`✅ Moved ${parish.name} to ${sel.value}. Refresh directory.`, "ok");
+      row.remove();
+      void loadParishDirectory();
+    } catch (err) {
+      setStatus(`❌ ${err.message}`, "err");
+    } finally {
+      goBtn.disabled = false;
+    }
+  });
+  btnRow.appendChild(goBtn);
+  btnRow.appendChild(cancelBtn);
+  row.appendChild(btnRow);
+  const wrap = document.querySelector(`[data-key="${parish.key}"]`);
+  if (wrap) wrap.appendChild(row);
 }
 
 function _pdShowEditRow(wrap, parish) {

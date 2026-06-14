@@ -482,6 +482,49 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   return true;
 });
 
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message?.type !== "delete_github_file") return false;
+  (async () => {
+    try {
+      const { gh_pat, gh_repo } = await chrome.storage.local.get(["gh_pat", "gh_repo"]);
+      if (!gh_pat || !gh_repo) {
+        sendResponse({ ok: false, error: "GitHub PAT or repo not configured." });
+        return;
+      }
+      const filePath = (message.path || "").trim();
+      const sha = (message.sha || "").trim();
+      if (!filePath || !sha) {
+        sendResponse({ ok: false, error: "Path and sha required to delete." });
+        return;
+      }
+      const apiBase = `https://api.github.com/repos/${gh_repo}/contents/${filePath}`;
+      const headers = {
+        Authorization: `token ${gh_pat}`,
+        Accept: "application/vnd.github+json",
+        "Content-Type": "application/json",
+        "X-GitHub-Api-Version": "2022-11-28",
+      };
+      const delResp = await fetch(apiBase, {
+        method: "DELETE",
+        headers,
+        body: JSON.stringify({
+          message: message.commitMessage || `delete ${filePath} [from extension]`,
+          sha,
+        }),
+      });
+      if (!delResp.ok) {
+        const err = await delResp.json().catch(() => ({}));
+        sendResponse({ ok: false, error: `GitHub delete ${delResp.status}: ${err.message || delResp.statusText}` });
+        return;
+      }
+      sendResponse({ ok: true });
+    } catch (err) {
+      sendResponse({ ok: false, error: String(err) });
+    }
+  })();
+  return true;
+});
+
 // ── Recipe push ───────────────────────────────────────────────────────────
 
 const _githubApiError = async (resp) => {

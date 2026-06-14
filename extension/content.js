@@ -3900,6 +3900,9 @@
     });
 
     body.appendChild(recipeSection);
+
+    const copilotMount = document.createElement("div");
+    body.insertBefore(copilotMount, body.firstChild);
     body.appendChild(guidedPanel);
 
     // ── ADVANCED SECTION ───────────────────────────────────────────────────
@@ -4464,6 +4467,9 @@
               const reason = String(failed.reason || failed.error || "failed").slice(0, 90);
               line = `❌ Last harvest: ${reason}`;
               harvestStatusLine.style.color = "#fca5a5";
+              if (window.ph_copilot?.rememberIssue) {
+                window.ph_copilot.rememberIssue(key, { lastIssue: reason });
+              }
             }
           }
           if (!line && failResp.ok) {
@@ -4485,9 +4491,41 @@
         }
       };
 
+      const dioceseSelect = document.createElement("select");
+      dioceseSelect.id = "ph-diocese-select";
+      dioceseSelect.style.cssText = [
+        "width:100%",
+        "border:1px solid #374151",
+        "border-radius:4px",
+        "padding:4px 6px",
+        "background:#0f172a",
+        "color:#f9fafb",
+        "font-size:10px",
+        "margin-bottom:6px",
+        "box-sizing:border-box",
+        "font-family:inherit",
+      ].join(";");
+      const dioceseOpts = [
+        { v: "", l: "— select diocese —" },
+        { v: "derry", l: "Derry" },
+        { v: "down_and_connor", l: "Down and Connor" },
+        { v: "raphoe", l: "Raphoe" },
+        { v: "donegal", l: "Donegal (custom)" },
+      ];
+      for (const o of dioceseOpts) {
+        const opt = document.createElement("option");
+        opt.value = o.v;
+        opt.textContent = o.l;
+        dioceseSelect.appendChild(opt);
+      }
+      const dioceseLabel = document.createElement("div");
+      dioceseLabel.style.cssText = "font-size:9px;color:#93c5fd;margin-bottom:2px;";
+      dioceseLabel.textContent = "Diocese (for recipe folder):";
+      pushSection.appendChild(dioceseLabel);
+      pushSection.appendChild(dioceseSelect);
+
       const dioceseLine = document.createElement("div");
-      dioceseLine.style.cssText = "font-size:10px;color:#d1d5db;margin-bottom:6px;";
-      dioceseLine.textContent = "Diocese: (open this parish from the operator console)";
+      dioceseLine.style.cssText = "font-size:9px;color:#9ca3af;margin-bottom:6px;display:none;";
       pushSection.appendChild(dioceseLine);
       let resolvedDiocese = "";
 
@@ -4497,10 +4535,17 @@
       pushSection.appendChild(autoDetectNote);
 
       const refreshDioceseLine = () => {
-        dioceseLine.textContent = resolvedDiocese
-          ? `Diocese: ${resolvedDiocese}`
-          : "Diocese: (open this parish from the operator console)";
+        if (resolvedDiocese) {
+          dioceseSelect.value = resolvedDiocese;
+          dioceseLine.style.display = "block";
+          dioceseLine.textContent = `Recipe will save to parishes/recipes/${resolvedDiocese}/`;
+        }
       };
+      dioceseSelect.addEventListener("change", () => {
+        resolvedDiocese = dioceseSelect.value.trim();
+        refreshDioceseLine();
+        if (resolvedDiocese) void _storageSet({ ph_last_diocese: resolvedDiocese });
+      });
 
       const parishMismatchBanner = document.createElement("div");
       parishMismatchBanner.style.cssText = [
@@ -5012,6 +5057,39 @@
       body.appendChild(pushSection);
     }
 
+    if (window.ph_buildToolbarCopilot && copilotMount) {
+      window.ph_buildToolbarCopilot(copilotMount, {
+        scan: () => _handleCopilotMessage({ type: "copilot_scan" }),
+        highlight: () => _handleCopilotMessage({ type: "copilot_highlight" }),
+        record: () => _handleCopilotMessage({ type: "copilot_record" }),
+        pin: () => _handleCopilotMessage({ type: "copilot_pin" }),
+        click: () => _handleCopilotMessage({ type: "copilot_click" }),
+        showStatus,
+        getParishKey: () => (document.getElementById("ph-parish-key")?.value || "").trim().toLowerCase(),
+        getGhRepo: async () => {
+          const r = await _storageGet(["gh_repo"]);
+          return r.gh_repo || "Raphoe-Diocese/parish_harvester";
+        },
+        onParishPicked: (p) => {
+          const keyInput = document.getElementById("ph-parish-key");
+          const nameInput = document.getElementById("ph-display-name");
+          const dioceseSelect = document.getElementById("ph-diocese-select");
+          if (keyInput && p.key) keyInput.value = p.key;
+          if (nameInput && p.name) nameInput.value = p.name;
+          if (dioceseSelect && p.diocese) dioceseSelect.value = p.diocese;
+          void _storageSet({
+            ph_training_parish: {
+              key: p.key,
+              name: p.name,
+              diocese: p.diocese || "",
+            },
+            ph_last_diocese: p.diocese || "",
+          });
+          updateParishRecordingLine(p.name, p.key, _currentHostname());
+        },
+      });
+    }
+
     const scrollContainer = document.createElement("div");
     scrollContainer.id = "ph-toolbar-scroll";
     scrollContainer.style.cssText = "overflow-y: auto;flex: 1 1 auto;min-height: 0;";
@@ -5488,6 +5566,7 @@
         dateScorer: scoreUrlCandidateStr,
       }) || { best: null, alternatives: [] };
       const detected = detectPageType();
+      const pageBrief = window.ph_copilot?.buildPageBrief?.() || {};
       const host = window.ph_copilot?.normHost?.(window.location.href) || "";
       if (ranked.best) {
         const match = links.find((l) => l.domIdx === ranked.best.domIdx) || links[0];
@@ -5503,12 +5582,22 @@
         alternatives: ranked.alternatives,
         pin: pins[host] || null,
         pageUrl: window.location.href,
+        pageBrief,
       }) || "No links found.";
+      const parishKey = document.getElementById("ph-parish-key")?.value?.trim().toLowerCase() || "";
+      if (parishKey && window.ph_copilot?.rememberIssue) {
+        window.ph_copilot.rememberIssue(parishKey, {
+          lastUrl: window.location.href,
+          lastAdvice: advice.slice(0, 240),
+          pageType: detected.type,
+        });
+      }
       const context = {
         best: ranked.best,
         alternatives: ranked.alternatives,
         advice,
         pageType: detected.type,
+        pageBrief,
       };
       return { ok: true, advice, context };
     }
