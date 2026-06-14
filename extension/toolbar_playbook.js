@@ -83,6 +83,15 @@
       ],
       pin: false,
     },
+    oneweb_docx: {
+      title: "One.com — automatic (no need to wait for previews)",
+      steps: [
+        "Bulletin URL read from page HTML instantly — no iframe loading needed.",
+        "Tap 📄 Save newsletter (auto) or Push Recipe directly.",
+        "Harvester downloads the .docx file directly each Sunday.",
+      ],
+      pin: false,
+    },
     iframe_maybe: {
       title: "Possible PDF frame",
       steps: [

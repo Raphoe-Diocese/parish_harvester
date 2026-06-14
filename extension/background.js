@@ -301,14 +301,21 @@ async function _upsertSitePattern(gh_pat, gh_repo, parishKey, displayName, recip
     })(),
     updated: new Date().toISOString().slice(0, 10),
     step_count: recipeFp.step_count || 0,
+    playbook_type: String(recipe.playbook_type || "").trim() || undefined,
+    operator_notes: Array.isArray(recipe.operator_notes) ? recipe.operator_notes : undefined,
+    do_not: Array.isArray(recipe.do_not) ? recipe.do_not : undefined,
   };
 
   const existingPattern = library.patterns[combined];
+  const recipeAdvice = Array.isArray(recipe.operator_notes) && recipe.operator_notes.length
+    ? recipe.operator_notes.join(" ")
+    : "";
   const adviceByType = {
     direct_pdf: "You are already on the PDF — click Get a PDF.",
     wp_pdfemb_list: "Click Follow a link → pick the newest dated bulletin → then Get a PDF.",
     pdf_link_list: "Click Find bulletin → Pick newest, or Follow a link to the latest PDF.",
     iframe_viewer: "Click It's in a frame / viewer and choose the bulletin frame.",
+    oneweb_docx: "One.com + Google previews: auto-detect newsletter from HTML. Direct download only — never wait for iframes. See Claudy recipe.",
     wix_pdf_viewer: "Use Find bulletin — Wix often hides the real PDF URL in the viewer.",
     wix_html: "Save page as PDF — harvester prints the Wix/HTML bulletin into the mega PDF each Sunday.",
     parish_messenger_embed: "Follow a link → pick newest View Newsletter (ignore Gift Aid / Data Entry PDFs).",
@@ -318,8 +325,10 @@ async function _upsertSitePattern(gh_pat, gh_repo, parishKey, displayName, recip
   library.patterns[combined] = {
     page_type: pageFp.page_type,
     recipe_flow: recipeFp.recipe_flow,
-    label: existingPattern?.label || pageFp.page_type,
-    advice: existingPattern?.advice || adviceByType[pageFp.page_type] || "",
+    label: existingPattern?.label || sitePattern.label || pageFp.page_type,
+    advice: recipeAdvice || existingPattern?.advice || adviceByType[pageFp.page_type] || "",
+    operator_notes: Array.isArray(recipe.operator_notes) ? recipe.operator_notes : existingPattern?.operator_notes,
+    do_not: Array.isArray(recipe.do_not) ? recipe.do_not : existingPattern?.do_not,
     example_parishes: Array.from(new Set([
       ...(Array.isArray(existingPattern?.example_parishes) ? existingPattern.example_parishes : []),
       parishKey,

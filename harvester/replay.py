@@ -16,6 +16,7 @@ from playwright.async_api import Browser, Page, TimeoutError as PlaywrightTimeou
 from .cloud_folders import is_cloud_folder_click_step, rewrite_cloud_folder_click_step
 from .cloud_urls import is_cloud_document_url, normalize_document_url, unwrap_docs_viewer_url
 from .config import PAGE_LOAD_TIMEOUT_MS, PARISHES_DIR
+from .utils import oneweb_newsletter_download_urls, rewrite_date_url
 
 
 class RecipeReplayError(RuntimeError):
@@ -28,6 +29,89 @@ POST_CLICK_WAIT_TIMEOUT_MS = 3_000
 MAX_SELECTOR_ERRORS = 3
 PDFEMB_SELECTOR = "a.pdfemb-viewer[href]"
 PDFEMB_HREF_EXTRACT_JS = "(els) => els.map(el => el.getAttribute('href')).filter(Boolean)"
+
+_NON_BULLETIN_RE = re.compile(
+    r"dataentry|giftaid|standingorder|donation|prayer|safeguarding|privacy|gdpr|diocese|"
+    r"sitemap|application|registration|volunteer|finances|financial|parishdraw|mcn\s*media",
+    re.IGNORECASE,
+)
+_BULLETIN_KEYWORD_RE = re.compile(r"\b(bulletin|newsletter)\b", re.IGNORECASE)
+_D_M_YY_IN_URL_RE = re.compile(r"(?<!\d)(\d{1,2})-(\d{1,2})-(\d{2})(?!\d)")
+
+
+def _is_non_bulletin_url(url: str) -> bool:
+    text = unquote(url or "")
+    if _BULLETIN_KEYWORD_RE.search(text):
+        return False
+    return bool(_NON_BULLETIN_RE.search(text))
+
+
+def _score_bulletin_url(url: str) -> tuple[int, int]:
+    """Higher = better. (date_score, keyword_bonus)."""
+    text = unquote(url or "").lower()
+    keyword_bonus = 10 if _BULLETIN_KEYWORD_RE.search(text) else 0
+    date_score = 0
+    for match in _D_M_YY_IN_URL_RE.finditer(text):
+        try:
+            day, month, year = int(match.group(1)), int(match.group(2)), 2000 + int(match.group(3))
+            date_score = max(date_score, year * 10000 + month * 100 + day)
+        except ValueError:
+            continue
+    m = re.search(r"(?<!\d)(\d{2})(\d{2})(\d{2})(?!\d)", text)
+    if m:
+        try:
+            day, month, year = int(m.group(1)), int(m.group(2)), 2000 + int(m.group(3))
+            date_score = max(date_score, year * 10000 + month * 100 + day)
+        except ValueError:
+            pass
+    return date_score, keyword_bonus
+
+
+def _url_matches_pattern(url: str, pattern: str) -> bool:
+    lower = unquote(url).lower()
+    pat = (pattern or "*.pdf").strip().lower() or "*.pdf"
+    if fnmatch.fnmatch(lower, pat):
+        return True
+    if pat == "*.pdf":
+        return ".pdf" in lower
+    if pat == "*.docx":
+        return ".docx" in lower
+    return False
+
+
+def _pattern_prefers_docx(pattern: str) -> bool:
+    pat = (pattern or "").strip().lower()
+    return ".docx" in pat or pat.endswith("docx")
+
+
+async def _collect_document_candidates(page: Page, pattern: str) -> list[str]:
+    """Unwrap viewer URLs, drop admin docs, prefer newest newsletter."""
+    pdfemb_links = await page.eval_on_selector_all(PDFEMB_SELECTOR, PDFEMB_HREF_EXTRACT_JS)
+    raw_links = await page.eval_on_selector_all(
+        "a[href],iframe[src],embed[src],object[data]",
+        """
+        (els) => els.map(el => el.getAttribute('href') || el.getAttribute('src') || el.getAttribute('data') || '').filter(Boolean)
+        """,
+    )
+    seen: set[str] = set()
+    candidates: list[str] = []
+    for raw in [*pdfemb_links, *raw_links]:
+        if not isinstance(raw, str) or not raw.strip():
+            continue
+        resolved = unwrap_docs_viewer_url(urljoin(page.url, raw.strip()))
+        if not _url_matches_pattern(resolved, pattern):
+            continue
+        if _is_non_bulletin_url(resolved):
+            continue
+        if resolved in seen:
+            continue
+        seen.add(resolved)
+        candidates.append(resolved)
+    candidates.sort(
+        key=lambda u: (_score_bulletin_url(u)[0], _score_bulletin_url(u)[1]),
+        reverse=True,
+    )
+    return candidates
 
 
 def _recipe_step_timeout_ms(recipe: dict) -> int:
@@ -246,29 +330,31 @@ async def _find_pdfemb_url(page: Page) -> str | None:
 
 
 async def _find_iframe_pdf_url(page: Page) -> str | None:
-    """Return the first iframe src that is (or contains) a direct PDF URL.
-
-    Handles two cases:
-    1. The iframe ``src`` ends in ``.pdf`` or contains ``.pdf`` — treat as a
-       direct PDF URL.
-    2. The iframe ``src`` is a Google Docs viewer URL — extract the real PDF
-       URL from the ``url=`` query parameter.
-    """
+    """Return the best iframe PDF URL (skips GDPR/privacy admin docs)."""
     srcs = await page.eval_on_selector_all(
         "iframe[src]",
         "(els) => els.map(el => el.getAttribute('src')).filter(Boolean)",
     )
+    candidates: list[str] = []
     for src in srcs:
         if not isinstance(src, str) or not src.strip():
             continue
         resolved = urljoin(page.url, src.strip())
-        # Unwrap Google Docs viewer URLs first
         unwrapped = unwrap_docs_viewer_url(resolved)
-        lower_unwrapped = unwrapped.lower()
-        lower_resolved = resolved.lower()
-        if ".pdf" in lower_unwrapped or ".pdf" in lower_resolved:
-            return unwrapped if unwrapped != resolved else resolved
-    return None
+        pick = unwrapped if unwrapped != resolved else resolved
+        lower = pick.lower()
+        if ".pdf" not in lower:
+            continue
+        if _is_non_bulletin_url(pick):
+            continue
+        candidates.append(pick)
+    if not candidates:
+        return None
+    candidates.sort(
+        key=lambda u: (_score_bulletin_url(u)[0], _score_bulletin_url(u)[1]),
+        reverse=True,
+    )
+    return candidates[0]
 
 
 async def _replay_click(
@@ -361,9 +447,19 @@ async def replay_recipe(
                     source_url = page.url
                     return dest, file_type, source_url
 
+                pattern = (step.get("url_pattern") or "*.pdf").strip() or "*.pdf"
                 step_url = (step.get("url") or "").strip()
+                download_candidates: list[str] = []
                 if step_url:
-                    tried = await _try_download_page_url(page, dest, step_url)
+                    if target_date:
+                        if "newsletter" in step_url.lower() and "onewebmedia" in step_url.lower():
+                            download_candidates = oneweb_newsletter_download_urls(step_url, target_date)
+                        else:
+                            download_candidates = [rewrite_date_url(step_url, target_date)]
+                    else:
+                        download_candidates = [step_url]
+                for candidate in download_candidates:
+                    tried = await _try_download_page_url(page, dest, candidate)
                     if tried:
                         return dest, tried[1], tried[0]
 
@@ -376,39 +472,25 @@ async def replay_recipe(
                     return dest, tried[1], tried[0]
 
                 pdfemb_url = await _find_pdfemb_url(page)
-                if pdfemb_url:
+                if pdfemb_url and not _pattern_prefers_docx(pattern):
                     source_url, file_type = await _download_document_url(page, pdfemb_url, dest)
                     return dest, file_type, source_url
 
-                # Check iframes for direct PDF sources
-                iframe_pdf_url = await _find_iframe_pdf_url(page)
-                if iframe_pdf_url:
-                    source_url, file_type = await _download_document_url(page, iframe_pdf_url, dest)
-                    return dest, file_type, source_url
+                # PDF iframe shortcut — skip when recipe asks for Word newsletters
+                if not _pattern_prefers_docx(pattern):
+                    iframe_pdf_url = await _find_iframe_pdf_url(page)
+                    if iframe_pdf_url:
+                        source_url, file_type = await _download_document_url(page, iframe_pdf_url, dest)
+                        return dest, file_type, source_url
 
-                pattern = (step.get("url_pattern") or "*.pdf").strip() or "*.pdf"
-                pdfemb_links = await page.eval_on_selector_all(PDFEMB_SELECTOR, PDFEMB_HREF_EXTRACT_JS)
-                links = await page.eval_on_selector_all(
-                    "a[href],iframe[src],embed[src],object[data]",
-                    """
-                    (els) => els.map(el => el.getAttribute('href') || el.getAttribute('src') || el.getAttribute('data') || '').filter(Boolean)
-                    """,
-                )
                 last_err = ""
-                for raw in [*pdfemb_links, *links]:
-                    if not isinstance(raw, str):
+                for resolved in await _collect_document_candidates(page, pattern):
+                    try:
+                        source_url, file_type = await _download_document_url(page, resolved, dest)
+                        return dest, file_type, source_url
+                    except RecipeReplayError as exc:
+                        last_err = str(exc)
                         continue
-                    resolved = urljoin(page.url, raw)
-                    lower = resolved.lower()
-                    if fnmatch.fnmatch(lower, pattern.lower()) or (
-                        pattern == "*.pdf" and ".pdf" in lower
-                    ) or (pattern == "*.docx" and ".docx" in lower):
-                        try:
-                            source_url, file_type = await _download_document_url(page, resolved, dest)
-                            return dest, file_type, source_url
-                        except RecipeReplayError as exc:
-                            last_err = str(exc)
-                            continue
 
                 if last_err:
                     raise RecipeReplayError(last_err)

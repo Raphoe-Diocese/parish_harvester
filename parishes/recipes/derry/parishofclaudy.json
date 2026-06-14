@@ -1,18 +1,29 @@
 {
   "parish_key": "parishofclaudy",
   "display_name": "Claudy",
-  "recorded_date": "2026-05-12",
+  "recorded_date": "2026-06-14",
   "start_url": "https://www.parishofclaudy.com/welcome/weekly-bulletin.html",
   "diocese": "derry",
+  "playbook_type": "oneweb_docx",
+  "site_type": "oneweb_newsletter",
+  "auto_direct": true,
   "timeout": 30000,
+  "operator_notes": [
+    "Many docs.google.com/viewer iframes load slowly (2–4 min) — ignore previews.",
+    "Bulletin is a Word file at onewebmedia/NEWSLETTER D-M-YY.docx — download directly.",
+    "Iframe src URLs are in the HTML immediately; no need to wait for previews.",
+    "Harvester rewrites the date each Sunday and tries filename variants (spaces before .docx)."
+  ],
+  "do_not": [
+    "Do not pick the first iframe PDF — often a GDPR or Privacy notice.",
+    "Do not use goto-only recipes on this page.",
+    "Do not train on financial-statement or admin docx files."
+  ],
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.parishofclaudy.com/welcome/weekly-bulletin.html"
-    },
-    {
       "action": "download",
-      "url_pattern": "*.docx"
+      "url": "http://parishofclaudy.com/onewebmedia/NEWSLETTER%2012-4-26.docx",
+      "url_pattern": "*newsletter*.docx"
     }
   ]
 }

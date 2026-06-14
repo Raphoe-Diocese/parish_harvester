@@ -69,6 +69,7 @@ from .utils import (
     extract_date_from_string,
     extract_newsletter_number,
     is_valid_pdf,
+    oneweb_newsletter_download_urls,
     rewrite_clonleigh_url,
     rewrite_date_url,
     rewrite_greenlough_url,
@@ -1959,13 +1960,9 @@ async def _fetch_entry(
             if dest.exists() and not _is_real_pdf(dest, key):
                 dest.unlink(missing_ok=True)
         elif entry.content_type != "html_link":
-            return FetchResult(
-                key=key,
-                display_name=entry.display_name,
-                status="error",
-                url=target_url,
-                error=recipe_error or "Recipe replay produced no valid PDF",
-            )
+            print(f"  ↪️  {key}: recipe failed — trying direct URL download")
+            if dest.exists() and not _is_real_pdf(dest, key):
+                dest.unlink(missing_ok=True)
         else:
             print(f"  ↪️  {key}: recipe failed — trying direct HTML print")
 
@@ -1979,54 +1976,59 @@ async def _fetch_entry(
     # Non-html entries keep URL prediction first.
     if entry.content_type != "html_link":
         primary_is_404 = False
-        try:
-            candidate_encoded = target_url.replace(" ", "%20")
-            if entry.content_type == "image":
-                await _download_image_as_pdf(
-                    candidate_encoded,
-                    dest,
-                    browser,
-                    timeout_ms=navigation_timeout_ms,
-                )
-                if _is_real_pdf(dest, key):
-                    return FetchResult(
-                        key=key, display_name=entry.display_name,
-                        status="ok", url=target_url,
-                        file_path=dest, file_type="image_to_pdf",
+        docx_candidates = [target_url]
+        if entry.content_type == "docx" and "newsletter" in entry.example_url.lower():
+            docx_candidates = oneweb_newsletter_download_urls(entry.example_url, target)
+        download_urls = docx_candidates if entry.content_type == "docx" else [target_url]
+        for candidate_url in download_urls:
+            try:
+                candidate_encoded = candidate_url.replace(" ", "%20")
+                if entry.content_type == "image":
+                    await _download_image_as_pdf(
+                        candidate_encoded,
+                        dest,
+                        browser,
+                        timeout_ms=navigation_timeout_ms,
                     )
-            elif entry.content_type == "docx":
-                await _download_docx_as_pdf(
-                    candidate_encoded,
-                    dest,
-                    browser,
-                    timeout_ms=navigation_timeout_ms,
-                )
-                if _is_real_pdf(dest, key):
-                    return FetchResult(
-                        key=key, display_name=entry.display_name,
-                        status="ok", url=target_url,
-                        file_path=dest, file_type="docx_to_pdf",
+                    if _is_real_pdf(dest, key):
+                        return FetchResult(
+                            key=key, display_name=entry.display_name,
+                            status="ok", url=candidate_url,
+                            file_path=dest, file_type="image_to_pdf",
+                        )
+                elif entry.content_type == "docx":
+                    await _download_docx_as_pdf(
+                        candidate_encoded,
+                        dest,
+                        browser,
+                        timeout_ms=navigation_timeout_ms,
                     )
-            else:
-                await _download_pdf(
-                    candidate_encoded,
-                    dest,
-                    browser,
-                    timeout_ms=navigation_timeout_ms,
-                )
-                if _is_real_pdf(dest, key):
-                    return FetchResult(
-                        key=key, display_name=entry.display_name,
-                        status="ok", url=target_url,
-                        file_path=dest, file_type="pdf",
+                    if _is_real_pdf(dest, key):
+                        return FetchResult(
+                            key=key, display_name=entry.display_name,
+                            status="ok", url=candidate_url,
+                            file_path=dest, file_type="docx_to_pdf",
+                        )
+                else:
+                    await _download_pdf(
+                        candidate_encoded,
+                        dest,
+                        browser,
+                        timeout_ms=navigation_timeout_ms,
                     )
-        except Exception as exc:
-            last_err = str(exc)
-            primary_is_404 = "HTTP 404" in last_err
-            print(f"  ↩️  {key}: {target_url} failed: {last_err}")
-        finally:
-            if dest.exists() and not _is_real_pdf(dest, key):
-                dest.unlink(missing_ok=True)
+                    if _is_real_pdf(dest, key):
+                        return FetchResult(
+                            key=key, display_name=entry.display_name,
+                            status="ok", url=candidate_url,
+                            file_path=dest, file_type="pdf",
+                        )
+            except Exception as exc:
+                last_err = str(exc)
+                primary_is_404 = primary_is_404 or "HTTP 404" in last_err
+                print(f"  ↩️  {key}: {candidate_url} failed: {last_err}")
+            finally:
+                if dest.exists() and not _is_real_pdf(dest, key):
+                    dest.unlink(missing_ok=True)
 
         # Pattern detection: when primary URL returns HTTP 404, try alternative
         # date-format variants before falling back to scraping.

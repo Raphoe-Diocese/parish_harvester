@@ -511,7 +511,7 @@
     const usesCloudFolder = steps.some(
       (s) => s && (s.cloud_folder || s.date_format === "YY.MM.DD")
     );
-    return {
+    let recipe = {
       version: 1,
       parish_key: parishKey,
       display_name: displayName,
@@ -520,6 +520,10 @@
       steps,
       ...(usesCloudFolder ? { cloud_folder: true, date_format: "YY.MM.DD" } : {}),
     };
+    if (window.ph_site_memory?.enrichRecipe) {
+      recipe = window.ph_site_memory.enrichRecipe(recipe, detectPageType());
+    }
+    return recipe;
   };
 
   const clearStandaloneRecipe = () => {
@@ -836,13 +840,14 @@
     return null;
   };
 
-  // Admin / non-bulletin PDFs (Gift Aid forms, data entry, etc.) — never treat as weekly bulletin.
+  // Admin / non-bulletin PDFs (Gift Aid forms, GDPR guides, etc.) — never treat as weekly bulletin.
   const _isNonBulletinPdf = (url, label) => {
     const text = `${url || ""} ${label || ""}`.toLowerCase();
+    if (/\b(bulletin|newsletter)\b/i.test(text)) return false;
     return (
-      /dataentry|giftaid|standingorder|donation|prayer|safeguarding|privacy|sitemap|application|registration|volunteer|finances|parishdraw/i.test(
+      /dataentry|giftaid|standingorder|donation|prayer|safeguarding|privacy|gdpr|diocese|sitemap|application|registration|volunteer|finances|financial|parishdraw|mcn\s*media/i.test(
         text
-      ) && !/\b(bulletin|newsletter|view newsletter)\b/i.test(text)
+      )
     );
   };
 
@@ -855,7 +860,38 @@
       return true;
     });
 
-  // Approximate date scores for named liturgical events (used when no numeric date found).
+  const _unwrapGoogleViewerSrc = (src) => {
+    const lower = (src || "").toLowerCase();
+    if (!lower.includes("docs.google.com/viewer") && !lower.includes("docs.google.com/gview")) {
+      return src;
+    }
+    try {
+      const urlParam = new URL(src, window.location.href).searchParams.get("url");
+      return urlParam ? decodeURIComponent(urlParam) : src;
+    } catch (_e) {
+      return src;
+    }
+  };
+
+  const _pickBestOnewebNewsletterUrl = () => {
+    const iframes = Array.from(document.querySelectorAll("iframe[src]"));
+    const scored = [];
+    for (let i = 0; i < iframes.length; i++) {
+      const resolved = _unwrapGoogleViewerSrc(iframes[i].getAttribute("src") || "");
+      if (
+        !/onewebmedia/i.test(resolved) ||
+        !/newsletter/i.test(resolved) ||
+        !/\.docx/i.test(resolved) ||
+        _isNonBulletinPdf(resolved, "")
+      ) {
+        continue;
+      }
+      scored.push({ url: resolved, ...scoreUrlCandidateStr(resolved, "", i) });
+    }
+    scored.sort(_bulletinDateSortFn);
+    return scored[0]?.url || "";
+  };
+
   const _NAMED_BULLETIN_SCORES = {
     "easter sunday": { month: 4, day: 15 },
     "palm sunday": { month: 4, day: 8 },
@@ -1264,6 +1300,33 @@
           : `💡 Click the ↓ download icon at the TOP of the viewer. When a new tab opens with the PDF, come back and click 📄 Get a PDF.`,
         type: "wix_viewer",
         wixPdfUrl: extractedPdfUrl,
+      };
+    }
+
+    const _unwrapViewerSrc = _unwrapGoogleViewerSrc;
+
+    const onewebNewsletterFrames = iframes.filter((f) => {
+      const resolved = _unwrapViewerSrc(f.getAttribute("src") || "");
+      return (
+        /onewebmedia/i.test(resolved) &&
+        /newsletter/i.test(resolved) &&
+        /\.docx/i.test(resolved)
+      );
+    });
+    const autoNewsletterUrl = _pickBestOnewebNewsletterUrl();
+    if (
+      onewebNewsletterFrames.length > 0 &&
+      (document.querySelector('script[src*="onewebstatic"]') ||
+        /onewebstatic|one\.com/i.test(document.documentElement.innerHTML.slice(0, 8000)))
+    ) {
+      return {
+        emoji: "📰",
+        summary: `One.com bulletin — ${onewebNewsletterFrames.length} newsletter(s) found in page HTML (previews load slowly).`,
+        advice: autoNewsletterUrl
+          ? "Automatic — tap Save newsletter (auto) or Push. No need to wait for Google previews."
+          : "Tap Bulletin in a frame → pick ✅ NEWSLETTER … docx (newest date).",
+        type: "oneweb_docx",
+        autoNewsletterUrl,
       };
     }
 
@@ -1946,7 +2009,7 @@
           const urlParam = new URL(src, window.location.href).searchParams.get("url");
           if (urlParam) {
             resolvedUrl = decodeURIComponent(urlParam);
-            isBulletin = true;
+            isBulletin = !_isNonBulletinPdf(resolvedUrl, "");
           }
         } catch (_e) {
           // keep original src
@@ -2895,6 +2958,22 @@
         _refreshGuidedContext();
         return { ok: true, added: true, action: "download" };
       }
+      if (pageCtx.type === "oneweb_docx" && pageCtx.autoNewsletterUrl) {
+        standaloneAddStep(
+          {
+            action: "download",
+            url: pageCtx.autoNewsletterUrl,
+            url_pattern: "*newsletter*.docx",
+          },
+          "mark_file",
+          `📄 Newsletter: ${pageCtx.autoNewsletterUrl.split("/").pop()}`
+        );
+        if (_stepsListEl) _renderSessionSteps();
+        if (_refreshRecipeCount) _refreshRecipeCount();
+        void _persistRecordingSession();
+        _refreshGuidedContext();
+        return { ok: true, added: true, action: "download" };
+      }
       if (
         pageCtx.type === "wix_html" ||
         (pageCtx.type === "html" && _pathLooksLikeNewsletterPage())
@@ -2956,6 +3035,7 @@
       if (contextPrimaryBtn) {
         const showContext =
           pageCtx.type === "direct_pdf" ||
+          pageCtx.type === "oneweb_docx" ||
           pageCtx.type === "iframe" ||
           pageCtx.type === "iframe_maybe" ||
           pageCtx.type === "wix_viewer" ||
@@ -2968,6 +3048,12 @@
           contextPrimaryBtn.style.display = "block";
           contextPrimaryBtn.style.background = "#16a34a";
           contextPrimaryBtn.textContent = "📄 2. Save this PDF";
+        } else if (pageCtx.type === "oneweb_docx") {
+          contextPrimaryBtn.style.display = "block";
+          contextPrimaryBtn.style.background = "#16a34a";
+          contextPrimaryBtn.textContent = pageCtx.autoNewsletterUrl
+            ? "📄 2. Save newsletter (auto)"
+            : "📐 2. Bulletin in frame";
         } else if (pageCtx.type === "wix_html" || (pageCtx.type === "html" && _pathLooksLikeNewsletterPage())) {
           contextPrimaryBtn.style.display = "block";
           contextPrimaryBtn.textContent = "📰 2. Save page as PDF";
@@ -3004,9 +3090,25 @@
           expectedCloudLabel: pageCtx.expectedLabel || "",
           cloudRowVisible: pageCtx.rowVisible,
         });
+        const mem = window.ph_site_memory?.getForPageType?.(pageCtx.type);
+        if (mem && playbookPanel.nextSibling?.dataset?.phMemory !== "1") {
+          let memoryEl = playbookPanel.querySelector("[data-ph-memory='1']");
+          if (!memoryEl) {
+            memoryEl = document.createElement("div");
+            memoryEl.dataset.phMemory = "1";
+            memoryEl.style.cssText =
+              "font-size:9px;color:#a5b4fc;line-height:1.45;background:#1e1b4b;border:1px solid #4338ca;border-radius:6px;padding:6px 8px;margin-top:6px;white-space:pre-wrap;";
+            playbookPanel.appendChild(memoryEl);
+          }
+          memoryEl.textContent = window.ph_site_memory.formatHintBlock(mem);
+        }
       }
       if (pinLinkBtn) {
-        const hidePin = pageCtx.type === "direct_pdf" || pageCtx.type === "wix_html" || pageCtx.type === "cloud_folder";
+        const hidePin =
+          pageCtx.type === "direct_pdf" ||
+          pageCtx.type === "oneweb_docx" ||
+          pageCtx.type === "wix_html" ||
+          pageCtx.type === "cloud_folder";
         pinLinkBtn.style.display = hidePin ? "none" : "block";
       }
     };
@@ -3614,6 +3716,14 @@
         const pageCtx = detectPageType();
         if (pageCtx.type === "direct_pdf") {
           markDownloadUrlSafe(window.location.href, showStatus, false);
+          return;
+        }
+        if (pageCtx.type === "oneweb_docx" && pageCtx.autoNewsletterUrl) {
+          markDownloadUrlSafe(pageCtx.autoNewsletterUrl, showStatus, true);
+          showStatus(
+            `✅ Auto-detected newsletter — ready to Push (no iframe wait).`,
+            "ok"
+          );
           return;
         }
         if (pageCtx.type === "wix_html") {
@@ -5325,6 +5435,13 @@
           showStatus("❌ Could not detect parish key from this page URL. Check you are on the parish website.", "error");
           return;
         }
+        if (window.ph_parish_pickers?.isJunkParishKey?.(key)) {
+          showStatus(
+            "❌ That parish key looks like a dated PDF filename — use Find parish to pick the real parish (e.g. buncranaparish).",
+            "error"
+          );
+          return;
+        }
         if (_standaloneRecipeSteps().length === 0) { showStatus("⚠️ No steps recorded yet.", "warn"); return; }
         const ensured = _ensureTerminalPdfStep();
         if (!ensured.ok) {
@@ -5349,10 +5466,14 @@
 
         console.log(`Parish Trainer: pushing recipe for key=${key}, diocese=${diocese}, url=${pageUrl}`);
         const recipe = buildStandaloneRecipe(key, name || key, diocese);
+        const detected = detectPageType();
         const sitePattern = (() => {
+          const mem = window.ph_site_memory;
+          if (mem?.patternPayloadFromPage) {
+            return mem.patternPayloadFromPage(detected, recipe);
+          }
           const lib = globalThis.PhPatternLibrary;
           if (!lib) return null;
-          const detected = detectPageType();
           return {
             page: lib.fingerprintFromPage(detected),
             recipe: lib.fingerprintFromRecipe(recipe),

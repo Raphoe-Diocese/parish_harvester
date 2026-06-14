@@ -30,6 +30,19 @@ def infer_key(url: str) -> str:
     return host.split(".")[0]
 
 
+def is_junk_parish_key(key: str) -> bool:
+    k = str(key or "").strip().lower()
+    if not k or len(k) < 4:
+        return True
+    if re.fullmatch(r"\d{6,8}(-pdf)?", k):
+        return True
+    if re.fullmatch(r"\d{2}\.\d{2}\.\d{2}(-pdf)?", k):
+        return True
+    if k.endswith("-pdf") and re.search(r"\d{5,}", k):
+        return True
+    return False
+
+
 class ParishPickerInferenceTests(unittest.TestCase):
     def test_mcn_holy_cross(self) -> None:
         url = "https://mcn.live/Camera/holy-cross-church"
@@ -42,6 +55,12 @@ class ParishPickerInferenceTests(unittest.TestCase):
     def test_normal_parish_site(self) -> None:
         url = "https://www.buncranaparish.com/bulletin"
         self.assertEqual(infer_key(url), "buncranaparish")
+
+    def test_junk_pdf_slug_keys_rejected(self) -> None:
+        self.assertTrue(is_junk_parish_key("050426-pdf"))
+        self.assertTrue(is_junk_parish_key("220326-pdf"))
+        self.assertTrue(is_junk_parish_key("26.06.14-pdf"))
+        self.assertFalse(is_junk_parish_key("buncranaparish"))
 
 
 if __name__ == "__main__":

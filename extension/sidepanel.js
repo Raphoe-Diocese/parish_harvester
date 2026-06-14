@@ -10,10 +10,6 @@ function setStatus(text, type) {
 }
 
 const _spPanels = {
-  copilot: {
-    tab: document.getElementById("tab-copilot"),
-    panel: document.getElementById("panel-copilot"),
-  },
   trainer: {
     tab: document.getElementById("tab-trainer"),
     panel: document.getElementById("panel-trainer"),
@@ -23,6 +19,8 @@ const _spPanels = {
     panel: document.getElementById("panel-problems"),
   },
 };
+
+const PROBLEMS_FIX_VISITED_KEY = "ph_problems_fix_visited";
 
 window._spSetStatus = setStatus;
 
@@ -922,7 +920,25 @@ function _problemsCategory(errorText) {
   return "other";
 }
 
-function _problemsRenderRows(rows) {
+async function _problemsMarkFixVisited(parishKey, fixBtn) {
+  const key = String(parishKey || "").trim();
+  if (!key) return;
+  const data = await _spStorageGet([PROBLEMS_FIX_VISITED_KEY]);
+  const visited = (data[PROBLEMS_FIX_VISITED_KEY] && typeof data[PROBLEMS_FIX_VISITED_KEY] === "object")
+    ? { ...data[PROBLEMS_FIX_VISITED_KEY] }
+    : {};
+  visited[key] = Date.now();
+  await _spStorageSet({ [PROBLEMS_FIX_VISITED_KEY]: visited });
+  if (fixBtn) fixBtn.classList.add("visited");
+}
+
+async function _problemsGetVisitedMap() {
+  const data = await _spStorageGet([PROBLEMS_FIX_VISITED_KEY]);
+  const visited = data[PROBLEMS_FIX_VISITED_KEY];
+  return (visited && typeof visited === "object") ? visited : {};
+}
+
+async function _problemsRenderRows(rows) {
   const tbody = document.getElementById("problems-body");
   const empty = document.getElementById("problems-empty");
   if (!tbody || !empty) return;
@@ -932,6 +948,7 @@ function _problemsRenderRows(rows) {
     return;
   }
   empty.textContent = "";
+  const visitedMap = await _problemsGetVisitedMap();
   for (const row of rows) {
     const tr = document.createElement("tr");
 
@@ -956,12 +973,18 @@ function _problemsRenderRows(rows) {
     fixBtn.type = "button";
     fixBtn.className = "problems-fix-btn";
     fixBtn.textContent = "🔧 Fix now";
+    if (visitedMap[row.parish]) fixBtn.classList.add("visited");
     fixBtn.addEventListener("click", () => {
       const startUrl = String(row.start_url || row.url || "").trim();
       if (!/^https?:\/\//i.test(startUrl)) {
         setStatus("❌ No valid start URL for this parish.", "err");
         return;
       }
+      void _problemsMarkFixVisited(row.parish, fixBtn);
+      setStatus(
+        `✅ Opened ${row.display_name || row.parish} — use the floating toolbar on that tab, then Push Recipe.`,
+        "ok"
+      );
       const match = _pdAllParishes.find((p) => p.key === row.parish);
       if (match) {
         chrome.storage.local.set({
@@ -1038,10 +1061,10 @@ async function loadProblemsDashboard() {
         consecutive_failures: Number(consecutiveFailures[item?.parish] || 0),
       })),
     ];
-    _problemsRenderRows(rows);
+    await _problemsRenderRows(rows);
   } catch (_e) {
     if (warning) warning.style.display = "block";
-    _problemsRenderRows([]);
+    await _problemsRenderRows([]);
   } finally {
     if (empty && !empty.textContent) {
       empty.textContent = "";
@@ -1161,13 +1184,32 @@ function _pdUpdateStaleBannerUi(staleBulletins) {
     banner.style.background = "#0f172a";
     banner.style.borderColor = "#334155";
     banner.style.color = "#bfdbfe";
-    text.textContent = `ℹ️ ${unknown.length} bulletins have unknown dates`;
+    text.textContent = `ℹ️ ${unknown.length} bulletins: date not in URL (informational — use Open to retrain if needed)`;
     toggleBtn.style.background = "#1d4ed8";
     _clearElement(list);
     for (const item of unknown) {
       const row = document.createElement("div");
-      row.style.cssText = "padding:3px 0;font-size:10px;line-height:1.3;border-bottom:1px solid rgba(51,65,85,0.7);";
-      row.textContent = item?.display_name || item?.key || "Unknown";
+      row.style.cssText =
+        "display:flex;align-items:center;gap:6px;padding:3px 0;font-size:10px;line-height:1.3;border-bottom:1px solid rgba(51,65,85,0.7);";
+
+      const label = document.createElement("div");
+      label.textContent = item?.display_name || item?.key || "Unknown";
+      label.style.cssText = "flex:1;";
+      row.appendChild(label);
+
+      if (item?.url) {
+        const openLink = document.createElement("a");
+        openLink.href = item.url;
+        openLink.target = "_blank";
+        openLink.rel = "noopener noreferrer";
+        openLink.className = "stale-open-link";
+        openLink.textContent = "Open";
+        openLink.addEventListener("click", (e) => {
+          e.preventDefault();
+          chrome.tabs.create({ url: item.url });
+        });
+        row.appendChild(openLink);
+      }
       list.appendChild(row);
     }
     return;
@@ -1724,9 +1766,9 @@ document.getElementById("stale-banner-toggle").addEventListener("click", functio
   this.textContent = isOpen ? "Show" : "Hide";
 });
 
-_spPanels.copilot.tab.addEventListener("click", () => _spShowPanel("copilot"));
 _spPanels.trainer.tab.addEventListener("click", () => _spShowPanel("trainer"));
 _spPanels.problems.tab.addEventListener("click", () => _spShowPanel("problems"));
+_spShowPanel("trainer");
 void loadProblemsDashboard();
 
 // ── Crop done notification ─────────────────────────────────────────────────

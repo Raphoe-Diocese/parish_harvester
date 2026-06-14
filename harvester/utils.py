@@ -6,7 +6,7 @@ from __future__ import annotations
 import re
 from datetime import date, timedelta
 from pathlib import Path
-from urllib.parse import unquote, urlparse
+from urllib.parse import quote, unquote, urlparse
 
 
 # ---------------------------------------------------------------------------
@@ -546,6 +546,43 @@ def rewrite_date_url(url: str, target: date) -> str:
         return parsed._replace(path=new_path).geturl()
 
     return url
+
+
+def oneweb_newsletter_download_urls(example_url: str, target: date) -> list[str]:
+    """
+    Direct onewebmedia newsletter URLs for One.com parishes (e.g. Claudy).
+
+    Skips slow Google Docs viewer iframes — downloads the .docx file directly.
+    Tries filename quirks seen on parishofclaudy.com (extra spaces before .docx).
+    """
+    primary = rewrite_date_url(example_url, target)
+    parsed = urlparse(primary)
+    path = unquote(parsed.path)
+    candidates: list[str] = []
+    seen: set[str] = set()
+
+    def _add(url: str) -> None:
+        u = (url or "").strip()
+        if u and u not in seen:
+            seen.add(u)
+            candidates.append(u)
+
+    _add(primary)
+    newsletter_match = re.search(
+        r"(?i)(/onewebmedia/)(newsletter\s+\d{1,2}-\d{1,2}-\d{2})",
+        path,
+    )
+    if newsletter_match:
+        prefix, stem = newsletter_match.group(1), newsletter_match.group(2)
+        for suffix in (".docx", " .docx", " -.docx"):
+            variant_path = f"{prefix}{stem}{suffix}"
+            _add(parsed._replace(path=quote(variant_path, safe="/")).geturl())
+    elif primary.lower().endswith(".docx"):
+        stem = primary[:-5]
+        _add(stem + " .docx")
+        _add(stem + " -.docx")
+
+    return candidates
 
 
 # ---------------------------------------------------------------------------

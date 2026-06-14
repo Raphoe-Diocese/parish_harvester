@@ -29,6 +29,70 @@
     parishesByDiocese: {},
   };
 
+  const _isJunkParishKey = (key) => {
+    const k = String(key || "").trim().toLowerCase();
+    if (!k || k.length < 4) return true;
+    if (/^\d{6,8}(-pdf)?$/.test(k)) return true;
+    if (/^\d{2}\.\d{2}\.\d{2}(-pdf)?$/.test(k)) return true;
+    if (/-pdf$/.test(k) && /\d{5,}/.test(k)) return true;
+    return false;
+  };
+
+  const _resolveSectionNameToKey = (sectionName) => {
+    const needle = String(sectionName || "")
+      .toLowerCase()
+      .replace(/\([^)]*\)/g, " ")
+      .replace(/&/g, "and")
+      .replace(/[^a-z0-9]+/g, " ")
+      .trim();
+    if (!needle) return "";
+    const words = needle.split(/\s+/).filter((w) => w.length >= 3);
+    let best = "";
+    let bestScore = 0;
+    for (const [key, meta] of Object.entries(registry.byKey)) {
+      if (_isJunkParishKey(key)) continue;
+      const display = String(meta.name || key).toLowerCase();
+      const keyNorm = key.replace(/parish$/i, "");
+      let score = 0;
+      if (display.includes(needle) || needle.includes(display.split(" ")[0])) score += 3;
+      for (const w of words) {
+        if (display.includes(w)) score += 2;
+        if (key.includes(w) || keyNorm.includes(w)) score += 2;
+      }
+      if (score > bestScore) {
+        bestScore = score;
+        best = key;
+      }
+    }
+    return bestScore >= 2 ? best : "";
+  };
+
+  const _pruneRegistry = () => {
+    for (const k of Object.keys(registry.byKey)) {
+      if (_isJunkParishKey(k)) delete registry.byKey[k];
+    }
+    for (const [url, hit] of Object.entries(registry.byUrl)) {
+      if (!hit || _isJunkParishKey(hit.key)) delete registry.byUrl[url];
+    }
+    registry.parishesByDiocese = {};
+    for (const [key, meta] of Object.entries(registry.byKey)) {
+      const dio = String(meta.diocese || "").trim();
+      if (!dio) continue;
+      if (!registry.parishesByDiocese[dio]) registry.parishesByDiocese[dio] = [];
+      if (!registry.parishesByDiocese[dio].some((p) => p.key === key)) {
+        registry.parishesByDiocese[dio].push({
+          key,
+          name: meta.name || key,
+        });
+      }
+    }
+    for (const dio of Object.keys(registry.parishesByDiocese)) {
+      registry.parishesByDiocese[dio].sort((a, b) =>
+        String(a.name).localeCompare(String(b.name))
+      );
+    }
+  };
+
   const normalizeUrlKey = (url) => {
     if (!url) return "";
     try {
@@ -106,7 +170,7 @@
 
   const _indexEntry = (key, name, diocese, website) => {
     const k = String(key || "").trim().toLowerCase().replace(/\s+/g, "_");
-    if (!k) return;
+    if (!k || _isJunkParishKey(k)) return;
     const display = String(name || k).trim();
     const dio = String(diocese || "").trim();
     if (!registry.byKey[k]) {
@@ -146,8 +210,37 @@
       }
       if (!line || line.startsWith("#")) continue;
       if (line.startsWith("http://") || line.startsWith("https://")) {
-        const key = curKey || pathSlugFromUrl(line) || "";
-        if (key) _indexEntry(key, curName || key, diocese, line);
+        let key = curKey || _resolveSectionNameToKey(curName);
+        if (!key) continue;
+        _indexEntry(key, curName || registry.byKey[key]?.name || key, diocese, line);
+      }
+    }
+  };
+
+  const _indexRecipesFromGithub = async (repo, headers) => {
+    for (const dio of registry.dioceses) {
+      if (!dio || dio === "unknown") continue;
+      try {
+        const resp = await fetch(
+          `https://api.github.com/repos/${repo}/contents/parishes/recipes/${dio}`,
+          { headers }
+        );
+        if (!resp.ok) continue;
+        const items = await resp.json();
+        for (const item of items) {
+          if (!item || item.type !== "file" || !String(item.name || "").endsWith(".json")) {
+            continue;
+          }
+          const key = String(item.name).slice(0, -5).trim().toLowerCase();
+          if (_isJunkParishKey(key)) continue;
+          if (!registry.byKey[key]) {
+            _indexEntry(key, key.replace(/parish$/i, "").replace(/_/g, " "), dio, "");
+          } else if (!registry.byKey[key].diocese) {
+            registry.byKey[key].diocese = dio;
+          }
+        }
+      } catch (_e) {
+        // try next diocese folder
       }
     }
   };
@@ -214,6 +307,7 @@
         for (const dio of registry.dioceses) {
           if (!registry.parishesByDiocese[dio]) registry.parishesByDiocese[dio] = [];
         }
+        await _indexRecipesFromGithub(repo, headers);
       }
     } catch (_e) {
       registry.dioceses = ["derry", "down_and_connor", "raphoe"];
@@ -222,6 +316,8 @@
     if (registry.dioceses.length === 0) {
       registry.dioceses = ["derry", "down_and_connor", "raphoe"];
     }
+
+    _pruneRegistry();
 
     registry.loaded = true;
     return registry;
@@ -432,5 +528,6 @@
     resolveFromPage,
     createSearchCombo,
     SHARED_HOSTS,
+    isJunkParishKey: _isJunkParishKey,
   };
 })();

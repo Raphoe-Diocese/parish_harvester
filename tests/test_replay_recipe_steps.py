@@ -9,7 +9,7 @@ from unittest.mock import AsyncMock, patch
 
 from PIL import Image
 
-from harvester.replay import _find_pdfemb_url, replay_recipe
+from harvester.replay import _find_pdfemb_url, _is_non_bulletin_url, _score_bulletin_url, replay_recipe
 
 
 class _FakePage:
@@ -75,7 +75,21 @@ class _FakeBrowser:
         return self.context
 
 
-class ReplayRecipeStepTests(unittest.IsolatedAsyncioTestCase):
+class ClaudyBulletinFilterTests(unittest.TestCase):
+    def test_gdpr_pdf_is_non_bulletin(self) -> None:
+        url = "http://parishofclaudy.com/onewebmedia/Diocese%20of%20Derry%20-%20GDPR%20Guide.pdf"
+        self.assertTrue(_is_non_bulletin_url(url))
+
+    def test_newsletter_docx_is_bulletin(self) -> None:
+        url = "http://parishofclaudy.com/onewebmedia/NEWSLETTER%207-6-26.docx"
+        self.assertFalse(_is_non_bulletin_url(url))
+
+    def test_newer_newsletter_scores_higher(self) -> None:
+        older = _score_bulletin_url("http://x/onewebmedia/NEWSLETTER%2031-5-26.docx")
+        newer = _score_bulletin_url("http://x/onewebmedia/NEWSLETTER%2014-6-26.docx")
+        self.assertGreater(newer[0], older[0])
+
+
     async def test_find_pdfemb_url_prefers_pdf_embedder_links(self) -> None:
         class _Page:
             url = "https://example.org/news/"

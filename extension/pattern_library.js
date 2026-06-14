@@ -46,6 +46,10 @@
       label: "Google Drive / OneDrive dated folder",
       steps: "Pick this Sunday's YY.MM.DD row → Save this PDF on file preview. Works across 2026, 2027, 2028…",
     },
+    oneweb_docx: {
+      label: "One.com Word bulletin (slow Google preview iframes)",
+      steps: "Automatic — read newsletter URL from page HTML. Tap Save newsletter (auto) or Push. Harvester downloads onewebmedia/NEWSLETTER directly.",
+    },
     parish_messenger_embed: {
       label: "Parish Messenger widget (parishservices.co)",
       steps: "Wait for the page to load → Follow a link → pick newest View Newsletter / May 2026 row. Ignore Gift Aid and Data Entry PDFs.",
@@ -62,6 +66,7 @@
 
   const RECIPE_FLOW_ADVICE = {
     direct_download: "Recipe pattern: open page → download PDF.",
+    direct_docx: "Recipe pattern: direct onewebmedia/NEWSLETTER download (skip slow iframe page).",
     click_then_pdf: "Recipe pattern: click a dated link → download PDF.",
     click_chain: "Recipe pattern: one or more clicks to reach the bulletin.",
     html_capture: "Recipe pattern: open bulletin page → print to PDF (Wix/HTML sites).",
@@ -96,6 +101,7 @@
     else if (type === "wix_viewer") pageType = "wix_pdf_viewer";
     else if (type === "wix_html" || type === "wix_date_grid") pageType = "wix_html";
     else if (type === "parish_messenger") pageType = "parish_messenger_embed";
+    else if (type === "oneweb_docx") pageType = "oneweb_docx";
     else if (type === "cloud_folder") pageType = "cloud_folder";
     else if (type === "image") pageType = "image_bulletin";
     else if (type === "html" || type === "unknown") pageType = "html_click_chain";
@@ -121,7 +127,9 @@
     const clickCount = actions.filter((a) => a === "click").length;
 
     let recipeFlow = "mixed";
-    if (hasHtml) recipeFlow = "html_capture";
+    if (String(recipe.site_type || "").includes("oneweb") || String(recipe.playbook_type || "") === "oneweb_docx") {
+      recipeFlow = "direct_docx";
+    } else if (hasHtml) recipeFlow = "html_capture";
     else if (hasImage) recipeFlow = "image_capture";
     else if (hasClick && hasDownload) recipeFlow = "click_then_pdf";
     else if (hasDownload && !hasClick) recipeFlow = "direct_download";
@@ -166,6 +174,8 @@
           recipe_flow: entry.recipe_flow,
           score,
           combined_key: entry.combined_key || "",
+          operator_notes: Array.isArray(entry.operator_notes) ? entry.operator_notes : [],
+          do_not: Array.isArray(entry.do_not) ? entry.do_not : [],
         });
       }
     });
@@ -183,6 +193,8 @@
         combined_key: key,
         is_pattern: true,
         advice: entry.advice || "",
+        operator_notes: Array.isArray(entry.operator_notes) ? entry.operator_notes : [],
+        do_not: Array.isArray(entry.do_not) ? entry.do_not : [],
         examples,
       });
     });
@@ -219,6 +231,15 @@
       const names = parishMatches.slice(0, 4).map((m) => m.display_name).join(", ");
       lines.push(`Similar parishes already solved: ${names}`);
     }
+
+    const mem = globalThis.ph_site_memory;
+    const liveMemory = mem?.getForPageType?.(
+      pageType === "oneweb_docx" ? "oneweb_docx" : ""
+    );
+    const notesBlock = mem?.formatHintBlock?.(
+      patternMatch?.operator_notes?.length ? patternMatch : liveMemory
+    );
+    if (notesBlock) lines.push(notesBlock);
 
     const predicted = String(pageFingerprint?.predicted_url || "").trim();
     if (predicted) {
