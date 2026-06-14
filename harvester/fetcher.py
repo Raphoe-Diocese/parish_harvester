@@ -1469,6 +1469,31 @@ def _mistral_is_enabled() -> bool:
     return bool(os.getenv("MISTRAL_API_KEY", "").strip())
 
 
+def _mistral_fallback_enabled(recipe_path: Path, recipe_meta: dict | None = None) -> bool:
+    """Mistral URL-guessing is opt-in; it must not override trained recipes."""
+    meta = recipe_meta if isinstance(recipe_meta, dict) else {}
+    if _trained_recipe_exists(recipe_path, meta):
+        return False
+    flag = os.getenv("PARISH_NO_MISTRAL_FALLBACK", "").strip().lower()
+    if flag in {"1", "true", "yes"}:
+        return False
+    if os.getenv("PARISH_MISTRAL_FALLBACK", "").strip().lower() in {"1", "true", "yes"}:
+        return _mistral_is_enabled()
+    return False
+
+
+def _trained_recipe_exists(recipe_path: Path, recipe_meta: dict) -> bool:
+    if not recipe_path.exists():
+        return False
+    steps = recipe_meta.get("steps") if isinstance(recipe_meta, dict) else None
+    return isinstance(steps, list) and len(steps) > 0
+
+
+def _legacy_fallbacks_enabled(recipe_path: Path, recipe_meta: dict) -> bool:
+    """Pattern H, scrape, and learned playbooks — only when no trained recipe."""
+    return not _trained_recipe_exists(recipe_path, recipe_meta)
+
+
 def _load_recipe_metadata(recipe_path: Path) -> dict:
     try:
         data = json.loads(recipe_path.read_text(encoding="utf-8"))
@@ -1685,6 +1710,9 @@ async def _try_mistral_auto_heal(
     recipe_path: Path,
     failure_reason: str,
 ) -> FetchResult | None:
+    if not _mistral_fallback_enabled(recipe_path, _load_recipe_metadata(recipe_path) if recipe_path.exists() else {}):
+        return None
+
     if not _mistral_is_enabled():
         print(f"  ℹ️  {entry.key}: skipping Mistral fallback because MISTRAL_API_KEY is not configured")
         return None
@@ -1917,10 +1945,12 @@ async def _fetch_entry(
                 dest.unlink(missing_ok=True)
 
     learned_attempted = False
+    trained_recipe = _trained_recipe_exists(recipe_path, recipe_meta)
+    legacy_fallbacks = _legacy_fallbacks_enabled(recipe_path, recipe_meta)
     learned_data = learned_recipes.load(key)
     learned_diocese = str((learned_data or {}).get("diocese") or "").strip()
     learned_playbook = learned_data.get("playbook", []) if isinstance(learned_data, dict) else []
-    if _learned_recipe_is_eligible(learned_data, date.today()):
+    if legacy_fallbacks and _learned_recipe_is_eligible(learned_data, date.today()):
         learned_attempted = True
         learned_strategy = str((learned_data or {}).get("last_strategy", "learned_playbook")).strip() or "learned_playbook"
         try:
@@ -2013,6 +2043,16 @@ async def _fetch_entry(
         if healed is not None:
             return healed
 
+        if trained_recipe:
+            print(f"  ⛔ {key}: trained recipe failed — skipping legacy fallbacks")
+            return FetchResult(
+                key=key,
+                display_name=entry.display_name,
+                status="error",
+                url=_failure_report_url(entry, recipe_meta, target),
+                error=recipe_error or last_err,
+            )
+
         if learned_attempted:
             print(f"  ↪️  {key}: falling back after recipe failure")
             if dest.exists() and not _is_real_pdf(dest, key):
@@ -2026,6 +2066,15 @@ async def _fetch_entry(
                 dest.unlink(missing_ok=True)
         else:
             print(f"  ↪️  {key}: recipe failed — trying direct HTML print")
+
+    if not legacy_fallbacks:
+        return FetchResult(
+            key=key,
+            display_name=entry.display_name,
+            status="error",
+            url=_failure_report_url(entry, recipe_meta, target),
+            error=recipe_error or last_err,
+        )
 
     if entry.content_type == "html_link":
         printed = await _try_direct_html_print(

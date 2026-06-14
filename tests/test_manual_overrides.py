@@ -186,7 +186,7 @@ class ManualOverrideTests(unittest.IsolatedAsyncioTestCase):
         self.assertEqual(result.url, "https://example.org/bulletins")
         self.assertEqual(result.file_type, "html_render")
 
-    async def test_fetch_entry_uses_mistral_fallback_after_recipe_failure(self) -> None:
+    async def test_fetch_entry_skips_mistral_when_trained_recipe_fails(self) -> None:
         entry = ParishEntry(
             key="mistralrecipe",
             display_name="Mistral Recipe Parish",
@@ -202,16 +202,7 @@ class ManualOverrideTests(unittest.IsolatedAsyncioTestCase):
             recipe_path.parent.mkdir(parents=True, exist_ok=True)
             recipe_path.write_text(json.dumps({"steps": [{"action": "goto", "url": "https://example.org"}]}), encoding="utf-8")
 
-            healed = FetchResult(
-                key=entry.key,
-                display_name=entry.display_name,
-                status="ok",
-                url="https://example.org/new.pdf",
-                file_path=out_dir / "mistralrecipe.pdf",
-                file_type="pdf",
-                is_fallback=True,
-            )
-            fallback = AsyncMock(return_value=healed)
+            fallback = AsyncMock(return_value=None)
             with (
                 patch("harvester.fetcher.recipe_path_for", return_value=recipe_path),
                 patch("harvester.fetcher.replay_recipe", AsyncMock(side_effect=RecipeReplayError("boom"))),
@@ -225,9 +216,8 @@ class ManualOverrideTests(unittest.IsolatedAsyncioTestCase):
                     manual_overrides={},
                 )
 
-        self.assertEqual(result.status, "ok")
-        self.assertTrue(result.is_fallback)
-        fallback.assert_awaited_once()
+        self.assertEqual(result.status, "error")
+        fallback.assert_not_awaited()
 
     async def test_fetch_entry_uses_mistral_fallback_after_prediction_failure(self) -> None:
         entry = ParishEntry(
