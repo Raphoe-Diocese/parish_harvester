@@ -1,15 +1,14 @@
 name: Bump extension version
 
+# Manual only — automatic bump-on-push caused duplicate commits and failure-email storms.
 on:
-  push:
-    branches: [main]
+  workflow_dispatch:
 
 permissions:
   contents: write
 
 jobs:
   bump:
-    if: github.actor != 'github-actions[bot]' && !contains(github.event.head_commit.message, '[skip ci]')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -47,6 +46,5 @@ jobs:
             echo "No manifest changes to commit."
             exit 0
           fi
-          # Keep CI enabled so deploy-pages publishes matching extension package + updates.xml.
-          git commit -m "chore: bump extension version"
+          git commit -m "chore: bump extension version [skip ci]"
           git push

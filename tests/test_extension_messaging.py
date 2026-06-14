@@ -68,12 +68,13 @@ class ExtensionMessagingTests(unittest.TestCase):
         ai_help_js = AI_HELP_JS.read_text(encoding="utf-8")
         manifest_json = MANIFEST_JSON.read_text(encoding="utf-8")
 
-        self.assertIn('id="gemini-api-key"', popup_html)
-        self.assertIn("gemini_api_key", popup_js)
-        self.assertIn('id="tab-ai"', sidepanel_html)
-        self.assertIn("askGemini", sidepanel_js)
-        self.assertIn("gatherPageContext", sidepanel_js)
-        self.assertIn("<script src=\"ai_help.js\"></script>", sidepanel_html)
+        self.assertIn('id="gh-pat"', popup_html)
+        self.assertIn('id="gh-repo"', popup_html)
+        self.assertIn("gh_pat", popup_js)
+        self.assertIn("gh_repo", popup_js)
+        self.assertIn('id="tab-copilot"', sidepanel_html)
+        self.assertIn("copilot-highlight", sidepanel_html)
+        self.assertIn("copilot_panel.js", sidepanel_html)
         self.assertIn("globalThis.PhAiHelp", ai_help_js)
         self.assertIn("gatherPageContextFromCurrentPage", ai_help_js)
         self.assertIn("saveHostMemory", ai_help_js)
@@ -108,10 +109,7 @@ class ExtensionMessagingTests(unittest.TestCase):
         self.assertIn("Active tab is real http(s) page:", popup_js)
         self.assertIn("GitHub PAT present:", popup_js)
         self.assertIn("GitHub repo configured:", popup_js)
-        self.assertIn("Mistral key present:", popup_js)
-        self.assertIn("Gemini key present:", popup_js)
-        self.assertIn("Last 10 ph_ai_memory_* keys:", popup_js)
-        self.assertIn("Recent AI Help log entries (last 5):", popup_js)
+        self.assertIn("Pattern learning:", popup_js)
         self.assertIn("Paste this whole block to your AI assistant.", popup_js)
 
     def test_content_scripts_use_isolated_world_only(self) -> None:
@@ -135,9 +133,7 @@ class ExtensionMessagingTests(unittest.TestCase):
 
     def test_ph_ai_help_log_key_referenced_in_ai_help_and_popup(self) -> None:
         ai_help_js = AI_HELP_JS.read_text(encoding="utf-8")
-        popup_js = POPUP_JS.read_text(encoding="utf-8")
         self.assertIn("ph_ai_help_log", ai_help_js)
-        self.assertIn("ph_ai_help_log", popup_js)
 
     def test_ai_help_uses_supported_model_and_logs_endpoint_metadata(self) -> None:
         ai_help_js = AI_HELP_JS.read_text(encoding="utf-8")

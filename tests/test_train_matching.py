@@ -13,6 +13,8 @@ from harvester.fetcher import parse_evidence_file
 from harvester.stitcher import _MAX_BULLETIN_PAGES, _build_parish_header_pdf, stitch_mega_pdf
 from train import _CLICK_TRACKER_JS, _build_mark_step, _match_parish
 
+REPO_ROOT = Path(__file__).resolve().parent.parent
+
 
 class ParishMatchingTests(unittest.TestCase):
     def _write_evidence(self, root: Path, diocese: str, content: str) -> None:
@@ -104,7 +106,7 @@ https://www.antrimparish.com
             self.assertIn("Antrim", msg)
 
     def test_problematic_real_world_parishes_match_from_repository_file(self) -> None:
-        repo_root = Path(__file__).resolve().parent
+        repo_root = REPO_ROOT
         parishes_dir = repo_root / "parishes"
 
         for name in ("Aghagallon and Ballinderry", "Antrim"):
@@ -131,7 +133,7 @@ https://www.antrimparish.com
         self.assertNotIn("attachShadow", _CLICK_TRACKER_JS)
 
     def test_extension_manifest_and_toolbar_are_present(self) -> None:
-        repo_root = Path(__file__).resolve().parent
+        repo_root = REPO_ROOT
         extension_dir = repo_root / "extension"
         manifest_path = extension_dir / "manifest.json"
         content_js = (extension_dir / "content.js").read_text(encoding="utf-8")
@@ -167,7 +169,7 @@ https://www.antrimparish.com
         self.assertNotIn("chrome.sidePanel.open", background_js)
 
     def test_popup_version_and_diagnostics_controls_exist(self) -> None:
-        repo_root = Path(__file__).resolve().parent
+        repo_root = REPO_ROOT
         popup_html = (repo_root / "extension" / "popup.html").read_text(encoding="utf-8")
         popup_js = (repo_root / "extension" / "popup.js").read_text(encoding="utf-8")
         manifest = json.loads((repo_root / "extension" / "manifest.json").read_text(encoding="utf-8"))
@@ -179,19 +181,19 @@ https://www.antrimparish.com
             "https://frankytyrone.github.io/parish_harvester/updates.xml",
         )
         self.assertIn('id="ext-version"', popup_html)
-        self.assertIn('id="mistral-api-key"', popup_html)
-        self.assertIn('id="gemini-api-key"', popup_html)
+        self.assertIn('id="gh-pat"', popup_html)
+        self.assertIn('id="gh-repo"', popup_html)
         self.assertIn('id="diag-section"', popup_html)
         self.assertIn('id="run-diag"', popup_html)
         self.assertIn('id="diag-results"', popup_html)
         self.assertIn("chrome.runtime.getManifest()", popup_js)
-        self.assertIn("mistral_api_key", popup_js)
-        self.assertIn("gemini_api_key", popup_js)
+        self.assertIn("gh_pat", popup_js)
+        self.assertIn("gh_repo", popup_js)
         self.assertIn('dispatchToActiveTab({ type: "ping" })', popup_js)
         self.assertIn('dispatchToActiveTab({ type: "ph_ping" })', popup_js)
 
     def test_operator_console_hides_wizard_and_uses_directory_details(self) -> None:
-        repo_root = Path(__file__).resolve().parent
+        repo_root = REPO_ROOT
         sidepanel_html = (repo_root / "extension" / "sidepanel.html").read_text(encoding="utf-8")
         sidepanel_js = (repo_root / "extension" / "sidepanel.js").read_text(encoding="utf-8")
         self.assertIn('class="section operator-hidden"', sidepanel_html)
@@ -199,16 +201,14 @@ https://www.antrimparish.com
         self.assertIn("pd-diocese-accordion", sidepanel_html)
         self.assertIn("_pdBuildParishDetails", sidepanel_js)
         self.assertIn("pd-subfolder", sidepanel_js)
-        self.assertIn('id="tab-ai"', sidepanel_html)
-        self.assertIn('id="ai-chat"', sidepanel_html)
-        self.assertIn("askGemini", sidepanel_js)
-        self.assertIn("gatherPageContext", sidepanel_js)
-        self.assertIn("ph_ai_memory_", sidepanel_js)
+        self.assertIn('id="tab-copilot"', sidepanel_html)
+        self.assertIn("copilot-highlight", sidepanel_html)
+        self.assertIn("copilot_panel.js", sidepanel_html)
         self.assertIn('"Raphoe Diocese"', sidepanel_js)
         self.assertIn("parishes/recipes/raphoe/${key}.json", sidepanel_js)
 
     def test_training_uses_persistent_context_with_extension_args(self) -> None:
-        train_source = (Path(__file__).resolve().parent / "train.py").read_text(encoding="utf-8")
+        train_source = (REPO_ROOT / "train.py").read_text(encoding="utf-8")
         self.assertIn("launch_persistent_context", train_source)
         self.assertIn("no_viewport=True", train_source)
         self.assertIn("--disable-extensions-except=", train_source)
@@ -222,7 +222,7 @@ https://www.antrimparish.com
         self.assertIn("tempfile.mkdtemp(", train_source)
 
     def test_train_auto_shows_toolbar_via_postmessage(self) -> None:
-        train_source = (Path(__file__).resolve().parent / "train.py").read_text(encoding="utf-8")
+        train_source = (REPO_ROOT / "train.py").read_text(encoding="utf-8")
         # Must post a window message to trigger the floating toolbar
         self.assertIn("window.postMessage", train_source)
         self.assertIn("toggle_toolbar", train_source)
@@ -233,7 +233,7 @@ https://www.antrimparish.com
         self.assertIn("Parish Trainer toolbar ready", train_source)
 
     def test_content_js_auto_shows_toolbar_on_training_bindings(self) -> None:
-        repo_root = Path(__file__).resolve().parent
+        repo_root = REPO_ROOT
         content_js = (repo_root / "extension" / "content.js").read_text(encoding="utf-8")
         # Auto-show helper must check for the Playwright training bindings
         self.assertIn("ph_mark_html", content_js)
@@ -248,7 +248,7 @@ https://www.antrimparish.com
         self.assertIn("Parish Trainer toolbar ready", content_js)
 
     def test_background_js_does_not_auto_show_toolbar(self) -> None:
-        repo_root = Path(__file__).resolve().parent
+        repo_root = REPO_ROOT
         background_js = (repo_root / "extension" / "background.js").read_text(encoding="utf-8")
         # The toolbar must NOT be shown automatically on every page load.
         # Removing the tabs.onUpdated auto-show listener is the fix for the
@@ -259,21 +259,21 @@ https://www.antrimparish.com
         self.assertIn("toggle_toolbar", background_js)
 
     def test_background_normalizes_recipe_to_single_terminal_url(self) -> None:
-        repo_root = Path(__file__).resolve().parent
+        repo_root = REPO_ROOT
         background_js = (repo_root / "extension" / "background.js").read_text(encoding="utf-8")
         self.assertIn("function _normalizeRecipeTerminalSteps", background_js)
         self.assertIn('new Set(["download", "image", "html"])', background_js)
         self.assertIn("idx === lastTerminalIdx", background_js)
 
     def test_main_deletes_single_pdfs_after_diocese_mega(self) -> None:
-        source = (Path(__file__).resolve().parent / "main.py").read_text(encoding="utf-8")
+        source = (REPO_ROOT / "main.py").read_text(encoding="utf-8")
         self.assertIn("Deleted", source)
         self.assertIn("single PDF file(s)", source)
         self.assertIn("CURRENT_DIR / result.file_path.name", source)
         self.assertIn("RAW_DIR / result.file_path.name", source)
 
     def test_harvest_workflow_runs_tests_before_harvester(self) -> None:
-        repo_root = Path(__file__).resolve().parent
+        repo_root = REPO_ROOT
         workflow = (repo_root / ".github" / "workflows" / "harvest.yml").read_text(encoding="utf-8")
         self.assertIn("run_tests:", workflow)
         self.assertIn("pip install pytest", workflow)
@@ -283,10 +283,10 @@ https://www.antrimparish.com
         self.assertLess(workflow.index("- name: Run tests"), workflow.index("- name: Run Bulletin Harvester"))
 
     def test_deploy_pages_builds_extension_update_assets(self) -> None:
-        workflow = (Path(__file__).resolve().parent / ".github" / "workflows" / "deploy-pages.yml").read_text(encoding="utf-8")
+        workflow = (REPO_ROOT / ".github" / "workflows" / "deploy-pages.yml").read_text(encoding="utf-8")
         self.assertIn("push:", workflow)
         self.assertIn("docs/**", workflow)
-        self.assertIn("extension/**", workflow)
+        self.assertNotIn("extension/**", workflow)
         self.assertIn("mega_pdf/**", workflow)
         self.assertIn("Download mega PDF artifacts from harvest run", workflow)
         self.assertIn("actions/download-artifact@v4", workflow)
@@ -317,7 +317,7 @@ https://www.antrimparish.com
         self.assertIn("_site/updates.xml", workflow)
 
     def test_ocr_bulletin_workflow_configuration(self) -> None:
-        workflow = (Path(__file__).resolve().parent / ".github" / "workflows" / "ocr-bulletin.yml").read_text(encoding="utf-8")
+        workflow = (REPO_ROOT / ".github" / "workflows" / "ocr-bulletin.yml").read_text(encoding="utf-8")
         self.assertIn("workflow_run:", workflow)
         self.assertIn('workflows: ["Harvest Parish Bulletins"]', workflow)
         self.assertIn("if: github.event.workflow_run.conclusion == 'success'", workflow)
@@ -336,7 +336,7 @@ https://www.antrimparish.com
         self.assertIn("git add docs", workflow)
 
     def test_ocr_convert_provider_fallback_order(self) -> None:
-        source = (Path(__file__).resolve().parent / "ocr" / "convert_bulletin.py").read_text(encoding="utf-8")
+        source = (REPO_ROOT / "ocr" / "convert_bulletin.py").read_text(encoding="utf-8")
         self.assertIn("Trying Mistral OCR (mistral-ocr-latest) on PDF ...", source)
         self.assertIn("Running image OCR with Gemini (gemini-1.5-flash) fallback ...", source)
         self.assertIn("Running image OCR with OpenAI gpt-4o-mini fallback ...", source)
@@ -350,20 +350,18 @@ https://www.antrimparish.com
         self.assertLess(gemini_idx, openai_idx)
 
     def test_extension_version_bump_workflow_configuration(self) -> None:
-        workflow = (Path(__file__).resolve().parent / ".github" / "workflows" / "bump-extension-version.yml").read_text(encoding="utf-8")
-        self.assertIn("push:", workflow)
-        self.assertIn("branches: [main]", workflow)
-        self.assertIn("github.actor != 'github-actions[bot]'", workflow)
-        self.assertIn("!contains(github.event.head_commit.message, '[skip ci]')", workflow)
+        workflow = (REPO_ROOT / ".github" / "workflows" / "bump-extension-version.yml").read_text(encoding="utf-8")
+        self.assertIn("workflow_dispatch:", workflow)
+        self.assertNotIn("push:\n    branches: [main]", workflow)
         self.assertIn('manifest_path = Path("extension/manifest.json")', workflow)
         self.assertIn("version must be major.minor.patch", workflow)
-        self.assertIn('git commit -m "chore: bump extension version"', workflow)
+        self.assertIn('git commit -m "chore: bump extension version [skip ci]"', workflow)
 
     def test_bulletin_page_limit_constant(self) -> None:
         self.assertEqual(_MAX_BULLETIN_PAGES, 4)
 
     def test_parish_header_has_new_window_link(self) -> None:
-        repo_root = Path(__file__).resolve().parent
+        repo_root = REPO_ROOT
         stitcher_source = (repo_root / "harvester" / "stitcher.py").read_text(encoding="utf-8")
         tree = ast.parse(stitcher_source)
         header_fn = next(
@@ -621,7 +619,7 @@ class UrlDateParsingAndScoringTests(unittest.TestCase):
 
 class ToolbarImprovementsTests(unittest.TestCase):
     def setUp(self):
-        repo_root = Path(__file__).resolve().parent
+        repo_root = REPO_ROOT
         self.content_js = (repo_root / "extension" / "content.js").read_text(encoding="utf-8")
         self.train_py = (repo_root / "train.py").read_text(encoding="utf-8")
 
@@ -682,7 +680,7 @@ class ToolbarImprovementsTests(unittest.TestCase):
 
 class PickImageModeTests(unittest.TestCase):
     def setUp(self):
-        repo_root = Path(__file__).resolve().parent
+        repo_root = REPO_ROOT
         self.content_js = (repo_root / "extension" / "content.js").read_text(encoding="utf-8")
 
     def test_pick_image_mode_exists(self):
@@ -702,7 +700,7 @@ class PickImageModeTests(unittest.TestCase):
 
 class DeadUrlTests(unittest.TestCase):
     def setUp(self):
-        repo_root = Path(__file__).resolve().parent
+        repo_root = REPO_ROOT
         self.content_js = (repo_root / "extension" / "content.js").read_text(encoding="utf-8")
         self.train_py = (repo_root / "train.py").read_text(encoding="utf-8")
 
@@ -736,7 +734,7 @@ class DeadUrlTests(unittest.TestCase):
 
 class WixViewerTests(unittest.TestCase):
     def setUp(self):
-        repo_root = Path(__file__).resolve().parent
+        repo_root = REPO_ROOT
         self.content_js = (repo_root / "extension" / "content.js").read_text(encoding="utf-8")
 
     def test_wix_viewer_detected(self):
@@ -757,7 +755,7 @@ class WixViewerTests(unittest.TestCase):
 
 class BlobUrlTests(unittest.TestCase):
     def setUp(self):
-        repo_root = Path(__file__).resolve().parent
+        repo_root = REPO_ROOT
         self.train_py = (repo_root / "train.py").read_text(encoding="utf-8")
 
     def test_blob_url_rejected(self):
@@ -781,7 +779,7 @@ class BlobUrlTests(unittest.TestCase):
 
 class BulletinDateRankingTests(unittest.TestCase):
     def setUp(self):
-        repo_root = Path(__file__).resolve().parent
+        repo_root = REPO_ROOT
         self.content_js = (repo_root / "extension" / "content.js").read_text(encoding="utf-8")
 
     def test_date_first_sort_not_position_sort(self):
