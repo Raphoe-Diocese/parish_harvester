@@ -336,7 +336,7 @@ async function _upsertSitePattern(gh_pat, gh_repo, parishKey, displayName, recip
     ? recipe.operator_notes.join(" ")
     : "";
   const adviceByType = {
-    direct_pdf: "You are already on the PDF — click Get a PDF.",
+    direct_pdf: "Tap Save this PDF — saves the real https:// address for GitHub. Word/docx in the tab title is normal.",
     wp_pdfemb_list: "Click Follow a link → pick the newest dated bulletin → then Get a PDF.",
     pdf_link_list: "Click Find bulletin → Pick newest, or Follow a link to the latest PDF.",
     iframe_viewer: "Click It's in a frame / viewer and choose the bulletin frame.",

@@ -83,16 +83,49 @@
         "Do not stop at click-only — need print_to_pdf as the final step.",
       ],
     },
+    dated_pdf_bulletin: {
+      playbook_type: "dated_pdf_bulletin",
+      site_type: "dated_pdf_path",
+      page_type: "direct_pdf",
+      recipe_flow: "direct_download",
+      label: "Word → PDF bulletin at /pdf/DDMMYY.pdf",
+      operator_notes: [
+        "Bulletin is a real PDF (often made in Microsoft Word → Print to PDF).",
+        "Tab title may say .docx or .jpg — ignore that; check the address bar ends in .pdf.",
+        "On the PDF page: tap Save this PDF — saves the full https://… address for Sunday harvest.",
+        "Or start on parishnews.html → point at this week's link → Yes → Save this PDF.",
+        "Harvester rewrites DDMMYY in the URL each Sunday (e.g. 140626 → 210626).",
+      ],
+      do_not: [
+        "Do not use use_page_url only — GitHub cannot read Chrome's internal PDF viewer address.",
+        "Do not worry if Document Properties title mentions Microsoft Word.",
+      ],
+    },
   };
 
-  const getForPageType = (pageType) => {
+  const _DDMMYY_PDF_RE = /\/pdf\/\d{6}\.pdf/i;
+
+  const _recipeUsesDatedPdfPath = (recipe = {}) => {
+    const urls = [
+      String(recipe.start_url || ""),
+      ...(Array.isArray(recipe.steps) ? recipe.steps : []).map((s) =>
+        String(s?.url || s?.href || "")
+      ),
+    ];
+    return urls.some((u) => _DDMMYY_PDF_RE.test(u));
+  };
+
+  const getForPageType = (pageType, recipe = null) => {
     const key = String(pageType || "").trim();
+    if (recipe && _recipeUsesDatedPdfPath(recipe)) {
+      return CATALOG.dated_pdf_bulletin;
+    }
     return CATALOG[key] || null;
   };
 
   const enrichRecipe = (recipe, pageCtx = {}) => {
     const base = recipe && typeof recipe === "object" ? { ...recipe } : {};
-    const memory = getForPageType(pageCtx.type);
+    const memory = getForPageType(pageCtx.type, base);
     if (!memory) return base;
 
     base.playbook_type = memory.playbook_type;
@@ -112,7 +145,7 @@
   };
 
   const patternPayloadFromPage = (pageCtx = {}, recipe = {}) => {
-    const memory = getForPageType(pageCtx.type);
+    const memory = getForPageType(pageCtx.type, recipe);
     const lib = globalThis.PhPatternLibrary;
     if (!lib) return null;
     const page = lib.fingerprintFromPage(pageCtx);

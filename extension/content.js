@@ -1562,7 +1562,9 @@
       return {
         emoji: "📄",
         summary: "This page IS a PDF document.",
-        advice: "Tap the green 📄 Save this PDF button, then Push Recipe below.",
+        advice: /\/pdf\/\d{6}\.pdf/i.test(url)
+          ? "Tap Save this PDF. Tab title may mention Word/docx — that is normal. Harvester rewrites the date in the URL each Sunday."
+          : "Tap the green Save this PDF button, then Send & test.",
         type: "direct_pdf",
       };
     }

@@ -7,8 +7,8 @@
 (() => {
   const ARCHETYPE_ADVICE = {
     direct_pdf: {
-      label: "Direct PDF page",
-      steps: "You are already on the PDF — click Get a PDF.",
+      label: "Direct PDF page (Word → Print to PDF)",
+      steps: "Tap Save this PDF — saves the full https:// address. Tab title may say .docx; ignore it.",
     },
     wp_pdfemb_list: {
       label: "WordPress PDF embed list",
