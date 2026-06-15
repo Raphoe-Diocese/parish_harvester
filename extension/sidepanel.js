@@ -888,6 +888,39 @@ function _pdRecipeIsInactive(data) {
   return Boolean(data.skip) || status === "dead_url" || status === "inactive";
 }
 
+async function _pdLoadRecipe(key) {
+  if (!key) return null;
+  const candidates = [
+    `parishes/recipes/derry/${key}.json`,
+    `parishes/recipes/down_and_connor/${key}.json`,
+    `parishes/recipes/raphoe/${key}.json`,
+    `parishes/recipes/${key}.json`,
+    `parishes/recipes/unknown/${key}.json`,
+  ];
+  for (const path of candidates) {
+    try {
+      const { content } = await _pdGhFetch(path);
+      return JSON.parse(content);
+    } catch (_e) {
+      // try next path
+    }
+  }
+  return null;
+}
+
+async function _problemsResolveFixUrl(row) {
+  const parish = String(row?.parish || "").trim();
+  const recipe = await _pdLoadRecipe(parish);
+  const recipeStart = String(recipe?.start_url || "").trim();
+  if (/^https?:\/\//i.test(recipeStart)) return recipeStart;
+  const match = _pdAllParishes.find((p) => p.key === parish);
+  const pageUrl = String(match?.pageUrl || match?.bulletinUrls?.[0] || "").trim();
+  if (/^https?:\/\//i.test(pageUrl)) return pageUrl;
+  const failedUrl = String(row?.url || row?.start_url || "").trim();
+  if (/^https?:\/\//i.test(failedUrl)) return failedUrl;
+  return "";
+}
+
 async function _pdCheckRecipe(key) {
   if (_pdRecipeCache[key]) return _pdRecipeCache[key];
   const candidates = [
@@ -1269,44 +1302,46 @@ async function _problemsRenderRows(rows) {
     fixBtn.textContent = "🔧 Fix now";
     if (visitedMap[row.parish]) fixBtn.classList.add("visited");
     fixBtn.addEventListener("click", () => {
-      const startUrl = String(row.start_url || row.url || "").trim();
-      if (!/^https?:\/\//i.test(startUrl)) {
-        setStatus("❌ No valid start URL for this parish.", "err");
-        return;
-      }
-      void _problemsMarkFixVisited(row.parish, fixBtn);
-      setStatus(
-        `✅ Opened ${row.display_name || row.parish} — use the floating toolbar on that tab, then Push Recipe.`,
-        "ok"
-      );
-      const match = _pdAllParishes.find((p) => p.key === row.parish);
-      if (match) {
-        chrome.storage.local.set({
-          ph_training_parish: {
-            key: match.key,
-            name: match.name,
-            diocese: match.diocese,
-            hostname: (() => {
-              try { return new URL(startUrl).hostname.toLowerCase(); } catch (_e) { return ""; }
-            })(),
-          },
-        });
-      }
-      chrome.tabs.create({ url: startUrl, active: true }, (tab) => {
-        const tabId = tab?.id;
-        if (!tabId) return;
-        const onUpdated = (updatedTabId, changeInfo) => {
-          if (updatedTabId !== tabId || changeInfo.status !== "complete") return;
-          chrome.tabs.onUpdated.removeListener(onUpdated);
-          chrome.runtime.sendMessage({
-            type: "dispatch_to_tab",
-            tabId,
-            allowInject: true,
-            payload: { type: "ph_show_toolbar", reason: "fix_now", parish_key: row.parish },
+      void (async () => {
+        const startUrl = await _problemsResolveFixUrl(row);
+        if (!/^https?:\/\//i.test(startUrl)) {
+          setStatus("❌ No valid start URL for this parish.", "err");
+          return;
+        }
+        void _problemsMarkFixVisited(row.parish, fixBtn);
+        setStatus(
+          `✅ Opened ${row.display_name || row.parish} — use the floating toolbar on that tab, then Push Recipe.`,
+          "ok"
+        );
+        const match = _pdAllParishes.find((p) => p.key === row.parish);
+        if (match) {
+          chrome.storage.local.set({
+            ph_training_parish: {
+              key: match.key,
+              name: match.name,
+              diocese: match.diocese,
+              hostname: (() => {
+                try { return new URL(startUrl).hostname.toLowerCase(); } catch (_e) { return ""; }
+              })(),
+            },
           });
-        };
-        chrome.tabs.onUpdated.addListener(onUpdated);
-      });
+        }
+        chrome.tabs.create({ url: startUrl, active: true }, (tab) => {
+          const tabId = tab?.id;
+          if (!tabId) return;
+          const onUpdated = (updatedTabId, changeInfo) => {
+            if (updatedTabId !== tabId || changeInfo.status !== "complete") return;
+            chrome.tabs.onUpdated.removeListener(onUpdated);
+            chrome.runtime.sendMessage({
+              type: "dispatch_to_tab",
+              tabId,
+              allowInject: true,
+              payload: { type: "ph_show_toolbar", reason: "fix_now", parish_key: row.parish },
+            });
+          };
+          chrome.tabs.onUpdated.addListener(onUpdated);
+        });
+      })();
     });
     action.appendChild(fixBtn);
     if (row.retrainedPending) {

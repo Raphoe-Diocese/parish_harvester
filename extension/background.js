@@ -788,8 +788,13 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         display_name: (incoming.display_name && incoming.display_name.trim()) ? incoming.display_name.trim() : existingRecipe.display_name,
         diocese:      (incoming.diocese      && incoming.diocese.trim())      ? incoming.diocese.trim()      : existingRecipe.diocese,
       } : incoming;
-      const mergedRecipe = _preserveTrainedClickRecipe(existingRecipe, incoming, recipe);
-      const normalizedRecipe = _normalizeRecipeTerminalSteps(mergedRecipe);
+      const normalizedRecipe = _normalizeRecipeTerminalSteps(recipe);
+      // Retrain push must clear harvest-blocking flags left on the old recipe.
+      delete normalizedRecipe.skip;
+      delete normalizedRecipe.status;
+      delete normalizedRecipe.reason;
+      delete normalizedRecipe.dead_reason;
+      delete normalizedRecipe.needs_retraining;
       const recipeStatus = String(normalizedRecipe.status || "").toLowerCase();
       if (recipeStatus === "dead_url" || recipeStatus === "inactive" || normalizedRecipe.skip) {
         normalizedRecipe.skip = true;

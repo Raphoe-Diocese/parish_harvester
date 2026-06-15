@@ -3,9 +3,9 @@
  */
 (() => {
   const PIN_HELP =
-    "📌 Pin = remember which link is the bulletin on this website. " +
-    "You still open that link once, then finish with Save PDF / Save page / Pick image. " +
-    "Pin helps next time you train or when the extension suggests links — it does not skip those steps.";
+    "🎯 Follow a link = you click the exact spot on the page (crosshair). That becomes the Sunday click step. " +
+    "📌 Pin = auto-finds the bulletin link and records the same click step. " +
+    "Either way you still open the link once, then finish with Save PDF / Save page / Pick image.";
 
   const PLANS = {
     direct_pdf: {

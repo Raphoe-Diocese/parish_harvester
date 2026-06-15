@@ -262,6 +262,8 @@ async def _save_download_to_pdf(download, dest: Path) -> str:
 
 async def _download_document_url(page: Page, raw_url: str, dest: Path) -> tuple[str, str]:
     url = _normalize_doc_url(raw_url)
+    if _is_non_bulletin_url(url):
+        raise RecipeReplayError(f"Refusing non-bulletin document URL: {raw_url}")
     response = await page.request.get(url, timeout=PAGE_LOAD_TIMEOUT_MS)
     if not response.ok:
         raise RecipeReplayError(f"HTTP {response.status} for {raw_url}")
@@ -400,8 +402,11 @@ async def _find_pdfemb_url(page: Page) -> str | None:
     for href in links:
         resolved = urljoin(page.url, href)
         lower = resolved.lower()
-        if lower.endswith(".pdf") or ".pdf" in lower:
-            return resolved
+        if not (lower.endswith(".pdf") or ".pdf" in lower):
+            continue
+        if _is_non_bulletin_url(resolved):
+            continue
+        return resolved
     return None
 
 

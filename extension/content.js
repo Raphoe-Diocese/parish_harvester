@@ -20,7 +20,7 @@
   // When the Playwright training bindings (window.ph_*) are absent, the
   // extension operates in "standalone" mode.  Steps are stored here so the
   // user can later push the recipe directly to GitHub without running train.py.
-  let standaloneStartUrl = "";
+  let _skipLoadExistingRecipe = false;
 
   const _inStandaloneMode = () => typeof window.ph_mark_download_url !== "function";
   const _currentHostname = () => {
@@ -457,6 +457,22 @@
       .filter((entry) => entry && entry.recipeStep && typeof entry.recipeStep.action === "string")
       .map((entry) => entry.recipeStep);
 
+  /** Start page for Sunday harvest — current page unless a click chain began elsewhere. */
+  const _resolveRecipeStartUrl = () => {
+    const pageUrl = _pageUrlForParishDetection();
+    const recorded = _standaloneRecipeSteps();
+    const hasClick = recorded.some(
+      (step) => String(step?.action || "").trim().toLowerCase() === "click"
+    );
+    if (!hasClick) {
+      return pageUrl;
+    }
+    if (standaloneStartUrl && _hostsMatch(standaloneStartUrl, pageUrl)) {
+      return standaloneStartUrl;
+    }
+    return pageUrl;
+  };
+
   const standaloneAddStep = (step, uiType = "", uiLabel = "") => {
     if (!_inStandaloneMode()) return;
     // Replace an existing download/image/html step if one already exists
@@ -469,6 +485,10 @@
         recipeSteps.splice(idx, 1);
       }
     }
+    const stepAction = String(step?.action || "").trim().toLowerCase();
+    const hadClickBefore = _standaloneRecipeSteps().some(
+      (s) => String(s?.action || "").trim().toLowerCase() === "click"
+    );
     recipeSteps.push({
       type: uiType || step.action || "step",
       label: uiLabel || _recipeStepToUiLabel(step),
@@ -476,7 +496,9 @@
     });
     if (_stepsListEl) _renderSessionSteps();
     if (_refreshRecipeCount) _refreshRecipeCount();
-    if (!standaloneStartUrl) {
+    if (stepAction === "click" && !hadClickBefore) {
+      standaloneStartUrl = window.location.href;
+    } else if (!standaloneStartUrl) {
       standaloneStartUrl = window.location.href;
     }
     void _persistRecordingSession();
@@ -497,9 +519,7 @@
 
   const buildStandaloneRecipe = (parishKey, displayName, diocese) => {
     const steps = [];
-    const pageUrl = _pageUrlForParishDetection();
-    const startUrl =
-      standaloneStartUrl && _hostsMatch(standaloneStartUrl, pageUrl) ? standaloneStartUrl : pageUrl;
+    const startUrl = _resolveRecipeStartUrl();
     if (startUrl) {
       const gotoStep = { action: "goto", url: startUrl };
       if (/(?:\d{1,2})[_-](?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[_-](?:\d{4})/i.test(startUrl)) {
@@ -552,8 +572,13 @@
 
   const _importStandaloneRecipe = (recipe, { showLoadedMessage = true } = {}) => {
     if (!_inStandaloneMode() || !recipe || !Array.isArray(recipe.steps)) return 0;
-    const startUrl = String(recipe.start_url || "").trim();
-    if (startUrl) standaloneStartUrl = startUrl;
+    const pageUrl = _pageUrlForParishDetection();
+    const savedStart = String(recipe.start_url || "").trim();
+    if (savedStart && _hostsMatch(savedStart, pageUrl)) {
+      standaloneStartUrl = savedStart;
+    } else {
+      standaloneStartUrl = pageUrl;
+    }
     recipeSteps = recipeSteps.filter((entry) => !entry?.recipeStep);
     let imported = 0;
     for (const step of recipe.steps) {
@@ -3954,11 +3979,11 @@
       "🔗 1. Follow a link",
       "#16a34a",
       () => startPickLinkMode(showPickConfirmation, showStatus),
-      "Click menus (News, Newsletter…) — then pick the bulletin link on the page."
+      "Crosshair on the page — click the exact menu/link where the bulletin always is (e.g. Current Newsletter)."
     );
 
     pinLinkBtn = makeSmallBtn(
-      "📌 Pin bulletin link (optional)",
+      "📌 Auto-pick bulletin link",
       "#6d28d9",
       async () => {
         showStatus("⏳ Finding best bulletin link on this page…", "info");
@@ -3967,17 +3992,27 @@
           showStatus("❌ Could not find a bulletin link — use Follow a link and pick it yourself.", "error");
           return;
         }
+        const pick = scan.context?.best;
         const pin = await _handleCopilotMessage({ type: "copilot_pin" });
         if (pin?.ok) {
-          showStatus(
-            "📌 Pinned for this website. You still open that link and finish with Save PDF / Save page.",
-            "ok"
-          );
+          const recorded = pick ? _copilotRecordPick(pick) : { ok: false };
+          if (recorded.ok) {
+            showStatus(
+              `✅ Click step recorded: "${pick.label || pick.selector}". Now open that link and finish with Save PDF / Save page.`,
+              "ok"
+            );
+            _refreshGuidedContext?.();
+          } else {
+            showStatus(
+              "📌 Pinned for this website. Use Follow a link to record the click step, then finish with Save PDF / Save page.",
+              "ok"
+            );
+          }
         } else {
           showStatus(`❌ ${pin?.reason || "Could not pin."}`, "error");
         }
       },
-      "Remember which link is the bulletin here. Does NOT replace opening it and saving the capture step."
+      "Extension guesses the bulletin link and records a click step. You still open it and save the capture step."
     );
 
     contextPrimaryBtn = makeSmallBtn(
@@ -4494,6 +4529,10 @@
 
     const stepsListEl = document.createElement("div");
     stepsListEl.style.cssText = "margin-bottom:6px;";
+    const recipeStartUrlEl = document.createElement("div");
+    recipeStartUrlEl.style.cssText =
+      "font-size:9px;color:#93c5fd;margin-bottom:4px;word-break:break-all;line-height:1.35;";
+    recipeStartUrlEl.textContent = "Sunday start URL: (record a step)";
     // Wire up the module-level reference so addSessionStep can find it
     _stepsListEl = stepsListEl;
     _renderSessionSteps();
@@ -4521,6 +4560,7 @@
       }
     });
 
+    recipeBodyEl.appendChild(recipeStartUrlEl);
     recipeBodyEl.appendChild(stepsListEl);
     recipeBodyEl.appendChild(undoBtn);
     recipeSection.appendChild(recipeHeaderEl);
@@ -4531,6 +4571,10 @@
       recipeTitleEl.textContent = `📋 Recipe Preview (${recipeSteps.length} step${
         recipeSteps.length !== 1 ? "s" : ""
       })`;
+      const startPreview = _resolveRecipeStartUrl();
+      recipeStartUrlEl.textContent = startPreview
+        ? `Sunday start URL: ${startPreview}`
+        : "Sunday start URL: (record a step)";
       _refreshGuidedContext();
       if (_standaloneRecipeSteps().length > 0 && !recipeOpen) {
         recipeOpen = true;
@@ -5419,7 +5463,11 @@
       const _bootstrapParishContext = async () => {
         const pageUrl = _pageUrlForParishDetection();
         const hostname = _hostnameFromUrl(pageUrl);
-        if (standaloneStartUrl && !_hostsMatch(standaloneStartUrl, pageUrl)) {
+        const recorded = _standaloneRecipeSteps();
+        const hasClick = recorded.some(
+          (s) => String(s?.action || "").trim().toLowerCase() === "click"
+        );
+        if (!hasClick || !standaloneStartUrl || !_hostsMatch(standaloneStartUrl, pageUrl)) {
           standaloneStartUrl = pageUrl;
         }
         _purgeStaleHostnameMapEntry(hostname, pageUrl);
@@ -5585,7 +5633,7 @@
           `parishes/recipes/${key}.json`,
         ];
         for (const filePath of pathsToTry) {
-          const rawUrl = `https://raw.githubusercontent.com/${ghRepo}/main/${filePath}`;
+          const rawUrl = `https://raw.githubusercontent.com/${ghRepo}/main/${filePath}?t=${Date.now()}`;
           try {
             const resp = await fetch(rawUrl, { headers });
             if (!resp.ok) continue;
@@ -5599,6 +5647,10 @@
       };
 
       _loadExistingRecipeIfEmpty = async (resolved, contactName, hostname) => {
+        if (_skipLoadExistingRecipe) {
+          _skipLoadExistingRecipe = false;
+          return;
+        }
         if (_standaloneRecipeSteps().length > 0 || !resolved?.key) return;
         const loaded = await loadRecipeFromRawGithub(resolved.key, resolvedDiocese || resolved.diocese);
         if (!loaded?.recipe) return;
@@ -6041,6 +6093,12 @@
       return { ok: true };
     }
     if (message.type === "ph_show_toolbar") {
+      if (message.reason === "fix_now") {
+        recipeSteps = recipeSteps.filter((entry) => !entry?.recipeStep);
+        standaloneStartUrl = _pageUrlForParishDetection();
+        _skipLoadExistingRecipe = true;
+        void _clearRecordingSession();
+      }
       _ensureToolbar(true);
       void _markRecordingActive();
       window.dispatchEvent(new CustomEvent("ph-retraining-hint", { detail: { parish_key: message.parish_key || "" } }));

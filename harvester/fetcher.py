@@ -63,6 +63,8 @@ from .cloud_folders import (
 from .html_capture import capture_html_page_as_pdf
 from .replay import (
     RecipeReplayError,
+    _find_iframe_pdf_url,
+    _is_non_bulletin_url,
     _print_page_to_pdf,
     _try_joomla_dropfiles_click_download,
     recipe_path_for,
@@ -766,38 +768,19 @@ async def _find_pdfemb_url(page: Page) -> str | None:
     for href in links:
         resolved = _unwrap_docs_viewer_url(urljoin(page.url, href))
         lower = resolved.lower()
-        if lower.endswith(".pdf") or ".pdf" in lower:
-            return resolved
-    return None
-
-
-async def _find_iframe_pdf_url(page: Page) -> str | None:
-    """Return the first iframe src that is (or contains) a direct PDF URL.
-
-    Handles two cases:
-    1. The iframe ``src`` ends in ``.pdf`` or contains ``.pdf`` — treat as a
-       direct PDF URL.
-    2. The iframe ``src`` is a Google Docs viewer URL
-       (``docs.google.com/viewer?url=…``) — extract the real PDF URL from the
-       ``url=`` query parameter.
-    """
-    srcs = await page.eval_on_selector_all(
-        "iframe[src]",
-        "(els) => els.map(el => el.getAttribute('src')).filter(Boolean)",
-    )
-    for src in srcs:
-        if not isinstance(src, str) or not src.strip():
+        if not (lower.endswith(".pdf") or ".pdf" in lower):
             continue
-        resolved = urljoin(page.url, src.strip())
-        # Unwrap Google Docs viewer URLs first
-        unwrapped = _unwrap_docs_viewer_url(resolved)
-        lower_unwrapped = unwrapped.lower()
-        lower_resolved = resolved.lower()
-        # Direct PDF iframe
-        if ".pdf" in lower_unwrapped or ".pdf" in lower_resolved:
-            return unwrapped if unwrapped != resolved else resolved
-        # Google Docs viewer that wasn't unwrapped to a PDF — skip
+        if _is_non_bulletin_url(resolved):
+            continue
+        return resolved
     return None
+
+
+def _disallow_non_bulletin_url(url: str) -> str | None:
+    """Return an error message when *url* is clearly not a parish bulletin."""
+    if not url or not _is_non_bulletin_url(url):
+        return None
+    return f"Downloaded admin/non-bulletin document — not a weekly bulletin: {url}"
 
 
 def _unwrap_docs_viewer_url(url: str) -> str:
@@ -1493,6 +1476,17 @@ async def _recover_stale_bulletin(
     if result.status != "ok" or not result.url:
         return result
 
+    blocked = _disallow_non_bulletin_url(result.url)
+    if blocked:
+        print(f"  ⚠️  {entry.key}: {blocked}")
+        return FetchResult(
+            key=entry.key,
+            display_name=entry.display_name,
+            status="error",
+            url=result.url,
+            error=blocked,
+        )
+
     verdict = check_bulletin_freshness(result.url, target)
     if verdict.status != "stale":
         return result
@@ -1647,14 +1641,19 @@ async def _fetch_entry(
                     return forced
                 recipe_error = "Recipe returned HTML page but PDF capture failed"
             elif _is_real_pdf(replayed_path, key):
-                return FetchResult(
-                    key=key,
-                    display_name=entry.display_name,
-                    status="ok",
-                    url=replay_url,
-                    file_path=replayed_path,
-                    file_type=replay_file_type,
-                )
+                blocked = _disallow_non_bulletin_url(replay_url)
+                if blocked:
+                    recipe_error = blocked
+                    print(f"  ↩️  {key}: recipe replay rejected: {blocked}")
+                else:
+                    return FetchResult(
+                        key=key,
+                        display_name=entry.display_name,
+                        status="ok",
+                        url=replay_url,
+                        file_path=replayed_path,
+                        file_type=replay_file_type,
+                    )
         except RecipeReplayError as exc:
             msg = str(exc)
             if "Recipe outdated" in msg:
