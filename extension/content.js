@@ -6,6 +6,7 @@
   const TOOLBAR_ID = "ph-floating-toolbar";
   let toolbarReadyLogged = false;
   let recipeSteps = []; // single source of truth for both UI preview and standalone recipe push
+  let lastPushedRecipeNote = "";
   let pickLinkActive = false;
   let pickLinkHighlightEl = null;
   let pickLinkCancelListeners = [];
@@ -176,6 +177,115 @@
     return /\.(pdf|docx?|pptx?|odt|ods)(\?|#|$)/i.test(path);
   };
 
+  const _markNavigationStart = (url) => {
+    try {
+      sessionStorage.setItem(
+        "ph_train_nav_started",
+        JSON.stringify({ url: String(url || window.location.href), at: Date.now() })
+      );
+    } catch (_e) {
+      // ignore
+    }
+  };
+
+  const _clearNavigationMark = () => {
+    try {
+      sessionStorage.removeItem("ph_train_nav_started");
+    } catch (_e) {
+      // ignore
+    }
+  };
+
+  const _formatLoadDuration = (ms) => {
+    const n = Math.max(0, Math.round(Number(ms) || 0));
+    if (n < 1000) return `${n}ms`;
+    const sec = Math.floor(n / 1000);
+    if (sec < 60) return `${sec}s`;
+    const min = Math.floor(sec / 60);
+    const rem = sec % 60;
+    return rem ? `${min}m ${rem}s` : `${min}m`;
+  };
+
+  const _navigationStartedAtMs = () => {
+    try {
+      const raw = sessionStorage.getItem("ph_train_nav_started");
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        const target = String(parsed?.url || "");
+        const at = Number(parsed?.at || 0);
+        if (at > 0 && (!target || target === window.location.href)) return at;
+      }
+    } catch (_e) {
+      // ignore
+    }
+    const nav = performance.getEntriesByType?.("navigation")?.[0];
+    if (nav && Number.isFinite(nav.startTime) && performance.timeOrigin) {
+      return performance.timeOrigin + nav.startTime;
+    }
+    return Date.now();
+  };
+
+  let _pageLoadTimerStop = null;
+
+  const _attachPageLoadTimer = (el) => {
+    if (_pageLoadTimerStop) _pageLoadTimerStop();
+    if (!el) return;
+    el.style.display = "block";
+    let stopped = false;
+    let interval = null;
+
+    const tick = () => {
+      if (stopped) return;
+      const nav = performance.getEntriesByType?.("navigation")?.[0];
+      const domMs =
+        nav && nav.domContentLoadedEventEnd > 0 ? Math.round(nav.domContentLoadedEventEnd) : null;
+      const loadMs = nav && nav.loadEventEnd > 0 ? Math.round(nav.loadEventEnd) : null;
+      const startedAt = _navigationStartedAtMs();
+      const elapsed = Math.max(0, Date.now() - startedAt);
+      const stillLoading = document.readyState !== "complete" || !loadMs;
+
+      if (stillLoading) {
+        el.style.color = elapsed >= 30000 ? "#fde68a" : "#93c5fd";
+        el.textContent =
+          elapsed >= 60000
+            ? `⏱ Still loading… ${_formatLoadDuration(elapsed)} — very slow site`
+            : elapsed >= 15000
+              ? `⏱ Still loading… ${_formatLoadDuration(elapsed)} — slow site`
+              : `⏱ Still loading… ${_formatLoadDuration(elapsed)}`;
+        return;
+      }
+
+      _clearNavigationMark();
+      const total = loadMs || elapsed;
+      const domPart = domMs ? ` · page readable at ${_formatLoadDuration(domMs)}` : "";
+      if (total >= 60000) {
+        el.style.color = "#fca5a5";
+        el.textContent =
+          `⏱ Loaded in ${_formatLoadDuration(total)}${domPart} — very slow; Sunday harvest may timeout`;
+      } else if (total >= 15000) {
+        el.style.color = "#fde68a";
+        el.textContent = `⏱ Loaded in ${_formatLoadDuration(total)}${domPart} — slow site`;
+      } else {
+        el.style.color = "#86efac";
+        el.textContent = `⏱ Loaded in ${_formatLoadDuration(total)}${domPart}`;
+      }
+      stopped = true;
+      if (interval) clearInterval(interval);
+    };
+
+    interval = setInterval(tick, 500);
+    window.addEventListener("load", tick, { once: true });
+    document.addEventListener("readystatechange", tick);
+    tick();
+
+    _pageLoadTimerStop = () => {
+      stopped = true;
+      if (interval) clearInterval(interval);
+      document.removeEventListener("readystatechange", tick);
+      _pageLoadTimerStop = null;
+    };
+  };
+
   const _openUrlInRecordingTab = async (absUrl, showStatus) => {
     if (!absUrl || typeof chrome === "undefined" || !chrome.runtime?.sendMessage) return false;
     try {
@@ -213,6 +323,7 @@
       if (opened) return true;
     }
     if (showStatus) showStatus("✅ Step saved — opening link…", "info");
+    _markNavigationStart(absUrl);
     window.location.assign(absUrl);
     return true;
   };
@@ -1868,6 +1979,14 @@
   // ── Session step tracking ─────────────────────────────────────────────────
 
   const addSessionStep = (type, label) => {
+    if (_inStandaloneMode() && (type === "mark_file" || type === "download")) {
+      standaloneAddStep(
+        { action: "download", url: window.location.href },
+        type,
+        label
+      );
+      return;
+    }
     recipeSteps.push({ type, label, recipeStep: null });
     if (_stepsListEl) _renderSessionSteps();
     if (_refreshRecipeCount) _refreshRecipeCount();
@@ -1895,7 +2014,7 @@
     if (recipeSteps.length === 0) {
       const empty = document.createElement("div");
       empty.style.cssText = "opacity:0.55;font-size:10px;padding:2px 0;";
-      empty.textContent = "No steps recorded yet.";
+      empty.textContent = lastPushedRecipeNote || "No steps recorded yet — tap Step 2 Save on a PDF page, or Step 1 on a news page.";
       _stepsListEl.appendChild(empty);
       return;
     }
@@ -2184,6 +2303,15 @@
       window.dispatchEvent(
         new CustomEvent("ph-confirm-mark-download", { detail: { url } })
       );
+      return;
+    }
+    if (_inStandaloneMode()) {
+      standaloneAddStep(
+        { action: "download", url },
+        "mark_file",
+        `📄 File: ${url.slice(-50)}`
+      );
+      if (showStatus) showStatus("✅ Bulletin saved — scroll down to Send & test.", "ok");
       return;
     }
     if (window.ph_mark_download_url) {
@@ -3173,6 +3301,7 @@
     let patternHintBanner = null;
     let patternHintWrap = null;
     let parishRecordingLine = null;
+    let pageLoadTimerLine = null;
 
     const updateParishRecordingLine = (displayName, parishKey, hostname) => {
       if (!parishRecordingLine) return;
@@ -3187,10 +3316,12 @@
     const resetGuidedPanel = () => {
       const savedPattern = patternHintWrap;
       const savedParish = parishRecordingLine;
+      const savedLoadTimer = pageLoadTimerLine;
       const savedIdentify = identifyResult;
       _clearElement(guidedPanel);
       if (savedPattern) guidedPanel.appendChild(savedPattern);
       if (savedParish) guidedPanel.appendChild(savedParish);
+      if (savedLoadTimer) guidedPanel.appendChild(savedLoadTimer);
       guidedPanel.appendChild(journeyStepBar);
       guidedPanel.appendChild(playbookPanel);
       guidedPanel.appendChild(nextStepBanner);
@@ -3467,6 +3598,7 @@
       _clearElement(guidedPanel);
       if (patternHintWrap) guidedPanel.appendChild(patternHintWrap);
       if (parishRecordingLine) guidedPanel.appendChild(parishRecordingLine);
+      if (pageLoadTimerLine) guidedPanel.appendChild(pageLoadTimerLine);
 
       const confirmQ = document.createElement("div");
       confirmQ.style.cssText = "font-weight:600;color:#93c5fd;margin-bottom:6px;font-size:11px;";
@@ -4161,7 +4293,22 @@
       "color:#bbf7d0",
       "margin-bottom:6px",
     ].join(";");
+
+    pageLoadTimerLine = document.createElement("div");
+    pageLoadTimerLine.style.cssText = [
+      "display:none",
+      "font-size:9px",
+      "line-height:1.4",
+      "margin-bottom:6px",
+      "padding:4px 6px",
+      "border-radius:4px",
+      "background:#0f172a",
+      "border:1px solid #334155",
+    ].join(";");
+    pageLoadTimerLine.title = "How long this page took to load while you train the recipe";
+
     guidedPanel.appendChild(parishRecordingLine);
+    guidedPanel.appendChild(pageLoadTimerLine);
     guidedPanel.appendChild(journeyStepBar);
     guidedPanel.appendChild(playbookPanel);
     guidedPanel.appendChild(nextStepBanner);
@@ -4171,6 +4318,7 @@
     guidedPanel.appendChild(moreOptionsSection);
     guidedPanel.appendChild(stuckLink);
     updateParishRecordingLine("", "", _currentHostname());
+    if (_inStandaloneMode()) _attachPageLoadTimer(pageLoadTimerLine);
     _refreshGuidedContext();
 
     // guidedPanel is attached to scrollable body after recipe preview (below).
@@ -4186,6 +4334,7 @@
         showStatus("✅ Recording continued on this page.", "ok");
       }
       _refreshGuidedContext();
+      if (pageLoadTimerLine && _inStandaloneMode()) _attachPageLoadTimer(pageLoadTimerLine);
       if (_stepsListEl) _renderSessionSteps();
       if (_refreshRecipeCount) _refreshRecipeCount();
     });
@@ -4572,9 +4721,15 @@
 
     // Wire up the recipe count refresh callback
     _refreshRecipeCount = () => {
-      recipeTitleEl.textContent = `📋 Recipe Preview (${recipeSteps.length} step${
-        recipeSteps.length !== 1 ? "s" : ""
-      })`;
+      const sentCount = _standaloneRecipeSteps().length;
+      if (sentCount > 0) {
+        lastPushedRecipeNote = "";
+        recipeTitleEl.textContent = `📋 Recipe Preview (${sentCount} step${sentCount !== 1 ? "s" : ""})`;
+      } else if (lastPushedRecipeNote) {
+        recipeTitleEl.textContent = "📋 Recipe Preview — sent to GitHub";
+      } else {
+        recipeTitleEl.textContent = "📋 Recipe Preview (0 steps)";
+      }
       const startPreview = _resolveRecipeStartUrl();
       recipeStartUrlEl.textContent = startPreview
         ? `Sunday start URL: ${startPreview}`
@@ -5851,17 +6006,23 @@
           );
           return;
         }
-        if (_standaloneRecipeSteps().length === 0) { showStatus("⚠️ No steps recorded yet.", "warn"); return; }
-        const ensured = _ensureTerminalPdfStep();
-        if (!ensured.ok) {
+        const ensuredTerminal = _ensureTerminalPdfStep();
+        if (_standaloneRecipeSteps().length === 0) {
           showStatus(
-            "❌ Finish with PDF capture first — tap 📄 Save this PDF, 📰 Save page as PDF, or 🖼️ image.",
+            "⚠️ No steps recorded yet — tap 💾 Step 2: Save this PDF (or 👉 Step 1 on a news page).",
+            "warn"
+          );
+          return;
+        }
+        if (!ensuredTerminal.ok) {
+          showStatus(
+            "❌ Finish with PDF capture first — tap 💾 Step 2: Save this PDF, 📰 Save page as PDF, or 🖼️ image.",
             "error"
           );
           return;
         }
-        if (ensured.added) {
-          showStatus("✅ PDF step added automatically — pushing…", "info");
+        if (ensuredTerminal.added) {
+          showStatus("✅ PDF step added automatically — sending…", "info");
         }
         const recorded = _standaloneRecipeSteps();
         const lastStep = recorded[recorded.length - 1];
@@ -5963,6 +6124,9 @@
               diocese,
               recipe.start_url || window.location.href
             );
+            const pushedSteps = recorded.length;
+            lastPushedRecipeNote =
+              `✅ Sent ${pushedSteps} step${pushedSteps === 1 ? "" : "s"} to GitHub — watch the Problems tab for the bulletin link.`;
             clearStandaloneRecipe();
             refreshStepCount();
             void checkStartUrlDrift();

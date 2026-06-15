@@ -22,6 +22,7 @@ const _spPanels = {
 
 const PROBLEMS_FIX_VISITED_KEY = "ph_problems_fix_visited";
 const PROBLEMS_RECIPE_RETRAINED_KEY = "ph_recipe_retrained";
+const PH_LAST_DISPATCH_KEY = "ph_last_parish_dispatch";
 
 async function _problemsRepoUrls() {
   const cfg = await chrome.storage.local.get(["gh_repo"]);
@@ -1189,6 +1190,13 @@ function _problemsShowVerifyResult(payload) {
   box.style.display = "block";
 }
 
+async function _problemsGetLastDispatch(parishKey) {
+  const data = await _spStorageGet([PH_LAST_DISPATCH_KEY]);
+  const map = data[PH_LAST_DISPATCH_KEY];
+  if (!map || typeof map !== "object") return null;
+  return map[String(parishKey || "").trim().toLowerCase()] || null;
+}
+
 async function _problemsPollHarvestResult({
   parishKey,
   displayName,
@@ -1197,19 +1205,33 @@ async function _problemsPollHarvestResult({
   dispatchStarted,
   verifyBtn,
 }) {
-  setStatus(`⏳ Testing ${displayName} on GitHub — checking every 12s…`, "warn");
   const links = _problemsGithubLinks(ghRepo);
   let runUrl = links.actions;
+  const started = Number(dispatchStarted) || Date.now();
+  _problemsShowVerifyResult({
+    ok: null,
+    displayName,
+    parishKey,
+    repo: ghRepo,
+    runUrl,
+    message: "Checking GitHub now — slow sites can take 2–5 minutes…",
+  });
+  setStatus(`⏳ Testing ${displayName} on GitHub…`, "warn");
 
-  for (let attempt = 0; attempt < 30; attempt += 1) {
-    await new Promise((resolve) => setTimeout(resolve, 12_000));
-    const run = await _problemsFindLatestWorkflowRun(ghPat, ghRepo, dispatchStarted);
+  for (let attempt = 0; attempt < 40; attempt += 1) {
+    if (attempt > 0) {
+      const delay = attempt < 10 ? 3000 : 12000;
+      await new Promise((resolve) => setTimeout(resolve, delay));
+    }
+    if (verifyBtn) verifyBtn.textContent = `⏳ ${Math.round((Date.now() - started) / 1000)}s…`;
+
+    const run = await _problemsFindLatestWorkflowRun(ghPat, ghRepo, started);
     if (run?.html_url) runUrl = run.html_url;
-    const report = await _problemsFetchLiveReport(ghRepo);
-    if (!report) continue;
-
-    const parishStatus = _problemsParishHarvestStatus(report, parishKey);
     const workflowDone = run && run.status === "completed";
+    const workflowRunning = run && (run.status === "in_progress" || run.status === "queued" || run.status === "pending");
+
+    const report = await _problemsFetchLiveReport(ghRepo);
+    const parishStatus = report ? _problemsParishHarvestStatus(report, parishKey) : { status: "unknown", item: null };
 
     if (parishStatus.status === "ok") {
       await _problemsClearRetrained(parishKey);
@@ -1222,10 +1244,25 @@ async function _problemsPollHarvestResult({
         runUrl,
         item: parishStatus.item,
       });
-      setStatus(`✅ ${displayName} verified — bulletin downloaded.`, "ok");
-      if (verifyBtn) verifyBtn.textContent = "✅ Verified";
+      setStatus(`✅ ${displayName} verified — bulletin link below.`, "ok");
+      if (verifyBtn) verifyBtn.textContent = "✅ Done";
       void loadProblemsDashboard();
       return;
+    }
+
+    if (workflowRunning) {
+      const runStatus = run.status === "queued" || run.status === "pending"
+        ? "queued (another harvest may be ahead — please wait)"
+        : "running on GitHub";
+      _problemsShowVerifyResult({
+        ok: null,
+        displayName,
+        parishKey,
+        repo: ghRepo,
+        runUrl,
+        message: `${runStatus} — ${Math.round((Date.now() - started) / 1000)}s elapsed. Result appears here when done.`,
+      });
+      continue;
     }
 
     if (workflowDone && parishStatus.status === "failed") {
@@ -1240,9 +1277,20 @@ async function _problemsPollHarvestResult({
       setStatus(`❌ ${displayName} still failing — see links below.`, "err");
       if (verifyBtn) {
         verifyBtn.disabled = false;
-        verifyBtn.textContent = "▶ Retry verify";
+        verifyBtn.textContent = "▶ Test again";
       }
       return;
+    }
+
+    if (workflowDone && parishStatus.status === "unknown") {
+      _problemsShowVerifyResult({
+        ok: null,
+        displayName,
+        parishKey,
+        repo: ghRepo,
+        runUrl,
+        message: "GitHub finished but report not updated yet — try Refresh in a moment.",
+      });
     }
   }
 
@@ -1252,22 +1300,26 @@ async function _problemsPollHarvestResult({
     parishKey,
     repo: ghRepo,
     runUrl,
-    message: "Timed out waiting — open the Actions run to check progress.",
+    message: "Timed out waiting — open the Actions run link below to see progress.",
   });
-  setStatus(`⚠️ Harvest still running for ${displayName} — open Actions link below.`, "warn");
+  setStatus(`⚠️ Still waiting for ${displayName} — open Actions link below.`, "warn");
   if (verifyBtn) {
     verifyBtn.disabled = false;
     verifyBtn.textContent = "▶ Test again";
   }
 }
 
-async function _problemsWatchParishHarvest(parishKey, displayName) {
+async function _problemsWatchParishHarvest(parishKey, displayName, dispatchAt) {
   const cfg = await _pdGetGithubConfig();
   if (!cfg || !parishKey) return;
-  const dispatchStarted = Date.now() - 30_000;
+  const stored = await _problemsGetLastDispatch(parishKey);
+  const dispatchStarted =
+    Number(dispatchAt) ||
+    Number(stored?.at) ||
+    Date.now() - 30_000;
   await _problemsPollHarvestResult({
     parishKey,
-    displayName: displayName || parishKey,
+    displayName: displayName || stored?.displayName || parishKey,
     ghPat: cfg.ghPat,
     ghRepo: cfg.ghRepo,
     dispatchStarted,
@@ -1275,7 +1327,7 @@ async function _problemsWatchParishHarvest(parishKey, displayName) {
   });
 }
 
-async function _problemsVerifyHarvest(row, verifyBtn) {
+async function _problemsVerifyHarvest(row, verifyBtn, { forceDispatch = false } = {}) {
   const cfg = await _pdGetGithubConfig();
   if (!cfg) {
     setStatus("❌ GitHub PAT not set — open ⚙️ Settings in the popup.", "err");
@@ -1283,12 +1335,29 @@ async function _problemsVerifyHarvest(row, verifyBtn) {
   }
   const parishKey = row.parish;
   const displayName = row.display_name || parishKey;
+  const lastDispatch = await _problemsGetLastDispatch(parishKey);
+  const recentDispatch =
+    lastDispatch?.at && Date.now() - lastDispatch.at < 45 * 60 * 1000;
+
   if (verifyBtn) {
     verifyBtn.disabled = true;
-    verifyBtn.textContent = "⏳ Running…";
+    verifyBtn.textContent = "⏳ Checking…";
   }
-  setStatus(`⏳ Triggering harvest for ${displayName}…`, "warn");
 
+  if (!forceDispatch && recentDispatch) {
+    setStatus(`⏳ Checking GitHub result for ${displayName}…`, "warn");
+    await _problemsPollHarvestResult({
+      parishKey,
+      displayName,
+      ghPat: cfg.ghPat,
+      ghRepo: cfg.ghRepo,
+      dispatchStarted: lastDispatch.at,
+      verifyBtn,
+    });
+    return;
+  }
+
+  setStatus(`⏳ Starting new test for ${displayName}…`, "warn");
   const dispatchStarted = Date.now();
   const dispatch = await _pdDispatchHarvest(parishKey);
   if (!dispatch.ok) {
@@ -1299,6 +1368,10 @@ async function _problemsVerifyHarvest(row, verifyBtn) {
     }
     return;
   }
+
+  const dispatchMap = (await _spStorageGet([PH_LAST_DISPATCH_KEY]))[PH_LAST_DISPATCH_KEY] || {};
+  dispatchMap[parishKey] = { at: dispatchStarted, displayName };
+  await _spStorageSet({ [PH_LAST_DISPATCH_KEY]: dispatchMap });
 
   await _problemsPollHarvestResult({
     parishKey,
@@ -1396,9 +1469,9 @@ async function _problemsRenderRows(rows) {
       verifyBtn.type = "button";
       verifyBtn.className = "problems-verify-btn";
       verifyBtn.textContent = "▶ Check result";
-      verifyBtn.title = "Re-run the single-parish test and show the bulletin link";
+      verifyBtn.title = "Check the GitHub test result (does not start a new test if one ran recently)";
       verifyBtn.addEventListener("click", () => {
-        void _problemsVerifyHarvest(row, verifyBtn);
+        void _problemsVerifyHarvest(row, verifyBtn, { forceDispatch: false });
       });
       action.appendChild(verifyBtn);
     }
@@ -2188,7 +2261,11 @@ chrome.runtime.onMessage.addListener((message) => {
     _spShowPanel("problems");
     void loadProblemsDashboard().then(() => {
       if (message.parish_key) {
-        void _problemsWatchParishHarvest(message.parish_key, message.display_name || message.parish_key);
+        void _problemsWatchParishHarvest(
+          message.parish_key,
+          message.display_name || message.parish_key,
+          message.dispatch_at
+        );
       }
     });
     return;

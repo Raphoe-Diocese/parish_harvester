@@ -1,5 +1,6 @@
 const SCRIPTABLE_PROTOCOLS = new Set(["http:", "https:"]);
 const PROBLEMS_RECIPE_RETRAINED_KEY = "ph_recipe_retrained";
+const PH_LAST_DISPATCH_KEY = "ph_last_parish_dispatch";
 
 try {
   importScripts("github_defaults.js");
@@ -876,11 +877,24 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
           retrained[key] = normalizedRecipe.recorded_date || new Date().toISOString().slice(0, 10);
         }
         await chrome.storage.local.set({ [PROBLEMS_RECIPE_RETRAINED_KEY]: retrained });
+        if (dispatchOk) {
+          const dispatchStored = await chrome.storage.local.get([PH_LAST_DISPATCH_KEY]);
+          const dispatchMap =
+            dispatchStored?.[PH_LAST_DISPATCH_KEY] && typeof dispatchStored[PH_LAST_DISPATCH_KEY] === "object"
+              ? { ...dispatchStored[PH_LAST_DISPATCH_KEY] }
+              : {};
+          dispatchMap[key] = {
+            at: Date.now(),
+            displayName: normalizedRecipe.display_name || key,
+          };
+          await chrome.storage.local.set({ [PH_LAST_DISPATCH_KEY]: dispatchMap });
+        }
         try {
           chrome.runtime.sendMessage({
             type: "problems_refresh",
             parish_key: key,
             display_name: normalizedRecipe.display_name || key,
+            dispatch_at: dispatchOk ? Date.now() : 0,
           });
         } catch (_broadcastErr) {
           // Side panel may be closed — non-fatal.
