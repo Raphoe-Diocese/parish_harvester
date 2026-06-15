@@ -748,9 +748,11 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       const incoming = message.recipe || {};
       const recipe = existingRecipe ? {
         ...existingRecipe,
-        // Always overwrite with the freshly-recorded steps and metadata.
         ...incoming,
-        // Keep the original display_name / diocese unless the new one is non-empty.
+        steps: Array.isArray(incoming.steps) ? incoming.steps : existingRecipe.steps,
+        start_url: (incoming.start_url && String(incoming.start_url).trim())
+          ? incoming.start_url
+          : existingRecipe.start_url,
         display_name: (incoming.display_name && incoming.display_name.trim()) ? incoming.display_name.trim() : existingRecipe.display_name,
         diocese:      (incoming.diocese      && incoming.diocese.trim())      ? incoming.diocese.trim()      : existingRecipe.diocese,
       } : incoming;
@@ -796,6 +798,9 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
       const result = await putResp.json();
       const htmlUrl = result?.content?.html_url || `https://github.com/${gh_repo}/blob/main/${filePath}`;
+
+      // Brief pause so GitHub serves the recipe commit before the harvest workflow checks out main.
+      await new Promise((resolve) => setTimeout(resolve, 2500));
 
       // After saving the recipe, immediately trigger a workflow_dispatch so
       // the Mega PDF is rebuilt for just this parish right away.

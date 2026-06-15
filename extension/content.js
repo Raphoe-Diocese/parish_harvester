@@ -933,18 +933,26 @@
   const buildStableLinkSelector = (el) => {
     if (!el) return "";
     const tag = el.tagName.toLowerCase();
+    const href = (el.getAttribute("href") || "").trim();
     const text = (el.innerText || el.textContent || "")
       .trim()
       .replace(/\s+/g, " ")
-      .slice(0, 80);
+      .slice(0, 120);
     const role = el.getAttribute("role") || "";
-    // Escape backslashes first, then double-quotes, for a valid Playwright selector
     const escapeForSelector = (s) => s.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
-    if (text && text.length >= 3 && text.length <= 60) {
-      return `${tag}:has-text("${escapeForSelector(text)}")`;
+    if (href && /\.pdf/i.test(href)) {
+      const tail = href.split("/").filter(Boolean).pop() || href;
+      if (tail.length >= 6) {
+        return `a[href*="${escapeForSelector(tail)}"]`;
+      }
+      return "a[href$='.pdf']";
     }
-    if (role) {
-      return `[role="${role}"]:has-text("${escapeForSelector(text)}")`;
+    if (text && text.length >= 3 && text.length <= 100) {
+      const short = text.slice(0, 60);
+      return `${tag}:has-text("${escapeForSelector(short)}")`;
+    }
+    if (role && text) {
+      return `[role="${role}"]:has-text("${escapeForSelector(text.slice(0, 60))}")`;
     }
     return cssPath(el);
   };
@@ -2284,11 +2292,13 @@
 
   const _standaloneAddClickAndDownload = (clickStep, downloadUrl, clickLabel, showStatus) => {
     standaloneAddStep(clickStep, "click", clickLabel);
-    standaloneAddStep(
-      { action: "download", url: downloadUrl },
-      "mark_file",
-      `📄 Download: ${downloadUrl.slice(-50)}`
-    );
+    if (downloadUrl && _isPdfOrDocUrl(downloadUrl)) {
+      standaloneAddStep(
+        { action: "download", use_page_url: true, url_pattern: "*.pdf" },
+        "mark_file",
+        "📄 Save PDF from opened bulletin page"
+      );
+    }
     void _persistRecordingSession();
     if (showStatus) {
       showStatus(
@@ -2346,10 +2356,13 @@
       return;
     }
     if (_inStandaloneMode()) {
+      const onPdfPage = _isPdfOrDocUrl(url) || _pageIsNativePdfViewer();
       standaloneAddStep(
-        { action: "download", url },
+        onPdfPage
+          ? { action: "download", use_page_url: true, url_pattern: "*.pdf" }
+          : { action: "download", url, use_captured_url: true },
         "mark_file",
-        `📄 File: ${url.slice(-50)}`
+        onPdfPage ? "📄 Save PDF from this page" : `📄 File: ${url.slice(-50)}`
       );
       if (showStatus) showStatus("✅ Bulletin saved — scroll down to Send & test.", "ok");
       return;
@@ -3736,14 +3749,15 @@
             return;
           }
           standaloneAddStep(
-            { action: "download", url: absUrl },
+            { action: "download", use_page_url: true, url_pattern: "*.pdf" },
             "mark_file",
-            `📄 Download: ${absUrl.slice(-50)}`
+            "📄 Save PDF from opened bulletin page"
           );
           void _persistRecordingSession();
           _notifyRecordingTabActive();
-          showStatus("✅ Click + download saved — push recipe when ready.", "ok");
-          resetGuidedPanel();
+          showStatus("✅ Click saved — opening bulletin. Tap Save this PDF on the PDF page.", "ok");
+          if (absUrl) void _navigateRecordingToUrl(absUrl, selectedEl, showStatus);
+          else resetGuidedPanel();
           return;
         }
 

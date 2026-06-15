@@ -260,11 +260,17 @@ async def _save_download_to_pdf(download, dest: Path) -> str:
     return "pdf"
 
 
-async def _download_document_url(page: Page, raw_url: str, dest: Path) -> tuple[str, str]:
+async def _download_document_url(
+    page: Page,
+    raw_url: str,
+    dest: Path,
+    *,
+    timeout_ms: int = PAGE_LOAD_TIMEOUT_MS,
+) -> tuple[str, str]:
     url = _normalize_doc_url(raw_url)
     if _is_non_bulletin_url(url):
         raise RecipeReplayError(f"Refusing non-bulletin document URL: {raw_url}")
-    response = await page.request.get(url, timeout=PAGE_LOAD_TIMEOUT_MS)
+    response = await page.request.get(url, timeout=timeout_ms)
     if not response.ok:
         raise RecipeReplayError(f"HTTP {response.status} for {raw_url}")
 
@@ -357,16 +363,39 @@ async def _try_browser_nav_download(
     return None
 
 
-async def _try_download_page_url(page: Page, dest: Path, raw_url: str | None = None) -> tuple[str, str] | None:
+def _resolve_download_candidates(
+    step_url: str,
+    *,
+    target_date: date | None,
+    use_captured_url: bool = False,
+) -> list[str]:
+    step_url = (step_url or "").strip()
+    if not step_url:
+        return []
+    if use_captured_url or not target_date:
+        return [step_url]
+    if "newsletter" in step_url.lower() and "onewebmedia" in step_url.lower():
+        return oneweb_newsletter_download_urls(step_url, target_date)
+    if re.search(r"/(?:Newsletters|Weekly-Bulletins)/\d+/", step_url, re.I):
+        return [rewrite_newsletter_number_for_target(step_url, target_date)]
+    return [rewrite_date_url(step_url, target_date)]
+
+
+async def _try_download_page_url(
+    page: Page,
+    dest: Path,
+    raw_url: str | None = None,
+    timeout_ms: int = PAGE_LOAD_TIMEOUT_MS,
+) -> tuple[str, str] | None:
     """Download a URL that serves PDF bytes without a .pdf suffix (e.g. cappaghparish.com/b/2)."""
     url = (raw_url or page.url or "").strip()
     if not url or url.startswith(("about:", "chrome:", "blob:", "data:")):
         return None
     try:
-        return await _download_document_url(page, url, dest)
+        return await _download_document_url(page, url, dest, timeout_ms=timeout_ms)
     except RecipeReplayError:
         pass
-    return await _try_browser_nav_download(page, dest, url, PAGE_LOAD_TIMEOUT_MS)
+    return await _try_browser_nav_download(page, dest, url, timeout_ms)
 
 
 async def _download_image_url_as_pdf(page: Page, raw_url: str, dest: Path) -> tuple[str, str]:
@@ -525,9 +554,25 @@ async def replay_recipe(
                 if picked:
                     return dest, picked[1], picked[0]
                 if _is_document_url(page.url):
-                    source_url, file_type = await _download_document_url(page, page.url, dest)
+                    source_url, file_type = await _download_document_url(
+                        page, page.url, dest, timeout_ms=step_timeout_ms
+                    )
                     return dest, file_type, source_url
-                tried = await _try_download_page_url(page, dest)
+                click_href = (step.get("href") or "").strip()
+                if click_href:
+                    resolved_href = urljoin(page.url, click_href)
+                    href_candidates = _resolve_download_candidates(
+                        resolved_href,
+                        target_date=target_date,
+                        use_captured_url=bool(step.get("use_captured_url")),
+                    )
+                    for candidate in href_candidates:
+                        tried = await _try_download_page_url(
+                            page, dest, candidate, timeout_ms=step_timeout_ms
+                        )
+                        if tried:
+                            return dest, tried[1], tried[0]
+                tried = await _try_download_page_url(page, dest, timeout_ms=step_timeout_ms)
                 if tried:
                     return dest, tried[1], tried[0]
                 continue
@@ -540,27 +585,31 @@ async def replay_recipe(
 
                 pattern = (step.get("url_pattern") or "*.pdf").strip() or "*.pdf"
                 step_url = (step.get("url") or "").strip()
+                use_captured = bool(step.get("use_captured_url"))
+                if step.get("use_page_url"):
+                    step_url = (page.url or "").strip()
+                    use_captured = True
                 download_candidates: list[str] = []
                 if step_url:
-                    if target_date:
-                        if "newsletter" in step_url.lower() and "onewebmedia" in step_url.lower():
-                            download_candidates = oneweb_newsletter_download_urls(step_url, target_date)
-                        elif re.search(r"/(?:Newsletters|Weekly-Bulletins)/\d+/", step_url, re.I):
-                            download_candidates = [rewrite_newsletter_number_for_target(step_url, target_date)]
-                        else:
-                            download_candidates = [rewrite_date_url(step_url, target_date)]
-                    else:
-                        download_candidates = [step_url]
+                    download_candidates = _resolve_download_candidates(
+                        step_url,
+                        target_date=target_date,
+                        use_captured_url=use_captured,
+                    )
                 for candidate in download_candidates:
-                    tried = await _try_download_page_url(page, dest, candidate)
+                    tried = await _try_download_page_url(
+                        page, dest, candidate, timeout_ms=step_timeout_ms
+                    )
                     if tried:
                         return dest, tried[1], tried[0]
 
                 if _is_document_url(page.url):
-                    source_url, file_type = await _download_document_url(page, page.url, dest)
+                    source_url, file_type = await _download_document_url(
+                        page, page.url, dest, timeout_ms=step_timeout_ms
+                    )
                     return dest, file_type, source_url
 
-                tried = await _try_download_page_url(page, dest)
+                tried = await _try_download_page_url(page, dest, timeout_ms=step_timeout_ms)
                 if tried:
                     return dest, tried[1], tried[0]
 
