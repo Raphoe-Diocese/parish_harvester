@@ -100,7 +100,6 @@ parish_harvester/
 │   ├── logger.py       # Centralized logging
 │   └── ...
 ├── extension/          # Chrome extension
-│   ├── agents/         # Smart Extract AI agents
 │   ├── content.js      # Toolbar & UI
 │   └── manifest.json
 ├── ocr/                # OCR processing

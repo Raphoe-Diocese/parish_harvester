@@ -45,7 +45,6 @@ from .config import (
     PARISHES_DIR,
     TOTAL_TIMEOUT_S,
 )
-from . import learned_recipes
 from .browser_launch import (
     headful_fallback_enabled,
     launch_harvester_browser,
@@ -93,10 +92,6 @@ _RETRY_DELAY_S: float = 3.0
 HTML_RENDER_MIN_BYTES = 4096
 _HOST_PROFILES_CACHE: dict | None = None
 _HEADER_DASH_CLASS = r"[-\u2013\u2014]"
-_MISTRAL_API_URL = "https://api.mistral.ai/v1/chat/completions"
-_MISTRAL_MODEL = "mistral-small-latest"
-_MISTRAL_TIMEOUT_S = 30
-_MISTRAL_MAX_LINKS = 120
 
 
 # ---------------------------------------------------------------------------
@@ -1465,23 +1460,6 @@ async def _fetch_from_manual_override(
     )
 
 
-def _mistral_is_enabled() -> bool:
-    return bool(os.getenv("MISTRAL_API_KEY", "").strip())
-
-
-def _mistral_fallback_enabled(recipe_path: Path, recipe_meta: dict | None = None) -> bool:
-    """Mistral URL-guessing is opt-in; it must not override trained recipes."""
-    meta = recipe_meta if isinstance(recipe_meta, dict) else {}
-    if _trained_recipe_exists(recipe_path, meta):
-        return False
-    flag = os.getenv("PARISH_NO_MISTRAL_FALLBACK", "").strip().lower()
-    if flag in {"1", "true", "yes"}:
-        return False
-    if os.getenv("PARISH_MISTRAL_FALLBACK", "").strip().lower() in {"1", "true", "yes"}:
-        return _mistral_is_enabled()
-    return False
-
-
 def _trained_recipe_exists(recipe_path: Path, recipe_meta: dict) -> bool:
     if not recipe_path.exists():
         return False
@@ -1490,7 +1468,7 @@ def _trained_recipe_exists(recipe_path: Path, recipe_meta: dict) -> bool:
 
 
 def _legacy_fallbacks_enabled(recipe_path: Path, recipe_meta: dict) -> bool:
-    """Pattern H, scrape, and learned playbooks — only when no trained recipe."""
+    """Pattern H and scrape fallbacks — only when no trained recipe."""
     return not _trained_recipe_exists(recipe_path, recipe_meta)
 
 
@@ -1500,300 +1478,6 @@ def _load_recipe_metadata(recipe_path: Path) -> dict:
     except Exception:
         return {}
     return data if isinstance(data, dict) else {}
-
-
-def _learned_recipe_is_eligible(data: dict | None, today: date) -> bool:
-    if not isinstance(data, dict):
-        return False
-    try:
-        success_rate = float(data.get("success_rate", 0.0))
-    except (TypeError, ValueError):
-        return False
-    if success_rate < 0.5:
-        return False
-    last_success_date = str(data.get("last_success_date") or "").strip()
-    if not last_success_date:
-        return False
-    try:
-        last_success = date.fromisoformat(last_success_date)
-    except ValueError:
-        return False
-    return (today - last_success).days <= 60
-
-
-async def _replay_learned_playbook(playbook: list, dest: Path, browser: Browser) -> tuple[Path, str, str]:
-    steps = [step for step in playbook if isinstance(step, dict)]
-    if not steps:
-        raise RecipeReplayError("Learned playbook has no steps")
-    recipe_payload = {"steps": steps}
-    with tempfile.NamedTemporaryFile("w", suffix=".json", delete=False, encoding="utf-8") as tmp:
-        json.dump(recipe_payload, tmp)
-        tmp.flush()
-        recipe_path = Path(tmp.name)
-    try:
-        return await replay_recipe(recipe_path=recipe_path, dest=dest, browser=browser)
-    finally:
-        recipe_path.unlink(missing_ok=True)
-
-
-def _normalize_mistral_url(raw: str) -> str:
-    text = (raw or "").strip()
-    if not text:
-        return ""
-    text = text.strip().strip("`").strip("'\"")
-    match = re.search(r"https?://\S+", text)
-    if match:
-        text = match.group(0)
-    text = text.rstrip("),.;]>")
-    parsed = urlparse(text)
-    if parsed.scheme not in {"http", "https"} or not parsed.netloc:
-        return ""
-    return text
-
-
-def _build_auto_healed_steps(url: str) -> list[dict[str, str]]:
-    path = urlparse(url).path.lower()
-    if path.endswith((".jpg", ".jpeg", ".png", ".webp")):
-        return [{"action": "image", "url": url}]
-    return [
-        {"action": "goto", "url": url},
-        {"action": "download"},
-    ]
-
-
-def _write_auto_healed_recipe(
-    entry: ParishEntry,
-    recipe_path: Path,
-    url: str,
-    target: date,
-) -> None:
-    payload: dict = {}
-    if recipe_path.exists():
-        try:
-            payload = json.loads(recipe_path.read_text(encoding="utf-8"))
-        except Exception:
-            payload = {}
-    payload["parish_key"] = entry.key
-    payload["display_name"] = entry.display_name
-    payload["recorded_date"] = target.isoformat()
-    payload["start_url"] = payload.get("start_url") or entry.bulletin_page or entry.example_url or url
-    payload["steps"] = _build_auto_healed_steps(url)
-    recipe_path.parent.mkdir(parents=True, exist_ok=True)
-    recipe_path.write_text(json.dumps(payload, indent=2) + "\n", encoding="utf-8")
-
-
-async def _extract_condensed_page_links(
-    scrape_url: str,
-    browser: Browser,
-    host_profile: dict | None = None,
-) -> tuple[str, list[tuple[str, str]]]:
-    context = await new_harvester_context(browser)
-    page = await context.new_page()
-    host_profile = host_profile or _get_host_profile(scrape_url)
-    navigation_timeout_ms = int(host_profile.get("navigation_timeout_ms", PAGE_LOAD_TIMEOUT_MS))
-    wait_after_load_ms = int(host_profile.get("wait_after_load_ms", 1500))
-    try:
-        await page.goto(
-            scrape_url.replace(" ", "%20"),
-            timeout=navigation_timeout_ms,
-            wait_until="domcontentloaded",
-        )
-        try:
-            await page.wait_for_load_state("networkidle", timeout=min(navigation_timeout_ms, 5_000))
-        except PlaywrightTimeoutError:
-            pass
-        await _page_wait(page, wait_after_load_ms)
-        raw_links = await page.eval_on_selector_all(
-            "a[href]",
-            """
-            (els) => els.map(el => ({
-                href: el.getAttribute('href') || '',
-                text: (el.innerText || el.textContent || '').replace(/\\s+/g, ' ').trim(),
-            }))
-            """,
-        )
-        links: list[tuple[str, str]] = []
-        seen: set[str] = set()
-        for item in raw_links:
-            if not isinstance(item, dict):
-                continue
-            href = str(item.get("href", "")).strip()
-            if not href or href.startswith(("#", "javascript:", "mailto:", "tel:")):
-                continue
-            resolved = urljoin(page.url, href)
-            parsed = urlparse(resolved)
-            if parsed.scheme not in {"http", "https"} or not parsed.netloc:
-                continue
-            norm = resolved.lower()
-            if norm in seen:
-                continue
-            seen.add(norm)
-            label = re.sub(r"\s+", " ", str(item.get("text", ""))).strip()
-            if len(label) > 140:
-                label = f"{label[:137]}..."
-            links.append((resolved, label))
-            if len(links) >= _MISTRAL_MAX_LINKS:
-                break
-        return page.url, links
-    finally:
-        try:
-            await context.close()
-        except Exception:
-            pass
-
-
-def _build_mistral_prompt(page_url: str, links: list[tuple[str, str]]) -> str:
-    lines = [
-        "Identify the link that points to the most recent weekly parish bulletin or newsletter.",
-        "Return ONLY the exact URL as plain text, no markdown, no explanation.",
-        f"Page URL: {page_url}",
-        "Links:",
-    ]
-    for idx, (url, label) in enumerate(links, start=1):
-        lines.append(f"{idx}. {label or '(no text)'} -> {url}")
-    return "\n".join(lines)
-
-
-def _call_mistral_for_bulletin_url(page_url: str, links: list[tuple[str, str]]) -> str:
-    api_key = os.getenv("MISTRAL_API_KEY", "").strip()
-    if not api_key:
-        raise RuntimeError("MISTRAL_API_KEY is not configured")
-    request_body = {
-        "model": _MISTRAL_MODEL,
-        "temperature": 0,
-        "max_tokens": 80,
-        "messages": [
-            {
-                "role": "user",
-                "content": _build_mistral_prompt(page_url, links),
-            }
-        ],
-    }
-    request = Request(
-        _MISTRAL_API_URL,
-        data=json.dumps(request_body).encode("utf-8"),
-        headers={
-            "Authorization": f"Bearer {api_key}",
-            "Content-Type": "application/json",
-            "Accept": "application/json",
-        },
-        method="POST",
-    )
-    try:
-        with urlopen(request, timeout=_MISTRAL_TIMEOUT_S) as response:
-            payload = json.loads(response.read().decode("utf-8"))
-    except HTTPError as exc:
-        detail = exc.read().decode("utf-8", errors="ignore").strip()
-        raise RuntimeError(f"Mistral API HTTP {exc.code}: {detail[:200]}") from exc
-    except URLError as exc:
-        raise RuntimeError(f"Mistral API request failed: {exc.reason}") from exc
-
-    choices = payload.get("choices") or []
-    if not choices:
-        raise RuntimeError("Mistral API returned no choices")
-    content = (choices[0].get("message") or {}).get("content", "")
-    if isinstance(content, list):
-        content = "".join(
-            str(part.get("text", ""))
-            for part in content
-            if isinstance(part, dict)
-        )
-    return _normalize_mistral_url(str(content))
-
-
-async def _try_mistral_auto_heal(
-    entry: ParishEntry,
-    target: date,
-    target_url: str,
-    dest: Path,
-    browser: Browser,
-    recipe_path: Path,
-    failure_reason: str,
-) -> FetchResult | None:
-    if not _mistral_fallback_enabled(recipe_path, _load_recipe_metadata(recipe_path) if recipe_path.exists() else {}):
-        return None
-
-    if not _mistral_is_enabled():
-        print(f"  ℹ️  {entry.key}: skipping Mistral fallback because MISTRAL_API_KEY is not configured")
-        return None
-
-    seed_urls: list[str] = []
-    for candidate in [entry.bulletin_page, *_scrape_seed_urls(entry, target_url)]:
-        candidate = candidate.strip()
-        if candidate and candidate not in seed_urls:
-            seed_urls.append(candidate)
-
-    if not seed_urls:
-        return None
-
-    print(f"  🤖 {entry.key}: attempting Mistral fallback after {failure_reason}")
-    host_profile = _get_host_profile(_recipe_start_url(entry, _load_recipe_metadata(recipe_path), target_url))
-    for scrape_url in seed_urls:
-        try:
-            page_url, links = await _extract_condensed_page_links(
-                scrape_url,
-                browser,
-                host_profile=host_profile,
-            )
-        except Exception as exc:
-            print(f"  ↩️  {entry.key}: Mistral fallback page scan failed for {scrape_url}: {exc}")
-            continue
-
-        if not links:
-            print(f"  ↩️  {entry.key}: no links found for Mistral fallback on {page_url}")
-            continue
-
-        try:
-            ai_url = await asyncio.to_thread(_call_mistral_for_bulletin_url, page_url, links)
-        except Exception as exc:
-            print(f"  ↩️  {entry.key}: Mistral fallback request failed: {exc}")
-            continue
-
-        if not ai_url:
-            print(f"  ↩️  {entry.key}: Mistral fallback did not return a usable URL")
-            continue
-
-        print(f"  🤖 {entry.key}: Mistral suggested {ai_url}")
-        with tempfile.TemporaryDirectory() as tmpdir:
-            tmp_recipe = Path(tmpdir) / "auto_heal_recipe.json"
-            tmp_recipe.write_text(
-                json.dumps(
-                    {
-                        "parish_key": entry.key,
-                        "display_name": entry.display_name,
-                        "recorded_date": target.isoformat(),
-                        "start_url": page_url,
-                        "steps": _build_auto_healed_steps(ai_url),
-                    }
-                ),
-                encoding="utf-8",
-            )
-            try:
-                healed_path, healed_file_type, _healed_source_url = await replay_recipe(
-                    recipe_path=tmp_recipe,
-                    dest=dest,
-                    browser=browser,
-                    target_date=target,
-                )
-                if _is_real_pdf(healed_path, entry.key):
-                    _write_auto_healed_recipe(entry, recipe_path, ai_url, target)
-                    print(f"  🤖 {entry.key}: recipe auto-healed via Mistral")
-                    return FetchResult(
-                        key=entry.key,
-                        display_name=entry.display_name,
-                        status="ok",
-                        url=ai_url,
-                        file_path=healed_path,
-                        file_type=healed_file_type,
-                        is_fallback=True,
-                    )
-            except Exception as exc:
-                print(f"  ↩️  {entry.key}: Mistral candidate failed {ai_url}: {exc}")
-            finally:
-                if dest.exists() and not _is_real_pdf(dest, entry.key):
-                    dest.unlink(missing_ok=True)
-
-    return None
 
 
 async def _recover_stale_bulletin(
@@ -1897,7 +1581,6 @@ async def _fetch_entry(
     dest = output_dir / safe_filename(key, ".pdf")
     last_err = "No valid content found"
     recipe_error = ""
-    ai_heal_attempted = False
 
     recipe_path = recipe_path_for(key, PARISHES_DIR)
     recipe_meta = _load_recipe_metadata(recipe_path) if recipe_path.exists() else {}
@@ -1944,48 +1627,8 @@ async def _fetch_entry(
             if dest.exists() and not _is_real_pdf(dest, key):
                 dest.unlink(missing_ok=True)
 
-    learned_attempted = False
     trained_recipe = _trained_recipe_exists(recipe_path, recipe_meta)
     legacy_fallbacks = _legacy_fallbacks_enabled(recipe_path, recipe_meta)
-    learned_data = learned_recipes.load(key)
-    learned_diocese = str((learned_data or {}).get("diocese") or "").strip()
-    learned_playbook = learned_data.get("playbook", []) if isinstance(learned_data, dict) else []
-    if legacy_fallbacks and _learned_recipe_is_eligible(learned_data, date.today()):
-        learned_attempted = True
-        learned_strategy = str((learned_data or {}).get("last_strategy", "learned_playbook")).strip() or "learned_playbook"
-        try:
-            replayed_path, replay_file_type, replay_url = await _replay_learned_playbook(
-                playbook=learned_playbook,
-                dest=dest,
-                browser=browser,
-            )
-            learned_recipes.record_success(key, learned_strategy, learned_playbook, diocese=learned_diocese)
-            if replay_file_type == "html_link":
-                forced = await _try_force_html_to_pdf(
-                    entry, replay_url, dest, browser, target, host_profile
-                )
-                if forced is not None:
-                    return forced
-                last_err = "Learned playbook returned HTML link but PDF capture failed"
-            elif _is_real_pdf(replayed_path, key):
-                return FetchResult(
-                    key=key,
-                    display_name=entry.display_name,
-                    status="ok",
-                    url=replay_url,
-                    file_path=replayed_path,
-                    file_type=replay_file_type,
-                )
-            learned_recipes.record_failure(key, diocese=learned_diocese)
-        except Exception as exc:
-            print(f"  ↩️  {key}: learned playbook failed: {exc}")
-            learned_recipes.record_failure(key, diocese=learned_diocese)
-        finally:
-            if dest.exists() and not _is_real_pdf(dest, key):
-                dest.unlink(missing_ok=True)
-
-    recipe_steps = recipe_meta.get("steps") if isinstance(recipe_meta, dict) else []
-    recipe_diocese = str((recipe_meta or {}).get("diocese") or "").strip()
     navigation_timeout_ms = int(host_profile.get("navigation_timeout_ms", PAGE_LOAD_TIMEOUT_MS))
     if recipe_path.exists():
         try:
@@ -2001,11 +1644,9 @@ async def _fetch_entry(
                     entry, replay_url, dest, browser, target, host_profile
                 )
                 if forced is not None:
-                    learned_recipes.record_success(key, forced.file_type, recipe_steps, diocese=recipe_diocese)
                     return forced
                 recipe_error = "Recipe returned HTML page but PDF capture failed"
             elif _is_real_pdf(replayed_path, key):
-                learned_recipes.record_success(key, replay_file_type, recipe_steps, diocese=recipe_diocese)
                 return FetchResult(
                     key=key,
                     display_name=entry.display_name,
@@ -2031,18 +1672,6 @@ async def _fetch_entry(
             if dest.exists() and not _is_real_pdf(dest, key):
                 dest.unlink(missing_ok=True)
 
-        healed = await _try_mistral_auto_heal(
-            entry=entry,
-            target=target,
-            target_url=target_url,
-            dest=dest,
-            browser=browser,
-            recipe_path=recipe_path,
-            failure_reason=recipe_error or "recipe replay failed",
-        )
-        if healed is not None:
-            return healed
-
         if trained_recipe:
             print(f"  ⛔ {key}: trained recipe failed — skipping legacy fallbacks")
             return FetchResult(
@@ -2053,10 +1682,6 @@ async def _fetch_entry(
                 error=recipe_error or last_err,
             )
 
-        if learned_attempted:
-            print(f"  ↪️  {key}: falling back after recipe failure")
-            if dest.exists() and not _is_real_pdf(dest, key):
-                dest.unlink(missing_ok=True)
         elif entry.content_type != "html_link":
             if _recipe_uses_trained_click_download(recipe_meta):
                 print(f"  ↪️  {key}: trained click recipe failed — skipping Pattern H URL guess")
@@ -2168,20 +1793,6 @@ async def _fetch_entry(
                     if dest.exists() and not _is_real_pdf(dest, key):
                         dest.unlink(missing_ok=True)
 
-        if last_err != "No valid content found":
-            ai_heal_attempted = True
-            healed = await _try_mistral_auto_heal(
-                entry=entry,
-                target=target,
-                target_url=target_url,
-                dest=dest,
-                browser=browser,
-                recipe_path=recipe_path,
-                failure_reason=last_err,
-            )
-            if healed is not None:
-                return healed
-
     # Prediction failed, or entry is html_link: scrape bulletin pages.
     for scrape_url in _scrape_seed_urls(entry, target_url):
         scraped = await _scrape_and_download(
@@ -2199,19 +1810,6 @@ async def _fetch_entry(
 
     if recipe_error:
         last_err = f"{recipe_error}; {last_err}"
-
-    if not ai_heal_attempted:
-        healed = await _try_mistral_auto_heal(
-            entry=entry,
-            target=target,
-            target_url=target_url,
-            dest=dest,
-            browser=browser,
-            recipe_path=recipe_path,
-            failure_reason=last_err,
-        )
-        if healed is not None:
-            return healed
 
     # Last resort: force HTML bulletin URLs to PDF (no bare links in mega PDF).
     if entry.content_type == "html_link":

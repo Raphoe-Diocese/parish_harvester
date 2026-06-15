@@ -110,7 +110,7 @@ class BulletinFreshnessTests(unittest.TestCase):
             self.assertFalse(results[1].is_stale)
             on_disk = json.loads(queue_path.read_text(encoding="utf-8"))
             self.assertEqual(len(on_disk["retry"]), 1)
-            self.assertEqual(on_disk["retry"][0]["strategy"], "mistral_heal")
+            self.assertEqual(on_disk["retry"][0]["strategy"], "manual_review")
 
     def test_week_window_matches_fetcher(self) -> None:
         target = date(2026, 6, 14)

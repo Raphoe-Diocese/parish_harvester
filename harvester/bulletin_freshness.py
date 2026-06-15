@@ -138,8 +138,7 @@ def suggest_retry_strategy(
     Strategies (in order of preference for operators):
       rescrape_bulletin_page — re-scan listing page for fresher links
       try_date_patterns      — URL prediction / pattern detect (A–H parishes)
-      retrain_recipe         — extension --train when recipe replay was used
-      mistral_heal           — AI link picker when scrape + patterns failed
+      retrain_recipe         — extension recipe when replay was used
       manual_review          — undated URL or no bulletin page
     """
     url = (result.url or "").lower()
@@ -155,7 +154,7 @@ def suggest_retry_strategy(
         return "try_date_patterns"
     if not extract_bulletin_date(url):
         return "manual_review"
-    return "mistral_heal"
+    return "manual_review"
 
 
 def mark_result_stale(
