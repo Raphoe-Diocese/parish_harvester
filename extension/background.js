@@ -846,6 +846,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
               inputs: {
                 diocese: "all",
                 target_parish: key,
+                run_tests: "false",
               },
             }),
           }

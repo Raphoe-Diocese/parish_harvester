@@ -516,7 +516,7 @@ async function _pdDispatchHarvest(parishKey) {
           "Content-Type": "application/json",
           "X-GitHub-Api-Version": "2022-11-28",
         },
-        body: JSON.stringify({ ref: "main", inputs: { diocese: "all", target_parish: parishKey } }),
+        body: JSON.stringify({ ref: "main", inputs: { diocese: "all", target_parish: parishKey, run_tests: "false" } }),
       }
     );
     if (resp.status === 204) return { ok: true };
@@ -1037,6 +1037,199 @@ async function _problemsGetVisitedMap() {
   return (visited && typeof visited === "object") ? visited : {};
 }
 
+function _problemsGithubLinks(repo) {
+  const base = `https://github.com/${repo}`;
+  return {
+    actions: `${base}/actions/workflows/harvest.yml`,
+    report: `${base}/blob/main/Bulletins/report.json`,
+    dashboard: `${base}/blob/main/Bulletins/dashboard.html`,
+    megaDerry: `https://raw.githubusercontent.com/${repo}/main/docs/mega_pdf/derry_mega_bulletin.pdf`,
+    megaDac: `https://raw.githubusercontent.com/${repo}/main/docs/mega_pdf/down_and_connor_mega_bulletin.pdf`,
+  };
+}
+
+function _problemsMegaPdfForParish(repo, parishKey) {
+  const links = _problemsGithubLinks(repo);
+  const match = _pdAllParishes.find((p) => p.key === parishKey);
+  const diocese = String(match?.diocese || "").toLowerCase();
+  if (diocese.includes("down") || diocese.includes("connor")) return links.megaDac;
+  return links.megaDerry;
+}
+
+async function _problemsFindLatestWorkflowRun(ghPat, ghRepo, afterMs) {
+  try {
+    const resp = await fetch(
+      `https://api.github.com/repos/${ghRepo}/actions/workflows/harvest.yml/runs?per_page=5`,
+      {
+        headers: {
+          Authorization: `token ${ghPat}`,
+          Accept: "application/vnd.github+json",
+          "X-GitHub-Api-Version": "2022-11-28",
+        },
+      }
+    );
+    if (!resp.ok) return null;
+    const data = await resp.json();
+    const runs = Array.isArray(data.workflow_runs) ? data.workflow_runs : [];
+    return runs.find((run) => new Date(run.created_at).getTime() >= afterMs - 10_000) || runs[0] || null;
+  } catch (_e) {
+    return null;
+  }
+}
+
+async function _problemsFetchLiveReport(repo) {
+  try {
+    const resp = await fetch(
+      `https://raw.githubusercontent.com/${repo}/main/Bulletins/report.json?t=${Date.now()}`,
+      { cache: "no-store" }
+    );
+    if (!resp.ok) return null;
+    return resp.json();
+  } catch (_e) {
+    return null;
+  }
+}
+
+function _problemsParishHarvestStatus(report, parishKey) {
+  const key = String(parishKey || "").trim().toLowerCase();
+  const downloaded = (report?.downloaded || []).find(
+    (row) => String(row?.parish || "").trim().toLowerCase() === key
+  );
+  if (downloaded) return { status: "ok", item: downloaded };
+  const failed = (report?.failed || []).find(
+    (row) => String(row?.parish || "").trim().toLowerCase() === key
+  );
+  if (failed) return { status: "failed", item: failed };
+  return { status: "unknown", item: null };
+}
+
+async function _problemsClearRetrained(parishKey) {
+  const data = await _spStorageGet([PROBLEMS_RECIPE_RETRAINED_KEY]);
+  const retrained = (data[PROBLEMS_RECIPE_RETRAINED_KEY] && typeof data[PROBLEMS_RECIPE_RETRAINED_KEY] === "object")
+    ? { ...data[PROBLEMS_RECIPE_RETRAINED_KEY] }
+    : {};
+  delete retrained[parishKey];
+  await _spStorageSet({ [PROBLEMS_RECIPE_RETRAINED_KEY]: retrained });
+}
+
+function _problemsShowVerifyResult(payload) {
+  const box = document.getElementById("problems-verify-result");
+  if (!box) return;
+  const links = _problemsGithubLinks(payload.repo);
+  const megaUrl = _problemsMegaPdfForParish(payload.repo, payload.parishKey);
+  const runLink = payload.runUrl || links.actions;
+  const lines = [];
+  if (payload.ok === true) {
+    box.className = "ok";
+    lines.push(`✅ <strong>${payload.displayName}</strong> downloaded in the latest harvest.`);
+    if (payload.item?.url) lines.push(`Bulletin URL: ${payload.item.url}`);
+  } else if (payload.ok === false) {
+    box.className = "err";
+    const reason = String(payload.item?.error || payload.item?.reason || "still failed").slice(0, 160);
+    lines.push(`❌ <strong>${payload.displayName}</strong> still failed: ${reason}`);
+  } else {
+    box.className = "warn";
+    lines.push(`⏳ <strong>${payload.displayName}</strong> — ${payload.message || "Harvest still running."}`);
+  }
+  lines.push(
+    `<a href="${runLink}" target="_blank" rel="noopener noreferrer">GitHub Actions run</a> · ` +
+    `<a href="${links.report}" target="_blank" rel="noopener noreferrer">report.json</a> · ` +
+    `<a href="${links.dashboard}" target="_blank" rel="noopener noreferrer">dashboard</a> · ` +
+    `<a href="${megaUrl}" target="_blank" rel="noopener noreferrer">mega PDF</a>`
+  );
+  box.innerHTML = lines.join("<br>");
+  box.style.display = "block";
+}
+
+async function _problemsVerifyHarvest(row, verifyBtn) {
+  const cfg = await _pdGetGithubConfig();
+  if (!cfg) {
+    setStatus("❌ GitHub PAT not set — open ⚙️ Settings in the popup.", "err");
+    return;
+  }
+  const parishKey = row.parish;
+  const displayName = row.display_name || parishKey;
+  if (verifyBtn) {
+    verifyBtn.disabled = true;
+    verifyBtn.textContent = "⏳ Running…";
+  }
+  setStatus(`⏳ Triggering harvest for ${displayName}…`, "warn");
+
+  const dispatchStarted = Date.now();
+  const dispatch = await _pdDispatchHarvest(parishKey);
+  if (!dispatch.ok) {
+    setStatus(`❌ Harvest trigger failed: ${dispatch.error}`, "err");
+    if (verifyBtn) {
+      verifyBtn.disabled = false;
+      verifyBtn.textContent = "▶ Verify harvest";
+    }
+    return;
+  }
+
+  setStatus(`⏳ Harvest running for ${displayName} — checking GitHub every 12s…`, "warn");
+  const links = _problemsGithubLinks(cfg.ghRepo);
+  let runUrl = links.actions;
+
+  for (let attempt = 0; attempt < 30; attempt += 1) {
+    await new Promise((resolve) => setTimeout(resolve, 12_000));
+    const run = await _problemsFindLatestWorkflowRun(cfg.ghPat, cfg.ghRepo, dispatchStarted);
+    if (run?.html_url) runUrl = run.html_url;
+    const report = await _problemsFetchLiveReport(cfg.ghRepo);
+    if (!report) continue;
+
+    const parishStatus = _problemsParishHarvestStatus(report, parishKey);
+    const workflowDone = run && run.status === "completed";
+
+    if (parishStatus.status === "ok") {
+      await _problemsClearRetrained(parishKey);
+      _pdHarvestReport = null;
+      _problemsShowVerifyResult({
+        ok: true,
+        displayName,
+        parishKey,
+        repo: cfg.ghRepo,
+        runUrl,
+        item: parishStatus.item,
+      });
+      setStatus(`✅ ${displayName} verified — downloaded OK.`, "ok");
+      if (verifyBtn) verifyBtn.textContent = "✅ Verified";
+      void loadProblemsDashboard();
+      return;
+    }
+
+    if (workflowDone && parishStatus.status === "failed") {
+      _problemsShowVerifyResult({
+        ok: false,
+        displayName,
+        parishKey,
+        repo: cfg.ghRepo,
+        runUrl,
+        item: parishStatus.item,
+      });
+      setStatus(`❌ ${displayName} still failing — see links below.`, "err");
+      if (verifyBtn) {
+        verifyBtn.disabled = false;
+        verifyBtn.textContent = "▶ Retry verify";
+      }
+      return;
+    }
+  }
+
+  _problemsShowVerifyResult({
+    ok: null,
+    displayName,
+    parishKey,
+    repo: cfg.ghRepo,
+    runUrl,
+    message: "Timed out waiting — open the Actions run to check progress.",
+  });
+  setStatus(`⚠️ Harvest still running for ${displayName} — open Actions link below.`, "warn");
+  if (verifyBtn) {
+    verifyBtn.disabled = false;
+    verifyBtn.textContent = "▶ Verify harvest";
+  }
+}
+
 async function _problemsRenderRows(rows) {
   const tbody = document.getElementById("problems-body");
   const empty = document.getElementById("problems-empty");
@@ -1069,6 +1262,7 @@ async function _problemsRenderRows(rows) {
     tr.appendChild(consecutive);
 
     const action = document.createElement("td");
+    action.className = "problems-action-cell";
     const fixBtn = document.createElement("button");
     fixBtn.type = "button";
     fixBtn.className = "problems-fix-btn";
@@ -1115,6 +1309,17 @@ async function _problemsRenderRows(rows) {
       });
     });
     action.appendChild(fixBtn);
+    if (row.retrainedPending) {
+      const verifyBtn = document.createElement("button");
+      verifyBtn.type = "button";
+      verifyBtn.className = "problems-verify-btn";
+      verifyBtn.textContent = "▶ Verify harvest";
+      verifyBtn.title = "Trigger a single-parish harvest on GitHub and show result links";
+      verifyBtn.addEventListener("click", () => {
+        void _problemsVerifyHarvest(row, verifyBtn);
+      });
+      action.appendChild(verifyBtn);
+    }
     tr.appendChild(action);
 
     tbody.appendChild(tr);
@@ -1155,6 +1360,7 @@ async function loadProblemsDashboard() {
       ];
       if (hiddenDead) parts.push(`${hiddenDead} marked dead/inactive (hidden)`);
       if (hiddenFixed) parts.push(`${hiddenFixed} already downloaded (hidden)`);
+      parts.push("retrained rows: click ▶ Verify harvest after Push Recipe");
       hint.textContent = parts.join(" · ") + ".";
     }
     await _problemsRenderRows(rows);
