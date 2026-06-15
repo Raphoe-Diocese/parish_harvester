@@ -2,7 +2,7 @@
   "parish_key": "buncranaparish",
   "display_name": "Buncrana",
   "diocese": "derry",
-  "start_url": "https://www.buncranaparish.com/parishnews.htm",
+  "start_url": "https://www.buncranaparish.com/",
   "playbook_type": "weekly_bulletin_download",
   "operator_notes": [
     "News page has a stable link: CLICK HERE to load Current Newsletter.",
@@ -12,14 +12,19 @@
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.buncranaparish.com/parishnews.htm"
+      "url": "https://www.buncranaparish.com/"
     },
     {
       "action": "click",
-      "selector": "a:has-text(\"CLICK HERE to load Current Newsletter\")",
       "fallback_selectors": [
-        "a[href*='/pdf/']"
-      ]
+        "a[href$='.pdf']",
+        "div#xlaANMzone_f9d56f > a"
+      ],
+      "selector": "a:has-text(\"CLICK HERE to load Current Newsletter\")"
+    },
+    {
+      "action": "download",
+      "url": "https://www.buncranaparish.com/pdf/140626.pdf"
     }
   ],
   "version": 1,
