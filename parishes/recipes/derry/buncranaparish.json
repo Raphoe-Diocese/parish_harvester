@@ -1,26 +1,27 @@
 {
-  "version": 1,
   "parish_key": "buncranaparish",
   "display_name": "Buncrana",
   "diocese": "derry",
-  "start_url": "https://www.buncranaparish.com/pdf/140626.pdf",
+  "start_url": "https://www.buncranaparish.com/parishnews.htm",
+  "playbook_type": "weekly_bulletin_download",
+  "operator_notes": [
+    "News page has a stable link: CLICK HERE to load Current Newsletter.",
+    "The PDF path changes weekly (/pdf/DDMMYY.pdf) — harvest by link text, not by fixed URL.",
+    "Do not start the recipe on the PDF URL."
+  ],
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.buncranaparish.com/pdf/140626.pdf"
+      "url": "https://www.buncranaparish.com/parishnews.htm"
     },
     {
       "action": "click",
+      "selector": "a:has-text(\"CLICK HERE to load Current Newsletter\")",
       "fallback_selectors": [
-        "a[href$='.pdf']",
-        "div#xlaANMzone_f3e214 > a"
-      ],
-      "selector": "a:has-text(\"CLICK HERE to load Current Newsletter\")"
-    },
-    {
-      "action": "download",
-      "url": "https://www.buncranaparish.com/pdf/140626.pdf"
+        "a[href*='/pdf/']"
+      ]
     }
   ],
+  "version": 1,
   "recorded_date": "2026-06-15"
 }
