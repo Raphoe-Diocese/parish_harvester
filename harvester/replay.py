@@ -51,6 +51,40 @@ def _is_non_bulletin_url(url: str) -> bool:
     return bool(_NON_BULLETIN_RE.search(text))
 
 
+def _looks_like_http_url(url: str) -> bool:
+    return (url or "").strip().lower().startswith(("http://", "https://"))
+
+
+def _looks_like_direct_document_url(url: str) -> bool:
+    lower = unquote((url or "").strip()).lower()
+    if not _looks_like_http_url(lower):
+        return False
+    path = urlparse(lower).path
+    return path.endswith((".pdf", ".docx", ".doc")) or "/pdf/" in path
+
+
+async def _capture_document_after_navigation(
+    page: Page,
+    dest: Path,
+    nav_url: str,
+    downloads: list,
+    timeout_ms: int,
+) -> tuple[Path, str, str] | None:
+    if downloads:
+        file_type = await _save_download_to_pdf(downloads.pop(0), dest)
+        return dest, file_type, nav_url or page.url
+    if nav_url and _looks_like_direct_document_url(nav_url):
+        tried = await _try_download_page_url(page, dest, nav_url, timeout_ms=timeout_ms)
+        if tried:
+            return dest, tried[1], tried[0]
+    if _looks_like_http_url(page.url) and _is_document_url(page.url):
+        source_url, file_type = await _download_document_url(
+            page, page.url, dest, timeout_ms=timeout_ms
+        )
+        return dest, file_type, source_url
+    return None
+
+
 def _score_bulletin_url(url: str) -> tuple[int, int]:
     """Higher = better. (date_score, keyword_bonus)."""
     text = unquote(url or "").lower()
@@ -284,6 +318,20 @@ async def _download_document_url(
     if _is_pdf_content(body):
         dest.write_bytes(body)
         return raw_url, "pdf"
+
+    if body[:3] == b"\xff\xd8\xff" or body[:8] == b"\x89PNG\r\n\x1a\n":
+        try:
+            from PIL import Image as PILImage
+        except ImportError as exc:
+            raise RecipeReplayError(
+                "Pillow is required for image bulletin conversion. Install with: pip install Pillow"
+            ) from exc
+        try:
+            img = PILImage.open(io.BytesIO(body)).convert("RGB")
+            img.save(str(dest), "PDF")
+            return raw_url, "image_to_pdf"
+        except Exception as exc:
+            raise RecipeReplayError(f"Invalid image content for bulletin conversion: {raw_url}") from exc
 
     content_type = response.headers.get("content-type", "")
     if "text/html" in content_type:
@@ -533,6 +581,7 @@ async def replay_recipe(
         await page.goto(start_url, timeout=step_timeout_ms, wait_until="domcontentloaded")
 
     try:
+        last_http_url = start_url if _looks_like_http_url(start_url) else ""
         for step in steps:
             action = step.get("action")
             if action == "goto":
@@ -542,6 +591,13 @@ async def replay_recipe(
                 if not url:
                     raise RecipeReplayError("Recipe goto step missing URL")
                 await page.goto(url, timeout=step_timeout_ms, wait_until="domcontentloaded")
+                if _looks_like_http_url(url):
+                    last_http_url = url
+                captured = await _capture_document_after_navigation(
+                    page, dest, url, downloads, step_timeout_ms
+                )
+                if captured:
+                    return captured
                 continue
 
             if action == "click":
@@ -588,6 +644,8 @@ async def replay_recipe(
                 use_captured = bool(step.get("use_captured_url"))
                 if step.get("use_page_url"):
                     step_url = (page.url or "").strip()
+                    if not _looks_like_http_url(step_url):
+                        step_url = (last_http_url or start_url or "").strip()
                     use_captured = True
                 download_candidates: list[str] = []
                 if step_url:

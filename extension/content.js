@@ -2294,9 +2294,9 @@
     standaloneAddStep(clickStep, "click", clickLabel);
     if (downloadUrl && _isPdfOrDocUrl(downloadUrl)) {
       standaloneAddStep(
-        { action: "download", use_page_url: true, url_pattern: "*.pdf" },
+        { action: "download", url: downloadUrl, use_captured_url: true },
         "mark_file",
-        "📄 Save PDF from opened bulletin page"
+        `📄 Download: ${downloadUrl.slice(-50)}`
       );
     }
     void _persistRecordingSession();
@@ -2356,10 +2356,11 @@
       return;
     }
     if (_inStandaloneMode()) {
-      const onPdfPage = _isPdfOrDocUrl(url) || _pageIsNativePdfViewer();
+      const pageHref = String(window.location.href || "").trim();
+      const onPdfPage = _isPdfOrDocUrl(pageHref) || _pageIsNativePdfViewer();
       standaloneAddStep(
         onPdfPage
-          ? { action: "download", use_page_url: true, url_pattern: "*.pdf" }
+          ? { action: "download", url: pageHref, use_captured_url: true }
           : { action: "download", url, use_captured_url: true },
         "mark_file",
         onPdfPage ? "📄 Save PDF from this page" : `📄 File: ${url.slice(-50)}`
@@ -3749,9 +3750,9 @@
             return;
           }
           standaloneAddStep(
-            { action: "download", use_page_url: true, url_pattern: "*.pdf" },
+            { action: "download", url: absUrl, use_captured_url: true },
             "mark_file",
-            "📄 Save PDF from opened bulletin page"
+            `📄 Download: ${absUrl.slice(-50)}`
           );
           void _persistRecordingSession();
           _notifyRecordingTabActive();
