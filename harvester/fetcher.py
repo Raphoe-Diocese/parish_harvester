@@ -1845,6 +1845,31 @@ async def _fetch_entry(
     )
 
 
+async def _guard_and_recover_ok_result(
+    result: FetchResult,
+    entry: ParishEntry,
+    target: date,
+    dest: Path,
+    browser: Browser,
+    recipe_meta: dict,
+    host_profile: dict,
+) -> FetchResult:
+    """Reject admin/non-bulletin URLs before stale recovery."""
+    blocked = _disallow_non_bulletin_url(result.url or "")
+    if blocked:
+        print(f"  ⚠️  {entry.key}: {blocked}")
+        return FetchResult(
+            key=entry.key,
+            display_name=entry.display_name,
+            status="error",
+            url=result.url,
+            error=blocked,
+        )
+    return await _recover_stale_bulletin(
+        result, entry, target, dest, browser, recipe_meta, host_profile
+    )
+
+
 async def _retry_entry_headful(
     entry: ParishEntry,
     output_dir: Path,
@@ -1870,7 +1895,7 @@ async def _retry_entry_headful(
                 )
             if result.status == "ok":
                 dest = output_dir / safe_filename(entry.key, ".pdf")
-                result = await _recover_stale_bulletin(
+                result = await _guard_and_recover_ok_result(
                     result,
                     entry,
                     target,
@@ -1924,7 +1949,7 @@ async def fetch_parish(
                 )
             if result.status == "ok":
                 dest = output_dir / safe_filename(entry.key, ".pdf")
-                result = await _recover_stale_bulletin(
+                result = await _guard_and_recover_ok_result(
                     result,
                     entry,
                     target,

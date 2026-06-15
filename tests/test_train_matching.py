@@ -201,9 +201,8 @@ https://www.antrimparish.com
         self.assertIn("pd-diocese-accordion", sidepanel_html)
         self.assertIn("_pdBuildParishDetails", sidepanel_js)
         self.assertIn("pd-subfolder", sidepanel_js)
-        self.assertIn('id="tab-copilot"', sidepanel_html)
-        self.assertIn("copilot-highlight", sidepanel_html)
-        self.assertIn("copilot_panel.js", sidepanel_html)
+        self.assertIn('id="tab-problems"', sidepanel_html)
+        self.assertIn('id="tab-trainer"', sidepanel_html)
         self.assertIn('"Raphoe Diocese"', sidepanel_js)
         self.assertIn("parishes/recipes/raphoe/${key}.json", sidepanel_js)
 

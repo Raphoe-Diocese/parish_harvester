@@ -122,7 +122,7 @@
         return "";
       },
       advice:
-        "Joomla Dropfiles — click cloud ↓ (a.mod_downloadlink) on this Sunday's row, or tap the blue download button in the trainer.",
+        "Joomla Dropfiles — click the cloud ↓ on this Sunday's row on the page, then tap 📥 2. Click cloud download in the toolbar to save that URL to the recipe.",
       doNot: ["Do not use Pick bulletin image — PDF downloads from mod_downloadlink."],
     },
     {
@@ -159,7 +159,7 @@
         const m = html.match(/https?:\/\/[^\s"'<>]+onewebmedia\/[^\s"'<>]*newsletter[^\s"'<>]*\.docx/i);
         return m ? m[0] : "";
       },
-      advice: "One.com — newsletter is a .docx at onewebmedia/. Auto-detect from HTML; never wait for slow Google preview iframes.",
+      advice: "One.com — newsletter is a .docx at onewebmedia/. Tap 📄 2. Save newsletter (auto) — do not wait for slow Google preview iframes. Never pick GDPR/Privacy PDFs.",
       doNot: ["Do not pick the first iframe PDF — often GDPR. Do not use image capture."],
     },
     {
@@ -302,7 +302,7 @@
         }
         return "";
       },
-      advice: "PDF is inside a Google viewer iframe — use Bulletin in frame, pick the bulletin frame.",
+      advice: "PDF is inside a Google viewer iframe — tap 📐 2. Bulletin in frame (under Extra) and pick the bulletin frame.",
       doNot: [],
     },
     {

@@ -1374,6 +1374,7 @@
         if (type === "oneweb_docx") result.autoNewsletterUrl = b.bestDownloadUrl;
       }
       if (b.doNot?.length) result.fingerprintDoNot = b.doNot;
+      if (b.advice && !result.advice) result.advice = b.advice;
       return result;
     };
 
@@ -1486,7 +1487,7 @@
         emoji: "🔗",
         summary: `PDF listing page — found ${count} PDF Embedder link(s) (WordPress plugin).`,
         advice:
-          'Use "No — I need to click a link" or "Pick newest bulletin" below to record the right bulletin link.',
+          "Tap 🔗 1. Follow a link, or 🔍 Find bulletin → 🎯 Pick newest bulletin, to record the right bulletin link.",
         type: "pdfemb",
         links: anchors,
       };
@@ -1580,7 +1581,7 @@
       return {
         emoji: "🖼️",
         summary: `This page embeds ${pdfIframes.length} PDF frame(s).`,
-        advice: "Click \"It's embedded in a frame\" to choose the correct frame.",
+        advice: "Tap 📐 2. Bulletin in frame (under Extra) to choose the correct frame.",
         type: "iframe",
       };
     }
@@ -1604,7 +1605,7 @@
         emoji: "🖼️",
         summary: `Found ${maybeDocIframes.length} frame(s) — may contain a PDF viewer.`,
         advice:
-          "Click \"It's embedded in a frame\" to inspect the frames. Background PDF detection now runs automatically as fallback.",
+          "Tap 📐 2. Bulletin in frame (under Extra). Background PDF detection also runs automatically as fallback.",
         type: "iframe_maybe",
       };
     }
@@ -1662,7 +1663,7 @@
             : ""
         }.`,
         advice:
-          "Click \"No — I need to click a link\" to select the correct bulletin.",
+          "Tap 🔗 1. Follow a link and pick the newest bulletin row.",
         type: "pdf_links",
         links: bulletinLinks.length > 0 ? bulletinLinks : pdfLinks,
         bulletinLinks,
@@ -1713,7 +1714,7 @@
           bulletinImages.length > 0
             ? `Found ${bulletinImages.length} bulletin image(s) in the article.`
             : "Found a large bulletin image on this page.",
-        advice: 'Use "Pick an image on this page" to select the bulletin image.',
+        advice: "Extra → 🖼️ Pick an image on this page (not Save page as PDF).",
         type: "image",
       };
     }
@@ -1754,7 +1755,7 @@
         emoji: "📋",
         summary: "HTML page — no PDF or document links detected.",
         advice:
-          'Background PDF detection now runs automatically. If still nothing appears, use "No — I need to click a link".',
+          "Background PDF detection runs automatically. If still nothing appears, tap 🔗 1. Follow a link.",
         type: "html",
       };
     }
@@ -3283,7 +3284,7 @@
       const stepCount = _standaloneRecipeSteps().length;
       const pageCtx = detectPageType();
       compactPageHint.textContent = pageCtx.summary || "";
-      compactPageHint.style.display = "none";
+      compactPageHint.style.display = pageCtx.summary ? "block" : "none";
 
       const onDirectPdf = pageCtx.type === "direct_pdf";
       if (clickFirstBtn) {

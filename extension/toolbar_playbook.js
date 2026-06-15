@@ -2,6 +2,9 @@
  * Parish Trainer playbook — visible "what to do on THIS page" (no AI, no chat).
  */
 (() => {
+  const HOW_IT_WORKS =
+    "How this works: the toolbar reads HTML patterns on this page (not AI). You record steps here → Push Recipe → GitHub. Sunday harvest replays those steps.";
+
   const PIN_HELP =
     "🎯 Follow a link = you click the exact spot on the page (crosshair). That becomes the Sunday click step. " +
     "📌 Pin = auto-finds the bulletin link and records the same click step. " +
@@ -190,6 +193,12 @@
     const plan = getPlan(pageCtx, state);
     el.replaceChildren();
 
+    const intro = document.createElement("div");
+    intro.style.cssText =
+      "font-size:9px;color:#93c5fd;line-height:1.45;background:#0c4a6e;border:1px solid #0369a1;border-radius:6px;padding:6px 8px;margin-bottom:8px;";
+    intro.textContent = HOW_IT_WORKS;
+    el.appendChild(intro);
+
     const head = document.createElement("div");
     head.style.cssText = "font-size:12px;font-weight:700;color:#f9fafb;margin-bottom:6px;line-height:1.35;";
     head.textContent = `${plan.emoji} ${plan.title}`;
@@ -204,6 +213,15 @@
       ol.appendChild(li);
     }
     el.appendChild(ol);
+
+    const doNot = Array.isArray(pageCtx?.fingerprintDoNot) ? pageCtx.fingerprintDoNot : [];
+    if (doNot.length) {
+      const avoid = document.createElement("div");
+      avoid.style.cssText =
+        "font-size:9px;color:#fecaca;line-height:1.45;background:#450a0a;border:1px solid #991b1b;border-radius:6px;padding:6px 8px;margin-bottom:6px;";
+      avoid.textContent = `Avoid: ${doNot.join(" ")}`;
+      el.appendChild(avoid);
+    }
 
     if (plan.showPin) {
       const pin = document.createElement("div");

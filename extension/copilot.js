@@ -190,7 +190,7 @@
     const lines = [];
     if (brief.bulletinOnPage || (brief.onNewsPage && pageType === "wix_html")) {
       lines.push("✅ I see the bulletin on this page.");
-      lines.push("→ Click 📰 Save page as PDF (best for Ardara-style HTML newsletters).");
+      lines.push("→ Click 📰 Save page as PDF (for HTML text newsletters on the page).");
       return lines.join("\n");
     }
     if (pageType === "wix_html" || pageType === "html") {
