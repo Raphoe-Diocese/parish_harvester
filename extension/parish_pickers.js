@@ -6,6 +6,8 @@
   const SHARED_HOSTS = new Set(["mcn.live", "www.mcn.live", "filesafe.space"]);
   const PATH_SKIP_SEGMENTS = new Set([
     "camera", "wp-content", "uploads", "index.html", "index.htm", "file", "view",
+    "parishnews.html", "parishnews.htm", "parishnews-html", "parishnews-htm",
+    "weekly-bulletin.html", "weekly-bulletin.htm", "bulletin.html", "bulletin.htm",
   ]);
 
   const CONTACT_FILES = [
@@ -32,9 +34,13 @@
   const _isJunkParishKey = (key) => {
     const k = String(key || "").trim().toLowerCase();
     if (!k || k.length < 4) return true;
+    if (/[\\/]/.test(k)) return true;
+    if (/\d{4}-\d{2}-\d{2}/.test(k)) return true;
     if (/^\d{6,8}(-pdf)?$/.test(k)) return true;
     if (/^\d{2}\.\d{2}\.\d{2}(-pdf)?$/.test(k)) return true;
     if (/-pdf$/.test(k) && /\d{5,}/.test(k)) return true;
+    if (/^parishnews(-html|-htm)?$/.test(k)) return true;
+    if (/^(weekly-)?bulletin(-html|-htm)?$/.test(k)) return true;
     return false;
   };
 
@@ -157,12 +163,14 @@
       ) {
         return "";
       }
+      const hostKey = hostname.split(".")[0] || "";
+      if (hostKey && registry.byKey[hostKey]) return hostKey;
       const pathKey = pathSlugFromUrl(url);
-      if (pathKey && (SHARED_HOSTS.has(hostname) || hostname.split(".").length <= 2)) {
+      if (pathKey && SHARED_HOSTS.has(hostname)) {
         if (registry.byKey[pathKey]) return pathKey;
         return pathKey;
       }
-      return hostname.split(".")[0] || "";
+      return hostKey;
     } catch (_e) {
       return "";
     }
@@ -371,6 +379,15 @@
       // ignore
     }
 
+    let hostKey = "";
+    try {
+      hostKey = new URL(url).hostname.toLowerCase().replace(/^www\d*\./, "").split(".")[0] || "";
+    } catch (_e) {
+      // ignore
+    }
+    const hostKeyHit = hostKey ? lookupByKey(hostKey) : null;
+    const confident = Boolean(urlHit || keyHit || (hostKeyHit && inferredKey === hostKey));
+
     return {
       key,
       name,
@@ -378,7 +395,7 @@
       hostname,
       inferredKey: inferredKey || key,
       urlMatched: Boolean(urlHit),
-      lowConfidence: Boolean(inferredKey && !urlHit && !keyHit),
+      lowConfidence: Boolean(inferredKey && !confident),
     };
   };
 
@@ -506,7 +523,10 @@
       wrap,
       input,
       setItems: (next) => {
-        items = Array.isArray(next) ? next : [];
+        items = (Array.isArray(next) ? next : []).filter((item) => {
+          const k = String(typeof item === "string" ? item : item?.key || item?.value || "").trim().toLowerCase();
+          return k && !_isJunkParishKey(k);
+        });
         applyFilter(input.value);
       },
       setValue: (val, display) => {

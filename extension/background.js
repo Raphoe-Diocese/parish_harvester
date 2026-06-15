@@ -876,6 +876,15 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
           retrained[key] = normalizedRecipe.recorded_date || new Date().toISOString().slice(0, 10);
         }
         await chrome.storage.local.set({ [PROBLEMS_RECIPE_RETRAINED_KEY]: retrained });
+        try {
+          chrome.runtime.sendMessage({
+            type: "problems_refresh",
+            parish_key: key,
+            display_name: normalizedRecipe.display_name || key,
+          });
+        } catch (_broadcastErr) {
+          // Side panel may be closed — non-fatal.
+        }
       } catch (_storeErr) {
         console.warn("Parish Trainer: could not store recipe retrained marker", _storeErr);
       }

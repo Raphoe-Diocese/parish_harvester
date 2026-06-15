@@ -1145,21 +1145,37 @@ async function _problemsClearRetrained(parishKey) {
   await _spStorageSet({ [PROBLEMS_RECIPE_RETRAINED_KEY]: retrained });
 }
 
+function _problemsParishBulletinPdf(repo, parishKey) {
+  return `https://raw.githubusercontent.com/${repo}/main/Bulletins/current/${parishKey}.pdf`;
+}
+
 function _problemsShowVerifyResult(payload) {
   const box = document.getElementById("problems-verify-result");
   if (!box) return;
   const links = _problemsGithubLinks(payload.repo);
-  const megaUrl = _problemsMegaPdfForParish(payload.repo, payload.parishKey);
+  const parishPdf = _problemsParishBulletinPdf(payload.repo, payload.parishKey);
   const runLink = payload.runUrl || links.actions;
   const lines = [];
   if (payload.ok === true) {
     box.className = "ok";
-    lines.push(`✅ <strong>${payload.displayName}</strong> downloaded in the latest harvest.`);
-    if (payload.item?.url) lines.push(`Bulletin URL: ${payload.item.url}`);
+    lines.push(`✅ <strong>${payload.displayName}</strong> — harvest worked.`);
+    if (payload.item?.url) {
+      lines.push(
+        `Source bulletin: <a href="${payload.item.url}" target="_blank" rel="noopener noreferrer">${payload.item.url}</a>`
+      );
+    }
+    lines.push(
+      `Parish PDF: <a href="${parishPdf}" target="_blank" rel="noopener noreferrer">Bulletins/current/${payload.parishKey}.pdf</a>`
+    );
   } else if (payload.ok === false) {
     box.className = "err";
     const reason = String(payload.item?.error || payload.item?.reason || "still failed").slice(0, 160);
     lines.push(`❌ <strong>${payload.displayName}</strong> still failed: ${reason}`);
+    if (payload.item?.url) {
+      lines.push(
+        `Last URL tried: <a href="${payload.item.url}" target="_blank" rel="noopener noreferrer">${payload.item.url}</a>`
+      );
+    }
   } else {
     box.className = "warn";
     lines.push(`⏳ <strong>${payload.displayName}</strong> — ${payload.message || "Harvest still running."}`);
@@ -1167,11 +1183,96 @@ function _problemsShowVerifyResult(payload) {
   lines.push(
     `<a href="${runLink}" target="_blank" rel="noopener noreferrer">GitHub Actions run</a> · ` +
     `<a href="${links.report}" target="_blank" rel="noopener noreferrer">report.json</a> · ` +
-    `<a href="${links.dashboard}" target="_blank" rel="noopener noreferrer">dashboard</a> · ` +
-    `<a href="${megaUrl}" target="_blank" rel="noopener noreferrer">mega PDF</a>`
+    `<a href="${links.dashboard}" target="_blank" rel="noopener noreferrer">dashboard</a>`
   );
   box.innerHTML = lines.join("<br>");
   box.style.display = "block";
+}
+
+async function _problemsPollHarvestResult({
+  parishKey,
+  displayName,
+  ghPat,
+  ghRepo,
+  dispatchStarted,
+  verifyBtn,
+}) {
+  setStatus(`⏳ Testing ${displayName} on GitHub — checking every 12s…`, "warn");
+  const links = _problemsGithubLinks(ghRepo);
+  let runUrl = links.actions;
+
+  for (let attempt = 0; attempt < 30; attempt += 1) {
+    await new Promise((resolve) => setTimeout(resolve, 12_000));
+    const run = await _problemsFindLatestWorkflowRun(ghPat, ghRepo, dispatchStarted);
+    if (run?.html_url) runUrl = run.html_url;
+    const report = await _problemsFetchLiveReport(ghRepo);
+    if (!report) continue;
+
+    const parishStatus = _problemsParishHarvestStatus(report, parishKey);
+    const workflowDone = run && run.status === "completed";
+
+    if (parishStatus.status === "ok") {
+      await _problemsClearRetrained(parishKey);
+      _pdHarvestReport = null;
+      _problemsShowVerifyResult({
+        ok: true,
+        displayName,
+        parishKey,
+        repo: ghRepo,
+        runUrl,
+        item: parishStatus.item,
+      });
+      setStatus(`✅ ${displayName} verified — bulletin downloaded.`, "ok");
+      if (verifyBtn) verifyBtn.textContent = "✅ Verified";
+      void loadProblemsDashboard();
+      return;
+    }
+
+    if (workflowDone && parishStatus.status === "failed") {
+      _problemsShowVerifyResult({
+        ok: false,
+        displayName,
+        parishKey,
+        repo: ghRepo,
+        runUrl,
+        item: parishStatus.item,
+      });
+      setStatus(`❌ ${displayName} still failing — see links below.`, "err");
+      if (verifyBtn) {
+        verifyBtn.disabled = false;
+        verifyBtn.textContent = "▶ Retry verify";
+      }
+      return;
+    }
+  }
+
+  _problemsShowVerifyResult({
+    ok: null,
+    displayName,
+    parishKey,
+    repo: ghRepo,
+    runUrl,
+    message: "Timed out waiting — open the Actions run to check progress.",
+  });
+  setStatus(`⚠️ Harvest still running for ${displayName} — open Actions link below.`, "warn");
+  if (verifyBtn) {
+    verifyBtn.disabled = false;
+    verifyBtn.textContent = "▶ Verify harvest";
+  }
+}
+
+async function _problemsWatchParishHarvest(parishKey, displayName) {
+  const cfg = await _pdGetGithubConfig();
+  if (!cfg || !parishKey) return;
+  const dispatchStarted = Date.now() - 30_000;
+  await _problemsPollHarvestResult({
+    parishKey,
+    displayName: displayName || parishKey,
+    ghPat: cfg.ghPat,
+    ghRepo: cfg.ghRepo,
+    dispatchStarted,
+    verifyBtn: null,
+  });
 }
 
 async function _problemsVerifyHarvest(row, verifyBtn) {
@@ -1199,68 +1300,14 @@ async function _problemsVerifyHarvest(row, verifyBtn) {
     return;
   }
 
-  setStatus(`⏳ Harvest running for ${displayName} — checking GitHub every 12s…`, "warn");
-  const links = _problemsGithubLinks(cfg.ghRepo);
-  let runUrl = links.actions;
-
-  for (let attempt = 0; attempt < 30; attempt += 1) {
-    await new Promise((resolve) => setTimeout(resolve, 12_000));
-    const run = await _problemsFindLatestWorkflowRun(cfg.ghPat, cfg.ghRepo, dispatchStarted);
-    if (run?.html_url) runUrl = run.html_url;
-    const report = await _problemsFetchLiveReport(cfg.ghRepo);
-    if (!report) continue;
-
-    const parishStatus = _problemsParishHarvestStatus(report, parishKey);
-    const workflowDone = run && run.status === "completed";
-
-    if (parishStatus.status === "ok") {
-      await _problemsClearRetrained(parishKey);
-      _pdHarvestReport = null;
-      _problemsShowVerifyResult({
-        ok: true,
-        displayName,
-        parishKey,
-        repo: cfg.ghRepo,
-        runUrl,
-        item: parishStatus.item,
-      });
-      setStatus(`✅ ${displayName} verified — downloaded OK.`, "ok");
-      if (verifyBtn) verifyBtn.textContent = "✅ Verified";
-      void loadProblemsDashboard();
-      return;
-    }
-
-    if (workflowDone && parishStatus.status === "failed") {
-      _problemsShowVerifyResult({
-        ok: false,
-        displayName,
-        parishKey,
-        repo: cfg.ghRepo,
-        runUrl,
-        item: parishStatus.item,
-      });
-      setStatus(`❌ ${displayName} still failing — see links below.`, "err");
-      if (verifyBtn) {
-        verifyBtn.disabled = false;
-        verifyBtn.textContent = "▶ Retry verify";
-      }
-      return;
-    }
-  }
-
-  _problemsShowVerifyResult({
-    ok: null,
-    displayName,
+  await _problemsPollHarvestResult({
     parishKey,
-    repo: cfg.ghRepo,
-    runUrl,
-    message: "Timed out waiting — open the Actions run to check progress.",
+    displayName,
+    ghPat: cfg.ghPat,
+    ghRepo: cfg.ghRepo,
+    dispatchStarted,
+    verifyBtn,
   });
-  setStatus(`⚠️ Harvest still running for ${displayName} — open Actions link below.`, "warn");
-  if (verifyBtn) {
-    verifyBtn.disabled = false;
-    verifyBtn.textContent = "▶ Verify harvest";
-  }
 }
 
 async function _problemsRenderRows(rows) {
@@ -1395,7 +1442,7 @@ async function loadProblemsDashboard() {
       ];
       if (hiddenDead) parts.push(`${hiddenDead} marked dead/inactive (hidden)`);
       if (hiddenFixed) parts.push(`${hiddenFixed} already downloaded (hidden)`);
-      parts.push("retrained rows: click ▶ Verify harvest after Push Recipe");
+      parts.push("after Push Recipe the row turns green — tap ▶ Verify harvest or wait for auto-refresh");
       hint.textContent = parts.join(" · ") + ".";
     }
     await _problemsRenderRows(rows);
@@ -2113,12 +2160,39 @@ document.getElementById("stale-banner-toggle").addEventListener("click", functio
 
 _spPanels.trainer.tab.addEventListener("click", () => _spShowPanel("trainer"));
 _spPanels.problems.tab.addEventListener("click", () => _spShowPanel("problems"));
+const problemsRefreshBtn = document.getElementById("problems-refresh-btn");
+if (problemsRefreshBtn) {
+  problemsRefreshBtn.addEventListener("click", () => {
+    problemsRefreshBtn.disabled = true;
+    problemsRefreshBtn.textContent = "↻ …";
+    void loadProblemsDashboard().finally(() => {
+      problemsRefreshBtn.disabled = false;
+      problemsRefreshBtn.textContent = "↻ Refresh";
+    });
+  });
+}
 _spShowPanel("trainer");
 void loadProblemsDashboard();
+
+chrome.storage.onChanged.addListener((changes, area) => {
+  if (area !== "local") return;
+  if (changes[PROBLEMS_RECIPE_RETRAINED_KEY]) {
+    void loadProblemsDashboard();
+  }
+});
 
 // ── Crop done notification ─────────────────────────────────────────────────
 
 chrome.runtime.onMessage.addListener((message) => {
+  if (message?.type === "problems_refresh") {
+    _spShowPanel("problems");
+    void loadProblemsDashboard().then(() => {
+      if (message.parish_key) {
+        void _problemsWatchParishHarvest(message.parish_key, message.display_name || message.parish_key);
+      }
+    });
+    return;
+  }
   if (message?.type !== "crop_done") return;
   const x = Number(message.x ?? 0);
   const y = Number(message.y ?? 0);

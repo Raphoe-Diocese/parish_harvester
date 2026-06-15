@@ -165,31 +165,52 @@
     return target === "_blank" || target === "_new";
   };
 
+  const _prefersClickByTextLink = (text = "") =>
+    /click here|current newsletter|this week|weekly bulletin|read more|view newsletter|load current/i.test(
+      String(text || "")
+    );
+
+  const _isPdfOrDocUrl = (url) => {
+    if (!url) return false;
+    const path = String(url).split("?")[0].toLowerCase();
+    return /\.(pdf|docx?|pptx?|odt|ods)(\?|#|$)/i.test(path);
+  };
+
+  const _openUrlInRecordingTab = async (absUrl, showStatus) => {
+    if (!absUrl || typeof chrome === "undefined" || !chrome.runtime?.sendMessage) return false;
+    try {
+      const resp = await new Promise((resolve) => {
+        chrome.runtime.sendMessage({ type: "open_recording_tab", url: absUrl }, (res) => {
+          if (chrome.runtime?.lastError) {
+            resolve({ ok: false, error: chrome.runtime.lastError.message });
+            return;
+          }
+          resolve(res || { ok: false });
+        });
+      });
+      if (resp?.ok) {
+        if (showStatus) {
+          showStatus(
+            _isPdfOrDocUrl(absUrl)
+              ? "✅ Step saved — bulletin opened in a new tab."
+              : "✅ Step saved — extension continues in the new tab.",
+            "ok"
+          );
+        }
+        return true;
+      }
+    } catch (_e) {
+      // Fall through to same-tab navigation.
+    }
+    return false;
+  };
+
   const _navigateRecordingToUrl = async (absUrl, selectedEl, showStatus) => {
     if (!absUrl) return false;
     await _persistRecordingSession({ pendingUrl: absUrl });
-    if (
-      _linkOpensNewTab(selectedEl) &&
-      typeof chrome !== "undefined" &&
-      chrome.runtime?.sendMessage
-    ) {
-      try {
-        const resp = await new Promise((resolve) => {
-          chrome.runtime.sendMessage({ type: "open_recording_tab", url: absUrl }, (res) => {
-            if (chrome.runtime?.lastError) {
-              resolve({ ok: false, error: chrome.runtime.lastError.message });
-              return;
-            }
-            resolve(res || { ok: false });
-          });
-        });
-        if (resp?.ok) {
-          if (showStatus) showStatus("✅ Step saved — extension continues in the new tab.", "ok");
-          return true;
-        }
-      } catch (_e) {
-        // Fall through to same-tab navigation.
-      }
+    if (_isPdfOrDocUrl(absUrl) || _linkOpensNewTab(selectedEl)) {
+      const opened = await _openUrlInRecordingTab(absUrl, showStatus);
+      if (opened) return true;
     }
     if (showStatus) showStatus("✅ Step saved — opening link…", "info");
     window.location.assign(absUrl);
@@ -3444,7 +3465,7 @@
 
       const confirmQ = document.createElement("div");
       confirmQ.style.cssText = "font-weight:600;color:#93c5fd;margin-bottom:6px;font-size:11px;";
-      confirmQ.textContent = "Is this the right link?";
+      confirmQ.textContent = "Is this the bulletin link? Tap the green button.";
       guidedPanel.appendChild(confirmQ);
 
       const preview = document.createElement("div");
@@ -3482,140 +3503,103 @@
       guidedPanel.appendChild(preview);
 
       const btnRow = document.createElement("div");
-      btnRow.style.cssText = "display:flex;gap:5px;flex-wrap:wrap;";
+      btnRow.style.cssText = "display:flex;gap:5px;flex-wrap:wrap;flex-direction:column;";
 
-      const looksRightBtn = makeSmallBtn(
-        "👍 Looks right",
-        "#16a34a",
-        () => {
-          if (window.ph_record_click) {
-            try {
-              window.ph_record_click({
-                tag: (selectedEl.tagName || "").toLowerCase(),
-                role: (selectedEl.getAttribute("role") || "").toLowerCase(),
-                text: (selectedEl.innerText || selectedEl.textContent || "").trim().slice(0, 200),
-                href: selectedEl.getAttribute("href") || "",
-                css_path: cssPath(selectedEl),
-              });
-              addSessionStep("click", clickLabel);
-            } catch (_e) {
-              showStatus("❌ Could not record click.", "error");
-              return;
-            }
-          } else if (_recordStandaloneClick()) {
-            // recorded in standalone mode
-          } else {
-            showStatus("❌ Could not record click.", "error");
-            return;
-          }
-          showStatus(`✅ Click step recorded: "${text || selector}"`);
-          resetGuidedPanel();
-        },
-        "Record this click and stay on this page"
-      );
-
-      const recordAndOpenBtn = makeSmallBtn(
-        "🔗 Record & open link",
-        "#2563eb",
-        () => {
-          const rawHref = selectedEl.getAttribute("href") || "";
-          if (!rawHref) {
-            showStatus("❌ This link has no URL to open.", "error");
-            resetGuidedPanel();
-            return;
-          }
-          let absUrl = "";
+      const _recordClickAndMaybeOpen = async (openLink) => {
+        const rawHref = selectedEl.getAttribute("href") || "";
+        let absUrl = "";
+        if (rawHref) {
           try {
             absUrl = new URL(rawHref, window.location.href).href;
           } catch (_e) {
-            showStatus("❌ Could not open that link.", "error");
-            resetGuidedPanel();
+            showStatus("❌ Could not read that link.", "error");
             return;
           }
+        }
 
-          if (_looksLikeBulletinDownloadUrl(absUrl, text)) {
-            stopPickLinkMode();
-            if (!_recordStandaloneClick()) {
-              showStatus("❌ Could not record click.", "error");
-              return;
-            }
-            standaloneAddStep(
-              { action: "download", url: absUrl },
-              "mark_file",
-              `📄 Download: ${absUrl.slice(-50)}`
-            );
-            void _persistRecordingSession();
-            _notifyRecordingTabActive();
-            showStatus(
-              "✅ Click + download saved. Brave may auto-download — push recipe now.",
-              "ok"
-            );
-            resetGuidedPanel();
-            return;
-          }
+        const useDownloadOnly =
+          openLink === "download" &&
+          absUrl &&
+          _looksLikeBulletinDownloadUrl(absUrl, text) &&
+          !_prefersClickByTextLink(text);
 
-          if (window.ph_record_click) {
-            try {
-              window.ph_record_click({
-                tag: (selectedEl.tagName || "").toLowerCase(),
-                role: (selectedEl.getAttribute("role") || "").toLowerCase(),
-                text: (selectedEl.innerText || selectedEl.textContent || "").trim().slice(0, 200),
-                href: selectedEl.getAttribute("href") || "",
-                css_path: cssPath(selectedEl),
-              });
-              addSessionStep("click", clickLabel);
-            } catch (_e) {
-              showStatus("❌ Could not record click.", "error");
-              return;
-            }
-          } else if (!_recordStandaloneClick()) {
+        if (useDownloadOnly) {
+          stopPickLinkMode();
+          if (!_recordStandaloneClick()) {
             showStatus("❌ Could not record click.", "error");
             return;
           }
-          stopPickLinkMode();
-          void _navigateRecordingToUrl(absUrl, selectedEl, showStatus);
-        },
-        "Save this step and go to the linked page (for multi-step recipes)"
-      );
-      recordAndOpenBtn.style.width = "auto";
+          standaloneAddStep(
+            { action: "download", url: absUrl },
+            "mark_file",
+            `📄 Download: ${absUrl.slice(-50)}`
+          );
+          void _persistRecordingSession();
+          _notifyRecordingTabActive();
+          showStatus("✅ Click + download saved — push recipe when ready.", "ok");
+          resetGuidedPanel();
+          return;
+        }
 
-      const autoDownloadBtn = makeSmallBtn(
-        "📄 Link auto-downloads PDF",
-        "#7c3aed",
-        () => {
-          const rawHref = selectedEl.getAttribute("href") || "";
-          if (!rawHref) {
-            showStatus("❌ This link has no URL.", "error");
+        if (window.ph_record_click) {
+          try {
+            window.ph_record_click({
+              tag: (selectedEl.tagName || "").toLowerCase(),
+              role: (selectedEl.getAttribute("role") || "").toLowerCase(),
+              text: (selectedEl.innerText || selectedEl.textContent || "").trim().slice(0, 200),
+              href: selectedEl.getAttribute("href") || "",
+              css_path: cssPath(selectedEl),
+            });
+            addSessionStep("click", clickLabel);
+          } catch (_e) {
+            showStatus("❌ Could not record click.", "error");
             return;
           }
-          try {
-            const absUrl = new URL(rawHref, window.location.href).href;
-            stopPickLinkMode();
-            _standaloneAddClickAndDownload(clickStep, absUrl, clickLabel, showStatus);
-            _notifyRecordingTabActive();
-            resetGuidedPanel();
-          } catch (_e) {
-            showStatus("❌ Could not read link URL.", "error");
-          }
+        } else if (!_recordStandaloneClick()) {
+          showStatus("❌ Could not record click.", "error");
+          return;
+        }
+
+        if (openLink === "stay") {
+          showStatus(`✅ Click step recorded: "${text || selector}"`);
+          resetGuidedPanel();
+          return;
+        }
+
+        if (!absUrl) {
+          showStatus("❌ This link has no URL to open.", "error");
+          resetGuidedPanel();
+          return;
+        }
+        stopPickLinkMode();
+        void _navigateRecordingToUrl(absUrl, selectedEl, showStatus);
+      };
+
+      const yesOpenBtn = makeSmallBtn(
+        "✅ Yes — record & open this link",
+        "#16a34a",
+        () => {
+          void _recordClickAndMaybeOpen("open");
         },
-        "Brave downloads the PDF without opening a page — saves click + download in one go"
+        "Records the click and opens the bulletin (usual choice)"
       );
-      autoDownloadBtn.style.width = "auto";
-      autoDownloadBtn.style.display = _looksLikeBulletinDownloadUrl(
-        (() => {
-          try {
-            return new URL(selectedEl.getAttribute("href") || "", window.location.href).href;
-          } catch (_e) {
-            return "";
-          }
-        })(),
-        text
-      )
-        ? "block"
-        : "none";
+      yesOpenBtn.style.width = "100%";
+      yesOpenBtn.style.fontSize = "11px";
+      yesOpenBtn.style.padding = "8px 10px";
+
+      const stayBtn = makeSmallBtn(
+        "Stay on this page (menu / no navigation)",
+        "#374151",
+        () => {
+          void _recordClickAndMaybeOpen("stay");
+        },
+        "Only record the click — use for dropdown menus"
+      );
+      stayBtn.style.width = "100%";
+      stayBtn.style.fontSize = "9px";
 
       const pickAgainBtn = makeSmallBtn(
-        "🔄 Pick again",
+        "🔄 Pick a different link",
         "#374151",
         () => {
           resetGuidedPanel();
@@ -3624,10 +3608,10 @@
         "Select a different link"
       );
       pickAgainBtn.style.width = "auto";
+      pickAgainBtn.style.fontSize = "9px";
 
-      btnRow.appendChild(looksRightBtn);
-      btnRow.appendChild(recordAndOpenBtn);
-      btnRow.appendChild(autoDownloadBtn);
+      btnRow.appendChild(yesOpenBtn);
+      btnRow.appendChild(stayBtn);
       btnRow.appendChild(pickAgainBtn);
       guidedPanel.appendChild(btnRow);
       guidedPanel.appendChild(stuckLink);
@@ -5146,6 +5130,44 @@
       let parishPickerTouched = false;
       let diocesePickerTouched = false;
 
+      const parishFormExpanded = document.createElement("div");
+      parishFormExpanded.style.cssText = "display:none;";
+
+      const wrongParishWrap = document.createElement("div");
+      wrongParishWrap.style.cssText = "margin-bottom:6px;display:none;";
+      const wrongParishBtn = document.createElement("button");
+      wrongParishBtn.type = "button";
+      wrongParishBtn.textContent = "Wrong parish? Change it";
+      wrongParishBtn.style.cssText = [
+        "border:none",
+        "background:transparent",
+        "color:#93c5fd",
+        "font-size:9px",
+        "padding:0",
+        "cursor:pointer",
+        "text-decoration:underline",
+        "font-family:inherit",
+      ].join(";");
+      wrongParishBtn.addEventListener("click", () => {
+        parishPickerTouched = true;
+        parishFormExpanded.style.display = "block";
+        wrongParishWrap.style.display = "none";
+        parishSearchCombo?.input?.focus?.();
+      });
+      wrongParishWrap.appendChild(wrongParishBtn);
+
+      const _setParishFormMode = (resolved) => {
+        const key = resolved?.inferredKey || resolved?.key || "";
+        const confident = Boolean(key && resolved && !resolved.lowConfidence);
+        if (confident && !parishPickerTouched) {
+          parishFormExpanded.style.display = "none";
+          wrongParishWrap.style.display = "block";
+        } else {
+          parishFormExpanded.style.display = "block";
+          wrongParishWrap.style.display = confident ? "block" : "none";
+        }
+      };
+
       const parishSearchCombo = window.ph_parish_pickers?.createSearchCombo
         ? window.ph_parish_pickers.createSearchCombo({
             label: "Find parish (type a few letters)",
@@ -5169,16 +5191,17 @@
             },
           })
         : null;
-      if (parishSearchCombo) pushSection.appendChild(parishSearchCombo.wrap);
+      if (parishSearchCombo) parishFormExpanded.appendChild(parishSearchCombo.wrap);
 
       const keyInput = makeInput("Parish key (folder name on GitHub)", "ph-parish-key");
       const nameInput = makeInput("Display name (shown in mega bulletin)", "ph-display-name");
-
+      parishFormExpanded.appendChild(keyInput);
+      parishFormExpanded.appendChild(nameInput);
+      pushSection.appendChild(wrongParishWrap);
+      pushSection.appendChild(parishFormExpanded);
       const harvestStatusLine = document.createElement("div");
       harvestStatusLine.style.cssText = "font-size:9px;color:#93c5fd;margin-bottom:4px;display:none;";
       pushSection.appendChild(harvestStatusLine);
-      pushSection.appendChild(keyInput);
-      pushSection.appendChild(nameInput);
       keyInput.addEventListener("input", () => {
         parishPickerTouched = true;
       });
@@ -5312,6 +5335,7 @@
         items = items.filter((p) => {
           const k = String(p.key || "").toLowerCase();
           if (!k || seenKeys.has(k)) return false;
+          if (window.ph_parish_pickers?.isJunkParishKey?.(k)) return false;
           seenKeys.add(k);
           return true;
         });
@@ -5447,8 +5471,8 @@
           autoDetectNote.style.display = "block";
           autoDetectNote.style.color = resolved.lowConfidence ? "#fde68a" : "#86efac";
           autoDetectNote.textContent = resolved.lowConfidence
-            ? `⚠️ Best guess: ${resolved.name || inferred} (${inferred}) — please confirm in Find parish`
-            : `✓ ${notePrefix}: ${resolved.name || inferred} (${inferred})`;
+            ? `⚠️ Best guess: ${resolved.name || inferred} (${inferred}) — tap Wrong parish? if needed`
+            : `✓ Recording for ${resolved.name || inferred} (${inferred})`;
         }
         if (resolved.name && !parishPickerTouched) nameInput.value = resolved.name;
         if (resolved.diocese && !diocesePickerTouched) {
@@ -5459,6 +5483,7 @@
         updateParishRecordingLine(nameInput.value || resolved.name, inferred, resolved.hostname);
         _showParishMismatch(inferred, resolved.key && resolved.key !== inferred ? resolved.key : "");
         _showTrainerTip(resolved);
+        _setParishFormMode(resolved);
       };
 
       const _bootstrapParishContext = async () => {
@@ -5581,6 +5606,20 @@
       let driftRecipeKey = "";
       let driftRecipeObject = null;
       let driftRecipePath = "";
+
+      const postPushBanner = document.createElement("div");
+      postPushBanner.style.cssText = [
+        "display:none",
+        "font-size:10px",
+        "line-height:1.45",
+        "color:#86efac",
+        "background:#14532d",
+        "border:1px solid #16a34a",
+        "border-radius:6px",
+        "padding:6px 8px",
+        "margin-bottom:6px",
+      ].join(";");
+      pushSection.appendChild(postPushBanner);
 
       const pushBtn = document.createElement("button");
       pushBtn.type = "button";
@@ -5850,15 +5889,42 @@
             const linkPart = linkUrl ? ` → ${linkUrl}` : ` → ${path}`;
             if (response.dispatchOk) {
               dispatchErrorBanner.style.display = "none";
-              showStatus(`✅ Recipe ${verb}! Triggering instant Mega PDF rebuild… ${linkPart}`, "ok");
+              showStatus(
+                `✅ Recipe ${verb}! Testing ${name || key} on GitHub now (this parish only).`,
+                "ok"
+              );
+              postPushBanner.style.display = "block";
+              postPushBanner.innerHTML =
+                `⏳ <strong>${name || key}</strong> is harvesting on GitHub. Open the <strong>Problems</strong> tab — it refreshes automatically and shows the bulletin link when done.`;
+        try {
+          chrome.runtime.sendMessage({
+            type: "problems_refresh",
+            parish_key: key,
+            display_name: name || key,
+          });
+        } catch (_e) {
+                // Side panel may be closed.
+              }
             } else if (response.dispatchError) {
               showDispatchErrorBanner(response.dispatchError);
               showStatus(
-                `✅ Recipe ${verb}!${linkPart} ⚠️ Rebuild trigger failed: ${response.dispatchError}`,
+                `✅ Recipe ${verb}!${linkPart} ⚠️ Test harvest failed to start: ${response.dispatchError}`,
                 "ok",
               );
+              postPushBanner.style.display = "block";
+              postPushBanner.style.color = "#fde68a";
+              postPushBanner.style.background = "#78350f";
+              postPushBanner.style.borderColor = "#f59e0b";
+              postPushBanner.textContent =
+                "Recipe saved but GitHub test did not start — open Problems and tap ▶ Verify harvest.";
             } else {
               showStatus(`✅ Recipe ${verb}!${linkPart}`, "ok");
+              postPushBanner.style.display = "block";
+              postPushBanner.style.color = "#fde68a";
+              postPushBanner.style.background = "#78350f";
+              postPushBanner.style.borderColor = "#f59e0b";
+              postPushBanner.textContent =
+                "Recipe saved. Open Problems → ▶ Verify harvest to test it.";
             }
             if (response.patternLearned) {
               showStatus("📚 Pattern saved — similar parishes will get hints next time.", "ok");
