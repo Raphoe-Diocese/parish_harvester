@@ -374,16 +374,50 @@
   </head>
   <body>
     <div class="wrap">
-      <h1>Parish Trainer <span class="guided-badge">Guided ✓</span></h1>
+      <h1>Parish Fixer <span class="guided-badge">3-step ✓</span></h1>
 
       <p id="status">Ready.</p>
 
       <div class="sp-tabs">
-        <button id="tab-trainer" class="sp-tab active" type="button">🛠️ Trainer</button>
-        <button id="tab-problems" class="sp-tab" type="button">🚨 Problems</button>
+        <button id="tab-problems" class="sp-tab active" type="button">🚨 Fix broken</button>
+        <button id="tab-trainer" class="sp-tab" type="button">📖 Directory</button>
       </div>
 
-      <div id="panel-trainer" class="sp-panel active">
+      <div id="panel-problems" class="sp-panel active">
+        <div class="section" id="problems-howto" style="background:#0c4a6e;border-color:#0284c7;margin-bottom:8px;">
+          <div style="font-size:11px;font-weight:700;color:#f9fafb;margin-bottom:5px;">How to fix a parish (3 steps)</div>
+          <ol style="margin:0 0 0 18px;padding:0;font-size:10px;line-height:1.55;color:#e2e8f0;">
+            <li><strong>Fix now</strong> — opens the parish news page in a new tab.</li>
+            <li>On that page: <strong>Point at the bulletin link</strong> → green <strong>Yes</strong> → <strong>Save</strong> if needed.</li>
+            <li><strong>Send & test</strong> — waits here and shows the bulletin link when done (not the mega PDF).</li>
+          </ol>
+        </div>
+        <div class="section">
+          <div id="problems-warning">⚠️ Could not load latest report (offline?)</div>
+          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;">
+            <p id="problems-hint" class="note" style="margin:0;flex:1;"></p>
+            <button type="button" id="problems-refresh-btn" class="grey" style="width:auto;flex-shrink:0;padding:4px 8px;font-size:10px;">↻ Refresh</button>
+          </div>
+          <div id="problems-verify-result"></div>
+          <div class="problems-table-wrap">
+            <table id="problems-table">
+              <thead>
+                <tr>
+                  <th>Parish</th>
+                  <th>Failure category</th>
+                  <th>Last seen</th>
+                  <th>Consecutive failures</th>
+                  <th>Action</th>
+                </tr>
+              </thead>
+              <tbody id="problems-body"></tbody>
+            </table>
+          </div>
+          <div id="problems-empty" class="problems-empty">Loading…</div>
+        </div>
+      </div>
+
+      <div id="panel-trainer" class="sp-panel">
       <div class="section operator-hidden" aria-hidden="true">
         <div class="section-title">What do you see on screen?</div>
         <div class="btn-col">
@@ -448,32 +482,6 @@
           <p class="note" style="margin-top:4px;">📌 saves a parish bulletin override from the active tab URL. ☑ skips a parish in this week's mega PDF. 📁 opens parish details (URL, recipe changes, repo/mega timestamps).</p>
         </div>
       </details>
-      </div>
-
-      <div id="panel-problems" class="sp-panel">
-        <div class="section">
-          <div id="problems-warning">⚠️ Could not load latest report (offline?)</div>
-          <div style="display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:4px;">
-            <p id="problems-hint" class="note" style="margin:0;flex:1;"></p>
-            <button type="button" id="problems-refresh-btn" class="grey" style="width:auto;flex-shrink:0;padding:4px 8px;font-size:10px;">↻ Refresh</button>
-          </div>
-          <div id="problems-verify-result"></div>
-          <div class="problems-table-wrap">
-            <table id="problems-table">
-              <thead>
-                <tr>
-                  <th>Parish</th>
-                  <th>Failure category</th>
-                  <th>Last seen</th>
-                  <th>Consecutive failures</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody id="problems-body"></tbody>
-            </table>
-          </div>
-          <div id="problems-empty" class="problems-empty">Loading…</div>
-        </div>
       </div>
     </div>
     <script src="github_defaults.js"></script>

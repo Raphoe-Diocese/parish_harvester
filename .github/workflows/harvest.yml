@@ -154,7 +154,7 @@ jobs:
           fi
 
       - name: Post GitHub Issue summary
-        if: success()
+        if: success() && github.event.inputs.target_parish == ''
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -258,6 +258,11 @@ jobs:
           fi
           git add -f Bulletins/report.json Bulletins/report.txt Bulletins/dashboard.html docs/mega_pdf/ docs/manifest.json 2>/dev/null || true
           git add -f parishes/consecutive_failures.json parishes/stale_bulletins.json parishes/retry_queue.json 2>/dev/null || true
+          TARGET_PARISH="${{ github.event.inputs.target_parish }}"
+          if [ -n "${TARGET_PARISH}" ] && [ -f "Bulletins/current/${TARGET_PARISH}.pdf" ]; then
+            git add -f "Bulletins/current/${TARGET_PARISH}.pdf"
+            echo "Including test PDF: Bulletins/current/${TARGET_PARISH}.pdf"
+          fi
           if git diff --cached --quiet; then
             echo "ℹ️  No staged changes — skipping commit."
             exit 0
@@ -373,7 +378,7 @@ jobs:
           retention-days: 30
 
       - name: Clean transient bulletin PDFs from repository
-        if: success()
+        if: success() && github.event.inputs.target_parish == ''
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"

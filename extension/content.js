@@ -2893,7 +2893,7 @@
     ].join(";");
 
     const title = document.createElement("span");
-    title.textContent = "⠿ Train bulletin";
+    title.textContent = "⠿ Parish bulletin fixer";
     title.style.cssText = "font-weight:600;font-size:11px;opacity:0.9;white-space:nowrap;";
     header.appendChild(title);
 
@@ -3090,16 +3090,18 @@
     const playbookPanel = document.createElement("div");
     playbookPanel.id = "ph-playbook-panel";
     playbookPanel.style.cssText = [
-      "background:#0c4a6e",
-      "border:1px solid #0284c7",
+      "background:#0f172a",
+      "border:1px solid #334155",
       "border-radius:8px",
-      "padding:8px",
+      "padding:6px 8px",
       "margin-bottom:6px",
     ].join(";");
 
+    const journeyStepBar = document.createElement("div");
+    journeyStepBar.id = "ph-journey-bar";
+
     const wizardQ = document.createElement("div");
     wizardQ.style.cssText = "display:none;font-size:11px;font-weight:600;margin-bottom:6px;color:#93c5fd;";
-    wizardQ.textContent = "Step 1 — follow a menu link to reach the bulletin";
 
     const nextStepBanner = document.createElement("div");
     nextStepBanner.style.cssText = [
@@ -3129,7 +3131,7 @@
       "padding:4px 6px",
     ].join(";");
     const moreOptionsSummary = document.createElement("summary");
-    moreOptionsSummary.textContent = "Extra: image, crop, frame, scan page";
+    moreOptionsSummary.textContent = "Other options (auto-guess link, image, frame…)";
     moreOptionsSummary.style.cssText = [
       "cursor:pointer",
       "font-size:10px",
@@ -3189,6 +3191,7 @@
       _clearElement(guidedPanel);
       if (savedPattern) guidedPanel.appendChild(savedPattern);
       if (savedParish) guidedPanel.appendChild(savedParish);
+      guidedPanel.appendChild(journeyStepBar);
       guidedPanel.appendChild(playbookPanel);
       guidedPanel.appendChild(nextStepBanner);
       guidedPanel.appendChild(wizardQ);
@@ -3319,13 +3322,13 @@
         );
         nextStepBanner.style.display = "block";
         nextStepBanner.textContent = hasTerminal
-          ? "✅ PDF saved — scroll down and tap Push Recipe to GitHub."
-          : "👇 Tap the green Save this PDF button, then Push.";
+          ? "✅ Bulletin saved — scroll down and tap Send & test."
+          : "👇 Tap the green Save button, then Send & test.";
         wizardQ.textContent = "You are on the bulletin PDF";
         if (contextPrimaryBtn) {
           contextPrimaryBtn.style.display = "block";
           contextPrimaryBtn.style.background = "#16a34a";
-          contextPrimaryBtn.textContent = "📄 2. Save this PDF";
+          contextPrimaryBtn.textContent = "💾 Step 2: Save this PDF";
         }
         if (moreOptionsSection) moreOptionsSection.style.display = "none";
         if (stuckLink) stuckLink.style.display = "none";
@@ -3336,13 +3339,13 @@
         nextStepBanner.style.display = "block";
         nextStepBanner.textContent =
           `✅ ${stepCount} step${stepCount === 1 ? "" : "s"} saved. ` +
-          "Use Follow a link again if you need another click, or finish with PDF / frame / image below.";
-        wizardQ.textContent = `Step ${stepCount + 1} — what is on this page?`;
+          "Need another menu click? Use Step 1 again. Otherwise save the bulletin, then Send & test.";
+        wizardQ.textContent = `Step ${stepCount + 1}`;
       } else {
         if (moreOptionsSection) moreOptionsSection.style.display = "";
         if (stuckLink) stuckLink.style.display = "none";
         nextStepBanner.style.display = "none";
-        wizardQ.textContent = "Step 1 — follow a menu link to reach the bulletin";
+        wizardQ.textContent = "Step 1";
       }
 
       if (contextPrimaryBtn) {
@@ -3361,36 +3364,36 @@
         if (pageCtx.type === "direct_pdf") {
           contextPrimaryBtn.style.display = "block";
           contextPrimaryBtn.style.background = "#16a34a";
-          contextPrimaryBtn.textContent = "📄 2. Save this PDF";
+          contextPrimaryBtn.textContent = "💾 Step 2: Save this PDF";
         } else if (pageCtx.type === "oneweb_docx") {
           contextPrimaryBtn.style.display = "block";
           contextPrimaryBtn.style.background = "#16a34a";
           contextPrimaryBtn.textContent = pageCtx.autoNewsletterUrl
-            ? "📄 2. Save newsletter (auto)"
-            : "📐 2. Bulletin in frame";
+            ? "💾 Step 2: Save newsletter"
+            : "📐 Step 2: Bulletin in a frame";
         } else if (pageCtx.type === "weekly_bulletin_download") {
           contextPrimaryBtn.style.display = "block";
           contextPrimaryBtn.style.background = "#2563eb";
-          contextPrimaryBtn.textContent = "📥 2. Click cloud download";
+          contextPrimaryBtn.textContent = "📥 Step 2: Download this week's row";
         } else if (pageCtx.type === "wix_html" || (pageCtx.type === "html" && _pathLooksLikeNewsletterPage())) {
           contextPrimaryBtn.style.display = "block";
-          contextPrimaryBtn.textContent = "📰 2. Save page as PDF";
+          contextPrimaryBtn.textContent = "💾 Step 2: Save page as PDF";
         } else if (pageCtx.type === "parish_messenger" || pageCtx.type === "pdf_links" || pageCtx.type === "pdfemb") {
           contextPrimaryBtn.style.display = "block";
-          contextPrimaryBtn.textContent = "🔗 2. Pick bulletin link";
+          contextPrimaryBtn.textContent = "👉 Step 1: Point at bulletin link";
         } else if (pageCtx.type === "cloud_folder") {
           contextPrimaryBtn.style.display = "block";
-          contextPrimaryBtn.textContent = "📅 2. Pick this Sunday's PDF row";
+          contextPrimaryBtn.textContent = "📅 Step 1: Pick this Sunday's row";
         } else if (
           pageCtx.type === "iframe" ||
           pageCtx.type === "iframe_maybe" ||
           pageCtx.type === "wix_viewer"
         ) {
           contextPrimaryBtn.style.display = "block";
-          contextPrimaryBtn.textContent = "📐 2. Bulletin in frame";
+          contextPrimaryBtn.textContent = "📐 Step 2: Bulletin in a frame";
         } else if (pageCtx.type === "image") {
           contextPrimaryBtn.style.display = "block";
-          contextPrimaryBtn.textContent = "🖼️ 2. Pick bulletin image";
+          contextPrimaryBtn.textContent = "🖼️ Step 2: Point at bulletin image";
         } else {
           contextPrimaryBtn.style.display = showContext ? "block" : "none";
         }
@@ -3400,14 +3403,21 @@
         const hasTerminal = recorded.some((s) =>
           _pdfTerminalActions.has(String(s?.action || "").toLowerCase())
         );
-        window.ph_playbook.render(playbookPanel, pageCtx, {
+        const planState = {
           stepCount: recorded.length,
           hasTerminal,
           lastHarvestIssue: _lastHarvestIssue,
           needsRetrain: _needsRetrain,
           expectedCloudLabel: pageCtx.expectedLabel || "",
           cloudRowVisible: pageCtx.rowVisible,
-        });
+          fixNow: Boolean(bar.dataset.phFixNow),
+          parishName: bar.dataset.phParishName || "",
+        };
+        window.ph_playbook.render(playbookPanel, pageCtx, planState);
+        if (window.ph_playbook.renderJourneyBar) {
+          const plan = window.ph_playbook.getPlan(pageCtx, planState);
+          window.ph_playbook.renderJourneyBar(journeyStepBar, plan.journeyStep);
+        }
         const mem = window.ph_site_memory?.getForPageType?.(pageCtx.type);
         if (mem && playbookPanel.nextSibling?.dataset?.phMemory !== "1") {
           let memoryEl = playbookPanel.querySelector("[data-ph-memory='1']");
@@ -3422,12 +3432,7 @@
         }
       }
       if (pinLinkBtn) {
-        const hidePin =
-          pageCtx.type === "direct_pdf" ||
-          pageCtx.type === "oneweb_docx" ||
-          pageCtx.type === "wix_html" ||
-          pageCtx.type === "cloud_folder";
-        pinLinkBtn.style.display = hidePin ? "none" : "block";
+        pinLinkBtn.style.display = "none";
       }
     };
 
@@ -3465,19 +3470,27 @@
 
       const confirmQ = document.createElement("div");
       confirmQ.style.cssText = "font-weight:600;color:#93c5fd;margin-bottom:6px;font-size:11px;";
-      confirmQ.textContent = "Is this the bulletin link? Tap the green button.";
+      confirmQ.textContent = "Step 2 — Is this the bulletin? Tap green if yes.";
       guidedPanel.appendChild(confirmQ);
 
+      const plainPick = document.createElement("div");
+      plainPick.style.cssText =
+        "font-size:10px;color:#e2e8f0;line-height:1.45;background:#0f172a;border-radius:4px;padding:6px 8px;margin-bottom:6px;";
+      const linkText = (selectedEl.innerText || selectedEl.textContent || "").trim().replace(/\s+/g, " ").slice(0, 80);
+      plainPick.innerHTML =
+        `Each Sunday the computer will click: <strong>${linkText || "this link"}</strong> ` +
+        `(usually the <strong>first</strong> match at the top of the page).` +
+        `<br><span style="color:#9ca3af;font-size:9px;">The dated PDF address changes every week — that is normal. The click text stays the same.</span>`;
+      guidedPanel.appendChild(plainPick);
+
+      const techDetails = document.createElement("details");
+      techDetails.style.cssText = "margin-bottom:6px;font-size:9px;color:#6b7280;";
+      const techSummary = document.createElement("summary");
+      techSummary.textContent = "Technical details";
+      techSummary.style.cursor = "pointer";
+      techDetails.appendChild(techSummary);
       const preview = document.createElement("div");
-      preview.style.cssText = [
-        "background:#0f172a",
-        "border-radius:4px",
-        "padding:5px",
-        "margin-bottom:6px",
-        "word-break:break-all",
-        "line-height:1.4",
-        "font-size:10px",
-      ].join(";");
+      preview.style.cssText = "margin-top:4px;word-break:break-all;line-height:1.4;";
 
       const makePreviewRow = (label, value) => {
         const row = document.createElement("div");
@@ -3500,7 +3513,12 @@
       selectorRow.appendChild(selectorLabel);
       selectorRow.appendChild(selectorCode);
       preview.appendChild(selectorRow);
-      guidedPanel.appendChild(preview);
+      techDetails.appendChild(preview);
+      guidedPanel.appendChild(techDetails);
+
+      if (window.ph_playbook?.renderJourneyBar) {
+        window.ph_playbook.renderJourneyBar(journeyStepBar, 2);
+      }
 
       const btnRow = document.createElement("div");
       btnRow.style.cssText = "display:flex;gap:5px;flex-wrap:wrap;flex-direction:column;";
@@ -3576,7 +3594,7 @@
       };
 
       const yesOpenBtn = makeSmallBtn(
-        "✅ Yes — record & open this link",
+        "✅ Yes — that's the bulletin (open it)",
         "#16a34a",
         () => {
           void _recordClickAndMaybeOpen("open");
@@ -3961,14 +3979,14 @@
     let pinLinkBtn = null;
 
     clickFirstBtn = makeSmallBtn(
-      "🔗 1. Follow a link",
+      "👉 Step 1: Point at the bulletin link",
       "#16a34a",
       () => startPickLinkMode(showPickConfirmation, showStatus),
-      "Crosshair on the page — click the exact menu/link where the bulletin always is (e.g. Current Newsletter)."
+      "Your cursor becomes a crosshair — click the link that opens this week's bulletin (e.g. Parish News at the top)."
     );
 
     pinLinkBtn = makeSmallBtn(
-      "📌 Auto-pick bulletin link",
+      "🤖 Auto-guess bulletin link",
       "#6d28d9",
       async () => {
         showStatus("⏳ Finding best bulletin link on this page…", "info");
@@ -4001,7 +4019,7 @@
     );
 
     contextPrimaryBtn = makeSmallBtn(
-      "📄 2. Save bulletin (PDF / page / frame)",
+      "💾 Step 2: Save the bulletin",
       "#2563eb",
       () => {
         const pageCtx = detectPageType();
@@ -4077,8 +4095,8 @@
     contextPrimaryBtn.style.display = "none";
 
     wizardBtns.appendChild(clickFirstBtn);
-    wizardBtns.appendChild(pinLinkBtn);
     wizardBtns.appendChild(contextPrimaryBtn);
+    moreOptionsBody.appendChild(pinLinkBtn);
 
     const pdfBtn = makeSmallBtn(
       "📄 Get a PDF",
@@ -4144,6 +4162,7 @@
       "margin-bottom:6px",
     ].join(";");
     guidedPanel.appendChild(parishRecordingLine);
+    guidedPanel.appendChild(journeyStepBar);
     guidedPanel.appendChild(playbookPanel);
     guidedPanel.appendChild(nextStepBanner);
     guidedPanel.appendChild(wizardQ);
@@ -5063,8 +5082,8 @@
       ].join(";");
 
       const pushTitle = document.createElement("div");
-      pushTitle.style.cssText = "font-size:10px;font-weight:600;color:#86efac;margin-bottom:6px;";
-      pushTitle.textContent = "⬆ Push Recipe to GitHub";
+      pushTitle.style.cssText = "font-size:11px;font-weight:700;color:#86efac;margin-bottom:6px;";
+      pushTitle.textContent = "🚀 Step 3 — Send & test (this parish only)";
       pushSection.appendChild(pushTitle);
 
       // GitHub settings check — warn early if PAT/repo are not configured.
@@ -5623,7 +5642,7 @@
 
       const pushBtn = document.createElement("button");
       pushBtn.type = "button";
-      pushBtn.textContent = "⬆ Push Recipe to GitHub";
+      pushBtn.textContent = "🚀 Send & test on GitHub";
       pushBtn.style.cssText = [
         "border:none",
         "border-radius:6px",
@@ -5870,14 +5889,14 @@
           };
         })();
         pushBtn.disabled = true;
-        pushBtn.textContent = "⏳ Pushing…";
+        pushBtn.textContent = "⏳ Sending…";
         _logSaveCycle("push_recipe", { parish_key: key, recipe }, { ok: "pending" });
         showStatus("⏳ Pushing recipe to GitHub…", "info");
 
         _safeSendMessage({ type: "push_recipe", parish_key: key, recipe, site_pattern: sitePattern }, (response, bridgeError) => {
           _logSaveCycle("push_recipe", { parish_key: key, recipe }, bridgeError ? { ok: false, reason: bridgeError } : response);
           pushBtn.disabled = false;
-          pushBtn.textContent = "⬆ Push Recipe to GitHub";
+          pushBtn.textContent = "🚀 Send & test on GitHub";
           if (bridgeError) {
             showStatus(`❌ ${bridgeError}`, "error");
             return;
@@ -5895,7 +5914,7 @@
               );
               postPushBanner.style.display = "block";
               postPushBanner.innerHTML =
-                `⏳ <strong>${name || key}</strong> is harvesting on GitHub. Open the <strong>Problems</strong> tab — it refreshes automatically and shows the bulletin link when done.`;
+                `⏳ <strong>${name || key}</strong> — single-parish test running (not the mega PDF). Problems tab will show the bulletin link when done.`;
         try {
           chrome.runtime.sendMessage({
             type: "problems_refresh",
@@ -6164,7 +6183,12 @@
         recipeSteps = recipeSteps.filter((entry) => !entry?.recipeStep);
         standaloneStartUrl = _pageUrlForParishDetection();
         _skipLoadExistingRecipe = true;
+        bar.dataset.phFixNow = "1";
+        bar.dataset.phParishName = String(message.parish_key || "").replace(/_/g, " ");
         void _clearRecordingSession();
+      } else {
+        delete bar.dataset.phFixNow;
+        delete bar.dataset.phParishName;
       }
       _ensureToolbar(true);
       void _markRecordingActive();

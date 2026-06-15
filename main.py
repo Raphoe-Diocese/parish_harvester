@@ -376,19 +376,22 @@ def main() -> int:
     except Exception as exc:
         print(f"  ⚠️  Dashboard generation failed (non-fatal): {exc}")
 
-    # Stitch mega PDF
+    # Stitch mega PDF (skip for single-parish test runs — faster verify after Push Recipe)
     print("\n── Stitch Mega PDF ─────────────────────────────────────────")
-    try:
-        stitch_mega_pdf(
-            stitch_results,
-            current_dir=CURRENT_DIR,
-            bulletins_dir=BULLETINS_DIR,
-            target=target,
-            contacts_path=contacts_path if contacts_path.exists() else None,
-            mega_excludes_path=PARISHES_DIR / "mega_excludes.json",
-        )
-    except Exception as exc:
-        print(f"  ⚠️  Mega PDF generation failed (non-fatal): {exc}")
+    if target_parish_key:
+        print(f"  ⏭️  Skipped (single-parish test for {target_parish_key})")
+    else:
+        try:
+            stitch_mega_pdf(
+                stitch_results,
+                current_dir=CURRENT_DIR,
+                bulletins_dir=BULLETINS_DIR,
+                target=target,
+                contacts_path=contacts_path if contacts_path.exists() else None,
+                mega_excludes_path=PARISHES_DIR / "mega_excludes.json",
+            )
+        except Exception as exc:
+            print(f"  ⚠️  Mega PDF generation failed (non-fatal): {exc}")
 
     # Stitch per-diocese mega PDFs (skip when running a single-parish rebuild)
     if not target_parish_key and diocese_results:

@@ -1,190 +1,146 @@
 /**
- * Parish Trainer playbook — visible "what to do on THIS page" (no AI, no chat).
+ * Plain-English playbook — what to do on THIS page (no jargon).
  */
 (() => {
-  const HOW_IT_WORKS =
-    "How this works: the toolbar reads HTML patterns on this page (not AI). You record steps here → Push Recipe → GitHub. Sunday harvest replays those steps.";
-
-  const PIN_HELP =
-    "🎯 Follow a link = you click the exact spot on the page (crosshair). That becomes the Sunday click step. " +
-    "📌 Pin = auto-finds the bulletin link and records the same click step. " +
-    "Either way you still open the link once, then finish with Save PDF / Save page / Pick image.";
+  const PLAIN_INTRO =
+    "You are showing the computer where this parish hides its weekly bulletin. " +
+    "When you are done, it tests just this parish on GitHub (not the big combined PDF).";
 
   const PLANS = {
     direct_pdf: {
-      title: "You are on the bulletin PDF",
+      title: "You are already on the bulletin PDF",
+      now: "Tap the green Save button below, then Send & test.",
       steps: [
-        "Tap Save this PDF (adds a download step).",
-        "Check Recipe Preview ends with download.",
-        "Pick diocese → Push Recipe to GitHub.",
-        "Optional: Operator Console → Instant rebuild to test.",
+        "Save this PDF (one tap).",
+        "Send & test — wait for the green tick in the Problems tab.",
       ],
-      pin: false,
     },
     cloud_folder: {
-      title: "Google Drive / OneDrive folder",
+      title: "Bulletins live in a cloud folder",
+      now: "Pick this week's dated row (newest at top), then save the PDF.",
       steps: [
-        "Tap Pick this Sunday's PDF row (dated YY.MM.DD, e.g. 26.06.14.pdf).",
-        "On the file preview page → Save this PDF.",
-        "Push Recipe — Sunday auto-picks the right date each week (2026, 2027, 2028…).",
+        "Point at this Sunday's PDF row.",
+        "When the file opens → save it → Send & test.",
       ],
-      pin: false,
     },
     parish_messenger: {
       title: "Parish Messenger site",
+      now: "Point at View Newsletter — not Gift Aid or GDPR.",
       steps: [
-        "Tap Follow a link → pick View Newsletter (not Gift Aid).",
-        "When the PDF opens → Save this PDF → Push.",
+        "Point at the newsletter link.",
+        "When the PDF opens → save it → Send & test.",
       ],
-      pin: true,
     },
     pdf_links: {
-      title: "This page lists PDF links",
+      title: "This page lists bulletin PDFs",
+      now: "Point at the top / newest Parish News or bulletin link.",
       steps: [
-        "Tap Follow a link → pick the newest bulletin row.",
-        "Record & open link → on PDF page → Save this PDF → Push.",
+        "Point at the newest bulletin link (usually the first row).",
+        "Green Yes opens it — save if needed → Send & test.",
       ],
-      pin: true,
     },
     pdfemb: {
       title: "WordPress PDF list",
-      steps: [
-        "Tap Follow a link → pick this week's bulletin.",
-        "Open PDF → Save this PDF → Push.",
-      ],
-      pin: true,
+      now: "Point at this week's bulletin in the list.",
+      steps: ["Point at the bulletin link.", "Save PDF → Send & test."],
     },
     wix_html: {
-      title: "HTML text bulletin (WordPress / Wix)",
-      steps: [
-        "If you need a menu click first → Follow a link.",
-        "On the newsletter article page → Save page as PDF → Push.",
-      ],
-      pin: false,
+      title: "Bulletin is a web page (not a PDF file)",
+      now: "Save this page as PDF, then Send & test.",
+      steps: ["Use Save page as PDF.", "Send & test."],
     },
     wix_date_grid: {
-      title: "Wix calendar of bulletins",
-      steps: [
-        "Follow a link → pick this Sunday's entry.",
-        "On that page → Save page as PDF → Push.",
-      ],
-      pin: true,
+      title: "Calendar of old bulletins",
+      now: "Point at this Sunday's entry in the grid.",
+      steps: ["Point at this week's row.", "Save → Send & test."],
     },
     wix_viewer: {
-      title: "PDF inside Wix viewer",
-      steps: [
-        "Tap Bulletin in a frame, or open download in viewer.",
-        "When you see the real PDF → Save this PDF → Push.",
-      ],
-      pin: false,
+      title: "PDF inside a viewer",
+      now: "Open the real PDF or use Bulletin in a frame.",
+      steps: ["Get to the actual PDF.", "Save → Send & test."],
     },
     iframe: {
-      title: "PDF in an embedded frame",
-      steps: [
-        "Tap Bulletin in a frame → pick the frame with the PDF.",
-        "Then Save this PDF → Push.",
-      ],
-      pin: false,
+      title: "PDF is inside a box on the page",
+      now: "Use Bulletin in a frame, then save the PDF.",
+      steps: ["Pick the frame with the bulletin.", "Save PDF → Send & test."],
     },
     oneweb_docx: {
-      title: "One.com — automatic (no need to wait for previews)",
-      steps: [
-        "Bulletin URL read from page HTML instantly — no iframe loading needed.",
-        "Tap 📄 Save newsletter (auto) or Push Recipe directly.",
-        "Harvester downloads the .docx file directly each Sunday.",
-      ],
-      pin: false,
+      title: "One.com newsletter (Word file)",
+      now: "Tap Save newsletter — it is automatic on this site.",
+      steps: ["Save newsletter (auto).", "Send & test."],
     },
     iframe_maybe: {
-      title: "Possible PDF frame",
-      steps: [
-        "Try Bulletin in a frame, or Follow a link to the PDF.",
-        "Finish with Save this PDF → Push.",
-      ],
-      pin: false,
+      title: "Bulletin might be in a frame",
+      now: "Try Bulletin in a frame, or point at a PDF link.",
+      steps: ["Find the bulletin.", "Save → Send & test."],
     },
     image: {
-      title: "Bulletin may be an image",
-      steps: [
-        "Tap Pick an image (or crop) on the bulletin picture.",
-        "Push when Recipe Preview ends with image or crop.",
-      ],
-      pin: false,
+      title: "Bulletin is a picture",
+      now: "Point at the bulletin image.",
+      steps: ["Pick the image.", "Send & test."],
     },
     weekly_bulletin_download: {
-      title: "Weekly bulletin list — cloud download",
-      steps: [
-        "Click the cloud ↓ icon on this Sunday's row (PDF downloads automatically).",
-        "Wait for green ✅ — download step should auto-record.",
-        "Push Recipe.",
-      ],
-      pin: false,
+      title: "Weekly list with a download icon",
+      now: "Click the cloud ↓ on this week's row — or tap the button below.",
+      steps: ["Download this week's row.", "Send & test."],
     },
     html: {
-      title: "Normal web page",
+      title: "Normal parish web page",
+      now: "Point at News / Newsletter / Parish News — whatever leads to the bulletin.",
       steps: [
-        "Tap Follow a link → menus like News / Newsletter / Bulletin.",
-        "Stop when you reach PDF or newsletter page, then finish capture → Push.",
+        "Point at the link that opens the bulletin.",
+        "Keep going until you see the PDF or newsletter page.",
+        "Send & test when done.",
       ],
-      pin: true,
     },
     unknown: {
-      title: "Go to the parish bulletin area first",
-      steps: [
-        "Open the page where the weekly newsletter lives.",
-        "The trainer will update with clearer steps.",
-      ],
-      pin: false,
+      title: "Open the parish newsletter page first",
+      now: "Go to where the weekly bulletin is listed, then the toolbar will update.",
+      steps: ["Find the news / newsletter page on this website."],
     },
   };
 
   const _defaultPlan = (pageCtx) => ({
     title: pageCtx.summary || "Train this parish",
+    now: pageCtx.advice || "Point at the link that opens the weekly bulletin.",
     steps: [
-      pageCtx.advice || "Follow menu links toward the bulletin.",
-      "Finish with Save PDF, Save page as PDF, or Pick image.",
-      "Push Recipe when Recipe Preview looks right.",
+      "Point at the bulletin link.",
+      "Send & test when the steps look right.",
     ],
-    pin: true,
   });
 
   const getPlan = (pageCtx, state = {}) => {
     const type = pageCtx?.type || "unknown";
     const base = PLANS[type] || _defaultPlan(pageCtx);
     const steps = [...base.steps];
+    let now = base.now || "";
     const stepCount = Number(state.stepCount || 0);
     const hasTerminal = Boolean(state.hasTerminal);
 
+    if (state.fixNow) {
+      now = `Fixing ${state.parishName || "this parish"} — ${now}`;
+    }
     if (stepCount > 0 && !hasTerminal) {
-      steps.unshift(`✓ ${stepCount} step(s) saved — keep going until you capture the bulletin.`);
+      now = `${stepCount} step${stepCount === 1 ? "" : "s"} saved — ${now}`;
     }
     if (hasTerminal) {
-      steps.unshift("✓ Bulletin capture recorded — scroll to Push Recipe.");
+      now = "Ready! Scroll down and tap Send & test.";
     }
     if (state.needsRetrain) {
-      steps.unshift(
-        "⚠️ RETRAIN NEEDED — last Sunday harvest failed. Re-record steps below, then Push."
-      );
+      steps.unshift("Last Sunday failed — re-point at the bulletin, then Send & test again.");
     }
     if (type === "cloud_folder" && state.expectedCloudLabel) {
       if (state.cloudRowVisible === false) {
-        steps.push(
-          `This Sunday's row (${state.expectedCloudLabel}) is not on screen yet — pick the newest dated PDF.`
-        );
-      } else {
-        steps.push(`Looking for row: ${state.expectedCloudLabel}`);
+        steps.push(`Row ${state.expectedCloudLabel} not visible yet — pick the newest dated file.`);
       }
-    }
-    if (state.lastHarvestIssue && !state.needsRetrain) {
-      steps.push(`Last Sunday failed: ${state.lastHarvestIssue.slice(0, 70)}… — this push should fix it.`);
     }
     return {
       emoji: pageCtx?.emoji || "📋",
       title: base.title,
+      now,
       steps,
-      showPin: Boolean(base.pin) && type !== "direct_pdf",
-      pinHelp: PIN_HELP,
       pushReady: hasTerminal && stepCount > 0,
+      journeyStep: hasTerminal ? 3 : stepCount > 0 ? 2 : 1,
     };
   };
 
@@ -192,59 +148,98 @@
     if (!el) return;
     const plan = getPlan(pageCtx, state);
     el.replaceChildren();
+    el.dataset.journeyStep = String(plan.journeyStep);
 
+    const nowLine = document.createElement("div");
+    nowLine.style.cssText =
+      "font-size:11px;font-weight:600;color:#f9fafb;line-height:1.45;margin-bottom:6px;";
+    nowLine.textContent = `${plan.emoji} ${plan.now}`;
+    el.appendChild(nowLine);
+
+    const details = document.createElement("details");
+    details.style.cssText = "margin:0;";
+    const summary = document.createElement("summary");
+    summary.style.cssText = "cursor:pointer;font-size:9px;color:#9ca3af;list-style-position:inside;";
+    summary.textContent = `More help: ${plan.title}`;
+    details.appendChild(summary);
+
+    const inner = document.createElement("div");
+    inner.style.cssText = "margin-top:6px;";
     const intro = document.createElement("div");
-    intro.style.cssText =
-      "font-size:9px;color:#93c5fd;line-height:1.45;background:#0c4a6e;border:1px solid #0369a1;border-radius:6px;padding:6px 8px;margin-bottom:8px;";
-    intro.textContent = HOW_IT_WORKS;
-    el.appendChild(intro);
-
-    const head = document.createElement("div");
-    head.style.cssText = "font-size:12px;font-weight:700;color:#f9fafb;margin-bottom:6px;line-height:1.35;";
-    head.textContent = `${plan.emoji} ${plan.title}`;
-    el.appendChild(head);
+    intro.style.cssText = "font-size:9px;color:#93c5fd;line-height:1.45;margin-bottom:6px;";
+    intro.textContent = PLAIN_INTRO;
+    inner.appendChild(intro);
 
     const ol = document.createElement("ol");
-    ol.style.cssText = "margin:0 0 8px 18px;padding:0;font-size:10px;line-height:1.5;color:#e2e8f0;";
+    ol.style.cssText = "margin:0 0 6px 16px;padding:0;font-size:9px;line-height:1.5;color:#cbd5e1;";
     for (const s of plan.steps) {
       const li = document.createElement("li");
-      li.style.marginBottom = "4px";
+      li.style.marginBottom = "3px";
       li.textContent = s;
       ol.appendChild(li);
     }
-    el.appendChild(ol);
+    inner.appendChild(ol);
 
     const doNot = Array.isArray(pageCtx?.fingerprintDoNot) ? pageCtx.fingerprintDoNot : [];
     if (doNot.length) {
       const avoid = document.createElement("div");
       avoid.style.cssText =
-        "font-size:9px;color:#fecaca;line-height:1.45;background:#450a0a;border:1px solid #991b1b;border-radius:6px;padding:6px 8px;margin-bottom:6px;";
-      avoid.textContent = `Avoid: ${doNot.join(" ")}`;
-      el.appendChild(avoid);
+        "font-size:9px;color:#fecaca;line-height:1.45;background:#450a0a;border:1px solid #991b1b;border-radius:6px;padding:5px 6px;margin-bottom:4px;";
+      avoid.textContent = `Do not click: ${doNot.join(" · ")}`;
+      inner.appendChild(avoid);
     }
 
-    if (plan.showPin) {
-      const pin = document.createElement("div");
-      pin.style.cssText = "font-size:9px;color:#c4b5fd;line-height:1.45;background:#1e1b4b;border:1px solid #4c1d95;border-radius:6px;padding:6px 8px;margin-bottom:6px;";
-      pin.textContent = plan.pinHelp;
-      el.appendChild(pin);
-    }
-
-    const check = document.createElement("div");
-    check.style.cssText = "font-size:9px;line-height:1.4;";
     if (state.needsRetrain) {
-      check.style.color = "#fca5a5";
-      check.textContent =
-        "⚠️ Recipe flagged for retrain — Sunday could not pick this week's bulletin automatically.";
+      const warn = document.createElement("div");
+      warn.style.cssText = "font-size:9px;color:#fca5a5;margin-bottom:4px;";
+      warn.textContent = "⚠️ Last Sunday's automatic download failed for this parish.";
+      inner.appendChild(warn);
     } else if (plan.pushReady) {
-      check.style.color = "#86efac";
-      check.textContent = "✅ Ready to push (capture step present).";
-    } else {
-      check.style.color = "#fde68a";
-      check.textContent = "⏳ Not ready to push yet — need a capture step (download / print / image).";
+      const ok = document.createElement("div");
+      ok.style.cssText = "font-size:9px;color:#86efac;";
+      ok.textContent = "✅ Ready to send & test.";
+      inner.appendChild(ok);
+    } else if (stepCountFromState(state) > 0) {
+      const wait = document.createElement("div");
+      wait.style.cssText = "font-size:9px;color:#fde68a;";
+      wait.textContent = "⏳ Keep going until the bulletin is captured.";
+      inner.appendChild(wait);
     }
-    el.appendChild(check);
+
+    details.appendChild(inner);
+    el.appendChild(details);
   };
 
-  window.ph_playbook = { getPlan, render, PIN_HELP };
+  const stepCountFromState = (state) => Number(state?.stepCount || 0);
+
+  const renderJourneyBar = (el, step) => {
+    if (!el) return;
+    const s = Math.min(3, Math.max(1, Number(step) || 1));
+    const labels = ["1 Find link", "2 Confirm", "3 Send & test"];
+    el.replaceChildren();
+    const wrap = document.createElement("div");
+    wrap.style.cssText = "display:flex;gap:4px;margin-bottom:6px;";
+    for (let i = 1; i <= 3; i += 1) {
+      const pill = document.createElement("div");
+      const active = i === s;
+      const done = i < s;
+      pill.style.cssText = [
+        "flex:1",
+        "text-align:center",
+        "font-size:9px",
+        "line-height:1.3",
+        "padding:4px 2px",
+        "border-radius:5px",
+        "border:1px solid",
+        active ? "background:#1d4ed8;border-color:#3b82f6;color:#fff;font-weight:700"
+          : done ? "background:#14532d;border-color:#16a34a;color:#86efac"
+          : "background:#0f172a;border-color:#374151;color:#6b7280",
+      ].join(";");
+      pill.textContent = (done ? "✓ " : "") + labels[i - 1];
+      wrap.appendChild(pill);
+    }
+    el.appendChild(wrap);
+  };
+
+  window.ph_playbook = { getPlan, render, renderJourneyBar, PLAIN_INTRO };
 })();

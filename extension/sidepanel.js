@@ -1158,14 +1158,14 @@ function _problemsShowVerifyResult(payload) {
   const lines = [];
   if (payload.ok === true) {
     box.className = "ok";
-    lines.push(`✅ <strong>${payload.displayName}</strong> — harvest worked.`);
+    lines.push(`✅ <strong>${payload.displayName}</strong> — single-parish test passed.`);
     if (payload.item?.url) {
       lines.push(
-        `Source bulletin: <a href="${payload.item.url}" target="_blank" rel="noopener noreferrer">${payload.item.url}</a>`
+        `<strong>Open bulletin (proof):</strong> <a href="${payload.item.url}" target="_blank" rel="noopener noreferrer">${payload.item.url}</a>`
       );
     }
     lines.push(
-      `Parish PDF: <a href="${parishPdf}" target="_blank" rel="noopener noreferrer">Bulletins/current/${payload.parishKey}.pdf</a>`
+      `Saved copy: <a href="${parishPdf}" target="_blank" rel="noopener noreferrer">Bulletins/current/${payload.parishKey}.pdf</a>`
     );
   } else if (payload.ok === false) {
     box.className = "err";
@@ -1257,7 +1257,7 @@ async function _problemsPollHarvestResult({
   setStatus(`⚠️ Harvest still running for ${displayName} — open Actions link below.`, "warn");
   if (verifyBtn) {
     verifyBtn.disabled = false;
-    verifyBtn.textContent = "▶ Verify harvest";
+    verifyBtn.textContent = "▶ Test again";
   }
 }
 
@@ -1295,7 +1295,7 @@ async function _problemsVerifyHarvest(row, verifyBtn) {
     setStatus(`❌ Harvest trigger failed: ${dispatch.error}`, "err");
     if (verifyBtn) {
       verifyBtn.disabled = false;
-      verifyBtn.textContent = "▶ Verify harvest";
+      verifyBtn.textContent = "▶ Test again";
     }
     return;
   }
@@ -1357,7 +1357,7 @@ async function _problemsRenderRows(rows) {
         }
         void _problemsMarkFixVisited(row.parish, fixBtn);
         setStatus(
-          `✅ Opened ${row.display_name || row.parish} — use the floating toolbar on that tab, then Push Recipe.`,
+          `✅ Opened ${row.display_name || row.parish} — on that tab: Point at bulletin → Yes → Send & test.`,
           "ok"
         );
         const match = _pdAllParishes.find((p) => p.key === row.parish);
@@ -1395,8 +1395,8 @@ async function _problemsRenderRows(rows) {
       const verifyBtn = document.createElement("button");
       verifyBtn.type = "button";
       verifyBtn.className = "problems-verify-btn";
-      verifyBtn.textContent = "▶ Verify harvest";
-      verifyBtn.title = "Trigger a single-parish harvest on GitHub and show result links";
+      verifyBtn.textContent = "▶ Check result";
+      verifyBtn.title = "Re-run the single-parish test and show the bulletin link";
       verifyBtn.addEventListener("click", () => {
         void _problemsVerifyHarvest(row, verifyBtn);
       });
@@ -1442,7 +1442,7 @@ async function loadProblemsDashboard() {
       ];
       if (hiddenDead) parts.push(`${hiddenDead} marked dead/inactive (hidden)`);
       if (hiddenFixed) parts.push(`${hiddenFixed} already downloaded (hidden)`);
-      parts.push("after Push Recipe the row turns green — tap ▶ Verify harvest or wait for auto-refresh");
+      parts.push("tap Fix now → point at bulletin → Send & test");
       hint.textContent = parts.join(" · ") + ".";
     }
     await _problemsRenderRows(rows);
@@ -2171,7 +2171,7 @@ if (problemsRefreshBtn) {
     });
   });
 }
-_spShowPanel("trainer");
+_spShowPanel("problems");
 void loadProblemsDashboard();
 
 chrome.storage.onChanged.addListener((changes, area) => {
