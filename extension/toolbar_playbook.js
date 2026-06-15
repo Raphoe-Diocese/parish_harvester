@@ -86,10 +86,11 @@
     },
     html: {
       title: "Normal parish web page",
-      now: "Point at News / Newsletter / Parish News — whatever leads to the bulletin.",
+      now: "Point at News / Newsletter — or Save page as PDF if the bulletin text is already on screen.",
       steps: [
-        "Point at the link that opens the bulletin.",
-        "Keep going until you see the PDF or newsletter page.",
+        "If bulletin text is on this page: tap Save page as PDF.",
+        "If it is a picture: tap Pick bulletin image.",
+        "Otherwise point at the link that opens the bulletin.",
         "Send & test when done.",
       ],
     },

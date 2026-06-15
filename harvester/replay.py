@@ -126,7 +126,7 @@ def _recipe_step_timeout_ms(recipe: dict) -> int:
     Values are clamped to [1_000, 120_000] ms:
     - 1,000 ms minimum avoids accidental 0/negative values that disable timeouts
       entirely (Playwright treats 0 as "wait indefinitely"), which can stall runs.
-    - 120,000 ms maximum prevents malformed recipe values from stalling runs.
+    - 180,000 ms maximum prevents malformed recipe values from stalling runs.
     """
     raw = recipe.get("timeout_ms", recipe.get("timeout"))
     try:
@@ -135,7 +135,7 @@ def _recipe_step_timeout_ms(recipe: dict) -> int:
         value = int(raw)
     except (TypeError, ValueError):
         return RECIPE_STEP_TIMEOUT_MS
-    return min(max(value, 1_000), 120_000)
+    return min(max(value, 1_000), 180_000)
 
 
 def recipe_path_for(parish_key: str, parishes_dir: Path = PARISHES_DIR) -> Path:
@@ -603,7 +603,7 @@ async def replay_recipe(
                 if (step.get("url") or "").strip():
                     await page.goto(html_url, timeout=step_timeout_ms, wait_until="domcontentloaded")
                 try:
-                    await page.wait_for_load_state("networkidle", timeout=min(step_timeout_ms, 15_000))
+                    await page.wait_for_load_state("networkidle", timeout=step_timeout_ms)
                 except PlaywrightTimeoutError:
                     pass
                 await asyncio.sleep(2.5)
@@ -618,7 +618,7 @@ async def replay_recipe(
                 if raw_pdf_url:
                     await page.goto(pdf_url, timeout=step_timeout_ms, wait_until="domcontentloaded")
                 try:
-                    await page.wait_for_load_state("networkidle", timeout=min(step_timeout_ms, 15_000))
+                    await page.wait_for_load_state("networkidle", timeout=step_timeout_ms)
                 except PlaywrightTimeoutError:
                     pass
                 await asyncio.sleep(2.5)

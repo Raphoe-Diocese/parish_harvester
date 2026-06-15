@@ -584,7 +584,7 @@ const _githubApiError = async (resp) => {
 
 function _normalizeRecipeTerminalSteps(recipe) {
   if (!recipe || !Array.isArray(recipe.steps)) return recipe;
-  const terminalActions = new Set(["download", "image", "html"]);
+  const terminalActions = new Set(["download", "image", "html", "print_to_pdf", "crop_screenshot"]);
   let lastTerminalIdx = -1;
   for (let i = 0; i < recipe.steps.length; i += 1) {
     const action = String(recipe.steps[i]?.action || "");

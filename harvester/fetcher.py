@@ -481,6 +481,49 @@ def _get_host_profile(start_url: str) -> dict:
     }
 
 
+def _apply_recipe_timeouts(host_profile: dict, recipe_meta: dict | None) -> dict:
+    """Merge trainer-recorded load times into harvest timeouts."""
+    merged = dict(host_profile)
+    if not isinstance(recipe_meta, dict):
+        return merged
+
+    raw_step = recipe_meta.get("timeout_ms", recipe_meta.get("timeout"))
+    if raw_step is not None:
+        try:
+            step_ms = min(max(int(raw_step), 1_000), 180_000)
+            merged["navigation_timeout_ms"] = max(
+                int(merged.get("navigation_timeout_ms", PAGE_LOAD_TIMEOUT_MS)),
+                step_ms,
+            )
+        except (TypeError, ValueError):
+            pass
+
+    raw_total = recipe_meta.get("total_timeout_s")
+    if raw_total is not None:
+        try:
+            merged["total_timeout_s"] = min(max(int(raw_total), 60), 600)
+            return merged
+        except (TypeError, ValueError):
+            pass
+
+    try:
+        load_ms = int(recipe_meta.get("observed_load_ms") or 0)
+    except (TypeError, ValueError):
+        load_ms = 0
+    if load_ms >= 1000:
+        steps = recipe_meta.get("steps")
+        step_count = len(steps) if isinstance(steps, list) and steps else 3
+        merged["navigation_timeout_ms"] = max(
+            int(merged.get("navigation_timeout_ms", PAGE_LOAD_TIMEOUT_MS)),
+            min(load_ms * 2, 180_000),
+        )
+        merged["total_timeout_s"] = min(
+            max(int(load_ms / 1000) * step_count * 2 + 45, 90),
+            600,
+        )
+    return merged
+
+
 def _recipe_uses_trained_click_download(recipe_meta: dict | None) -> bool:
     """True when a parish should be harvested via trained click steps, not URL guessing."""
     if not isinstance(recipe_meta, dict):
@@ -1578,7 +1621,10 @@ async def _fetch_entry(
 
     recipe_path = recipe_path_for(key, PARISHES_DIR)
     recipe_meta = _load_recipe_metadata(recipe_path) if recipe_path.exists() else {}
-    host_profile = _get_host_profile(_recipe_start_url(entry, recipe_meta, target_url))
+    host_profile = _apply_recipe_timeouts(
+        _get_host_profile(_recipe_start_url(entry, recipe_meta, target_url)),
+        recipe_meta,
+    )
 
     if recipe_path.exists():
         recipe_status = str(recipe_meta.get("status", "")).strip().lower()
@@ -1878,8 +1924,11 @@ async def _retry_entry_headful(
 ) -> FetchResult:
     """One headful-browser attempt for hosts that block headless CI."""
     recipe_meta = _load_recipe_metadata(recipe_path_for(entry.key, PARISHES_DIR))
-    host_profile = _get_host_profile(
-        _recipe_start_url(entry, recipe_meta, entry.bulletin_page or entry.example_url)
+    host_profile = _apply_recipe_timeouts(
+        _get_host_profile(
+            _recipe_start_url(entry, recipe_meta, entry.bulletin_page or entry.example_url)
+        ),
+        recipe_meta,
     )
     parish_timeout_s = max(TOTAL_TIMEOUT_S, int(host_profile.get("total_timeout_s", TOTAL_TIMEOUT_S)))
     async with async_playwright() as pw:
@@ -1930,8 +1979,11 @@ async def fetch_parish(
     """Fetch one parish bulletin with retries and a total timeout."""
     last_error = ""
     recipe_meta = _load_recipe_metadata(recipe_path_for(entry.key, PARISHES_DIR))
-    host_profile = _get_host_profile(
-        _recipe_start_url(entry, recipe_meta, entry.bulletin_page or entry.example_url)
+    host_profile = _apply_recipe_timeouts(
+        _get_host_profile(
+            _recipe_start_url(entry, recipe_meta, entry.bulletin_page or entry.example_url)
+        ),
+        recipe_meta,
     )
     max_retries = max(0, int(host_profile.get("max_retries", _MAX_ATTEMPTS - 1)))
     retry_backoff_ms = max(0, int(host_profile.get("retry_backoff_ms", int(_RETRY_DELAY_S * 1000))))

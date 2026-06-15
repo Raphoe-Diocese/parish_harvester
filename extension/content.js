@@ -226,6 +226,30 @@
   };
 
   let _pageLoadTimerStop = null;
+  let _sessionMaxLoadMs = 0;
+
+  const _getCurrentPageLoadMs = () => {
+    const nav = performance.getEntriesByType?.("navigation")?.[0];
+    if (nav && nav.loadEventEnd > 0) return Math.round(nav.loadEventEnd);
+    const startedAt = _navigationStartedAtMs();
+    return Math.max(0, Date.now() - startedAt);
+  };
+
+  const _getObservedLoadMsForRecipe = () => {
+    const current = _getCurrentPageLoadMs();
+    return Math.max(_sessionMaxLoadMs, current);
+  };
+
+  const _recipeTimeoutsFromLoadMs = (loadMs, stepCount = 3) => {
+    const ms = Math.max(0, Number(loadMs) || 0);
+    if (ms < 1000) return null;
+    const steps = Math.max(1, Number(stepCount) || 1);
+    return {
+      observed_load_ms: ms,
+      timeout_ms: Math.min(Math.max(ms * 2, 45_000), 180_000),
+      total_timeout_s: Math.min(Math.max(Math.ceil(ms / 1000) * steps * 2 + 45, 90), 300),
+    };
+  };
 
   const _attachPageLoadTimer = (el) => {
     if (_pageLoadTimerStop) _pageLoadTimerStop();
@@ -257,17 +281,22 @@
 
       _clearNavigationMark();
       const total = loadMs || elapsed;
+      _sessionMaxLoadMs = Math.max(_sessionMaxLoadMs, total);
       const domPart = domMs ? ` · page readable at ${_formatLoadDuration(domMs)}` : "";
+      const timeoutHint = _recipeTimeoutsFromLoadMs(total);
+      const saveHint = timeoutHint
+        ? ` · harvest wait ${_formatLoadDuration(timeoutHint.total_timeout_s * 1000)} saved to recipe`
+        : "";
       if (total >= 60000) {
         el.style.color = "#fca5a5";
         el.textContent =
-          `⏱ Loaded in ${_formatLoadDuration(total)}${domPart} — very slow; Sunday harvest may timeout`;
+          `⏱ Loaded in ${_formatLoadDuration(total)}${domPart}${saveHint} — very slow site`;
       } else if (total >= 15000) {
         el.style.color = "#fde68a";
-        el.textContent = `⏱ Loaded in ${_formatLoadDuration(total)}${domPart} — slow site`;
+        el.textContent = `⏱ Loaded in ${_formatLoadDuration(total)}${domPart}${saveHint} — slow site`;
       } else {
         el.style.color = "#86efac";
-        el.textContent = `⏱ Loaded in ${_formatLoadDuration(total)}${domPart}`;
+        el.textContent = `⏱ Loaded in ${_formatLoadDuration(total)}${domPart}${saveHint}`;
       }
       stopped = true;
       if (interval) clearInterval(interval);
@@ -672,6 +701,10 @@
       steps,
       ...(usesCloudFolder ? { cloud_folder: true, date_format: "YY.MM.DD" } : {}),
     };
+    const loadTimeouts = _recipeTimeoutsFromLoadMs(_getObservedLoadMsForRecipe(), steps.length);
+    if (loadTimeouts) {
+      Object.assign(recipe, loadTimeouts);
+    }
     if (window.ph_site_memory?.enrichRecipe) {
       recipe = window.ph_site_memory.enrichRecipe(recipe, detectPageType());
     }
@@ -1883,12 +1916,16 @@
     }
 
     if (allLinks.length > 0) {
+      const htmlBulletinPage = _pathLooksLikeNewsletterPage();
       return {
-        emoji: "📋",
-        summary: "HTML page — no PDF or document links detected.",
-        advice:
-          "Background PDF detection runs automatically. If still nothing appears, tap 🔗 1. Follow a link.",
-        type: "html",
+        emoji: htmlBulletinPage ? "📰" : "📋",
+        summary: htmlBulletinPage
+          ? "HTML text bulletin — the newsletter text is on this page (not a PDF file)."
+          : "HTML page — no PDF or document links detected.",
+        advice: htmlBulletinPage
+          ? 'Tap "Save page as PDF" — Sunday harvest prints this page into the mega bulletin.'
+          : "Tap Save page as PDF if the bulletin is text on this page, or Follow a link to reach the PDF.",
+        type: htmlBulletinPage ? "wix_html" : "html",
       };
     }
     return {
@@ -2277,11 +2314,14 @@
   const _pathLooksLikeNewsletterPage = () => {
     try {
       const path = new URL(_pageUrlForParishDetection()).pathname || "";
-      if (/\/(news|newsletter|bulletin|parishnews|nuacht)(\/|$)/i.test(path)) return true;
+      if (/\/(news|newsletter|bulletin|parishnews|nuacht|notice|board)(\/|$|\.)/i.test(path)) {
+        return true;
+      }
+      if (/notice[\s_-]*board/i.test(path)) return true;
       if (/\/\d{4}\/\d{2}\/\d{2}\//i.test(path) && /newsletter|bulletin|pastoral/i.test(path)) {
         return true;
       }
-      return /newsletter|bulletin|pastoral-area/i.test(path);
+      return /newsletter|bulletin|pastoral-area|notice.?board/i.test(path);
     } catch (_e) {
       return false;
     }
@@ -3529,6 +3569,22 @@
           contextPrimaryBtn.style.display = showContext ? "block" : "none";
         }
       }
+
+      const htmlCapturePage =
+        pageCtx.type === "wix_html" ||
+        (pageCtx.type === "html" && _pathLooksLikeNewsletterPage());
+      if (savePagePdfBtn) {
+        savePagePdfBtn.style.display =
+          onDirectPdf || (htmlCapturePage && stepCount === 0) ? "none" : "block";
+      }
+      if (pickImageBtn) {
+        pickImageBtn.style.display = onDirectPdf ? "none" : "block";
+        pickImageBtn.style.background = pageCtx.type === "image" ? "#16a34a" : "#2563eb";
+      }
+      if (imageCropBtn) {
+        imageCropBtn.style.display = onDirectPdf ? "none" : "block";
+      }
+
       if (playbookPanel && window.ph_playbook?.render) {
         const recorded = _standaloneRecipeSteps();
         const hasTerminal = recorded.some((s) =>
@@ -4108,6 +4164,9 @@
 
     // Wizard buttons — link-first flow; PDF/frame only when page context needs them
     let contextPrimaryBtn = null;
+    let savePagePdfBtn = null;
+    let pickImageBtn = null;
+    let imageCropBtn = null;
     let pinLinkBtn = null;
 
     clickFirstBtn = makeSmallBtn(
@@ -4188,9 +4247,13 @@
           showStatus("✅ Recorded: page will print into the mega bulletin.", "ok");
           return;
         }
-        if (pageCtx.type === "html" && _pathLooksLikeNewsletterPage()) {
-          standaloneAddStep({ action: "print_to_pdf" }, "print_to_pdf", "📰 Save page as PDF");
-          showStatus("✅ Recorded: this news page will print into the mega bulletin.", "ok");
+        if (pageCtx.type === "html") {
+          if (_pathLooksLikeNewsletterPage()) {
+            standaloneAddStep({ action: "print_to_pdf" }, "print_to_pdf", "📰 Save page as PDF");
+            showStatus("✅ Recorded: this page will print into the mega bulletin.", "ok");
+            return;
+          }
+          startPickLinkMode(showPickConfirmation, showStatus);
           return;
         }
         if (pageCtx.type === "pdf_links") {
@@ -4228,6 +4291,39 @@
 
     wizardBtns.appendChild(clickFirstBtn);
     wizardBtns.appendChild(contextPrimaryBtn);
+
+    savePagePdfBtn = makeSmallBtn(
+      "📰 Save page as PDF (HTML text bulletin)",
+      "#7c3aed",
+      () => {
+        standaloneAddStep({ action: "print_to_pdf" }, "print_to_pdf", "📰 Save page as PDF");
+        showStatus("✅ Recorded: this page will be printed into the mega bulletin on Sunday.", "ok");
+      },
+      "Bulletin is text on the page (WordPress/Wix/HTML notice board) — harvester prints it to PDF"
+    );
+    pickImageBtn = makeSmallBtn(
+      "🖼️ Pick bulletin image on this page",
+      "#2563eb",
+      () => {
+        pickedImages = [];
+        startPickImageMode(showPickImageConfirmation, showStatus);
+      },
+      "The bulletin is a picture on the page — click to select it"
+    );
+    imageCropBtn = makeSmallBtn(
+      "✂️ Crop bulletin from screen",
+      "#2563eb",
+      () => {
+        bar.dataset.phHidden = "true";
+        bar.style.display = "none";
+        startCrop();
+      },
+      "Draw a rectangle around the bulletin if it is not a normal image link"
+    );
+    wizardBtns.appendChild(savePagePdfBtn);
+    wizardBtns.appendChild(pickImageBtn);
+    wizardBtns.appendChild(imageCropBtn);
+
     moreOptionsBody.appendChild(pinLinkBtn);
 
     const pdfBtn = makeSmallBtn(
@@ -4235,34 +4331,6 @@
       "#374151",
       () => markDownloadUrlSafe(window.location.href, showStatus, false),
       "Only when you are already looking at the PDF file"
-    );
-    const savePagePdfBtn = makeSmallBtn(
-      "📰 Save page as PDF (HTML text bulletin)",
-      "#7c3aed",
-      () => {
-        standaloneAddStep({ action: "print_to_pdf" }, "print_to_pdf", "📰 Save page as PDF");
-        showStatus("✅ Recorded: this page will be printed into the mega bulletin on Sunday.", "ok");
-      },
-      "Bulletin is text on the page (WordPress/Wix/HTML) — harvester prints it to PDF"
-    );
-    const imageCropBtn = makeSmallBtn(
-      "🖼️ Get an image (newsletter screenshot)",
-      "#2563eb",
-      () => {
-        bar.dataset.phHidden = "true";
-        bar.style.display = "none";
-        startCrop();
-      },
-      "The bulletin is an image on screen — draw a rectangle to capture it"
-    );
-    const pickImageBtn = makeSmallBtn(
-      "🖼️ Pick an image on this page",
-      "#2563eb",
-      () => {
-        pickedImages = [];
-        startPickImageMode(showPickImageConfirmation, showStatus);
-      },
-      "Click to hover-select an existing image on the page — no cropping needed"
     );
     const noBulletinBtn = makeSmallBtn(
       "🚫 No bulletin here (skip)",
@@ -4280,9 +4348,6 @@
     );
 
     moreOptionsBody.appendChild(pdfBtn);
-    moreOptionsBody.appendChild(savePagePdfBtn);
-    moreOptionsBody.appendChild(imageCropBtn);
-    moreOptionsBody.appendChild(pickImageBtn);
     moreOptionsBody.appendChild(noBulletinBtn);
 
     parishRecordingLine = document.createElement("div");
