@@ -16,7 +16,12 @@ from playwright.async_api import Browser, Page, TimeoutError as PlaywrightTimeou
 from .cloud_folders import is_cloud_folder_click_step, rewrite_cloud_folder_click_step
 from .cloud_urls import is_cloud_document_url, normalize_document_url, unwrap_docs_viewer_url
 from .config import PAGE_LOAD_TIMEOUT_MS, PARISHES_DIR
-from .utils import oneweb_newsletter_download_urls, rewrite_date_url, rewrite_newsletter_number_for_target
+from .utils import (
+    extract_date_from_string,
+    oneweb_newsletter_download_urls,
+    rewrite_date_url,
+    rewrite_newsletter_number_for_target,
+)
 
 
 class RecipeReplayError(RuntimeError):
@@ -103,7 +108,19 @@ def _score_bulletin_url(url: str) -> tuple[int, int]:
             date_score = max(date_score, year * 10000 + month * 100 + day)
         except ValueError:
             pass
+    parsed = extract_date_from_string(text)
+    if parsed:
+        date_score = max(date_score, parsed.year * 10000 + parsed.month * 100 + parsed.day)
     return date_score, keyword_bonus
+
+
+def _score_bulletin_link(href: str, label: str = "") -> tuple[int, int, int]:
+    """Return (total_score, date_score, dom_tiebreak) for ranking bulletin links."""
+    combined = f"{unquote(href or '')} {label or ''}"
+    date_score, keyword_bonus = _score_bulletin_url(combined)
+    notice_bonus = 5 if re.search(r"\b(notice|parish news|latest bulletin)\b", combined, re.I) else 0
+    total = date_score * 100 + keyword_bonus + notice_bonus
+    return total, date_score, keyword_bonus
 
 
 def _url_matches_pattern(url: str, pattern: str) -> bool:
@@ -446,11 +463,36 @@ async def _try_download_page_url(
     return await _try_browser_nav_download(page, dest, url, timeout_ms)
 
 
-async def _download_image_url_as_pdf(page: Page, raw_url: str, dest: Path) -> tuple[str, str]:
-    response = await page.request.get(raw_url, timeout=PAGE_LOAD_TIMEOUT_MS)
+def _fit_image_to_a4_page(image):
+    from PIL import Image  # type: ignore[import]
+
+    page_width = 1240
+    page_height = 1754
+    source = image.convert("RGB")
+    scale = min(page_width / source.width, page_height / source.height)
+    scaled = source.resize(
+        (
+            max(1, int(round(source.width * scale))),
+            max(1, int(round(source.height * scale))),
+        ),
+        Image.Resampling.LANCZOS,
+    )
+    canvas = Image.new("RGB", (page_width, page_height), (255, 255, 255))
+    offset = ((page_width - scaled.width) // 2, (page_height - scaled.height) // 2)
+    canvas.paste(scaled, offset)
+    return canvas
+
+
+async def _download_image_bytes(
+    page: Page, raw_url: str, timeout_ms: int = PAGE_LOAD_TIMEOUT_MS
+) -> bytes:
+    response = await page.request.get(raw_url, timeout=timeout_ms)
     if not response.ok:
         raise RecipeReplayError(f"HTTP {response.status} for {raw_url}")
-    body = await response.body()
+    return await response.body()
+
+
+async def _download_image_url_as_pdf(page: Page, raw_url: str, dest: Path) -> tuple[str, str]:
     try:
         from PIL import Image  # type: ignore[import]
     except ImportError as exc:
@@ -458,11 +500,114 @@ async def _download_image_url_as_pdf(page: Page, raw_url: str, dest: Path) -> tu
             "Pillow is required for image bulletin conversion. Install with: pip install Pillow"
         ) from exc
     try:
+        body = await _download_image_bytes(page, raw_url)
         img = Image.open(io.BytesIO(body)).convert("RGB")
         img.save(str(dest), "PDF")
+    except RecipeReplayError:
+        raise
     except Exception as exc:
         raise RecipeReplayError(f"Invalid image content for bulletin conversion: {raw_url}") from exc
     return raw_url, "image_to_pdf"
+
+
+async def _download_image_urls_as_pdf(
+    page: Page,
+    image_urls: list[str],
+    dest: Path,
+    timeout_ms: int = PAGE_LOAD_TIMEOUT_MS,
+) -> tuple[str, str]:
+    if not image_urls:
+        raise RecipeReplayError("Recipe image_stack step found no bulletin image URLs")
+    try:
+        from PIL import Image  # type: ignore[import]
+    except ImportError as exc:
+        raise RecipeReplayError(
+            "Pillow is required for image bulletin conversion. Install with: pip install Pillow"
+        ) from exc
+
+    pages = []
+    for raw_url in image_urls:
+        try:
+            body = await _download_image_bytes(page, raw_url, timeout_ms=timeout_ms)
+            with Image.open(io.BytesIO(body)) as img:
+                pages.append(_fit_image_to_a4_page(img))
+        except RecipeReplayError:
+            raise
+        except Exception as exc:
+            raise RecipeReplayError(
+                f"Invalid image content for bulletin conversion: {raw_url}"
+            ) from exc
+
+    if not pages:
+        raise RecipeReplayError("Recipe image_stack step found no usable bulletin images")
+
+    pages[0].save(
+        str(dest),
+        save_all=True,
+        append_images=pages[1:],
+        format="PDF",
+        resolution=150,
+    )
+    return image_urls[0], "image_to_pdf"
+
+
+async def _find_stacked_bulletin_image_urls(
+    page: Page,
+    count: int,
+    *,
+    selector: str = "",
+    min_long_side: int = 800,
+    min_short_side: int = 600,
+) -> list[str]:
+    """Return the first *count* large bulletin images on the page in DOM order."""
+    if count < 1:
+        return []
+
+    eval_selector = selector.strip() or "img"
+    raw_images = await page.eval_on_selector_all(
+        eval_selector,
+        """
+        (els) => els.map((el, index) => {
+            const src =
+              el.currentSrc ||
+              el.getAttribute('src') ||
+              el.getAttribute('data-src') ||
+              el.getAttribute('data-lazy-src') ||
+              el.getAttribute('data-original') ||
+              '';
+            return {
+              index,
+              src,
+              naturalWidth: Number(el.naturalWidth || 0),
+              naturalHeight: Number(el.naturalHeight || 0),
+            };
+        })
+        """,
+    )
+
+    candidates: list[tuple[int, str]] = []
+    seen: set[str] = set()
+    for item in raw_images:
+        if not isinstance(item, dict):
+            continue
+        src = str(item.get("src", "")).strip()
+        if not src or src.startswith("data:"):
+            continue
+        resolved = urljoin(page.url, src)
+        lower = resolved.lower()
+        if lower in seen or lower.endswith(".svg") or "image/svg+xml" in lower:
+            continue
+        width = int(item.get("naturalWidth") or 0)
+        height = int(item.get("naturalHeight") or 0)
+        long_side = max(width, height)
+        short_side = min(width, height)
+        if long_side < min_long_side or short_side < min_short_side:
+            continue
+        seen.add(lower)
+        candidates.append((int(item.get("index") or 0), resolved))
+
+    candidates.sort(key=lambda item: item[0])
+    return [url for _idx, url in candidates[:count]]
 
 
 async def _print_page_to_pdf(page: Page, dest: Path) -> None:
@@ -515,6 +660,84 @@ async def _find_iframe_pdf_url(page: Page) -> str | None:
     return candidates[0]
 
 
+async def _click_locator_match(
+    page: Page,
+    locator,
+    step_timeout_ms: int,
+) -> None:
+    await locator.wait_for(state="visible", timeout=step_timeout_ms)
+    await locator.click(timeout=step_timeout_ms)
+    try:
+        await page.wait_for_load_state("domcontentloaded", timeout=POST_CLICK_WAIT_TIMEOUT_MS)
+    except PlaywrightTimeoutError:
+        pass
+
+
+async def _replay_click_by_strategy(
+    page: Page,
+    step: dict,
+    selectors: list[str],
+    step_timeout_ms: int,
+) -> bool:
+    """Click the best bulletin link when pick_strategy is set. Returns True on success."""
+    strategy = (step.get("pick_strategy") or "").strip().lower()
+    if strategy not in {"newest_dated", "first_match", "last_match"}:
+        return False
+
+    position = (step.get("bulletin_position") or "top").strip().lower()
+    errors: list[str] = []
+
+    for sel in selectors:
+        try:
+            locator = page.locator(sel)
+            count = await locator.count()
+            if count <= 0:
+                continue
+
+            if strategy == "first_match":
+                await _click_locator_match(page, locator.nth(0), step_timeout_ms)
+                return True
+            if strategy == "last_match":
+                await _click_locator_match(page, locator.nth(count - 1), step_timeout_ms)
+                return True
+
+            best_idx = -1
+            best_rank: tuple[int, int] = (-1, -1)
+            for idx in range(count):
+                item = locator.nth(idx)
+                try:
+                    href = (await item.get_attribute("href")) or ""
+                    try:
+                        label = (await item.inner_text(timeout=2_000)) or ""
+                    except Exception:
+                        label = ""
+                    resolved = urljoin(page.url, href.strip())
+                    if resolved and _is_non_bulletin_url(resolved):
+                        continue
+                    total, date_score, _keyword = _score_bulletin_link(resolved, label)
+                    tiebreak = idx if position == "bottom" else -idx
+                    rank = (total, tiebreak)
+                    if rank > best_rank:
+                        best_rank = rank
+                        best_idx = idx
+                except Exception as exc:
+                    errors.append(f"{sel}[{idx}]: {exc}")
+
+            if best_idx >= 0:
+                await _click_locator_match(page, locator.nth(best_idx), step_timeout_ms)
+                return True
+
+            fallback_idx = count - 1 if position == "bottom" else 0
+            await _click_locator_match(page, locator.nth(fallback_idx), step_timeout_ms)
+            return True
+        except Exception as exc:
+            errors.append(f"{sel}: {exc}")
+
+    if errors:
+        raise RecipeReplayError("; ".join(errors[:MAX_SELECTOR_ERRORS]))
+    return False
+
+
 async def _replay_click(
     page: Page,
     step: dict,
@@ -536,16 +759,14 @@ async def _replay_click(
     if not selectors:
         raise RecipeReplayError("Recipe click step missing selector")
 
+    if step.get("pick_strategy"):
+        if await _replay_click_by_strategy(page, step, selectors, step_timeout_ms):
+            return
+
     errors: list[str] = []
     for sel in selectors:
         try:
-            locator = page.locator(sel).first
-            await locator.wait_for(state="visible", timeout=step_timeout_ms)
-            await locator.click(timeout=step_timeout_ms)
-            try:
-                await page.wait_for_load_state("domcontentloaded", timeout=POST_CLICK_WAIT_TIMEOUT_MS)
-            except PlaywrightTimeoutError:
-                pass
+            await _click_locator_match(page, page.locator(sel).first, step_timeout_ms)
             return
         except Exception as exc:
             errors.append(f"{sel}: {exc}")
@@ -701,6 +922,44 @@ async def replay_recipe(
                 if not raw_url:
                     raise RecipeReplayError("Recipe image step missing URL")
                 source_url, file_type = await _download_image_url_as_pdf(page, raw_url, dest)
+                return dest, file_type, source_url
+
+            if action == "image_stack":
+                try:
+                    count = int(step.get("count") or 2)
+                except (TypeError, ValueError) as exc:
+                    raise RecipeReplayError("Recipe image_stack step has invalid count") from exc
+                if count < 1:
+                    raise RecipeReplayError("Recipe image_stack step count must be at least 1")
+
+                try:
+                    await page.wait_for_load_state("networkidle", timeout=min(step_timeout_ms, 30_000))
+                except PlaywrightTimeoutError:
+                    pass
+                await asyncio.sleep(2.0)
+
+                selector = (step.get("selector") or "").strip()
+                try:
+                    min_long_side = int(step.get("min_long_side") or 800)
+                    min_short_side = int(step.get("min_short_side") or 600)
+                except (TypeError, ValueError) as exc:
+                    raise RecipeReplayError("Recipe image_stack step has invalid size filter") from exc
+
+                image_urls = await _find_stacked_bulletin_image_urls(
+                    page,
+                    count,
+                    selector=selector,
+                    min_long_side=min_long_side,
+                    min_short_side=min_short_side,
+                )
+                if len(image_urls) < count:
+                    raise RecipeReplayError(
+                        f"Recipe image_stack found {len(image_urls)} bulletin image(s) but expected {count}"
+                    )
+
+                source_url, file_type = await _download_image_urls_as_pdf(
+                    page, image_urls, dest, timeout_ms=step_timeout_ms
+                )
                 return dest, file_type, source_url
 
             if action == "html":

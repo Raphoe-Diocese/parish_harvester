@@ -330,6 +330,7 @@ async function _upsertSitePattern(gh_pat, gh_repo, parishKey, displayName, recip
     do_not: Array.isArray(recipe.do_not) ? recipe.do_not : undefined,
     html_fingerprint: sitePattern.html?.fingerprint_id || existingParish?.html_fingerprint,
     html_markers: sitePattern.html?.html_markers || existingParish?.html_markers,
+    bulletin_layout: recipe.bulletin_layout || existingParish?.bulletin_layout,
   };
 
   const recipeAdvice = Array.isArray(recipe.operator_notes) && recipe.operator_notes.length
@@ -356,6 +357,7 @@ async function _upsertSitePattern(gh_pat, gh_repo, parishKey, displayName, recip
     do_not: Array.isArray(recipe.do_not) ? recipe.do_not : existingPattern?.do_not,
     html_fingerprint: sitePattern.html?.fingerprint_id || existingPattern?.html_fingerprint,
     html_markers: sitePattern.html?.html_markers || existingPattern?.html_markers,
+    bulletin_layout: recipe.bulletin_layout || existingPattern?.bulletin_layout,
     example_parishes: Array.from(new Set([
       ...(Array.isArray(existingPattern?.example_parishes) ? existingPattern.example_parishes : []),
       parishKey,
@@ -582,22 +584,75 @@ const _githubApiError = async (resp) => {
   }
 };
 
+function _looksLikeDatedSelector(selector) {
+  const value = String(selector || "");
+  if (!value) return false;
+  return (
+    /\d{1,2}(?:st|nd|rd|th)?[_\s-](?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)/i.test(value) ||
+    /\d{1,2}[_-]\d{1,2}[_-]20\d{2}/i.test(value) ||
+    /href\*="[^"]*\d{1,2}(?:st|nd|rd|th)?/i.test(value)
+  );
+}
+
+function _normalizeClickStepsForWeeklyHarvest(recipe) {
+  if (!recipe || !Array.isArray(recipe.steps)) return recipe;
+  let layout = recipe.bulletin_layout && typeof recipe.bulletin_layout === "object"
+    ? { ...recipe.bulletin_layout }
+    : null;
+
+  recipe.steps = recipe.steps.map((step) => {
+    if (!step || String(step.action || "").toLowerCase() !== "click") return step;
+    const next = { ...step };
+    if (_looksLikeDatedSelector(next.selector)) {
+      next.selector = "a[href$='.pdf']";
+    }
+    const looksLikePdfList =
+      /\[href[^\]]*\.pdf/i.test(String(next.selector || "")) ||
+      /\.pdf/i.test(String(next.href || ""));
+    if (looksLikePdfList && !next.pick_strategy) {
+      next.pick_strategy = "newest_dated";
+      next.bulletin_position = next.bulletin_position || "top";
+    }
+    const fallbacks = new Set(
+      Array.isArray(next.fallback_selectors)
+        ? next.fallback_selectors.filter((s) => s && !_looksLikeDatedSelector(s))
+        : []
+    );
+    if (looksLikePdfList) {
+      fallbacks.add("a[href$='.pdf']");
+      fallbacks.add("a[href*='.pdf']");
+    }
+    if (fallbacks.size) next.fallback_selectors = Array.from(fallbacks);
+    if (next.pick_strategy) {
+      layout = {
+        strategy: next.pick_strategy,
+        position: next.bulletin_position || layout?.position || "top",
+      };
+    }
+    return next;
+  });
+
+  if (layout) recipe.bulletin_layout = layout;
+  return recipe;
+}
+
 function _normalizeRecipeTerminalSteps(recipe) {
   if (!recipe || !Array.isArray(recipe.steps)) return recipe;
-  const terminalActions = new Set(["download", "image", "html", "print_to_pdf", "crop_screenshot"]);
+  const normalized = _normalizeClickStepsForWeeklyHarvest({ ...recipe, steps: [...recipe.steps] });
+  const terminalActions = new Set(["download", "image", "image_stack", "html", "print_to_pdf", "crop_screenshot"]);
   let lastTerminalIdx = -1;
-  for (let i = 0; i < recipe.steps.length; i += 1) {
-    const action = String(recipe.steps[i]?.action || "");
+  for (let i = 0; i < normalized.steps.length; i += 1) {
+    const action = String(normalized.steps[i]?.action || "");
     if (terminalActions.has(action)) lastTerminalIdx = i;
   }
-  if (lastTerminalIdx < 0) return recipe;
+  if (lastTerminalIdx < 0) return normalized;
 
-  const normalizedSteps = recipe.steps.filter((step, idx) => {
+  const normalizedSteps = normalized.steps.filter((step, idx) => {
     const action = String(step?.action || "");
     if (!terminalActions.has(action)) return true;
     return idx === lastTerminalIdx;
   });
-  return { ...recipe, steps: normalizedSteps };
+  return { ...normalized, steps: normalizedSteps };
 }
 
 function _canonicalDioceseSlug(value) {
@@ -755,6 +810,10 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
           : existingRecipe.start_url,
         display_name: (incoming.display_name && incoming.display_name.trim()) ? incoming.display_name.trim() : existingRecipe.display_name,
         diocese:      (incoming.diocese      && incoming.diocese.trim())      ? incoming.diocese.trim()      : existingRecipe.diocese,
+        observed_load_ms: incoming.observed_load_ms ?? existingRecipe.observed_load_ms,
+        timeout_ms: incoming.timeout_ms ?? existingRecipe.timeout_ms,
+        total_timeout_s: incoming.total_timeout_s ?? existingRecipe.total_timeout_s,
+        timeout: incoming.timeout ?? existingRecipe.timeout,
       } : incoming;
       const normalizedRecipe = _normalizeRecipeTerminalSteps(recipe);
       // Retrain push must clear harvest-blocking flags left on the old recipe.

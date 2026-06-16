@@ -637,7 +637,7 @@
   const standaloneAddStep = (step, uiType = "", uiLabel = "") => {
     if (!_inStandaloneMode()) return;
     // Replace an existing download/image/html step if one already exists
-    const terminal = ["download", "image", "print_to_pdf", "crop_screenshot"];
+    const terminal = ["download", "image", "image_stack", "print_to_pdf", "crop_screenshot"];
     if (terminal.includes(step.action)) {
       const idx = recipeSteps.findIndex((entry) =>
         terminal.includes(String(entry?.recipeStep?.action || ""))
@@ -704,9 +704,20 @@
     const loadTimeouts = _recipeTimeoutsFromLoadMs(_getObservedLoadMsForRecipe(), steps.length);
     if (loadTimeouts) {
       Object.assign(recipe, loadTimeouts);
+    } else {
+      const stepCount = Math.max(steps.length, 1);
+      recipe.timeout_ms = recipe.timeout_ms || 45_000;
+      recipe.total_timeout_s = Math.min(Math.max(stepCount * 45 + 90, 120), 300);
     }
     if (window.ph_site_memory?.enrichRecipe) {
       recipe = window.ph_site_memory.enrichRecipe(recipe, detectPageType());
+    }
+    const clickStep = steps.find((s) => String(s?.action || "").toLowerCase() === "click");
+    if (clickStep?.pick_strategy) {
+      recipe.bulletin_layout = {
+        strategy: clickStep.pick_strategy,
+        position: clickStep.bulletin_position || "top",
+      };
     }
     return recipe;
   };
@@ -732,6 +743,10 @@
     }
     if (action === "html" || action === "print_to_pdf") return "Save page as PDF (included in mega bulletin)";
     if (action === "image") return `Capture image: …${String(step.url || "").slice(-40)}`;
+    if (action === "image_stack") {
+      const count = Number(step.count || step.urls?.length || 2);
+      return `Capture top ${count} bulletin images (weekly stack)`;
+    }
     return `${action || "step"}: ${JSON.stringify(step).slice(0, 80)}`;
   };
 
@@ -930,6 +945,49 @@
     return direct;
   };
 
+  const _STABLE_LINK_TEXT_RE =
+    /\b(download file|download pdf|view newsletter|read newsletter|latest bulletin|parish news)\b/i;
+
+  const _textLooksDated = (value) => {
+    const text = String(value || "");
+    if (!text) return false;
+    if (extractDateFromUrl(text)?.year) return true;
+    return /\b\d{1,2}(?:st|nd|rd|th)?\b/i.test(text) && /\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b/i.test(text);
+  };
+
+  const _inferBulletinPosition = (el) => {
+    if (!(el instanceof Element)) return "top";
+    const links = Array.from(
+      document.querySelectorAll('a[href$=".pdf"], a[href*=".pdf"], a[href$=".docx"], a[href*=".docx"]')
+    ).filter((node) => !_isNonBulletinPdf(node.href || "", node.innerText || ""));
+    if (links.length <= 1) return "top";
+    const idx = links.findIndex((node) => node === el || node.contains(el) || el.contains(node));
+    if (idx < 0) return "top";
+    if (idx === 0) return "top";
+    if (idx >= links.length - 1) return "bottom";
+    return "middle";
+  };
+
+  const _enrichClickStepForWeeklyReplay = (clickStep, el) => {
+    const next = { ...clickStep };
+    const href = String(next.href || "").trim();
+    const selector = String(next.selector || "").trim();
+    const looksLikeBulletinLink =
+      /\.pdf|\.docx/i.test(href) ||
+      /\[href[^\]]*\.pdf/i.test(selector) ||
+      /:has-text\("download file"\)/i.test(selector);
+
+    if (!looksLikeBulletinLink) return next;
+
+    next.pick_strategy = next.pick_strategy || "newest_dated";
+    next.bulletin_position = next.bulletin_position || _inferBulletinPosition(el);
+    const fallbacks = new Set(Array.isArray(next.fallback_selectors) ? next.fallback_selectors : []);
+    fallbacks.add("a[href$='.pdf']");
+    fallbacks.add("a[href*='.pdf']");
+    next.fallback_selectors = Array.from(fallbacks);
+    return next;
+  };
+
   const buildStableLinkSelector = (el) => {
     if (!el) return "";
     const tag = el.tagName.toLowerCase();
@@ -941,13 +999,17 @@
     const role = el.getAttribute("role") || "";
     const escapeForSelector = (s) => s.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
     if (href && /\.pdf/i.test(href)) {
+      const stableMatch = text.match(_STABLE_LINK_TEXT_RE);
+      if (stableMatch && !_textLooksDated(stableMatch[0])) {
+        return `${tag}:has-text("${escapeForSelector(stableMatch[0])}")`;
+      }
       const tail = href.split("/").filter(Boolean).pop() || href;
-      if (tail.length >= 6) {
+      if (tail.length >= 6 && !_textLooksDated(tail)) {
         return `a[href*="${escapeForSelector(tail)}"]`;
       }
       return "a[href$='.pdf']";
     }
-    if (text && text.length >= 3 && text.length <= 100) {
+    if (text && text.length >= 3 && text.length <= 100 && !_textLooksDated(text)) {
       const short = text.slice(0, 60);
       return `${tag}:has-text("${escapeForSelector(short)}")`;
     }
@@ -3645,12 +3707,15 @@
       const href = selectedEl.getAttribute("href") || "";
       const text = _getEnrichedLinkLabel(selectedEl).slice(0, 60);
       const clickLabel = `🔗 Click: "${text || selector}"`;
-      const clickStep = {
-        action: "click",
-        selector,
-        href,
-        text,
-      };
+      const clickStep = _enrichClickStepForWeeklyReplay(
+        {
+          action: "click",
+          selector,
+          href,
+          text,
+        },
+        selectedEl
+      );
       const cloudFmt = _detectCloudDateFormat(text);
       if (cloudFmt || _isCloudFolderUrl(window.location.href)) {
         clickStep.date_format = cloudFmt || "YY.MM.DD";
@@ -3681,10 +3746,16 @@
       plainPick.style.cssText =
         "font-size:10px;color:#e2e8f0;line-height:1.45;background:#0f172a;border-radius:4px;padding:6px 8px;margin-bottom:6px;";
       const linkText = (selectedEl.innerText || selectedEl.textContent || "").trim().replace(/\s+/g, " ").slice(0, 80);
+      const strategy = clickStep.pick_strategy || "newest_dated";
+      const position = clickStep.bulletin_position || "top";
+      const weeklyLine =
+        strategy === "newest_dated"
+          ? `Each Sunday the harvester picks the <strong>newest dated</strong> bulletin PDF on this page (usually near the <strong>${position}</strong>).`
+          : strategy === "last_match"
+            ? "Each Sunday the harvester clicks the <strong>last</strong> matching bulletin link on the page."
+            : `Each Sunday the harvester clicks the <strong>first</strong> matching bulletin link (near the ${position}).`;
       plainPick.innerHTML =
-        `Each Sunday the computer will click: <strong>${linkText || "this link"}</strong> ` +
-        `(usually the <strong>first</strong> match at the top of the page).` +
-        `<br><span style="color:#9ca3af;font-size:9px;">The dated PDF address changes every week — that is normal. The click text stays the same.</span>`;
+        `${weeklyLine}<br><span style="color:#9ca3af;font-size:9px;">You picked: ${linkText || "this link"}. The filename/date changes every week — that is normal.</span>`;
       guidedPanel.appendChild(plainPick);
 
       const techDetails = document.createElement("details");
@@ -4093,10 +4164,28 @@
             resetGuidedPanel();
             return;
           }
-          pickedImages.push({ url: absUrl, el: imgEl });
-          if (window.ph_mark_image) {
+          const allImages = pickedImages.slice();
+          allImages.push({ url: absUrl, el: imgEl });
+          const urls = allImages
+            .map((entry) => String(entry?.url || "").trim())
+            .filter(Boolean);
+          if (urls.length === 0) {
+            showStatus("❌ Could not read image URLs. Try a different image.", "error");
+            resetGuidedPanel();
+            return;
+          }
+
+          const useStack = urls.length > 1;
+          const recipeStep = useStack
+            ? { action: "image_stack", count: urls.length, urls }
+            : { action: "image", url: urls[0] };
+          const uiLabel = useStack
+            ? `🖼️ Stack ${urls.length} images: …${urls[0].slice(-35)}`
+            : `🖼️ Image: ${urls[0].slice(-50)}`;
+
+          if (!useStack && window.ph_mark_image) {
             try {
-              const request = { url: absUrl };
+              const request = { url: urls[0] };
               const markResult = window.ph_mark_image(request);
               const response = markResult === false
                 ? { ok: false, reason: "Page rejected the image save." }
@@ -4106,19 +4195,23 @@
                 showStatus(`❌ ${response.reason}`, "error");
                 return;
               }
-              addSessionStep("mark_image", `🖼️ Image: ${absUrl.slice(-50)}`);
-              showStatus(`✅ Image recorded: ${absUrl.slice(-40)}`);
+              addSessionStep("mark_image", uiLabel);
+              showStatus(`✅ Image recorded: ${urls[0].slice(-40)}`);
             } catch (_e) {
-              _logSaveCycle("mark_image", { url: absUrl }, { ok: false, reason: "Could not record image. Try refreshing." });
+              _logSaveCycle("mark_image", { url: urls[0] }, { ok: false, reason: "Could not record image. Try refreshing." });
               showStatus("❌ Could not record image. Try refreshing.", "error");
             }
           } else {
             standaloneAddStep(
-              { action: "image", url: absUrl },
-              "mark_image",
-              `🖼️ Image: ${absUrl.slice(-50)}`
+              recipeStep,
+              useStack ? "image_stack" : "mark_image",
+              uiLabel
             );
-            showStatus(`✅ Image noted: ${absUrl.slice(-40)}`);
+            showStatus(
+              useStack
+                ? `✅ ${urls.length} images saved — harvester will grab top ${urls.length} each week`
+                : `✅ Image noted: ${urls[0].slice(-40)}`
+            );
           }
           pickedImages = [];
           resetGuidedPanel();
@@ -6951,15 +7044,21 @@
         let href = clickData.href;
         const bulletinHref = _hrefFromBulletinClick(target);
         if (bulletinHref) href = bulletinHref;
-        const selector = text && text.length >= 3 && text.length <= 60
-          ? `${clickData.tag}:has-text("${text.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}")`
-          : clickData.css_path;
-        const step = { action: "click", selector };
-        const fallbacks = [];
-        if (href && href.toLowerCase().endsWith(".pdf")) fallbacks.push("a[href$='.pdf']");
-        else if (href && href.toLowerCase().endsWith(".docx")) fallbacks.push("a[href$='.docx']");
-        if (clickData.css_path && clickData.css_path !== selector) fallbacks.push(clickData.css_path);
-        if (fallbacks.length) step.fallback_selectors = fallbacks;
+        const selector =
+          text && text.length >= 3 && text.length <= 60 && !_textLooksDated(text)
+            ? `${clickData.tag}:has-text("${text.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}")`
+            : href && /\.pdf/i.test(href)
+              ? "a[href$='.pdf']"
+              : clickData.css_path;
+        const step = _enrichClickStepForWeeklyReplay(
+          { action: "click", selector, href, text },
+          target
+        );
+        if (clickData.css_path && clickData.css_path !== step.selector) {
+          step.fallback_selectors = Array.from(
+            new Set([...(step.fallback_selectors || []), clickData.css_path])
+          );
+        }
 
         if (href && _looksLikeBulletinDownloadUrl(href, text)) {
           _standaloneAddClickAndDownload(step, href, label, null);

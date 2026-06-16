@@ -169,6 +169,89 @@ class ClaudyBulletinFilterTests(unittest.TestCase):
             fake_download.assert_awaited_once()
             self.assertTrue(context.closed)
 
+    def test_replay_recipe_supports_image_stack_step(self) -> None:
+        import asyncio
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            recipe_path = root / "recipe.json"
+            recipe_path.write_text(
+                json.dumps(
+                    {
+                        "steps": [
+                            {"action": "goto", "url": "https://example.org/bulletins/"},
+                            {"action": "image_stack", "count": 2},
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
+            dest = root / "bulletin.pdf"
+            context = _FakeContext()
+            browser = _FakeBrowser(context)
+
+            fake_find = AsyncMock(
+                return_value=[
+                    "https://example.org/b1.jpg",
+                    "https://example.org/b2.jpg",
+                ]
+            )
+            fake_stack = AsyncMock(return_value=("https://example.org/b1.jpg", "image_to_pdf"))
+            with patch("harvester.replay._find_stacked_bulletin_image_urls", fake_find):
+                with patch("harvester.replay._download_image_urls_as_pdf", fake_stack):
+                    out_path, file_type, source_url = asyncio.run(
+                        replay_recipe(recipe_path, dest, browser)
+                    )
+
+            self.assertEqual(out_path, dest)
+            self.assertEqual(file_type, "image_to_pdf")
+            self.assertEqual(source_url, "https://example.org/b1.jpg")
+            fake_find.assert_awaited_once()
+            fake_stack.assert_awaited_once()
+            self.assertTrue(context.closed)
+
+    def test_find_stacked_bulletin_image_urls_keeps_dom_order(self) -> None:
+        import asyncio
+
+        from harvester.replay import _find_stacked_bulletin_image_urls
+
+        class _Page:
+            url = "https://example.org/bulletins/"
+
+            async def eval_on_selector_all(self, selector: str, _script: str):
+                self.selector = selector
+                return [
+                    {
+                        "index": 2,
+                        "src": "/wp-content/uploads/2026/06/second.jpg",
+                        "naturalWidth": 900,
+                        "naturalHeight": 1200,
+                    },
+                    {
+                        "index": 0,
+                        "src": "/wp-content/uploads/2026/06/first.jpg",
+                        "naturalWidth": 900,
+                        "naturalHeight": 1200,
+                    },
+                    {
+                        "index": 1,
+                        "src": "/logo.png",
+                        "naturalWidth": 120,
+                        "naturalHeight": 80,
+                    },
+                ]
+
+        page = _Page()
+        urls = asyncio.run(_find_stacked_bulletin_image_urls(page, 2))
+        self.assertEqual(
+            urls,
+            [
+                "https://example.org/wp-content/uploads/2026/06/first.jpg",
+                "https://example.org/wp-content/uploads/2026/06/second.jpg",
+            ],
+        )
+        self.assertEqual(page.selector, "img")
+
     async def test_replay_recipe_supports_print_to_pdf_step(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

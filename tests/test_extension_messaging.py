@@ -37,10 +37,10 @@ class ExtensionMessagingTests(unittest.TestCase):
 
     def test_mark_image_standalone_path_uses_single_recipe_step_append(self) -> None:
         content = CONTENT_JS.read_text(encoding="utf-8")
-        marker = 'standaloneAddStep(\n              { action: "image", url: absUrl },'
+        marker = 'const recipeStep = useStack\n            ? { action: "image_stack", count: urls.length, urls }\n            : { action: "image", url: urls[0] };'
         self.assertIn(marker, content)
         block_start = content.index(marker)
-        block_end = content.index("showStatus(`✅ Image noted", block_start)
+        block_end = content.index("pickedImages = [];", block_start)
         self.assertNotIn("addSessionStep(\"mark_image\"", content[block_start:block_end])
 
     def test_toolbar_core_controls_and_advanced_fold_exist(self) -> None:

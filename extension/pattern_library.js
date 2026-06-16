@@ -74,7 +74,7 @@
     click_then_pdf: "Recipe pattern: click a dated link → download PDF.",
     click_chain: "Recipe pattern: one or more clicks to reach the bulletin.",
     html_capture: "Recipe pattern: open bulletin page → print to PDF (Wix/HTML sites).",
-    image_capture: "Recipe pattern: capture bulletin image(s).",
+    image_stack: "Recipe pattern: grab top N bulletin images and stack into one PDF.",
     mixed: "Recipe pattern: mixed steps — follow what worked on similar parishes.",
   };
 
@@ -128,7 +128,8 @@
     const hasClick = actions.includes("click");
     const hasDownload = actions.includes("download");
     const hasHtml = actions.includes("html") || actions.includes("print_to_pdf");
-    const hasImage = actions.includes("image");
+    const hasImageStack = actions.includes("image_stack");
+    const hasImage = actions.includes("image") || hasImageStack;
     const clickCount = actions.filter((a) => a === "click").length;
 
     let recipeFlow = "mixed";
@@ -140,6 +141,7 @@
     ) {
       recipeFlow = "direct_download";
     } else if (hasHtml) recipeFlow = "html_capture";
+    else if (hasImageStack) recipeFlow = "image_stack";
     else if (hasImage) recipeFlow = "image_capture";
     else if (hasClick && hasDownload) recipeFlow = "click_then_pdf";
     else if (hasDownload && !hasClick) recipeFlow = "direct_download";
@@ -184,9 +186,10 @@
           recipe_flow: entry.recipe_flow,
           score,
           combined_key: entry.combined_key || "",
-          operator_notes: Array.isArray(entry.operator_notes) ? entry.operator_notes : [],
-          do_not: Array.isArray(entry.do_not) ? entry.do_not : [],
-        });
+        operator_notes: Array.isArray(entry.operator_notes) ? entry.operator_notes : [],
+        do_not: Array.isArray(entry.do_not) ? entry.do_not : [],
+        bulletin_layout: entry.bulletin_layout,
+      });
       }
     });
 
@@ -206,6 +209,7 @@
         operator_notes: Array.isArray(entry.operator_notes) ? entry.operator_notes : [],
         do_not: Array.isArray(entry.do_not) ? entry.do_not : [],
         examples,
+        bulletin_layout: entry.bulletin_layout,
       });
     });
 
@@ -235,6 +239,18 @@
 
     if (patternMatch?.advice) {
       lines.push(`Learned tip: ${patternMatch.advice}`);
+    }
+    if (patternMatch?.bulletin_layout?.position) {
+      lines.push(
+        `Layout memory: bulletin usually near the ${patternMatch.bulletin_layout.position} (${patternMatch.bulletin_layout.strategy || "newest_dated"}).`
+      );
+    }
+
+    const seenBefore = matches.find(
+      (m) => m.is_pattern && Array.isArray(m.examples) && m.examples.length > 0
+    );
+    if (seenBefore?.examples?.length) {
+      lines.push(`Seen before on: ${seenBefore.examples.slice(0, 3).join(", ")}`);
     } else if (patternMatch?.examples?.length) {
       lines.push(`Similar parishes already solved: ${patternMatch.examples.slice(0, 4).join(", ")}`);
     } else if (parishMatches.length > 0) {

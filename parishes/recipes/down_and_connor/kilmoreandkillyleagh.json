@@ -1,7 +1,7 @@
 {
   "parish_key": "kilmoreandkillyleagh",
   "display_name": "Kilmore and Killyleagh",
-  "recorded_date": "2026-04-30",
+  "recorded_date": "2026-06-14",
   "start_url": "https://www.kilmoreandkillyleagh.com/latest-notices--downloads.html",
   "steps": [
     {
@@ -10,12 +10,13 @@
     },
     {
       "action": "click",
-      "selector": "a[href$='.pdf']",
+      "selector": "a:has-text(\"Download File\")",
       "fallback_selectors": [
-        "a[href*='april'][href$='.pdf']",
-        "a[href*='.pdf']",
-        "tbody > tr > td:nth-of-type(1) > div:nth-of-type(1) > div > a"
-      ]
+        "a[href$='.pdf']",
+        "a[href*='.pdf']"
+      ],
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "top"
     },
     {
       "action": "download",
@@ -23,5 +24,12 @@
     }
   ],
   "diocese": "down_and_connor",
-  "timeout": 30000
+  "timeout": 60000,
+  "playbook_type": "pdf_download_list",
+  "site_type": "pdf_link_list",
+  "page_type": "pdf_link_list",
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }

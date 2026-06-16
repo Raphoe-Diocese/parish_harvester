@@ -126,6 +126,7 @@ class FetchResult:
     is_stale: bool = False  # Reject from mega PDF — bulletin date outside harvest week
     stale_reason: str = ""
     retry_strategy: str = ""  # Hint for next harvest: rescrape, retrain, etc.
+    diagnosis: dict = field(default_factory=dict)  # timeout budget, recipe hints for failures
 
     # Legacy compat — old code used .parish
     @property
@@ -487,6 +488,9 @@ def _apply_recipe_timeouts(host_profile: dict, recipe_meta: dict | None) -> dict
     if not isinstance(recipe_meta, dict):
         return merged
 
+    steps = recipe_meta.get("steps")
+    step_count = len(steps) if isinstance(steps, list) and steps else 3
+
     raw_step = recipe_meta.get("timeout_ms", recipe_meta.get("timeout"))
     if raw_step is not None:
         try:
@@ -511,8 +515,6 @@ def _apply_recipe_timeouts(host_profile: dict, recipe_meta: dict | None) -> dict
     except (TypeError, ValueError):
         load_ms = 0
     if load_ms >= 1000:
-        steps = recipe_meta.get("steps")
-        step_count = len(steps) if isinstance(steps, list) and steps else 3
         merged["navigation_timeout_ms"] = max(
             int(merged.get("navigation_timeout_ms", PAGE_LOAD_TIMEOUT_MS)),
             min(load_ms * 2, 180_000),
@@ -521,7 +523,32 @@ def _apply_recipe_timeouts(host_profile: dict, recipe_meta: dict | None) -> dict
             max(int(load_ms / 1000) * step_count * 2 + 45, 90),
             600,
         )
+        return merged
+
+    # Recipe timeout/timeout_ms sets per-step wait but historically did not set
+    # total_timeout_s — harvest then still used the 60s global cap and timed out
+    # on slow click→download chains even after "1m 30s saved to recipe" in the UI.
+    nav_ms = int(merged.get("navigation_timeout_ms", PAGE_LOAD_TIMEOUT_MS))
+    derived_total = int(nav_ms / 1000) * max(step_count, 1) * 2 + 60
+    merged["total_timeout_s"] = min(max(derived_total, 120), 600)
     return merged
+
+
+def _timeout_diagnosis(recipe_meta: dict | None, host_profile: dict) -> dict:
+    """Human-readable timeout budget for logs and report.json failures."""
+    recipe_meta = recipe_meta if isinstance(recipe_meta, dict) else {}
+    steps = recipe_meta.get("steps")
+    step_count = len(steps) if isinstance(steps, list) and steps else 0
+    return {
+        "total_timeout_s": int(host_profile.get("total_timeout_s", TOTAL_TIMEOUT_S)),
+        "navigation_timeout_ms": int(
+            host_profile.get("navigation_timeout_ms", PAGE_LOAD_TIMEOUT_MS)
+        ),
+        "observed_load_ms": recipe_meta.get("observed_load_ms"),
+        "recipe_timeout_ms": recipe_meta.get("timeout_ms", recipe_meta.get("timeout")),
+        "recipe_total_timeout_s": recipe_meta.get("total_timeout_s"),
+        "step_count": step_count,
+    }
 
 
 def _recipe_uses_trained_click_download(recipe_meta: dict | None) -> bool:
@@ -1625,6 +1652,12 @@ async def _fetch_entry(
         _get_host_profile(_recipe_start_url(entry, recipe_meta, target_url)),
         recipe_meta,
     )
+    timeout_diag = _timeout_diagnosis(recipe_meta, host_profile)
+    print(
+        f"  ⏱  {key}: harvest budget {timeout_diag['total_timeout_s']}s total, "
+        f"{timeout_diag['navigation_timeout_ms']}ms per step "
+        f"({timeout_diag['step_count']} steps)"
+    )
 
     if recipe_path.exists():
         recipe_status = str(recipe_meta.get("status", "")).strip().lower()
@@ -1725,6 +1758,11 @@ async def _fetch_entry(
                 status="error",
                 url=_failure_report_url(entry, recipe_meta, target),
                 error=recipe_error or last_err,
+                diagnosis={
+                    **timeout_diag,
+                    "failure_stage": "recipe_replay",
+                    "recipe_error": recipe_error or last_err,
+                },
             )
 
         elif entry.content_type != "html_link":
@@ -1988,7 +2026,8 @@ async def fetch_parish(
     max_retries = max(0, int(host_profile.get("max_retries", _MAX_ATTEMPTS - 1)))
     retry_backoff_ms = max(0, int(host_profile.get("retry_backoff_ms", int(_RETRY_DELAY_S * 1000))))
     total_attempts = max_retries + 1
-    parish_timeout_s = max(TOTAL_TIMEOUT_S, int(host_profile.get("total_timeout_s", TOTAL_TIMEOUT_S)))
+    parish_timeout_s = max(120, int(host_profile.get("total_timeout_s", TOTAL_TIMEOUT_S)))
+    timeout_diag = _timeout_diagnosis(recipe_meta, host_profile)
     for attempt in range(total_attempts):
         try:
             async with asyncio.timeout(parish_timeout_s):
@@ -2030,6 +2069,12 @@ async def fetch_parish(
             last_error = result.error
         except TimeoutError:
             last_error = "Total timeout exceeded"
+            timeout_diag = _timeout_diagnosis(recipe_meta, host_profile)
+            print(
+                f"  ⏱  {entry.key}: exceeded {parish_timeout_s}s parish budget "
+                f"(nav {timeout_diag['navigation_timeout_ms']}ms × "
+                f"{timeout_diag['step_count']} steps)"
+            )
         except Exception as exc:
             last_error = str(exc)
 
@@ -2057,6 +2102,10 @@ async def fetch_parish(
         status="error",
         url=_failure_report_url(entry, recipe_meta, target),
         error=last_error,
+        diagnosis={
+            **_timeout_diagnosis(recipe_meta, host_profile),
+            "failure_stage": "timeout" if last_error == "Total timeout exceeded" else "error",
+        },
     )
 
 

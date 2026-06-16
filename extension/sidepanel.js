@@ -1030,7 +1030,7 @@ function _pdStatusDot(parish) {
 }
 
 function _problemsCategory(errorText, options = {}) {
-  if (options.retrainedPending) return "retrained — verify harvest";
+  if (options.retrainedPending) return "retrained — harvest still failing";
   const text = String(errorText || "");
   if (/getaddrinfo|Name or service not known|ENOTFOUND|Could not resolve host/i.test(text)) return "dns";
   if (/SSL|certificate/i.test(text)) return "ssl";
@@ -1172,6 +1172,14 @@ function _problemsShowVerifyResult(payload) {
     box.className = "err";
     const reason = String(payload.item?.error || payload.item?.reason || "still failed").slice(0, 160);
     lines.push(`❌ <strong>${payload.displayName}</strong> still failed: ${reason}`);
+    const diag = payload.item?.diagnosis;
+    if (diag && typeof diag === "object") {
+      const budget = diag.total_timeout_s ? `${diag.total_timeout_s}s total budget` : "";
+      const nav = diag.navigation_timeout_ms ? `${diag.navigation_timeout_ms}ms per step` : "";
+      const stage = diag.failure_stage ? `stage: ${diag.failure_stage}` : "";
+      const hint = [budget, nav, stage].filter(Boolean).join(" · ");
+      if (hint) lines.push(`Diagnosis: ${hint}`);
+    }
     if (payload.item?.url) {
       lines.push(
         `Last URL tried: <a href="${payload.item.url}" target="_blank" rel="noopener noreferrer">${payload.item.url}</a>`

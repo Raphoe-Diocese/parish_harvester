@@ -182,6 +182,7 @@ def generate_report(
                 "display_name": r.display_name,
                 "url": r.url,
                 "error": r.error,
+                **({"diagnosis": r.diagnosis} if getattr(r, "diagnosis", None) else {}),
             })
 
     report = {

@@ -764,6 +764,8 @@ async def run_training(parish_query: str, diocese: str | None, parishes_dir: Pat
                 print(f"{idx}. ⚠️  No valid document URL recorded.")
         elif action == "image":
             print(f"{idx}. Image: {step.get('url', '')}")
+        elif action == "image_stack":
+            print(f"{idx}. Image stack: top {step.get('count', 2)} bulletin image(s)")
         elif action == "html":
             print(f"{idx}. HTML link: {step.get('url', '')}")
         elif action == "crop_screenshot":

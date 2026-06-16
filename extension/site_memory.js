@@ -101,6 +101,38 @@
         "Do not worry if Document Properties title mentions Microsoft Word.",
       ],
     },
+    stacked_image_bulletin: {
+      playbook_type: "stacked_image_bulletin",
+      site_type: "stacked_image_bulletin",
+      page_type: "stacked_image_bulletin",
+      recipe_flow: "image_stack",
+      label: "Stacked JPEG bulletin images (top N each week)",
+      operator_notes: [
+        "Bulletins are full-page images stacked on one page — newest week at the top.",
+        "Pick the first two images, or use Pick another image too after the first.",
+        "Harvester grabs the top N large images automatically each Sunday — no dated URLs.",
+      ],
+      do_not: [
+        "Do not hardcode one image URL — it goes stale every week.",
+        "Do not Save page as PDF — that captures every old bulletin on the page.",
+      ],
+    },
+    pdf_download_list: {
+      playbook_type: "pdf_download_list",
+      site_type: "pdf_link_list",
+      page_type: "pdf_link_list",
+      recipe_flow: "click_then_pdf",
+      label: "PDF download list (newest dated row each week)",
+      operator_notes: [
+        "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
+        "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+        "Do not worry if the filename or date in the link text changes every week.",
+      ],
+      do_not: [
+        "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
+        "Do not pick GDPR, Gift Aid, or financial statement PDFs.",
+      ],
+    },
   };
 
   const _DDMMYY_PDF_RE = /\/pdf\/\d{6}\.pdf/i;
@@ -115,10 +147,21 @@
     return urls.some((u) => _DDMMYY_PDF_RE.test(u));
   };
 
+  const _recipeUsesImageStack = (recipe = {}) =>
+    (Array.isArray(recipe.steps) ? recipe.steps : []).some(
+      (step) => String(step?.action || "").trim() === "image_stack"
+    );
+
   const getForPageType = (pageType, recipe = null) => {
     const key = String(pageType || "").trim();
+    if (recipe && _recipeUsesImageStack(recipe)) {
+      return CATALOG.stacked_image_bulletin;
+    }
     if (recipe && _recipeUsesDatedPdfPath(recipe)) {
       return CATALOG.dated_pdf_bulletin;
+    }
+    if (key === "pdf_link_list" || key === "pdf_links") {
+      return CATALOG.pdf_download_list;
     }
     return CATALOG[key] || null;
   };
