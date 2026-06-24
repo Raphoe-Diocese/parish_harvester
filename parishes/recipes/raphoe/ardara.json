@@ -1,18 +1,41 @@
 {
+  "version": 1,
   "parish_key": "ardara",
-  "parish_name": "Ardara",
   "display_name": "Ardara",
-  "recorded_date": "2026-05-22",
+  "diocese": "raphoe",
   "start_url": "http://ardara.ie/news/",
   "steps": [
     {
       "action": "goto",
       "url": "http://ardara.ie/news/"
+    },
+    {
+      "action": "click",
+      "fallback_selectors": [
+        "section#wpsp-24188 > article:nth-of-type(1) > div > header > h2 > a"
+      ],
+      "href": "https://ardara.ie/notices/church-of-the-holy-family-newsletter-sun-21st-june-26/",
+      "selector": "a:has-text(\"Church of the Holy Family Newsletter: Sun. 21st June ’26\")",
+      "text": "Church of the Holy Family Newsletter: Sun. 21st June ’26"
+    },
+    {
+      "action": "print_to_pdf",
+      "selector": "article"
     }
   ],
-  "version": 1,
-  "diocese": "raphoe",
-  "placeholder": true,
-  "auto_generated": true,
-  "auto_fixed": true
+  "observed_load_ms": 9561,
+  "timeout_ms": 45000,
+  "total_timeout_s": 105,
+  "playbook_type": "wix_html",
+  "site_type": "html_text_bulletin",
+  "operator_notes": [
+    "Bulletin text is on the web page — not a downloadable PDF file.",
+    "Use Save page as PDF on the newsletter article page.",
+    "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
+  ],
+  "do_not": [
+    "Do not use Pick bulletin image when the page is mostly text paragraphs.",
+    "Do not stop at click-only — need print_to_pdf as the final step."
+  ],
+  "recorded_date": "2026-06-24"
 }
