@@ -633,6 +633,8 @@
       .filter((entry) => entry && entry.recipeStep && typeof entry.recipeStep.action === "string")
       .map((entry) => entry.recipeStep);
 
+  globalThis.__phStandaloneStepCount = () => _standaloneRecipeSteps().length;
+
   /** Start page for Sunday harvest — current page unless a click chain began elsewhere. */
   const _resolveRecipeStartUrl = () => {
     const pageUrl = _pageUrlForParishDetection();
@@ -936,6 +938,9 @@
         }
       } catch (err) {
         console.error("[Parish Trainer] createToolbar failed:", err);
+        if (globalThis.ph_toolbar_diag?.setError) {
+          globalThis.ph_toolbar_diag.setError(String(err));
+        }
         if (stubNode) {
           const status = stubNode.querySelector("#ph-stub-status");
           if (status) {
@@ -5101,6 +5106,10 @@
     body.appendChild(guidedPanel);
     body.appendChild(recipeSection);
 
+    if (globalThis.ph_toolbar_diag?.attachPanel) {
+      globalThis.ph_toolbar_diag.attachPanel(body, { open: false, autoRun: true });
+    }
+
     // Copilot chat UI removed — playbook + pin cover training without API cost.
 
     // ── ADVANCED SECTION ───────────────────────────────────────────────────
@@ -7241,6 +7250,20 @@
       _phBridgeDispatch(message, sendResponse)
     );
   }
+
+  globalThis.__phShowToolbar = () => {
+    _ensureToolbar(true);
+    void _markRecordingActive();
+  };
+  document.addEventListener("ph-show-toolbar", () => {
+    try {
+      globalThis.__phShowToolbar();
+    } catch (err) {
+      if (globalThis.ph_toolbar_diag?.setError) {
+        globalThis.ph_toolbar_diag.setError(String(err));
+      }
+    }
+  });
 
   // ── Click recording ───────────────────────────────────────────────────────
 

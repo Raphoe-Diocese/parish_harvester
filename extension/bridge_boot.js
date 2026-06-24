@@ -75,6 +75,9 @@
         '<div id="ph-stub-status" style="opacity:.95;">Loading recipe toolbar…</div>',
       ].join("");
       globalThis.__phGetToolbarMount().appendChild(bar);
+      if (globalThis.ph_toolbar_diag?.attachStubPanel) {
+        globalThis.ph_toolbar_diag.attachStubPanel(bar);
+      }
     }
     bar.dataset.phHidden = "false";
     bar.style.display = "flex";
@@ -82,6 +85,9 @@
   };
 
   const _showStubError = (message) => {
+    if (globalThis.ph_toolbar_diag?.setError) {
+      globalThis.ph_toolbar_diag.setError(message);
+    }
     const bar = _showStubToolbar();
     const status = bar.querySelector("#ph-stub-status");
     if (status) {
@@ -169,6 +175,11 @@
       if (status) status.textContent = "Upgrading to full trainer…";
     }
   };
+
+  document.addEventListener("ph-show-toolbar", () => {
+    _handleStubToolbar("show_toolbar");
+    _upgradeToolbar({ type: "show_toolbar" });
+  });
 
   if (typeof chrome !== "undefined" && chrome.runtime?.onMessage) {
     chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {

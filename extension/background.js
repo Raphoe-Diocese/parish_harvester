@@ -97,7 +97,7 @@ async function _waitForTabBridgeReady(tabId, options = {}) {
   return false;
 }
 
-const TRAINER_BRIDGE_FILES = globalThis.PH_TRAINER_BRIDGE_FILES || ["bridge_boot.js"];
+const TRAINER_BRIDGE_FILES = globalThis.PH_TRAINER_BRIDGE_FILES || ["bridge_boot.js", "toolbar_diag.js"];
 const TRAINER_HEAVY_FILES = globalThis.PH_TRAINER_HEAVY_FILES || [
   "pattern_library.js",
   "html_fingerprint.js",

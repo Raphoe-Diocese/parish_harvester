@@ -1,4 +1,4 @@
-globalThis.PH_TRAINER_BRIDGE_FILES = ["bridge_boot.js"];
+globalThis.PH_TRAINER_BRIDGE_FILES = ["bridge_boot.js", "toolbar_diag.js"];
 globalThis.PH_TRAINER_HEAVY_FILES = [
   "pattern_library.js",
   "html_fingerprint.js",
