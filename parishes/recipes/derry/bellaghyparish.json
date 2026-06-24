@@ -1,27 +1,39 @@
 {
   "version": 1,
   "parish_key": "bellaghyparish",
-  "display_name": "Bellaghyparish",
+  "display_name": "Bellaghy",
   "diocese": "derry",
-  "start_url": "https://bellaghyparish.com/news/",
+  "start_url": "https://bellaghyparish.com/newsletter/",
   "steps": [
     {
       "action": "goto",
-      "url": "https://bellaghyparish.com/news/"
+      "url": "https://bellaghyparish.com/newsletter/"
     },
     {
       "action": "click",
-      "selector": "a[href$=\".pdf\"], a[href*=\".pdf\"]",
-      "pick_strategy": "newest_dated"
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "a[href$='.pdf']",
+        "a[href*='.pdf']",
+        "article#post-429 > div > div:nth-of-type(1) > a:nth-of-type(1)"
+      ],
+      "href": "https://bellaghyparish.com/wp-content/uploads/2026/06/21-June-2026.pdf",
+      "pick_strategy": "newest_dated",
+      "selector": "a[href$='.pdf']",
+      "text": "21 June 2026"
     },
     {
       "action": "download",
+      "url": "https://bellaghyparish.com/wp-content/uploads/2026/06/21-June-2026.pdf",
       "use_captured_url": true
     }
   ],
-  "recorded_date": "2026-06-24",
-  "auto_fixed": true,
-  "observed_load_ms": 3200,
+  "observed_load_ms": 1019,
   "timeout_ms": 45000,
-  "total_timeout_s": 180
+  "total_timeout_s": 90,
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  },
+  "recorded_date": "2026-06-24"
 }
