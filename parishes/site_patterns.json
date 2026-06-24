@@ -231,6 +231,30 @@
         "ballyclareballygowan"
       ],
       "success_count": 5
+    },
+    "wp_block_file_bulletin+direct_download": {
+      "page_type": "wp_block_file_bulletin",
+      "recipe_flow": "direct_download",
+      "label": "WordPress permanent bulletin page (wp-block-file)",
+      "advice": "Permanent /parish-bulletin/ URL — PDF filename changes weekly under /wp-content/uploads/YYYY/MM/. PDF is in object.wp-block-file__embed[data] — harvest scrapes the embed URL. Use url_pattern *bulletin*.pdf — never pin a dated filename.",
+      "operator_notes": [
+        "Permanent /parish-bulletin/ URL — PDF filename changes weekly under /wp-content/uploads/YYYY/MM/.",
+        "PDF is in object.wp-block-file__embed[data] — harvest scrapes the embed URL.",
+        "Use url_pattern *bulletin*.pdf — never pin a dated filename."
+      ],
+      "do_not": [
+        "Do not train on the homepage — use the dedicated bulletin page only.",
+        "Do not pin saintanthony.co.uk if the parish moved to saintanthonys.uk."
+      ],
+      "html_fingerprint": "wp_block_file_bulletin",
+      "html_markers": [
+        "wp-block-file block",
+        "file embed/button"
+      ],
+      "example_parishes": [
+        "clonmanyparish"
+      ],
+      "success_count": 1
     }
   },
   "parishes": {
@@ -275,13 +299,28 @@
       ]
     },
     "clonmanyparish": {
-      "page_type": "direct_pdf",
-      "recipe_flow": "click_then_pdf",
-      "combined_key": "direct_pdf+click_then_pdf",
+      "page_type": "wp_block_file_bulletin",
+      "recipe_flow": "direct_download",
+      "combined_key": "wp_block_file_bulletin+direct_download",
       "display_name": "Clonmany",
       "start_url_host": "clonmanyparish.ie",
-      "updated": "2026-06-15",
-      "step_count": 3
+      "updated": "2026-06-24",
+      "step_count": 3,
+      "playbook_type": "permanent_bulletin_page",
+      "operator_notes": [
+        "Permanent /parish-bulletin/ URL — PDF filename changes weekly under /wp-content/uploads/YYYY/MM/.",
+        "PDF is in object.wp-block-file__embed[data] — harvest scrapes the embed URL.",
+        "Use url_pattern *bulletin*.pdf — never pin a dated filename."
+      ],
+      "do_not": [
+        "Do not train on the homepage — use the dedicated bulletin page only.",
+        "Do not pin saintanthony.co.uk if the parish moved to saintanthonys.uk."
+      ],
+      "html_fingerprint": "wp_block_file_bulletin",
+      "html_markers": [
+        "wp-block-file block",
+        "file embed/button"
+      ]
     },
     "dmaparish": {
       "page_type": "direct_pdf",
