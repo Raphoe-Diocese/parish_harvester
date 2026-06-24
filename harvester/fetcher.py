@@ -712,6 +712,44 @@ async def _try_direct_html_print(
     return await _try_force_html_to_pdf(entry, target_url, dest, browser, target, host_profile)
 
 
+async def _try_html_link_captures(
+    entry: "ParishEntry",
+    target_url: str,
+    dest: Path,
+    browser: Browser,
+    host_profile: dict,
+    target: date,
+) -> FetchResult | None:
+    """Capture HTML bulletin pages — never scrape sidebar PDFs on html_link parishes."""
+    folder_url = entry.example_url or target_url
+    if is_cloud_folder_url(folder_url):
+        return FetchResult(
+            key=entry.key,
+            display_name=entry.display_name,
+            status="error",
+            url=folder_url,
+            error=(
+                "Cloud folder bulletin not found for this Sunday — open the folder in "
+                "Parish Trainer, pick the dated PDF row (YY.MM.DD), Save PDF, and push recipe"
+            ),
+        )
+
+    for capture_url in _scrape_seed_urls(entry, target_url):
+        forced = await _try_force_html_to_pdf(
+            entry, capture_url, dest, browser, target, host_profile
+        )
+        if forced is not None:
+            return forced
+    return FetchResult(
+        key=entry.key,
+        display_name=entry.display_name,
+        status="error",
+        url=entry.example_url or target_url,
+        file_type="html_render",
+        error="HTML bulletin could not be captured as PDF — re-train with print_to_pdf or crop",
+    )
+
+
 async def _render_page_to_pdf(page: Page, dest_path: str) -> bool:
     """Render the currently-loaded Playwright page to a PDF on disk."""
     try:
@@ -1618,6 +1656,20 @@ async def _recover_stale_bulletin(
         for scrape_url in _scrape_seed_urls(entry, result.url):
             if dest.exists():
                 dest.unlink(missing_ok=True)
+            if entry.content_type == "html_link":
+                refreshed = await _try_force_html_to_pdf(
+                    entry,
+                    scrape_url,
+                    dest,
+                    browser,
+                    target,
+                    host_profile,
+                )
+                if refreshed is not None and refreshed.status == "ok":
+                    if check_bulletin_freshness(refreshed.url or scrape_url, target).status != "stale":
+                        print(f"  ✅ {entry.key}: HTML recapture found current-week bulletin")
+                        return refreshed
+                continue
             scraped = await _scrape_and_download(
                 entry,
                 target,
@@ -1826,13 +1878,13 @@ async def _fetch_entry(
         )
 
     if entry.content_type == "html_link":
-        printed = await _try_direct_html_print(
+        printed = await _try_html_link_captures(
             entry, target_url, dest, browser, host_profile, target
         )
         if printed is not None:
             return printed
 
-    # Non-html entries keep URL prediction first — unless a click recipe is trained.
+    # PDF parishes: direct URL download, then page scrape for bulletin links.
     if entry.content_type != "html_link" and not _recipe_uses_trained_click_download(recipe_meta):
         primary_is_404 = False
         docx_candidates = [target_url]
@@ -1917,51 +1969,33 @@ async def _fetch_entry(
                     if dest.exists() and not _is_real_pdf(dest, key):
                         dest.unlink(missing_ok=True)
 
-    # Prediction failed, or entry is html_link: scrape bulletin pages.
-    for scrape_url in _scrape_seed_urls(entry, target_url):
-        scraped = await _scrape_and_download(
-            entry,
-            target,
-            scrape_url,
-            dest,
-            browser,
-            recipe_meta=recipe_meta,
-            host_profile=host_profile,
-        )
-        if scraped.status == "ok":
-            return scraped
-        last_err = scraped.error or last_err
+    # Prediction failed: scrape bulletin pages (PDF parishes only — not html_link).
+    if entry.content_type != "html_link":
+        for scrape_url in _scrape_seed_urls(entry, target_url):
+            scraped = await _scrape_and_download(
+                entry,
+                target,
+                scrape_url,
+                dest,
+                browser,
+                recipe_meta=recipe_meta,
+                host_profile=host_profile,
+            )
+            if scraped.status == "ok":
+                return scraped
+            last_err = scraped.error or last_err
 
     if recipe_error:
         last_err = f"{recipe_error}; {last_err}"
 
-    # Last resort: force HTML bulletin URLs to PDF (no bare links in mega PDF).
     if entry.content_type == "html_link":
-        folder_url = entry.example_url or target_url
-        if is_cloud_folder_url(folder_url):
-            return FetchResult(
-                key=key,
-                display_name=entry.display_name,
-                status="error",
-                url=folder_url,
-                error=(
-                    "Cloud folder bulletin not found for this Sunday — open the folder in "
-                    "Parish Trainer, pick the dated PDF row (YY.MM.DD), Save PDF, and push recipe"
-                ),
-            )
-        for capture_url in _scrape_seed_urls(entry, target_url):
-            forced = await _try_force_html_to_pdf(
-                entry, capture_url, dest, browser, target, host_profile
-            )
-            if forced is not None:
-                return forced
         return FetchResult(
             key=key,
             display_name=entry.display_name,
             status="error",
             url=entry.example_url or target_url,
             file_type="html_render",
-            error="HTML bulletin could not be captured as PDF — re-train with print_to_pdf or crop",
+            error=last_err or "HTML bulletin could not be captured as PDF — re-train with print_to_pdf or crop",
         )
 
     return FetchResult(

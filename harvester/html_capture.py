@@ -21,6 +21,7 @@ if TYPE_CHECKING:
     from playwright.async_api import Page
 
 CONTENT_SELECTORS: tuple[str, ...] = (
+    "[data-ph-bulletin-root]",
     "article",
     ".entry-content",
     ".post-content",
@@ -29,7 +30,31 @@ CONTENT_SELECTORS: tuple[str, ...] = (
     ".site-content",
     '[role="main"]',
     "main",
+    "div.col-sm-9",
 )
+
+_PARISH_MESSENGER_SCRIPT = 'script[src*="theparishmessenger.com"]'
+
+_WAIT_DYNAMIC_BULLETIN_JS = """
+() => {
+  const script = document.querySelector('script[src*="theparishmessenger.com"]');
+  if (!script) return true;
+  const box = script.closest('.col-sm-9') || script.parentElement;
+  if (!box) return false;
+  const text = (box.innerText || '').replace(/\\s+/g, ' ').trim();
+  return text.length >= 300;
+}
+"""
+
+_MARK_MESSENGER_ROOT_JS = """
+() => {
+  const script = document.querySelector('script[src*="theparishmessenger.com"]');
+  const root = script && (script.closest('.col-sm-9') || script.parentElement);
+  if (!root) return null;
+  root.setAttribute('data-ph-bulletin-root', '1');
+  return '[data-ph-bulletin-root]';
+}
+"""
 
 _LISTING_HINTS = re.compile(
     r"archive|newsletter|bulletin|weekly|past|previous|all.?posts|category",
@@ -146,7 +171,28 @@ async def try_navigate_to_current_bulletin(page: Page, target: date) -> bool:
         return False
 
 
+async def wait_for_dynamic_bulletin(page: Page, timeout_ms: int = 20_000) -> bool:
+    """Wait for Parish Messenger (and similar) embeds to inject bulletin HTML."""
+    try:
+        await page.wait_for_function(_WAIT_DYNAMIC_BULLETIN_JS, timeout=timeout_ms)
+        return True
+    except Exception:
+        return False
+
+
 async def hide_non_content_chrome(page: Page) -> str | None:
+    try:
+        messenger_sel = await page.evaluate(_MARK_MESSENGER_ROOT_JS)
+    except Exception:
+        messenger_sel = None
+    if messenger_sel:
+        try:
+            used = await page.evaluate(_HIDE_CHROME_JS, messenger_sel)
+        except Exception:
+            used = False
+        if used:
+            return messenger_sel
+
     for selector in CONTENT_SELECTORS:
         try:
             used = await page.evaluate(_HIDE_CHROME_JS, selector)
@@ -167,6 +213,7 @@ async def capture_html_page_as_pdf(
     wait_ms: int = 1500,
 ) -> tuple[bool, str]:
     """Returns (success, capture_mode)."""
+    await wait_for_dynamic_bulletin(page, timeout_ms=max(wait_ms, 15_000))
     await try_navigate_to_current_bulletin(page, target)
     if wait_ms > 0:
         wait_for_timeout = getattr(page, "wait_for_timeout", None)
