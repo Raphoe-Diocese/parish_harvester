@@ -11,15 +11,41 @@
     },
     {
       "action": "click",
-      "selector": "a[href*=\"/pdf/\"]",
-      "text": "Sunday, 14th June 2026 - 11th Sunday Ordinary Time CLICK HER",
-      "pick_strategy": "newest_dated"
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "a[href$='.pdf']",
+        "a[href*='.pdf']",
+        "div#xlaANMzone_26a1fe > a"
+      ],
+      "href": "pdf/210626.pdf",
+      "pick_strategy": "newest_dated",
+      "selector": "a:has-text(\"CLICK HERE to load Current Newsletter\")",
+      "text": "CLICK HERE to load Current Newsletter"
     },
     {
       "action": "download",
+      "url": "https://www.castledergparish.com/pdf/210626.pdf",
       "use_captured_url": true
     }
   ],
-  "recorded_date": "2026-06-15",
-  "auto_fixed": true
+  "timeout_ms": 45000,
+  "total_timeout_s": 225,
+  "playbook_type": "dated_pdf_bulletin",
+  "site_type": "dated_pdf_path",
+  "operator_notes": [
+    "Bulletin is a real PDF (often made in Microsoft Word → Print to PDF).",
+    "Tab title may say .docx or .jpg — ignore that; check the address bar ends in .pdf.",
+    "On the PDF page: tap Save this PDF — saves the full https://… address for Sunday harvest.",
+    "Or start on parishnews.html → point at this week's link → Yes → Save this PDF.",
+    "Harvester rewrites DDMMYY in the URL each Sunday (e.g. 140626 → 210626)."
+  ],
+  "do_not": [
+    "Do not use use_page_url only — GitHub cannot read Chrome's internal PDF viewer address.",
+    "Do not worry if Document Properties title mentions Microsoft Word."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  },
+  "recorded_date": "2026-06-24"
 }
