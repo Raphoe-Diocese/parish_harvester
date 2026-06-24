@@ -3,7 +3,7 @@ const PROBLEMS_RECIPE_RETRAINED_KEY = "ph_recipe_retrained";
 const PH_LAST_DISPATCH_KEY = "ph_last_parish_dispatch";
 
 try {
-  importScripts("github_defaults.js");
+  importScripts("github_defaults.js", "trainer_inject.js");
 } catch (_importErr) {
   // Fallback when loaded in a context without importScripts.
   globalThis.PH_DEFAULT_GH_REPO = "Raphoe-Diocese/parish_harvester";
@@ -20,7 +20,31 @@ chrome.runtime.onInstalled.addListener(() => {
       chrome.storage.local.set({ gh_repo: phResolveGhRepo("") });
     }
   });
+  void _warmOpenTabs();
 });
+
+chrome.runtime.onStartup.addListener(() => {
+  void _warmOpenTabs();
+});
+
+async function _warmOpenTabs() {
+  let tabs = [];
+  try {
+    tabs = await chrome.tabs.query({});
+  } catch (_err) {
+    return;
+  }
+  for (const tab of tabs) {
+    if (!tab?.id || !_tabUrlIsScriptable(tab.url || "")) continue;
+    try {
+      const ping = await _sendMessageToTab(tab.id, { type: "ph_ping" });
+      if (ping.ok) continue;
+      await _injectTrainerFiles(tab.id, TRAINER_BRIDGE_FILES);
+    } catch (_err) {
+      // Non-fatal — popup/click will inject on demand.
+    }
+  }
+}
 
 function _tabUrlIsScriptable(url) {
   if (!url || typeof url !== "string") return false;
@@ -43,27 +67,86 @@ async function _sendMessageToTab(tabId, message) {
   }
 }
 
-async function _injectTrainerScripts(tabId) {
+async function _waitForTabReceiver(tabId, options = {}) {
+  const maxAttempts = Number(options.maxAttempts || 30);
+  const delayMs = Number(options.delayMs || 200);
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const pong = await _sendMessageToTab(tabId, { type: "ph_ping" });
+    if (pong.ok) {
+      return true;
+    }
+    if (attempt < maxAttempts - 1) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+  }
+  return false;
+}
+
+async function _waitForTabBridgeReady(tabId, options = {}) {
+  const maxAttempts = Number(options.maxAttempts || 60);
+  const delayMs = Number(options.delayMs || 200);
+  for (let attempt = 0; attempt < maxAttempts; attempt++) {
+    const ready = await _sendMessageToTab(tabId, { type: "ph_bridge_ready" });
+    if (ready.ok) {
+      return true;
+    }
+    if (attempt < maxAttempts - 1) {
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
+    }
+  }
+  return false;
+}
+
+const TRAINER_BRIDGE_FILES = globalThis.PH_TRAINER_BRIDGE_FILES || ["bridge_boot.js"];
+const TRAINER_HEAVY_FILES = globalThis.PH_TRAINER_HEAVY_FILES || [
+  "pattern_library.js",
+  "html_fingerprint.js",
+  "site_memory.js",
+  "parish_pickers.js",
+  "copilot.js",
+  "toolbar_playbook.js",
+  "click-chain.js",
+  "isolated.js",
+  "content.js",
+];
+
+async function _injectTrainerFiles(tabId, files) {
   try {
     await chrome.scripting.executeScript({
-      target: { tabId },
-      files: [
-        "pattern_library.js",
-        "html_fingerprint.js",
-        "site_memory.js",
-        "parish_pickers.js",
-        "copilot.js",
-        "toolbar_playbook.js",
-        "click-chain.js",
-        "isolated.js",
-        "content.js",
-      ],
+      target: { tabId, allFrames: false },
+      files,
       world: "ISOLATED",
     });
     return { ok: true };
   } catch (err) {
     return { ok: false, error: String(err) };
   }
+}
+
+async function _injectTrainerScripts(tabId) {
+  const ping = await _sendMessageToTab(tabId, { type: "ph_ping" });
+  if (ping.ok) {
+    const ready = await _waitForTabBridgeReady(tabId, { maxAttempts: 8, delayMs: 150 });
+    if (ready) {
+      return { ok: true, skipped: true };
+    }
+    const heavy = await _injectTrainerFiles(tabId, TRAINER_HEAVY_FILES);
+    if (heavy.ok) {
+      return heavy;
+    }
+    return heavy;
+  }
+
+  const full = await _injectTrainerFiles(tabId, [...TRAINER_BRIDGE_FILES, ...TRAINER_HEAVY_FILES]);
+  if (full.ok) {
+    return full;
+  }
+
+  const bridgeOnly = await _injectTrainerFiles(tabId, TRAINER_BRIDGE_FILES);
+  if (!bridgeOnly.ok) {
+    return full;
+  }
+  return await _injectTrainerFiles(tabId, TRAINER_HEAVY_FILES);
 }
 
 async function sendToTab(tabId, message, options = {}) {
@@ -102,12 +185,40 @@ async function sendToTab(tabId, message, options = {}) {
     };
   }
 
+  // Content scripts may still be parsing on slow pages — wait before re-injecting.
+  if (await _waitForTabReceiver(tabId, { maxAttempts: 15, delayMs: 200 })) {
+    if (await _waitForTabBridgeReady(tabId, { maxAttempts: 45, delayMs: 200 })) {
+      const warmAttempt = await _sendMessageToTab(tabId, message);
+      if (warmAttempt.ok) {
+        return warmAttempt;
+      }
+    }
+  }
+
   const injected = await _injectTrainerScripts(tabId);
   if (!injected.ok) {
     return {
       ok: false,
       reason: "inject_failed",
       error: injected.error || "Failed to inject extension scripts.",
+      tabUrl: tab?.url || "",
+    };
+  }
+
+  if (!(await _waitForTabReceiver(tabId, { maxAttempts: 30, delayMs: 200 }))) {
+    return {
+      ok: false,
+      reason: "receiver_unavailable",
+      error: "Content script bridge did not become ready after injection.",
+      tabUrl: tab?.url || "",
+    };
+  }
+
+  if (!(await _waitForTabBridgeReady(tabId, { maxAttempts: 60, delayMs: 200 }))) {
+    return {
+      ok: false,
+      reason: "receiver_unavailable",
+      error: "Parish Trainer loaded but the floating toolbar is not ready yet. Refresh the tab and try again.",
       tabUrl: tab?.url || "",
     };
   }
@@ -174,6 +285,10 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   if (!_tabUrlIsScriptable(tab?.url || "")) return;
   (async () => {
     try {
+      const ping = await _sendMessageToTab(tabId, { type: "ph_ping" });
+      if (!ping.ok) {
+        await _injectTrainerFiles(tabId, TRAINER_BRIDGE_FILES);
+      }
       const { ph_recording_session: session } = await chrome.storage.local.get([
         "ph_recording_session",
       ]);

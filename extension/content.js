@@ -1,4 +1,12 @@
 (() => {
+  if (globalThis.__phContentInstalled) {
+    if (typeof globalThis.__phBridgeSetDispatch === "function" && typeof globalThis.__phContentDispatch === "function") {
+      globalThis.__phBridgeSetDispatch(globalThis.__phContentDispatch);
+    }
+    return;
+  }
+  globalThis.__phContentInstalled = true;
+
   // ── Session state ────────────────────────────────────────────────────────
   let cropOverlay = null;
   let lastCropSignature = "";
@@ -889,6 +897,11 @@
   const _ensureToolbar = (visible = true) => {
     _cleanupDuplicateToolbars();
     let node = _getToolbarNode();
+    if (node?.dataset?.phStub === "1") {
+      node.remove();
+      toolbar = null;
+      node = null;
+    }
     if (!node) {
       node = createToolbar();
       document.documentElement.appendChild(node);
@@ -6657,43 +6670,55 @@
     if (!message || typeof message !== "object") {
       return { ok: false, reason: "Invalid message payload." };
     }
-    if (message.type === "ph_ping") return { ok: true };
+    if (message.type === "ph_ping" || message.type === "ping") return { ok: true };
 
     if (message.type === "toggle_toolbar") {
-      const bar = _getToolbarNode();
-      if (!bar) {
-        _ensureToolbar(true);
-      } else if (bar.dataset.phHidden === "true" || bar.style.display === "none") {
-        _ensureToolbar(true);
-      } else {
-        bar.dataset.phHidden = "true";
-        bar.style.display = "none";
+      try {
+        const bar = _getToolbarNode();
+        if (!bar) {
+          _ensureToolbar(true);
+        } else if (bar.dataset.phHidden === "true" || bar.style.display === "none") {
+          _ensureToolbar(true);
+        } else {
+          bar.dataset.phHidden = "true";
+          bar.style.display = "none";
+        }
+        return { ok: true };
+      } catch (err) {
+        return { ok: false, reason: String(err) };
       }
-      return { ok: true };
     }
 
     if (message.type === "show_toolbar") {
-      _ensureToolbar(true);
-      void _markRecordingActive();
-      return { ok: true };
+      try {
+        _ensureToolbar(true);
+        void _markRecordingActive();
+        return { ok: true };
+      } catch (err) {
+        return { ok: false, reason: String(err) };
+      }
     }
     if (message.type === "ph_show_toolbar") {
-      const bar = _ensureToolbar(true);
-      if (message.reason === "fix_now") {
-        recipeSteps = recipeSteps.filter((entry) => !entry?.recipeStep);
-        standaloneStartUrl = _pageUrlForParishDetection();
-        _skipLoadExistingRecipe = true;
-        bar.dataset.phFixNow = "1";
-        bar.dataset.phParishName = String(message.parish_key || "").replace(/_/g, " ");
-        void _clearRecordingSession();
-      } else {
-        delete bar.dataset.phFixNow;
-        delete bar.dataset.phParishName;
+      try {
+        const bar = _ensureToolbar(true);
+        if (message.reason === "fix_now") {
+          recipeSteps = recipeSteps.filter((entry) => !entry?.recipeStep);
+          standaloneStartUrl = _pageUrlForParishDetection();
+          _skipLoadExistingRecipe = true;
+          bar.dataset.phFixNow = "1";
+          bar.dataset.phParishName = String(message.parish_key || "").replace(/_/g, " ");
+          void _clearRecordingSession();
+        } else {
+          delete bar.dataset.phFixNow;
+          delete bar.dataset.phParishName;
+        }
+        void _markRecordingActive();
+        window.dispatchEvent(new CustomEvent("ph-retraining-hint", { detail: { parish_key: message.parish_key || "" } }));
+        if (_refreshParishPushForm) void _refreshParishPushForm();
+        return { ok: true };
+      } catch (err) {
+        return { ok: false, reason: String(err) };
       }
-      void _markRecordingActive();
-      window.dispatchEvent(new CustomEvent("ph-retraining-hint", { detail: { parish_key: message.parish_key || "" } }));
-      if (_refreshParishPushForm) void _refreshParishPushForm();
-      return { ok: true };
     }
     if (message.type === "restore_recording_session") {
       void _restoreRecordingSessionFromStorage();
@@ -7118,51 +7143,60 @@
 
   window.addEventListener("message", (event) => {
     if (event.source !== window) return;
-    if (event.data && event.data.direction === "from-isolated") {
-      _handleIncomingMessage(event.data.message);
-    }
+    if (!event.data || event.data.direction !== "from-isolated") return;
+    // Ignore chrome runtime messages mirrored through postMessage — bridge_boot handles those.
+    const mirroredType = event.data.message?.type;
+    if (mirroredType && mirroredType !== "mark_element") return;
+    _handleIncomingMessage(event.data.message);
   });
 
-  if (typeof chrome !== "undefined" && chrome.runtime?.onMessage) {
-    chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-      if (message?.type === "get_standalone_steps") {
-        sendResponse({ ok: true, count: _standaloneRecipeSteps().length });
-        return true;
-      }
-      if (message?.type === "auto_download_detected") {
-        const url = String(message.url || "").trim();
-        if (url && _inStandaloneMode()) {
-          const steps = _standaloneRecipeSteps();
-          const last = steps[steps.length - 1];
-          const already =
-            last &&
-            String(last.action || "").toLowerCase() === "download" &&
-            String(last.url || "") === url;
-          if (!already) {
-            standaloneAddStep(
-              { action: "download", url },
-              "mark_file",
-              `📄 Auto-download: ${url.slice(-50)}`
-            );
-            _ensureToolbar(true);
-            window.dispatchEvent(
-              new CustomEvent("ph-recording-continued", {
-                detail: { stepCount: _standaloneRecipeSteps().length },
-              })
-            );
-          }
-        }
-        sendResponse({ ok: true });
-        return true;
-      }
-      if (String(message?.type || "").startsWith("copilot_")) {
-        void _handleCopilotMessage(message).then((result) => sendResponse(result));
-        return true;
-      }
-      const result = _handleIncomingMessage(message);
-      sendResponse(result);
+  const _phBridgeDispatch = (message, sendResponse) => {
+    if (message?.type === "get_standalone_steps") {
+      sendResponse({ ok: true, count: _standaloneRecipeSteps().length });
       return true;
-    });
+    }
+    if (message?.type === "auto_download_detected") {
+      const url = String(message.url || "").trim();
+      if (url && _inStandaloneMode()) {
+        const steps = _standaloneRecipeSteps();
+        const last = steps[steps.length - 1];
+        const already =
+          last &&
+          String(last.action || "").toLowerCase() === "download" &&
+          String(last.url || "") === url;
+        if (!already) {
+          standaloneAddStep(
+            { action: "download", url },
+            "mark_file",
+            `📄 Auto-download: ${url.slice(-50)}`
+          );
+          _ensureToolbar(true);
+          window.dispatchEvent(
+            new CustomEvent("ph-recording-continued", {
+              detail: { stepCount: _standaloneRecipeSteps().length },
+            })
+          );
+        }
+      }
+      sendResponse({ ok: true });
+      return true;
+    }
+    if (String(message?.type || "").startsWith("copilot_")) {
+      void _handleCopilotMessage(message).then((result) => sendResponse(result));
+      return true;
+    }
+    const result = _handleIncomingMessage(message);
+    sendResponse(result);
+    return true;
+  };
+
+  if (typeof globalThis.__phBridgeSetDispatch === "function") {
+    globalThis.__phContentDispatch = _phBridgeDispatch;
+    globalThis.__phBridgeSetDispatch(_phBridgeDispatch);
+  } else if (typeof chrome !== "undefined" && chrome.runtime?.onMessage) {
+    chrome.runtime.onMessage.addListener((message, _sender, sendResponse) =>
+      _phBridgeDispatch(message, sendResponse)
+    );
   }
 
   // ── Click recording ───────────────────────────────────────────────────────

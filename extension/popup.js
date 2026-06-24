@@ -3,9 +3,25 @@ const versionEl = document.getElementById("ext-version");
 if (versionEl) versionEl.textContent = `v${manifest.version}`;
 
 const statusEl = document.getElementById("status");
+const TRAINER_BRIDGE_FILES = globalThis.PH_TRAINER_BRIDGE_FILES || ["bridge_boot.js"];
+const TRAINER_HEAVY_FILES = globalThis.PH_TRAINER_HEAVY_FILES || [
+  "pattern_library.js",
+  "html_fingerprint.js",
+  "site_memory.js",
+  "parish_pickers.js",
+  "copilot.js",
+  "toolbar_playbook.js",
+  "click-chain.js",
+  "isolated.js",
+  "content.js",
+];
 
 function setStatusText(text) {
   statusEl.textContent = text;
+}
+
+function sleep(ms) {
+  return new Promise((resolve) => setTimeout(resolve, ms));
 }
 
 function formatDispatchError(result) {
@@ -17,12 +33,70 @@ function formatDispatchError(result) {
     return "Page script bridge failed to load. Refresh the page and try again.";
   }
   if (result.reason === "receiver_unavailable") {
+    const detail = String(result.error || "").trim();
+    if (detail) {
+      return `${detail} Refresh the tab, or click the toolbar icon again, then retry.`;
+    }
     return "Page bridge not responding. Refresh the tab, or click the toolbar icon again, then retry.";
   }
   if (result.reason === "tab_not_found") {
     return "Could not access active tab.";
   }
   return `Could not communicate with page. ${result.error || "Try refreshing."}`;
+}
+
+async function tabsSend(tabId, message) {
+  try {
+    return await chrome.tabs.sendMessage(tabId, message);
+  } catch (err) {
+    return { ok: false, error: String(err) };
+  }
+}
+
+async function injectFiles(tabId, files) {
+  try {
+    await chrome.scripting.executeScript({
+      target: { tabId, allFrames: false },
+      files,
+      world: "ISOLATED",
+    });
+    return { ok: true };
+  } catch (err) {
+    return { ok: false, error: String(err) };
+  }
+}
+
+async function ensureTabBridge(tabId) {
+  let ping = await tabsSend(tabId, { type: "ph_ping" });
+  if (!ping?.ok) {
+    const bridgeInject = await injectFiles(tabId, TRAINER_BRIDGE_FILES);
+    if (!bridgeInject.ok) {
+      return { ok: false, reason: "inject_failed", error: bridgeInject.error || "Could not inject page bridge." };
+    }
+    for (let attempt = 0; attempt < 40; attempt++) {
+      ping = await tabsSend(tabId, { type: "ph_ping" });
+      if (ping?.ok) break;
+      await sleep(100);
+    }
+  }
+  if (!ping?.ok) {
+    return { ok: false, reason: "receiver_unavailable", error: "Page bridge did not start on this tab." };
+  }
+
+  let ready = await tabsSend(tabId, { type: "ph_bridge_ready" });
+  if (!ready?.ok) {
+    const heavyInject = await injectFiles(tabId, TRAINER_HEAVY_FILES);
+    if (!heavyInject.ok) {
+      return { ok: false, reason: "inject_failed", error: heavyInject.error || "Could not inject trainer scripts." };
+    }
+    for (let attempt = 0; attempt < 80; attempt++) {
+      ready = await tabsSend(tabId, { type: "ph_bridge_ready" });
+      if (ready?.ok) break;
+      await sleep(150);
+    }
+  }
+
+  return { ok: true, partial: !ready?.ok };
 }
 
 async function dispatchToActiveTab(message) {
@@ -32,6 +106,16 @@ async function dispatchToActiveTab(message) {
   }
   if (!/^https?:\/\//i.test(tab.url || "")) {
     return { ok: false, reason: "unsupported_url" };
+  }
+
+  const bridge = await ensureTabBridge(tab.id);
+  if (!bridge.ok) {
+    return bridge;
+  }
+
+  const direct = await tabsSend(tab.id, message);
+  if (direct?.ok) {
+    return direct;
   }
 
   return await new Promise((resolve) => {
@@ -51,16 +135,17 @@ async function dispatchToActiveTab(message) {
           });
           return;
         }
-        resolve(result || { ok: false, reason: "dispatch_error" });
+        resolve(result || { ok: false, reason: "dispatch_error", error: direct?.error || "no_explicit_ok_from_page" });
       }
     );
   });
 }
 
 async function sendToActiveTab(message) {
+  setStatusText("Connecting to page…");
   let result = await dispatchToActiveTab(message);
   if (!result?.ok && result.reason === "receiver_unavailable") {
-    await new Promise((resolve) => setTimeout(resolve, 500));
+    await sleep(800);
     result = await dispatchToActiveTab(message);
   }
   if (!result?.ok) {
@@ -73,7 +158,7 @@ async function sendToActiveTab(message) {
   }
 
   if (message.type === "show_toolbar") {
-    setStatusText("Toolbar shown.");
+    setStatusText(result.full === false ? "Toolbar loading on page…" : "Toolbar shown.");
   }
 }
 
@@ -81,6 +166,13 @@ document.getElementById("open-operator").addEventListener("click", () => {
   chrome.tabs.create({ url: chrome.runtime.getURL("sidepanel.html") });
   setStatusText("Opened operator console.");
 });
+
+const showToolbarBtn = document.getElementById("show-toolbar");
+if (showToolbarBtn) {
+  showToolbarBtn.addEventListener("click", () => {
+    void sendToActiveTab({ type: "show_toolbar" });
+  });
+}
 
 // ── GitHub Settings ────────────────────────────────────────────────────────
 
@@ -120,7 +212,6 @@ const diagBtn = document.getElementById("run-diag");
 const diagResultsEl = document.getElementById("diag-results");
 const diagCopyBtn = document.getElementById("diag-copy");
 
-// Holds plain-text lines for "Copy diagnostic info (paste to AI)"
 let _diagTextLines = [];
 const _diagCopyButtonLabel = "📋 Copy diagnostic info (paste to AI)";
 
@@ -137,21 +228,7 @@ function _addDiagRow(icon, text) {
   return row;
 }
 
-function _updateDiagRow(row, icon, text) {
-  if (!row) return;
-  row.children[0].textContent = icon + " ";
-  row.children[1].textContent = text;
-}
-
-function _maskGeminiKey(value) {
-  const key = String(value || "").trim();
-  if (!key) return "no";
-  if (key.length <= 8) return "****";
-  return `${key.slice(0, 4)}…${key.slice(-4)}`;
-}
-
 function _clipLinesTo4000Chars(lines) {
-  // Keep the copied dump comfortably under ~4 KB for easy paste into chat tools.
   const safeLines = [];
   let used = 0;
   let truncated = false;
@@ -199,6 +276,19 @@ async function runDiagnostics() {
   const activeTabUrlLine = `Active tab URL: ${activeTabIsHttp ? activeUrl : "n/a — extension tab"}`;
   const activeTabTypeLine = `Active tab is real http(s) page: ${activeTabIsHttp ? "yes" : "no"}`;
 
+  let bridgeLine = "Page bridge ping: n/a";
+  if (activeTab?.id && activeTabIsHttp) {
+    const bridge = await ensureTabBridge(activeTab.id);
+    if (bridge.ok) {
+      const ready = await tabsSend(activeTab.id, { type: "ph_bridge_ready" });
+      bridgeLine = ready?.ok
+        ? "Page bridge ping: ok (full toolbar ready)"
+        : "Page bridge ping: ok (stub toolbar only — wait a few seconds)";
+    } else {
+      bridgeLine = `Page bridge ping: failed (${bridge.error || bridge.reason || "unknown"})`;
+    }
+  }
+
   const allLocalStorage = await new Promise((resolve) => chrome.storage.local.get(null, resolve));
   const pat = typeof allLocalStorage.gh_pat === "string" ? allLocalStorage.gh_pat.trim() : "";
   const repo = phResolveGhRepo(allLocalStorage.gh_repo);
@@ -208,28 +298,6 @@ async function runDiagnostics() {
   const repoLine = `GitHub repo configured: ${repo}`;
   const patternLine = "Pattern learning: HTML fingerprint scan + parishes/site_patterns.json on GitHub";
 
-  const debug = allLocalStorage.ph_parish_detect_debug;
-  const parishDetectLines = [];
-  if (debug && typeof debug === "object") {
-    parishDetectLines.push(`Parish page hostname: ${debug.hostname || "n/a"}`);
-    parishDetectLines.push(`Inferred parish key: ${debug.inferredKey || debug.resolvedKey || "n/a"}`);
-    parishDetectLines.push(`Recording start host: ${debug.recordingHost || "n/a"}`);
-    parishDetectLines.push(
-      `Stale-session mismatch: ${debug.mismatch ? "YES (fixed in v1.34.3+)" : "no"}`
-    );
-  } else if (activeTabIsHttp) {
-    try {
-      const host = new URL(activeUrl).hostname.toLowerCase().replace(/^www\d*\./, "");
-      const key = host.split(".")[0] || "";
-      parishDetectLines.push(`Inferred parish key (from tab URL): ${key || "n/a"}`);
-      parishDetectLines.push("Parish detect debug: open the parish page toolbar once, then re-run diagnostics");
-    } catch (_e) {
-      parishDetectLines.push("Parish detect debug: unavailable");
-    }
-  } else {
-    parishDetectLines.push("Parish detect debug: n/a (not on a parish webpage)");
-  }
-
   const dumpLines = _clipLinesTo4000Chars([
     "Parish Trainer diagnostic dump",
     "============================",
@@ -237,10 +305,10 @@ async function runDiagnostics() {
     userAgentLine,
     activeTabUrlLine,
     activeTabTypeLine,
+    bridgeLine,
     patLine,
     repoLine,
     patternLine,
-    ...parishDetectLines,
     "Paste this whole block to your AI assistant.",
   ]);
   _diagTextLines = dumpLines;
@@ -248,12 +316,10 @@ async function runDiagnostics() {
   _addDiagRow("ℹ️", versionLine);
   _addDiagRow("📄", activeTabUrlLine);
   _addDiagRow("🔍", activeTabTypeLine);
+  _addDiagRow("🌉", bridgeLine);
   _addDiagRow("🔐", patLine);
   _addDiagRow("📦", repoLine);
   _addDiagRow("📚", patternLine);
-  for (const line of parishDetectLines) {
-    _addDiagRow("📍", line);
-  }
   _addDiagRow("📋", "Diagnostic text is ready to copy.");
 
   if (diagCopyBtn) diagCopyBtn.style.display = "";
@@ -274,7 +340,6 @@ if (diagCopyBtn) {
       diagCopyBtn.textContent = "✅ Copied!";
       setTimeout(() => { diagCopyBtn.textContent = _diagCopyButtonLabel; }, 2000);
     }).catch((_e) => {
-      console.error("Parish Trainer: clipboard copy failed:", _e);
       diagCopyBtn.textContent = "❌ Copy failed";
       setTimeout(() => { diagCopyBtn.textContent = _diagCopyButtonLabel; }, 2000);
     });
@@ -282,5 +347,3 @@ if (diagCopyBtn) {
 }
 
 void sendToActiveTab({ type: "show_toolbar" });
-void dispatchToActiveTab({ type: "ping" });
-void dispatchToActiveTab({ type: "ph_ping" });

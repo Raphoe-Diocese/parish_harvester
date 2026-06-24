@@ -1,0 +1,149 @@
+(() => {
+  if (globalThis.__phBridgeInstalled) {
+    return;
+  }
+  globalThis.__phBridgeInstalled = true;
+
+  const TOOLBAR_ID = "ph-floating-toolbar";
+  let dispatch = null;
+  const pendingUpgrades = [];
+
+  const isPing = (type) => type === "ph_ping" || type === "ping";
+  const isToolbarMessage = (type) => type === "show_toolbar" || type === "toggle_toolbar" || type === "ph_show_toolbar";
+
+  const _getStubToolbar = () => document.getElementById(TOOLBAR_ID);
+
+  const _showStubToolbar = () => {
+    let bar = _getStubToolbar();
+    if (!bar) {
+      bar = document.createElement("div");
+      bar.id = TOOLBAR_ID;
+      bar.dataset.phStub = "1";
+      bar.style.cssText = [
+        "position:fixed",
+        "top:16px",
+        "right:16px",
+        "z-index:2147483647",
+        "display:flex",
+        "flex-direction:column",
+        "gap:8px",
+        "min-width:220px",
+        "max-width:320px",
+        "padding:10px 12px",
+        "border-radius:10px",
+        "background:#111827",
+        "color:#f9fafb",
+        "border:1px solid #374151",
+        "box-shadow:0 10px 30px rgba(0,0,0,.35)",
+        "font:12px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif",
+      ].join(";");
+      bar.innerHTML = [
+        '<div style="font-weight:600;font-size:13px;">Parish Trainer</div>',
+        '<div id="ph-stub-status" style="opacity:.9;">Loading toolbar on this page…</div>',
+      ].join("");
+      (document.documentElement || document.body || document).appendChild(bar);
+    }
+    bar.dataset.phHidden = "false";
+    bar.style.display = "flex";
+    return bar;
+  };
+
+  const _handleStubToolbar = (type) => {
+    const bar = _getStubToolbar();
+    if (type === "toggle_toolbar" && bar && bar.dataset.phHidden !== "true" && bar.style.display !== "none") {
+      bar.dataset.phHidden = "true";
+      bar.style.display = "none";
+      return;
+    }
+    _showStubToolbar();
+  };
+
+  const _upgradeToolbar = (message) => {
+    if (!dispatch) {
+      pendingUpgrades.push(message);
+      return;
+    }
+    try {
+      dispatch(message, () => {});
+    } catch (_err) {
+      // Stub toolbar remains visible if the full trainer fails to mount.
+    }
+  };
+
+  const _flushPendingUpgrades = () => {
+    if (!dispatch) return;
+    while (pendingUpgrades.length) {
+      const message = pendingUpgrades.shift();
+      if (!message) continue;
+      _upgradeToolbar(message);
+    }
+  };
+
+  const _waitForDispatch = (message, sendResponse, attempt = 0) => {
+    if (dispatch) {
+      try {
+        dispatch(message, sendResponse);
+      } catch (err) {
+        try {
+          sendResponse({ ok: false, reason: String(err) });
+        } catch (_e) {
+          // Response channel may already be closed.
+        }
+      }
+      return;
+    }
+    if (attempt >= 180) {
+      try {
+        sendResponse({
+          ok: false,
+          reason: "Parish Trainer did not finish loading on this page. Refresh the tab, then open the extension again.",
+        });
+      } catch (_e) {
+        // no-op
+      }
+      return;
+    }
+    setTimeout(() => _waitForDispatch(message, sendResponse, attempt + 1), 100);
+  };
+
+  globalThis.__phBridgeSetDispatch = (fn) => {
+    dispatch = typeof fn === "function" ? fn : null;
+    _flushPendingUpgrades();
+    const stub = _getStubToolbar();
+    if (stub?.dataset?.phStub === "1") {
+      const status = stub.querySelector("#ph-stub-status");
+      if (status) status.textContent = "Upgrading to full trainer…";
+    }
+  };
+
+  if (typeof chrome !== "undefined" && chrome.runtime?.onMessage) {
+    chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+      const type = message?.type;
+      if (type === "ph_bridge_ready") {
+        sendResponse({ ok: Boolean(dispatch) });
+        return true;
+      }
+      if (isPing(type)) {
+        sendResponse({ ok: true, bridge_ready: Boolean(dispatch) });
+        return true;
+      }
+      if (isToolbarMessage(type)) {
+        _handleStubToolbar(type);
+        _upgradeToolbar(message);
+        sendResponse({ ok: true, toolbar: true, full: Boolean(dispatch) });
+        return true;
+      }
+      if (!dispatch) {
+        _waitForDispatch(message, sendResponse);
+        return true;
+      }
+      try {
+        const keepChannel = dispatch(message, sendResponse);
+        return keepChannel !== false;
+      } catch (err) {
+        sendResponse({ ok: false, reason: String(err) });
+        return true;
+      }
+    });
+  }
+})();
