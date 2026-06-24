@@ -137,8 +137,9 @@
     };
   };
 
-  const fingerprintFromRecipe = (recipe = {}) => {
-    const steps = Array.isArray(recipe.steps) ? recipe.steps : [];
+  const fingerprintFromRecipe = (recipe) => {
+    const safeRecipe = recipe && typeof recipe === "object" ? recipe : {};
+    const steps = Array.isArray(safeRecipe.steps) ? safeRecipe.steps : [];
     const actions = steps.map((s) => String(s?.action || "").trim().toLowerCase()).filter(Boolean);
     const hasClick = actions.includes("click");
     const hasDownload = actions.includes("download");
@@ -148,8 +149,8 @@
     const clickCount = actions.filter((a) => a === "click").length;
 
     let recipeFlow = "mixed";
-    const siteType = String(recipe.site_type || "");
-    const playbookType = String(recipe.playbook_type || "");
+    const siteType = String(safeRecipe.site_type || "");
+    const playbookType = String(safeRecipe.playbook_type || "");
     if (siteType.includes("oneweb") || playbookType === "oneweb_docx") {
       recipeFlow = "direct_docx";
     } else if (siteType.includes("mdocs") || playbookType.includes("mdocs")) {

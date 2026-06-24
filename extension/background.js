@@ -410,7 +410,8 @@ function _isBadBulletinDownloadUrl(url, startUrl) {
   return false;
 }
 
-function _recipeLooksLikeMdocs(recipe = {}) {
+function _recipeLooksLikeMdocs(recipe) {
+  if (!recipe || typeof recipe !== "object") return false;
   if (String(recipe.site_type || "").includes("mdocs")) return true;
   if (String(recipe.playbook_type || "").includes("mdocs")) return true;
   return (Array.isArray(recipe.steps) ? recipe.steps : []).some((step) => {

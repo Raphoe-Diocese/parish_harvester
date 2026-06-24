@@ -201,7 +201,8 @@
       (step) => String(step?.action || "").trim() === "image_stack"
     );
 
-  const _recipeLooksLikeMdocs = (recipe = {}) => {
+  const _recipeLooksLikeMdocs = (recipe) => {
+    if (!recipe || typeof recipe !== "object") return false;
     if (String(recipe.site_type || "").includes("mdocs")) return true;
     if (String(recipe.playbook_type || "").includes("mdocs")) return true;
     return (Array.isArray(recipe.steps) ? recipe.steps : []).some((step) => {
@@ -210,7 +211,8 @@
     });
   };
 
-  const _recipeLooksLikeDropfiles = (recipe = {}) => {
+  const _recipeLooksLikeDropfiles = (recipe) => {
+    if (!recipe || typeof recipe !== "object") return false;
     if (String(recipe.site_type || "").includes("dropfiles")) return true;
     return (Array.isArray(recipe.steps) ? recipe.steps : []).some((step) =>
       /mod_downloadlink/i.test(String(step?.selector || ""))
@@ -218,21 +220,22 @@
   };
 
   const getForPageType = (pageType, recipe = null, pageCtx = null) => {
+    const safeRecipe = recipe && typeof recipe === "object" ? recipe : {};
     const key = String(pageType || "").trim();
     const fpId = String(pageCtx?.htmlFingerprint || "").trim();
-    if (fpId === "mdocs_bulletin_table" || _recipeLooksLikeMdocs(recipe)) {
+    if (fpId === "mdocs_bulletin_table" || _recipeLooksLikeMdocs(safeRecipe)) {
       return CATALOG.mdocs_download_list;
     }
     if (fpId === "wp_block_file_bulletin" || key === "wp_block_file_bulletin") {
       return CATALOG.wp_block_file_bulletin;
     }
-    if (fpId === "joomla_dropfiles_weekly" || _recipeLooksLikeDropfiles(recipe)) {
+    if (fpId === "joomla_dropfiles_weekly" || _recipeLooksLikeDropfiles(safeRecipe)) {
       return CATALOG.joomla_dropfiles;
     }
-    if (fpId === "stacked_image_bulletin" || (recipe && _recipeUsesImageStack(recipe))) {
+    if (fpId === "stacked_image_bulletin" || _recipeUsesImageStack(safeRecipe)) {
       return CATALOG.stacked_image_bulletin;
     }
-    if (recipe && _recipeUsesDatedPdfPath(recipe)) {
+    if (_recipeUsesDatedPdfPath(safeRecipe)) {
       return CATALOG.dated_pdf_bulletin;
     }
     if (key === "pdf_link_list" || key === "pdf_links") {

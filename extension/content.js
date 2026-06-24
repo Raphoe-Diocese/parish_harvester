@@ -330,6 +330,46 @@
     };
   };
 
+  const _openBulletinInNewTabNow = (absUrl, selectedEl) => {
+    if (!absUrl) return false;
+    try {
+      const link = document.createElement("a");
+      link.href = absUrl;
+      link.target = "_blank";
+      link.rel = "noopener noreferrer";
+      link.style.display = "none";
+      document.body.appendChild(link);
+      link.click();
+      link.remove();
+      return true;
+    } catch (_e) {
+      // try element click next
+    }
+    if (selectedEl instanceof Element) {
+      const anchor =
+        selectedEl.closest("a[href]") || (selectedEl.tagName === "A" ? selectedEl : null);
+      if (anchor) {
+        const prevTarget = anchor.getAttribute("target");
+        anchor.setAttribute("target", "_blank");
+        try {
+          anchor.click();
+          if (prevTarget == null) anchor.removeAttribute("target");
+          else anchor.setAttribute("target", prevTarget);
+          return true;
+        } catch (_e2) {
+          if (prevTarget == null) anchor.removeAttribute("target");
+          else anchor.setAttribute("target", prevTarget);
+        }
+      }
+    }
+    try {
+      const popup = window.open(absUrl, "_blank", "noopener,noreferrer");
+      return Boolean(popup);
+    } catch (_e3) {
+      return false;
+    }
+  };
+
   const _openUrlInRecordingTab = async (absUrl, showStatus) => {
     if (!absUrl || typeof chrome === "undefined" || !chrome.runtime?.sendMessage) return false;
     try {
@@ -361,29 +401,26 @@
 
   const _navigateRecordingToUrl = async (absUrl, selectedEl, showStatus) => {
     if (!absUrl) return false;
+
+    // Open synchronously first — async awaits below break the user-gesture chain
+    // and Chrome blocks window.open after recording/persist delays.
+    if (_openBulletinInNewTabNow(absUrl, selectedEl)) {
+      if (showStatus) {
+        showStatus(
+          _isPdfOrDocUrl(absUrl)
+            ? "✅ Step saved — bulletin opened in a new tab."
+            : "✅ Step saved — extension continues in the new tab.",
+          "ok"
+        );
+      }
+      void _persistRecordingSession({ pendingUrl: absUrl });
+      return true;
+    }
+
     await _persistRecordingSession({ pendingUrl: absUrl });
 
-    // Recipe training: always open the bulletin in a new tab so the news page
-    // stays open and the extension can continue on the PDF/intermediate page.
     const opened = await _openUrlInRecordingTab(absUrl, showStatus);
     if (opened) return true;
-
-    try {
-      const popup = window.open(absUrl, "_blank", "noopener,noreferrer");
-      if (popup) {
-        if (showStatus) {
-          showStatus(
-            _isPdfOrDocUrl(absUrl)
-              ? "✅ Step saved — bulletin opened in a new tab."
-              : "✅ Step saved — extension continues in the new tab.",
-            "ok"
-          );
-        }
-        return true;
-      }
-    } catch (_e) {
-      // Pop-up blocked — fall through to same-tab navigation.
-    }
 
     if (showStatus) {
       showStatus(
@@ -3904,6 +3941,7 @@
     };
 
     const _refreshGuidedContext = () => {
+      try {
       const stepCount = _standaloneRecipeSteps().length;
       const pageCtx = detectPageType();
       compactPageHint.textContent = pageCtx.summary || "";
@@ -4039,7 +4077,7 @@
           const plan = window.ph_playbook.getPlan(pageCtx, planState);
           window.ph_playbook.renderJourneyBar(journeyStepBar, plan.journeyStep);
         }
-        const mem = window.ph_site_memory?.getForPageType?.(pageCtx.type);
+        const mem = window.ph_site_memory?.getForPageType?.(pageCtx.type, null, pageCtx);
         if (mem && playbookPanel.nextSibling?.dataset?.phMemory !== "1") {
           let memoryEl = playbookPanel.querySelector("[data-ph-memory='1']");
           if (!memoryEl) {
@@ -4054,6 +4092,12 @@
       }
       if (pinLinkBtn) {
         pinLinkBtn.style.display = "none";
+      }
+      } catch (guidedErr) {
+        console.error("[Parish Trainer] guided context refresh failed:", guidedErr);
+        if (globalThis.ph_toolbar_diag?.setError) {
+          globalThis.ph_toolbar_diag.setError(`Guided panel: ${guidedErr}`);
+        }
       }
     };
 
@@ -4155,14 +4199,16 @@
       btnRow.style.cssText = "display:flex;gap:5px;flex-wrap:wrap;flex-direction:column;";
 
       const _recordClickAndMaybeOpen = async (openLink) => {
-        const rawHref = selectedEl.getAttribute("href") || "";
-        let absUrl = "";
-        if (rawHref) {
-          try {
-            absUrl = new URL(rawHref, window.location.href).href;
-          } catch (_e) {
-            showStatus("❌ Could not read that link.", "error");
-            return;
+        let absUrl = _hrefFromBulletinClick(selectedEl) || "";
+        if (!absUrl) {
+          const rawHref = selectedEl.getAttribute("href") || "";
+          if (rawHref) {
+            try {
+              absUrl = new URL(rawHref, window.location.href).href;
+            } catch (_e) {
+              showStatus("❌ Could not read that link.", "error");
+              return;
+            }
           }
         }
 
