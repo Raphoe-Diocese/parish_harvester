@@ -6,6 +6,16 @@
   "start_url": "https://threepatrons.org/",
   "steps": [
     {
+      "action": "goto",
+      "url": "https://threepatrons.org/"
+    },
+    {
+      "action": "click",
+      "selector": "input#mod-finder-searchword-header",
+      "href": "",
+      "text": ""
+    },
+    {
       "action": "click",
       "selector": "div > div:nth-of-type(1) > div > div:nth-of-type(1) > h3 > a",
       "href": "https://threepatrons.org/files/10/Weekly-Bulletins/105/Sunday-21st-June-2026",
@@ -13,24 +23,23 @@
     },
     {
       "action": "download",
-      "url": "https://threepatrons.org/files/10/Weekly-Bulletins/105/Sunday-21st-June-2026"
+      "url": "https://threepatrons.org/files/10/Weekly-Bulletins/105/Sunday-21st-June-2026",
+      "use_captured_url": true
     }
   ],
-  "observed_load_ms": 8700,
+  "observed_load_ms": 6039,
   "timeout_ms": 45000,
-  "total_timeout_s": 99,
+  "total_timeout_s": 101,
   "playbook_type": "weekly_bulletin_download",
-  "site_type": "sequential_bulletin_number",
-  "auto_direct": true,
+  "site_type": "joomla_dropfiles",
   "operator_notes": [
-    "Homepage shows dated rows — click the cloud download on this Sunday's bulletin.",
-    "PDF downloads automatically; trainer records the download URL.",
-    "Harvester advances /Weekly-Bulletins/NNN/ by weeks since the example date.",
-    "Joomla Dropfiles widget: cloud icon is a.mod_downloadlink — clicking the icon inside still counts."
+    "Joomla Dropfiles — cloud ↓ icon (a.mod_downloadlink) serves Word .docx.",
+    "Click the cloud on this Sunday's row — harvester converts docx → PDF automatically.",
+    "Do not record diocese GDPR/Privacy PDFs — only mod_downloadlink on the parish host."
   ],
   "do_not": [
-    "Do not use Pick bulletin image — this is a PDF download site.",
-    "Do not stop at click-only — need a download capture step."
+    "Do not save a download URL from downandconnor.org or other diocese admin PDFs.",
+    "Do not use Pick bulletin image — this is a file download site."
   ],
   "recorded_date": "2026-06-24"
 }
