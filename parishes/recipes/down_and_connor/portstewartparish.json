@@ -1,28 +1,37 @@
 {
+  "version": 1,
   "parish_key": "portstewartparish",
   "display_name": "Portstewart",
-  "recorded_date": "2026-04-30",
-  "start_url": "https://portstewartparish.website/bulletins/",
+  "diocese": "down_and_connor",
+  "start_url": "https://portstewartparish.website/weekly-bulletin/",
   "steps": [
     {
       "action": "goto",
-      "url": "https://portstewartparish.website/bulletins/"
+      "url": "https://portstewartparish.website/weekly-bulletin/"
     },
     {
       "action": "click",
-      "selector": "a[href$='.docx']",
-      "fallback_selectors": [
-        "a[href*='weekly'][href$='.pdf']",
-        "a[href$='.pdf']",
-        "a[href*='.pdf']",
-        "aside#colormag_125x125_advertisement_widget-2 > div > div > a:nth-of-type(2)"
-      ]
+      "selector": "a:has-text(\"Download\")",
+      "href": "https://portstewartparish.website/?mdocs-file=9456",
+      "text": "21st June 2026 - 21st June 2026.pdf 62 downloads Download | "
     },
     {
-      "action": "download",
-      "url_pattern": "*.pdf"
+      "action": "print_to_pdf"
     }
   ],
-  "diocese": "down_and_connor",
-  "timeout": 30000
+  "observed_load_ms": 11516,
+  "timeout_ms": 45000,
+  "total_timeout_s": 117,
+  "playbook_type": "wix_html",
+  "site_type": "html_text_bulletin",
+  "operator_notes": [
+    "Bulletin text is on the web page — not a downloadable PDF file.",
+    "Use Save page as PDF on the newsletter article page.",
+    "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
+  ],
+  "do_not": [
+    "Do not use Pick bulletin image when the page is mostly text paragraphs.",
+    "Do not stop at click-only — need print_to_pdf as the final step."
+  ],
+  "recorded_date": "2026-06-24"
 }
