@@ -1,44 +1,36 @@
 {
+  "version": 1,
   "parish_key": "threepatrons",
-  "display_name": "Three Patrons",
-  "recorded_date": "2026-06-15",
-  "start_url": "https://threepatrons.org/",
+  "display_name": "The Three Patrons Parish (Pennyburn / Carnhill / Galliagh)",
   "diocese": "derry",
-  "playbook_type": "weekly_bulletin_download",
-  "site_type": "sequential_bulletin_number",
-  "disable_html_render_fallback": true,
-  "operator_notes": [
-    "Homepage shows dated rows \u2014 click the cloud download on this Sunday's bulletin.",
-    "PDF downloads automatically; the trainer records that download URL.",
-    "Harvester advances /Weekly-Bulletins/NNN/ by weeks since the example date.",
-    "Joomla Dropfiles widget: cloud icon is a.mod_downloadlink \u2014 clicking the icon inside still counts."
-  ],
-  "do_not": [
-    "Do not use Pick bulletin image \u2014 this is a PDF download site.",
-    "Do not stop at click-only \u2014 need a download capture step.",
-    "Do not rely on homepage print-to-PDF \u2014 site blocks bare HTTP downloads."
-  ],
+  "start_url": "https://threepatrons.org/",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://threepatrons.org/"
-    },
-    {
       "action": "click",
-      "selector": "a.mod_downloadlink[href]",
-      "fallback_selectors": [
-        ".mod_dropfiles_latest a.mod_downloadlink",
-        "a[href*='Weekly-Bulletins']"
-      ]
+      "selector": "div > div:nth-of-type(1) > div > div:nth-of-type(1) > h3 > a",
+      "href": "https://threepatrons.org/files/10/Weekly-Bulletins/105/Sunday-21st-June-2026",
+      "text": "Sunday 21st June 2026"
     },
     {
       "action": "download",
-      "url_pattern": "*.pdf"
+      "url": "https://threepatrons.org/files/10/Weekly-Bulletins/105/Sunday-21st-June-2026"
     }
   ],
-  "version": 1,
+  "observed_load_ms": 8700,
+  "timeout_ms": 45000,
+  "total_timeout_s": 99,
+  "playbook_type": "weekly_bulletin_download",
+  "site_type": "sequential_bulletin_number",
   "auto_direct": true,
-  "timeout_ms": 90000,
-  "recorded_bulletin_number": 104,
-  "auto_fixed": true
+  "operator_notes": [
+    "Homepage shows dated rows — click the cloud download on this Sunday's bulletin.",
+    "PDF downloads automatically; trainer records the download URL.",
+    "Harvester advances /Weekly-Bulletins/NNN/ by weeks since the example date.",
+    "Joomla Dropfiles widget: cloud icon is a.mod_downloadlink — clicking the icon inside still counts."
+  ],
+  "do_not": [
+    "Do not use Pick bulletin image — this is a PDF download site.",
+    "Do not stop at click-only — need a download capture step."
+  ],
+  "recorded_date": "2026-06-24"
 }
