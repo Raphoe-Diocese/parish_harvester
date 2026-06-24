@@ -193,10 +193,23 @@
         return true;
       }
       if (isToolbarMessage(type)) {
+        if (dispatch) {
+          try {
+            dispatch(message, sendResponse);
+            return true;
+          } catch (err) {
+            if (globalThis.ph_toolbar_diag?.setError) {
+              globalThis.ph_toolbar_diag.setError(String(err));
+            }
+            _handleStubToolbar(type);
+            sendResponse({ ok: true, toolbar: true, full: false, reason: String(err) });
+            return true;
+          }
+        }
         _handleStubToolbar(type);
         _upgradeToolbar(message);
         const bar = _getToolbarEl();
-        sendResponse({ ok: true, toolbar: Boolean(bar), full: Boolean(dispatch) });
+        sendResponse({ ok: true, toolbar: Boolean(bar), full: false });
         return true;
       }
       if (!dispatch) {

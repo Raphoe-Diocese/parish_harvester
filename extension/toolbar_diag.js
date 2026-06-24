@@ -49,16 +49,13 @@
     }
 
     let bridgePing = null;
-    if (typeof chrome !== "undefined" && chrome.runtime?.sendMessage) {
-      try {
-        bridgePing = await new Promise((resolve) => {
-          chrome.runtime.sendMessage({ type: "ph_ping" }, (res) => {
-            resolve(res || { ok: false, error: chrome.runtime?.lastError?.message || "no response" });
-          });
-        });
-      } catch (err) {
-        bridgePing = { ok: false, error: String(err) };
-      }
+    try {
+      bridgePing = {
+        ok: Boolean(globalThis.__phBridgeInstalled),
+        bridge_ready: Boolean(globalThis.__phContentDispatch),
+      };
+    } catch (err) {
+      bridgePing = { ok: false, error: String(err) };
     }
 
     const stepsCount =
@@ -77,7 +74,8 @@
       mount_connected: Boolean(mount?.isConnected),
       toolbar_present: Boolean(bar),
       toolbar_connected: Boolean(bar?.isConnected),
-      toolbar_mode: bar?.dataset?.phStub === "1" ? "stub" : bar ? "full" : "missing",
+      toolbar_mode: bar?.dataset?.phStub === "1" ? "stub" : bar?.dataset?.phMinimal === "1" ? "minimal" : bar ? "full" : "missing",
+      toolbar_minimal: bar?.dataset?.phMinimal === "1",
       toolbar_display: bar?.style?.display || "n/a",
       toolbar_hidden: bar?.dataset?.phHidden || "n/a",
       toolbar_rect: rect
@@ -110,6 +108,7 @@
       _line("Mount on page", d.mount_present ? (d.mount_connected ? "yes (connected)" : "yes (detached)") : "no"),
       _line("Toolbar element", d.toolbar_present ? (d.toolbar_connected ? "yes (connected)" : "yes (detached)") : "MISSING"),
       _line("Toolbar mode", d.toolbar_mode || "n/a"),
+      d.toolbar_minimal ? _line("Minimal trainer", "yes (full UI failed — simplified buttons active)") : null,
       _line("Toolbar display", d.toolbar_display || "n/a"),
       _line("Toolbar on screen", d.toolbar_on_screen ? "yes" : "NO — likely hidden or zero size"),
       _line("Toolbar rect", d.toolbar_rect || "n/a"),

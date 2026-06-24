@@ -928,6 +928,37 @@
       let created = null;
       try {
         created = createToolbar();
+      } catch (fullErr) {
+        console.error("[Parish Trainer] createToolbar failed:", fullErr);
+        if (globalThis.ph_toolbar_diag?.setError) {
+          globalThis.ph_toolbar_diag.setError(`Full toolbar failed: ${fullErr}`);
+        }
+        try {
+          created =
+            typeof globalThis.__phCreateMinimalToolbar === "function"
+              ? globalThis.__phCreateMinimalToolbar()
+              : createMinimalToolbar();
+        } catch (minErr) {
+          console.error("[Parish Trainer] minimal toolbar failed:", minErr);
+          if (globalThis.ph_toolbar_diag?.setError) {
+            globalThis.ph_toolbar_diag.setError(`Minimal toolbar failed: ${minErr}`);
+          }
+          if (stubNode) {
+            const status = stubNode.querySelector("#ph-stub-status");
+            if (status) {
+              status.textContent = `Trainer error: ${minErr}`;
+              status.style.color = "#fca5a5";
+            }
+            stubNode.style.borderColor = "#ef4444";
+            node = stubNode;
+            toolbar = stubNode;
+          } else {
+            throw minErr;
+          }
+          created = null;
+        }
+      }
+      if (created) {
         const mount = _getToolbarMount();
         created.style.pointerEvents = "auto";
         mount.appendChild(created);
@@ -935,23 +966,6 @@
         toolbar = node;
         if (stubNode?.parentNode) {
           stubNode.parentNode.removeChild(stubNode);
-        }
-      } catch (err) {
-        console.error("[Parish Trainer] createToolbar failed:", err);
-        if (globalThis.ph_toolbar_diag?.setError) {
-          globalThis.ph_toolbar_diag.setError(String(err));
-        }
-        if (stubNode) {
-          const status = stubNode.querySelector("#ph-stub-status");
-          if (status) {
-            status.textContent = `Trainer error: ${String(err)}`;
-            status.style.color = "#fca5a5";
-          }
-          stubNode.style.borderColor = "#ef4444";
-          node = stubNode;
-          toolbar = stubNode;
-        } else {
-          throw err;
         }
       }
     }
@@ -3205,6 +3219,147 @@
     if (btn) { try { btn.click(); } catch (_e) {} }
   };
 
+  // ── createMinimalToolbar (fallback when full UI fails) ────────────────────
+
+  const createMinimalToolbar = () => {
+    const bar = document.createElement("div");
+    bar.id = TOOLBAR_ID;
+    bar.dataset.phMinimal = "1";
+    bar.style.cssText = [
+      "position:fixed",
+      "top:12px",
+      "right:12px",
+      "z-index:2147483647",
+      "display:flex",
+      "flex-direction:column",
+      "gap:8px",
+      "min-width:300px",
+      "max-width:380px",
+      "padding:10px",
+      "border-radius:10px",
+      "background:#111827",
+      "color:#f9fafb",
+      "border:2px solid #16a34a",
+      "box-shadow:0 12px 40px rgba(0,0,0,.55)",
+      "font:12px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif",
+      "pointer-events:auto",
+      "max-height:calc(100vh - 24px)",
+      "overflow:auto",
+    ].join(";");
+
+    const title = document.createElement("div");
+    title.style.fontWeight = "700";
+    title.textContent = "Parish bulletin fixer (simplified)";
+    bar.appendChild(title);
+
+    let pageSummary = "Scanning page…";
+    try {
+      const ctx = detectPageType();
+      pageSummary = `${ctx.emoji || "📋"} ${ctx.summary || ctx.type || "unknown page"}`;
+    } catch (err) {
+      pageSummary = `Page scan failed: ${err}`;
+    }
+    const hint = document.createElement("div");
+    hint.style.cssText = "font-size:11px;color:#cbd5e1;";
+    hint.textContent = pageSummary;
+    bar.appendChild(hint);
+
+    const status = document.createElement("div");
+    status.style.cssText = "font-size:10px;color:#86efac;min-height:14px;";
+    const showMiniStatus = (msg, isErr = false) => {
+      status.textContent = msg;
+      status.style.color = isErr ? "#fca5a5" : "#86efac";
+    };
+    bar.appendChild(status);
+
+    const mkBtn = (label, bg, onClick) => {
+      const btn = document.createElement("button");
+      btn.type = "button";
+      btn.textContent = label;
+      btn.style.cssText = [
+        "border:none",
+        "border-radius:6px",
+        "padding:8px 10px",
+        "background:" + bg,
+        "color:#fff",
+        "cursor:pointer",
+        "font-size:11px",
+        "text-align:left",
+        "font-family:inherit",
+      ].join(";");
+      btn.addEventListener("click", onClick);
+      return btn;
+    };
+
+    bar.appendChild(
+      mkBtn("👉 Step 1: Point at bulletin link", "#16a34a", () => {
+        startPickLinkMode(
+          (el) => {
+            const selector = buildStableLinkSelector(el);
+            const href = el.getAttribute("href") || "";
+            const text = (el.innerText || el.textContent || "").trim().slice(0, 80);
+            standaloneAddStep(
+              { action: "click", selector, href, text },
+              "click",
+              `🔗 Click: "${text || selector}"`
+            );
+            showMiniStatus(`✅ Click recorded (${_standaloneRecipeSteps().length} steps)`);
+          },
+          showMiniStatus
+        );
+      })
+    );
+
+    bar.appendChild(
+      mkBtn("💾 Step 2: Save bulletin PDF", "#2563eb", () => {
+        const url = window.location.href;
+        const ctx = detectPageType();
+        if (ctx.type === "direct_pdf" || /\.pdf(\?|#|$)/i.test(url)) {
+          standaloneAddStep({ action: "download", url }, "mark_file", `📄 ${url.slice(-50)}`);
+          showMiniStatus("✅ PDF URL saved");
+          return;
+        }
+        if (ctx.type === "wix_html" || ctx.type === "html") {
+          standaloneAddStep({ action: "print_to_pdf" }, "print_to_pdf", "📰 Save page as PDF");
+          showMiniStatus("✅ Save page as PDF recorded");
+          return;
+        }
+        showMiniStatus("Point at the bulletin link first, or open the PDF page", true);
+      })
+    );
+
+    bar.appendChild(
+      mkBtn("📰 Save page as PDF (HTML bulletin)", "#7c3aed", () => {
+        standaloneAddStep({ action: "print_to_pdf" }, "print_to_pdf", "📰 Save page as PDF");
+        showMiniStatus("✅ HTML → PDF step recorded");
+      })
+    );
+
+    const stepsEl = document.createElement("div");
+    stepsEl.style.cssText = "font-size:10px;color:#9ca3af;";
+    const refreshSteps = () => {
+      const n = _standaloneRecipeSteps().length;
+      stepsEl.textContent = n ? `${n} step(s) recorded — open extension popup to Send & test` : "No steps yet";
+    };
+    refreshSteps();
+    bar.appendChild(stepsEl);
+    window.addEventListener("ph-recording-continued", refreshSteps);
+
+    if (globalThis.ph_toolbar_diag?.attachPanel) {
+      globalThis.ph_toolbar_diag.attachPanel(bar, { open: true, autoRun: true });
+    }
+
+    const closeBtn = mkBtn("✕ Hide", "#374151", () => {
+      bar.style.display = "none";
+      bar.dataset.phHidden = "true";
+    });
+    bar.appendChild(closeBtn);
+
+    return bar;
+  };
+
+  globalThis.__phCreateMinimalToolbar = createMinimalToolbar;
+
   // ── createToolbar ─────────────────────────────────────────────────────────
 
   const createToolbar = () => {
@@ -4671,7 +4826,14 @@
     guidedPanel.appendChild(stuckLink);
     updateParishRecordingLine("", "", _currentHostname());
     if (_inStandaloneMode()) _attachPageLoadTimer(pageLoadTimerLine);
-    _refreshGuidedContext();
+    try {
+      _refreshGuidedContext();
+    } catch (guidedErr) {
+      console.error("[Parish Trainer] guided context refresh failed:", guidedErr);
+      if (globalThis.ph_toolbar_diag?.setError) {
+        globalThis.ph_toolbar_diag.setError(`Guided panel: ${guidedErr}`);
+      }
+    }
 
     // guidedPanel is attached to scrollable body after recipe preview (below).
 
