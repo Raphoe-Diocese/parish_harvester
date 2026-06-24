@@ -269,10 +269,38 @@ async function runDiagnostics() {
   if (diagCopyBtn) diagCopyBtn.style.display = "none";
 
   const versionLine = `Extension version: ${chrome.runtime.getManifest().version}`;
-  const userAgentLine = `Browser user-agent: ${navigator.userAgent || "n/a"}`;
   const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
   const activeUrl = String(activeTab?.url || "").trim();
   const activeTabIsHttp = /^https?:\/\//i.test(activeUrl);
+
+  let fullReportText = "";
+  if (activeTab?.id && activeTabIsHttp) {
+    const bridge = await ensureTabBridge(activeTab.id);
+    if (bridge.ok) {
+      const diag = await tabsSend(activeTab.id, { type: "ph_run_full_diagnosis" });
+      if (diag?.ok && diag.text) {
+        fullReportText = String(diag.text);
+      }
+    }
+  }
+
+  if (fullReportText) {
+    const dumpLines = _clipLinesTo4000Chars(fullReportText.split("\n"));
+    _diagTextLines = dumpLines;
+    const preview = dumpLines.slice(0, 12);
+    for (const line of preview) {
+      if (!line.trim()) continue;
+      const icon = line.startsWith("🔴") ? "🔴" : line.startsWith("🟡") ? "🟡" : line.startsWith("🔵") ? "🔵" : "ℹ️";
+      _addDiagRow(icon, line.replace(/^[🔴🟡🔵🟢]\s*/, ""));
+    }
+    if (dumpLines.length > preview.length) {
+      _addDiagRow("ℹ️", `… ${dumpLines.length - preview.length} more lines — tap Copy for full report`);
+    }
+    if (diagCopyBtn) diagCopyBtn.style.display = "";
+    return;
+  }
+
+  const userAgentLine = `Browser user-agent: ${navigator.userAgent || "n/a"}`;
   const activeTabUrlLine = `Active tab URL: ${activeTabIsHttp ? activeUrl : "n/a — extension tab"}`;
   const activeTabTypeLine = `Active tab is real http(s) page: ${activeTabIsHttp ? "yes" : "no"}`;
 
@@ -296,11 +324,11 @@ async function runDiagnostics() {
 
   const patLine = `GitHub PAT present: ${pat ? "yes" : "no"}${ghLogin ? ` (authenticated user: ${ghLogin})` : ""}`;
   const repoLine = `GitHub repo configured: ${repo}`;
-  const patternLine = "Pattern learning: HTML fingerprint scan + parishes/site_patterns.json on GitHub";
+  const patternLine = "Open a parish website tab and run again for full diagnosis kit.";
 
   const dumpLines = _clipLinesTo4000Chars([
-    "Parish Trainer diagnostic dump",
-    "============================",
+    "Parish Trainer diagnostic dump (basic — open a parish tab for full kit)",
+    "========================================================================",
     versionLine,
     userAgentLine,
     activeTabUrlLine,

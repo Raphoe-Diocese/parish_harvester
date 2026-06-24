@@ -7465,6 +7465,25 @@
       sendResponse({ ok: true });
       return true;
     }
+    if (message.type === "ph_run_full_diagnosis") {
+      void (async () => {
+        try {
+          if (!globalThis.ph_recipe_diag?.runFullDiagnosis) {
+            sendResponse({ ok: false, reason: "Diagnosis kit not loaded — reload extension." });
+            return;
+          }
+          const report = await globalThis.ph_recipe_diag.runFullDiagnosis();
+          sendResponse({
+            ok: true,
+            text: globalThis.ph_recipe_diag.formatReport(report),
+            report,
+          });
+        } catch (err) {
+          sendResponse({ ok: false, reason: String(err) });
+        }
+      })();
+      return true;
+    }
     if (String(message?.type || "").startsWith("copilot_")) {
       void _handleCopilotMessage(message).then((result) => sendResponse(result));
       return true;
@@ -7487,6 +7506,28 @@
     _ensureToolbar(true);
     void _markRecordingActive();
   };
+
+  globalThis.__phDiagExport = () => {
+    const pageUrl = _pageUrlForParishDetection();
+    let parishKey = "";
+    try {
+      const inferred = _inferParishKeyFromUrl(pageUrl);
+      parishKey = String(inferred || "").trim().toLowerCase();
+    } catch (_e) {
+      parishKey = "";
+    }
+    return {
+      page_url: pageUrl,
+      parish_key: parishKey,
+      page_type: detectPageType(),
+      recipe_steps: _standaloneRecipeSteps(),
+      session_ui_steps: recipeSteps.length,
+      standalone_start_url: standaloneStartUrl || "",
+      in_standalone_mode: _inStandaloneMode(),
+      toolbar_visible: Boolean(_getToolbarNode() && _getToolbarNode().style.display !== "none"),
+    };
+  };
+
   document.addEventListener("ph-show-toolbar", () => {
     try {
       globalThis.__phShowToolbar();

@@ -384,6 +384,103 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   return true;
 });
 
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message?.type !== "ph_recipe_diag_github") return false;
+  (async () => {
+    try {
+      const url = String(message.url || "").trim();
+      let parishKey = String(message.parish_key || "").trim().toLowerCase();
+      const stored = await chrome.storage.local.get(["gh_repo", "ph_hostname_map"]);
+      const ghRepo = String(stored.gh_repo || "Raphoe-Diocese/parish_harvester").trim();
+      const rawBase = `https://raw.githubusercontent.com/${ghRepo}/main`;
+
+      if (!parishKey && url) {
+        try {
+          const host = new URL(url).hostname.toLowerCase();
+          const map =
+            stored.ph_hostname_map && typeof stored.ph_hostname_map === "object"
+              ? stored.ph_hostname_map
+              : {};
+          const parish = map[host];
+          parishKey = String(
+            parish?.parish_key || parish?.key || host.replace(/^www\d*\./, "").split(".")[0] || ""
+          )
+            .trim()
+            .toLowerCase()
+            .replace(/\s+/g, "_");
+        } catch (_e) {
+          parishKey = "";
+        }
+      }
+
+      let consecutive_failures = 0;
+      let last_failure_reason = "";
+      let last_harvest_status = "";
+      let recipe = null;
+      let recipe_found = false;
+
+      try {
+        const failResp = await fetch(`${rawBase}/parishes/consecutive_failures.json`);
+        if (failResp.ok) {
+          const fails = await failResp.json();
+          if (parishKey && fails && typeof fails === "object") {
+            consecutive_failures = Number(fails[parishKey] || 0);
+          }
+        }
+      } catch (_e) {
+        // non-fatal
+      }
+
+      try {
+        const reportResp = await fetch(`${rawBase}/Bulletins/report.json`);
+        if (reportResp.ok) {
+          const report = await reportResp.json();
+          const downloaded = (report.downloaded || []).find((r) => r.parish === parishKey);
+          const failed = (report.failed || []).find((r) => r.parish === parishKey);
+          if (downloaded) {
+            last_harvest_status = `downloaded (${report.target_date || "recent"})`;
+          } else if (failed) {
+            last_harvest_status = "failed";
+            last_failure_reason = String(failed.reason || failed.error || "").slice(0, 220);
+          }
+        }
+      } catch (_e) {
+        // non-fatal
+      }
+
+      if (parishKey) {
+        for (const dio of ["derry", "raphoe"]) {
+          try {
+            const recipeResp = await fetch(
+              `${rawBase}/parishes/recipes/${dio}/${parishKey}.json`
+            );
+            if (recipeResp.ok) {
+              recipe = await recipeResp.json();
+              recipe_found = true;
+              break;
+            }
+          } catch (_e) {
+            // try next diocese
+          }
+        }
+      }
+
+      sendResponse({
+        ok: true,
+        parish_key: parishKey,
+        consecutive_failures,
+        last_harvest_status,
+        last_failure_reason,
+        recipe_found,
+        recipe,
+      });
+    } catch (err) {
+      sendResponse({ ok: false, error: String(err) });
+    }
+  })();
+  return true;
+});
+
 const SITE_PATTERNS_PATH = "parishes/site_patterns.json";
 const HOST_PROFILES_PATH = "parishes/host_profiles.json";
 

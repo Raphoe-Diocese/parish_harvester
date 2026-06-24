@@ -131,13 +131,26 @@
     const output = container.querySelector(".ph-diag-output") || document.createElement("div");
     output.className = "ph-diag-output";
     output.style.cssText =
-      "margin-top:6px;font-size:9px;line-height:1.45;color:#cbd5e1;white-space:pre-wrap;word-break:break-word;max-height:140px;overflow:auto;background:#0f172a;border:1px solid #374151;border-radius:4px;padding:6px;";
+      "margin-top:6px;font-size:9px;line-height:1.45;color:#cbd5e1;white-space:pre-wrap;word-break:break-word;max-height:220px;overflow:auto;background:#0f172a;border:1px solid #374151;border-radius:4px;padding:6px;";
 
     const run = async () => {
       output.textContent = "Running diagnostics…";
-      const data = await collect();
-      output.textContent = formatLines(data).join("\n");
-      container.dataset.phDiagText = output.textContent;
+      let text = "";
+      if (globalThis.ph_recipe_diag?.runFullDiagnosis) {
+        try {
+          const report = await globalThis.ph_recipe_diag.runFullDiagnosis();
+          text = globalThis.ph_recipe_diag.formatReport(report);
+        } catch (err) {
+          setError(String(err));
+          const data = await collect();
+          text = formatLines(data).join("\n") + `\n\n❌ Full diagnosis failed: ${err}`;
+        }
+      } else {
+        const data = await collect();
+        text = formatLines(data).join("\n");
+      }
+      output.textContent = text;
+      container.dataset.phDiagText = text;
     };
 
     const btnRow = container.querySelector(".ph-diag-buttons");
@@ -209,7 +222,7 @@
     if (options.open) details.open = true;
 
     const summary = document.createElement("summary");
-    summary.textContent = "🔍 Diagnostics (bridge / visibility)";
+    summary.textContent = "🔍 Diagnosis kit (extension + recipe + GitHub)";
     summary.style.cssText = "padding:6px 8px;cursor:pointer;font-size:10px;font-weight:600;color:#93c5fd;list-style-position:inside;";
     details.appendChild(summary);
 
