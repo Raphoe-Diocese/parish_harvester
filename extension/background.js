@@ -289,10 +289,22 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       if (!ping.ok) {
         await _injectTrainerFiles(tabId, TRAINER_BRIDGE_FILES);
       }
-      const { ph_recording_session: session } = await chrome.storage.local.get([
-        "ph_recording_session",
-      ]);
-      if (!session?.active) return;
+      const { ph_recording_session: legacySession, ph_recording_sessions: sessionsMap } =
+        await chrome.storage.local.get(["ph_recording_session", "ph_recording_sessions"]);
+      let sessionActive = Boolean(legacySession?.active);
+      if (!sessionActive && sessionsMap && typeof sessionsMap === "object") {
+        const host = (() => {
+          try {
+            return new URL(tab.url || "").hostname.toLowerCase();
+          } catch (_e) {
+            return "";
+          }
+        })();
+        if (host && sessionsMap[host]?.active) {
+          sessionActive = true;
+        }
+      }
+      if (!sessionActive) return;
       await sendToTab(tabId, { type: "restore_recording_session" }, { allowInject: true });
     } catch (_err) {
       // Non-fatal — user can reopen the toolbar from the popup.

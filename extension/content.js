@@ -362,11 +362,35 @@
   const _navigateRecordingToUrl = async (absUrl, selectedEl, showStatus) => {
     if (!absUrl) return false;
     await _persistRecordingSession({ pendingUrl: absUrl });
-    if (_isPdfOrDocUrl(absUrl) || _linkOpensNewTab(selectedEl)) {
-      const opened = await _openUrlInRecordingTab(absUrl, showStatus);
-      if (opened) return true;
+
+    // Recipe training: always open the bulletin in a new tab so the news page
+    // stays open and the extension can continue on the PDF/intermediate page.
+    const opened = await _openUrlInRecordingTab(absUrl, showStatus);
+    if (opened) return true;
+
+    try {
+      const popup = window.open(absUrl, "_blank", "noopener,noreferrer");
+      if (popup) {
+        if (showStatus) {
+          showStatus(
+            _isPdfOrDocUrl(absUrl)
+              ? "✅ Step saved — bulletin opened in a new tab."
+              : "✅ Step saved — extension continues in the new tab.",
+            "ok"
+          );
+        }
+        return true;
+      }
+    } catch (_e) {
+      // Pop-up blocked — fall through to same-tab navigation.
     }
-    if (showStatus) showStatus("✅ Step saved — opening link…", "info");
+
+    if (showStatus) {
+      showStatus(
+        "✅ Step saved — opening link in this tab (allow pop-ups for a new tab).",
+        "info"
+      );
+    }
     _markNavigationStart(absUrl);
     window.location.assign(absUrl);
     return true;
