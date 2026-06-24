@@ -4,22 +4,40 @@
   "display_name": "Clonleigh (Strabane Pastoral Area)",
   "diocese": "derry",
   "start_url": "https://clonleighparish.com/category/newsletter/",
-  "site_type": "html_text_bulletin",
-  "playbook_type": "clonleigh_wp",
-  "recorded_date": "2026-06-24",
-  "auto_fixed": true,
   "steps": [
     {
       "action": "goto",
-      "url": "https://clonleighparish.com/2026/06/12/strabane-pastoral-area-newsletter-for-sunday-14th-june-2026/",
-      "use_target_url": true
+      "url": "https://clonleighparish.com/category/newsletter/"
+    },
+    {
+      "action": "click",
+      "href": "https://clonleighparish.com/2026/06/19/strabane-pastoral-area-newsletter-for-sunday-21st-june-2026/",
+      "selector": "article#post-9487 > div > section > figure > figcaption > a",
+      "text": "Strabane Pastoral Area Newsletter for Sunday 21st June 2026 "
+    },
+    {
+      "action": "click",
+      "href": "https://clonleighparish.com/2026/06/19/strabane-pastoral-area-newsletter-for-sunday-21st-june-2026/",
+      "selector": "html > body > a:nth-of-type(2)",
+      "text": ""
     },
     {
       "action": "print_to_pdf"
     }
   ],
+  "observed_load_ms": 2354,
+  "timeout_ms": 45000,
+  "total_timeout_s": 90,
+  "playbook_type": "permanent_bulletin_page",
+  "site_type": "wp_block_file_bulletin",
   "operator_notes": [
-    "Harvester predicts the Saturday WordPress post URL each Sunday (Pattern clonleigh).",
-    "Do not click a hard-coded post id — the slug changes every week."
-  ]
+    "Permanent /parish-bulletin/ URL — PDF filename changes weekly under /wp-content/uploads/YYYY/MM/.",
+    "PDF is in object.wp-block-file__embed[data] — harvest scrapes the embed URL.",
+    "Use url_pattern *bulletin*.pdf — never pin a dated filename."
+  ],
+  "do_not": [
+    "Do not train on the homepage — use the dedicated bulletin page only.",
+    "Do not pin saintanthony.co.uk if the parish moved to saintanthonys.uk."
+  ],
+  "recorded_date": "2026-06-24"
 }
