@@ -11,28 +11,21 @@
     },
     {
       "action": "click",
-      "selector": "a:has-text(\"Current Newsletter\")",
+      "fallback_selectors": [
+        "ul#menu-main-menu-2 > li:nth-of-type(3) > ul > li:nth-of-type(1) > a"
+      ],
       "href": "https://clonmanyparish.ie/current-newsletter/",
+      "selector": "a:has-text(\"Current Newsletter\")",
       "text": "Current Newsletter"
     },
     {
       "action": "download",
-      "url_pattern": "*bulletin*.pdf"
+      "url": "https://clonmanyparish.ie/wp-content/uploads/2026/06/2026-06-21-1.pdf",
+      "use_captured_url": true
     }
   ],
-  "observed_load_ms": 1854,
+  "observed_load_ms": 1001,
   "timeout_ms": 45000,
   "total_timeout_s": 90,
-  "playbook_type": "permanent_bulletin_page",
-  "site_type": "wp_block_file_bulletin",
-  "operator_notes": [
-    "Permanent /parish-bulletin/ URL — PDF filename changes weekly under /wp-content/uploads/YYYY/MM/.",
-    "PDF is in object.wp-block-file__embed[data] — harvest scrapes the embed URL.",
-    "Use url_pattern *bulletin*.pdf — never pin a dated filename."
-  ],
-  "do_not": [
-    "Do not train on the homepage — use the dedicated bulletin page only.",
-    "Do not pin saintanthony.co.uk if the parish moved to saintanthonys.uk."
-  ],
   "recorded_date": "2026-06-24"
 }
