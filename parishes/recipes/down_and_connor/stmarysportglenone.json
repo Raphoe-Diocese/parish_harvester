@@ -1,41 +1,36 @@
 {
+  "version": 1,
   "parish_key": "stmarysportglenone",
   "display_name": "Port Glenone",
-  "recorded_date": "2026-04-30",
-  "start_url": "https://stmarysportglenone.co.uk/?page_id=40",
+  "diocese": "down_and_connor",
+  "start_url": "https://stmarysportglenone.org/?page_id=40",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://stmarysportglenone.co.uk/?page_id=40"
-    },
-    {
       "action": "click",
-      "selector": "a:has-text('Home')",
-      "fallback_selectors": [
-        "a[href$='.pdf']",
-        "a[href*='.pdf']",
-        "li#menu-item-19 > a"
-      ]
-    },
-    {
-      "action": "click",
-      "selector": "a:has-text('Bulletin')",
-      "fallback_selectors": [
-        "a[href$='.pdf']",
-        "a[href*='.pdf']",
-        "li#menu-item-44 > a"
-      ]
+      "selector": "div > div:nth-of-type(1) > div > div:nth-of-type(1) > div > a:nth-of-type(1)",
+      "href": "https://stmarysportglenone.org/download/9/Bulletins/100/12th-Sunday-of-Year-A",
+      "text": ""
     },
     {
       "action": "download",
-      "url_pattern": "*.pdf",
-      "captured_url": "no_bulletin"
+      "url": "https://www.downandconnor.org/wp-content/uploads/2018/06/Privacy-Notice-DC-31-May-18-2.pdf"
     }
   ],
-  "diocese": "down_and_connor",
-  "placeholder": true,
-  "auto_generated": true,
-  "auto_fixed": true,
-  "needs_retraining": true,
-  "retraining_reason": "Stub recipe from April \u2014 no bulletin was captured"
+  "observed_load_ms": 5660,
+  "timeout_ms": 45000,
+  "total_timeout_s": 90,
+  "playbook_type": "weekly_bulletin_download",
+  "site_type": "sequential_bulletin_number",
+  "auto_direct": true,
+  "operator_notes": [
+    "Homepage shows dated rows — click the cloud download on this Sunday's bulletin.",
+    "PDF downloads automatically; trainer records the download URL.",
+    "Harvester advances /Weekly-Bulletins/NNN/ by weeks since the example date.",
+    "Joomla Dropfiles widget: cloud icon is a.mod_downloadlink — clicking the icon inside still counts."
+  ],
+  "do_not": [
+    "Do not use Pick bulletin image — this is a PDF download site.",
+    "Do not stop at click-only — need a download capture step."
+  ],
+  "recorded_date": "2026-06-24"
 }
