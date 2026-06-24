@@ -5,16 +5,48 @@
   globalThis.__phBridgeInstalled = true;
 
   const TOOLBAR_ID = "ph-floating-toolbar";
+
+  globalThis.__phGetToolbarMount = () => {
+    let mount = document.getElementById("ph-trainer-mount");
+    if (!mount) {
+      mount = document.createElement("div");
+      mount.id = "ph-trainer-mount";
+      mount.setAttribute("data-ph-trainer", "1");
+      mount.style.cssText = [
+        "position:fixed!important",
+        "top:0!important",
+        "left:0!important",
+        "width:100%!important",
+        "height:0!important",
+        "z-index:2147483647!important",
+        "pointer-events:none!important",
+        "margin:0!important",
+        "padding:0!important",
+        "border:none!important",
+      ].join(";");
+      const root = document.body || document.documentElement;
+      root.appendChild(mount);
+    }
+    return mount;
+  };
+
   let dispatch = null;
   const pendingUpgrades = [];
 
   const isPing = (type) => type === "ph_ping" || type === "ping";
   const isToolbarMessage = (type) => type === "show_toolbar" || type === "toggle_toolbar" || type === "ph_show_toolbar";
 
-  const _getStubToolbar = () => document.getElementById(TOOLBAR_ID);
+  const _getToolbarEl = () => {
+    const mount = document.getElementById("ph-trainer-mount");
+    if (mount) {
+      const inMount = mount.querySelector(`#${TOOLBAR_ID}`);
+      if (inMount) return inMount;
+    }
+    return document.getElementById(TOOLBAR_ID);
+  };
 
   const _showStubToolbar = () => {
-    let bar = _getStubToolbar();
+    let bar = _getToolbarEl();
     if (!bar) {
       bar = document.createElement("div");
       bar.id = TOOLBAR_ID;
@@ -27,29 +59,40 @@
         "display:flex",
         "flex-direction:column",
         "gap:8px",
-        "min-width:220px",
-        "max-width:320px",
-        "padding:10px 12px",
+        "min-width:240px",
+        "max-width:340px",
+        "padding:12px 14px",
         "border-radius:10px",
         "background:#111827",
         "color:#f9fafb",
-        "border:1px solid #374151",
-        "box-shadow:0 10px 30px rgba(0,0,0,.35)",
+        "border:2px solid #f59e0b",
+        "box-shadow:0 12px 40px rgba(0,0,0,.55)",
         "font:12px/1.35 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif",
+        "pointer-events:auto",
       ].join(";");
       bar.innerHTML = [
-        '<div style="font-weight:600;font-size:13px;">Parish Trainer</div>',
-        '<div id="ph-stub-status" style="opacity:.9;">Loading toolbar on this page…</div>',
+        '<div style="font-weight:700;font-size:14px;">Parish Trainer</div>',
+        '<div id="ph-stub-status" style="opacity:.95;">Loading recipe toolbar…</div>',
       ].join("");
-      (document.documentElement || document.body || document).appendChild(bar);
+      globalThis.__phGetToolbarMount().appendChild(bar);
     }
     bar.dataset.phHidden = "false";
     bar.style.display = "flex";
     return bar;
   };
 
+  const _showStubError = (message) => {
+    const bar = _showStubToolbar();
+    const status = bar.querySelector("#ph-stub-status");
+    if (status) {
+      status.textContent = String(message || "Trainer failed to load. Refresh the page and try again.");
+      status.style.color = "#fca5a5";
+    }
+    bar.style.borderColor = "#ef4444";
+  };
+
   const _handleStubToolbar = (type) => {
-    const bar = _getStubToolbar();
+    const bar = _getToolbarEl();
     if (type === "toggle_toolbar" && bar && bar.dataset.phHidden !== "true" && bar.style.display !== "none") {
       bar.dataset.phHidden = "true";
       bar.style.display = "none";
@@ -63,11 +106,22 @@
       pendingUpgrades.push(message);
       return;
     }
-    try {
-      dispatch(message, () => {});
-    } catch (_err) {
-      // Stub toolbar remains visible if the full trainer fails to mount.
-    }
+    setTimeout(() => {
+      try {
+        dispatch(message, (response) => {
+          const bar = _getToolbarEl();
+          const fullReady = bar && bar.dataset.phStub !== "1" && bar.isConnected;
+          if (!fullReady) {
+            _showStubError(
+              (response && (response.reason || response.error)) ||
+                "Full trainer did not mount on this page."
+            );
+          }
+        });
+      } catch (err) {
+        _showStubError(String(err));
+      }
+    }, 30);
   };
 
   const _flushPendingUpgrades = () => {
@@ -109,7 +163,7 @@
   globalThis.__phBridgeSetDispatch = (fn) => {
     dispatch = typeof fn === "function" ? fn : null;
     _flushPendingUpgrades();
-    const stub = _getStubToolbar();
+    const stub = _getToolbarEl();
     if (stub?.dataset?.phStub === "1") {
       const status = stub.querySelector("#ph-stub-status");
       if (status) status.textContent = "Upgrading to full trainer…";
@@ -130,7 +184,8 @@
       if (isToolbarMessage(type)) {
         _handleStubToolbar(type);
         _upgradeToolbar(message);
-        sendResponse({ ok: true, toolbar: true, full: Boolean(dispatch) });
+        const bar = _getToolbarEl();
+        sendResponse({ ok: true, toolbar: Boolean(bar), full: Boolean(dispatch) });
         return true;
       }
       if (!dispatch) {

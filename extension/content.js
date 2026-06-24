@@ -1,9 +1,12 @@
 (() => {
-  if (globalThis.__phContentInstalled) {
-    if (typeof globalThis.__phBridgeSetDispatch === "function" && typeof globalThis.__phContentDispatch === "function") {
+  if (globalThis.__phContentInstalled && typeof globalThis.__phContentDispatch === "function") {
+    if (typeof globalThis.__phBridgeSetDispatch === "function") {
       globalThis.__phBridgeSetDispatch(globalThis.__phContentDispatch);
     }
     return;
+  }
+  if (globalThis.__phContentInstalled && !globalThis.__phContentDispatch) {
+    globalThis.__phContentInstalled = false;
   }
   globalThis.__phContentInstalled = true;
 
@@ -875,6 +878,14 @@
     if (toolbar && toolbar.isConnected) {
       return toolbar;
     }
+    const mount = document.getElementById("ph-trainer-mount");
+    if (mount) {
+      const inMount = mount.querySelector(`#${TOOLBAR_ID}`);
+      if (inMount) {
+        toolbar = inMount;
+        return inMount;
+      }
+    }
     const found = document.getElementById(TOOLBAR_ID);
     if (found) {
       toolbar = found;
@@ -894,24 +905,56 @@
     toolbar = keep;
   };
 
+  const _getToolbarMount = () => {
+    if (typeof globalThis.__phGetToolbarMount === "function") {
+      return globalThis.__phGetToolbarMount();
+    }
+    return document.body || document.documentElement;
+  };
+
   const _ensureToolbar = (visible = true) => {
     _cleanupDuplicateToolbars();
     let node = _getToolbarNode();
+    const stubNode = node?.dataset?.phStub === "1" ? node : null;
+
     if (node?.dataset?.phStub === "1") {
-      node.remove();
-      toolbar = null;
       node = null;
+      toolbar = null;
     }
+
     if (!node) {
-      node = createToolbar();
-      document.documentElement.appendChild(node);
-      toolbar = node;
+      let created = null;
+      try {
+        created = createToolbar();
+        const mount = _getToolbarMount();
+        created.style.pointerEvents = "auto";
+        mount.appendChild(created);
+        node = created;
+        toolbar = node;
+        if (stubNode?.parentNode) {
+          stubNode.parentNode.removeChild(stubNode);
+        }
+      } catch (err) {
+        console.error("[Parish Trainer] createToolbar failed:", err);
+        if (stubNode) {
+          const status = stubNode.querySelector("#ph-stub-status");
+          if (status) {
+            status.textContent = `Trainer error: ${String(err)}`;
+            status.style.color = "#fca5a5";
+          }
+          stubNode.style.borderColor = "#ef4444";
+          node = stubNode;
+          toolbar = stubNode;
+        } else {
+          throw err;
+        }
+      }
     }
-    if (visible) {
+    if (visible && node) {
       node.dataset.phHidden = "false";
       node.style.display = "flex";
       _notifyRecordingTabActive();
-      if (!toolbarReadyLogged) {
+      if (!toolbarReadyLogged && node.dataset.phStub !== "1") {
         console.log("✅ Parish Trainer toolbar ready");
         toolbarReadyLogged = true;
       }
