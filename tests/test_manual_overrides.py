@@ -137,7 +137,17 @@ class ManualOverrideTests(unittest.IsolatedAsyncioTestCase):
             out_dir = Path(tmp)
             recipe_path = out_dir / "recipes" / "trainedrecipe.json"
             recipe_path.parent.mkdir(parents=True, exist_ok=True)
-            recipe_path.write_text(json.dumps({"steps": [{"action": "goto", "url": "https://example.org"}]}), encoding="utf-8")
+            recipe_path.write_text(
+                json.dumps(
+                    {
+                        "steps": [
+                            {"action": "goto", "url": "https://example.org"},
+                            {"action": "download", "url": "https://example.org/bulletin.pdf"},
+                        ]
+                    }
+                ),
+                encoding="utf-8",
+            )
 
             with (
                 patch("harvester.fetcher.recipe_path_for", return_value=recipe_path),

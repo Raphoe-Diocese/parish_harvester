@@ -44,9 +44,28 @@ class HostProfilesTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             recipe_path = Path(tmp) / "example.json"
             recipe_path.write_text("{}", encoding="utf-8")
-            recipe_meta = {"steps": [{"action": "goto", "url": "https://example.org/"}]}
+            recipe_meta = {
+                "steps": [
+                    {"action": "goto", "url": "https://example.org/"},
+                    {"action": "download", "url": "https://example.org/bulletin.pdf"},
+                ]
+            }
             self.assertTrue(fetcher._trained_recipe_exists(recipe_path, recipe_meta))
             self.assertFalse(fetcher._legacy_fallbacks_enabled(recipe_path, recipe_meta))
+
+    def test_goto_only_recipe_is_placeholder(self) -> None:
+        recipe_meta = {"steps": [{"action": "goto", "url": "https://example.org/news"}]}
+        self.assertTrue(fetcher._is_placeholder_recipe(recipe_meta))
+        self.assertFalse(
+            fetcher._is_placeholder_recipe(
+                {
+                    "steps": [
+                        {"action": "goto", "url": "https://example.org/bulletin.pdf"},
+                        {"action": "download", "url": "https://example.org/bulletin.pdf"},
+                    ]
+                }
+            )
+        )
 
     def test_get_host_profile_returns_defaults_for_unlisted_host(self) -> None:
         profile = fetcher._get_host_profile("https://example.org/bulletins")

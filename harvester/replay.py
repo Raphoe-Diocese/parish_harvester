@@ -42,7 +42,8 @@ PDFEMB_HREF_EXTRACT_JS = "(els) => els.map(el => el.getAttribute('href')).filter
 
 _NON_BULLETIN_RE = re.compile(
     r"dataentry|giftaid|standingorder|donation|prayer|safeguarding|privacy|gdpr|diocese|"
-    r"sitemap|application|registration|volunteer|finances|financial|parishdraw|mcn\s*media",
+    r"sitemap|application|registration|volunteer|finances|financial|parishdraw|mcn\s*media|"
+    r"gaza|bishops-call|draw_poster|poster_20\d{2}|fbcdn\.net|facebook\.com",
     re.IGNORECASE,
 )
 _BULLETIN_KEYWORD_RE = re.compile(r"\b(bulletin|newsletter)\b", re.IGNORECASE)

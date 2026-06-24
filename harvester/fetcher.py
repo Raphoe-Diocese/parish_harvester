@@ -1513,8 +1513,49 @@ async def _fetch_from_manual_override(
     )
 
 
+_RECIPE_TERMINAL_ACTIONS = frozenset(
+    {"download", "image_stack", "print_to_pdf", "crop_screenshot", "image"}
+)
+
+
+def _is_placeholder_recipe(recipe_meta: dict | None) -> bool:
+    """True for auto-seeded or stub recipes that must not block URL prediction."""
+    if not isinstance(recipe_meta, dict):
+        return True
+    if recipe_meta.get("placeholder") or recipe_meta.get("auto_generated"):
+        return True
+    steps = recipe_meta.get("steps")
+    if not isinstance(steps, list) or not steps:
+        return True
+    for step in steps:
+        if not isinstance(step, dict):
+            continue
+        if step.get("captured_url") == "no_bulletin":
+            return True
+    actions = [
+        str(step.get("action") or "").strip().lower()
+        for step in steps
+        if isinstance(step, dict)
+    ]
+    if any(action in _RECIPE_TERMINAL_ACTIONS for action in actions):
+        return False
+    if len(actions) == 1 and actions[0] == "goto":
+        url = (
+            str(steps[0].get("url") or recipe_meta.get("start_url") or "")
+            .strip()
+            .lower()
+        )
+        if url.split("?")[0].endswith(".pdf"):
+            return False
+        if "drive.usercontent.google.com/download" in url:
+            return False
+    return True
+
+
 def _trained_recipe_exists(recipe_path: Path, recipe_meta: dict) -> bool:
     if not recipe_path.exists():
+        return False
+    if _is_placeholder_recipe(recipe_meta):
         return False
     steps = recipe_meta.get("steps") if isinstance(recipe_meta, dict) else None
     return isinstance(steps, list) and len(steps) > 0
