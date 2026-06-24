@@ -31,6 +31,8 @@ CONTENT_SELECTORS: tuple[str, ...] = (
     '[role="main"]',
     "main",
     "div.col-sm-9",
+    "section.information_section",
+    ".information_section .container",
 )
 
 _PARISH_MESSENGER_SCRIPT = 'script[src*="theparishmessenger.com"]'
@@ -39,19 +41,52 @@ _WAIT_DYNAMIC_BULLETIN_JS = """
 () => {
   const script = document.querySelector('script[src*="theparishmessenger.com"]');
   if (!script) return true;
-  const box = script.closest('.col-sm-9') || script.parentElement;
-  if (!box) return false;
-  const text = (box.innerText || '').replace(/\\s+/g, ' ').trim();
-  return text.length >= 300;
+  const boxes = [];
+  const seen = new Set();
+  for (const sel of ['.col-sm-9', 'section.information_section', '.information_section .container', '.container']) {
+    const el = script.closest(sel);
+    if (el && !seen.has(el)) {
+      seen.add(el);
+      boxes.push(el);
+    }
+  }
+  if (script.parentElement && !seen.has(script.parentElement)) {
+    boxes.push(script.parentElement);
+  }
+  return boxes.some((box) => {
+    const text = (box.innerText || '').replace(/\\s+/g, ' ').trim();
+    return text.length >= 300;
+  });
 }
 """
 
 _MARK_MESSENGER_ROOT_JS = """
 () => {
   const script = document.querySelector('script[src*="theparishmessenger.com"]');
-  const root = script && (script.closest('.col-sm-9') || script.parentElement);
-  if (!root) return null;
-  root.setAttribute('data-ph-bulletin-root', '1');
+  if (!script) return null;
+  const candidates = [];
+  const seen = new Set();
+  for (const sel of ['.col-sm-9', 'section.information_section', '.information_section .container', '.container']) {
+    const el = script.closest(sel);
+    if (el && !seen.has(el)) {
+      seen.add(el);
+      candidates.push(el);
+    }
+  }
+  if (script.parentElement && !seen.has(script.parentElement)) {
+    candidates.push(script.parentElement);
+  }
+  let best = null;
+  let bestLen = 0;
+  for (const el of candidates) {
+    const text = (el.innerText || '').replace(/\\s+/g, ' ').trim();
+    if (text.length > bestLen) {
+      bestLen = text.length;
+      best = el;
+    }
+  }
+  if (!best || bestLen < 200) return null;
+  best.setAttribute('data-ph-bulletin-root', '1');
   return '[data-ph-bulletin-root]';
 }
 """
