@@ -247,7 +247,7 @@
     return {
       observed_load_ms: ms,
       timeout_ms: Math.min(Math.max(ms * 2, 45_000), 180_000),
-      total_timeout_s: Math.min(Math.max(Math.ceil(ms / 1000) * steps * 2 + 45, 90), 300),
+      total_timeout_s: Math.min(Math.max(Math.ceil(ms / 1000) * steps * 2 + 45, 90), 420),
     };
   };
 
@@ -270,11 +270,15 @@
 
       if (stillLoading) {
         el.style.color = elapsed >= 30000 ? "#fde68a" : "#93c5fd";
+        const commitHint =
+          elapsed >= 45000 && document.readyState !== "complete"
+            ? " — WordPress may never finish; harvest will use commit navigation"
+            : "";
         el.textContent =
           elapsed >= 60000
-            ? `⏱ Still loading… ${_formatLoadDuration(elapsed)} — very slow site`
+            ? `⏱ Still loading… ${_formatLoadDuration(elapsed)} — very slow site${commitHint}`
             : elapsed >= 15000
-              ? `⏱ Still loading… ${_formatLoadDuration(elapsed)} — slow site`
+              ? `⏱ Still loading… ${_formatLoadDuration(elapsed)} — slow site${commitHint}`
               : `⏱ Still loading… ${_formatLoadDuration(elapsed)}`;
         return;
       }
@@ -708,6 +712,35 @@
       const stepCount = Math.max(steps.length, 1);
       recipe.timeout_ms = recipe.timeout_ms || 45_000;
       recipe.total_timeout_s = Math.min(Math.max(stepCount * 45 + 90, 120), 300);
+    }
+    try {
+      const host = startUrl ? new URL(startUrl).hostname.toLowerCase() : "";
+      const observedMs = _getObservedLoadMsForRecipe();
+      if (
+        host.includes("derriaghycatholicparish.com")
+        || host.includes("portstewartparish.website")
+        || observedMs >= 45_000
+      ) {
+        recipe.navigation_wait_until = "commit";
+        recipe.timeout_ms = Math.max(Number(recipe.timeout_ms) || 0, 180_000);
+        recipe.total_timeout_s = Math.max(Number(recipe.total_timeout_s) || 0, host.includes("portstewart") ? 600 : 300);
+      }
+      if (host.includes("portstewartparish.website") && startUrl && startUrl.startsWith("https://")) {
+        recipe.start_url = startUrl.replace(/^https:/i, "http:");
+        const gotoStep = recipe.steps.find((s) => String(s?.action || "").toLowerCase() === "goto");
+        if (gotoStep && gotoStep.url) {
+          gotoStep.url = String(gotoStep.url).replace(/^https:/i, "http:");
+        }
+      }
+      if (host.includes("portstewartparish.ie") && startUrl && startUrl.startsWith("https://")) {
+        recipe.start_url = startUrl.replace(/^https:/i, "http:");
+        const gotoStep = recipe.steps.find((s) => String(s?.action || "").toLowerCase() === "goto");
+        if (gotoStep && gotoStep.url) {
+          gotoStep.url = String(gotoStep.url).replace(/^https:/i, "http:");
+        }
+      }
+    } catch (_hostErr) {
+      // ignore invalid start_url
     }
     if (window.ph_site_memory?.enrichRecipe) {
       recipe = window.ph_site_memory.enrichRecipe(recipe, detectPageType());
@@ -1163,6 +1196,7 @@
         return;
       }
       const lower = abs.toLowerCase();
+      if (_isNonBulletinPdf(abs, label)) return;
       const looksWeekly =
         /weekly-bulletins|\/newsletters\/|\/files\/\d+\/[^/?#]*sunday/i.test(lower);
       if (!looksWeekly && !_looksLikeBulletinDownloadUrl(abs, label)) return;
@@ -1587,6 +1621,9 @@
         pdfemb: "🔗",
         parish_messenger: "📰",
         wix_html: "📰",
+        mdocs_bulletin_list: "📥",
+        wp_block_file_bulletin: "📄",
+        stacked_image_bulletin: "🖼️",
         wix_viewer: "📐",
         cloud_folder: "☁️",
         iframe_maybe: "📐",
@@ -1658,6 +1695,20 @@
       if (!skipCloud && !skipImage) {
         return fpDetect;
       }
+    }
+
+    // 1c2. mDocs PDF bulletin table (Portstewart etc.) — before HTML newsletter heuristics
+    if (
+      document.querySelector("table.mdocs, .mdocs-table, a.mdocs-download, a[href*='mdocs-file']")
+    ) {
+      return {
+        emoji: "📥",
+        summary: "mDocs PDF bulletin table — real downloadable PDF files.",
+        advice:
+          "Click Download on this week's row (usually top), then capture the PDF download. Do NOT use Save page as PDF.",
+        type: "mdocs_bulletin_list",
+        htmlFingerprint: "mdocs_bulletin_table",
+      };
     }
 
     // 1c. WordPress HTML text newsletter (Clonleigh-style) before loose image heuristics
@@ -3454,9 +3505,18 @@
 
     const _pdfTerminalActions = new Set(["download", "image", "image_stack", "print_to_pdf", "crop_screenshot"]);
 
+    const _isHarvestClickTerminal = (step) => {
+      if (!step || String(step.action || "").toLowerCase() !== "click") return false;
+      const blob = `${step.selector || ""} ${step.href || ""}`;
+      return /mod_downloadlink|mdocs-file|mdocs-download|table\.mdocs/i.test(blob);
+    };
+
     const _ensureTerminalPdfStep = () => {
       const recorded = _standaloneRecipeSteps();
       const last = recorded[recorded.length - 1];
+      if (last && _isHarvestClickTerminal(last)) {
+        return { ok: true, added: false, clickOnly: true };
+      }
       if (last && _pdfTerminalActions.has(String(last.action || "").toLowerCase())) {
         return { ok: true, added: false };
       }
@@ -3497,11 +3557,18 @@
       if (
         pageCtx.autoDownloadUrl &&
         (pageCtx.type === "weekly_bulletin_download" ||
+          pageCtx.type === "mdocs_bulletin_list" ||
           pageCtx.htmlFingerprint === "joomla_dropfiles_weekly" ||
+          pageCtx.htmlFingerprint === "mdocs_bulletin_table" ||
           pageCtx.htmlFingerprint === "sequential_weekly_bulletins")
       ) {
         standaloneAddStep(
-          { action: "download", url: pageCtx.autoDownloadUrl },
+          {
+            action: "download",
+            url: pageCtx.autoDownloadUrl,
+            use_captured_url: true,
+            url_pattern: pageCtx.type === "mdocs_bulletin_list" ? "*.pdf" : undefined,
+          },
           "mark_file",
           `📄 Download: ${pageCtx.autoDownloadUrl.slice(-50)}`
         );
@@ -3515,7 +3582,7 @@
         const bulletinUrl = _pickBestWeeklyBulletinUrl();
         if (bulletinUrl) {
           standaloneAddStep(
-            { action: "download", url: bulletinUrl },
+            { action: "download", url: bulletinUrl, use_captured_url: true },
             "mark_file",
             `📄 Download: ${bulletinUrl.slice(-50)}`
           );
@@ -3525,6 +3592,49 @@
           _refreshGuidedContext();
           return { ok: true, added: true, action: "download" };
         }
+      }
+      if (
+        pageCtx.type === "mdocs_bulletin_list" ||
+        pageCtx.htmlFingerprint === "mdocs_bulletin_table" ||
+        /mdocs-file|table\.mdocs/i.test(document.documentElement.innerHTML.slice(0, 80000))
+      ) {
+        const mdocsUrl = pageCtx.autoDownloadUrl || "";
+        if (mdocsUrl && !_isNonBulletinPdf(mdocsUrl, "")) {
+          standaloneAddStep(
+            { action: "download", url: mdocsUrl, use_captured_url: true, url_pattern: "*.pdf" },
+            "mark_file",
+            `📄 mDocs PDF: ${mdocsUrl.slice(-50)}`
+          );
+        } else {
+          standaloneAddStep(
+            { action: "download", use_captured_url: true, url_pattern: "*.pdf" },
+            "mark_file",
+            "📄 mDocs PDF download (newest row)"
+          );
+        }
+        if (_stepsListEl) _renderSessionSteps();
+        if (_refreshRecipeCount) _refreshRecipeCount();
+        void _persistRecordingSession();
+        _refreshGuidedContext();
+        return { ok: true, added: true, action: "download" };
+      }
+      if (
+        pageCtx.type === "wp_block_file_bulletin" ||
+        pageCtx.htmlFingerprint === "wp_block_file_bulletin"
+      ) {
+        const embedUrl = pageCtx.autoDownloadUrl || "";
+        standaloneAddStep(
+          embedUrl
+            ? { action: "download", url: embedUrl, url_pattern: "*bulletin*.pdf" }
+            : { action: "download", url_pattern: "*bulletin*.pdf" },
+          "mark_file",
+          "📄 Bulletin PDF from wp-block-file embed"
+        );
+        if (_stepsListEl) _renderSessionSteps();
+        if (_refreshRecipeCount) _refreshRecipeCount();
+        void _persistRecordingSession();
+        _refreshGuidedContext();
+        return { ok: true, added: true, action: "download" };
       }
       const fallbackBulletinUrl = _pickBestWeeklyBulletinUrl();
       if (fallbackBulletinUrl) {
@@ -3602,6 +3712,7 @@
           pageCtx.type === "direct_pdf" ||
           pageCtx.type === "oneweb_docx" ||
           pageCtx.type === "weekly_bulletin_download" ||
+          pageCtx.type === "mdocs_bulletin_list" ||
           pageCtx.type === "iframe" ||
           pageCtx.type === "iframe_maybe" ||
           pageCtx.type === "wix_viewer" ||
@@ -3624,6 +3735,10 @@
           contextPrimaryBtn.style.display = "block";
           contextPrimaryBtn.style.background = "#2563eb";
           contextPrimaryBtn.textContent = "📥 Step 2: Download this week's row";
+        } else if (pageCtx.type === "mdocs_bulletin_list") {
+          contextPrimaryBtn.style.display = "block";
+          contextPrimaryBtn.style.background = "#16a34a";
+          contextPrimaryBtn.textContent = "📥 Step 2: Download bulletin PDF";
         } else if (pageCtx.type === "wix_html" || (pageCtx.type === "html" && _pathLooksLikeNewsletterPage())) {
           contextPrimaryBtn.style.display = "block";
           contextPrimaryBtn.textContent = "💾 Step 2: Save page as PDF";
@@ -3651,9 +3766,10 @@
       const htmlCapturePage =
         pageCtx.type === "wix_html" ||
         (pageCtx.type === "html" && _pathLooksLikeNewsletterPage());
+      const mdocsPdfPage = pageCtx.type === "mdocs_bulletin_list";
       if (savePagePdfBtn) {
         savePagePdfBtn.style.display =
-          onDirectPdf || (htmlCapturePage && stepCount === 0) ? "none" : "block";
+          onDirectPdf || mdocsPdfPage || (htmlCapturePage && stepCount === 0) ? "none" : "block";
       }
       if (pickImageBtn) {
         pickImageBtn.style.display = onDirectPdf ? "none" : "block";
@@ -5921,6 +6037,47 @@
         dispatchErrorBanner.style.display = "block";
       };
 
+      const formatPushDiagnosisHtml = (response) => {
+        const lines = [];
+        const v = response.githubVerify;
+        if (v && v.ok) {
+          lines.push(
+            `<strong>GitHub copy verified:</strong> ${v.stepCount} step(s)` +
+            (v.lastAction ? `, ends with <code>${v.lastAction}</code>` : "") +
+            (v.recorded_date ? `, dated ${v.recorded_date}` : "")
+          );
+          if (v.skip || v.needs_retraining) {
+            lines.push("⚠️ Recipe still has skip/retraining flags — harvest will ignore it.");
+          }
+        } else if (v && v.error) {
+          lines.push(`⚠️ Could not verify recipe on GitHub: ${v.error}`);
+        }
+        if (response.stepsPreservedFromOld) {
+          lines.push(
+            "⚠️ <strong>No steps in your push</strong> — GitHub kept the OLD steps. Re-record and push again."
+          );
+        }
+        if (response.filePath) {
+          lines.push(`File: <code>${response.filePath}</code>`);
+        }
+        return lines.join("<br>");
+      };
+
+      const showPostPushBanner = (response, headlineHtml, tone = "ok") => {
+        postPushBanner.style.display = "block";
+        if (tone === "warn") {
+          postPushBanner.style.color = "#fde68a";
+          postPushBanner.style.background = "#78350f";
+          postPushBanner.style.borderColor = "#f59e0b";
+        } else {
+          postPushBanner.style.color = "#86efac";
+          postPushBanner.style.background = "#14532d";
+          postPushBanner.style.borderColor = "#16a34a";
+        }
+        const diag = formatPushDiagnosisHtml(response);
+        postPushBanner.innerHTML = headlineHtml + (diag ? `<br><br>${diag}` : "");
+      };
+
       const driftBanner = document.createElement("div");
       driftBanner.style.cssText = [
         "display:none",
@@ -6201,9 +6358,13 @@
         }
         const recorded = _standaloneRecipeSteps();
         const lastStep = recorded[recorded.length - 1];
-        if (!lastStep || !_pdfTerminalActions.has(String(lastStep.action || "").toLowerCase())) {
+        const lastAction = String(lastStep?.action || "").toLowerCase();
+        if (
+          !lastStep
+          || (!_pdfTerminalActions.has(lastAction) && !_isHarvestClickTerminal(lastStep))
+        ) {
           showStatus(
-            "❌ Recipe must end with PDF capture: download, image, image_stack, print_to_pdf, or crop_screenshot.",
+            "❌ Recipe must end with PDF capture: download, image, image_stack, print_to_pdf, crop_screenshot, or a Dropfiles/mDocs click.",
             "error"
           );
           return;
@@ -6248,9 +6409,10 @@
                 `✅ Recipe ${verb}! Testing ${name || key} on GitHub now (this parish only).`,
                 "ok"
               );
-              postPushBanner.style.display = "block";
-              postPushBanner.innerHTML =
-                `⏳ <strong>${name || key}</strong> — single-parish test running (not the mega PDF). Problems tab will show the bulletin link when done.`;
+              showPostPushBanner(
+                response,
+                `⏳ <strong>${name || key}</strong> — single-parish test running (not the mega PDF). Problems tab will show the bulletin link when done.`
+              );
         try {
           chrome.runtime.sendMessage({
             type: "problems_refresh",
@@ -6266,20 +6428,18 @@
                 `✅ Recipe ${verb}!${linkPart} ⚠️ Test harvest failed to start: ${response.dispatchError}`,
                 "ok",
               );
-              postPushBanner.style.display = "block";
-              postPushBanner.style.color = "#fde68a";
-              postPushBanner.style.background = "#78350f";
-              postPushBanner.style.borderColor = "#f59e0b";
-              postPushBanner.textContent =
-                "Recipe saved but GitHub test did not start — open Problems and tap ▶ Verify harvest.";
+              showPostPushBanner(
+                response,
+                "Recipe saved but GitHub test did not start — open Problems and tap ▶ Check result.",
+                "warn"
+              );
             } else {
               showStatus(`✅ Recipe ${verb}!${linkPart}`, "ok");
-              postPushBanner.style.display = "block";
-              postPushBanner.style.color = "#fde68a";
-              postPushBanner.style.background = "#78350f";
-              postPushBanner.style.borderColor = "#f59e0b";
-              postPushBanner.textContent =
-                "Recipe saved. Open Problems → ▶ Verify harvest to test it.";
+              showPostPushBanner(
+                response,
+                "Recipe saved. Open Problems → ▶ Check result to test it.",
+                "warn"
+              );
             }
             if (response.patternLearned) {
               showStatus("📚 Pattern saved — similar parishes will get hints next time.", "ok");

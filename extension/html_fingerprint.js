@@ -222,6 +222,107 @@
       doNot: ["Do not pick Gift Aid or Data Entry PDFs from the widget menu."],
     },
     {
+      id: "mdocs_bulletin_table",
+      label: "mDocs PDF bulletin table (WordPress plugin)",
+      pageType: "mdocs_bulletin_list",
+      captureMethod: "click_then_pdf",
+      playbookType: "mdocs_download_list",
+      minScore: 32,
+      markers: [
+        { re: /table\.mdocs|class="mdocs-table|mdocs-list/i, weight: 22, label: "mDocs table" },
+        { re: /mdocs-file|mdocs-download|wp-content\/mdocs/i, weight: 20, label: "mDocs download link" },
+        { re: /weekly.?bulletin|parish.?bulletin/i, weight: 8, label: "bulletin page" },
+      ],
+      pickDownloadUrl: (doc) => {
+        const links = Array.from(
+          doc.querySelectorAll(
+            "table.mdocs a[href*='.pdf'], a.mdocs-download[href], .mdocs a[href*='.pdf']"
+          )
+        );
+        for (const a of links) {
+          const href = a.getAttribute("href") || "";
+          const text = `${a.textContent || ""} ${href}`.toLowerCase();
+          if (/privacy|gdpr|gift.?aid/i.test(text)) continue;
+          try {
+            return new URL(href, doc.location?.href || "").href;
+          } catch (_e) {
+            continue;
+          }
+        }
+        return "";
+      },
+      advice:
+        "mDocs table — click Download on the newest row (usually top). Harvester downloads the real PDF. Do NOT use Save page as PDF.",
+      doNot: [
+        "Do not use Save page as PDF — bulletins are downloadable PDF files in the mDocs table.",
+        "Do not use https:// if the site certificate is expired — use http:// for portstewartparish.website.",
+      ],
+    },
+    {
+      id: "wp_block_file_bulletin",
+      label: "WordPress block file bulletin embed",
+      pageType: "wp_block_file_bulletin",
+      captureMethod: "direct_download",
+      playbookType: "permanent_bulletin_page",
+      minScore: 30,
+      markers: [
+        { re: /wp-block-file/i, weight: 24, label: "wp-block-file block" },
+        { re: /wp-block-file__embed|wp-block-file__button/i, weight: 18, label: "file embed/button" },
+        { re: /parish-bulletin|weekly.?bulletin/i, weight: 10, label: "bulletin page" },
+      ],
+      pickDownloadUrl: (doc) => {
+        const embed = doc.querySelector("object.wp-block-file__embed[data], embed.wp-block-file__embed[src]");
+        const raw = embed?.getAttribute("data") || embed?.getAttribute("src") || "";
+        if (raw && /\.pdf/i.test(raw)) {
+          try {
+            return new URL(raw, doc.location?.href || "").href;
+          } catch (_e) {
+            return raw;
+          }
+        }
+        const dl = doc.querySelector('a.wp-block-file__button[href$=".pdf"], a[download][href*=".pdf"]');
+        if (dl) {
+          try {
+            return new URL(dl.getAttribute("href") || "", doc.location?.href || "").href;
+          } catch (_e2) {
+            return "";
+          }
+        }
+        return "";
+      },
+      advice:
+        "Permanent bulletin page — PDF is in the wp-block-file embed. Tap Get a PDF with pattern *bulletin*.pdf (no dated filename).",
+      doNot: ["Do not train on the old domain if the parish moved (e.g. saintanthonys.uk)."],
+    },
+    {
+      id: "stacked_image_bulletin",
+      label: "Stacked JPEG bulletin images (top N each week)",
+      pageType: "stacked_image_bulletin",
+      captureMethod: "image_stack",
+      playbookType: "stacked_image_bulletin",
+      minScore: 28,
+      domRequired: true,
+      domValidate: (doc) => {
+        const root = _entryContentRoot(doc) || doc.body;
+        if (!root) return false;
+        const imgs = Array.from(root.querySelectorAll("img")).filter(
+          (img) => _imageWidth(img) >= 400 && !DECORATIVE_IMG_RE.test(`${img.className} ${img.alt || ""}`)
+        );
+        return imgs.length >= 2;
+      },
+      markers: [
+        { re: /wp-content\/uploads\/.*\.(jpg|jpeg|png)/i, weight: 14, label: "WP uploaded images" },
+        { re: /bulletin|newsletter|ordinary.?time/i, weight: 10, label: "bulletin keywords" },
+      ],
+      pickDownloadUrl: () => "",
+      advice:
+        "Stacked image bulletin — use Pick another image twice (top images). Harvester stacks top N images each Sunday — never hardcode image URLs.",
+      doNot: [
+        "Do not hardcode one image URL in the recipe — it goes stale every week.",
+        "Do not Save page as PDF — that captures every old bulletin on the page.",
+      ],
+    },
+    {
       id: "wix_html_bulletin",
       label: "Wix HTML bulletin page",
       pageType: "wix_html",

@@ -975,12 +975,17 @@ async function _problemsFilterActionableRows(report, consecutiveFailures, retrai
       return;
     }
     const retrainedPending = _problemsIsRetrainedPending(parish, targetDate, retrainedMap);
+    const errorText = String(item?.error || "");
+    const diagnosis = item?.diagnosis && typeof item.diagnosis === "object" ? item.diagnosis : null;
     rows.push({
       parish,
       display_name: String(item?.display_name || item?.parish || ""),
       start_url: String(item?.start_url || item?.url || ""),
       url: String(item?.url || ""),
-      category: _problemsCategory(item?.error || "", { retrainedPending }),
+      error_text: errorText,
+      diagnosis,
+      advice: _problemsFailureAdvice(errorText, diagnosis),
+      category: _problemsCategory(errorText, { retrainedPending, diagnosis }),
       last_seen: lastSeen,
       consecutive_failures: Number(consecutiveFailures[parish] || 0),
       retrainedPending,
@@ -1029,15 +1034,74 @@ function _pdStatusDot(parish) {
   return "⬜";
 }
 
-function _problemsCategory(errorText, options = {}) {
-  if (options.retrainedPending) return "retrained — harvest still failing";
+function _problemsFailureAdvice(errorText, diagnosis) {
   const text = String(errorText || "");
-  if (/getaddrinfo|Name or service not known|ENOTFOUND|Could not resolve host/i.test(text)) return "dns";
-  if (/SSL|certificate/i.test(text)) return "ssl";
-  if (/timeout|Timeout|TimeoutError/i.test(text)) return "timeout";
-  if (/Recipe download step did not find|Recipe finished without downloading/i.test(text)) return "recipe_drift";
-  if (/no PDF|html_link/i.test(text)) return "no_pdf";
-  return "other";
+  const diag = diagnosis && typeof diagnosis === "object" ? diagnosis : {};
+  if (/Stale bulletin rejected/i.test(text)) {
+    const date = diag.bulletin_date || text.match(/bulletin date ([^,)]+)/i)?.[1];
+    return date
+      ? `Your recipe worked — harvest downloaded a ${date} bulletin but this week needs a newer one. Open this Sunday's newsletter and end with print_to_pdf.`
+      : "Your recipe worked but the bulletin was too old for this harvest week.";
+  }
+  if (/Recipe for .* is outdated/i.test(text)) {
+    return "Harvest ran your recipe on GitHub but a click selector broke (menu or link moved). Re-record from the parish news page.";
+  }
+  if (/admin\/non-bulletin|not a weekly bulletin/i.test(text)) {
+    if (/mdocs|portstewartparish/i.test(`${text} ${diag.playbook_type || ""} ${diag.site_type || ""}`)) {
+      return "Wrong PDF captured — on mDocs sites click Download on the newest bulletin row, then Push (real PDF download, not Save page as PDF).";
+    }
+    return diag.step_count === 0
+      ? "No recipe on GitHub — harvest guessed and grabbed a sidebar/admin PDF. Train with print_to_pdf on the news page."
+      : "Harvest grabbed the wrong file. For HTML bulletins use print_to_pdf; for PDF list sites use Download on the newest row.";
+  }
+  if (/Recipe replay failed/i.test(text)) {
+    return "Recipe on GitHub failed during replay. Tap Check result for the exact error.";
+  }
+  if (diag.failure_stage === "recipe_blocked" || /needs_retraining|marked for manual/i.test(text)) {
+    return "Recipe has skip/retraining flags — harvest never runs it. Push again from the trainer (that clears the flags).";
+  }
+  if (diag.legacy_fallbacks_blocked) {
+    return "Trained recipe failed and harvest will not fall back to old URL guessing — fix the recipe steps.";
+  }
+  if (diag.step_count === 0) {
+    return "GitHub has no recipe steps for this parish — harvest uses legacy scraping which often picks the wrong file.";
+  }
+  return "";
+}
+
+function _problemsCategory(errorText, options = {}) {
+  const text = String(errorText || "");
+  const diagnosis = options.diagnosis && typeof options.diagnosis === "object"
+    ? options.diagnosis
+    : null;
+  let base;
+  if (/Stale bulletin rejected/i.test(text)) {
+    base = "bulletin too old (recipe worked)";
+  } else if (/Recipe for .* is outdated/i.test(text)) {
+    base = "recipe outdated";
+  } else if (/admin\/non-bulletin|not a weekly bulletin/i.test(text)) {
+    base = diagnosis?.step_count === 0 ? "no recipe — wrong scrape" : "wrong file scraped";
+  } else if (/Recipe replay failed/i.test(text)) {
+    base = "recipe replay failed";
+  } else if (/needs_retraining|marked for manual|recipe_blocked/i.test(text)) {
+    base = "recipe blocked";
+  } else if (diagnosis?.step_count === 0) {
+    base = "no recipe on GitHub";
+  } else if (/getaddrinfo|Name or service not known|ENOTFOUND|Could not resolve host/i.test(text)) {
+    base = "dns";
+  } else if (/SSL|certificate/i.test(text)) {
+    base = "ssl";
+  } else if (/timeout|Timeout|TimeoutError/i.test(text)) {
+    base = "timeout";
+  } else if (/Recipe download step did not find|Recipe finished without downloading/i.test(text)) {
+    base = "recipe_drift";
+  } else if (/no PDF|html_link/i.test(text)) {
+    base = "no_pdf";
+  } else {
+    base = "other";
+  }
+  if (options.retrainedPending) return `retrained — ${base}`;
+  return base;
 }
 
 async function _problemsGetRetrainedMap() {
@@ -1170,15 +1234,24 @@ function _problemsShowVerifyResult(payload) {
     );
   } else if (payload.ok === false) {
     box.className = "err";
-    const reason = String(payload.item?.error || payload.item?.reason || "still failed").slice(0, 160);
+    const reason = String(payload.item?.error || payload.item?.reason || "still failed").slice(0, 220);
     lines.push(`❌ <strong>${payload.displayName}</strong> still failed: ${reason}`);
+    const advice = _problemsFailureAdvice(
+      payload.item?.error || payload.item?.reason || "",
+      payload.item?.diagnosis
+    );
+    if (advice) lines.push(`<strong>What this means:</strong> ${advice}`);
     const diag = payload.item?.diagnosis;
     if (diag && typeof diag === "object") {
       const budget = diag.total_timeout_s ? `${diag.total_timeout_s}s total budget` : "";
       const nav = diag.navigation_timeout_ms ? `${diag.navigation_timeout_ms}ms per step` : "";
       const stage = diag.failure_stage ? `stage: ${diag.failure_stage}` : "";
-      const hint = [budget, nav, stage].filter(Boolean).join(" · ");
+      const steps = diag.step_count != null ? `${diag.step_count} recipe steps` : "";
+      const recorded = diag.recipe_recorded_date ? `recipe dated ${diag.recipe_recorded_date}` : "";
+      const navWait = diag.navigation_wait_until ? `nav: ${diag.navigation_wait_until}` : "";
+      const hint = [budget, nav, stage, steps, recorded, navWait].filter(Boolean).join(" · ");
       if (hint) lines.push(`Diagnosis: ${hint}`);
+      if (diag.slow_site_note) lines.push(`Slow site: ${diag.slow_site_note}`);
     }
     if (payload.item?.url) {
       lines.push(
@@ -1412,6 +1485,16 @@ async function _problemsRenderRows(rows) {
     const category = document.createElement("td");
     category.textContent = row.category;
     if (row.retrainedPending) category.classList.add("problems-retrained");
+    const tipParts = [];
+    if (row.error_text) tipParts.push(row.error_text);
+    if (row.advice) tipParts.push(row.advice);
+    if (row.diagnosis?.recipe_recorded_date) {
+      tipParts.push(`GitHub recipe dated: ${row.diagnosis.recipe_recorded_date}`);
+    }
+    if (row.diagnosis?.step_count != null) {
+      tipParts.push(`Recipe steps on harvest: ${row.diagnosis.step_count}`);
+    }
+    if (tipParts.length) category.title = tipParts.join("\n\n");
     tr.appendChild(category);
 
     const lastSeen = document.createElement("td");

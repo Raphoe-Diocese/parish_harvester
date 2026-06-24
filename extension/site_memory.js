@@ -101,6 +101,55 @@
         "Do not worry if Document Properties title mentions Microsoft Word.",
       ],
     },
+    mdocs_download_list: {
+      playbook_type: "mdocs_download_list",
+      site_type: "mdocs_bulletin_list",
+      page_type: "mdocs_bulletin_list",
+      recipe_flow: "click_then_pdf",
+      label: "mDocs PDF bulletin table",
+      operator_notes: [
+        "mDocs WordPress plugin lists dated PDFs — newest row is usually at the top.",
+        "Click Download on this week's row, then capture PDF download (not Save page as PDF).",
+        "Slow sites: use http:// if HTTPS certificate is expired (portstewartparish.website).",
+        "Harvester waits up to 7 minutes for the table on very slow hosts.",
+      ],
+      do_not: [
+        "Do not use Save page as PDF — bulletins are real PDF files in the mDocs table.",
+        "Do not use https://portstewartparish.website — certificate expired; use http://.",
+      ],
+    },
+    wp_block_file_bulletin: {
+      playbook_type: "permanent_bulletin_page",
+      site_type: "wp_block_file_bulletin",
+      page_type: "wp_block_file_bulletin",
+      recipe_flow: "direct_download",
+      label: "WordPress permanent bulletin page (wp-block-file)",
+      operator_notes: [
+        "Permanent /parish-bulletin/ URL — PDF filename changes weekly under /wp-content/uploads/YYYY/MM/.",
+        "PDF is in object.wp-block-file__embed[data] — harvest scrapes the embed URL.",
+        "Use url_pattern *bulletin*.pdf — never pin a dated filename.",
+      ],
+      do_not: [
+        "Do not train on the homepage — use the dedicated bulletin page only.",
+        "Do not pin saintanthony.co.uk if the parish moved to saintanthonys.uk.",
+      ],
+    },
+    joomla_dropfiles: {
+      playbook_type: "weekly_bulletin_download",
+      site_type: "joomla_dropfiles",
+      page_type: "weekly_bulletin_download",
+      recipe_flow: "click_then_download",
+      label: "Joomla Dropfiles cloud download (.docx → PDF)",
+      operator_notes: [
+        "Joomla Dropfiles — cloud ↓ icon (a.mod_downloadlink) serves Word .docx.",
+        "Click the cloud on this Sunday's row — harvester converts docx → PDF automatically.",
+        "Do not record diocese GDPR/Privacy PDFs — only mod_downloadlink on the parish host.",
+      ],
+      do_not: [
+        "Do not save a download URL from downandconnor.org or other diocese admin PDFs.",
+        "Do not use Pick bulletin image — this is a file download site.",
+      ],
+    },
     stacked_image_bulletin: {
       playbook_type: "stacked_image_bulletin",
       site_type: "stacked_image_bulletin",
@@ -152,9 +201,35 @@
       (step) => String(step?.action || "").trim() === "image_stack"
     );
 
-  const getForPageType = (pageType, recipe = null) => {
+  const _recipeLooksLikeMdocs = (recipe = {}) => {
+    if (String(recipe.site_type || "").includes("mdocs")) return true;
+    if (String(recipe.playbook_type || "").includes("mdocs")) return true;
+    return (Array.isArray(recipe.steps) ? recipe.steps : []).some((step) => {
+      const blob = `${step?.href || ""} ${step?.url || ""} ${step?.selector || ""}`;
+      return /mdocs-file|table\.mdocs|mdocs-download/i.test(blob);
+    });
+  };
+
+  const _recipeLooksLikeDropfiles = (recipe = {}) => {
+    if (String(recipe.site_type || "").includes("dropfiles")) return true;
+    return (Array.isArray(recipe.steps) ? recipe.steps : []).some((step) =>
+      /mod_downloadlink/i.test(String(step?.selector || ""))
+    );
+  };
+
+  const getForPageType = (pageType, recipe = null, pageCtx = null) => {
     const key = String(pageType || "").trim();
-    if (recipe && _recipeUsesImageStack(recipe)) {
+    const fpId = String(pageCtx?.htmlFingerprint || "").trim();
+    if (fpId === "mdocs_bulletin_table" || _recipeLooksLikeMdocs(recipe)) {
+      return CATALOG.mdocs_download_list;
+    }
+    if (fpId === "wp_block_file_bulletin" || key === "wp_block_file_bulletin") {
+      return CATALOG.wp_block_file_bulletin;
+    }
+    if (fpId === "joomla_dropfiles_weekly" || _recipeLooksLikeDropfiles(recipe)) {
+      return CATALOG.joomla_dropfiles;
+    }
+    if (fpId === "stacked_image_bulletin" || (recipe && _recipeUsesImageStack(recipe))) {
       return CATALOG.stacked_image_bulletin;
     }
     if (recipe && _recipeUsesDatedPdfPath(recipe)) {
@@ -168,7 +243,7 @@
 
   const enrichRecipe = (recipe, pageCtx = {}) => {
     const base = recipe && typeof recipe === "object" ? { ...recipe } : {};
-    const memory = getForPageType(pageCtx.type, base);
+    const memory = getForPageType(pageCtx.type, base, pageCtx);
     if (!memory) return base;
 
     base.playbook_type = memory.playbook_type;
@@ -188,7 +263,7 @@
   };
 
   const patternPayloadFromPage = (pageCtx = {}, recipe = {}) => {
-    const memory = getForPageType(pageCtx.type, recipe);
+    const memory = getForPageType(pageCtx.type, recipe, pageCtx);
     const lib = globalThis.PhPatternLibrary;
     if (!lib) return null;
     const page = lib.fingerprintFromPage(pageCtx);

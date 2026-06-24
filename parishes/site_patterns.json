@@ -244,13 +244,20 @@
       "step_count": 4
     },
     "parishofballinascreen": {
-      "page_type": "image_bulletin",
+      "page_type": "html_text_bulletin",
       "recipe_flow": "html_capture",
-      "combined_key": "image_bulletin+html_capture",
-      "display_name": "Ballinascreen & Desertmartin Parish",
+      "combined_key": "html_text_bulletin+html_capture",
+      "display_name": "Ballinascreen (& Desertmartin amalgamated)",
       "start_url_host": "www.parishofballinascreen.com",
-      "updated": "2026-06-13",
-      "step_count": 3
+      "updated": "2026-06-24",
+      "step_count": 2,
+      "playbook_type": "wix_dated_slug",
+      "operator_notes": [
+        "One HTML bulletin page per week for both Ballinascreen and Desertmartin.",
+        "URL pattern: ballinascreen-desertmartin-parishes-D_month_YYYY — changes every Sunday.",
+        "Recipe uses use_target_url so harvest rewrites the date automatically.",
+        "Train on the bulletin page, then print_to_pdf — no PDF download on this site."
+      ]
     },
     "buncranaparish": {
       "page_type": "direct_pdf",
@@ -583,6 +590,72 @@
       "start_url_host": "www.kilmoreandkillyleagh.com",
       "updated": "2026-06-16",
       "step_count": 3
+    },
+    "derriaghycatholicparish": {
+      "page_type": "stacked_image_bulletin",
+      "recipe_flow": "image_stack",
+      "combined_key": "stacked_image_bulletin+image_stack",
+      "display_name": "Derriaghy",
+      "start_url_host": "derriaghycatholicparish.com",
+      "updated": "2026-06-24",
+      "step_count": 2,
+      "playbook_type": "stacked_image_bulletin",
+      "operator_notes": [
+        "One.com WordPress — TLS is fast (~0.6s) but the page can hang past 60s on domcontentloaded.",
+        "Harvest uses commit navigation and a 2–3 minute budget (goto + image_stack).",
+        "While training, if the timer stays on Still loading past 45s, that is normal — push anyway."
+      ]
+    },
+    "saintanthony": {
+      "page_type": "wp_block_file_bulletin",
+      "recipe_flow": "click_then_pdf",
+      "combined_key": "wp_block_file_bulletin+click_then_pdf",
+      "display_name": "Saint Anthony",
+      "start_url_host": "saintanthonys.uk",
+      "updated": "2026-06-24",
+      "step_count": 2,
+      "playbook_type": "permanent_bulletin_page",
+      "operator_notes": [
+        "New site saintanthonys.uk — permanent /parish-bulletin/ page (not saintanthony.co.uk).",
+        "PDF in wp-block-file embed (object[data=…bulletin….pdf]) — page URL never changes.",
+        "Harvest: goto /parish-bulletin/ then download *bulletin*.pdf from embed."
+      ]
+    },
+    "portstewartparish": {
+      "page_type": "mdocs_bulletin_list",
+      "recipe_flow": "click_then_pdf",
+      "combined_key": "mdocs_bulletin_list+click_then_pdf",
+      "display_name": "Portstewart",
+      "start_url_host": "portstewartparish.website",
+      "updated": "2026-06-24",
+      "step_count": 3,
+      "playbook_type": "mdocs_download_list",
+      "operator_notes": [
+        "Real PDF files — mDocs Download column. Never Save page as PDF.",
+        "Use HTTP — HTTPS cert is expired.",
+        "mDocs table on /bulletins/ — first row is this week's PDF (Download link in column 3).",
+        "Page can take 3–5 minutes to load — harvest budget up to 10 minutes."
+      ],
+      "do_not": [
+        "Do not use Save page as PDF — bulletins are downloadable PDFs in the mDocs table.",
+        "Do not use https://portstewartparish.website."
+      ]
+    },
+    "stmarysportglenone": {
+      "page_type": "weekly_bulletin_download",
+      "recipe_flow": "click_then_download",
+      "combined_key": "weekly_bulletin_download+click_then_download",
+      "display_name": "Port Glenone",
+      "start_url_host": "stmarysportglenone.org",
+      "updated": "2026-06-24",
+      "step_count": 1,
+      "playbook_type": "weekly_bulletin_download",
+      "site_type": "joomla_dropfiles",
+      "operator_notes": [
+        "Joomla Dropfiles on stmarysportglenone.org — bulletin is Word .docx, not PDF.",
+        "Click the cloud ↓ (a.mod_downloadlink) on the first Weekly Bulletins row.",
+        "Do not save a download URL from downandconnor.org — diocese GDPR PDFs are not bulletins.",
+      ]
     }
   }
 }

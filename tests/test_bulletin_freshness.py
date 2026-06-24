@@ -28,6 +28,12 @@ class BulletinFreshnessTests(unittest.TestCase):
             extract_bulletin_date("https://x.com/bulletin-2026-06-15.pdf"),
             date(2026, 6, 15),
         )
+        self.assertEqual(
+            extract_bulletin_date(
+                "https://saintanthonys.uk/wp-content/uploads/2026/06/bulletin210611sunot.pdf"
+            ),
+            date(2026, 6, 21),
+        )
 
     def test_check_freshness_in_week_is_fresh(self) -> None:
         target = date(2026, 6, 14)  # Sunday

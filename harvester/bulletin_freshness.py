@@ -56,6 +56,35 @@ def week_window(target: date) -> tuple[date, date]:
 def extract_bulletin_date(url_or_text: str) -> date | None:
     """Extract the most likely bulletin date from a URL or link label."""
     text = url_or_text or ""
+
+    # WordPress media folders are authoritative: /uploads/2026/06/file.pdf
+    wp_uploads = re.search(r"/uploads/(20\d{2})/(0?\d{1,2})/", text, re.I)
+    if wp_uploads:
+        try:
+            folder_year = int(wp_uploads.group(1))
+            folder_month = int(wp_uploads.group(2))
+            basename = text.rsplit("/", 1)[-1].lower()
+            if re.search(r"sun.?ot|sunday|ordinary.?time", basename, re.I):
+                bulletin_dm = re.search(r"bulletin(\d{2})(\d{2})", basename, re.I)
+                if bulletin_dm:
+                    day = int(bulletin_dm.group(1))
+                    month = int(bulletin_dm.group(2))
+                    if month == folder_month:
+                        return _safe_date(folder_year, folder_month, day)
+            day_match = re.search(
+                rf"(?<!\d)(0?[1-9]|[12]\d|3[01]){folder_month:02d}{folder_year % 100:02d}(?!\d)",
+                basename,
+            )
+            if day_match:
+                day = int(day_match.group(1))
+                return _safe_date(folder_year, folder_month, day)
+            slug_day = re.search(r"(?<!\d)(0?[1-9]|[12]\d|3[01])(?!\d)", basename)
+            if slug_day:
+                return _safe_date(folder_year, folder_month, int(slug_day.group(1)))
+            return _safe_date(folder_year, folder_month, 1)
+        except (TypeError, ValueError):
+            pass
+
     parsed = extract_date_from_string(text)
     if parsed:
         return parsed
@@ -63,7 +92,7 @@ def extract_bulletin_date(url_or_text: str) -> date | None:
     patterns = (
         (_ISO_RE, lambda m: _safe_date(int(m.group(1)), int(m.group(2)), int(m.group(3)))),
         (_DMY_ISO_RE, lambda m: _safe_date(int(m.group(3)), int(m.group(2)), int(m.group(1)))),
-        (_DDMMYY_RE, lambda m: _safe_parse("%d%m%y", "".join(m.groups()))),
+        (_DDMMYY_RE, lambda m: _safe_parse_ddmmyy(m.group(1), m.group(2), m.group(3))),
         (_DDMMYYYY_RE, lambda m: _safe_parse("%d%m%Y", "".join(m.groups()))),
     )
     for pattern, parser in patterns:
@@ -84,6 +113,15 @@ def _safe_date(year: int, month: int, day: int) -> date | None:
 def _safe_parse(fmt: str, raw: str) -> date | None:
     try:
         return datetime.strptime(raw, fmt).date()
+    except ValueError:
+        return None
+
+
+def _safe_parse_ddmmyy(day_s: str, month_s: str, year_s: str) -> date | None:
+    """Parse DDMMYY using 2000+YY (matches harvester.utils)."""
+    try:
+        year = 2000 + int(year_s)
+        return date(year, int(month_s), int(day_s))
     except ValueError:
         return None
 
@@ -174,6 +212,13 @@ def mark_result_stale(
         f"Stale bulletin rejected for mega PDF "
         f"(bulletin date {date_str}, {verdict.reason})"
     )
+    result.diagnosis = {
+        **(result.diagnosis if isinstance(result.diagnosis, dict) else {}),
+        "failure_stage": "stale_rejected",
+        "bulletin_date": date_str,
+        "stale_reason": verdict.reason,
+        "recipe_worked": True,
+    }
     if result.file_path and result.file_path.exists():
         try:
             result.file_path.unlink()

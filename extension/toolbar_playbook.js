@@ -84,6 +84,15 @@
       now: "Click the cloud ↓ on this week's row — or tap the button below.",
       steps: ["Download this week's row.", "Send & test."],
     },
+    mdocs_bulletin_list: {
+      title: "PDF bulletin table (mDocs plugin)",
+      now: "Point at Download on this week's row — real PDF files, NOT Save page as PDF.",
+      steps: [
+        "Step 1: Point at the Download link on the newest bulletin row.",
+        "Step 2: Capture the PDF download (never Save page as PDF or Crop).",
+        "Send & test.",
+      ],
+    },
     html: {
       title: "Normal parish web page",
       now: "Point at News / Newsletter — or Save page as PDF if the bulletin text is already on screen.",

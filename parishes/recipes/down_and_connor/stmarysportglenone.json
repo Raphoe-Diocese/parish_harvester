@@ -1,41 +1,34 @@
 {
+  "version": 1,
   "parish_key": "stmarysportglenone",
   "display_name": "Port Glenone",
-  "recorded_date": "2026-04-30",
-  "start_url": "https://stmarysportglenone.co.uk/?page_id=40",
+  "diocese": "down_and_connor",
+  "start_url": "https://stmarysportglenone.org/?page_id=40",
+  "site_type": "joomla_dropfiles",
+  "playbook_type": "weekly_bulletin_download",
+  "recorded_date": "2026-06-24",
+  "timeout_ms": 120000,
+  "total_timeout_s": 360,
   "steps": [
     {
       "action": "goto",
-      "url": "https://stmarysportglenone.co.uk/?page_id=40"
+      "url": "https://stmarysportglenone.org/?page_id=40"
     },
     {
       "action": "click",
-      "selector": "a:has-text('Home')",
+      "selector": "a.mod_downloadlink",
+      "pick_strategy": "first_match",
+      "bulletin_position": "top",
       "fallback_selectors": [
-        "a[href$='.pdf']",
-        "a[href*='.pdf']",
-        "li#menu-item-19 > a"
+        ".mod_dropfiles_latest a.mod_downloadlink",
+        "a.mod_dropfiles_downloadlink"
       ]
-    },
-    {
-      "action": "click",
-      "selector": "a:has-text('Bulletin')",
-      "fallback_selectors": [
-        "a[href$='.pdf']",
-        "a[href*='.pdf']",
-        "li#menu-item-44 > a"
-      ]
-    },
-    {
-      "action": "download",
-      "url_pattern": "*.pdf",
-      "captured_url": "no_bulletin"
     }
   ],
-  "diocese": "down_and_connor",
-  "placeholder": true,
-  "auto_generated": true,
-  "auto_fixed": true,
-  "needs_retraining": true,
-  "retraining_reason": "Stub recipe from April \u2014 no bulletin was captured"
+  "operator_notes": [
+    "New domain stmarysportglenone.org (was .co.uk).",
+    "Joomla Dropfiles — cloud ↓ icon (a.mod_downloadlink) serves a Word .docx file.",
+    "Harvester converts docx → PDF automatically (same as Claudy) — you do not need a PDF on the site.",
+    "Train on ?page_id=40 or homepage Weekly Bulletins — first row is the latest."
+  ]
 }

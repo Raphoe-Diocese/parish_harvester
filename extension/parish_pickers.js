@@ -31,6 +31,17 @@
     parishesByDiocese: {},
   };
 
+  const KEY_ALIASES = {
+    "portstewart-st-marys": "portstewartparish",
+    "portstewartstmarys": "portstewartparish",
+    "portstewart-st-mary's": "portstewartparish",
+  };
+
+  const _resolveKeyAlias = (key) => {
+    const k = String(key || "").trim().toLowerCase();
+    return KEY_ALIASES[k] || k;
+  };
+
   const _isJunkParishKey = (key) => {
     const k = String(key || "").trim().toLowerCase();
     if (!k || k.length < 4) return true;
@@ -333,7 +344,10 @@
 
   const lookupByUrl = (url) => registry.byUrl[normalizeUrlKey(url)] || null;
 
-  const lookupByKey = (key) => registry.byKey[String(key || "").trim().toLowerCase()] || null;
+  const lookupByKey = (key) => {
+    const normalized = _resolveKeyAlias(key);
+    return registry.byKey[normalized] || registry.byKey[String(key || "").trim().toLowerCase()] || null;
+  };
 
   const resolveFromPage = (pageUrl, storageData = {}) => {
     const url = pageUrl || "";

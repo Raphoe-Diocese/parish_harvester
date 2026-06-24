@@ -258,6 +258,164 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 });
 
 const SITE_PATTERNS_PATH = "parishes/site_patterns.json";
+const HOST_PROFILES_PATH = "parishes/host_profiles.json";
+
+function _isBadBulletinDownloadUrl(url, startUrl) {
+  const text = String(url || "").toLowerCase();
+  if (!text) return false;
+  if (/\b(bulletin|newsletter)\b/i.test(text)) return false;
+  if (
+    /privacy|gdpr|gift.?aid|dataentry|financial|diocese|prayer|safeguarding|standingorder|donation/i.test(
+      text
+    )
+  ) {
+    return true;
+  }
+  try {
+    const dlHost = new URL(url).hostname.toLowerCase();
+    const startHost = new URL(String(startUrl || url)).hostname.toLowerCase();
+    if (dlHost !== startHost && !/weekly-bulletins|mdocs-file|\.docx/i.test(text)) {
+      return true;
+    }
+  } catch (_e) {
+    // ignore invalid URLs
+  }
+  return false;
+}
+
+function _recipeLooksLikeMdocs(recipe = {}) {
+  if (String(recipe.site_type || "").includes("mdocs")) return true;
+  if (String(recipe.playbook_type || "").includes("mdocs")) return true;
+  return (Array.isArray(recipe.steps) ? recipe.steps : []).some((step) => {
+    const blob = `${step?.href || ""} ${step?.url || ""} ${step?.selector || ""}`;
+    return /mdocs-file|table\.mdocs|mdocs-download/i.test(blob);
+  });
+}
+
+function _sanitizeRecipeOnPush(recipe) {
+  if (!recipe || !Array.isArray(recipe.steps)) return recipe;
+  const out = { ...recipe, steps: recipe.steps.map((s) => (s && typeof s === "object" ? { ...s } : s)) };
+  const startUrl = String(out.start_url || "").trim();
+
+  if (/portstewartparish\.(website|ie)/i.test(startUrl)) {
+    out.start_url = startUrl.replace(/^https:/i, "http:");
+    out.navigation_wait_until = out.navigation_wait_until || "commit";
+    out.timeout_ms = Math.max(Number(out.timeout_ms) || 0, 180000);
+    out.total_timeout_s = Math.max(Number(out.total_timeout_s) || 0, 420);
+    out.site_type = out.site_type || "mdocs_bulletin_list";
+    out.playbook_type = out.playbook_type || "mdocs_download_list";
+    out.steps = out.steps.map((step) => {
+      if (!step || typeof step !== "object") return step;
+      const next = { ...step };
+      if (next.url) next.url = String(next.url).replace(/^https:\/\/portstewartparish/i, "http://portstewartparish");
+      return next;
+    });
+  }
+
+  if (_recipeLooksLikeMdocs(out)) {
+    out.steps = out.steps.filter((s) => String(s?.action || "").toLowerCase() !== "print_to_pdf");
+    if (!out.steps.some((s) => String(s?.action || "").toLowerCase() === "download")) {
+      out.steps.push({ action: "download", use_captured_url: true, url_pattern: "*.pdf" });
+    }
+    out.site_type = out.site_type || "mdocs_bulletin_list";
+    out.playbook_type = out.playbook_type || "mdocs_download_list";
+  }
+
+  out.steps = out.steps.map((step) => {
+    if (String(step?.action || "").toLowerCase() !== "image_stack") return step;
+    const next = { ...step };
+    delete next.urls;
+    if (!next.count) next.count = 2;
+    return next;
+  });
+
+  out.steps = out.steps.map((step) => {
+    if (String(step?.action || "").toLowerCase() !== "download") return step;
+    const next = { ...step };
+    const dlUrl = String(next.url || next.captured_url || "").trim();
+    if (dlUrl && _isBadBulletinDownloadUrl(dlUrl, startUrl)) {
+      delete next.url;
+      delete next.captured_url;
+      next.use_captured_url = true;
+    }
+    return next;
+  });
+
+  const hasDropfilesClick = out.steps.some((s) =>
+    /mod_downloadlink/i.test(String(s?.selector || ""))
+  );
+  if (hasDropfilesClick) {
+    const badDownloads = out.steps.filter((s) => {
+      if (String(s?.action || "").toLowerCase() !== "download") return false;
+      const dlUrl = String(s.url || s.captured_url || "").trim();
+      return dlUrl && _isBadBulletinDownloadUrl(dlUrl, startUrl);
+    });
+    if (badDownloads.length > 0) {
+      out.steps = out.steps.filter((s) => !badDownloads.includes(s));
+    }
+    out.site_type = out.site_type || "joomla_dropfiles";
+  }
+
+  return out;
+}
+
+async function _upsertHostProfile(gh_pat, gh_repo, recipe) {
+  const startUrl = String(recipe.start_url || "").trim();
+  if (!startUrl) return { ok: false, skipped: true };
+  let host = "";
+  try {
+    host = new URL(startUrl).hostname.toLowerCase();
+  } catch (_e) {
+    return { ok: false, skipped: true };
+  }
+
+  const loaded = await _fetchGithubJsonFile(gh_pat, gh_repo, HOST_PROFILES_PATH);
+  if (!loaded.ok) return loaded;
+
+  const profile =
+    loaded.data && typeof loaded.data === "object"
+      ? loaded.data
+      : { _comment: "Per-host fetch profiles.", _default: {}, hosts: {} };
+  if (!profile.hosts || typeof profile.hosts !== "object") profile.hosts = {};
+
+  const existing = profile.hosts[host] && typeof profile.hosts[host] === "object"
+    ? profile.hosts[host]
+    : {};
+  const next = { ...existing };
+  if (recipe.navigation_wait_until) next.navigation_wait_until = recipe.navigation_wait_until;
+  if (recipe.total_timeout_s) next.total_timeout_s = Number(recipe.total_timeout_s);
+  if (recipe.timeout_ms) next.navigation_timeout_ms = Number(recipe.timeout_ms);
+  if (Number(recipe.observed_load_ms) >= 45000) {
+    next.wait_after_load_ms = Math.min(Number(recipe.observed_load_ms), 180000);
+  }
+  if (/portstewartparish\.(website|ie)/i.test(host)) {
+    next.ignore_https_errors = true;
+    next.prefer_headful = true;
+    next.notes =
+      "Use HTTP — HTTPS cert expired. mDocs bulletin table can take 3–5 minutes; PDF is first row Download link.";
+  }
+  if (/derriaghycatholicparish\.com/i.test(host)) {
+    next.navigation_wait_until = next.navigation_wait_until || "commit";
+    next.prefer_headful = true;
+    if (!next.notes) {
+      next.notes = "TLS is fast but domcontentloaded can hang — harvest uses commit navigation.";
+    }
+  }
+  const opNotes = Array.isArray(recipe.operator_notes) ? recipe.operator_notes : [];
+  if (opNotes.length && !next.notes) {
+    next.notes = opNotes.join(" ").slice(0, 280);
+  }
+
+  profile.hosts[host] = next;
+  return _putGithubJsonFile(
+    gh_pat,
+    gh_repo,
+    HOST_PROFILES_PATH,
+    profile,
+    loaded.sha,
+    `chore: learn host profile for ${host}`
+  );
+}
 
 async function _fetchGithubJsonFile(gh_pat, gh_repo, filePath) {
   const apiUrl = `https://api.github.com/repos/${gh_repo}/contents/${filePath}`;
@@ -349,6 +507,9 @@ async function _upsertSitePattern(gh_pat, gh_repo, parishKey, displayName, recip
     oneweb_docx: "One.com + Google previews: auto-detect newsletter from HTML. Direct download only — never wait for iframes. See Claudy recipe.",
     wix_pdf_viewer: "Use Find bulletin — Wix often hides the real PDF URL in the viewer.",
     wix_html: "Save page as PDF — harvester prints HTML text bulletins (WordPress/Wix) into the mega PDF each Sunday.",
+    mdocs_download_list: "mDocs table — click Download on newest row, then capture PDF. Never Save page as PDF.",
+    wp_block_file_bulletin: "Permanent bulletin page — harvest scrapes wp-block-file embed (*bulletin*.pdf pattern).",
+    stacked_image_bulletin: "Stack top N bulletin images — never hardcode image URLs in the recipe.",
     parish_messenger_embed: "Follow a link → pick newest View Newsletter (ignore Gift Aid / Data Entry PDFs).",
     image_bulletin: "Click Get an image or Pick an image on this page.",
     html_click_chain: "Click Follow a link to reach the bulletin, then Get a PDF or Mark as HTML.",
@@ -589,6 +750,50 @@ const _githubApiError = async (resp) => {
   }
 };
 
+function _decodeGithubFileContent(content) {
+  if (!content || typeof content !== "string") return null;
+  try {
+    const decoded = decodeURIComponent(
+      atob(content.replace(/\n/g, ""))
+        .split("")
+        .map((c) => `%${(`00${c.charCodeAt(0).toString(16)}`).slice(-2)}`)
+        .join("")
+    );
+    return JSON.parse(decoded);
+  } catch (_e) {
+    return null;
+  }
+}
+
+async function _verifyRecipeOnGithub(apiBase, headers, expectedSteps) {
+  try {
+    const verifyResp = await fetch(apiBase, { headers });
+    if (!verifyResp.ok) {
+      return { ok: false, error: `Could not read recipe back (${verifyResp.status})` };
+    }
+    const verifyData = await verifyResp.json();
+    const parsed = _decodeGithubFileContent(verifyData.content);
+    if (!parsed || typeof parsed !== "object") {
+      return { ok: false, error: "Recipe saved but could not parse GitHub copy" };
+    }
+    const steps = Array.isArray(parsed.steps) ? parsed.steps : [];
+    const last = steps.length ? steps[steps.length - 1] : null;
+    const expected = Array.isArray(expectedSteps) ? expectedSteps.length : 0;
+    return {
+      ok: true,
+      stepCount: steps.length,
+      lastAction: last && typeof last === "object" ? String(last.action || "").trim() : "",
+      recorded_date: String(parsed.recorded_date || "").trim(),
+      sha: verifyData.sha || "",
+      stepsMatch: steps.length === expected && expected > 0,
+      skip: Boolean(parsed.skip),
+      needs_retraining: Boolean(parsed.needs_retraining),
+    };
+  } catch (err) {
+    return { ok: false, error: String(err) };
+  }
+}
+
 function _looksLikeDatedSelector(selector) {
   const value = String(selector || "");
   if (!value) return false;
@@ -824,7 +1029,9 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         ...incoming,
         steps: stepsReplaced ? incoming.steps : (existingRecipe?.steps || incoming.steps),
       };
-      const normalizedRecipe = _normalizeRecipeTerminalSteps(recipe);
+      const normalizedRecipe = _normalizeRecipeTerminalSteps(
+        _sanitizeRecipeOnPush(recipe)
+      );
       // Retrain push must clear harvest-blocking flags left on the old recipe.
       delete normalizedRecipe.skip;
       delete normalizedRecipe.status;
@@ -870,6 +1077,18 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       const result = await putResp.json();
       const htmlUrl = result?.content?.html_url || `https://github.com/${gh_repo}/blob/main/${filePath}`;
 
+      const stepsPreservedFromOld = Boolean(
+        existingRecipe
+        && Array.isArray(existingRecipe.steps)
+        && existingRecipe.steps.length > 0
+        && !stepsReplaced
+      );
+      const githubVerify = await _verifyRecipeOnGithub(
+        apiBase,
+        headers,
+        normalizedRecipe.steps
+      );
+
       // Brief pause so GitHub serves the recipe commit before the harvest workflow checks out main.
       await new Promise((resolve) => setTimeout(resolve, 2500));
 
@@ -912,6 +1131,8 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
       let patternLearned = false;
       let patternLearnError = "";
+      let hostProfileLearned = false;
+      let hostProfileLearnError = "";
       if (message.site_pattern) {
         try {
           const patternResult = await _upsertSitePattern(
@@ -930,6 +1151,15 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
           patternLearnError = String(patternErr);
         }
       }
+      try {
+        const hostResult = await _upsertHostProfile(gh_pat, gh_repo, normalizedRecipe);
+        hostProfileLearned = Boolean(hostResult?.ok);
+        if (!hostResult?.ok && !hostResult?.skipped) {
+          hostProfileLearnError = hostResult?.error || "Could not save host profile.";
+        }
+      } catch (hostErr) {
+        hostProfileLearnError = String(hostErr);
+      }
 
       sendResponse({
         ok: true,
@@ -940,6 +1170,11 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         dispatchError,
         patternLearned,
         patternLearnError,
+        hostProfileLearned,
+        hostProfileLearnError,
+        stepsPushed: Array.isArray(normalizedRecipe.steps) ? normalizedRecipe.steps.length : 0,
+        stepsPreservedFromOld,
+        githubVerify,
       });
 
       try {

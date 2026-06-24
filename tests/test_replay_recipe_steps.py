@@ -9,7 +9,14 @@ from unittest.mock import AsyncMock, patch
 
 from PIL import Image
 
-from harvester.replay import _find_pdfemb_url, _is_non_bulletin_url, _score_bulletin_url, replay_recipe
+from harvester.replay import (
+    _find_mdocs_pdf_urls,
+    _find_pdfemb_url,
+    _is_non_bulletin_url,
+    _recipe_navigation_wait_until,
+    _score_bulletin_url,
+    replay_recipe,
+)
 
 
 class _FakePage:
@@ -358,6 +365,90 @@ class ClaudyBulletinFilterTests(unittest.TestCase):
             self.assertEqual(page.url, "https://threepatrons.org/")
             self.assertEqual(file_type, "pdf")
             self.assertIn("Weekly-Bulletins", source_url)
+
+
+class TestNavigationWaitUntil(unittest.TestCase):
+    def test_recipe_navigation_wait_until_reads_recipe_field(self) -> None:
+        self.assertEqual(
+            _recipe_navigation_wait_until({"navigation_wait_until": "commit"}),
+            "commit",
+        )
+
+    def test_replay_goto_uses_commit_when_recipe_requests_it(self) -> None:
+        import asyncio
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            recipe_path = root / "recipe.json"
+            recipe_path.write_text(
+                json.dumps(
+                    {
+                        "navigation_wait_until": "commit",
+                        "timeout_ms": 120000,
+                        "steps": [
+                            {"action": "goto", "url": "https://derriaghycatholicparish.com/?page_id=262"},
+                            {"action": "image_stack", "count": 2},
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            dest = root / "bulletin.pdf"
+            context = _FakePageContext()
+            browser = _FakeBrowser(context)
+            fake_find = AsyncMock(
+                return_value=[
+                    "https://example.org/b1.jpg",
+                    "https://example.org/b2.jpg",
+                ]
+            )
+            fake_stack = AsyncMock(return_value=("https://example.org/b1.jpg", "image_to_pdf"))
+            with patch("harvester.replay._find_stacked_bulletin_image_urls", fake_find):
+                with patch("harvester.replay._download_image_urls_as_pdf", fake_stack):
+                    asyncio.run(replay_recipe(recipe_path, dest, browser))
+
+            page = context.page
+            self.assertEqual(page.goto_calls, 1)
+            self.assertEqual(page.last_wait_until, "commit")
+
+    def test_find_mdocs_pdf_urls_prefers_newest_dated_pdf(self) -> None:
+        import asyncio
+
+        class _MdocsPage:
+            url = "http://portstewartparish.website/bulletins/"
+
+            async def eval_on_selector_all(self, _selector: str, _js: str):
+                return [
+                    "/wp-content/mdocs-previews/21st-june-2026.pdf",
+                    "/wp-content/mdocs-previews/14th-june-2026.pdf",
+                ]
+
+        found = asyncio.run(_find_mdocs_pdf_urls(_MdocsPage()))
+        self.assertTrue(found)
+        self.assertIn("21st-june-2026", found[0])
+
+
+class _FakePageContext:
+    def __init__(self) -> None:
+        self.page = _FakePageWithWaitUntil()
+        self.accept_downloads = False
+        self.closed = False
+
+    async def new_page(self):
+        return self.page
+
+    async def close(self) -> None:
+        self.closed = True
+
+
+class _FakePageWithWaitUntil(_FakePage):
+    def __init__(self) -> None:
+        super().__init__()
+        self.last_wait_until = ""
+
+    async def goto(self, url: str, timeout: int = 0, wait_until: str = "domcontentloaded") -> None:
+        self.last_wait_until = wait_until
+        await super().goto(url, timeout=timeout, wait_until=wait_until)
 
 
 if __name__ == "__main__":

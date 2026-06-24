@@ -54,6 +54,18 @@
       label: "Weekly bulletin list (cloud auto-download)",
       steps: "Click cloud ↓ on this Sunday's row — PDF downloads automatically. Trainer records download, then Push.",
     },
+    mdocs_download_list: {
+      label: "mDocs PDF bulletin table (WordPress)",
+      steps: "Click Download on the newest mDocs row → capture PDF download. Never Save page as PDF on these sites.",
+    },
+    wp_block_file_bulletin: {
+      label: "WordPress permanent bulletin page",
+      steps: "Open /parish-bulletin/ → Get a PDF with pattern *bulletin*.pdf (embed URL changes weekly).",
+    },
+    stacked_image_bulletin: {
+      label: "Stacked image bulletin (top N JPEGs)",
+      steps: "Pick the top bulletin images (image_stack) — harvester stacks them each Sunday. No hardcoded image URLs.",
+    },
     parish_messenger_embed: {
       label: "Parish Messenger widget (parishservices.co)",
       steps: "Wait for the page to load → Follow a link → pick newest View Newsletter / May 2026 row. Ignore Gift Aid and Data Entry PDFs.",
@@ -107,6 +119,9 @@
     else if (type === "parish_messenger") pageType = "parish_messenger_embed";
     else if (type === "oneweb_docx") pageType = "oneweb_docx";
     else if (type === "weekly_bulletin_download") pageType = "weekly_bulletin_download";
+    else if (type === "mdocs_bulletin_list") pageType = "mdocs_bulletin_list";
+    else if (type === "wp_block_file_bulletin") pageType = "wp_block_file_bulletin";
+    else if (type === "stacked_image_bulletin") pageType = "stacked_image_bulletin";
     else if (type === "cloud_folder") pageType = "cloud_folder";
     else if (type === "image") pageType = "image_bulletin";
     else if (type === "html" || type === "unknown") pageType = "html_click_chain";
@@ -133,11 +148,17 @@
     const clickCount = actions.filter((a) => a === "click").length;
 
     let recipeFlow = "mixed";
-    if (String(recipe.site_type || "").includes("oneweb") || String(recipe.playbook_type || "") === "oneweb_docx") {
+    const siteType = String(recipe.site_type || "");
+    const playbookType = String(recipe.playbook_type || "");
+    if (siteType.includes("oneweb") || playbookType === "oneweb_docx") {
       recipeFlow = "direct_docx";
+    } else if (siteType.includes("mdocs") || playbookType.includes("mdocs")) {
+      recipeFlow = "click_then_pdf";
+    } else if (siteType.includes("dropfiles") || playbookType === "weekly_bulletin_download") {
+      recipeFlow = hasClick && !hasDownload ? "click_then_download" : "direct_download";
     } else if (
-      String(recipe.playbook_type || "") === "weekly_bulletin_download" ||
-      String(recipe.site_type || "") === "sequential_bulletin_number"
+      playbookType === "weekly_bulletin_download" ||
+      siteType === "sequential_bulletin_number"
     ) {
       recipeFlow = "direct_download";
     } else if (hasHtml) recipeFlow = "html_capture";

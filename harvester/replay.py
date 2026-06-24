@@ -77,6 +77,8 @@ async def _goto_or_download(
     url: str,
     downloads: list,
     timeout_ms: int,
+    *,
+    wait_until: str = "domcontentloaded",
 ) -> tuple[Path, str, str] | None:
     """Navigate or fetch a direct document URL (Drive downloads abort normal goto)."""
     if _looks_like_direct_document_url(url):
@@ -86,7 +88,7 @@ async def _goto_or_download(
         tried = await _try_download_page_url(page, dest, url, timeout_ms=timeout_ms)
         if tried:
             return dest, tried[1], tried[0]
-    await page.goto(url, timeout=timeout_ms, wait_until="domcontentloaded")
+    await _navigate_page(page, url, timeout_ms, wait_until=wait_until)
     return await _capture_document_after_navigation(page, dest, url, downloads, timeout_ms)
 
 
@@ -211,6 +213,135 @@ def _recipe_step_timeout_ms(recipe: dict) -> int:
     return min(max(value, 1_000), 180_000)
 
 
+_VALID_NAV_WAIT_UNTIL = frozenset({"commit", "domcontentloaded", "load", "networkidle"})
+_HOST_PROFILES_RAW: dict | None = None
+
+
+def _load_host_profiles_raw() -> dict:
+    global _HOST_PROFILES_RAW
+    if _HOST_PROFILES_RAW is not None:
+        return _HOST_PROFILES_RAW
+    fallback: dict = {"_default": {}, "hosts": {}}
+    profiles_path = PARISHES_DIR / "host_profiles.json"
+    try:
+        loaded = json.loads(profiles_path.read_text(encoding="utf-8"))
+        if isinstance(loaded, dict):
+            if isinstance(loaded.get("_default"), dict):
+                fallback["_default"] = loaded["_default"]
+            if isinstance(loaded.get("hosts"), dict):
+                fallback["hosts"] = loaded["hosts"]
+    except Exception:
+        pass
+    _HOST_PROFILES_RAW = fallback
+    return fallback
+
+
+def _host_profile_for_start_url(start_url: str) -> dict:
+    profiles = _load_host_profiles_raw()
+    merged = dict(profiles.get("_default", {}))
+    host = urlparse(start_url).netloc.lower().split(":", 1)[0]
+    candidates = [host]
+    if host.startswith("www."):
+        candidates.append(host[4:])
+    elif host:
+        candidates.append(f"www.{host}")
+    hosts = profiles.get("hosts", {})
+    if isinstance(hosts, dict):
+        for key in candidates:
+            override = hosts.get(key)
+            if isinstance(override, dict):
+                merged.update(override)
+                break
+    return merged
+
+
+def _recipe_navigation_wait_until(recipe: dict) -> str:
+    """How eagerly goto waits — slow WordPress hosts often need ``commit``."""
+    raw = str(recipe.get("navigation_wait_until") or "").strip().lower()
+    if raw in _VALID_NAV_WAIT_UNTIL:
+        return raw
+    start_url = (recipe.get("start_url") or "").strip()
+    host_wait = str(_host_profile_for_start_url(start_url).get("navigation_wait_until") or "").strip().lower()
+    if host_wait in _VALID_NAV_WAIT_UNTIL:
+        return host_wait
+    return "domcontentloaded"
+
+
+async def _find_mdocs_pdf_urls(page: Page) -> list[str]:
+    """mDocs plugin lists — latest bulletin is first row (site copy)."""
+    raw_links = await page.eval_on_selector_all(
+        "table.mdocs a[href], a.mdocs-download[href], .mdocs a[href], .mdocs-file a[href]",
+        "(els) => els.map(el => el.getAttribute('href') || '').filter(Boolean)",
+    )
+    seen: set[str] = set()
+    candidates: list[str] = []
+    for raw in raw_links:
+        if not isinstance(raw, str) or not raw.strip():
+            continue
+        resolved = urljoin(page.url, raw.strip())
+        lower = resolved.lower()
+        if ".pdf" not in lower:
+            continue
+        if _is_non_bulletin_url(resolved):
+            continue
+        if resolved in seen:
+            continue
+        seen.add(resolved)
+        candidates.append(resolved)
+    candidates.sort(
+        key=lambda u: (_score_bulletin_url(u)[0], _score_bulletin_url(u)[1]),
+        reverse=True,
+    )
+    return candidates
+
+
+async def _wait_for_bulletin_content(page: Page, recipe: dict, timeout_ms: int) -> None:
+    """Slow hosts: wait for mdocs table or wp-block-file embed after commit navigation."""
+    playbook = str(recipe.get("playbook_type") or recipe.get("site_type") or "").lower()
+    probes = []
+    if "mdocs" in playbook:
+        probes.extend(["table.mdocs", "a.mdocs-download", ".mdocs a[href]"])
+    if "wp_block" in playbook or "permanent_bulletin" in playbook:
+        probes.extend(["object.wp-block-file__embed", ".wp-block-file a[href$='.pdf']"])
+    if not probes:
+        probes = ["table.mdocs", "object.wp-block-file__embed", "a[href$='.pdf']"]
+    budget = min(max(int(timeout_ms), 15_000), 240_000)
+    for sel in probes:
+        try:
+            await page.wait_for_selector(sel, timeout=budget)
+            return
+        except PlaywrightTimeoutError:
+            continue
+    try:
+        wait_after = int(_host_profile_for_start_url(recipe.get("start_url") or page.url).get("wait_after_load_ms") or 0)
+    except (TypeError, ValueError):
+        wait_after = 0
+    if wait_after > 0:
+        await asyncio.sleep(min(wait_after / 1000, 120))
+
+
+async def _navigate_page(
+    page: Page,
+    url: str,
+    timeout_ms: int,
+    *,
+    wait_until: str = "domcontentloaded",
+) -> None:
+    """Navigate with recipe/host wait policy — commit avoids hung domcontentloaded."""
+    mode = wait_until if wait_until in _VALID_NAV_WAIT_UNTIL else "domcontentloaded"
+    if mode == "commit":
+        await page.goto(url, timeout=timeout_ms, wait_until="commit")
+        try:
+            await page.wait_for_load_state(
+                "domcontentloaded",
+                timeout=min(max(timeout_ms // 2, 15_000), 90_000),
+            )
+        except PlaywrightTimeoutError:
+            pass
+        return
+    await page.goto(url, timeout=timeout_ms, wait_until=mode)
+
+
 def recipe_path_for(parish_key: str, parishes_dir: Path = PARISHES_DIR) -> Path:
     """Return the path to the recipe JSON for *parish_key*.
 
@@ -321,7 +452,7 @@ async def _convert_docx_to_pdf_bytes(docx_bytes: bytes) -> bytes:
 
 async def _save_download_to_pdf(download, dest: Path) -> str:
     suggested = (download.suggested_filename or "").lower()
-    if suggested.endswith(".docx"):
+    if suggested.endswith(".docx") or suggested.endswith(".doc"):
         with tempfile.TemporaryDirectory() as tmpdir:
             tmp_docx = Path(tmpdir) / "download.docx"
             await download.save_as(str(tmp_docx))
@@ -655,10 +786,10 @@ async def _find_pdfemb_url(page: Page) -> str | None:
 
 
 async def _find_iframe_pdf_url(page: Page) -> str | None:
-    """Return the best iframe PDF URL (skips GDPR/privacy admin docs)."""
+    """Return the best embedded PDF URL (iframe, object, or embed)."""
     srcs = await page.eval_on_selector_all(
-        "iframe[src]",
-        "(els) => els.map(el => el.getAttribute('src')).filter(Boolean)",
+        "iframe[src], object[data], embed[src]",
+        "(els) => els.map(el => el.getAttribute('src') || el.getAttribute('data') || '').filter(Boolean)",
     )
     candidates: list[str] = []
     for src in srcs:
@@ -809,26 +940,32 @@ async def replay_recipe(
 ) -> tuple[Path, str, str]:
     recipe = load_recipe(recipe_path)
     step_timeout_ms = _recipe_step_timeout_ms(recipe)
+    nav_wait_until = _recipe_navigation_wait_until(recipe)
     steps = recipe["steps"]
-
-    context = await browser.new_context(accept_downloads=True)
-    page = await context.new_page()
-    downloads: list = []
-    page.on("download", lambda d: downloads.append(d))
 
     start_url = (recipe.get("start_url") or "").strip()
     if not start_url:
         start_url = (target_url or "").strip()
+    host_profile = _host_profile_for_start_url(start_url)
+    context_opts: dict = {"accept_downloads": True}
+    if host_profile.get("ignore_https_errors"):
+        context_opts["ignore_https_errors"] = True
+    context = await browser.new_context(**context_opts)
+    page = await context.new_page()
+    downloads: list = []
+    page.on("download", lambda d: downloads.append(d))
+
     first_action = (steps[0].get("action") if steps else "") or ""
     if start_url and first_action != "goto":
         if _looks_like_direct_document_url(start_url):
             captured = await _goto_or_download(
-                page, dest, start_url, downloads, step_timeout_ms
+                page, dest, start_url, downloads, step_timeout_ms,
+                wait_until=nav_wait_until,
             )
             if captured:
                 return captured
         else:
-            await page.goto(start_url, timeout=step_timeout_ms, wait_until="domcontentloaded")
+            await _navigate_page(page, start_url, step_timeout_ms, wait_until=nav_wait_until)
             if _looks_like_http_url(start_url):
                 last_http_url = start_url
 
@@ -843,12 +980,14 @@ async def replay_recipe(
                 if not url:
                     raise RecipeReplayError("Recipe goto step missing URL")
                 captured = await _goto_or_download(
-                    page, dest, url, downloads, step_timeout_ms
+                    page, dest, url, downloads, step_timeout_ms,
+                    wait_until=nav_wait_until,
                 )
                 if captured:
                     return captured
                 if _looks_like_http_url(url):
                     last_http_url = url
+                await _wait_for_bulletin_content(page, recipe, step_timeout_ms)
                 continue
 
             if action == "click":
@@ -933,6 +1072,17 @@ async def replay_recipe(
                     if iframe_pdf_url:
                         source_url, file_type = await _download_document_url(page, iframe_pdf_url, dest)
                         return dest, file_type, source_url
+
+                mdocs_urls = await _find_mdocs_pdf_urls(page)
+                for mdocs_url in mdocs_urls:
+                    try:
+                        source_url, file_type = await _download_document_url(
+                            page, mdocs_url, dest, timeout_ms=step_timeout_ms
+                        )
+                        return dest, file_type, source_url
+                    except RecipeReplayError as exc:
+                        last_err = str(exc)
+                        continue
 
                 last_err = ""
                 for resolved in await _collect_document_candidates(page, pattern):

@@ -1,28 +1,48 @@
 {
+  "version": 1,
   "parish_key": "portstewartparish",
   "display_name": "Portstewart",
-  "recorded_date": "2026-04-30",
-  "start_url": "https://portstewartparish.website/bulletins/",
+  "diocese": "down_and_connor",
+  "start_url": "http://portstewartparish.website/bulletins/",
+  "site_type": "mdocs_bulletin_list",
+  "playbook_type": "mdocs_download_list",
+  "recorded_date": "2026-06-24",
+  "timeout_ms": 180000,
+  "total_timeout_s": 600,
+  "observed_load_ms": 300000,
+  "navigation_wait_until": "commit",
   "steps": [
     {
       "action": "goto",
-      "url": "https://portstewartparish.website/bulletins/"
+      "url": "http://portstewartparish.website/bulletins/"
     },
     {
       "action": "click",
-      "selector": "a[href$='.docx']",
+      "selector": "table.mdocs tbody tr:first-child a[href*='.pdf']",
+      "pick_strategy": "first_match",
+      "bulletin_position": "top",
       "fallback_selectors": [
-        "a[href*='weekly'][href$='.pdf']",
-        "a[href$='.pdf']",
-        "a[href*='.pdf']",
-        "aside#colormag_125x125_advertisement_widget-2 > div > div > a:nth-of-type(2)"
+        "table.mdocs a[href$='.pdf']",
+        "a.mdocs-download[href*='.pdf']",
+        ".mdocs a[href*='.pdf']",
+        "a:has-text(\"Download\")"
       ]
     },
     {
       "action": "download",
+      "use_captured_url": true,
       "url_pattern": "*.pdf"
     }
   ],
-  "diocese": "down_and_connor",
-  "timeout": 30000
+  "operator_notes": [
+    "Real PDF files in mDocs table — click Download, then capture PDF. Never Save page as PDF.",
+    "HTTP only — HTTPS certificate is expired (harvest fails on https://).",
+    "mDocs table on /bulletins/ — latest PDF is always the first row (21st June 2026 at top).",
+    "Site can take 3–5 minutes to show the table — harvest budget is up to 10 minutes.",
+    "PDF href is on the Download link in column 3, not the homepage."
+  ],
+  "do_not": [
+    "Do not use Save page as PDF — bulletins are downloadable PDF files, not HTML text.",
+    "Do not use https://portstewartparish.website — certificate expired; use http://."
+  ]
 }

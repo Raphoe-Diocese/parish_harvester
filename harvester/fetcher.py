@@ -479,6 +479,9 @@ def _get_host_profile(start_url: str) -> dict:
         "retry_backoff_ms": int(merged.get("retry_backoff_ms", int(_RETRY_DELAY_S * 1000))),
         "prefer_headful": bool(merged.get("prefer_headful", False)),
         "total_timeout_s": int(merged.get("total_timeout_s", TOTAL_TIMEOUT_S)),
+        "navigation_wait_until": str(merged.get("navigation_wait_until") or "").strip().lower() or None,
+        "ignore_https_errors": bool(merged.get("ignore_https_errors", False)),
+        "slow_site_note": str(merged.get("notes") or merged.get("slow_site_note") or "").strip() or None,
     }
 
 
@@ -549,6 +552,39 @@ def _timeout_diagnosis(recipe_meta: dict | None, host_profile: dict) -> dict:
         "recipe_total_timeout_s": recipe_meta.get("total_timeout_s"),
         "step_count": step_count,
     }
+
+
+def _harvest_diagnosis(
+    recipe_path: Path | None,
+    recipe_meta: dict | None,
+    host_profile: dict,
+    **extra: object,
+) -> dict:
+    """Report.json diagnosis: timeouts plus which recipe file harvest actually used."""
+    diag = _timeout_diagnosis(recipe_meta, host_profile)
+    meta = recipe_meta if isinstance(recipe_meta, dict) else {}
+    if recipe_path and recipe_path.exists():
+        try:
+            diag["recipe_path"] = str(recipe_path.relative_to(PARISHES_DIR.parent))
+        except ValueError:
+            diag["recipe_path"] = str(recipe_path)
+    elif recipe_path:
+        diag["recipe_path"] = str(recipe_path)
+    if meta.get("recorded_date"):
+        diag["recipe_recorded_date"] = str(meta["recorded_date"])
+    nav_wait = str(meta.get("navigation_wait_until") or host_profile.get("navigation_wait_until") or "").strip()
+    if nav_wait:
+        diag["navigation_wait_until"] = nav_wait
+    slow_note = str(host_profile.get("slow_site_note") or "").strip()
+    if slow_note:
+        diag["slow_site_note"] = slow_note
+    steps = meta.get("steps")
+    if isinstance(steps, list) and steps:
+        last = steps[-1]
+        if isinstance(last, dict):
+            diag["last_step_action"] = str(last.get("action") or "").strip()
+    diag.update(extra)
+    return diag
 
 
 def _recipe_uses_trained_click_download(recipe_meta: dict | None) -> bool:
@@ -1777,6 +1813,12 @@ async def _fetch_entry(
                 url=str(recipe_meta.get("start_url") or recipe_meta.get("url") or target_url),
                 file_type="skipped",
                 error=reason,
+                diagnosis=_harvest_diagnosis(
+                    recipe_path,
+                    recipe_meta,
+                    host_profile,
+                    failure_stage="recipe_blocked",
+                ),
             )
 
     manual_override = (manual_overrides or {}).get(key)
@@ -1845,17 +1887,25 @@ async def _fetch_entry(
 
         if trained_recipe:
             print(f"  ⛔ {key}: trained recipe failed — skipping legacy fallbacks")
+            replay_stage = (
+                "recipe_outdated"
+                if recipe_error and "outdated" in recipe_error.lower()
+                else "recipe_replay"
+            )
             return FetchResult(
                 key=key,
                 display_name=entry.display_name,
                 status="error",
                 url=_failure_report_url(entry, recipe_meta, target),
                 error=recipe_error or last_err,
-                diagnosis={
-                    **timeout_diag,
-                    "failure_stage": "recipe_replay",
-                    "recipe_error": recipe_error or last_err,
-                },
+                diagnosis=_harvest_diagnosis(
+                    recipe_path,
+                    recipe_meta,
+                    host_profile,
+                    failure_stage=replay_stage,
+                    recipe_error=recipe_error or last_err,
+                    legacy_fallbacks_blocked=True,
+                ),
             )
 
         elif entry.content_type != "html_link":
@@ -1875,6 +1925,13 @@ async def _fetch_entry(
             status="error",
             url=_failure_report_url(entry, recipe_meta, target),
             error=recipe_error or last_err,
+            diagnosis=_harvest_diagnosis(
+                recipe_path,
+                recipe_meta,
+                host_profile,
+                failure_stage="recipe_replay" if recipe_error else "error",
+                recipe_error=recipe_error or None,
+            ),
         )
 
     if entry.content_type == "html_link":
@@ -2091,7 +2148,8 @@ async def fetch_parish(
 ) -> FetchResult:
     """Fetch one parish bulletin with retries and a total timeout."""
     last_error = ""
-    recipe_meta = _load_recipe_metadata(recipe_path_for(entry.key, PARISHES_DIR))
+    recipe_path = recipe_path_for(entry.key, PARISHES_DIR)
+    recipe_meta = _load_recipe_metadata(recipe_path)
     host_profile = _apply_recipe_timeouts(
         _get_host_profile(
             _recipe_start_url(entry, recipe_meta, entry.bulletin_page or entry.example_url)
@@ -2177,10 +2235,12 @@ async def fetch_parish(
         status="error",
         url=_failure_report_url(entry, recipe_meta, target),
         error=last_error,
-        diagnosis={
-            **_timeout_diagnosis(recipe_meta, host_profile),
-            "failure_stage": "timeout" if last_error == "Total timeout exceeded" else "error",
-        },
+        diagnosis=_harvest_diagnosis(
+            recipe_path if recipe_path.exists() else None,
+            recipe_meta,
+            host_profile,
+            failure_stage="timeout" if last_error == "Total timeout exceeded" else "error",
+        ),
     )
 
 
