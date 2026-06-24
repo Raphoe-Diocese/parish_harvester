@@ -49,6 +49,11 @@ async function _injectTrainerScripts(tabId) {
       target: { tabId },
       files: [
         "pattern_library.js",
+        "html_fingerprint.js",
+        "site_memory.js",
+        "parish_pickers.js",
+        "copilot.js",
+        "toolbar_playbook.js",
         "click-chain.js",
         "isolated.js",
         "content.js",
@@ -603,9 +608,7 @@ function _normalizeClickStepsForWeeklyHarvest(recipe) {
   recipe.steps = recipe.steps.map((step) => {
     if (!step || String(step.action || "").toLowerCase() !== "click") return step;
     const next = { ...step };
-    if (_looksLikeDatedSelector(next.selector)) {
-      next.selector = "a[href$='.pdf']";
-    }
+    // Preserve trainer-recorded selectors — only add generic fallbacks, never rewrite.
     const looksLikePdfList =
       /\[href[^\]]*\.pdf/i.test(String(next.selector || "")) ||
       /\.pdf/i.test(String(next.href || ""));
@@ -615,7 +618,7 @@ function _normalizeClickStepsForWeeklyHarvest(recipe) {
     }
     const fallbacks = new Set(
       Array.isArray(next.fallback_selectors)
-        ? next.fallback_selectors.filter((s) => s && !_looksLikeDatedSelector(s))
+        ? next.fallback_selectors.filter((s) => s && String(s).trim())
         : []
     );
     if (looksLikePdfList) {
@@ -669,6 +672,7 @@ function _canonicalDioceseSlug(value) {
   ) {
     return "down_and_connor";
   }
+  if (raw === "raphoe" || raw === "raphoe_diocese" || raw === "raphoe diocese") return "raphoe";
   const normalized = raw.replace(/&/g, "and").replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
   return normalized;
 }
@@ -801,10 +805,11 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
       // Preserve stable fields from the existing recipe when updating.
       const incoming = message.recipe || {};
-      const recipe = existingRecipe ? {
+      const stepsReplaced = Array.isArray(incoming.steps) && incoming.steps.length > 0;
+      const recipe = existingRecipe && !stepsReplaced ? {
         ...existingRecipe,
         ...incoming,
-        steps: Array.isArray(incoming.steps) ? incoming.steps : existingRecipe.steps,
+        steps: existingRecipe.steps,
         start_url: (incoming.start_url && String(incoming.start_url).trim())
           ? incoming.start_url
           : existingRecipe.start_url,
@@ -814,7 +819,11 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         timeout_ms: incoming.timeout_ms ?? existingRecipe.timeout_ms,
         total_timeout_s: incoming.total_timeout_s ?? existingRecipe.total_timeout_s,
         timeout: incoming.timeout ?? existingRecipe.timeout,
-      } : incoming;
+      } : {
+        ...(stepsReplaced ? {} : (existingRecipe || {})),
+        ...incoming,
+        steps: stepsReplaced ? incoming.steps : (existingRecipe?.steps || incoming.steps),
+      };
       const normalizedRecipe = _normalizeRecipeTerminalSteps(recipe);
       // Retrain push must clear harvest-blocking flags left on the old recipe.
       delete normalizedRecipe.skip;
@@ -822,6 +831,9 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       delete normalizedRecipe.reason;
       delete normalizedRecipe.dead_reason;
       delete normalizedRecipe.needs_retraining;
+      delete normalizedRecipe.placeholder;
+      delete normalizedRecipe.auto_generated;
+      delete normalizedRecipe.retraining_reason;
       const recipeStatus = String(normalizedRecipe.status || "").toLowerCase();
       if (recipeStatus === "dead_url" || recipeStatus === "inactive" || normalizedRecipe.skip) {
         normalizedRecipe.skip = true;

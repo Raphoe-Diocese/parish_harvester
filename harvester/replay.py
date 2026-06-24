@@ -65,8 +65,29 @@ def _looks_like_direct_document_url(url: str) -> bool:
     lower = unquote((url or "").strip()).lower()
     if not _looks_like_http_url(lower):
         return False
+    if "drive.usercontent.google.com/download" in lower:
+        return True
     path = urlparse(lower).path
     return path.endswith((".pdf", ".docx", ".doc")) or "/pdf/" in path
+
+
+async def _goto_or_download(
+    page: Page,
+    dest: Path,
+    url: str,
+    downloads: list,
+    timeout_ms: int,
+) -> tuple[Path, str, str] | None:
+    """Navigate or fetch a direct document URL (Drive downloads abort normal goto)."""
+    if _looks_like_direct_document_url(url):
+        tried = await _try_browser_nav_download(page, dest, url, timeout_ms)
+        if tried:
+            return dest, tried[1], tried[0]
+        tried = await _try_download_page_url(page, dest, url, timeout_ms=timeout_ms)
+        if tried:
+            return dest, tried[1], tried[0]
+    await page.goto(url, timeout=timeout_ms, wait_until="domcontentloaded")
+    return await _capture_document_after_navigation(page, dest, url, downloads, timeout_ms)
 
 
 async def _capture_document_after_navigation(
@@ -800,7 +821,16 @@ async def replay_recipe(
         start_url = (target_url or "").strip()
     first_action = (steps[0].get("action") if steps else "") or ""
     if start_url and first_action != "goto":
-        await page.goto(start_url, timeout=step_timeout_ms, wait_until="domcontentloaded")
+        if _looks_like_direct_document_url(start_url):
+            captured = await _goto_or_download(
+                page, dest, start_url, downloads, step_timeout_ms
+            )
+            if captured:
+                return captured
+        else:
+            await page.goto(start_url, timeout=step_timeout_ms, wait_until="domcontentloaded")
+            if _looks_like_http_url(start_url):
+                last_http_url = start_url
 
     try:
         last_http_url = start_url if _looks_like_http_url(start_url) else ""
@@ -812,14 +842,13 @@ async def replay_recipe(
                     url = target_url.strip()
                 if not url:
                     raise RecipeReplayError("Recipe goto step missing URL")
-                await page.goto(url, timeout=step_timeout_ms, wait_until="domcontentloaded")
-                if _looks_like_http_url(url):
-                    last_http_url = url
-                captured = await _capture_document_after_navigation(
+                captured = await _goto_or_download(
                     page, dest, url, downloads, step_timeout_ms
                 )
                 if captured:
                     return captured
+                if _looks_like_http_url(url):
+                    last_http_url = url
                 continue
 
             if action == "click":

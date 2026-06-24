@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>${page_title}</title>
+  <link rel="stylesheet" href="../../assets/site.css" />
+  <style>
+    body { margin: 0; font-family: Arial, Helvetica, sans-serif; background: #f7fbfb; color: #16202a; }
+    .page { max-width: 1100px; margin: 0 auto; padding: 0 16px 28px; }
+    .headline { margin: 0 -16px 18px; padding: 18px 16px; background: #1a6b6b; color: #fff; font-weight: 800; font-size: clamp(1.2rem, 2.4vw, 2rem); text-transform: uppercase; text-align: center; }
+    .week-note { text-align: center; margin: 0 0 16px; color: #4b5563; font-size: 0.95rem; }
+    .stats { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; margin-bottom: 18px; }
+    .stat { background: #fff; border: 1px solid #d6ecea; border-radius: 10px; padding: 10px 16px; font-weight: 700; color: #1a6b6b; }
+    .parish-section { background: #fff; border: 1px solid #d6ecea; border-radius: 14px; padding: 16px; }
+    .parish-section h2 { margin: 0 0 12px; color: #1a6b6b; text-transform: uppercase; font-size: 1rem; text-align: center; }
+    .parish-list { list-style: none; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px 12px; margin: 0; padding: 0; }
+    .parish-list a { color: #1a6b6b; text-decoration: none; display: flex; align-items: center; min-height: 44px; padding: 8px 10px; border: 1px solid #e3efee; border-radius: 8px; background: #f9fcfc; font-weight: 700; }
+    .parish-list a:hover { background: #e8f4f4; }
+    .parish-list .ok a { border-color: #9fd4d0; }
+    .parish-list .miss a { opacity: 0.75; }
+    .footer { margin-top: 22px; border-top: 1px solid #d6ecea; padding-top: 10px; color: #4b5563; font-size: 0.92rem; display: flex; justify-content: space-between; flex-wrap: wrap; gap: 10px; }
+    .footer a { color: #1a6b6b; }
+    @media (max-width: 940px) { .parish-list { grid-template-columns: 1fr 1fr; } }
+    @media (max-width: 640px) { .parish-list { grid-template-columns: 1fr; } }
+  </style>
+</head>
+<body>
+  <main class="page">
+    <header class="headline">${headline}</header>
+    <p class="week-note">This week's parish bulletins — ${week_label}. Tap a parish to open its bulletin PDF.</p>
+    <div class="stats">
+      <span class="stat">✅ ${ok_count} downloaded</span>
+      <span class="stat">⏭️ ${skip_count} skipped</span>
+      <span class="stat">❌ ${fail_count} need attention</span>
+    </div>
+    <section class="parish-section">
+      <h2>${parish_heading}</h2>
+      ${parish_links_html}
+    </section>
+    <footer class="footer">
+      <span>© ${year} Parish Press</span>
+      <a href="${issues_url}" target="_blank" rel="noopener noreferrer">Report a problem</a>
+    </footer>
+  </main>
+</body>
+</html>

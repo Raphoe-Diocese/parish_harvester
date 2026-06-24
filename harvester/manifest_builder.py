@@ -469,20 +469,19 @@ def build_manifest(report_path: Path, dioceses_in_run: list[str], output_path: P
 
         mega_filename = f"{ocr_slug}_mega_bulletin.pdf"
         mega_pdf_path = mega_dir / mega_filename
-        if not mega_pdf_path.exists():
-            continue
-
         parish_keys = _load_parish_keys(repo_root, normalized_diocese)
         downloaded = _count_parishes(report_downloaded, parish_keys)
         html_links = _count_parishes(report_html_links, parish_keys)
         failed = _count_parishes(report_failed, parish_keys)
         total = downloaded + failed
         success_rate = f"{(downloaded / total * 100) if total else 0.0:.1f}%"
+        diocese_page = f"{PAGES_BASE_URL}/dioceses/{ocr_slug.replace('_', '-')}/"
 
         entry: dict[str, object] = {
             "display_name": _display_name(normalized_diocese, ocr_slug),
-            "mega_pdf": f"{PAGES_BASE_URL}/mega_pdf/{mega_filename}",
-            "mega_pdf_cdn": f"{CDN_BASE_URL}/mega_pdf/{mega_filename}",
+            "mega_pdf": f"{PAGES_BASE_URL}/mega_pdf/{mega_filename}" if mega_pdf_path.exists() else diocese_page,
+            "mega_pdf_cdn": f"{CDN_BASE_URL}/mega_pdf/{mega_filename}" if mega_pdf_path.exists() else diocese_page,
+            "parish_page": diocese_page,
             "downloaded": downloaded,
             "html_links": html_links,
             "failed": failed,

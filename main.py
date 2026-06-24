@@ -376,10 +376,13 @@ def main() -> int:
     except Exception as exc:
         print(f"  ⚠️  Dashboard generation failed (non-fatal): {exc}")
 
-    # Stitch mega PDF (skip for single-parish test runs — faster verify after Push Recipe)
+    # Stitch mega PDF (opt-in via HARVEST_MEGA_PDF=1 — default is current-week parish PDFs only)
+    harvest_mega = os.environ.get("HARVEST_MEGA_PDF", "0").strip().lower() in {"1", "true", "yes"}
     print("\n── Stitch Mega PDF ─────────────────────────────────────────")
     if target_parish_key:
         print(f"  ⏭️  Skipped (single-parish test for {target_parish_key})")
+    elif not harvest_mega:
+        print("  ⏭️  Skipped (current-week mode — set HARVEST_MEGA_PDF=1 to enable)")
     else:
         try:
             stitch_mega_pdf(
@@ -393,8 +396,8 @@ def main() -> int:
         except Exception as exc:
             print(f"  ⚠️  Mega PDF generation failed (non-fatal): {exc}")
 
-    # Stitch per-diocese mega PDFs (skip when running a single-parish rebuild)
-    if not target_parish_key and diocese_results:
+    # Stitch per-diocese mega PDFs (opt-in only)
+    if harvest_mega and not target_parish_key and diocese_results:
         print("\n── Per-Diocese Mega PDFs ───────────────────────────────────")
         mega_pdf_dir = Path("mega_pdf")
         mega_pdf_dir.mkdir(exist_ok=True)
@@ -415,24 +418,24 @@ def main() -> int:
                     output_path=diocese_pdf,
                 )
                 print(f"  📖 {short} mega PDF : {diocese_pdf}")
-                # Mega PDF exists for this diocese — remove per-parish single PDFs
-                # for this diocese so only the mega output remains in the repo.
-                deleted = 0
-                for result in d_results:
-                    if result.status != "ok" or not result.file_path:
-                        continue
-                    for candidate in (
-                        CURRENT_DIR / result.file_path.name,
-                        RAW_DIR / result.file_path.name,
-                    ):
-                        try:
-                            if candidate.exists():
-                                candidate.unlink()
-                                deleted += 1
-                        except OSError:
-                            pass
-                if deleted:
-                    print(f"  🗑️  Deleted {deleted} single PDF file(s) for {short}")
+                if harvest_mega:
+                    # Only delete per-parish PDFs when mega mode is on.
+                    deleted = 0
+                    for result in d_results:
+                        if result.status != "ok" or not result.file_path:
+                            continue
+                        for candidate in (
+                            CURRENT_DIR / result.file_path.name,
+                            RAW_DIR / result.file_path.name,
+                        ):
+                            try:
+                                if candidate.exists():
+                                    candidate.unlink()
+                                    deleted += 1
+                            except OSError:
+                                pass
+                    if deleted:
+                        print(f"  🗑️  Deleted {deleted} single PDF file(s) for {short}")
             except Exception as exc:
                 print(f"  ⚠️  {short} mega PDF failed (non-fatal): {exc}")
 

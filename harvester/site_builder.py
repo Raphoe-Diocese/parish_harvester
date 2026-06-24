@@ -8,7 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from harvester.fetcher import parse_evidence_file
-from harvester.page_renderer import render_diocese_page
+from harvester.page_renderer import render_diocese_current_page, render_diocese_page
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DOCS_DIR = REPO_ROOT / "docs"
@@ -18,6 +18,7 @@ BULLETINS_DIR = DOCS_DIR / "bulletins"
 LIVE_DIOCESES = {"raphoe", "derry", "down-and-connor"}
 RELIABILITY_PATH = DOCS_DIR / "reliability.json"
 REPORT_PATH = REPO_ROOT / "Bulletins" / "report.json"
+GITHUB_RAW_BASE = "https://raw.githubusercontent.com/Raphoe-Diocese/parish_harvester/main/Bulletins/current"
 EVIDENCE_DIOCESE_KEYS = {
     "derry": "derry_diocese",
     "down-and-connor": "down_and_connor",
@@ -138,6 +139,95 @@ def _recipe_keys(diocese_key: str) -> set[str]:
                 continue
         keys.add(path.stem)
     return keys
+
+
+def _load_report_sections(report_path: Path) -> tuple[dict, dict, dict, str]:
+    """Return (downloaded, failed, skipped, target_date) keyed by parish_key."""
+    downloaded: dict[str, dict] = {}
+    failed: dict[str, dict] = {}
+    skipped: dict[str, dict] = {}
+    target_date = ""
+    if not report_path.exists():
+        return downloaded, failed, skipped, target_date
+    try:
+        payload = json.loads(report_path.read_text(encoding="utf-8"))
+    except Exception:
+        return downloaded, failed, skipped, target_date
+    target_date = str(payload.get("target_date") or "").strip()
+    for section, bucket in (
+        ("downloaded", downloaded),
+        ("failed", failed),
+        ("skipped", skipped),
+    ):
+        rows = payload.get(section)
+        if not isinstance(rows, list):
+            continue
+        for row in rows:
+            if not isinstance(row, dict):
+                continue
+            key = str(row.get("parish") or "").strip()
+            if key:
+                bucket[key] = row
+    return downloaded, failed, skipped, target_date
+
+
+def _parish_links_with_harvest(diocese_key: str, report_path: Path) -> tuple[list[dict[str, str]], dict[str, int]]:
+    """Merge evidence/recipe links with this week's harvest report."""
+    base_links = _parish_links(diocese_key)
+    downloaded, _failed, skipped, _target_date = _load_report_sections(report_path)
+    recipe_keys = _recipe_keys(diocese_key)
+    stats = {"ok": 0, "skip": 0, "fail": 0}
+    merged: list[dict[str, str]] = []
+    seen: set[str] = set()
+
+    def _append(name: str, key: str, fallback_url: str) -> None:
+        if key in seen:
+            return
+        seen.add(key)
+        if key in downloaded:
+            row = downloaded[key]
+            url = f"{GITHUB_RAW_BASE}/{key}.pdf"
+            local = REPO_ROOT / "Bulletins" / "current" / f"{key}.pdf"
+            if not local.exists():
+                url = str(row.get("url") or fallback_url or "#")
+            merged.append({"name": name, "url": url, "status": "ok"})
+            stats["ok"] += 1
+        elif key in skipped:
+            merged.append({"name": name, "url": fallback_url or "#", "status": "skip"})
+            stats["skip"] += 1
+        else:
+            merged.append({"name": name, "url": fallback_url or "#", "status": "miss"})
+            stats["fail"] += 1
+
+    for link in base_links:
+        name = str(link.get("name") or "").strip()
+        url = str(link.get("url") or "").strip()
+        key = _slugify(name).replace("-", "")
+        for recipe_key in recipe_keys:
+            if recipe_key.replace("_", "") in _slugify(name).replace("-", ""):
+                key = recipe_key
+                break
+        _append(name or key, key, url)
+
+    for recipe_key in sorted(recipe_keys):
+        if recipe_key in seen:
+            continue
+        path = next(
+            (p for p in _recipe_files(diocese_key) if p.stem == recipe_key),
+            None,
+        )
+        fallback = ""
+        display = recipe_key.replace("-", " ").replace("_", " ").title()
+        if path:
+            try:
+                payload = json.loads(path.read_text(encoding="utf-8"))
+                display = str(payload.get("display_name") or display).strip()
+                fallback = str(payload.get("start_url") or "").strip()
+            except Exception:
+                pass
+        _append(display, recipe_key, fallback)
+
+    return merged, stats
 
 
 def _load_downloaded(report_path: Path) -> set[str]:
@@ -276,7 +366,7 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
         (
             "<section class=\"live-diocese\">"
             f"<div class=\"live-diocese-head\"><h2>{html_name} Diocese</h2>"
-            f"<a href=\"dioceses/{row['key']}/\">Open big bulletin →</a></div>"
+            f"<a href=\"dioceses/{row['key']}/\">Open parish bulletins →</a></div>"
             "<p class=\"live-diocese-note\">Parish links below come from the bulletin evidence file.</p>"
             f"{_render_placeholder_parish_links(_parish_links(row['key']))}"
             "</section>"
@@ -396,6 +486,8 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
     dioceses = _all_dioceses()
     downloaded = _load_downloaded(report_path)
     reliability = _load_reliability()
+    _downloaded_map, _failed_map, _skipped_map, target_date = _load_report_sections(report_path)
+    week_label = target_date or "this Sunday"
 
     rows: list[dict[str, str]] = []
     for diocese in dioceses:
@@ -404,21 +496,18 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
         trained = bool(keys)
         success_this_run = bool(downloaded.intersection(keys))
 
-        viewer_path, updated = _latest_viewer(diocese.key)
-        if diocese.key in LIVE_DIOCESES and trained and success_this_run and viewer_path:
-            archive_viewer_url = f"../../bulletins/{viewer_path.name}"
-            ocr_standalone_url = f"../../bulletins/{viewer_path.stem}-ocr.html"
-            render_diocese_page(
-                diocese_key=diocese.key,
+        if diocese.key in LIVE_DIOCESES and trained:
+            parish_links, stats = _parish_links_with_harvest(diocese.key, report_path)
+            render_diocese_current_page(
                 diocese_display_name=diocese.name,
-                mega_pdf_url=f"../../mega_pdf/{diocese.key.replace('-', '_')}_mega_bulletin.pdf",
-                ocr_text=_ocr_text_from_viewer(viewer_path),
-                parish_links=_parish_links(diocese.key),
+                parish_links=parish_links,
                 out_path=out_path,
-                archive_viewer_url=archive_viewer_url,
-                ocr_standalone_url=ocr_standalone_url,
+                week_label=week_label,
+                ok_count=stats.get("ok", 0),
+                skip_count=stats.get("skip", 0),
+                fail_count=stats.get("fail", 0),
             )
-            updated_label = updated or "Coming soon"
+            updated_label = target_date or "Coming soon"
         else:
             _placeholder_page(diocese, out_path)
             updated_label = "Coming soon"

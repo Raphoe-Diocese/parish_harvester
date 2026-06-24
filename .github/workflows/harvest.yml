@@ -85,6 +85,7 @@ jobs:
           fi
           xvfb-run -a python main.py $ARGS
         env:
+          HARVEST_MEGA_PDF: "0"
           HARVEST_EMAIL_TO: ${{ secrets.HARVEST_EMAIL_TO }}
           HARVEST_EMAIL_FROM: ${{ secrets.HARVEST_EMAIL_FROM }}
           EMAIL_PROVIDER: ${{ secrets.EMAIL_PROVIDER }}
@@ -248,15 +249,9 @@ jobs:
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          # Copy mega PDFs into docs/ so GitHub Pages can serve them
-          mkdir -p docs/mega_pdf
-          if [ -f mega_pdf/derry_mega_bulletin.pdf ]; then
-            cp mega_pdf/derry_mega_bulletin.pdf docs/mega_pdf/derry_mega_bulletin.pdf
-          fi
-          if [ -f mega_pdf/down_and_connor_mega_bulletin.pdf ]; then
-            cp mega_pdf/down_and_connor_mega_bulletin.pdf docs/mega_pdf/down_and_connor_mega_bulletin.pdf
-          fi
-          git add -f Bulletins/report.json Bulletins/report.txt Bulletins/dashboard.html docs/mega_pdf/ docs/manifest.json 2>/dev/null || true
+          # Current-week parish PDFs (mega PDF disabled by default)
+          git add -f Bulletins/report.json Bulletins/report.txt Bulletins/dashboard.html docs/manifest.json docs/dioceses/ 2>/dev/null || true
+          git add -f Bulletins/current/*.pdf 2>/dev/null || true
           git add -f parishes/consecutive_failures.json parishes/stale_bulletins.json parishes/retry_queue.json 2>/dev/null || true
           TARGET_PARISH="${{ github.event.inputs.target_parish }}"
           if [ -n "${TARGET_PARISH}" ] && [ -f "Bulletins/current/${TARGET_PARISH}.pdf" ]; then
@@ -285,8 +280,7 @@ jobs:
 
 
       - name: Prepare standalone Mega PDF artifact
-        id: prepare_mega_pdf
-        if: success()
+        if: false
         run: |
           set -euo pipefail
           echo "mega_pdf_ready=false" >> "$GITHUB_OUTPUT"
@@ -378,7 +372,7 @@ jobs:
           retention-days: 30
 
       - name: Clean transient bulletin PDFs from repository
-        if: success() && github.event.inputs.target_parish == ''
+        if: false
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"

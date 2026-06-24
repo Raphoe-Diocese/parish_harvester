@@ -90,6 +90,7 @@ def _probe_pdf_links(page_url: str) -> list[str]:
 
 
 def _direct_download_recipe(key: str, display: str, diocese: str, url: str) -> dict:
+    """Download-only recipe — avoids Playwright goto abort on Drive/PDF URLs."""
     return {
         "parish_key": key,
         "display_name": display,
@@ -98,7 +99,6 @@ def _direct_download_recipe(key: str, display: str, diocese: str, url: str) -> d
         "start_url": url,
         "auto_fixed": True,
         "steps": [
-            {"action": "goto", "url": url},
             {"action": "download", "url": url, "use_captured_url": True},
         ],
         "version": 1,

@@ -3452,7 +3452,7 @@
       _refreshGuidedContext();
     };
 
-    const _pdfTerminalActions = new Set(["download", "image", "print_to_pdf", "crop_screenshot"]);
+    const _pdfTerminalActions = new Set(["download", "image", "image_stack", "print_to_pdf", "crop_screenshot"]);
 
     const _ensureTerminalPdfStep = () => {
       const recorded = _standaloneRecipeSteps();
@@ -6203,7 +6203,7 @@
         const lastStep = recorded[recorded.length - 1];
         if (!lastStep || !_pdfTerminalActions.has(String(lastStep.action || "").toLowerCase())) {
           showStatus(
-            "❌ Recipe must end with PDF capture: download, image, print_to_pdf, or crop_screenshot.",
+            "❌ Recipe must end with PDF capture: download, image, image_stack, print_to_pdf, or crop_screenshot.",
             "error"
           );
           return;
@@ -6518,6 +6518,7 @@
       return { ok: true };
     }
     if (message.type === "ph_show_toolbar") {
+      const bar = _ensureToolbar(true);
       if (message.reason === "fix_now") {
         recipeSteps = recipeSteps.filter((entry) => !entry?.recipeStep);
         standaloneStartUrl = _pageUrlForParishDetection();
@@ -6529,7 +6530,6 @@
         delete bar.dataset.phFixNow;
         delete bar.dataset.phParishName;
       }
-      _ensureToolbar(true);
       void _markRecordingActive();
       window.dispatchEvent(new CustomEvent("ph-retraining-hint", { detail: { parish_key: message.parish_key || "" } }));
       if (_refreshParishPushForm) void _refreshParishPushForm();

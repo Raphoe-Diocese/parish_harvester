@@ -6,11 +6,13 @@ from pathlib import Path
 from string import Template
 
 TEMPLATE_PATH = Path(__file__).resolve().parent / "templates" / "diocese_page.html"
-ISSUES_URL = "https://github.com/Frankytyrone/parish_harvester/issues/new"
+CURRENT_TEMPLATE_PATH = Path(__file__).resolve().parent / "templates" / "diocese_page_current.html"
+ISSUES_URL = "https://github.com/Raphoe-Diocese/parish_harvester/issues/new"
 EMPTY_OCR_TEXT = "We're still collecting OCR text for this diocese. Check back next Sunday."
+GITHUB_RAW_BASE = "https://raw.githubusercontent.com/Raphoe-Diocese/parish_harvester/main/Bulletins/current"
 
 
-def _render_parish_links(parish_links: list[dict]) -> str:
+def _render_parish_links(parish_links: list[dict], *, with_status: bool = False) -> str:
     if not parish_links:
         return '<p class="empty-state">No parish links available yet.</p>'
 
@@ -18,8 +20,42 @@ def _render_parish_links(parish_links: list[dict]) -> str:
     for link in sorted(parish_links, key=lambda item: str(item.get("name") or "").lower()):
         name = html.escape(str(link.get("name") or "Unnamed Parish"))
         url = html.escape(str(link.get("url") or "#"), quote=True)
-        items.append(f'<li><a href="{url}" target="_blank" rel="noopener noreferrer">{name}</a></li>')
+        status = str(link.get("status") or "").strip().lower()
+        css = "ok" if status == "ok" else ("miss" if status else "")
+        li_class = f' class="{css}"' if with_status and css else ""
+        suffix = " ✓" if status == "ok" else ""
+        items.append(
+            f'<li{li_class}><a href="{url}" target="_blank" rel="noopener noreferrer">{name}{suffix}</a></li>'
+        )
     return f'<ul class="parish-list">{"".join(items)}</ul>'
+
+
+def render_diocese_current_page(
+    diocese_display_name: str,
+    parish_links: list[dict],
+    out_path: Path,
+    *,
+    week_label: str = "this Sunday",
+    ok_count: int = 0,
+    skip_count: int = 0,
+    fail_count: int = 0,
+) -> None:
+    template = Template(CURRENT_TEMPLATE_PATH.read_text(encoding="utf-8"))
+    display = str(diocese_display_name or "").strip() or "Diocese"
+    payload = {
+        "page_title": html.escape(f"{display} — Parish Bulletins"),
+        "headline": html.escape(f"{display.upper()} PARISH BULLETINS"),
+        "week_label": html.escape(week_label),
+        "ok_count": str(ok_count),
+        "skip_count": str(skip_count),
+        "fail_count": str(fail_count),
+        "parish_heading": html.escape(f"{display.upper()} PARISHES"),
+        "parish_links_html": _render_parish_links(parish_links, with_status=True),
+        "year": str(datetime.now(UTC).year),
+        "issues_url": html.escape(ISSUES_URL, quote=True),
+    }
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(template.safe_substitute(payload), encoding="utf-8")
 
 
 def render_diocese_page(
