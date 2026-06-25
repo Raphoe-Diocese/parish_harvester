@@ -6701,7 +6701,14 @@
           return;
         }
         if (ensuredTerminal.added) {
+          globalThis.__phLastAutoTerminal = {
+            added: true,
+            action: ensuredTerminal.action || "download",
+            at: new Date().toISOString(),
+          };
           showStatus("✅ PDF step added automatically — sending…", "info");
+        } else {
+          globalThis.__phLastAutoTerminal = null;
         }
         const recorded = _standaloneRecipeSteps();
         const lastStep = recorded[recorded.length - 1];
@@ -6720,6 +6727,21 @@
         console.log(`Parish Trainer: pushing recipe for key=${key}, diocese=${diocese}, url=${pageUrl}`);
         const recipe = buildStandaloneRecipe(key, name || key, diocese);
         const detected = detectPageType();
+        let diagnosisSnapshot = null;
+        if (globalThis.ph_recipe_diag?.runFullDiagnosis) {
+          try {
+            diagnosisSnapshot = await globalThis.ph_recipe_diag.runFullDiagnosis();
+            const errN = Number(diagnosisSnapshot?.counts?.error || 0);
+            if (errN > 0) {
+              console.warn(
+                `Parish Trainer: ${errN} diagnosis error(s) before push — saved to repo for review.`,
+                diagnosisSnapshot.issues?.filter((i) => i.severity === "error")
+              );
+            }
+          } catch (diagErr) {
+            console.warn("Parish Trainer: pre-push diagnosis failed:", diagErr);
+          }
+        }
         const sitePattern = (() => {
           const mem = window.ph_site_memory;
           if (mem?.patternPayloadFromPage) {
@@ -6737,7 +6759,14 @@
         _logSaveCycle("push_recipe", { parish_key: key, recipe }, { ok: "pending" });
         showStatus("⏳ Pushing recipe to GitHub…", "info");
 
-        _safeSendMessage({ type: "push_recipe", parish_key: key, recipe, site_pattern: sitePattern }, (response, bridgeError) => {
+        _safeSendMessage({
+          type: "push_recipe",
+          parish_key: key,
+          recipe,
+          site_pattern: sitePattern,
+          diagnosis_snapshot: diagnosisSnapshot,
+          diagnosis_source: "push_recipe",
+        }, (response, bridgeError) => {
           _logSaveCycle("push_recipe", { parish_key: key, recipe }, bridgeError ? { ok: false, reason: bridgeError } : response);
           pushBtn.disabled = false;
           pushBtn.textContent = "🚀 Send & test on GitHub";
@@ -7566,15 +7595,35 @@
     } catch (_e) {
       parishKey = "";
     }
+    const detected = detectPageType();
+    let htmlScan = null;
+    try {
+      if (globalThis.PhHtmlFingerprint?.scanPage) {
+        htmlScan = globalThis.PhHtmlFingerprint.scanPage(document);
+      }
+    } catch (_e) {
+      htmlScan = null;
+    }
+    const recipeDetail = _standaloneRecipeSteps();
+  const sessionDetail = recipeSteps.map((s) => ({
+      action: s.action || "",
+      label: s.label || "",
+      text: s.text || "",
+    }));
     return {
       page_url: pageUrl,
       parish_key: parishKey,
-      page_type: detectPageType(),
-      recipe_steps: _standaloneRecipeSteps(),
+      page_type: detected,
+      html_fingerprint_scan: htmlScan,
+      html_fingerprint_id: detected.htmlFingerprint || htmlScan?.best?.id || "",
+      recipe_steps: recipeDetail,
+      recipe_steps_detail: recipeDetail,
       session_ui_steps: recipeSteps.length,
+      session_steps_detail: sessionDetail,
       standalone_start_url: standaloneStartUrl || "",
       in_standalone_mode: _inStandaloneMode(),
       toolbar_visible: Boolean(_getToolbarNode() && _getToolbarNode().style.display !== "none"),
+      last_auto_terminal: globalThis.__phLastAutoTerminal || null,
     };
   };
 

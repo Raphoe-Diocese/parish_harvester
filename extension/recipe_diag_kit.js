@@ -185,6 +185,33 @@
       );
     }
 
+    if (
+      (pageType === "pdfemb" || pageCtx.html_fingerprint_id === "wordpress_pdfemb") &&
+      actions.includes("print_to_pdf")
+    ) {
+      issues.push(
+        _issue(
+          "pdfemb_print_to_pdf",
+          "error",
+          "PDF Embedder page — do not Save page as PDF",
+          "Bulletin is a real PDF file linked in the page HTML.",
+          "Use Save this PDF / download on the newest a.pdfemb-viewer link."
+        )
+      );
+    }
+
+    if (pageType === "pdfemb" && clickCount > 0 && !actions.includes("download")) {
+      issues.push(
+        _issue(
+          "pdfemb_needs_download_step",
+          "warn",
+          "PDF Embedder — clicks recorded but no download step",
+          "After picking the bulletin link, tap Save this PDF.",
+          "Harvester reads a.pdfemb-viewer hrefs — recipe must end with download."
+        )
+      );
+    }
+
     const startUrl = String(pageCtx.standalone_start_url || pageCtx.page_url || "");
     const startHost = _hostname(startUrl);
     const pageHost = _hostname(pageCtx.page_url || window.location.href);
@@ -480,18 +507,302 @@
     return out;
   };
 
+  const _scanHtmlFingerprint = (pageCtx) => {
+    const scan = pageCtx.html_fingerprint_scan;
+    if (scan && scan.best) return scan;
+    try {
+      if (globalThis.PhHtmlFingerprint?.scanPage) {
+        return globalThis.PhHtmlFingerprint.scanPage(document);
+      }
+    } catch (_e) {
+      return null;
+    }
+    return null;
+  };
+
+  const _pageArchetype = (pageCtx, htmlScan) => {
+    const lib = globalThis.PhPatternLibrary;
+    const detected = pageCtx.page_type && typeof pageCtx.page_type === "object"
+      ? pageCtx.page_type
+      : { type: String(pageCtx.page_type || "unknown") };
+    if (lib?.fingerprintFromPage) {
+      return lib.fingerprintFromPage(detected);
+    }
+    const best = htmlScan?.best;
+    return {
+      page_type: best?.pageType || detected.type || "unknown",
+      pattern_key: best?.id || pageCtx.html_fingerprint_id || "",
+    };
+  };
+
+  const _expectedTerminalForArchetype = (archetype) => {
+    const key = String(archetype || "").toLowerCase();
+    if (key === "wp_pdfemb_list" || key === "pdf_link_list" || key === "wp_block_file_bulletin") {
+      return { prefer: ["download"], avoid: ["print_to_pdf", "html"] };
+    }
+    if (key === "weekly_bulletin_download" || key === "mdocs_download_list") {
+      return { prefer: ["download"], avoid: ["print_to_pdf"] };
+    }
+    if (key === "wix_html" || key === "wix_date_grid") {
+      return { prefer: ["print_to_pdf", "html"], avoid: [] };
+    }
+    if (key === "iframe_viewer" || key === "wix_pdf_viewer") {
+      return { prefer: ["download", "print_to_pdf"], avoid: [] };
+    }
+    if (key === "direct_pdf") {
+      return { prefer: ["download"], avoid: ["print_to_pdf"] };
+    }
+    return { prefer: ["download", "print_to_pdf", "image"], avoid: [] };
+  };
+
+  const _analyzePageRecipeMismatch = (pageCtx, steps) => {
+    const issues = [];
+    const list = Array.isArray(steps) ? steps : [];
+    const actions = list.map((s) => String(s?.action || "").trim().toLowerCase());
+    const lastAction = actions.length ? actions[actions.length - 1] : "";
+    const htmlScan = _scanHtmlFingerprint(pageCtx);
+    const archetype = _pageArchetype(pageCtx, htmlScan);
+    const archetypeKey = String(archetype.page_type || archetype.pattern_key || "").trim();
+    const detectType = String(pageCtx.page_type?.type || pageCtx.page_type || "").trim();
+    const fpId = String(htmlScan?.best?.id || pageCtx.html_fingerprint_id || "").trim();
+    const fpLabel = String(htmlScan?.best?.label || "").trim();
+    const pdfembInDom = Boolean(
+      document.querySelector?.('a.pdfemb-viewer[href*=".pdf"], a[class*="pdfemb"][href*=".pdf"]')
+    );
+
+    if (fpId === "wordpress_pdfemb" && detectType === "iframe_maybe") {
+      issues.push(
+        _issue(
+          "embed_not_iframe",
+          "error",
+          "PDF Embedder page misread as iframe",
+          `HTML fingerprint: ${fpLabel || "WordPress PDF Embedder"} but detectPageType says ${detectType}.`,
+          "Use Follow a link → pick newest bulletin → Save this PDF. Do NOT use frame/viewer flow."
+        )
+      );
+    }
+
+    if (pdfembInDom && !["pdfemb", "wp_pdfemb_list"].includes(detectType) && !["pdfemb", "wp_pdfemb_list"].includes(archetypeKey)) {
+      issues.push(
+        _issue(
+          "pdfemb_links_on_page",
+          "error",
+          "Page has PDF Embedder links — not a mystery iframe",
+          "Found a.pdfemb-viewer[href] in page HTML (direct PDF URLs).",
+          "Tap Pick newest bulletin or Follow a link on the top dated PDF, then Save this PDF."
+        )
+      );
+    }
+
+    if (fpId && detectType && detectType !== "unknown") {
+      const lib = globalThis.PhPatternLibrary;
+      const mapped = lib?.fingerprintFromPage?.({ type: detectType });
+      const mappedType = mapped?.page_type || "";
+      if (mappedType && archetypeKey && mappedType !== archetypeKey && fpId !== "wordpress_pdfemb") {
+        issues.push(
+          _issue(
+            "page_type_mismatch",
+            "warn",
+            "Page type detectors disagree",
+            `detectPageType=${detectType} · fingerprint=${archetypeKey} · html_id=${fpId}`,
+            "Trust the HTML fingerprint advice in the toolbar Pattern hint."
+          )
+        );
+      }
+    }
+
+    const expected = _expectedTerminalForArchetype(archetypeKey || fpId);
+    if (lastAction && expected.avoid.includes(lastAction)) {
+      issues.push(
+        _issue(
+          "wrong_terminal_for_layout",
+          "error",
+          `Wrong finish step for ${archetypeKey || fpLabel || "this layout"}`,
+          `Recipe ends with "${lastAction}" but this site type needs: ${expected.prefer.join(" or ")}.`,
+          htmlScan?.best?.advice || pageCtx.page_type?.advice || "Re-record using the green primary button for this page type."
+        )
+      );
+    }
+
+    if (
+      (archetypeKey === "wp_pdfemb_list" || fpId === "wordpress_pdfemb") &&
+      list.length === 1 &&
+      actions[0] === "goto"
+    ) {
+      issues.push(
+        _issue(
+          "pdfemb_needs_download",
+          "warn",
+          "PDF Embedder page — goto-only recipe will fail harvest",
+          "Harvester needs a download step (or goto+download with url_pattern).",
+          "Add download step with *.pdf — or push after Pick newest bulletin + Save PDF."
+        )
+      );
+    }
+
+    if (pageCtx.last_auto_terminal?.added) {
+      issues.push(
+        _issue(
+          "auto_terminal_added",
+          "warn",
+          "Download step was added automatically before push",
+          `Extension added "${pageCtx.last_auto_terminal.action || "download"}" — you may not have tapped Save PDF yourself.`,
+          "Confirm the auto-added step is correct, or re-record manually so you learn the flow."
+        )
+      );
+    }
+
+    return { issues, htmlScan, archetype };
+  };
+
+  const _analyzeSessionDrift = (pageCtx) => {
+    const issues = [];
+    const uiCount = Number(pageCtx.session_ui_steps) || 0;
+    const recipeCount = Array.isArray(pageCtx.recipe_steps)
+      ? pageCtx.recipe_steps.length
+      : Number(pageCtx.recipe_steps_local) || 0;
+    if (uiCount > recipeCount + 1) {
+      issues.push(
+        _issue(
+          "session_steps_drift",
+          "error",
+          "Toolbar shows more clicks than the recipe will push",
+          `Session UI: ${uiCount} step(s) · Recipe file: ${recipeCount} step(s).`,
+          "Some clicks did not become recipe steps — tap Save PDF / confirm Step 2 before Send & test."
+        )
+      );
+    }
+    const uiSteps = Array.isArray(pageCtx.session_steps_detail) ? pageCtx.session_steps_detail : [];
+    const recipeSteps = Array.isArray(pageCtx.recipe_steps_detail)
+      ? pageCtx.recipe_steps_detail
+      : Array.isArray(pageCtx.recipe_steps)
+        ? pageCtx.recipe_steps
+        : [];
+    const uiClicks = uiSteps.filter((s) => String(s?.action || "").toLowerCase() === "click").length;
+    const recipeClicks = recipeSteps.filter((s) => String(s?.action || "").toLowerCase() === "click").length;
+    if (uiClicks > 0 && recipeClicks === 0 && recipeSteps.length > 0) {
+      issues.push(
+        _issue(
+          "clicks_not_in_recipe",
+          "error",
+          "You clicked links but recipe has no click steps",
+          `${uiClicks} UI click(s) — recipe has ${recipeSteps.length} step(s) with no click.`,
+          "After Step 1 confirm, ensure Step 2 Save PDF runs — clicks alone do not harvest."
+        )
+      );
+    }
+    return issues;
+  };
+
+  const _getPatternHints = async (pageCtx, parishKey) => {
+    const hints = [];
+    const lib = globalThis.PhPatternLibrary;
+    if (!lib) return hints;
+
+    const detected = pageCtx.page_type && typeof pageCtx.page_type === "object"
+      ? pageCtx.page_type
+      : { type: String(pageCtx.page_type || "unknown") };
+    const pageFp = lib.fingerprintFromPage?.(detected);
+    if (pageFp?.page_type && lib.ARCHETYPE_ADVICE?.[pageFp.page_type]) {
+      const adv = lib.ARCHETYPE_ADVICE[pageFp.page_type];
+      hints.push({ kind: "archetype", label: adv.label, steps: adv.steps });
+    }
+
+    try {
+      const stored = await _storageGet(["ph_site_patterns_cache"]);
+      let library = stored.ph_site_patterns_cache;
+      if (!library && chrome?.runtime?.sendMessage) {
+        library = await new Promise((resolve) => {
+          chrome.runtime.sendMessage({ type: "fetch_site_patterns" }, (res) => {
+            resolve(res?.ok ? res.library : null);
+          });
+        });
+      }
+      if (library && lib.findSimilar && pageFp) {
+        const similar = lib.findSimilar(library, pageFp, parishKey);
+        if (similar?.length) {
+          for (const match of similar.slice(0, 2)) {
+            hints.push({
+              kind: "similar_parish",
+              parish: match.parish_key || match.key,
+              pattern: match.pattern_key || "",
+              flow: match.recipe_flow || "",
+            });
+          }
+        }
+      }
+    } catch (_e) {
+      // non-fatal
+    }
+
+    const mem = globalThis.ph_site_memory;
+    if (mem?.getForPageType && mem?.formatHintBlock) {
+      try {
+        const block = mem.formatHintBlock(mem.getForPageType(detected.type, null, detected));
+        if (block) hints.push({ kind: "site_memory", text: block.slice(0, 400) });
+      } catch (_e) {
+        // non-fatal
+      }
+    }
+
+    return hints;
+  };
+
+  const buildDiagnosisPayload = async (report) => {
+    const r = report || (await runFullDiagnosis());
+    return {
+      collected_at: r.collected_at,
+      extension_version: r.extension_version,
+      parish_key: r.parish_key,
+      page_url: r.page_url,
+      page_type: r.page_type,
+      page_archetype: r.page_archetype,
+      page_summary: r.page_summary,
+      html_fingerprint: r.html_fingerprint,
+      recipe_steps_local: r.recipe_steps_local,
+      session_ui_steps: r.session_ui_steps,
+      issues: r.issues,
+      counts: r.counts,
+      pattern_hints: r.pattern_hints,
+      github: r.github,
+    };
+  };
+
+  const saveDiagnosisToGithub = async (report) => {
+    const payload = await buildDiagnosisPayload(report);
+    const key = String(payload.parish_key || "").trim().toLowerCase();
+    if (!key) return { ok: false, error: "No parish_key — open a parish page first." };
+    return new Promise((resolve) => {
+      chrome.runtime.sendMessage(
+        { type: "ph_save_diagnosis", parish_key: key, diagnosis: payload, source: "manual_diag" },
+        (res) => {
+          if (chrome.runtime?.lastError) {
+            resolve({ ok: false, error: chrome.runtime.lastError.message });
+            return;
+          }
+          resolve(res || { ok: false, error: "No response" });
+        }
+      );
+    });
+  };
+
   const runFullDiagnosis = async () => {
     const pageCtx = _pageContext();
     const pageHost = _hostname(pageCtx.page_url || window.location.href);
     const parishKey = String(pageCtx.parish_key || "").trim();
 
     const toolbar = await _checkToolbar();
+    const mismatch = _analyzePageRecipeMismatch(pageCtx, pageCtx.recipe_steps || []);
     let issues = [
       ..._checkExtensionStack(),
       ...toolbar.issues,
       ...(await _checkRecordingSession(pageHost)),
       ..._analyzeSteps(pageCtx.recipe_steps || [], pageCtx),
+      ..._analyzeSessionDrift(pageCtx),
+      ...mismatch.issues,
     ];
+
+    const pattern_hints = await _getPatternHints(pageCtx, parishKey || "");
 
     const gh = await _fetchGithubContext(pageCtx.page_url || window.location.href, parishKey);
     if (gh) {
@@ -519,9 +830,28 @@
       parish_key: parishKey || gh?.parish_key || "",
       page_type: pageCtx.page_type?.type || pageCtx.page_type || "",
       page_summary: pageCtx.page_type?.summary || "",
+      page_archetype: mismatch.archetype?.page_type || "",
+      html_fingerprint: mismatch.htmlScan?.best
+        ? {
+            id: mismatch.htmlScan.best.id,
+            label: mismatch.htmlScan.best.label,
+            score: mismatch.htmlScan.best.score,
+            pageType: mismatch.htmlScan.best.pageType,
+            captureMethod: mismatch.htmlScan.best.captureMethod,
+            bestDownloadUrl: mismatch.htmlScan.best.bestDownloadUrl || "",
+            advice: mismatch.htmlScan.best.advice || "",
+            doNot: mismatch.htmlScan.best.doNot || "",
+            downloadUrlCount: Array.isArray(mismatch.htmlScan.allDownloadUrls)
+              ? mismatch.htmlScan.allDownloadUrls.length
+              : 0,
+          }
+        : null,
       recipe_steps_local: Array.isArray(pageCtx.recipe_steps) ? pageCtx.recipe_steps.length : 0,
+      session_ui_steps: pageCtx.session_ui_steps ?? 0,
+      recipe_steps_detail: pageCtx.recipe_steps_detail || pageCtx.recipe_steps || [],
       issues,
       counts,
+      pattern_hints,
       github: gh || null,
       toolbar: toolbar.facts || {},
     };
@@ -544,9 +874,37 @@
       `Page: ${r.page_url || "n/a"}`,
       `Parish key: ${r.parish_key || "(not detected)"}`,
       `Page type: ${r.page_type || "unknown"}${r.page_summary ? ` — ${r.page_summary}` : ""}`,
-      `Local recipe steps: ${r.recipe_steps_local ?? "n/a"}`,
+      r.page_archetype ? `Archetype: ${r.page_archetype}` : null,
+      `Local recipe steps: ${r.recipe_steps_local ?? "n/a"} · Session UI steps: ${r.session_ui_steps ?? "n/a"}`,
       "",
     ];
+
+    if (r.html_fingerprint) {
+      const hf = r.html_fingerprint;
+      lines.push(
+        "--- HTML fingerprint (backend page scan) ---",
+        `Match: ${hf.label || hf.id || "none"} (score ${hf.score ?? "?"})`,
+        hf.captureMethod ? `Capture method: ${hf.captureMethod}` : null,
+        hf.bestDownloadUrl ? `Best PDF URL: ${hf.bestDownloadUrl}` : null,
+        hf.downloadUrlCount != null ? `PDF URLs found in HTML: ${hf.downloadUrlCount}` : null,
+        hf.advice ? `Advice: ${hf.advice}` : null,
+        hf.doNot ? `Do NOT: ${hf.doNot}` : null,
+        ""
+      );
+    }
+
+    if (Array.isArray(r.pattern_hints) && r.pattern_hints.length) {
+      lines.push("--- Pattern hints (learned from repo) ---");
+      for (const h of r.pattern_hints) {
+        if (h.kind === "archetype") lines.push(`• ${h.label}: ${h.steps}`);
+        else if (h.kind === "similar_parish") {
+          lines.push(`• Similar parish: ${h.parish} (${h.pattern || h.flow})`);
+        } else if (h.kind === "site_memory" && h.text) {
+          lines.push(`• ${h.text.split("\n")[0]}`);
+        }
+      }
+      lines.push("");
+    }
 
     if (r.toolbar) {
       const t = r.toolbar;
@@ -587,6 +945,7 @@
     }
 
     lines.push("Paste this block to your AI assistant or Franky.");
+    lines.push(`Save to repo: parishes/training_diagnosis/${r.parish_key || "PARISH_KEY"}.json`);
     return lines.filter((x) => x != null).join("\n");
   };
 
@@ -594,5 +953,7 @@
     runFullDiagnosis,
     formatReport,
     analyzeSteps: _analyzeSteps,
+    buildDiagnosisPayload,
+    saveDiagnosisToGithub,
   };
 })();

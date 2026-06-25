@@ -18,6 +18,7 @@ REPO = Path(__file__).resolve().parent.parent
 RECIPES_ROOT = REPO / "parishes" / "recipes"
 FAILURES_PATH = REPO / "parishes" / "consecutive_failures.json"
 REPORT_PATH = REPO / "Bulletins" / "report.json"
+TRAINING_DIAG_DIR = REPO / "parishes" / "training_diagnosis"
 
 TERMINAL = {"download", "image", "image_stack", "print_to_pdf", "html", "crop_screenshot"}
 BAD_DL = re.compile(
@@ -180,6 +181,32 @@ def _analyze_recipe(key: str, path: Path, recipe: dict) -> list[dict]:
     return issues
 
 
+def _training_diag_issues(key: str) -> list[dict]:
+    path = TRAINING_DIAG_DIR / f"{key}.json"
+    if not path.is_file():
+        return []
+    data = _load_json(path)
+    if not isinstance(data, dict):
+        return []
+    out: list[dict] = []
+    for item in data.get("issues") or []:
+        if not isinstance(item, dict):
+            continue
+        out.append(
+            {
+                "severity": item.get("severity", "info"),
+                "code": str(item.get("id") or "extension_diag"),
+                "parish": key,
+                "file": str(path.relative_to(REPO)),
+                "message": str(item.get("title") or ""),
+                "fix": str(item.get("fix") or ""),
+                "detail": str(item.get("detail") or ""),
+                "source": "extension_training_diagnosis",
+            }
+        )
+    return out
+
+
 def main() -> int:
     parser = argparse.ArgumentParser(description="Diagnose parish recipe health in this repo.")
     parser.add_argument("parishes", nargs="*", help="Parish keys to check (default: all)")
@@ -198,6 +225,7 @@ def main() -> int:
     for key, path, recipe in _iter_recipes(keys):
         checked += 1
         all_issues.extend(_analyze_recipe(key, path, recipe))
+        all_issues.extend(_training_diag_issues(key))
 
         streak = int(failures.get(key, 0) or 0)
         if streak >= 3:

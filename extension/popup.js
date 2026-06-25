@@ -209,10 +209,13 @@ document.getElementById("gh-save").addEventListener("click", () => {
 });
 
 const diagBtn = document.getElementById("run-diag");
+const diagSaveBtn = document.getElementById("save-diag-github");
+const diagSaveStatusEl = document.getElementById("diag-save-status");
 const diagResultsEl = document.getElementById("diag-results");
 const diagCopyBtn = document.getElementById("diag-copy");
 
 let _diagTextLines = [];
+let _lastDiagReport = null;
 const _diagCopyButtonLabel = "📋 Copy diagnostic info (paste to AI)";
 
 function _addDiagRow(icon, text) {
@@ -280,6 +283,7 @@ async function runDiagnostics() {
       const diag = await tabsSend(activeTab.id, { type: "ph_run_full_diagnosis" });
       if (diag?.ok && diag.text) {
         fullReportText = String(diag.text);
+        _lastDiagReport = diag.report || null;
       }
     }
   }
@@ -356,6 +360,47 @@ async function runDiagnostics() {
 if (diagBtn) {
   diagBtn.addEventListener("click", () => {
     void runDiagnostics();
+  });
+}
+
+if (diagSaveBtn) {
+  diagSaveBtn.addEventListener("click", async () => {
+    if (diagSaveStatusEl) diagSaveStatusEl.textContent = "⏳ Saving to GitHub…";
+    const [activeTab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    if (!activeTab?.id || !/^https?:\/\//i.test(activeTab.url || "")) {
+      if (diagSaveStatusEl) diagSaveStatusEl.textContent = "Open a parish website tab first.";
+      return;
+    }
+    const bridge = await ensureTabBridge(activeTab.id);
+    if (!bridge.ok) {
+      if (diagSaveStatusEl) diagSaveStatusEl.textContent = formatDispatchError(bridge);
+      return;
+    }
+  const diag = await tabsSend(activeTab.id, { type: "ph_run_full_diagnosis" });
+    if (!diag?.ok) {
+      if (diagSaveStatusEl) diagSaveStatusEl.textContent = "Could not run diagnosis on page.";
+      return;
+    }
+    const report = diag.report || null;
+    const parishKey = report?.parish_key || "";
+    const res = await new Promise((resolve) => {
+      chrome.runtime.sendMessage(
+        {
+          type: "ph_save_diagnosis",
+          parish_key: parishKey,
+          diagnosis: report,
+          source: "popup_manual",
+        },
+        (r) => resolve(r || { ok: false, error: "No response" })
+      );
+    });
+    if (res?.ok) {
+      if (diagSaveStatusEl) {
+        diagSaveStatusEl.textContent = `✅ Saved parishes/training_diagnosis/${parishKey || "?"}.json`;
+      }
+    } else if (diagSaveStatusEl) {
+      diagSaveStatusEl.textContent = `❌ ${res?.error || "Save failed"}`;
+    }
   });
 }
 

@@ -385,6 +385,36 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 });
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message?.type !== "ph_save_diagnosis") return false;
+  (async () => {
+    try {
+      const { gh_pat, gh_repo: storedGhRepo } = await chrome.storage.local.get(["gh_pat", "gh_repo"]);
+      const gh_repo = phResolveGhRepo(storedGhRepo);
+      if (!gh_pat) {
+        sendResponse({ ok: false, error: "GitHub PAT not configured." });
+        return;
+      }
+      const parishKey = String(message.parish_key || message.diagnosis?.parish_key || "").trim().toLowerCase();
+      if (!parishKey) {
+        sendResponse({ ok: false, error: "No parish_key provided." });
+        return;
+      }
+      const result = await _upsertTrainingDiagnosis(
+        gh_pat,
+        gh_repo,
+        parishKey,
+        message.diagnosis,
+        message.source || "manual_diag"
+      );
+      sendResponse(result);
+    } catch (err) {
+      sendResponse({ ok: false, error: String(err) });
+    }
+  })();
+  return true;
+});
+
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type !== "ph_recipe_diag_github") return false;
   (async () => {
     try {
@@ -449,7 +479,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       }
 
       if (parishKey) {
-        for (const dio of ["derry", "raphoe"]) {
+        for (const dio of ["derry", "down_and_connor", "raphoe", "unknown"]) {
           try {
             const recipeResp = await fetch(
               `${rawBase}/parishes/recipes/${dio}/${parishKey}.json`
@@ -483,6 +513,60 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 
 const SITE_PATTERNS_PATH = "parishes/site_patterns.json";
 const HOST_PROFILES_PATH = "parishes/host_profiles.json";
+const TRAINING_DIAGNOSIS_DIR = "parishes/training_diagnosis";
+
+async function _upsertTrainingDiagnosis(gh_pat, gh_repo, parishKey, diagnosis, source = "extension") {
+  const key = String(parishKey || "").trim().toLowerCase();
+  if (!key || !diagnosis || typeof diagnosis !== "object") {
+    return { ok: false, skipped: true };
+  }
+  const filePath = `${TRAINING_DIAGNOSIS_DIR}/${key}.json`;
+  const loaded = await _fetchGithubJsonFile(gh_pat, gh_repo, filePath);
+  if (!loaded.ok && loaded.error) return loaded;
+
+  const prior = loaded.data && typeof loaded.data === "object" ? loaded.data : {};
+  const history = Array.isArray(prior.history) ? prior.history.slice(-4) : [];
+  if (prior.collected_at) {
+    history.push({
+      collected_at: prior.collected_at,
+      issue_count: Array.isArray(prior.issues) ? prior.issues.length : 0,
+      source: prior.source || "extension",
+    });
+  }
+
+  const payload = {
+    parish_key: key,
+    collected_at: diagnosis.collected_at || new Date().toISOString(),
+    extension_version: diagnosis.extension_version || "",
+    source,
+    page_url: diagnosis.page_url || "",
+    page_type: diagnosis.page_type || "",
+    page_archetype: diagnosis.page_archetype || "",
+    html_fingerprint: diagnosis.html_fingerprint || null,
+    recipe_steps_local: diagnosis.recipe_steps_local ?? 0,
+    session_ui_steps: diagnosis.session_ui_steps ?? 0,
+    issues: Array.isArray(diagnosis.issues) ? diagnosis.issues : [],
+    counts: diagnosis.counts || {},
+    pattern_hints: diagnosis.pattern_hints || [],
+    github: diagnosis.github
+      ? {
+          recipe_found: Boolean(diagnosis.github.recipe_found),
+          consecutive_failures: diagnosis.github.consecutive_failures ?? 0,
+          last_failure_reason: diagnosis.github.last_failure_reason || "",
+        }
+      : null,
+    history,
+  };
+
+  return _putGithubJsonFile(
+    gh_pat,
+    gh_repo,
+    filePath,
+    payload,
+    loaded.sha,
+    `chore: training diagnosis for ${key} [${source}]`
+  );
+}
 
 function _isBadBulletinDownloadUrl(url, startUrl) {
   const text = String(url || "").toLowerCase();
@@ -1366,6 +1450,25 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       let patternLearnError = "";
       let hostProfileLearned = false;
       let hostProfileLearnError = "";
+      let diagnosisSaved = false;
+      let diagnosisSaveError = "";
+      if (message.diagnosis_snapshot && typeof message.diagnosis_snapshot === "object") {
+        try {
+          const diagResult = await _upsertTrainingDiagnosis(
+            gh_pat,
+            gh_repo,
+            key,
+            message.diagnosis_snapshot,
+            message.diagnosis_source || "push_recipe"
+          );
+          diagnosisSaved = Boolean(diagResult?.ok);
+          if (!diagResult?.ok && !diagResult?.skipped) {
+            diagnosisSaveError = diagResult?.error || "Could not save training diagnosis.";
+          }
+        } catch (diagErr) {
+          diagnosisSaveError = String(diagErr);
+        }
+      }
       if (message.site_pattern) {
         try {
           const patternResult = await _upsertSitePattern(
@@ -1405,6 +1508,8 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         patternLearnError,
         hostProfileLearned,
         hostProfileLearnError,
+        diagnosisSaved,
+        diagnosisSaveError,
         stepsPushed: Array.isArray(normalizedRecipe.steps) ? normalizedRecipe.steps.length : 0,
         stepsPreservedFromOld,
         githubVerify,
