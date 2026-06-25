@@ -267,14 +267,14 @@
       "html_fingerprint": "wp_block_file_bulletin",
       "html_markers": [
         "wp-block-file block",
-        "file embed/button",
-        "bulletin page"
+        "file embed/button"
       ],
       "example_parishes": [
         "clonmanyparish",
-        "clonleighparish"
+        "clonleighparish",
+        "derriaghycatholicparish"
       ],
-      "success_count": 2
+      "success_count": 3
     },
     "weekly_bulletin_download+click_then_download": {
       "page_type": "weekly_bulletin_download",
@@ -691,18 +691,27 @@
       "step_count": 3
     },
     "derriaghycatholicparish": {
-      "page_type": "stacked_image_bulletin",
-      "recipe_flow": "image_stack",
-      "combined_key": "stacked_image_bulletin+image_stack",
+      "page_type": "wp_block_file_bulletin",
+      "recipe_flow": "direct_download",
+      "combined_key": "wp_block_file_bulletin+direct_download",
       "display_name": "Derriaghy",
       "start_url_host": "derriaghycatholicparish.com",
-      "updated": "2026-06-24",
+      "updated": "2026-06-25",
       "step_count": 2,
-      "playbook_type": "stacked_image_bulletin",
+      "playbook_type": "permanent_bulletin_page",
       "operator_notes": [
-        "One.com WordPress — TLS is fast (~0.6s) but the page can hang past 60s on domcontentloaded.",
-        "Harvest uses commit navigation and a 2–3 minute budget (goto + image_stack).",
-        "While training, if the timer stays on Still loading past 45s, that is normal — push anyway."
+        "Permanent /parish-bulletin/ URL — PDF filename changes weekly under /wp-content/uploads/YYYY/MM/.",
+        "PDF is in object.wp-block-file__embed[data] — harvest scrapes the embed URL.",
+        "Use url_pattern *bulletin*.pdf — never pin a dated filename."
+      ],
+      "do_not": [
+        "Do not train on the homepage — use the dedicated bulletin page only.",
+        "Do not pin saintanthony.co.uk if the parish moved to saintanthonys.uk."
+      ],
+      "html_fingerprint": "wp_block_file_bulletin",
+      "html_markers": [
+        "wp-block-file block",
+        "file embed/button"
       ]
     },
     "saintanthony": {
