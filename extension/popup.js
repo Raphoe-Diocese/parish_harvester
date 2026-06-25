@@ -374,4 +374,211 @@ if (diagCopyBtn) {
   });
 }
 
+// ── Dead / broken websites ─────────────────────────────────────────────────
+
+const deadCurrentEl = document.getElementById("dead-current");
+const deadReasonEl = document.getElementById("dead-reason");
+const deadDisableEvidenceEl = document.getElementById("dead-disable-evidence");
+const deadMarkBtn = document.getElementById("dead-mark-btn");
+const deadStatusEl = document.getElementById("dead-status");
+const deadListEl = document.getElementById("dead-list");
+
+let _currentDeadParish = null;
+
+function _bgMessage(payload) {
+  return new Promise((resolve) => {
+    chrome.runtime.sendMessage(payload, (result) => {
+      if (chrome.runtime.lastError) {
+        resolve({ ok: false, error: chrome.runtime.lastError.message });
+        return;
+      }
+      resolve(result || { ok: false, error: "No response from background." });
+    });
+  });
+}
+
+function _setDeadStatus(text, isError = false) {
+  if (!deadStatusEl) return;
+  deadStatusEl.textContent = text;
+  deadStatusEl.style.color = isError ? "#fca5a5" : "#86efac";
+}
+
+function _formatDeadDate(iso) {
+  if (!iso) return "";
+  try {
+    return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+  } catch (_e) {
+    return "";
+  }
+}
+
+async function _renderDeadList() {
+  if (!deadListEl) return;
+  const res = await _bgMessage({ type: "list_dead_parishes" });
+  const list = res?.ok && Array.isArray(res.parishes) ? res.parishes : [];
+  deadListEl.replaceChildren();
+  if (!list.length) {
+    const empty = document.createElement("span");
+    empty.style.cssText = "color:#6b7280;font-size:10px;";
+    empty.textContent = "No dead sites remembered yet.";
+    deadListEl.appendChild(empty);
+    return;
+  }
+  for (const p of list) {
+    const row = document.createElement("div");
+    row.className = "dead-row";
+    const info = document.createElement("div");
+    info.style.flex = "1";
+    const title = document.createElement("div");
+    title.innerHTML = `<strong style="color:#fca5a5;">${p.name || p.key}</strong> <span style="color:#6b7280;">(${p.key})</span>`;
+    const meta = document.createElement("div");
+    meta.style.color = "#9ca3af";
+    meta.textContent = [
+      p.diocese || "",
+      p.url || "",
+      p.marked_at ? `marked ${_formatDeadDate(p.marked_at)}` : "",
+    ].filter(Boolean).join(" · ");
+    const note = document.createElement("div");
+    note.style.color = "#d1d5db";
+    note.textContent = p.reason || "";
+    info.append(title, meta, note);
+
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.textContent = "✕";
+    removeBtn.title = "Remove from local reminder list (does not re-enable harvest)";
+    removeBtn.addEventListener("click", async () => {
+      await _bgMessage({ type: "remove_dead_parish_local", parish_key: p.key });
+      await _renderDeadList();
+      _setDeadStatus(`Removed ${p.name || p.key} from local list.`);
+    });
+
+    row.append(info, removeBtn);
+    deadListEl.appendChild(row);
+  }
+}
+
+async function _detectCurrentParishForDead() {
+  if (!deadCurrentEl) return;
+  const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  const url = String(tab?.url || "").trim();
+  if (!/^https?:\/\//i.test(url)) {
+    _currentDeadParish = null;
+    deadCurrentEl.textContent = "Open a parish website tab to detect it here.";
+    if (deadMarkBtn) deadMarkBtn.disabled = true;
+    return;
+  }
+
+  const stored = await new Promise((resolve) => {
+    chrome.storage.local.get(["ph_training_parish", "ph_dead_parishes"], resolve);
+  });
+  const deadList = Array.isArray(stored?.ph_dead_parishes) ? stored.ph_dead_parishes : [];
+  const tabHost = (() => {
+    try { return new URL(url).hostname.replace(/^www\./, ""); } catch (_e) { return ""; }
+  })();
+
+  let parish = null;
+  const training = stored?.ph_training_parish;
+  if (training?.key && training?.name) {
+    parish = {
+      key: training.key,
+      name: training.name,
+      diocese: training.diocese || "",
+      pageUrl: url,
+      bulletinUrls: [url],
+    };
+  }
+
+  if (!parish) {
+    const resolved = await _bgMessage({ type: "resolve_parish_from_url", url });
+    if (resolved?.ok && resolved.parish) parish = resolved.parish;
+  }
+
+  if (!parish && tabHost) {
+    const hostKey = tabHost.split(".")[0];
+    parish = {
+      key: hostKey,
+      name: hostKey,
+      diocese: "",
+      pageUrl: url,
+      bulletinUrls: [url],
+    };
+  }
+
+  _currentDeadParish = parish;
+  const alreadyDead = deadList.some((p) => String(p.key).toLowerCase() === String(parish?.key || "").toLowerCase());
+  if (parish) {
+    deadCurrentEl.innerHTML = alreadyDead
+      ? `☠ <strong>${parish.name}</strong> (${parish.key}) — already in your dead list`
+      : `Detected: <strong>${parish.name}</strong> (${parish.key})<br><span style="color:#9ca3af;">${url}</span>`;
+    if (deadMarkBtn) deadMarkBtn.disabled = alreadyDead;
+  } else {
+    deadCurrentEl.textContent = `Tab: ${url} — could not match a parish name. You can still mark by hostname if needed.`;
+    if (deadMarkBtn) deadMarkBtn.disabled = false;
+  }
+}
+
+if (deadMarkBtn) {
+  deadMarkBtn.addEventListener("click", async () => {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    const url = String(tab?.url || "").trim();
+    if (!/^https?:\/\//i.test(url)) {
+      _setDeadStatus("Open a parish website tab first.", true);
+      return;
+    }
+
+    let parish = _currentDeadParish;
+    if (!parish?.key) {
+      const resolved = await _bgMessage({ type: "resolve_parish_from_url", url });
+      parish = resolved?.parish;
+    }
+    if (!parish?.key) {
+      try {
+        const host = new URL(url).hostname.replace(/^www\./, "");
+        parish = { key: host.split(".")[0], name: host, diocese: "", pageUrl: url };
+      } catch (_e) {
+        _setDeadStatus("Could not detect parish.", true);
+        return;
+      }
+    }
+
+    const reason = String(deadReasonEl?.value || "").trim() || "Website gone or unreachable.";
+    const label = parish.name || parish.key;
+    if (!confirm(`Mark "${label}" as a DEAD website?\n\n• Pushes dead recipe to GitHub (harvest skips)\n• ${deadDisableEvidenceEl?.checked ? "Adds DISABLED to evidence file" : "Evidence file unchanged"}\n• Saves to your local reminder list`)) {
+      return;
+    }
+
+    deadMarkBtn.disabled = true;
+    _setDeadStatus("⏳ Marking as dead…");
+
+    const res = await _bgMessage({
+      type: "mark_parish_dead",
+      parish_key: parish.key,
+      display_name: parish.name || parish.key,
+      diocese: parish.diocese || "",
+      url: parish.pageUrl || parish.bulletinUrls?.[0] || url,
+      reason,
+      disable_evidence: Boolean(deadDisableEvidenceEl?.checked),
+    });
+
+    if (!res?.ok) {
+      _setDeadStatus(`❌ ${res?.error || "Failed."}`, true);
+      deadMarkBtn.disabled = false;
+      return;
+    }
+
+    let msg = `✅ ${label} marked dead on GitHub.`;
+    if (res.evidence_disabled) msg += " Evidence file updated.";
+    else if (res.evidence_warning) msg += ` (${res.evidence_warning})`;
+    _setDeadStatus(msg);
+    if (deadReasonEl) deadReasonEl.value = "";
+    await _renderDeadList();
+    await _detectCurrentParishForDead();
+    deadMarkBtn.disabled = true;
+  });
+}
+
+void _renderDeadList();
+void _detectCurrentParishForDead();
+
 void sendToActiveTab({ type: "show_toolbar" });

@@ -11,15 +11,43 @@ from __future__ import annotations
 
 import json
 import re
+import ssl
 import sys
 import urllib.error
 import urllib.request
+from datetime import date
 from pathlib import Path
 from urllib.parse import urljoin, urlparse
 
 REPO = Path(__file__).resolve().parent.parent
 RECIPES = REPO / "parishes" / "recipes"
 PARISHES = REPO / "parishes"
+
+PDFEMB_RE = re.compile(r"pdfemb-viewer", re.IGNORECASE)
+
+# Confirmed gone / unreachable — no extension retrain needed.
+KNOWN_DEAD_SITES: dict[str, dict[str, str]] = {
+    "nativityparish": {
+        "display_name": "Nativity",
+        "diocese": "down_and_connor",
+        "evidence_name": "Nativity",
+        "start_url": "https://www.nativityparish.com/news",
+        "reason": "Website unreachable — nativityparish.com/news times out (site gone).",
+    },
+    "stagnesbelfast": {
+        "display_name": "St Agnes Belfast",
+        "diocese": "down_and_connor",
+        "evidence_name": "St Agnes Belfast",
+        "start_url": "https://www.stagnesbelfast.com/?p=6069",
+        "reason": "Bulletin page gone — no PDF on stagnesbelfast.com (stub since April).",
+    },
+}
+
+EVIDENCE_BY_DIOCESE = {
+    "derry": PARISHES / "derry_diocese_bulletin_urls.txt",
+    "down_and_connor": PARISHES / "down_and_connor_bulletin_urls.txt",
+    "raphoe": PARISHES / "raphoe_diocese_bulletin_urls.txt",
+}
 
 PDF_HREF_RE = re.compile(
     r"""href\s*=\s*["']([^"']+\.pdf[^"']*)["']""",
@@ -55,8 +83,15 @@ def _fetch_html(url: str, timeout: int = 20) -> str:
         url,
         headers={"User-Agent": "ParishHarvester/1.0 (bulletin archive; +https://github.com/Raphoe-Diocese/parish_harvester)"},
     )
-    with urllib.request.urlopen(req, timeout=timeout) as resp:
-        return resp.read(500_000).decode("utf-8", errors="replace")
+    ctx = ssl.create_default_context()
+    try:
+        with urllib.request.urlopen(req, timeout=timeout, context=ctx) as resp:
+            return resp.read(500_000).decode("utf-8", errors="replace")
+    except ssl.SSLError:
+        ctx.check_hostname = False
+        ctx.verify_mode = ssl.CERT_NONE
+        with urllib.request.urlopen(req, timeout=timeout, context=ctx) as resp:
+            return resp.read(500_000).decode("utf-8", errors="replace")
 
 
 def _probe_pdf_links(page_url: str) -> list[str]:
@@ -112,6 +147,133 @@ def _mark_inactive(recipe: dict, reason: str) -> dict:
     recipe["reason"] = reason
     recipe["auto_fixed"] = True
     return recipe
+
+
+def _mark_dead_url(recipe: dict, reason: str) -> dict:
+    recipe["status"] = "dead_url"
+    recipe["skip"] = True
+    recipe["dead_reason"] = reason
+    recipe["reason"] = reason
+    recipe["steps"] = []
+    recipe["auto_fixed"] = True
+    recipe["recorded_date"] = date.today().isoformat()
+    for key in ("placeholder", "needs_retraining", "retraining_reason", "captured_url"):
+        recipe.pop(key, None)
+    return recipe
+
+
+def _pdfemb_list_recipe(key: str, display: str, diocese: str, page_url: str) -> dict:
+    return {
+        "parish_key": key,
+        "display_name": display,
+        "diocese": diocese,
+        "recorded_date": date.today().isoformat(),
+        "start_url": page_url,
+        "site_type": "wp_pdfemb_list",
+        "auto_fixed": True,
+        "steps": [
+            {"action": "goto", "url": page_url},
+            {"action": "download", "url_pattern": "*.pdf"},
+        ],
+        "version": 2,
+        "observed_load_ms": 45000,
+        "timeout_ms": 60000,
+        "total_timeout_s": 120,
+    }
+
+
+def _page_has_pdfemb(html: str) -> bool:
+    return bool(PDFEMB_RE.search(html))
+
+
+def _disable_parish_in_evidence(evidence_path: Path, parish_name: str) -> bool:
+    if not evidence_path.is_file():
+        return False
+    lines = evidence_path.read_text(encoding="utf-8").split("\n")
+    escaped = re.escape(parish_name)
+    header_re = re.compile(rf"^#\s*---\s*{escaped}\s*---", re.IGNORECASE)
+    for i, line in enumerate(lines):
+        if header_re.match(line.strip()):
+            if i + 1 < len(lines) and "DISABLED" in lines[i + 1]:
+                return False
+            lines.insert(i + 1, "# DISABLED — website gone / removed from harvest via autofix")
+            evidence_path.write_text("\n".join(lines), encoding="utf-8")
+            return True
+    return False
+
+
+def _apply_known_dead_sites() -> int:
+    changed = 0
+    evidence_path = EVIDENCE_BY_DIOCESE["down_and_connor"]
+    for key, info in KNOWN_DEAD_SITES.items():
+        path = RECIPES / info["diocese"] / f"{key}.json"
+        if not path.is_file():
+            continue
+        recipe = _load_json(path)
+        recipe.update({
+            "parish_key": key,
+            "display_name": info["display_name"],
+            "diocese": info["diocese"],
+            "start_url": info["start_url"],
+        })
+        _mark_dead_url(recipe, info["reason"])
+        _save_json(path, recipe)
+        if _disable_parish_in_evidence(evidence_path, info["evidence_name"]):
+            print(f"[evidence-disable] {info['evidence_name']}")
+        print(f"[dead] {key}")
+        changed += 1
+    return changed
+
+
+def _recipe_needs_pdfemb_fix(recipe: dict) -> bool:
+    steps = recipe.get("steps")
+    if not isinstance(steps, list):
+        return False
+    if recipe.get("site_type") == "wp_pdfemb_list" and recipe.get("version", 0) >= 2:
+        return False
+    for step in steps:
+        if not isinstance(step, dict):
+            continue
+        if step.get("action") == "download" and step.get("url"):
+            url = str(step.get("url"))
+            if re.search(r"20\d{2}.*\.pdf", url, re.I):
+                return True
+        if step.get("action") == "click" and step.get("selector") == "div#content":
+            return True
+    return False
+
+
+def _apply_pdfemb_probes() -> int:
+    changed = 0
+    for sub in ("down_and_connor", "derry"):
+        subdir = RECIPES / sub
+        if not subdir.is_dir():
+            continue
+        for path in sorted(subdir.glob("*.json")):
+            recipe = _load_json(path)
+            if recipe.get("skip") or recipe.get("status") in ("dead_url", "inactive"):
+                continue
+            page = str(recipe.get("start_url") or "").strip()
+            if not page or page.lower().endswith(".pdf"):
+                continue
+            needs = _recipe_needs_pdfemb_fix(recipe)
+            if not needs:
+                continue
+            try:
+                html = _fetch_html(page, timeout=30)
+            except (urllib.error.URLError, TimeoutError, OSError):
+                continue
+            if not _page_has_pdfemb(html):
+                continue
+            key = recipe.get("parish_key", path.stem)
+            display = recipe.get("display_name", key)
+            diocese = recipe.get("diocese", sub)
+            fixed = _pdfemb_list_recipe(key, display, diocese, page)
+            _save_json(path, fixed)
+            print(f"[pdfemb] {path.name}")
+            changed += 1
+    return changed
+
 
 
 def _mark_placeholder(recipe: dict) -> dict:
@@ -318,6 +480,8 @@ def _match_evidence(recipe: dict, evidence: dict[str, dict]) -> dict | None:
 
 def main() -> int:
     changed = 0
+    changed += _apply_known_dead_sites()
+    changed += _apply_pdfemb_probes()
     evidence = _parse_raphoe_evidence()
 
     for path in sorted((RECIPES / "raphoe").glob("*.json")):

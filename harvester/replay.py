@@ -774,6 +774,7 @@ async def _print_page_to_pdf(page: Page, dest: Path) -> None:
 
 async def _find_pdfemb_url(page: Page) -> str | None:
     links = await page.eval_on_selector_all(PDFEMB_SELECTOR, PDFEMB_HREF_EXTRACT_JS)
+    candidates: list[str] = []
     for href in links:
         resolved = urljoin(page.url, href)
         lower = resolved.lower()
@@ -781,8 +782,11 @@ async def _find_pdfemb_url(page: Page) -> str | None:
             continue
         if _is_non_bulletin_url(resolved):
             continue
-        return resolved
-    return None
+        candidates.append(resolved)
+    if not candidates:
+        return None
+    candidates.sort(key=lambda u: _score_bulletin_url(u), reverse=True)
+    return candidates[0]
 
 
 async def _find_iframe_pdf_url(page: Page) -> str | None:

@@ -3,7 +3,7 @@ const PROBLEMS_RECIPE_RETRAINED_KEY = "ph_recipe_retrained";
 const PH_LAST_DISPATCH_KEY = "ph_last_parish_dispatch";
 
 try {
-  importScripts("github_defaults.js", "trainer_inject.js");
+  importScripts("github_defaults.js", "trainer_inject.js", "parish_dead_sites.js");
 } catch (_importErr) {
   // Fallback when loaded in a context without importScripts.
   globalThis.PH_DEFAULT_GH_REPO = "Raphoe-Diocese/parish_harvester";
@@ -1257,6 +1257,13 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       const normalizedRecipe = _normalizeRecipeTerminalSteps(
         _sanitizeRecipeOnPush(recipe)
       );
+      const markAsDead = Boolean(message.mark_dead) ||
+        ["dead_url", "inactive"].includes(String(incoming.status || "").toLowerCase()) ||
+        incoming.skip === true;
+      const deadStatus = ["dead_url", "inactive"].includes(String(incoming.status || "").toLowerCase())
+        ? String(incoming.status).toLowerCase()
+        : "dead_url";
+      const deadReason = String(incoming.dead_reason || incoming.reason || "Marked inactive").trim();
       // Retrain push must clear harvest-blocking flags left on the old recipe.
       delete normalizedRecipe.skip;
       delete normalizedRecipe.status;
@@ -1266,12 +1273,11 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       delete normalizedRecipe.placeholder;
       delete normalizedRecipe.auto_generated;
       delete normalizedRecipe.retraining_reason;
-      const recipeStatus = String(normalizedRecipe.status || "").toLowerCase();
-      if (recipeStatus === "dead_url" || recipeStatus === "inactive" || normalizedRecipe.skip) {
+      if (markAsDead) {
+        normalizedRecipe.status = deadStatus;
         normalizedRecipe.skip = true;
-        if (!normalizedRecipe.reason) {
-          normalizedRecipe.reason = normalizedRecipe.dead_reason || "Marked inactive";
-        }
+        normalizedRecipe.dead_reason = deadReason || "Marked inactive";
+        normalizedRecipe.reason = normalizedRecipe.dead_reason;
       }
 
       // Set recorded_date to today.
@@ -1315,43 +1321,45 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       );
 
       // Brief pause so GitHub serves the recipe commit before the harvest workflow checks out main.
-      await new Promise((resolve) => setTimeout(resolve, 2500));
+      await new Promise((resolve) => setTimeout(resolve, markAsDead ? 0 : 2500));
 
       // After saving the recipe, immediately trigger a workflow_dispatch so
       // the Mega PDF is rebuilt for just this parish right away.
       let dispatchOk = false;
       let dispatchError = "";
-      try {
-        const dispatchResp = await fetch(
-          `https://api.github.com/repos/${gh_repo}/actions/workflows/harvest.yml/dispatches`,
-          {
-            method: "POST",
-            headers: {
-              Authorization: `token ${gh_pat}`,
-              Accept: "application/vnd.github+json",
-              "Content-Type": "application/json",
-              "X-GitHub-Api-Version": "2022-11-28",
-            },
-            body: JSON.stringify({
-              ref: "main",
-              inputs: {
-                diocese: "all",
-                target_parish: key,
-                run_tests: "false",
+      if (!markAsDead && !message.mark_dead) {
+        try {
+          const dispatchResp = await fetch(
+            `https://api.github.com/repos/${gh_repo}/actions/workflows/harvest.yml/dispatches`,
+            {
+              method: "POST",
+              headers: {
+                Authorization: `token ${gh_pat}`,
+                Accept: "application/vnd.github+json",
+                "Content-Type": "application/json",
+                "X-GitHub-Api-Version": "2022-11-28",
               },
-            }),
+              body: JSON.stringify({
+                ref: "main",
+                inputs: {
+                  diocese: "all",
+                  target_parish: key,
+                  run_tests: "false",
+                },
+              }),
+            }
+          );
+          dispatchOk = dispatchResp.status === 204;
+          if (!dispatchOk) {
+            if (dispatchResp.status === 403) {
+              dispatchError = "Your GitHub PAT is missing the 'workflow' scope. Go to github.com/settings/tokens, click your token, tick the 'workflow' checkbox, then regenerate and save it in the extension settings.";
+            } else {
+              dispatchError = await _githubApiError(dispatchResp);
+            }
           }
-        );
-        dispatchOk = dispatchResp.status === 204;
-        if (!dispatchOk) {
-          if (dispatchResp.status === 403) {
-            dispatchError = "Your GitHub PAT is missing the 'workflow' scope. Go to github.com/settings/tokens, click your token, tick the 'workflow' checkbox, then regenerate and save it in the extension settings.";
-          } else {
-            dispatchError = await _githubApiError(dispatchResp);
-          }
+        } catch (dispatchErr) {
+          dispatchError = String(dispatchErr);
         }
-      } catch (dispatchErr) {
-        dispatchError = String(dispatchErr);
       }
 
       let patternLearned = false;
@@ -1447,6 +1455,244 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 });
 
 // ── Auto-download PDF detection (Brave / sites that force download) ────────
+async function _pushDeadRecipeFile(gh_pat, gh_repo, parishKey, recipe) {
+  const key = String(parishKey || "").trim().toLowerCase().replace(/\s+/g, "_");
+  const dioceseSubfolder = _canonicalDioceseSlug(String(recipe.diocese || "").trim()) || "unknown";
+  const filePath = `parishes/recipes/${dioceseSubfolder}/${key}.json`;
+  const apiBase = `https://api.github.com/repos/${gh_repo}/contents/${filePath}`;
+  const headers = {
+    Authorization: `token ${gh_pat}`,
+    Accept: "application/vnd.github+json",
+    "Content-Type": "application/json",
+    "X-GitHub-Api-Version": "2022-11-28",
+  };
+
+  let existingSha = null;
+  try {
+    const getResp = await fetch(apiBase, { headers });
+    if (getResp.ok) {
+      const existing = await getResp.json();
+      existingSha = existing.sha || null;
+    }
+  } catch (_e) { /* new file */ }
+
+  const deadRecipe = {
+    ...recipe,
+    parish_key: key,
+    status: "dead_url",
+    skip: true,
+    recorded_date: new Date().toISOString().slice(0, 10),
+    steps: [],
+  };
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(deadRecipe, null, 2))));
+  const putResp = await fetch(apiBase, {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({
+      message: `chore: mark ${key} as dead website [from extension]`,
+      content: encoded,
+      ...(existingSha ? { sha: existingSha } : {}),
+    }),
+  });
+  if (!putResp.ok) return { ok: false, error: await _githubApiError(putResp) };
+  const result = await putResp.json();
+  const htmlUrl = result?.content?.html_url || `https://github.com/${gh_repo}/blob/main/${filePath}`;
+  return { ok: true, url: htmlUrl };
+}
+
+  const apiUrl = `https://api.github.com/repos/${gh_repo}/contents/${filePath}`;
+  const headers = {
+    Authorization: `token ${gh_pat}`,
+    Accept: "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
+  };
+  const resp = await fetch(apiUrl, { headers });
+  if (resp.status === 404) return { ok: true, text: null, sha: null };
+  if (!resp.ok) return { ok: false, error: await _githubApiError(resp) };
+  const json = await resp.json();
+  try {
+    const decoded = decodeURIComponent(
+      atob(String(json.content || "").replace(/\n/g, ""))
+        .split("")
+        .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
+        .join("")
+    );
+    return { ok: true, text: decoded, sha: json.sha || null };
+  } catch (err) {
+    return { ok: false, error: `Could not decode ${filePath}: ${String(err)}` };
+  }
+}
+
+async function _putGithubTextFile(gh_pat, gh_repo, filePath, text, sha, commitMessage) {
+  const apiUrl = `https://api.github.com/repos/${gh_repo}/contents/${filePath}`;
+  const headers = {
+    Authorization: `token ${gh_pat}`,
+    Accept: "application/vnd.github+json",
+    "Content-Type": "application/json",
+    "X-GitHub-Api-Version": "2022-11-28",
+  };
+  const encoded = btoa(unescape(encodeURIComponent(String(text || ""))));
+  const body = {
+    message: commitMessage,
+    content: encoded,
+    ...(sha ? { sha } : {}),
+  };
+  const putResp = await fetch(apiUrl, { method: "PUT", headers, body: JSON.stringify(body) });
+  if (!putResp.ok) return { ok: false, error: await _githubApiError(putResp) };
+  return { ok: true };
+}
+
+async function _resolveParishFromUrl(gh_pat, gh_repo, tabUrl) {
+  const deadApi = globalThis.PH_DEAD_SITES;
+  if (!deadApi || !tabUrl) return null;
+  const evidenceFiles = deadApi.PH_EVIDENCE_FILES || {};
+  const allParishes = [];
+  for (const [diocese, path] of Object.entries(evidenceFiles)) {
+    const loaded = await _fetchGithubTextFile(gh_pat, gh_repo, path);
+    if (!loaded.ok || !loaded.text) continue;
+    allParishes.push(...deadApi.phParseEvidence(loaded.text, diocese));
+  }
+  return deadApi.phMatchParishFromUrl(tabUrl, allParishes);
+}
+
+const _phStorageGet = (keys) => new Promise((resolve) => {
+  chrome.storage.local.get(keys, (result) => resolve(result || {}));
+});
+const _phStorageSet = (payload) => new Promise((resolve) => {
+  chrome.storage.local.set(payload, () => resolve(!chrome.runtime?.lastError));
+});
+
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  const type = message?.type;
+  if (
+    type !== "mark_parish_dead" &&
+    type !== "remove_dead_parish_local" &&
+    type !== "list_dead_parishes" &&
+    type !== "resolve_parish_from_url"
+  ) {
+    return false;
+  }
+
+  (async () => {
+    const deadApi = globalThis.PH_DEAD_SITES;
+    if (!deadApi) {
+      sendResponse({ ok: false, error: "Dead-site module not loaded." });
+      return;
+    }
+
+    if (type === "list_dead_parishes") {
+      const list = await deadApi.phGetDeadParishes(_phStorageGet);
+      sendResponse({ ok: true, parishes: list });
+      return;
+    }
+
+    if (type === "remove_dead_parish_local") {
+      const list = await deadApi.phRemoveDeadParishLocal(_phStorageGet, _phStorageSet, message.parish_key);
+      sendResponse({ ok: true, parishes: list });
+      return;
+    }
+
+    const { gh_pat, gh_repo: storedGhRepo } = await _phStorageGet(["gh_pat", "gh_repo"]);
+    const gh_repo = phResolveGhRepo(storedGhRepo);
+
+    if (type === "resolve_parish_from_url") {
+      if (!gh_pat) {
+        sendResponse({ ok: false, error: "GitHub PAT not configured." });
+        return;
+      }
+      const parish = await _resolveParishFromUrl(gh_pat, gh_repo, String(message.url || "").trim());
+      sendResponse({ ok: true, parish });
+      return;
+    }
+
+    if (type === "mark_parish_dead") {
+      if (!gh_pat) {
+        sendResponse({ ok: false, error: "GitHub PAT not configured. Open popup → GitHub Settings." });
+        return;
+      }
+
+      const parishKey = String(message.parish_key || "").trim().toLowerCase().replace(/[^a-z0-9]+/g, "");
+      const displayName = String(message.display_name || message.name || parishKey).trim();
+      const diocese = String(message.diocese || "").trim();
+      const startUrl = String(message.url || message.start_url || "").trim();
+      const reason = String(message.reason || "Website gone or unreachable — marked dead from extension.").trim();
+      const disableEvidence = message.disable_evidence !== false;
+
+      if (!parishKey) {
+        sendResponse({ ok: false, error: "No parish_key provided." });
+        return;
+      }
+
+      const dioceseSlug = _canonicalDioceseSlug(diocese) || "unknown";
+      const recipe = {
+        parish_key: parishKey,
+        display_name: displayName,
+        diocese,
+        start_url: startUrl,
+        status: "dead_url",
+        skip: true,
+        dead_reason: reason,
+        reason,
+        steps: [],
+      };
+
+      const pushResult = await _pushDeadRecipeFile(gh_pat, gh_repo, parishKey, recipe);
+
+      if (!pushResult?.ok) {
+        sendResponse({ ok: false, error: pushResult?.error || "Failed to push dead recipe." });
+        return;
+      }
+
+      let evidenceDisabled = false;
+      let evidenceWarning = "";
+      if (disableEvidence && diocese && displayName) {
+        const evidencePath = deadApi.PH_EVIDENCE_FILES[diocese];
+        if (evidencePath) {
+          const loaded = await _fetchGithubTextFile(gh_pat, gh_repo, evidencePath);
+          if (loaded.ok && loaded.text) {
+            const disabled = deadApi.phDisableParishInEvidence(loaded.text, displayName);
+            if (disabled.ok) {
+              const put = await _putGithubTextFile(
+                gh_pat,
+                gh_repo,
+                evidencePath,
+                disabled.text,
+                loaded.sha,
+                `evidence: disable ${displayName} [dead site from extension]`
+              );
+              evidenceDisabled = Boolean(put.ok);
+              if (!put.ok) evidenceWarning = put.error || "Evidence file not updated.";
+            } else {
+              evidenceWarning = disabled.error || "Could not find parish in evidence file.";
+            }
+          } else {
+            evidenceWarning = loaded.error || "Could not load evidence file.";
+          }
+        }
+      }
+
+      const parishes = await deadApi.phUpsertDeadParish(_phStorageGet, _phStorageSet, {
+        key: parishKey,
+        name: displayName,
+        diocese,
+        url: startUrl,
+        reason,
+        evidence_disabled: evidenceDisabled,
+      });
+
+      sendResponse({
+        ok: true,
+        recipe_url: pushResult.url,
+        evidence_disabled: evidenceDisabled,
+        evidence_warning: evidenceWarning,
+        parishes,
+      });
+    }
+  })();
+
+  return true;
+});
+
 const _recordingTabIds = new Set();
 
 chrome.runtime.onMessage.addListener((message, sender) => {

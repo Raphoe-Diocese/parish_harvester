@@ -129,6 +129,64 @@
         font-size: 10px;
         line-height: 1.35;
       }
+      .dead-list {
+        margin-top: 8px;
+        max-height: 140px;
+        overflow-y: auto;
+        border: 1px solid #374151;
+        border-radius: 4px;
+        padding: 4px 6px;
+        background: #0f172a;
+      }
+      .dead-row {
+        display: flex;
+        align-items: flex-start;
+        gap: 6px;
+        padding: 4px 0;
+        border-bottom: 1px solid #1f2937;
+        font-size: 10px;
+        line-height: 1.35;
+      }
+      .dead-row:last-child { border-bottom: none; }
+      .dead-row button {
+        flex-shrink: 0;
+        padding: 2px 6px;
+        font-size: 9px;
+        background: #7f1d1d;
+      }
+      button.dead-mark {
+        background: #b91c1c;
+        width: 100%;
+        margin-top: 4px;
+      }
+      #dead-current {
+        font-size: 10px;
+        color: #fde68a;
+        margin-bottom: 6px;
+        line-height: 1.4;
+      }
+      textarea#dead-reason {
+        width: 100%;
+        min-height: 44px;
+        border: 1px solid #374151;
+        border-radius: 4px;
+        padding: 4px 6px;
+        background: #0f172a;
+        color: #f9fafb;
+        font-size: 10px;
+        font-family: inherit;
+        box-sizing: border-box;
+        margin-bottom: 4px;
+        resize: vertical;
+      }
+      label.checkbox {
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        font-size: 10px;
+        color: #d1d5db;
+        margin: 4px 0;
+      }
     </style>
   </head>
   <body>
@@ -204,6 +262,29 @@
         </div>
       </details>
 
+      <details class="section" id="dead-sites-section">
+        <summary class="section-title">☠ Dead / broken websites</summary>
+        <div class="section-content">
+          <p style="font-size:10px;color:#9ca3af;margin:0 0 6px;line-height:1.4;">
+            Mark gone domains so harvest stops and you keep a local reminder list.
+            Removing from the list below only clears your reminder — GitHub recipe stays dead until you retrain.
+          </p>
+          <div id="dead-current">Open a parish tab to detect it here.</div>
+          <label for="dead-reason">Note (optional)</label>
+          <textarea id="dead-reason" placeholder="e.g. Site gone — DNS failure, parked domain…"></textarea>
+          <label class="checkbox">
+            <input id="dead-disable-evidence" type="checkbox" checked />
+            Also disable in evidence file (stops weekly harvest)
+          </label>
+          <button id="dead-mark-btn" type="button" class="dead-mark">☠ Mark current parish as DEAD</button>
+          <p id="dead-status" style="font-size:10px;margin-top:6px;"></p>
+          <h3 style="font-size:11px;margin:10px 0 4px;color:#fca5a5;">Remembered dead sites</h3>
+          <div id="dead-list" class="dead-list">
+            <span style="color:#6b7280;font-size:10px;">Loading…</span>
+          </div>
+        </div>
+      </details>
+
       <details class="section" id="diag-section">
         <summary class="section-title">🔍 Diagnosis kit</summary>
         <div class="section-content">
@@ -214,6 +295,7 @@
       </details>
     </div>
     <script src="github_defaults.js"></script>
+    <script src="parish_dead_sites.js"></script>
     <script src="trainer_inject.js"></script>
     <script src="popup.js"></script>
   </body>

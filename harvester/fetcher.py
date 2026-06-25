@@ -909,6 +909,7 @@ async def _find_pdfemb_url(page: Page) -> str | None:
         "a.pdfemb-viewer[href]",
         "(els) => els.map(el => el.getAttribute('href')).filter(Boolean)",
     )
+    candidates: list[str] = []
     for href in links:
         resolved = _unwrap_docs_viewer_url(urljoin(page.url, href))
         lower = resolved.lower()
@@ -916,8 +917,12 @@ async def _find_pdfemb_url(page: Page) -> str | None:
             continue
         if _is_non_bulletin_url(resolved):
             continue
-        return resolved
-    return None
+        candidates.append(resolved)
+    if not candidates:
+        return None
+    from harvester.replay import _score_bulletin_url
+    candidates.sort(key=lambda u: _score_bulletin_url(u), reverse=True)
+    return candidates[0]
 
 
 def _disallow_non_bulletin_url(url: str) -> str | None:
