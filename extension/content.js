@@ -3948,11 +3948,19 @@
       compactPageHint.style.display = pageCtx.summary ? "block" : "none";
 
       const onDirectPdf = pageCtx.type === "direct_pdf";
+      const wpBlockPage = _isWpBlockBulletinPage(pageCtx);
       if (clickFirstBtn) {
-        clickFirstBtn.style.display = onDirectPdf ? "none" : "block";
+        clickFirstBtn.style.display =
+          onDirectPdf || (wpBlockPage && stepCount === 0) ? "none" : "block";
       }
 
-      if (onDirectPdf) {
+      if (wpBlockPage && stepCount === 0 && !onDirectPdf) {
+        wizardQ.textContent = "Bulletin PDF is already on this page";
+        nextStepBanner.style.display = "block";
+        nextStepBanner.textContent =
+          "👇 Tap the green Save bulletin PDF button below (one step). Then Send & test.";
+        if (moreOptionsSection) moreOptionsSection.style.display = "";
+      } else if (onDirectPdf) {
         const recorded = _standaloneRecipeSteps();
         const hasTerminal = recorded.some((s) =>
           _pdfTerminalActions.has(String(s?.action || "").toLowerCase())
@@ -3998,7 +4006,8 @@
           pageCtx.type === "parish_messenger" ||
           pageCtx.type === "cloud_folder" ||
           (pageCtx.type === "html" && _pathLooksLikeNewsletterPage()) ||
-          pageCtx.type === "pdf_links";
+          pageCtx.type === "pdf_links" ||
+          wpBlockPage;
         if (pageCtx.type === "direct_pdf") {
           contextPrimaryBtn.style.display = "block";
           contextPrimaryBtn.style.background = "#16a34a";
@@ -4016,7 +4025,14 @@
         } else if (pageCtx.type === "mdocs_bulletin_list") {
           contextPrimaryBtn.style.display = "block";
           contextPrimaryBtn.style.background = "#16a34a";
-          contextPrimaryBtn.textContent = "📥 Step 2: Download bulletin PDF";
+          contextPrimaryBtn.textContent = "📥 Step 1: Download bulletin PDF";
+        } else if (wpBlockPage) {
+          contextPrimaryBtn.style.display = "block";
+          contextPrimaryBtn.style.background = "#16a34a";
+          contextPrimaryBtn.textContent =
+            stepCount > 0
+              ? "📄 Re-save bulletin PDF (from embed)"
+              : "📄 Step 1: Save bulletin PDF (from embed)";
         } else if (pageCtx.type === "wix_html" || (pageCtx.type === "html" && _pathLooksLikeNewsletterPage())) {
           contextPrimaryBtn.style.display = "block";
           contextPrimaryBtn.textContent = "💾 Step 2: Save page as PDF";
@@ -4047,14 +4063,19 @@
       const mdocsPdfPage = pageCtx.type === "mdocs_bulletin_list";
       if (savePagePdfBtn) {
         savePagePdfBtn.style.display =
-          onDirectPdf || mdocsPdfPage || (htmlCapturePage && stepCount === 0) ? "none" : "block";
+          onDirectPdf || mdocsPdfPage || wpBlockPage || (htmlCapturePage && stepCount === 0)
+            ? "none"
+            : "block";
       }
       if (pickImageBtn) {
-        pickImageBtn.style.display = onDirectPdf ? "none" : "block";
+        pickImageBtn.style.display = onDirectPdf || wpBlockPage ? "none" : "block";
         pickImageBtn.style.background = pageCtx.type === "image" ? "#16a34a" : "#2563eb";
       }
       if (imageCropBtn) {
-        imageCropBtn.style.display = onDirectPdf ? "none" : "block";
+        imageCropBtn.style.display = onDirectPdf || wpBlockPage ? "none" : "block";
+      }
+      if (getPdfBtn) {
+        getPdfBtn.style.display = wpBlockPage || mdocsPdfPage ? "none" : "block";
       }
 
       if (playbookPanel && window.ph_playbook?.render) {
@@ -4680,6 +4701,23 @@
     let pickImageBtn = null;
     let imageCropBtn = null;
     let pinLinkBtn = null;
+    let getPdfBtn = null;
+
+    const _isWpBlockBulletinPage = (pageCtx = detectPageType()) =>
+      pageCtx.type === "wp_block_file_bulletin" ||
+      pageCtx.htmlFingerprint === "wp_block_file_bulletin";
+
+    const _captureWpBlockOrMdocsFromPage = (pageCtx = detectPageType()) => {
+      const result = _ensureTerminalPdfStep();
+      if (result?.ok && result.added) {
+        showStatus("✅ Bulletin PDF saved — scroll down and tap Send & test.", "ok");
+      } else if (result?.ok) {
+        showStatus("✅ Bulletin step already recorded.", "ok");
+      } else {
+        showStatus("❌ Could not read the bulletin PDF on this page.", "error");
+      }
+      _refreshGuidedContext();
+    };
 
     clickFirstBtn = makeSmallBtn(
       "👉 Step 1: Point at the bulletin link",
@@ -4726,6 +4764,17 @@
       "#2563eb",
       () => {
         const pageCtx = detectPageType();
+        if (_isWpBlockBulletinPage(pageCtx)) {
+          _captureWpBlockOrMdocsFromPage(pageCtx);
+          return;
+        }
+        if (
+          pageCtx.type === "mdocs_bulletin_list" ||
+          pageCtx.htmlFingerprint === "mdocs_bulletin_table"
+        ) {
+          _captureWpBlockOrMdocsFromPage(pageCtx);
+          return;
+        }
         if (pageCtx.type === "direct_pdf") {
           markDownloadUrlSafe(window.location.href, showStatus, false);
           return;
@@ -4842,8 +4891,9 @@
       "📄 Get a PDF",
       "#374151",
       () => markDownloadUrlSafe(window.location.href, showStatus, false),
-      "Only when you are already looking at the PDF file"
+      "Advanced: save PDF when you are already on the raw PDF file (not needed on embed bulletin pages)"
     );
+    getPdfBtn = pdfBtn;
     const noBulletinBtn = makeSmallBtn(
       "🚫 No bulletin here (skip)",
       "#6b7280",

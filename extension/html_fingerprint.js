@@ -291,7 +291,7 @@
         return "";
       },
       advice:
-        "Permanent bulletin page — PDF is in the wp-block-file embed. Tap Get a PDF with pattern *bulletin*.pdf (no dated filename).",
+        "You are already on the bulletin page. Tap the big green button: Save bulletin PDF (from embed). Then scroll down to Send & test.",
       doNot: ["Do not train on the old domain if the parish moved (e.g. saintanthonys.uk)."],
     },
     {

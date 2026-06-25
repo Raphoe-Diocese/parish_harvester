@@ -93,6 +93,14 @@
         "Send & test.",
       ],
     },
+    wp_block_file_bulletin: {
+      title: "WordPress bulletin page (PDF already on screen)",
+      now: "Tap the green Save bulletin PDF button — one step, then Send & test.",
+      steps: [
+        "Tap Save bulletin PDF (from embed) — harvester uses *bulletin*.pdf pattern each week.",
+        "Send & test.",
+      ],
+    },
     html: {
       title: "Normal parish web page",
       now: "Point at News / Newsletter — or Save page as PDF if the bulletin text is already on screen.",

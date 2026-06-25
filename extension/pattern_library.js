@@ -60,7 +60,7 @@
     },
     wp_block_file_bulletin: {
       label: "WordPress permanent bulletin page",
-      steps: "Open /parish-bulletin/ → Get a PDF with pattern *bulletin*.pdf (embed URL changes weekly).",
+      steps: "On the bulletin page: tap the green Save bulletin PDF (from embed) button, then Send & test.",
     },
     stacked_image_bulletin: {
       label: "Stacked image bulletin (top N JPEGs)",

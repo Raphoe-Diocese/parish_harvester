@@ -126,7 +126,7 @@
       label: "WordPress permanent bulletin page (wp-block-file)",
       operator_notes: [
         "Permanent /parish-bulletin/ URL — PDF filename changes weekly under /wp-content/uploads/YYYY/MM/.",
-        "PDF is in object.wp-block-file__embed[data] — harvest scrapes the embed URL.",
+        "On the bulletin page: tap the green Save bulletin PDF (from embed) button.",
         "Use url_pattern *bulletin*.pdf — never pin a dated filename.",
       ],
       do_not: [
