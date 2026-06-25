@@ -1,14 +1,9 @@
 {
   "version": 1,
   "parish_key": "stmarysportglenone",
-  "display_name": "Port Glenone",
+  "display_name": "Port Glenone (St Mary's Portglenone)",
   "diocese": "down_and_connor",
   "start_url": "https://stmarysportglenone.org/?page_id=40",
-  "site_type": "joomla_dropfiles",
-  "playbook_type": "weekly_bulletin_download",
-  "recorded_date": "2026-06-24",
-  "timeout_ms": 120000,
-  "total_timeout_s": 360,
   "steps": [
     {
       "action": "goto",
@@ -16,19 +11,34 @@
     },
     {
       "action": "click",
-      "selector": "a.mod_downloadlink",
-      "pick_strategy": "first_match",
-      "bulletin_position": "top",
-      "fallback_selectors": [
-        ".mod_dropfiles_latest a.mod_downloadlink",
-        "a.mod_dropfiles_downloadlink"
-      ]
+      "selector": "div > div:nth-of-type(1) > div > div:nth-of-type(1) > div > a:nth-of-type(1)",
+      "href": "https://stmarysportglenone.org/download/9/Bulletins/100/12th-Sunday-of-Year-A",
+      "text": ""
+    },
+    {
+      "action": "click",
+      "selector": "html > body > a:nth-of-type(2)",
+      "href": "https://stmarysportglenone.org/download/9/Bulletins/100/12th-Sunday-of-Year-A",
+      "text": ""
+    },
+    {
+      "action": "download",
+      "use_captured_url": true
     }
   ],
+  "observed_load_ms": 17564,
+  "timeout_ms": 45000,
+  "total_timeout_s": 189,
+  "playbook_type": "weekly_bulletin_download",
+  "site_type": "joomla_dropfiles",
   "operator_notes": [
-    "New domain stmarysportglenone.org (was .co.uk).",
-    "Joomla Dropfiles — cloud ↓ icon (a.mod_downloadlink) serves a Word .docx file.",
-    "Harvester converts docx → PDF automatically (same as Claudy) — you do not need a PDF on the site.",
-    "Train on ?page_id=40 or homepage Weekly Bulletins — first row is the latest."
-  ]
+    "Joomla Dropfiles — cloud ↓ icon (a.mod_downloadlink) serves Word .docx.",
+    "Click the cloud on this Sunday's row — harvester converts docx → PDF automatically.",
+    "Do not record diocese GDPR/Privacy PDFs — only mod_downloadlink on the parish host."
+  ],
+  "do_not": [
+    "Do not save a download URL from downandconnor.org or other diocese admin PDFs.",
+    "Do not use Pick bulletin image — this is a file download site."
+  ],
+  "recorded_date": "2026-06-25"
 }
