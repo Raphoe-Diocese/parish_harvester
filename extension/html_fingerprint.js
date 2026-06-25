@@ -265,6 +265,13 @@
       captureMethod: "direct_download",
       playbookType: "permanent_bulletin_page",
       minScore: 30,
+      domRequired: true,
+      domValidate: (doc) =>
+        Boolean(
+          doc.querySelector(
+            ".wp-block-file, object.wp-block-file__embed, embed.wp-block-file__embed[src], a.wp-block-file__button[href]"
+          )
+        ),
       markers: [
         { re: /wp-block-file/i, weight: 24, label: "wp-block-file block" },
         { re: /wp-block-file__embed|wp-block-file__button/i, weight: 18, label: "file embed/button" },
@@ -576,7 +583,19 @@
     }
 
     matches.sort((a, b) => b.score - a.score);
-    const best = matches[0] || null;
+    let best = matches[0] || null;
+    // Global WP block CSS can false-match wp-block-file; prefer PDF Embedder when viewer links exist.
+    try {
+      const pdfembAnchors = doc.querySelectorAll(
+        'a.pdfemb-viewer[href], a[class*="pdfemb"][href*=".pdf"]'
+      );
+      if (pdfembAnchors.length > 0 && best?.id === "wp_block_file_bulletin") {
+        const pdfembMatch = matches.find((m) => m.id === "wordpress_pdfemb");
+        if (pdfembMatch) best = pdfembMatch;
+      }
+    } catch (_pdfembPick) {
+      // ignore
+    }
 
     const allDownloadUrls = [];
     try {

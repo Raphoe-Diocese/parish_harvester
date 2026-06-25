@@ -519,12 +519,28 @@
   // unavailable (e.g. after an extension reload mid-session).
   // callback(response, errorString) — errorString is non-null on failure.
   const _safeSendMessage = (message, callback) => {
-    const TIMEOUT_MS = 15000;
+    const pushRecipe = message?.type === "push_recipe";
+    const TIMEOUT_MS = pushRecipe ? 90000 : 15000;
 
     // ── Direct path ──────────────────────────────────────────────────────
     if (typeof chrome !== "undefined" && chrome?.runtime?.sendMessage) {
       try {
+        let settled = false;
+        let timer = null;
+        if (pushRecipe) {
+          timer = setTimeout(() => {
+            if (settled) return;
+            settled = true;
+            callback(
+              null,
+              "Push is taking longer than expected. Check GitHub for the recipe file — if it saved, reload the page. Otherwise verify your PAT in Settings."
+            );
+          }, TIMEOUT_MS);
+        }
         chrome.runtime.sendMessage(message, (res) => {
+          if (settled) return;
+          settled = true;
+          if (timer) clearTimeout(timer);
           const lastErr = chrome.runtime?.lastError;
           if (lastErr) {
             callback(null, lastErr.message);
@@ -1821,6 +1837,42 @@
       };
     }
 
+    // 1c3. WordPress PDF Embedder — before HTML fingerprint (global WP CSS can false-match wp-block-file).
+    const pdfembElsEarly = Array.from(
+      document.querySelectorAll(
+        'a.pdfemb-viewer, a[class*="pdfemb"], [id^="pdfemb-embed-"], [class*="pdfemb-embed"]'
+      )
+    );
+    const pdfembLinksEarly = pdfembElsEarly.filter((el) => {
+      const href =
+        el.getAttribute("href") ||
+        el.getAttribute("data-url") ||
+        el.getAttribute("data-pdfurl") ||
+        "";
+      if (href.length > 0) return true;
+      const inner = el.querySelector && el.querySelector("iframe[src], embed[src]");
+      return inner && (inner.getAttribute("src") || "").toLowerCase().includes(".pdf");
+    });
+    if (pdfembElsEarly.length > 0 || pdfembLinksEarly.length > 0) {
+      const count = Math.max(pdfembElsEarly.length, pdfembLinksEarly.length);
+      const anchors = pdfembElsEarly.filter(
+        (el) =>
+          el.tagName === "A" &&
+          (el.getAttribute("href") ||
+            el.getAttribute("data-url") ||
+            el.getAttribute("data-pdfurl"))
+      );
+      return {
+        emoji: "🔗",
+        summary: `PDF listing page — found ${count} PDF Embedder link(s) (WordPress plugin).`,
+        advice:
+          "Tap 🔗 1. Follow a link, or 🔍 Find bulletin → 🎯 Pick newest bulletin, to record the right bulletin link.",
+        type: "pdfemb",
+        htmlFingerprint: "wordpress_pdfemb",
+        links: anchors,
+      };
+    }
+
     // 1d. Full HTML fingerprint scan (CMS / plugin markers in page source)
     const fpDetect = _htmlFingerprintDetect();
     if (fpDetect) {
@@ -1873,47 +1925,6 @@
           'Click Follow a link → pick the newest "View Newsletter" or dated row (e.g. May 2026). Ignore Gift Aid / Data Entry PDFs in the menu.',
         type: "parish_messenger",
         links: widgetLinks.length > 0 ? widgetLinks : undefined,
-      };
-    }
-
-    // 2. WordPress PDF Embedder plugin — check original <a> tags AND viewer elements
-    const pdfembEls = Array.from(
-      document.querySelectorAll(
-        'a.pdfemb-viewer, a[class*="pdfemb"], [id^="pdfemb-embed-"], [class*="pdfemb-embed"]'
-      )
-    );
-    // Filter to those that have a usable href or contain a child PDF iframe/embed
-    const pdfembLinks = pdfembEls.filter((el) => {
-      const href =
-        el.getAttribute("href") ||
-        el.getAttribute("data-url") ||
-        el.getAttribute("data-pdfurl") ||
-        "";
-      if (href.length > 0) return true;
-      // For viewer wrapper divs, look for a nested iframe/embed with a PDF src
-      const inner =
-        el.querySelector && el.querySelector("iframe[src], embed[src]");
-      return (
-        inner && (inner.getAttribute("src") || "").toLowerCase().includes(".pdf")
-      );
-    });
-    if (pdfembEls.length > 0 || pdfembLinks.length > 0) {
-      const count = Math.max(pdfembEls.length, pdfembLinks.length);
-      // Collect anchor elements only (need href for "Pick newest" feature)
-      const anchors = pdfembEls.filter(
-        (el) =>
-          el.tagName === "A" &&
-          (el.getAttribute("href") ||
-            el.getAttribute("data-url") ||
-            el.getAttribute("data-pdfurl"))
-      );
-      return {
-        emoji: "🔗",
-        summary: `PDF listing page — found ${count} PDF Embedder link(s) (WordPress plugin).`,
-        advice:
-          "Tap 🔗 1. Follow a link, or 🔍 Find bulletin → 🎯 Pick newest bulletin, to record the right bulletin link.",
-        type: "pdfemb",
-        links: anchors,
       };
     }
 
@@ -3889,6 +3900,22 @@
             "📄 mDocs PDF download (newest row)"
           );
         }
+        if (_stepsListEl) _renderSessionSteps();
+        if (_refreshRecipeCount) _refreshRecipeCount();
+        void _persistRecordingSession();
+        _refreshGuidedContext();
+        return { ok: true, added: true, action: "download" };
+      }
+      if (
+        pageCtx.type === "pdfemb" ||
+        pageCtx.htmlFingerprint === "wordpress_pdfemb" ||
+        pageCtx.htmlFingerprint === "wp_pdfemb_list"
+      ) {
+        standaloneAddStep(
+          { action: "download", url_pattern: "*.pdf" },
+          "mark_file",
+          "📄 PDF Embedder — newest bulletin PDF"
+        );
         if (_stepsListEl) _renderSessionSteps();
         if (_refreshRecipeCount) _refreshRecipeCount();
         void _persistRecordingSession();
@@ -6730,7 +6757,10 @@
         let diagnosisSnapshot = null;
         if (globalThis.ph_recipe_diag?.runFullDiagnosis) {
           try {
-            diagnosisSnapshot = await globalThis.ph_recipe_diag.runFullDiagnosis();
+            diagnosisSnapshot = await Promise.race([
+              globalThis.ph_recipe_diag.runFullDiagnosis(),
+              new Promise((resolve) => setTimeout(() => resolve(null), 4000)),
+            ]);
             const errN = Number(diagnosisSnapshot?.counts?.error || 0);
             if (errN > 0) {
               console.warn(
@@ -6759,70 +6789,62 @@
         _logSaveCycle("push_recipe", { parish_key: key, recipe }, { ok: "pending" });
         showStatus("⏳ Pushing recipe to GitHub…", "info");
 
-        _safeSendMessage({
-          type: "push_recipe",
-          parish_key: key,
-          recipe,
-          site_pattern: sitePattern,
-          diagnosis_snapshot: diagnosisSnapshot,
-          diagnosis_source: "push_recipe",
-        }, (response, bridgeError) => {
-          _logSaveCycle("push_recipe", { parish_key: key, recipe }, bridgeError ? { ok: false, reason: bridgeError } : response);
-          pushBtn.disabled = false;
-          pushBtn.textContent = "🚀 Send & test on GitHub";
-          if (bridgeError) {
-            showStatus(`❌ ${bridgeError}`, "error");
-            return;
+        const _finishPushUi = (response, { isFollowup = false } = {}) => {
+          if (!response?.ok) return;
+          const verb = response.updated ? "updated" : "created";
+          const path = response.filePath || `parishes/recipes/${key}.json`;
+          const linkUrl = response.url || "";
+          const linkPart = linkUrl ? ` → ${linkUrl}` : ` → ${path}`;
+          if (response.dispatchOk) {
+            dispatchErrorBanner.style.display = "none";
+            showStatus(
+              `✅ Recipe ${verb}! Testing ${name || key} on GitHub now (this parish only).`,
+              "ok"
+            );
+            showPostPushBanner(
+              response,
+              `⏳ <strong>${name || key}</strong> — single-parish test running (not the mega PDF). Problems tab will show the bulletin link when done.`
+            );
+            try {
+              chrome.runtime.sendMessage({
+                type: "problems_refresh",
+                parish_key: key,
+                display_name: name || key,
+              });
+            } catch (_e) {
+              // Side panel may be closed.
+            }
+          } else if (response.dispatchPending && !isFollowup) {
+            showStatus(`✅ Recipe ${verb}! Saved to GitHub — starting harvest test…`, "ok");
+            showPostPushBanner(
+              response,
+              `✅ <strong>${name || key}</strong> — recipe saved. Single-parish test starting…`
+            );
+          } else if (response.dispatchError) {
+            showDispatchErrorBanner(response.dispatchError);
+            showStatus(
+              `✅ Recipe ${verb}!${linkPart} ⚠️ Test harvest failed to start: ${response.dispatchError}`,
+              "ok",
+            );
+            showPostPushBanner(
+              response,
+              "Recipe saved but GitHub test did not start — open Problems and tap ▶ Check result.",
+              "warn"
+            );
+          } else if (!isFollowup) {
+            showStatus(`✅ Recipe ${verb}!${linkPart}`, "ok");
+            showPostPushBanner(
+              response,
+              "Recipe saved. Open Problems → ▶ Check result to test it.",
+              "warn"
+            );
           }
-          if (response && response.ok) {
-            const verb = response.updated ? "updated" : "created";
-            const path = response.filePath || `parishes/recipes/${key}.json`;
-            const linkUrl = response.url || "";
-            const linkPart = linkUrl ? ` → ${linkUrl}` : ` → ${path}`;
-            if (response.dispatchOk) {
-              dispatchErrorBanner.style.display = "none";
-              showStatus(
-                `✅ Recipe ${verb}! Testing ${name || key} on GitHub now (this parish only).`,
-                "ok"
-              );
-              showPostPushBanner(
-                response,
-                `⏳ <strong>${name || key}</strong> — single-parish test running (not the mega PDF). Problems tab will show the bulletin link when done.`
-              );
-        try {
-          chrome.runtime.sendMessage({
-            type: "problems_refresh",
-            parish_key: key,
-            display_name: name || key,
-          });
-        } catch (_e) {
-                // Side panel may be closed.
-              }
-            } else if (response.dispatchError) {
-              showDispatchErrorBanner(response.dispatchError);
-              showStatus(
-                `✅ Recipe ${verb}!${linkPart} ⚠️ Test harvest failed to start: ${response.dispatchError}`,
-                "ok",
-              );
-              showPostPushBanner(
-                response,
-                "Recipe saved but GitHub test did not start — open Problems and tap ▶ Check result.",
-                "warn"
-              );
-            } else {
-              showStatus(`✅ Recipe ${verb}!${linkPart}`, "ok");
-              showPostPushBanner(
-                response,
-                "Recipe saved. Open Problems → ▶ Check result to test it.",
-                "warn"
-              );
-            }
-            if (response.patternLearned) {
-              showStatus("📚 Pattern saved — similar parishes will get hints next time.", "ok");
-            } else if (response.patternLearnError) {
-              console.warn("Pattern learn failed:", response.patternLearnError);
-            }
-            // Persist diocese and per-domain context for next time.
+          if (response.patternLearned) {
+            showStatus("📚 Pattern saved — similar parishes will get hints next time.", "ok");
+          } else if (response.patternLearnError) {
+            console.warn("Pattern learn failed:", response.patternLearnError);
+          }
+          if (!isFollowup) {
             if (typeof chrome !== "undefined" && chrome.storage) {
               try {
                 if (diocese) chrome.storage.local.set({ ph_last_diocese: diocese });
@@ -6841,6 +6863,32 @@
             clearStandaloneRecipe();
             refreshStepCount();
             void checkStartUrlDrift();
+          }
+        };
+
+        globalThis.__phOnPushFollowup = (followup) => {
+          if (!followup || followup.type !== "push_recipe_followup") return;
+          if (String(followup.parish_key || "") !== key) return;
+          _finishPushUi(followup, { isFollowup: true });
+        };
+
+        _safeSendMessage({
+          type: "push_recipe",
+          parish_key: key,
+          recipe,
+          site_pattern: sitePattern,
+          diagnosis_snapshot: diagnosisSnapshot,
+          diagnosis_source: "push_recipe",
+        }, (response, bridgeError) => {
+          _logSaveCycle("push_recipe", { parish_key: key, recipe }, bridgeError ? { ok: false, reason: bridgeError } : response);
+          pushBtn.disabled = false;
+          pushBtn.textContent = "🚀 Send & test on GitHub";
+          if (bridgeError) {
+            showStatus(`❌ ${bridgeError}`, "error");
+            return;
+          }
+          if (response && response.ok) {
+            _finishPushUi(response, { isFollowup: false });
           } else {
             showStatus(`❌ ${(response && response.error) || "Unknown error. Check GitHub settings in the popup."}`, "error");
           }
@@ -7085,6 +7133,13 @@
     }
     if (message.type === "restore_recording_session") {
       void _restoreRecordingSessionFromStorage();
+      return { ok: true };
+    }
+
+    if (message.type === "push_recipe_followup") {
+      if (typeof globalThis.__phOnPushFollowup === "function") {
+        globalThis.__phOnPushFollowup(message);
+      }
       return { ok: true };
     }
 

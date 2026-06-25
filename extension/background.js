@@ -1191,7 +1191,7 @@ function _canonicalDioceseSlug(value) {
   return normalized;
 }
 
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type !== "push_recipe" && message?.type !== "new_parish") return false;
 
   (async () => {
@@ -1398,6 +1398,20 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         && existingRecipe.steps.length > 0
         && !stepsReplaced
       );
+
+      // Reply immediately after GitHub save — harvest dispatch / diagnosis can take 30s+.
+      const tabId = sender?.tab?.id;
+      sendResponse({
+        ok: true,
+        url: htmlUrl,
+        filePath,
+        updated: !!existingSha,
+        dispatchOk: false,
+        dispatchPending: !markAsDead && !message.mark_dead,
+        stepsPushed: Array.isArray(normalizedRecipe.steps) ? normalizedRecipe.steps.length : 0,
+        stepsPreservedFromOld,
+      });
+
       const githubVerify = await _verifyRecipeOnGithub(
         apiBase,
         headers,
@@ -1497,7 +1511,9 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         hostProfileLearnError = String(hostErr);
       }
 
-      sendResponse({
+      const followup = {
+        type: "push_recipe_followup",
+        parish_key: key,
         ok: true,
         url: htmlUrl,
         filePath,
@@ -1513,7 +1529,14 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
         stepsPushed: Array.isArray(normalizedRecipe.steps) ? normalizedRecipe.steps.length : 0,
         stepsPreservedFromOld,
         githubVerify,
-      });
+      };
+      if (tabId) {
+        try {
+          await chrome.tabs.sendMessage(tabId, followup);
+        } catch (_tabMsgErr) {
+          // Tab may have navigated — non-fatal.
+        }
+      }
 
       try {
         const stored = await chrome.storage.local.get([PROBLEMS_RECIPE_RETRAINED_KEY]);

@@ -259,6 +259,34 @@ class ClaudyBulletinFilterTests(unittest.TestCase):
         )
         self.assertEqual(page.selector, "img")
 
+    def test_find_stacked_bulletin_image_urls_supports_last_position(self) -> None:
+        import asyncio
+
+        from harvester.replay import _find_stacked_bulletin_image_urls
+
+        class _Page:
+            url = "https://example.org/"
+
+            async def eval_on_selector_all(self, selector: str, _script: str):
+                return [
+                    {"index": 0, "src": "/old-a.jpg", "naturalWidth": 900, "naturalHeight": 1200},
+                    {"index": 1, "src": "/old-b.jpg", "naturalWidth": 900, "naturalHeight": 1200},
+                    {"index": 2, "src": "/new-1.jpg", "naturalWidth": 900, "naturalHeight": 1200},
+                    {"index": 3, "src": "/new-2.jpg", "naturalWidth": 900, "naturalHeight": 1200},
+                ]
+
+        page = _Page()
+        urls = asyncio.run(
+            _find_stacked_bulletin_image_urls(page, 2, position="last")
+        )
+        self.assertEqual(
+            urls,
+            [
+                "https://example.org/new-1.jpg",
+                "https://example.org/new-2.jpg",
+            ],
+        )
+
     async def test_replay_recipe_supports_print_to_pdf_step(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)

@@ -170,6 +170,7 @@ def _pdfemb_list_recipe(key: str, display: str, diocese: str, page_url: str) -> 
         "recorded_date": date.today().isoformat(),
         "start_url": page_url,
         "site_type": "wp_pdfemb_list",
+        "playbook_type": "pdfemb",
         "auto_fixed": True,
         "steps": [
             {"action": "goto", "url": page_url},
@@ -179,6 +180,7 @@ def _pdfemb_list_recipe(key: str, display: str, diocese: str, page_url: str) -> 
         "observed_load_ms": 45000,
         "timeout_ms": 60000,
         "total_timeout_s": 120,
+        "navigation_wait_until": "commit",
     }
 
 
@@ -229,7 +231,18 @@ def _recipe_needs_pdfemb_fix(recipe: dict) -> bool:
     steps = recipe.get("steps")
     if not isinstance(steps, list):
         return False
-    if recipe.get("site_type") == "wp_pdfemb_list" and recipe.get("version", 0) >= 2:
+    site_type = str(recipe.get("site_type") or "").lower()
+    if site_type == "wp_pdfemb_list" and recipe.get("version", 0) >= 2:
+        for step in steps:
+            if not isinstance(step, dict) or step.get("action") != "download":
+                continue
+            if step.get("url") or step.get("captured_url"):
+                return True
+            pattern = str(step.get("url_pattern") or "")
+            if "bulletin" in pattern.lower():
+                return True
+        if recipe.get("navigation_wait_until") != "commit":
+            return True
         return False
     for step in steps:
         if not isinstance(step, dict):

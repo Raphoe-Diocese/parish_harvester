@@ -65,6 +65,16 @@ _MONTH_NAMES: list[str] = [
 ]
 
 
+def _ordinal_suffix(day: int) -> str:
+    if 10 <= day % 100 <= 20:
+        return "th"
+    return {1: "st", 2: "nd", 3: "rd"}.get(day % 10, "th")
+
+
+def _slug_had_ordinal(slug_fragment: str) -> bool:
+    return bool(re.search(r"\d{1,2}(?:st|nd|rd|th)\b", slug_fragment, re.IGNORECASE))
+
+
 def extract_date_from_string(text: str) -> date | None:
     """Try to parse a date from a filename/URL fragment. Returns None on failure."""
     # ISO with dashes
@@ -460,6 +470,9 @@ def rewrite_date_url(url: str, target: date) -> str:
     slug_has_full_year = bool(slug_m and len(slug_m.group(3)) == 4)
     slug_in_range = bool(orig_slug and abs((orig_slug - target).days) < 365)
 
+    if orig_slug and orig_slug == target:
+        return url
+
     if orig_slug and (slug_has_full_year or slug_in_range):
         def _replace_slug_d(m: re.Match) -> str:
             try:
@@ -479,7 +492,13 @@ def rewrite_date_url(url: str, target: date) -> str:
                         month_str = _MONTH_NAMES[target.month]
                     else:
                         month_str = _MONTH_NAMES[target.month].capitalize()
-                    return f"{target.day}{sep}{month_str}{sep}{target.year}"
+                    had_ordinal = _slug_had_ordinal(m.group(0))
+                    day_str = (
+                        f"{target.day}{_ordinal_suffix(target.day)}"
+                        if had_ordinal
+                        else str(target.day)
+                    )
+                    return f"{day_str}{sep}{month_str}{sep}{target.year}"
             except ValueError:
                 pass
             return m.group(0)

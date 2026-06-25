@@ -5,10 +5,16 @@
   "recorded_date": "2026-06-25",
   "start_url": "https://www.antrimparish.com/bulletinpage/",
   "site_type": "wp_pdfemb_list",
+  "playbook_type": "pdfemb",
+  "auto_fixed": true,
   "operator_notes": [
     "WordPress PDF Embedder — bulletins are <a class=\"pdfemb-viewer\" href=\"...pdf\"> in page HTML (not a separate iframe URL).",
-    "Harvester reads those hrefs directly; pick the newest dated PDF (first on page is usually current week).",
+    "Filenames use ordinals: 21st-June-2026.pdf — harvester reads live hrefs, never rewrites captured URLs.",
     "PDFs live on www-static.antrimparish.com CDN."
+  ],
+  "do_not": [
+    "Do not use wp-block-file or *bulletin*.pdf pattern — Antrim uses PDF Embedder links only.",
+    "Do not pin a dated PDF filename in the recipe."
   ],
   "steps": [
     {
@@ -23,5 +29,6 @@
   "version": 2,
   "observed_load_ms": 45000,
   "timeout_ms": 60000,
-  "total_timeout_s": 120
+  "total_timeout_s": 120,
+  "navigation_wait_until": "commit"
 }

@@ -296,15 +296,22 @@ async def _find_mdocs_pdf_urls(page: Page) -> list[str]:
 
 
 async def _wait_for_bulletin_content(page: Page, recipe: dict, timeout_ms: int) -> None:
-    """Slow hosts: wait for mdocs table or wp-block-file embed after commit navigation."""
+    """Slow hosts: wait for mdocs table, wp-block-file embed, or pdfemb links after commit navigation."""
     playbook = str(recipe.get("playbook_type") or recipe.get("site_type") or "").lower()
     probes = []
+    if "pdfemb" in playbook or "wp_pdfemb" in playbook:
+        probes.extend(["a.pdfemb-viewer[href]", 'a[class*="pdfemb"][href*=".pdf"]'])
     if "mdocs" in playbook:
         probes.extend(["table.mdocs", "a.mdocs-download", ".mdocs a[href]"])
     if "wp_block" in playbook or "permanent_bulletin" in playbook:
         probes.extend(["object.wp-block-file__embed", ".wp-block-file a[href$='.pdf']"])
     if not probes:
-        probes = ["table.mdocs", "object.wp-block-file__embed", "a[href$='.pdf']"]
+        probes = [
+            "a.pdfemb-viewer[href]",
+            "table.mdocs",
+            "object.wp-block-file__embed",
+            "a[href$='.pdf']",
+        ]
     budget = min(max(int(timeout_ms), 15_000), 240_000)
     for sel in probes:
         try:
@@ -711,8 +718,13 @@ async def _find_stacked_bulletin_image_urls(
     selector: str = "",
     min_long_side: int = 800,
     min_short_side: int = 600,
+    position: str = "first",
 ) -> list[str]:
-    """Return the first *count* large bulletin images on the page in DOM order."""
+    """Return *count* large bulletin images on the page in DOM order.
+
+    position: "first" (default) or "last" — Wix homepages often archive old
+    bulletin JPEGs above the current week; use "last" to grab the newest pair.
+    """
     if count < 1:
         return []
 
@@ -760,6 +772,9 @@ async def _find_stacked_bulletin_image_urls(
         candidates.append((int(item.get("index") or 0), resolved))
 
     candidates.sort(key=lambda item: item[0])
+    pick = str(position or "first").strip().lower()
+    if pick == "last":
+        return [url for _idx, url in candidates[-count:]]
     return [url for _idx, url in candidates[:count]]
 
 
@@ -1036,13 +1051,30 @@ async def replay_recipe(
                 pattern = (step.get("url_pattern") or "*.pdf").strip() or "*.pdf"
                 step_url = (step.get("url") or "").strip()
                 use_captured = bool(step.get("use_captured_url"))
+                site_type = str(recipe.get("site_type") or "").lower()
+                playbook = str(recipe.get("playbook_type") or "").lower()
+                pdfemb_site = "pdfemb" in site_type or "wp_pdfemb" in site_type or playbook == "pdfemb"
+                last_err = ""
+
+                # PDF Embedder parishes: read live hrefs from the page — never rewrite a stale captured URL.
+                if pdfemb_site and not _pattern_prefers_docx(pattern):
+                    pdfemb_url = await _find_pdfemb_url(page)
+                    if pdfemb_url:
+                        try:
+                            source_url, file_type = await _download_document_url(
+                                page, pdfemb_url, dest, timeout_ms=step_timeout_ms
+                            )
+                            return dest, file_type, source_url
+                        except RecipeReplayError as exc:
+                            last_err = str(exc)
+
                 if step.get("use_page_url"):
                     step_url = (page.url or "").strip()
                     if not _looks_like_http_url(step_url):
                         step_url = (last_http_url or start_url or "").strip()
                     use_captured = True
                 download_candidates: list[str] = []
-                if step_url:
+                if step_url and not pdfemb_site:
                     download_candidates = _resolve_download_candidates(
                         step_url,
                         target_date=target_date,
@@ -1120,9 +1152,22 @@ async def replay_recipe(
                     await page.wait_for_load_state("networkidle", timeout=min(step_timeout_ms, 30_000))
                 except PlaywrightTimeoutError:
                     pass
+                if step.get("scroll_bottom"):
+                    try:
+                        await page.evaluate(
+                            "() => window.scrollTo(0, document.body.scrollHeight)"
+                        )
+                        await asyncio.sleep(1.5)
+                    except Exception:
+                        pass
                 await asyncio.sleep(2.0)
 
                 selector = (step.get("selector") or "").strip()
+                position = str(step.get("position") or "first").strip().lower()
+                if position not in {"first", "last"}:
+                    raise RecipeReplayError(
+                        'Recipe image_stack position must be "first" or "last"'
+                    )
                 try:
                     min_long_side = int(step.get("min_long_side") or 800)
                     min_short_side = int(step.get("min_short_side") or 600)
@@ -1135,6 +1180,7 @@ async def replay_recipe(
                     selector=selector,
                     min_long_side=min_long_side,
                     min_short_side=min_short_side,
+                    position=position,
                 )
                 if len(image_urls) < count:
                     raise RecipeReplayError(

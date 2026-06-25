@@ -549,6 +549,21 @@ class UrlDateParsingAndScoringTests(unittest.TestCase):
             "ballinascreen-desertmartin-parishes-9_january_2028",
         )
 
+    def test_rewrite_date_url_preserves_ordinal_slug(self) -> None:
+        from harvester.utils import rewrite_date_url
+        from datetime import date as _date
+
+        antrim = (
+            "https://www-static.antrimparish.com/wp-content/uploads/2026/06/"
+            "21st-June-2026.pdf"
+        )
+        self.assertEqual(rewrite_date_url(antrim, _date(2026, 6, 21)), antrim)
+        self.assertEqual(
+            rewrite_date_url(antrim, _date(2026, 6, 28)),
+            "https://www-static.antrimparish.com/wp-content/uploads/2026/06/"
+            "28th-June-2026.pdf",
+        )
+
     def test_extract_candidate_date_combines_parsers(self) -> None:
         """_extract_candidate_date delegates to both extract_date_from_string and slug."""
         from harvester.fetcher import _extract_candidate_date
