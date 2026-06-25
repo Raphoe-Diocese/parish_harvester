@@ -4,26 +4,30 @@
   "display_name": "Derriaghy",
   "diocese": "down_and_connor",
   "start_url": "https://derriaghycatholicparish.com/?page_id=262",
-  "site_type": "stacked_image_bulletin",
-  "playbook_type": "stacked_image_bulletin",
-  "recorded_date": "2026-06-24",
-  "timeout_ms": 120000,
-  "total_timeout_s": 300,
-  "observed_load_ms": 90000,
-  "navigation_wait_until": "commit",
   "steps": [
     {
       "action": "goto",
       "url": "https://derriaghycatholicparish.com/?page_id=262"
     },
     {
-      "action": "image_stack",
-      "count": 2
+      "action": "download",
+      "url_pattern": "*bulletin*.pdf"
     }
   ],
+  "observed_load_ms": 6451,
+  "timeout_ms": 180000,
+  "total_timeout_s": 300,
+  "navigation_wait_until": "commit",
+  "playbook_type": "permanent_bulletin_page",
+  "site_type": "wp_block_file_bulletin",
   "operator_notes": [
-    "Stacked JPEG bulletin on one.com WordPress.",
-    "TLS handshake is fast (~0.6s) but the page can hang on domcontentloaded — harvest uses commit navigation.",
-    "Expect about 2–3 minutes total (goto + image_stack). PageSpeed: pagespeed.web.dev for derriaghycatholicparish.com."
-  ]
+    "Permanent /parish-bulletin/ URL — PDF filename changes weekly under /wp-content/uploads/YYYY/MM/.",
+    "PDF is in object.wp-block-file__embed[data] — harvest scrapes the embed URL.",
+    "Use url_pattern *bulletin*.pdf — never pin a dated filename."
+  ],
+  "do_not": [
+    "Do not train on the homepage — use the dedicated bulletin page only.",
+    "Do not pin saintanthony.co.uk if the parish moved to saintanthonys.uk."
+  ],
+  "recorded_date": "2026-06-25"
 }
