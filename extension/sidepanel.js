@@ -517,7 +517,14 @@ async function _pdDispatchHarvest(parishKey) {
           "Content-Type": "application/json",
           "X-GitHub-Api-Version": "2022-11-28",
         },
-        body: JSON.stringify({ ref: "main", inputs: { diocese: "all", target_parish: parishKey, run_tests: "false" } }),
+        body: JSON.stringify({
+          ref: "main",
+          inputs: {
+            diocese: "all",
+            target_parish: parishKey || "",
+            run_tests: "false",
+          },
+        }),
       }
     );
     if (resp.status === 204) return { ok: true };
@@ -526,6 +533,10 @@ async function _pdDispatchHarvest(parishKey) {
   } catch (err) {
     return { ok: false, error: String(err) };
   }
+}
+
+async function _pdDispatchFullHarvest() {
+  return _pdDispatchHarvest("");
 }
 
 // ── Mega-excludes helpers ─────────────────────────────────────────────────
@@ -1555,17 +1566,17 @@ async function _problemsRenderRows(rows) {
       })();
     });
     action.appendChild(fixBtn);
-    if (row.retrainedPending) {
-      const verifyBtn = document.createElement("button");
-      verifyBtn.type = "button";
-      verifyBtn.className = "problems-verify-btn";
-      verifyBtn.textContent = "▶ Check result";
-      verifyBtn.title = "Check the GitHub test result (does not start a new test if one ran recently)";
-      verifyBtn.addEventListener("click", () => {
-        void _problemsVerifyHarvest(row, verifyBtn, { forceDispatch: false });
-      });
-      action.appendChild(verifyBtn);
-    }
+    const testBtn = document.createElement("button");
+    testBtn.type = "button";
+    testBtn.className = "problems-verify-btn";
+    testBtn.textContent = row.retrainedPending ? "▶ Check result" : "▶ Test parish";
+    testBtn.title = row.retrainedPending
+      ? "Check the result from your last Send & test (single-parish harvest, not mega PDF)"
+      : "Run a single-parish harvest test on GitHub — no recipe push needed";
+    testBtn.addEventListener("click", () => {
+      void _problemsVerifyHarvest(row, testBtn, { forceDispatch: !row.retrainedPending });
+    });
+    action.appendChild(testBtn);
     tr.appendChild(action);
 
     tbody.appendChild(tr);
@@ -2333,6 +2344,29 @@ if (problemsRefreshBtn) {
       problemsRefreshBtn.disabled = false;
       problemsRefreshBtn.textContent = "↻ Refresh";
     });
+  });
+}
+const problemsFullHarvestBtn = document.getElementById("problems-full-harvest-btn");
+if (problemsFullHarvestBtn) {
+  problemsFullHarvestBtn.addEventListener("click", () => {
+    void (async () => {
+      problemsFullHarvestBtn.disabled = true;
+      problemsFullHarvestBtn.textContent = "⏳ …";
+      setStatus("⏳ Starting full harvest on GitHub (all parishes)…", "warn");
+      const result = await _pdDispatchFullHarvest();
+      if (!result.ok) {
+        setStatus(`❌ Full harvest failed to start: ${result.error}`, "err");
+        problemsFullHarvestBtn.disabled = false;
+        problemsFullHarvestBtn.textContent = "▶ Full harvest";
+        return;
+      }
+      setStatus(
+        "✅ Full harvest started (30–60 min). Open GitHub Actions → Harvest Parish Bulletins to watch progress, then tap Refresh here.",
+        "ok"
+      );
+      problemsFullHarvestBtn.disabled = false;
+      problemsFullHarvestBtn.textContent = "▶ Full harvest";
+    })();
   });
 }
 _spShowPanel("problems");
