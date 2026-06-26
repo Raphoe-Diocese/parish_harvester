@@ -332,6 +332,11 @@ async function _pdLoadHarvestReport() {
   try {
     const cfg = await _pdGetGithubConfig();
     if (!cfg) return null;
+    const report = await _problemsFetchLiveReport(cfg.ghRepo, cfg.ghPat);
+    if (report) {
+      _pdHarvestReport = report;
+      return _pdHarvestReport;
+    }
     const resp = await fetch(
       `https://raw.githubusercontent.com/${cfg.ghRepo}/main/Bulletins/report.json`
     );
@@ -1168,7 +1173,7 @@ function _problemsMegaPdfForParish(repo, parishKey) {
 async function _problemsFindLatestWorkflowRun(ghPat, ghRepo, afterMs) {
   try {
     const resp = await fetch(
-      `https://api.github.com/repos/${ghRepo}/actions/workflows/harvest.yml/runs?per_page=5`,
+      `https://api.github.com/repos/${ghRepo}/actions/workflows/harvest.yml/runs?per_page=20&event=workflow_dispatch`,
       {
         headers: {
           Authorization: `token ${ghPat}`,
@@ -1180,13 +1185,24 @@ async function _problemsFindLatestWorkflowRun(ghPat, ghRepo, afterMs) {
     if (!resp.ok) return null;
     const data = await resp.json();
     const runs = Array.isArray(data.workflow_runs) ? data.workflow_runs : [];
-    return runs.find((run) => new Date(run.created_at).getTime() >= afterMs - 10_000) || runs[0] || null;
+    const cutoff = afterMs - 120_000;
+    const recent = runs.filter((run) => new Date(run.created_at).getTime() >= cutoff);
+    return recent[0] || runs[0] || null;
   } catch (_e) {
     return null;
   }
 }
 
-async function _problemsFetchLiveReport(repo) {
+async function _problemsFetchLiveReport(repo, ghPat) {
+  const mod = globalThis.phGithubRecipePush;
+  if (mod?.fetchReportJson && ghPat) {
+    try {
+      const report = await mod.fetchReportJson({ gh_pat: ghPat, gh_repo: repo });
+      if (report && typeof report === "object") return report;
+    } catch (_e) {
+      // Fall through to raw CDN.
+    }
+  }
   try {
     const resp = await fetch(
       `https://raw.githubusercontent.com/${repo}/main/Bulletins/report.json?t=${Date.now()}`,
@@ -1310,9 +1326,12 @@ async function _problemsPollHarvestResult({
   });
   setStatus(`⏳ Testing ${displayName} on GitHub…`, "warn");
 
-  for (let attempt = 0; attempt < 40; attempt += 1) {
+  const pushMod = globalThis.phGithubRecipePush;
+  const maxAttempts = 55;
+
+  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
     if (attempt > 0) {
-      const delay = attempt < 10 ? 3000 : 12000;
+      const delay = attempt < 8 ? 3000 : attempt < 20 ? 8000 : 12000;
       await new Promise((resolve) => setTimeout(resolve, delay));
     }
     if (verifyBtn) verifyBtn.textContent = `⏳ ${Math.round((Date.now() - started) / 1000)}s…`;
@@ -1321,20 +1340,39 @@ async function _problemsPollHarvestResult({
     if (run?.html_url) runUrl = run.html_url;
     const workflowDone = run && run.status === "completed";
     const workflowRunning = run && (run.status === "in_progress" || run.status === "queued" || run.status === "pending");
+    const workflowFailed = workflowDone && run.conclusion === "failure";
+    const workflowSucceeded = workflowDone && run.conclusion === "success";
 
-    const report = await _problemsFetchLiveReport(ghRepo);
+    const report = await _problemsFetchLiveReport(ghRepo, ghPat);
     const parishStatus = report ? _problemsParishHarvestStatus(report, parishKey) : { status: "unknown", item: null };
 
-    if (parishStatus.status === "ok") {
+    let pdfExists = false;
+    if (pushMod?.parishPdfExists) {
+      try {
+        pdfExists = await pushMod.parishPdfExists({
+          gh_pat: ghPat,
+          gh_repo: ghRepo,
+          parish_key: parishKey,
+        });
+      } catch (_e) {
+        pdfExists = false;
+      }
+    }
+
+    if (parishStatus.status === "ok" || (pdfExists && workflowSucceeded)) {
       await _problemsClearRetrained(parishKey);
       _pdHarvestReport = null;
+      const item = parishStatus.item || {
+        parish: parishKey,
+        url: _problemsParishBulletinPdf(ghRepo, parishKey),
+      };
       _problemsShowVerifyResult({
         ok: true,
         displayName,
         parishKey,
         repo: ghRepo,
         runUrl,
-        item: parishStatus.item,
+        item,
       });
       setStatus(`✅ ${displayName} verified — bulletin link below.`, "ok");
       if (verifyBtn) verifyBtn.textContent = "✅ Done";
@@ -1355,6 +1393,34 @@ async function _problemsPollHarvestResult({
         message: `${runStatus} — ${Math.round((Date.now() - started) / 1000)}s elapsed. Result appears here when done.`,
       });
       continue;
+    }
+
+    if (workflowFailed) {
+      if (parishStatus.status === "failed") {
+        _problemsShowVerifyResult({
+          ok: false,
+          displayName,
+          parishKey,
+          repo: ghRepo,
+          runUrl,
+          item: parishStatus.item,
+        });
+      } else {
+        _problemsShowVerifyResult({
+          ok: false,
+          displayName,
+          parishKey,
+          repo: ghRepo,
+          runUrl,
+          message: "GitHub Actions run failed — open the run link below for the error log.",
+        });
+      }
+      setStatus(`❌ ${displayName} still failing — see links below.`, "err");
+      if (verifyBtn) {
+        verifyBtn.disabled = false;
+        verifyBtn.textContent = "▶ Test again";
+      }
+      return;
     }
 
     if (workflowDone && parishStatus.status === "failed") {
@@ -1381,7 +1447,9 @@ async function _problemsPollHarvestResult({
         parishKey,
         repo: ghRepo,
         runUrl,
-        message: "GitHub finished but report not updated yet — try Refresh in a moment.",
+        message: pdfExists
+          ? "PDF found on GitHub — refreshing report…"
+          : "GitHub finished but report not updated yet — still checking…",
       });
     }
   }
@@ -1592,14 +1660,18 @@ async function loadProblemsDashboard() {
   for (const key of Object.keys(_pdRecipeCache)) delete _pdRecipeCache[key];
   try {
     const urls = await _problemsRepoUrls();
-    const [reportResp, failuresResp] = await Promise.all([
-      fetch(urls.reportUrl, { cache: "no-store" }),
-      fetch(urls.failuresUrl, { cache: "no-store" }),
-    ]);
-    if (!reportResp.ok || !failuresResp.ok) {
+    const cfg = await _pdGetGithubConfig();
+    let report = cfg ? await _problemsFetchLiveReport(urls.repo, cfg.ghPat) : null;
+    const failuresResp = await fetch(urls.failuresUrl, { cache: "no-store" });
+    if (!report) {
+      const reportResp = await fetch(urls.reportUrl, { cache: "no-store" });
+      if (!reportResp.ok || !failuresResp.ok) {
+        throw new Error("Could not fetch live report data");
+      }
+      report = await reportResp.json();
+    } else if (!failuresResp.ok) {
       throw new Error("Could not fetch live report data");
     }
-    const report = await reportResp.json();
     const consecutive = await failuresResp.json();
     const consecutiveFailures = (consecutive && typeof consecutive === "object") ? consecutive : {};
     const retrainedMap = await _problemsGetRetrainedMap();

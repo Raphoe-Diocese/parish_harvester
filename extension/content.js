@@ -7045,28 +7045,90 @@
           _finishPushUi(followup, { isFollowup: true });
         };
 
-        _safeSendMessage({
-          type: "push_recipe",
-          parish_key: key,
-          recipe,
-          site_pattern: sitePattern,
-          diagnosis_snapshot: diagnosisSnapshot,
-          diagnosis_source: "push_recipe",
-        }, (response, bridgeError) => {
-          clearTimeout(pushSafetyTimer);
-          clearTimeout(pushProgress15);
-          _logSaveCycle("push_recipe", { parish_key: key, recipe }, bridgeError ? { ok: false, reason: bridgeError } : response);
-          _resetPushBtn();
-          if (bridgeError) {
-            showStatus(`❌ ${bridgeError}`, "error");
-            return;
-          }
-          if (response && response.ok) {
+        const _runDirectPush = async () => {
+          try {
+            const settings = await _storageGet(["gh_pat", "gh_repo"]);
+            if (!settings.gh_pat) {
+              showStatus("❌ GitHub PAT not configured. Open extension popup → Settings.", "error");
+              return;
+            }
+            const pushMod = globalThis.phGithubRecipePush;
+            if (!pushMod?.pushRecipe) {
+              showStatus("❌ Extension not fully loaded — reload the extension and refresh this page.", "error");
+              return;
+            }
+
+            let recipeToPush = recipe;
+            try {
+              const sanitized = await new Promise((resolve) => {
+                if (!chrome?.runtime?.sendMessage) {
+                  resolve(recipe);
+                  return;
+                }
+                chrome.runtime.sendMessage({ type: "sanitize_recipe", recipe }, (res) => {
+                  resolve(res?.recipe || recipe);
+                });
+              });
+              recipeToPush = sanitized;
+            } catch (_sanitizeErr) {
+              // Use raw recipe if sanitizer unavailable.
+            }
+
+            const pushResult = await pushMod.pushRecipe({
+              gh_pat: settings.gh_pat,
+              gh_repo: settings.gh_repo,
+              parish_key: key,
+              recipe: recipeToPush,
+            });
+            _logSaveCycle("push_recipe", { parish_key: key, recipe: recipeToPush }, pushResult);
+
+            if (!pushResult.ok) {
+              showStatus(`❌ ${pushResult.error}`, "error");
+              return;
+            }
+
+            await new Promise((resolve) => setTimeout(resolve, 2500));
+            const dispatchResult = await pushMod.dispatchHarvestTest({
+              gh_pat: settings.gh_pat,
+              gh_repo: settings.gh_repo,
+              parish_key: key,
+            });
+
+            const response = {
+              ok: true,
+              url: pushResult.url,
+              filePath: pushResult.filePath,
+              updated: pushResult.updated,
+              dispatchOk: dispatchResult.ok,
+              dispatchError: dispatchResult.ok ? "" : (dispatchResult.error || "Dispatch failed"),
+              dispatchPending: !dispatchResult.ok,
+            };
             _finishPushUi(response, { isFollowup: false });
-          } else {
-            showStatus(`❌ ${(response && response.error) || "Unknown error. Check GitHub settings in the popup."}`, "error");
+
+            if (chrome?.runtime?.sendMessage) {
+              chrome.runtime.sendMessage({
+                type: "push_recipe_followup_work",
+                parish_key: key,
+                recipe: pushResult.recipe || recipeToPush,
+                site_pattern: sitePattern,
+                diagnosis_snapshot: diagnosisSnapshot,
+                diagnosis_source: "push_recipe",
+                dispatchOk: dispatchResult.ok,
+                filePath: pushResult.filePath,
+                updated: pushResult.updated,
+                url: pushResult.url,
+              }).catch(() => {});
+            }
+          } catch (pushErr) {
+            _logSaveCycle("push_recipe", { parish_key: key, recipe }, { ok: false, error: String(pushErr) });
+            showStatus(`❌ ${String(pushErr)}`, "error");
+          } finally {
+            clearTimeout(pushSafetyTimer);
+            clearTimeout(pushProgress15);
+            _resetPushBtn();
           }
-        });
+        };
+        void _runDirectPush();
       });
       pushSection.appendChild(pushBtn);
 

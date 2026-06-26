@@ -3,7 +3,7 @@ const PROBLEMS_RECIPE_RETRAINED_KEY = "ph_recipe_retrained";
 const PH_LAST_DISPATCH_KEY = "ph_last_parish_dispatch";
 
 try {
-  importScripts("github_defaults.js", "trainer_inject.js", "parish_dead_sites.js");
+  importScripts("github_defaults.js", "github_recipe_push.js", "trainer_inject.js", "parish_dead_sites.js");
 } catch (_importErr) {
   // Fallback when loaded in a context without importScripts.
   globalThis.PH_DEFAULT_GH_REPO = "Raphoe-Diocese/parish_harvester";
@@ -1273,6 +1273,140 @@ async function _locateRecipeOnGithub(gh_pat, gh_repo, key, preferredDiocese) {
   };
 }
 
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message?.type === "sanitize_recipe") {
+    const recipe = _normalizeRecipeTerminalSteps(_sanitizeRecipeOnPush(message.recipe || {}));
+    sendResponse({ ok: true, recipe });
+    return false;
+  }
+  return false;
+});
+
+async function _pushRecipeFollowupWork(message, gh_pat, gh_repo) {
+  const key = String(message.parish_key || "").trim().toLowerCase().replace(/\s+/g, "_");
+  if (!key) return;
+  const normalizedRecipe = message.recipe && typeof message.recipe === "object" ? message.recipe : {};
+  const headers = {
+    Authorization: `token ${gh_pat}`,
+    Accept: "application/vnd.github+json",
+    "Content-Type": "application/json",
+    "X-GitHub-Api-Version": "2022-11-28",
+  };
+  const filePath = message.filePath || "";
+  const savedDiocese = _canonicalDioceseSlug(normalizedRecipe.diocese) || "unknown";
+
+  if (savedDiocese && savedDiocese !== "unknown" && filePath) {
+    for (const strayDio of _RECIPE_DIOCESE_FOLDERS) {
+      if (strayDio === savedDiocese) continue;
+      const strayPath = `parishes/recipes/${strayDio}/${key}.json`;
+      if (strayPath === filePath) continue;
+      try {
+        const strayApi = `https://api.github.com/repos/${gh_repo}/contents/${strayPath}`;
+        const strayGet = await _fetchGithubJson(strayApi, headers, 15000);
+        if (!strayGet.ok) continue;
+        const strayData = await strayGet.json();
+        await _fetchGithubJson(strayApi, headers, 15000, {
+          method: "DELETE",
+          body: JSON.stringify({
+            message: `chore: remove duplicate recipe for ${key} from ${strayDio} (belongs in ${savedDiocese})`,
+            sha: strayData.sha,
+          }),
+        });
+      } catch (_strayErr) {
+        // Non-fatal.
+      }
+    }
+  }
+
+  if (message.diagnosis_snapshot && typeof message.diagnosis_snapshot === "object") {
+    try {
+      await _upsertTrainingDiagnosis(
+        gh_pat,
+        gh_repo,
+        key,
+        message.diagnosis_snapshot,
+        message.diagnosis_source || "push_recipe"
+      );
+    } catch (_diagErr) {
+      // Non-fatal.
+    }
+  }
+  if (message.site_pattern) {
+    try {
+      await _upsertSitePattern(
+        gh_pat,
+        gh_repo,
+        key,
+        normalizedRecipe.display_name || key,
+        normalizedRecipe,
+        message.site_pattern
+      );
+    } catch (_patternErr) {
+      // Non-fatal.
+    }
+  }
+  try {
+    await _upsertHostProfile(gh_pat, gh_repo, normalizedRecipe);
+  } catch (_hostErr) {
+    // Non-fatal.
+  }
+
+  try {
+    const stored = await chrome.storage.local.get([PROBLEMS_RECIPE_RETRAINED_KEY]);
+    const retrained = (stored?.[PROBLEMS_RECIPE_RETRAINED_KEY] && typeof stored[PROBLEMS_RECIPE_RETRAINED_KEY] === "object")
+      ? stored[PROBLEMS_RECIPE_RETRAINED_KEY]
+      : {};
+    if (normalizedRecipe.skip || ["dead_url", "inactive"].includes(String(normalizedRecipe.status || "").toLowerCase())) {
+      delete retrained[key];
+    } else {
+      retrained[key] = normalizedRecipe.recorded_date || new Date().toISOString().slice(0, 10);
+    }
+    await chrome.storage.local.set({ [PROBLEMS_RECIPE_RETRAINED_KEY]: retrained });
+    if (message.dispatchOk) {
+      const dispatchStored = await chrome.storage.local.get([PH_LAST_DISPATCH_KEY]);
+      const dispatchMap =
+        dispatchStored?.[PH_LAST_DISPATCH_KEY] && typeof dispatchStored[PH_LAST_DISPATCH_KEY] === "object"
+          ? { ...dispatchStored[PH_LAST_DISPATCH_KEY] }
+          : {};
+      dispatchMap[key] = {
+        at: Date.now(),
+        displayName: normalizedRecipe.display_name || key,
+      };
+      await chrome.storage.local.set({ [PH_LAST_DISPATCH_KEY]: dispatchMap });
+    }
+    try {
+      chrome.runtime.sendMessage({
+        type: "problems_refresh",
+        parish_key: key,
+        display_name: normalizedRecipe.display_name || key,
+        dispatch_at: message.dispatchOk ? Date.now() : 0,
+      });
+    } catch (_broadcastErr) {
+      // Side panel may be closed.
+    }
+  } catch (_storeErr) {
+    console.warn("Parish Trainer: could not store recipe retrained marker", _storeErr);
+  }
+}
+
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message?.type !== "push_recipe_followup_work") return false;
+  (async () => {
+    try {
+      const { gh_pat, gh_repo: storedGhRepo } = await chrome.storage.local.get(["gh_pat", "gh_repo"]);
+      if (!gh_pat) {
+        sendResponse({ ok: false, error: "No PAT" });
+        return;
+      }
+      await _pushRecipeFollowupWork(message, gh_pat, phResolveGhRepo(storedGhRepo));
+      sendResponse({ ok: true });
+    } catch (err) {
+      sendResponse({ ok: false, error: String(err) });
+    }
+  })();
+  return true;
+});
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type !== "push_recipe" && message?.type !== "new_parish") return false;
 
@@ -1375,7 +1509,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       // Locate existing recipe across diocese folders (user may have picked wrong diocese).
       const recipeDioceseRaw = ((message.recipe || {}).diocese || "").trim();
-      const located = await _locateRecipeOnGithub(gh_pat, gh_repo, key, recipeDioceseRaw);
+      const located = globalThis.phGithubRecipePush
+        ? await globalThis.phGithubRecipePush.locateRecipe(gh_pat, gh_repo, key, recipeDioceseRaw)
+        : await _locateRecipeOnGithub(gh_pat, gh_repo, key, recipeDioceseRaw);
       const filePath = located.filePath;
       const apiBase = located.apiBase;
       const existingSha = located.existingSha;
@@ -1643,7 +1779,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         const retrained = (stored?.[PROBLEMS_RECIPE_RETRAINED_KEY] && typeof stored[PROBLEMS_RECIPE_RETRAINED_KEY] === "object")
           ? stored[PROBLEMS_RECIPE_RETRAINED_KEY]
           : {};
-        if (recipeStatus === "dead_url" || recipeStatus === "inactive" || normalizedRecipe.skip) {
+        if (deadStatus === "dead_url" || deadStatus === "inactive" || normalizedRecipe.skip) {
           delete retrained[key];
         } else {
           retrained[key] = normalizedRecipe.recorded_date || new Date().toISOString().slice(0, 10);
