@@ -537,6 +537,21 @@
   };
   _installTrustedTypesPolicy();
 
+  const _slimDiagnosisForPush = (snapshot) => {
+    if (!snapshot || typeof snapshot !== "object") return null;
+    return {
+      collected_at: snapshot.collected_at,
+      extension_version: snapshot.extension_version,
+      page_url: snapshot.page_url,
+      parish_key: snapshot.parish_key,
+      page_type: snapshot.page_type,
+      site_intake: snapshot.site_intake,
+      html_fingerprint: snapshot.html_fingerprint,
+      counts: snapshot.counts,
+      issues: Array.isArray(snapshot.issues) ? snapshot.issues.slice(0, 15) : [],
+    };
+  };
+
   // ── Safe message bridge ───────────────────────────────────────────────────
   // content.js now runs in the ISOLATED world so chrome.runtime is always
   // available.  _safeSendMessage uses the direct API and falls back to the
@@ -545,7 +560,7 @@
   // callback(response, errorString) — errorString is non-null on failure.
   const _safeSendMessage = (message, callback) => {
     const pushRecipe = message?.type === "push_recipe";
-    const TIMEOUT_MS = pushRecipe ? 90000 : 15000;
+    const TIMEOUT_MS = pushRecipe ? 45000 : 15000;
 
     // ── Direct path ──────────────────────────────────────────────────────
     if (typeof chrome !== "undefined" && chrome?.runtime?.sendMessage) {
@@ -6907,7 +6922,7 @@
         }
 
         console.log(`Parish Trainer: pushing recipe for key=${key}, diocese=${diocese}, url=${pageUrl}`);
-        await _flushRecordingSession();
+        void _flushRecordingSession();
         const recipe = buildStandaloneRecipe(key, name || key, diocese);
         const detected = detectPageType();
         let diagnosisSnapshot = null;
@@ -6915,19 +6930,13 @@
           try {
             diagnosisSnapshot = await Promise.race([
               globalThis.ph_recipe_diag.runFullDiagnosis(),
-              new Promise((resolve) => setTimeout(() => resolve(null), 500)),
+              new Promise((resolve) => setTimeout(() => resolve(null), 300)),
             ]);
-            const errN = Number(diagnosisSnapshot?.counts?.error || 0);
-            if (errN > 0) {
-              console.warn(
-                `Parish Trainer: ${errN} diagnosis error(s) before push — saved to repo for review.`,
-                diagnosisSnapshot.issues?.filter((i) => i.severity === "error")
-              );
-            }
           } catch (diagErr) {
-            console.warn("Parish Trainer: pre-push diagnosis failed:", diagErr);
+            console.warn("Parish Trainer: pre-push diagnosis skipped:", diagErr);
           }
         }
+        diagnosisSnapshot = _slimDiagnosisForPush(diagnosisSnapshot);
         const sitePattern = (() => {
           const mem = window.ph_site_memory;
           if (mem?.patternPayloadFromPage) {
@@ -6946,7 +6955,10 @@
           pushBtn.disabled = false;
           pushBtn.textContent = "🚀 Send & test on GitHub";
         };
-        const pushSafetyTimer = setTimeout(_resetPushBtn, 95000);
+        const pushSafetyTimer = setTimeout(_resetPushBtn, 50000);
+        const pushProgress15 = setTimeout(() => {
+          if (pushBtn.disabled) showStatus("⏳ Still saving to GitHub… (check PAT in Settings if this hangs)", "info");
+        }, 15000);
         _logSaveCycle("push_recipe", { parish_key: key, recipe }, { ok: "pending" });
         showStatus("⏳ Pushing recipe to GitHub…", "info");
 
@@ -7042,6 +7054,7 @@
           diagnosis_source: "push_recipe",
         }, (response, bridgeError) => {
           clearTimeout(pushSafetyTimer);
+          clearTimeout(pushProgress15);
           _logSaveCycle("push_recipe", { parish_key: key, recipe }, bridgeError ? { ok: false, reason: bridgeError } : response);
           _resetPushBtn();
           if (bridgeError) {
