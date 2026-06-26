@@ -61,7 +61,6 @@ DOCX_HREF_RE = re.compile(
 SKIP_HOSTS = ("facebook.com", "fbcdn.net", "instagram.com")
 INACTIVE_REASONS = {
     "facebook": "Facebook bulletin — cannot automate weekly harvest",
-    "mcn.live": "MCN.live camera stream — needs image capture training",
     "folder": "Google Drive folder — needs direct file link",
 }
 
@@ -378,6 +377,41 @@ def _fix_dated_selectors(path: Path, recipe: dict) -> bool:
     return changed
 
 
+def _fix_mcn_live_recipe(path: Path, recipe: dict) -> bool:
+    """MCN.live parish pages — PDF bulletin link on same page as camera feed."""
+    page = str(recipe.get("start_url") or "").strip()
+    if "mcn.live" not in page.lower():
+        return False
+    key = recipe.get("parish_key", path.stem)
+    display = recipe.get("display_name", key)
+    diocese = recipe.get("diocese", "raphoe")
+    fixed = {
+        "version": 2,
+        "parish_key": key,
+        "display_name": display,
+        "diocese": diocese,
+        "recorded_date": date.today().isoformat(),
+        "start_url": page,
+        "site_type": "mcn_live_parish_page",
+        "playbook_type": "mcn_pdf_near_camera",
+        "auto_fixed": True,
+        "operator_notes": [
+            "MCN.live — bulletin PDF link on the same page as the camera panel.",
+            "Harvester uses goto + download *.pdf after JavaScript renders.",
+        ],
+        "do_not": ["Do not mark inactive or screenshot the camera stream."],
+        "steps": [
+            {"action": "goto", "url": page},
+            {"action": "download", "url_pattern": "*.pdf"},
+        ],
+        "timeout_ms": 90000,
+        "total_timeout_s": 180,
+        "navigation_wait_until": "commit",
+    }
+    _save_json(path, fixed)
+    return True
+
+
 def _fix_raphoe_recipe(path: Path, recipe: dict, evidence_url: str, ev_notes: str) -> bool:
     key = recipe.get("parish_key", path.stem)
     display = recipe.get("display_name", key)
@@ -391,15 +425,13 @@ def _fix_raphoe_recipe(path: Path, recipe: dict, evidence_url: str, ev_notes: st
         _save_json(path, recipe)
         return True
 
-    if "mcn.live" in low or "cannot automate" in notes_low and "mcn" in notes_low:
-        _mark_inactive(recipe, INACTIVE_REASONS["mcn.live"])
-        _save_json(path, recipe)
-        return True
-
     if "drive.google.com/drive/folders" in low:
         _mark_inactive(recipe, INACTIVE_REASONS["folder"])
         _save_json(path, recipe)
         return True
+
+    if "mcn.live" in low:
+        return _fix_mcn_live_recipe(path, recipe)
 
     if "drive.usercontent.google.com" in low or low.split("?")[0].endswith(".pdf"):
         fixed = _direct_download_recipe(key, display, diocese, url)

@@ -305,6 +305,13 @@ async def _wait_for_bulletin_content(page: Page, recipe: dict, timeout_ms: int) 
         probes.extend(["table.mdocs", "a.mdocs-download", ".mdocs a[href]"])
     if "wp_block" in playbook or "permanent_bulletin" in playbook:
         probes.extend(["object.wp-block-file__embed", ".wp-block-file a[href$='.pdf']"])
+    if "mcn_live" in playbook or "mcn_pdf" in playbook:
+        probes.extend([
+            "a[href$='.pdf']",
+            "a[href*='.pdf']",
+            "a[href*='bulletin']",
+            "a[href*='download']",
+        ])
     if not probes:
         probes = [
             "a.pdfemb-viewer[href]",

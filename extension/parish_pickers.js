@@ -356,9 +356,10 @@
     const inferredKey = urlHit?.key || inferParishKeyFromUrl(url);
     const keyHit = inferredKey ? lookupByKey(inferredKey) : null;
 
+    const registryDiocese = urlHit?.diocese || keyHit?.diocese || "";
     let key = inferredKey || "";
     let name = urlHit?.name || keyHit?.name || "";
-    let diocese = urlHit?.diocese || keyHit?.diocese || "";
+    let diocese = registryDiocese;
 
     const hostMap =
       storageData.ph_hostname_map && typeof storageData.ph_hostname_map === "object"
@@ -372,7 +373,8 @@
         .replace(/\s+/g, "_");
       const mappedName = String(cached.display_name || cached.name || "").trim();
       const mappedDiocese = String(cached.diocese || "").trim();
-      if (mappedDiocese) diocese = mappedDiocese;
+      // Prefer parish registry diocese over stale hostname cache (wrong-folder pushes).
+      if (!registryDiocese && mappedDiocese) diocese = mappedDiocese;
       if (mappedName) name = mappedName;
       if (mappedKey && normalizeUrlKey(cached.start_url || "") === normalizeUrlKey(url)) {
         key = mappedKey;
@@ -380,6 +382,8 @@
         key = mappedKey;
       }
     }
+
+    if (registryDiocese) diocese = registryDiocese;
 
     if (!name && key) {
       const hit = lookupByKey(key);
@@ -420,6 +424,7 @@
     label = "",
     onChange,
     inputStyle = "",
+    autoOpenOnFocus = false,
   }) => {
     const wrap = document.createElement("div");
     wrap.style.cssText = "position:relative;margin-bottom:6px;";
@@ -459,6 +464,7 @@
 
     let selectedValue = value;
     let filtered = items.slice();
+    let menuOpen = false;
 
     const formatLabel = (item) => {
       if (!item) return "";
@@ -468,7 +474,7 @@
 
     const renderMenu = () => {
       menu.replaceChildren();
-      if (filtered.length === 0) {
+      if (!menuOpen || filtered.length === 0) {
         menu.style.display = "none";
         return;
       }
@@ -499,6 +505,7 @@
           const val = typeof item === "string" ? item : item.value || item.key || "";
           selectedValue = val;
           input.value = formatLabel(item);
+          menuOpen = false;
           menu.style.display = "none";
           if (onChange) onChange(item, val);
         });
@@ -507,7 +514,7 @@
       menu.style.display = "block";
     };
 
-    const applyFilter = (q) => {
+    const applyFilter = (q, { openMenu = false } = {}) => {
       const query = String(q || "").trim().toLowerCase();
       if (!query) {
         filtered = items.slice();
@@ -518,17 +525,21 @@
           return blob.includes(query) || val.includes(query);
         });
       }
+      if (openMenu) menuOpen = true;
       renderMenu();
     };
 
-    input.addEventListener("focus", () => applyFilter(input.value));
+    input.addEventListener("focus", () => {
+      if (autoOpenOnFocus) applyFilter(input.value, { openMenu: true });
+    });
     input.addEventListener("input", () => {
       selectedValue = "";
-      applyFilter(input.value);
+      applyFilter(input.value, { openMenu: true });
       if (onChange) onChange(null, "");
     });
     input.addEventListener("blur", () => {
       setTimeout(() => {
+        menuOpen = false;
         menu.style.display = "none";
       }, 150);
     });
@@ -541,14 +552,25 @@
           const k = String(typeof item === "string" ? item : item?.key || item?.value || "").trim().toLowerCase();
           return k && !_isJunkParishKey(k);
         });
-        applyFilter(input.value);
+        filtered = items.slice();
+        if (menuOpen) renderMenu();
       },
       setValue: (val, display) => {
         selectedValue = val || "";
         input.value = display || val || "";
+        menuOpen = false;
+        menu.style.display = "none";
       },
       getValue: () => selectedValue || input.value.trim(),
       getDisplay: () => input.value.trim(),
+      openMenu: () => {
+        menuOpen = true;
+        applyFilter(input.value, { openMenu: true });
+      },
+      closeMenu: () => {
+        menuOpen = false;
+        menu.style.display = "none";
+      },
     };
   };
 

@@ -80,7 +80,7 @@ def _suggest_action(key: str, recipe: dict, fail_row: dict | None) -> tuple[str,
         return "mark_inactive", "non-automatable source"
     if "google drive" in low or "drive.usercontent" in low:
         return "autofix_drive", "needs direct Drive file URL"
-    if "image_stack" in low or "mcn.live" in low:
+    if "image_stack" in low:
         return "retrain_image", "image capture recipe"
     if "timeout" in low and recipe.get("auto_fixed"):
         return "verify_autofix", "retry after recipe autofix"
@@ -102,6 +102,8 @@ def _infer_bulletin_format(recipe: dict, pattern: dict | None) -> str:
     playbook = str(recipe.get("playbook_type") or "").lower()
     if "image_stack" in site or "stacked_image" in playbook:
         return "image_stack"
+    if "mcn_live" in site or "mcn_pdf" in playbook:
+        return "pdf_download"
     if "html" in site or "html_capture" in playbook:
         return "html"
     if "docx" in site or "dropfiles" in playbook:

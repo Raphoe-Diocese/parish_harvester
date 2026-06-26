@@ -1192,6 +1192,74 @@ function _canonicalDioceseSlug(value) {
   return normalized;
 }
 
+const _RECIPE_DIOCESE_FOLDERS = ["derry", "down_and_connor", "raphoe", "unknown"];
+
+async function _fetchGithubJson(url, headers, timeoutMs = 45000, init = {}) {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), timeoutMs);
+  try {
+    const resp = await fetch(url, { ...init, headers, signal: controller.signal });
+    return resp;
+  } catch (err) {
+    if (err && err.name === "AbortError") {
+      throw new Error(`GitHub request timed out after ${Math.round(timeoutMs / 1000)}s — check your connection and PAT.`);
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
+}
+
+/** Find an existing recipe file across diocese folders (fixes wrong-folder pushes). */
+async function _locateRecipeOnGithub(gh_pat, gh_repo, key, preferredDiocese) {
+  const headers = {
+    Authorization: `token ${gh_pat}`,
+    Accept: "application/vnd.github+json",
+    "X-GitHub-Api-Version": "2022-11-28",
+  };
+  const preferred = _canonicalDioceseSlug(preferredDiocese) || "";
+  const dioceses = [...new Set([preferred, ..._RECIPE_DIOCESE_FOLDERS].filter(Boolean))];
+
+  for (const dio of dioceses) {
+    const filePath = `parishes/recipes/${dio}/${key}.json`;
+    const apiBase = `https://api.github.com/repos/${gh_repo}/contents/${filePath}`;
+    try {
+      const getResp = await _fetchGithubJson(apiBase, headers, 30000);
+      if (!getResp.ok) {
+        if (getResp.status === 404) continue;
+        console.warn(`Parish Trainer: could not read ${filePath} (${getResp.status})`);
+        continue;
+      }
+      const existing = await getResp.json();
+      let existingRecipe = null;
+      try {
+        existingRecipe = JSON.parse(_decodeGithubFileContent(existing.content) || "{}");
+      } catch (_parseErr) {
+        existingRecipe = null;
+      }
+      return {
+        filePath,
+        apiBase,
+        diocese: dio,
+        existingSha: existing.sha || null,
+        existingRecipe,
+      };
+    } catch (err) {
+      console.warn(`Parish Trainer: locate recipe failed for ${filePath}:`, err);
+    }
+  }
+
+  const dio = preferred || "unknown";
+  const filePath = `parishes/recipes/${dio}/${key}.json`;
+  return {
+    filePath,
+    apiBase: `https://api.github.com/repos/${gh_repo}/contents/${filePath}`,
+    diocese: dio,
+    existingSha: null,
+    existingRecipe: null,
+  };
+}
+
 chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
   if (message?.type !== "push_recipe" && message?.type !== "new_parish") return false;
 
@@ -1282,41 +1350,19 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         return;
       }
 
-      // Determine diocese subfolder from the recipe being pushed.
-      // Falls back to "unknown" if diocese is empty or not provided.
+      // Locate existing recipe across diocese folders (user may have picked wrong diocese).
       const recipeDioceseRaw = ((message.recipe || {}).diocese || "").trim();
-      const dioceseSubfolder = _canonicalDioceseSlug(recipeDioceseRaw) || "unknown";
-      const filePath = `parishes/recipes/${dioceseSubfolder}/${key}.json`;
-      const apiBase  = `https://api.github.com/repos/${gh_repo}/contents/${filePath}`;
-      const headers  = {
+      const located = await _locateRecipeOnGithub(gh_pat, gh_repo, key, recipeDioceseRaw);
+      const filePath = located.filePath;
+      const apiBase = located.apiBase;
+      const existingSha = located.existingSha;
+      const existingRecipe = located.existingRecipe;
+      const headers = {
         Authorization: `token ${gh_pat}`,
         Accept: "application/vnd.github+json",
         "Content-Type": "application/json",
         "X-GitHub-Api-Version": "2022-11-28",
       };
-
-      // Fetch existing file SHA (needed for updates) and existing recipe.
-      let existingSha = null;
-      let existingRecipe = null;
-      try {
-        const getResp = await fetch(apiBase, { headers });
-        if (getResp.ok) {
-          const existing = await getResp.json();
-          existingSha = existing.sha || null;
-          try {
-            const decoded = decodeURIComponent(
-              atob(existing.content.replace(/\n/g, ""))
-                .split("")
-                .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-                .join("")
-            );
-            existingRecipe = JSON.parse(decoded);
-          } catch (_parseErr) { /* use new recipe as-is */ }
-        } else if (getResp.status !== 404) {
-          // Non-404 failure fetching the existing file — warn but proceed (treat as new).
-          console.warn(`Parish Trainer: could not check existing recipe (${getResp.status})`);
-        }
-      } catch (_e) { /* file does not exist yet — that's fine */ }
 
       // Preserve stable fields from the existing recipe when updating.
       const incoming = message.recipe || {};
@@ -1368,6 +1414,9 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       // Set recorded_date to today.
       normalizedRecipe.recorded_date = new Date().toISOString().slice(0, 10);
       normalizedRecipe.parish_key = key;
+      if (located.diocese) {
+        normalizedRecipe.diocese = located.diocese;
+      }
       const recipeDiocese = (normalizedRecipe.diocese || "").trim();
 
       const recipeJson = JSON.stringify(normalizedRecipe, null, 2);
@@ -1379,12 +1428,12 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         ...(existingSha ? { sha: existingSha } : {}),
       };
 
-      const putResp = await fetch(apiBase, {
-        method: "PUT",
+      const putResp = await _fetchGithubJson(
+        apiBase,
         headers,
-        body: JSON.stringify(body),
-      });
-
+        60000,
+        { method: "PUT", body: JSON.stringify(body) }
+      );
       if (!putResp.ok) {
         sendResponse({ ok: false, error: await _githubApiError(putResp) });
         return;
@@ -1402,7 +1451,13 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       // Reply immediately after GitHub save — harvest dispatch / diagnosis can take 30s+.
       const tabId = sender?.tab?.id;
-      sendResponse({
+      let responded = false;
+      const safeSendResponse = (payload) => {
+        if (responded) return;
+        responded = true;
+        sendResponse(payload);
+      };
+      safeSendResponse({
         ok: true,
         url: htmlUrl,
         filePath,
@@ -1412,6 +1467,33 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         stepsPushed: Array.isArray(normalizedRecipe.steps) ? normalizedRecipe.steps.length : 0,
         stepsPreservedFromOld,
       });
+
+      // Best-effort: remove duplicate recipe copies in wrong diocese folders (after UI unblocks).
+      const savedDiocese = _canonicalDioceseSlug(normalizedRecipe.diocese || located.diocese) || located.diocese;
+      if (savedDiocese && savedDiocese !== "unknown") {
+        void (async () => {
+          for (const strayDio of _RECIPE_DIOCESE_FOLDERS) {
+            if (strayDio === savedDiocese) continue;
+            const strayPath = `parishes/recipes/${strayDio}/${key}.json`;
+            if (strayPath === filePath) continue;
+            try {
+              const strayApi = `https://api.github.com/repos/${gh_repo}/contents/${strayPath}`;
+              const strayGet = await _fetchGithubJson(strayApi, headers, 15000);
+              if (!strayGet.ok) continue;
+              const strayData = await strayGet.json();
+              await _fetchGithubJson(strayApi, headers, 15000, {
+                method: "DELETE",
+                body: JSON.stringify({
+                  message: `chore: remove duplicate recipe for ${key} from ${strayDio} (belongs in ${savedDiocese})`,
+                  sha: strayData.sha,
+                }),
+              });
+            } catch (_strayErr) {
+              // Non-fatal.
+            }
+          }
+        })();
+      }
 
       const githubVerify = await _verifyRecipeOnGithub(
         apiBase,

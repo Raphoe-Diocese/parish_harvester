@@ -1,20 +1,32 @@
 {
+  "version": 2,
   "parish_key": "holy-cross-church",
-  "parish_name": "Holy Cross Church",
-  "display_name": "Holy Cross Church",
-  "recorded_date": "2026-05-22",
+  "display_name": "Bodoney",
+  "diocese": "raphoe",
+  "recorded_date": "2026-06-26",
   "start_url": "https://mcn.live/Camera/holy-cross-church",
+  "site_type": "mcn_live_parish_page",
+  "playbook_type": "mcn_pdf_near_camera",
+  "auto_fixed": true,
+  "operator_notes": [
+    "MCN.live parish page — live camera plus a weekly bulletin PDF link in the same page panel.",
+    "Harvester loads the page in Playwright and downloads the newest *.pdf from the DOM (not a camera screenshot)."
+  ],
+  "do_not": [
+    "Do not mark inactive — bulletin is a PDF download on this page.",
+    "Do not use image_stack or crop_screenshot for the camera feed."
+  ],
   "steps": [
     {
       "action": "goto",
       "url": "https://mcn.live/Camera/holy-cross-church"
+    },
+    {
+      "action": "download",
+      "url_pattern": "*.pdf"
     }
   ],
-  "version": 1,
-  "diocese": "raphoe",
-  "placeholder": true,
-  "status": "inactive",
-  "skip": true,
-  "reason": "MCN.live camera stream \u2014 needs image capture training",
-  "auto_fixed": true
+  "timeout_ms": 90000,
+  "total_timeout_s": 180,
+  "navigation_wait_until": "commit"
 }

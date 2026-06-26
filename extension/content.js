@@ -132,7 +132,10 @@
     return map[host] || null;
   };
 
-  const _persistRecordingSession = async (extra = {}) => {
+  let _persistDebounceTimer = null;
+  let _persistPendingExtra = {};
+
+  const _persistRecordingSessionNow = async (extra = {}) => {
     if (!_inStandaloneMode()) return;
     const host = _hostnameFromUrl(_pageUrlForParishDetection());
     if (!host) return;
@@ -157,6 +160,28 @@
       [RECORDING_SESSIONS_KEY]: map,
       [LEGACY_RECORDING_SESSION_KEY]: { active: false, steps: [], updatedAt: Date.now() },
     });
+  };
+
+  const _flushRecordingSession = async () => {
+    if (_persistDebounceTimer) {
+      clearTimeout(_persistDebounceTimer);
+      _persistDebounceTimer = null;
+    }
+    const extra = _persistPendingExtra;
+    _persistPendingExtra = {};
+    await _persistRecordingSessionNow(extra);
+  };
+
+  const _persistRecordingSession = (extra = {}) => {
+    if (!_inStandaloneMode()) return;
+    Object.assign(_persistPendingExtra, extra || {});
+    if (_persistDebounceTimer) clearTimeout(_persistDebounceTimer);
+    _persistDebounceTimer = setTimeout(() => {
+      _persistDebounceTimer = null;
+      const pending = _persistPendingExtra;
+      _persistPendingExtra = {};
+      void _persistRecordingSessionNow(pending);
+    }, 300);
   };
 
   const _clearRecordingSession = async () => {
@@ -1089,6 +1114,8 @@
     return parts.join(" > ");
   };
 
+  let _pageTypeCache = { url: "", at: 0, result: null };
+
   const nearestElementSelector = (x, y) => {
     const candidates = document.elementsFromPoint(x, y);
     for (const el of candidates) {
@@ -1175,9 +1202,17 @@
 
   const buildStableLinkSelector = (el) => {
     if (!el) return "";
-    const tag = el.tagName.toLowerCase();
-    const href = (el.getAttribute("href") || "").trim();
-    const text = (el.innerText || el.textContent || "")
+    const anchor =
+      el.tagName === "A" ? el : (el.closest && el.closest("a[href]")) || el;
+    if (anchor?.classList?.contains("mod_downloadlink")) {
+      return "a.mod_downloadlink[href]";
+    }
+    if (anchor?.closest?.(".mod_dropfiles_latest, .mod_dropfiles_list")) {
+      return "a.mod_downloadlink[href]";
+    }
+    const tag = (anchor || el).tagName.toLowerCase();
+    const href = ((anchor || el).getAttribute("href") || "").trim();
+    const text = ((anchor || el).innerText || (anchor || el).textContent || "")
       .trim()
       .replace(/\s+/g, " ")
       .slice(0, 120);
@@ -1749,7 +1784,7 @@
     return d;
   };
 
-  const detectPageType = () => {
+  const _detectPageTypeImpl = () => {
     const url = window.location.href.toLowerCase();
 
     const _htmlFingerprintDetect = () => {
@@ -2205,6 +2240,25 @@
         "Navigate to the parish bulletin page first, then try again.",
       type: "unknown",
     };
+  };
+
+  const detectPageType = () => {
+    const url = window.location.href;
+    const now = Date.now();
+    if (
+      _pageTypeCache.url === url
+      && _pageTypeCache.result
+      && now - _pageTypeCache.at < 2500
+    ) {
+      return _pageTypeCache.result;
+    }
+    const result = _detectPageTypeImpl();
+    _pageTypeCache = { url, at: now, result };
+    return result;
+  };
+
+  const _invalidatePageTypeCache = () => {
+    _pageTypeCache = { url: "", at: 0, result: null };
   };
 
   // ── Deep Detect: monitor network requests for document URLs ──────────────
@@ -4149,6 +4203,15 @@
       }
     };
 
+    let _guidedContextTimer = null;
+    const _scheduleRefreshGuidedContext = () => {
+      if (_guidedContextTimer) return;
+      _guidedContextTimer = setTimeout(() => {
+        _guidedContextTimer = null;
+        _refreshGuidedContext();
+      }, 200);
+    };
+
     // Show a confirmation step after a link is picked
     const showPickConfirmation = (selectedEl) => {
       const selector = buildStableLinkSelector(selectedEl);
@@ -5395,7 +5458,7 @@
       recipeStartUrlEl.textContent = startPreview
         ? `Sunday start URL: ${startPreview}`
         : "Sunday start URL: (record a step)";
-      _refreshGuidedContext();
+      _scheduleRefreshGuidedContext();
       if (_standaloneRecipeSteps().length > 0 && !recipeOpen) {
         recipeOpen = true;
         recipeBodyEl.style.display = "block";
@@ -6020,6 +6083,7 @@
               if (item.name) nameInput.value = item.name;
               if (item.diocese) {
                 resolvedDiocese = item.diocese;
+                diocesePickerExpanded = false;
                 dioceseCombo?.setValue(item.diocese, item.diocese.replace(/_/g, " "));
                 refreshDioceseLine();
               }
@@ -6122,6 +6186,7 @@
 
       let resolvedDiocese = "";
       let dioceseCombo = null;
+      let diocesePickerExpanded = false;
       const NEW_DIOCESE_VALUE = "__new_diocese__";
       const newDioceseWrap = document.createElement("div");
       newDioceseWrap.style.display = "none";
@@ -6147,6 +6212,40 @@
       const dioceseLine = document.createElement("div");
       dioceseLine.style.cssText = "font-size:9px;color:#9ca3af;margin-bottom:6px;display:none;";
       pushSection.appendChild(dioceseLine);
+
+      const dioceseCompactRow = document.createElement("div");
+      dioceseCompactRow.style.cssText = [
+        "display:none",
+        "align-items:center",
+        "justify-content:space-between",
+        "gap:6px",
+        "margin-bottom:6px",
+        "font-size:10px",
+      ].join(";");
+      const dioceseCompactLabel = document.createElement("span");
+      dioceseCompactLabel.style.cssText = "color:#86efac;flex:1;line-height:1.35;";
+      const dioceseChangeBtn = document.createElement("button");
+      dioceseChangeBtn.type = "button";
+      dioceseChangeBtn.textContent = "▼";
+      dioceseChangeBtn.title = "Change diocese folder (only if this parish is in the wrong folder)";
+      dioceseChangeBtn.style.cssText = [
+        "border:1px solid #374151",
+        "border-radius:4px",
+        "padding:2px 6px",
+        "background:#1e293b",
+        "color:#9ca3af",
+        "cursor:pointer",
+        "font-size:10px",
+        "font-family:inherit",
+        "flex-shrink:0",
+      ].join(";");
+      dioceseCompactRow.appendChild(dioceseCompactLabel);
+      dioceseCompactRow.appendChild(dioceseChangeBtn);
+      pushSection.appendChild(dioceseCompactRow);
+
+      const dioceseChangeWrap = document.createElement("div");
+      dioceseChangeWrap.style.display = "none";
+      pushSection.appendChild(dioceseChangeWrap);
 
       const _refreshParishPickerItems = async () => {
         if (!parishSearchCombo) return;
@@ -6182,24 +6281,53 @@
       };
 
       const refreshDioceseLine = () => {
-        if (resolvedDiocese && resolvedDiocese !== NEW_DIOCESE_VALUE) {
+        const known = resolvedDiocese && resolvedDiocese !== NEW_DIOCESE_VALUE;
+        if (known && !diocesePickerExpanded && !diocesePickerTouched) {
+          dioceseCompactRow.style.display = "flex";
+          dioceseChangeWrap.style.display = "none";
+          dioceseLine.style.display = "none";
+          dioceseCompactLabel.textContent =
+            `✓ ${resolvedDiocese.replace(/_/g, " ")} — parishes/recipes/${resolvedDiocese}/`;
+          dioceseChangeBtn.textContent = "▼";
+        } else if (known && diocesePickerExpanded) {
+          dioceseCompactRow.style.display = "flex";
+          dioceseChangeWrap.style.display = "block";
           dioceseLine.style.display = "block";
-          dioceseLine.textContent = `Recipe will save to parishes/recipes/${resolvedDiocese}/`;
+          dioceseLine.textContent = `Change diocese folder (current: ${resolvedDiocese})`;
+          dioceseCompactLabel.textContent =
+            `✓ ${resolvedDiocese.replace(/_/g, " ")} — parishes/recipes/${resolvedDiocese}/`;
+          dioceseChangeBtn.textContent = "▲";
         } else if (resolvedDiocese === NEW_DIOCESE_VALUE) {
+          dioceseCompactRow.style.display = "none";
+          dioceseChangeWrap.style.display = "block";
           dioceseLine.style.display = "block";
           dioceseLine.textContent = "Enter new diocese folder name below.";
         } else {
-          dioceseLine.style.display = "none";
+          dioceseCompactRow.style.display = "none";
+          dioceseChangeWrap.style.display = "block";
+          dioceseLine.style.display = "block";
+          dioceseLine.textContent = "Pick diocese folder for this parish.";
         }
         void _refreshParishPickerItems();
       };
 
+      dioceseChangeBtn.addEventListener("click", () => {
+        diocesePickerExpanded = !diocesePickerExpanded;
+        if (!diocesePickerExpanded) dioceseCombo?.closeMenu?.();
+        refreshDioceseLine();
+        if (diocesePickerExpanded) {
+          dioceseCombo?.input?.focus?.();
+          dioceseCombo?.openMenu?.();
+        }
+      });
+
       let dioceseSelect;
       if (window.ph_parish_pickers?.createSearchCombo) {
         dioceseCombo = window.ph_parish_pickers.createSearchCombo({
-          label: "Diocese folder (type to search)",
-          placeholder: "Type rap, der, clo…",
+          label: "Change diocese folder",
+          placeholder: "Type to search dioceses…",
           inputStyle,
+          autoOpenOnFocus: false,
           onChange: (item, val) => {
             diocesePickerTouched = true;
             if (val === NEW_DIOCESE_VALUE) {
@@ -6210,12 +6338,15 @@
             }
             newDioceseWrap.style.display = "none";
             resolvedDiocese = val || "";
-            if (resolvedDiocese) void _storageSet({ ph_last_diocese: resolvedDiocese });
+            if (resolvedDiocese) {
+              diocesePickerExpanded = false;
+              void _storageSet({ ph_last_diocese: resolvedDiocese });
+            }
             refreshDioceseLine();
           },
         });
-        pushSection.appendChild(dioceseCombo.wrap);
-        pushSection.appendChild(newDioceseWrap);
+        dioceseChangeWrap.appendChild(dioceseCombo.wrap);
+        dioceseChangeWrap.appendChild(newDioceseWrap);
         dioceseSelect = {
           get value() {
             if (resolvedDiocese === NEW_DIOCESE_VALUE) {
@@ -6305,6 +6436,10 @@
       const _applyResolvedParishToPushForm = (resolved, { notePrefix = "Matched from this page URL" } = {}) => {
         if (!resolved) return;
         const inferred = resolved.inferredKey || resolved.key || "";
+        if (!resolved.diocese && inferred) {
+          const registryHit = window.ph_parish_pickers?.lookupByKey?.(inferred);
+          if (registryHit?.diocese) resolved.diocese = registryHit.diocese;
+        }
         if (inferred && !parishPickerTouched) {
           keyInput.value = inferred;
           autoDetectNote.style.display = "block";
@@ -6316,6 +6451,7 @@
         if (resolved.name && !parishPickerTouched) nameInput.value = resolved.name;
         if (resolved.diocese && !diocesePickerTouched) {
           resolvedDiocese = resolved.diocese;
+          diocesePickerExpanded = false;
           dioceseCombo?.setValue(resolved.diocese, resolved.diocese.replace(/_/g, " "));
           refreshDioceseLine();
         }
@@ -6340,7 +6476,7 @@
         await window.ph_parish_pickers?.loadRegistry?.(settings.gh_repo);
         await _loadDioceseComboItems();
         const resolved = _resolveParishContextForPage(pageUrl, settings || {});
-        if (!resolved.diocese && settings.ph_last_diocese && !resolvedDiocese) {
+        if (!resolved.diocese && settings.ph_last_diocese && !resolvedDiocese && !diocesePickerTouched) {
           resolvedDiocese = String(settings.ph_last_diocese || "").trim();
           dioceseCombo?.setValue(resolvedDiocese, resolvedDiocese.replace(/_/g, " "));
           refreshDioceseLine();
@@ -6349,10 +6485,12 @@
           resolved.key = resolved.inferredKey;
         }
         _applyResolvedParishToPushForm(resolved);
-        await _writeParishDetectDebug(resolved);
-        void _refreshHarvestStatusLine(resolved.inferredKey || resolved.key);
+        void _writeParishDetectDebug(resolved);
+        setTimeout(() => {
+          void _refreshHarvestStatusLine(resolved.inferredKey || resolved.key);
+          void refreshPatternHints();
+        }, 1500);
         await _loadExistingRecipeIfEmpty(resolved, resolved.name, hostname);
-        void refreshPatternHints();
       };
 
       _refreshParishPushForm = _bootstrapParishContext;
@@ -6546,10 +6684,13 @@
           return raw.replace(/&/g, "and").replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
         };
 
-        // Try diocese subfolder path first, then fall back to legacy flat path.
+        // Try diocese subfolder path first, then scan all known folders, then legacy flat path.
         const dioceseSubfolder = canonicalDioceseSlug(diocese) || "unknown";
         const pathsToTry = [
           `parishes/recipes/${dioceseSubfolder}/${key}.json`,
+          ...["derry", "down_and_connor", "raphoe", "unknown"]
+            .filter((d) => d !== dioceseSubfolder)
+            .map((d) => `parishes/recipes/${d}/${key}.json`),
           `parishes/recipes/${key}.json`,
         ];
         for (const filePath of pathsToTry) {
@@ -6639,7 +6780,7 @@
         if (typeof chrome !== "undefined" && chrome.storage) {
           try {
             storageData = await new Promise((resolve) => {
-              chrome.storage.local.get(["ph_hostname_map", "ph_last_diocese"], (r) => {
+              chrome.storage.local.get(["ph_hostname_map", "ph_last_diocese", "gh_repo"], (r) => {
                 if (chrome.runtime?.lastError) resolve({});
                 else resolve(r || {});
               });
@@ -6648,6 +6789,8 @@
             storageData = {};
           }
         }
+
+        await window.ph_parish_pickers?.loadRegistry?.(storageData.gh_repo);
 
         const resolved = _resolveParishContextForPage(pageUrl, storageData);
         const inferredKey = String(resolved.inferredKey || _inferParishKeyFromUrl(pageUrl) || "")
@@ -6678,8 +6821,10 @@
           }
         }
         if (!diocese) {
-          showStatus("❌ Pick a diocese (Derry, etc.) before pushing — recipes must not land in unknown/.", "error");
-          dioceseSelect.focus();
+          showStatus("❌ Could not detect diocese for this parish — tap ▼ next to the diocese line to pick one.", "error");
+          diocesePickerExpanded = true;
+          refreshDioceseLine();
+          dioceseCombo?.input?.focus?.();
           return;
         }
         resolvedDiocese = diocese;
@@ -6691,6 +6836,16 @@
           const hit = window.ph_parish_pickers?.lookupByKey?.(inferredKey);
           if (hit?.name && !nameInput.value.trim()) name = hit.name;
           if (!name) name = _inferDisplayNameFromUrl(pageUrl) || inferredKey;
+        }
+        // Parish registry wins over stale ph_last_diocese / hostname cache.
+        const registryHit = window.ph_parish_pickers?.lookupByKey?.(key);
+        if (registryHit?.diocese) {
+          diocese = registryHit.diocese;
+          if (!diocesePickerTouched) {
+            resolvedDiocese = registryHit.diocese;
+            dioceseCombo?.setValue(registryHit.diocese, registryHit.diocese.replace(/_/g, " "));
+            refreshDioceseLine();
+          }
         }
         if (name) nameInput.value = name;
         updateParishRecordingLine(name, key, _hostnameFromUrl(pageUrl));
@@ -6752,6 +6907,7 @@
         }
 
         console.log(`Parish Trainer: pushing recipe for key=${key}, diocese=${diocese}, url=${pageUrl}`);
+        await _flushRecordingSession();
         const recipe = buildStandaloneRecipe(key, name || key, diocese);
         const detected = detectPageType();
         let diagnosisSnapshot = null;
@@ -6759,7 +6915,7 @@
           try {
             diagnosisSnapshot = await Promise.race([
               globalThis.ph_recipe_diag.runFullDiagnosis(),
-              new Promise((resolve) => setTimeout(() => resolve(null), 4000)),
+              new Promise((resolve) => setTimeout(() => resolve(null), 500)),
             ]);
             const errN = Number(diagnosisSnapshot?.counts?.error || 0);
             if (errN > 0) {
@@ -6786,6 +6942,11 @@
         })();
         pushBtn.disabled = true;
         pushBtn.textContent = "⏳ Sending…";
+        const _resetPushBtn = () => {
+          pushBtn.disabled = false;
+          pushBtn.textContent = "🚀 Send & test on GitHub";
+        };
+        const pushSafetyTimer = setTimeout(_resetPushBtn, 95000);
         _logSaveCycle("push_recipe", { parish_key: key, recipe }, { ok: "pending" });
         showStatus("⏳ Pushing recipe to GitHub…", "info");
 
@@ -6880,9 +7041,9 @@
           diagnosis_snapshot: diagnosisSnapshot,
           diagnosis_source: "push_recipe",
         }, (response, bridgeError) => {
+          clearTimeout(pushSafetyTimer);
           _logSaveCycle("push_recipe", { parish_key: key, recipe }, bridgeError ? { ok: false, reason: bridgeError } : response);
-          pushBtn.disabled = false;
-          pushBtn.textContent = "🚀 Send & test on GitHub";
+          _resetPushBtn();
           if (bridgeError) {
             showStatus(`❌ ${bridgeError}`, "error");
             return;
