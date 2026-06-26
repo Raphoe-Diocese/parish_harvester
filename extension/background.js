@@ -548,6 +548,7 @@ async function _upsertTrainingDiagnosis(gh_pat, gh_repo, parishKey, diagnosis, s
     issues: Array.isArray(diagnosis.issues) ? diagnosis.issues : [],
     counts: diagnosis.counts || {},
     pattern_hints: diagnosis.pattern_hints || [],
+    site_intake: diagnosis.site_intake || null,
     github: diagnosis.github
       ? {
           recipe_found: Boolean(diagnosis.github.recipe_found),

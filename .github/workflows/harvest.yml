@@ -76,6 +76,11 @@ jobs:
         run: |
           echo "::warning::Tests failed — harvest will still run. Fix tests soon; see test.yml on push."
 
+      - name: Autofix recipes before harvest
+        run: |
+          set -euo pipefail
+          python scripts/autofix_recipes.py || true
+
       - name: Run Bulletin Harvester
         run: |
           set -euo pipefail
@@ -111,6 +116,14 @@ jobs:
           if [ ! -f Bulletins/report.txt ]; then
             echo "Error: expected harvest output missing: Bulletins/report.txt"
             exit 1
+          fi
+
+      - name: Build training backlog
+        if: always()
+        run: |
+          set -euo pipefail
+          if [ -f Bulletins/report.json ]; then
+            python scripts/build_training_backlog.py || true
           fi
 
       - name: Write workflow step summary

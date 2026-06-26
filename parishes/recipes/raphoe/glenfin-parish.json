@@ -2,24 +2,26 @@
   "parish_key": "glenfin-parish",
   "display_name": "Glenfin Parish",
   "diocese": "raphoe",
-  "recorded_date": "2026-06-17",
+  "recorded_date": "2026-06-25",
   "start_url": "https://www.glenfin-parish.com/#sbp-bulletin",
+  "site_type": "wordpress_newsletter_archive",
   "auto_fixed": true,
+  "operator_notes": [
+    "Bulletin PDF links sit in a hidden archive list — harvester scores newest dated *.pdf from the DOM.",
+    "Do not click hidden anchors; goto + download only."
+  ],
   "steps": [
     {
       "action": "goto",
       "url": "https://www.glenfin-parish.com/#sbp-bulletin"
     },
     {
-      "action": "click",
-      "selector": "a[href$=\".pdf\"], a[href*=\".pdf\"]",
-      "pick_strategy": "newest_dated"
-    },
-    {
       "action": "download",
-      "url": "http://www.glenfinparish.com/app/uploads/2019/11/Newsletter-2019-November-10th-.pdf",
-      "use_captured_url": true
+      "url_pattern": "*.pdf"
     }
   ],
-  "version": 1
+  "version": 2,
+  "timeout_ms": 60000,
+  "navigation_wait_until": "commit",
+  "total_timeout_s": 120
 }

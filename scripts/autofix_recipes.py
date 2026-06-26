@@ -491,6 +491,33 @@ def _match_evidence(recipe: dict, evidence: dict[str, dict]) -> dict | None:
     return None
 
 
+def _fix_archive_pdf_listing(path: Path, recipe: dict) -> bool:
+    """Replace brittle click chains on PDF archive pages with DOM scrape download."""
+    steps = recipe.get("steps")
+    if not isinstance(steps, list):
+        return False
+    if not any(isinstance(s, dict) and s.get("action") == "click" for s in steps):
+        return False
+    if not any(isinstance(s, dict) and s.get("action") == "download" for s in steps):
+        return False
+    page = str(recipe.get("start_url") or "").strip()
+    if not page or page.lower().endswith(".pdf"):
+        return False
+    pdfs = _probe_pdf_links(page)
+    if len(pdfs) < 3:
+        return False
+    recipe["steps"] = [
+        {"action": "goto", "url": page},
+        {"action": "download", "url_pattern": "*.pdf"},
+    ]
+    recipe["auto_fixed"] = True
+    recipe["recorded_date"] = date.today().isoformat()
+    recipe.pop("placeholder", None)
+    recipe.pop("needs_retraining", None)
+    _save_json(path, recipe)
+    return True
+
+
 def main() -> int:
     changed = 0
     changed += _apply_known_dead_sites()
@@ -531,6 +558,9 @@ def main() -> int:
             elif _fix_dated_selectors(path, recipe):
                 changed += 1
                 print(f"[dated] {path.name}")
+            elif _fix_archive_pdf_listing(path, recipe):
+                changed += 1
+                print(f"[archive] {path.name}")
 
     # Remove duplicate junk recipe
     junk = RECIPES / "derry" / "2026-06-07-pdf.json"

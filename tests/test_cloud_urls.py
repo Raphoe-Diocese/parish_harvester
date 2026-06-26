@@ -25,6 +25,14 @@ class CloudUrlTests(unittest.TestCase):
         url = "https://contoso.sharepoint.com/sites/parish/Shared%20Documents/bulletin.pdf"
         self.assertTrue(is_cloud_document_url(url))
 
+    def test_pdfjs_viewer_unwraps_embedded_pdf(self) -> None:
+        url = (
+            "https://portaferryparish.com/plugins/content/pdf_embed/assets/viewer/"
+            "pdfjs/web/viewer.html?file=https%3A%2F%2Fportaferryparish.com%2Fimages%2Fdownloads%2FBulletin2019A.pdf"
+        )
+        out = normalize_document_url(url)
+        self.assertIn("portaferryparish.com/images/downloads/Bulletin2019A.pdf", out)
+
 
 if __name__ == "__main__":
     unittest.main()

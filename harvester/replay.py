@@ -837,12 +837,33 @@ async def _click_locator_match(
     locator,
     step_timeout_ms: int,
 ) -> None:
-    await locator.wait_for(state="visible", timeout=step_timeout_ms)
-    await locator.click(timeout=step_timeout_ms)
+    try:
+        await locator.wait_for(state="visible", timeout=step_timeout_ms)
+        await locator.click(timeout=step_timeout_ms)
+    except PlaywrightTimeoutError:
+        href = (await locator.get_attribute("href")) or ""
+        resolved = urljoin(page.url, href.strip()) if href.strip() else ""
+        if resolved and _looks_like_http_url(resolved):
+            await _navigate_page(page, resolved, step_timeout_ms, wait_until="commit")
+        else:
+            raise
     try:
         await page.wait_for_load_state("domcontentloaded", timeout=POST_CLICK_WAIT_TIMEOUT_MS)
     except PlaywrightTimeoutError:
         pass
+
+
+def _peek_next_download_step(steps: list, index: int) -> dict | None:
+    """Return the next download step if click steps can be skipped."""
+    for step in steps[index + 1 :]:
+        if not isinstance(step, dict):
+            continue
+        action = str(step.get("action") or "").strip().lower()
+        if action == "download":
+            return step
+        if action != "click":
+            break
+    return None
 
 
 async def _replay_click_by_strategy(
@@ -990,7 +1011,7 @@ async def replay_recipe(
 
     try:
         last_http_url = start_url if _looks_like_http_url(start_url) else ""
-        for step in steps:
+        for step_index, step in enumerate(steps):
             action = step.get("action")
             if action == "goto":
                 url = (step.get("url") or "").strip()
@@ -1010,6 +1031,20 @@ async def replay_recipe(
                 continue
 
             if action == "click":
+                upcoming_download = _peek_next_download_step(steps, step_index)
+                if upcoming_download and upcoming_download.get("use_captured_url"):
+                    step_url = (upcoming_download.get("url") or "").strip()
+                    if step_url:
+                        for candidate in _resolve_download_candidates(
+                            step_url,
+                            target_date=target_date,
+                            use_captured_url=True,
+                        ):
+                            tried = await _try_download_page_url(
+                                page, dest, candidate, timeout_ms=step_timeout_ms
+                            )
+                            if tried:
+                                return dest, tried[1], tried[0]
                 await _replay_click(page, step, step_timeout_ms, target_date=target_date)
                 if downloads:
                     file_type = await _save_download_to_pdf(downloads.pop(0), dest)

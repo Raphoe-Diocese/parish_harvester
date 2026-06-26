@@ -1,51 +1,28 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "bangorparish",
   "display_name": "Bangor",
   "diocese": "down_and_connor",
   "start_url": "https://www.bangorparish.com/parish-bulletin/",
+  "site_type": "wp_block_file_bulletin",
+  "auto_fixed": true,
+  "operator_notes": [
+    "Parish bulletin page lists weekly PDFs — harvest newest *.pdf from the DOM.",
+    "Filenames use DD-Month-YYYY (e.g. 14-June-2026-NEWSLETTER.pdf)."
+  ],
   "steps": [
     {
       "action": "goto",
       "url": "https://www.bangorparish.com/parish-bulletin/"
     },
     {
-      "action": "click",
-      "bulletin_position": "top",
-      "fallback_selectors": [
-        "a[href$='.pdf']",
-        "a[href*='.pdf']"
-      ],
-      "href": "https://www.bangorparish.com/wp-content/uploads/14-June-2026-NEWSLETTER.pdf",
-      "pick_strategy": "newest_dated",
-      "selector": "a[href$='.pdf']",
-      "text": "You can download PDF versions of the Parish Weekly Newslette"
-    },
-    {
-      "action": "click",
-      "bulletin_position": "bottom",
-      "fallback_selectors": [
-        "a[href$='.pdf']",
-        "a[href*='.pdf']",
-        "html > body > a"
-      ],
-      "href": "https://www.bangorparish.com/wp-content/uploads/14-June-2026-NEWSLETTER.pdf",
-      "pick_strategy": "newest_dated",
-      "selector": "a[href$='.pdf']",
-      "text": ""
-    },
-    {
       "action": "download",
-      "url": "https://www.bangorparish.com/wp-content/uploads/14-June-2026-NEWSLETTER.pdf",
-      "use_captured_url": true
+      "url_pattern": "*.pdf"
     }
   ],
   "observed_load_ms": 1331,
   "timeout_ms": 45000,
   "total_timeout_s": 90,
-  "bulletin_layout": {
-    "strategy": "newest_dated",
-    "position": "bottom"
-  },
+  "navigation_wait_until": "commit",
   "recorded_date": "2026-06-25"
 }

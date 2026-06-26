@@ -1,9 +1,21 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "derriaghycatholicparish",
   "display_name": "Derriaghy",
   "diocese": "down_and_connor",
   "start_url": "https://derriaghycatholicparish.com/?page_id=262",
+  "site_type": "wp_block_file_bulletin",
+  "playbook_type": "permanent_bulletin_page",
+  "auto_fixed": true,
+  "operator_notes": [
+    "Permanent bulletin page — PDF filename changes weekly under /wp-content/uploads/YYYY/MM/.",
+    "PDF is in object.wp-block-file__embed[data]; harvester scrapes after commit navigation.",
+    "Site can be slow — use commit wait and long timeout."
+  ],
+  "do_not": [
+    "Do not use /parish-bulletin/ — that path 404s; use ?page_id=262.",
+    "Do not pin a dated filename."
+  ],
   "steps": [
     {
       "action": "goto",
@@ -11,23 +23,12 @@
     },
     {
       "action": "download",
-      "url_pattern": "*bulletin*.pdf"
+      "url_pattern": "*.pdf"
     }
   ],
   "observed_load_ms": 6451,
   "timeout_ms": 180000,
   "total_timeout_s": 300,
   "navigation_wait_until": "commit",
-  "playbook_type": "permanent_bulletin_page",
-  "site_type": "wp_block_file_bulletin",
-  "operator_notes": [
-    "Permanent /parish-bulletin/ URL — PDF filename changes weekly under /wp-content/uploads/YYYY/MM/.",
-    "PDF is in object.wp-block-file__embed[data] — harvest scrapes the embed URL.",
-    "Use url_pattern *bulletin*.pdf — never pin a dated filename."
-  ],
-  "do_not": [
-    "Do not train on the homepage — use the dedicated bulletin page only.",
-    "Do not pin saintanthony.co.uk if the parish moved to saintanthonys.uk."
-  ],
   "recorded_date": "2026-06-25"
 }

@@ -786,6 +786,42 @@
     });
   };
 
+  const _inferSiteIntake = (pageCtx, mismatch) => {
+    const fp = mismatch.htmlScan?.best;
+    const pageType = String(pageCtx.page_type?.type || pageCtx.page_type || "").toLowerCase();
+    const capture = String(fp?.captureMethod || fp?.pageType || "").toLowerCase();
+    let bulletin_format = "unknown";
+    if (capture.includes("image_stack") || pageType.includes("image_stack")) bulletin_format = "image_stack";
+    else if (capture.includes("image") || pageType.includes("image")) bulletin_format = "image";
+    else if (capture.includes("html") || pageType.includes("html")) bulletin_format = "html";
+    else if (capture.includes("docx") || pageType.includes("docx") || pageType.includes("dropfiles")) {
+      bulletin_format = "word";
+    } else if (capture.includes("drive") || pageType.includes("drive")) bulletin_format = "google_drive";
+    else if (pageType.includes("facebook")) bulletin_format = "facebook";
+    else if (capture.includes("pdf") || pageType.includes("pdf")) bulletin_format = "pdf_download";
+
+    const terminal_map = {
+      pdf_download: "download",
+      word: "download",
+      html: "print_to_pdf",
+      image: "image",
+      image_stack: "image_stack",
+      google_drive: "download",
+    };
+
+    return {
+      bulletin_format,
+      suggested_terminal_step: terminal_map[bulletin_format] || fp?.captureMethod || "",
+      page_type: pageType,
+      fingerprint_id: fp?.id || "",
+      best_download_url: fp?.bestDownloadUrl || "",
+      operator_confirm: {
+        bulletin_format: null,
+        notes: "",
+      },
+    };
+  };
+
   const runFullDiagnosis = async () => {
     const pageCtx = _pageContext();
     const pageHost = _hostname(pageCtx.page_url || window.location.href);
@@ -831,6 +867,7 @@
       page_type: pageCtx.page_type?.type || pageCtx.page_type || "",
       page_summary: pageCtx.page_type?.summary || "",
       page_archetype: mismatch.archetype?.page_type || "",
+      site_intake: _inferSiteIntake(pageCtx, mismatch),
       html_fingerprint: mismatch.htmlScan?.best
         ? {
             id: mismatch.htmlScan.best.id,

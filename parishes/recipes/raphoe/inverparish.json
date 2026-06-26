@@ -2,24 +2,25 @@
   "parish_key": "inverparish",
   "display_name": "Inverparish",
   "diocese": "raphoe",
-  "recorded_date": "2026-06-17",
+  "recorded_date": "2026-06-25",
   "start_url": "https://www.inverparish.com/parish-newsletter.html",
+  "site_type": "weebly_newsletter_pdf",
   "auto_fixed": true,
+  "operator_notes": [
+    "Weebly — the newsletter PDF href is in the DOM but the download control is hidden.",
+    "Use goto + download url_pattern; do not click the hidden link."
+  ],
   "steps": [
     {
       "action": "goto",
       "url": "https://www.inverparish.com/parish-newsletter.html"
     },
     {
-      "action": "click",
-      "selector": "a[href$=\".pdf\"], a[href*=\".pdf\"]",
-      "pick_strategy": "newest_dated"
-    },
-    {
       "action": "download",
-      "url": "https://www.inverparish.com/uploads/2/5/2/9/25295787/inver_parish_newsletter_-_sat_20th__-_sun_21st_june_2026.pdf",
-      "use_captured_url": true
+      "url_pattern": "*newsletter*.pdf"
     }
   ],
-  "version": 1
+  "version": 2,
+  "timeout_ms": 45000,
+  "total_timeout_s": 90
 }

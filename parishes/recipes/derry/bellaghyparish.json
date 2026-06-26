@@ -1,44 +1,32 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "bellaghyparish",
   "display_name": "Bellaghy",
   "diocese": "derry",
   "start_url": "https://bellaghyparish.com/newsletter/",
+  "site_type": "wp_block_file_bulletin",
+  "auto_fixed": true,
+  "operator_notes": [
+    "Newsletter archive — dozens of PDF hrefs are in hidden table rows.",
+    "Harvest newest *.pdf from the DOM; never click calendar/events links."
+  ],
+  "do_not": [
+    "Do not use /news/ — bulletin listing is at /newsletter/.",
+    "Do not click hidden nth() archive links or events calendar URLs."
+  ],
   "steps": [
     {
       "action": "goto",
       "url": "https://bellaghyparish.com/newsletter/"
     },
     {
-      "action": "click",
-      "bulletin_position": "middle",
-      "fallback_selectors": [
-        "a[href$='.pdf']",
-        "a[href*='.pdf']"
-      ],
-      "href": "https://bellaghyparish.com/wp-content/uploads/2026/06/21-June-2026.pdf",
-      "pick_strategy": "newest_dated",
-      "selector": "a:has-text(\"Download PDF\")",
-      "text": "21 June 2026 Download PDF | Download PDF"
-    },
-    {
-      "action": "click",
-      "href": "https://bellaghyparish.com/events/month/2026-05/?shortcode=6cd3377f",
-      "selector": "html > body > a:nth-of-type(3)",
-      "text": ""
-    },
-    {
       "action": "download",
-      "url": "https://bellaghyparish.com/wp-content/uploads/2026/06/21-June-2026.pdf",
-      "use_captured_url": true
+      "url_pattern": "*.pdf"
     }
   ],
   "observed_load_ms": 1054,
   "timeout_ms": 45000,
   "total_timeout_s": 90,
-  "bulletin_layout": {
-    "strategy": "newest_dated",
-    "position": "middle"
-  },
+  "navigation_wait_until": "commit",
   "recorded_date": "2026-06-25"
 }

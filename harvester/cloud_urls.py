@@ -19,15 +19,25 @@ _ONEDRIVE_SHARE_RE = re.compile(
 
 
 def unwrap_docs_viewer_url(url: str) -> str:
-    """Extract embedded file URL from Google Docs viewer / gview wrappers."""
-    parsed = urlparse(url)
+    """Extract embedded file URL from pdf.js / Google Docs viewer wrappers."""
+    text = (url or "").strip()
+    if not text:
+        return text
+
+    parsed = urlparse(text)
+    path_lower = parsed.path.lower()
+    if "viewer.html" in path_lower or "/pdfjs/" in path_lower:
+        raw = parse_qs(parsed.query).get("file", [""])[0].strip()
+        if raw:
+            return unquote(raw)
+
     host = parsed.netloc.lower()
     if "docs.google.com" not in host:
-        return url
+        return text
     if "viewer" not in parsed.path and "viewerng" not in parsed.path and "gview" not in parsed.path:
-        return url
+        return text
     raw = parse_qs(parsed.query).get("url", [""])[0].strip()
-    return unquote(raw) if raw else url
+    return unquote(raw) if raw else text
 
 
 def rewrite_gdrive_download_url(url: str) -> str:

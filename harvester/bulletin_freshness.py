@@ -14,7 +14,7 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
-from .utils import extract_date_from_string
+from .utils import extract_date_from_slug, extract_date_from_string
 
 if TYPE_CHECKING:
     from .fetcher import FetchResult, ParishEntry
@@ -84,6 +84,12 @@ def extract_bulletin_date(url_or_text: str) -> date | None:
             return _safe_date(folder_year, folder_month, 1)
         except (TypeError, ValueError):
             pass
+
+    basename = text.rsplit("/", 1)[-1]
+    slug_source = basename.rsplit(".", 1)[0] if "." in basename else basename
+    slug_date = extract_date_from_slug(slug_source)
+    if slug_date:
+        return slug_date
 
     parsed = extract_date_from_string(text)
     if parsed:
