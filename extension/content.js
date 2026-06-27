@@ -6623,14 +6623,18 @@
             gh_repo: settings.gh_repo,
             parish_key: parishKey,
             startedAt,
-            onProgress: ({ elapsed, runStatus }) => {
+            onProgress: ({ elapsed, runStatus, queued }) => {
               if (token !== _postPushWatchToken) return;
-              const statusLabel =
-                runStatus === "queued" || runStatus === "pending"
-                  ? "queued on GitHub"
-                  : runStatus === "in_progress"
-                    ? "running on GitHub"
-                    : "checking result";
+              let statusLabel = "checking result";
+              if (queued || runStatus === "queued") {
+                statusLabel = "queued (full harvest may be ahead)";
+              } else if (runStatus === "in_progress") {
+                statusLabel = "running on GitHub";
+              } else if (runStatus === "starting" || runStatus === "waiting") {
+                statusLabel = "waiting for GitHub Actions";
+              } else if (runStatus === "pending") {
+                statusLabel = "queued on GitHub";
+              }
               showPostPushBanner(
                 pushResponse,
                 `⏳ <strong>${displayName}</strong> — ${statusLabel} (${elapsed}s)…`
@@ -7126,90 +7130,108 @@
         globalThis.__phOnPushFollowup = (followup) => {
           if (!followup || followup.type !== "push_recipe_followup") return;
           if (String(followup.parish_key || "") !== key) return;
-          _finishPushUi(followup, { isFollowup: true });
+          if (followup.patternLearned || followup.diagnosisSaved) {
+            console.log("Parish Trainer: push followup extras", followup);
+          }
         };
 
-        const _tryDirectPushFallback = async () => {
-          const settings = await _storageGet(["gh_pat", "gh_repo"]);
-          if (!settings.gh_pat) {
-            return { ok: false, error: "GitHub PAT not configured." };
+        const _sanitizeRecipeQuick = async (rawRecipe) => {
+          try {
+            return await Promise.race([
+              new Promise((resolve) => {
+                if (!chrome?.runtime?.sendMessage) {
+                  resolve(rawRecipe);
+                  return;
+                }
+                chrome.runtime.sendMessage({ type: "sanitize_recipe", recipe: rawRecipe }, (res) => {
+                  resolve(res?.recipe || rawRecipe);
+                });
+              }),
+              new Promise((resolve) => setTimeout(() => resolve(rawRecipe), 2000)),
+            ]);
+          } catch (_e) {
+            return rawRecipe;
           }
-          const pushMod = globalThis.phGithubRecipePush;
-          if (!pushMod?.pushRecipe) {
-            return { ok: false, error: "Extension module not loaded — reload extension and refresh page." };
-          }
-          showStatus("⏳ Retrying save directly…", "info");
-          const pushResult = await pushMod.pushRecipe({
-            gh_pat: settings.gh_pat,
-            gh_repo: settings.gh_repo,
-            parish_key: key,
-            recipe,
-          });
-          if (!pushResult.ok) return pushResult;
-          await new Promise((resolve) => setTimeout(resolve, 1500));
-          const dispatchResult = await pushMod.dispatchHarvestTest({
-            gh_pat: settings.gh_pat,
-            gh_repo: settings.gh_repo,
-            parish_key: key,
-          });
-          if (chrome?.runtime?.sendMessage) {
-            chrome.runtime.sendMessage({
-              type: "push_recipe_followup_work",
-              parish_key: key,
-              recipe: pushResult.recipe || recipe,
-              site_pattern: sitePattern,
-              diagnosis_snapshot: diagnosisSnapshot,
-              diagnosis_source: "push_recipe",
-              dispatchOk: dispatchResult.ok,
-              filePath: pushResult.filePath,
-              updated: pushResult.updated,
-              url: pushResult.url,
-            }).catch(() => {});
-          }
-          return {
-            ok: true,
-            url: pushResult.url,
-            filePath: pushResult.filePath,
-            updated: pushResult.updated,
-            dispatchOk: dispatchResult.ok,
-            dispatchError: dispatchResult.ok ? "" : (dispatchResult.error || "Dispatch failed"),
-            dispatchPending: !dispatchResult.ok,
-          };
         };
 
-        _safeSendMessage({
-          type: "push_recipe",
-          parish_key: key,
-          recipe,
-          site_pattern: sitePattern,
-          diagnosis_snapshot: diagnosisSnapshot,
-          diagnosis_source: "push_recipe",
-        }, async (response, bridgeError) => {
-          clearTimeout(pushSafetyTimer);
-          clearTimeout(pushProgress15);
-          if (bridgeError || !response?.ok) {
-            const fallback = await _tryDirectPushFallback();
-            _logSaveCycle(
-              "push_recipe",
-              { parish_key: key, recipe },
-              fallback.ok ? fallback : { ok: false, reason: bridgeError || response?.error, fallback }
-            );
-            _resetPushBtn();
-            if (fallback.ok) {
-              _finishPushUi(fallback, { isFollowup: false });
+        const _runFastPush = async () => {
+          try {
+            const settings = await _storageGet(["gh_pat", "gh_repo"]);
+            if (!settings.gh_pat) {
+              showStatus("❌ GitHub PAT not configured. Open extension popup → Settings.", "error");
               return;
             }
-            const errMsg = bridgeError
-              || response?.error
-              || fallback.error
-              || "Save failed. Check PAT in Settings (repo + workflow scopes).";
-            showStatus(`❌ ${errMsg}`, "error");
-            return;
+            const pushMod = globalThis.phGithubRecipePush;
+            if (!pushMod?.pushRecipe) {
+              showStatus("❌ Reload extension (chrome://extensions) then refresh this page.", "error");
+              return;
+            }
+
+            const recipeToPush = await _sanitizeRecipeQuick(recipe);
+            showStatus("⏳ Saving recipe to GitHub…", "info");
+            const pushResult = await pushMod.pushRecipe({
+              gh_pat: settings.gh_pat,
+              gh_repo: settings.gh_repo,
+              parish_key: key,
+              recipe: recipeToPush,
+            });
+
+            if (!pushResult.ok) {
+              _logSaveCycle("push_recipe", { parish_key: key, recipe: recipeToPush }, pushResult);
+              showStatus(`❌ ${pushResult.error}`, "error");
+              return;
+            }
+
+            clearTimeout(pushSafetyTimer);
+            clearTimeout(pushProgress15);
+            _resetPushBtn();
+            showStatus("✅ Recipe saved — starting single-parish test…", "ok");
+
+            const dispatchAt = Date.now();
+            const dispatchResult = await pushMod.dispatchHarvestTest({
+              gh_pat: settings.gh_pat,
+              gh_repo: settings.gh_repo,
+              parish_key: key,
+            });
+
+            const response = {
+              ok: true,
+              url: pushResult.url,
+              filePath: pushResult.filePath,
+              updated: pushResult.updated,
+              dispatchOk: dispatchResult.ok,
+              dispatchError: dispatchResult.ok ? "" : (dispatchResult.error || "Dispatch failed"),
+              dispatchPending: !dispatchResult.ok,
+              stepsPushed: Array.isArray(recipeToPush.steps) ? recipeToPush.steps.length : 0,
+              stepsPreservedFromOld: false,
+            };
+            _logSaveCycle("push_recipe", { parish_key: key, recipe: recipeToPush }, response);
+            _finishPushUi(response, { isFollowup: false });
+
+            if (chrome?.runtime?.sendMessage) {
+              chrome.runtime.sendMessage({
+                type: "push_recipe_followup_work",
+                parish_key: key,
+                recipe: pushResult.recipe || recipeToPush,
+                site_pattern: sitePattern,
+                diagnosis_snapshot: diagnosisSnapshot,
+                diagnosis_source: "push_recipe",
+                dispatchOk: dispatchResult.ok,
+                filePath: pushResult.filePath,
+                updated: pushResult.updated,
+                url: pushResult.url,
+              }).catch(() => {});
+            }
+          } catch (pushErr) {
+            _logSaveCycle("push_recipe", { parish_key: key, recipe }, { ok: false, error: String(pushErr) });
+            showStatus(`❌ ${String(pushErr)}`, "error");
+          } finally {
+            clearTimeout(pushSafetyTimer);
+            clearTimeout(pushProgress15);
+            _resetPushBtn();
           }
-          _logSaveCycle("push_recipe", { parish_key: key, recipe }, response);
-          _resetPushBtn();
-          _finishPushUi(response, { isFollowup: false });
-        });
+        };
+        void _runFastPush();
       });
       pushSection.appendChild(pushBtn);
 

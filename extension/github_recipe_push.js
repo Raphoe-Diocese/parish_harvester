@@ -120,7 +120,7 @@
 
     if (preferred) {
       try {
-        const hit = await tryPath(preferred, 12000);
+        const hit = await tryPath(preferred, 8000);
         if (hit) return hit;
       } catch (err) {
         console.warn("phGithubRecipePush: preferred path failed", err);
@@ -129,7 +129,7 @@
 
     const others = DIOCESE_FOLDERS.filter((d) => d !== preferred);
     const probes = await Promise.all(
-      others.map((dio) => tryPath(dio, 8000).catch(() => null))
+      others.map((dio) => tryPath(dio, 5000).catch(() => null))
     );
     const found = probes.find(Boolean);
     if (found) return found;
@@ -340,53 +340,87 @@
     parish_key,
     startedAt,
     onProgress,
-    maxAttempts = 55,
+    maxAttempts = 40,
   }) {
     const gh_repo = resolveGhRepo(storedRepo);
     const key = String(parish_key || "").trim().toLowerCase();
     const started = Number(startedAt) || Date.now();
     let runUrl = `https://github.com/${gh_repo}/actions/workflows/harvest.yml`;
+    let trackedRunId = null;
 
     for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
       if (attempt > 0) {
-        const delay = attempt < 8 ? 3000 : attempt < 20 ? 8000 : 12000;
+        const delay = attempt < 12 ? 5000 : 10000;
         await sleep(delay);
       }
       const elapsed = Math.round((Date.now() - started) / 1000);
       const run = await findLatestHarvestRun(gh_pat, gh_repo, started);
       if (run?.html_url) runUrl = run.html_url;
-      const workflowDone = run && run.status === "completed";
-      const workflowRunning = run && (run.status === "in_progress" || run.status === "queued" || run.status === "pending");
+
+      const runStartedMs = run ? new Date(run.created_at).getTime() : 0;
+      const runBelongsToUs = run && runStartedMs >= started - 60_000;
+      if (runBelongsToUs && !trackedRunId) trackedRunId = run.id;
+
+      const isOurRun = trackedRunId && run && run.id === trackedRunId;
+      const workflowDone = isOurRun && run.status === "completed";
+      const workflowRunning =
+        isOurRun && (run.status === "in_progress" || run.status === "queued" || run.status === "pending");
       const workflowFailed = workflowDone && run.conclusion === "failure";
       const workflowSucceeded = workflowDone && run.conclusion === "success";
 
-      const report = await fetchReportJson({ gh_pat, gh_repo: storedRepo });
-      const parishStatus = report ? parishHarvestStatus(report, key) : { status: "unknown", item: null };
-
+      let parishStatus = { status: "unknown", item: null };
       let pdfOk = false;
-      if (workflowSucceeded) {
-        pdfOk = await parishPdfExists({ gh_pat, gh_repo: storedRepo, parish_key: key });
+      if (workflowDone || workflowRunning || attempt >= 2) {
+        const report = await fetchReportJson({ gh_pat, gh_repo: storedRepo });
+        parishStatus = report ? parishHarvestStatus(report, key) : { status: "unknown", item: null };
+        if (workflowSucceeded) {
+          pdfOk = await parishPdfExists({ gh_pat, gh_repo: storedRepo, parish_key: key });
+        }
       }
 
+      const runStatus = isOurRun ? run.status : trackedRunId ? "waiting" : "starting";
       onProgress?.({
         attempt,
         elapsed,
         runUrl,
-        runStatus: run?.status,
+        runStatus,
         parishStatus: parishStatus.status,
+        queued: !trackedRunId && elapsed > 45,
       });
 
-      if (parishStatus.status === "ok" || pdfOk) {
+      if (workflowSucceeded && (parishStatus.status === "ok" || pdfOk)) {
         return { ok: true, runUrl, item: parishStatus.item, elapsed };
       }
-      if (workflowFailed || (workflowDone && parishStatus.status === "failed")) {
-        const reason =
-          parishStatus.item?.reason ||
-          parishStatus.item?.error ||
-          "GitHub Actions run failed";
-        return { ok: false, runUrl, item: parishStatus.item, elapsed, reason };
+      if (workflowFailed) {
+        return {
+          ok: false,
+          runUrl,
+          item: parishStatus.item,
+          elapsed,
+          reason: parishStatus.item?.reason || parishStatus.item?.error || "GitHub Actions run failed",
+        };
+      }
+      if (workflowDone && parishStatus.status === "failed") {
+        return {
+          ok: false,
+          runUrl,
+          item: parishStatus.item,
+          elapsed,
+          reason: parishStatus.item?.reason || parishStatus.item?.error || "Harvest failed",
+        };
       }
       if (workflowRunning) continue;
+
+      if (!trackedRunId && elapsed > 90) {
+        onProgress?.({
+          attempt,
+          elapsed,
+          runUrl,
+          runStatus: "queued",
+          parishStatus: "unknown",
+          queued: true,
+        });
+      }
     }
 
     return {
