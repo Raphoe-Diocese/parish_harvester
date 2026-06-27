@@ -174,20 +174,52 @@
         { re: /wp-content\/plugins\/pdf-embedder/i, weight: 15, label: "pdf-embedder plugin path" },
       ],
       pickDownloadUrl: (doc) => {
-        const anchors = doc.querySelectorAll(
-          'a.pdfemb-viewer[href], a[class*="pdfemb"][href], a[href$=".pdf"]'
-        );
-        for (const a of anchors) {
-          const href = a.getAttribute("href") || "";
-          if (/\.pdf/i.test(href) || /bulletin|newsletter/i.test(href + (a.textContent || ""))) {
-            try {
-              return new URL(href, doc.location?.href || "").href;
-            } catch (_e) {
-              continue;
-            }
+        const push = (href, label = "") => {
+          if (!href || !/\.pdf/i.test(href)) return "";
+          if (/giftaid|privacy|gdpr|volunteer|dataentry/i.test(`${href} ${label}`)) return "";
+          try {
+            return new URL(href, doc.location?.href || "").href;
+          } catch (_e) {
+            return "";
           }
+        };
+        const scored = [];
+        const add = (href, label = "") => {
+          const hit = push(href, label);
+          if (hit) scored.push(hit);
+        };
+        doc.querySelectorAll(
+          'a.pdfemb-viewer[href], a[class*="pdfemb"][href], a[href$=".pdf"]'
+        ).forEach((a) => {
+          add(a.getAttribute("href") || "", (a.textContent || "").trim());
+        });
+        const embeds = doc.querySelectorAll(
+          'iframe[src*=".pdf"], embed[src*=".pdf"], object[data*=".pdf"], [class*="pdfemb"] iframe[src]'
+        );
+        for (const el of embeds) {
+          add(el.getAttribute("src") || el.getAttribute("data") || "", "");
         }
-        return "";
+        if (!scored.length) return "";
+        if (scored.length === 1) return scored[0];
+        const rank = (url) => {
+          const path = url.toLowerCase();
+          const ym = path.match(/\/(20\d{2})\/(0[1-9]|1[0-2])\//);
+          if (ym) return parseInt(ym[1], 10) * 100 + parseInt(ym[2], 10);
+          const named = path.match(
+            /(\d{1,2})(?:st|nd|rd|th)?[-_ ]?(january|february|march|april|may|june|july|august|september|october|november|december)[-_ ]?(20\d{2})/i
+          );
+          if (named) {
+            const months = {
+              january: 1, february: 2, march: 3, april: 4, may: 5, june: 6,
+              july: 7, august: 8, september: 9, october: 10, november: 11, december: 12,
+            };
+            const mo = months[String(named[2]).toLowerCase()] || 0;
+            return parseInt(named[3], 10) * 100 + mo + parseInt(named[1], 10) / 100;
+          }
+          return 0;
+        };
+        scored.sort((a, b) => rank(b) - rank(a) || b.localeCompare(a));
+        return scored[0];
       },
       advice: "WordPress PDF Embedder — pick the newest dated bulletin card, then Save PDF.",
       doNot: [],

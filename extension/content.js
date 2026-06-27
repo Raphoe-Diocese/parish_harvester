@@ -1799,6 +1799,66 @@
     return d;
   };
 
+  /** PDF Embedder inline viewer (Antrim-style): bulletin is already on-page in iframe/embed. */
+  const _findPdfembInlinePdfUrl = () => {
+    const candidates = [];
+    const push = (raw, label = "") => {
+      if (!raw || typeof raw !== "string") return;
+      const href = raw.trim();
+      if (!href || href.startsWith("javascript:") || href.startsWith("#")) return;
+      try {
+        const resolved = new URL(href, window.location.href).href;
+        const lower = resolved.toLowerCase();
+        if (!lower.includes(".pdf")) return;
+        if (_isNonBulletinPdf(resolved, label)) return;
+        candidates.push({ url: resolved, label, ...scoreUrlCandidateStr(resolved, label, candidates.length) });
+      } catch (_e) {
+        // ignore bad URLs
+      }
+    };
+    const selectors = [
+      'a.pdfemb-viewer[href*=".pdf"]',
+      'a[class*="pdfemb"][href*=".pdf"]',
+      'iframe[src*=".pdf"]',
+      'embed[src*=".pdf"]',
+      'object[data*=".pdf"]',
+      '[id^="pdfemb-embed-"] iframe[src]',
+      '[class*="pdfemb"] iframe[src]',
+      '[class*="pdfemb"] embed[src]',
+    ];
+    for (const sel of selectors) {
+      document.querySelectorAll(sel).forEach((el) => {
+        const label = (el.innerText || el.textContent || el.getAttribute("title") || "").trim();
+        push(
+          el.getAttribute("href") ||
+            el.getAttribute("src") ||
+            el.getAttribute("data") ||
+            el.getAttribute("data-pdfurl") ||
+            el.getAttribute("data-url"),
+          label
+        );
+      });
+    }
+    document.querySelectorAll('[id^="pdfemb-embed-"], [class*="pdfemb-embed"]').forEach((el) => {
+      push(el.getAttribute("data-pdfurl") || el.getAttribute("data-url"), el.id || "");
+    });
+    if (!candidates.length) {
+      try {
+        const html = document.documentElement?.innerHTML?.slice(0, 250000) || "";
+        const re = /https?:\/\/[^\s"'<>]+\.pdf/gi;
+        let m;
+        while ((m = re.exec(html)) !== null) {
+          push(m[0], m[0].split("/").pop() || "");
+        }
+      } catch (_htmlScan) {
+        // ignore
+      }
+    }
+    if (!candidates.length) return "";
+    candidates.sort(_bulletinDateSortFn);
+    return candidates[0]?.url || "";
+  };
+
   const _detectPageTypeImpl = () => {
     const url = window.location.href.toLowerCase();
 
@@ -1846,6 +1906,16 @@
       if (b.bestDownloadUrl) {
         result.autoDownloadUrl = b.bestDownloadUrl;
         if (type === "oneweb_docx") result.autoNewsletterUrl = b.bestDownloadUrl;
+      } else if (type === "pdfemb" || b.id === "wordpress_pdfemb") {
+        const inlinePdf = _findPdfembInlinePdfUrl();
+        if (inlinePdf) {
+          result.type = "pdfemb_embed";
+          result.autoDownloadUrl = inlinePdf;
+          result.emoji = "📄";
+          result.summary = "PDF Embedder — bulletin PDF is embedded on this page.";
+          result.advice =
+            "Tap the green Save bulletin PDF button below (one step). Then Send & test.";
+        }
       }
       if (b.doNot?.length) result.fingerprintDoNot = b.doNot;
       if (b.advice && !result.advice) result.advice = b.advice;
@@ -1904,6 +1974,21 @@
       return inner && (inner.getAttribute("src") || "").toLowerCase().includes(".pdf");
     });
     if (pdfembElsEarly.length > 0 || pdfembLinksEarly.length > 0) {
+      const inlinePdf =
+        _findPdfembInlinePdfUrl() ||
+        _pickBestWeeklyBulletinUrl() ||
+        (globalThis.PhHtmlFingerprint?.scanPage?.(document)?.best?.bestDownloadUrl || "");
+      if (inlinePdf && /\.pdf/i.test(inlinePdf)) {
+        return {
+          emoji: "📄",
+          summary: "PDF Embedder — bulletin PDF is embedded on this page.",
+          advice:
+            "Tap the green Save bulletin PDF button below (one step). Then Send & test.",
+          type: "pdfemb_embed",
+          htmlFingerprint: "wordpress_pdfemb",
+          autoDownloadUrl: inlinePdf,
+        };
+      }
       const count = Math.max(pdfembElsEarly.length, pdfembLinksEarly.length);
       const anchors = pdfembElsEarly.filter(
         (el) =>
@@ -3913,11 +3998,13 @@
       }
       if (
         pageCtx.autoDownloadUrl &&
-        (pageCtx.type === "weekly_bulletin_download" ||
+        (pageCtx.type === "pdfemb_embed" ||
+          pageCtx.type === "weekly_bulletin_download" ||
           pageCtx.type === "mdocs_bulletin_list" ||
           pageCtx.htmlFingerprint === "joomla_dropfiles_weekly" ||
           pageCtx.htmlFingerprint === "mdocs_bulletin_table" ||
-          pageCtx.htmlFingerprint === "sequential_weekly_bulletins")
+          pageCtx.htmlFingerprint === "sequential_weekly_bulletins" ||
+          pageCtx.htmlFingerprint === "wordpress_pdfemb")
       ) {
         standaloneAddStep(
           {
@@ -3977,14 +4064,28 @@
       }
       if (
         pageCtx.type === "pdfemb" ||
+        pageCtx.type === "pdfemb_embed" ||
         pageCtx.htmlFingerprint === "wordpress_pdfemb" ||
         pageCtx.htmlFingerprint === "wp_pdfemb_list"
       ) {
-        standaloneAddStep(
-          { action: "download", url_pattern: "*.pdf" },
-          "mark_file",
-          "📄 PDF Embedder — newest bulletin PDF"
-        );
+        if (pageCtx.autoDownloadUrl) {
+          standaloneAddStep(
+            {
+              action: "download",
+              url: pageCtx.autoDownloadUrl,
+              use_captured_url: true,
+              url_pattern: "*.pdf",
+            },
+            "mark_file",
+            `📄 PDF Embedder: ${pageCtx.autoDownloadUrl.slice(-50)}`
+          );
+        } else {
+          standaloneAddStep(
+            { action: "download", url_pattern: "*.pdf" },
+            "mark_file",
+            "📄 PDF Embedder — newest bulletin PDF"
+          );
+        }
         if (_stepsListEl) _renderSessionSteps();
         if (_refreshRecipeCount) _refreshRecipeCount();
         void _persistRecordingSession();
@@ -4810,6 +4911,7 @@
 
     const _isWpBlockBulletinPage = (pageCtx = detectPageType()) =>
       pageCtx.type === "wp_block_file_bulletin" ||
+      pageCtx.type === "pdfemb_embed" ||
       pageCtx.htmlFingerprint === "wp_block_file_bulletin";
 
     const _captureWpBlockOrMdocsFromPage = (pageCtx = detectPageType()) => {

@@ -29,7 +29,7 @@ class RecipeReplayError(RuntimeError):
 
 
 DOCX_CONVERSION_TIMEOUT_S = 60
-RECIPE_STEP_TIMEOUT_MS = 15_000
+RECIPE_STEP_TIMEOUT_MS = PAGE_LOAD_TIMEOUT_MS
 POST_CLICK_WAIT_TIMEOUT_MS = 3_000
 MAX_SELECTOR_ERRORS = 3
 DROPFILES_DOWNLOAD_SELECTORS = (
@@ -194,23 +194,38 @@ async def _collect_document_candidates(page: Page, pattern: str) -> list[str]:
     return candidates
 
 
-def _recipe_step_timeout_ms(recipe: dict) -> int:
-    """Return recipe-specific step timeout in milliseconds.
+def _recipe_start_url(recipe: dict) -> str:
+    """Recipe start URL — fall back to first goto step when start_url omitted."""
+    start = (recipe.get("start_url") or "").strip()
+    if start:
+        return start
+    for step in recipe.get("steps") or []:
+        if not isinstance(step, dict):
+            continue
+        if str(step.get("action") or "").strip().lower() == "goto":
+            url = (step.get("url") or "").strip()
+            if url:
+                return url
+    return ""
 
-    Uses ``timeout_ms`` first, then ``timeout`` for backward compatibility.
-    Values are clamped to [1_000, 120_000] ms:
-    - 1,000 ms minimum avoids accidental 0/negative values that disable timeouts
-      entirely (Playwright treats 0 as "wait indefinitely"), which can stall runs.
-    - 180,000 ms maximum prevents malformed recipe values from stalling runs.
-    """
+
+def _recipe_step_timeout_ms(recipe: dict) -> int:
+    """Per-step Playwright timeout — recipe value merged with host_profiles.json."""
     raw = recipe.get("timeout_ms", recipe.get("timeout"))
     try:
         if raw is None:
-            return RECIPE_STEP_TIMEOUT_MS
-        value = int(raw)
+            base = RECIPE_STEP_TIMEOUT_MS
+        else:
+            base = min(max(int(raw), 1_000), 180_000)
     except (TypeError, ValueError):
-        return RECIPE_STEP_TIMEOUT_MS
-    return min(max(value, 1_000), 180_000)
+        base = RECIPE_STEP_TIMEOUT_MS
+
+    host_ms = int(
+        _host_profile_for_start_url(_recipe_start_url(recipe)).get("navigation_timeout_ms") or 0
+    )
+    if host_ms > 0:
+        base = max(base, host_ms)
+    return base
 
 
 _VALID_NAV_WAIT_UNTIL = frozenset({"commit", "domcontentloaded", "load", "networkidle"})
@@ -260,8 +275,9 @@ def _recipe_navigation_wait_until(recipe: dict) -> str:
     raw = str(recipe.get("navigation_wait_until") or "").strip().lower()
     if raw in _VALID_NAV_WAIT_UNTIL:
         return raw
-    start_url = (recipe.get("start_url") or "").strip()
-    host_wait = str(_host_profile_for_start_url(start_url).get("navigation_wait_until") or "").strip().lower()
+    host_wait = str(
+        _host_profile_for_start_url(_recipe_start_url(recipe)).get("navigation_wait_until") or ""
+    ).strip().lower()
     if host_wait in _VALID_NAV_WAIT_UNTIL:
         return host_wait
     return "domcontentloaded"
