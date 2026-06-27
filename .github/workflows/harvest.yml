@@ -42,7 +42,9 @@ concurrency:
 jobs:
   harvest:
     runs-on: ubuntu-latest
-    timeout-minutes: 60
+    # 60 min was too short — the full run timed out before reaching Raphoe.
+    # Public-repo Actions minutes are free, so give the full run room to finish.
+    timeout-minutes: 180
 
     steps:
       - name: Checkout repository

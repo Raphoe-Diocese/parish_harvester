@@ -68,11 +68,17 @@ def _silence_playwright_shutdown(
 
 
 def _discover_dioceses(parishes_dir: Path) -> list[str]:
-    """Return sorted list of diocese names from evidence files in *parishes_dir*."""
-    return sorted(
+    """Return diocese names from evidence files, Raphoe first.
+
+    Raphoe is the home diocese. The CI job can run long and time out before an
+    alphabetical list reaches it, so Raphoe must always be harvested first.
+    """
+    names = sorted(
         p.stem.replace("_bulletin_urls", "")
         for p in parishes_dir.glob("*_bulletin_urls.txt")
     )
+    names.sort(key=lambda n: (0 if "raphoe" in n.lower() else 1, n))
+    return names
 
 
 def _prioritise_entries(

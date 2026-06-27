@@ -7387,7 +7387,42 @@
             clearTimeout(pushSafetyTimer);
             clearTimeout(pushProgress15);
             _resetPushBtn();
-            showStatus("✅ Recipe saved on GitHub — single-parish test starting (usually 1–3 min)…", "ok");
+
+            // Read the file back from GitHub so we never claim "saved" when it
+            // went to the wrong folder or kept the old steps.
+            const intendedSteps = Array.isArray(recipeToPush.steps) ? recipeToPush.steps.length : 0;
+            let savedSteps = intendedSteps;
+            let savedPath = pushResult.filePath || "(unknown path)";
+            if (pushMod.verifyRecipe) {
+              showStatus("⏳ Confirming the save landed on GitHub…", "info");
+              const verify = await pushMod.verifyRecipe({
+                gh_pat: settings.gh_pat,
+                gh_repo: settings.gh_repo,
+                parish_key: key,
+                expectedSteps: intendedSteps,
+                expectedFolder: recipeToPush.diocese || "",
+              });
+              if (!verify.ok) {
+                showStatus(
+                  `❌ GitHub did NOT confirm the save (${verify.error}). Your change is NOT on GitHub — tap Send & test again.`,
+                  "error"
+                );
+                return;
+              }
+              savedSteps = verify.savedSteps;
+              savedPath = verify.filePath || savedPath;
+              if (!verify.matches) {
+                showStatus(
+                  `⚠️ Saved to ${savedPath}, but it has ${savedSteps} step(s) — not your ${intendedSteps}. Your NEW steps did not save. Tap “Clear steps”, record again, then Send & test.`,
+                  "warn"
+                );
+                return;
+              }
+            }
+            showStatus(
+              `✅ Confirmed: ${savedSteps} step(s) saved to ${savedPath} — single-parish test starting (1–3 min)…`,
+              "ok"
+            );
 
             const dispatchAt = Date.now();
             const dispatchResult = await pushMod.dispatchHarvestTest({

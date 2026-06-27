@@ -524,11 +524,43 @@
     };
   }
 
+  /**
+   * Read the recipe back from GitHub after a push so "saved" is never a lie.
+   * Confirms the file exists and (optionally) that its step count matches what
+   * we intended to save — catching wrong-folder writes and old-steps-kept merges.
+   */
+  const verifyRecipe = async ({ gh_pat, gh_repo: storedRepo, parish_key, expectedSteps, expectedFolder }) => {
+    const gh_repo = resolveGhRepo(storedRepo);
+    const key = String(parish_key || "").trim().toLowerCase().replace(/\s+/g, "_");
+    if (!key) return { ok: false, error: "No parish_key to verify." };
+    let located = null;
+    try {
+      located = await locateRecipe(String(gh_pat || "").trim(), gh_repo, key, expectedFolder || "");
+    } catch (err) {
+      return { ok: false, error: `Could not read back from GitHub: ${String(err)}` };
+    }
+    if (!located || !located.existingRecipe) {
+      return { ok: false, error: "Recipe file not found on GitHub after save." };
+    }
+    const savedSteps = Array.isArray(located.existingRecipe.steps)
+      ? located.existingRecipe.steps.length
+      : 0;
+    const want = Number(expectedSteps);
+    return {
+      ok: true,
+      filePath: located.filePath,
+      diocese: located.diocese,
+      savedSteps,
+      matches: !Number.isFinite(want) || want <= 0 || savedSteps === want,
+    };
+  };
+
   global.phGithubRecipePush = {
     canonicalDioceseSlug,
     resolveGhRepo,
     locateRecipe,
     pushRecipe,
+    verifyRecipe,
     dispatchHarvestTest,
     fetchReportJson,
     fetchParishStatusJson,
