@@ -794,6 +794,21 @@ async def _print_page_to_pdf(page: Page, dest: Path) -> None:
     dest.write_bytes(pdf_bytes)
 
 
+async def _smart_print_page_to_pdf(page: Page, dest: Path, target: date) -> None:
+    """Print HTML bulletins using Parish Messenger / content-region detection when possible."""
+    from .html_capture import capture_html_page_as_pdf
+
+    ok, _mode = await capture_html_page_as_pdf(
+        page,
+        dest,
+        target,
+        print_pdf=_print_page_to_pdf,
+        wait_ms=2500,
+    )
+    if not ok:
+        await _print_page_to_pdf(page, dest)
+
+
 async def _find_pdfemb_url(page: Page) -> str | None:
     links = await page.eval_on_selector_all(PDFEMB_SELECTOR, PDFEMB_HREF_EXTRACT_JS)
     candidates: list[str] = []
@@ -1245,7 +1260,7 @@ async def replay_recipe(
                 except PlaywrightTimeoutError:
                     pass
                 await asyncio.sleep(2.5)
-                await _print_page_to_pdf(page, dest)
+                await _smart_print_page_to_pdf(page, dest, target)
                 return dest, "print_to_pdf", html_url
 
             if action == "print_to_pdf":
@@ -1260,7 +1275,7 @@ async def replay_recipe(
                 except PlaywrightTimeoutError:
                     pass
                 await asyncio.sleep(2.5)
-                await _print_page_to_pdf(page, dest)
+                await _smart_print_page_to_pdf(page, dest, target)
                 return dest, "print_to_pdf", pdf_url
 
             if action == "crop_screenshot":
