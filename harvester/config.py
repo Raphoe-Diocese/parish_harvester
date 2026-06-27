@@ -16,6 +16,7 @@ RAW_DIR = BULLETINS_DIR / "raw"
 CURRENT_DIR = BULLETINS_DIR / "current"
 REPORT_JSON = BULLETINS_DIR / "report.json"
 REPORT_TXT = BULLETINS_DIR / "report.txt"
+PARISH_STATUS_JSON = PARISHES_DIR / "parish_status.json"
 
 # ---------------------------------------------------------------------------
 # Timeouts & concurrency

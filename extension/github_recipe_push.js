@@ -284,6 +284,55 @@
     return raw.json();
   };
 
+  const fetchParishStatusJson = async ({ gh_pat, gh_repo: storedRepo }) => {
+    const gh_repo = resolveGhRepo(storedRepo);
+    const pat = String(gh_pat || "").trim();
+    if (pat) {
+      try {
+        const resp = await fetchGithub(
+          `https://api.github.com/repos/${gh_repo}/contents/parishes/parish_status.json`,
+          authHeaders(pat),
+          15000
+        );
+        if (resp.ok) {
+          const data = await resp.json();
+          return JSON.parse(decodeGithubContent(data.content) || "{}");
+        }
+      } catch (_e) {
+        // fall through to raw
+      }
+    }
+    const raw = await fetch(
+      `https://raw.githubusercontent.com/${gh_repo}/main/parishes/parish_status.json?t=${Date.now()}`,
+      { cache: "no-store" }
+    );
+    if (!raw.ok) return null;
+    return raw.json();
+  };
+
+  function parishStatusFromDoc(statusDoc, parishKey) {
+    const key = String(parishKey || "").trim();
+    const keyLower = key.toLowerCase();
+    let row = statusDoc?.parishes?.[key];
+    if (!row && statusDoc?.parishes) {
+      row = Object.entries(statusDoc.parishes).find(
+        ([k]) => String(k).toLowerCase() === keyLower
+      )?.[1];
+    }
+    if (!row) return null;
+    const item = { ...row, parish: key };
+    if (row.outcome === "ok") return { status: "ok", item };
+    if (row.outcome === "stale") {
+      return {
+        status: "stale",
+        item: { ...item, error: row.error || row.reason || "Bulletin too old (recipe worked)" },
+      };
+    }
+    if (row.outcome === "failed") return { status: "failed", item };
+    if (row.outcome === "html_only") return { status: "html_link", item };
+    return { status: "unknown", item };
+  }
+
   const parishPdfExists = async ({ gh_pat, gh_repo: storedRepo, parish_key }) => {
     const gh_repo = resolveGhRepo(storedRepo);
     const key = String(parish_key || "").trim();
@@ -387,8 +436,17 @@
       let parishStatus = { status: "unknown", item: null };
       let pdfOk = false;
       if (workflowDone || workflowRunning || attempt >= 2) {
-        const report = await fetchReportJson({ gh_pat, gh_repo: storedRepo });
-        parishStatus = report ? parishHarvestStatus(report, key) : { status: "unknown", item: null };
+        const statusDoc = await fetchParishStatusJson({ gh_pat, gh_repo: storedRepo });
+        const fromStatus = statusDoc ? parishStatusFromDoc(statusDoc, key) : null;
+        const testedAt = fromStatus?.item?.last_tested_at || statusDoc?.last_patched_at || "";
+        const testedMs = testedAt ? new Date(testedAt).getTime() : 0;
+        const freshResult = Number.isFinite(testedMs) && testedMs >= started - 120_000;
+        if (freshResult && fromStatus) {
+          parishStatus = fromStatus;
+        } else {
+          const report = await fetchReportJson({ gh_pat, gh_repo: storedRepo });
+          parishStatus = report ? parishHarvestStatus(report, key) : { status: "unknown", item: null };
+        }
         if (workflowSucceeded) {
           pdfOk = await parishPdfExists({ gh_pat, gh_repo: storedRepo, parish_key: key });
         }
@@ -473,9 +531,11 @@
     pushRecipe,
     dispatchHarvestTest,
     fetchReportJson,
+    fetchParishStatusJson,
     parishPdfExists,
     pollHarvestUntilDone,
     findLatestHarvestRun,
     parishHarvestStatus,
+    parishStatusFromDoc,
   };
 })(typeof globalThis !== "undefined" ? globalThis : self);

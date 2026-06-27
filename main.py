@@ -41,6 +41,7 @@ from harvester.harvest_log import (
 from harvester.manifest_builder import build_manifest
 from harvester.priority_queue import prioritise
 from harvester.report import generate_report, patch_report_for_parishes
+from harvester.parish_status import write_parish_status
 from harvester.recipe_health import apply_dns_inactive_flags
 from harvester.site_builder import run as run_site_builder
 from harvester.stitcher import stitch_mega_pdf
@@ -363,6 +364,13 @@ def main() -> int:
     if not target_parish_key:
         print(f"  📄 Report JSON : {REPORT_JSON}")
         print(f"  📄 Report TXT  : {REPORT_TXT}")
+
+    print("\n── Parish status ───────────────────────────────────────────")
+    try:
+        write_parish_status()
+        print("  📄 Wrote       : parishes/parish_status.json")
+    except Exception as exc:
+        print(f"  ⚠️  Parish status generation failed (non-fatal): {exc}")
 
     # Generate dashboard
     print("\n── Dashboard ───────────────────────────────────────────────")

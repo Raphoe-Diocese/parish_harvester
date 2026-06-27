@@ -269,7 +269,8 @@ def _result_to_report_entry(r: "FetchResult", current_dir: Path) -> tuple[str, d
     if r.status == "ok" and r.file_path and r.file_path.exists():
         dest = current_dir / r.file_path.name
         current_dir.mkdir(parents=True, exist_ok=True)
-        shutil.copy2(r.file_path, dest)
+        if r.file_path.resolve() != dest.resolve():
+            shutil.copy2(r.file_path, dest)
         return "downloaded", {
             "parish": r.key,
             "display_name": r.display_name,

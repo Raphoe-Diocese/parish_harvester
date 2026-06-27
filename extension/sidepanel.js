@@ -30,6 +30,7 @@ async function _problemsRepoUrls() {
   const base = `https://raw.githubusercontent.com/${repo}/main`;
   return {
     reportUrl: `${base}/Bulletins/report.json`,
+    statusUrl: `${base}/parishes/parish_status.json`,
     failuresUrl: `${base}/parishes/consecutive_failures.json`,
     repo,
   };
@@ -985,12 +986,66 @@ function _pdDioceseForKey(parishKey) {
 }
 
 function _problemsFormatLastSeen(item, report) {
-  const tested = String(item?.last_tested_at || report?.last_patched_at || "").trim();
+  const tested = String(item?.last_tested_at || report?.last_patched_at || report?.generated_at || "").trim();
   if (tested) {
     const d = tested.slice(0, 10);
     if (/^\d{4}-\d{2}-\d{2}$/.test(d)) return formatUkDate(d);
   }
   return formatUkDate(String(report?.target_date || ""));
+}
+
+async function _problemsFetchParishStatus(repo, ghPat) {
+  const mod = globalThis.phGithubRecipePush;
+  if (mod?.fetchParishStatusJson && ghPat) {
+    try {
+      const status = await mod.fetchParishStatusJson({ gh_pat: ghPat, gh_repo: repo });
+      if (status && status.schema_version >= 1) return status;
+    } catch (_e) {
+      // Fall through to raw CDN.
+    }
+  }
+  try {
+    const resp = await fetch(
+      `https://raw.githubusercontent.com/${repo}/main/parishes/parish_status.json?t=${Date.now()}`,
+      { cache: "no-store" }
+    );
+    if (!resp.ok) return null;
+    return resp.json();
+  } catch (_e) {
+    return null;
+  }
+}
+
+function _problemsRowsFromStatus(status, retrainedMap) {
+  const targetDate = String(status?.target_date || "");
+  const defaultLastSeen = formatUkDate(targetDate);
+  const rows = [];
+  for (const key of status?.actionable_keys || []) {
+    const item = status?.parishes?.[key];
+    if (!item || item.actionable === false) continue;
+    const parishMeta = _pdAllParishes.find((p) => p.key === key);
+    if (parishMeta?.disabled) continue;
+    const retrainedPending = _problemsIsRetrainedPending(key, targetDate, retrainedMap);
+    const errorText = String(item.error || item.reason || "");
+    const diagnosis = item.diagnosis && typeof item.diagnosis === "object" ? item.diagnosis : null;
+    rows.push({
+      parish: key,
+      display_name: String(item.display_name || key),
+      diocese: String(item.diocese || _pdDioceseForKey(key) || ""),
+      start_url: String(item.url || ""),
+      url: String(item.url || ""),
+      error_text: errorText,
+      diagnosis,
+      advice: _problemsFailureAdvice(errorText, diagnosis),
+      category: retrainedPending
+        ? `retrained — ${item.category || _problemsCategory(errorText, { retrainedPending, diagnosis })}`
+        : (item.category || _problemsCategory(errorText, { retrainedPending, diagnosis })),
+      last_seen: _problemsFormatLastSeen(item, status) || defaultLastSeen,
+      consecutive_failures: Number(item.consecutive_failures || 0),
+      retrainedPending,
+    });
+  }
+  return rows;
 }
 
 async function _problemsFilterActionableRows(report, consecutiveFailures, retrainedMap) {
@@ -1211,6 +1266,7 @@ function _problemsGithubLinks(repo) {
   return {
     actions: `${base}/actions/workflows/harvest.yml`,
     report: `${base}/blob/main/Bulletins/report.json`,
+    status: `${base}/blob/main/parishes/parish_status.json`,
     dashboard: `${base}/blob/main/Bulletins/dashboard.html`,
     megaDerry: `https://raw.githubusercontent.com/${repo}/main/docs/mega_pdf/derry_mega_bulletin.pdf`,
     megaDac: `https://raw.githubusercontent.com/${repo}/main/docs/mega_pdf/down_and_connor_mega_bulletin.pdf`,
@@ -1363,6 +1419,7 @@ function _problemsShowVerifyResult(payload) {
   }
   lines.push(
     `<a href="${runLink}" target="_blank" rel="noopener noreferrer">GitHub Actions run</a> · ` +
+    `<a href="${links.status}" target="_blank" rel="noopener noreferrer">parish_status.json</a> · ` +
     `<a href="${links.report}" target="_blank" rel="noopener noreferrer">report.json</a> · ` +
     `<a href="${links.dashboard}" target="_blank" rel="noopener noreferrer">dashboard</a>`
   );
@@ -1416,7 +1473,18 @@ async function _problemsPollHarvestResult({
     const workflowSucceeded = workflowDone && run.conclusion === "success";
 
     const report = await _problemsFetchLiveReport(ghRepo, ghPat);
-    const parishStatus = report ? _problemsParishHarvestStatus(report, parishKey) : { status: "unknown", item: null };
+    const statusDoc = pushMod?.fetchParishStatusJson
+      ? await pushMod.fetchParishStatusJson({ gh_pat: ghPat, gh_repo: ghRepo })
+      : null;
+    let parishStatus = statusDoc && pushMod?.parishStatusFromDoc
+      ? pushMod.parishStatusFromDoc(statusDoc, parishKey)
+      : null;
+    const testedAt = parishStatus?.item?.last_tested_at || statusDoc?.last_patched_at || "";
+    const testedMs = testedAt ? new Date(testedAt).getTime() : 0;
+    const freshStatus = Number.isFinite(testedMs) && testedMs >= started - 120_000;
+    if (!freshStatus || !parishStatus) {
+      parishStatus = report ? _problemsParishHarvestStatus(report, parishKey) : { status: "unknown", item: null };
+    }
 
     let pdfExists = false;
     if (pushMod?.parishPdfExists) {
@@ -1789,35 +1857,50 @@ async function loadProblemsDashboard() {
     await _pdEnsureParishesLoaded();
     const urls = await _problemsRepoUrls();
     const cfg = await _pdGetGithubConfig();
-    let report = cfg ? await _problemsFetchLiveReport(urls.repo, cfg.ghPat) : null;
-    const failuresResp = await fetch(urls.failuresUrl, { cache: "no-store" });
-    if (!report) {
-      const reportResp = await fetch(urls.reportUrl, { cache: "no-store" });
-      if (!reportResp.ok || !failuresResp.ok) {
+    const retrainedMap = await _problemsGetRetrainedMap();
+    const parishStatus = cfg ? await _problemsFetchParishStatus(urls.repo, cfg.ghPat) : null;
+
+    let rows = [];
+    let lastSeen = formatUkDate(String(parishStatus?.target_date || ""));
+    let hiddenDead = 0;
+    let hiddenFixed = 0;
+    let statusSource = "parish_status.json";
+
+    if (parishStatus?.schema_version >= 1 && Array.isArray(parishStatus.actionable_keys)) {
+      rows = _problemsRowsFromStatus(parishStatus, retrainedMap);
+      lastSeen = formatUkDate(String(parishStatus.target_date || "")) || lastSeen;
+    } else {
+      statusSource = "report.json (legacy)";
+      let report = cfg ? await _problemsFetchLiveReport(urls.repo, cfg.ghPat) : null;
+      const failuresResp = await fetch(urls.failuresUrl, { cache: "no-store" });
+      if (!report) {
+        const reportResp = await fetch(urls.reportUrl, { cache: "no-store" });
+        if (!reportResp.ok || !failuresResp.ok) {
+          throw new Error("Could not fetch live report data");
+        }
+        report = await reportResp.json();
+      } else if (!failuresResp.ok) {
         throw new Error("Could not fetch live report data");
       }
-      report = await reportResp.json();
-    } else if (!failuresResp.ok) {
-      throw new Error("Could not fetch live report data");
+      const consecutive = await failuresResp.json();
+      const consecutiveFailures = (consecutive && typeof consecutive === "object") ? consecutive : {};
+      const legacy = await _problemsFilterActionableRows(report, consecutiveFailures, retrainedMap);
+      rows = legacy.rows;
+      hiddenDead = legacy.hiddenDead;
+      hiddenFixed = legacy.hiddenFixed;
+      lastSeen = legacy.lastSeen;
     }
-    const consecutive = await failuresResp.json();
-    const consecutiveFailures = (consecutive && typeof consecutive === "object") ? consecutive : {};
-    const retrainedMap = await _problemsGetRetrainedMap();
-    const {
-      rows,
-      hiddenDead,
-      hiddenFixed,
-      lastSeen,
-    } = await _problemsFilterActionableRows(report, consecutiveFailures, retrainedMap);
+
     if (hint) {
       const parts = [
         `${rows.length} parish${rows.length === 1 ? "" : "es"} need action`,
-        `last harvest ${lastSeen || "unknown date"}`,
+        `week ${lastSeen || "unknown"}`,
+        `source ${statusSource}`,
         `repo ${urls.repo}`,
       ];
-      if (hiddenDead) parts.push(`${hiddenDead} marked dead/inactive (hidden)`);
-      if (hiddenFixed) parts.push(`${hiddenFixed} already downloaded (hidden)`);
-      parts.push("tap Fix now → point at bulletin → Send & test");
+      if (hiddenDead) parts.push(`${hiddenDead} dead/disabled (hidden)`);
+      if (hiddenFixed) parts.push(`${hiddenFixed} already OK (hidden)`);
+      parts.push("Fix → Send & test → result recorded in parish_status.json");
       hint.textContent = parts.join(" · ") + ".";
     }
     await _problemsRenderRows(rows);

@@ -267,7 +267,7 @@ jobs:
           # Current-week parish PDFs (mega PDF disabled by default)
           git add -f Bulletins/report.json Bulletins/report.txt Bulletins/dashboard.html docs/manifest.json docs/dioceses/ 2>/dev/null || true
           git add -f Bulletins/current/*.pdf 2>/dev/null || true
-          git add -f parishes/consecutive_failures.json parishes/stale_bulletins.json parishes/retry_queue.json 2>/dev/null || true
+          git add -f parishes/consecutive_failures.json parishes/stale_bulletins.json parishes/retry_queue.json parishes/parish_status.json 2>/dev/null || true
           TARGET_PARISH="${{ github.event.inputs.target_parish }}"
           if [ -n "${TARGET_PARISH}" ] && [ -f "Bulletins/current/${TARGET_PARISH}.pdf" ]; then
             git add -f "Bulletins/current/${TARGET_PARISH}.pdf"
@@ -293,83 +293,6 @@ jobs:
           echo "❌ Could not push after 5 attempts."
           exit 1
 
-
-      - name: Prepare standalone Mega PDF artifact
-        if: false
-        run: |
-          set -euo pipefail
-          echo "mega_pdf_ready=false" >> "$GITHUB_OUTPUT"
-          if [ -f Bulletins/report.json ]; then
-            TARGET_DATE=$(python -c "import json; d=json.load(open('Bulletins/report.json')); print(d.get('target_date',''))")
-            MEGA_PDF="Bulletins/all_bulletins_${TARGET_DATE}.pdf"
-            if [ -f "${MEGA_PDF}" ]; then
-              cp "${MEGA_PDF}" Bulletins/mega_bulletin.pdf
-              echo "mega_pdf_ready=true" >> "$GITHUB_OUTPUT"
-              echo "Prepared standalone Mega PDF: Bulletins/mega_bulletin.pdf"
-            else
-              echo "Mega PDF not found at expected path: ${MEGA_PDF}"
-            fi
-          fi
-
-      - name: Upload Mega Bulletin PDF artifact
-        if: success() && steps.prepare_mega_pdf.outputs.mega_pdf_ready == 'true'
-        uses: actions/upload-artifact@v4
-        with:
-          name: Mega-Bulletin-PDF
-          path: Bulletins/mega_bulletin.pdf
-          retention-days: 30
-
-      - name: Upload derry mega bulletin PDF
-        if: success() && hashFiles('mega_pdf/derry_mega_bulletin.pdf') != ''
-        uses: actions/upload-artifact@v4
-        with:
-          name: derry-mega-bulletin-pdf
-          path: mega_pdf/derry_mega_bulletin.pdf
-          retention-days: 30
-
-      - name: Upload down_and_connor mega bulletin PDF
-        if: success() && hashFiles('mega_pdf/down_and_connor_mega_bulletin.pdf') != ''
-        uses: actions/upload-artifact@v4
-        with:
-          name: down_and_connor-mega-bulletin-pdf
-          path: mega_pdf/down_and_connor_mega_bulletin.pdf
-          retention-days: 30
-
-      - name: Upload Mega PDF to Google Drive
-        if: success() && steps.prepare_mega_pdf.outputs.mega_pdf_ready == 'true'
-        env:
-          GDRIVE_SERVICE_ACCOUNT: ${{ secrets.GDRIVE_SERVICE_ACCOUNT }}
-          GDRIVE_FOLDER_ID: ${{ secrets.GDRIVE_FOLDER_ID }}
-        run: |
-          set -euo pipefail
-          if [ -z "${GDRIVE_SERVICE_ACCOUNT}" ] || [ -z "${GDRIVE_FOLDER_ID}" ]; then
-            echo "⏭️  Google Drive upload skipped — GDRIVE_SERVICE_ACCOUNT or GDRIVE_FOLDER_ID secret not set."
-            exit 0
-          fi
-          if ! command -v rclone >/dev/null 2>&1; then
-            sudo apt-get update -y >/dev/null
-            sudo apt-get install -y rclone >/dev/null
-          fi
-          RCLONE_BIN=$(command -v rclone)
-          mkdir -p ~/.config/rclone
-          SA_FILE=$(mktemp)
-          trap 'rm -f "${SA_FILE}"' EXIT
-          umask 077
-          echo "${GDRIVE_SERVICE_ACCOUNT}" > "${SA_FILE}"
-          cat > ~/.config/rclone/rclone.conf << EOF
-          [gdrive]
-          type = drive
-          scope = drive
-          service_account_file = ${SA_FILE}
-          root_folder_id = ${GDRIVE_FOLDER_ID}
-          EOF
-          TARGET_DATE=$(python -c "import json; d=json.load(open('Bulletins/report.json')); print(d.get('target_date','unknown'))" 2>/dev/null || echo "unknown")
-          # Keep one canonical "latest" file in Drive (very high cutoff avoids chunking for this file size).
-          "$RCLONE_BIN" copy Bulletins/mega_bulletin.pdf gdrive: --drive-upload-cutoff 1000G --verbose 2>&1 | tail -5
-          # Also keep a dated immutable archive copy.
-          "$RCLONE_BIN" copyto Bulletins/mega_bulletin.pdf "gdrive:parish_bulletin_${TARGET_DATE}.pdf" --verbose 2>&1 | tail -5
-          echo "✅ Mega PDF uploaded to Google Drive folder ${GDRIVE_FOLDER_ID}"
-
       - name: Upload Bulletins artifact
         if: success()
         uses: actions/upload-artifact@v4
@@ -388,40 +311,7 @@ jobs:
 
       - name: Clean transient bulletin PDFs from repository
         if: false
-        run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          mkdir -p Bulletins/current
-          find Bulletins/current -maxdepth 1 -type f -name '*.pdf' -delete || true
-          find Bulletins -maxdepth 1 -type f -name 'all_bulletins_*.pdf' -delete || true
-          touch Bulletins/current/.gitkeep
-          shopt -s nullglob
-          pdfs=(Bulletins/all_bulletins_*.pdf)
-          if [ ${#pdfs[@]} -gt 0 ]; then
-            git add -A Bulletins/current "${pdfs[@]}"
-          else
-            git add -A Bulletins/current
-          fi
-          if git diff --cached --quiet; then
-            echo "ℹ️  No staged cleanup changes — skipping commit."
-            exit 0
-          fi
-          git commit -m "chore: clean transient bulletin PDFs [skip ci]"
-          for attempt in 1 2 3 4 5; do
-            if git push origin HEAD:main; then
-              echo "✅ Cleanup pushed on attempt ${attempt}"
-              exit 0
-            fi
-            echo "⚠️  Cleanup push attempt ${attempt} failed; pulling --rebase and retrying…"
-            git pull --rebase origin main || {
-              echo "❌ Rebase failed during cleanup; aborting."
-              git rebase --abort || true
-              exit 1
-            }
-          done
-          echo "❌ Could not push cleanup commit after 5 attempts."
-          exit 1
+        run: echo "Disabled — current-week PDFs stay in Bulletins/current/"
 
       - name: Update cost dashboard
         if: always()
