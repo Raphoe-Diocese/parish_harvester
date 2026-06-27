@@ -3064,10 +3064,37 @@
     lastCropSignature = cropSignature(payload);
     if (window.ph_mark_crop) {
       window.ph_mark_crop(payload);
-    } else {
-      console.warn("Parish Trainer: ph_mark_crop binding is unavailable.");
     }
-    addSessionStep("crop", "✂️ Crop recorded");
+    if (_inStandaloneMode()) {
+      // Build a real, replayable crop_screenshot step so Send & test works.
+      // Previously this only added a UI row that could never be pushed.
+      const toSection = (s) => {
+        const out = {
+          x: Math.round(Number(s.x) || 0),
+          y: Math.round(Number(s.y) || 0),
+          page_x: Math.round(Number(s.pageX != null ? s.pageX : s.x) || 0),
+          page_y: Math.round(Number(s.pageY != null ? s.pageY : s.y) || 0),
+          width: Math.round(Number(s.width) || 0),
+          height: Math.round(Number(s.height) || 0),
+        };
+        if (s.element_selector) out.element_selector = s.element_selector;
+        return out;
+      };
+      const cropStep = { action: "crop_screenshot", ...toSection(payload) };
+      if (Array.isArray(payload.sections) && payload.sections.length > 1) {
+        cropStep.sections = payload.sections.map(toSection);
+      }
+      standaloneAddStep(
+        cropStep,
+        "crop_screenshot",
+        `✂️ Crop bulletin (${cropStep.width}×${cropStep.height})`
+      );
+    } else {
+      if (!window.ph_mark_crop) {
+        console.warn("Parish Trainer: ph_mark_crop binding is unavailable.");
+      }
+      addSessionStep("crop", "✂️ Crop recorded");
+    }
     window.postMessage(
       { direction: "from-main", message: { type: "crop_done", ...payload } },
       "*"
@@ -5201,9 +5228,16 @@
           try {
             window.ph_mark_download_url({ url: "no_bulletin", type: "no_bulletin" });
           } catch (_e) {}
+          addSessionStep("no_bulletin", "🚫 No bulletin — skipped");
+          showStatus("🚫 Marked as no bulletin. You can now close this tab or move on.");
+          return;
         }
-        addSessionStep("no_bulletin", "🚫 No bulletin — skipped");
-        showStatus("🚫 Marked as no bulletin. You can now close this tab or move on.");
+        // Standalone mode can't persist a "no bulletin" mark from this page,
+        // so tell the truth instead of pretending it was saved.
+        showStatus(
+          "🚫 'No bulletin' can't be saved from here. Leave this parish untrained, or mark it in the Problems tab.",
+          "warn"
+        );
       },
       "Record that this parish has no bulletin and skip it"
     );
