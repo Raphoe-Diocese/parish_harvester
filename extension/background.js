@@ -1274,10 +1274,12 @@ async function _locateRecipeOnGithub(gh_pat, gh_repo, key, preferredDiocese) {
 }
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message?.type === "sanitize_recipe") {
+  if (message?.type !== "sanitize_recipe") return false;
+  try {
     const recipe = _normalizeRecipeTerminalSteps(_sanitizeRecipeOnPush(message.recipe || {}));
     sendResponse({ ok: true, recipe });
-    return false;
+  } catch (err) {
+    sendResponse({ ok: false, error: String(err), recipe: message.recipe || {} });
   }
   return false;
 });
@@ -1584,15 +1586,35 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
       const body = {
         message: `chore: update recipe for ${key} [${recipeDiocese || "unknown diocese"}]`,
         content: encoded,
+        branch: "main",
         ...(existingSha ? { sha: existingSha } : {}),
       };
 
-      const putResp = await _fetchGithubJson(
+      let putResp = await _fetchGithubJson(
         apiBase,
         headers,
         30000,
         { method: "PUT", body: JSON.stringify(body) }
       );
+      if (putResp.status === 422 && !body.sha) {
+        try {
+          const refetch = await _fetchGithubJson(apiBase, headers, 15000);
+          if (refetch.ok) {
+            const refData = await refetch.json();
+            if (refData?.sha) {
+              body.sha = refData.sha;
+              putResp = await _fetchGithubJson(
+                apiBase,
+                headers,
+                30000,
+                { method: "PUT", body: JSON.stringify(body) }
+              );
+            }
+          }
+        } catch (_retryErr) {
+          // fall through
+        }
+      }
       if (!putResp.ok) {
         reply({ ok: false, error: await _githubApiError(putResp) });
         return;

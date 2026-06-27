@@ -66,14 +66,30 @@
     }
   };
 
+  const authHeaderValue = (gh_pat) => {
+    const p = String(gh_pat || "").trim();
+    // Fine-grained PATs require Bearer; classic PATs use token (Bearer also works).
+    if (p.startsWith("github_pat_")) return `Bearer ${p}`;
+    return `token ${p}`;
+  };
+
   const authHeaders = (gh_pat, withJson = false) => {
     const headers = {
-      Authorization: `token ${gh_pat}`,
+      Authorization: authHeaderValue(gh_pat),
       Accept: "application/vnd.github+json",
       "X-GitHub-Api-Version": "2022-11-28",
     };
     if (withJson) headers["Content-Type"] = "application/json";
     return headers;
+  };
+
+  const encodeGithubBase64 = (text) => {
+    const bytes = new TextEncoder().encode(String(text));
+    let binary = "";
+    for (let i = 0; i < bytes.length; i += 1) {
+      binary += String.fromCharCode(bytes[i]);
+    }
+    return btoa(binary);
   };
 
   const locateRecipe = async (gh_pat, gh_repo, key, preferredDiocese) => {
@@ -168,20 +184,42 @@
     delete merged.needs_retraining;
 
     const headers = authHeaders(gh_pat_clean, true);
-    const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(merged, null, 2))));
-    const putResp = await fetchGithub(
+    const encoded = encodeGithubBase64(JSON.stringify(merged, null, 2));
+    const putBody = {
+      message: `chore: update recipe for ${key} [${merged.diocese || "unknown"}]`,
+      content: encoded,
+      branch: "main",
+      ...(existingSha ? { sha: existingSha } : {}),
+    };
+
+    let putResp = await fetchGithub(
       located.apiBase,
       headers,
       25000,
-      {
-        method: "PUT",
-        body: JSON.stringify({
-          message: `chore: update recipe for ${key} [${merged.diocese || "unknown"}]`,
-          content: encoded,
-          ...(existingSha ? { sha: existingSha } : {}),
-        }),
-      }
+      { method: "PUT", body: JSON.stringify(putBody) }
     );
+
+    // File exists but locate missed sha (timeout/auth blip) — refetch sha and retry once.
+    if (putResp.status === 422 && !putBody.sha) {
+      try {
+        const refetch = await fetchGithub(located.apiBase, authHeaders(gh_pat_clean), 12000);
+        if (refetch.ok) {
+          const refData = await refetch.json();
+          if (refData?.sha) {
+            putBody.sha = refData.sha;
+            putResp = await fetchGithub(
+              located.apiBase,
+              headers,
+              25000,
+              { method: "PUT", body: JSON.stringify(putBody) }
+            );
+          }
+        }
+      } catch (_retryErr) {
+        // fall through to error handling
+      }
+    }
+
     if (!putResp.ok) {
       return { ok: false, error: await githubApiError(putResp) };
     }
