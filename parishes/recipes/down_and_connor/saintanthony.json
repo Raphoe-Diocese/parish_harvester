@@ -4,12 +4,6 @@
   "display_name": "Saint Anthony",
   "diocese": "down_and_connor",
   "start_url": "https://saintanthonys.uk/parish-bulletin/",
-  "site_type": "wp_block_file_bulletin",
-  "playbook_type": "permanent_bulletin_page",
-  "recorded_date": "2026-06-24",
-  "timeout_ms": 90000,
-  "total_timeout_s": 240,
-  "observed_load_ms": 45000,
   "steps": [
     {
       "action": "goto",
@@ -17,13 +11,23 @@
     },
     {
       "action": "download",
+      "url": "https://saintanthonys.uk/wp-content/uploads/2026/06/bulletin210611sunot.pdf",
       "url_pattern": "*bulletin*.pdf"
     }
   ],
+  "observed_load_ms": 4102,
+  "timeout_ms": 45000,
+  "total_timeout_s": 90,
+  "playbook_type": "permanent_bulletin_page",
+  "site_type": "wp_block_file_bulletin",
   "operator_notes": [
-    "New site saintanthonys.uk (replaces saintanthony.co.uk).",
     "Permanent /parish-bulletin/ URL — PDF filename changes weekly under /wp-content/uploads/YYYY/MM/.",
-    "PDF is in object.wp-block-file__embed[data] and the Download button — harvest scrapes the embed URL.",
-    "Do not train on the homepage; use /parish-bulletin/ only."
-  ]
+    "On the bulletin page: tap the green Save bulletin PDF (from embed) button.",
+    "Use url_pattern *bulletin*.pdf — never pin a dated filename."
+  ],
+  "do_not": [
+    "Do not train on the homepage — use the dedicated bulletin page only.",
+    "Do not pin saintanthony.co.uk if the parish moved to saintanthonys.uk."
+  ],
+  "recorded_date": "2026-06-27"
 }
