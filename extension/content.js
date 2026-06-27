@@ -4333,18 +4333,32 @@
         pageCtx.type === "wix_html" ||
         (pageCtx.type === "html" && _pathLooksLikeNewsletterPage());
       const mdocsPdfPage = pageCtx.type === "mdocs_bulletin_list";
+      // Sort the wheat from the chaff: when the site type is a confident
+      // "link/file → PDF" flow, hide the HTML-text and image buttons so the
+      // user only sees the one action that fits this page.
+      const pdfFlowType =
+        onDirectPdf ||
+        wpBlockPage ||
+        mdocsPdfPage ||
+        pageCtx.type === "pdfemb" ||
+        pageCtx.type === "pdf_links" ||
+        pageCtx.type === "parish_messenger" ||
+        pageCtx.type === "cloud_folder" ||
+        pageCtx.type === "weekly_bulletin_download" ||
+        pageCtx.type === "oneweb_docx" ||
+        pageCtx.type === "iframe" ||
+        pageCtx.type === "iframe_maybe" ||
+        pageCtx.type === "wix_viewer";
       if (savePagePdfBtn) {
         savePagePdfBtn.style.display =
-          onDirectPdf || mdocsPdfPage || wpBlockPage || (htmlCapturePage && stepCount === 0)
-            ? "none"
-            : "block";
+          pdfFlowType || (htmlCapturePage && stepCount === 0) ? "none" : "block";
       }
       if (pickImageBtn) {
-        pickImageBtn.style.display = onDirectPdf || wpBlockPage ? "none" : "block";
+        pickImageBtn.style.display = pdfFlowType ? "none" : "block";
         pickImageBtn.style.background = pageCtx.type === "image" ? "#16a34a" : "#2563eb";
       }
       if (imageCropBtn) {
-        imageCropBtn.style.display = onDirectPdf || wpBlockPage ? "none" : "block";
+        imageCropBtn.style.display = pdfFlowType ? "none" : "block";
       }
       if (getPdfBtn) {
         getPdfBtn.style.display = wpBlockPage || mdocsPdfPage ? "none" : "block";
@@ -6330,31 +6344,49 @@
               harvestStatusLine.style.color = "#86efac";
             } else if (failed) {
               const reason = String(failed.reason || failed.error || "failed").slice(0, 90);
-              const training = _standaloneRecipeSteps().length > 0;
-              const onPdf = detectPageType().type === "direct_pdf";
-              _lastHarvestIssue = reason;
-              _needsRetrain = false;
-              const cloudFail =
-                /cloud folder|yy\.mm\.dd|html_render|folder listing|re-train/i.test(reason) ||
-                (failed.file_type === "html_render" && _isCloudFolderUrl(pageUrl));
-              if (cloudFail || reason.includes("outdated")) {
-                _needsRetrain = true;
-              }
-              if (training || onPdf) {
-                line = _needsRetrain
-                  ? `⚠️ Retrain needed — last harvest: ${reason}`
-                  : `ℹ️ Last Sunday's run failed (${reason}) — push this recipe to fix it`;
-                harvestStatusLine.style.color = _needsRetrain ? "#fca5a5" : "#fde68a";
+              // Stale-failure guard: if the recipe was re-saved AFTER this
+              // harvest ran, the failure predates the fix — don't scare the user
+              // with an error that no longer applies.
+              let fixedSince = false;
+              try {
+                const reportDate = String(report.target_date || "").slice(0, 10);
+                const loadedRec = await loadRecipeFromRawGithub(key);
+                const recDate = String(loadedRec?.recipe?.recorded_date || "").slice(0, 10);
+                if (recDate && reportDate && recDate > reportDate) fixedSince = true;
+              } catch (_e) {}
+              if (fixedSince) {
+                _lastHarvestIssue = "";
+                _needsRetrain = false;
+                line = "✅ Fix saved since the last run — press Send & test (or wait for Sunday) to confirm.";
+                harvestStatusLine.style.color = "#86efac";
+                _refreshGuidedContext();
               } else {
-                line = _needsRetrain
-                  ? `⚠️ Retrain this recipe — last harvest: ${reason}`
-                  : `❌ Last harvest: ${reason}`;
-                harvestStatusLine.style.color = "#fca5a5";
+                const training = _standaloneRecipeSteps().length > 0;
+                const onPdf = detectPageType().type === "direct_pdf";
+                _lastHarvestIssue = reason;
+                _needsRetrain = false;
+                const cloudFail =
+                  /cloud folder|yy\.mm\.dd|html_render|folder listing|re-train/i.test(reason) ||
+                  (failed.file_type === "html_render" && _isCloudFolderUrl(pageUrl));
+                if (cloudFail || reason.includes("outdated")) {
+                  _needsRetrain = true;
+                }
+                if (training || onPdf) {
+                  line = _needsRetrain
+                    ? `⚠️ Retrain needed — last harvest: ${reason}`
+                    : `ℹ️ Last Sunday's run failed (${reason}) — push this recipe to fix it`;
+                  harvestStatusLine.style.color = _needsRetrain ? "#fca5a5" : "#fde68a";
+                } else {
+                  line = _needsRetrain
+                    ? `⚠️ Retrain this recipe — last harvest: ${reason}`
+                    : `❌ Last harvest: ${reason}`;
+                  harvestStatusLine.style.color = "#fca5a5";
+                }
+                if (window.ph_copilot?.rememberIssue) {
+                  window.ph_copilot.rememberIssue(key, { lastIssue: reason, needsRetrain: _needsRetrain });
+                }
+                _refreshGuidedContext();
               }
-              if (window.ph_copilot?.rememberIssue) {
-                window.ph_copilot.rememberIssue(key, { lastIssue: reason, needsRetrain: _needsRetrain });
-              }
-              _refreshGuidedContext();
             }
           }
           if (!line && failResp.ok) {
