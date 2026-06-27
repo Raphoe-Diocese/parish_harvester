@@ -875,6 +875,22 @@
     if (window.ph_site_memory?.enrichRecipe) {
       recipe = window.ph_site_memory.enrichRecipe(recipe, detectPageType());
     }
+    const pageCtxForRecipe = detectPageType();
+    if (pageCtxForRecipe.type === "google_drive_static") {
+      const viewUrl = String(pageCtxForRecipe.driveViewUrl || _googleDriveViewUrl(window.location.href) || "").trim();
+      const downloadUrl = String(pageCtxForRecipe.autoDownloadUrl || _googleDriveDirectDownloadUrl(window.location.href) || "").trim();
+      if (viewUrl) recipe.start_url = viewUrl;
+      if (downloadUrl) {
+        const dlIdx = recipe.steps.findIndex((s) => String(s?.action || "").toLowerCase() === "download");
+        const dlStep = {
+          action: "download",
+          url: downloadUrl,
+          use_captured_url: true,
+        };
+        if (dlIdx >= 0) recipe.steps[dlIdx] = dlStep;
+        else recipe.steps.push(dlStep);
+      }
+    }
     const clickStep = steps.find((s) => String(s?.action || "").toLowerCase() === "click");
     if (clickStep?.pick_strategy) {
       recipe.bulletin_layout = {
@@ -1631,6 +1647,38 @@
     return false;
   };
 
+  const _extractGoogleDriveFileId = (url) => {
+    const text = String(url || "");
+    const fileMatch = text.match(/drive\.google\.com\/file\/d\/([^/?#]+)/i);
+    if (fileMatch) return fileMatch[1];
+    const idMatch = text.match(/[?&]id=([^&#]+)/i);
+    return idMatch ? idMatch[1] : "";
+  };
+
+  const _googleDriveDirectDownloadUrl = (fileIdOrUrl) => {
+    const id =
+      /^[a-zA-Z0-9_-]{10,}$/.test(String(fileIdOrUrl || ""))
+        ? String(fileIdOrUrl)
+        : _extractGoogleDriveFileId(fileIdOrUrl);
+    if (!id) return "";
+    return `https://drive.usercontent.google.com/download?id=${encodeURIComponent(id)}&export=download`;
+  };
+
+  const _googleDriveViewUrl = (fileIdOrUrl) => {
+    const id =
+      /^[a-zA-Z0-9_-]{10,}$/.test(String(fileIdOrUrl || ""))
+        ? String(fileIdOrUrl)
+        : _extractGoogleDriveFileId(fileIdOrUrl);
+    if (!id) return "";
+    return `https://drive.google.com/file/d/${id}/view`;
+  };
+
+  const _isGoogleDriveFileViewUrl = (url) =>
+    /drive\.google\.com\/file\/d\//i.test(String(url || ""));
+
+  const _isGoogleDriveDirectDownloadUrl = (url) =>
+    /drive\.usercontent\.google\.com\/download/i.test(String(url || ""));
+
   // Chrome (and some hosts) serve PDFs without a .pdf suffix in the address bar.
   const _pageIsNativePdfViewer = () => {
     try {
@@ -1954,6 +2002,23 @@
         type: "cloud_folder",
         expectedLabel: expected,
         rowVisible,
+      };
+    }
+
+    // 1b2. Google Drive — single permanent file (Raphoe, Glenswilly, etc.)
+    if (_isGoogleDriveFileViewUrl(url) || _isGoogleDriveDirectDownloadUrl(url)) {
+      const fileId = _extractGoogleDriveFileId(url);
+      const downloadUrl = _googleDriveDirectDownloadUrl(fileId || url);
+      const viewUrl = _googleDriveViewUrl(fileId || url) || url;
+      return {
+        emoji: "📁",
+        summary: "Google Drive — permanent bulletin file (same link each week).",
+        advice:
+          "Train on this Drive preview page — tap the green Save Drive bulletin button (one step). Do not open the instant-download link.",
+        type: "google_drive_static",
+        htmlFingerprint: "google_drive_file",
+        autoDownloadUrl: downloadUrl,
+        driveViewUrl: viewUrl,
       };
     }
 
@@ -3999,6 +4064,7 @@
       if (
         pageCtx.autoDownloadUrl &&
         (pageCtx.type === "pdfemb_embed" ||
+          pageCtx.type === "google_drive_static" ||
           pageCtx.type === "weekly_bulletin_download" ||
           pageCtx.type === "mdocs_bulletin_list" ||
           pageCtx.htmlFingerprint === "joomla_dropfiles_weekly" ||
@@ -4152,10 +4218,15 @@
       }
 
       if (wpBlockPage && stepCount === 0 && !onDirectPdf) {
-        wizardQ.textContent = "Bulletin PDF is already on this page";
+        wizardQ.textContent =
+          pageCtx.type === "google_drive_static"
+            ? "Google Drive permanent bulletin"
+            : "Bulletin PDF is already on this page";
         nextStepBanner.style.display = "block";
         nextStepBanner.textContent =
-          "👇 Tap the green Save bulletin PDF button below (one step). Then Send & test.";
+          pageCtx.type === "google_drive_static"
+            ? "👇 Train on this Drive preview page — tap Save Drive bulletin, then Send & test. Do not open the instant-download link."
+            : "👇 Tap the green Save bulletin PDF button below (one step). Then Send & test.";
         if (moreOptionsSection) moreOptionsSection.style.display = "";
       } else if (onDirectPdf) {
         const recorded = _standaloneRecipeSteps();
@@ -4227,9 +4298,13 @@
           contextPrimaryBtn.style.display = "block";
           contextPrimaryBtn.style.background = "#16a34a";
           contextPrimaryBtn.textContent =
-            stepCount > 0
-              ? "📄 Re-save bulletin PDF (from embed)"
-              : "📄 Step 1: Save bulletin PDF (from embed)";
+            pageCtx.type === "google_drive_static"
+              ? stepCount > 0
+                ? "📁 Re-save Drive bulletin download"
+                : "📁 Step 1: Save Drive bulletin (static URL)"
+              : stepCount > 0
+                ? "📄 Re-save bulletin PDF (from embed)"
+                : "📄 Step 1: Save bulletin PDF (from embed)";
         } else if (pageCtx.type === "wix_html" || (pageCtx.type === "html" && _pathLooksLikeNewsletterPage())) {
           contextPrimaryBtn.style.display = "block";
           contextPrimaryBtn.textContent = "💾 Step 2: Save page as PDF";
@@ -4909,10 +4984,13 @@
     let pinLinkBtn = null;
     let getPdfBtn = null;
 
-    const _isWpBlockBulletinPage = (pageCtx = detectPageType()) =>
+    const _isStaticOneStepPage = (pageCtx = detectPageType()) =>
       pageCtx.type === "wp_block_file_bulletin" ||
       pageCtx.type === "pdfemb_embed" ||
+      pageCtx.type === "google_drive_static" ||
       pageCtx.htmlFingerprint === "wp_block_file_bulletin";
+
+    const _isWpBlockBulletinPage = _isStaticOneStepPage;
 
     const _captureWpBlockOrMdocsFromPage = (pageCtx = detectPageType()) => {
       const result = _ensureTerminalPdfStep();

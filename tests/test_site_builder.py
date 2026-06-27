@@ -33,7 +33,7 @@ class SiteBuilderTests(unittest.TestCase):
             (parishes_dir / "raphoe_diocese_bulletin_urls.txt").write_text(
                 "\n".join(
                     [
-                        "# --- Raphoe town ---",
+                        "# --- Parish of Raphoe ---",
                         "# key: drive-raphoe-town",
                         "# page: https://drive.google.com/file/d/abc/view",
                         "https://drive.usercontent.google.com/download?id=abc&export=download",
@@ -68,7 +68,7 @@ class SiteBuilderTests(unittest.TestCase):
 
             self.assertIn("Download PDF", derry_page)
             self.assertIn("Line one", derry_page)
-            self.assertIn("Raphoe town", raphoe_page)
+            self.assertIn("Parish of Raphoe", raphoe_page)
             self.assertIn("We're still collecting bulletins for this diocese", armagh_page)
 
 

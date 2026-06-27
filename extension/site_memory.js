@@ -134,6 +134,24 @@
         "Do not pin saintanthony.co.uk if the parish moved to saintanthonys.uk.",
       ],
     },
+    google_drive_static: {
+      playbook_type: "direct_download",
+      site_type: "google_drive_static",
+      page_type: "google_drive_static",
+      recipe_flow: "direct_download",
+      label: "Google Drive permanent bulletin file",
+      auto_direct: true,
+      skip_goto_on_push: true,
+      operator_notes: [
+        "Permanent Google Drive file — parish replaces the PDF in the same link each week.",
+        "Train on drive.google.com/file/d/…/view (preview page), not the instant-download URL.",
+        "Harvester downloads via drive.usercontent.google.com/download?id=… automatically.",
+      ],
+      do_not: [
+        "Do not open the usercontent download link to train — the tab closes instantly.",
+        "Do not add a goto step to the download URL.",
+      ],
+    },
     joomla_dropfiles: {
       playbook_type: "weekly_bulletin_download",
       site_type: "joomla_dropfiles",
@@ -225,6 +243,9 @@
     const fpId = String(pageCtx?.htmlFingerprint || "").trim();
     if (fpId === "mdocs_bulletin_table" || _recipeLooksLikeMdocs(safeRecipe)) {
       return CATALOG.mdocs_download_list;
+    }
+    if (fpId === "google_drive_file" || key === "google_drive_static") {
+      return CATALOG.google_drive_static;
     }
     if (fpId === "wp_block_file_bulletin" || key === "wp_block_file_bulletin") {
       return CATALOG.wp_block_file_bulletin;

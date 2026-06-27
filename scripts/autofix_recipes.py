@@ -125,15 +125,22 @@ def _probe_pdf_links(page_url: str) -> list[str]:
 
 def _direct_download_recipe(key: str, display: str, diocese: str, url: str) -> dict:
     """Download-only recipe — avoids Playwright goto abort on Drive/PDF URLs."""
+    from harvester.cloud_urls import gdrive_file_id_from_url, gdrive_view_url, normalize_document_url
+
+    download_url = normalize_document_url(url)
+    file_id = gdrive_file_id_from_url(download_url) or gdrive_file_id_from_url(url)
+    start_url = gdrive_view_url(file_id) if file_id else download_url
     return {
         "parish_key": key,
         "display_name": display,
         "diocese": diocese,
+        "site_type": "google_drive_static" if file_id else "",
+        "playbook_type": "direct_download" if file_id else "",
         "recorded_date": "2026-06-17",
-        "start_url": url,
+        "start_url": start_url,
         "auto_fixed": True,
         "steps": [
-            {"action": "download", "url": url, "use_captured_url": True},
+            {"action": "download", "url": download_url, "use_captured_url": True},
         ],
         "version": 1,
     }

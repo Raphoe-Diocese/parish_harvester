@@ -14,7 +14,13 @@ from urllib.parse import parse_qs, unquote, urljoin, urlparse
 from playwright.async_api import Browser, Page, TimeoutError as PlaywrightTimeoutError
 
 from .cloud_folders import is_cloud_folder_click_step, rewrite_cloud_folder_click_step
-from .cloud_urls import is_cloud_document_url, normalize_document_url, unwrap_docs_viewer_url
+from .cloud_urls import (
+    gdrive_confirm_token,
+    gdrive_download_url_with_confirm,
+    is_cloud_document_url,
+    normalize_document_url,
+    unwrap_docs_viewer_url,
+)
 from .config import PAGE_LOAD_TIMEOUT_MS, PARISHES_DIR
 from .utils import (
     extract_date_from_string,
@@ -88,6 +94,8 @@ async def _goto_or_download(
         tried = await _try_download_page_url(page, dest, url, timeout_ms=timeout_ms)
         if tried:
             return dest, tried[1], tried[0]
+        if _looks_like_direct_document_url(url):
+            return None
     await _navigate_page(page, url, timeout_ms, wait_until=wait_until)
     return await _capture_document_after_navigation(page, dest, url, downloads, timeout_ms)
 
@@ -509,6 +517,21 @@ async def _download_document_url(
         raise RecipeReplayError(f"HTTP {response.status} for {raw_url}")
 
     body = await response.body()
+    content_type = response.headers.get("content-type", "")
+    if (
+        "text/html" in content_type
+        and "drive.usercontent.google.com/download" in url.lower()
+        and not _is_pdf_content(body)
+    ):
+        confirm = gdrive_confirm_token(body.decode("utf-8", errors="ignore"))
+        if confirm:
+            confirm_url = gdrive_download_url_with_confirm(url, confirm)
+            response = await page.request.get(confirm_url, timeout=timeout_ms)
+            if not response.ok:
+                raise RecipeReplayError(f"HTTP {response.status} for {confirm_url}")
+            body = await response.body()
+            content_type = response.headers.get("content-type", "")
+
     path = urlparse(url.lower()).path
     if path.endswith(".docx"):
         pdf_bytes = await _convert_docx_to_pdf_bytes(body)
@@ -533,7 +556,6 @@ async def _download_document_url(
         except Exception as exc:
             raise RecipeReplayError(f"Invalid image content for bulletin conversion: {raw_url}") from exc
 
-    content_type = response.headers.get("content-type", "")
     if "text/html" in content_type:
         raise RecipeReplayError(f"Server returned HTML instead of document for {raw_url}")
 

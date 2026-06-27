@@ -17,7 +17,7 @@ class RaphoeAssetsTests(unittest.TestCase):
         self.assertTrue(evidence_path.exists())
         self.assertFalse(old_path.exists())
         self.assertIn("# --- Ardara ---", text)
-        self.assertIn("# --- Raphoe town ---", text)
+        self.assertIn("# --- Parish of Raphoe ---", text)
         self.assertIn("drive.usercontent.google.com/download?id=1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa&export=download", text)
         self.assertEqual(text.count("milfordrathmullanparishes.ie/bulletins/"), 2)  # page + URL
 

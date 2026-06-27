@@ -32,7 +32,7 @@ class LandingPageTests(unittest.TestCase):
             (root / "parishes" / "raphoe_diocese_bulletin_urls.txt").write_text(
                 "\n".join(
                     [
-                        "# --- Raphoe town ---",
+                        "# --- Parish of Raphoe ---",
                         "# key: drive-raphoe-town",
                         "# page: https://drive.google.com/file/d/abc/view",
                         "https://drive.usercontent.google.com/download?id=abc&export=download",
@@ -82,7 +82,7 @@ class LandingPageTests(unittest.TestCase):
             self.assertIn("Derry", index_html)
             self.assertIn("Down and Connor", index_html)
             self.assertIn("Raphoe Diocese", index_html)
-            self.assertIn("Raphoe town", index_html)
+            self.assertIn("Parish of Raphoe", index_html)
             self.assertIn("🟢", index_html)
             self.assertIn("🔴", index_html)
 

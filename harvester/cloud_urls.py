@@ -82,3 +82,49 @@ def normalize_document_url(url: str) -> str:
     if _ONEDRIVE_SHARE_RE.search(text):
         return text
     return text
+
+
+def gdrive_view_url(file_id: str) -> str:
+    token = (file_id or "").strip()
+    if not token:
+        return ""
+    return f"https://drive.google.com/file/d/{token}/view"
+
+
+def gdrive_file_id_from_url(url: str) -> str:
+    text = (url or "").strip()
+    if not text:
+        return ""
+    for pattern in (_GDRIVE_FILE_RE, _GDRIVE_OPEN_RE, _GDRIVE_UC_RE):
+        match = pattern.search(text)
+        if match:
+            return match.group(1)
+    parsed = urlparse(text)
+    if "drive.usercontent.google.com" in parsed.netloc.lower():
+        return parse_qs(parsed.query).get("id", [""])[0].strip()
+    return ""
+
+
+def gdrive_confirm_token(html: str) -> str:
+    text = html or ""
+    for pattern in (
+        r"confirm=([0-9A-Za-z_]+)",
+        r'name="confirm"\s+value="([0-9A-Za-z_]+)"',
+        r"download_warning[^\"']*confirm=([0-9A-Za-z_]+)",
+        r"uc-download-link[^>]+href=\"[^\"]*confirm=([0-9A-Za-z_]+)",
+    ):
+        match = re.search(pattern, text)
+        if match:
+            return match.group(1)
+    return ""
+
+
+def gdrive_download_url_with_confirm(url: str, confirm: str) -> str:
+    base = normalize_document_url(url)
+    token = (confirm or "").strip()
+    if not base or not token:
+        return base
+    joiner = "&" if "?" in base else "?"
+    if f"confirm={token}" in base:
+        return base
+    return f"{base}{joiner}confirm={token}"

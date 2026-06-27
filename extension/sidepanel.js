@@ -930,12 +930,27 @@ async function _problemsResolveFixUrl(row) {
   const parish = String(row?.parish || "").trim();
   const recipe = await _pdLoadRecipe(parish);
   const recipeStart = String(recipe?.start_url || "").trim();
-  if (/^https?:\/\//i.test(recipeStart)) return recipeStart;
+  if (/drive\.usercontent\.google\.com\/download/i.test(recipeStart)) {
+    const idMatch = recipeStart.match(/[?&]id=([^&#]+)/i);
+    if (idMatch?.[1]) {
+      return `https://drive.google.com/file/d/${idMatch[1]}/view`;
+    }
+  }
+  if (/^https?:\/\/drive\.google\.com\/file\/d\//i.test(recipeStart)) return recipeStart;
+  if (/^https?:\/\//i.test(recipeStart) && !/drive\.usercontent\.google\.com/i.test(recipeStart)) {
+    return recipeStart;
+  }
   const match = _pdAllParishes.find((p) => p.key === parish);
   const pageUrl = String(match?.pageUrl || match?.bulletinUrls?.[0] || "").trim();
-  if (/^https?:\/\//i.test(pageUrl)) return pageUrl;
+  if (/^https?:\/\/drive\.google\.com\/file\/d\//i.test(pageUrl)) return pageUrl;
+  if (/^https?:\/\//i.test(pageUrl) && !/drive\.usercontent\.google\.com/i.test(pageUrl)) {
+    return pageUrl;
+  }
   const failedUrl = String(row?.url || row?.start_url || "").trim();
-  if (/^https?:\/\//i.test(failedUrl)) return failedUrl;
+  if (/^https?:\/\/drive\.google\.com\/file\/d\//i.test(failedUrl)) return failedUrl;
+  if (/^https?:\/\//i.test(failedUrl) && !/drive\.usercontent\.google\.com/i.test(failedUrl)) {
+    return failedUrl;
+  }
   return "";
 }
 

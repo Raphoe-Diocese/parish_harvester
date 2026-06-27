@@ -406,6 +406,40 @@
       doNot: [],
     },
     {
+      id: "google_drive_file",
+      label: "Google Drive permanent bulletin file",
+      pageType: "google_drive_static",
+      captureMethod: "direct_download",
+      playbookType: "direct_download",
+      minScore: 28,
+      domValidate: (doc) =>
+        /drive\.google\.com\/file\/d\//i.test(doc.location?.href || "") ||
+        /drive\.usercontent\.google\.com\/download/i.test(doc.location?.href || ""),
+      domRequired: true,
+      markers: [
+        { re: /drive\.google\.com\/file\/d\//i, weight: 30, label: "Drive file preview URL" },
+        { re: /drive\.usercontent\.google\.com\/download/i, weight: 30, label: "Drive direct download URL" },
+      ],
+      pickDownloadUrl: (doc) => {
+        const href = doc.location?.href || "";
+        const idMatch = href.match(/drive\.google\.com\/file\/d\/([^/?#]+)/i);
+        const fileId =
+          (idMatch && idMatch[1]) ||
+          (() => {
+            try {
+              return new URL(href).searchParams.get("id") || "";
+            } catch (_e) {
+              return "";
+            }
+          })();
+        if (!fileId) return "";
+        return `https://drive.usercontent.google.com/download?id=${encodeURIComponent(fileId)}&export=download`;
+      },
+      advice:
+        "Google Drive static file — tap the green Save Drive bulletin button (one step). Train on the /view page, not the download link.",
+      doNot: ["Do not train on drive.usercontent.google.com/download — it closes instantly."],
+    },
+    {
       id: "google_drive_folder",
       label: "Google Drive dated folder",
       pageType: "cloud_folder",

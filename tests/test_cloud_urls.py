@@ -2,7 +2,15 @@ from __future__ import annotations
 
 import unittest
 
-from harvester.cloud_urls import is_cloud_document_url, normalize_document_url, rewrite_gdrive_download_url
+from harvester.cloud_urls import (
+    gdrive_confirm_token,
+    gdrive_download_url_with_confirm,
+    gdrive_file_id_from_url,
+    gdrive_view_url,
+    is_cloud_document_url,
+    normalize_document_url,
+    rewrite_gdrive_download_url,
+)
 
 
 class CloudUrlTests(unittest.TestCase):
@@ -32,6 +40,29 @@ class CloudUrlTests(unittest.TestCase):
         )
         out = normalize_document_url(url)
         self.assertIn("portaferryparish.com/images/downloads/Bulletin2019A.pdf", out)
+
+    def test_gdrive_file_id_from_view_and_download_urls(self) -> None:
+        view = "https://drive.google.com/file/d/1jmslbrliw1BTtdrxHbqpUbhQEf6wXHy5/view?pli=1"
+        download = (
+            "https://drive.usercontent.google.com/download?"
+            "id=1jmslbrliw1BTtdrxHbqpUbhQEf6wXHy5&export=download"
+        )
+        self.assertEqual(gdrive_file_id_from_url(view), "1jmslbrliw1BTtdrxHbqpUbhQEf6wXHy5")
+        self.assertEqual(gdrive_file_id_from_url(download), "1jmslbrliw1BTtdrxHbqpUbhQEf6wXHy5")
+        self.assertEqual(
+            gdrive_view_url("1jmslbrliw1BTtdrxHbqpUbhQEf6wXHy5"),
+            "https://drive.google.com/file/d/1jmslbrliw1BTtdrxHbqpUbhQEf6wXHy5/view",
+        )
+
+    def test_gdrive_confirm_token_appended(self) -> None:
+        html = '<form action="/download"><input name="confirm" value="t123"></form>'
+        token = gdrive_confirm_token(html)
+        self.assertEqual(token, "t123")
+        out = gdrive_download_url_with_confirm(
+            "https://drive.usercontent.google.com/download?id=ABC&export=download",
+            token,
+        )
+        self.assertIn("confirm=t123", out)
 
 
 if __name__ == "__main__":
