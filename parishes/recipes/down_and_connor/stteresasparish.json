@@ -3,41 +3,34 @@
   "parish_key": "stteresasparish",
   "display_name": "St Teresas",
   "diocese": "down_and_connor",
-  "start_url": "https://stteresasparish.church/parish-news/",
+  "start_url": "https://stteresasparish.church/2026/06/26/the-st-teresas-parish-bulletin-for-sunday-28th-june-2026/",
   "steps": [
     {
       "action": "goto",
-      "url": "https://stteresasparish.church/parish-news/"
+      "url": "https://stteresasparish.church/2026/06/26/the-st-teresas-parish-bulletin-for-sunday-28th-june-2026/"
     },
     {
-      "action": "click",
-      "href": "https://stteresasparish.church/2026/06/19/the-st-teresas-parish-bulletin-for-sunday-21st-june-2026/",
-      "selector": "div > div > article:nth-of-type(3) > div > h2 > a",
-      "text": "The St Teresa’s Parish Bulletin for Sunday, 21st June 2026 |"
-    },
-    {
-      "action": "click",
-      "href": "https://stteresasparish.church/2026/06/19/the-st-teresas-parish-bulletin-for-sunday-21st-june-2026/",
-      "selector": "html > body > a",
-      "text": ""
-    },
-    {
-      "action": "print_to_pdf"
+      "action": "image_stack",
+      "count": 2,
+      "urls": [
+        "https://stteresasparish.church/wp-content/uploads/2026/06/microsoft-word-28th-june-2026.docx-1.jpg",
+        "https://stteresasparish.church/wp-content/uploads/2026/06/microsoft-word-28th-june-2026.docx-2.jpg"
+      ]
     }
   ],
-  "observed_load_ms": 2382,
+  "observed_load_ms": 2235,
   "timeout_ms": 45000,
   "total_timeout_s": 90,
-  "playbook_type": "wix_html",
-  "site_type": "html_text_bulletin",
+  "playbook_type": "stacked_image_bulletin",
+  "site_type": "stacked_image_bulletin",
   "operator_notes": [
-    "Bulletin text is on the web page — not a downloadable PDF file.",
-    "Use Save page as PDF on the newsletter article page.",
-    "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
+    "Bulletins are full-page images stacked on one page — newest week at the top.",
+    "Pick the first two images, or use Pick another image too after the first.",
+    "Harvester grabs the top N large images automatically each Sunday — no dated URLs."
   ],
   "do_not": [
-    "Do not use Pick bulletin image when the page is mostly text paragraphs.",
-    "Do not stop at click-only — need print_to_pdf as the final step."
+    "Do not hardcode one image URL — it goes stale every week.",
+    "Do not Save page as PDF — that captures every old bulletin on the page."
   ],
-  "recorded_date": "2026-06-25"
+  "recorded_date": "2026-06-27"
 }
