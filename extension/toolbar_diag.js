@@ -138,8 +138,21 @@
       let text = "";
       if (globalThis.ph_recipe_diag?.runFullDiagnosis) {
         try {
-          const report = await globalThis.ph_recipe_diag.runFullDiagnosis();
-          text = globalThis.ph_recipe_diag.formatReport(report);
+          // Backstop: never let the panel sit on "Running diagnostics…" forever.
+          const TIMED_OUT = Symbol("diag_timeout");
+          const report = await Promise.race([
+            globalThis.ph_recipe_diag.runFullDiagnosis(),
+            new Promise((resolve) => setTimeout(() => resolve(TIMED_OUT), 20000)),
+          ]);
+          if (report === TIMED_OUT) {
+            setError("Full diagnosis timed out after 20s.");
+            const data = await collect();
+            text =
+              formatLines(data).join("\n") +
+              "\n\n⚠️ Full diagnosis timed out — basic toolbar report shown above.";
+          } else {
+            text = globalThis.ph_recipe_diag.formatReport(report);
+          }
         } catch (err) {
           setError(String(err));
           const data = await collect();

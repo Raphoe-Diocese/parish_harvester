@@ -397,9 +397,16 @@
     if (!chrome?.runtime?.sendMessage) return null;
     try {
       return await new Promise((resolve) => {
+        // Without this timeout a hung background fetch leaves the whole
+        // diagnosis stuck on "Running diagnostics…" forever.
+        const timer = setTimeout(
+          () => resolve({ ok: false, error: "GitHub lookup timed out (10s)" }),
+          10000
+        );
         chrome.runtime.sendMessage(
           { type: "ph_recipe_diag_github", url: pageUrl, parish_key: parishKey || "" },
           (res) => {
+            clearTimeout(timer);
             if (chrome.runtime?.lastError) {
               resolve({ ok: false, error: chrome.runtime.lastError.message });
               return;
@@ -713,7 +720,9 @@
       let library = stored.ph_site_patterns_cache;
       if (!library && chrome?.runtime?.sendMessage) {
         library = await new Promise((resolve) => {
+          const timer = setTimeout(() => resolve(null), 8000);
           chrome.runtime.sendMessage({ type: "fetch_site_patterns" }, (res) => {
+            clearTimeout(timer);
             resolve(res?.ok ? res.library : null);
           });
         });
