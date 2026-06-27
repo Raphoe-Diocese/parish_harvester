@@ -6907,6 +6907,23 @@
       driftBanner.appendChild(updateStartUrlBtn);
       advancedBodyEl.appendChild(driftBanner);
 
+      // Positive counterpart to the drift warning: reassure the user when a
+      // working recipe already exists so they stop re-training things that
+      // are already fine.
+      const readyBanner = document.createElement("div");
+      readyBanner.style.cssText = [
+        "display:none",
+        "background:#14532d",
+        "border:1px solid #16a34a",
+        "color:#bbf7d0",
+        "font-size:10px",
+        "line-height:1.45",
+        "border-radius:6px",
+        "padding:6px 8px",
+        "margin-bottom:6px",
+      ].join(";");
+      advancedBodyEl.appendChild(readyBanner);
+
       let driftRecipeKey = "";
       let driftRecipeObject = null;
       let driftRecipePath = "";
@@ -7055,8 +7072,21 @@
           driftRecipeObject = loaded.recipe;
           driftRecipePath = loaded.filePath;
           driftBanner.style.display = "block";
+          readyBanner.style.display = "none";
         } else {
           driftBanner.style.display = "none";
+          const stepCount = Array.isArray(loaded.recipe.steps) ? loaded.recipe.steps.length : 0;
+          if (stepCount > 0) {
+            const dn = String(loaded.recipe.display_name || key).trim();
+            const when = String(loaded.recipe.recorded_date || "").trim();
+            readyBanner.textContent =
+              `✓ You already have a working recipe for ${dn} — ${stepCount} step${stepCount === 1 ? "" : "s"}` +
+              (when ? `, saved ${when}` : "") +
+              `. No need to re-train — just press “Send & test on GitHub”.`;
+            readyBanner.style.display = "block";
+          } else {
+            readyBanner.style.display = "none";
+          }
         }
       };
 
