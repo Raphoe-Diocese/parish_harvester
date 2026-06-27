@@ -77,6 +77,37 @@ def _looks_like_direct_document_url(url: str) -> bool:
     return path.endswith((".pdf", ".docx", ".doc")) or "/pdf/" in path
 
 
+def _is_gdrive_usercontent_url(url: str) -> bool:
+    return "drive.usercontent.google.com/download" in unquote((url or "").strip()).lower()
+
+
+def _recipe_is_gdrive_static(recipe: dict) -> bool:
+    if str(recipe.get("site_type") or "").strip().lower() == "google_drive_static":
+        return True
+    if _is_gdrive_usercontent_url(str(recipe.get("start_url") or "")):
+        return True
+    for step in recipe.get("steps") or []:
+        if not isinstance(step, dict):
+            continue
+        if str(step.get("action") or "").strip().lower() != "download":
+            continue
+        if _is_gdrive_usercontent_url(str(step.get("url") or "")):
+            return True
+    return False
+
+
+def _gdrive_download_url_from_recipe(recipe: dict) -> str:
+    for step in recipe.get("steps") or []:
+        if not isinstance(step, dict):
+            continue
+        if str(step.get("action") or "").strip().lower() == "download":
+            url = str(step.get("url") or "").strip()
+            if url:
+                return normalize_document_url(url)
+    start = str(recipe.get("start_url") or "").strip()
+    return normalize_document_url(start) if start else ""
+
+
 async def _goto_or_download(
     page: Page,
     dest: Path,
@@ -88,14 +119,15 @@ async def _goto_or_download(
 ) -> tuple[Path, str, str] | None:
     """Navigate or fetch a direct document URL (Drive downloads abort normal goto)."""
     if _looks_like_direct_document_url(url):
-        tried = await _try_browser_nav_download(page, dest, url, timeout_ms)
-        if tried:
-            return dest, tried[1], tried[0]
+        # HTTP first — Drive usercontent URLs abort Playwright goto with ERR_ABORTED.
         tried = await _try_download_page_url(page, dest, url, timeout_ms=timeout_ms)
         if tried:
             return dest, tried[1], tried[0]
-        if _looks_like_direct_document_url(url):
-            return None
+        if not _is_gdrive_usercontent_url(url):
+            tried = await _try_browser_nav_download(page, dest, url, timeout_ms)
+            if tried:
+                return dest, tried[1], tried[0]
+        return None
     await _navigate_page(page, url, timeout_ms, wait_until=wait_until)
     return await _capture_document_after_navigation(page, dest, url, downloads, timeout_ms)
 
@@ -665,6 +697,8 @@ async def _try_download_page_url(
         return await _download_document_url(page, url, dest, timeout_ms=timeout_ms)
     except RecipeReplayError:
         pass
+    if _is_gdrive_usercontent_url(url):
+        return None
     return await _try_browser_nav_download(page, dest, url, timeout_ms)
 
 
@@ -1056,6 +1090,19 @@ async def replay_recipe(
     page.on("download", lambda d: downloads.append(d))
 
     first_action = (steps[0].get("action") if steps else "") or ""
+
+    # Google Drive static bulletins: download via HTTP only — never page.goto usercontent URL.
+    if _recipe_is_gdrive_static(recipe):
+        drive_url = _gdrive_download_url_from_recipe(recipe)
+        if drive_url:
+            try:
+                source_url, file_type = await _download_document_url(
+                    page, drive_url, dest, timeout_ms=step_timeout_ms
+                )
+                return dest, file_type, source_url
+            except RecipeReplayError as exc:
+                raise RecipeReplayError(str(exc)) from exc
+
     if start_url and first_action != "goto":
         if _looks_like_direct_document_url(start_url):
             captured = await _goto_or_download(
@@ -1064,7 +1111,7 @@ async def replay_recipe(
             )
             if captured:
                 return captured
-        else:
+        elif not _recipe_is_gdrive_static(recipe):
             await _navigate_page(page, start_url, step_timeout_ms, wait_until=nav_wait_until)
             if _looks_like_http_url(start_url):
                 last_http_url = start_url
