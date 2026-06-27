@@ -6648,22 +6648,43 @@
               `https://raw.githubusercontent.com/${ghRepo}/main/Bulletins/current/${parishKey}.pdf`;
             showPostPushBanner(
               pushResponse,
-              `✅ <strong>${displayName}</strong> — bulletin ready! ` +
-              `<a href="${pdfUrl}" target="_blank" rel="noopener noreferrer">Open PDF</a>`,
+              `✅ <strong>${displayName}</strong> — test passed! Result recorded on GitHub. ` +
+              `<a href="${pdfUrl}" target="_blank" rel="noopener noreferrer">Open PDF</a> · ` +
+              `Check Problems tab for updated status.`,
               "ok"
             );
-            showStatus(`✅ ${displayName} test passed.`, "ok");
+            showStatus(`✅ ${displayName} test passed — see Problems tab.`, "ok");
+            try {
+              chrome.runtime.sendMessage({ type: "problems_refresh", parish_key: parishKey, display_name: displayName });
+            } catch (_e) {}
+            return;
+          }
+          if (result.stale) {
+            const reason = String(result.reason || result.item?.error || "Bulletin too old").slice(0, 160);
+            showPostPushBanner(
+              pushResponse,
+              `🕐 <strong>${displayName}</strong> — recipe worked! Bulletin too old for this week (recorded on GitHub). ` +
+              `${reason} · Open Problems tab.`,
+              "warn"
+            );
+            showStatus(`🕐 ${displayName} — recipe OK, bulletin stale (recorded on GitHub).`, "warn");
+            try {
+              chrome.runtime.sendMessage({ type: "problems_refresh", parish_key: parishKey, display_name: displayName });
+            } catch (_e) {}
             return;
           }
           if (result.ok === false) {
             const reason = String(result.reason || "Harvest failed").slice(0, 200);
             showPostPushBanner(
               pushResponse,
-              `❌ <strong>${displayName}</strong> — ${reason}. ` +
-              `<a href="${result.runUrl}" target="_blank" rel="noopener noreferrer">Actions log</a> — re-record and Send & test.`,
+              `❌ <strong>${displayName}</strong> — ${reason} (recorded on GitHub). ` +
+              `<a href="${result.runUrl}" target="_blank" rel="noopener noreferrer">Actions log</a> · Problems tab.`,
               "err"
             );
-            showStatus(`❌ ${displayName} test failed — see banner.`, "error");
+            showStatus(`❌ ${displayName} test failed — see Problems tab.`, "error");
+            try {
+              chrome.runtime.sendMessage({ type: "problems_refresh", parish_key: parishKey, display_name: displayName });
+            } catch (_e) {}
             return;
           }
           showPostPushBanner(

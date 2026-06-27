@@ -75,6 +75,40 @@ class PatchReportTests(unittest.TestCase):
             on_disk = json.loads(report_json.read_text(encoding="utf-8"))
             self.assertEqual(on_disk["summary"]["failed"], 0)
             self.assertTrue(report_txt.exists())
+            self.assertIn("last_tested_at", on_disk["downloaded"][0])
+            self.assertIn("last_patched_at", on_disk)
+
+    def test_stale_result_goes_to_stale_rejected_with_timestamp(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            report_json = tmp_path / "report.json"
+            report_txt = tmp_path / "report.txt"
+            current_dir = tmp_path / "current"
+            current_dir.mkdir()
+
+            result = FetchResult(
+                key="bangorparish",
+                display_name="Bangor",
+                status="error",
+                url="https://example.com/bulletin",
+                error="Stale bulletin rejected for mega PDF (bulletin date 2026-06-07, too_old)",
+            )
+            result.is_stale = True
+            result.stale_reason = "too_old"
+            target = date(2026, 6, 14)
+
+            patched = patch_report_for_parishes(
+                [result],
+                report_json,
+                report_txt,
+                target,
+                current_dir=current_dir,
+            )
+
+            self.assertIsNotNone(patched)
+            self.assertEqual(patched["summary"]["stale_rejected"], 1)
+            self.assertEqual(patched["stale_rejected"][0]["parish"], "bangorparish")
+            self.assertIn("last_tested_at", patched["stale_rejected"][0])
 
     def test_creates_report_when_missing(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

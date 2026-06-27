@@ -322,14 +322,30 @@
 
   function parishHarvestStatus(report, parishKey) {
     const key = String(parishKey || "").trim().toLowerCase();
-    const downloaded = (report?.downloaded || []).find(
+    const find = (rows) => (rows || []).find(
       (row) => String(row?.parish || "").trim().toLowerCase() === key
     );
+    const downloaded = find(report?.downloaded);
     if (downloaded) return { status: "ok", item: downloaded };
-    const failed = (report?.failed || []).find(
-      (row) => String(row?.parish || "").trim().toLowerCase() === key
-    );
-    if (failed) return { status: "failed", item: failed };
+    const stale = find(report?.stale_rejected);
+    if (stale) {
+      return {
+        status: "stale",
+        item: {
+          ...stale,
+          error: stale.error || stale.reason || "Bulletin too old (recipe worked)",
+        },
+      };
+    }
+    const failed = find(report?.failed);
+    if (failed) {
+      if (/Stale bulletin rejected/i.test(String(failed.error || ""))) {
+        return { status: "stale", item: failed };
+      }
+      return { status: "failed", item: failed };
+    }
+    const htmlLink = find(report?.html_links);
+    if (htmlLink) return { status: "html_link", item: htmlLink };
     return { status: "unknown", item: null };
   }
 
@@ -391,6 +407,16 @@
       if (workflowSucceeded && (parishStatus.status === "ok" || pdfOk)) {
         return { ok: true, runUrl, item: parishStatus.item, elapsed };
       }
+      if (workflowDone && parishStatus.status === "stale") {
+        return {
+          ok: false,
+          stale: true,
+          runUrl,
+          item: parishStatus.item,
+          elapsed,
+          reason: parishStatus.item?.error || parishStatus.item?.reason || "Bulletin too old (recipe worked)",
+        };
+      }
       if (workflowFailed) {
         return {
           ok: false,
@@ -407,6 +433,15 @@
           item: parishStatus.item,
           elapsed,
           reason: parishStatus.item?.reason || parishStatus.item?.error || "Harvest failed",
+        };
+      }
+      if (workflowDone && parishStatus.status === "html_link") {
+        return {
+          ok: false,
+          runUrl,
+          item: parishStatus.item,
+          elapsed,
+          reason: "HTML-only bulletin (no PDF saved)",
         };
       }
       if (workflowRunning) continue;

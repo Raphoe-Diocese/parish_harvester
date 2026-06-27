@@ -961,57 +961,66 @@ async function _pdCheckRecipe(key) {
   return "none";
 }
 
+async function _pdEnsureParishesLoaded() {
+  if (_pdAllParishes.length > 0 && Object.keys(_pdDioceseTexts).length > 0) return;
+  const evidenceResults = await Promise.all(
+    Object.entries(PD_EVIDENCE_FILES).map(([diocese, path]) =>
+      _pdGhFetch(path)
+        .then(({ content }) => ({ diocese, path, content }))
+        .catch(() => null)
+    )
+  );
+  _pdAllParishes = [];
+  _pdDioceseTexts = {};
+  for (const r of evidenceResults) {
+    if (!r?.content) continue;
+    _pdDioceseTexts[r.diocese] = { text: r.content, path: r.path };
+    _pdAllParishes.push(..._pdParseEvidence(r.content, r.diocese));
+  }
+}
+
+function _pdDioceseForKey(parishKey) {
+  const match = _pdAllParishes.find((p) => p.key === parishKey);
+  return match?.diocese || "";
+}
+
+function _problemsFormatLastSeen(item, report) {
+  const tested = String(item?.last_tested_at || report?.last_patched_at || "").trim();
+  if (tested) {
+    const d = tested.slice(0, 10);
+    if (/^\d{4}-\d{2}-\d{2}$/.test(d)) return formatUkDate(d);
+  }
+  return formatUkDate(String(report?.target_date || ""));
+}
+
 async function _problemsFilterActionableRows(report, consecutiveFailures, retrainedMap) {
   const targetDate = String(report?.target_date || "");
-  const lastSeen = formatUkDate(targetDate);
+  const defaultLastSeen = formatUkDate(targetDate);
   const downloadedKeys = new Set(
     (Array.isArray(report?.downloaded) ? report.downloaded : [])
       .map((item) => String(item?.parish || "").trim())
       .filter(Boolean)
   );
   const failed = Array.isArray(report?.failed) ? report.failed : [];
+  const staleRejected = Array.isArray(report?.stale_rejected) ? report.stale_rejected : [];
   const htmlLinks = Array.isArray(report?.html_links) ? report.html_links : [];
+  const problemItems = [
+    ...failed.filter((item) => !/Stale bulletin rejected/i.test(String(item?.error || ""))),
+    ...staleRejected,
+    ...failed.filter((item) => /Stale bulletin rejected/i.test(String(item?.error || ""))),
+  ];
   const recipeStatuses = await Promise.all(
-    [...failed, ...htmlLinks].map((item) => _pdCheckRecipe(String(item?.parish || "").trim()))
+    [...problemItems, ...htmlLinks].map((item) => _pdCheckRecipe(String(item?.parish || "").trim()))
   );
 
   let hiddenDead = 0;
   let hiddenFixed = 0;
   const rows = [];
+  const seen = new Set();
 
-  failed.forEach((item, idx) => {
+  const pushRow = (item, statusIdx, defaults = {}) => {
     const parish = String(item?.parish || "").trim();
-    if (!parish) return;
-    if (downloadedKeys.has(parish)) {
-      hiddenFixed += 1;
-      return;
-    }
-    if (recipeStatuses[idx] === "dead") {
-      hiddenDead += 1;
-      return;
-    }
-    const retrainedPending = _problemsIsRetrainedPending(parish, targetDate, retrainedMap);
-    const errorText = String(item?.error || "");
-    const diagnosis = item?.diagnosis && typeof item.diagnosis === "object" ? item.diagnosis : null;
-    rows.push({
-      parish,
-      display_name: String(item?.display_name || item?.parish || ""),
-      start_url: String(item?.start_url || item?.url || ""),
-      url: String(item?.url || ""),
-      error_text: errorText,
-      diagnosis,
-      advice: _problemsFailureAdvice(errorText, diagnosis),
-      category: _problemsCategory(errorText, { retrainedPending, diagnosis }),
-      last_seen: lastSeen,
-      consecutive_failures: Number(consecutiveFailures[parish] || 0),
-      retrainedPending,
-    });
-  });
-
-  htmlLinks.forEach((item, offset) => {
-    const parish = String(item?.parish || "").trim();
-    if (!parish) return;
-    const statusIdx = failed.length + offset;
+    if (!parish || seen.has(parish)) return;
     if (downloadedKeys.has(parish)) {
       hiddenFixed += 1;
       return;
@@ -1020,19 +1029,65 @@ async function _problemsFilterActionableRows(report, consecutiveFailures, retrai
       hiddenDead += 1;
       return;
     }
+    const parishMeta = _pdAllParishes.find((p) => p.key === parish);
+    if (parishMeta?.disabled) {
+      hiddenDead += 1;
+      return;
+    }
+    seen.add(parish);
+    const retrainedPending = _problemsIsRetrainedPending(parish, targetDate, retrainedMap);
+    const errorText = String(item?.error || item?.reason || defaults.error_text || "");
+    const diagnosis = item?.diagnosis && typeof item.diagnosis === "object" ? item.diagnosis : null;
     rows.push({
       parish,
       display_name: String(item?.display_name || item?.parish || ""),
+      diocese: _pdDioceseForKey(parish),
+      start_url: String(item?.start_url || item?.url || ""),
+      url: String(item?.url || ""),
+      error_text: errorText,
+      diagnosis,
+      advice: _problemsFailureAdvice(errorText, diagnosis),
+      category: defaults.category || _problemsCategory(errorText, { retrainedPending, diagnosis }),
+      last_seen: _problemsFormatLastSeen(item, report) || defaultLastSeen,
+      consecutive_failures: Number(consecutiveFailures[parish] || 0),
+      retrainedPending,
+    });
+  };
+
+  problemItems.forEach((item, idx) => pushRow(item, idx));
+
+  htmlLinks.forEach((item, offset) => {
+    const parish = String(item?.parish || "").trim();
+    if (!parish || seen.has(parish)) return;
+    const statusIdx = problemItems.length + offset;
+    if (downloadedKeys.has(parish)) {
+      hiddenFixed += 1;
+      return;
+    }
+    if (recipeStatuses[statusIdx] === "dead") {
+      hiddenDead += 1;
+      return;
+    }
+    const parishMeta = _pdAllParishes.find((p) => p.key === parish);
+    if (parishMeta?.disabled) {
+      hiddenDead += 1;
+      return;
+    }
+    seen.add(parish);
+    rows.push({
+      parish,
+      display_name: String(item?.display_name || item?.parish || ""),
+      diocese: _pdDioceseForKey(parish),
       start_url: String(item?.start_url || item?.url || ""),
       url: String(item?.url || ""),
       category: "no_pdf",
-      last_seen: lastSeen,
+      last_seen: _problemsFormatLastSeen(item, report) || defaultLastSeen,
       consecutive_failures: Number(consecutiveFailures[parish] || 0),
       retrainedPending: false,
     });
   });
 
-  return { rows, hiddenDead, hiddenFixed, lastSeen };
+  return { rows, hiddenDead, hiddenFixed, lastSeen: defaultLastSeen };
 }
 
 // ── Rendering ─────────────────────────────────────────────────────────────
@@ -1216,15 +1271,25 @@ async function _problemsFetchLiveReport(repo, ghPat) {
 }
 
 function _problemsParishHarvestStatus(report, parishKey) {
+  const mod = globalThis.phGithubRecipePush;
+  if (mod?.parishHarvestStatus) {
+    return mod.parishHarvestStatus(report, parishKey);
+  }
   const key = String(parishKey || "").trim().toLowerCase();
-  const downloaded = (report?.downloaded || []).find(
+  const find = (rows) => (rows || []).find(
     (row) => String(row?.parish || "").trim().toLowerCase() === key
   );
+  const downloaded = find(report?.downloaded);
   if (downloaded) return { status: "ok", item: downloaded };
-  const failed = (report?.failed || []).find(
-    (row) => String(row?.parish || "").trim().toLowerCase() === key
-  );
-  if (failed) return { status: "failed", item: failed };
+  const stale = find(report?.stale_rejected);
+  if (stale) return { status: "stale", item: stale };
+  const failed = find(report?.failed);
+  if (failed) {
+    if (/Stale bulletin rejected/i.test(String(failed.error || ""))) {
+      return { status: "stale", item: failed };
+    }
+    return { status: "failed", item: failed };
+  }
   return { status: "unknown", item: null };
 }
 
@@ -1259,6 +1324,13 @@ function _problemsShowVerifyResult(payload) {
     lines.push(
       `Saved copy: <a href="${parishPdf}" target="_blank" rel="noopener noreferrer">Bulletins/current/${payload.parishKey}.pdf</a>`
     );
+  } else if (payload.stale === true) {
+    box.className = "warn";
+    const reason = String(payload.item?.error || payload.item?.reason || "Bulletin too old").slice(0, 220);
+    lines.push(`🕐 <strong>${payload.displayName}</strong> — recipe worked, bulletin too old for this week.`);
+    lines.push(`Recorded on GitHub: ${reason}`);
+    const advice = _problemsFailureAdvice(reason, payload.item?.diagnosis);
+    if (advice) lines.push(`<strong>What this means:</strong> ${advice}`);
   } else if (payload.ok === false) {
     box.className = "err";
     const reason = String(payload.item?.error || payload.item?.reason || "still failed").slice(0, 220);
@@ -1380,6 +1452,24 @@ async function _problemsPollHarvestResult({
       return;
     }
 
+    if (workflowDone && parishStatus.status === "stale") {
+      _problemsShowVerifyResult({
+        stale: true,
+        displayName,
+        parishKey,
+        repo: ghRepo,
+        runUrl,
+        item: parishStatus.item,
+      });
+      setStatus(`🕐 ${displayName} — recipe OK, bulletin too old (recorded on GitHub).`, "warn");
+      if (verifyBtn) {
+        verifyBtn.disabled = false;
+        verifyBtn.textContent = "▶ Test again";
+      }
+      void loadProblemsDashboard();
+      return;
+    }
+
     if (workflowRunning) {
       const runStatus = run.status === "queued" || run.status === "pending"
         ? "queued (another harvest may be ahead — please wait)"
@@ -1396,9 +1486,10 @@ async function _problemsPollHarvestResult({
     }
 
     if (workflowFailed) {
-      if (parishStatus.status === "failed") {
+      if (parishStatus.status === "failed" || parishStatus.status === "stale") {
         _problemsShowVerifyResult({
-          ok: false,
+          ok: parishStatus.status === "failed" ? false : undefined,
+          stale: parishStatus.status === "stale",
           displayName,
           parishKey,
           repo: ghRepo,
@@ -1420,6 +1511,7 @@ async function _problemsPollHarvestResult({
         verifyBtn.disabled = false;
         verifyBtn.textContent = "▶ Test again";
       }
+      void loadProblemsDashboard();
       return;
     }
 
@@ -1437,6 +1529,7 @@ async function _problemsPollHarvestResult({
         verifyBtn.disabled = false;
         verifyBtn.textContent = "▶ Test again";
       }
+      void loadProblemsDashboard();
       return;
     }
 
@@ -1561,6 +1654,10 @@ async function _problemsRenderRows(rows) {
     parish.textContent = row.display_name || row.parish || "Unknown";
     tr.appendChild(parish);
 
+    const diocese = document.createElement("td");
+    diocese.textContent = row.diocese || "—";
+    tr.appendChild(diocese);
+
     const category = document.createElement("td");
     category.textContent = row.category;
     if (row.retrainedPending) category.classList.add("problems-retrained");
@@ -1645,6 +1742,36 @@ async function _problemsRenderRows(rows) {
       void _problemsVerifyHarvest(row, testBtn, { forceDispatch: !row.retrainedPending });
     });
     action.appendChild(testBtn);
+
+    const removeBtn = document.createElement("button");
+    removeBtn.type = "button";
+    removeBtn.className = "problems-remove-btn";
+    removeBtn.textContent = "🗑 Remove";
+    removeBtn.title = "Disable parish in harvest (marks DISABLED in evidence file on GitHub)";
+    removeBtn.addEventListener("click", () => {
+      void (async () => {
+        await _pdEnsureParishesLoaded();
+        const match = _pdAllParishes.find((p) => p.key === row.parish);
+        if (!match) {
+          setStatus("❌ Parish not found in directory — check GitHub PAT, then Refresh.", "err");
+          return;
+        }
+        if (!confirm(`Remove ${match.name} from the harvest?\n\nThis marks the parish DISABLED in the evidence file on GitHub.`)) {
+          return;
+        }
+        removeBtn.disabled = true;
+        try {
+          await _pdDisableParish(match);
+          setStatus(`✅ ${match.name} disabled — refreshing Problems list…`, "ok");
+          void loadProblemsDashboard();
+        } catch (err) {
+          setStatus(`❌ ${err.message}`, "err");
+        } finally {
+          removeBtn.disabled = false;
+        }
+      })();
+    });
+    action.appendChild(removeBtn);
     tr.appendChild(action);
 
     tbody.appendChild(tr);
@@ -1659,6 +1786,7 @@ async function loadProblemsDashboard() {
   if (empty) empty.textContent = "Loading…";
   for (const key of Object.keys(_pdRecipeCache)) delete _pdRecipeCache[key];
   try {
+    await _pdEnsureParishesLoaded();
     const urls = await _problemsRepoUrls();
     const cfg = await _pdGetGithubConfig();
     let report = cfg ? await _problemsFetchLiveReport(urls.repo, cfg.ghPat) : null;

@@ -8,7 +8,7 @@ from __future__ import annotations
 
 import json
 import shutil
-from datetime import date
+from datetime import date, datetime, timezone
 from pathlib import Path
 from typing import TYPE_CHECKING
 
@@ -107,6 +107,11 @@ def reconcile_report_with_recipes(report: dict, parishes_dir: Path | None = None
         and str(item.get("parish") or "").strip() not in downloaded_keys
     ]
     report["html_links"] = html_links
+    report["stale_rejected"] = [
+        item for item in (report.get("stale_rejected") or [])
+        if isinstance(item, dict)
+        and str(item.get("parish") or "").strip() not in downloaded_keys
+    ]
     report["skipped"] = skipped + moved_skipped
     _recompute_summary(report)
     return report
@@ -357,12 +362,15 @@ def patch_report_for_parishes(
         }
 
     report["target_date"] = str(target)
+    tested_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    report["last_patched_at"] = tested_at
 
     for r in results:
         _remove_parish_from_sections(report, r.key)
         bucket, entry = _result_to_report_entry(r, current_dir)
         if entry is None:
             continue
+        entry["last_tested_at"] = tested_at
         section = report.setdefault(bucket, [])
         if isinstance(section, list):
             section.append(entry)
