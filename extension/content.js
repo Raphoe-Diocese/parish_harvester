@@ -6949,9 +6949,10 @@
         const settings = await _storageGet(["gh_repo", "gh_pat"]);
         const ghRepo = String(settings.gh_repo || "Raphoe-Diocese/parish_harvester").trim();
         if (!ghRepo) return null;
+        // raw.githubusercontent.com serves public files. Adding an Authorization
+        // header makes the browser send a CORS preflight that GitHub's raw host
+        // rejects, which blocks every recipe lookup. Public repo => no auth header.
         const headers = {};
-        const pat = String(settings.gh_pat || "").trim();
-        if (pat) headers.Authorization = `token ${pat}`;
         // Keep this normalization aligned with background.js::_canonicalDioceseSlug.
         const canonicalDioceseSlug = (value) => {
           const raw = String(value || "").trim().toLowerCase();
