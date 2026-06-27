@@ -1345,7 +1345,7 @@ async def replay_recipe(
                 except PlaywrightTimeoutError:
                     pass
                 await asyncio.sleep(2.5)
-                await _smart_print_page_to_pdf(page, dest, target)
+                await _smart_print_page_to_pdf(page, dest, target_date)
                 return dest, "print_to_pdf", html_url
 
             if action == "print_to_pdf":
@@ -1360,7 +1360,7 @@ async def replay_recipe(
                 except PlaywrightTimeoutError:
                     pass
                 await asyncio.sleep(2.5)
-                await _smart_print_page_to_pdf(page, dest, target)
+                await _smart_print_page_to_pdf(page, dest, target_date)
                 return dest, "print_to_pdf", pdf_url
 
             if action == "crop_screenshot":
