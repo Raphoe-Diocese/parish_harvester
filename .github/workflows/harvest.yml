@@ -32,9 +32,11 @@ permissions:
   contents: write
   issues: write
 
+# Full harvest and single-parish tests must not share one queue — otherwise
+# "Send & test" waits 30–60+ min behind a running full harvest.
 concurrency:
-  group: harvest-push
-  cancel-in-progress: false
+  group: harvest-${{ github.event.inputs.target_parish || 'full' }}
+  cancel-in-progress: ${{ github.event.inputs.target_parish != '' }}
 
 jobs:
   harvest:

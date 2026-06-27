@@ -7056,7 +7056,7 @@
           if (response.dispatchOk) {
             dispatchErrorBanner.style.display = "none";
             showStatus(
-              `✅ Recipe ${verb}! Testing ${name || key} on GitHub now (this parish only).`,
+              `✅ Recipe ${verb}! Saved — test on GitHub (usually 1–3 min, not the mega PDF).`,
               "ok"
             );
             showPostPushBanner(
@@ -7185,7 +7185,7 @@
             clearTimeout(pushSafetyTimer);
             clearTimeout(pushProgress15);
             _resetPushBtn();
-            showStatus("✅ Recipe saved — starting single-parish test…", "ok");
+            showStatus("✅ Recipe saved on GitHub — single-parish test starting (usually 1–3 min)…", "ok");
 
             const dispatchAt = Date.now();
             const dispatchResult = await pushMod.dispatchHarvestTest({
