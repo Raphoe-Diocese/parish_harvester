@@ -301,6 +301,102 @@
     }
   };
 
+  const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
+  async function findLatestHarvestRun(gh_pat, gh_repo, afterMs) {
+    try {
+      const resp = await fetchGithub(
+        `https://api.github.com/repos/${gh_repo}/actions/workflows/harvest.yml/runs?per_page=20&event=workflow_dispatch`,
+        authHeaders(gh_pat),
+        15000
+      );
+      if (!resp.ok) return null;
+      const data = await resp.json();
+      const runs = Array.isArray(data.workflow_runs) ? data.workflow_runs : [];
+      const cutoff = afterMs - 120_000;
+      return runs.find((run) => new Date(run.created_at).getTime() >= cutoff) || runs[0] || null;
+    } catch (_e) {
+      return null;
+    }
+  }
+
+  function parishHarvestStatus(report, parishKey) {
+    const key = String(parishKey || "").trim().toLowerCase();
+    const downloaded = (report?.downloaded || []).find(
+      (row) => String(row?.parish || "").trim().toLowerCase() === key
+    );
+    if (downloaded) return { status: "ok", item: downloaded };
+    const failed = (report?.failed || []).find(
+      (row) => String(row?.parish || "").trim().toLowerCase() === key
+    );
+    if (failed) return { status: "failed", item: failed };
+    return { status: "unknown", item: null };
+  }
+
+  /** Poll GitHub until single-parish harvest succeeds, fails, or times out. */
+  async function pollHarvestUntilDone({
+    gh_pat,
+    gh_repo: storedRepo,
+    parish_key,
+    startedAt,
+    onProgress,
+    maxAttempts = 55,
+  }) {
+    const gh_repo = resolveGhRepo(storedRepo);
+    const key = String(parish_key || "").trim().toLowerCase();
+    const started = Number(startedAt) || Date.now();
+    let runUrl = `https://github.com/${gh_repo}/actions/workflows/harvest.yml`;
+
+    for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+      if (attempt > 0) {
+        const delay = attempt < 8 ? 3000 : attempt < 20 ? 8000 : 12000;
+        await sleep(delay);
+      }
+      const elapsed = Math.round((Date.now() - started) / 1000);
+      const run = await findLatestHarvestRun(gh_pat, gh_repo, started);
+      if (run?.html_url) runUrl = run.html_url;
+      const workflowDone = run && run.status === "completed";
+      const workflowRunning = run && (run.status === "in_progress" || run.status === "queued" || run.status === "pending");
+      const workflowFailed = workflowDone && run.conclusion === "failure";
+      const workflowSucceeded = workflowDone && run.conclusion === "success";
+
+      const report = await fetchReportJson({ gh_pat, gh_repo: storedRepo });
+      const parishStatus = report ? parishHarvestStatus(report, key) : { status: "unknown", item: null };
+
+      let pdfOk = false;
+      if (workflowSucceeded) {
+        pdfOk = await parishPdfExists({ gh_pat, gh_repo: storedRepo, parish_key: key });
+      }
+
+      onProgress?.({
+        attempt,
+        elapsed,
+        runUrl,
+        runStatus: run?.status,
+        parishStatus: parishStatus.status,
+      });
+
+      if (parishStatus.status === "ok" || pdfOk) {
+        return { ok: true, runUrl, item: parishStatus.item, elapsed };
+      }
+      if (workflowFailed || (workflowDone && parishStatus.status === "failed")) {
+        const reason =
+          parishStatus.item?.reason ||
+          parishStatus.item?.error ||
+          "GitHub Actions run failed";
+        return { ok: false, runUrl, item: parishStatus.item, elapsed, reason };
+      }
+      if (workflowRunning) continue;
+    }
+
+    return {
+      ok: null,
+      runUrl,
+      elapsed: Math.round((Date.now() - started) / 1000),
+      reason: "Timed out waiting for harvest result",
+    };
+  }
+
   global.phGithubRecipePush = {
     canonicalDioceseSlug,
     resolveGhRepo,
@@ -309,5 +405,8 @@
     dispatchHarvestTest,
     fetchReportJson,
     parishPdfExists,
+    pollHarvestUntilDone,
+    findLatestHarvestRun,
+    parishHarvestStatus,
   };
 })(typeof globalThis !== "undefined" ? globalThis : self);

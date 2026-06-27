@@ -6596,6 +6596,10 @@
           postPushBanner.style.color = "#fde68a";
           postPushBanner.style.background = "#78350f";
           postPushBanner.style.borderColor = "#f59e0b";
+        } else if (tone === "err") {
+          postPushBanner.style.color = "#fecaca";
+          postPushBanner.style.background = "#7f1d1d";
+          postPushBanner.style.borderColor = "#ef4444";
         } else {
           postPushBanner.style.color = "#86efac";
           postPushBanner.style.background = "#14532d";
@@ -6603,6 +6607,68 @@
         }
         const diag = formatPushDiagnosisHtml(response);
         postPushBanner.innerHTML = headlineHtml + (diag ? `<br><br>${diag}` : "");
+      };
+
+      let _postPushWatchToken = 0;
+      const _startPostPushHarvestWatch = (parishKey, displayName, pushResponse, dispatchAt) => {
+        const token = ++_postPushWatchToken;
+        void (async () => {
+          const settings = await _storageGet(["gh_pat", "gh_repo"]);
+          const mod = globalThis.phGithubRecipePush;
+          if (!settings.gh_pat || !mod?.pollHarvestUntilDone) return;
+          const ghRepo = String(settings.gh_repo || "Raphoe-Diocese/parish_harvester").trim();
+          const startedAt = Number(dispatchAt) || Date.now();
+          const result = await mod.pollHarvestUntilDone({
+            gh_pat: settings.gh_pat,
+            gh_repo: settings.gh_repo,
+            parish_key: parishKey,
+            startedAt,
+            onProgress: ({ elapsed, runStatus }) => {
+              if (token !== _postPushWatchToken) return;
+              const statusLabel =
+                runStatus === "queued" || runStatus === "pending"
+                  ? "queued on GitHub"
+                  : runStatus === "in_progress"
+                    ? "running on GitHub"
+                    : "checking result";
+              showPostPushBanner(
+                pushResponse,
+                `⏳ <strong>${displayName}</strong> — ${statusLabel} (${elapsed}s)…`
+              );
+            },
+          });
+          if (token !== _postPushWatchToken) return;
+          if (result.ok) {
+            const pdfUrl =
+              result.item?.url ||
+              `https://raw.githubusercontent.com/${ghRepo}/main/Bulletins/current/${parishKey}.pdf`;
+            showPostPushBanner(
+              pushResponse,
+              `✅ <strong>${displayName}</strong> — bulletin ready! ` +
+              `<a href="${pdfUrl}" target="_blank" rel="noopener noreferrer">Open PDF</a>`,
+              "ok"
+            );
+            showStatus(`✅ ${displayName} test passed.`, "ok");
+            return;
+          }
+          if (result.ok === false) {
+            const reason = String(result.reason || "Harvest failed").slice(0, 200);
+            showPostPushBanner(
+              pushResponse,
+              `❌ <strong>${displayName}</strong> — ${reason}. ` +
+              `<a href="${result.runUrl}" target="_blank" rel="noopener noreferrer">Actions log</a> — re-record and Send & test.`,
+              "err"
+            );
+            showStatus(`❌ ${displayName} test failed — see banner.`, "error");
+            return;
+          }
+          showPostPushBanner(
+            pushResponse,
+            `⚠️ <strong>${displayName}</strong> — still waiting after ${result.elapsed}s. ` +
+            `<a href="${result.runUrl}" target="_blank" rel="noopener noreferrer">Open Actions</a> or Problems tab.`,
+            "warn"
+          );
+        })();
       };
 
       const driftBanner = document.createElement("div");
@@ -6968,6 +7034,21 @@
           const path = response.filePath || `parishes/recipes/${key}.json`;
           const linkUrl = response.url || "";
           const linkPart = linkUrl ? ` → ${linkUrl}` : ` → ${path}`;
+
+          if (response.stepsPreservedFromOld && !isFollowup) {
+            showStatus(
+              "⚠️ GitHub kept the OLD recipe steps — record new steps on this page, then Send & test again.",
+              "warn"
+            );
+            showPostPushBanner(
+              response,
+              `⚠️ <strong>${name || key}</strong> — no new steps were sent; old recipe unchanged. Record PDF steps first.`,
+              "warn"
+            );
+            return;
+          }
+
+          const dispatchAt = Date.now();
           if (response.dispatchOk) {
             dispatchErrorBanner.style.display = "none";
             showStatus(
@@ -6976,13 +7057,15 @@
             );
             showPostPushBanner(
               response,
-              `⏳ <strong>${name || key}</strong> — single-parish test running (not the mega PDF). Problems tab will show the bulletin link when done.`
+              `⏳ <strong>${name || key}</strong> — single-parish test running (${0}s)…`
             );
+            _startPostPushHarvestWatch(key, name || key, response, dispatchAt);
             try {
               chrome.runtime.sendMessage({
                 type: "problems_refresh",
                 parish_key: key,
                 display_name: name || key,
+                dispatch_at: dispatchAt,
               });
             } catch (_e) {
               // Side panel may be closed.
@@ -6991,8 +7074,9 @@
             showStatus(`✅ Recipe ${verb}! Saved to GitHub — starting harvest test…`, "ok");
             showPostPushBanner(
               response,
-              `✅ <strong>${name || key}</strong> — recipe saved. Single-parish test starting…`
+              `⏳ <strong>${name || key}</strong> — starting single-parish test…`
             );
+            _startPostPushHarvestWatch(key, name || key, response, dispatchAt);
           } else if (response.dispatchError) {
             showDispatchErrorBanner(response.dispatchError);
             showStatus(
