@@ -11,7 +11,6 @@ on:
     branches: [main]
     paths:
       - docs/**
-      - extension/**
       - mega_pdf/**
       - .github/workflows/deploy-pages.yml
   workflow_dispatch:
@@ -38,7 +37,7 @@ jobs:
       - name: Download mega PDF artifacts from harvest run
         if: github.event_name == 'workflow_run'
         continue-on-error: true
-        uses: actions/download-artifact@v4.1.3
+        uses: actions/download-artifact@v4
         with:
           github-token: ${{ github.token }}
           run-id: ${{ github.event.workflow_run.id }}
@@ -46,7 +45,7 @@ jobs:
           path: _harvest_artifacts
           merge-multiple: true
 
-      - name: Stage mega PDFs for Pages
+      - name: Verify mega PDFs for Pages deploy
         env:
           EVENT_NAME: ${{ github.event_name }}
           WORKFLOW_RUN_ID: ${{ github.event.workflow_run.id || '' }}
@@ -65,7 +64,7 @@ jobs:
               fi
               cp "${pdf}" "${dest}"
               HAD_NEW_ARTIFACTS=true
-            done < <(find _harvest_artifacts -type f -name '*_mega_bulletin.pdf' -print0 2>/dev/null || true)
+            done < <(find _harvest_artifacts -type f -name '*_mega_bulletin.pdf' -print0)
           fi
 
           if [ -d docs/mega_pdf ]; then
@@ -79,9 +78,9 @@ jobs:
 
           shopt -s nullglob
           pdfs=(mega_pdf/*_mega_bulletin.pdf)
-          if [ "${EVENT_NAME}" = "workflow_run" ] && [ "${#pdfs[@]}" -eq 0 ]; then
-            echo "::warning::No mega PDF artifacts from harvest run ${WORKFLOW_RUN_ID:-unknown} (conclusion: ${HARVEST_CONCLUSION:-n/a})."
-            echo "Deploying docs/ anyway — diocese pages and OCR archive stay online."
+          if [ "${EVENT_NAME}" = "workflow_run" ] && [ ${#pdfs[@]} -eq 0 ]; then
+            echo "Error: no mega PDF artifacts were downloaded from workflow run ${WORKFLOW_RUN_ID:-unknown} (conclusion: ${HARVEST_CONCLUSION:-n/a})."
+            exit 1
           elif [ "${#pdfs[@]}" -gt 0 ]; then
             echo "Mega PDFs staged for Pages:"
             for pdf in "${pdfs[@]}"; do
@@ -99,7 +98,7 @@ jobs:
 
           echo "HAD_NEW_ARTIFACTS=${HAD_NEW_ARTIFACTS}" >> "$GITHUB_ENV"
 
-      - name: Build Pages site
+      - name: Build Pages site (mega PDFs + extension updates)
         env:
           CHROME_EXTENSION_APP_ID: ${{ vars.CHROME_EXTENSION_APP_ID }}
         run: |
@@ -117,9 +116,7 @@ jobs:
           pdfs=(mega_pdf/*_mega_bulletin.pdf)
           if [ ${#pdfs[@]} -gt 0 ]; then
             mkdir -p _site/mega_pdf
-            for pdf in "${pdfs[@]}"; do
-              cp "${pdf}" "_site/mega_pdf/$(basename "${pdf}")"
-            done
+            cp -a mega_pdf/. _site/mega_pdf/
           fi
 
           mkdir -p _site/extension

@@ -95,7 +95,7 @@ jobs:
           fi
           xvfb-run -a python main.py $ARGS
         env:
-          HARVEST_MEGA_PDF: "0"
+          HARVEST_MEGA_PDF: "1"
           HARVEST_EMAIL_TO: ${{ secrets.HARVEST_EMAIL_TO }}
           HARVEST_EMAIL_FROM: ${{ secrets.HARVEST_EMAIL_FROM }}
           EMAIL_PROVIDER: ${{ secrets.EMAIL_PROVIDER }}
@@ -122,6 +122,15 @@ jobs:
             echo "Error: expected harvest output missing: Bulletins/report.txt"
             exit 1
           fi
+
+      - name: Upload mega PDF artifacts
+        if: success() && github.event.inputs.target_parish == ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-mega-bulletin-pdf
+          path: mega_pdf/*_mega_bulletin.pdf
+          if-no-files-found: warn
+          retention-days: 30
 
       - name: Build training backlog
         if: always()
