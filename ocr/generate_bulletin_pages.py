@@ -32,7 +32,7 @@ CONTACTS_PATH_BY_DIOCESE = {
 HEADER_PATTERN = re.compile(r"^#\s*---\s*(.*?)\s*---\s*$")
 OCR_BODY_PATTERN = re.compile(r'<div class="scrollable-viewer">\s*(.*?)\s*</div>\s*</body>', re.DOTALL | re.IGNORECASE)
 OCR_PAGE_HEADING_PATTERN = re.compile(r"<h2>\s*Page\s+(\d+)\s*</h2>", re.IGNORECASE)
-VIEWER_FILE_PATTERN = re.compile(r"^(derry|down_and_connor)-(\d{4}-\d{2}-\d{2})\.html$")
+VIEWER_FILE_PATTERN = re.compile(r"^([a-z0-9_]+)-(\d{4}-\d{2}-\d{2})\.html$")
 OCR_PANEL_PATTERN = re.compile(
     r'<div id="ocr-panel">\s*(.*?)\s*</div>\s*<div class="note-box">',
     re.DOTALL | re.IGNORECASE,
@@ -40,6 +40,7 @@ OCR_PANEL_PATTERN = re.compile(
 HTML_TAG_PATTERN = re.compile(r"<[^>]+>")
 WHITESPACE_PATTERN = re.compile(r"\s+")
 TEAL = "#1a6b6b"
+DEEP_TEAL = "#14524f"  # darker teal for top-level OCR headings, for visual hierarchy
 TEXT = "#1a1a2e"
 ACCENT = "#c0392b"
 FOOTER = "#114b4b"
@@ -61,22 +62,55 @@ class ViewerEntry:
     path: Path
 
 
-DIOCESES = {
-    "derry": DioceseConfig(
-        key="derry",
-        display_name="Derry Diocese",
-        headline="DERRY DIOCESE BIG BULLETIN",
-        evidence_path=REPO_ROOT / "parishes" / "derry_diocese_bulletin_urls.txt",
-        pdf_filename="derry_mega_bulletin.pdf",
-    ),
-    "down_and_connor": DioceseConfig(
-        key="down_and_connor",
-        display_name="Down & Connor Diocese",
-        headline="DOWN & CONNOR DIOCESE BIG BULLETIN",
-        evidence_path=REPO_ROOT / "parishes" / "down_and_connor_bulletin_urls.txt",
-        pdf_filename="down_and_connor_mega_bulletin.pdf",
-    ),
-}
+_FALLBACK_DIOCESES = [
+    {
+        "key": "derry",
+        "display_name": "Derry Diocese",
+        "headline": "DERRY DIOCESE BIG BULLETIN",
+        "evidence_file": "parishes/derry_diocese_bulletin_urls.txt",
+        "pdf_filename": "derry_mega_bulletin.pdf",
+    },
+    {
+        "key": "down_and_connor",
+        "display_name": "Down & Connor Diocese",
+        "headline": "DOWN & CONNOR DIOCESE BIG BULLETIN",
+        "evidence_file": "parishes/down_and_connor_bulletin_urls.txt",
+        "pdf_filename": "down_and_connor_mega_bulletin.pdf",
+    },
+    {
+        "key": "raphoe",
+        "display_name": "Raphoe Diocese",
+        "headline": "RAPHOE DIOCESE BIG BULLETIN",
+        "evidence_file": "parishes/raphoe_diocese_bulletin_urls.txt",
+        "pdf_filename": "raphoe_mega_bulletin.pdf",
+    },
+]
+
+
+def _load_dioceses() -> dict[str, DioceseConfig]:
+    config_path = REPO_ROOT / "parishes" / "dioceses.json"
+    entries = _FALLBACK_DIOCESES
+    if config_path.exists():
+        try:
+            data = json.loads(config_path.read_text(encoding="utf-8"))
+            if isinstance(data.get("dioceses"), list) and data["dioceses"]:
+                entries = data["dioceses"]
+        except (json.JSONDecodeError, OSError, KeyError, TypeError):
+            pass
+    result: dict[str, DioceseConfig] = {}
+    for entry in entries:
+        key = entry["key"]
+        result[key] = DioceseConfig(
+            key=key,
+            display_name=entry["display_name"],
+            headline=entry["headline"],
+            evidence_path=REPO_ROOT / entry["evidence_file"],
+            pdf_filename=entry["pdf_filename"],
+        )
+    return result
+
+
+DIOCESES = _load_dioceses()
 
 
 def parse_parish_links(path: Path) -> list[tuple[str, str]]:
@@ -353,7 +387,8 @@ def render_ocr_standalone_page(
       padding: 20px 18px;
       box-shadow: 0 4px 12px rgba(26, 107, 107, 0.06);
     }}
-    .ocr-body h1, .ocr-body h2, .ocr-body h3 {{ color: {TEAL}; margin: 16px 0 10px; }}
+    .ocr-body h1, .ocr-body h2 {{ color: {DEEP_TEAL}; margin: 16px 0 10px; font-weight: 700; }}
+    .ocr-body h3, .ocr-body h4 {{ color: {TEAL}; margin: 14px 0 8px; font-weight: 700; }}
     .ocr-body h3.ocr-page-heading {{
       font-size: 0.95rem;
       letter-spacing: 0.08em;
@@ -711,10 +746,17 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
       line-height: 1.8;
       color: {TEXT};
     }}
-    #ocr-panel h1, #ocr-panel h2, #ocr-panel h3 {{
-      color: {TEAL};
+    #ocr-panel h1, #ocr-panel h2 {{
+      color: {DEEP_TEAL};
       margin-top: 16px;
       margin-bottom: 10px;
+      font-weight: 700;
+    }}
+    #ocr-panel h3, #ocr-panel h4 {{
+      color: {TEAL};
+      margin-top: 14px;
+      margin-bottom: 8px;
+      font-weight: 700;
     }}
     #ocr-panel h3.ocr-page-heading {{
       font-size: 1rem;
@@ -1245,6 +1287,8 @@ def regenerate_viewer_from_existing(existing_path: Path) -> Path:
     if not match:
         raise ValueError(f"Not a viewer file: {existing_path.name}")
     diocese, bulletin_date = match.group(1), match.group(2)
+    if diocese not in DIOCESES:
+        raise ValueError(f"Unknown diocese key in viewer file: {diocese}")
     config = DIOCESES[diocese]
     raw_html = existing_path.read_text(encoding="utf-8")
     page_match = re.search(r"Page 1 of (\d+)", raw_html)
@@ -1303,7 +1347,10 @@ def scan_viewer_entries() -> list[ViewerEntry]:
         match = VIEWER_FILE_PATTERN.match(path.name)
         if not match:
             continue
-        entries.append(ViewerEntry(diocese=match.group(1), date=match.group(2), path=path))
+        diocese = match.group(1)
+        if diocese not in DIOCESES:
+            continue
+        entries.append(ViewerEntry(diocese=diocese, date=match.group(2), path=path))
     return sorted(entries, key=lambda entry: (entry.date, entry.diocese), reverse=True)
 
 

@@ -201,11 +201,13 @@ document.getElementById("gh-save").addEventListener("click", () => {
 //   • ☠️  button  → push a dead recipe to GitHub
 //   • exclude ☑   → add / remove the parish key from parishes/mega_excludes.json
 
-const PD_EVIDENCE_FILES = {
+const PD_EVIDENCE_FILES_FALLBACK = {
   "Derry Diocese":         "parishes/derry_diocese_bulletin_urls.txt",
   "Down & Connor Diocese": "parishes/down_and_connor_bulletin_urls.txt",
   "Raphoe Diocese":        "parishes/raphoe_diocese_bulletin_urls.txt",
 };
+let PD_EVIDENCE_FILES = { ...PD_EVIDENCE_FILES_FALLBACK };
+const DIOCESES_JSON_PATH = "parishes/dioceses.json";
 const MEGA_EXCLUDES_PATH = "parishes/mega_excludes.json";
 const MANUAL_OVERRIDES_PATH = "parishes/manual_overrides.json";
 const LAST_INCLUDED_PATH = "parishes/last_included.json";
@@ -626,14 +628,129 @@ async function _pdLoadLastIncluded() {
 
 function _pdDioceseSlug(dioceseName) {
   const info = _pdDioceseTexts[dioceseName];
-  if (!info?.path) return "";
-  const m = info.path.match(/^parishes\/(.+)_bulletin_urls\.txt$/);
-  if (!m) return "";
-  const slug = m[1];
-  if (slug === "derry_diocese") return "derry";
-  if (slug === "down_and_connor_diocese") return "down_and_connor";
-  if (slug === "raphoe_diocese") return "raphoe";
-  return slug;
+  if (info?.path) {
+    const m = info.path.match(/^parishes\/(.+)_bulletin_urls\.txt$/);
+    if (m) {
+      let slug = m[1];
+      if (slug.endsWith("_diocese")) slug = slug.slice(0, -"_diocese".length);
+      return slug;
+    }
+  }
+  return String(dioceseName || "")
+    .replace(/\s*&\s*/g, "_and_")
+    .replace(/[^a-zA-Z0-9]+/g, "_")
+    .replace(/^_|_$/g, "")
+    .toLowerCase()
+    .replace(/_diocese$/i, "");
+}
+
+async function _pdLoadDioceseConfig() {
+  try {
+    const { content } = await _pdGhFetch(DIOCESES_JSON_PATH);
+    const parsed = JSON.parse(content);
+    if (Array.isArray(parsed?.dioceses) && parsed.dioceses.length > 0) {
+      const map = {};
+      for (const d of parsed.dioceses) {
+        if (d.display_name && d.evidence_file) map[d.display_name] = d.evidence_file;
+      }
+      if (Object.keys(map).length > 0) PD_EVIDENCE_FILES = map;
+    }
+  } catch (_e) {
+    PD_EVIDENCE_FILES = { ...PD_EVIDENCE_FILES_FALLBACK };
+  }
+}
+
+async function _pdEnsureDioceseInfo(dioceseDisplayName) {
+  let info = _pdDioceseTexts[dioceseDisplayName];
+  if (info?.text != null) return info;
+  const path = PD_EVIDENCE_FILES[dioceseDisplayName];
+  if (!path) throw new Error(`Unknown diocese: ${dioceseDisplayName}`);
+  try {
+    const { content } = await _pdGhFetch(path);
+    info = { text: content, path };
+  } catch (_e) {
+    info = { text: "", path };
+  }
+  _pdDioceseTexts[dioceseDisplayName] = info;
+  return info;
+}
+
+async function _pdAddParish(dioceseDisplayName, name, url) {
+  const trimmedName = String(name || "").trim();
+  const trimmedUrl = String(url || "").trim();
+  if (!trimmedName) throw new Error("Parish name is required.");
+  if (!trimmedUrl) throw new Error("Bulletin URL is required.");
+  const info = await _pdEnsureDioceseInfo(dioceseDisplayName);
+  if (_pdExtractParishBlock(info.text, trimmedName) != null) {
+    throw new Error(`Parish "${trimmedName}" already exists in ${dioceseDisplayName}.`);
+  }
+  const newText = info.text.trimEnd() + "\n\n# --- " + trimmedName + " ---\n" + trimmedUrl + "\n";
+  const res = await _pdGhPush(info.path, newText, `evidence: add ${trimmedName} to ${dioceseDisplayName} [from extension]`);
+  if (!res?.ok) throw new Error(res?.error || "Save failed.");
+  info.text = newText;
+  const newParish = _pdParseEvidence(newText, dioceseDisplayName).find((p) => p.name === trimmedName);
+  if (newParish) _pdAllParishes.push(newParish);
+}
+
+async function _pdDeleteParish(parish) {
+  const info = await _pdEnsureDioceseInfo(parish.diocese);
+  const extracted = _pdExtractParishBlock(info.text, parish.name);
+  if (!extracted) throw new Error(`Could not find ${parish.name} in evidence file.`);
+  const res = await _pdGhPush(
+    info.path,
+    extracted.remainder,
+    `evidence: remove ${parish.name} from ${parish.diocese} [from extension]`
+  );
+  if (!res?.ok) throw new Error(res?.error || "Save failed.");
+  info.text = extracted.remainder;
+  _pdAllParishes = _pdAllParishes.filter((p) => !(p.diocese === parish.diocese && p.name === parish.name));
+  delete _pdParishDetailsCache[parish.key];
+}
+
+async function _pdCreateDiocese(displayName) {
+  const trimmed = String(displayName || "").trim();
+  if (!trimmed) throw new Error("Diocese name is required.");
+  if (PD_EVIDENCE_FILES[trimmed]) throw new Error(`Diocese "${trimmed}" already exists.`);
+  const key = _pdDioceseSlug(trimmed);
+  if (!key) throw new Error("Could not derive diocese key from name.");
+  const evidence_file = `parishes/${key}_diocese_bulletin_urls.txt`;
+  const headline = trimmed.toUpperCase() + " BIG BULLETIN";
+  const pdf_filename = `${key}_mega_bulletin.pdf`;
+
+  let configData;
+  try {
+    const { content } = await _pdGhFetch(DIOCESES_JSON_PATH);
+    configData = JSON.parse(content);
+  } catch (_e) {
+    configData = { dioceses: [] };
+  }
+  if (!Array.isArray(configData.dioceses)) configData.dioceses = [];
+  if (configData.dioceses.some((d) => d.key === key || d.display_name === trimmed)) {
+    throw new Error(`Diocese key "${key}" already exists in dioceses.json.`);
+  }
+  configData.dioceses.push({
+    key,
+    display_name: trimmed,
+    headline,
+    evidence_file,
+    pdf_filename,
+  });
+  const configRes = await _pdGhPush(
+    DIOCESES_JSON_PATH,
+    JSON.stringify(configData, null, 2) + "\n",
+    `evidence: add diocese ${trimmed} [from extension]`
+  );
+  if (!configRes?.ok) throw new Error(configRes?.error || "Failed to save dioceses.json.");
+
+  const evidenceRes = await _pdGhPush(
+    evidence_file,
+    `# ${trimmed} bulletin URLs\n`,
+    `evidence: create ${trimmed} [from extension]`
+  );
+  if (!evidenceRes?.ok) throw new Error(evidenceRes?.error || "Failed to create evidence file.");
+
+  PD_EVIDENCE_FILES[trimmed] = evidence_file;
+  _pdDioceseTexts[trimmed] = { text: `# ${trimmed} bulletin URLs\n`, path: evidence_file };
 }
 
 async function _pdGetGithubConfig() {
@@ -979,19 +1096,19 @@ async function _pdCheckRecipe(key) {
 
 async function _pdEnsureParishesLoaded() {
   if (_pdAllParishes.length > 0 && Object.keys(_pdDioceseTexts).length > 0) return;
+  await _pdLoadDioceseConfig();
   const evidenceResults = await Promise.all(
     Object.entries(PD_EVIDENCE_FILES).map(([diocese, path]) =>
       _pdGhFetch(path)
         .then(({ content }) => ({ diocese, path, content }))
-        .catch(() => null)
+        .catch(() => ({ diocese, path, content: "" }))
     )
   );
   _pdAllParishes = [];
   _pdDioceseTexts = {};
   for (const r of evidenceResults) {
-    if (!r?.content) continue;
-    _pdDioceseTexts[r.diocese] = { text: r.content, path: r.path };
-    _pdAllParishes.push(..._pdParseEvidence(r.content, r.diocese));
+    _pdDioceseTexts[r.diocese] = { text: r.content || "", path: r.path };
+    if (r.content) _pdAllParishes.push(..._pdParseEvidence(r.content, r.diocese));
   }
 }
 
@@ -1931,10 +2048,119 @@ async function loadProblemsDashboard() {
 
 const _PD_DOT_TITLES = { "🟢": "Recipe trained", "🟡": "Needs training", "🔴": "Dead website", "⚫": "Disabled", "📌": "Manual override URL set", "⬜": "Checking…" };
 
+function _pdShowAddParishDialog(dioceseDisplayName, anchorEl) {
+  const existing = document.querySelector(".pd-add-parish-row");
+  if (existing) { existing.remove(); return; }
+  const row = document.createElement("div");
+  row.className = "pd-edit-row pd-add-parish-row";
+  const label = document.createElement("div");
+  label.style.cssText = "font-size:9px;color:#93c5fd;";
+  label.textContent = `Add parish to ${dioceseDisplayName}:`;
+  row.appendChild(label);
+  const nameInp = document.createElement("input");
+  nameInp.type = "text";
+  nameInp.placeholder = "Parish name";
+  nameInp.style.cssText = "width:100%;margin-bottom:4px;";
+  row.appendChild(nameInp);
+  const urlInp = document.createElement("input");
+  urlInp.type = "url";
+  urlInp.placeholder = "https://parish.com/bulletin.pdf";
+  urlInp.style.cssText = "width:100%;";
+  row.appendChild(urlInp);
+  const btnRow = document.createElement("div");
+  btnRow.className = "pd-edit-btns";
+  const saveBtn = document.createElement("button");
+  saveBtn.type = "button";
+  saveBtn.className = "green";
+  saveBtn.textContent = "Save";
+  const cancelBtn = document.createElement("button");
+  cancelBtn.type = "button";
+  cancelBtn.textContent = "Cancel";
+  cancelBtn.addEventListener("click", () => row.remove());
+  saveBtn.addEventListener("click", async () => {
+    saveBtn.disabled = true;
+    try {
+      await _pdAddParish(dioceseDisplayName, nameInp.value, urlInp.value);
+      setStatus(`✅ Added ${nameInp.value.trim()} to ${dioceseDisplayName}.`, "ok");
+      row.remove();
+      _pdRenderAll(document.getElementById("pd-search")?.value || "", _pdExcludes || []);
+    } catch (err) {
+      setStatus(`❌ ${err.message}`, "err");
+    } finally {
+      saveBtn.disabled = false;
+    }
+  });
+  btnRow.appendChild(saveBtn);
+  btnRow.appendChild(cancelBtn);
+  row.appendChild(btnRow);
+  anchorEl.appendChild(row);
+  nameInp.focus();
+}
+
+function _pdShowNewDioceseDialog() {
+  const existing = document.querySelector(".pd-new-diocese-row");
+  if (existing) { existing.remove(); return; }
+  const container = document.getElementById("parish-dir-content");
+  const row = document.createElement("div");
+  row.className = "pd-edit-row pd-new-diocese-row";
+  row.style.marginBottom = "8px";
+  const label = document.createElement("div");
+  label.style.cssText = "font-size:9px;color:#93c5fd;";
+  label.textContent = "New diocese display name (e.g. Clogher Diocese):";
+  row.appendChild(label);
+  const inp = document.createElement("input");
+  inp.type = "text";
+  inp.placeholder = "Clogher Diocese";
+  inp.style.cssText = "width:100%;";
+  row.appendChild(inp);
+  const btnRow = document.createElement("div");
+  btnRow.className = "pd-edit-btns";
+  const saveBtn = document.createElement("button");
+  saveBtn.type = "button";
+  saveBtn.className = "green";
+  saveBtn.textContent = "Create + push to GitHub";
+  const cancelBtn = document.createElement("button");
+  cancelBtn.type = "button";
+  cancelBtn.textContent = "Cancel";
+  cancelBtn.addEventListener("click", () => row.remove());
+  saveBtn.addEventListener("click", async () => {
+    saveBtn.disabled = true;
+    try {
+      await _pdCreateDiocese(inp.value);
+      setStatus(
+        "✅ New diocese saved. Harvesting will pick it up automatically. Its public webpage + mega PDF + OCR will appear once a harvest run produces its mega PDF.",
+        "ok"
+      );
+      row.remove();
+      _pdRenderAll(document.getElementById("pd-search")?.value || "", _pdExcludes || []);
+    } catch (err) {
+      setStatus(`❌ ${err.message}`, "err");
+    } finally {
+      saveBtn.disabled = false;
+    }
+  });
+  btnRow.appendChild(saveBtn);
+  btnRow.appendChild(cancelBtn);
+  row.appendChild(btnRow);
+  if (container?.firstChild) container.insertBefore(row, container.firstChild.nextSibling);
+  else if (container) container.appendChild(row);
+  inp.focus();
+}
+
 function _pdRenderAll(searchTerm, excludes) {
   const container = document.getElementById("parish-dir-content");
   _clearElement(container);
   const lc = (searchTerm || "").toLowerCase();
+
+  const toolbarRow = document.createElement("div");
+  toolbarRow.style.cssText = "margin-bottom:8px;";
+  const newDioceseBtn = document.createElement("button");
+  newDioceseBtn.type = "button";
+  newDioceseBtn.className = "pd-btn green";
+  newDioceseBtn.textContent = "➕ New diocese";
+  newDioceseBtn.addEventListener("click", () => _pdShowNewDioceseDialog());
+  toolbarRow.appendChild(newDioceseBtn);
+  container.appendChild(toolbarRow);
 
   const byDiocese = {};
   for (const p of _pdAllParishes) {
@@ -1944,11 +2170,19 @@ function _pdRenderAll(searchTerm, excludes) {
     byDiocese[p.diocese].push(p);
   }
 
-  for (const [diocese, parishes] of Object.entries(byDiocese)) {
+  const allDioceses = Object.keys(PD_EVIDENCE_FILES);
+  let renderedAny = false;
+  for (const diocese of allDioceses) {
+    const parishes = byDiocese[diocese] || [];
+    if (lc && parishes.length === 0) continue;
+    if (_pdShowBrokenOnly && parishes.length === 0) continue;
+    renderedAny = true;
+
     const dioceseEl = document.createElement("div");
     dioceseEl.className = "pd-diocese";
     const accordion = document.createElement("details");
     accordion.className = "pd-diocese-accordion";
+    accordion.open = !!lc || parishes.length > 0;
     const title = document.createElement("summary");
     title.className = "pd-diocese-title";
     title.textContent = `${diocese} (${parishes.length})`;
@@ -1956,18 +2190,30 @@ function _pdRenderAll(searchTerm, excludes) {
     const content = document.createElement("div");
     content.className = "pd-diocese-content";
     for (const parish of parishes) content.appendChild(_pdBuildRow(parish, excludes));
+
+    const addBtn = document.createElement("button");
+    addBtn.type = "button";
+    addBtn.className = "pd-btn";
+    addBtn.textContent = "➕ Add parish";
+    addBtn.style.cssText = "margin-top:6px;font-size:10px;";
+    addBtn.addEventListener("click", () => _pdShowAddParishDialog(diocese, content));
+    content.appendChild(addBtn);
+
     accordion.appendChild(content);
     dioceseEl.appendChild(accordion);
     container.appendChild(dioceseEl);
   }
 
-  if (!container.children.length) {
+  if (!renderedAny) {
     let emptyMessage = "No parishes loaded.";
     if (lc) emptyMessage = "No matching parishes.";
     else if (_pdShowBrokenOnly) emptyMessage = "No broken parishes found.";
-    container.textContent = emptyMessage;
-    container.style.color = "#6b7280";
-    container.style.fontSize = "10px";
+    else if (allDioceses.length === 0) emptyMessage = "No dioceses configured.";
+    const emptyEl = document.createElement("div");
+    emptyEl.textContent = emptyMessage;
+    emptyEl.style.color = "#6b7280";
+    emptyEl.style.fontSize = "10px";
+    container.appendChild(emptyEl);
   }
 }
 
@@ -2151,7 +2397,7 @@ function _pdBuildRow(parish, excludes) {
 
   const removeBtn = document.createElement("button");
   removeBtn.className = "pd-btn red";
-  removeBtn.textContent = "🗑";
+  removeBtn.textContent = "⛔";
   removeBtn.title = "Disable parish in harvest (marks DISABLED in evidence file)";
   removeBtn.addEventListener("click", async () => {
     if (!confirm(`Disable ${parish.name} in the harvester repo?`)) return;
@@ -2168,6 +2414,25 @@ function _pdBuildRow(parish, excludes) {
     }
   });
   row.appendChild(removeBtn);
+
+  const deleteBtn = document.createElement("button");
+  deleteBtn.className = "pd-btn red";
+  deleteBtn.textContent = "🗑";
+  deleteBtn.title = "Delete parish from evidence file (removes entry entirely)";
+  deleteBtn.addEventListener("click", async () => {
+    if (!confirm(`Delete ${parish.name} from ${parish.diocese}? This removes the parish block from the evidence file.`)) return;
+    deleteBtn.disabled = true;
+    try {
+      await _pdDeleteParish(parish);
+      setStatus(`✅ ${parish.name} deleted from evidence file.`, "ok");
+      _pdRenderAll(document.getElementById("pd-search")?.value || "", _pdExcludes || []);
+    } catch (err) {
+      setStatus(`❌ ${err.message}`, "err");
+    } finally {
+      deleteBtn.disabled = false;
+    }
+  });
+  row.appendChild(deleteBtn);
 
   if (!parish.disabled) {
     const deadBtn = document.createElement("button");
@@ -2540,6 +2805,7 @@ async function loadParishDirectory() {
   _pdUpdateStaleBannerUi({ stale: [], unknown_date: [] });
 
   try {
+    await _pdLoadDioceseConfig();
     const [excludes, _overrides, consecutiveFailures, staleBulletins, _lastIncluded, ...evidenceResults] = await Promise.all([
       _pdLoadExcludes(),
       _pdLoadOverrides(),
@@ -2554,7 +2820,11 @@ async function loadParishDirectory() {
     ]);
 
     for (const r of evidenceResults) {
-      if (r.error) { console.warn(`Parish Directory: ${r.diocese}: ${r.error}`); continue; }
+      if (r.error) {
+        console.warn(`Parish Directory: ${r.diocese}: ${r.error}`);
+        _pdDioceseTexts[r.diocese] = { text: "", path: r.path };
+        continue;
+      }
       _pdDioceseTexts[r.diocese] = { text: r.content, path: r.path };
       _pdAllParishes.push(..._pdParseEvidence(r.content, r.diocese));
     }
@@ -2562,12 +2832,12 @@ async function loadParishDirectory() {
     _pdHarvestReport = null;
     await _pdLoadHarvestReport();
 
-    if (_pdAllParishes.length === 0) {
+    if (Object.keys(PD_EVIDENCE_FILES).length === 0 || Object.keys(_pdDioceseTexts).length === 0) {
       loadingEl.style.display = "none";
       const failed = evidenceResults.filter((r) => r.error).map((r) => `${r.diocese}: ${r.error}`);
       errorEl.textContent = failed.length
-        ? `⚠️ No parishes loaded. ${failed.join(" | ")}`
-        : "⚠️ No parishes loaded — check GitHub settings.";
+        ? `⚠️ No dioceses loaded. ${failed.join(" | ")}`
+        : "⚠️ No dioceses configured — check GitHub settings.";
       errorEl.style.display = "block";
       return;
     }

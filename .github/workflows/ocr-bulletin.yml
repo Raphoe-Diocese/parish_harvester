@@ -56,7 +56,7 @@ jobs:
           TODAY="$(date -u +%Y-%m-%d)"
           mkdir -p /tmp/ocr-bulletins
           FAILURES=0
-          for diocese in derry down_and_connor; do
+          for diocese in $(python -c "import json;print(' '.join(d['key'] for d in json.load(open('parishes/dioceses.json'))['dioceses']))"); do
             pdf_path="/tmp/ocr-bulletins/${diocese}_mega_bulletin.pdf"
             if [ ! -f "${pdf_path}" ]; then
               echo "Warning: PDF not found for ${diocese}, skipping"
