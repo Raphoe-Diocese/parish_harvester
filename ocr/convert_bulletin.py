@@ -42,6 +42,20 @@ CSS = """
     text-transform: uppercase;
     letter-spacing: 0.08em;
   }
+  .scrollable-viewer h1,
+  .scrollable-viewer h2 {
+    color: #14524f;
+  }
+  .scrollable-viewer h3,
+  .scrollable-viewer h4 {
+    color: #1a6b6b;
+  }
+  .scrollable-viewer strong {
+    color: #14524f;
+  }
+  .scrollable-viewer a {
+    color: #1a6b6b;
+  }
 </style>
 """
 
@@ -91,6 +105,8 @@ HR_MARKERS = {"---", "***"}
 STRONG_STAR_PATTERN = re.compile(r"\*\*(.+?)\*\*")
 STRONG_UNDERSCORE_PATTERN = re.compile(r"__(.+?)__")
 EM_PATTERN = re.compile(r"(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)")
+# Mistral OCR emits image placeholders like ![img-0.jpeg](img-0.jpeg); strip them.
+IMAGE_MD_PATTERN = re.compile(r"!\[[^\]]*\]\([^)]*\)")
 
 
 def pdf_to_images(pdf_path):
@@ -284,7 +300,7 @@ def render_markdown_lines(lines: list[str]) -> str:
     parts: list[str] = []
     i = 0
     while i < len(lines):
-        raw_line = lines[i]
+        raw_line = IMAGE_MD_PATTERN.sub("", lines[i])
         stripped = raw_line.strip()
         if not stripped:
             i += 1
