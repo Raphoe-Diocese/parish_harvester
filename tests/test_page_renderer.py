@@ -72,11 +72,16 @@ class PageRendererTests(unittest.TestCase):
                 ],
                 out_path=out_path,
                 mega_pdf_url="../../mega_pdf/raphoe_mega_bulletin.pdf",
+                bulletin_viewer_url="../../bulletins/raphoe-2026-06-29.html",
+                ocr_standalone_url="../../bulletins/raphoe-2026-06-29-ocr.html",
                 ocr_text="Sunday mass at 10am",
             )
             html = out_path.read_text(encoding="utf-8")
             self.assertIn("Go to OCR version", html)
             self.assertIn('id="ocr-section"', html)
+            self.assertIn("Open PDF in new tab", html)
+            self.assertIn("Open full bulletin in new tab", html)
+            self.assertIn("Open bulletin text in new tab", html)
             self.assertIn("parish-accordion", html)
             self.assertIn("parish-link-grid", html)
             self.assertNotIn("parish-select", html)

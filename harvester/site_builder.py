@@ -9,8 +9,6 @@ from pathlib import Path
 
 from harvester.fetcher import parse_evidence_file
 from harvester.page_renderer import (
-    render_diocese_current_page,
-    render_diocese_page,
     render_diocese_raphoe_page,
 )
 
@@ -540,6 +538,32 @@ def _subscribe_page(dioceses: list[DioceseCard]) -> str:
 """
 
 
+def _bulletin_viewer_url(diocese_key: str) -> str:
+    viewer_path, _viewer_date = _latest_viewer(diocese_key)
+    if viewer_path is None:
+        return "../../bulletins/index.html"
+    return f"../../bulletins/{viewer_path.name}"
+
+
+def _ocr_standalone_url(diocese_key: str) -> str:
+    standalone = _latest_ocr_standalone(diocese_key)
+    if standalone is not None:
+        return f"../../bulletins/{standalone.name}"
+    return _bulletin_viewer_url(diocese_key)
+
+
+def _mega_pdf_url(diocese_key: str) -> str:
+    stem = diocese_key.replace("-", "_")
+    return f"../../mega_pdf/{stem}_mega_bulletin.pdf"
+
+
+def _parish_links_for_big_bulletin(diocese_key: str, report_path: Path) -> list[dict[str, str]]:
+    if diocese_key == "raphoe":
+        return _parish_links(diocese_key)
+    links, _stats = _parish_links_with_harvest(diocese_key, report_path)
+    return [{"name": str(item.get("name") or ""), "url": str(item.get("url") or "")} for item in links if item.get("url")]
+
+
 def _render_placeholder_parish_links(parish_links: list[dict[str, str]]) -> str:
     if not parish_links:
         return "<p>No parish links available yet.</p>"
@@ -565,28 +589,22 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
         success_this_run = bool(downloaded.intersection(keys))
 
         if diocese.key in LIVE_DIOCESES and trained:
-            if diocese.key == "raphoe":
-                parish_links = _parish_links(diocese.key)
-                ocr_text, ocr_is_html = _ocr_content_for_diocese(diocese.key)
-                render_diocese_raphoe_page(
-                    parish_links=parish_links,
-                    out_path=out_path,
-                    mega_pdf_url="../../mega_pdf/raphoe_mega_bulletin.pdf",
-                    ocr_text=ocr_text,
-                    ocr_is_html=ocr_is_html,
-                    week_label=week_label if target_date else "",
-                )
-            else:
-                parish_links, stats = _parish_links_with_harvest(diocese.key, report_path)
-                render_diocese_current_page(
-                    diocese_display_name=diocese.name,
-                    parish_links=parish_links,
-                    out_path=out_path,
-                    week_label=week_label,
-                    ok_count=stats.get("ok", 0),
-                    skip_count=stats.get("skip", 0),
-                    fail_count=stats.get("fail", 0),
-                )
+            parish_links = _parish_links_for_big_bulletin(diocese.key, report_path)
+            ocr_text, ocr_is_html = _ocr_content_for_diocese(diocese.key)
+            display_upper = diocese.name.upper()
+            render_diocese_raphoe_page(
+                parish_links=parish_links,
+                out_path=out_path,
+                mega_pdf_url=_mega_pdf_url(diocese.key),
+                bulletin_viewer_url=_bulletin_viewer_url(diocese.key),
+                ocr_standalone_url=_ocr_standalone_url(diocese.key),
+                ocr_text=ocr_text,
+                ocr_is_html=ocr_is_html,
+                week_label=week_label if target_date else "",
+                diocese_display_name=diocese.name,
+                headline=f"{display_upper} BIG BULLETIN",
+                parish_heading=f"{display_upper} PARISHES WITH WORKING BULLETIN LINKS",
+            )
             updated_label = target_date or "Coming soon"
         else:
             _placeholder_page(diocese, out_path)
