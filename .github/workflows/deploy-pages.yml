@@ -19,6 +19,7 @@ permissions:
   pages: write
   id-token: write
   contents: write
+  actions: read
 
 concurrency:
   group: pages
@@ -44,6 +45,28 @@ jobs:
           pattern: "*-mega-bulletin-pdf"
           path: _harvest_artifacts
           merge-multiple: true
+
+      - name: Download mega PDFs from latest harvest (OCR/docs-only deploys)
+        if: github.event_name != 'workflow_run'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          mkdir -p _harvest_artifacts
+          FOUND=""
+          while IFS= read -r run_id; do
+            [ -n "${run_id}" ] || continue
+            count="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/artifacts" --jq '[.artifacts[] | select(.name | test("mega-bulletin-pdf"; "i"))] | length')"
+            if [ "${count:-0}" -gt 0 ]; then
+              echo "Downloading mega PDF artifact from harvest run ${run_id}"
+              gh run download "${run_id}" --repo "${GITHUB_REPOSITORY}" --dir _harvest_artifacts
+              FOUND="yes"
+              break
+            fi
+          done < <(gh run list --repo "${GITHUB_REPOSITORY}" --workflow harvest.yml --status success --limit 25 --json databaseId --jq '.[].databaseId')
+          if [ -z "${FOUND}" ]; then
+            echo "::warning::No harvest run with mega PDF artifacts found — Pages deploy may omit mega PDFs."
+          fi
 
       - name: Verify mega PDFs for Pages deploy
         env:

@@ -288,6 +288,8 @@ https://www.antrimparish.com
         self.assertNotIn("extension/**", workflow)
         self.assertIn("mega_pdf/**", workflow)
         self.assertIn("Download mega PDF artifacts from harvest run", workflow)
+        self.assertIn("Download mega PDFs from latest harvest (OCR/docs-only deploys)", workflow)
+        self.assertIn("gh run download", workflow)
         self.assertIn("actions/download-artifact@v4", workflow)
         self.assertIn("if: github.event_name == 'workflow_run'", workflow)
         self.assertIn("run-id: ${{ github.event.workflow_run.id }}", workflow)
