@@ -38,5 +38,13 @@ class RaphoeAssetsTests(unittest.TestCase):
         self.assertEqual(payload["steunanscathedral"]["display_name"], "Cathedral")
 
 
+    def test_raphoe_bruckless_recipe_uses_cloud_folder(self) -> None:
+        recipe_path = REPO_ROOT / "parishes" / "recipes" / "raphoe" / "drive-1rjeey-ayy.json"
+        payload = json.loads(recipe_path.read_text(encoding="utf-8"))
+        self.assertEqual(payload.get("site_type"), "cloud_folder")
+        self.assertNotIn("skip", payload)
+        self.assertIn("1z9goh6DrkCUkpJMDbwfsi28Yc_t0_ltC", payload.get("start_url", ""))
+
+
 if __name__ == "__main__":
     unittest.main()
