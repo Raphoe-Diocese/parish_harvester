@@ -4,7 +4,9 @@ name: Deploy Parish Press to GitHub Pages
 
 on:
   workflow_run:
-    workflows: ["Harvest Parish Bulletins"]
+    workflows:
+      - "Harvest Parish Bulletins"
+      - "Generate OCR bulletin viewers"
     types:
       - completed
   push:
@@ -27,6 +29,7 @@ concurrency:
 
 jobs:
   deploy:
+    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -36,7 +39,7 @@ jobs:
         uses: actions/checkout@v4
 
       - name: Download mega PDF artifacts from harvest run
-        if: github.event_name == 'workflow_run'
+        if: github.event_name == 'workflow_run' && github.event.workflow_run.name == 'Harvest Parish Bulletins'
         continue-on-error: true
         uses: actions/download-artifact@v4
         with:
@@ -47,7 +50,7 @@ jobs:
           merge-multiple: true
 
       - name: Download mega PDFs from latest harvest (OCR/docs-only deploys)
-        if: github.event_name != 'workflow_run'
+        if: github.event_name != 'workflow_run' || github.event.workflow_run.name == 'Generate OCR bulletin viewers'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -73,6 +76,7 @@ jobs:
           EVENT_NAME: ${{ github.event_name }}
           WORKFLOW_RUN_ID: ${{ github.event.workflow_run.id || '' }}
           HARVEST_CONCLUSION: ${{ github.event.workflow_run.conclusion || '' }}
+          TRIGGERING_WORKFLOW: ${{ github.event.workflow_run.name || '' }}
         run: |
           set -euo pipefail
           mkdir -p mega_pdf
@@ -101,7 +105,7 @@ jobs:
 
           shopt -s nullglob
           pdfs=(mega_pdf/*_mega_bulletin.pdf)
-          if [ "${EVENT_NAME}" = "workflow_run" ] && [ ${#pdfs[@]} -eq 0 ]; then
+          if [ "${EVENT_NAME}" = "workflow_run" ] && [ "${TRIGGERING_WORKFLOW}" = "Harvest Parish Bulletins" ] && [ ${#pdfs[@]} -eq 0 ]; then
             echo "Error: no mega PDF artifacts were downloaded from workflow run ${WORKFLOW_RUN_ID:-unknown} (conclusion: ${HARVEST_CONCLUSION:-n/a})."
             exit 1
           elif [ "${#pdfs[@]}" -gt 0 ]; then
