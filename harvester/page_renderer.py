@@ -12,12 +12,20 @@ EMPTY_OCR_TEXT = "We're still collecting OCR text for this diocese. Check back n
 GITHUB_RAW_BASE = "https://raw.githubusercontent.com/Raphoe-Diocese/parish_harvester/main/Bulletins/current"
 
 
-def _render_parish_links(parish_links: list[dict], *, with_status: bool = False) -> str:
+def _render_parish_links(
+    parish_links: list[dict],
+    *,
+    with_status: bool = False,
+    preserve_order: bool = False,
+) -> str:
     if not parish_links:
         return '<p class="empty-state">No parish links available yet.</p>'
 
     items: list[str] = []
-    for link in sorted(parish_links, key=lambda item: str(item.get("name") or "").lower()):
+    ordered = parish_links
+    if not preserve_order:
+        ordered = sorted(parish_links, key=lambda item: str(item.get("name") or "").lower())
+    for link in ordered:
         name = html.escape(str(link.get("name") or "Unnamed Parish"))
         url = html.escape(str(link.get("url") or "#"), quote=True)
         status = str(link.get("status") or "").strip().lower()
@@ -39,18 +47,36 @@ def render_diocese_current_page(
     ok_count: int = 0,
     skip_count: int = 0,
     fail_count: int = 0,
+    links_only: bool = False,
+    preserve_order: bool = False,
 ) -> None:
     template = Template(CURRENT_TEMPLATE_PATH.read_text(encoding="utf-8"))
     display = str(diocese_display_name or "").strip() or "Diocese"
+    week_note = (
+        "Tap a parish to open its bulletin page."
+        if links_only
+        else f"This week's parish bulletins — {week_label}. Tap a parish to open its bulletin PDF."
+    )
+    stats_html = ""
+    if not links_only:
+        stats_html = (
+            '<div class="stats">'
+            f'<span class="stat">✅ {ok_count} downloaded</span>'
+            f'<span class="stat">⏭️ {skip_count} skipped</span>'
+            f'<span class="stat">❌ {fail_count} need attention</span>'
+            "</div>"
+        )
     payload = {
         "page_title": html.escape(f"{display} — Parish Bulletins"),
         "headline": html.escape(f"{display.upper()} PARISH BULLETINS"),
-        "week_label": html.escape(week_label),
-        "ok_count": str(ok_count),
-        "skip_count": str(skip_count),
-        "fail_count": str(fail_count),
+        "week_note": html.escape(week_note),
+        "stats_html": stats_html,
         "parish_heading": html.escape(f"{display.upper()} PARISHES"),
-        "parish_links_html": _render_parish_links(parish_links, with_status=True),
+        "parish_links_html": _render_parish_links(
+            parish_links,
+            with_status=not links_only,
+            preserve_order=preserve_order,
+        ),
         "year": str(datetime.now(UTC).year),
         "issues_url": html.escape(ISSUES_URL, quote=True),
     }

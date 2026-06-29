@@ -497,16 +497,26 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
         success_this_run = bool(downloaded.intersection(keys))
 
         if diocese.key in LIVE_DIOCESES and trained:
-            parish_links, stats = _parish_links_with_harvest(diocese.key, report_path)
-            render_diocese_current_page(
-                diocese_display_name=diocese.name,
-                parish_links=parish_links,
-                out_path=out_path,
-                week_label=week_label,
-                ok_count=stats.get("ok", 0),
-                skip_count=stats.get("skip", 0),
-                fail_count=stats.get("fail", 0),
-            )
+            if diocese.key == "raphoe":
+                parish_links = _parish_links(diocese.key)
+                render_diocese_current_page(
+                    diocese_display_name=diocese.name,
+                    parish_links=parish_links,
+                    out_path=out_path,
+                    links_only=True,
+                    preserve_order=True,
+                )
+            else:
+                parish_links, stats = _parish_links_with_harvest(diocese.key, report_path)
+                render_diocese_current_page(
+                    diocese_display_name=diocese.name,
+                    parish_links=parish_links,
+                    out_path=out_path,
+                    week_label=week_label,
+                    ok_count=stats.get("ok", 0),
+                    skip_count=stats.get("skip", 0),
+                    fail_count=stats.get("fail", 0),
+                )
             updated_label = target_date or "Coming soon"
         else:
             _placeholder_page(diocese, out_path)

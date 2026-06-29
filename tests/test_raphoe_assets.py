@@ -17,10 +17,11 @@ class RaphoeAssetsTests(unittest.TestCase):
         self.assertTrue(evidence_path.exists())
         self.assertFalse(old_path.exists())
         self.assertIn("# --- Ardara ---", text)
-        self.assertIn("# --- Templecrone Parish ---", text)
-        self.assertIn("# --- Parish of Raphoe ---", text)
+        self.assertIn("# --- Cathedral ---", text)
+        self.assertIn("# --- Templecrone ---", text)
+        self.assertIn("# --- Raphoe ---", text)
         self.assertIn("drive.usercontent.google.com/download?id=1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa&export=download", text)
-        self.assertEqual(text.count("milfordrathmullanparishes.ie/bulletins/"), 2)  # page + URL
+        self.assertEqual(text.count("milfordrathmullanparishes.ie/bulletins/"), 4)
 
     def test_raphoe_contacts_file_contains_placeholder_entries(self) -> None:
         contacts_path = REPO_ROOT / "parishes" / "raphoe_diocese_contacts.json"
@@ -29,9 +30,12 @@ class RaphoeAssetsTests(unittest.TestCase):
         self.assertIn("ardara", payload)
         self.assertIn("drive-1jmslbrliw", payload)
         self.assertIn("drive-1hh7w-ew0v", payload)
-        self.assertEqual(payload["drive-1hh7w-ew0v"]["display_name"], "Templecrone Parish")
-        self.assertEqual(payload["drive-1hh7w-ew0v"]["website"], "https://templecroneparish.ie/")
-        self.assertEqual(payload["steunanscathedral"]["display_name"], "St Eunan's Cathedral Letterkenny")
+        self.assertEqual(payload["drive-1hh7w-ew0v"]["display_name"], "Templecrone")
+        self.assertEqual(
+            payload["drive-1hh7w-ew0v"]["website"],
+            "https://drive.google.com/file/d/1Hh7w-Ew0vLJUFMihFiVzVJGhjeYposIH/view",
+        )
+        self.assertEqual(payload["steunanscathedral"]["display_name"], "Cathedral")
 
 
 if __name__ == "__main__":
