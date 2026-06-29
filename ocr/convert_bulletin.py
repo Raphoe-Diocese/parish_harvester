@@ -20,41 +20,77 @@ from ocr.text_extract import extract_text_pages
 
 CSS = """
 <style>
+  html, body {
+    margin: 0;
+    padding: 0;
+    overflow-x: hidden;
+  }
   .scrollable-viewer {
-    max-width: 800px;
-    margin: 0 auto;
+    max-width: 100%;
+    margin: 0;
     background: #ffffff;
-    border: 1px solid #ccc;
-    border-radius: 8px;
-    box-shadow: 0 4px 16px rgba(0, 0, 0, 0.15);
     font-family: Georgia, serif;
     font-size: 16px;
     line-height: 1.7;
-    max-height: 90vh;
-    overflow-y: auto;
-    padding: 32px 40px;
+    padding: 16px 20px;
+  }
+  .page-label {
+    font-size: 1em;
+    font-weight: 700;
+    margin: 1.2em 0 0.35em;
+    color: #0f2b5b;
+  }
+  .page-label:first-child {
+    margin-top: 0;
   }
   p {
     margin: 4px 0;
   }
-  .ocr-page-heading {
-    color: #1a6b6b;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
+  hr {
+    margin: 1em 0;
+    border: none;
+    border-top: 1px solid #ddd;
   }
-  .scrollable-viewer h1,
-  .scrollable-viewer h2 {
-    color: #14524f;
+  .b-title {
+    font-size: 1.35em;
+    font-weight: 700;
+    color: #0f2b5b;
+    margin: 0.9em 0 0.3em;
+    border-bottom: 2px solid #c8d6f0;
+    padding-bottom: 0.15em;
   }
-  .scrollable-viewer h3,
-  .scrollable-viewer h4 {
-    color: #1a6b6b;
+  .b-head {
+    font-size: 1.15em;
+    font-weight: 700;
+    color: #134e9c;
+    margin: 0.75em 0 0.25em;
   }
-  .scrollable-viewer strong {
-    color: #14524f;
+  .b-sub {
+    font-size: 1.02em;
+    font-weight: 700;
+    color: #1f6f4a;
+    margin: 0.6em 0 0.2em;
   }
-  .scrollable-viewer a {
-    color: #1a6b6b;
+  strong { color: #0f2b5b; }
+  a { color: #1d4ed8; }
+  table.b-table {
+    border-collapse: collapse;
+    width: 100%;
+    margin: 0.5em 0;
+    font-size: 0.95em;
+  }
+  table.b-table td, table.b-table th {
+    border: 1px solid #d0d8e8;
+    padding: 4px 8px;
+    text-align: left;
+    vertical-align: top;
+  }
+  table.b-table th {
+    background: #eef3fb;
+    color: #0f2b5b;
+  }
+  table.b-table tr:nth-child(even) td {
+    background: #f7f9fd;
   }
 </style>
 """
@@ -99,12 +135,9 @@ PHONE_028_PATTERN = r"028[\s-]*\d{3}[\s-]*\d{4,5}"
 PHONE_PATTERN = re.compile(
     rf"(?<!\w)(?:{PHONE_074_PATTERN}|{PHONE_087_PATTERN}|{PHONE_353_PATTERN}|{PHONE_028_PATTERN})(?!\w)"
 )
-TABLE_ROW_PATTERN = re.compile(r"^\s*\|.*\|\s*$")
-HEADING_PATTERN = re.compile(r"^(#{1,4})\s+(.*)$")
-HR_MARKERS = {"---", "***"}
-STRONG_STAR_PATTERN = re.compile(r"\*\*(.+?)\*\*")
-STRONG_UNDERSCORE_PATTERN = re.compile(r"__(.+?)__")
-EM_PATTERN = re.compile(r"(?<!\*)\*(?!\*)(.+?)(?<!\*)\*(?!\*)")
+HEADING_MD_PATTERN = re.compile(r"^(#{1,6})\s+(.*)$")
+HR_MD_PATTERN = re.compile(r"^\s*(?:-{3,}|\*{3,}|_{3,})\s*$")
+BOLD_MD_PATTERN = re.compile(r"\*\*(.+?)\*\*")
 # Mistral OCR emits image placeholders like ![img-0.jpeg](img-0.jpeg); strip them.
 IMAGE_MD_PATTERN = re.compile(r"!\[[^\]]*\]\([^)]*\)")
 
@@ -232,7 +265,7 @@ def linkify(text):
     def replace_email(match):
         email = match.group(0)
         escaped_email = html_utils.escape(email, quote=True)
-        return stash(f'<a href="mailto:{escaped_email}" style="color:#1a6b6b;">{escaped_email}</a>')
+        return stash(f'<a href="mailto:{escaped_email}">{escaped_email}</a>')
 
     def replace_url(match):
         url = match.group(0)
@@ -241,7 +274,7 @@ def linkify(text):
         escaped_href = html_utils.escape(href, quote=True)
         escaped_text = html_utils.escape(trimmed_url)
         link = (
-            f'<a href="{escaped_href}" target="_blank" rel="noopener noreferrer" style="color:#1a6b6b;">'
+            f'<a href="{escaped_href}" target="_blank" rel="noopener noreferrer">'
             f"{escaped_text}</a>"
         )
         return f"{stash(link)}{trailing}"
@@ -265,7 +298,7 @@ def linkify(text):
             return phone
         escaped_phone = html_utils.escape(phone)
         escaped_href = html_utils.escape(href, quote=True)
-        return stash(f'<a href="tel:{escaped_href}" style="color:#1a6b6b;">{escaped_phone}</a>')
+        return stash(f'<a href="tel:{escaped_href}">{escaped_phone}</a>')
 
     linked = EMAIL_PATTERN.sub(replace_email, text)
     linked = URL_PATTERN.sub(replace_url, linked)
@@ -276,87 +309,109 @@ def linkify(text):
     return linked
 
 
-def apply_inline_markdown(text: str) -> str:
-    rendered = STRONG_STAR_PATTERN.sub(r"<strong>\1</strong>", text)
-    rendered = STRONG_UNDERSCORE_PATTERN.sub(r"<strong>\1</strong>", rendered)
-    rendered = EM_PATTERN.sub(r"<em>\1</em>", rendered)
-    return rendered
+def _escape_html(value):
+    return value.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")
 
 
-def _render_table(lines: list[str]) -> str:
-    rows = []
-    for line in lines:
-        cells = [cell.strip() for cell in line.strip()[1:-1].split("|")]
-        cell_html = "".join(
-            f"<td style=\"border:1px solid #d6ecea; padding:6px;\">"
-            f"{linkify(apply_inline_markdown(html_utils.escape(cell)))}</td>"
-            for cell in cells
-        )
-        rows.append(f"<tr>{cell_html}</tr>")
-    return "<table style=\"border-collapse:collapse; margin:10px 0; width:100%;\">" + "".join(rows) + "</table>"
+def _render_inline(text):
+    """Escape one line of OCR text and apply bold + links."""
+    text = _escape_html(text)
+    text = BOLD_MD_PATTERN.sub(r"<strong>\1</strong>", text)
+    return linkify(text)
 
 
-def render_markdown_lines(lines: list[str]) -> str:
+def _is_table_row(line):
+    s = line.strip()
+    return s.startswith("|") and s.endswith("|") and s.count("|") >= 2
+
+
+def _is_table_separator(line):
+    s = line.strip()
+    return bool(re.fullmatch(r"\|?[\s:\-|]+\|?", s)) and "-" in s
+
+
+def _table_cells(line):
+    s = line.strip()
+    if s.startswith("|"):
+        s = s[1:]
+    if s.endswith("|"):
+        s = s[:-1]
+    return [c.strip() for c in s.split("|")]
+
+
+def _render_table(rows):
+    """Turn a block of markdown table rows into a styled HTML table."""
+    has_header = any(_is_table_separator(r) for r in rows)
+    body = [r for r in rows if not _is_table_separator(r)]
+    if not body:
+        return ""
+    out = ['<table class="b-table">']
+    for idx, row in enumerate(body):
+        tag = "th" if has_header and idx == 0 else "td"
+        cells = _table_cells(row)
+        out.append("<tr>" + "".join(f"<{tag}>{_render_inline(c)}</{tag}>" for c in cells) + "</tr>")
+    out.append("</table>")
+    return "\n".join(out)
+
+
+def render_markdown_lines(lines: list[str]) -> list[str]:
+    """Render one page's OCR lines, grouping markdown tables into HTML tables."""
     parts: list[str] = []
     i = 0
-    while i < len(lines):
-        raw_line = IMAGE_MD_PATTERN.sub("", lines[i])
-        stripped = raw_line.strip()
-        if not stripped:
+    total = len(lines)
+    while i < total:
+        line = IMAGE_MD_PATTERN.sub("", lines[i]).rstrip()
+        if not line.strip():
             i += 1
             continue
-
-        if TABLE_ROW_PATTERN.match(raw_line):
-            table_lines = [raw_line]
-            i += 1
-            while i < len(lines) and TABLE_ROW_PATTERN.match(lines[i]):
-                table_lines.append(lines[i])
-                i += 1
-            parts.append(_render_table(table_lines))
+        if _is_table_row(line):
+            block = []
+            while i < total:
+                row = IMAGE_MD_PATTERN.sub("", lines[i]).rstrip()
+                if _is_table_row(row):
+                    block.append(row)
+                    i += 1
+                else:
+                    break
+            table_html = _render_table(block)
+            if table_html:
+                parts.append(table_html)
             continue
-
-        if stripped in HR_MARKERS:
+        if HR_MD_PATTERN.match(line):
             parts.append("<hr>")
             i += 1
             continue
-
-        heading_match = HEADING_PATTERN.match(stripped)
-        if heading_match:
-            marker, heading_text = heading_match.groups()
-            level = {1: "h1", 2: "h2", 3: "h3", 4: "h4"}.get(len(marker), "h4")
-            heading_html = linkify(apply_inline_markdown(html_utils.escape(heading_text.strip())))
-            parts.append(f"<{level}>{heading_html}</{level}>")
+        heading = HEADING_MD_PATTERN.match(line)
+        if heading:
+            level = min(len(heading.group(1)), 3)
+            tag = {1: "h2", 2: "h3", 3: "h4"}[level]
+            css_class = {1: "b-title", 2: "b-head", 3: "b-sub"}[level]
+            parts.append(
+                f'<{tag} class="{css_class}">{_render_inline(heading.group(2).strip())}</{tag}>'
+            )
             i += 1
             continue
-
-        paragraph = linkify(apply_inline_markdown(html_utils.escape(stripped)))
-        parts.append(f"<p>{paragraph}</p>")
+        parts.append(f"<p>{_render_inline(line)}</p>")
         i += 1
-
-    return "\n".join(parts)
+    return parts
 
 
 def build_html_content(pages_text):
     parts = []
     for i, lines in enumerate(pages_text, start=1):
-        section_content = render_markdown_lines(lines)
-        parts.append(
-            f"<section id=\"ocr-page-{i}\">\n"
-            f"<h3 id=\"ocr-page-heading-{i}\" class=\"ocr-page-heading\">PAGE {i}</h3>\n"
-            f"{section_content}\n"
-            "</section>"
-        )
+        if i > 1:
+            parts.append("<hr>")
+        parts.append(f'<p class="page-label">Page {i}</p>')
+        parts.extend(render_markdown_lines(lines))
     return "\n".join(parts)
 
 
 def build_stub_html_content(reason: str) -> str:
     safe = html_utils.escape(reason)
     return (
-        '<section id="ocr-page-1">\n'
-        '<h3 class="ocr-page-heading">PAGE 1</h3>\n'
+        '<p class="page-label">Page 1</p>\n'
         f"<p><strong>OCR text is temporarily unavailable.</strong> {safe}</p>\n"
-        "<p>Please use the original PDF until the next harvest run completes.</p>\n"
-        "</section>"
+        "<p>Please use the original PDF until the next harvest run completes.</p>"
     )
 
 

@@ -752,17 +752,52 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
       margin-bottom: 10px;
       font-weight: 700;
     }}
+    #ocr-panel h2.b-title {{
+      font-size: 1.35em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c8d6f0;
+      padding-bottom: 0.15em;
+    }}
+    #ocr-panel h3.b-head {{
+      font-size: 1.15em;
+      color: #134e9c;
+    }}
+    #ocr-panel h4.b-sub {{
+      font-size: 1.02em;
+      color: #1f6f4a;
+    }}
     #ocr-panel h3, #ocr-panel h4 {{
       color: {TEAL};
       margin-top: 14px;
       margin-bottom: 8px;
       font-weight: 700;
     }}
-    #ocr-panel h3.ocr-page-heading {{
-      font-size: 1rem;
-      letter-spacing: 0.08em;
-      text-transform: uppercase;
-      margin-top: 24px;
+    #ocr-panel .page-label {{
+      font-size: 1em;
+      font-weight: 700;
+      margin: 1.2em 0 0.35em;
+      color: #0f2b5b;
+      text-transform: none;
+      letter-spacing: normal;
+    }}
+    #ocr-panel table.b-table {{
+      border-collapse: collapse;
+      width: 100%;
+      margin: 0.5em 0;
+      font-size: 0.95em;
+    }}
+    #ocr-panel table.b-table td, #ocr-panel table.b-table th {{
+      border: 1px solid #d0d8e8;
+      padding: 4px 8px;
+      text-align: left;
+      vertical-align: top;
+    }}
+    #ocr-panel table.b-table th {{
+      background: #eef3fb;
+      color: #0f2b5b;
+    }}
+    #ocr-panel table.b-table tr:nth-child(even) td {{
+      background: #f7f9fd;
     }}
     #ocr-panel hr {{ border: 0; border-top: 1px solid #d4dfde; margin: 20px 0; }}
     #ocr-panel p {{ margin: 0 0 12px; white-space: pre-wrap; }}

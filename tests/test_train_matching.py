@@ -356,6 +356,13 @@ https://www.antrimparish.com
         self.assertLess(mistral_idx, gemini_idx)
         self.assertLess(gemini_idx, openai_idx)
 
+    def test_ocr_convert_beautifying_markup(self) -> None:
+        source = (REPO_ROOT / "ocr" / "convert_bulletin.py").read_text(encoding="utf-8")
+        self.assertIn('class="b-table"', source)
+        self.assertIn('class="b-title"', source)
+        self.assertIn("_is_table_separator", source)
+        self.assertIn('class="page-label"', source)
+
     def test_extension_version_bump_workflow_configuration(self) -> None:
         workflow = (REPO_ROOT / ".github" / "workflows" / "bump-extension-version.yml").read_text(encoding="utf-8")
         self.assertIn("workflow_dispatch:", workflow)
