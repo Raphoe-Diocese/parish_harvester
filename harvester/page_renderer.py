@@ -39,6 +39,26 @@ def _render_parish_links(
     return f'<ul class="parish-list">{"".join(items)}</ul>'
 
 
+def _render_parish_accordion(parish_links: list[dict]) -> str:
+    if not parish_links:
+        return '<p class="empty-state">No parish links available yet.</p>'
+
+    items: list[str] = []
+    for link in sorted(parish_links, key=lambda item: str(item.get("name") or "").lower()):
+        name = html.escape(str(link.get("name") or "Unnamed Parish"))
+        url = html.escape(str(link.get("url") or "#"), quote=True)
+        items.append(
+            f'<li><a href="{url}" target="_blank" rel="noopener noreferrer">{name}</a></li>'
+        )
+
+    return (
+        '<details class="parish-accordion">'
+        '<summary class="parish-accordion-toggle">Show parish bulletin links (A–Z)</summary>'
+        f'<ul class="parish-link-grid">{"".join(items)}</ul>'
+        "</details>"
+    )
+
+
 def _render_parish_dropdown(parish_links: list[dict]) -> str:
     if not parish_links:
         return '<p class="empty-state">No parish links available yet.</p>'
@@ -83,7 +103,7 @@ def render_diocese_raphoe_page(
         "mega_pdf_url": html.escape(mega_pdf_url, quote=True),
         "ocr_block_html": _build_ocr_block(ocr_text, ocr_is_html=ocr_is_html),
         "parish_heading": "RAPHOE PARISHES WITH WORKING BULLETIN LINKS",
-        "parish_dropdown_html": _render_parish_dropdown(parish_links),
+        "parish_accordion_html": _render_parish_accordion(parish_links),
         "year": str(datetime.now(UTC).year),
         "issues_url": html.escape(ISSUES_URL, quote=True),
     }

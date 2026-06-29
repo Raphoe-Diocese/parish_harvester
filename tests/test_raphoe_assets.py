@@ -17,6 +17,7 @@ class RaphoeAssetsTests(unittest.TestCase):
         self.assertTrue(evidence_path.exists())
         self.assertFalse(old_path.exists())
         self.assertIn("# --- Ardara ---", text)
+        self.assertIn("# --- Mevagh ---", text)
         self.assertIn("# --- Cathedral ---", text)
         self.assertIn("# --- Templecrone ---", text)
         self.assertIn("# --- Raphoe ---", text)

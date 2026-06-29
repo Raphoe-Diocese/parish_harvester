@@ -201,44 +201,54 @@
       text-transform: uppercase;
       letter-spacing: 0.04em;
     }
-    .parish-picker {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      max-width: 420px;
+    .parish-accordion {
+      max-width: 920px;
       margin: 0 auto;
-    }
-    .parish-dropdown {
-      width: 100%;
-      min-height: 48px;
-      padding: 10px 12px;
-      border: 1px solid var(--teal);
-      border-radius: 6px;
-      font-size: 1rem;
-      font-family: inherit;
-      color: var(--text);
+      text-align: left;
+      border: 1px solid var(--border);
+      border-radius: 8px;
       background: #fff;
+      padding: 0;
     }
-    .parish-open-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 48px;
-      padding: 10px 20px;
-      border-radius: 6px;
-      background: var(--teal);
-      color: #fff;
+    .parish-accordion-toggle {
+      list-style: none;
+      cursor: pointer;
+      padding: 14px 16px;
+      font-family: "Open Sans", Arial, Helvetica, sans-serif;
       font-weight: 700;
+      font-size: 1rem;
+      color: var(--teal);
+      text-align: center;
+    }
+    .parish-accordion-toggle::-webkit-details-marker { display: none; }
+    .parish-accordion[open] .parish-accordion-toggle {
+      border-bottom: 1px solid var(--border);
+    }
+    .parish-link-grid {
+      list-style: disc;
+      margin: 0;
+      padding: 16px 16px 16px 28px;
+      columns: 3;
+      column-gap: 28px;
+      color: var(--link-blue);
+    }
+    .parish-link-grid li {
+      margin: 0 0 8px 0;
+      break-inside: avoid;
+    }
+    .parish-link-grid a {
+      color: var(--link-blue);
       text-decoration: none;
-      font-size: 0.95rem;
-      width: 100%;
+      font-weight: 600;
+      font-size: 0.98rem;
     }
-    .parish-open-btn[aria-disabled="true"] {
-      opacity: 0.45;
-      pointer-events: none;
+    .parish-link-grid a:hover { text-decoration: underline; }
+    @media (max-width: 800px) {
+      .parish-link-grid { columns: 2; }
     }
-    .parish-open-btn:hover { background: var(--teal-dark); text-decoration: none; }
+    @media (max-width: 520px) {
+      .parish-link-grid { columns: 1; padding-left: 24px; }
+    }
     .site-footer {
       background: var(--footer-purple);
       color: #fff;
@@ -300,7 +310,7 @@
 
     <section class="parish-section">
       <h2>RAPHOE PARISHES WITH WORKING BULLETIN LINKS</h2>
-      <div class="parish-picker"><select id="parish-select" class="parish-dropdown" aria-label="Choose a parish bulletin"><option value="">Choose a parish…</option><option value="https://annagryparish.ie/newsletter-2/">Annagry</option><option value="http://ardara.ie/news/">Ardara</option><option value="https://www.facebook.com/donalquinn1959">Ballintra Parish</option><option value="https://drive.google.com/drive/folders/1jPOi4GRU22vAxeKNe5Y_doBJ3riPh7ZK">Bruckless</option><option value="https://www.facebook.com/profile.php?id=100079250566866">Carrigart (Downings, Meevagh)</option><option value="https://www.steunanscathedral.ie/newsletter/">Cathedral</option><option value="https://www.parishpress.net/wp-content/uploads/parish-bulletins/donegal/raphoe/drumholm-parish/bulletin.pdf?t=1782303743">Drumholm</option><option value="https://mcn.live/Camera/holy-cross-church">Dunfanaghy</option><option value="https://naomhfionan.com/nuachtlitir/">Falcarragh</option><option value="https://drive.google.com/file/d/1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa/view">Gartan/Termon</option><option value="https://www.glenfin-parish.com/#sbp-bulletin">Glenfin</option><option value="https://drive.google.com/file/d/14aLAxt4mv7eYBvYx2GGthpsQnLrsysmK/view">Glenties</option><option value="https://www.parishpress.net/wp-content/uploads/parish-bulletins/donegal/raphoe/gort-a-choirce/bulletin.pdf?t=1771000171">Gortahork</option><option value="https://www.inverparish.com/parish-newsletter.html">Inver</option><option value="https://drive.google.com/file/d/1m6sOGz3dECWvbbpXCnRGdHG77yWiLXxR/view">Irish Martyrs</option><option value="https://www.kilbarron.org/bulletin">Kilbarron</option><option value="https://www.mcn.live/Camera/st-carthas-church-kilcar,-f94-h2y5">Kilcar</option><option value="https://mcn.live/Camera/st-mary-of-the-visitation-church-killybegs">Killybegs</option><option value="https://drive.google.com/file/d/1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa/view">Kilmacrenan</option><option value="https://www.kincasslagh.ie/?post_type=kbp_bulletins">Kincasslagh</option><option value="https://milfordrathmullanparishes.ie/bulletins/">Milford Kilkeel</option><option value="https://newtownkilleaparish.ie/bulletin/">Newtown Killea</option><option value="https://drive.google.com/file/d/1jmslbrliw1BTtdrxHbqpUbhQEf6wXHy5/view">Raphoe</option><option value="https://milfordrathmullanparishes.ie/bulletins/">Rathmullan</option><option value="https://www.stranorlarparish.ie/our-parish/">Stranolar</option><option value="https://tawnawillyparish.ie/bulletin/">Tawnawilly</option><option value="https://drive.google.com/file/d/1Hh7w-Ew0vLJUFMihFiVzVJGhjeYposIH/view">Templecrone</option></select><a id="parish-open" class="parish-open-btn" href="#" target="_blank" rel="noopener noreferrer" aria-disabled="true">Open parish bulletin</a></div>
+      <details class="parish-accordion"><summary class="parish-accordion-toggle">Show parish bulletin links (A–Z)</summary><ul class="parish-link-grid"><li><a href="https://annagryparish.ie/newsletter-2/" target="_blank" rel="noopener noreferrer">Annagry</a></li><li><a href="http://ardara.ie/news/" target="_blank" rel="noopener noreferrer">Ardara</a></li><li><a href="https://www.facebook.com/donalquinn1959" target="_blank" rel="noopener noreferrer">Ballintra Parish</a></li><li><a href="https://drive.google.com/drive/folders/1jPOi4GRU22vAxeKNe5Y_doBJ3riPh7ZK" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li><a href="https://www.steunanscathedral.ie/newsletter/" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li><a href="https://www.parishpress.net/wp-content/uploads/parish-bulletins/donegal/raphoe/drumholm-parish/bulletin.pdf?t=1782303743" target="_blank" rel="noopener noreferrer">Drumholm</a></li><li><a href="https://mcn.live/Camera/holy-cross-church" target="_blank" rel="noopener noreferrer">Dunfanaghy</a></li><li><a href="https://naomhfionan.com/nuachtlitir/" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li><a href="https://drive.google.com/file/d/1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa/view" target="_blank" rel="noopener noreferrer">Gartan/Termon</a></li><li><a href="https://www.glenfin-parish.com/#sbp-bulletin" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li><a href="https://drive.google.com/file/d/14aLAxt4mv7eYBvYx2GGthpsQnLrsysmK/view" target="_blank" rel="noopener noreferrer">Glenties</a></li><li><a href="https://www.parishpress.net/wp-content/uploads/parish-bulletins/donegal/raphoe/gort-a-choirce/bulletin.pdf?t=1771000171" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li><a href="https://www.inverparish.com/parish-newsletter.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li><a href="https://drive.google.com/file/d/1m6sOGz3dECWvbbpXCnRGdHG77yWiLXxR/view" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li><a href="https://www.kilbarron.org/bulletin" target="_blank" rel="noopener noreferrer">Kilbarron</a></li><li><a href="https://www.mcn.live/Camera/st-carthas-church-kilcar,-f94-h2y5" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li><a href="https://mcn.live/Camera/st-mary-of-the-visitation-church-killybegs" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li><a href="https://drive.google.com/file/d/1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa/view" target="_blank" rel="noopener noreferrer">Kilmacrenan</a></li><li><a href="https://www.kincasslagh.ie/?post_type=kbp_bulletins" target="_blank" rel="noopener noreferrer">Kincasslagh</a></li><li><a href="https://www.facebook.com/profile.php?id=100079250566866" target="_blank" rel="noopener noreferrer">Mevagh</a></li><li><a href="https://milfordrathmullanparishes.ie/bulletins/" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li><a href="https://newtownkilleaparish.ie/bulletin/" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li><a href="https://drive.google.com/file/d/1jmslbrliw1BTtdrxHbqpUbhQEf6wXHy5/view" target="_blank" rel="noopener noreferrer">Raphoe</a></li><li><a href="https://milfordrathmullanparishes.ie/bulletins/" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li><a href="https://www.stranorlarparish.ie/our-parish/" target="_blank" rel="noopener noreferrer">Stranolar</a></li><li><a href="https://tawnawillyparish.ie/bulletin/" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li><a href="https://drive.google.com/file/d/1Hh7w-Ew0vLJUFMihFiVzVJGhjeYposIH/view" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul></details>
     </section>
   </main>
 
@@ -311,18 +321,6 @@
 
   <script>
     (function () {
-      const parishSelect = document.getElementById('parish-select');
-      const parishOpen = document.getElementById('parish-open');
-      if (parishSelect && parishOpen) {
-        function syncParishLink() {
-          const url = parishSelect.value || '';
-          parishOpen.href = url || '#';
-          parishOpen.setAttribute('aria-disabled', url ? 'false' : 'true');
-        }
-        parishSelect.addEventListener('change', syncParishLink);
-        syncParishLink();
-      }
-
       const ocrRoot = document.getElementById('ocr-text');
       const ocrSearch = document.getElementById('ocr-search');
       const clearSearch = document.getElementById('clear-search');

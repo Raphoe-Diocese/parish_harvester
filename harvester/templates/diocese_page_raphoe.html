@@ -201,44 +201,54 @@
       text-transform: uppercase;
       letter-spacing: 0.04em;
     }
-    .parish-picker {
-      display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      max-width: 420px;
+    .parish-accordion {
+      max-width: 920px;
       margin: 0 auto;
-    }
-    .parish-dropdown {
-      width: 100%;
-      min-height: 48px;
-      padding: 10px 12px;
-      border: 1px solid var(--teal);
-      border-radius: 6px;
-      font-size: 1rem;
-      font-family: inherit;
-      color: var(--text);
+      text-align: left;
+      border: 1px solid var(--border);
+      border-radius: 8px;
       background: #fff;
+      padding: 0;
     }
-    .parish-open-btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 48px;
-      padding: 10px 20px;
-      border-radius: 6px;
-      background: var(--teal);
-      color: #fff;
+    .parish-accordion-toggle {
+      list-style: none;
+      cursor: pointer;
+      padding: 14px 16px;
+      font-family: "Open Sans", Arial, Helvetica, sans-serif;
       font-weight: 700;
+      font-size: 1rem;
+      color: var(--teal);
+      text-align: center;
+    }
+    .parish-accordion-toggle::-webkit-details-marker { display: none; }
+    .parish-accordion[open] .parish-accordion-toggle {
+      border-bottom: 1px solid var(--border);
+    }
+    .parish-link-grid {
+      list-style: disc;
+      margin: 0;
+      padding: 16px 16px 16px 28px;
+      columns: 3;
+      column-gap: 28px;
+      color: var(--link-blue);
+    }
+    .parish-link-grid li {
+      margin: 0 0 8px 0;
+      break-inside: avoid;
+    }
+    .parish-link-grid a {
+      color: var(--link-blue);
       text-decoration: none;
-      font-size: 0.95rem;
-      width: 100%;
+      font-weight: 600;
+      font-size: 0.98rem;
     }
-    .parish-open-btn[aria-disabled="true"] {
-      opacity: 0.45;
-      pointer-events: none;
+    .parish-link-grid a:hover { text-decoration: underline; }
+    @media (max-width: 800px) {
+      .parish-link-grid { columns: 2; }
     }
-    .parish-open-btn:hover { background: var(--teal-dark); text-decoration: none; }
+    @media (max-width: 520px) {
+      .parish-link-grid { columns: 1; padding-left: 24px; }
+    }
     .site-footer {
       background: var(--footer-purple);
       color: #fff;
@@ -300,7 +310,7 @@
 
     <section class="parish-section">
       <h2>${parish_heading}</h2>
-      ${parish_dropdown_html}
+      ${parish_accordion_html}
     </section>
   </main>
 
@@ -311,18 +321,6 @@
 
   <script>
     (function () {
-      const parishSelect = document.getElementById('parish-select');
-      const parishOpen = document.getElementById('parish-open');
-      if (parishSelect && parishOpen) {
-        function syncParishLink() {
-          const url = parishSelect.value || '';
-          parishOpen.href = url || '#';
-          parishOpen.setAttribute('aria-disabled', url ? 'false' : 'true');
-        }
-        parishSelect.addEventListener('change', syncParishLink);
-        syncParishLink();
-      }
-
       const ocrRoot = document.getElementById('ocr-text');
       const ocrSearch = document.getElementById('ocr-search');
       const clearSearch = document.getElementById('clear-search');

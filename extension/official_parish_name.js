@@ -25,6 +25,8 @@
     ballintra: "Ballintra Parish",
     kilmacrenan: "Kilmacrenan",
     rathmullan: "Rathmullan",
+    carrigart: "Mevagh",
+    "drumholm-parish": "Drumholm",
   };
 
   const NON_PARISH_HOST_SUFFIXES = [

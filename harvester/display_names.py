@@ -32,7 +32,7 @@ _SLUG_OVERRIDES: dict[str, str] = {
     "kilbarron": "Kilbarron",
     "kincasslagh": "Kincasslagh",
     "ardara": "Ardara",
-    "carrigart": "Carrigart (Downings, Meevagh)",
+    "carrigart": "Mevagh",
     "drive-1kna8f6t54": "Gartan/Termon",
     "drive-14alaxt4mv": "Glenties",
     "drive-1m6sogz3de": "Irish Martyrs",
