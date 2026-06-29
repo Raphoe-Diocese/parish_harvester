@@ -676,10 +676,12 @@ async function _pdEnsureDioceseInfo(dioceseDisplayName) {
 }
 
 async function _pdAddParish(dioceseDisplayName, name, url) {
-  const trimmedName = String(name || "").trim();
   const trimmedUrl = String(url || "").trim();
-  if (!trimmedName) throw new Error("Parish name is required.");
   if (!trimmedUrl) throw new Error("Bulletin URL is required.");
+  let trimmedName = String(name || "").trim();
+  const fromUrl = globalThis.phOfficialParishName?.officialDisplayNameFromUrl?.(trimmedUrl) || "";
+  if (fromUrl) trimmedName = fromUrl;
+  if (!trimmedName) throw new Error("Parish name is required (or use a parish website URL).");
   const info = await _pdEnsureDioceseInfo(dioceseDisplayName);
   if (_pdExtractParishBlock(info.text, trimmedName) != null) {
     throw new Error(`Parish "${trimmedName}" already exists in ${dioceseDisplayName}.`);

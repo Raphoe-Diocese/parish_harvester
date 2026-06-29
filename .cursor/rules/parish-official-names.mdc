@@ -1,0 +1,15 @@
+# Parish official names
+
+When adding or renaming a parish, **always use the official name from the parish website URL**, not informal local names.
+
+Examples:
+- `https://templecroneparish.ie/` → **Templecrone Parish** (not "Dungloe")
+- `https://annagryparish.ie/...` → **Annagry Parish**
+- `https://stranorlarparish.ie/...` → **Stranorlar Parish**
+
+Rules:
+1. Put `# page: https://parish-website/...` in the evidence file (`parishes/*_bulletin_urls.txt`).
+2. Display name comes from the website hostname via `harvester/display_names.py` (Python) and `extension/official_parish_name.js` (extension).
+3. Irish/special names use overrides in those files (e.g. Naomh Fionán, St Eunan's Cathedral).
+4. Google Drive static bulletins: keep `drive-*` key, set `# page:` to the parish website, bulletin URL is the Drive download link.
+5. After bulk renames run: `py -3.11 scripts/sync_parish_display_names.py`

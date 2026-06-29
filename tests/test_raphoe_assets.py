@@ -5,7 +5,7 @@ import unittest
 from pathlib import Path
 
 
-REPO_ROOT = Path(__file__).resolve().parent
+REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 class RaphoeAssetsTests(unittest.TestCase):
@@ -17,6 +17,7 @@ class RaphoeAssetsTests(unittest.TestCase):
         self.assertTrue(evidence_path.exists())
         self.assertFalse(old_path.exists())
         self.assertIn("# --- Ardara ---", text)
+        self.assertIn("# --- Templecrone Parish ---", text)
         self.assertIn("# --- Parish of Raphoe ---", text)
         self.assertIn("drive.usercontent.google.com/download?id=1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa&export=download", text)
         self.assertEqual(text.count("milfordrathmullanparishes.ie/bulletins/"), 2)  # page + URL
@@ -27,7 +28,9 @@ class RaphoeAssetsTests(unittest.TestCase):
 
         self.assertIn("ardara", payload)
         self.assertIn("drive-1jmslbrliw", payload)
-        self.assertEqual(payload["dungloe"]["facebook"], "https://www.facebook.com/donalquinn1959")
+        self.assertIn("drive-1hh7w-ew0v", payload)
+        self.assertEqual(payload["drive-1hh7w-ew0v"]["display_name"], "Templecrone Parish")
+        self.assertEqual(payload["drive-1hh7w-ew0v"]["website"], "https://templecroneparish.ie/")
         self.assertEqual(payload["steunanscathedral"]["display_name"], "St Eunan's Cathedral Letterkenny")
 
 
