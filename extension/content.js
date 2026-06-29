@@ -861,13 +861,7 @@
   const buildStandaloneRecipe = (parishKey, displayName, diocese) => {
     const steps = [];
     const startUrl = _resolveRecipeStartUrl();
-    if (startUrl) {
-      const gotoStep = { action: "goto", url: startUrl };
-      if (/(?:\d{1,2})[_-](?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[_-](?:\d{4})/i.test(startUrl)) {
-        gotoStep.use_target_url = true;
-      }
-      steps.push(gotoStep);
-    }
+    // Harvester opens start_url before replaying steps — keep UI step count = JSON steps.
     steps.push(..._standaloneRecipeSteps());
     const usesCloudFolder = steps.some(
       (s) => s && (s.cloud_folder || s.date_format === "YY.MM.DD")
@@ -901,19 +895,12 @@
         recipe.timeout_ms = Math.max(Number(recipe.timeout_ms) || 0, 180_000);
         recipe.total_timeout_s = Math.max(Number(recipe.total_timeout_s) || 0, host.includes("portstewart") ? 600 : 300);
       }
-      if (host.includes("portstewartparish.website") && startUrl && startUrl.startsWith("https://")) {
+      if (
+        (host.includes("portstewartparish.website") || host.includes("portstewartparish.ie"))
+        && startUrl
+        && startUrl.startsWith("https://")
+      ) {
         recipe.start_url = startUrl.replace(/^https:/i, "http:");
-        const gotoStep = recipe.steps.find((s) => String(s?.action || "").toLowerCase() === "goto");
-        if (gotoStep && gotoStep.url) {
-          gotoStep.url = String(gotoStep.url).replace(/^https:/i, "http:");
-        }
-      }
-      if (host.includes("portstewartparish.ie") && startUrl && startUrl.startsWith("https://")) {
-        recipe.start_url = startUrl.replace(/^https:/i, "http:");
-        const gotoStep = recipe.steps.find((s) => String(s?.action || "").toLowerCase() === "goto");
-        if (gotoStep && gotoStep.url) {
-          gotoStep.url = String(gotoStep.url).replace(/^https:/i, "http:");
-        }
       }
     } catch (_hostErr) {
       // ignore invalid start_url
@@ -7528,7 +7515,8 @@
 
             // Read the file back from GitHub so we never claim "saved" when it
             // went to the wrong folder or kept the old steps.
-            const intendedSteps = Array.isArray(recipeToPush.steps) ? recipeToPush.steps.length : 0;
+            const pushedRecipe = pushResult.recipe || recipeToPush;
+            const intendedSteps = Array.isArray(pushedRecipe.steps) ? pushedRecipe.steps.length : 0;
             let savedSteps = intendedSteps;
             let savedPath = pushResult.filePath || "(unknown path)";
             if (pushMod.verifyRecipe) {
@@ -7537,12 +7525,13 @@
                 gh_pat: settings.gh_pat,
                 gh_repo: settings.gh_repo,
                 parish_key: key,
+                expectedRecipe: pushedRecipe,
                 expectedSteps: intendedSteps,
                 expectedFolder: recipeToPush.diocese || "",
               });
               if (!verify.ok) {
                 showStatus(
-                  `❌ GitHub did NOT confirm the save (${verify.error}). Your change is NOT on GitHub — tap Send & test again.`,
+                  `❌ GitHub did NOT confirm the save (${verify.error}). Tap Send & test again in a few seconds.`,
                   "error"
                 );
                 return;
@@ -7551,7 +7540,7 @@
               savedPath = verify.filePath || savedPath;
               if (!verify.matches) {
                 showStatus(
-                  `⚠️ Saved to ${savedPath}, but it has ${savedSteps} step(s) — not your ${intendedSteps}. Your NEW steps did not save. Tap “Clear steps”, record again, then Send & test.`,
+                  `⚠️ GitHub still shows the old recipe (${savedSteps} step(s), yours ${intendedSteps}). Wait 5 seconds and tap Send & test again.`,
                   "warn"
                 );
                 return;

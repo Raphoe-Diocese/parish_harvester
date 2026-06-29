@@ -47,20 +47,47 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
+          has_mega_artifact() {
+            local run_id="$1"
+            local count
+            count="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/artifacts" --jq '[.artifacts[] | select(.name | test("mega-bulletin-pdf"; "i"))] | length')"
+            [ "${count:-0}" -gt 0 ]
+          }
+          pick_run_with_mega_artifact() {
+            local run_id=""
+            while IFS= read -r candidate; do
+              [ -n "${candidate}" ] || continue
+              if has_mega_artifact "${candidate}"; then
+                run_id="${candidate}"
+                break
+              fi
+            done < <(gh run list --repo "${GITHUB_REPOSITORY}" --workflow harvest.yml --status success --limit 25 --json databaseId --jq '.[].databaseId')
+            echo "${run_id}"
+          }
+
           if [ "${{ github.event_name }}" = "workflow_run" ]; then
-            echo "run_id=${{ github.event.workflow_run.id }}" >> "$GITHUB_OUTPUT"
-            echo "Using harvest workflow run ${{ github.event.workflow_run.id }}"
-          else
-            RUN_ID="$(gh run list --repo "${GITHUB_REPOSITORY}" --workflow harvest.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId')"
-            if [ -z "${RUN_ID}" ] || [ "${RUN_ID}" = "null" ]; then
-              echo "::error::No successful harvest run found — run a Raphoe harvest first, then retry OCR."
-              exit 1
+            RUN_ID="${{ github.event.workflow_run.id }}"
+            if has_mega_artifact "${RUN_ID}"; then
+              echo "run_id=${RUN_ID}" >> "$GITHUB_OUTPUT"
+              echo "Using harvest workflow run ${RUN_ID} (has mega PDF artifact)"
+            else
+              echo "run_id=none" >> "$GITHUB_OUTPUT"
+              echo "Harvest run ${RUN_ID} has no mega PDF artifact — will use GitHub Pages fallback"
             fi
-            echo "run_id=${RUN_ID}" >> "$GITHUB_OUTPUT"
-            echo "Manual OCR run — using latest successful harvest run ${RUN_ID}"
+          else
+            RUN_ID="$(pick_run_with_mega_artifact)"
+            if [ -n "${RUN_ID}" ]; then
+              echo "run_id=${RUN_ID}" >> "$GITHUB_OUTPUT"
+              echo "Manual OCR run — using harvest run ${RUN_ID} (has mega PDF artifact)"
+            else
+              echo "run_id=none" >> "$GITHUB_OUTPUT"
+              echo "No harvest run with mega PDF artifacts — will use GitHub Pages fallback"
+            fi
           fi
 
       - name: Download mega PDF artifacts from harvest run
+        if: steps.harvest_run.outputs.run_id != 'none'
+        continue-on-error: true
         uses: actions/download-artifact@v4.1.3
         with:
           github-token: ${{ github.token }}
@@ -73,15 +100,11 @@ jobs:
         run: |
           set -euo pipefail
           STAGED="/tmp/ocr-bulletins/staged"
-          mkdir -p "${STAGED}"
+          RAW="/tmp/ocr-bulletins/raw"
+          mkdir -p "${STAGED}" "${RAW}"
           shopt -s nullglob
-          mapfile -d '' PDFS < <(find /tmp/ocr-bulletins/raw -type f -name '*_mega_bulletin.pdf' -print0)
-          if [ ${#PDFS[@]} -eq 0 ]; then
-            echo "::error::No mega PDF files found in harvest artifacts (looked under /tmp/ocr-bulletins/raw)."
-            find /tmp/ocr-bulletins/raw -type f 2>/dev/null | head -20 || true
-            exit 1
-          fi
-          for pdf in "${PDFS[@]}"; do
+          mapfile -d '' PDFS < <(find "${RAW}" -type f -name '*_mega_bulletin.pdf' -print0 2>/dev/null || true)
+          for pdf in "${PDFS[@]:-}"; do
             dest="${STAGED}/$(basename "${pdf}")"
             if [ -e "${dest}" ]; then
               echo "Error: duplicate mega PDF filename: ${dest}"
@@ -90,6 +113,31 @@ jobs:
             cp "${pdf}" "${dest}"
             ls -lh "${dest}"
           done
+
+          PAGES_BASE="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}"
+          for diocese in $(python -c "import json;print(' '.join(d['key'] for d in json.load(open('parishes/dioceses.json'))['dioceses']))"); do
+            dest="${STAGED}/${diocese}_mega_bulletin.pdf"
+            if [ -f "${dest}" ]; then
+              continue
+            fi
+            url="${PAGES_BASE}/mega_pdf/${diocese}_mega_bulletin.pdf"
+            echo "Trying GitHub Pages fallback for ${diocese}: ${url}"
+            if curl -fsSL "${url}" -o "${dest}.tmp" && python3 -c "import sys; sig=open(sys.argv[1],'rb').read(5); sys.exit(0 if sig==b'%PDF-' else 1)" "${dest}.tmp"; then
+              mv "${dest}.tmp" "${dest}"
+              ls -lh "${dest}"
+            else
+              rm -f "${dest}.tmp"
+              echo "Warning: no mega PDF for ${diocese} in artifacts or on Pages"
+            fi
+          done
+
+          mapfile -d '' STAGED_PDFS < <(find "${STAGED}" -maxdepth 1 -type f -name '*_mega_bulletin.pdf' -print0)
+          if [ ${#STAGED_PDFS[@]} -eq 0 ]; then
+            echo "::error::No mega PDF files found (checked harvest artifacts and ${PAGES_BASE}/mega_pdf/)."
+            find "${RAW}" -type f 2>/dev/null | head -20 || true
+            exit 1
+          fi
+          echo "Staged ${#STAGED_PDFS[@]} mega PDF(s) for OCR"
 
       - name: Generate OCR viewer pages
         id: ocr_generate

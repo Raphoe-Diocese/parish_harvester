@@ -524,34 +524,95 @@
     };
   }
 
+  const recipeStepsFingerprint = (steps) => {
+    if (!Array.isArray(steps)) return "[]";
+    return JSON.stringify(
+      steps.map((step) => {
+        const action = String(step?.action || "").trim().toLowerCase();
+        const out = { action };
+        if (step?.selector) out.selector = String(step.selector);
+        if (step?.text) out.text = String(step.text).slice(0, 120);
+        if (step?.pick_strategy) out.pick_strategy = String(step.pick_strategy);
+        if (step?.bulletin_position) out.bulletin_position = String(step.bulletin_position);
+        if (step?.use_captured_url) out.use_captured_url = true;
+        if (step?.url_pattern) out.url_pattern = String(step.url_pattern);
+        if (step?.use_target_url) out.use_target_url = true;
+        if (action === "goto" && step?.url) out.url = String(step.url);
+        return out;
+      })
+    );
+  };
+
+  const recipesMatchForVerify = (savedRecipe, expectedRecipe) => {
+    if (!expectedRecipe || typeof expectedRecipe !== "object") return null;
+    const savedSteps = Array.isArray(savedRecipe?.steps) ? savedRecipe.steps : [];
+    const expectedSteps = Array.isArray(expectedRecipe?.steps) ? expectedRecipe.steps : [];
+    return recipeStepsFingerprint(savedSteps) === recipeStepsFingerprint(expectedSteps);
+  };
+
   /**
    * Read the recipe back from GitHub after a push so "saved" is never a lie.
-   * Confirms the file exists and (optionally) that its step count matches what
-   * we intended to save — catching wrong-folder writes and old-steps-kept merges.
+   * Compares step fingerprints (not just counts) and retries briefly while GitHub
+   * catches up — avoids false "clear steps" errors from hidden goto injection.
    */
-  const verifyRecipe = async ({ gh_pat, gh_repo: storedRepo, parish_key, expectedSteps, expectedFolder }) => {
+  const verifyRecipe = async ({
+    gh_pat,
+    gh_repo: storedRepo,
+    parish_key,
+    expectedSteps,
+    expectedRecipe,
+    expectedFolder,
+  }) => {
     const gh_repo = resolveGhRepo(storedRepo);
     const key = String(parish_key || "").trim().toLowerCase().replace(/\s+/g, "_");
     if (!key) return { ok: false, error: "No parish_key to verify." };
-    let located = null;
-    try {
-      located = await locateRecipe(String(gh_pat || "").trim(), gh_repo, key, expectedFolder || "");
-    } catch (err) {
-      return { ok: false, error: `Could not read back from GitHub: ${String(err)}` };
+    const pat = String(gh_pat || "").trim();
+    const wantCount = Array.isArray(expectedRecipe?.steps)
+      ? expectedRecipe.steps.length
+      : Number(expectedSteps);
+    let lastLocated = null;
+    for (let attempt = 0; attempt < 4; attempt += 1) {
+      if (attempt > 0) await sleep(1500);
+      try {
+        lastLocated = await locateRecipe(pat, gh_repo, key, expectedFolder || "");
+      } catch (err) {
+        if (attempt === 3) {
+          return { ok: false, error: `Could not read back from GitHub: ${String(err)}` };
+        }
+        continue;
+      }
+      if (!lastLocated?.existingRecipe) {
+        if (attempt === 3) {
+          return { ok: false, error: "Recipe file not found on GitHub after save." };
+        }
+        continue;
+      }
+      const savedRecipe = lastLocated.existingRecipe;
+      const savedSteps = Array.isArray(savedRecipe.steps) ? savedRecipe.steps.length : 0;
+      const contentMatch = recipesMatchForVerify(savedRecipe, expectedRecipe);
+      const countMatch = !Number.isFinite(wantCount) || wantCount <= 0 || savedSteps === wantCount;
+      const matches = contentMatch === true || (contentMatch === null && countMatch);
+      if (matches) {
+        return {
+          ok: true,
+          filePath: lastLocated.filePath,
+          diocese: lastLocated.diocese,
+          savedSteps,
+          expectedSteps: wantCount,
+          matches: true,
+        };
+      }
     }
-    if (!located || !located.existingRecipe) {
-      return { ok: false, error: "Recipe file not found on GitHub after save." };
-    }
-    const savedSteps = Array.isArray(located.existingRecipe.steps)
-      ? located.existingRecipe.steps.length
+    const savedSteps = Array.isArray(lastLocated?.existingRecipe?.steps)
+      ? lastLocated.existingRecipe.steps.length
       : 0;
-    const want = Number(expectedSteps);
     return {
       ok: true,
-      filePath: located.filePath,
-      diocese: located.diocese,
+      filePath: lastLocated?.filePath || "",
+      diocese: lastLocated?.diocese || "",
       savedSteps,
-      matches: !Number.isFinite(want) || want <= 0 || savedSteps === want,
+      expectedSteps: wantCount,
+      matches: false,
     };
   };
 
