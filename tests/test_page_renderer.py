@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from harvester.page_renderer import EMPTY_OCR_TEXT, render_diocese_page
+from harvester.page_renderer import EMPTY_OCR_TEXT, render_diocese_page, render_diocese_raphoe_page
 
 
 class PageRendererTests(unittest.TestCase):
@@ -61,6 +61,28 @@ class PageRendererTests(unittest.TestCase):
             self.assertIn("A Parish", html)
             self.assertIn("B Parish", html)
             self.assertIn("DERRY PARISHES WITH WORKING BULLETIN LINKS", html)
+
+    def test_render_diocese_raphoe_page_stacked_layout_and_dropdown(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            out_path = Path(tmpdir) / "index.html"
+            render_diocese_raphoe_page(
+                parish_links=[
+                    {"name": "Z Parish", "url": "https://example.com/z"},
+                    {"name": "A Parish", "url": "https://example.com/a"},
+                ],
+                out_path=out_path,
+                mega_pdf_url="../../mega_pdf/raphoe_mega_bulletin.pdf",
+                ocr_text="Sunday mass at 10am",
+            )
+            html = out_path.read_text(encoding="utf-8")
+            self.assertIn("Go to OCR version", html)
+            self.assertIn('id="ocr-section"', html)
+            self.assertIn("parish-select", html)
+            self.assertIn("A Parish", html)
+            self.assertIn("Z Parish", html)
+            self.assertLess(html.index("A Parish"), html.index("Z Parish"))
+            self.assertIn("raphoe_mega_bulletin.pdf", html)
+            self.assertIn("Sunday mass at 10am", html)
 
 
 if __name__ == "__main__":

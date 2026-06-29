@@ -7,6 +7,7 @@ from string import Template
 
 TEMPLATE_PATH = Path(__file__).resolve().parent / "templates" / "diocese_page.html"
 CURRENT_TEMPLATE_PATH = Path(__file__).resolve().parent / "templates" / "diocese_page_current.html"
+RAPHOE_TEMPLATE_PATH = Path(__file__).resolve().parent / "templates" / "diocese_page_raphoe.html"
 ISSUES_URL = "https://github.com/Raphoe-Diocese/parish_harvester/issues/new"
 EMPTY_OCR_TEXT = "We're still collecting OCR text for this diocese. Check back next Sunday."
 GITHUB_RAW_BASE = "https://raw.githubusercontent.com/Raphoe-Diocese/parish_harvester/main/Bulletins/current"
@@ -36,6 +37,58 @@ def _render_parish_links(
             f'<li{li_class}><a href="{url}" target="_blank" rel="noopener noreferrer">{name}{suffix}</a></li>'
         )
     return f'<ul class="parish-list">{"".join(items)}</ul>'
+
+
+def _render_parish_dropdown(parish_links: list[dict]) -> str:
+    if not parish_links:
+        return '<p class="empty-state">No parish links available yet.</p>'
+
+    options = ['<option value="">Choose a parish…</option>']
+    for link in sorted(parish_links, key=lambda item: str(item.get("name") or "").lower()):
+        name = html.escape(str(link.get("name") or "Unnamed Parish"))
+        url = html.escape(str(link.get("url") or ""), quote=True)
+        if not url:
+            continue
+        options.append(f'<option value="{url}">{name}</option>')
+
+    return (
+        '<div class="parish-picker">'
+        f'<select id="parish-select" class="parish-dropdown" aria-label="Choose a parish bulletin">{"".join(options)}</select>'
+        '<a id="parish-open" class="parish-open-btn" href="#" target="_blank" rel="noopener noreferrer" aria-disabled="true">Open parish bulletin</a>'
+        "</div>"
+    )
+
+
+def _build_ocr_block(ocr_text: str, *, ocr_is_html: bool = False) -> str:
+    normalized = (ocr_text or "").strip() or EMPTY_OCR_TEXT
+    if ocr_is_html:
+        return f'<div class="ocr-body" id="ocr-text">{normalized}</div>'
+    return f'<pre class="ocr-pre" id="ocr-text">{html.escape(normalized)}</pre>'
+
+
+def render_diocese_raphoe_page(
+    parish_links: list[dict],
+    out_path: Path,
+    *,
+    mega_pdf_url: str,
+    ocr_text: str = "",
+    ocr_is_html: bool = False,
+    week_label: str = "",
+) -> None:
+    template = Template(RAPHOE_TEMPLATE_PATH.read_text(encoding="utf-8"))
+    week_suffix = f" — {week_label}" if week_label else ""
+    payload = {
+        "page_title": html.escape(f"Raphoe Diocese Big Bulletin{week_suffix}"),
+        "headline": "RAPHOE DIOCESE BIG BULLETIN",
+        "mega_pdf_url": html.escape(mega_pdf_url, quote=True),
+        "ocr_block_html": _build_ocr_block(ocr_text, ocr_is_html=ocr_is_html),
+        "parish_heading": "RAPHOE PARISHES WITH WORKING BULLETIN LINKS",
+        "parish_dropdown_html": _render_parish_dropdown(parish_links),
+        "year": str(datetime.now(UTC).year),
+        "issues_url": html.escape(ISSUES_URL, quote=True),
+    }
+    out_path.parent.mkdir(parents=True, exist_ok=True)
+    out_path.write_text(template.safe_substitute(payload), encoding="utf-8")
 
 
 def render_diocese_current_page(

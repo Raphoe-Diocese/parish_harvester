@@ -8,7 +8,11 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from harvester.fetcher import parse_evidence_file
-from harvester.page_renderer import render_diocese_current_page, render_diocese_page
+from harvester.page_renderer import (
+    render_diocese_current_page,
+    render_diocese_page,
+    render_diocese_raphoe_page,
+)
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DOCS_DIR = REPO_ROOT / "docs"
@@ -272,6 +276,70 @@ def _latest_viewer(diocese_key: str) -> tuple[Path | None, str | None]:
     return latest if latest else (None, None)
 
 
+def _ocr_html_from_viewer(path: Path | None) -> str:
+    if path is None or not path.exists():
+        return ""
+    raw_html = path.read_text(encoding="utf-8")
+    match = re.search(
+        r'<div id="ocr-panel">\s*(.*?)\s*</div>\s*<div class="note-box">',
+        raw_html,
+        re.IGNORECASE | re.DOTALL,
+    )
+    if not match:
+        return ""
+    return match.group(1).strip()
+
+
+def _latest_ocr_standalone(diocese_key: str) -> Path | None:
+    if not BULLETINS_DIR.exists():
+        return None
+    stem = diocese_key.replace("-", "[-_]")
+    regex = re.compile(rf"^{stem}-(\d{{4}}-\d{{2}}-\d{{2}})-ocr\.html$")
+    latest: tuple[Path, str] | None = None
+    for path in sorted(BULLETINS_DIR.glob("*.html")):
+        match = regex.match(path.name)
+        if not match:
+            continue
+        date_text = match.group(1)
+        if latest is None or date_text > latest[1]:
+            latest = (path, date_text)
+    return latest[0] if latest else None
+
+
+def _ocr_html_from_standalone(path: Path | None) -> str:
+    if path is None or not path.exists():
+        return ""
+    raw_html = path.read_text(encoding="utf-8")
+    match = re.search(
+        r'<div class="ocr-body[^"]*">\s*(.*?)\s*</div>\s*</main>',
+        raw_html,
+        re.IGNORECASE | re.DOTALL,
+    )
+    if match:
+        return match.group(1).strip()
+    match = re.search(
+        r'<div class="scrollable-viewer">\s*(.*?)\s*</div>\s*</body>',
+        raw_html,
+        re.IGNORECASE | re.DOTALL,
+    )
+    if match:
+        return match.group(1).strip()
+    return ""
+
+
+def _ocr_content_for_diocese(diocese_key: str) -> tuple[str, bool]:
+    viewer_path, _viewer_date = _latest_viewer(diocese_key)
+    html_content = _ocr_html_from_viewer(viewer_path)
+    if html_content:
+        return html_content, True
+    standalone = _latest_ocr_standalone(diocese_key)
+    html_content = _ocr_html_from_standalone(standalone)
+    if html_content:
+        return html_content, True
+    plain = _ocr_text_from_viewer(viewer_path)
+    return plain, False
+
+
 def _ocr_text_from_viewer(path: Path | None) -> str:
     if path is None or not path.exists():
         return ""
@@ -499,12 +567,14 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
         if diocese.key in LIVE_DIOCESES and trained:
             if diocese.key == "raphoe":
                 parish_links = _parish_links(diocese.key)
-                render_diocese_current_page(
-                    diocese_display_name=diocese.name,
+                ocr_text, ocr_is_html = _ocr_content_for_diocese(diocese.key)
+                render_diocese_raphoe_page(
                     parish_links=parish_links,
                     out_path=out_path,
-                    links_only=True,
-                    preserve_order=True,
+                    mega_pdf_url="../../mega_pdf/raphoe_mega_bulletin.pdf",
+                    ocr_text=ocr_text,
+                    ocr_is_html=ocr_is_html,
+                    week_label=week_label if target_date else "",
                 )
             else:
                 parish_links, stats = _parish_links_with_harvest(diocese.key, report_path)
