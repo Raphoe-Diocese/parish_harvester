@@ -58,6 +58,43 @@
       return standaloneStartUrl || "";
     }
   };
+  // WordPress / Divi edit mode and your own ParishPress site — never hijack the page.
+  const _isEditorPageUrl = (url = "") => {
+    try {
+      const parsed = new URL(String(url || _pageUrlForParishDetection()));
+      const href = parsed.href.toLowerCase();
+      const path = parsed.pathname.toLowerCase();
+      if (
+        href.includes("et_fb=1") ||
+        path.includes("/wp-admin") ||
+        href.includes("customize.php") ||
+        href.includes("elementor-preview") ||
+        href.includes("fl_builder") ||
+        (href.includes("action=edit") && path.includes("post.php"))
+      ) {
+        return true;
+      }
+      const host = parsed.hostname.toLowerCase().replace(/^www\./, "");
+      if (host === "parishpress.net" && !path.includes("/wp-content/uploads/parish-bulletins/")) {
+        return true;
+      }
+      return false;
+    } catch (_e) {
+      return false;
+    }
+  };
+  const _dismissToolbar = (clearSession = false) => {
+    const bar = _getToolbarNode();
+    if (bar) {
+      bar.dataset.phHidden = "true";
+      bar.style.display = "none";
+    }
+    stopPickLinkMode?.();
+    stopPickImageMode?.();
+    if (clearSession || _isEditorPageUrl()) {
+      void _clearRecordingSession();
+    }
+  };
   const _hostsMatch = (urlA, urlB) => {
     const a = _hostnameFromUrl(urlA);
     const b = _hostnameFromUrl(urlB);
@@ -461,6 +498,15 @@
   const _restoreRecordingSessionFromStorage = async () => {
     if (!_inStandaloneMode()) return false;
     const pageUrl = _pageUrlForParishDetection();
+    if (_isEditorPageUrl(pageUrl)) {
+      const bar = _getToolbarNode();
+      if (bar) {
+        bar.dataset.phHidden = "true";
+        bar.style.display = "none";
+      }
+      await _clearRecordingSession();
+      return false;
+    }
     const currentHost = _hostnameFromUrl(pageUrl);
     const session = await _getRecordingSessionForCurrentHost();
     if (!session?.active) {
@@ -3668,8 +3714,7 @@
     }
 
     const closeBtn = mkBtn("✕ Hide", "#374151", () => {
-      bar.style.display = "none";
-      bar.dataset.phHidden = "true";
+      _dismissToolbar(true);
     });
     bar.appendChild(closeBtn);
 
@@ -3766,10 +3811,7 @@
       "margin-left: auto",
     ].join(";");
     closeBtn.addEventListener("click", () => {
-      bar.dataset.phHidden = "true";
-      bar.style.display = "none";
-      stopPickLinkMode();
-      stopPickImageMode();
+      _dismissToolbar(true);
     });
     header.appendChild(closeBtn);
 
@@ -8585,6 +8627,7 @@
   const _AUTO_SHOW_DELAYS_MS = [0, 300, 1000, 2500, 4000, 7000];
 
   const _tryAutoShowToolbar = () => {
+    if (_isEditorPageUrl()) return;
     if (_TRAINING_BINDINGS.some((b) => typeof window[b] === "function")) {
       _ensureToolbar(true);
     }

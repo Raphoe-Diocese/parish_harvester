@@ -305,6 +305,14 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
         }
       }
       if (!sessionActive) return;
+      const pageUrl = String(tab.url || "");
+      if (
+        /et_fb=1/i.test(pageUrl) ||
+        /\/wp-admin/i.test(pageUrl) ||
+        (/parishpress\.net/i.test(pageUrl) && !/wp-content\/uploads\/parish-bulletins/i.test(pageUrl))
+      ) {
+        return;
+      }
       await sendToTab(tabId, { type: "restore_recording_session" }, { allowInject: true });
     } catch (_err) {
       // Non-fatal — user can reopen the toolbar from the popup.
