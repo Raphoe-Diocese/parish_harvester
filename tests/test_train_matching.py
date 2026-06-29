@@ -349,12 +349,13 @@ https://www.antrimparish.com
 
     def test_ocr_convert_provider_fallback_order(self) -> None:
         source = (REPO_ROOT / "ocr" / "convert_bulletin.py").read_text(encoding="utf-8")
-        self.assertIn("Trying Mistral OCR (mistral-ocr-latest) on PDF ...", source)
+        self.assertIn("Mistral OCR (mistral-ocr-latest) on PDF ...", source)
+        self.assertIn("Retrying Mistral OCR (mistral-ocr-latest) on PDF ...", source)
         self.assertIn("Running image OCR with Gemini (gemini-2.5-flash) fallback ...", source)
         self.assertIn("Running image OCR with GitHub Models (gpt-4o-mini) fallback ...", source)
         self.assertIn("Running image OCR with OpenAI gpt-4o-mini fallback ...", source)
         self.assertIn("Tier 0 text extraction as fallback", source)
-        mistral_idx = source.find("Trying Mistral OCR (mistral-ocr-latest) on PDF ...")
+        mistral_idx = source.find("Mistral OCR (mistral-ocr-latest) on PDF ...")
         gemini_idx = source.find("Running image OCR with Gemini (gemini-2.5-flash) fallback ...")
         github_idx = source.find("Running image OCR with GitHub Models (gpt-4o-mini) fallback ...")
         openai_idx = source.find("Running image OCR with OpenAI gpt-4o-mini fallback ...")
