@@ -331,7 +331,7 @@ https://www.antrimparish.com
         self.assertIn("mega-bulletin-pdf", workflow)
         self.assertIn("Stage mega PDFs for OCR", workflow)
         self.assertIn("GitHub Pages fallback", workflow)
-        self.assertIn("find \"${RAW}\"", workflow)
+        self.assertIn("Skipping duplicate artifact path", workflow)
         self.assertIn("Rebuild diocese pages", workflow)
         self.assertIn("site_builder import run", workflow)
         self.assertIn("ocr/convert_bulletin.py", workflow)

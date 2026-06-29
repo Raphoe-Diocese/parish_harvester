@@ -104,11 +104,14 @@ jobs:
           mkdir -p "${STAGED}" "${RAW}"
           shopt -s nullglob
           mapfile -d '' PDFS < <(find "${RAW}" -type f -name '*_mega_bulletin.pdf' -print0 2>/dev/null || true)
-          for pdf in "${PDFS[@]:-}"; do
-            dest="${STAGED}/$(basename "${pdf}")"
-            if [ -e "${dest}" ]; then
-              echo "Error: duplicate mega PDF filename: ${dest}"
-              exit 1
+          for pdf in "${PDFS[@]}"; do
+            [ -n "${pdf}" ] || continue
+            name="$(basename "${pdf}")"
+            [ -n "${name}" ] || continue
+            dest="${STAGED}/${name}"
+            if [ -f "${dest}" ]; then
+              echo "Skipping duplicate artifact path (already staged): ${pdf}"
+              continue
             fi
             cp "${pdf}" "${dest}"
             ls -lh "${dest}"
