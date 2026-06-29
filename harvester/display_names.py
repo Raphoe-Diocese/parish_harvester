@@ -43,6 +43,7 @@ _SLUG_OVERRIDES: dict[str, str] = {
     "ballintra": "Ballintra Parish",
     "kilmacrenan": "Kilmacrenan",
     "rathmullan": "Rathmullan",
+    "drumholm-parish": "Drumholm",
 }
 
 

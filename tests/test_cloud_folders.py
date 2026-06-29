@@ -11,6 +11,7 @@ from harvester.cloud_folders import (
     parse_yy_mm_dd,
     recipe_uses_cloud_folder,
     rewrite_cloud_folder_click_step,
+    rewrite_year_folder_click_step,
 )
 from harvester.utils import extract_date_from_string
 
@@ -70,6 +71,17 @@ class CloudFolderTests(unittest.TestCase):
             {"action": "download"},
         ]
         self.assertTrue(recipe_uses_cloud_folder(steps))
+
+    def test_rewrite_year_folder_click_step(self) -> None:
+        step = {
+            "action": "click",
+            "text": "2026",
+            "year_folder": True,
+            "selector": "[role=\"row\"]:has-text('2026')",
+        }
+        rewritten = rewrite_year_folder_click_step(step, date(2028, 1, 9))
+        self.assertEqual(rewritten["text"], "2028")
+        self.assertIn("2028", rewritten["selector"])
 
 
 if __name__ == "__main__":

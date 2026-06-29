@@ -13,7 +13,12 @@ from urllib.parse import parse_qs, unquote, urljoin, urlparse
 
 from playwright.async_api import Browser, Page, TimeoutError as PlaywrightTimeoutError
 
-from .cloud_folders import is_cloud_folder_click_step, rewrite_cloud_folder_click_step
+from .cloud_folders import (
+    is_cloud_folder_click_step,
+    is_year_folder_click_step,
+    rewrite_cloud_folder_click_step,
+    rewrite_year_folder_click_step,
+)
 from .cloud_urls import (
     gdrive_confirm_token,
     gdrive_download_url_with_confirm,
@@ -1032,8 +1037,11 @@ async def _replay_click(
     *,
     target_date: date | None = None,
 ) -> None:
-    if target_date and is_cloud_folder_click_step(step):
-        step = rewrite_cloud_folder_click_step(step, target_date)
+    if target_date:
+        if is_year_folder_click_step(step):
+            step = rewrite_year_folder_click_step(step, target_date)
+        if is_cloud_folder_click_step(step):
+            step = rewrite_cloud_folder_click_step(step, target_date)
 
     selectors: list[str] = []
     selector = (step.get("selector") or "").strip()

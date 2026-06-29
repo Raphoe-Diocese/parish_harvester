@@ -95,6 +95,8 @@ def is_cloud_folder_click_step(step: dict) -> bool:
     """True when a click step should rewrite its date each harvest."""
     if not isinstance(step, dict) or step.get("action") != "click":
         return False
+    if step.get("year_folder"):
+        return False
     if step.get("cloud_folder") or step.get("date_format"):
         return True
     blob = " ".join(
@@ -102,6 +104,47 @@ def is_cloud_folder_click_step(step: dict) -> bool:
         for k in ("text", "selector", "href")
     )
     return detect_cloud_date_format(blob) is not None
+
+
+def is_year_folder_click_step(step: dict) -> bool:
+    """True when a click step opens the Drive year folder (2026, 2027, …)."""
+    return (
+        isinstance(step, dict)
+        and step.get("action") == "click"
+        and bool(step.get("year_folder"))
+    )
+
+
+def year_folder_selector_candidates(year: int) -> list[str]:
+    label = str(year)
+    escaped = label.replace("'", "\\'")
+    return [
+        f'[role="row"]:has-text("{escaped}")',
+        f'[role="gridcell"]:has-text("{escaped}")',
+        f':has-text("{escaped}")',
+    ]
+
+
+def rewrite_year_folder_click_step(step: dict, target: date) -> dict:
+    """Rewrite click step to open the target year's folder row."""
+    if not is_year_folder_click_step(step):
+        return step
+    year = str(target.year)
+    rewritten = dict(step)
+    rewritten["text"] = year
+    rewritten["year_folder"] = True
+    rewritten["selector"] = year_folder_selector_candidates(target.year)[0]
+    existing = [
+        s.strip()
+        for s in (step.get("fallback_selectors") or [])
+        if isinstance(s, str) and s.strip()
+    ]
+    merged: list[str] = []
+    for sel in [*year_folder_selector_candidates(target.year), *existing]:
+        if sel not in merged:
+            merged.append(sel)
+    rewritten["fallback_selectors"] = merged
+    return rewritten
 
 
 def rewrite_cloud_folder_click_step(step: dict, target: date) -> dict:
@@ -139,6 +182,8 @@ def recipe_uses_cloud_folder(steps: list) -> bool:
     for step in steps:
         if not isinstance(step, dict):
             continue
+        if is_year_folder_click_step(step):
+            return True
         if is_cloud_folder_click_step(step):
             return True
         url = str(step.get("url") or "")

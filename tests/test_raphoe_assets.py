@@ -43,7 +43,15 @@ class RaphoeAssetsTests(unittest.TestCase):
         payload = json.loads(recipe_path.read_text(encoding="utf-8"))
         self.assertEqual(payload.get("site_type"), "cloud_folder")
         self.assertNotIn("skip", payload)
-        self.assertIn("1z9goh6DrkCUkpJMDbwfsi28Yc_t0_ltC", payload.get("start_url", ""))
+        self.assertIn("1jPOi4GRU22vAxeKNe5Y_doBJ3riPh7ZK", payload.get("start_url", ""))
+        steps = payload.get("steps") or []
+        self.assertTrue(any(step.get("year_folder") for step in steps if isinstance(step, dict)))
+
+    def test_drumholm_recipe_is_static_pdf(self) -> None:
+        recipe_path = REPO_ROOT / "parishes" / "recipes" / "raphoe" / "drumholm-parish.json"
+        payload = json.loads(recipe_path.read_text(encoding="utf-8"))
+        self.assertEqual(payload.get("site_type"), "static_pdf")
+        self.assertIn("drumholm-parish/bulletin.pdf", payload.get("start_url", ""))
 
 
 if __name__ == "__main__":
