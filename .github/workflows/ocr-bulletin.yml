@@ -9,10 +9,13 @@ on:
 
 permissions:
   contents: write
+  actions: read
 
 jobs:
   generate-ocr-viewers:
-    if: github.event.workflow_run.conclusion == 'success'
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      github.event.workflow_run.conclusion == 'success'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository
@@ -38,17 +41,58 @@ jobs:
         run: |
           pip install -r requirements.txt -r requirements-ocr.txt
 
+      - name: Resolve harvest run for mega PDF artifacts
+        id: harvest_run
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          if [ "${{ github.event_name }}" = "workflow_run" ]; then
+            echo "run_id=${{ github.event.workflow_run.id }}" >> "$GITHUB_OUTPUT"
+            echo "Using harvest workflow run ${{ github.event.workflow_run.id }}"
+          else
+            RUN_ID="$(gh run list --repo "${GITHUB_REPOSITORY}" --workflow harvest.yml --status success --limit 1 --json databaseId --jq '.[0].databaseId')"
+            if [ -z "${RUN_ID}" ] || [ "${RUN_ID}" = "null" ]; then
+              echo "::error::No successful harvest run found — run a Raphoe harvest first, then retry OCR."
+              exit 1
+            fi
+            echo "run_id=${RUN_ID}" >> "$GITHUB_OUTPUT"
+            echo "Manual OCR run — using latest successful harvest run ${RUN_ID}"
+          fi
+
       - name: Download mega PDF artifacts from harvest run
         uses: actions/download-artifact@v4.1.3
-        continue-on-error: false
         with:
           github-token: ${{ github.token }}
-          run-id: ${{ github.event.workflow_run.id }}
+          run-id: ${{ steps.harvest_run.outputs.run_id }}
           pattern: "*-mega-bulletin-pdf"
-          path: /tmp/ocr-bulletins/
+          path: /tmp/ocr-bulletins/raw
           merge-multiple: true
 
+      - name: Stage mega PDFs for OCR
+        run: |
+          set -euo pipefail
+          STAGED="/tmp/ocr-bulletins/staged"
+          mkdir -p "${STAGED}"
+          shopt -s nullglob
+          mapfile -d '' PDFS < <(find /tmp/ocr-bulletins/raw -type f -name '*_mega_bulletin.pdf' -print0)
+          if [ ${#PDFS[@]} -eq 0 ]; then
+            echo "::error::No mega PDF files found in harvest artifacts (looked under /tmp/ocr-bulletins/raw)."
+            find /tmp/ocr-bulletins/raw -type f 2>/dev/null | head -20 || true
+            exit 1
+          fi
+          for pdf in "${PDFS[@]}"; do
+            dest="${STAGED}/$(basename "${pdf}")"
+            if [ -e "${dest}" ]; then
+              echo "Error: duplicate mega PDF filename: ${dest}"
+              exit 1
+            fi
+            cp "${pdf}" "${dest}"
+            ls -lh "${dest}"
+          done
+
       - name: Generate OCR viewer pages
+        id: ocr_generate
         env:
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
@@ -56,11 +100,13 @@ jobs:
           GITHUB_TOKEN: ${{ github.token }}
           PYTHONPATH: ${{ github.workspace }}
         run: |
+          set -euo pipefail
           TODAY="$(date -u +%Y-%m-%d)"
-          mkdir -p /tmp/ocr-bulletins
+          STAGED="/tmp/ocr-bulletins/staged"
+          PROCESSED=0
           FAILURES=0
           for diocese in $(python -c "import json;print(' '.join(d['key'] for d in json.load(open('parishes/dioceses.json'))['dioceses']))"); do
-            pdf_path="/tmp/ocr-bulletins/${diocese}_mega_bulletin.pdf"
+            pdf_path="${STAGED}/${diocese}_mega_bulletin.pdf"
             if [ ! -f "${pdf_path}" ]; then
               echo "Warning: PDF not found for ${diocese}, skipping"
               continue
@@ -86,17 +132,39 @@ jobs:
               FAILURES=$((FAILURES + 1))
               continue
             fi
+            PROCESSED=$((PROCESSED + 1))
             echo "OK: ${diocese}"
           done
+          echo "processed=${PROCESSED}" >> "$GITHUB_OUTPUT"
+          if [ "${PROCESSED}" -eq 0 ]; then
+            echo "::error::OCR produced no diocese viewers — check API keys and harvest PDF artifacts."
+            exit 1
+          fi
           if [ "${FAILURES}" -gt 0 ]; then
             echo "::warning::OCR completed with ${FAILURES} diocese failure(s) — other dioceses still committed."
           fi
 
-      - name: Commit generated bulletin pages
+      - name: Rebuild diocese pages (embed OCR on Raphoe page)
+        if: steps.ocr_generate.outputs.processed != '0'
         run: |
+          set -euo pipefail
+          if [ ! -f Bulletins/report.json ]; then
+            echo "Warning: Bulletins/report.json missing — skipping site rebuild"
+            exit 0
+          fi
+          python -c "from pathlib import Path; from harvester.site_builder import run; run(report_path=Path('Bulletins/report.json'), docs_dir=Path('docs'))"
+          echo "Rebuilt docs/dioceses/*/index.html with latest OCR content"
+
+      - name: Commit generated bulletin pages
+        if: steps.ocr_generate.outputs.processed != '0'
+        run: |
+          set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs Bulletins
-          git diff --cached --quiet && exit 0
+          if git diff --cached --quiet; then
+            echo "::error::OCR ran but nothing changed in docs/ — commit step had nothing to save."
+            exit 1
+          fi
           git commit -m "chore: update OCR bulletin viewers for $(date -u +%Y-%m-%d)"
           git push origin HEAD:main
