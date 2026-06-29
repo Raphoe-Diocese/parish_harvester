@@ -347,14 +347,18 @@ https://www.antrimparish.com
         self.assertIn("Trying Mistral OCR (mistral-ocr-latest) on PDF ...", source)
         self.assertIn("Running image OCR with Gemini (gemini-1.5-flash) fallback ...", source)
         self.assertIn("Running image OCR with OpenAI gpt-4o-mini fallback ...", source)
+        self.assertIn("Tier 0 text extraction as fallback", source)
         mistral_idx = source.find("Trying Mistral OCR (mistral-ocr-latest) on PDF ...")
         gemini_idx = source.find("Running image OCR with Gemini (gemini-1.5-flash) fallback ...")
         openai_idx = source.find("Running image OCR with OpenAI gpt-4o-mini fallback ...")
+        tier0_idx = source.find("Tier 0 text extraction as fallback")
         self.assertGreaterEqual(mistral_idx, 0)
         self.assertGreaterEqual(gemini_idx, 0)
         self.assertGreaterEqual(openai_idx, 0)
+        self.assertGreaterEqual(tier0_idx, 0)
         self.assertLess(mistral_idx, gemini_idx)
         self.assertLess(gemini_idx, openai_idx)
+        self.assertLess(openai_idx, tier0_idx)
 
     def test_ocr_convert_beautifying_markup(self) -> None:
         source = (REPO_ROOT / "ocr" / "convert_bulletin.py").read_text(encoding="utf-8")

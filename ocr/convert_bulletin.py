@@ -119,7 +119,8 @@ OCR_PROMPT = (
     "Do NOT wrap your response in markdown code fences or backticks. "
     "Do NOT include image references like !img-0.jpeg. "
     "Mass times, church names, and personal names (including Mc/Mac/O'/Ní) must be letter-perfect. "
-    "Preserve multi-column layout using plain text spacing; use one row per line for timetable tables. "
+    "Use markdown headings (# for parish titles, ## for sections) and markdown tables (| Day | Time |) "
+    "for mass-time grids and timetables. "
     "If text is illegible, write [illegible] — never guess a name or time."
 )
 
@@ -432,21 +433,22 @@ def main():
     provider_used = None
     images = None
 
-    print("Trying Tier 0 text extraction (born-digital PDF) ...")
-    try:
-        tier0_pages = extract_text_pages(pdf_file)
-        if tier0_pages:
-            pages_text = tier0_pages
-            provider_used = "Tier0-text"
-            print(f"  Tier 0 succeeded on {len(tier0_pages)} page(s) — skipping vision OCR.")
-        else:
-            print("  Tier 0 skipped — PDF looks scanned or image-only.")
-    except Exception as e:
-        print(f"  Tier 0 failed ({type(e).__name__}: {e}).")
-
     mistral_api_key = os.environ.get("MISTRAL_API_KEY")
     gemini_api_key = os.environ.get("GEMINI_API_KEY")
     openai_api_key = os.environ.get("OPENAI_API_KEY")
+
+    if not mistral_api_key and not gemini_api_key and not openai_api_key:
+        print("No vision OCR keys set — trying Tier 0 text extraction only ...")
+        try:
+            tier0_pages = extract_text_pages(pdf_file)
+            if tier0_pages:
+                pages_text = tier0_pages
+                provider_used = "Tier0-text"
+                print(f"  Tier 0 succeeded on {len(tier0_pages)} page(s).")
+            else:
+                print("  Tier 0 skipped — PDF looks scanned or image-only.")
+        except Exception as e:
+            print(f"  Tier 0 failed ({type(e).__name__}: {e}).")
 
     if pages_text is None and not mistral_api_key and not gemini_api_key and not openai_api_key:
         print("Warning: No OCR API keys set and Tier 0 did not apply — writing stub HTML.")
@@ -498,6 +500,19 @@ def main():
             except Exception as e:
                 print(f"  OpenAI OCR failed ({type(e).__name__}: {e}).")
                 pages_text = None
+
+    if pages_text is None:
+        print("Vision OCR unavailable — trying Tier 0 text extraction as fallback ...")
+        try:
+            tier0_pages = extract_text_pages(pdf_file)
+            if tier0_pages:
+                pages_text = tier0_pages
+                provider_used = "Tier0-text"
+                print(f"  Tier 0 fallback succeeded on {len(tier0_pages)} page(s).")
+            else:
+                print("  Tier 0 fallback skipped — PDF looks scanned or image-only.")
+        except Exception as e:
+            print(f"  Tier 0 fallback failed ({type(e).__name__}: {e}).")
 
     if pages_text is None:
         print("Warning: All OCR providers failed — writing stub HTML.")
