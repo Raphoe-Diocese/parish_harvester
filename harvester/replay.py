@@ -29,6 +29,7 @@ from .cloud_urls import (
 from .config import PAGE_LOAD_TIMEOUT_MS, PARISHES_DIR
 from .utils import (
     extract_date_from_string,
+    extract_newsletter_number,
     oneweb_newsletter_download_urls,
     rewrite_date_url,
     rewrite_newsletter_number_for_target,
@@ -965,6 +966,81 @@ def _peek_next_download_step(steps: list, index: int) -> dict | None:
     return None
 
 
+_ANCHOR_BATCH_JS = """
+(els) => els.map((el, idx) => ({
+  href: el.href || el.getAttribute('href') || '',
+  text: ((el.innerText || el.textContent || '') + '').trim().slice(0, 300),
+  idx: idx
+})).filter(x => x.href)
+"""
+
+
+async def _collect_anchor_entries(page: Page, selector: str) -> list[dict]:
+    """Read href + label for all matching anchors in one browser round-trip."""
+    try:
+        raw = await page.eval_on_selector_all(selector, _ANCHOR_BATCH_JS)
+    except Exception:
+        return []
+    entries: list[dict] = []
+    for item in raw or []:
+        if not isinstance(item, dict):
+            continue
+        href = str(item.get("href") or "").strip()
+        if not href:
+            continue
+        entries.append(
+            {
+                "href": href,
+                "text": str(item.get("text") or ""),
+                "idx": int(item.get("idx") or 0),
+            }
+        )
+    return entries
+
+
+def _best_newsletter_link_index(
+    entries: list[dict],
+    page_url: str,
+    *,
+    position: str = "top",
+) -> int | None:
+    """Pattern H: pick highest /Newsletters/NNN/ or /Weekly-Bulletins/NNN/ number."""
+    ranks: list[tuple[int, int, int]] = []
+    for ent in entries:
+        resolved = urljoin(page_url, ent["href"])
+        if resolved and _is_non_bulletin_url(resolved):
+            continue
+        num = extract_newsletter_number(resolved)
+        if num is None:
+            continue
+        tiebreak = ent["idx"] if position == "bottom" else -ent["idx"]
+        ranks.append((num, tiebreak, ent["idx"]))
+    if not ranks:
+        return None
+    return max(ranks)[2]
+
+
+def _best_scored_link_index(
+    entries: list[dict],
+    page_url: str,
+    *,
+    position: str = "top",
+) -> int | None:
+    best_idx: int | None = None
+    best_rank: tuple[int, int] = (-1, -1)
+    for ent in entries:
+        resolved = urljoin(page_url, ent["href"])
+        if resolved and _is_non_bulletin_url(resolved):
+            continue
+        total, _date_score, _keyword = _score_bulletin_link(resolved, ent["text"])
+        tiebreak = ent["idx"] if position == "bottom" else -ent["idx"]
+        rank = (total, tiebreak)
+        if rank > best_rank:
+            best_rank = rank
+            best_idx = ent["idx"]
+    return best_idx
+
+
 async def _replay_click_by_strategy(
     page: Page,
     step: dict,
@@ -981,45 +1057,35 @@ async def _replay_click_by_strategy(
 
     for sel in selectors:
         try:
-            locator = page.locator(sel)
-            count = await locator.count()
-            if count <= 0:
+            entries = await _collect_anchor_entries(page, sel)
+            if not entries:
                 continue
 
+            locator = page.locator(sel)
+            count = len(entries)
+
             if strategy == "first_match":
-                await _click_locator_match(page, locator.nth(0), step_timeout_ms)
+                await _click_locator_match(page, locator.nth(entries[0]["idx"]), step_timeout_ms)
                 return True
             if strategy == "last_match":
-                await _click_locator_match(page, locator.nth(count - 1), step_timeout_ms)
+                await _click_locator_match(
+                    page, locator.nth(entries[-1]["idx"]), step_timeout_ms
+                )
                 return True
 
-            best_idx = -1
-            best_rank: tuple[int, int] = (-1, -1)
-            for idx in range(count):
-                item = locator.nth(idx)
-                try:
-                    href = (await item.get_attribute("href")) or ""
-                    try:
-                        label = (await item.inner_text(timeout=2_000)) or ""
-                    except Exception:
-                        label = ""
-                    resolved = urljoin(page.url, href.strip())
-                    if resolved and _is_non_bulletin_url(resolved):
-                        continue
-                    total, date_score, _keyword = _score_bulletin_link(resolved, label)
-                    tiebreak = idx if position == "bottom" else -idx
-                    rank = (total, tiebreak)
-                    if rank > best_rank:
-                        best_rank = rank
-                        best_idx = idx
-                except Exception as exc:
-                    errors.append(f"{sel}[{idx}]: {exc}")
+            newsletter_idx = _best_newsletter_link_index(
+                entries, page.url, position=position
+            )
+            if newsletter_idx is not None:
+                await _click_locator_match(page, locator.nth(newsletter_idx), step_timeout_ms)
+                return True
 
-            if best_idx >= 0:
+            best_idx = _best_scored_link_index(entries, page.url, position=position)
+            if best_idx is not None:
                 await _click_locator_match(page, locator.nth(best_idx), step_timeout_ms)
                 return True
 
-            fallback_idx = count - 1 if position == "bottom" else 0
+            fallback_idx = entries[-1]["idx"] if position == "bottom" else entries[0]["idx"]
             await _click_locator_match(page, locator.nth(fallback_idx), step_timeout_ms)
             return True
         except Exception as exc:
