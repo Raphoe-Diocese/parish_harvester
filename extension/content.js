@@ -4641,26 +4641,118 @@
       return false;
     };
 
+    const showBulletinPickConfirm = (selectedEl) => {
+      const selector = buildStableLinkSelector(selectedEl);
+      const href = selectedEl.getAttribute("href") || "";
+      const text = _getEnrichedLinkLabel(selectedEl).slice(0, 80);
+      const displayDate = getDisplayDate(href, text);
+
+      _clearElement(guidedPanel);
+      if (patternHintWrap) guidedPanel.appendChild(patternHintWrap);
+      if (parishRecordingLine) guidedPanel.appendChild(parishRecordingLine);
+      if (pageLoadTimerLine) guidedPanel.appendChild(pageLoadTimerLine);
+
+      const confirmQ = document.createElement("div");
+      confirmQ.style.cssText = "font-weight:700;color:#93c5fd;margin-bottom:6px;font-size:12px;";
+      confirmQ.textContent = "Is this this week's bulletin?";
+      guidedPanel.appendChild(confirmQ);
+
+      const preview = document.createElement("div");
+      preview.style.cssText =
+        "font-size:10px;color:#e2e8f0;line-height:1.45;background:#0f172a;border-radius:4px;padding:8px;margin-bottom:8px;border:1px solid #334155;";
+      const dateLine = displayDate
+        ? `<div style="color:#fbbf24;font-weight:600;margin-bottom:4px;">📅 ${displayDate}</div>`
+        : "";
+      preview.innerHTML =
+        `${dateLine}<div style="font-weight:600;margin-bottom:4px;">${text || "(link text)"}</div>` +
+        `<div style="color:#9ca3af;font-size:9px;word-break:break-all;">${(href || "").slice(0, 120)}</div>` +
+        `<div style="color:#6b7280;font-size:9px;margin-top:6px;">Each Sunday the harvester picks the <strong>newest</strong> matching link on this page — not this exact filename.</div>`;
+      guidedPanel.appendChild(preview);
+
+      const btnRow = document.createElement("div");
+      btnRow.style.cssText = "display:flex;flex-direction:column;gap:6px;";
+
+      const yesBtn = makeSmallBtn(
+        "✅ Yes — save this pick",
+        "#16a34a",
+        () => {
+          if (_recordBulletinListPick(selectedEl, { openAfter: false })) return;
+          showStatus("✅ Bulletin pick saved — tap Send & test when ready.", "ok");
+          resetGuidedPanel();
+        },
+        "Save this as the bulletin link for Sunday harvest"
+      );
+      yesBtn.style.width = "100%";
+      yesBtn.style.padding = "8px 10px";
+      yesBtn.style.fontSize = "11px";
+
+      const wrongBtn = makeSmallBtn(
+        "❌ Wrong — let me point at the right link",
+        "#b91c1c",
+        () => {
+          resetGuidedPanel();
+          startPickLinkMode(showBulletinPickConfirm, showStatus);
+          showStatus("Click the correct bulletin link on the page.", "info");
+        },
+        "Use crosshair to pick a different row"
+      );
+      wrongBtn.style.width = "100%";
+      wrongBtn.style.padding = "8px 10px";
+      wrongBtn.style.fontSize = "11px";
+
+      const pickListBtn = makeSmallBtn(
+        "📋 Show other candidates",
+        "#374151",
+        () => {
+          const result = detectPageType();
+          const pickableLinks = result.links || result.bulletinLinks || [];
+          const { pool, hasAnyDate } = _scoreBulletinLinkElements(pickableLinks);
+          if (pool.length > 1) {
+            showPickMultipleChoice(pool.slice(0, 5), hasAnyDate);
+          } else {
+            startPickLinkMode(showBulletinPickConfirm, showStatus);
+          }
+        },
+        "See up to 5 newest links if the auto-pick looks wrong"
+      );
+      pickListBtn.style.width = "100%";
+      pickListBtn.style.fontSize = "9px";
+
+      btnRow.appendChild(yesBtn);
+      btnRow.appendChild(wrongBtn);
+      btnRow.appendChild(pickListBtn);
+      guidedPanel.appendChild(btnRow);
+
+      if (selectedEl instanceof Element) {
+        const prevOutline = selectedEl.style.outline;
+        selectedEl.style.outline = "3px solid #f59e0b";
+        selectedEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        setTimeout(() => {
+          if (selectedEl.style.outline === "3px solid #f59e0b") {
+            selectedEl.style.outline = prevOutline;
+          }
+        }, 4000);
+      }
+    };
+
     const _runPickNewestBulletin = () => {
       const result = detectPageType();
       const pickableLinks = result.links || result.bulletinLinks || [];
       if (!pickableLinks.length) {
         showStatus("❌ No bulletin links found — use Other options → point at a specific link.", "error");
-        startPickLinkMode(showPickConfirmation, showStatus);
+        startPickLinkMode(showBulletinPickConfirm, showStatus);
         return;
       }
-      const { pool, ambiguous } = _scoreBulletinLinkElements(pickableLinks);
+      const { pool, ambiguous, hasAnyDate } = _scoreBulletinLinkElements(pickableLinks);
       if (!pool.length) {
         showStatus("❌ Could not score bulletin links on this page.", "error");
         return;
       }
-      if (!ambiguous) {
-        if (_recordBulletinListPick(pool[0].el, { openAfter: false })) return;
-      } else {
-        showPickMultipleChoice(pool.slice(0, 5), true);
+      if (ambiguous && pool.length > 1) {
+        showPickMultipleChoice(pool.slice(0, 5), hasAnyDate);
         return;
       }
-      showPickConfirmation(pool[0].el);
+      showBulletinPickConfirm(pool[0].el);
     };
 
     const showPickConfirmation = (selectedEl) => {
@@ -5004,7 +5096,7 @@
           "font-family:inherit",
           "flex-shrink:0",
         ].join(";");
-        pickBtn.addEventListener("click", () => showPickConfirmation(el));
+        pickBtn.addEventListener("click", () => showBulletinPickConfirm(el));
         row.appendChild(info);
         row.appendChild(pickBtn);
         guidedPanel.appendChild(row);
@@ -5441,11 +5533,11 @@
 
     moreOptionsBody.appendChild(pinLinkBtn);
 
-    const manualPickLinkBtn = makeSmallBtn(
+      const manualPickLinkBtn = makeSmallBtn(
       "🔗 Point at a specific link manually",
       "#374151",
-      () => startPickLinkMode(showPickConfirmation, showStatus),
-      "Only if Pick newest bulletin picked the wrong row"
+      () => startPickLinkMode(showBulletinPickConfirm, showStatus),
+      "Crosshair pick — use if auto-pick or the candidate list is wrong"
     );
     manualPickLinkBtn.style.marginTop = "4px";
     moreOptionsBody.appendChild(manualPickLinkBtn);
@@ -7071,6 +7163,90 @@
       };
 
       let _postPushWatchToken = 0;
+
+      const _restartBulletinPickAfterWrongHarvest = () => {
+        while (recipeSteps.length > 0) {
+          const last = recipeSteps[recipeSteps.length - 1];
+          const action = String(last?.recipeStep?.action || "").toLowerCase();
+          if (action === "download" || action === "click") {
+            undoSessionStep();
+          } else {
+            break;
+          }
+        }
+        if (typeof refreshStepCount === "function") refreshStepCount();
+        resetGuidedPanel();
+        showStatus("Pick the correct bulletin, confirm it, then Send & test again.", "warn");
+        const pushEl = document.getElementById("ph-push-section");
+        if (pushEl) pushEl.scrollIntoView({ behavior: "smooth", block: "nearest" });
+        _runPickNewestBulletin();
+      };
+
+      const _showHarvestPdfVerify = ({ parishKey, displayName, pdfUrl, pushResponse }) => {
+        postPushBanner.style.display = "block";
+        postPushBanner.style.color = "#e2e8f0";
+        postPushBanner.style.background = "#1e3a5f";
+        postPushBanner.style.borderColor = "#2563eb";
+        _clearElement(postPushBanner);
+
+        const head = document.createElement("div");
+        head.style.cssText = "font-size:11px;font-weight:700;margin-bottom:6px;line-height:1.4;";
+        head.innerHTML =
+          `✅ <strong>${displayName}</strong> — harvest downloaded a PDF.<br>` +
+          `<span style="font-weight:600;color:#93c5fd;">Open it and check: is this the right bulletin?</span>`;
+        postPushBanner.appendChild(head);
+
+        const openRow = document.createElement("div");
+        openRow.style.cssText = "margin-bottom:8px;font-size:10px;";
+        const openLink = document.createElement("a");
+        openLink.href = pdfUrl;
+        openLink.target = "_blank";
+        openLink.rel = "noopener noreferrer";
+        openLink.style.cssText = "color:#93c5fd;font-weight:600;";
+        openLink.textContent = "Open PDF in new tab →";
+        openRow.appendChild(openLink);
+        postPushBanner.appendChild(openRow);
+
+        const btnRow = document.createElement("div");
+        btnRow.style.cssText = "display:flex;flex-direction:column;gap:6px;";
+
+        const yesBtn = document.createElement("button");
+        yesBtn.type = "button";
+        yesBtn.textContent = "✅ PDF is correct — done";
+        yesBtn.style.cssText =
+          "border:none;border-radius:4px;padding:8px 10px;background:#16a34a;color:#fff;cursor:pointer;font-size:11px;font-weight:600;font-family:inherit;";
+        yesBtn.addEventListener("click", () => {
+          showPostPushBanner(
+            pushResponse,
+            `✅ <strong>${displayName}</strong> — you confirmed the PDF. Recorded on GitHub. ` +
+              `<a href="${pdfUrl}" target="_blank" rel="noopener noreferrer">Open PDF</a>`,
+            "ok"
+          );
+          showStatus(`✅ ${displayName} — PDF confirmed.`, "ok");
+          try {
+            chrome.runtime.sendMessage({
+              type: "problems_refresh",
+              parish_key: parishKey,
+              display_name: displayName,
+            });
+          } catch (_e) {}
+        });
+
+        const wrongBtn = document.createElement("button");
+        wrongBtn.type = "button";
+        wrongBtn.textContent = "❌ Wrong pick — fix recipe";
+        wrongBtn.style.cssText =
+          "border:none;border-radius:4px;padding:8px 10px;background:#b91c1c;color:#fff;cursor:pointer;font-size:11px;font-weight:600;font-family:inherit;";
+        wrongBtn.addEventListener("click", () => {
+          _restartBulletinPickAfterWrongHarvest();
+          postPushBanner.style.display = "none";
+        });
+
+        btnRow.appendChild(yesBtn);
+        btnRow.appendChild(wrongBtn);
+        postPushBanner.appendChild(btnRow);
+      };
+
       const _startPostPushHarvestWatch = (parishKey, displayName, pushResponse, dispatchAt) => {
         const token = ++_postPushWatchToken;
         void (async () => {
@@ -7107,14 +7283,13 @@
             const pdfUrl =
               result.item?.url ||
               `https://raw.githubusercontent.com/${ghRepo}/main/Bulletins/current/${parishKey}.pdf`;
-            showPostPushBanner(
+            showStatus(`✅ ${displayName} test passed — open the PDF and confirm it's correct.`, "ok");
+            _showHarvestPdfVerify({
+              parishKey,
+              displayName,
+              pdfUrl,
               pushResponse,
-              `✅ <strong>${displayName}</strong> — test passed! Result recorded on GitHub. ` +
-              `<a href="${pdfUrl}" target="_blank" rel="noopener noreferrer">Open PDF</a> · ` +
-              `Check Problems tab for updated status.`,
-              "ok"
-            );
-            showStatus(`✅ ${displayName} test passed — see Problems tab.`, "ok");
+            });
             try {
               chrome.runtime.sendMessage({ type: "problems_refresh", parish_key: parishKey, display_name: displayName });
             } catch (_e) {}
