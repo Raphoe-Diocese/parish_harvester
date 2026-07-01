@@ -4369,9 +4369,15 @@
 
       const onDirectPdf = pageCtx.type === "direct_pdf";
       const wpBlockPage = _isWpBlockBulletinPage(pageCtx);
+      const pdfLinkListPage =
+        pageCtx.type === "pdf_links" ||
+        pageCtx.type === "parish_messenger" ||
+        pageCtx.type === "pdfemb";
       if (clickFirstBtn) {
         clickFirstBtn.style.display =
-          onDirectPdf || (wpBlockPage && stepCount === 0) ? "none" : "block";
+          onDirectPdf || (wpBlockPage && stepCount === 0) || pdfLinkListPage
+            ? "none"
+            : "block";
       }
 
       if (wpBlockPage && stepCount === 0 && !onDirectPdf) {
@@ -4466,8 +4472,12 @@
           contextPrimaryBtn.style.display = "block";
           contextPrimaryBtn.textContent = "💾 Step 2: Save page as PDF";
         } else if (pageCtx.type === "parish_messenger" || pageCtx.type === "pdf_links" || pageCtx.type === "pdfemb") {
+          const linkCount = (pageCtx.links || pageCtx.bulletinLinks || []).length;
           contextPrimaryBtn.style.display = "block";
-          contextPrimaryBtn.textContent = "👉 Step 1: Point at bulletin link";
+          contextPrimaryBtn.style.background = "#16a34a";
+          contextPrimaryBtn.textContent = linkCount
+            ? `🎯 Pick newest bulletin (${linkCount} links)`
+            : "🎯 Pick newest bulletin";
         } else if (pageCtx.type === "cloud_folder") {
           contextPrimaryBtn.style.display = "block";
           contextPrimaryBtn.textContent = "📅 Step 1: Pick this Sunday's row";
@@ -4575,6 +4585,84 @@
     };
 
     // Show a confirmation step after a link is picked
+    const _scoreBulletinLinkElements = (linkElements) => {
+      const scored = (linkElements || []).map((el, idx) => {
+        const url = el.getAttribute("href") || "";
+        const label = _getEnrichedLinkLabel(el);
+        const s = scoreUrlCandidateStr(url, label, idx);
+        const phrase = window.ph_copilot?.scorePhrase?.(url, label);
+        const adminSkip = phrase && phrase.penalty >= 120 && phrase.bonus < 40;
+        return { el, url, label, domIdx: idx, ...s, adminSkip };
+      });
+      const viable = scored.filter((c) => !c.adminSkip);
+      const pool = viable.length ? viable : scored;
+      pool.sort(_bulletinDateSortFn);
+      const hasAnyDate = pool.some((c) => c.hasDate);
+      const ambiguous =
+        !hasAnyDate || (pool.length > 1 && pool[0].dateScore === pool[1].dateScore);
+      return { pool, ambiguous, hasAnyDate };
+    };
+
+    const _recordBulletinListPick = (selectedEl, { openAfter = false } = {}) => {
+      const selector = buildStableLinkSelector(selectedEl);
+      const href =
+        _hrefFromBulletinClick(selectedEl) ||
+        selectedEl.getAttribute("href") ||
+        "";
+      const text = _getEnrichedLinkLabel(selectedEl).slice(0, 60);
+      const clickLabel = `🔗 Newest bulletin: "${text || selector}"`;
+      const clickStep = _enrichClickStepForWeeklyReplay(
+        { action: "click", selector, href, text },
+        selectedEl
+      );
+      const autoHarvestDownload =
+        Boolean(clickStep.pick_strategy) ||
+        _looksLikeBulletinDownloadUrl(href, text);
+
+      if (!openAfter && autoHarvestDownload) {
+        standaloneAddStep(clickStep, "click", clickLabel);
+        void _persistRecordingSession();
+        _notifyRecordingTabActive();
+        showStatus(
+          "✅ Newest bulletin recorded — harvest picks the latest link and downloads it each Sunday. Tap Send & test.",
+          "ok"
+        );
+        resetGuidedPanel();
+        return true;
+      }
+
+      standaloneAddStep(clickStep, "click", clickLabel);
+      void _persistRecordingSession();
+      if (!openAfter) {
+        showStatus(`✅ Click step recorded: "${text || selector}"`, "ok");
+        resetGuidedPanel();
+        return true;
+      }
+      return false;
+    };
+
+    const _runPickNewestBulletin = () => {
+      const result = detectPageType();
+      const pickableLinks = result.links || result.bulletinLinks || [];
+      if (!pickableLinks.length) {
+        showStatus("❌ No bulletin links found — use Other options → point at a specific link.", "error");
+        startPickLinkMode(showPickConfirmation, showStatus);
+        return;
+      }
+      const { pool, ambiguous } = _scoreBulletinLinkElements(pickableLinks);
+      if (!pool.length) {
+        showStatus("❌ Could not score bulletin links on this page.", "error");
+        return;
+      }
+      if (!ambiguous) {
+        if (_recordBulletinListPick(pool[0].el, { openAfter: false })) return;
+      } else {
+        showPickMultipleChoice(pool.slice(0, 5), true);
+        return;
+      }
+      showPickConfirmation(pool[0].el);
+    };
+
     const showPickConfirmation = (selectedEl) => {
       const selector = buildStableLinkSelector(selectedEl);
       const href = selectedEl.getAttribute("href") || "";
@@ -4746,15 +4834,28 @@
 
       const yesOpenBtn = makeSmallBtn(
         "✅ Yes — that's the bulletin (open it)",
-        "#16a34a",
+        "#374151",
         () => {
           void _recordClickAndMaybeOpen("open");
         },
-        "Records the click and opens the bulletin (usual choice)"
+        "Opens the link — only if you need to check the PDF in the browser"
       );
       yesOpenBtn.style.width = "100%";
-      yesOpenBtn.style.fontSize = "11px";
-      yesOpenBtn.style.padding = "8px 10px";
+      yesOpenBtn.style.fontSize = "10px";
+      yesOpenBtn.style.padding = "6px 10px";
+
+      const recordOnlyBtn = makeSmallBtn(
+        "✅ Record this bulletin — done (recommended)",
+        "#16a34a",
+        () => {
+          if (_recordBulletinListPick(selectedEl, { openAfter: false })) return;
+          void _recordClickAndMaybeOpen("stay");
+        },
+        "Harvest picks the newest link and downloads each Sunday — no need to open the PDF"
+      );
+      recordOnlyBtn.style.width = "100%";
+      recordOnlyBtn.style.fontSize = "11px";
+      recordOnlyBtn.style.padding = "8px 10px";
 
       const stayBtn = makeSmallBtn(
         "Stay on this page (menu / no navigation)",
@@ -4779,6 +4880,7 @@
       pickAgainBtn.style.width = "auto";
       pickAgainBtn.style.fontSize = "9px";
 
+      btnRow.appendChild(recordOnlyBtn);
       btnRow.appendChild(yesOpenBtn);
       btnRow.appendChild(stayBtn);
       btnRow.appendChild(pickAgainBtn);
@@ -5273,12 +5375,8 @@
           startPickLinkMode(showPickConfirmation, showStatus);
           return;
         }
-        if (pageCtx.type === "pdf_links") {
-          startPickLinkMode(showPickConfirmation, showStatus);
-          return;
-        }
-        if (pageCtx.type === "parish_messenger") {
-          startPickLinkMode(showPickConfirmation, showStatus);
+        if (pageCtx.type === "pdf_links" || pageCtx.type === "parish_messenger" || pageCtx.type === "pdfemb") {
+          _runPickNewestBulletin();
           return;
         }
         if (pageCtx.type === "cloud_folder") {
@@ -5342,6 +5440,15 @@
     wizardBtns.appendChild(imageCropBtn);
 
     moreOptionsBody.appendChild(pinLinkBtn);
+
+    const manualPickLinkBtn = makeSmallBtn(
+      "🔗 Point at a specific link manually",
+      "#374151",
+      () => startPickLinkMode(showPickConfirmation, showStatus),
+      "Only if Pick newest bulletin picked the wrong row"
+    );
+    manualPickLinkBtn.style.marginTop = "4px";
+    moreOptionsBody.appendChild(manualPickLinkBtn);
 
     const pdfBtn = makeSmallBtn(
       "📄 Get a PDF",
@@ -5528,8 +5635,8 @@
       identifyResult.appendChild(summaryStrong);
       identifyResult.appendChild(adviceSpan);
 
-      // "Pick newest bulletin" shortcut for pdfemb / pdf_links pages
-      const pickableLinks = result.links || [];
+      // "Pick newest bulletin" — same as the main green button (kept for Find bulletin scan)
+      const pickableLinks = result.links || result.bulletinLinks || [];
       if (
         (result.type === "pdfemb" ||
           result.type === "pdf_links" ||
@@ -5542,31 +5649,7 @@
           } found)`,
           "#16a34a",
           () => {
-            // Score each link — copilot rules prefer current newsletter + skip admin PDFs.
-            const scored = pickableLinks.map((el, idx) => {
-              const url = el.getAttribute("href") || "";
-              const label = _getEnrichedLinkLabel(el);
-              const s = scoreUrlCandidateStr(url, label, idx);
-              const phrase = window.ph_copilot?.scorePhrase?.(url, label);
-              const adminSkip = phrase && phrase.penalty >= 120 && phrase.bonus < 40;
-              return { el, url, label, domIdx: idx, ...s, adminSkip };
-            });
-            const viable = scored.filter((c) => !c.adminSkip);
-            const pool = viable.length ? viable : scored;
-            pool.sort(_bulletinDateSortFn);
-
-            // Ambiguous: no dates found at all, or top two candidates share the
-            // same date score (cannot tell which is newer).
-            const hasAnyDate = pool.some((c) => c.hasDate);
-            const ambiguous =
-              !hasAnyDate ||
-              (pool.length > 1 && pool[0].dateScore === pool[1].dateScore);
-
-            if (!ambiguous) {
-              showPickConfirmation(pool[0].el);
-            } else {
-              showPickMultipleChoice(pool.slice(0, 3), hasAnyDate);
-            }
+            _runPickNewestBulletin();
           },
           "Automatically selects the most recent bulletin link for you to confirm"
         );
@@ -8547,7 +8630,16 @@
         }
 
         if (href && _looksLikeBulletinDownloadUrl(href, text)) {
-          _standaloneAddClickAndDownload(step, href, label, null);
+          if (step.pick_strategy) {
+            standaloneAddStep(step, "click", label);
+            void _persistRecordingSession();
+            showStatus(
+              "✅ Newest bulletin link recorded — harvest downloads it each Sunday.",
+              "ok"
+            );
+          } else {
+            _standaloneAddClickAndDownload(step, href, label, null);
+          }
           _ensureToolbar(true);
           window.dispatchEvent(
             new CustomEvent("ph-recording-continued", {
