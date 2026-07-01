@@ -313,14 +313,27 @@
     return Math.max(_sessionMaxLoadMs, current);
   };
 
+  const HARVEST_TIMEOUT_BUFFER_MS = 10_000;
+  const HARVEST_TIMEOUT_BUFFER_S = 10;
+
   const _recipeTimeoutsFromLoadMs = (loadMs, stepCount = 3) => {
     const ms = Math.max(0, Number(loadMs) || 0);
     if (ms < 1000) return null;
     const steps = Math.max(1, Number(stepCount) || 1);
     return {
       observed_load_ms: ms,
-      timeout_ms: Math.min(Math.max(ms * 2, 45_000), 180_000),
-      total_timeout_s: Math.min(Math.max(Math.ceil(ms / 1000) * steps * 2 + 45, 90), 420),
+      timeout_ms: Math.min(
+        Math.max(ms * 2 + HARVEST_TIMEOUT_BUFFER_MS, 45_000 + HARVEST_TIMEOUT_BUFFER_MS),
+        300_000
+      ),
+      total_timeout_s: Math.min(
+        Math.max(
+          Math.ceil(ms / 1000) * steps * 2 + 45 + HARVEST_TIMEOUT_BUFFER_S,
+          180 + HARVEST_TIMEOUT_BUFFER_S,
+          steps * 120 + HARVEST_TIMEOUT_BUFFER_S
+        ),
+        900
+      ),
     };
   };
 
@@ -339,6 +352,7 @@
       const loadMs = nav && nav.loadEventEnd > 0 ? Math.round(nav.loadEventEnd) : null;
       const startedAt = _navigationStartedAtMs();
       const elapsed = Math.max(0, Date.now() - startedAt);
+      _sessionMaxLoadMs = Math.max(_sessionMaxLoadMs, elapsed);
       const stillLoading = document.readyState !== "complete" || !loadMs;
 
       if (stillLoading) {
@@ -880,8 +894,11 @@
       Object.assign(recipe, loadTimeouts);
     } else {
       const stepCount = Math.max(steps.length, 1);
-      recipe.timeout_ms = recipe.timeout_ms || 45_000;
-      recipe.total_timeout_s = Math.min(Math.max(stepCount * 45 + 90, 120), 300);
+      recipe.timeout_ms = recipe.timeout_ms || 90_000 + HARVEST_TIMEOUT_BUFFER_MS;
+      recipe.total_timeout_s = Math.min(
+        Math.max(stepCount * 120 + 60 + HARVEST_TIMEOUT_BUFFER_S, 180 + HARVEST_TIMEOUT_BUFFER_S),
+        900
+      );
     }
     try {
       const host = startUrl ? new URL(startUrl).hostname.toLowerCase() : "";
@@ -892,8 +909,11 @@
         || observedMs >= 45_000
       ) {
         recipe.navigation_wait_until = "commit";
-        recipe.timeout_ms = Math.max(Number(recipe.timeout_ms) || 0, 180_000);
-        recipe.total_timeout_s = Math.max(Number(recipe.total_timeout_s) || 0, host.includes("portstewart") ? 600 : 300);
+        recipe.timeout_ms = Math.max(Number(recipe.timeout_ms) || 0, 300_000);
+        recipe.total_timeout_s = Math.max(
+          Number(recipe.total_timeout_s) || 0,
+          host.includes("portstewart") ? 900 : 600
+        );
       }
       if (
         (host.includes("portstewartparish.website") || host.includes("portstewartparish.ie"))

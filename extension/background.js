@@ -618,8 +618,8 @@ function _sanitizeRecipeOnPush(recipe) {
   if (/portstewartparish\.(website|ie)/i.test(startUrl)) {
     out.start_url = startUrl.replace(/^https:/i, "http:");
     out.navigation_wait_until = out.navigation_wait_until || "commit";
-    out.timeout_ms = Math.max(Number(out.timeout_ms) || 0, 180000);
-    out.total_timeout_s = Math.max(Number(out.total_timeout_s) || 0, 420);
+    out.timeout_ms = Math.max(Number(out.timeout_ms) || 0, 300000);
+    out.total_timeout_s = Math.max(Number(out.total_timeout_s) || 0, 900);
     out.site_type = out.site_type || "mdocs_bulletin_list";
     out.playbook_type = out.playbook_type || "mdocs_download_list";
     out.steps = out.steps.map((step) => {

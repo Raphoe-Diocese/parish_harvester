@@ -21,9 +21,16 @@ PARISH_STATUS_JSON = PARISHES_DIR / "parish_status.json"
 # ---------------------------------------------------------------------------
 # Timeouts & concurrency
 # ---------------------------------------------------------------------------
-PAGE_LOAD_TIMEOUT_MS: int = 45_000   # 45 s per page request
-TOTAL_TIMEOUT_S: int = 60            # 60 s total per parish
-CONCURRENCY: int = 10                # parallel asyncio tasks
+PAGE_LOAD_TIMEOUT_MS: int = 90_000   # 90 s per page request (slow parish hosting)
+TOTAL_TIMEOUT_S: int = 180           # 3 min default parish budget
+CONCURRENCY: int = 3                 # fewer parallel tabs = fewer CI false timeouts
+
+# Extra headroom on top of recipe/trainer timings (extension uses the same values).
+HARVEST_TIMEOUT_BUFFER_S: int = 10
+HARVEST_TIMEOUT_BUFFER_MS: int = 10_000
+MAX_NAVIGATION_TIMEOUT_MS: int = 300_000  # 5 min per step (4 min sites + margin)
+MAX_TOTAL_TIMEOUT_S: int = 900              # 15 min max per parish
+MIN_PARISH_TIMEOUT_S: int = 180             # never harvest a parish with less than 3 min
 
 # ---------------------------------------------------------------------------
 # PDF validation

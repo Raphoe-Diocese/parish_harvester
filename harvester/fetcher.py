@@ -38,8 +38,13 @@ from PyPDF2 import PdfReader
 
 from .config import (
     CONCURRENCY,
+    HARVEST_TIMEOUT_BUFFER_MS,
+    HARVEST_TIMEOUT_BUFFER_S,
     MAX_BULLETIN_PAGES,
     MAX_BULLETIN_SIZE_MB,
+    MAX_NAVIGATION_TIMEOUT_MS,
+    MAX_TOTAL_TIMEOUT_S,
+    MIN_PARISH_TIMEOUT_S,
     MIN_PDF_BYTES,
     PAGE_LOAD_TIMEOUT_MS,
     PARISHES_DIR,
@@ -485,6 +490,14 @@ def _get_host_profile(start_url: str) -> dict:
     }
 
 
+def _apply_timeout_buffer_ms(nav_ms: int) -> int:
+    return min(int(nav_ms) + HARVEST_TIMEOUT_BUFFER_MS, MAX_NAVIGATION_TIMEOUT_MS)
+
+
+def _apply_timeout_buffer_s(total_s: int) -> int:
+    return min(int(total_s) + HARVEST_TIMEOUT_BUFFER_S, MAX_TOTAL_TIMEOUT_S)
+
+
 def _apply_recipe_timeouts(host_profile: dict, recipe_meta: dict | None) -> dict:
     """Merge trainer-recorded load times into harvest timeouts."""
     merged = dict(host_profile)
@@ -494,22 +507,14 @@ def _apply_recipe_timeouts(host_profile: dict, recipe_meta: dict | None) -> dict
     steps = recipe_meta.get("steps")
     step_count = len(steps) if isinstance(steps, list) and steps else 3
 
+    nav_ms = int(merged.get("navigation_timeout_ms", PAGE_LOAD_TIMEOUT_MS))
+    total_s = int(merged.get("total_timeout_s", TOTAL_TIMEOUT_S))
+
     raw_step = recipe_meta.get("timeout_ms", recipe_meta.get("timeout"))
     if raw_step is not None:
         try:
-            step_ms = min(max(int(raw_step), 1_000), 180_000)
-            merged["navigation_timeout_ms"] = max(
-                int(merged.get("navigation_timeout_ms", PAGE_LOAD_TIMEOUT_MS)),
-                step_ms,
-            )
-        except (TypeError, ValueError):
-            pass
-
-    raw_total = recipe_meta.get("total_timeout_s")
-    if raw_total is not None:
-        try:
-            merged["total_timeout_s"] = min(max(int(raw_total), 60), 600)
-            return merged
+            step_ms = min(max(int(raw_step), 1_000), MAX_NAVIGATION_TIMEOUT_MS)
+            nav_ms = max(nav_ms, step_ms)
         except (TypeError, ValueError):
             pass
 
@@ -518,22 +523,26 @@ def _apply_recipe_timeouts(host_profile: dict, recipe_meta: dict | None) -> dict
     except (TypeError, ValueError):
         load_ms = 0
     if load_ms >= 1000:
-        merged["navigation_timeout_ms"] = max(
-            int(merged.get("navigation_timeout_ms", PAGE_LOAD_TIMEOUT_MS)),
-            min(load_ms * 2, 180_000),
-        )
-        merged["total_timeout_s"] = min(
-            max(int(load_ms / 1000) * step_count * 2 + 45, 90),
-            600,
-        )
-        return merged
+        nav_ms = max(nav_ms, min(load_ms * 2, MAX_NAVIGATION_TIMEOUT_MS))
+        total_s = max(total_s, int(load_ms / 1000) * step_count * 2 + 45)
+
+    raw_total = recipe_meta.get("total_timeout_s")
+    if raw_total is not None:
+        try:
+            total_s = max(total_s, min(max(int(raw_total), 60), MAX_TOTAL_TIMEOUT_S))
+        except (TypeError, ValueError):
+            pass
 
     # Recipe timeout/timeout_ms sets per-step wait but historically did not set
     # total_timeout_s — harvest then still used the 60s global cap and timed out
     # on slow click→download chains even after "1m 30s saved to recipe" in the UI.
-    nav_ms = int(merged.get("navigation_timeout_ms", PAGE_LOAD_TIMEOUT_MS))
     derived_total = int(nav_ms / 1000) * max(step_count, 1) * 2 + 60
-    merged["total_timeout_s"] = min(max(derived_total, 120), 600)
+    multistep_floor = step_count * 120
+    total_s = max(total_s, derived_total, MIN_PARISH_TIMEOUT_S, multistep_floor)
+    total_s = min(total_s, MAX_TOTAL_TIMEOUT_S)
+
+    merged["navigation_timeout_ms"] = _apply_timeout_buffer_ms(nav_ms)
+    merged["total_timeout_s"] = _apply_timeout_buffer_s(total_s)
     return merged
 
 
@@ -2105,7 +2114,10 @@ async def _retry_entry_headful(
         ),
         recipe_meta,
     )
-    parish_timeout_s = max(TOTAL_TIMEOUT_S, int(host_profile.get("total_timeout_s", TOTAL_TIMEOUT_S)))
+    parish_timeout_s = max(
+        MIN_PARISH_TIMEOUT_S,
+        int(host_profile.get("total_timeout_s", TOTAL_TIMEOUT_S)),
+    )
     async with async_playwright() as pw:
         browser = await launch_harvester_browser(pw, headless=False)
         try:
@@ -2164,7 +2176,10 @@ async def fetch_parish(
     max_retries = max(0, int(host_profile.get("max_retries", _MAX_ATTEMPTS - 1)))
     retry_backoff_ms = max(0, int(host_profile.get("retry_backoff_ms", int(_RETRY_DELAY_S * 1000))))
     total_attempts = max_retries + 1
-    parish_timeout_s = max(120, int(host_profile.get("total_timeout_s", TOTAL_TIMEOUT_S)))
+    parish_timeout_s = max(
+        MIN_PARISH_TIMEOUT_S,
+        int(host_profile.get("total_timeout_s", TOTAL_TIMEOUT_S)),
+    )
     timeout_diag = _timeout_diagnosis(recipe_meta, host_profile)
     for attempt in range(total_attempts):
         try:
