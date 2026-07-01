@@ -1,21 +1,46 @@
 {
   "version": 1,
   "parish_key": "banagherparish",
-  "display_name": "Banagherparish",
+  "display_name": "Banagher",
   "diocese": "derry",
   "start_url": "https://www.banagherparish.com/information#47-9-newsletters",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.banagherparish.com/information#47-9-newsletters"
+      "action": "click",
+      "selector": "a[href*=\"/Newsletters/\"]",
+      "href": "https://www.banagherparish.com/files/9/Newsletters/395/Bulletin---13th-Sunday-in-Ordinary-Time---28th-June-2026",
+      "text": "Bulletin - 13th Sunday in Ordinary Time - 28th June 2026 | B",
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "bottom",
+      "fallback_selectors": [
+        "a[href$='.pdf']",
+        "a[href*='.pdf']",
+        "a[href*=\"/Newsletters/\"]",
+        "a[href*=\"/Weekly-Bulletins/\"]"
+      ]
     },
     {
-      "action": "click",
-      "selector": "a:has-text(\"Bulletin - 6th Sunday of Easter - 10th May 2026\")",
-      "fallback_selectors": [
-        "div > div:nth-of-type(2) > div:nth-of-type(112) > div:nth-of-type(1) > h3 > a"
-      ]
+      "action": "download",
+      "url": "https://www.banagherparish.com/files/9/Newsletters/395/Bulletin---13th-Sunday-in-Ordinary-Time---28th-June-2026"
     }
   ],
-  "recorded_date": "2026-05-10"
+  "observed_load_ms": 24191.199951171875,
+  "timeout_ms": 58382.39990234375,
+  "total_timeout_s": 250,
+  "playbook_type": "pdf_download_list",
+  "site_type": "pdf_link_list",
+  "operator_notes": [
+    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
+    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+    "Do not worry if the filename or date in the link text changes every week."
+  ],
+  "do_not": [
+    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
+    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "bottom"
+  },
+  "recorded_date": "2026-07-01"
 }
