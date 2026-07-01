@@ -1218,6 +1218,15 @@ function _canonicalDioceseSlug(value) {
   return normalized;
 }
 
+function _harvestWorkflowDiocese(value) {
+  const slug = _canonicalDioceseSlug(value);
+  if (!slug) return "all";
+  if (slug === "derry") return "derry_diocese";
+  if (slug === "raphoe") return "raphoe_diocese";
+  if (slug === "down_and_connor") return "down_and_connor";
+  return slug;
+}
+
 const _RECIPE_DIOCESE_FOLDERS = ["derry", "down_and_connor", "raphoe", "unknown"];
 
 async function _fetchGithubJson(url, headers, timeoutMs = 45000, init = {}) {
@@ -1724,7 +1733,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
               body: JSON.stringify({
                 ref: "main",
                 inputs: {
-                  diocese: "all",
+                  diocese: _harvestWorkflowDiocese(savedDiocese),
                   target_parish: key,
                   run_tests: "false",
                 },

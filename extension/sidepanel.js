@@ -575,9 +575,23 @@ async function _pdDisableParish(parish) {
 
 // ── Harvest workflow dispatch ──────────────────────────────────────────────
 
-async function _pdDispatchHarvest(parishKey) {
+async function _pdDispatchHarvest(parishKey, dioceseName) {
   const cfg = await _pdGetGithubConfig();
   if (!cfg) return { ok: false, error: "GitHub not configured." };
+  const key = String(parishKey || "").trim().toLowerCase();
+  let dioceseInput = "all";
+  if (key) {
+    const display = dioceseName || _pdDioceseForKey(key);
+    const slug = _pdDioceseSlug(display);
+    const mod = globalThis.phGithubRecipePush;
+    dioceseInput = mod?.harvestWorkflowDiocese
+      ? mod.harvestWorkflowDiocese(slug)
+      : slug === "derry"
+        ? "derry_diocese"
+        : slug === "raphoe"
+          ? "raphoe_diocese"
+          : slug || "all";
+  }
   try {
     const resp = await fetch(
       `https://api.github.com/repos/${cfg.ghRepo}/actions/workflows/harvest.yml/dispatches`,
@@ -592,8 +606,8 @@ async function _pdDispatchHarvest(parishKey) {
         body: JSON.stringify({
           ref: "main",
           inputs: {
-            diocese: "all",
-            target_parish: parishKey || "",
+            diocese: dioceseInput,
+            target_parish: key,
             run_tests: "false",
           },
         }),
@@ -1878,7 +1892,7 @@ async function _problemsVerifyHarvest(row, verifyBtn, { forceDispatch = false } 
 
   setStatus(`⏳ Starting new test for ${displayName}…`, "warn");
   const dispatchStarted = Date.now();
-  const dispatch = await _pdDispatchHarvest(parishKey);
+  const dispatch = await _pdDispatchHarvest(parishKey, _pdDioceseForKey(parishKey));
   if (!dispatch.ok) {
     setStatus(`❌ Harvest trigger failed: ${dispatch.error}`, "err");
     if (verifyBtn) {
@@ -2671,7 +2685,7 @@ function _pdShowEditRow(wrap, parish) {
         setInlineStatus("✅ Saved. Triggering harvest rebuild…", "ok");
         setStatus(`✅ Saved page URL for ${parish.name}. Triggering harvest…`, "ok");
         editRow.remove();
-        _pdDispatchHarvest(parish.key).then((d) => {
+        _pdDispatchHarvest(parish.key, parish.diocese).then((d) => {
           if (d?.ok) {
             setStatus(`✅ Saved page URL for ${parish.name} and triggered harvest rebuild.`, "ok");
           } else {

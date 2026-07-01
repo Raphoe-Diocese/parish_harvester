@@ -7742,6 +7742,7 @@
               gh_pat: settings.gh_pat,
               gh_repo: settings.gh_repo,
               parish_key: key,
+              diocese: recipeToPush.diocese || pushedRecipe.diocese || "",
             });
 
             const response = {

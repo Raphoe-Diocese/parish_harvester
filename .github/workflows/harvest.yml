@@ -141,34 +141,80 @@ jobs:
 
       - name: Write workflow step summary
         if: always()
+        env:
+          TARGET_PARISH: ${{ github.event.inputs.target_parish }}
         run: |
           set -euo pipefail
           if [ -f Bulletins/report.json ]; then
             python - <<'PYEOF'
           import json, os
           d = json.load(open("Bulletins/report.json"))
-          s = d.get("summary", {})
-          dl = s.get("downloaded", 0)
-          hl = s.get("html_links", 0)
-          fa = s.get("failed", 0)
-          total = dl + fa
-          rate = f"{dl/total*100:.1f}%" if total > 0 else "N/A"
-          lines = [
-              f"## 📋 Bulletin Harvest — {d.get('target_date','?')}",
-              "",
-              f"| Metric | Value |",
-              f"|--------|-------|",
-              f"| ✅ Downloaded | {dl} |",
-              f"| 🔗 HTML links | {hl} |",
-              f"| 💥 Failed | {fa} |",
-              f"| 📈 Success rate | {rate} |",
-              "",
-          ]
-          if d.get("failed"):
-              lines += ["### ❌ Failed parishes (need re-training)", ""]
-              for f in d["failed"]:
-                  lines.append(f"- **{f['display_name']}** — _{f.get('error','?')[:120]}_")
+          target = (os.environ.get("TARGET_PARISH") or "").strip().lower()
+          lines = []
+
+          if target:
+              lines += [
+                  f"## 🧪 Single-parish test: `{target}`",
+                  "",
+                  "_Only this parish was harvested. The full diocese was **not** re-run._",
+                  "",
+              ]
+              found = None
+              for section, icon in (
+                  ("downloaded", "✅"),
+                  ("html_links", "🔗"),
+                  ("failed", "❌"),
+                  ("skipped", "⏭️"),
+                  ("stale_rejected", "🕐"),
+              ):
+                  for item in d.get(section) or []:
+                      if (item.get("parish") or "").lower() == target:
+                          found = (section, icon, item)
+                          break
+                  if found:
+                      break
+              if found:
+                  section, icon, item = found
+                  name = item.get("display_name") or target
+                  if section == "downloaded":
+                      lines.append(f"| Result | {icon} **Downloaded** — `{item.get('file', '?')}` |")
+                  elif section == "html_links":
+                      lines.append(f"| Result | {icon} **HTML link** — {item.get('url', '?')} |")
+                  elif section == "failed":
+                      err = (item.get("error") or "?")[:200]
+                      lines.append(f"| Result | {icon} **Failed** — _{err}_ |")
+                  elif section == "skipped":
+                      lines.append(f"| Result | {icon} **Skipped** — _{item.get('reason', '?')}_ |")
+                  else:
+                      lines.append(f"| Result | {icon} **Stale rejected** — _{item.get('reason', '?')}_ |")
+                  lines.append(f"| Parish | **{name}** |")
+              else:
+                  lines.append("| Result | ⚠️ **Not found in report** — run may have been cancelled before harvest finished. |")
               lines.append("")
+          else:
+              s = d.get("summary", {})
+              dl = s.get("downloaded", 0)
+              hl = s.get("html_links", 0)
+              fa = s.get("failed", 0)
+              total = dl + fa
+              rate = f"{dl/total*100:.1f}%" if total > 0 else "N/A"
+              lines += [
+                  f"## 📋 Bulletin Harvest — {d.get('target_date','?')}",
+                  "",
+                  f"| Metric | Value |",
+                  f"|--------|-------|",
+                  f"| ✅ Downloaded | {dl} |",
+                  f"| 🔗 HTML links | {hl} |",
+                  f"| 💥 Failed | {fa} |",
+                  f"| 📈 Success rate | {rate} |",
+                  "",
+              ]
+              if d.get("failed"):
+                  lines += ["### ❌ Failed parishes (need re-training)", ""]
+                  for f in d["failed"]:
+                      lines.append(f"- **{f['display_name']}** — _{f.get('error','?')[:120]}_")
+                  lines.append("")
+
           with open(os.environ["GITHUB_STEP_SUMMARY"], "a") as fh:
               fh.write("\n".join(lines))
           PYEOF

@@ -5,6 +5,16 @@
 (function initPhGithubRecipePush(global) {
   const DIOCESE_FOLDERS = ["derry", "down_and_connor", "raphoe", "unknown"];
 
+  /** Map recipe/slug names to harvest.yml workflow_dispatch diocese input. */
+  const harvestWorkflowDiocese = (value) => {
+    const slug = canonicalDioceseSlug(value);
+    if (!slug) return "all";
+    if (slug === "derry") return "derry_diocese";
+    if (slug === "raphoe") return "raphoe_diocese";
+    if (slug === "down_and_connor") return "down_and_connor";
+    return slug;
+  };
+
   const canonicalDioceseSlug = (value) => {
     const raw = String(value || "").trim().toLowerCase();
     if (!raw) return "";
@@ -233,11 +243,12 @@
     };
   };
 
-  const dispatchHarvestTest = async ({ gh_pat, gh_repo: storedRepo, parish_key }) => {
+  const dispatchHarvestTest = async ({ gh_pat, gh_repo: storedRepo, parish_key, diocese }) => {
     const gh_pat_clean = String(gh_pat || "").trim();
     if (!gh_pat_clean) return { ok: false, error: "GitHub PAT not configured." };
     const gh_repo = resolveGhRepo(storedRepo);
     const key = String(parish_key || "").trim().toLowerCase();
+    const dioceseInput = harvestWorkflowDiocese(diocese);
     const headers = authHeaders(gh_pat_clean, true);
     const resp = await fetchGithub(
       `https://api.github.com/repos/${gh_repo}/actions/workflows/harvest.yml/dispatches`,
@@ -247,7 +258,7 @@
         method: "POST",
         body: JSON.stringify({
           ref: "main",
-          inputs: { diocese: "all", target_parish: key, run_tests: "false" },
+          inputs: { diocese: dioceseInput, target_parish: key, run_tests: "false" },
         }),
       }
     );
@@ -618,6 +629,7 @@
 
   global.phGithubRecipePush = {
     canonicalDioceseSlug,
+    harvestWorkflowDiocese,
     resolveGhRepo,
     locateRecipe,
     pushRecipe,
