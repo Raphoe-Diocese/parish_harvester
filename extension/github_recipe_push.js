@@ -209,8 +209,8 @@
       { method: "PUT", body: JSON.stringify(putBody) }
     );
 
-    // File exists but locate missed sha (timeout/auth blip) — refetch sha and retry once.
-    if (putResp.status === 422 && !putBody.sha) {
+    // Stale or missing sha (422) — refetch latest sha and retry once.
+    if (putResp.status === 422) {
       try {
         const refetch = await fetchGithub(located.apiBase, authHeaders(gh_pat_clean), 12000);
         if (refetch.ok) {
@@ -231,7 +231,15 @@
     }
 
     if (!putResp.ok) {
-      return { ok: false, error: await githubApiError(putResp) };
+      const errText = await githubApiError(putResp);
+      if (putResp.status === 422 && /does not match/i.test(errText)) {
+        return {
+          ok: false,
+          error:
+            "GitHub recipe changed since this tab loaded — tap Send & test once more (or reload the page first).",
+        };
+      }
+      return { ok: false, error: errText };
     }
     const result = await putResp.json();
     return {

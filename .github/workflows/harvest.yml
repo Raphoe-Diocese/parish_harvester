@@ -324,7 +324,7 @@ jobs:
           # Current-week parish PDFs (mega PDF disabled by default)
           git add -f Bulletins/report.json Bulletins/report.txt Bulletins/dashboard.html docs/manifest.json docs/dioceses/ 2>/dev/null || true
           git add -f Bulletins/current/*.pdf 2>/dev/null || true
-          git add -f parishes/consecutive_failures.json parishes/stale_bulletins.json parishes/retry_queue.json parishes/parish_status.json 2>/dev/null || true
+          git add -f parishes/consecutive_failures.json parishes/stale_bulletins.json parishes/retry_queue.json parishes/parish_status.json parishes/training_backlog.json 2>/dev/null || true
           TARGET_PARISH="${{ github.event.inputs.target_parish }}"
           if [ -n "${TARGET_PARISH}" ] && [ -f "Bulletins/current/${TARGET_PARISH}.pdf" ]; then
             git add -f "Bulletins/current/${TARGET_PARISH}.pdf"
@@ -340,8 +340,9 @@ jobs:
               echo "✅ Pushed on attempt ${attempt}"
               exit 0
             fi
-            echo "⚠️  Push attempt ${attempt} failed; pulling --rebase and retrying…"
-            git pull --rebase origin main || {
+            echo "⚠️  Push attempt ${attempt} failed; fetching and rebasing (autostash)…"
+            git fetch origin main
+            git rebase --autostash origin/main || {
               echo "❌ Rebase failed; aborting."
               git rebase --abort || true
               exit 1

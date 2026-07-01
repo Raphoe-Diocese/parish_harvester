@@ -1631,7 +1631,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         30000,
         { method: "PUT", body: JSON.stringify(body) }
       );
-      if (putResp.status === 422 && !body.sha) {
+      if (putResp.status === 422) {
         try {
           const refetch = await _fetchGithubJson(apiBase, headers, 15000);
           if (refetch.ok) {
@@ -1651,7 +1651,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
         }
       }
       if (!putResp.ok) {
-        reply({ ok: false, error: await _githubApiError(putResp) });
+        const errText = await _githubApiError(putResp);
+        if (putResp.status === 422 && /does not match/i.test(errText)) {
+          reply({
+            ok: false,
+            error:
+              "GitHub recipe changed since this tab loaded — tap Send & test once more (or reload the page first).",
+          });
+          return;
+        }
+        reply({ ok: false, error: errText });
         return;
       }
 
