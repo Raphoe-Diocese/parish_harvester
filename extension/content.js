@@ -250,15 +250,60 @@
     return /\.(pdf|docx?|pptx?|odt|ods)(\?|#|$)/i.test(path);
   };
 
-  const _markNavigationStart = (url) => {
+  const _markNavigationStart = (url, atMs) => {
     try {
       sessionStorage.setItem(
         "ph_train_nav_started",
-        JSON.stringify({ url: String(url || window.location.href), at: Date.now() })
+        JSON.stringify({
+          url: String(url || window.location.href),
+          at: Number(atMs) || Date.now(),
+        })
       );
     } catch (_e) {
       // ignore
     }
+  };
+
+  const _bootstrapFixNowLoadTimer = () => {
+    if (!_inStandaloneMode()) return;
+    const timerEl =
+      globalThis.__phPageLoadTimerLine ||
+      document.getElementById("ph-page-load-timer");
+    if (!timerEl) return;
+    timerEl.style.display = "block";
+    _attachPageLoadTimer(timerEl);
+  };
+
+  const _applyFixNowToolbar = async (message) => {
+    const navAt = Number(message?.nav_started_at);
+    if (Number.isFinite(navAt) && navAt > 0) {
+      _markNavigationStart(window.location.href, navAt);
+    } else {
+      _markNavigationStart(window.location.href);
+    }
+    _sessionMaxLoadMs = 0;
+    recipeSteps = [];
+    standaloneStartUrl = _pageUrlForParishDetection();
+    _skipLoadExistingRecipe = true;
+    const bar = _ensureToolbar(true);
+    if (bar) {
+      bar.dataset.phFixNow = "1";
+      bar.dataset.phParishName = String(message?.parish_key || "").replace(/_/g, " ");
+    }
+    await _persistRecordingSessionNow({ fixNow: true });
+    _bootstrapFixNowLoadTimer();
+    window.dispatchEvent(
+      new CustomEvent("ph-retraining-hint", {
+        detail: { parish_key: message?.parish_key || "" },
+      })
+    );
+    if (typeof showStatus === "function") {
+      showStatus(
+        "🔧 Fix now — wait for the load timer, then point at the bulletin.",
+        "info"
+      );
+    }
+    if (_refreshParishPushForm) void _refreshParishPushForm();
   };
 
   const _clearNavigationMark = () => {
@@ -1251,10 +1296,15 @@
     return /\b\d{1,2}(?:st|nd|rd|th)?\b/i.test(text) && /\b(jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)\b/i.test(text);
   };
 
+  const _isSequentialNewsletterUrl = (url) =>
+    /\/(?:newsletters|weekly-bulletins)\/\d+\//i.test(String(url || ""));
+
   const _inferBulletinPosition = (el) => {
     if (!(el instanceof Element)) return "top";
     const links = Array.from(
-      document.querySelectorAll('a[href$=".pdf"], a[href*=".pdf"], a[href$=".docx"], a[href*=".docx"]')
+      document.querySelectorAll(
+        'a[href$=".pdf"], a[href*=".pdf"], a[href$=".docx"], a[href*=".docx"], a[href*="/Newsletters/"], a[href*="/Weekly-Bulletins/"]'
+      )
     ).filter((node) => !_isNonBulletinPdf(node.href || "", node.innerText || ""));
     if (links.length <= 1) return "top";
     const idx = links.findIndex((node) => node === el || node.contains(el) || el.contains(node));
@@ -1268,10 +1318,14 @@
     const next = { ...clickStep };
     const href = String(next.href || "").trim();
     const selector = String(next.selector || "").trim();
+    const text = String(next.text || "").trim();
     const looksLikeBulletinLink =
       /\.pdf|\.docx/i.test(href) ||
       /\[href[^\]]*\.pdf/i.test(selector) ||
-      /:has-text\("download file"\)/i.test(selector);
+      /:has-text\("download file"\)/i.test(selector) ||
+      _isSequentialNewsletterUrl(href) ||
+      /\/newsletters\/|\/weekly-bulletins\//i.test(selector) ||
+      (/\bbulletin\b/i.test(text) && _isSequentialNewsletterUrl(href));
 
     if (!looksLikeBulletinLink) return next;
 
@@ -1280,6 +1334,15 @@
     const fallbacks = new Set(Array.isArray(next.fallback_selectors) ? next.fallback_selectors : []);
     fallbacks.add("a[href$='.pdf']");
     fallbacks.add("a[href*='.pdf']");
+    if (_isSequentialNewsletterUrl(href) || /banagherparish|threepatrons/i.test(window.location.hostname || "")) {
+      fallbacks.add('a[href*="/Newsletters/"]');
+      fallbacks.add('a[href*="/Weekly-Bulletins/"]');
+      if (!/\/newsletters\/|\/weekly-bulletins\//i.test(selector)) {
+        next.selector = href.includes("/Weekly-Bulletins/")
+          ? 'a[href*="/Weekly-Bulletins/"]'
+          : 'a[href*="/Newsletters/"]';
+      }
+    }
     next.fallback_selectors = Array.from(fallbacks);
     return next;
   };
@@ -1302,6 +1365,12 @@
       .slice(0, 120);
     const role = el.getAttribute("role") || "";
     const escapeForSelector = (s) => s.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+    if (href && /\/weekly-bulletins\/\d+\//i.test(href)) {
+      return 'a[href*="/Weekly-Bulletins/"]';
+    }
+    if (href && /\/newsletters\/\d+\//i.test(href)) {
+      return 'a[href*="/Newsletters/"]';
+    }
     if (href && /\.pdf/i.test(href)) {
       const stableMatch = text.match(_STABLE_LINK_TEXT_RE);
       if (stableMatch && !_textLooksDated(stableMatch[0])) {
@@ -1662,6 +1731,8 @@
     if (!url) return false;
     const combined = `${url} ${text}`.toLowerCase();
     if (isDocumentUrl(url)) return true;
+    if (/\/files\/\d+\/(?:newsletters|weekly-bulletins)\//i.test(url)) return true;
+    if (/\/newsletters\/\d+\//i.test(url)) return true;
     if (/\/files\/\d+\/weekly-bulletins\//i.test(url)) return true;
     if (/\/weekly-bulletins\//i.test(url)) return true;
     if (/\/files\/\d+\/[^/?#]*sunday/i.test(url)) return true;
@@ -2321,19 +2392,29 @@
       };
     }
 
-    // 5. Generic PDF / document links
+    // 5. Generic PDF / document links (incl. Banagher /Newsletters/ without .pdf suffix)
+    const newsletterListLinks = _filterBulletinCandidates(
+      Array.from(
+        document.querySelectorAll('a[href*="/Newsletters/"], a[href*="/Weekly-Bulletins/"]')
+      )
+    );
     const pdfLinks = _filterBulletinCandidates(
       Array.from(document.querySelectorAll("a[href]")).filter((a) => {
         const href = (a.getAttribute("href") || "").toLowerCase();
         return (
           href.includes(".pdf") ||
           href.includes(".docx") ||
-          href.includes("/wp-content/uploads/")
+          href.includes("/wp-content/uploads/") ||
+          /\/newsletters\/\d+\//i.test(href) ||
+          /\/weekly-bulletins\/\d+\//i.test(href)
         );
       })
     );
-    if (pdfLinks.length > 0) {
-      const bulletinLinks = pdfLinks.filter((a) => {
+    const combinedLinks = newsletterListLinks.length
+      ? Array.from(new Set([...newsletterListLinks, ...pdfLinks]))
+      : pdfLinks;
+    if (combinedLinks.length > 0) {
+      const bulletinLinks = combinedLinks.filter((a) => {
         const text = (
           (a.innerText || a.textContent || "") +
           " " +
@@ -2345,15 +2426,15 @@
       });
       return {
         emoji: "🔗",
-        summary: `Found ${pdfLinks.length} PDF link(s)${
+        summary: `Found ${combinedLinks.length} bulletin link(s)${
           bulletinLinks.length > 0
             ? ` (${bulletinLinks.length} look like weekly bulletins)`
             : ""
         }.`,
         advice:
-          "Tap 🔗 1. Follow a link and pick the newest bulletin row.",
+          "Tap 🎯 Pick newest bulletin, or 🔗 Follow a link and confirm the newest row.",
         type: "pdf_links",
-        links: bulletinLinks.length > 0 ? bulletinLinks : pdfLinks,
+        links: bulletinLinks.length > 0 ? bulletinLinks : combinedLinks,
         bulletinLinks,
       };
     }
@@ -5304,6 +5385,7 @@
     ].join(";");
 
     pageLoadTimerLine = document.createElement("div");
+    pageLoadTimerLine.id = "ph-page-load-timer";
     pageLoadTimerLine.style.cssText = [
       "display:none",
       "font-size:9px",
@@ -5327,6 +5409,7 @@
     guidedPanel.appendChild(moreOptionsSection);
     guidedPanel.appendChild(stuckLink);
     updateParishRecordingLine("", "", _currentHostname());
+    globalThis.__phPageLoadTimerLine = pageLoadTimerLine;
     if (_inStandaloneMode()) _attachPageLoadTimer(pageLoadTimerLine);
     try {
       _refreshGuidedContext();
@@ -7834,20 +7917,14 @@
     }
     if (message.type === "ph_show_toolbar") {
       try {
-        const bar = _ensureToolbar(true);
         if (message.reason === "fix_now") {
-          recipeSteps = recipeSteps.filter((entry) => !entry?.recipeStep);
-          standaloneStartUrl = _pageUrlForParishDetection();
-          _skipLoadExistingRecipe = true;
-          bar.dataset.phFixNow = "1";
-          bar.dataset.phParishName = String(message.parish_key || "").replace(/_/g, " ");
-          void _clearRecordingSession();
-        } else {
-          delete bar.dataset.phFixNow;
-          delete bar.dataset.phParishName;
+          void _applyFixNowToolbar(message);
+          return { ok: true };
         }
+        const bar = _ensureToolbar(true);
+        delete bar?.dataset?.phFixNow;
+        delete bar?.dataset?.phParishName;
         void _markRecordingActive();
-        window.dispatchEvent(new CustomEvent("ph-retraining-hint", { detail: { parish_key: message.parish_key || "" } }));
         if (_refreshParishPushForm) void _refreshParishPushForm();
         return { ok: true };
       } catch (err) {
@@ -8454,14 +8531,13 @@
         let href = clickData.href;
         const bulletinHref = _hrefFromBulletinClick(target);
         if (bulletinHref) href = bulletinHref;
-        const selector =
-          text && text.length >= 3 && text.length <= 60 && !_textLooksDated(text)
-            ? `${clickData.tag}:has-text("${text.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}")`
-            : href && /\.pdf/i.test(href)
-              ? "a[href$='.pdf']"
-              : clickData.css_path;
         const step = _enrichClickStepForWeeklyReplay(
-          { action: "click", selector, href, text },
+          {
+            action: "click",
+            selector: buildStableLinkSelector(target),
+            href,
+            text,
+          },
           target
         );
         if (clickData.css_path && clickData.css_path !== step.selector) {

@@ -23,6 +23,70 @@ const _spPanels = {
 const PROBLEMS_FIX_VISITED_KEY = "ph_problems_fix_visited";
 const PROBLEMS_RECIPE_RETRAINED_KEY = "ph_recipe_retrained";
 const PH_LAST_DISPATCH_KEY = "ph_last_parish_dispatch";
+const FIX_NOW_TOOLBAR_DELAYS_MS = [0, 350, 900, 2000, 4000, 7000, 11000];
+
+async function _problemsBeginFixNowSession(startUrl, parishKey) {
+  const navStartedAt = Date.now();
+  let hostname = "";
+  try {
+    hostname = new URL(startUrl).hostname.toLowerCase();
+  } catch (_e) {
+    return { navStartedAt, hostname: "" };
+  }
+
+  const stored = await chrome.storage.local.get(["ph_recording_sessions"]);
+  const sessions =
+    stored.ph_recording_sessions && typeof stored.ph_recording_sessions === "object"
+      ? { ...stored.ph_recording_sessions }
+      : {};
+  sessions[hostname] = {
+    active: true,
+    hostname,
+    startUrl,
+    steps: [],
+    updatedAt: navStartedAt,
+    fixNow: true,
+    parish_key: parishKey,
+  };
+  await chrome.storage.local.set({
+    ph_recording_sessions: sessions,
+    ph_recording_session: { active: false, steps: [], updatedAt: navStartedAt },
+  });
+  return { navStartedAt, hostname };
+}
+
+function _scheduleFixNowToolbar(tabId, parishKey, navStartedAt, startUrl) {
+  if (!tabId) return;
+  const payload = {
+    type: "ph_show_toolbar",
+    reason: "fix_now",
+    parish_key: parishKey,
+    nav_started_at: navStartedAt,
+  };
+  const sessionKey = `ph_fix_now_tab_${tabId}`;
+  if (chrome.storage?.session?.set) {
+    void chrome.storage.session.set({
+      [sessionKey]: {
+        parish_key: parishKey,
+        nav_started_at: navStartedAt,
+        url: startUrl,
+      },
+    });
+    setTimeout(() => {
+      void chrome.storage.session.remove(sessionKey);
+    }, 15000);
+  }
+  for (const delay of FIX_NOW_TOOLBAR_DELAYS_MS) {
+    setTimeout(() => {
+      chrome.runtime.sendMessage({
+        type: "dispatch_to_tab",
+        tabId,
+        allowInject: true,
+        payload,
+      });
+    }, delay);
+  }
+}
 
 async function _problemsRepoUrls() {
   const cfg = await chrome.storage.local.get(["gh_repo"]);
@@ -1898,8 +1962,9 @@ async function _problemsRenderRows(rows) {
           return;
         }
         void _problemsMarkFixVisited(row.parish, fixBtn);
+        const { navStartedAt } = await _problemsBeginFixNowSession(startUrl, row.parish);
         setStatus(
-          `✅ Opened ${row.display_name || row.parish} — on that tab: Point at bulletin → Yes → Send & test.`,
+          `✅ Opened ${row.display_name || row.parish} — toolbar should appear automatically. Wait for the load timer.`,
           "ok"
         );
         const match = _pdAllParishes.find((p) => p.key === row.parish);
@@ -1918,17 +1983,7 @@ async function _problemsRenderRows(rows) {
         chrome.tabs.create({ url: startUrl, active: true }, (tab) => {
           const tabId = tab?.id;
           if (!tabId) return;
-          const onUpdated = (updatedTabId, changeInfo) => {
-            if (updatedTabId !== tabId || changeInfo.status !== "complete") return;
-            chrome.tabs.onUpdated.removeListener(onUpdated);
-            chrome.runtime.sendMessage({
-              type: "dispatch_to_tab",
-              tabId,
-              allowInject: true,
-              payload: { type: "ph_show_toolbar", reason: "fix_now", parish_key: row.parish },
-            });
-          };
-          chrome.tabs.onUpdated.addListener(onUpdated);
+          _scheduleFixNowToolbar(tabId, row.parish, navStartedAt, startUrl);
         });
       })();
     });

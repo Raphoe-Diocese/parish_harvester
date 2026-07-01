@@ -281,10 +281,28 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 });
 
 chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-  if (changeInfo.status !== "complete") return;
+  if (changeInfo.status !== "complete" && changeInfo.status !== "loading") return;
   if (!_tabUrlIsScriptable(tab?.url || "")) return;
   (async () => {
     try {
+      const fixKey = `ph_fix_now_tab_${tabId}`;
+      const fixStored = await chrome.storage.session.get(fixKey);
+      const fixNow = fixStored[fixKey];
+      if (fixNow) {
+        await sendToTab(
+          tabId,
+          {
+            type: "ph_show_toolbar",
+            reason: "fix_now",
+            parish_key: fixNow.parish_key || "",
+            nav_started_at: fixNow.nav_started_at,
+          },
+          { allowInject: true }
+        );
+      }
+
+      if (changeInfo.status !== "complete") return;
+
       const ping = await _sendMessageToTab(tabId, { type: "ph_ping" });
       if (!ping.ok) {
         await _injectTrainerFiles(tabId, TRAINER_BRIDGE_FILES);
