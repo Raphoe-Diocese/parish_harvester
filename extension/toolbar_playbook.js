@@ -46,8 +46,8 @@
     },
     wix_html: {
       title: "Bulletin is a web page (not a PDF file)",
-      now: "Save this page as PDF, then Send & test.",
-      steps: ["Use Save page as PDF.", "Send & test."],
+      now: "After the homepage click opens this page, tap Save page as PDF — that is correct for Wix.",
+      steps: ["Step 1: click the bulletin link on the homepage.", "Step 2: Save page as PDF on this page.", "Send & test."],
     },
     wix_date_grid: {
       title: "Calendar of old bulletins",

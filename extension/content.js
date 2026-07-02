@@ -199,14 +199,17 @@
     });
   };
 
-  const _flushRecordingSession = async () => {
+  const _flushRecordingSession = async (extra = {}) => {
     if (_persistDebounceTimer) {
       clearTimeout(_persistDebounceTimer);
       _persistDebounceTimer = null;
     }
-    const extra = _persistPendingExtra;
+    if (extra && typeof extra === "object") {
+      Object.assign(_persistPendingExtra, extra);
+    }
+    const pending = _persistPendingExtra;
     _persistPendingExtra = {};
-    await _persistRecordingSessionNow(extra);
+    await _persistRecordingSessionNow(pending);
   };
 
   const _persistRecordingSession = (extra = {}) => {
@@ -523,6 +526,9 @@
   const _navigateRecordingToUrl = async (absUrl, selectedEl, showStatus) => {
     if (!absUrl) return false;
 
+    // Persist before navigation — debounced save often never runs before the tab unloads.
+    await _flushRecordingSession({ pendingUrl: absUrl });
+
     // Open synchronously first — async awaits below break the user-gesture chain
     // and Chrome blocks window.open after recording/persist delays.
     if (_openBulletinInNewTabNow(absUrl, selectedEl)) {
@@ -534,11 +540,8 @@
           "ok"
         );
       }
-      void _persistRecordingSession({ pendingUrl: absUrl });
       return true;
     }
-
-    await _persistRecordingSession({ pendingUrl: absUrl });
 
     const opened = await _openUrlInRecordingTab(absUrl, showStatus);
     if (opened) return true;
@@ -604,6 +607,24 @@
         detail: { stepCount: _standaloneRecipeSteps().length },
       })
     );
+    const restoredSteps = _standaloneRecipeSteps();
+    const hasClick = restoredSteps.some(
+      (s) => String(s?.action || "").trim().toLowerCase() === "click"
+    );
+    const hasPrint = restoredSteps.some((s) => {
+      const a = String(s?.action || "").trim().toLowerCase();
+      return a === "print_to_pdf" || a === "html";
+    });
+    if (hasClick && !hasPrint) {
+      window.dispatchEvent(
+        new CustomEvent("ph-retraining-hint", {
+          detail: {
+            parish_key: session.parish_key || "",
+            hint: "homepage_click_done",
+          },
+        })
+      );
+    }
     return true;
   };
 
@@ -2666,6 +2687,9 @@
         type,
         label
       );
+      return;
+    }
+    if (_inStandaloneMode() && type === "click") {
       return;
     }
     recipeSteps.push({ type, label, recipeStep: null });
@@ -4903,15 +4927,20 @@
             "mark_file",
             `📄 Download: ${absUrl.slice(-50)}`
           );
-          void _persistRecordingSession();
+          await _flushRecordingSession();
           _notifyRecordingTabActive();
           showStatus("✅ Click saved — opening bulletin. Tap Save this PDF on the PDF page.", "ok");
-          if (absUrl) void _navigateRecordingToUrl(absUrl, selectedEl, showStatus);
+          if (absUrl) await _navigateRecordingToUrl(absUrl, selectedEl, showStatus);
           else resetGuidedPanel();
           return;
         }
 
-        if (window.ph_record_click) {
+        if (_inStandaloneMode()) {
+          if (!_recordStandaloneClick()) {
+            showStatus("❌ Could not record click.", "error");
+            return;
+          }
+        } else if (window.ph_record_click) {
           try {
             window.ph_record_click({
               tag: (selectedEl.tagName || "").toLowerCase(),
@@ -4931,6 +4960,7 @@
         }
 
         if (openLink === "stay") {
+          await _flushRecordingSession();
           showStatus(`✅ Click step recorded: "${text || selector}"`);
           resetGuidedPanel();
           return;
@@ -4942,7 +4972,7 @@
           return;
         }
         stopPickLinkMode();
-        void _navigateRecordingToUrl(absUrl, selectedEl, showStatus);
+        await _navigateRecordingToUrl(absUrl, selectedEl, showStatus);
       };
 
       const yesOpenBtn = makeSmallBtn(
@@ -5687,7 +5717,14 @@
         resetGuidedPanel();
       }
     });
-    window.addEventListener("ph-retraining-hint", () => {
+    window.addEventListener("ph-retraining-hint", (e) => {
+      if (e?.detail?.hint === "homepage_click_done") {
+        showStatus(
+          "✅ Homepage click kept — this Wix bulletin is HTML. Tap Save page as PDF, then Send & test.",
+          "ok"
+        );
+        return;
+      }
       showStatus("Retraining: follow the steps on this page, then click '⬆ Push Recipe to GitHub'.", "warn");
     });
 
@@ -7057,7 +7094,10 @@
         const hasClick = recorded.some(
           (s) => String(s?.action || "").trim().toLowerCase() === "click"
         );
-        if (!hasClick || !standaloneStartUrl || !_hostsMatch(standaloneStartUrl, pageUrl)) {
+        const activeSession = await _getRecordingSessionForCurrentHost();
+        if (hasClick && activeSession?.startUrl && _hostsMatch(activeSession.startUrl, pageUrl)) {
+          standaloneStartUrl = activeSession.startUrl;
+        } else if (!hasClick || !standaloneStartUrl || !_hostsMatch(standaloneStartUrl, pageUrl)) {
           standaloneStartUrl = pageUrl;
         }
         _purgeStaleHostnameMapEntry(hostname, pageUrl);
@@ -7494,6 +7534,15 @@
           return;
         }
         if (_standaloneRecipeSteps().length > 0 || !resolved?.key) return;
+        const activeSession = await _getRecordingSessionForCurrentHost();
+        if (
+          activeSession?.active &&
+          (Array.isArray(activeSession.steps) && activeSession.steps.length > 0 ||
+            activeSession.pendingUrl ||
+            activeSession.fixNow)
+        ) {
+          return;
+        }
         const loaded = await loadRecipeFromRawGithub(resolved.key, resolvedDiocese || resolved.diocese);
         if (!loaded?.recipe) return;
         if (loaded.recipe.display_name && !contactName) {
