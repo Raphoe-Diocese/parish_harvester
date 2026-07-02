@@ -1,0 +1,46 @@
+{
+  "version": 1,
+  "parish_key": "steelstownparish",
+  "display_name": "Steelstown",
+  "diocese": "derry",
+  "start_url": "http://steelstownparish.com/news.html",
+  "steps": [
+    {
+      "action": "click",
+      "selector": "a:has-text(\"Parish News\")",
+      "href": "pdf/280626.pdf",
+      "text": "Parish News 13th Sunday Ord. Time-Sunday, 28th June 2026 | P",
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "middle",
+      "fallback_selectors": [
+        "a[href$='.pdf']",
+        "a[href*='.pdf']"
+      ]
+    },
+    {
+      "action": "download",
+      "url": "http://steelstownparish.com/pdf/280626.pdf"
+    }
+  ],
+  "observed_load_ms": 15530.699951171875,
+  "timeout_ms": 55000,
+  "total_timeout_s": 250,
+  "playbook_type": "dated_pdf_bulletin",
+  "site_type": "dated_pdf_path",
+  "operator_notes": [
+    "Bulletin is a real PDF (often made in Microsoft Word → Print to PDF).",
+    "Tab title may say .docx or .jpg — ignore that; check the address bar ends in .pdf.",
+    "On the PDF page: tap Save this PDF — saves the full https://… address for Sunday harvest.",
+    "Or start on parishnews.html → point at this week's link → Yes → Save this PDF.",
+    "Harvester rewrites DDMMYY in the URL each Sunday (e.g. 140626 → 210626)."
+  ],
+  "do_not": [
+    "Do not use use_page_url only — GitHub cannot read Chrome's internal PDF viewer address.",
+    "Do not worry if Document Properties title mentions Microsoft Word."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "middle"
+  },
+  "recorded_date": "2026-07-02"
+}
