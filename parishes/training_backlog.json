@@ -2,16 +2,16 @@
   "generated_at": "2026-07-02",
   "target_date": "2026-06-28",
   "summary": {
-    "downloaded": 21,
+    "downloaded": 22,
     "html_links": 0,
     "skipped": 3,
-    "failed": 21,
+    "failed": 20,
     "stale_rejected": 0
   },
   "action_counts": {
-    "ok": 74,
+    "ok": 75,
     "investigate": 12,
-    "verify_autofix": 10,
+    "verify_autofix": 9,
     "skip": 16,
     "retrain": 6
   },
@@ -1060,22 +1060,24 @@
       "recipe_file": "parishes/recipes/derry/clonmanyparish.json",
       "recipe": {
         "start_url": "https://clonmanyparish.ie/newsletter/",
-        "site_type": "wp_block_file_bulletin",
-        "playbook_type": "",
+        "site_type": "pdf_link_list",
+        "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 2,
-        "click_count": 0,
+        "click_count": 1,
         "has_terminal": true,
         "operator_notes": [
-          "Newsletter archive lists dated PDFs \u2014 harvest newest *.pdf without menu clicks.",
-          "Do not use brittle menu selectors (Current Newsletter submenu)."
+          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
+          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+          "Do not worry if the filename or date in the link text changes every week."
         ],
         "do_not": [
-          "Do not click ul#menu-main-menu-2 \u2014 newsletter PDFs are on /newsletter/ already."
+          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
+          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
         ],
-        "recorded_date": "2026-06-25"
+        "recorded_date": "2026-07-02"
       },
       "bulletin_format": "download",
       "learned_pattern": "direct_pdf",
@@ -1085,10 +1087,10 @@
         "notes": "Permanent /parish-bulletin/ URL \u2014 PDF filename changes weekly under /wp-content/uploads/YYYY/MM/. PDF is in object.wp-block-file__embed[data] \u2014 harvest scrapes the embed URL. Use url_pattern *bulletin*.pdf \u2014 never pin a dated filename."
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
-      "suggested_action": "verify_autofix",
-      "suggested_reason": "retry after recipe autofix"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "parishofstjohncoleraine",
