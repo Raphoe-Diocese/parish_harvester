@@ -2,16 +2,16 @@
   "generated_at": "2026-07-02",
   "target_date": "2026-06-28",
   "summary": {
-    "downloaded": 18,
+    "downloaded": 19,
     "html_links": 0,
     "skipped": 3,
-    "failed": 24,
+    "failed": 23,
     "stale_rejected": 0
   },
   "action_counts": {
-    "ok": 71,
+    "ok": 72,
     "investigate": 11,
-    "verify_autofix": 12,
+    "verify_autofix": 11,
     "skip": 16,
     "retrain": 6
   },
@@ -1472,26 +1472,35 @@
       "recipe_file": "parishes/recipes/derry/parishofdungiven.json",
       "recipe": {
         "start_url": "https://parishofdungiven.com/parishnews.html",
-        "site_type": "",
-        "playbook_type": "",
+        "site_type": "dated_pdf_path",
+        "playbook_type": "dated_pdf_bulletin",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 3,
+        "step_count": 2,
         "click_count": 1,
         "has_terminal": true,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-06-15"
+        "operator_notes": [
+          "Bulletin is a real PDF (often made in Microsoft Word \u2192 Print to PDF).",
+          "Tab title may say .docx or .jpg \u2014 ignore that; check the address bar ends in .pdf.",
+          "On the PDF page: tap Save this PDF \u2014 saves the full https://\u2026 address for Sunday harvest.",
+          "Or start on parishnews.html \u2192 point at this week's link \u2192 Yes \u2192 Save this PDF.",
+          "Harvester rewrites DDMMYY in the URL each Sunday (e.g. 140626 \u2192 210626)."
+        ],
+        "do_not": [
+          "Do not use use_page_url only \u2014 GitHub cannot read Chrome's internal PDF viewer address.",
+          "Do not worry if Document Properties title mentions Microsoft Word."
+        ],
+        "recorded_date": "2026-07-02"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
-      "suggested_action": "verify_autofix",
-      "suggested_reason": "retry after recipe autofix"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "dunsfordandardglassparish",
