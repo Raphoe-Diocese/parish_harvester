@@ -3,145 +3,144 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Derry Big Bulletin — 2026-06-28</title>
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@600;700&family=Open+Sans:ital,wght@0,400;0,600;0,700;1,400&display=swap" rel="stylesheet" />
+  <title>Derry Diocese Bulletin Viewer — 02/07/2026</title>
   <style>
-    * { box-sizing: border-box; }
-    :root {
-      --teal: #2a5b6f;
-      --teal-dark: #004d5b;
-      --link-blue: #0056b3;
-      --ocr-accent: #40c4ff;
-      --footer-purple: #3b1a40;
-      --text: #1a1a2e;
-      --muted: #4b5563;
-      --border: #d6e3ea;
-      --panel-bg: #fff;
-    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      margin: 0;
-      font-family: "Open Sans", Arial, Helvetica, sans-serif;
-      background: #fff;
-      color: var(--text);
-      -webkit-text-size-adjust: 100%;
+      font-family: "Segoe UI", Arial, sans-serif;
+      background: #f7f8fb;
+      color: #1a1a2e;
+      line-height: 1.6;
     }
-    .page { max-width: 980px; margin: 0 auto; padding: 20px 16px 0; }
-    .title-card {
-      background: #fff;
-      border-radius: 4px;
-      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.08);
-      padding: 22px 18px;
-      margin: 0 0 18px;
-      text-align: center;
-    }
-    .title-card h1 {
-      margin: 0;
-      font-family: "Playfair Display", Georgia, "Times New Roman", serif;
-      font-size: clamp(1.55rem, 4.5vw, 2.35rem);
-      font-weight: 700;
-      color: var(--teal);
-      text-transform: uppercase;
-      letter-spacing: 0.03em;
-      line-height: 1.2;
-    }
-    .top-actions {
+    a { color: #1a6b6b; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .page { max-width: 1400px; margin: 0 auto; padding: 20px 16px 40px; }
+    .back-link { display: inline-block; margin-bottom: 14px; font-weight: 700; color: #1a6b6b; }
+    .header { text-align: center; margin-bottom: 24px; }
+    .diocese-label { margin: 0 0 6px; color: #c0392b; font-size: 0.95rem; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 800; }
+    h1 { margin: 0 0 8px; color: #1a6b6b; font-size: clamp(1.8rem, 3vw, 2.5rem); }
+    .meta { color: #6b7280; font-size: 0.95rem; }
+    
+    /* Tabs */
+    .tabs {
       display: flex;
-      flex-direction: column;
-      align-items: center;
-      gap: 12px;
-      margin: 0 0 20px;
-    }
-    .go-ocr-btn {
-      display: inline-flex;
-      align-items: center;
       justify-content: center;
-      min-height: 48px;
-      padding: 10px 22px;
-      border: 2px solid var(--ocr-accent);
-      border-radius: 4px;
-      color: var(--ocr-accent);
-      font-style: italic;
-      font-weight: 600;
-      text-decoration: none;
-      background: #fff;
-      font-size: 1rem;
-      width: min(100%, 360px);
-      text-align: center;
+      gap: 10px;
+      margin: 0 0 20px;
+      padding: 16px 0;
+      background: #e8edf5;
+      border-bottom: 2px solid #c7d2e8;
     }
-    .go-ocr-btn:hover { background: #f0fbff; text-decoration: none; }
-    .download-link {
-      color: var(--link-blue);
-      font-weight: 600;
-      text-decoration: none;
-      font-size: 1rem;
-    }
-    .download-link:hover { text-decoration: underline; }
-    .panel {
-      background: var(--panel-bg);
-      border: 1px solid var(--border);
+    .tab-btn {
+      padding: 12px 28px;
+      border: 2px solid #1a6b6b;
       border-radius: 8px;
-      padding: 16px 14px 18px;
-      margin-bottom: 22px;
-    }
-    .panel h2 {
-      margin: 0 0 12px;
-      font-family: "Playfair Display", Georgia, serif;
-      font-size: clamp(1rem, 2.8vw, 1.2rem);
+      background: white;
+      color: #1a6b6b;
       font-weight: 700;
-      color: var(--teal-dark);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-      text-align: center;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
     }
+    .tab-btn:hover {
+      background: #f0f4f8;
+    }
+    .tab-btn.active {
+      background: #1a6b6b;
+      color: white;
+    }
+    
+    /* Panel container */
+    .panel-container { position: relative; }
+    .view-panel {
+      display: none;
+      background: white;
+      border: 1px solid #d6ecea;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(26, 107, 107, 0.08);
+    }
+    .view-panel.active { display: block; }
+    
+    /* Toolbar */
     .panel-toolbar {
       display: flex;
-      justify-content: center;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
       flex-wrap: wrap;
-      gap: 8px;
-      margin: 0 0 12px;
     }
     .toolbar-btn {
+      padding: 8px 16px;
+      border: 2px solid #1a6b6b;
+      border-radius: 6px;
+      background: white;
+      color: #1a6b6b;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-decoration: none;
       display: inline-flex;
       align-items: center;
-      justify-content: center;
-      min-height: 44px;
-      padding: 8px 14px;
-      border: 2px solid var(--teal);
-      border-radius: 6px;
-      background: #fff;
-      color: var(--teal);
-      font-weight: 600;
+      gap: 4px;
+    }
+    .toolbar-btn:hover {
+      background: #1a6b6b;
+      color: white;
       text-decoration: none;
-      font-size: 0.92rem;
-      font-family: inherit;
     }
-    .toolbar-btn:hover { background: #f0f8f8; text-decoration: none; }
-    .viewer {
-      height: min(78vh, 900px);
-      min-height: 320px;
-      overflow: hidden;
-      border: 1px solid #d8e4e3;
+    
+    /* PDF View */
+    .pdf-controls {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      margin: 12px 0;
+      font-weight: 700;
+      flex-wrap: wrap;
+    }
+    .pdf-controls button {
+      border: 0;
       border-radius: 6px;
-      background: #f8fafa;
+      background: #1a6b6b;
+      color: white;
+      font-weight: 700;
+      padding: 10px 20px;
+      cursor: pointer;
+      font-size: 0.95rem;
     }
-    .viewer iframe { width: 100%; height: 100%; border: 0; display: block; }
-    .ocr-search-bar { margin-bottom: 10px; position: relative; }
-    .ocr-search-bar input {
+    .pdf-controls button:disabled { background: #9bbfbd; cursor: not-allowed; }
+    .pdf-canvas-wrap {
+      height: 75vh;
+      min-height: 500px;
+      overflow: auto;
+      border: 1px solid #c7dcda;
+      border-radius: 10px;
+      background: #f2f5f5;
+      display: flex;
+      justify-content: center;
+      align-items: flex-start;
+      padding: 10px;
+    }
+    #pdf-canvas { display: block; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 100%; }
+    
+    /* OCR View */
+    .ocr-search-bar {
+      position: relative;
+      margin-bottom: 12px;
+    }
+    .search-input {
       width: 100%;
-      min-height: 48px;
-      padding: 10px 40px 10px 12px;
-      border: 1px solid var(--teal);
-      border-radius: 6px;
+      border: 1px solid #bdd7d5;
+      border-radius: 8px;
+      padding: 12px 44px 12px 16px;
       font-size: 1rem;
-      outline: none;
-      font-family: inherit;
     }
-    .ocr-search-bar input:focus { box-shadow: 0 0 0 2px #d6ecea; }
     .search-clear {
       position: absolute;
-      right: 8px;
+      right: 12px;
       top: 50%;
       transform: translateY(-50%);
       width: 32px;
@@ -150,7 +149,7 @@
       border-radius: 50%;
       background: transparent;
       color: #6b7280;
-      font-size: 1.2rem;
+      font-size: 1.3rem;
       cursor: pointer;
     }
     .search-clear[hidden] { display: none; }
@@ -159,49 +158,64 @@
       align-items: center;
       justify-content: space-between;
       gap: 10px;
-      margin-bottom: 10px;
+      margin-bottom: 12px;
       flex-wrap: wrap;
     }
     .ocr-search-tools button {
       border: 0;
       border-radius: 6px;
-      background: var(--teal);
-      color: #fff;
-      font-weight: 700;
-      min-height: 44px;
-      padding: 8px 14px;
+      background: #1a6b6b;
+      color: white;
+      font-weight: 600;
+      padding: 7px 14px;
       cursor: pointer;
       font-size: 0.9rem;
-      font-family: inherit;
     }
     .ocr-search-tools button:disabled { background: #9bbfbd; cursor: not-allowed; }
-    .match-count { color: var(--muted); font-size: 0.92rem; font-weight: 700; }
-    .ocr-viewer {
-      max-height: min(70vh, 720px);
-      overflow: auto;
-      border: 1px solid #d8e4e3;
-      border-radius: 6px;
-      background: #fff;
-      padding: 14px;
-      -webkit-overflow-scrolling: touch;
+    .match-count {
+      color: #6b7280;
+      font-size: 0.9rem;
+      font-weight: 600;
     }
-    .ocr-pre {
-      margin: 0;
-      white-space: pre-wrap;
-      line-height: 1.65;
-      font-size: clamp(0.95rem, 2.5vw, 1rem);
-      font-family: inherit;
+    #ocr-panel {
+      height: 70vh;
+      min-height: 500px;
+      overflow-y: auto;
+      border: 1px solid #d9e4e3;
+      border-radius: 10px;
+      padding: 24px;
+      background: white;
+      font-size: 17px;
+      line-height: 1.8;
+      color: #1a1a2e;
     }
-    .ocr-body h1, .ocr-body h2, .ocr-body h3 { color: var(--teal); margin: 16px 0 10px; }
-    .ocr-body h2.b-title {
+    #ocr-panel h1, #ocr-panel h2 {
+      color: #14524f;
+      margin-top: 16px;
+      margin-bottom: 10px;
+      font-weight: 700;
+    }
+    #ocr-panel h2.b-title {
       font-size: 1.35em;
       color: #0f2b5b;
       border-bottom: 2px solid #c8d6f0;
       padding-bottom: 0.15em;
     }
-    .ocr-body h3.b-head { font-size: 1.15em; color: #134e9c; }
-    .ocr-body h4.b-sub { font-size: 1.02em; color: #1f6f4a; }
-    .ocr-body .page-label {
+    #ocr-panel h3.b-head {
+      font-size: 1.15em;
+      color: #134e9c;
+    }
+    #ocr-panel h4.b-sub {
+      font-size: 1.02em;
+      color: #1f6f4a;
+    }
+    #ocr-panel h3, #ocr-panel h4 {
+      color: #1a6b6b;
+      margin-top: 14px;
+      margin-bottom: 8px;
+      font-weight: 700;
+    }
+    #ocr-panel .page-label {
       font-size: 1em;
       font-weight: 700;
       margin: 1.2em 0 0.35em;
@@ -209,159 +223,195 @@
       text-transform: none;
       letter-spacing: normal;
     }
-    .ocr-body table.b-table {
+    #ocr-panel table.b-table {
       border-collapse: collapse;
       width: 100%;
       margin: 0.5em 0;
       font-size: 0.95em;
     }
-    .ocr-body table.b-table td, .ocr-body table.b-table th {
+    #ocr-panel table.b-table td, #ocr-panel table.b-table th {
       border: 1px solid #d0d8e8;
       padding: 4px 8px;
       text-align: left;
       vertical-align: top;
     }
-    .ocr-body table.b-table th {
+    #ocr-panel table.b-table th {
       background: #eef3fb;
       color: #0f2b5b;
     }
-    .ocr-body table.b-table tr:nth-child(even) td {
+    #ocr-panel table.b-table tr:nth-child(even) td {
       background: #f7f9fd;
     }
-    .ocr-body p { margin: 0 0 12px; white-space: pre-wrap; }
-    .ocr-body hr { border: 0; border-top: 1px solid #d4dfde; margin: 18px 0; }
-    #ocr-text mark { background: #fff3cd; padding: 0 2px; border-radius: 2px; }
-    #ocr-text mark.search-active { background: #fde047; outline: 2px solid var(--teal-dark); }
-    .disclaimer {
-      margin: 0 0 10px;
-      color: #b42318;
-      font-style: italic;
+    #ocr-panel hr { border: 0; border-top: 1px solid #d4dfde; margin: 20px 0; }
+    #ocr-panel p { margin: 0 0 12px; white-space: pre-wrap; }
+    #ocr-panel mark { background: #fef08a; padding: 1px 3px; border-radius: 2px; }
+    #ocr-panel mark.search-active { background: #fde047; outline: 2px solid #0f5e5e; }
+    #ocr-panel a { color: #1a6b6b; font-weight: 600; }
+    .note-box {
+      margin-top: 16px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      color: #713f12;
+      font-weight: 600;
       font-size: 0.95rem;
-      line-height: 1.5;
     }
-    .ocr-def { margin: 0 0 24px; color: var(--muted); font-size: 0.92rem; line-height: 1.5; }
+    
+    /* Parish Section */
     .parish-section {
-      margin-bottom: 28px;
-      text-align: center;
+      margin-top: 32px;
+      background: white;
+      border: 1px solid #d6ecea;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 12px rgba(26, 107, 107, 0.06);
     }
     .parish-section h2 {
-      margin: 0 0 14px;
-      font-family: "Playfair Display", Georgia, serif;
-      font-size: clamp(1rem, 2.8vw, 1.15rem);
-      font-weight: 700;
-      color: var(--teal);
-      text-transform: uppercase;
-      letter-spacing: 0.04em;
-    }
-    .parish-accordion {
-      max-width: 920px;
-      margin: 0 auto;
-      text-align: left;
-      border: 1px solid var(--border);
-      border-radius: 8px;
-      background: #fff;
-      padding: 0;
-    }
-    .parish-accordion-toggle {
-      list-style: none;
-      cursor: pointer;
-      padding: 14px 16px;
-      font-family: "Open Sans", Arial, Helvetica, sans-serif;
-      font-weight: 700;
-      font-size: 1rem;
-      color: var(--teal);
+      margin: 0 0 18px;
+      color: #1a6b6b;
+      font-size: 1.4rem;
+      font-weight: 800;
       text-align: center;
     }
-    .parish-accordion-toggle::-webkit-details-marker { display: none; }
-    .parish-accordion[open] .parish-accordion-toggle {
-      border-bottom: 1px solid var(--border);
+    .parish-filter {
+      width: 100%;
+      border: 1px solid #bdd7d5;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 1rem;
+      margin-bottom: 16px;
     }
-    .parish-link-grid {
-      list-style: disc;
+    ul.parish-grid {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      padding: 0;
       margin: 0;
-      padding: 16px 16px 16px 28px;
-      columns: 3;
-      column-gap: 28px;
-      color: var(--link-blue);
     }
-    .parish-link-grid li {
-      margin: 0 0 8px 0;
-      break-inside: avoid;
-    }
-    .parish-link-grid a {
-      color: var(--link-blue);
+    .parish-item { margin: 0; }
+    .parish-link {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
       text-decoration: none;
-      font-weight: 600;
-      font-size: 0.98rem;
+      color: #1a6b6b;
+      font-size: 1rem;
+      font-weight: 700;
+      background: #f9fcfc;
+      border: 1px solid #d9ecea;
+      border-radius: 8px;
+      padding: 10px 14px;
+      transition: all 0.15s;
     }
-    .parish-link-grid a:hover { text-decoration: underline; }
-    @media (max-width: 800px) {
-      .parish-link-grid { columns: 2; }
+    .parish-link:hover {
+      background: #e8f4f4;
+      text-decoration: none;
+      transform: translateY(-1px);
     }
-    @media (max-width: 520px) {
-      .parish-link-grid { columns: 1; padding-left: 24px; }
+    .empty-state { margin: 0 0 12px; color: #6b7280; font-size: 0.95rem; }
+    
+    /* Footer */
+    footer {
+      margin-top: 32px;
+      background: #114b4b;
+      color: white;
+      padding: 16px 20px;
     }
-    .site-footer {
-      background: var(--footer-purple);
-      color: #fff;
-      padding: 16px;
-      margin: 0 -16px;
+    .footer-inner {
+      max-width: 1400px;
+      margin: 0 auto;
       display: flex;
       justify-content: space-between;
-      align-items: center;
+      gap: 12px;
       flex-wrap: wrap;
-      gap: 10px;
-      font-size: 0.92rem;
+      font-size: 0.9rem;
     }
-    .site-footer a { color: #fff; text-decoration: none; }
-    .site-footer a:hover { text-decoration: underline; }
-    @media (max-width: 640px) {
-      .page { padding-top: 12px; }
-      .title-card { padding: 18px 14px; }
-      .viewer { min-height: 280px; height: 62vh; }
-      .ocr-viewer { max-height: 58vh; }
+    .footer-inner a { color: #d8f0ee; font-weight: 700; }
+    .footer-inner a:hover { text-decoration: underline; }
+    
+    /* Responsive */
+    @media (max-width: 900px) {
+      ul.parish-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .tabs { flex-direction: column; align-items: stretch; padding: 12px; }
+      .tab-btn { width: 100%; }
+    }
+    @media (max-width: 600px) {
+      .page { padding: 16px 12px; }
+      ul.parish-grid { grid-template-columns: 1fr; }
+      .pdf-controls, .ocr-search-tools { flex-direction: column; }
+      .pdf-canvas-wrap, #ocr-panel {
+        height: auto;
+        min-height: 55vh;
+        max-height: 70vh;
+      }
+      .pdf-controls button, .ocr-search-tools button, .tab-btn {
+        min-height: 48px;
+        width: 100%;
+      }
+      .panel-toolbar { justify-content: stretch; }
+      .toolbar-btn { flex: 1; justify-content: center; min-height: 48px; }
     }
   </style>
 </head>
 <body>
-  <main class="page">
-    <header class="title-card">
-      <h1>DERRY BIG BULLETIN</h1>
+  <div class="page">
+    <a class="back-link" href="index.html">← Back to bulletin archive</a>
+    <header class="header">
+      <p class="diocese-label">DERRY</p>
+      <h1>DERRY DIOCESE BIG BULLETIN</h1>
+      <p class="meta">Generated for 02/07/2026.</p>
     </header>
 
-    <div class="top-actions">
-      <a class="go-ocr-btn" href="#ocr-section">Go to OCR version</a>
-      <a class="download-link" href="../../mega_pdf/derry_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer">Download PDF</a>
+    <!-- Tabs -->
+    <div class="tabs" role="tablist" aria-label="Bulletin view">
+      <button class="tab-btn active" type="button" role="tab" aria-selected="true" data-tab="pdf" onclick="switchTab('pdf', this)">📄 Parish Bulletin (PDF)</button>
+      <button class="tab-btn" type="button" role="tab" aria-selected="false" data-tab="ocr" onclick="switchTab('ocr', this)">📝 Searchable Bulletin Text</button>
     </div>
 
-    <section class="panel pdf-panel" aria-label="Original PDF bulletin">
-      <h2>Bulletins Original PDF Version</h2>
-      <div class="panel-toolbar">
-        <a class="toolbar-btn" href="../../mega_pdf/derry_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer">↗ Open PDF in new tab</a>
-        <a class="toolbar-btn" href="../../bulletins/derry-2026-07-02.html" target="_blank" rel="noopener noreferrer">↗ Open full bulletin in new tab</a>
-      </div>
-      <div class="viewer">
-        <iframe src="../../mega_pdf/derry_mega_bulletin.pdf" title="Diocese mega bulletin PDF"></iframe>
-      </div>
-    </section>
-
-    <section class="panel ocr-panel" id="ocr-section" aria-label="OCR plain text bulletin">
-      <h2>Bulletins OCR Extracted Plain Text</h2>
-      <div class="panel-toolbar">
-        <a class="toolbar-btn" href="../../bulletins/derry-2026-07-02-ocr.html" target="_blank" rel="noopener noreferrer">↗ Open bulletin text in new tab</a>
-      </div>
-      <div class="ocr-search-bar">
-        <input type="search" id="ocr-search" placeholder="Search bulletin text (e.g. mass, bingo, parish name)..." aria-label="Search bulletin text" />
-        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
-      </div>
-      <div class="ocr-search-tools">
-        <span id="ocr-match-count" class="match-count">0 matches</span>
-        <div>
-          <button id="ocr-prev" type="button" disabled aria-label="Previous match">← Prev</button>
-          <button id="ocr-next" type="button" disabled aria-label="Next match">Next →</button>
+    <!-- Panel Container -->
+    <div class="panel-container">
+      
+      <!-- PDF Panel -->
+      <div id="panel-pdf" class="view-panel active">
+        <div class="panel-toolbar">
+          <a class="toolbar-btn" href="../mega_pdf/derry_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer">↗ Open PDF in new tab</a>
+          <a class="toolbar-btn" href="../mega_pdf/derry_mega_bulletin.pdf" download>⬇ Download PDF</a>
+        </div>
+        <div class="pdf-controls" data-controls="top">
+          <button data-action="prev" type="button" aria-label="Previous PDF page">← Previous page</button>
+          <span data-role="page-indicator">Page 1 of 20</span>
+          <button data-action="next" type="button" aria-label="Next PDF page">Next page →</button>
+        </div>
+        <div id="pdf-canvas-wrap" class="pdf-canvas-wrap">
+          <canvas id="pdf-canvas" title="Derry Diocese bulletin PDF"></canvas>
+        </div>
+        <div class="pdf-controls" data-controls="bottom">
+          <button data-action="prev" type="button" aria-label="Previous PDF page">← Previous page</button>
+          <span data-role="page-indicator">Page 1 of 20</span>
+          <button data-action="next" type="button" aria-label="Next PDF page">Next page →</button>
         </div>
       </div>
-      <div class="ocr-viewer" id="ocr-viewer"><div class="ocr-body" id="ocr-text"><p class="page-label">Page 1</p>
+
+      <!-- OCR Panel -->
+      <div id="panel-ocr" class="view-panel">
+        <div class="panel-toolbar">
+          <a class="toolbar-btn" href="derry-2026-07-02-ocr.html" target="_blank" rel="noopener noreferrer">↗ Open bulletin text in new tab</a>
+        </div>
+        <div class="ocr-search-bar">
+          <input id="ocr-search" class="search-input" type="search" placeholder="🔍 Search OCR text..." aria-label="Search OCR text" />
+          <button id="clear-search" class="search-clear" type="button" aria-label="Clear OCR search" hidden>×</button>
+        </div>
+        <div class="ocr-search-tools">
+          <span id="ocr-match-count" class="match-count">0 matches</span>
+          <div>
+            <button id="ocr-prev" type="button" disabled aria-label="Previous search match">← Prev match</button>
+            <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
+          </div>
+        </div>
+        <div id="ocr-panel"><p class="page-label">Page 1</p>
 <h2 class="b-title">Ardstrraw East</h2>
 <h3 class="b-head">Latest Parish Newsletter</h3>
 <p><strong>Sunday, 21st June 2026 - Ardstrraw East Parish Newsletter</strong></p>
@@ -1029,50 +1079,194 @@
 <tr><td>Three Patrons:</td><td><a href="https://threepatrons.org/" target="_blank" rel="noopener noreferrer">https://threepatrons.org/</a></td></tr>
 <tr><td>Urney and Castlefin:</td><td><a href="http://urneyandcastlefinparish.com/?page_id=1227" target="_blank" rel="noopener noreferrer">http://urneyandcastlefinparish.com/?page_id=1227</a></td></tr>
 <tr><td>Waterside (&amp; Strathfoyle amalgamated):</td><td><a href="https://watersideparish.net/wp-content/uploads/2026/04/newsletter_280626oo.pdf" target="_blank" rel="noopener noreferrer">https://watersideparish.net/wp-content/uploads/2026/04/newsletter_280626oo.pdf</a></td></tr>
-</table></div></div>
-    </section>
+</table></div>
+        <div class="note-box">This bulletin text is auto-generated from the PDF. Irish (Gaeilge) and English are kept as printed. Please verify mass times and names against the original PDF.</div>
+      </div>
 
-    <p class="disclaimer">Note: The plain-text OCR version is auto-generated and may contain errors so it is always best to double check with the original PDF.</p>
-    <p class="ocr-def">OCR stands for Optical Character Recognition. It is a technology that converts images of text into machine-readable text.</p>
+    </div>
 
+    <!-- Parish Links Section -->
     <section class="parish-section">
-      <h2>DERRY PARISHES WITH WORKING BULLETIN LINKS</h2>
-      <details class="parish-accordion"><summary class="parish-accordion-toggle">Show parish bulletin links (A–Z)</summary><ul class="parish-link-grid"><li><a href="https://www.parishofaghyaran.com/news.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li><a href="https://www.parishofaghyaran.com/news.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li><a href="http://www.ardmoreparish.com/news.html" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li><a href="http://www.ardmoreparish.com/pdf/280626.pdf" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li><a href="http://parishofardstraweast.com/parishnews.html" target="_blank" rel="noopener noreferrer">Ardstraw East</a></li><li><a href="http://parishofardstraweast.com/parishnews.html" target="_blank" rel="noopener noreferrer">Ardstraw East</a></li><li><a href="https://www.parishofballinascreen.com/" target="_blank" rel="noopener noreferrer">Ballinascreen (&amp; Desertmartin amalgamated)</a></li><li><a href="https://www.parishofballinascreen.com/" target="_blank" rel="noopener noreferrer">Ballinascreen (&amp; Desertmartin amalgamated)</a></li><li><a href="https://www.banagherparish.com/information#47-9-newsletters" target="_blank" rel="noopener noreferrer">Banagher</a></li><li><a href="https://www.banagherparish.com/information#47-9-newsletters" target="_blank" rel="noopener noreferrer">Banagher</a></li><li><a href="https://bellaghyparish.com/" target="_blank" rel="noopener noreferrer">Bellaghy</a></li><li><a href="https://bellaghyparish.com/wp-content/uploads/2026/06/28-June-2026.pdf" target="_blank" rel="noopener noreferrer">Bellaghy</a></li><li><a href="https://www.buncranaparish.com/parishnews.htm" target="_blank" rel="noopener noreferrer">Buncrana</a></li><li><a href="https://www.buncranaparish.com/" target="_blank" rel="noopener noreferrer">Buncrana Parish</a></li><li><a href="https://camusparish.com/" target="_blank" rel="noopener noreferrer">Camus</a></li><li><a href="https://raw.githubusercontent.com/Raphoe-Diocese/parish_harvester/main/Bulletins/current/camusparish.pdf" target="_blank" rel="noopener noreferrer">Camus</a></li><li><a href="https://www.cappaghparish.com/index.html" target="_blank" rel="noopener noreferrer">Cappaghparish</a></li><li><a href="http://www.carndonaghparish.com/parishnews.html" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li><a href="http://www.carndonaghparish.com/parishnews.html" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li><a href="https://www.castledergparish.com/parishnews.html" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li><a href="https://www.castledergparish.com/pdf/280626.pdf" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li><a href="https://www.parishofclaudy.com/welcome/weekly-bulletin.html" target="_blank" rel="noopener noreferrer">Claudy</a></li><li><a href="https://parishofclaudy.com/welcome/weekly-bulletin.html" target="_blank" rel="noopener noreferrer">Claudy</a></li><li><a href="https://clonleighparish.com/category/newsletter/" target="_blank" rel="noopener noreferrer">Clonleigh (Strabane Pastoral Area)</a></li><li><a href="https://clonleighparish.com/category/newsletter/" target="_blank" rel="noopener noreferrer">Clonleigh (Strabane Pastoral Area)</a></li><li><a href="https://clonmanyparish.ie/newsletter/" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li><a href="https://clonmanyparish.ie/newsletter/" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li><a href="https://www.parishofstjohncoleraine.com/" target="_blank" rel="noopener noreferrer">Coleraine (St John)</a></li><li><a href="#" target="_blank" rel="noopener noreferrer">Coleraine (St John)</a></li><li><a href="http://www.culdaffparish.com/news.html" target="_blank" rel="noopener noreferrer">Culdaff</a></li><li><a href="http://culmoreparish.com/news.html" target="_blank" rel="noopener noreferrer">Culmoe</a></li><li><a href="http://culmoreparish.com/news.html" target="_blank" rel="noopener noreferrer">Culmore Parish</a></li><li><a href="https://www.desertmartinparish.com/?page_id=6" target="_blank" rel="noopener noreferrer">Desertmartin</a></li><li><a href="https://www.parishofballinascreen.com/" target="_blank" rel="noopener noreferrer">Desertmartin</a></li><li><a href="https://dmaparish.com/parishnews.html" target="_blank" rel="noopener noreferrer">DMA Parish (Claudy area)</a></li><li><a href="https://drumquinparish.com/" target="_blank" rel="noopener noreferrer">Drumquin</a></li><li><a href="https://www.drumraghparish.com/" target="_blank" rel="noopener noreferrer">Drumragh</a></li><li><a href="https://raw.githubusercontent.com/Raphoe-Diocese/parish_harvester/main/Bulletins/current/drumraghparish.pdf" target="_blank" rel="noopener noreferrer">Drumragh</a></li><li><a href="https://parishofdungiven.com/parishnews.html" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li><a href="https://parishofdungiven.com/parishnews.html" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li><a href="https://www.errigalparish.com/news.html" target="_blank" rel="noopener noreferrer">Errigal</a></li><li><a href="http://www.fahanparish.com/" target="_blank" rel="noopener noreferrer">Fahan</a></li><li><a href="https://granaghanparish.com/" target="_blank" rel="noopener noreferrer">Granaghan</a></li><li><a href="https://greencastleparish.com/" target="_blank" rel="noopener noreferrer">Greencastle</a></li><li><a href="https://www.greenlough.com/newsletter/" target="_blank" rel="noopener noreferrer">Greenlough</a></li><li><a href="https://www.holyfamily-parish.com/" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li><a href="https://www.iskaheenparish.com/bulletin" target="_blank" rel="noopener noreferrer">Iskaheen</a></li><li><a href="https://www.parishofkilrea.com/news.html" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li><a href="https://www.parishofkilrea.com/news.html" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li><a href="https://www.laveyparish.com/" target="_blank" rel="noopener noreferrer">Lavey</a></li><li><a href="https://www.leckpatrickparish.com/news.html" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li><a href="https://www.leckpatrickparish.com/news.html" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li><a href="https://www.limavadyparish.org/parish%20bulletins.html" target="_blank" rel="noopener noreferrer">Limavady</a></li><li><a href="https://www.limavadyparish.org/onewebmedia/28-6-26.pdf" target="_blank" rel="noopener noreferrer">Limavady</a></li><li><a href="https://longtowerchurch.org/" target="_blank" rel="noopener noreferrer">Long Tower</a></li><li><a href="http://www.magheraparishderry.com/parishnews.php" target="_blank" rel="noopener noreferrer">Maghera (Derry)</a></li><li><a href="http://malinparish.ie/" target="_blank" rel="noopener noreferrer">Malin</a></li><li><a href="https://www.melmountparish.com/" target="_blank" rel="noopener noreferrer">Melmount (&amp; Camus)</a></li><li><a href="https://www.melmountparish.com/parishnews.html" target="_blank" rel="noopener noreferrer">Melmount (&amp; Camus)</a></li><li><a href="https://www.movilleparish.com/" target="_blank" rel="noopener noreferrer">Moville</a></li><li><a href="http://www.parishofsionmills.com/" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li><a href="http://www.parishofsionmills.com/news.html" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li><a href="https://steugenescathedral.com/" target="_blank" rel="noopener noreferrer">St Eugene&#x27;s Cathedral (Templemore)</a></li><li><a href="https://www.stmarysparishcreggan.com/bulletins" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Parish Creggan</a></li><li><a href="https://staroftheseacatholic.com/" target="_blank" rel="noopener noreferrer">Star of the Sea (Magilligan)</a></li><li><a href="http://www.steelstownparish.com/" target="_blank" rel="noopener noreferrer">Steelstown</a></li><li><a href="https://threepatrons.org/" target="_blank" rel="noopener noreferrer">Three Patrons</a></li><li><a href="http://urneyandcastlefinparish.com/?page_id=1227" target="_blank" rel="noopener noreferrer">Urney and Castlefin</a></li><li><a href="#" target="_blank" rel="noopener noreferrer">Urney and Castlefin</a></li><li><a href="https://watersideparish.net/" target="_blank" rel="noopener noreferrer">Waterside (&amp; Strathfoyle amalgamated)</a></li></ul></details>
+      <h2>DERRY Parishes with Working Bulletin Links</h2>
+      <input id="parish-filter" class="parish-filter" type="search" placeholder="🔍 Filter parishes..." aria-label="Filter parishes" />
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghyaran"><a class="parish-link" href="https://www.parishofaghyaran.com/news.html" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Aghyaran</span></a></li><li class="parish-item" data-name="ardmore"><a class="parish-link" href="http://www.ardmoreparish.com/news.html" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Ardmore</span></a></li><li class="parish-item" data-name="ardstraw east"><a class="parish-link" href="http://parishofardstraweast.com/pdf/240526.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Ardstraw East</span></a></li><li class="parish-item" data-name="ballinascreen (&amp; desertmartin amalgamated)"><a class="parish-link" href="https://www.parishofballinascreen.com/ballinascreen-desertmartin-parishes-21_june_2026" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Ballinascreen (&amp; Desertmartin amalgamated)</span></a></li><li class="parish-item" data-name="banagher"><a class="parish-link" href="https://www.banagherparish.com/files/9/Newsletters/384/Bulletin---Divine-Mercy-Sunday---12th-April-2026" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Banagher</span></a></li><li class="parish-item" data-name="bellaghy"><a class="parish-link" href="https://bellaghyparish.com/wp-content/uploads/2026/04/Newsletter-12-April-2026-1.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Bellaghy</span></a></li><li class="parish-item" data-name="buncrana"><a class="parish-link" href="https://www.buncranaparish.com/pdf/050426.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Buncrana</span></a></li><li class="parish-item" data-name="camus"><a class="parish-link" href="https://camusparish.com/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Camus</span></a></li><li class="parish-item" data-name="carndonagh"><a class="parish-link" href="http://www.carndonaghparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Carndonagh</span></a></li><li class="parish-item" data-name="castlederg"><a class="parish-link" href="https://www.castledergparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Castlederg</span></a></li><li class="parish-item" data-name="claudy"><a class="parish-link" href="http://parishofclaudy.com/onewebmedia/NEWSLETTER%207-6-26.docx" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Claudy</span></a></li><li class="parish-item" data-name="clonleigh (strabane pastoral area)"><a class="parish-link" href="https://clonleighparish.com/2026/06/12/strabane-pastoral-area-newsletter-for-sunday-14th-june-2026/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Clonleigh (Strabane Pastoral Area)</span></a></li><li class="parish-item" data-name="clonmany"><a class="parish-link" href="https://clonmanyparish.ie/wp-content/uploads/2026/04/2026-04-12.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Clonmany</span></a></li><li class="parish-item" data-name="coleraine (st john)"><a class="parish-link" href="https://www.parishofstjohncoleraine.com/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Coleraine (St John)</span></a></li><li class="parish-item" data-name="culdaff"><a class="parish-link" href="http://www.culdaffparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Culdaff</span></a></li><li class="parish-item" data-name="culmoe"><a class="parish-link" href="http://culmoreparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Culmoe</span></a></li><li class="parish-item" data-name="desertmartin"><a class="parish-link" href="https://www.desertmartinparish.com/?page_id=6" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Desertmartin</span></a></li><li class="parish-item" data-name="dma parish (claudy area)"><a class="parish-link" href="https://dmaparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>DMA Parish (Claudy area)</span></a></li><li class="parish-item" data-name="drumquin"><a class="parish-link" href="https://drumquinparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Drumquin</span></a></li><li class="parish-item" data-name="drumragh"><a class="parish-link" href="https://www.drumraghparish.com/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Drumragh</span></a></li><li class="parish-item" data-name="dungiven"><a class="parish-link" href="https://parishofdungiven.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Dungiven</span></a></li><li class="parish-item" data-name="errigal"><a class="parish-link" href="https://www.errigalparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Errigal</span></a></li><li class="parish-item" data-name="fahan"><a class="parish-link" href="http://www.fahanparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Fahan</span></a></li><li class="parish-item" data-name="granaghan"><a class="parish-link" href="https://granaghanparish.com/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Granaghan</span></a></li><li class="parish-item" data-name="greencastle"><a class="parish-link" href="https://greencastleparish.com/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Greencastle</span></a></li><li class="parish-item" data-name="greenlough"><a class="parish-link" href="http://www.greenlough.com/publications/newsletter/2nd_Sunday_of_Easter_-_Divine_Mercy_Sunday_[2026-4-12].pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Greenlough</span></a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="https://www.holyfamily-parish.com/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Holy Family</span></a></li><li class="parish-item" data-name="iskaheen"><a class="parish-link" href="https://i0.wp.com/www.iskaheenparish.com/wp-content/uploads/2026/04/1.jpg?w=1090&amp;ssl=1" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Iskaheen</span></a></li><li class="parish-item" data-name="kilrea"><a class="parish-link" href="https://www.parishofkilrea.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Kilrea</span></a></li><li class="parish-item" data-name="lavey"><a class="parish-link" href="https://www.laveyparish.com/parishsecretary/laveyparishbulletin.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Lavey</span></a></li><li class="parish-item" data-name="leckpatrick"><a class="parish-link" href="https://www.leckpatrickparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Leckpatrick</span></a></li><li class="parish-item" data-name="limavady"><a class="parish-link" href="https://www.limavadyparish.org/onewebmedia/5-4-26.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Limavady</span></a></li><li class="parish-item" data-name="long tower"><a class="parish-link" href="https://longtowerchurch.org/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Long Tower</span></a></li><li class="parish-item" data-name="maghera (derry)"><a class="parish-link" href="http://www.magheraparishderry.com/pdf/050426.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Maghera (Derry)</span></a></li><li class="parish-item" data-name="malin"><a class="parish-link" href="https://malinparish.ie/wp-content/uploads/2026/04/Bulletin-5th-April-2026.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Malin</span></a></li><li class="parish-item" data-name="melmount (&amp; camus)"><a class="parish-link" href="https://www.melmountparish.com/parishnews.html" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Melmount (&amp; Camus)</span></a></li><li class="parish-item" data-name="moville"><a class="parish-link" href="https://movilleparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Moville</span></a></li><li class="parish-item" data-name="sion mills"><a class="parish-link" href="http://www.parishofsionmills.com/news.html" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Sion Mills</span></a></li><li class="parish-item" data-name="st eugene&#x27;s cathedral (templemore)"><a class="parish-link" href="https://steugenescathedral.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Eugene&#x27;s Cathedral (Templemore)</span></a></li><li class="parish-item" data-name="st mary&#x27;s parish creggan"><a class="parish-link" href="https://www.stmarysparishcreggan.com/bulletins" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Mary&#x27;s Parish Creggan</span></a></li><li class="parish-item" data-name="star of the sea (magilligan)"><a class="parish-link" href="https://drive.usercontent.google.com/download?id=1cF4BuBrZCRrSwMQeTT8mJrGNpr5aFGpD&amp;export=download" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Star of the Sea (Magilligan)</span></a></li><li class="parish-item" data-name="steelstown"><a class="parish-link" href="http://www.steelstownparish.com/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Steelstown</span></a></li><li class="parish-item" data-name="three patrons"><a class="parish-link" href="https://www.threepatrons.org/files/10/Weekly-Bulletins/104/Sunday-14th-June-2026" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Three Patrons</span></a></li><li class="parish-item" data-name="urney and castlefin"><a class="parish-link" href="http://urneyandcastlefinparish.com/?page_id=1227" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Urney and Castlefin</span></a></li><li class="parish-item" data-name="waterside (&amp; strathfoyle amalgamated)"><a class="parish-link" href="https://watersideparish.net/wp-content/uploads/2026/04/newsletter_120426oo.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Waterside (&amp; Strathfoyle amalgamated)</span></a></li></ul>
     </section>
-  </main>
-
-  <footer class="site-footer">
-    <span>© 2026 Parish Press</span>
-    <a href="https://github.com/Raphoe-Diocese/parish_harvester/issues/new" target="_blank" rel="noopener noreferrer">Report a problem</a>
+  </div>
+  <!-- Support Banner -->
+  <div style="max-width:1400px;margin:24px auto 0;padding:0 16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;background:#fff;border:1px solid #d6ecea;border-radius:12px;padding:14px 18px;">
+      <span style="font-size:0.95rem;color:#4b5563;">📊 <span id="view-count">–</span> views this week</span>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <a href="https://github.com/Frankytyrone/parish_harvester" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#24292e;color:#fff;border-radius:8px;font-weight:600;font-size:0.9rem;text-decoration:none;">⭐ Star on GitHub</a>
+        <a href="https://buymeacoffee.com/frankytyrone" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#FFDD00;color:#000;border-radius:8px;font-weight:700;font-size:0.9rem;text-decoration:none;">☕ Buy Me a Coffee</a>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <div class="footer-inner">
+      <span>© 2026 Parish Press — Free forever for all Irish parishes</span>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <a href="https://github.com/Frankytyrone/parish_harvester" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://buymeacoffee.com/frankytyrone" target="_blank" rel="noopener noreferrer">☕ Donate</a>
+      </div>
+    </div>
   </footer>
 
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>
+    // Tab Switching
+    function switchTab(tabName, button) {
+      document.querySelectorAll('.view-panel').forEach(function(panel) {
+        panel.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-btn').forEach(function(btn) {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-selected', 'false');
+      });
+      document.getElementById('panel-' + tabName).classList.add('active');
+      button.classList.add('active');
+      button.setAttribute('aria-selected', 'true');
+    }
+
     (function () {
-      const ocrRoot = document.getElementById('ocr-text');
+      const pdfHref = '../mega_pdf/derry_mega_bulletin.pdf';
+      const initialPages = 20;
+      const canvas = document.getElementById('pdf-canvas');
+      const canvasWrap = document.getElementById('pdf-canvas-wrap');
+      const context = canvas.getContext('2d');
+      const ocrPanel = document.getElementById('ocr-panel');
+      const indicators = Array.from(document.querySelectorAll('[data-role="page-indicator"]'));
+      const prevButtons = Array.from(document.querySelectorAll('button[data-action="prev"]'));
+      const nextButtons = Array.from(document.querySelectorAll('button[data-action="next"]'));
       const ocrSearch = document.getElementById('ocr-search');
       const clearSearch = document.getElementById('clear-search');
       const matchCount = document.getElementById('ocr-match-count');
       const prevMatchBtn = document.getElementById('ocr-prev');
       const nextMatchBtn = document.getElementById('ocr-next');
-      if (!ocrRoot || !ocrSearch) return;
-
-      const originalHtml = ocrRoot.innerHTML;
+      const parishFilter = document.getElementById('parish-filter');
+      const parishItems = Array.from(document.querySelectorAll('.parish-item'));
+      const parishEmpty = document.getElementById('parish-empty');
+      const originalOcrHtml = ocrPanel.innerHTML;
+      const pdfjs = window['pdfjs-dist/build/pdf'] || window.pdfjsLib;
+      let currentPage = 1;
+      let totalPages = initialPages;
+      let pdfDoc = null;
+      let isRendering = false;
+      let pendingPage = null;
       let ocrMatches = [];
       let currentMatchIndex = -1;
 
-      function escapeRegExp(text) {
-        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      if (!pdfjs) {
+        return;
       }
+
+      pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+
+      function escapeRegExp(text) {
+        const specials = new Set(['\\', '^', '$', '.', '|', '?', '*', '+', '(', ')', '[', ']', '{', '}']);
+        return Array.from(text).map((ch) => specials.has(ch) ? `\\${ch}` : ch).join('');
+      }
+
+      function updateControls() {
+        indicators.forEach((indicator) => {
+          indicator.textContent = `Page ${currentPage} of ${totalPages}`;
+        });
+        prevButtons.forEach((button) => {
+          button.disabled = currentPage <= 1 || !pdfDoc;
+        });
+        nextButtons.forEach((button) => {
+          button.disabled = currentPage >= totalPages || !pdfDoc;
+        });
+      }
+
+      function queueRender(pageNumber) {
+        if (isRendering) {
+          pendingPage = pageNumber;
+          return;
+        }
+        renderPage(pageNumber);
+      }
+
+      async function renderPage(pageNumber) {
+        if (!pdfDoc) {
+          return;
+        }
+        isRendering = true;
+        currentPage = pageNumber;
+        updateControls();
+        const page = await pdfDoc.getPage(pageNumber);
+        const viewport = page.getViewport({ scale: 1 });
+        const availableWidth = Math.max(canvasWrap.clientWidth - 16, 100);
+        const scale = availableWidth / viewport.width;
+        const scaledViewport = page.getViewport({ scale });
+        canvas.width = Math.floor(scaledViewport.width);
+        canvas.height = Math.floor(scaledViewport.height);
+        canvas.style.width = '100%';
+        canvas.style.height = 'auto';
+        await page.render({
+          canvasContext: context,
+          viewport: scaledViewport,
+        }).promise;
+        // PDF page changes do not scroll the bulletin text panel.
+        isRendering = false;
+        if (pendingPage !== null) {
+          const queued = pendingPage;
+          pendingPage = null;
+          queueRender(queued);
+        }
+      }
+
+      function goToPage(nextPage) {
+        if (!pdfDoc) {
+          return;
+        }
+        const clamped = Math.min(Math.max(nextPage, 1), totalPages);
+        if (clamped === currentPage && !isRendering) {
+          return;
+        }
+        queueRender(clamped);
+      }
+
+      prevButtons.forEach((button) => {
+        button.addEventListener('click', function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          goToPage(currentPage - 1);
+        });
+      });
+      nextButtons.forEach((button) => {
+        button.addEventListener('click', function (event) {
+          event.preventDefault();
+          event.stopPropagation();
+          goToPage(currentPage + 1);
+        });
+      });
+
+      new ResizeObserver(function () {
+        if (pdfDoc) {
+          queueRender(currentPage);
+        }
+      }).observe(canvasWrap);
+
+      pdfjs.getDocument(pdfHref).promise.then(function (doc) {
+        pdfDoc = doc;
+        totalPages = doc.numPages || initialPages;
+        updateControls();
+        queueRender(currentPage);
+      }).catch(function () {
+        updateControls();
+      });
 
       function scrollToMatch(idx) {
         if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
-        ocrMatches.forEach(function (mark) { mark.classList.remove('search-active'); });
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
         const target = ocrMatches[idx];
         target.classList.add('search-active');
         target.scrollIntoView({ behavior: 'smooth', block: 'center' });
       }
 
       function updateMatchUi() {
+        if (!matchCount || !prevMatchBtn || !nextMatchBtn) return;
         const total = ocrMatches.length;
         if (!total) {
           matchCount.textContent = '0 matches';
@@ -1080,25 +1274,23 @@
           nextMatchBtn.disabled = true;
           return;
         }
-        matchCount.textContent = (currentMatchIndex + 1) + ' of ' + total + ' matches';
+        matchCount.textContent = `${currentMatchIndex + 1} / ${total} matches`;
         prevMatchBtn.disabled = false;
         nextMatchBtn.disabled = false;
       }
 
-      function applySearch(query) {
-        ocrRoot.innerHTML = originalHtml;
+      function applyOcrSearch(query) {
+        ocrPanel.innerHTML = originalOcrHtml;
         ocrMatches = [];
         currentMatchIndex = -1;
         if (!query) {
           clearSearch.hidden = true;
-          matchCount.textContent = '0 matches';
-          prevMatchBtn.disabled = true;
-          nextMatchBtn.disabled = true;
+          updateMatchUi();
           return;
         }
         clearSearch.hidden = false;
         const regex = new RegExp(escapeRegExp(query), 'gi');
-        const walker = document.createTreeWalker(ocrRoot, NodeFilter.SHOW_TEXT, null);
+        const walker = document.createTreeWalker(ocrPanel, NodeFilter.SHOW_TEXT, null);
         const nodes = [];
         while (walker.nextNode()) {
           const node = walker.currentNode;
@@ -1106,14 +1298,16 @@
             nodes.push(node);
           }
         }
-        nodes.forEach(function (node) {
+        nodes.forEach((node) => {
           const text = node.nodeValue;
           regex.lastIndex = 0;
-          if (!regex.test(text)) return;
+          if (!regex.test(text)) {
+            return;
+          }
           regex.lastIndex = 0;
           const fragment = document.createDocumentFragment();
           let lastIndex = 0;
-          let match;
+          let match = null;
           while ((match = regex.exec(text)) !== null) {
             if (match.index > lastIndex) {
               fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
@@ -1136,12 +1330,12 @@
         updateMatchUi();
       }
 
-      ocrSearch.addEventListener('input', function (e) {
-        applySearch(e.target.value.trim());
+      ocrSearch.addEventListener('input', function (event) {
+        applyOcrSearch(event.target.value.trim());
       });
       clearSearch.addEventListener('click', function () {
         ocrSearch.value = '';
-        applySearch('');
+        applyOcrSearch('');
         ocrSearch.focus();
       });
       prevMatchBtn.addEventListener('click', function () {
@@ -1156,6 +1350,76 @@
         updateMatchUi();
         scrollToMatch(currentMatchIndex);
       });
+      ocrSearch.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' && ocrMatches.length) {
+          event.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+
+      parishFilter.addEventListener('input', function (event) {
+        const term = event.target.value.trim().toLowerCase();
+        let visibleCount = 0;
+        parishItems.forEach((item) => {
+          const matches = item.dataset.name.includes(term);
+          item.hidden = !matches;
+          if (matches) {
+            visibleCount += 1;
+          }
+        });
+        if (parishEmpty) {
+          parishEmpty.hidden = visibleCount !== 0;
+        }
+      });
+
+      updateControls();
+      updateMatchUi();
+    })();
+
+    // ── View Counter (localStorage) ──────────────────────────────────
+    (function() {
+      var key = 'ph_views_' + location.pathname;
+      var weekKey = 'ph_views_week';
+      var now = new Date();
+      var weekId = now.getFullYear() + '-W' + String(Math.ceil((now - new Date(now.getFullYear(),0,1)) / 86400000 / 7)).padStart(2,'0');
+      try {
+        var views = JSON.parse(localStorage.getItem(key) || '{}'  );
+        if (views.week !== weekId) { views = { week: weekId, count: 0 }; }
+        views.count += 1;
+        localStorage.setItem(key, JSON.stringify(views));
+        // Update total weekly views across all pages
+        var total = JSON.parse(localStorage.getItem(weekKey) || '{}'  );
+        if (total.week !== weekId) { total = { week: weekId, count: 0 }; }
+        total.count += 1;
+        localStorage.setItem(weekKey, JSON.stringify(total));
+        var el = document.getElementById('view-count');
+        if (el) el.textContent = total.count;
+      } catch(e) {}
+    })();
+
+    // ── Self-Check: Is this week's bulletin available? ───────────────
+    (function() {
+      var generated = document.querySelector('.meta');
+      if (!generated) return;
+      var text = generated.textContent || '';
+      var match = text.match(/(\d{4})-(\d{2})-(\d{2})/);
+      if (!match) {
+        match = text.match(/(\d{2})\/(\d{2})\/(\d{4})/);
+        if (match) match = [null, match[3], match[2], match[1]];
+      }
+      if (!match) return;
+      var bulletinDate = new Date(match[1] + '-' + match[2] + '-' + match[3]);
+      var now = new Date();
+      var daysSince = Math.floor((now - bulletinDate) / 86400000);
+      if (daysSince > 8) {
+        var banner = document.createElement('div');
+        banner.style.cssText = 'max-width:1400px;margin:12px auto;padding:0 16px;';
+        banner.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px 16px;color:#991b1b;font-weight:600;text-align:center;">⚠️ This bulletin is ' + daysSince + ' days old. A newer version may be available — check back after Sunday\'s harvest run.</div>';
+        var page = document.querySelector('.page');
+        if (page) page.insertBefore(banner, page.firstChild);
+      }
     })();
   </script>
 </body>
