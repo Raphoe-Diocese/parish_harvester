@@ -44,6 +44,12 @@
 
   /** WordPress (or similar) HTML text newsletter — not a JPEG bulletin. */
   const isWordPressHtmlBulletinPage = (doc = document) => {
+    const pdfArchiveLinks = Array.from(
+      doc.querySelectorAll('a[href*="/wp-content/uploads/"]')
+    ).filter((a) => /\.pdf(\?|#|$)/i.test(a.getAttribute("href") || ""));
+    // Newsletter archive pages (Clonmany-style) list many PDFs — not HTML bulletins.
+    if (pdfArchiveLinks.length >= 2) return false;
+
     const root = _entryContentRoot(doc);
     if (!root) return false;
     const textLen = _plainTextLen(root);
@@ -650,18 +656,6 @@
 
     matches.sort((a, b) => b.score - a.score);
     let best = matches[0] || null;
-    // Global WP block CSS can false-match wp-block-file; prefer PDF Embedder when viewer links exist.
-    try {
-      const pdfembAnchors = doc.querySelectorAll(
-        'a.pdfemb-viewer[href], a[class*="pdfemb"][href*=".pdf"]'
-      );
-      if (pdfembAnchors.length > 0 && best?.id === "wp_block_file_bulletin") {
-        const pdfembMatch = matches.find((m) => m.id === "wordpress_pdfemb");
-        if (pdfembMatch) best = pdfembMatch;
-      }
-    } catch (_pdfembPick) {
-      // ignore
-    }
 
     const allDownloadUrls = [];
     try {
@@ -678,6 +672,30 @@
         }
       });
     } catch (_e2) {}
+
+    const wpUploadPdfCount = allDownloadUrls.filter((u) =>
+      /wp-content\/uploads\/.*\.pdf/i.test(u)
+    ).length;
+    const wpPdfList = matches.find((m) => m.id === "wp_uploads_pdf_list");
+    if (
+      best?.id === "wordpress_html_post" &&
+      wpPdfList &&
+      wpUploadPdfCount >= 2
+    ) {
+      best = wpPdfList;
+    }
+    // Global WP block CSS can false-match wp-block-file; prefer PDF Embedder when viewer links exist.
+    try {
+      const pdfembAnchors = doc.querySelectorAll(
+        'a.pdfemb-viewer[href], a[class*="pdfemb"][href*=".pdf"]'
+      );
+      if (pdfembAnchors.length > 0 && best?.id === "wp_block_file_bulletin") {
+        const pdfembMatch = matches.find((m) => m.id === "wordpress_pdfemb");
+        if (pdfembMatch) best = pdfembMatch;
+      }
+    } catch (_pdfembPick) {
+      // ignore
+    }
 
     return {
       scannedAt: new Date().toISOString(),
