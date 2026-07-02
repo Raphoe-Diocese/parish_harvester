@@ -954,6 +954,18 @@
         900
       );
     }
+    const hasMessengerPrint = steps.some(
+      (s) =>
+        s &&
+        (s.action === "print_to_pdf" || s.action === "html") &&
+        (recipe.site_type === "parish_messenger" || recipe.playbook_type === "parish_messenger")
+    );
+    if (hasMessengerPrint) {
+      recipe.total_timeout_s = Math.max(
+        Number(recipe.total_timeout_s) || 0,
+        300 + HARVEST_TIMEOUT_BUFFER_S
+      );
+    }
     try {
       const host = startUrl ? new URL(startUrl).hostname.toLowerCase() : "";
       const observedMs = _getObservedLoadMsForRecipe();

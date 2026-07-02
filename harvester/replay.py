@@ -872,7 +872,9 @@ async def _print_page_to_pdf(page: Page, dest: Path) -> None:
     dest.write_bytes(pdf_bytes)
 
 
-async def _smart_print_page_to_pdf(page: Page, dest: Path, target: date) -> None:
+async def _smart_print_page_to_pdf(
+    page: Page, dest: Path, target: date, *, wait_ms: int = 2500
+) -> None:
     """Print HTML bulletins using Parish Messenger / content-region detection when possible."""
     from .html_capture import capture_html_page_as_pdf
 
@@ -881,10 +883,36 @@ async def _smart_print_page_to_pdf(page: Page, dest: Path, target: date) -> None
         dest,
         target,
         print_pdf=_print_page_to_pdf,
-        wait_ms=2500,
+        wait_ms=wait_ms,
     )
     if not ok:
         await _print_page_to_pdf(page, dest)
+
+
+def _recipe_uses_parish_messenger(recipe: dict) -> bool:
+    site = str(recipe.get("site_type") or recipe.get("playbook_type") or "").lower()
+    return "parish_messenger" in site or site == "parish_messenger"
+
+
+async def _prepare_page_for_html_print(
+    page: Page, recipe: dict, step_timeout_ms: int
+) -> None:
+    """Wait for bulletin HTML before print_to_pdf — messenger widgets never reach networkidle."""
+    from .html_capture import wait_for_dynamic_bulletin
+
+    if _recipe_uses_parish_messenger(recipe):
+        await wait_for_dynamic_bulletin(
+            page, timeout_ms=min(max(step_timeout_ms, 20_000), 90_000)
+        )
+        await asyncio.sleep(2.0)
+        return
+    try:
+        await page.wait_for_load_state(
+            "networkidle", timeout=min(step_timeout_ms, 15_000)
+        )
+    except PlaywrightTimeoutError:
+        pass
+    await asyncio.sleep(2.5)
 
 
 async def _find_pdfemb_url(page: Page) -> str | None:
@@ -1337,9 +1365,13 @@ async def replay_recipe(
                         continue
 
                 last_err = ""
-                for resolved in await _collect_document_candidates(page, pattern):
+                candidates = await _collect_document_candidates(page, pattern)
+                per_candidate_ms = min(max(step_timeout_ms // max(len(candidates), 1), 8_000), 30_000)
+                for resolved in candidates[:8]:
                     try:
-                        source_url, file_type = await _download_document_url(page, resolved, dest)
+                        source_url, file_type = await _download_document_url(
+                            page, resolved, dest, timeout_ms=per_candidate_ms
+                        )
                         return dest, file_type, source_url
                     except RecipeReplayError as exc:
                         last_err = str(exc)
@@ -1414,12 +1446,9 @@ async def replay_recipe(
                     raise RecipeReplayError("Recipe html step missing URL")
                 if (step.get("url") or "").strip():
                     await page.goto(html_url, timeout=step_timeout_ms, wait_until="domcontentloaded")
-                try:
-                    await page.wait_for_load_state("networkidle", timeout=step_timeout_ms)
-                except PlaywrightTimeoutError:
-                    pass
-                await asyncio.sleep(2.5)
-                await _smart_print_page_to_pdf(page, dest, target_date)
+                await _prepare_page_for_html_print(page, recipe, step_timeout_ms)
+                print_wait_ms = 25_000 if _recipe_uses_parish_messenger(recipe) else 2500
+                await _smart_print_page_to_pdf(page, dest, target_date, wait_ms=print_wait_ms)
                 return dest, "print_to_pdf", html_url
 
             if action == "print_to_pdf":
@@ -1429,12 +1458,9 @@ async def replay_recipe(
                     raise RecipeReplayError("Recipe print_to_pdf step missing URL")
                 if raw_pdf_url:
                     await page.goto(pdf_url, timeout=step_timeout_ms, wait_until="domcontentloaded")
-                try:
-                    await page.wait_for_load_state("networkidle", timeout=step_timeout_ms)
-                except PlaywrightTimeoutError:
-                    pass
-                await asyncio.sleep(2.5)
-                await _smart_print_page_to_pdf(page, dest, target_date)
+                await _prepare_page_for_html_print(page, recipe, step_timeout_ms)
+                print_wait_ms = 25_000 if _recipe_uses_parish_messenger(recipe) else 2500
+                await _smart_print_page_to_pdf(page, dest, target_date, wait_ms=print_wait_ms)
                 return dest, "print_to_pdf", pdf_url
 
             if action == "crop_screenshot":

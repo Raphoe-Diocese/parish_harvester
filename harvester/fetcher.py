@@ -543,6 +543,9 @@ def _apply_recipe_timeouts(host_profile: dict, recipe_meta: dict | None) -> dict
 
     merged["navigation_timeout_ms"] = _apply_timeout_buffer_ms(nav_ms)
     merged["total_timeout_s"] = _apply_timeout_buffer_s(total_s)
+    site = str(recipe_meta.get("site_type") or recipe_meta.get("playbook_type") or "").lower()
+    if "parish_messenger" in site:
+        merged["prefer_headful"] = True
     return merged
 
 

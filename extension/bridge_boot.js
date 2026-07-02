@@ -176,11 +176,6 @@
     }
   };
 
-  document.addEventListener("ph-show-toolbar", () => {
-    _handleStubToolbar("show_toolbar");
-    _upgradeToolbar({ type: "show_toolbar" });
-  });
-
   if (typeof chrome !== "undefined" && chrome.runtime?.onMessage) {
     chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       const type = message?.type;
@@ -225,4 +220,144 @@
       }
     });
   }
+
+  const FIX_NOW_TIMER_ID = "ph-fix-now-load-timer";
+
+  const _formatLoadDuration = (ms) => {
+    const n = Math.max(0, Math.round(Number(ms) || 0));
+    if (n < 1000) return `${n}ms`;
+    const sec = Math.floor(n / 1000);
+    if (sec < 60) return `${sec}s`;
+    const min = Math.floor(sec / 60);
+    const rem = sec % 60;
+    return rem ? `${min}m ${rem}s` : `${min}m`;
+  };
+
+  const _markFixNowNavStart = (navAt, url) => {
+    try {
+      sessionStorage.setItem(
+        "ph_train_nav_started",
+        JSON.stringify({ url: String(url || location.href), at: Number(navAt) || Date.now() })
+      );
+    } catch (_e) {
+      // ignore
+    }
+  };
+
+  const _ensureFixNowTimerEl = () => {
+    let el = document.getElementById(FIX_NOW_TIMER_ID);
+    if (el) return el;
+    const mount = () => {
+      const root = document.body || document.documentElement;
+      if (!root) return null;
+      el = document.createElement("div");
+      el.id = FIX_NOW_TIMER_ID;
+      el.style.cssText = [
+        "position:fixed",
+        "top:12px",
+        "left:12px",
+        "z-index:2147483646",
+        "padding:8px 10px",
+        "border-radius:8px",
+        "background:#0f172a",
+        "border:1px solid #334155",
+        "color:#93c5fd",
+        "font:11px/1.4 system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif",
+        "box-shadow:0 8px 24px rgba(0,0,0,.45)",
+        "pointer-events:none",
+      ].join(";");
+      root.appendChild(el);
+      return el;
+    };
+    if (document.body) return mount();
+    document.addEventListener("DOMContentLoaded", () => { mount(); }, { once: true });
+    return null;
+  };
+
+  const _startFixNowLoadTimer = (navAt) => {
+    const startedAt = Number(navAt) || Date.now();
+    _markFixNowNavStart(startedAt, location.href);
+    let interval = null;
+    const tick = () => {
+      const el = _ensureFixNowTimerEl();
+      if (!el) return;
+      const elapsed = Math.max(0, Date.now() - startedAt);
+      const nav = performance.getEntriesByType?.("navigation")?.[0];
+      const loadMs = nav && nav.loadEventEnd > 0 ? Math.round(nav.loadEventEnd) : null;
+      const stillLoading = document.readyState !== "complete" || !loadMs;
+      if (stillLoading) {
+        el.style.color = elapsed >= 30000 ? "#fde68a" : "#93c5fd";
+        el.textContent =
+          elapsed >= 60000
+            ? `⏱ Fix now — still loading… ${_formatLoadDuration(elapsed)}`
+            : elapsed >= 15000
+              ? `⏱ Fix now — loading… ${_formatLoadDuration(elapsed)}`
+              : `⏱ Fix now — loading… ${_formatLoadDuration(elapsed)}`;
+        return;
+      }
+      const total = loadMs || elapsed;
+      el.style.color = total >= 60000 ? "#fca5a5" : total >= 15000 ? "#fde68a" : "#86efac";
+      el.textContent = `⏱ Fix now — loaded in ${_formatLoadDuration(total)}`;
+      if (interval) clearInterval(interval);
+    };
+    tick();
+    interval = setInterval(tick, 500);
+    window.addEventListener("load", tick, { once: true });
+    document.addEventListener("readystatechange", tick);
+  };
+
+  const _bootFixNowClockFromStorage = async () => {
+    if (!chrome?.storage) return;
+    const hostname = (() => {
+      try {
+        return location.hostname.toLowerCase();
+      } catch (_e) {
+        return "";
+      }
+    })();
+    if (!hostname) return;
+
+    let navAt = 0;
+    try {
+      if (chrome.storage.session?.get) {
+        const sessionKeys = await chrome.storage.session.get(null);
+        for (const [key, val] of Object.entries(sessionKeys || {})) {
+          if (!key.startsWith("ph_fix_now_tab_") || !val || typeof val !== "object") continue;
+          const fixUrl = String(val.url || "");
+          try {
+            if (fixUrl && new URL(fixUrl).hostname.toLowerCase() !== hostname) continue;
+          } catch (_e) {
+            continue;
+          }
+          navAt = Number(val.nav_started_at) || 0;
+          break;
+        }
+      }
+    } catch (_e) {
+      // ignore
+    }
+
+    if (!navAt) {
+      try {
+        const stored = await chrome.storage.local.get(["ph_recording_sessions"]);
+        const session = stored?.ph_recording_sessions?.[hostname];
+        if (session?.fixNow) {
+          navAt = Number(session.updatedAt) || 0;
+        }
+      } catch (_e) {
+        // ignore
+      }
+    }
+
+    if (navAt > 0) {
+      _startFixNowLoadTimer(navAt);
+    }
+  };
+
+  document.addEventListener("ph-show-toolbar", () => {
+    _handleStubToolbar("show_toolbar");
+    _upgradeToolbar({ type: "show_toolbar" });
+  });
+
+  void _bootFixNowClockFromStorage();
 })();
