@@ -1,31 +1,37 @@
 {
-  "version": 2,
+  "version": 1,
   "parish_key": "clonmanyparish",
   "display_name": "Clonmany",
   "diocese": "derry",
   "start_url": "https://clonmanyparish.ie/newsletter/",
-  "site_type": "wp_block_file_bulletin",
-  "auto_fixed": true,
-  "operator_notes": [
-    "Newsletter archive lists dated PDFs — harvest newest *.pdf without menu clicks.",
-    "Do not use brittle menu selectors (Current Newsletter submenu)."
-  ],
-  "do_not": [
-    "Do not click ul#menu-main-menu-2 — newsletter PDFs are on /newsletter/ already."
-  ],
   "steps": [
     {
-      "action": "goto",
-      "url": "https://clonmanyparish.ie/newsletter/"
+      "action": "click",
+      "selector": "a:has-text(\"Current Newsletter\")",
+      "href": "https://clonmanyparish.ie/current-newsletter/",
+      "text": "Current Newsletter",
+      "fallback_selectors": [
+        "ul#menu-main-menu-2 > li:nth-of-type(3) > ul > li:nth-of-type(1) > a"
+      ]
     },
     {
       "action": "download",
-      "url_pattern": "*.pdf"
+      "url": "https://clonmanyparish.ie/wp-content/uploads/2026/06/2026-06-28.pdf"
     }
   ],
-  "observed_load_ms": 1001,
-  "timeout_ms": 45000,
-  "total_timeout_s": 90,
-  "navigation_wait_until": "commit",
-  "recorded_date": "2026-06-25"
+  "observed_load_ms": 1860,
+  "timeout_ms": 55000,
+  "total_timeout_s": 250,
+  "playbook_type": "pdf_download_list",
+  "site_type": "pdf_link_list",
+  "operator_notes": [
+    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
+    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+    "Do not worry if the filename or date in the link text changes every week."
+  ],
+  "do_not": [
+    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
+    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+  ],
+  "recorded_date": "2026-07-02"
 }
