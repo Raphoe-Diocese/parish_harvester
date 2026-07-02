@@ -98,6 +98,8 @@ async function _waitForTabBridgeReady(tabId, options = {}) {
 }
 
 const TRAINER_BRIDGE_FILES = globalThis.PH_TRAINER_BRIDGE_FILES || ["bridge_boot.js", "toolbar_diag.js"];
+const FIX_NOW_TOOLBAR_DELAYS_MS = [0, 350, 900, 2000, 4000, 7000, 11000, 18000, 30000, 45000];
+const FIX_NOW_SESSION_TTL_MS = 120000;
 const TRAINER_HEAVY_FILES = globalThis.PH_TRAINER_HEAVY_FILES || [
   "pattern_library.js",
   "html_fingerprint.js",
@@ -120,6 +122,41 @@ async function _injectTrainerFiles(tabId, files) {
     return { ok: true };
   } catch (err) {
     return { ok: false, error: String(err) };
+  }
+}
+
+async function _rememberFixNowTab(tabId, { parish_key, nav_started_at, url }) {
+  if (!tabId || !chrome.storage?.session?.set) return;
+  const sessionKey = `ph_fix_now_tab_${tabId}`;
+  await chrome.storage.session.set({
+    [sessionKey]: {
+      parish_key: parish_key || "",
+      nav_started_at: nav_started_at || Date.now(),
+      url: url || "",
+    },
+  });
+  setTimeout(() => {
+    void chrome.storage.session.remove(sessionKey);
+  }, FIX_NOW_SESSION_TTL_MS);
+}
+
+async function _scheduleFixNowToolbar(tabId, parishKey, navStartedAt, startUrl) {
+  if (!tabId) return;
+  const payload = {
+    type: "ph_show_toolbar",
+    reason: "fix_now",
+    parish_key: parishKey,
+    nav_started_at: navStartedAt,
+  };
+  await _rememberFixNowTab(tabId, {
+    parish_key: parishKey,
+    nav_started_at: navStartedAt,
+    url: startUrl,
+  });
+  for (const delay of FIX_NOW_TOOLBAR_DELAYS_MS) {
+    setTimeout(() => {
+      void sendToTab(tabId, payload, { allowInject: true });
+    }, delay);
   }
 }
 
@@ -336,6 +373,27 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       // Non-fatal — user can reopen the toolbar from the popup.
     }
   })();
+});
+
+chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+  if (message?.type !== "schedule_fix_now_toolbar") return false;
+  (async () => {
+    const tabId = Number(message.tabId || 0);
+    if (!tabId) {
+      sendResponse({ ok: false, error: "No tab ID." });
+      return;
+    }
+    await _scheduleFixNowToolbar(
+      tabId,
+      String(message.parish_key || ""),
+      Number(message.nav_started_at) || Date.now(),
+      String(message.url || "")
+    );
+    sendResponse({ ok: true });
+  })().catch((err) => {
+    sendResponse({ ok: false, error: String(err) });
+  });
+  return true;
 });
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {

@@ -23,7 +23,6 @@ const _spPanels = {
 const PROBLEMS_FIX_VISITED_KEY = "ph_problems_fix_visited";
 const PROBLEMS_RECIPE_RETRAINED_KEY = "ph_recipe_retrained";
 const PH_LAST_DISPATCH_KEY = "ph_last_parish_dispatch";
-const FIX_NOW_TOOLBAR_DELAYS_MS = [0, 350, 900, 2000, 4000, 7000, 11000];
 
 async function _problemsBeginFixNowSession(startUrl, parishKey) {
   const navStartedAt = Date.now();
@@ -57,35 +56,13 @@ async function _problemsBeginFixNowSession(startUrl, parishKey) {
 
 function _scheduleFixNowToolbar(tabId, parishKey, navStartedAt, startUrl) {
   if (!tabId) return;
-  const payload = {
-    type: "ph_show_toolbar",
-    reason: "fix_now",
+  chrome.runtime.sendMessage({
+    type: "schedule_fix_now_toolbar",
+    tabId,
     parish_key: parishKey,
     nav_started_at: navStartedAt,
-  };
-  const sessionKey = `ph_fix_now_tab_${tabId}`;
-  if (chrome.storage?.session?.set) {
-    void chrome.storage.session.set({
-      [sessionKey]: {
-        parish_key: parishKey,
-        nav_started_at: navStartedAt,
-        url: startUrl,
-      },
-    });
-    setTimeout(() => {
-      void chrome.storage.session.remove(sessionKey);
-    }, 15000);
-  }
-  for (const delay of FIX_NOW_TOOLBAR_DELAYS_MS) {
-    setTimeout(() => {
-      chrome.runtime.sendMessage({
-        type: "dispatch_to_tab",
-        tabId,
-        allowInject: true,
-        payload,
-      });
-    }, delay);
-  }
+    url: startUrl,
+  });
 }
 
 async function _problemsRepoUrls() {

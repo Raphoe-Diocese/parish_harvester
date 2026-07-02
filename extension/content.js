@@ -589,6 +589,15 @@
     standaloneStartUrl =
       session.startUrl && _hostsMatch(session.startUrl, pageUrl) ? session.startUrl : pageUrl;
 
+    if (session.fixNow) {
+      await _applyFixNowToolbar({
+        reason: "fix_now",
+        parish_key: session.parish_key || "",
+        nav_started_at: session.updatedAt || Date.now(),
+      });
+      return true;
+    }
+
     _ensureToolbar(true);
     window.dispatchEvent(
       new CustomEvent("ph-recording-continued", {
