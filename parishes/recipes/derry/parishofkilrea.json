@@ -6,27 +6,41 @@
   "start_url": "https://www.parishofkilrea.com/news.html",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.parishofkilrea.com/news.html"
+      "action": "click",
+      "selector": "a:has-text(\"Parish News\")",
+      "href": "pdf/280626.pdf",
+      "text": "Safeguarding Notice: Should you have any concerns regarding ",
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "a[href$='.pdf']",
+        "a[href*='.pdf']"
+      ]
     },
     {
       "action": "download",
-      "url_pattern": "*.pdf"
+      "url": "https://www.parishofkilrea.com/pdf/280626.pdf"
     }
   ],
-  "recorded_date": "2026-06-26",
+  "observed_load_ms": 3531.39990234375,
+  "timeout_ms": 55000,
+  "total_timeout_s": 250,
   "playbook_type": "dated_pdf_bulletin",
   "site_type": "dated_pdf_path",
   "operator_notes": [
-    "Bulletin is a real PDF (often made in Microsoft Word \u2192 Print to PDF).",
-    "Tab title may say .docx or .jpg \u2014 ignore that; check the address bar ends in .pdf.",
-    "On the PDF page: tap Save this PDF \u2014 saves the full https://\u2026 address for Sunday harvest.",
-    "Or start on parishnews.html \u2192 point at this week's link \u2192 Yes \u2192 Save this PDF.",
-    "Harvester rewrites DDMMYY in the URL each Sunday (e.g. 140626 \u2192 210626)."
+    "Bulletin is a real PDF (often made in Microsoft Word → Print to PDF).",
+    "Tab title may say .docx or .jpg — ignore that; check the address bar ends in .pdf.",
+    "On the PDF page: tap Save this PDF — saves the full https://… address for Sunday harvest.",
+    "Or start on parishnews.html → point at this week's link → Yes → Save this PDF.",
+    "Harvester rewrites DDMMYY in the URL each Sunday (e.g. 140626 → 210626)."
   ],
   "do_not": [
-    "Do not use use_page_url only \u2014 GitHub cannot read Chrome's internal PDF viewer address.",
+    "Do not use use_page_url only — GitHub cannot read Chrome's internal PDF viewer address.",
     "Do not worry if Document Properties title mentions Microsoft Word."
   ],
-  "auto_fixed": true
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  },
+  "recorded_date": "2026-07-02"
 }
