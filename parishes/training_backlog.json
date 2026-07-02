@@ -2,16 +2,16 @@
   "generated_at": "2026-07-02",
   "target_date": "2026-06-28",
   "summary": {
-    "downloaded": 17,
+    "downloaded": 18,
     "html_links": 0,
     "skipped": 3,
-    "failed": 25,
+    "failed": 24,
     "stale_rejected": 0
   },
   "action_counts": {
-    "ok": 70,
-    "investigate": 10,
-    "verify_autofix": 13,
+    "ok": 71,
+    "investigate": 11,
+    "verify_autofix": 12,
     "skip": 16,
     "retrain": 6
   },
@@ -219,28 +219,35 @@
       "recipe_file": "parishes/recipes/derry/parishofaghyaran.json",
       "recipe": {
         "start_url": "https://www.parishofaghyaran.com/news.html",
-        "site_type": "html_text_bulletin",
-        "playbook_type": "parish_messenger",
+        "site_type": "dated_pdf_path",
+        "playbook_type": "dated_pdf_bulletin",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 2,
-        "click_count": 0,
+        "click_count": 1,
         "has_terminal": true,
         "operator_notes": [
-          "Parish Messenger weekly HTML on news.html \u2014 print the bulletin column, not sidebar PDFs."
+          "Bulletin is a real PDF (often made in Microsoft Word \u2192 Print to PDF).",
+          "Tab title may say .docx or .jpg \u2014 ignore that; check the address bar ends in .pdf.",
+          "On the PDF page: tap Save this PDF \u2014 saves the full https://\u2026 address for Sunday harvest.",
+          "Or start on parishnews.html \u2192 point at this week's link \u2192 Yes \u2192 Save this PDF.",
+          "Harvester rewrites DDMMYY in the URL each Sunday (e.g. 140626 \u2192 210626)."
         ],
-        "do_not": [],
-        "recorded_date": "2026-06-24"
+        "do_not": [
+          "Do not use use_page_url only \u2014 GitHub cannot read Chrome's internal PDF viewer address.",
+          "Do not worry if Document Properties title mentions Microsoft Word."
+        ],
+        "recorded_date": "2026-07-02"
       },
-      "bulletin_format": "html",
+      "bulletin_format": "download",
       "learned_pattern": "News page with PDF links",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "No valid content found",
-      "suggested_action": "investigate",
-      "suggested_reason": "No valid content found"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "annagryparish",
@@ -1835,22 +1842,29 @@
     },
     {
       "parish_key": "greenlough",
-      "display_name": "Greenlough Parish",
+      "display_name": "Greenlough",
       "diocese": "unknown",
       "recipe_file": "parishes/recipes/unknown/greenlough.json",
       "recipe": {
         "start_url": "https://www.greenlough.com/newsletter/",
-        "site_type": "",
-        "playbook_type": "",
+        "site_type": "pdf_link_list",
+        "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 2,
-        "click_count": 0,
+        "click_count": 1,
         "has_terminal": true,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-06-26"
+        "operator_notes": [
+          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
+          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+          "Do not worry if the filename or date in the link text changes every week."
+        ],
+        "do_not": [
+          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
+          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+        ],
+        "recorded_date": "2026-07-02"
       },
       "bulletin_format": "download",
       "learned_pattern": "direct_pdf",
@@ -1858,8 +1872,8 @@
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
       "last_error": "Total timeout exceeded",
-      "suggested_action": "verify_autofix",
-      "suggested_reason": "retry after recipe autofix"
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "parishofhannahstown",
@@ -1944,6 +1958,43 @@
       "last_error": "",
       "suggested_action": "ok",
       "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "holyfamily-parish",
+      "display_name": "Holy Family",
+      "diocese": "down_and_connor",
+      "recipe_file": "parishes/recipes/down_and_connor/holyfamily-parish.json",
+      "recipe": {
+        "start_url": "https://www.holyfamily-parish.com/",
+        "site_type": "dated_pdf_path",
+        "playbook_type": "dated_pdf_bulletin",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 2,
+        "click_count": 1,
+        "has_terminal": true,
+        "operator_notes": [
+          "Bulletin is a real PDF (often made in Microsoft Word \u2192 Print to PDF).",
+          "Tab title may say .docx or .jpg \u2014 ignore that; check the address bar ends in .pdf.",
+          "On the PDF page: tap Save this PDF \u2014 saves the full https://\u2026 address for Sunday harvest.",
+          "Or start on parishnews.html \u2192 point at this week's link \u2192 Yes \u2192 Save this PDF.",
+          "Harvester rewrites DDMMYY in the URL each Sunday (e.g. 140626 \u2192 210626)."
+        ],
+        "do_not": [
+          "Do not use use_page_url only \u2014 GitHub cannot read Chrome's internal PDF viewer address.",
+          "Do not worry if Document Properties title mentions Microsoft Word."
+        ],
+        "recorded_date": "2026-07-02"
+      },
+      "bulletin_format": "download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "failed",
+      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
+      "suggested_action": "investigate",
+      "suggested_reason": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop"
     },
     {
       "parish_key": "holyrosaryparishbelfast",
@@ -2059,24 +2110,31 @@
     },
     {
       "parish_key": "iskaheenparish",
-      "display_name": "Iskaheenparish",
+      "display_name": "Iskaheen",
       "diocese": "unknown",
       "recipe_file": "parishes/recipes/unknown/iskaheenparish.json",
       "recipe": {
         "start_url": "https://www.iskaheenparish.com/bulletin",
-        "site_type": "",
-        "playbook_type": "",
+        "site_type": "stacked_image_bulletin",
+        "playbook_type": "stacked_image_bulletin",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 2,
+        "step_count": 1,
         "click_count": 0,
         "has_terminal": true,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-05-21"
+        "operator_notes": [
+          "Bulletins are full-page images stacked on one page \u2014 newest week at the top.",
+          "Pick the first two images, or use Pick another image too after the first.",
+          "Harvester grabs the top N large images automatically each Sunday \u2014 no dated URLs."
+        ],
+        "do_not": [
+          "Do not hardcode one image URL \u2014 it goes stale every week.",
+          "Do not Save page as PDF \u2014 that captures every old bulletin on the page."
+        ],
+        "recorded_date": "2026-07-02"
       },
-      "bulletin_format": "image",
+      "bulletin_format": "image_stack",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
