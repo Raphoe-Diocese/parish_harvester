@@ -18,7 +18,10 @@ permissions:
 
 jobs:
   send_digest:
-    if: github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success'
+    if: >-
+      github.event_name == 'workflow_dispatch' ||
+      (github.event_name == 'workflow_run' &&
+       github.event.workflow_run.conclusion != 'cancelled')
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

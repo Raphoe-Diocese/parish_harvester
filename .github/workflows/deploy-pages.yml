@@ -29,7 +29,10 @@ concurrency:
 
 jobs:
   deploy:
-    if: ${{ github.event_name != 'workflow_run' || github.event.workflow_run.conclusion == 'success' }}
+    if: >-
+      ${{ github.event_name != 'workflow_run' ||
+      (github.event.workflow_run.conclusion == 'success' ||
+       github.event.workflow_run.conclusion == 'failure') }}
     runs-on: ubuntu-latest
     environment:
       name: github-pages
@@ -66,7 +69,7 @@ jobs:
               FOUND="yes"
               break
             fi
-          done < <(gh run list --repo "${GITHUB_REPOSITORY}" --workflow harvest.yml --status success --limit 25 --json databaseId --jq '.[].databaseId')
+          done < <(gh run list --repo "${GITHUB_REPOSITORY}" --workflow harvest.yml --limit 25 --json databaseId,conclusion --jq '.[] | select(.conclusion == "success" or .conclusion == "failure") | .databaseId')
           if [ -z "${FOUND}" ]; then
             echo "::warning::No harvest run with mega PDF artifacts found — Pages deploy may omit mega PDFs."
           fi
@@ -106,8 +109,7 @@ jobs:
           shopt -s nullglob
           pdfs=(mega_pdf/*_mega_bulletin.pdf)
           if [ "${EVENT_NAME}" = "workflow_run" ] && [ "${TRIGGERING_WORKFLOW}" = "Harvest Parish Bulletins" ] && [ ${#pdfs[@]} -eq 0 ]; then
-            echo "Error: no mega PDF artifacts were downloaded from workflow run ${WORKFLOW_RUN_ID:-unknown} (conclusion: ${HARVEST_CONCLUSION:-n/a})."
-            exit 1
+            echo "::warning::No mega PDF artifacts from harvest run ${WORKFLOW_RUN_ID:-unknown} (conclusion: ${HARVEST_CONCLUSION:-n/a}) — deploying diocese pages without fresh mega PDFs."
           elif [ "${#pdfs[@]}" -gt 0 ]; then
             echo "Mega PDFs staged for Pages:"
             for pdf in "${pdfs[@]}"; do
