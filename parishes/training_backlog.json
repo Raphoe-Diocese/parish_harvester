@@ -1,21 +1,57 @@
 {
-  "generated_at": "2026-07-02",
+  "generated_at": "2026-07-04",
   "target_date": "2026-06-28",
   "summary": {
-    "downloaded": 22,
+    "downloaded": 47,
     "html_links": 0,
-    "skipped": 3,
-    "failed": 20,
+    "skipped": 16,
+    "failed": 60,
     "stale_rejected": 0
   },
   "action_counts": {
-    "ok": 75,
-    "investigate": 12,
-    "verify_autofix": 9,
+    "ok": 42,
+    "retrain": 10,
+    "investigate": 29,
+    "verify_autofix": 19,
     "skip": 16,
-    "retrain": 6
+    "retrain_image": 2
   },
   "parishes": [
+    {
+      "parish_key": "ardara",
+      "display_name": "Ardara",
+      "diocese": "raphoe",
+      "recipe_file": "parishes/recipes/raphoe/ardara.json",
+      "recipe": {
+        "start_url": "http://ardara.ie/news/",
+        "site_type": "html_text_bulletin",
+        "playbook_type": "wix_html",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 5,
+        "click_count": 3,
+        "has_terminal": true,
+        "operator_notes": [
+          "Bulletin text is on the web page \u2014 not a downloadable PDF file.",
+          "Use Save page as PDF on the newsletter article page.",
+          "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
+        ],
+        "do_not": [
+          "Do not use Pick bulletin image when the page is mostly text paragraphs.",
+          "Do not stop at click-only \u2014 need print_to_pdf as the final step."
+        ],
+        "recorded_date": "2026-06-27"
+      },
+      "bulletin_format": "html",
+      "learned_pattern": "iframe_viewer",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "failed",
+      "last_error": "Recipe for Ardara is outdated \u2014 the website may have changed. Re-train with: python main.py --train \"Ardara\"",
+      "suggested_action": "retrain",
+      "suggested_reason": "outdated selectors"
+    },
     {
       "parish_key": "christtheredeemer",
       "display_name": "Christ the Redeemer",
@@ -39,10 +75,49 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Stub recipe from April \u2014 no bulletin was captured",
       "suggested_action": "retrain",
       "suggested_reason": "Stub recipe from April \u2014 no bulletin was captured"
+    },
+    {
+      "parish_key": "clonleighparish",
+      "display_name": "Clonleigh (Strabane Pastoral Area)",
+      "diocese": "derry",
+      "recipe_file": "parishes/recipes/derry/clonleighparish.json",
+      "recipe": {
+        "start_url": "https://clonleighparish.com/category/newsletter/",
+        "site_type": "wp_block_file_bulletin",
+        "playbook_type": "permanent_bulletin_page",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 4,
+        "click_count": 2,
+        "has_terminal": true,
+        "operator_notes": [
+          "Permanent /parish-bulletin/ URL \u2014 PDF filename changes weekly under /wp-content/uploads/YYYY/MM/.",
+          "PDF is in object.wp-block-file__embed[data] \u2014 harvest scrapes the embed URL.",
+          "Use url_pattern *bulletin*.pdf \u2014 never pin a dated filename."
+        ],
+        "do_not": [
+          "Do not train on the homepage \u2014 use the dedicated bulletin page only.",
+          "Do not pin saintanthony.co.uk if the parish moved to saintanthonys.uk."
+        ],
+        "recorded_date": "2026-06-24"
+      },
+      "bulletin_format": "html",
+      "learned_pattern": "Wix HTML bulletin",
+      "host_profile": {
+        "total_timeout_s": 90,
+        "navigation_timeout_ms": 45000,
+        "notes": "Permanent /parish-bulletin/ URL \u2014 PDF filename changes weekly under /wp-content/uploads/YYYY/MM/. PDF is in object.wp-block-file__embed[data] \u2014 harvest scrapes the embed URL. Use url_pattern *bulletin*.pdf \u2014 never pin a dated filename."
+      },
+      "has_extension_diagnosis": false,
+      "harvest_status": "failed",
+      "last_error": "Recipe for Clonleigh (Strabane Pastoral Area) is outdated \u2014 the website may have changed. Re-train with: python main.py --train \"Clonleigh (Strabane Pastoral Area)\"",
+      "suggested_action": "retrain",
+      "suggested_reason": "outdated selectors"
     },
     {
       "parish_key": "kincasslagh",
@@ -67,10 +142,52 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
       "suggested_action": "retrain",
       "suggested_reason": "placeholder recipe"
+    },
+    {
+      "parish_key": "stmarysportglenone",
+      "display_name": "Port Glenone (St Mary's Portglenone)",
+      "diocese": "down_and_connor",
+      "recipe_file": "parishes/recipes/down_and_connor/stmarysportglenone.json",
+      "recipe": {
+        "start_url": "https://stmarysportglenone.org/?page_id=40",
+        "site_type": "joomla_dropfiles",
+        "playbook_type": "weekly_bulletin_download",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 3,
+        "click_count": 1,
+        "has_terminal": true,
+        "operator_notes": [
+          "Joomla Dropfiles \u2014 cloud \u2193 icon (a.mod_downloadlink) serves Word .docx.",
+          "Click the cloud on this Sunday's row \u2014 harvester converts docx \u2192 PDF automatically.",
+          "Do not record diocese GDPR/Privacy PDFs \u2014 only mod_downloadlink on the parish host."
+        ],
+        "do_not": [
+          "Do not save a download URL from downandconnor.org or other diocese admin PDFs.",
+          "Do not use Pick bulletin image \u2014 this is a file download site."
+        ],
+        "recorded_date": "2026-06-27"
+      },
+      "bulletin_format": "download",
+      "learned_pattern": "Joomla Dropfiles cloud download (.docx \u2192 PDF)",
+      "host_profile": {
+        "navigation_timeout_ms": 45000,
+        "wait_after_load_ms": 5000,
+        "total_timeout_s": 189,
+        "max_retries": 3,
+        "prefer_headful": true,
+        "notes": "Joomla Dropfiles \u2014 click a.mod_downloadlink; harvest converts .docx to PDF."
+      },
+      "has_extension_diagnosis": false,
+      "harvest_status": "failed",
+      "last_error": "Recipe for Port Glenone (St Mary's Portglenone) is outdated \u2014 the website may have changed. Re-train with: python main.py --train \"Port Glenone (St Mary's Portglenone)\"; headful fallback: Recipe for Port Glenone (St Mary's Portglenone) is o",
+      "suggested_action": "retrain",
+      "suggested_reason": "outdated selectors"
     },
     {
       "parish_key": "stgerardsparish",
@@ -95,8 +212,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Stub recipe from April \u2014 no bulletin was captured",
       "suggested_action": "retrain",
       "suggested_reason": "Stub recipe from April \u2014 no bulletin was captured"
     },
@@ -123,8 +240,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Stub recipe from April \u2014 no bulletin was captured",
       "suggested_action": "retrain",
       "suggested_reason": "Stub recipe from April \u2014 no bulletin was captured"
     },
@@ -151,8 +268,8 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Stub recipe from April \u2014 no bulletin was captured",
       "suggested_action": "retrain",
       "suggested_reason": "Stub recipe from April \u2014 no bulletin was captured"
     },
@@ -179,10 +296,52 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
       "suggested_action": "retrain",
       "suggested_reason": "placeholder recipe"
+    },
+    {
+      "parish_key": "threepatrons",
+      "display_name": "The Three Patrons Parish (Pennyburn / Carnhill / Galliagh)",
+      "diocese": "derry",
+      "recipe_file": "parishes/recipes/derry/threepatrons.json",
+      "recipe": {
+        "start_url": "https://threepatrons.org/",
+        "site_type": "joomla_dropfiles",
+        "playbook_type": "weekly_bulletin_download",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 2,
+        "click_count": 1,
+        "has_terminal": true,
+        "operator_notes": [
+          "Joomla Dropfiles \u2014 cloud \u2193 icon (a.mod_downloadlink) serves Word .docx.",
+          "Click the cloud on this Sunday's row \u2014 harvester converts docx \u2192 PDF automatically.",
+          "Do not record diocese GDPR/Privacy PDFs \u2014 only mod_downloadlink on the parish host."
+        ],
+        "do_not": [
+          "Do not save a download URL from downandconnor.org or other diocese admin PDFs.",
+          "Do not use Pick bulletin image \u2014 this is a file download site."
+        ],
+        "recorded_date": "2026-07-02"
+      },
+      "bulletin_format": "download",
+      "learned_pattern": "Weekly bulletin list with auto-download",
+      "host_profile": {
+        "navigation_timeout_ms": 45000,
+        "wait_after_load_ms": 3000,
+        "total_timeout_s": 90,
+        "prefer_headful": true,
+        "max_retries": 3,
+        "notes": "Joomla Dropfiles \u2014 cloud \u2193 icon (a.mod_downloadlink) serves Word .docx. Click the cloud on this Sunday's row \u2014 harvester converts docx \u2192 PDF automatically. Do not record diocese GDPR/Privacy PDFs \u2014 only mod_downloadlink on the parish host."
+      },
+      "has_extension_diagnosis": false,
+      "harvest_status": "failed",
+      "last_error": "Recipe for Three Patrons is outdated \u2014 the website may have changed. Re-train with: python main.py --train \"Three Patrons\"; headful fallback: Recipe for Three Patrons is outdated \u2014 the website may have changed. Re-train with: python main.py",
+      "suggested_action": "retrain",
+      "suggested_reason": "outdated selectors"
     },
     {
       "parish_key": "aghagallonandballinderryparish",
@@ -307,45 +466,10 @@
         "notes": "Heavy WordPress page with PDF Embedder plugin. PDF hrefs are in a.pdfemb-viewer links on www-static.antrimparish.com."
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
-    },
-    {
-      "parish_key": "ardara",
-      "display_name": "Ardara",
-      "diocese": "raphoe",
-      "recipe_file": "parishes/recipes/raphoe/ardara.json",
-      "recipe": {
-        "start_url": "http://ardara.ie/news/",
-        "site_type": "html_text_bulletin",
-        "playbook_type": "wix_html",
-        "status": "",
-        "skip": false,
-        "placeholder": false,
-        "step_count": 5,
-        "click_count": 3,
-        "has_terminal": true,
-        "operator_notes": [
-          "Bulletin text is on the web page \u2014 not a downloadable PDF file.",
-          "Use Save page as PDF on the newsletter article page.",
-          "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
-        ],
-        "do_not": [
-          "Do not use Pick bulletin image when the page is mostly text paragraphs.",
-          "Do not stop at click-only \u2014 need print_to_pdf as the final step."
-        ],
-        "recorded_date": "2026-06-27"
-      },
-      "bulletin_format": "html",
-      "learned_pattern": "iframe_viewer",
-      "host_profile": null,
-      "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: Page.goto: Timeout 60000ms exceeded.\nCall log:\n  - navigating to \"https://www.antrimparish.com/bulletinpage/\", waiting until \"commit\"\n",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: Page.goto: Timeout 60000ms exceeded.\nCall log:\n  - navigating to \"https://www.antrimparish.com/bulletinpage/\", waiting until \"commit\"\n"
     },
     {
       "parish_key": "ardmoreparish",
@@ -413,10 +537,10 @@
         "total_timeout_s": 120
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded; headful fallback: Headful fallback timed out",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded; headful fallback: Headful fallback timed out"
     },
     {
       "parish_key": "parishofballinascreen",
@@ -451,9 +575,9 @@
       },
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "No valid content found",
+      "last_error": "Total timeout exceeded",
       "suggested_action": "investigate",
-      "suggested_reason": "No valid content found"
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "ballintra",
@@ -478,7 +602,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
+      "harvest_status": "skipped",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Facebook bulletin \u2014 cannot automate weekly harvest"
@@ -506,10 +630,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "ballyclareballygowan",
@@ -565,10 +689,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "ballymoneyparish",
@@ -593,10 +717,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "banagherparish",
@@ -656,10 +780,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Stale bulletin rejected for mega PDF (bulletin date 2026-06-14, date_behind_of_target)",
+      "suggested_action": "investigate",
+      "suggested_reason": "Stale bulletin rejected for mega PDF (bulletin date 2026-06-14, date_behind_of_target)"
     },
     {
       "parish_key": "bellaghyparish",
@@ -717,10 +841,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "drive-1rjeey-ayy",
@@ -748,10 +872,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: Server returned HTML instead of document for https://drive.google.com/drive/folders/1jPOi4GRU22vAxeKNe5Y_doBJ3riPh7ZK",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: Server returned HTML instead of document for https://drive.google.com/drive/folders/1jPOi4GRU22vAxeKNe5Y_doBJ3riPh7ZK"
     },
     {
       "parish_key": "buncranaparish",
@@ -781,10 +905,10 @@
       "learned_pattern": "direct_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
-      "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "camusparish",
@@ -875,10 +999,10 @@
       "learned_pattern": "Parish Services / Parish Messenger widget",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
-      "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "carrickparish",
@@ -903,10 +1027,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "castledergparish",
@@ -1010,48 +1134,9 @@
       },
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "No valid content found",
+      "last_error": "Recipe replay failed: Page.goto: Timeout 45000ms exceeded.\nCall log:\n  - navigating to \"https://parishofclaudy.com/welcome/weekly-bulletin.html\", waiting until \"domcontentloaded\"\n",
       "suggested_action": "investigate",
-      "suggested_reason": "No valid content found"
-    },
-    {
-      "parish_key": "clonleighparish",
-      "display_name": "Clonleigh (Strabane Pastoral Area)",
-      "diocese": "derry",
-      "recipe_file": "parishes/recipes/derry/clonleighparish.json",
-      "recipe": {
-        "start_url": "https://clonleighparish.com/category/newsletter/",
-        "site_type": "wp_block_file_bulletin",
-        "playbook_type": "permanent_bulletin_page",
-        "status": "",
-        "skip": false,
-        "placeholder": false,
-        "step_count": 4,
-        "click_count": 2,
-        "has_terminal": true,
-        "operator_notes": [
-          "Permanent /parish-bulletin/ URL \u2014 PDF filename changes weekly under /wp-content/uploads/YYYY/MM/.",
-          "PDF is in object.wp-block-file__embed[data] \u2014 harvest scrapes the embed URL.",
-          "Use url_pattern *bulletin*.pdf \u2014 never pin a dated filename."
-        ],
-        "do_not": [
-          "Do not train on the homepage \u2014 use the dedicated bulletin page only.",
-          "Do not pin saintanthony.co.uk if the parish moved to saintanthonys.uk."
-        ],
-        "recorded_date": "2026-06-24"
-      },
-      "bulletin_format": "html",
-      "learned_pattern": "Wix HTML bulletin",
-      "host_profile": {
-        "total_timeout_s": 90,
-        "navigation_timeout_ms": 45000,
-        "notes": "Permanent /parish-bulletin/ URL \u2014 PDF filename changes weekly under /wp-content/uploads/YYYY/MM/. PDF is in object.wp-block-file__embed[data] \u2014 harvest scrapes the embed URL. Use url_pattern *bulletin*.pdf \u2014 never pin a dated filename."
-      },
-      "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
-      "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
+      "suggested_reason": "Recipe replay failed: Page.goto: Timeout 45000ms exceeded.\nCall log:\n  - navigating to \"https://parishofclaudy.com/welcome/weekly-bulletin.html\", waiting until "
     },
     {
       "parish_key": "clonmanyparish",
@@ -1087,10 +1172,10 @@
         "notes": "Permanent /parish-bulletin/ URL \u2014 PDF filename changes weekly under /wp-content/uploads/YYYY/MM/. PDF is in object.wp-block-file__embed[data] \u2014 harvest scrapes the embed URL. Use url_pattern *bulletin*.pdf \u2014 never pin a dated filename."
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: a[href$='.pdf']: Page.goto: net::ERR_ABORTED at https://clonmanyparish.ie/wp-content/uploads/2026/06/2026-06-28.pdf\nCall log:\n  - navigating to \"https://clonmanyparish.ie/wp-content/uploads/2026/06/2026-06-28.pdf\", wai",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: a[href$='.pdf']: Page.goto: net::ERR_ABORTED at https://clonmanyparish.ie/wp-content/uploads/2026/06/2026-06-28.pdf\nCall log:\n  - navigati"
     },
     {
       "parish_key": "parishofstjohncoleraine",
@@ -1143,7 +1228,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
+      "harvest_status": "skipped",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Website DNS no longer resolves (corpuschristiparishbelfast.com)."
@@ -1235,10 +1320,10 @@
         "notes": "One.com WordPress \u2014 TLS ~0.6s but domcontentloaded often exceeds 60s; harvest uses commit navigation. Plan ~2\u20133 min per run."
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded; headful fallback: Stale bulletin rejected for mega PDF (bulletin date 2026-06-11, date_behind_of_target)",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded; headful fallback: Stale bulletin rejected for mega PDF (bulletin date 2026-06-11, date_behind_of_target)"
     },
     {
       "parish_key": "desertmartinparish",
@@ -1299,10 +1384,10 @@
         "max_retries": 3
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "verify_autofix",
+      "suggested_reason": "retry after recipe autofix"
     },
     {
       "parish_key": "drumbocarryduff",
@@ -1327,7 +1412,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
+      "harvest_status": "skipped",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Website DNS no longer resolves (drumbocarryduff.ie)."
@@ -1527,10 +1612,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "errigalparish",
@@ -1667,10 +1752,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "verify_autofix",
+      "suggested_reason": "retry after recipe autofix"
     },
     {
       "parish_key": "glenavyandkilleadparish",
@@ -1723,10 +1808,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Stale bulletin rejected for mega PDF (bulletin date 2025-03-30, date_behind_of_target)",
+      "suggested_action": "investigate",
+      "suggested_reason": "Stale bulletin rejected for mega PDF (bulletin date 2025-03-30, date_behind_of_target)"
     },
     {
       "parish_key": "drive-14alaxt4mv",
@@ -1881,10 +1966,10 @@
       "learned_pattern": "direct_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
-      "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "parishofhannahstown",
@@ -1909,10 +1994,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "verify_autofix",
+      "suggested_reason": "retry after recipe autofix"
     },
     {
       "parish_key": "holycrossparishbelfast",
@@ -1937,10 +2022,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "holy-familyparish",
@@ -1965,10 +2050,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "holyfamily-parish",
@@ -2002,10 +2087,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop",
-      "suggested_action": "investigate",
-      "suggested_reason": "HTML bulletin could not be captured as PDF \u2014 re-train with print_to_pdf or crop"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "holyrosaryparishbelfast",
@@ -2030,10 +2115,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "holytrinityparishbelfast",
@@ -2058,7 +2143,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
+      "harvest_status": "skipped",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Website DNS no longer resolves (holytrinityparishbelfast.com)."
@@ -2150,9 +2235,9 @@
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
+      "last_error": "Recipe replay failed: Page.goto: net::ERR_NAME_NOT_RESOLVED at https://www.iskaheenparish.com/bulletin\nCall log:\n  - navigating to \"https://www.iskaheenparish.com/bulletin\", waiting until \"domcontentloaded\"\n",
       "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
+      "suggested_reason": "Recipe replay failed: Page.goto: net::ERR_NAME_NOT_RESOLVED at https://www.iskaheenparish.com/bulletin\nCall log:\n  - navigating to \"https://www.iskaheenparish.c"
     },
     {
       "parish_key": "kilbarron",
@@ -2283,7 +2368,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
+      "harvest_status": "skipped",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Shares Gartan/Termon Drive bulletin \u2014 harvested via drive-1kna8f6t54"
@@ -2311,10 +2396,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "verify_autofix",
+      "suggested_reason": "retry after recipe autofix"
     },
     {
       "parish_key": "parishofkilrea",
@@ -2348,10 +2433,10 @@
       "learned_pattern": "direct_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
-      "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "laveyparish",
@@ -2432,10 +2517,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: APIRequestContext.get: connect ENETUNREACH 2a02:2350:5:106:802e:8351:626a:2480:443 - Local (:::0)\nCall log:\n  - \u2192 GET https://www.limavadyparish.org/onewebmedia/28-6-26.pdf\n  -     - user-agent: Mozilla/5.0 (X11; Linux",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: APIRequestContext.get: connect ENETUNREACH 2a02:2350:5:106:802e:8351:626a:2480:443 - Local (:::0)\nCall log:\n  - \u2192 GET https://www.limavady"
     },
     {
       "parish_key": "parishoflisburn",
@@ -2460,10 +2545,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "loughshoreparishes",
@@ -2552,10 +2637,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: Recipe image_stack found 0 bulletin image(s) but expected 2",
+      "suggested_action": "retrain_image",
+      "suggested_reason": "image capture recipe"
     },
     {
       "parish_key": "magheraparishderry",
@@ -2613,10 +2698,10 @@
       "learned_pattern": "Parish Services / Parish Messenger widget",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
-      "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "carrigart",
@@ -2641,7 +2726,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
+      "harvest_status": "skipped",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Facebook bulletin \u2014 cannot automate weekly harvest"
@@ -2669,10 +2754,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Stale bulletin rejected for mega PDF (bulletin date 2011-02-01, date_behind_of_target)",
+      "suggested_action": "investigate",
+      "suggested_reason": "Stale bulletin rejected for mega PDF (bulletin date 2011-02-01, date_behind_of_target)"
     },
     {
       "parish_key": "nativityparish",
@@ -2691,13 +2776,13 @@
         "has_terminal": false,
         "operator_notes": [],
         "do_not": [],
-        "recorded_date": "2026-07-02"
+        "recorded_date": "2026-07-04"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
+      "harvest_status": "skipped",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Website unreachable \u2014 nativityparish.com/news times out (site gone)."
@@ -2753,52 +2838,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
-    },
-    {
-      "parish_key": "stmarysportglenone",
-      "display_name": "Port Glenone (St Mary's Portglenone)",
-      "diocese": "down_and_connor",
-      "recipe_file": "parishes/recipes/down_and_connor/stmarysportglenone.json",
-      "recipe": {
-        "start_url": "https://stmarysportglenone.org/?page_id=40",
-        "site_type": "joomla_dropfiles",
-        "playbook_type": "weekly_bulletin_download",
-        "status": "",
-        "skip": false,
-        "placeholder": false,
-        "step_count": 3,
-        "click_count": 1,
-        "has_terminal": true,
-        "operator_notes": [
-          "Joomla Dropfiles \u2014 cloud \u2193 icon (a.mod_downloadlink) serves Word .docx.",
-          "Click the cloud on this Sunday's row \u2014 harvester converts docx \u2192 PDF automatically.",
-          "Do not record diocese GDPR/Privacy PDFs \u2014 only mod_downloadlink on the parish host."
-        ],
-        "do_not": [
-          "Do not save a download URL from downandconnor.org or other diocese admin PDFs.",
-          "Do not use Pick bulletin image \u2014 this is a file download site."
-        ],
-        "recorded_date": "2026-06-27"
-      },
-      "bulletin_format": "download",
-      "learned_pattern": "Joomla Dropfiles cloud download (.docx \u2192 PDF)",
-      "host_profile": {
-        "navigation_timeout_ms": 45000,
-        "wait_after_load_ms": 5000,
-        "total_timeout_s": 189,
-        "max_retries": 3,
-        "prefer_headful": true,
-        "notes": "Joomla Dropfiles \u2014 click a.mod_downloadlink; harvest converts .docx to PDF."
-      },
-      "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "portaferryparish",
@@ -2874,10 +2917,10 @@
         "notes": "Use HTTP \u2014 HTTPS cert expired. mdocs bulletin table can take 3\u20135 min to appear; PDF is row 1 Download link."
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded; headful fallback: Headful fallback timed out",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded; headful fallback: Headful fallback timed out"
     },
     {
       "parish_key": "drive-1jmslbrliw",
@@ -2933,7 +2976,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
+      "harvest_status": "skipped",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Shares Milford Kilkeel bulletin page \u2014 harvested via milfordrathmullanparishes"
@@ -2961,10 +3004,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "saintanthony",
@@ -3029,10 +3072,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "verify_autofix",
+      "suggested_reason": "retry after recipe autofix"
     },
     {
       "parish_key": "saulandballeeparish",
@@ -3057,10 +3100,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "parishofsionmills",
@@ -3091,9 +3134,9 @@
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Total timeout exceeded",
+      "last_error": "No valid content found; headful fallback: No valid content found",
       "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded"
+      "suggested_reason": "No valid content found; headful fallback: No valid content found"
     },
     {
       "parish_key": "stagnesbelfast",
@@ -3112,13 +3155,13 @@
         "has_terminal": false,
         "operator_notes": [],
         "do_not": [],
-        "recorded_date": "2026-07-02"
+        "recorded_date": "2026-07-04"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
+      "harvest_status": "skipped",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Bulletin page gone \u2014 no PDF on stagnesbelfast.com (stub since April)."
@@ -3146,10 +3189,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "stbrigidsparishbelfast",
@@ -3174,10 +3217,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "verify_autofix",
+      "suggested_reason": "retry after recipe autofix"
     },
     {
       "parish_key": "st-colmcilles",
@@ -3202,10 +3245,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "stlukesparishbelfast",
@@ -3230,7 +3273,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
+      "harvest_status": "skipped",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Website DNS no longer resolves (stlukesparishbelfast.com)."
@@ -3258,10 +3301,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "verify_autofix",
+      "suggested_reason": "retry after recipe autofix"
     },
     {
       "parish_key": "stmarysbelfast",
@@ -3286,7 +3329,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
+      "harvest_status": "skipped",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "SSL certificate invalid (ERR_CERT_COMMON_NAME_INVALID)."
@@ -3314,10 +3357,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "verify_autofix",
+      "suggested_reason": "retry after recipe autofix"
     },
     {
       "parish_key": "stmatthewsparish",
@@ -3342,7 +3385,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
+      "harvest_status": "skipped",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "SSL certificate invalid (ERR_CERT_DATE_INVALID)."
@@ -3370,10 +3413,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "verify_autofix",
+      "suggested_reason": "retry after recipe autofix"
     },
     {
       "parish_key": "stpatricksdownpatrick",
@@ -3398,10 +3441,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "verify_autofix",
+      "suggested_reason": "retry after recipe autofix"
     },
     {
       "parish_key": "stteresasparish",
@@ -3437,10 +3480,10 @@
         "notes": "Bulletin text is on the web page \u2014 not a downloadable PDF file. Use Save page as PDF on the newsletter article page. Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: Recipe image_stack found 0 bulletin image(s) but expected 2",
+      "suggested_action": "retrain_image",
+      "suggested_reason": "image capture recipe"
     },
     {
       "parish_key": "stvincentdepaulparishbelfast",
@@ -3465,7 +3508,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
+      "harvest_status": "skipped",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Website DNS no longer resolves (stvincentdepaulparishbelfast.com)."
@@ -3566,48 +3609,6 @@
       "last_error": "",
       "suggested_action": "ok",
       "suggested_reason": "downloaded or not in failure list"
-    },
-    {
-      "parish_key": "threepatrons",
-      "display_name": "The Three Patrons Parish (Pennyburn / Carnhill / Galliagh)",
-      "diocese": "derry",
-      "recipe_file": "parishes/recipes/derry/threepatrons.json",
-      "recipe": {
-        "start_url": "https://threepatrons.org/",
-        "site_type": "joomla_dropfiles",
-        "playbook_type": "weekly_bulletin_download",
-        "status": "",
-        "skip": false,
-        "placeholder": false,
-        "step_count": 2,
-        "click_count": 1,
-        "has_terminal": true,
-        "operator_notes": [
-          "Joomla Dropfiles \u2014 cloud \u2193 icon (a.mod_downloadlink) serves Word .docx.",
-          "Click the cloud on this Sunday's row \u2014 harvester converts docx \u2192 PDF automatically.",
-          "Do not record diocese GDPR/Privacy PDFs \u2014 only mod_downloadlink on the parish host."
-        ],
-        "do_not": [
-          "Do not save a download URL from downandconnor.org or other diocese admin PDFs.",
-          "Do not use Pick bulletin image \u2014 this is a file download site."
-        ],
-        "recorded_date": "2026-07-02"
-      },
-      "bulletin_format": "download",
-      "learned_pattern": "Weekly bulletin list with auto-download",
-      "host_profile": {
-        "navigation_timeout_ms": 45000,
-        "wait_after_load_ms": 3000,
-        "total_timeout_s": 90,
-        "prefer_headful": true,
-        "max_retries": 3,
-        "notes": "Joomla Dropfiles \u2014 cloud \u2193 icon (a.mod_downloadlink) serves Word .docx. Click the cloud on this Sunday's row \u2014 harvester converts docx \u2192 PDF automatically. Do not record diocese GDPR/Privacy PDFs \u2014 only mod_downloadlink on the parish host."
-      },
-      "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Total timeout exceeded; headful fallback: Headful fallback timed out",
-      "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded; headful fallback: Headful fallback timed out"
     },
     {
       "parish_key": "urneyandcastlefinparish",
