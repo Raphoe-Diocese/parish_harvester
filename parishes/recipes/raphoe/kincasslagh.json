@@ -1,18 +1,42 @@
 {
+  "version": 1,
   "parish_key": "kincasslagh",
-  "parish_name": "Kincasslagh",
   "display_name": "Kincasslagh",
-  "recorded_date": "2026-05-22",
+  "diocese": "raphoe",
+  "site_type": "dated_pdf_path",
+  "playbook_type": "dated_pdf_bulletin",
+  "recorded_date": "2026-07-05",
   "start_url": "https://www.kincasslagh.ie/?post_type=kbp_bulletins",
+  "auto_fixed": true,
+  "operator_notes": [
+    "Bulletin list page — PDFs named YYYYMMDD.pdf under /app/uploads/YYYY/MM/.",
+    "Harvester picks the newest dated PDF link each Sunday (e.g. 20260705.pdf)."
+  ],
   "steps": [
     {
       "action": "goto",
       "url": "https://www.kincasslagh.ie/?post_type=kbp_bulletins"
+    },
+    {
+      "action": "click",
+      "selector": "a[href$='.pdf'], a[href*='.pdf']",
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "a[href*='app/uploads'][href$='.pdf']"
+      ]
+    },
+    {
+      "action": "download",
+      "url": "https://kincasslagh.ie/app/uploads/2026/07/20260705.pdf",
+      "use_captured_url": true
     }
   ],
-  "version": 1,
-  "diocese": "raphoe",
-  "placeholder": true,
-  "auto_generated": true,
-  "auto_fixed": true
+  "observed_load_ms": 5000,
+  "timeout_ms": 90000,
+  "total_timeout_s": 180,
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }

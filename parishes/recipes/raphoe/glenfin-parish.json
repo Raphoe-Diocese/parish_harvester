@@ -3,11 +3,27 @@
   "parish_key": "glenfin-parish",
   "display_name": "Glenfin",
   "diocese": "raphoe",
-  "start_url": "https://www.glenfin-parish.com/app/uploads/2025/03/Fourth-Sunday-Lent-C-March-30th-2025.pdf",
+  "site_type": "dated_pdf_path",
+  "playbook_type": "dated_pdf_bulletin",
+  "recorded_date": "2026-07-05",
+  "start_url": "https://www.glenfin-parish.com/#sbp-bulletin",
+  "auto_fixed": true,
+  "operator_notes": [
+    "Download Latest Bulletin button on #sbp-bulletin section.",
+    "Parish website may lag — if bulletin date is months old, ask parish to update the button link."
+  ],
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.glenfin-parish.com/app/uploads/2025/03/Fourth-Sunday-Lent-C-March-30th-2025.pdf"
+      "url": "https://www.glenfin-parish.com/#sbp-bulletin"
+    },
+    {
+      "action": "click",
+      "selector": ".sbp-download-bulletin a[href$='.pdf'], a.sbp-download-bulletin[href$='.pdf'], #sbp-bulletin a[target='_blank'][href*='uploads'][href$='.pdf']",
+      "text": "Download Latest Bulletin",
+      "fallback_selectors": [
+        "#sbp-bulletin a[href$='.pdf']"
+      ]
     },
     {
       "action": "download",
@@ -15,8 +31,7 @@
       "use_captured_url": true
     }
   ],
-  "observed_load_ms": 1423,
-  "timeout_ms": 45000,
-  "total_timeout_s": 90,
-  "recorded_date": "2026-06-27"
+  "observed_load_ms": 8000,
+  "timeout_ms": 90000,
+  "total_timeout_s": 180
 }
