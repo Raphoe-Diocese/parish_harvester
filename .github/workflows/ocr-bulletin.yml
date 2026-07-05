@@ -97,6 +97,41 @@ jobs:
           path: /tmp/ocr-bulletins/raw
           merge-multiple: true
 
+      - name: Download harvest report for site rebuild
+        if: steps.harvest_run.outputs.run_id != 'none'
+        continue-on-error: true
+        uses: actions/download-artifact@v4.1.3
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ steps.harvest_run.outputs.run_id }}
+          pattern: "bulletins-*"
+          path: Bulletins
+          merge-multiple: true
+
+      - name: Download harvest docs snapshot
+        if: steps.harvest_run.outputs.run_id != 'none'
+        continue-on-error: true
+        uses: actions/download-artifact@v4.1.3
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ steps.harvest_run.outputs.run_id }}
+          pattern: "harvest-docs-*"
+          path: _harvest_docs
+          merge-multiple: true
+
+      - name: Apply harvest docs snapshot
+        run: |
+          set -euo pipefail
+          if [ -d _harvest_docs/docs/dioceses ]; then
+            mkdir -p docs/dioceses
+            cp -a _harvest_docs/docs/dioceses/. docs/dioceses/
+            echo "Applied harvest docs/dioceses snapshot"
+          fi
+          if [ -f _harvest_docs/docs/manifest.json ]; then
+            cp _harvest_docs/docs/manifest.json docs/manifest.json
+            echo "Applied harvest docs/manifest.json"
+          fi
+
       - name: Stage mega PDFs for OCR
         run: |
           set -euo pipefail
@@ -207,16 +242,48 @@ jobs:
           python -c "from pathlib import Path; from harvester.site_builder import run; run(report_path=Path('Bulletins/report.json'), docs_dir=Path('docs'))"
           echo "Rebuilt docs/dioceses/*/index.html with latest OCR content"
 
+      - name: Upload OCR docs snapshot
+        if: steps.ocr_generate.outputs.processed != '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: ocr-docs-${{ github.run_id }}
+          path: |
+            docs/bulletins/
+            docs/dioceses/
+          if-no-files-found: warn
+          retention-days: 14
+
       - name: Commit generated bulletin pages
         if: steps.ocr_generate.outputs.processed != '0'
+        id: commit_ocr
+        continue-on-error: true
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs Bulletins
           if git diff --cached --quiet; then
-            echo "::error::OCR ran but nothing changed in docs/ — commit step had nothing to save."
-            exit 1
+            echo "::warning::OCR ran but nothing changed in docs/ — nothing to commit."
+            exit 0
           fi
           git commit -m "chore: update OCR bulletin viewers for $(date -u +%Y-%m-%d)"
-          git push origin HEAD:main
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD:main; then
+              echo "✅ OCR pushed on attempt ${attempt}"
+              exit 0
+            fi
+            echo "⚠️  OCR push attempt ${attempt} failed; fetching and rebasing (autostash)…"
+            git fetch origin main
+            git rebase --autostash origin/main || {
+              echo "❌ OCR rebase failed; aborting."
+              git rebase --abort || true
+              exit 1
+            }
+          done
+          echo "❌ Could not push OCR after 5 attempts."
+          exit 1
+
+      - name: Warn if OCR git commit failed
+        if: steps.ocr_generate.outputs.processed != '0' && steps.commit_ocr.outcome == 'failure'
+        run: |
+          echo "::warning::OCR viewers were generated but could not push to main — ocr-docs artifact was uploaded for Pages deploy."

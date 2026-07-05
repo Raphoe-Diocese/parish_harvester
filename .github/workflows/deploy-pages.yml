@@ -52,6 +52,59 @@ jobs:
           path: _harvest_artifacts
           merge-multiple: true
 
+      - name: Download harvest docs snapshot from harvest run
+        if: github.event_name == 'workflow_run' && github.event.workflow_run.name == 'Harvest Parish Bulletins'
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ github.event.workflow_run.id }}
+          pattern: "harvest-docs-*"
+          path: _harvest_docs
+          merge-multiple: true
+
+      - name: Download OCR docs snapshot from OCR run
+        if: github.event_name == 'workflow_run' && github.event.workflow_run.name == 'Generate OCR bulletin viewers'
+        continue-on-error: true
+        uses: actions/download-artifact@v4
+        with:
+          github-token: ${{ github.token }}
+          run-id: ${{ github.event.workflow_run.id }}
+          pattern: "ocr-docs-*"
+          path: _ocr_docs
+          merge-multiple: true
+
+      - name: Apply workflow docs snapshots to checkout
+        run: |
+          set -euo pipefail
+          applied=false
+          if [ -d _harvest_docs/docs/dioceses ]; then
+            mkdir -p docs/dioceses
+            cp -a _harvest_docs/docs/dioceses/. docs/dioceses/
+            echo "Applied harvest docs/dioceses snapshot"
+            applied=true
+          fi
+          if [ -f _harvest_docs/docs/manifest.json ]; then
+            cp _harvest_docs/docs/manifest.json docs/manifest.json
+            echo "Applied harvest docs/manifest.json"
+            applied=true
+          fi
+          if [ -d _ocr_docs/docs/bulletins ]; then
+            mkdir -p docs/bulletins
+            cp -a _ocr_docs/docs/bulletins/. docs/bulletins/
+            echo "Applied OCR docs/bulletins snapshot"
+            applied=true
+          fi
+          if [ -d _ocr_docs/docs/dioceses ]; then
+            mkdir -p docs/dioceses
+            cp -a _ocr_docs/docs/dioceses/. docs/dioceses/
+            echo "Applied OCR docs/dioceses snapshot"
+            applied=true
+          fi
+          if [ "${applied}" = "false" ]; then
+            echo "No workflow docs snapshots to apply — using git checkout docs/"
+          fi
+
       - name: Download mega PDFs from latest harvest (OCR/docs-only deploys)
         if: github.event_name != 'workflow_run' || github.event.workflow_run.name == 'Generate OCR bulletin viewers'
         env:
@@ -215,6 +268,8 @@ jobs:
 
       - name: Clean mega PDFs from repository after deploy
         if: github.event_name == 'workflow_run' && env.HAD_NEW_ARTIFACTS == 'true'
+        continue-on-error: true
+        id: cleanup_repo
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
@@ -251,3 +306,8 @@ jobs:
           done
           echo "Could not push cleanup commit after 5 attempts."
           exit 1
+
+      - name: Warn if repo cleanup push failed
+        if: steps.cleanup_repo.outcome == 'failure'
+        run: |
+          echo "::warning::Pages deploy succeeded but could not push PDF cleanup commit to main."

@@ -133,6 +133,34 @@ jobs:
           if-no-files-found: warn
           retention-days: 30
 
+      # Upload BEFORE commit — if git push fails later, OCR/deploy still get fresh outputs.
+      - name: Upload Bulletins artifact
+        if: steps.harvest_run.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: bulletins-${{ github.run_id }}
+          path: Bulletins/
+          retention-days: 30
+
+      - name: Upload dashboard artifact
+        if: steps.harvest_run.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: harvest-dashboard-${{ github.run_id }}
+          path: Bulletins/dashboard.html
+          retention-days: 30
+
+      - name: Upload harvest docs snapshot
+        if: steps.harvest_run.outcome == 'success' && github.event.inputs.target_parish == ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: harvest-docs-${{ github.run_id }}
+          path: |
+            docs/dioceses/
+            docs/manifest.json
+          if-no-files-found: warn
+          retention-days: 14
+
       - name: Build training backlog
         if: always()
         run: |
@@ -318,7 +346,8 @@ jobs:
 
       - name: Commit bulletins back to repo
         if: steps.harvest_run.outcome == 'success'
-        continue-on-error: false
+        id: commit_harvest
+        continue-on-error: true
         run: |
           set -euo pipefail
           if [ ! -f Bulletins/report.json ]; then
@@ -358,21 +387,10 @@ jobs:
           echo "❌ Could not push after 5 attempts."
           exit 1
 
-      - name: Upload Bulletins artifact
-        if: steps.harvest_run.outcome == 'success'
-        uses: actions/upload-artifact@v4
-        with:
-          name: bulletins-${{ github.run_id }}
-          path: Bulletins/
-          retention-days: 30
-
-      - name: Upload dashboard artifact
-        if: steps.harvest_run.outcome == 'success'
-        uses: actions/upload-artifact@v4
-        with:
-          name: harvest-dashboard-${{ github.run_id }}
-          path: Bulletins/dashboard.html
-          retention-days: 30
+      - name: Warn if git commit failed
+        if: steps.harvest_run.outcome == 'success' && steps.commit_harvest.outcome == 'failure'
+        run: |
+          echo "::warning::Harvest finished OK but could not push to main — mega PDF and report artifacts were still uploaded for OCR/Pages deploy."
 
       - name: Clean transient bulletin PDFs from repository
         if: false

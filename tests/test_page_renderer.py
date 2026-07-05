@@ -27,7 +27,7 @@ class PageRendererTests(unittest.TestCase):
             self.assertIn("https://example.com/?q=&lt;x&gt;", html)
             self.assertNotIn("Raphoe <script>", html)
             self.assertNotIn("danger <b>tag</b>", html)
-            self.assertIn("function highlightOCR(query)", html)
+            self.assertIn("function applySearch(query)", html)
 
     def test_render_diocese_page_uses_placeholder_when_ocr_missing(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
