@@ -934,7 +934,6 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
       <!-- PDF Panel -->
       <div id="panel-pdf" class="view-panel active">
         <div class="panel-toolbar">
-          <a class="toolbar-btn" href="{pdf_href}" target="_blank" rel="noopener noreferrer">↗ Open PDF in new tab</a>
           <a class="toolbar-btn" href="{pdf_href}" download>⬇ Download PDF</a>
         </div>
         <div class="pdf-controls" data-controls="top">
@@ -945,18 +944,10 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
         <div id="pdf-canvas-wrap" class="pdf-canvas-wrap">
           <canvas id="pdf-canvas" title="{html.escape(config.display_name)} bulletin PDF"></canvas>
         </div>
-        <div class="pdf-controls" data-controls="bottom">
-          <button data-action="prev" type="button" aria-label="Previous PDF page">← Previous page</button>
-          <span data-role="page-indicator">Page 1 of {page_count}</span>
-          <button data-action="next" type="button" aria-label="Next PDF page">Next page →</button>
-        </div>
       </div>
 
       <!-- OCR Panel -->
       <div id="panel-ocr" class="view-panel">
-        <div class="panel-toolbar">
-          <a class="toolbar-btn" href="{ocr_standalone_href}" target="_blank" rel="noopener noreferrer">↗ Open bulletin text in new tab</a>
-        </div>
         <div class="ocr-search-bar">
           <input id="ocr-search" class="search-input" type="search" placeholder="🔍 Search OCR text..." aria-label="Search OCR text" />
           <button id="clear-search" class="search-clear" type="button" aria-label="Clear OCR search" hidden>×</button>
