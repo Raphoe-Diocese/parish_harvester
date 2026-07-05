@@ -3,28 +3,45 @@
   "parish_key": "stranorlarparish",
   "display_name": "Stranolar",
   "diocese": "raphoe",
-  "site_type": "html_text_bulletin",
-  "playbook_type": "wix_html",
+  "site_type": "dated_pdf_path",
+  "playbook_type": "dated_pdf_bulletin",
   "recorded_date": "2026-07-05",
-  "start_url": "https://www.stranorlarparish.ie/current-newsletter/",
+  "start_url": "https://www.stranorlarparish.ie/newsletter/",
   "auto_fixed": true,
   "operator_notes": [
-    "Bulletin is HTML on /current-newsletter/ — not linked from /our-parish/.",
-    "Harvester prints the page to PDF. Parish may pause newsletter in July/August."
+    "PDF archive at /newsletter/ — pick newest dated PDF (better for OCR than HTML current issue).",
+    "Current HTML issue is at /current-newsletter/ — parish may pause in July/August.",
+    "Do not start on /our-parish/ — no bulletin link in page body."
   ],
   "do_not": [
-    "Do not start on /our-parish/ — no bulletin link there."
+    "Do not use /our-parish/ as start URL — bulletin is only in sidebar or /newsletter/."
   ],
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.stranorlarparish.ie/current-newsletter/"
+      "url": "https://www.stranorlarparish.ie/newsletter/"
     },
     {
-      "action": "print_to_pdf"
+      "action": "click",
+      "selector": "a[href$='.pdf'], a[href*='.pdf']",
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "top",
+      "href": "https://www.stranorlarparish.ie/wp-content/uploads/2026/06/28th-June-2026.pdf",
+      "fallback_selectors": [
+        "a[href*='wp-content/uploads'][href$='.pdf']"
+      ]
+    },
+    {
+      "action": "download",
+      "url": "https://www.stranorlarparish.ie/wp-content/uploads/2026/06/28th-June-2026.pdf",
+      "use_captured_url": true
     }
   ],
-  "observed_load_ms": 5000,
+  "observed_load_ms": 8000,
   "timeout_ms": 90000,
-  "total_timeout_s": 180
+  "total_timeout_s": 180,
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
