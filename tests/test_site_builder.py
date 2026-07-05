@@ -67,7 +67,8 @@ class SiteBuilderTests(unittest.TestCase):
             armagh_page = (docs / "dioceses" / "armagh" / "index.html").read_text(encoding="utf-8")
 
             self.assertIn("Download PDF", derry_page)
-            self.assertNotIn("Open PDF in new tab", derry_page)
+            self.assertIn("Open PDF in new tab", derry_page)
+            self.assertIn("Open bulletin text in new tab", derry_page)
             self.assertIn("Line one", derry_page)
             self.assertIn("DERRY", derry_page)
             self.assertIn("BIG BULLETIN", derry_page)

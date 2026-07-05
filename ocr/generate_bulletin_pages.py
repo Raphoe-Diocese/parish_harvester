@@ -934,6 +934,7 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
       <!-- PDF Panel -->
       <div id="panel-pdf" class="view-panel active">
         <div class="panel-toolbar">
+          <a class="toolbar-btn" href="{pdf_href}" target="_blank" rel="noopener noreferrer">↗ Open PDF in new tab</a>
           <a class="toolbar-btn" href="{pdf_href}" download>⬇ Download PDF</a>
         </div>
         <div class="pdf-controls" data-controls="top">
@@ -948,6 +949,9 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
 
       <!-- OCR Panel -->
       <div id="panel-ocr" class="view-panel">
+        <div class="panel-toolbar">
+          <a class="toolbar-btn" href="{ocr_standalone_href}" target="_blank" rel="noopener noreferrer">↗ Open bulletin text in new tab</a>
+        </div>
         <div class="ocr-search-bar">
           <input id="ocr-search" class="search-input" type="search" placeholder="🔍 Search OCR text..." aria-label="Search OCR text" />
           <button id="clear-search" class="search-clear" type="button" aria-label="Clear OCR search" hidden>×</button>
