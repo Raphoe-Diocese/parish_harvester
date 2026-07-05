@@ -1,39 +1,47 @@
 {
+  "version": 3,
   "parish_key": "drive-1rjeey-ayy",
   "parish_name": "Bruckless",
   "display_name": "Bruckless",
   "diocese": "raphoe",
   "site_type": "cloud_folder",
   "playbook_type": "cloud_folder",
-  "recorded_date": "2026-06-29",
-  "start_url": "https://drive.google.com/drive/folders/1jPOi4GRU22vAxeKNe5Y_doBJ3riPh7ZK",
+  "cloud_folder": true,
+  "date_format": "YY.MM.DD",
+  "recorded_date": "2026-07-05",
+  "start_url": "https://drive.google.com/drive/folders/1z9goh6DrkCUkpJMDbwfsi28Yc_t0_ltC",
   "auto_fixed": true,
   "operator_notes": [
-    "Parish Newsletter Drive: year folders (2026, 2027, …) then YY.MM.DD.pdf rows.",
-    "Harvester auto-opens the correct year folder and this Sunday's PDF filename each run."
+    "Google Drive 2026 folder — bulletins named YY.MM.DD.pdf (e.g. 26.07.05.pdf for 5 July 2026).",
+    "Parent folder (1jPOi4…) lists year subfolders; harvest opens the 2026 folder directly.",
+    "Harvester rewrites the click to this Sunday's filename each week — do not pin a fixed date."
+  ],
+  "do_not": [
+    "Do not use the parent Drive folder URL as the harvest start — it returns HTML, not a PDF.",
+    "Do not pin June-2026-style filenames — harvest picks the current Sunday row automatically."
   ],
   "steps": [
     {
       "action": "goto",
-      "url": "https://drive.google.com/drive/folders/1jPOi4GRU22vAxeKNe5Y_doBJ3riPh7ZK"
-    },
-    {
-      "action": "click",
-      "text": "2026",
-      "year_folder": true,
-      "selector": "[role=\"row\"]:has-text('2026')"
+      "url": "https://drive.google.com/drive/folders/1z9goh6DrkCUkpJMDbwfsi28Yc_t0_ltC"
     },
     {
       "action": "click",
       "text": "26.06.28.pdf",
       "cloud_folder": true,
       "date_format": "YY.MM.DD",
-      "selector": "[role=\"row\"]:has-text('26.06.28.pdf')"
+      "selector": "[role=\"row\"]:has-text('26.06.28.pdf')",
+      "fallback_selectors": [
+        "[role=\"gridcell\"]:has-text('26.06.28.pdf')",
+        ":has-text('26.06.28.pdf')"
+      ]
     },
     {
       "action": "download",
       "url_pattern": "*.pdf"
     }
   ],
-  "version": 3
+  "observed_load_ms": 8000,
+  "timeout_ms": 120000,
+  "total_timeout_s": 300
 }
