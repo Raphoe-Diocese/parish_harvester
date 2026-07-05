@@ -88,10 +88,6 @@ jobs:
           if [ -d _harvest_artifacts ]; then
             while IFS= read -r -d '' pdf; do
               dest="mega_pdf/$(basename "${pdf}")"
-              if [ -e "${dest}" ]; then
-                echo "Error: duplicate mega PDF filename downloaded: ${dest}"
-                exit 1
-              fi
               cp "${pdf}" "${dest}"
               HAD_NEW_ARTIFACTS=true
             done < <(find _harvest_artifacts -type f -name '*_mega_bulletin.pdf' -print0)
