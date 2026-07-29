@@ -26,57 +26,60 @@ CSS = """
     overflow-x: hidden;
   }
   .scrollable-viewer {
-    max-width: 100%;
-    margin: 0;
+    max-width: min(52rem, 100%);
+    margin: 0 auto;
     background: #ffffff;
-    font-family: Georgia, serif;
-    font-size: 16px;
-    line-height: 1.7;
-    padding: 16px 20px;
+    font-family: Georgia, "Times New Roman", Times, serif;
+    font-size: 1.125rem;
+    line-height: 1.45;
+    padding: 12px 16px 28px;
   }
   .page-label {
-    font-size: 1em;
+    font-size: 0.8rem;
     font-weight: 700;
-    margin: 1.2em 0 0.35em;
-    color: #0f2b5b;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    margin: 1.1em 0 0.4em;
+    color: #64748b;
+    font-family: system-ui, sans-serif;
   }
   .page-label:first-child {
     margin-top: 0;
   }
   p {
-    margin: 4px 0;
+    margin: 0 0 0.65em;
   }
   hr {
-    margin: 1em 0;
+    margin: 0.9em 0;
     border: none;
-    border-top: 1px solid #ddd;
+    border-top: 1px solid #e2e8f0;
   }
   .b-title {
-    font-size: 1.35em;
+    font-size: 1.28em;
     font-weight: 700;
     color: #0f2b5b;
-    margin: 0.9em 0 0.3em;
+    margin: 0.85em 0 0.25em;
     border-bottom: 2px solid #c8d6f0;
-    padding-bottom: 0.15em;
+    padding-bottom: 0.12em;
   }
   .b-head {
-    font-size: 1.15em;
+    font-size: 1.12em;
     font-weight: 700;
     color: #134e9c;
-    margin: 0.75em 0 0.25em;
+    margin: 0.7em 0 0.2em;
   }
   .b-sub {
     font-size: 1.02em;
     font-weight: 700;
     color: #1f6f4a;
-    margin: 0.6em 0 0.2em;
+    margin: 0.55em 0 0.15em;
   }
   strong { color: #0f2b5b; }
   a { color: #1d4ed8; }
   table.b-table {
     border-collapse: collapse;
     width: 100%;
-    margin: 0.5em 0;
+    margin: 0.45em 0 0.75em;
     font-size: 0.95em;
   }
   table.b-table td, table.b-table th {
@@ -394,16 +397,32 @@ def _render_table(rows):
 
 
 def render_markdown_lines(lines: list[str]) -> list[str]:
-    """Render one page's OCR lines, grouping markdown tables into HTML tables."""
+    """Render one page's OCR lines into HTML.
+
+    Consecutive body lines become one ``<p>`` joined with ``<br>`` so the
+    reader is not full of empty gaps (one paragraph tag per OCR line).
+    """
     parts: list[str] = []
+    body_buf: list[str] = []
     i = 0
     total = len(lines)
+
+    def flush_body() -> None:
+        nonlocal body_buf
+        if not body_buf:
+            return
+        rendered = "<br>\n".join(_render_inline(line) for line in body_buf)
+        parts.append(f"<p>{rendered}</p>")
+        body_buf = []
+
     while i < total:
         line = IMAGE_MD_PATTERN.sub("", lines[i]).rstrip()
         if not line.strip():
+            flush_body()
             i += 1
             continue
         if _is_table_row(line):
+            flush_body()
             block = []
             while i < total:
                 row = IMAGE_MD_PATTERN.sub("", lines[i]).rstrip()
@@ -417,11 +436,13 @@ def render_markdown_lines(lines: list[str]) -> list[str]:
                 parts.append(table_html)
             continue
         if HR_MD_PATTERN.match(line):
+            flush_body()
             parts.append("<hr>")
             i += 1
             continue
         heading = HEADING_MD_PATTERN.match(line)
         if heading:
+            flush_body()
             level = min(len(heading.group(1)), 3)
             tag = {1: "h2", 2: "h3", 3: "h4"}[level]
             css_class = {1: "b-title", 2: "b-head", 3: "b-sub"}[level]
@@ -430,8 +451,9 @@ def render_markdown_lines(lines: list[str]) -> list[str]:
             )
             i += 1
             continue
-        parts.append(f"<p>{_render_inline(line)}</p>")
+        body_buf.append(line)
         i += 1
+    flush_body()
     return parts
 
 

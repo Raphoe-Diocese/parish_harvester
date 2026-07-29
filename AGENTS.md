@@ -62,6 +62,16 @@ Extension Send & test
 3. Update extension only if new fields are user-visible.
 4. Add/update tests in `tests/test_parish_status.py` and `tests/test_patch_report.py`.
 
+## Locked fix order (do not divert)
+
+Until this list is finished, do **not** start other work. Park new ideas for a later list.
+
+1. **OCR reader** — tight modern text (in progress / verify live)
+2. **Problems console** — full work-queue polish
+3. **Recipe success** — one parish at a time
+4. **parishpress.ie** — live DNS/Pages when user is ready
+5. **Site look** — modern pages after OCR
+
 ## Dates (user-facing)
 
 Always show **DD/MM/YYYY** (UK) in the extension, dashboards, emails, and site pages.

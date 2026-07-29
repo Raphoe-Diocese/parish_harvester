@@ -136,7 +136,54 @@ def extract_ocr_fragment(path: Path) -> str:
     if not match:
         raise ValueError(f"Could not find OCR content wrapper in {path}")
     fragment = OCR_PAGE_HEADING_PATTERN.sub(r"<h3>PAGE \1</h3>", match.group(1).strip())
-    return fragment
+    return tighten_ocr_paragraphs(fragment)
+
+
+def tighten_ocr_paragraphs(fragment: str) -> str:
+    """Merge runs of plain ``<p>…</p>`` into one paragraph with ``<br>`` joins.
+
+    Older OCR HTML put every line in its own ``<p>``, which created huge
+    whitespace. New convert_bulletin output already groups lines; this keeps
+    legacy fragments readable without a full re-OCR.
+    """
+    token_re = re.compile(
+        r"(<p>(?!class=)(?![^>]*\bclass=)(.*?)</p>)|(<h[1-6]\b[^>]*>.*?</h[1-6]>|"
+        r"<hr\s*/?>|<table\b[\s\S]*?</table>|<p\s+class=\"[^\"]+\">.*?</p>)",
+        re.IGNORECASE | re.DOTALL,
+    )
+    out: list[str] = []
+    buf: list[str] = []
+
+    def flush() -> None:
+        nonlocal buf
+        if not buf:
+            return
+        if len(buf) == 1:
+            out.append(f"<p>{buf[0]}</p>")
+        else:
+            out.append("<p>" + "<br>\n".join(buf) + "</p>")
+        buf = []
+
+    pos = 0
+    for match in token_re.finditer(fragment):
+        if match.start() > pos:
+            gap = fragment[pos : match.start()].strip()
+            if gap:
+                flush()
+                out.append(gap)
+        if match.group(1) is not None:
+            buf.append(match.group(2).strip())
+        else:
+            flush()
+            out.append(match.group(3))
+        pos = match.end()
+    if pos < len(fragment):
+        gap = fragment[pos:].strip()
+        if gap:
+            flush()
+            out.append(gap)
+    flush()
+    return "\n".join(out) if out else fragment
 
 
 def count_pdf_pages(path: Path) -> int:
@@ -368,65 +415,69 @@ def render_ocr_standalone_page(
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
     body {{
       font-family: Georgia, "Times New Roman", Times, serif;
-      background: #fafbfc;
+      background: #f8fafc;
       color: {TEXT};
-      line-height: 1.55;
-      font-size: 18px;
+      line-height: 1.45;
+      font-size: 1.125rem;
       -webkit-text-size-adjust: 100%;
     }}
     a {{ color: {TEAL}; text-decoration: none; font-weight: 600; }}
     a:hover {{ text-decoration: underline; }}
-    .page {{ max-width: 42rem; margin: 0 auto; padding: 16px 20px 48px; }}
+    .page {{ max-width: min(52rem, 100%); margin: 0 auto; padding: 12px 16px 40px; }}
     .back-link {{
-      display: inline-block; margin-bottom: 12px; font-weight: 700; color: {TEAL};
-      font-family: "Segoe UI", system-ui, sans-serif; font-size: 0.92rem;
+      display: inline-block; margin-bottom: 10px; font-weight: 700; color: {TEAL};
+      font-family: system-ui, sans-serif; font-size: 0.9rem;
     }}
     h1 {{
-      margin: 0 0 8px; color: {TEAL}; font-size: clamp(1.35rem, 3.5vw, 1.85rem);
-      font-family: "Segoe UI", system-ui, sans-serif; font-weight: 700; letter-spacing: -0.02em;
+      margin: 0 0 6px; color: {TEAL}; font-size: clamp(1.35rem, 3.5vw, 1.85rem);
+      font-family: system-ui, sans-serif; font-weight: 700; letter-spacing: -0.02em;
     }}
     .meta {{
-      color: #6b7280; font-size: 0.9rem; margin-bottom: 16px;
-      font-family: "Segoe UI", system-ui, sans-serif;
+      color: #6b7280; font-size: 0.88rem; margin-bottom: 12px;
+      font-family: system-ui, sans-serif;
     }}
     .ocr-body {{
       background: #fff;
-      border: 1px solid #e5ebea;
-      border-radius: 8px;
-      padding: 28px 24px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 18px 20px 28px;
     }}
-    .ocr-body h1, .ocr-body h2 {{ color: {DEEP_TEAL}; margin: 1.1em 0 0.45em; font-weight: 700; }}
-    .ocr-body h3, .ocr-body h4 {{ color: {TEAL}; margin: 1em 0 0.4em; font-weight: 700; }}
-    .ocr-body h3.ocr-page-heading {{
-      font-size: 0.8rem;
+    .ocr-body h1, .ocr-body h2 {{ color: {DEEP_TEAL}; margin: 0.9em 0 0.3em; font-weight: 700; }}
+    .ocr-body h3, .ocr-body h4 {{ color: {TEAL}; margin: 0.8em 0 0.25em; font-weight: 700; }}
+    .ocr-body h2.b-title, .ocr-body .b-title {{
+      font-size: 1.28em; border-bottom: 2px solid #c8d6f0; padding-bottom: 0.12em;
+    }}
+    .ocr-body h3.ocr-page-heading, .ocr-body .page-label {{
+      font-size: 0.78rem;
       letter-spacing: 0.06em;
       text-transform: uppercase;
-      margin-top: 1.6em;
-      font-family: "Segoe UI", system-ui, sans-serif;
-      color: #6b7280;
+      margin: 1.1em 0 0.35em;
+      font-family: system-ui, sans-serif;
+      color: #64748b;
     }}
-    .ocr-body p {{ margin: 0 0 0.35em; white-space: pre-wrap; }}
-    .ocr-body hr {{ border: 0; border-top: 1px solid #e5ebea; margin: 1.25em 0; }}
+    .ocr-body p {{ margin: 0 0 0.65em; }}
+    .ocr-body p + p {{ margin-top: 0; }}
+    .ocr-body hr {{ border: 0; border-top: 1px solid #e2e8f0; margin: 0.9em 0; }}
     .ocr-body mark {{ background: #fff3cd; padding: 0 2px; border-radius: 2px; }}
     .ocr-body mark.search-active {{ background: #fde047; outline: 2px solid #0f5e5e; }}
-    .ocr-search-bar {{ position: relative; margin-bottom: 10px; }}
+    .ocr-search-bar {{ position: relative; margin-bottom: 8px; }}
     .search-input {{
       width: 100%; min-height: 44px; border: 1px solid #bdd7d5; border-radius: 8px;
       padding: 10px 40px 10px 12px; font-size: 1rem;
-      font-family: "Segoe UI", system-ui, sans-serif;
+      font-family: system-ui, sans-serif;
     }}
     .search-clear {{ position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #6b7280; font-size: 1.2rem; cursor: pointer; }}
     .search-clear[hidden] {{ display: none; }}
     .ocr-search-tools {{
       display: flex; align-items: center; justify-content: space-between; gap: 10px;
-      margin-bottom: 14px; flex-wrap: wrap;
-      font-family: "Segoe UI", system-ui, sans-serif;
+      margin-bottom: 12px; flex-wrap: wrap;
+      font-family: system-ui, sans-serif;
     }}
     .ocr-search-tools button {{ border: 0; border-radius: 6px; background: {TEAL}; color: #fff; font-weight: 700; min-height: 40px; padding: 8px 14px; cursor: pointer; }}
     .ocr-search-tools button:disabled {{ background: #9bbfbd; cursor: not-allowed; }}
     .match-count {{ color: #6b7280; font-size: 0.92rem; font-weight: 700; }}
     .note-box {{
-      margin-top: 20px;
+      margin-top: 16px;
       padding: 12px 16px;
       border-radius: 8px;
       background: #fff4df;
@@ -434,12 +485,12 @@ def render_ocr_standalone_page(
       color: #713f12;
       font-weight: 600;
       font-size: 0.9rem;
-      font-family: "Segoe UI", system-ui, sans-serif;
+      font-family: system-ui, sans-serif;
     }}
     @media (max-width: 600px) {{
-      .page {{ padding: 12px 14px 36px; }}
-      body {{ font-size: 17px; }}
-      .ocr-body {{ padding: 18px 14px; }}
+      .page {{ padding: 10px 12px 32px; }}
+      body {{ font-size: 1.05rem; }}
+      .ocr-body {{ padding: 14px 12px 22px; }}
     }}
   </style>
 </head>
@@ -752,34 +803,33 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
       font-weight: 600;
     }}
     #ocr-panel {{
-      height: 70vh;
-      min-height: 500px;
+      min-height: 60vh;
       overflow-y: auto;
-      border: 1px solid #d9e4e3;
-      border-radius: 10px;
-      padding: 28px 32px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 18px 20px 28px;
       background: white;
       font-family: Georgia, "Times New Roman", Times, serif;
-      font-size: 18px;
-      line-height: 1.55;
+      font-size: 1.125rem;
+      line-height: 1.45;
       color: {TEXT};
-      max-width: 42rem;
+      max-width: min(52rem, 100%);
       margin: 0 auto;
     }}
     #ocr-panel h1, #ocr-panel h2 {{
       color: {DEEP_TEAL};
-      margin-top: 16px;
-      margin-bottom: 10px;
+      margin-top: 0.9em;
+      margin-bottom: 0.3em;
       font-weight: 700;
     }}
     #ocr-panel h2.b-title {{
-      font-size: 1.35em;
+      font-size: 1.28em;
       color: #0f2b5b;
       border-bottom: 2px solid #c8d6f0;
-      padding-bottom: 0.15em;
+      padding-bottom: 0.12em;
     }}
     #ocr-panel h3.b-head {{
-      font-size: 1.15em;
+      font-size: 1.12em;
       color: #134e9c;
     }}
     #ocr-panel h4.b-sub {{
@@ -788,22 +838,23 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
     }}
     #ocr-panel h3, #ocr-panel h4 {{
       color: {TEAL};
-      margin-top: 14px;
-      margin-bottom: 8px;
+      margin-top: 0.8em;
+      margin-bottom: 0.25em;
       font-weight: 700;
     }}
     #ocr-panel .page-label {{
-      font-size: 1em;
+      font-size: 0.78rem;
       font-weight: 700;
-      margin: 1.2em 0 0.35em;
-      color: #0f2b5b;
-      text-transform: none;
-      letter-spacing: normal;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.1em 0 0.35em;
+      color: #64748b;
+      font-family: system-ui, sans-serif;
     }}
     #ocr-panel table.b-table {{
       border-collapse: collapse;
       width: 100%;
-      margin: 0.5em 0;
+      margin: 0.45em 0 0.75em;
       font-size: 0.95em;
     }}
     #ocr-panel table.b-table td, #ocr-panel table.b-table th {{
@@ -819,8 +870,8 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
     #ocr-panel table.b-table tr:nth-child(even) td {{
       background: #f7f9fd;
     }}
-    #ocr-panel hr {{ border: 0; border-top: 1px solid #e5ebea; margin: 1.25em 0; }}
-    #ocr-panel p {{ margin: 0 0 0.35em; white-space: pre-wrap; }}
+    #ocr-panel hr {{ border: 0; border-top: 1px solid #e2e8f0; margin: 0.9em 0; }}
+    #ocr-panel p {{ margin: 0 0 0.65em; }}
     #ocr-panel mark {{ background: #fef08a; padding: 1px 3px; border-radius: 2px; }}
     #ocr-panel mark.search-active {{ background: #fde047; outline: 2px solid #0f5e5e; }}
     #ocr-panel a {{ color: {TEAL}; font-weight: 600; }}
