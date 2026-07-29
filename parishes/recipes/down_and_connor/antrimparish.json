@@ -6,12 +6,27 @@
   "start_url": "https://www.antrimparish.com/bulletinpage/",
   "steps": [
     {
-      "action": "print_to_pdf",
-      "selector": "article"
+      "action": "goto",
+      "url": "https://www.antrimparish.com/bulletinpage/"
+    },
+    {
+      "action": "download",
+      "url_pattern": "*.pdf"
     }
   ],
-  "observed_load_ms": 5765,
-  "timeout_ms": 55000,
-  "total_timeout_s": 190,
-  "recorded_date": "2026-07-15"
+  "observed_load_ms": 8000,
+  "timeout_ms": 90000,
+  "total_timeout_s": 180,
+  "playbook_type": "pdfemb",
+  "site_type": "wp_pdfemb",
+  "operator_notes": [
+    "PDF Embedder shows several weekly PDFs on one page — newest at the top.",
+    "Harvester picks the best bulletin PDF from network-loaded www-static URLs (ignore Volunteer EOI etc.).",
+    "Site SSL certificate is often expired — host profile sets ignore_https_errors."
+  ],
+  "do_not": [
+    "Do not hardcode one dated PDF URL — it changes every week.",
+    "Do not download Volunteer-EOI or other non-bulletin PDFs on the page."
+  ],
+  "recorded_date": "2026-07-29"
 }

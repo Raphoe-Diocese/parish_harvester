@@ -801,14 +801,16 @@ async def _find_stacked_bulletin_image_urls(
     count: int,
     *,
     selector: str = "",
-    min_long_side: int = 800,
-    min_short_side: int = 600,
+    min_long_side: int = 550,
+    min_short_side: int = 500,
     position: str = "first",
 ) -> list[str]:
     """Return *count* large bulletin images on the page in DOM order.
 
-    position: "first" (default) or "last" — Wix homepages often archive old
-    bulletin JPEGs above the current week; use "last" to grab the newest pair.
+    Defaults accept A4-ish page scans (~595×841) while still excluding small
+    logos/icons. position: "first" (default) or "last" — Wix homepages often
+    archive old bulletin JPEGs above the current week; use "last" to grab the
+    newest pair.
     """
     if count < 1:
         return []
@@ -873,7 +875,12 @@ async def _print_page_to_pdf(page: Page, dest: Path) -> None:
 
 
 async def _smart_print_page_to_pdf(
-    page: Page, dest: Path, target: date, *, wait_ms: int = 2500
+    page: Page,
+    dest: Path,
+    target: date,
+    *,
+    wait_ms: int = 2500,
+    skip_listing_nav: bool = False,
 ) -> None:
     """Print HTML bulletins using Parish Messenger / content-region detection when possible."""
     from .html_capture import capture_html_page_as_pdf
@@ -884,6 +891,7 @@ async def _smart_print_page_to_pdf(
         target,
         print_pdf=_print_page_to_pdf,
         wait_ms=wait_ms,
+        skip_listing_nav=skip_listing_nav,
     )
     if not ok:
         await _print_page_to_pdf(page, dest)
@@ -916,10 +924,28 @@ async def _prepare_page_for_html_print(
 
 
 async def _find_pdfemb_url(page: Page) -> str | None:
+    """Best PDF Embedder bulletin URL on the page.
+
+    Newer PDF Embedder builds render canvases without ``a.pdfemb-viewer[href]``.
+    Fall back to network-loaded ``*.pdf`` resources (and any leftover hrefs).
+    """
     links = await page.eval_on_selector_all(PDFEMB_SELECTOR, PDFEMB_HREF_EXTRACT_JS)
+    try:
+        network_pdfs = await page.evaluate(
+            """() => performance.getEntriesByType('resource')
+                .map(r => r.name)
+                .filter(n => /\\.pdf($|\\?)/i.test(n))"""
+        )
+    except Exception:
+        network_pdfs = []
+    if not isinstance(network_pdfs, list):
+        network_pdfs = []
+
     candidates: list[str] = []
-    for href in links:
-        resolved = urljoin(page.url, href)
+    for href in [*links, *network_pdfs]:
+        if not isinstance(href, str) or not href.strip():
+            continue
+        resolved = urljoin(page.url, href.strip())
         lower = resolved.lower()
         if not (lower.endswith(".pdf") or ".pdf" in lower):
             continue
@@ -928,8 +954,13 @@ async def _find_pdfemb_url(page: Page) -> str | None:
         candidates.append(resolved)
     if not candidates:
         return None
-    candidates.sort(key=lambda u: _score_bulletin_url(u), reverse=True)
-    return candidates[0]
+    # Prefer first occurrence order for equal scores (top embed = current week).
+    ranked = sorted(
+        enumerate(candidates),
+        key=lambda item: (_score_bulletin_url(item[1]), -item[0]),
+        reverse=True,
+    )
+    return ranked[0][1]
 
 
 async def _find_iframe_pdf_url(page: Page) -> str | None:
@@ -965,12 +996,13 @@ async def _click_locator_match(
     locator,
     step_timeout_ms: int,
 ) -> None:
+    href = ((await locator.get_attribute("href")) or "").strip()
+    resolved = urljoin(page.url, href) if href else ""
+    before = page.url
     try:
         await locator.wait_for(state="visible", timeout=step_timeout_ms)
         await locator.click(timeout=step_timeout_ms)
     except PlaywrightTimeoutError:
-        href = (await locator.get_attribute("href")) or ""
-        resolved = urljoin(page.url, href.strip()) if href.strip() else ""
         if resolved and _looks_like_http_url(resolved):
             await _navigate_page(page, resolved, step_timeout_ms, wait_until="commit")
         else:
@@ -979,6 +1011,21 @@ async def _click_locator_match(
         await page.wait_for_load_state("domcontentloaded", timeout=POST_CLICK_WAIT_TIMEOUT_MS)
     except PlaywrightTimeoutError:
         pass
+
+    # Some WP themes "accept" the click without leaving the listing page.
+    # If we have a real article href and the URL did not change, navigate directly.
+    if resolved and _looks_like_http_url(resolved):
+        before_path = urlparse(before).path.rstrip("/")
+        after_path = urlparse(page.url).path.rstrip("/")
+        target_path = urlparse(resolved).path.rstrip("/")
+        if after_path == before_path and target_path and target_path != before_path:
+            await _navigate_page(page, resolved, step_timeout_ms, wait_until="commit")
+            try:
+                await page.wait_for_load_state(
+                    "domcontentloaded", timeout=POST_CLICK_WAIT_TIMEOUT_MS
+                )
+            except PlaywrightTimeoutError:
+                pass
 
 
 def _peek_next_download_step(steps: list, index: int) -> dict | None:
@@ -1417,8 +1464,8 @@ async def replay_recipe(
                         'Recipe image_stack position must be "first" or "last"'
                     )
                 try:
-                    min_long_side = int(step.get("min_long_side") or 800)
-                    min_short_side = int(step.get("min_short_side") or 600)
+                    min_long_side = int(step.get("min_long_side") or 550)
+                    min_short_side = int(step.get("min_short_side") or 500)
                 except (TypeError, ValueError) as exc:
                     raise RecipeReplayError("Recipe image_stack step has invalid size filter") from exc
 
@@ -1448,7 +1495,8 @@ async def replay_recipe(
                     await page.goto(html_url, timeout=step_timeout_ms, wait_until="domcontentloaded")
                 await _prepare_page_for_html_print(page, recipe, step_timeout_ms)
                 print_wait_ms = 25_000 if _recipe_uses_parish_messenger(recipe) else 2500
-                await _smart_print_page_to_pdf(page, dest, target_date, wait_ms=print_wait_ms)
+                skip_nav = bool(step.get("skip_listing_nav", False))
+                await _smart_print_page_to_pdf(page, dest, target_date, wait_ms=print_wait_ms, skip_listing_nav=skip_nav)
                 return dest, "print_to_pdf", html_url
 
             if action == "print_to_pdf":
@@ -1460,7 +1508,8 @@ async def replay_recipe(
                     await page.goto(pdf_url, timeout=step_timeout_ms, wait_until="domcontentloaded")
                 await _prepare_page_for_html_print(page, recipe, step_timeout_ms)
                 print_wait_ms = 25_000 if _recipe_uses_parish_messenger(recipe) else 2500
-                await _smart_print_page_to_pdf(page, dest, target_date, wait_ms=print_wait_ms)
+                skip_nav = bool(step.get("skip_listing_nav", False))
+                await _smart_print_page_to_pdf(page, dest, target_date, wait_ms=print_wait_ms, skip_listing_nav=skip_nav)
                 return dest, "print_to_pdf", pdf_url
 
             if action == "crop_screenshot":

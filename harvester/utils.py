@@ -4,9 +4,28 @@ utils.py — Shared helper utilities for the Parish Bulletin Harvester.
 from __future__ import annotations
 
 import re
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from urllib.parse import quote, unquote, urlparse
+
+
+def format_uk_date(iso_date: str | date | None) -> str:
+    """Format a date for display as DD/MM/YYYY (UK). Pass-through if unparseable."""
+    if iso_date is None:
+        return ""
+    if isinstance(iso_date, date) and not isinstance(iso_date, datetime):
+        return iso_date.strftime("%d/%m/%Y")
+    raw = str(iso_date or "").strip()
+    if not raw:
+        return ""
+    # Accept YYYY-MM-DD or full ISO timestamps.
+    match = re.match(r"^(\d{4})-(\d{2})-(\d{2})", raw)
+    if match:
+        return f"{match.group(3)}/{match.group(2)}/{match.group(1)}"
+    try:
+        return datetime.fromisoformat(raw.replace("Z", "+00:00")).strftime("%d/%m/%Y")
+    except ValueError:
+        return raw
 
 
 # ---------------------------------------------------------------------------

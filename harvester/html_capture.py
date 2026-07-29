@@ -102,8 +102,13 @@ _HIDE_CHROME_JS = """
   if (!root) return false;
   const mark = (node) => {
     if (!node || node === document.documentElement) return;
+    // Stop at the bulletin root — keep all of its descendants visible.
+    if (node === root) return;
     for (const child of Array.from(node.children)) {
-      if (child === root || root.contains(child)) {
+      // Keep walking ancestors of root (child.contains(root)), not descendants
+      // (root.contains(child)) — the old check hid the parent wrapper and
+      // printed a blank ~1KB PDF.
+      if (child === root || child.contains(root)) {
         mark(child);
       } else {
         child.style.setProperty('display', 'none', 'important');
@@ -215,6 +220,53 @@ async def wait_for_dynamic_bulletin(page: Page, timeout_ms: int = 20_000) -> boo
         return False
 
 
+_CONTENT_TEXT_LEN_JS = """
+(selector) => {
+  const els = Array.from(document.querySelectorAll(selector));
+  let best = 0;
+  for (const el of els) {
+    const n = (el.innerText || '').replace(/\\s+/g, ' ').trim().length;
+    if (n > best) best = n;
+  }
+  return best;
+}
+"""
+
+_HIDE_BEST_MATCH_JS = """
+(selector) => {
+  const els = Array.from(document.querySelectorAll(selector));
+  let best = null;
+  let bestLen = 0;
+  for (const el of els) {
+    const n = (el.innerText || '').replace(/\\s+/g, ' ').trim().length;
+    if (n > bestLen) {
+      bestLen = n;
+      best = el;
+    }
+  }
+  if (!best || bestLen < 200) return false;
+  best.setAttribute('data-ph-bulletin-root', '1');
+  const root = best;
+  const mark = (node) => {
+    if (!node || node === document.documentElement) return;
+    if (node === root) return;
+    for (const child of Array.from(node.children)) {
+      if (child === root || child.contains(root)) {
+        mark(child);
+      } else {
+        child.style.setProperty('display', 'none', 'important');
+      }
+    }
+  };
+  mark(document.body);
+  root.style.setProperty('display', 'block', 'important');
+  root.style.setProperty('max-width', '100%', 'important');
+  window.scrollTo(0, 0);
+  return true;
+}
+"""
+
+
 async def hide_non_content_chrome(page: Page) -> str | None:
     try:
         messenger_sel = await page.evaluate(_MARK_MESSENGER_ROOT_JS)
@@ -229,8 +281,17 @@ async def hide_non_content_chrome(page: Page) -> str | None:
             return messenger_sel
 
     for selector in CONTENT_SELECTORS:
+        # Skip [data-ph-bulletin-root] here — only set by messenger / best-match below.
+        if selector == "[data-ph-bulletin-root]":
+            continue
         try:
-            used = await page.evaluate(_HIDE_CHROME_JS, selector)
+            text_len = await page.evaluate(_CONTENT_TEXT_LEN_JS, selector)
+        except Exception:
+            text_len = 0
+        if not isinstance(text_len, int) or text_len < 200:
+            continue
+        try:
+            used = await page.evaluate(_HIDE_BEST_MATCH_JS, selector)
         except Exception:
             continue
         if used:
@@ -246,10 +307,12 @@ async def capture_html_page_as_pdf(
     print_pdf: Callable[[Page, Path], Awaitable[None]],
     verify_pdf: Callable[[Path], None] | None = None,
     wait_ms: int = 1500,
+    skip_listing_nav: bool = False,
 ) -> tuple[bool, str]:
     """Returns (success, capture_mode)."""
     await wait_for_dynamic_bulletin(page, timeout_ms=max(wait_ms, 15_000))
-    await try_navigate_to_current_bulletin(page, target)
+    if not skip_listing_nav:
+        await try_navigate_to_current_bulletin(page, target)
     if wait_ms > 0:
         wait_for_timeout = getattr(page, "wait_for_timeout", None)
         if callable(wait_for_timeout):

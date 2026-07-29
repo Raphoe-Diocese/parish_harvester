@@ -274,13 +274,23 @@ def _extract_date_from_url(url: str) -> date | None:
 
 
 def update_stale_bulletins(
-    results: list[FetchResult], bulletins_path: Path | None = None
+    results: list[FetchResult],
+    bulletins_path: Path | None = None,
+    *,
+    target: date | None = None,
 ) -> dict[str, object]:
-    """Persist stale/unknown bulletin-date checks based on result URLs."""
+    """Persist stale/unknown bulletin-date checks based on result URLs.
+
+    Ages are measured against the harvest *target* Sunday when provided,
+    matching ``bulletin_freshness.MAX_STALE_DAYS_FROM_TARGET``. Falling back
+    to ``date.today()`` keeps unit tests and ad-hoc callers working.
+    """
+    from .bulletin_freshness import MAX_STALE_DAYS_FROM_TARGET
+
     path = bulletins_path or _STALE_BULLETINS_PATH
     path.parent.mkdir(parents=True, exist_ok=True)
 
-    today = date.today()
+    reference = target if target is not None else date.today()
     stale: list[dict[str, object]] = []
     unknown_date: list[dict[str, object]] = []
 
@@ -303,8 +313,9 @@ def update_stale_bulletins(
             )
             continue
 
-        days_old = (today - extracted).days
-        if days_old > 8:
+        days_from_target = (extracted - reference).days
+        days_old = abs(days_from_target)
+        if days_old > MAX_STALE_DAYS_FROM_TARGET:
             stale.append(
                 {
                     "key": key,
@@ -312,6 +323,7 @@ def update_stale_bulletins(
                     "url": result.url,
                     "extracted_date": extracted.isoformat(),
                     "days_old": days_old,
+                    "days_from_target": days_from_target,
                     "reason": "date_in_url",
                 }
             )
@@ -320,6 +332,7 @@ def update_stale_bulletins(
         "generated_at": datetime.now(timezone.utc)
         .replace(tzinfo=None)
         .isoformat(timespec="seconds"),
+        "harvest_target": reference.isoformat(),
         "stale": stale,
         "unknown_date": unknown_date,
     }

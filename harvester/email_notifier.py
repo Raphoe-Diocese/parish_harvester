@@ -32,6 +32,7 @@ from email.mime.text import MIMEText
 from pathlib import Path
 
 from .logger import get_logger
+from .utils import format_uk_date
 
 logger = get_logger(__name__)
 
@@ -358,7 +359,7 @@ def send_harvest_notification(
         return
 
     target_date = report.get("target_date", "unknown")
-    subject = f"✅ Parish Harvest Complete - {target_date}"
+    subject = f"✅ Parish Harvest Complete - {format_uk_date(target_date) or target_date}"
 
     html_body = generate_email_html(report, duration_seconds)
     plain_body = generate_email_plain(report, duration_seconds)

@@ -153,7 +153,7 @@ class ManifestBuilderTests(unittest.TestCase):
                 item.findtext("title"),
             )
             self.assertEqual(
-                "https://frankytyrone.github.io/parish_harvester/mega_pdf/derry_mega_bulletin.pdf",
+                "https://raphoe-diocese.github.io/parish_harvester/mega_pdf/derry_mega_bulletin.pdf",
                 item.findtext("link"),
             )
 

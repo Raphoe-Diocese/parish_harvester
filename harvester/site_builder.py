@@ -393,7 +393,7 @@ def _placeholder_page(diocese: DioceseCard, out_path: Path) -> None:
 </head>
 <body>
   <main class=\"wrap\">
-    <h1 class=\"headline\">{diocese.name.upper()} DIOCESE BIG BULLETIN</h1>
+    <h1 class=\"headline\">{diocese.name.upper()} DIOCESE COLLATED BULLETIN</h1>
     <section class=\"card\">
       <p>We're still collecting bulletins for this diocese. Check back next Sunday.</p>
     </section>
@@ -500,7 +500,7 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
   </main>
   <footer class=\"footer\">
     <p><a href=\"bulletins/index.html\">Browse the full OCR bulletin archive</a></p>
-    <p><a href=\"mega_pdf/index.html\">Open the mega PDF tab viewer</a></p>
+    <p><a href=\"mega_pdf/index.html\">Open the Collated Bulletin PDF viewer</a></p>
     <p><a href=\"EMBEDDING.md\">Read the embedding guide</a> · <a href=\"embed-examples.html\">Open copy/paste embed examples</a></p>
     <p><a href=\"badges/\">Parish reliability scores</a></p>
     <p>Subscribe (RSS): <a href=\"feeds/derry_diocese.xml\">Derry Diocese</a> · <a href=\"feeds/down_and_connor.xml\">Down &amp; Connor</a></p>
@@ -579,7 +579,9 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
     downloaded = _load_downloaded(report_path)
     reliability = _load_reliability()
     _downloaded_map, _failed_map, _skipped_map, target_date = _load_report_sections(report_path)
-    week_label = target_date or "this Sunday"
+    from harvester.utils import format_uk_date
+
+    week_label = format_uk_date(target_date) or target_date or "this Sunday"
 
     rows: list[dict[str, str]] = []
     for diocese in dioceses:
@@ -602,10 +604,10 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
                 ocr_is_html=ocr_is_html,
                 week_label=week_label if target_date else "",
                 diocese_display_name=diocese.name,
-                headline=f"{display_upper} BIG BULLETIN",
+                headline=f"{display_upper} COLLATED BULLETIN",
                 parish_heading=f"{display_upper} PARISHES WITH WORKING BULLETIN LINKS",
             )
-            updated_label = target_date or "Coming soon"
+            updated_label = format_uk_date(target_date) or target_date or "Coming soon"
         else:
             _placeholder_page(diocese, out_path)
             updated_label = "Coming soon"

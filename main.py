@@ -49,12 +49,9 @@ from train import run_training
 
 
 def format_uk_date(iso_date: str) -> str:
-    raw = str(iso_date or "").strip()
-    try:
-        parsed = datetime.strptime(raw, "%Y-%m-%d")
-    except ValueError:
-        return raw
-    return parsed.strftime("%d/%m/%Y")
+    from harvester.utils import format_uk_date as _format_uk_date
+
+    return _format_uk_date(iso_date)
 
 
 def _silence_playwright_shutdown(
@@ -290,7 +287,7 @@ def main() -> int:
                 )
         update_consecutive_failures(all_results)
         prune_inactive_consecutive_failures()
-        update_stale_bulletins(all_results)
+        update_stale_bulletins(all_results, target=target)
 
     # Generate combined report (across all dioceses)
     print("\n── Report ──────────────────────────────────────────────────")

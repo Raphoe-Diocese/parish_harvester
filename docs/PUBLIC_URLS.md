@@ -14,7 +14,7 @@
 | Raphoe diocese bulletin | https://raphoe-diocese.github.io/parish_harvester/dioceses/raphoe/ |
 | OCR archive (all weeks) | https://raphoe-diocese.github.io/parish_harvester/bulletins/ |
 | Search | https://raphoe-diocese.github.io/parish_harvester/search/ |
-| Mega PDF tab viewer | https://raphoe-diocese.github.io/parish_harvester/mega_pdf/ |
+| Collated Bulletin PDF viewer | https://raphoe-diocese.github.io/parish_harvester/mega_pdf/ |
 | Site map | https://raphoe-diocese.github.io/parish_harvester/sitemap.html |
 
 ## Extension auto-update (same Pages site)

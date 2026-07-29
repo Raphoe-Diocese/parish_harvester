@@ -7,7 +7,7 @@
 3. **Harvest** current-week PDFs via GitHub Actions (`python main.py`).
 4. **Fix** failures from the extension Problems tab → retrain → Send & test.
 
-Mega PDF stitching is **off by default** (`HARVEST_MEGA_PDF=0`). Do not re-enable without explicit user request.
+Collated Bulletin PDF stitching is **off by default** (`HARVEST_MEGA_PDF=0`). Do not re-enable without explicit user request.
 
 ## Single source of truth for “what’s wrong?”
 
@@ -61,6 +61,19 @@ Extension Send & test
 2. Update `build_parish_status()` in `parish_status.py` (category/outcome logic).
 3. Update extension only if new fields are user-visible.
 4. Add/update tests in `tests/test_parish_status.py` and `tests/test_patch_report.py`.
+
+## Dates (user-facing)
+
+Always show **DD/MM/YYYY** (UK) in the extension, dashboards, emails, and site pages.
+Keep machine JSON fields as ISO `YYYY-MM-DD` / timestamps. Use `harvester.utils.format_uk_date`
+and extension `formatUkDate()`.
+
+## HTML bulletin gotchas (recipe replay)
+
+- Click with no URL change → force navigate to `href` (`replay._click_locator_match`).
+- `html` / `print_to_pdf` after click → set `skip_listing_nav: true` so `html_capture` does not leave the article.
+- Hide-chrome must use `child.contains(root)` (not `root.contains(child)`) or parents get hidden → blank ~1KB PDF.
+- A4 image bulletins may be ~595×841 — keep image_stack min sides low enough.
 
 ## Do not
 

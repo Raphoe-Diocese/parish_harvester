@@ -396,7 +396,7 @@ function _pdHarvestStatusForKey(parishKey) {
   if (!_pdHarvestReport || !parishKey) return "";
   const key = String(parishKey).trim().toLowerCase();
   const downloaded = (_pdHarvestReport.downloaded || []).some((r) => r.parish === key);
-  if (downloaded) return `✅ Last harvest (${_pdHarvestReport.target_date || ""}): OK`;
+  if (downloaded) return `✅ Last harvest (${formatUkDate(_pdHarvestReport.target_date) || "—"}): OK`;
   const failed = (_pdHarvestReport.failed || []).find((r) => r.parish === key);
   if (failed) {
     return `❌ Last harvest: ${String(failed.reason || failed.error || "failed").slice(0, 80)}`;
@@ -620,7 +620,7 @@ async function _pdLoadExcludes() {
 async function _pdSaveExcludes(excludes) {
   _pdExcludes = excludes;
   const content = JSON.stringify(excludes.sort(), null, 2);
-  return _pdGhPush(MEGA_EXCLUDES_PATH, content, "excludes: update mega PDF exclude list [from extension]");
+  return _pdGhPush(MEGA_EXCLUDES_PATH, content, "excludes: update Collated Bulletin exclude list [from extension]");
 }
 
 // ── Manual bulletin overrides ───────────────────────────────────────────────
@@ -831,9 +831,17 @@ function _pdFormatTime(ts) {
 
 function formatUkDate(isoDate) {
   const value = String(isoDate || "").trim();
-  const match = value.match(/^(\d{4})-(\d{2})-(\d{2})$/);
-  if (!match) return "—";
-  return `${match[3]}/${match[2]}/${match[1]}`;
+  if (!value) return "—";
+  const match = value.match(/(\d{4})-(\d{2})-(\d{2})/);
+  if (match) return `${match[3]}/${match[2]}/${match[1]}`;
+  const d = new Date(value);
+  if (!Number.isNaN(d.getTime())) {
+    const dd = String(d.getUTCDate()).padStart(2, "0");
+    const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
+    const yyyy = d.getUTCFullYear();
+    return `${dd}/${mm}/${yyyy}`;
+  }
+  return value;
 }
 
 async function _pdFetchLatestCommitTime(path) {
@@ -1004,7 +1012,7 @@ function _pdRenderSubfolder(container, details) {
   rowMega.className = "pd-subfolder-row";
   const rowMegaLabel = document.createElement("span");
   rowMegaLabel.className = "pd-subfolder-label";
-  rowMegaLabel.textContent = "Last included in mega bulletin:";
+  rowMegaLabel.textContent = "Last included in Collated Bulletin:";
   const rowMegaTime = document.createElement("span");
   rowMegaTime.className = "pd-subfolder-time";
   rowMegaTime.textContent = _pdFormatTime(details.lastIncludedIso);
@@ -1904,6 +1912,8 @@ async function _problemsRenderRows(rows) {
   }
   empty.textContent = "";
   const visitedMap = await _problemsGetVisitedMap();
+  const ghCfg = await _pdGetGithubConfig();
+  const ghRepo = ghCfg?.ghRepo || "Raphoe-Diocese/parish_harvester";
   for (const row of rows) {
     const tr = document.createElement("tr");
 
@@ -1922,7 +1932,7 @@ async function _problemsRenderRows(rows) {
     if (row.error_text) tipParts.push(row.error_text);
     if (row.advice) tipParts.push(row.advice);
     if (row.diagnosis?.recipe_recorded_date) {
-      tipParts.push(`GitHub recipe dated: ${row.diagnosis.recipe_recorded_date}`);
+      tipParts.push(`GitHub recipe dated: ${formatUkDate(row.diagnosis.recipe_recorded_date)}`);
     }
     if (row.diagnosis?.step_count != null) {
       tipParts.push(`Recipe steps on harvest: ${row.diagnosis.step_count}`);
@@ -1984,12 +1994,24 @@ async function _problemsRenderRows(rows) {
     testBtn.className = "problems-verify-btn";
     testBtn.textContent = row.retrainedPending ? "▶ Check result" : "▶ Test parish";
     testBtn.title = row.retrainedPending
-      ? "Check the result from your last Send & test (single-parish harvest, not mega PDF)"
+      ? "Check the result from your last Send & test (single-parish harvest, not Collated Bulletin PDF)"
       : "Run a single-parish harvest test on GitHub — no recipe push needed";
     testBtn.addEventListener("click", () => {
       void _problemsVerifyHarvest(row, testBtn, { forceDispatch: !row.retrainedPending });
     });
     action.appendChild(testBtn);
+
+    const recipeSlug = _pdDioceseSlug(row.diocese || "");
+    if (recipeSlug && row.parish) {
+      const ghLink = document.createElement("a");
+      ghLink.className = "problems-github-link";
+      ghLink.href = `https://github.com/${ghRepo}/blob/main/parishes/recipes/${recipeSlug}/${row.parish}.json`;
+      ghLink.target = "_blank";
+      ghLink.rel = "noopener noreferrer";
+      ghLink.textContent = "GitHub";
+      ghLink.title = "Open recipe JSON on GitHub";
+      action.appendChild(ghLink);
+    }
 
     const removeBtn = document.createElement("button");
     removeBtn.type = "button";
@@ -2176,7 +2198,7 @@ function _pdShowNewDioceseDialog() {
     try {
       await _pdCreateDiocese(inp.value);
       setStatus(
-        "✅ New diocese saved. Harvesting will pick it up automatically. Its public webpage + mega PDF + OCR will appear once a harvest run produces its mega PDF.",
+        "✅ New diocese saved. Harvesting will pick it up automatically. Its public webpage + Collated Bulletin PDF + OCR will appear once a harvest run produces its Collated Bulletin.",
         "ok"
       );
       row.remove();
@@ -2494,7 +2516,7 @@ function _pdBuildRow(parish, excludes) {
   const excl = document.createElement("input");
   excl.type = "checkbox";
   excl.className = "pd-excl";
-  excl.title = "Exclude from mega PDF this week";
+  excl.title = "Exclude from Collated Bulletin this week";
   excl.checked = excludes.includes(parish.key);
   excl.addEventListener("change", async () => {
     excl.disabled = true;
@@ -2505,7 +2527,7 @@ function _pdBuildRow(parish, excludes) {
         : current.filter((k) => k !== parish.key);
       const res = await _pdSaveExcludes(updated);
       if (!res?.ok) { excl.checked = !excl.checked; setStatus(`❌ ${res?.error || "Save failed."}`, "err"); }
-      else setStatus(`✅ ${parish.name} ${excl.checked ? "excluded from" : "included in"} mega PDF.`, "ok");
+      else setStatus(`✅ ${parish.name} ${excl.checked ? "excluded from" : "included in"} Collated Bulletin.`, "ok");
     } catch (err) {
       excl.checked = !excl.checked; setStatus(`❌ ${err.message}`, "err");
     } finally {

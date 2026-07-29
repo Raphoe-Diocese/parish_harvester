@@ -6,29 +6,43 @@
   "start_url": "https://ardara.ie/news/",
   "steps": [
     {
-      "action": "click",
-      "href": "https://ardara.ie/news/church-of-the-holy-family-newsletter-sun-26th-july-26/",
-      "selector": "a:has-text(\"Church of the Holy Family Newsletter: Sun. 26th July ’26\")",
-      "text": "Church of the Holy Family Newsletter: Sun. 26th July ’26 Jul"
+      "action": "goto",
+      "url": "https://ardara.ie/news/"
     },
     {
-      "action": "print_to_pdf",
-      "selector": "article"
+      "action": "click",
+      "selector": "#wpsp-24188 article:first-child h2.wp-show-posts-entry-title a",
+      "text": "Church of the Holy Family Newsletter",
+      "pick_strategy": "first_match",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "h2.wp-show-posts-entry-title a[href*='church-of-the-holy-family-newsletter']",
+        "section.wp-show-posts article h2 a[href*='church-of-the-holy-family-newsletter']"
+      ]
+    },
+    {
+      "action": "html",
+      "wait_ms": 3000,
+      "skip_listing_nav": true
     }
   ],
-  "observed_load_ms": 2896.5,
-  "timeout_ms": 55000,
-  "total_timeout_s": 250,
-  "playbook_type": "wix_html",
+  "observed_load_ms": 5000,
+  "timeout_ms": 90000,
+  "total_timeout_s": 180,
+  "playbook_type": "html_text_bulletin",
   "site_type": "html_text_bulletin",
   "operator_notes": [
-    "Bulletin text is on the web page — not a downloadable PDF file.",
-    "Use Save page as PDF on the newsletter article page.",
-    "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
+    "Bulletin is HTML on the article page — not a downloadable PDF.",
+    "Click the newest Holy Family Newsletter on /news/, then html step prints it.",
+    "skip_listing_nav=true prevents html_capture re-navigating away from the article."
   ],
   "do_not": [
-    "Do not use Pick bulletin image when the page is mostly text paragraphs.",
-    "Do not stop at click-only — need print_to_pdf as the final step."
+    "Do not pin a fixed weekly URL — the slug changes every Sunday.",
+    "Do not remove skip_listing_nav — without it html_capture re-navigates away and prints a blank page."
   ],
-  "recorded_date": "2026-07-29"
+  "recorded_date": "2026-07-29",
+  "bulletin_layout": {
+    "strategy": "first_match",
+    "position": "top"
+  }
 }

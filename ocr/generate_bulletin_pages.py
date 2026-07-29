@@ -66,21 +66,21 @@ _FALLBACK_DIOCESES = [
     {
         "key": "derry",
         "display_name": "Derry Diocese",
-        "headline": "DERRY DIOCESE BIG BULLETIN",
+        "headline": "DERRY DIOCESE COLLATED BULLETIN",
         "evidence_file": "parishes/derry_diocese_bulletin_urls.txt",
         "pdf_filename": "derry_mega_bulletin.pdf",
     },
     {
         "key": "down_and_connor",
         "display_name": "Down & Connor Diocese",
-        "headline": "DOWN & CONNOR DIOCESE BIG BULLETIN",
+        "headline": "DOWN & CONNOR DIOCESE COLLATED BULLETIN",
         "evidence_file": "parishes/down_and_connor_bulletin_urls.txt",
         "pdf_filename": "down_and_connor_mega_bulletin.pdf",
     },
     {
         "key": "raphoe",
         "display_name": "Raphoe Diocese",
-        "headline": "RAPHOE DIOCESE BIG BULLETIN",
+        "headline": "RAPHOE DIOCESE COLLATED BULLETIN",
         "evidence_file": "parishes/raphoe_diocese_bulletin_urls.txt",
         "pdf_filename": "raphoe_mega_bulletin.pdf",
     },
@@ -367,60 +367,79 @@ def render_ocr_standalone_page(
   <style>
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
     body {{
-      font-family: "Segoe UI", Arial, sans-serif;
-      background: #f7f8fb;
+      font-family: Georgia, "Times New Roman", Times, serif;
+      background: #fafbfc;
       color: {TEXT};
-      line-height: 1.75;
-      font-size: 17px;
+      line-height: 1.55;
+      font-size: 18px;
       -webkit-text-size-adjust: 100%;
     }}
     a {{ color: {TEAL}; text-decoration: none; font-weight: 600; }}
     a:hover {{ text-decoration: underline; }}
-    .page {{ max-width: 900px; margin: 0 auto; padding: 20px 16px 40px; }}
-    .back-link {{ display: inline-block; margin-bottom: 14px; font-weight: 700; color: {TEAL}; }}
-    h1 {{ margin: 0 0 8px; color: {TEAL}; font-size: clamp(1.4rem, 4vw, 2rem); }}
-    .meta {{ color: #6b7280; font-size: 0.95rem; margin-bottom: 18px; }}
+    .page {{ max-width: 42rem; margin: 0 auto; padding: 16px 20px 48px; }}
+    .back-link {{
+      display: inline-block; margin-bottom: 12px; font-weight: 700; color: {TEAL};
+      font-family: "Segoe UI", system-ui, sans-serif; font-size: 0.92rem;
+    }}
+    h1 {{
+      margin: 0 0 8px; color: {TEAL}; font-size: clamp(1.35rem, 3.5vw, 1.85rem);
+      font-family: "Segoe UI", system-ui, sans-serif; font-weight: 700; letter-spacing: -0.02em;
+    }}
+    .meta {{
+      color: #6b7280; font-size: 0.9rem; margin-bottom: 16px;
+      font-family: "Segoe UI", system-ui, sans-serif;
+    }}
     .ocr-body {{
       background: #fff;
-      border: 1px solid #d6ecea;
-      border-radius: 14px;
-      padding: 20px 18px;
-      box-shadow: 0 4px 12px rgba(26, 107, 107, 0.06);
+      border: 1px solid #e5ebea;
+      border-radius: 8px;
+      padding: 28px 24px;
     }}
-    .ocr-body h1, .ocr-body h2 {{ color: {DEEP_TEAL}; margin: 16px 0 10px; font-weight: 700; }}
-    .ocr-body h3, .ocr-body h4 {{ color: {TEAL}; margin: 14px 0 8px; font-weight: 700; }}
+    .ocr-body h1, .ocr-body h2 {{ color: {DEEP_TEAL}; margin: 1.1em 0 0.45em; font-weight: 700; }}
+    .ocr-body h3, .ocr-body h4 {{ color: {TEAL}; margin: 1em 0 0.4em; font-weight: 700; }}
     .ocr-body h3.ocr-page-heading {{
-      font-size: 0.95rem;
-      letter-spacing: 0.08em;
+      font-size: 0.8rem;
+      letter-spacing: 0.06em;
       text-transform: uppercase;
-      margin-top: 24px;
+      margin-top: 1.6em;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      color: #6b7280;
     }}
-    .ocr-body p {{ margin: 0 0 12px; white-space: pre-wrap; }}
-    .ocr-body hr {{ border: 0; border-top: 1px solid #d4dfde; margin: 20px 0; }}
+    .ocr-body p {{ margin: 0 0 0.35em; white-space: pre-wrap; }}
+    .ocr-body hr {{ border: 0; border-top: 1px solid #e5ebea; margin: 1.25em 0; }}
     .ocr-body mark {{ background: #fff3cd; padding: 0 2px; border-radius: 2px; }}
     .ocr-body mark.search-active {{ background: #fde047; outline: 2px solid #0f5e5e; }}
     .ocr-search-bar {{ position: relative; margin-bottom: 10px; }}
-    .search-input {{ width: 100%; min-height: 48px; border: 1px solid #bdd7d5; border-radius: 8px; padding: 10px 40px 10px 12px; font-size: 1rem; }}
+    .search-input {{
+      width: 100%; min-height: 44px; border: 1px solid #bdd7d5; border-radius: 8px;
+      padding: 10px 40px 10px 12px; font-size: 1rem;
+      font-family: "Segoe UI", system-ui, sans-serif;
+    }}
     .search-clear {{ position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #6b7280; font-size: 1.2rem; cursor: pointer; }}
     .search-clear[hidden] {{ display: none; }}
-    .ocr-search-tools {{ display: flex; align-items: center; justify-content: space-between; gap: 10px; margin-bottom: 12px; flex-wrap: wrap; }}
+    .ocr-search-tools {{
+      display: flex; align-items: center; justify-content: space-between; gap: 10px;
+      margin-bottom: 14px; flex-wrap: wrap;
+      font-family: "Segoe UI", system-ui, sans-serif;
+    }}
     .ocr-search-tools button {{ border: 0; border-radius: 6px; background: {TEAL}; color: #fff; font-weight: 700; min-height: 40px; padding: 8px 14px; cursor: pointer; }}
     .ocr-search-tools button:disabled {{ background: #9bbfbd; cursor: not-allowed; }}
     .match-count {{ color: #6b7280; font-size: 0.92rem; font-weight: 700; }}
-    .ocr-scroll {{ max-height: 70vh; overflow-y: auto; -webkit-overflow-scrolling: touch; }}
     .note-box {{
-      margin-top: 16px;
+      margin-top: 20px;
       padding: 12px 16px;
-      border-radius: 10px;
+      border-radius: 8px;
       background: #fff4df;
       border: 1px solid #f5d08d;
       color: #713f12;
       font-weight: 600;
-      font-size: 0.95rem;
+      font-size: 0.9rem;
+      font-family: "Segoe UI", system-ui, sans-serif;
     }}
     @media (max-width: 600px) {{
-      .page {{ padding: 16px 12px 32px; }}
-      .ocr-body {{ padding: 16px 14px; font-size: 16px; }}
+      .page {{ padding: 12px 14px 36px; }}
+      body {{ font-size: 17px; }}
+      .ocr-body {{ padding: 18px 14px; }}
     }}
   </style>
 </head>
@@ -430,7 +449,7 @@ def render_ocr_standalone_page(
     <p class="meta">{html.escape(diocese_label)} · {html.escape(uk_bulletin_date)}</p>
     <h1>Parish Bulletin Text</h1>
     <div class="ocr-search-bar">
-      <input id="ocr-search" class="search-input" type="search" placeholder="🔍 Search (e.g. mass, bingo, parish name)..." aria-label="Search bulletin text" />
+      <input id="ocr-search" class="search-input" type="search" placeholder="Search (e.g. mass, bingo, parish name)..." aria-label="Search bulletin text" />
       <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
     </div>
     <div class="ocr-search-tools">
@@ -440,9 +459,7 @@ def render_ocr_standalone_page(
         <button id="ocr-next" type="button" disabled>Next match →</button>
       </div>
     </div>
-    <div class="ocr-scroll">
-      <div class="ocr-body" id="ocr-text">{ocr_fragment}</div>
-    </div>
+    <div class="ocr-body" id="ocr-text">{ocr_fragment}</div>
     <div class="note-box">This text is auto-generated from the parish bulletin PDF. Irish (Gaeilge) and English are preserved as printed. Please verify mass times and names against the original PDF.</div>
   </div>
   <script>
@@ -564,14 +581,14 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
   <style>
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
     body {{
-      font-family: "Segoe UI", Arial, sans-serif;
-      background: #f7f8fb;
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: #fafbfc;
       color: {TEXT};
-      line-height: 1.6;
+      line-height: 1.55;
     }}
     a {{ color: {TEAL}; text-decoration: none; }}
     a:hover {{ text-decoration: underline; }}
-    .page {{ max-width: 1400px; margin: 0 auto; padding: 20px 16px 40px; }}
+    .page {{ max-width: 1100px; margin: 0 auto; padding: 16px 16px 40px; }}
     .back-link {{ display: inline-block; margin-bottom: 14px; font-weight: 700; color: {TEAL}; }}
     .header {{ text-align: center; margin-bottom: 24px; }}
     .diocese-label {{ margin: 0 0 6px; color: {ACCENT}; font-size: 0.95rem; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 800; }}
@@ -740,11 +757,14 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
       overflow-y: auto;
       border: 1px solid #d9e4e3;
       border-radius: 10px;
-      padding: 24px;
+      padding: 28px 32px;
       background: white;
-      font-size: 17px;
-      line-height: 1.8;
+      font-family: Georgia, "Times New Roman", Times, serif;
+      font-size: 18px;
+      line-height: 1.55;
       color: {TEXT};
+      max-width: 42rem;
+      margin: 0 auto;
     }}
     #ocr-panel h1, #ocr-panel h2 {{
       color: {DEEP_TEAL};
@@ -799,8 +819,8 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
     #ocr-panel table.b-table tr:nth-child(even) td {{
       background: #f7f9fd;
     }}
-    #ocr-panel hr {{ border: 0; border-top: 1px solid #d4dfde; margin: 20px 0; }}
-    #ocr-panel p {{ margin: 0 0 12px; white-space: pre-wrap; }}
+    #ocr-panel hr {{ border: 0; border-top: 1px solid #e5ebea; margin: 1.25em 0; }}
+    #ocr-panel p {{ margin: 0 0 0.35em; white-space: pre-wrap; }}
     #ocr-panel mark {{ background: #fef08a; padding: 1px 3px; border-radius: 2px; }}
     #ocr-panel mark.search-active {{ background: #fde047; outline: 2px solid #0f5e5e; }}
     #ocr-panel a {{ color: {TEAL}; font-weight: 600; }}
@@ -878,7 +898,7 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
       padding: 16px 20px;
     }}
     .footer-inner {{
-      max-width: 1400px;
+      max-width: 1100px;
       margin: 0 auto;
       display: flex;
       justify-content: space-between;
@@ -977,7 +997,7 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
     </section>
   </div>
   <!-- Support Banner -->
-  <div style="max-width:1400px;margin:24px auto 0;padding:0 16px;">
+  <div style="max-width:1100px;margin:24px auto 0;padding:0 16px;">
     <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;background:#fff;border:1px solid #d6ecea;border-radius:12px;padding:14px 18px;">
       <span style="font-size:0.95rem;color:#4b5563;">📊 <span id="view-count">–</span> views this week</span>
       <div style="display:flex;gap:10px;flex-wrap:wrap;">
@@ -1299,7 +1319,7 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
       var daysSince = Math.floor((now - bulletinDate) / 86400000);
       if (daysSince > 8) {{
         var banner = document.createElement('div');
-        banner.style.cssText = 'max-width:1400px;margin:12px auto;padding:0 16px;';
+        banner.style.cssText = 'max-width:1100px;margin:12px auto;padding:0 16px;';
         banner.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px 16px;color:#991b1b;font-weight:600;text-align:center;">⚠️ This bulletin is ' + daysSince + ' days old. A newer version may be available — check back after Sunday\\'s harvest run.</div>';
         var page = document.querySelector('.page');
         if (page) page.insertBefore(banner, page.firstChild);

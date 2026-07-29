@@ -450,8 +450,15 @@ function _setDeadStatus(text, isError = false) {
 
 function _formatDeadDate(iso) {
   if (!iso) return "";
+  const value = String(iso).trim();
+  const match = value.match(/(\d{4})-(\d{2})-(\d{2})/);
+  if (match) return `${match[3]}/${match[2]}/${match[1]}`;
   try {
-    return new Date(iso).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" });
+    const d = new Date(iso);
+    if (Number.isNaN(d.getTime())) return "";
+    const dd = String(d.getUTCDate()).padStart(2, "0");
+    const mm = String(d.getUTCMonth() + 1).padStart(2, "0");
+    return `${dd}/${mm}/${d.getUTCFullYear()}`;
   } catch (_e) {
     return "";
   }

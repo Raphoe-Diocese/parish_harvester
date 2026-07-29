@@ -95,7 +95,7 @@ def render_diocese_raphoe_page(
     ocr_is_html: bool = False,
     week_label: str = "",
     diocese_display_name: str = "Raphoe Diocese",
-    headline: str = "RAPHOE DIOCESE BIG BULLETIN",
+    headline: str = "RAPHOE DIOCESE COLLATED BULLETIN",
     parish_heading: str = "RAPHOE PARISHES WITH WORKING BULLETIN LINKS",
     bulletin_viewer_url: str = "../../bulletins/index.html",
     ocr_standalone_url: str = "../../bulletins/index.html",
@@ -182,7 +182,7 @@ def render_diocese_page(
     payload = {
         "page_title": html.escape(f"{display} Diocese Big Bulletin"),
         "diocese_display_name": html.escape(display),
-        "headline": html.escape(f"{display.upper()} DIOCESE BIG BULLETIN"),
+        "headline": html.escape(f"{display.upper()} DIOCESE COLLATED BULLETIN"),
         "mega_pdf_url": html.escape(mega_pdf_url, quote=True),
         "archive_viewer_url": html.escape(archive_viewer_url, quote=True),
         "ocr_standalone_url": html.escape(ocr_standalone_url, quote=True),

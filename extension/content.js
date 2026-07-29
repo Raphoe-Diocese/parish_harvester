@@ -6739,7 +6739,12 @@
             const downloaded = (report.downloaded || []).some((r) => r.parish === key);
             const failed = (report.failed || []).find((r) => r.parish === key);
             if (downloaded) {
-              line = `✅ Last harvest (${report.target_date || "recent"}): downloaded OK`;
+              const ukDate = (() => {
+                const raw = String(report.target_date || "");
+                const m = raw.match(/(\d{4})-(\d{2})-(\d{2})/);
+                return m ? `${m[3]}/${m[2]}/${m[1]}` : (raw || "recent");
+              })();
+              line = `✅ Last harvest (${ukDate}): downloaded OK`;
               harvestStatusLine.style.color = "#86efac";
             } else if (failed) {
               const reason = String(failed.reason || failed.error || "failed").slice(0, 90);

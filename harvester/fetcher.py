@@ -921,9 +921,21 @@ async def _find_pdfemb_url(page: Page) -> str | None:
         "a.pdfemb-viewer[href]",
         "(els) => els.map(el => el.getAttribute('href')).filter(Boolean)",
     )
+    try:
+        network_pdfs = await page.evaluate(
+            """() => performance.getEntriesByType('resource')
+                .map(r => r.name)
+                .filter(n => /\\.pdf($|\\?)/i.test(n))"""
+        )
+    except Exception:
+        network_pdfs = []
+    if not isinstance(network_pdfs, list):
+        network_pdfs = []
     candidates: list[str] = []
-    for href in links:
-        resolved = _unwrap_docs_viewer_url(urljoin(page.url, href))
+    for href in [*links, *network_pdfs]:
+        if not isinstance(href, str) or not href.strip():
+            continue
+        resolved = _unwrap_docs_viewer_url(urljoin(page.url, href.strip()))
         lower = resolved.lower()
         if not (lower.endswith(".pdf") or ".pdf" in lower):
             continue
@@ -933,8 +945,12 @@ async def _find_pdfemb_url(page: Page) -> str | None:
     if not candidates:
         return None
     from harvester.replay import _score_bulletin_url
-    candidates.sort(key=lambda u: _score_bulletin_url(u), reverse=True)
-    return candidates[0]
+    ranked = sorted(
+        enumerate(candidates),
+        key=lambda item: (_score_bulletin_url(item[1]), -item[0]),
+        reverse=True,
+    )
+    return ranked[0][1]
 
 
 def _disallow_non_bulletin_url(url: str) -> str | None:

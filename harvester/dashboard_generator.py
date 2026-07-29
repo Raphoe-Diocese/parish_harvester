@@ -12,6 +12,8 @@ from collections import defaultdict
 from datetime import datetime, timedelta, timezone
 from pathlib import Path
 
+from .utils import format_uk_date
+
 
 def generate_dashboard(
     report_path: Path,
@@ -231,7 +233,7 @@ def generate_dashboard(
 
     <div class="header">
         <h1>📋 Parish Bulletin Harvest Dashboard</h1>
-        <p>Last updated: {report.get("target_date", "unknown")}</p>
+        <p>Last updated: {format_uk_date(report.get("target_date", "")) or "unknown"}</p>
     </div>
 
     {_summary_cards(report)}
@@ -253,8 +255,8 @@ def generate_dashboard(
 """
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(html, encoding="utf-8")
-    logger.info(f"📊 Dashboard created: {output_path}")
-    logger.info(f"🌐 Open in browser: file://{output_path.resolve()}")
+    print(f"  📊 Dashboard created: {output_path}")
+    print(f"  🌐 Open in browser: file://{output_path.resolve()}")
 
 
 # ---------------------------------------------------------------------------
@@ -377,7 +379,8 @@ def _parish_grid(report: dict) -> str:
         name = parish_data.get("display_name") or parish_data.get("parish", "Unknown")
         url = parish_data.get("url", "")
         error = parish_data.get("error", "")
-        ts = parish_data.get("timestamp", report.get("target_date", ""))
+        ts_raw = parish_data.get("timestamp", report.get("target_date", ""))
+        ts = format_uk_date(ts_raw) or str(ts_raw or "")
 
         if status == "success":
             badge = '<span class="badge badge-success">✅ Downloaded</span>'

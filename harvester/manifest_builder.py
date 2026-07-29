@@ -12,8 +12,8 @@ from xml.etree import ElementTree as ET
 
 from ocr.generate_bulletin_pages import DIOCESES
 
-PAGES_BASE_URL = "https://frankytyrone.github.io/parish_harvester"
-CDN_BASE_URL = "https://cdn.jsdelivr.net/gh/Frankytyrone/parish_harvester@main"
+PAGES_BASE_URL = "https://raphoe-diocese.github.io/parish_harvester"
+CDN_BASE_URL = "https://cdn.jsdelivr.net/gh/Raphoe-Diocese/parish_harvester@main"
 VIEWER_FILE_PATTERN = re.compile(r"^(derry|down_and_connor)-(\d{4}-\d{2}-\d{2})\.html$")
 OCR_PANEL_PATTERN = re.compile(
     r'<div id="ocr-panel">\s*(.*?)\s*</div>\s*<div class="note-box">',
@@ -310,7 +310,7 @@ def _write_rss_feeds(
         ET.SubElement(item, "link").text = mega_pdf
         ET.SubElement(item, "guid").text = f"{mega_pdf}#{item_date}"
         ET.SubElement(item, "pubDate").text = pub_date
-        ET.SubElement(item, "description").text = f"Latest mega PDF ({success_rate} success rate)"
+        ET.SubElement(item, "description").text = f"Latest Collated Bulletin PDF ({success_rate} success rate)"
 
         feed_path = feeds_dir / f"{diocese}.xml"
         ET.ElementTree(rss).write(feed_path, encoding="utf-8", xml_declaration=True)
