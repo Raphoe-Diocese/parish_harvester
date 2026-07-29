@@ -1,25 +1,69 @@
 {
+  "version": 1,
   "parish_key": "annagryparish",
-  "display_name": "Annagryparish",
+  "display_name": "Annagry",
   "diocese": "raphoe",
-  "recorded_date": "2026-06-17",
   "start_url": "https://annagryparish.ie/newsletter-2/",
-  "auto_fixed": true,
   "steps": [
     {
-      "action": "goto",
-      "url": "https://annagryparish.ie/newsletter-2/"
+      "action": "click",
+      "selector": "a[href$='.pdf']",
+      "href": "https://annagryparish.ie/wp-content/uploads/2026/07/260726.pdf",
+      "text": "26:07:26",
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "a[href$='.pdf']",
+        "a[href*='.pdf']"
+      ]
     },
     {
       "action": "click",
-      "selector": "a[href$=\".pdf\"], a[href*=\".pdf\"]",
-      "pick_strategy": "newest_dated"
+      "selector": "a[href$='.pdf']",
+      "href": "https://annagryparish.ie/wp-content/uploads/2026/07/260726.pdf",
+      "text": "",
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "bottom",
+      "fallback_selectors": [
+        "a[href$='.pdf']",
+        "a[href*='.pdf']",
+        "html > body > a"
+      ]
+    },
+    {
+      "action": "click",
+      "selector": "a[href$='.pdf']",
+      "href": "https://annagryparish.ie/wp-content/uploads/2026/07/260726.pdf",
+      "text": "26:07:26",
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "a[href$='.pdf']",
+        "a[href*='.pdf']"
+      ]
     },
     {
       "action": "download",
-      "url": "https://annagryparish.ie/wp-content/uploads/2026/06/210626.pdf",
-      "use_captured_url": true
+      "url": "https://annagryparish.ie/wp-content/uploads/2026/07/260726.pdf"
     }
   ],
-  "version": 1
+  "observed_load_ms": 5150,
+  "timeout_ms": 55000,
+  "total_timeout_s": 490,
+  "playbook_type": "pdf_download_list",
+  "site_type": "pdf_link_list",
+  "operator_notes": [
+    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
+    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+    "Do not worry if the filename or date in the link text changes every week."
+  ],
+  "do_not": [
+    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
+    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  },
+  "recorded_date": "2026-07-29"
 }
