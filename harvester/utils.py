@@ -138,6 +138,11 @@ def extract_date_from_string(text: str) -> date | None:
         except ValueError:
             pass
 
+    # Ordinal month-name slugs: 26th-July-2026, 5_april_2026
+    slug_date = extract_date_from_slug(text)
+    if slug_date:
+        return slug_date
+
     return None
 
 

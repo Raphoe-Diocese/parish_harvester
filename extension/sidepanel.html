@@ -187,8 +187,31 @@
         color: #9ca3af;
         line-height: 1.35;
       }
+      .problems-filters {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 6px;
+        margin: 0 0 8px;
+        align-items: center;
+      }
+      .problems-filters select {
+        font-size: 10px;
+        padding: 3px 6px;
+        background: #0f172a;
+        color: #e2e8f0;
+        border: 1px solid #334155;
+        border-radius: 4px;
+        max-width: 170px;
+      }
+      .problems-howto-toggle {
+        width: auto;
+        padding: 2px 8px;
+        font-size: 10px;
+        background: #075985;
+        margin-bottom: 6px;
+      }
       .problems-table-wrap {
-        max-height: 520px;
+        max-height: 560px;
         overflow: auto;
         border: 1px solid #374151;
         border-radius: 6px;
@@ -200,7 +223,7 @@
       }
       #problems-table th, #problems-table td {
         border-bottom: 1px solid #334155;
-        padding: 5px 6px;
+        padding: 4px 5px;
         text-align: left;
         vertical-align: top;
       }
@@ -209,6 +232,11 @@
         top: 0;
         background: #0f172a;
         color: #93c5fd;
+      }
+      .problems-url-cell a {
+        color: #93c5fd;
+        word-break: break-all;
+        font-size: 9px;
       }
       .problems-retrained {
         color: #86efac;
@@ -402,13 +430,14 @@
       </div>
 
       <div id="panel-problems" class="sp-panel active">
-        <div class="section" id="problems-howto" style="background:#0c4a6e;border-color:#0284c7;margin-bottom:8px;">
+        <button type="button" id="problems-howto-toggle" class="problems-howto-toggle">Show how-to ▸</button>
+        <div class="section" id="problems-howto" style="display:none;background:#0c4a6e;border-color:#0284c7;margin-bottom:8px;">
           <div style="font-size:11px;font-weight:700;color:#f9fafb;margin-bottom:5px;">How to fix a parish (3 steps)</div>
           <ol style="margin:0 0 0 18px;padding:0;font-size:10px;line-height:1.55;color:#e2e8f0;">
             <li><strong>Fix now</strong> — opens the parish news page in a new tab.</li>
             <li>On that page: record steps → <strong>Send & test</strong> (saves recipe + runs one-parish test).</li>
             <li>Or skip re-push: tap <strong>▶ Test parish</strong> here to harvest that parish only.</li>
-            <li>When the bulletin link appears below, you're done — move to the next parish.</li>
+            <li>When the parish leaves this list (Refresh), you're done.</li>
           </ol>
         </div>
         <div class="section">
@@ -420,6 +449,11 @@
               <button type="button" id="problems-refresh-btn" class="grey" style="width:auto;padding:4px 8px;font-size:10px;">↻ Refresh</button>
             </div>
           </div>
+          <div class="problems-filters">
+            <select id="problems-filter-diocese" title="Filter by diocese"><option value="">All dioceses</option></select>
+            <select id="problems-filter-category" title="Filter by reason"><option value="">All reasons</option></select>
+            <span id="problems-auto-refresh-note" style="font-size:9px;color:#64748b;">Auto-refresh 20 min</span>
+          </div>
           <div id="problems-verify-result"></div>
           <div class="problems-table-wrap">
             <table id="problems-table">
@@ -427,9 +461,10 @@
                 <tr>
                   <th>Parish</th>
                   <th>Diocese</th>
-                  <th>Failure category</th>
+                  <th>Reason</th>
+                  <th>Bulletin / PDF</th>
                   <th>Last test</th>
-                  <th>Consecutive failures</th>
+                  <th>#</th>
                   <th>Action</th>
                 </tr>
               </thead>

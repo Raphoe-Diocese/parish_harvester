@@ -370,6 +370,38 @@ function _pdUpdatePrimaryBulletinUrl(fileText, parishName, newUrl) {
 }
 
 let _pdHarvestReport = null;
+let _pdParishStatusDoc = null;
+let _problemsAllRows = [];
+let _problemsAutoRefreshTimer = null;
+const PROBLEMS_AUTO_REFRESH_MS = 20 * 60 * 1000;
+
+async function _pdLoadParishStatusDoc(force = false) {
+  if (_pdParishStatusDoc && !force) return _pdParishStatusDoc;
+  try {
+    const cfg = await _pdGetGithubConfig();
+    if (!cfg) return null;
+    const status = await _problemsFetchParishStatus(cfg.ghRepo, cfg.ghPat);
+    if (status?.schema_version >= 1) {
+      _pdParishStatusDoc = status;
+      try {
+        await chrome.storage.local.set({
+          ph_parish_status_cache: {
+            fetched_at: Date.now(),
+            target_date: status.target_date || "",
+            actionable_count: Array.isArray(status.actionable_keys) ? status.actionable_keys.length : 0,
+            summary: status.summary || {},
+          },
+        });
+      } catch (_e) {
+        // storage optional
+      }
+      return _pdParishStatusDoc;
+    }
+  } catch (_e) {
+    // fall through
+  }
+  return null;
+}
 
 async function _pdLoadHarvestReport() {
   if (_pdHarvestReport) return _pdHarvestReport;
@@ -382,7 +414,8 @@ async function _pdLoadHarvestReport() {
       return _pdHarvestReport;
     }
     const resp = await fetch(
-      `https://raw.githubusercontent.com/${cfg.ghRepo}/main/Bulletins/report.json`
+      `https://raw.githubusercontent.com/${cfg.ghRepo}/main/Bulletins/report.json?t=${Date.now()}`,
+      { cache: "no-store" }
     );
     if (!resp.ok) return null;
     _pdHarvestReport = await resp.json();
@@ -393,10 +426,33 @@ async function _pdLoadHarvestReport() {
 }
 
 function _pdHarvestStatusForKey(parishKey) {
-  if (!_pdHarvestReport || !parishKey) return "";
+  if (!parishKey) return "";
   const key = String(parishKey).trim().toLowerCase();
-  const downloaded = (_pdHarvestReport.downloaded || []).some((r) => r.parish === key);
-  if (downloaded) return `✅ Last harvest (${formatUkDate(_pdHarvestReport.target_date) || "—"}): OK`;
+  const statusItem = _pdParishStatusDoc?.parishes?.[key];
+  if (statusItem) {
+    const outcome = String(statusItem.outcome || "");
+    const url = String(statusItem.url || "").trim();
+    const when = formatUkDate(String(statusItem.last_tested_at || _pdParishStatusDoc?.target_date || "").slice(0, 10));
+    if (outcome === "ok") {
+      return url
+        ? `✅ Last harvest (${when || "—"}): OK — ${url}`
+        : `✅ Last harvest (${when || "—"}): OK`;
+    }
+    if (outcome === "stale") {
+      return `⚠️ Stale (${when || "—"}): ${String(statusItem.error || "bulletin too old").slice(0, 80)}`;
+    }
+    if (outcome && outcome !== "ok") {
+      return `❌ Last harvest: ${String(statusItem.error || statusItem.category || outcome).slice(0, 80)}`;
+    }
+  }
+  if (!_pdHarvestReport) return "";
+  const downloaded = (_pdHarvestReport.downloaded || []).find((r) => r.parish === key);
+  if (downloaded) {
+    const url = String(downloaded.url || "").trim();
+    return url
+      ? `✅ Last harvest (${formatUkDate(_pdHarvestReport.target_date) || "—"}): OK — ${url}`
+      : `✅ Last harvest (${formatUkDate(_pdHarvestReport.target_date) || "—"}): OK`;
+  }
   const failed = (_pdHarvestReport.failed || []).find((r) => r.parish === key);
   if (failed) {
     return `❌ Last harvest: ${String(failed.reason || failed.error || "failed").slice(0, 80)}`;
@@ -919,7 +975,10 @@ async function _pdBuildParishDetails(parish) {
   const override = _pdGetOverride(parish.key);
   const { recipe, path: recipePath } = await _pdLoadRecipeForParish(parish);
   const terminal = _pdRecipeTerminalUrl(recipe);
-  const currentUrl = (override?.url || terminal.url || parish.bulletinUrls[0] || parish.pageUrl || "").trim();
+  await _pdLoadParishStatusDoc();
+  await _pdLoadHarvestReport();
+  const statusUrl = String(_pdParishStatusDoc?.parishes?.[parish.key]?.url || "").trim();
+  const currentUrl = (override?.url || statusUrl || terminal.url || parish.bulletinUrls[0] || parish.pageUrl || "").trim();
   const changes = _pdConfirmedChangesList(parish, override, recipe, recipePath);
   const lastUpdatedRepoIso = await _pdFetchLatestCommitTime(recipePath || _pdDioceseTexts[parish.diocese]?.path || "");
   const lastIncludedIso = (_pdLastIncluded && _pdLastIncluded[parish.key]) || "";
@@ -1048,6 +1107,9 @@ function _pdFailureCount(parishKey) {
 }
 
 function _pdIsBroken(parishKey) {
+  const key = String(parishKey || "").trim().toLowerCase();
+  const item = _pdParishStatusDoc?.parishes?.[key];
+  if (item && typeof item.actionable === "boolean") return item.actionable === true;
   return _pdFailureCount(parishKey) >= 2;
 }
 
@@ -1901,13 +1963,72 @@ async function _problemsVerifyHarvest(row, verifyBtn, { forceDispatch = false } 
   });
 }
 
+function _problemsPopulateFilters(rows) {
+  const dioceseSel = document.getElementById("problems-filter-diocese");
+  const categorySel = document.getElementById("problems-filter-category");
+  if (!dioceseSel || !categorySel) return;
+  const dioceses = [...new Set(rows.map((r) => r.diocese).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+  const categories = [...new Set(rows.map((r) => r.category).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+  const keepDiocese = dioceseSel.value;
+  const keepCategory = categorySel.value;
+  dioceseSel.innerHTML = '<option value="">All dioceses</option>';
+  for (const d of dioceses) {
+    const opt = document.createElement("option");
+    opt.value = d;
+    opt.textContent = d;
+    dioceseSel.appendChild(opt);
+  }
+  categorySel.innerHTML = '<option value="">All reasons</option>';
+  for (const c of categories) {
+    const opt = document.createElement("option");
+    opt.value = c;
+    opt.textContent = c;
+    categorySel.appendChild(opt);
+  }
+  if ([...dioceseSel.options].some((o) => o.value === keepDiocese)) dioceseSel.value = keepDiocese;
+  if ([...categorySel.options].some((o) => o.value === keepCategory)) categorySel.value = keepCategory;
+}
+
+function _problemsFilteredRows() {
+  const diocese = String(document.getElementById("problems-filter-diocese")?.value || "");
+  const category = String(document.getElementById("problems-filter-category")?.value || "");
+  let rows = _problemsAllRows.slice();
+  if (diocese) rows = rows.filter((r) => r.diocese === diocese);
+  if (category) rows = rows.filter((r) => r.category === category);
+  // Sort: fewer failures first within same reason, then by name — easier wins first.
+  rows.sort((a, b) => {
+    const ca = String(a.category || "");
+    const cb = String(b.category || "");
+    if (ca !== cb) return ca.localeCompare(cb);
+    const fa = Number(a.consecutive_failures || 0);
+    const fb = Number(b.consecutive_failures || 0);
+    if (fa !== fb) return fa - fb;
+    return String(a.display_name || a.parish).localeCompare(String(b.display_name || b.parish));
+  });
+  return rows;
+}
+
+function _problemsShortUrl(url) {
+  const raw = String(url || "").trim();
+  if (!raw) return "";
+  try {
+    const u = new URL(raw);
+    const path = u.pathname.split("/").filter(Boolean).slice(-2).join("/") || u.hostname;
+    return path.length > 42 ? `${path.slice(0, 40)}…` : path;
+  } catch (_e) {
+    return raw.length > 42 ? `${raw.slice(0, 40)}…` : raw;
+  }
+}
+
 async function _problemsRenderRows(rows) {
   const tbody = document.getElementById("problems-body");
   const empty = document.getElementById("problems-empty");
   if (!tbody || !empty) return;
   _clearElement(tbody);
   if (!rows.length) {
-    empty.textContent = "No current problem rows.";
+    empty.textContent = _problemsAllRows.length
+      ? "No rows match these filters."
+      : "No current problem rows.";
     return;
   }
   empty.textContent = "";
@@ -1939,6 +2060,22 @@ async function _problemsRenderRows(rows) {
     }
     if (tipParts.length) category.title = tipParts.join("\n\n");
     tr.appendChild(category);
+
+    const urlCell = document.createElement("td");
+    urlCell.className = "problems-url-cell";
+    const bulletinUrl = String(row.url || row.start_url || "").trim();
+    if (/^https?:\/\//i.test(bulletinUrl)) {
+      const a = document.createElement("a");
+      a.href = bulletinUrl;
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
+      a.textContent = _problemsShortUrl(bulletinUrl);
+      a.title = bulletinUrl;
+      urlCell.appendChild(a);
+    } else {
+      urlCell.textContent = "—";
+    }
+    tr.appendChild(urlCell);
 
     const lastSeen = document.createElement("td");
     lastSeen.textContent = row.last_seen;
@@ -2055,12 +2192,15 @@ async function loadProblemsDashboard() {
   if (warning) warning.style.display = "none";
   if (empty) empty.textContent = "Loading…";
   for (const key of Object.keys(_pdRecipeCache)) delete _pdRecipeCache[key];
+  for (const key of Object.keys(_pdParishDetailsCache)) delete _pdParishDetailsCache[key];
+  _pdHarvestReport = null;
+  _pdParishStatusDoc = null;
   try {
     await _pdEnsureParishesLoaded();
     const urls = await _problemsRepoUrls();
     const cfg = await _pdGetGithubConfig();
     const retrainedMap = await _problemsGetRetrainedMap();
-    const parishStatus = cfg ? await _problemsFetchParishStatus(urls.repo, cfg.ghPat) : null;
+    const parishStatus = await _pdLoadParishStatusDoc(true);
 
     let rows = [];
     let lastSeen = formatUkDate(String(parishStatus?.target_date || ""));
@@ -2093,21 +2233,26 @@ async function loadProblemsDashboard() {
       lastSeen = legacy.lastSeen;
     }
 
+    _problemsAllRows = rows;
+    _problemsPopulateFilters(rows);
+    const visible = _problemsFilteredRows();
+
     if (hint) {
       const parts = [
-        `${rows.length} parish${rows.length === 1 ? "" : "es"} need action`,
+        `${visible.length}${visible.length !== rows.length ? `/${rows.length}` : ""} need action`,
         `week ${lastSeen || "unknown"}`,
         `source ${statusSource}`,
         `repo ${urls.repo}`,
       ];
       if (hiddenDead) parts.push(`${hiddenDead} dead/disabled (hidden)`);
       if (hiddenFixed) parts.push(`${hiddenFixed} already OK (hidden)`);
-      parts.push("Fix → Send & test → result recorded in parish_status.json");
+      parts.push("fixed parishes leave this list after harvest + Refresh");
       hint.textContent = parts.join(" · ") + ".";
     }
-    await _problemsRenderRows(rows);
+    await _problemsRenderRows(visible);
   } catch (_e) {
     if (warning) warning.style.display = "block";
+    _problemsAllRows = [];
     await _problemsRenderRows([]);
   } finally {
     if (empty && !empty.textContent) {
@@ -2900,6 +3045,8 @@ async function loadParishDirectory() {
     }
     _pdConsecutiveFailures = consecutiveFailures || {};
     _pdHarvestReport = null;
+    _pdParishStatusDoc = null;
+    await _pdLoadParishStatusDoc(true);
     await _pdLoadHarvestReport();
 
     if (Object.keys(PD_EVIDENCE_FILES).length === 0 || Object.keys(_pdDioceseTexts).length === 0) {
@@ -2948,11 +3095,15 @@ if (_pdDetailsEl) {
 }
 document.getElementById("pd-refresh").addEventListener("click", () => {
   Object.keys(_pdRecipeCache).forEach((k) => delete _pdRecipeCache[k]);
+  Object.keys(_pdParishDetailsCache).forEach((k) => delete _pdParishDetailsCache[k]);
+  _pdHarvestReport = null;
+  _pdParishStatusDoc = null;
   _pdExcludes = null;
   _pdOverrides = null;
   _pdConsecutiveFailures = {};
   _pdShowBrokenOnly = false;
   loadParishDirectory();
+  void loadProblemsDashboard();
 });
 document.getElementById("pd-search").addEventListener("input", function () {
   if (_pdAllParishes.length > 0) _pdRenderAll(this.value, _pdExcludes || []);
@@ -2973,6 +3124,22 @@ document.getElementById("stale-banner-toggle").addEventListener("click", functio
 
 _spPanels.trainer.tab.addEventListener("click", () => _spShowPanel("trainer"));
 _spPanels.problems.tab.addEventListener("click", () => _spShowPanel("problems"));
+const problemsHowtoToggle = document.getElementById("problems-howto-toggle");
+const problemsHowto = document.getElementById("problems-howto");
+if (problemsHowtoToggle && problemsHowto) {
+  problemsHowtoToggle.addEventListener("click", () => {
+    const open = problemsHowto.style.display !== "none";
+    problemsHowto.style.display = open ? "none" : "block";
+    problemsHowtoToggle.textContent = open ? "Show how-to ▸" : "Hide how-to ▾";
+  });
+}
+for (const id of ["problems-filter-diocese", "problems-filter-category"]) {
+  const el = document.getElementById(id);
+  if (!el) continue;
+  el.addEventListener("change", () => {
+    void _problemsRenderRows(_problemsFilteredRows());
+  });
+}
 const problemsRefreshBtn = document.getElementById("problems-refresh-btn");
 if (problemsRefreshBtn) {
   problemsRefreshBtn.addEventListener("click", () => {
@@ -2983,6 +3150,11 @@ if (problemsRefreshBtn) {
       problemsRefreshBtn.textContent = "↻ Refresh";
     });
   });
+}
+if (!_problemsAutoRefreshTimer) {
+  _problemsAutoRefreshTimer = setInterval(() => {
+    void loadProblemsDashboard();
+  }, PROBLEMS_AUTO_REFRESH_MS);
 }
 const problemsFullHarvestBtn = document.getElementById("problems-full-harvest-btn");
 if (problemsFullHarvestBtn) {

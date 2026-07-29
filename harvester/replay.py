@@ -7,7 +7,7 @@ import json
 import re
 import subprocess
 import tempfile
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urljoin, urlparse
 
@@ -360,20 +360,32 @@ async def _find_mdocs_pdf_urls(page: Page) -> list[str]:
 async def _wait_for_bulletin_content(page: Page, recipe: dict, timeout_ms: int) -> None:
     """Slow hosts: wait for mdocs table, wp-block-file embed, or pdfemb links after commit navigation."""
     playbook = str(recipe.get("playbook_type") or recipe.get("site_type") or "").lower()
-    probes = []
-    if "pdfemb" in playbook or "wp_pdfemb" in playbook:
-        probes.extend(["a.pdfemb-viewer[href]", 'a[class*="pdfemb"][href*=".pdf"]'])
+    probes: list[str] = []
+    pdfemb_site = "pdfemb" in playbook or "wp_pdfemb" in playbook
+    if pdfemb_site:
+        # Newer PDF Embedder paints canvases and fetches PDFs over the network —
+        # often with NO a.pdfemb-viewer[href]. Prefer canvas, then poll network PDFs.
+        probes.extend(
+            [
+                "canvas.pdfemb-viewer",
+                "div.pdfemb-viewer canvas",
+                "a.pdfemb-viewer[href]",
+                'a[class*="pdfemb"][href*=".pdf"]',
+            ]
+        )
     if "mdocs" in playbook:
         probes.extend(["table.mdocs", "a.mdocs-download", ".mdocs a[href]"])
     if "wp_block" in playbook or "permanent_bulletin" in playbook:
         probes.extend(["object.wp-block-file__embed", ".wp-block-file a[href$='.pdf']"])
     if "mcn_live" in playbook or "mcn_pdf" in playbook:
-        probes.extend([
-            "a[href$='.pdf']",
-            "a[href*='.pdf']",
-            "a[href*='bulletin']",
-            "a[href*='download']",
-        ])
+        probes.extend(
+            [
+                "a[href$='.pdf']",
+                "a[href*='.pdf']",
+                "a[href*='bulletin']",
+                "a[href*='download']",
+            ]
+        )
     if not probes:
         probes = [
             "a.pdfemb-viewer[href]",
@@ -382,6 +394,27 @@ async def _wait_for_bulletin_content(page: Page, recipe: dict, timeout_ms: int) 
             "a[href$='.pdf']",
         ]
     budget = min(max(int(timeout_ms), 15_000), 240_000)
+    if pdfemb_site:
+        per_sel = min(8_000, max(3_000, budget // max(len(probes), 1)))
+        for sel in probes:
+            try:
+                await page.wait_for_selector(sel, timeout=per_sel)
+                break
+            except PlaywrightTimeoutError:
+                continue
+        deadline = asyncio.get_event_loop().time() + min(budget / 1000, 25)
+        while asyncio.get_event_loop().time() < deadline:
+            try:
+                found = await page.evaluate(
+                    """() => performance.getEntriesByType('resource')
+                        .some(r => /\\.pdf($|\\?)/i.test(r.name))"""
+                )
+            except Exception:
+                found = False
+            if found:
+                return
+            await asyncio.sleep(0.5)
+        return
     for sel in probes:
         try:
             await page.wait_for_selector(sel, timeout=budget)
@@ -389,7 +422,12 @@ async def _wait_for_bulletin_content(page: Page, recipe: dict, timeout_ms: int) 
         except PlaywrightTimeoutError:
             continue
     try:
-        wait_after = int(_host_profile_for_start_url(recipe.get("start_url") or page.url).get("wait_after_load_ms") or 0)
+        wait_after = int(
+            _host_profile_for_start_url(recipe.get("start_url") or page.url).get(
+                "wait_after_load_ms"
+            )
+            or 0
+        )
     except (TypeError, ValueError):
         wait_after = 0
     if wait_after > 0:
@@ -923,44 +961,56 @@ async def _prepare_page_for_html_print(
     await asyncio.sleep(2.5)
 
 
-async def _find_pdfemb_url(page: Page) -> str | None:
+async def _find_pdfemb_url(page: Page, target_date: date | None = None) -> str | None:
     """Best PDF Embedder bulletin URL on the page.
 
     Newer PDF Embedder builds render canvases without ``a.pdfemb-viewer[href]``.
     Fall back to network-loaded ``*.pdf`` resources (and any leftover hrefs).
     """
-    links = await page.eval_on_selector_all(PDFEMB_SELECTOR, PDFEMB_HREF_EXTRACT_JS)
-    try:
-        network_pdfs = await page.evaluate(
-            """() => performance.getEntriesByType('resource')
-                .map(r => r.name)
-                .filter(n => /\\.pdf($|\\?)/i.test(n))"""
-        )
-    except Exception:
-        network_pdfs = []
-    if not isinstance(network_pdfs, list):
-        network_pdfs = []
+    # Give lazy network PDF fetches a moment to appear in performance entries.
+    for _ in range(10):
+        links = await page.eval_on_selector_all(PDFEMB_SELECTOR, PDFEMB_HREF_EXTRACT_JS)
+        try:
+            network_pdfs = await page.evaluate(
+                """() => performance.getEntriesByType('resource')
+                    .map(r => r.name)
+                    .filter(n => /\\.pdf($|\\?)/i.test(n))"""
+            )
+        except Exception:
+            network_pdfs = []
+        if not isinstance(network_pdfs, list):
+            network_pdfs = []
 
-    candidates: list[str] = []
-    for href in [*links, *network_pdfs]:
-        if not isinstance(href, str) or not href.strip():
-            continue
-        resolved = urljoin(page.url, href.strip())
-        lower = resolved.lower()
-        if not (lower.endswith(".pdf") or ".pdf" in lower):
-            continue
-        if _is_non_bulletin_url(resolved):
-            continue
-        candidates.append(resolved)
-    if not candidates:
-        return None
-    # Prefer first occurrence order for equal scores (top embed = current week).
-    ranked = sorted(
-        enumerate(candidates),
-        key=lambda item: (_score_bulletin_url(item[1]), -item[0]),
-        reverse=True,
-    )
-    return ranked[0][1]
+        candidates: list[str] = []
+        for href in [*links, *network_pdfs]:
+            if not isinstance(href, str) or not href.strip():
+                continue
+            resolved = urljoin(page.url, href.strip())
+            lower = resolved.lower()
+            if not (lower.endswith(".pdf") or ".pdf" in lower):
+                continue
+            if _is_non_bulletin_url(resolved):
+                continue
+            candidates.append(resolved)
+        if candidates:
+            week_start = (target_date - timedelta(days=6)) if target_date else None
+
+            def _rank(item: tuple[int, str]) -> tuple:
+                idx, url = item
+                date_score, keyword_bonus = _score_bulletin_url(url)
+                freshness = 0
+                if target_date is not None:
+                    extracted = extract_date_from_string(unquote(url))
+                    if extracted and week_start is not None and week_start <= extracted <= target_date:
+                        freshness = 2
+                    elif extracted and extracted > target_date:
+                        freshness = 1
+                return (freshness, date_score, keyword_bonus, -idx)
+
+            ranked = sorted(enumerate(candidates), key=_rank, reverse=True)
+            return ranked[0][1]
+        await asyncio.sleep(0.5)
+    return None
 
 
 async def _find_iframe_pdf_url(page: Page) -> str | None:
@@ -1349,7 +1399,7 @@ async def replay_recipe(
 
                 # PDF Embedder parishes: read live hrefs from the page — never rewrite a stale captured URL.
                 if pdfemb_site and not _pattern_prefers_docx(pattern):
-                    pdfemb_url = await _find_pdfemb_url(page)
+                    pdfemb_url = await _find_pdfemb_url(page, target_date=target_date)
                     if pdfemb_url:
                         try:
                             source_url, file_type = await _download_document_url(
@@ -1388,7 +1438,7 @@ async def replay_recipe(
                 if tried:
                     return dest, tried[1], tried[0]
 
-                pdfemb_url = await _find_pdfemb_url(page)
+                pdfemb_url = await _find_pdfemb_url(page, target_date=target_date)
                 if pdfemb_url and not _pattern_prefers_docx(pattern):
                     source_url, file_type = await _download_document_url(page, pdfemb_url, dest)
                     return dest, file_type, source_url

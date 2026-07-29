@@ -14,19 +14,20 @@
       "url_pattern": "*.pdf"
     }
   ],
-  "observed_load_ms": 8000,
+  "observed_load_ms": 10000,
   "timeout_ms": 90000,
   "total_timeout_s": 180,
   "playbook_type": "pdfemb",
   "site_type": "wp_pdfemb",
   "operator_notes": [
-    "PDF Embedder shows several weekly PDFs on one page — newest at the top.",
-    "Harvester picks the best bulletin PDF from network-loaded www-static URLs (ignore Volunteer EOI etc.).",
+    "PDF Embedder shows weekly PDFs as canvases (no a.pdfemb-viewer href) — harvester reads network *.pdf URLs.",
+    "Newest current-week PDF is preferred (e.g. 26th-July-2026.pdf). Ignore Volunteer-EOI.",
     "Site SSL certificate is often expired — host profile sets ignore_https_errors."
   ],
   "do_not": [
     "Do not hardcode one dated PDF URL — it changes every week.",
-    "Do not download Volunteer-EOI or other non-bulletin PDFs on the page."
+    "Do not download Volunteer-EOI or other non-bulletin PDFs on the page.",
+    "Do not wait forever for a.pdfemb-viewer[href] — this site uses canvas embeds."
   ],
   "recorded_date": "2026-07-29"
 }
