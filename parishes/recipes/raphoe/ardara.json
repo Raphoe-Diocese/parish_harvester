@@ -3,45 +3,32 @@
   "parish_key": "ardara",
   "display_name": "Ardara",
   "diocese": "raphoe",
-  "start_url": "http://ardara.ie/news/",
+  "start_url": "https://ardara.ie/news/",
   "steps": [
     {
-      "action": "goto",
-      "url": "http://ardara.ie/news/"
-    },
-    {
       "action": "click",
-      "selector": "a[href*='church-of-the-holy-family-newsletter']",
-      "text": "Church of the Holy Family Newsletter",
-      "pick_strategy": "newest_dated",
-      "bulletin_position": "top",
-      "fallback_selectors": [
-        "#wpsp-24188 article:first-child h2.wp-show-posts-entry-title a",
-        "section.wp-show-posts article h2 a"
-      ]
+      "href": "https://ardara.ie/news/church-of-the-holy-family-newsletter-sun-26th-july-26/",
+      "selector": "a:has-text(\"Church of the Holy Family Newsletter: Sun. 26th July ’26\")",
+      "text": "Church of the Holy Family Newsletter: Sun. 26th July ’26 Jul"
     },
     {
-      "action": "print_to_pdf"
+      "action": "print_to_pdf",
+      "selector": "article"
     }
   ],
-  "observed_load_ms": 5000,
-  "timeout_ms": 90000,
-  "total_timeout_s": 180,
+  "observed_load_ms": 2896.5,
+  "timeout_ms": 55000,
+  "total_timeout_s": 250,
   "playbook_type": "wix_html",
   "site_type": "html_text_bulletin",
   "operator_notes": [
     "Bulletin text is on the web page — not a downloadable PDF file.",
-    "Harvester picks the newest 'Church of the Holy Family Newsletter' article each Sunday.",
-    "Use Save page as PDF on the newsletter article page."
+    "Use Save page as PDF on the newsletter article page.",
+    "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
   ],
   "do_not": [
-    "Do not pin a fixed date in the selector — the title changes every week.",
+    "Do not use Pick bulletin image when the page is mostly text paragraphs.",
     "Do not stop at click-only — need print_to_pdf as the final step."
   ],
-  "recorded_date": "2026-07-05",
-  "auto_fixed": true,
-  "bulletin_layout": {
-    "strategy": "newest_dated",
-    "position": "top"
-  }
+  "recorded_date": "2026-07-29"
 }
