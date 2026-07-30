@@ -571,7 +571,8 @@ def _ocr_standalone_url(diocese_key: str) -> str:
 
 def _mega_pdf_url(diocese_key: str) -> str:
     stem = diocese_key.replace("-", "_")
-    return f"../../mega_pdf/{stem}_mega_bulletin.pdf"
+    pages_base = "https://raphoe-diocese.github.io/parish_harvester"
+    return f"{pages_base}/mega_pdf/{stem}_mega_bulletin.pdf"
 
 
 def _parish_links_for_big_bulletin(diocese_key: str, report_path: Path) -> list[dict[str, str]]:
