@@ -971,8 +971,8 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
     
     /* PDF View — native scroll fills the screen; no page-flip controls */
     .pdf-frame-wrap {{
-      height: calc(100vh - 220px);
-      min-height: 70vh;
+      height: 92vh;
+      min-height: 92vh;
       overflow: hidden;
       border: 1px solid #c7dcda;
       border-radius: 10px;
@@ -1052,8 +1052,8 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
     .ocr-zoom-hint {{ display: none; font-size: 0.72rem; color: #64748b; }}
     @media (pointer: coarse) {{ .ocr-zoom-hint {{ display: inline; margin-left: 6px; }} }}
     #ocr-panel {{
-      height: calc(100vh - 280px);
-      min-height: 60vh;
+      height: 92vh;
+      min-height: 92vh;
       overflow-y: auto;
       border: 1px solid #e2e8f0;
       border-radius: 6px;
@@ -1274,8 +1274,8 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
       .page {{ padding: 16px 12px; }}
       ul.parish-grid {{ grid-template-columns: 1fr; }}
       .pdf-frame-wrap, #ocr-panel {{
-        height: calc(100vh - 200px);
-        min-height: 55vh;
+        height: 90vh;
+        min-height: 90vh;
       }}
       .ocr-search-tools {{ flex-direction: column; }}
       .ocr-search-tools button, .tab-btn {{
