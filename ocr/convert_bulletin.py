@@ -124,8 +124,15 @@ OCR_PROMPT = (
     "Do NOT repeat words or headings — each word/phrase once only (never ORDINARYORDINARY or word word). "
     "Mass times, church names, deceased names, and personal names (including Mc/Mac/O'/Ní) must be letter-perfect. "
     "Never invent, autocorrect, or guess a name, date, or mass time. "
-    "Use markdown headings (# for parish titles, ## for sections) and markdown tables (| Day | Time |) "
-    "for mass-time grids and timetables. "
+    "LAYOUT (structure only — do not rewrite wording):\n"
+    "- Read columns top-to-bottom, left-to-right; keep reading order natural for a parish newsletter.\n"
+    "- One blank line between major blocks (title, contacts, mass times, notices, intentions).\n"
+    "- Put the parish or church name on its own line as a markdown heading: # Parish / church title.\n"
+    "- Use ## for section titles exactly as printed (Mass Times, Anniversaries, Notices, etc.).\n"
+    "- Mass grids and timetables → markdown tables with header row, e.g. | Day | Time | Intention |.\n"
+    "- Contact lines (phone, email, website, address) each on their own line; keep digits and emails exact.\n"
+    "- Keep lists as separate lines (one intention / notice per line); do not glue columns into one run-on sentence.\n"
+    "- Ignore decorative lines, watermarks, and page furniture that are not readable text.\n"
     "If text is illegible, write [illegible] — never guess."
 )
 
