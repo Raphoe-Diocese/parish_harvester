@@ -117,31 +117,45 @@ HTML_TEMPLATE = """\
 
 OCR_PROMPT = (
     "You are an OCR assistant reading an Irish Catholic parish bulletin page (English and Irish Gaeilge). "
-    "Extract ALL text exactly as it appears. "
+    "Extract ALL text exactly as it appears — faithful transcription only. "
     "Do NOT translate Irish/Gaeilge to English — preserve both languages faithfully. "
     "Do NOT wrap your response in markdown code fences or backticks. "
     "Do NOT include image references like !img-0.jpeg. "
-    "Mass times, church names, and personal names (including Mc/Mac/O'/Ní) must be letter-perfect. "
+    "Do NOT repeat words or headings — each word/phrase once only (never ORDINARYORDINARY or word word). "
+    "Mass times, church names, deceased names, and personal names (including Mc/Mac/O'/Ní) must be letter-perfect. "
+    "Never invent, autocorrect, or guess a name, date, or mass time. "
     "Use markdown headings (# for parish titles, ## for sections) and markdown tables (| Day | Time |) "
     "for mass-time grids and timetables. "
-    "If text is illegible, write [illegible] — never guess a name or time."
+    "If text is illegible, write [illegible] — never guess."
 )
 
 MARKDOWN_FENCE_PATTERN = re.compile(r"^\s*```(?:[A-Za-z0-9_-]+)?\s*$")
 EMAIL_PATTERN = re.compile(r"\b[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Za-z]{2,}\b")
 URL_PATTERN = re.compile(r"(?<!@)\b(?:https?://|www\.)[^\s<>\"]+", re.IGNORECASE)
 DIGITS_ONLY_PATTERN = re.compile(r"\D")
-# 074 Donegal-format landline, 087 Irish mobile prefix, +353 international Irish, 028 NI-format landline.
-PHONE_074_PATTERN = r"074[\s-]*\d{3}[\s-]*\d{4}"
-PHONE_087_PATTERN = r"087[\s-]*\d{3}[\s-]*\d{4}"
-PHONE_353_PATTERN = r"\+353[\s-]*\d{2}[\s-]*\d{3}[\s-]*\d{4}"
-PHONE_028_PATTERN = r"028[\s-]*\d{3}[\s-]*\d{4,5}"
+# Irish + NI/UK phone formats commonly seen on parish bulletins.
 PHONE_PATTERN = re.compile(
-    rf"(?<!\w)(?:{PHONE_074_PATTERN}|{PHONE_087_PATTERN}|{PHONE_353_PATTERN}|{PHONE_028_PATTERN})(?!\w)"
+    r"(?<!\w)(?:"
+    r"\+353[\s.-]*\d{1,2}[\s.-]*\d{3}[\s.-]*\d{4}"
+    r"|\+44[\s.-]*\d{2,4}[\s.-]*\d{3,4}[\s.-]*\d{3,4}"
+    r"|0(?:28|74|1\d|2\d|4\d|5\d|6\d|7\d|8\d|9\d)"
+    r"[\s.-]*\d{2,4}[\s.-]*\d{3,5}"
+    r")(?!\w)"
 )
 HEADING_MD_PATTERN = re.compile(r"^(#{1,6})\s+(.*)$")
 HR_MD_PATTERN = re.compile(r"^\s*(?:-{3,}|\*{3,}|_{3,})\s*$")
 BOLD_MD_PATTERN = re.compile(r"\*\*(.+?)\*\*")
+_WORD_DUP_RE = re.compile(r"\b([A-Za-zÀ-ÿ0-9'’&./+-]{2,})\b(?:\s+\1\b)+", re.IGNORECASE)
+_ORDINAL_DUP_RE = re.compile(r"\b(\d+)\1(st|nd|rd|th)\b", re.IGNORECASE)
+_SPACE_ORDINAL_RE = re.compile(r"\b(\d)\s+(\d)(st|nd|rd|th)\b", re.IGNORECASE)
+_WORD_TH_DUP_RE = re.compile(
+    r"\b([A-Za-zÀ-ÿ]{3,})(st|nd|rd|th)\s+\1\b", re.IGNORECASE
+)
+_PUNCT_DUP_RE = re.compile(r"([.,;:!?\u2019'])\1+")
+_PHRASE_DUP_RE = re.compile(
+    r"\b((?:[A-Za-zÀ-ÿ0-9'’&./+-]+(?:\s+[A-Za-zÀ-ÿ0-9'’&./+-]+){1,6}))\s+\1\b",
+    re.IGNORECASE,
+)
 # Mistral OCR emits image placeholders like ![img-0.jpeg](img-0.jpeg); strip them.
 IMAGE_MD_PATTERN = re.compile(r"!\[[^\]]*\]\([^)]*\)")
 
@@ -282,8 +296,86 @@ def ocr_images_with_openai(images):
     return pages_text, "OpenAI fallback"
 
 
+def to_tel_href(display):
+    """Normalize matched phone display text to tel: href (+353 IE, +44 UK/NI)."""
+    digits = DIGITS_ONLY_PATTERN.sub("", display)
+    if not digits:
+        return None
+    if digits.startswith("00"):
+        digits = digits[2:]
+    if digits.startswith("353"):
+        national = digits[3:].lstrip("0")
+        return f"+353{national}" if national else None
+    if digits.startswith("44"):
+        national = digits[2:].lstrip("0")
+        return f"+44{national}" if national else None
+    if digits.startswith("028"):
+        # Northern Ireland landline → +44 28…
+        return f"+44{digits[1:]}"
+    if digits.startswith("0"):
+        national = digits[1:]
+        if national:
+            return f"+353{national}"
+    return None
+
+
+def collapse_glued_duplicate_token(token: str) -> str:
+    """ORDINARYORDINARY / REST IN PEACE.REST → single copy when halves match."""
+    raw = token.strip()
+    if len(raw) < 8:
+        return token
+    # Exact doubled token (no space): ABAB where A==B
+    n = len(raw)
+    if n % 2 == 0:
+        half = n // 2
+        a, b = raw[:half], raw[half:]
+        if a.lower() == b.lower():
+            return a
+    # Doubled with trailing punctuation on both halves: WORD.WORD.
+    for sep in (".", ",", ";", ":", "!", "?"):
+        if sep in raw:
+            parts = raw.split(sep)
+            parts = [p for p in parts if p != ""]
+            if len(parts) >= 2 and all(p.lower() == parts[0].lower() for p in parts):
+                return parts[0] + (sep if raw.endswith(sep) else "")
+    return token
+
+
+def clean_ocr_line(text: str) -> str:
+    """Remove common OCR duplication artefacts before HTML render."""
+    if not text:
+        return text
+    cleaned = str(text)
+    # 1717th → 17th
+    cleaned = _ORDINAL_DUP_RE.sub(r"\1\2", cleaned)
+    # 1 7th → 17th (common OCR split)
+    cleaned = _SPACE_ORDINAL_RE.sub(r"\1\2\3", cleaned)
+    # SUNDAYth SUNDAY → SUNDAY
+    cleaned = _WORD_TH_DUP_RE.sub(r"\1", cleaned)
+    # word word / short phrase phrase
+    prev = None
+    while prev != cleaned:
+        prev = cleaned
+        cleaned = _WORD_DUP_RE.sub(r"\1", cleaned)
+        cleaned = _PHRASE_DUP_RE.sub(r"\1", cleaned)
+    # Glued duplicates per whitespace token
+    cleaned = " ".join(collapse_glued_duplicate_token(tok) for tok in cleaned.split(" "))
+    # Also collapse whole-line glued duplicates with no spaces
+    cleaned = collapse_glued_duplicate_token(cleaned)
+    # Glued phrase repeats: WE PRAY FOR OUR DEADWE PRAY FOR OUR DEAD
+    prev = None
+    while prev != cleaned:
+        prev = cleaned
+        cleaned = re.sub(r"([A-Z][A-Z0-9'’ ]{4,60}?)\1", r"\1", cleaned)
+    cleaned = _PUNCT_DUP_RE.sub(r"\1", cleaned)
+    # ORDINARY TIME.ORDINARY TIME. → ORDINARY TIME.
+    cleaned = re.sub(r"\b([A-Z][A-Z ]{2,40})\.\1\b", r"\1", cleaned)
+    cleaned = re.sub(r"[ \t]{2,}", " ", cleaned).strip()
+    return cleaned
+
+
 def linkify(text):
-    """Convert escaped text emails, URLs, and Irish-style phone numbers into HTML links."""
+    """Convert escaped text emails, URLs, and phone numbers into HTML links."""
     placeholders = []
 
     def stash(replacement):
@@ -307,7 +399,10 @@ def linkify(text):
     def replace_email(match):
         email = match.group(0)
         escaped_email = html_utils.escape(email, quote=True)
-        return stash(f'<a href="mailto:{escaped_email}">{escaped_email}</a>')
+        return stash(
+            f'<a href="mailto:{escaped_email}" target="_blank" rel="noopener noreferrer">'
+            f"{escaped_email}</a>"
+        )
 
     def replace_url(match):
         url = match.group(0)
@@ -321,18 +416,6 @@ def linkify(text):
         )
         return f"{stash(link)}{trailing}"
 
-    def to_tel_href(display):
-        """Normalize matched phone display text to an Irish tel: href."""
-        digits = DIGITS_ONLY_PATTERN.sub("", display)
-        if digits.startswith("353"):
-            national = digits[3:]
-            return f"+353{national}" if national else None
-        if digits.startswith("0"):
-            national = digits[1:]
-            if national:
-                return f"+353{national}"
-        return None
-
     def replace_phone(match):
         phone = match.group(0)
         href = to_tel_href(phone)
@@ -340,7 +423,10 @@ def linkify(text):
             return phone
         escaped_phone = html_utils.escape(phone)
         escaped_href = html_utils.escape(href, quote=True)
-        return stash(f'<a href="tel:{escaped_href}">{escaped_phone}</a>')
+        return stash(
+            f'<a href="tel:{escaped_href}" style="color:#1d4ed8;font-weight:600;">'
+            f"{escaped_phone}</a>"
+        )
 
     linked = EMAIL_PATTERN.sub(replace_email, text)
     linked = URL_PATTERN.sub(replace_url, linked)
@@ -357,6 +443,7 @@ def _escape_html(value):
 
 def _render_inline(text):
     """Escape one line of OCR text and apply bold + links."""
+    text = clean_ocr_line(text)
     text = _escape_html(text)
     text = BOLD_MD_PATTERN.sub(r"<strong>\1</strong>", text)
     return linkify(text)

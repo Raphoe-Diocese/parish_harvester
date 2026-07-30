@@ -66,11 +66,15 @@ Extension Send & test
 
 Until this list is finished, do **not** start other work. Park new ideas for a later list.
 
-1. **OCR reader** — tight modern text (in progress / verify live)
+1. **OCR reader** — tight modern text, no duplicate words, compact layout (in progress)
 2. **Problems console** — full work-queue polish
 3. **Recipe success** — one parish at a time
 4. **parishpress.ie** — live DNS/Pages when user is ready
 5. **Site look** — modern pages after OCR
+
+## Parked (later list — do not start yet)
+
+- **Remove bulletin archive entirely** — delete all traces of `https://raphoe-diocese.github.io/parish_harvester/bulletins/` (page, links, nav, generators, sitemaps). User request 2026-07-30.
 
 ## Dates (user-facing)
 

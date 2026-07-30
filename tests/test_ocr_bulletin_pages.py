@@ -78,7 +78,7 @@ class OcrBulletinPageTests(unittest.TestCase):
                 parish_links=[("Parish One", "https://example.com/one")],
             )
 
-            self.assertIn("TEST DIOCESE BIG BULLETIN", html_output)
+            self.assertIn("TEST COLLATED BULLETIN", html_output)
             self.assertIn("Page 1 of 2", html_output)
             self.assertIn("../mega_pdf/test_mega_bulletin.pdf", html_output)
             self.assertIn("PARISHES WITH WORKING BULLETIN LINKS", html_output.upper())
@@ -106,7 +106,7 @@ class OcrBulletinPageTests(unittest.TestCase):
             ocr_fragment="<p>Ar dheis Dé go raibh a anam</p>",
             viewer_href="test-2026-05-19.html",
         )
-        self.assertIn("Parish Bulletin Text", html_output)
+        self.assertIn("Text Bulletin", html_output)
         self.assertIn("Ar dheis Dé go raibh a anam", html_output)
         self.assertIn("Gaeilge", html_output)
 

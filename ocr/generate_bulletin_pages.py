@@ -27,6 +27,7 @@ DIFFS_DIR = BULLETINS_DATA_DIR / "diffs"
 CONTACTS_PATH_BY_DIOCESE = {
     "derry": REPO_ROOT / "parishes" / "derry_diocese_contacts.json",
     "down_and_connor": REPO_ROOT / "parishes" / "down_and_connor_contacts.json",
+    "raphoe": REPO_ROOT / "parishes" / "raphoe_diocese_contacts.json",
 }
 
 HEADER_PATTERN = re.compile(r"^#\s*---\s*(.*?)\s*---\s*$")
@@ -144,8 +145,11 @@ def tighten_ocr_paragraphs(fragment: str) -> str:
 
     Older OCR HTML put every line in its own ``<p>``, which created huge
     whitespace. New convert_bulletin output already groups lines; this keeps
-    legacy fragments readable without a full re-OCR.
+    legacy fragments readable without a full re-OCR. Also cleans duplicated
+    OCR words (ORDINARYORDINARY, word word, 1717th, …).
     """
+    from ocr.convert_bulletin import _render_inline
+
     token_re = re.compile(
         r"(<p>(?!class=)(?![^>]*\bclass=)(.*?)</p>)|(<h[1-6]\b[^>]*>.*?</h[1-6]>|"
         r"<hr\s*/?>|<table\b[\s\S]*?</table>|<p\s+class=\"[^\"]+\">.*?</p>)",
@@ -153,6 +157,13 @@ def tighten_ocr_paragraphs(fragment: str) -> str:
     )
     out: list[str] = []
     buf: list[str] = []
+
+    def _clean_inner(inner: str) -> str:
+        plain = re.sub(r"<[^>]+>", "", inner or "")
+        plain = html.unescape(plain).strip()
+        if not plain:
+            return ""
+        return _render_inline(plain)
 
     def flush() -> None:
         nonlocal buf
@@ -172,7 +183,9 @@ def tighten_ocr_paragraphs(fragment: str) -> str:
                 flush()
                 out.append(gap)
         if match.group(1) is not None:
-            buf.append(match.group(2).strip())
+            cleaned = _clean_inner(match.group(2) or "")
+            if cleaned:
+                buf.append(cleaned)
         else:
             flush()
             out.append(match.group(3))
@@ -224,6 +237,115 @@ def _load_parish_entries(diocese: str, parish_links: list[tuple[str, str]]) -> l
         seen.add(parish_key)
         entries.append((parish_key, name))
     return entries
+
+
+def _strip_parish_title_lines(chunk: str, display_name: str, newsletter_url: str) -> str:
+    """Remove stitcher banner lines (name + URL) already shown in the section header."""
+    from ocr.parish_splitter import _name_patterns, _line_is_parish_marker
+
+    strong, weak = _name_patterns(display_name)
+    patterns = strong + weak
+    url_norm = (newsletter_url or "").strip().rstrip("/")
+    out: list[str] = []
+    for line in (chunk or "").splitlines():
+        stripped = line.strip()
+        if not stripped:
+            if out and out[-1] != "":
+                out.append("")
+            continue
+        if _line_is_parish_marker(stripped, patterns):
+            continue
+        compact = stripped.rstrip("/")
+        if url_norm:
+            left = compact.lower().replace("https://", "").replace("http://", "")
+            right = url_norm.lower().replace("https://", "").replace("http://", "")
+            if left == right:
+                continue
+        out.append(line.rstrip())
+    while out and not out[0].strip():
+        out.pop(0)
+    while out and not out[-1].strip():
+        out.pop()
+    return "\n".join(out)
+
+
+def _chunk_looks_like_directory(chunk: str) -> bool:
+    """True when chunk is mostly the end-of-PDF missing-parish link list."""
+    lines = [ln.strip() for ln in (chunk or "").splitlines() if ln.strip()]
+    if not lines:
+        return True
+    if len(lines) <= 2:
+        return True
+    linkish = 0
+    for ln in lines:
+        if ln.startswith("http") or ln.endswith(":") or re.fullmatch(r"[A-Za-zÀ-ÿ'’/&\- ]{2,40}", ln.rstrip(":")):
+            linkish += 1
+    return linkish >= max(2, int(len(lines) * 0.75))
+
+
+def build_az_parish_ocr_html(
+    diocese: str,
+    ocr_text: str,
+    parish_links: list[tuple[str, str]],
+) -> str:
+    """Build A–Z parish sections with newsletter URL top-right (new tab)."""
+    from ocr.convert_bulletin import render_markdown_lines
+
+    entries = _load_parish_entries(diocese, parish_links)
+    if not entries:
+        return ""
+    url_by_name = {name: url for name, url in parish_links}
+    chunks = split_ocr_by_parish(ocr_text or "", entries)
+    ordered = sorted(entries, key=lambda item: item[1].lower())
+    sections: list[str] = []
+    for idx, (parish_key, display_name) in enumerate(ordered):
+        url = url_by_name.get(display_name, "")
+        raw_chunk = chunks.get(parish_key) or ""
+        body_text = _strip_parish_title_lines(raw_chunk, display_name, url)
+        if _chunk_looks_like_directory(body_text):
+            body_text = ""
+        if body_text.strip():
+            body_html = "\n".join(render_markdown_lines(body_text.splitlines()))
+        else:
+            body_html = (
+                '<p class="parish-empty">No searchable bulletin text for this parish this week. '
+                "Use the newsletter link for the original.</p>"
+            )
+        stripe = "even" if idx % 2 == 0 else "odd"
+        safe_key = html.escape(parish_key, quote=True)
+        safe_name = html.escape(display_name)
+        if url:
+            safe_href = html.escape(url, quote=True)
+            source = (
+                f'<a class="parish-source" href="{safe_href}" target="_blank" '
+                f'rel="noopener noreferrer">Parish newsletter ↗</a>'
+            )
+        else:
+            source = '<span class="parish-source muted">No newsletter URL</span>'
+        sections.append(
+            f'<section class="parish-block parish-{stripe}" id="parish-{safe_key}">\n'
+            f'  <header class="parish-head">\n'
+            f'    <h2 class="parish-name">{safe_name}</h2>\n'
+            f"    {source}\n"
+            f"  </header>\n"
+            f'  <div class="parish-body">{body_html}</div>\n'
+            f"</section>"
+        )
+    return "\n".join(sections)
+
+
+def prepare_ocr_fragment(
+    diocese: str,
+    ocr_fragment: str,
+    parish_links: list[tuple[str, str]] | None = None,
+) -> str:
+    """Clean OCR HTML and, when possible, rebuild as A–Z parish sections."""
+    cleaned = tighten_ocr_paragraphs(ocr_fragment or "")
+    if not parish_links:
+        return cleaned
+    plain = _fragment_to_plain_text(cleaned)
+    rebuilt = build_az_parish_ocr_html(diocese, plain, parish_links)
+    return rebuilt if rebuilt.strip() else cleaned
 
 
 def _fragment_to_plain_text(ocr_fragment: str) -> str:
@@ -410,108 +532,160 @@ def render_ocr_standalone_page(
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>{html.escape(config.display_name)} Bulletin Text — {html.escape(uk_bulletin_date)}</title>
+  <title>{html.escape(config.display_name)} Text Bulletin — {html.escape(uk_bulletin_date)}</title>
   <style>
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
     body {{
       font-family: Georgia, "Times New Roman", Times, serif;
-      background: #f8fafc;
+      background: #fff;
       color: {TEXT};
-      line-height: 1.45;
-      font-size: 1.125rem;
+      line-height: 1.35;
+      font-size: 1.05rem;
       -webkit-text-size-adjust: 100%;
     }}
-    a {{ color: {TEAL}; text-decoration: none; font-weight: 600; }}
-    a:hover {{ text-decoration: underline; }}
-    .page {{ max-width: min(52rem, 100%); margin: 0 auto; padding: 12px 16px 40px; }}
+    a {{ color: #1d4ed8; text-decoration: underline; font-weight: 600; }}
+    .page {{ max-width: 100%; margin: 0; padding: 8px 10px 24px; }}
+    .top {{
+      display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px;
+      margin-bottom: 8px; font-family: Georgia, "Times New Roman", Times, serif;
+    }}
     .back-link {{
-      display: inline-block; margin-bottom: 10px; font-weight: 700; color: {TEAL};
-      font-family: system-ui, sans-serif; font-size: 0.9rem;
+      font-family: system-ui, sans-serif; font-size: 0.85rem; font-weight: 700;
+      color: {TEAL}; text-decoration: none;
     }}
-    h1 {{
-      margin: 0 0 6px; color: {TEAL}; font-size: clamp(1.35rem, 3.5vw, 1.85rem);
-      font-family: system-ui, sans-serif; font-weight: 700; letter-spacing: -0.02em;
-    }}
-    .meta {{
-      color: #6b7280; font-size: 0.88rem; margin-bottom: 12px;
-      font-family: system-ui, sans-serif;
+    .title-line {{
+      font-size: 1.05rem; font-weight: 700; color: {TEXT};
     }}
     .ocr-body {{
       background: #fff;
-      border: 1px solid #e2e8f0;
-      border-radius: 6px;
-      padding: 18px 20px 28px;
+      padding: 0;
+      max-width: 100%;
     }}
-    .ocr-body h1, .ocr-body h2 {{ color: {DEEP_TEAL}; margin: 0.9em 0 0.3em; font-weight: 700; }}
-    .ocr-body h3, .ocr-body h4 {{ color: {TEAL}; margin: 0.8em 0 0.25em; font-weight: 700; }}
+    .ocr-body h1, .ocr-body h2 {{ color: {DEEP_TEAL}; margin: 0.7em 0 0.2em; font-weight: 700; font-size: 1.15em; }}
+    .ocr-body h3, .ocr-body h4 {{ color: {TEAL}; margin: 0.6em 0 0.15em; font-weight: 700; }}
     .ocr-body h2.b-title, .ocr-body .b-title {{
-      font-size: 1.28em; border-bottom: 2px solid #c8d6f0; padding-bottom: 0.12em;
+      font-size: 1.2em; border-bottom: 1px solid #c8d6f0; padding-bottom: 0.1em;
     }}
     .ocr-body h3.ocr-page-heading, .ocr-body .page-label {{
-      font-size: 0.78rem;
-      letter-spacing: 0.06em;
+      font-size: 0.72rem;
+      letter-spacing: 0.05em;
       text-transform: uppercase;
-      margin: 1.1em 0 0.35em;
+      margin: 0.85em 0 0.25em;
       font-family: system-ui, sans-serif;
       color: #64748b;
     }}
-    .ocr-body p {{ margin: 0 0 0.65em; }}
-    .ocr-body p + p {{ margin-top: 0; }}
-    .ocr-body hr {{ border: 0; border-top: 1px solid #e2e8f0; margin: 0.9em 0; }}
+    .ocr-body p {{ margin: 0 0 0.35em; }}
+    .ocr-body hr {{ border: 0; border-top: 1px solid #e2e8f0; margin: 0.7em 0; }}
     .ocr-body mark {{ background: #fff3cd; padding: 0 2px; border-radius: 2px; }}
     .ocr-body mark.search-active {{ background: #fde047; outline: 2px solid #0f5e5e; }}
-    .ocr-search-bar {{ position: relative; margin-bottom: 8px; }}
+    .parish-block {{
+      margin: 0 0 1rem;
+      padding: 0.15rem 0 0.85rem;
+      border-bottom: 1px solid #e5e7eb;
+    }}
+    .parish-block.parish-odd {{
+      background: #f7faf9;
+      margin-left: -8px;
+      margin-right: -8px;
+      padding-left: 8px;
+      padding-right: 8px;
+      border-radius: 3px;
+    }}
+    .parish-head {{
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 6px 12px;
+      margin: 0 0 0.4rem;
+      padding: 0.3rem 0 0.3rem 0.55rem;
+      border-left: 3px solid {TEAL};
+    }}
+    .parish-odd .parish-head {{ border-left-color: {DEEP_TEAL}; }}
+    .parish-name {{
+      margin: 0 !important;
+      font-size: 1.12rem !important;
+      font-family: Georgia, "Times New Roman", Times, serif;
+      color: {DEEP_TEAL} !important;
+      border: 0 !important;
+      padding: 0 !important;
+    }}
+    .parish-source {{
+      font-family: system-ui, sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      white-space: nowrap;
+      text-decoration: none !important;
+      color: #1d4ed8;
+    }}
+    .parish-source:hover {{ text-decoration: underline !important; }}
+    .parish-source.muted {{ color: #94a3b8; font-weight: 500; }}
+    .parish-empty {{
+      font-family: system-ui, sans-serif;
+      font-size: 0.88rem;
+      color: #64748b;
+      font-style: italic;
+    }}
+    .search-panel {{
+      margin-top: 14px;
+      font-family: system-ui, sans-serif;
+      border-top: 1px solid #e2e8f0;
+      padding-top: 8px;
+    }}
+    .search-panel summary {{
+      cursor: pointer; font-size: 0.85rem; color: #475569; font-weight: 600;
+      list-style: none;
+    }}
+    .search-panel summary::-webkit-details-marker {{ display: none; }}
+    .search-panel[open] summary {{ margin-bottom: 8px; }}
+    .ocr-search-bar {{ position: relative; margin-bottom: 6px; }}
     .search-input {{
-      width: 100%; min-height: 44px; border: 1px solid #bdd7d5; border-radius: 8px;
-      padding: 10px 40px 10px 12px; font-size: 1rem;
+      width: 100%; min-height: 36px; border: 1px solid #cbd5e1; border-radius: 6px;
+      padding: 6px 32px 6px 10px; font-size: 0.95rem;
       font-family: system-ui, sans-serif;
     }}
-    .search-clear {{ position: absolute; right: 8px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #6b7280; font-size: 1.2rem; cursor: pointer; }}
+    .search-clear {{ position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 28px; height: 28px; border: 0; background: transparent; color: #6b7280; font-size: 1.1rem; cursor: pointer; }}
     .search-clear[hidden] {{ display: none; }}
     .ocr-search-tools {{
-      display: flex; align-items: center; justify-content: space-between; gap: 10px;
-      margin-bottom: 12px; flex-wrap: wrap;
-      font-family: system-ui, sans-serif;
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap;
     }}
-    .ocr-search-tools button {{ border: 0; border-radius: 6px; background: {TEAL}; color: #fff; font-weight: 700; min-height: 40px; padding: 8px 14px; cursor: pointer; }}
+    .ocr-search-tools button {{ border: 0; border-radius: 5px; background: {TEAL}; color: #fff; font-weight: 700; min-height: 32px; padding: 4px 10px; cursor: pointer; font-size: 0.85rem; }}
     .ocr-search-tools button:disabled {{ background: #9bbfbd; cursor: not-allowed; }}
-    .match-count {{ color: #6b7280; font-size: 0.92rem; font-weight: 700; }}
+    .match-count {{ color: #6b7280; font-size: 0.8rem; font-weight: 600; }}
     .note-box {{
-      margin-top: 16px;
-      padding: 12px 16px;
-      border-radius: 8px;
-      background: #fff4df;
-      border: 1px solid #f5d08d;
-      color: #713f12;
-      font-weight: 600;
-      font-size: 0.9rem;
+      margin-top: 12px;
+      color: #78716c;
+      font-weight: 400;
+      font-size: 0.72rem;
+      line-height: 1.35;
       font-family: system-ui, sans-serif;
-    }}
-    @media (max-width: 600px) {{
-      .page {{ padding: 10px 12px 32px; }}
-      body {{ font-size: 1.05rem; }}
-      .ocr-body {{ padding: 14px 12px 22px; }}
+      font-style: italic;
     }}
   </style>
 </head>
 <body>
   <div class="page">
-    <a class="back-link" href="{html.escape(viewer_href, quote=True)}">← Back to bulletin viewer</a>
-    <p class="meta">{html.escape(diocese_label)} · {html.escape(uk_bulletin_date)}</p>
-    <h1>Parish Bulletin Text</h1>
-    <div class="ocr-search-bar">
-      <input id="ocr-search" class="search-input" type="search" placeholder="Search (e.g. mass, bingo, parish name)..." aria-label="Search bulletin text" />
-      <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
-    </div>
-    <div class="ocr-search-tools">
-      <span id="ocr-match-count" class="match-count">0 matches</span>
-      <div>
-        <button id="ocr-prev" type="button" disabled>← Prev match</button>
-        <button id="ocr-next" type="button" disabled>Next match →</button>
-      </div>
+    <div class="top">
+      <a class="back-link" href="{html.escape(viewer_href, quote=True)}">← Viewer</a>
+      <span class="title-line">{html.escape(diocese_label)} Text Bulletin · {html.escape(uk_bulletin_date)}</span>
     </div>
     <div class="ocr-body" id="ocr-text">{ocr_fragment}</div>
-    <div class="note-box">This text is auto-generated from the parish bulletin PDF. Irish (Gaeilge) and English are preserved as printed. Please verify mass times and names against the original PDF.</div>
+    <details class="search-panel">
+      <summary>Search text ▸</summary>
+      <div class="ocr-search-bar">
+        <input id="ocr-search" class="search-input" type="search" placeholder="mass, bingo, parish…" aria-label="Search bulletin text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled>← Prev</button>
+          <button id="ocr-next" type="button" disabled>Next →</button>
+        </div>
+      </div>
+    </details>
+    <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
   </div>
   <script>
     (function () {{
@@ -807,11 +981,11 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
       overflow-y: auto;
       border: 1px solid #e2e8f0;
       border-radius: 6px;
-      padding: 18px 20px 28px;
+      padding: 14px 16px 22px;
       background: white;
       font-family: Georgia, "Times New Roman", Times, serif;
-      font-size: 1.125rem;
-      line-height: 1.45;
+      font-size: 1.08rem;
+      line-height: 1.38;
       color: {TEXT};
       max-width: min(52rem, 100%);
       margin: 0 auto;
@@ -871,10 +1045,56 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
       background: #f7f9fd;
     }}
     #ocr-panel hr {{ border: 0; border-top: 1px solid #e2e8f0; margin: 0.9em 0; }}
-    #ocr-panel p {{ margin: 0 0 0.65em; }}
+    #ocr-panel p {{ margin: 0 0 0.35em; }}
     #ocr-panel mark {{ background: #fef08a; padding: 1px 3px; border-radius: 2px; }}
     #ocr-panel mark.search-active {{ background: #fde047; outline: 2px solid #0f5e5e; }}
     #ocr-panel a {{ color: {TEAL}; font-weight: 600; }}
+    #ocr-panel .parish-block {{
+      margin: 0 0 1rem;
+      padding: 0.15rem 0 0.85rem;
+      border-bottom: 1px solid #e5e7eb;
+    }}
+    #ocr-panel .parish-block.parish-odd {{
+      background: #f7faf9;
+      margin-left: -8px;
+      margin-right: -8px;
+      padding-left: 8px;
+      padding-right: 8px;
+      border-radius: 3px;
+    }}
+    #ocr-panel .parish-head {{
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 6px 12px;
+      margin: 0 0 0.4rem;
+      padding: 0.3rem 0 0.3rem 0.55rem;
+      border-left: 3px solid {TEAL};
+    }}
+    #ocr-panel .parish-odd .parish-head {{ border-left-color: {DEEP_TEAL}; }}
+    #ocr-panel .parish-name {{
+      margin: 0 !important;
+      font-size: 1.15rem !important;
+      color: {DEEP_TEAL} !important;
+      border: 0 !important;
+      padding: 0 !important;
+    }}
+    #ocr-panel .parish-source {{
+      font-family: system-ui, sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      white-space: nowrap;
+      text-decoration: none;
+      color: #1d4ed8;
+    }}
+    #ocr-panel .parish-source:hover {{ text-decoration: underline; }}
+    #ocr-panel .parish-empty {{
+      font-family: system-ui, sans-serif;
+      font-size: 0.9rem;
+      color: #64748b;
+      font-style: italic;
+    }}
     .note-box {{
       margin-top: 16px;
       padding: 12px 16px;
@@ -989,14 +1209,14 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
     <a class="back-link" href="{archive_href}">← Back to bulletin archive</a>
     <header class="header">
       <p class="diocese-label">{html.escape(diocese_label)}</p>
-      <h1>{html.escape(config.headline)}</h1>
+      <h1>{html.escape(config.headline.replace("DIOCESE ", "").replace("BIG BULLETIN", "COLLATED BULLETIN"))}</h1>
       <p class="meta">Generated for {html.escape(uk_bulletin_date)}.</p>
     </header>
 
     <!-- Tabs -->
     <div class="tabs" role="tablist" aria-label="Bulletin view">
       <button class="tab-btn active" type="button" role="tab" aria-selected="true" data-tab="pdf" onclick="switchTab('pdf', this)">📄 Parish Bulletin (PDF)</button>
-      <button class="tab-btn" type="button" role="tab" aria-selected="false" data-tab="ocr" onclick="switchTab('ocr', this)">📝 Searchable Bulletin Text</button>
+      <button class="tab-btn" type="button" role="tab" aria-selected="false" data-tab="ocr" onclick="switchTab('ocr', this)">📝 Text Bulletin</button>
     </div>
 
     <!-- Panel Container -->
@@ -1359,9 +1579,9 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
       var generated = document.querySelector('.meta');
       if (!generated) return;
       var text = generated.textContent || '';
-      var match = text.match(/(\d{{4}})-(\d{{2}})-(\d{{2}})/);
+      var match = text.match(/(\\d{{4}})-(\\d{{2}})-(\\d{{2}})/);
       if (!match) {{
-        match = text.match(/(\d{{2}})\/(\d{{2}})\/(\d{{4}})/);
+        match = text.match(/(\\d{{2}})[/](\\d{{2}})[/](\\d{{4}})/);
         if (match) match = [null, match[3], match[2], match[1]];
       }}
       if (!match) return;
@@ -1405,6 +1625,7 @@ def regenerate_viewer_from_existing(existing_path: Path) -> Path:
         raise ValueError(f"Could not find OCR panel in {existing_path}")
     ocr_fragment = panel_match.group(1).strip()
     parish_links = parse_parish_links(config.evidence_path)
+    ocr_fragment = prepare_ocr_fragment(diocese, ocr_fragment, parish_links)
     output_path = BULLETINS_DIR / existing_path.name
     output_path.write_text(
         render_viewer_page(config, bulletin_date, page_count, ocr_fragment, parish_links),
@@ -1422,8 +1643,9 @@ def write_viewer_page(diocese: str, bulletin_date: str, pdf_path: Path, ocr_html
     config = DIOCESES[diocese]
     page_count = count_pdf_pages(pdf_path)
     ocr_fragment = extract_ocr_fragment(ocr_html_path)
-    ocr_plain_text = _fragment_to_plain_text(ocr_fragment)
     parish_links = parse_parish_links(config.evidence_path)
+    ocr_plain_text = _fragment_to_plain_text(ocr_fragment)
+    ocr_fragment = prepare_ocr_fragment(diocese, ocr_fragment, parish_links)
     output_path = BULLETINS_DIR / f"{diocese}-{bulletin_date}.html"
     output_path.write_text(
         render_viewer_page(config, bulletin_date, page_count, ocr_fragment, parish_links),
