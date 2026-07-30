@@ -128,8 +128,8 @@
     }
     .toolbar-btn:hover { background: #f0f8f8; text-decoration: none; }
     .viewer {
-      height: min(82vh, 980px);
-      min-height: 360px;
+      height: calc(100vh - 150px);
+      min-height: 70vh;
       overflow: hidden;
       border: 1px solid #d8e4e3;
       border-radius: 6px;
@@ -186,7 +186,9 @@
     .ocr-search-tools button:disabled { background: #9bbfbd; cursor: not-allowed; }
     .match-count { color: var(--muted); font-size: 0.92rem; font-weight: 700; }
     .ocr-viewer {
-      max-height: min(78vh, 860px);
+      height: calc(100vh - 220px);
+      min-height: 70vh;
+      max-height: none;
       overflow: auto;
       border: 1px solid #d8e4e3;
       border-radius: 6px;
@@ -238,37 +240,44 @@
     }
     .ocr-parish-url:hover { text-decoration: underline; }
     .parish-block {
-      margin: 0 0 0.9rem;
-      padding: 0.1rem 0 0.7rem;
-      border-bottom: 1px solid #e5e7eb;
+      margin: 0 0 0.55rem;
+      padding: 0;
+      border: 1px solid #e5e7eb;
+      border-radius: 4px;
+      background: #fff;
     }
-    .parish-block.parish-odd {
-      background: #f7faf9;
-      margin-left: -6px;
-      margin-right: -6px;
-      padding-left: 6px;
-      padding-right: 6px;
-      border-radius: 3px;
-    }
+    .parish-block.parish-odd { background: #f7faf9; }
+    .parish-block > summary.parish-head,
     .parish-head {
       display: flex;
       flex-wrap: wrap;
       align-items: baseline;
       justify-content: space-between;
       gap: 6px 12px;
-      margin: 0 0 0.35rem;
-      padding: 0.25rem 0 0.25rem 0.5rem;
+      margin: 0;
+      padding: 0.45rem 0.55rem 0.45rem 0.65rem;
       border-left: 3px solid var(--teal);
+      cursor: pointer;
+      list-style: none;
     }
+    .parish-block > summary.parish-head::-webkit-details-marker { display: none; }
+    .parish-odd > summary.parish-head,
     .parish-odd .parish-head { border-left-color: var(--teal-dark); }
     .parish-name {
       margin: 0 !important;
-      font-size: 1.1rem !important;
+      font-size: 1.05rem !important;
       font-family: Georgia, "Times New Roman", Times, serif;
       color: var(--teal-dark) !important;
       border: 0 !important;
       padding: 0 !important;
     }
+    .parish-name::before {
+      content: "▸ ";
+      color: var(--teal);
+      font-family: system-ui, sans-serif;
+      font-size: 0.85em;
+    }
+    .parish-block[open] .parish-name::before { content: "▾ "; }
     .parish-source {
       font-family: "Open Sans", Arial, Helvetica, sans-serif;
       font-size: 0.78rem;
@@ -278,6 +287,7 @@
       color: var(--link-blue);
     }
     .parish-source:hover { text-decoration: underline; }
+    .parish-body { padding: 0.25rem 0.65rem 0.7rem; }
     .parish-empty {
       font-family: "Open Sans", Arial, Helvetica, sans-serif;
       font-size: 0.88rem;
@@ -401,8 +411,8 @@
       .title-card { padding: 8px 10px; }
       .top-actions { gap: 6px; }
       .go-ocr-btn, .download-link, .toolbar-btn { width: 100%; }
-      .viewer { min-height: 280px; height: 62vh; }
-      .ocr-viewer { max-height: 58vh; }
+      .viewer { min-height: 65vh; height: calc(100vh - 180px); }
+      .ocr-viewer { min-height: 65vh; height: calc(100vh - 240px); }
       .parish-link-grid { columns: 1; }
     }
   </style>
@@ -442,33 +452,38 @@
           <button id="ocr-next" type="button" disabled aria-label="Next match">Next →</button>
         </div>
       </div>
-      <div class="ocr-viewer" id="ocr-viewer"><div class="ocr-body" id="ocr-text"><section class="parish-block parish-even" id="parish-aghagallonandballinderryparish">
-  <header class="parish-head">
-    <h2 class="parish-name">Aghagallon and Ballinderry</h2>
-    <a class="parish-source" href="https://www.aghagallonandballinderryparish.ie" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+      <div class="ocr-viewer" id="ocr-viewer"><div class="ocr-body" id="ocr-text"><details class="parish-block parish-even" id="parish-aghagallonandballinderryparish">
+  <summary class="parish-head">
+    <span class="parish-name">Aghagallon and Ballinderry</span>
+    <a class="parish-source" href="https://www.aghagallonandballinderryparish.ie" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
+  <div class="parish-body"><p>Parish newsletter ↗<br>
+No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
+Antrim<br>
+Parish newsletter ↗<br>
+No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+</details>
+<details class="parish-block parish-odd" id="parish-antrimparish">
+  <summary class="parish-head">
+    <span class="parish-name">Antrim</span>
+    <a class="parish-source" href="https://www.antrimparish.com/bulletinpage/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-odd" id="parish-antrimparish">
-  <header class="parish-head">
-    <h2 class="parish-name">Antrim</h2>
-    <a class="parish-source" href="https://www.antrimparish.com/bulletinpage/" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-even" id="parish-ballycastleparish">
+  <summary class="parish-head">
+    <span class="parish-name">Ballycastle</span>
+    <a class="parish-source" href="https://www.ballycastleparish.com/s/12th-April-2026.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-even" id="parish-ballycastleparish">
-  <header class="parish-head">
-    <h2 class="parish-name">Ballycastle</h2>
-    <a class="parish-source" href="https://www.ballycastleparish.com/s/12th-April-2026.pdf" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-odd" id="parish-ballyclareballygowan">
-  <header class="parish-head">
-    <h2 class="parish-name">Ballyclare and Ballygowan</h2>
-    <a class="parish-source" href="https://ballyclareballygowan.com/notice%20board.htm" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
-  <div class="parish-body"><p><a href="https://ballyclareballygowan.com" target="_blank" rel="noopener noreferrer">https://ballyclareballygowan.com</a><br>
+</details>
+<details class="parish-block parish-odd" id="parish-ballyclareballygowan">
+  <summary class="parish-head">
+    <span class="parish-name">Ballyclare and Ballygowan</span>
+    <a class="parish-source" href="https://ballyclareballygowan.com/notice%20board.htm" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
+  <div class="parish-body"><p>Parish newsletter ↗<br>
+<a href="https://ballyclareballygowan.com" target="_blank" rel="noopener noreferrer">https://ballyclareballygowan.com</a><br>
 Page 4<br>
 Please click on the button if you wish to make an online donatation to<br>
 the Parish of Ballyclare and Ballygowan. Thank you.This Week’s Hymns<br>
@@ -572,90 +587,98 @@ following their calling. Through the outpouring of your grace may many<br>
 come to the joy of knowing and responding to the invitation of Jesus to<br>
 “Come, Follow Me! ”<br>
 Amen</p></div>
-</section>
-<section class="parish-block parish-even" id="parish-ballymenaparish">
-  <header class="parish-head">
-    <h2 class="parish-name">Ballymena</h2>
-    <a class="parish-source" href="https://ballymenaparish.org" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-even" id="parish-ballymenaparish">
+  <summary class="parish-head">
+    <span class="parish-name">Ballymena</span>
+    <a class="parish-source" href="https://ballymenaparish.org" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-odd" id="parish-ballymoneyparish">
-  <header class="parish-head">
-    <h2 class="parish-name">Ballymoney</h2>
-    <a class="parish-source" href="https://www.ballymoneyparish.com" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-odd" id="parish-ballymoneyparish">
+  <summary class="parish-head">
+    <span class="parish-name">Ballymoney</span>
+    <a class="parish-source" href="https://www.ballymoneyparish.com" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
+  <div class="parish-body"><p>Parish newsletter ↗<br>
+No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
+Bangor<br>
+Parish newsletter ↗<br>
+No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
+Bright<br>
+Parish newsletter ↗<br>
+No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+</details>
+<details class="parish-block parish-even" id="parish-bangorparish">
+  <summary class="parish-head">
+    <span class="parish-name">Bangor</span>
+    <a class="parish-source" href="https://www.bangorparish.com" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-even" id="parish-bangorparish">
-  <header class="parish-head">
-    <h2 class="parish-name">Bangor</h2>
-    <a class="parish-source" href="https://www.bangorparish.com" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-odd" id="parish-bright">
+  <summary class="parish-head">
+    <span class="parish-name">Bright</span>
+    <a class="parish-source" href="https://parishofbright.net/wp-content/uploads/2026/04/Bulletin-5-04-2026.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-odd" id="parish-bright">
-  <header class="parish-head">
-    <h2 class="parish-name">Bright</h2>
-    <a class="parish-source" href="https://parishofbright.net/wp-content/uploads/2026/04/Bulletin-5-04-2026.pdf" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-even" id="parish-carrickfergus">
+  <summary class="parish-head">
+    <span class="parish-name">Carrickfergus</span>
+    <a class="parish-source" href="https://www.carrickparish.org" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-even" id="parish-carrickfergus">
-  <header class="parish-head">
-    <h2 class="parish-name">Carrickfergus</h2>
-    <a class="parish-source" href="https://www.carrickparish.org" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-odd" id="parish-christtheredeemer">
+  <summary class="parish-head">
+    <span class="parish-name">Christ the Redeemer</span>
+    <a class="parish-source" href="https://www.christtheredeemer.co.uk/parish-bulletin" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-odd" id="parish-christtheredeemer">
-  <header class="parish-head">
-    <h2 class="parish-name">Christ the Redeemer</h2>
-    <a class="parish-source" href="https://www.christtheredeemer.co.uk/parish-bulletin" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-even" id="parish-corpuschristiparishbelfast">
+  <summary class="parish-head">
+    <span class="parish-name">Corpus Christi Belfast</span>
+    <a class="parish-source" href="https://www.corpuschristiparishbelfast.com/news" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-even" id="parish-corpuschristiparishbelfast">
-  <header class="parish-head">
-    <h2 class="parish-name">Corpus Christi Belfast</h2>
-    <a class="parish-source" href="https://www.corpuschristiparishbelfast.com/news" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-odd" id="parish-derriaghy">
+  <summary class="parish-head">
+    <span class="parish-name">Derriaghy</span>
+    <a class="parish-source" href="https://derriaghycatholicparish.com" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-odd" id="parish-derriaghy">
-  <header class="parish-head">
-    <h2 class="parish-name">Derriaghy</h2>
-    <a class="parish-source" href="https://derriaghycatholicparish.com" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-even" id="parish-drumbocarryduff">
+  <summary class="parish-head">
+    <span class="parish-name">Drumbo and Carryduff</span>
+    <a class="parish-source" href="https://www.drumbocarryduff.ie/#sbp-bulletin" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-even" id="parish-drumbocarryduff">
-  <header class="parish-head">
-    <h2 class="parish-name">Drumbo and Carryduff</h2>
-    <a class="parish-source" href="https://www.drumbocarryduff.ie/#sbp-bulletin" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-odd" id="parish-dunsfordandardglassparish">
+  <summary class="parish-head">
+    <span class="parish-name">Dunsford and Ardglass</span>
+    <a class="parish-source" href="https://www.dunsfordandardglassparish.com/?page_id=623" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-odd" id="parish-dunsfordandardglassparish">
-  <header class="parish-head">
-    <h2 class="parish-name">Dunsford and Ardglass</h2>
-    <a class="parish-source" href="https://www.dunsfordandardglassparish.com/?page_id=623" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-even" id="parish-glenariffeparish">
+  <summary class="parish-head">
+    <span class="parish-name">Glenariffe</span>
+    <a class="parish-source" href="https://glenariffeparish.org/whats-on" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-even" id="parish-glenariffeparish">
-  <header class="parish-head">
-    <h2 class="parish-name">Glenariffe</h2>
-    <a class="parish-source" href="https://glenariffeparish.org/whats-on" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-odd" id="parish-glenavyandkilleadparish">
-  <header class="parish-head">
-    <h2 class="parish-name">Glenavy and Killead</h2>
-    <a class="parish-source" href="https://www.glenavyandkilleadparish.com" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
-  <div class="parish-body"><p>Page 6<br>
+</details>
+<details class="parish-block parish-odd" id="parish-glenavyandkilleadparish">
+  <summary class="parish-head">
+    <span class="parish-name">Glenavy and Killead</span>
+    <a class="parish-source" href="https://www.glenavyandkilleadparish.com" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
+  <div class="parish-body"><p>Parish newsletter ↗<br>
+Page 6<br>
 27– 3 May 2026 Mass Intentions<br>
 St Joseph’s Mater Dei St James<br>
 Monday<br>
@@ -934,62 +957,67 @@ Palestinian Christian theologian, Samuel Munayer, will<br>
 explore how liberation theology emerges from the lived<br>
 experience of Palestinian Christians. Registration<br>
 essential. Visit An Evening With Samuel Munayer</p></div>
-</section>
-<section class="parish-block parish-even" id="parish-hannahstown">
-  <header class="parish-head">
-    <h2 class="parish-name">Hannahstown</h2>
-    <a class="parish-source" href="https://www.parishofhannahstown.com/weekly-bulletins" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-even" id="parish-hannahstown">
+  <summary class="parish-head">
+    <span class="parish-name">Hannahstown</span>
+    <a class="parish-source" href="https://www.parishofhannahstown.com/weekly-bulletins" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-odd" id="parish-holycrossbelfast">
-  <header class="parish-head">
-    <h2 class="parish-name">Holy Cross Belfast</h2>
-    <a class="parish-source" href="http://www.holycrossparishbelfast.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-odd" id="parish-holycrossbelfast">
+  <summary class="parish-head">
+    <span class="parish-name">Holy Cross Belfast</span>
+    <a class="parish-source" href="http://www.holycrossparishbelfast.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-even" id="parish-holy-familyparish">
-  <header class="parish-head">
-    <h2 class="parish-name">Holy Family</h2>
-    <a class="parish-source" href="https://www.holy-familyparish.com/bulletin/" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-even" id="parish-holy-familyparish">
+  <summary class="parish-head">
+    <span class="parish-name">Holy Family</span>
+    <a class="parish-source" href="https://www.holy-familyparish.com/bulletin/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-odd" id="parish-holyrosarybelfast">
-  <header class="parish-head">
-    <h2 class="parish-name">Holy Rosary Belfast</h2>
-    <a class="parish-source" href="https://www.holyrosaryparishbelfast.net/weekly-bulletin" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-odd" id="parish-holyrosarybelfast">
+  <summary class="parish-head">
+    <span class="parish-name">Holy Rosary Belfast</span>
+    <a class="parish-source" href="https://www.holyrosaryparishbelfast.net/weekly-bulletin" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-even" id="parish-holytrinityparishbelfast">
-  <header class="parish-head">
-    <h2 class="parish-name">Holy Trinity Belfast</h2>
-    <a class="parish-source" href="https://holytrinityparishbelfast.com/newsletters/" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-even" id="parish-holytrinityparishbelfast">
+  <summary class="parish-head">
+    <span class="parish-name">Holy Trinity Belfast</span>
+    <a class="parish-source" href="https://holytrinityparishbelfast.com/newsletters/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-odd" id="parish-kilmoreandkillyleagh">
-  <header class="parish-head">
-    <h2 class="parish-name">Kilmore and Killyleagh</h2>
-    <a class="parish-source" href="https://www.kilmoreandkillyleagh.com" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-odd" id="parish-kilmoreandkillyleagh">
+  <summary class="parish-head">
+    <span class="parish-name">Kilmore and Killyleagh</span>
+    <a class="parish-source" href="https://www.kilmoreandkillyleagh.com" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
+  <div class="parish-body"><p>Parish newsletter ↗<br>
+No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
+Lisburn<br>
+Parish newsletter ↗<br>
+No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+</details>
+<details class="parish-block parish-even" id="parish-lisburn">
+  <summary class="parish-head">
+    <span class="parish-name">Lisburn</span>
+    <a class="parish-source" href="https://parishoflisburn.org" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-even" id="parish-lisburn">
-  <header class="parish-head">
-    <h2 class="parish-name">Lisburn</h2>
-    <a class="parish-source" href="https://parishoflisburn.org" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-odd" id="parish-loughshore">
-  <header class="parish-head">
-    <h2 class="parish-name">Loughshore</h2>
-    <a class="parish-source" href="https://www.loughshoreparishes.org/sunday-bulletin/" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
-  <div class="parish-body"><p><a href="https://www.loughshoreparishes.org" target="_blank" rel="noopener noreferrer">https://www.loughshoreparishes.org</a><br>
+</details>
+<details class="parish-block parish-odd" id="parish-loughshore">
+  <summary class="parish-head">
+    <span class="parish-name">Loughshore</span>
+    <a class="parish-source" href="https://www.loughshoreparishes.org/sunday-bulletin/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
+  <div class="parish-body"><p>Parish newsletter ↗<br>
+<a href="https://www.loughshoreparishes.org" target="_blank" rel="noopener noreferrer">https://www.loughshoreparishes.org</a><br>
 Page 9<br>
  The Loughshore Parishes <br>
 St Mary’s, Greencastle; St Mary, Star of the Sea, Whitehouse;<br>
@@ -1183,8 +1211,10 @@ PIPS 0800 088 6042<br>
 Youth Education Health Advise<br>
 <a href="tel:+442890757" style="color:#1d4ed8;font-weight:600;">02890 757</a><br>
 809<br>
-Diocesan Safeguarding Officer Philip O’Hara 07534<br>
-992 124<br>
+Diocesan Safeguarding Officer Philip O’Hara<br>
+07534<br>
+992<br>
+124<br>
 Sacred Heart of Jesus, I place all my trust in Thee AA Meeting upstairs in the Parish Centre every Monday &amp; Friday, 6.30pm -7.30pm, and Thursday at 7pm. (Ladies Group) Chatty Café. Open Wednesday 10.30am to 12.30pm. Come and join us for a cuppa &amp; a chat.<br>
 The Spred Group meet every second Monday in the Parish Hall at 7pm.<br>
 The Stitch and Crocheting Group meet Thursday evenings,7pm in the Parish centre. Come along and learn a new skill. DATES FOR YOUR DIARY<br>
@@ -1245,197 +1275,200 @@ aries of the Precious Blood in Ohio. Bookings at<br>
 Page 12<br>
 Missing &amp; Online-Only Bulletins<br>
 Generated 26/07/2026<br>
-The following parishes do not have a downloadable PDF bulletin. Click a link to view the bulletin online.</p></div>
-</section>
-<section class="parish-block parish-even" id="parish-maghera">
-  <header class="parish-head">
-    <h2 class="parish-name">Maghera</h2>
-    <a class="parish-source" href="https://www.parishofmaghera.com/" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+The following parishes do not have a downloadable PDF bulletin. Click a link to view the bulletin online.<br>
+Maghera<br>
+Parish newsletter ↗<br>
+No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+</details>
+<details class="parish-block parish-even" id="parish-maghera">
+  <summary class="parish-head">
+    <span class="parish-name">Maghera</span>
+    <a class="parish-source" href="https://www.parishofmaghera.com/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-odd" id="parish-nativityparish">
-  <header class="parish-head">
-    <h2 class="parish-name">Nativity</h2>
-    <a class="parish-source" href="https://www.nativityparish.com/news" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-odd" id="parish-nativityparish">
+  <summary class="parish-head">
+    <span class="parish-name">Nativity</span>
+    <a class="parish-source" href="https://www.nativityparish.com/news" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-even" id="parish-ourladyqueenofpeace">
-  <header class="parish-head">
-    <h2 class="parish-name">Our Lady Queen of Peace</h2>
-    <a class="parish-source" href="https://www.ourladyqueenofpeacekilwee.com/bulletins" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-even" id="parish-ourladyqueenofpeace">
+  <summary class="parish-head">
+    <span class="parish-name">Our Lady Queen of Peace</span>
+    <a class="parish-source" href="https://www.ourladyqueenofpeacekilwee.com/bulletins" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-odd" id="parish-portglenonestmarysportglenone">
-  <header class="parish-head">
-    <h2 class="parish-name">Port Glenone (St Mary&#x27;s Portglenone)</h2>
-    <a class="parish-source" href="https://stmarysportglenone.org/?page_id=40" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-odd" id="parish-portglenonestmarysportglenone">
+  <summary class="parish-head">
+    <span class="parish-name">Port Glenone (St Mary&#x27;s Portglenone)</span>
+    <a class="parish-source" href="https://stmarysportglenone.org/?page_id=40" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-even" id="parish-portaferryparish">
-  <header class="parish-head">
-    <h2 class="parish-name">Portaferry</h2>
-    <a class="parish-source" href="https://portaferryparish.com/bulletin" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-even" id="parish-portaferryparish">
+  <summary class="parish-head">
+    <span class="parish-name">Portaferry</span>
+    <a class="parish-source" href="https://portaferryparish.com/bulletin" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-odd" id="parish-portstewartparish">
-  <header class="parish-head">
-    <h2 class="parish-name">Portstewart</h2>
-    <a class="parish-source" href="http://portstewartparish.website/bulletins/" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-odd" id="parish-portstewartparish">
+  <summary class="parish-head">
+    <span class="parish-name">Portstewart</span>
+    <a class="parish-source" href="http://portstewartparish.website/bulletins/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-even" id="parish-sacredheartbelfast">
-  <header class="parish-head">
-    <h2 class="parish-name">Sacred Heart Belfast</h2>
-    <a class="parish-source" href="https://www.sacredheartparishbelfast.com/gallery/Parish%20Bulletin%2012th%20April%202026.pdf" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-even" id="parish-sacredheartbelfast">
+  <summary class="parish-head">
+    <span class="parish-name">Sacred Heart Belfast</span>
+    <a class="parish-source" href="https://www.sacredheartparishbelfast.com/gallery/Parish%20Bulletin%2012th%20April%202026.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-odd" id="parish-saintannesparish">
-  <header class="parish-head">
-    <h2 class="parish-name">Saint Annes</h2>
-    <a class="parish-source" href="https://www.saintannesparish.net" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-odd" id="parish-saintannesparish">
+  <summary class="parish-head">
+    <span class="parish-name">Saint Annes</span>
+    <a class="parish-source" href="https://www.saintannesparish.net" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-even" id="parish-saintanthony">
-  <header class="parish-head">
-    <h2 class="parish-name">Saint Anthony</h2>
-    <a class="parish-source" href="https://saintanthonys.uk/parish-bulletin/" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-even" id="parish-saintanthony">
+  <summary class="parish-head">
+    <span class="parish-name">Saint Anthony</span>
+    <a class="parish-source" href="https://saintanthonys.uk/parish-bulletin/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-odd" id="parish-saintmalachysparish">
-  <header class="parish-head">
-    <h2 class="parish-name">Saint Malachy&#x27;s</h2>
-    <a class="parish-source" href="https://www.saintmalachysparish.com/" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-odd" id="parish-saintmalachysparish">
+  <summary class="parish-head">
+    <span class="parish-name">Saint Malachy&#x27;s</span>
+    <a class="parish-source" href="https://www.saintmalachysparish.com/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-even" id="parish-saulandballeeparish">
-  <header class="parish-head">
-    <h2 class="parish-name">Saul and Ballee</h2>
-    <a class="parish-source" href="https://www.saulandballeeparish.com" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-even" id="parish-saulandballeeparish">
+  <summary class="parish-head">
+    <span class="parish-name">Saul and Ballee</span>
+    <a class="parish-source" href="https://www.saulandballeeparish.com" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-odd" id="parish-stagnesbelfast">
-  <header class="parish-head">
-    <h2 class="parish-name">St Agnes Belfast</h2>
-    <a class="parish-source" href="https://www.stagnesbelfast.com/" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-odd" id="parish-stagnesbelfast">
+  <summary class="parish-head">
+    <span class="parish-name">St Agnes Belfast</span>
+    <a class="parish-source" href="https://www.stagnesbelfast.com/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-even" id="parish-stbernadettesparish">
-  <header class="parish-head">
-    <h2 class="parish-name">St Bernadettes</h2>
-    <a class="parish-source" href="https://www.stbernadettesparish.org/bulletin/uploaded/Parish%20Bulletin%2012th%20April%202026.pdf" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-even" id="parish-stbernadettesparish">
+  <summary class="parish-head">
+    <span class="parish-name">St Bernadettes</span>
+    <a class="parish-source" href="https://www.stbernadettesparish.org/bulletin/uploaded/Parish%20Bulletin%2012th%20April%202026.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-odd" id="parish-stbrigidsbelfast">
-  <header class="parish-head">
-    <h2 class="parish-name">St Brigids Belfast</h2>
-    <a class="parish-source" href="https://stbrigidsparishbelfast.org" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-odd" id="parish-stbrigidsbelfast">
+  <summary class="parish-head">
+    <span class="parish-name">St Brigids Belfast</span>
+    <a class="parish-source" href="https://stbrigidsparishbelfast.org" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-even" id="parish-st-colmcilles">
-  <header class="parish-head">
-    <h2 class="parish-name">St Colmcilles</h2>
-    <a class="parish-source" href="https://st-colmcilles.net/weekly-bulletins/past-weeks-bulletins/" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-even" id="parish-st-colmcilles">
+  <summary class="parish-head">
+    <span class="parish-name">St Colmcilles</span>
+    <a class="parish-source" href="https://st-colmcilles.net/weekly-bulletins/past-weeks-bulletins/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-odd" id="parish-stgerardsparish">
-  <header class="parish-head">
-    <h2 class="parish-name">St Gerards</h2>
-    <a class="parish-source" href="https://stgerardsparish.org/parish-news-events/" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-odd" id="parish-stgerardsparish">
+  <summary class="parish-head">
+    <span class="parish-name">St Gerards</span>
+    <a class="parish-source" href="https://stgerardsparish.org/parish-news-events/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-even" id="parish-stlukesparishbelfast">
-  <header class="parish-head">
-    <h2 class="parish-name">St Luke&#x27;s Belfast</h2>
-    <a class="parish-source" href="https://www.stlukesparishbelfast.com/news" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-even" id="parish-stlukesparishbelfast">
+  <summary class="parish-head">
+    <span class="parish-name">St Luke&#x27;s Belfast</span>
+    <a class="parish-source" href="https://www.stlukesparishbelfast.com/news" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-odd" id="parish-stmacnissirandalstown">
-  <header class="parish-head">
-    <h2 class="parish-name">St MacNissi Randalstown</h2>
-    <a class="parish-source" href="https://www.stmacnissirandalstown.com/bulletin" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-odd" id="parish-stmacnissirandalstown">
+  <summary class="parish-head">
+    <span class="parish-name">St MacNissi Randalstown</span>
+    <a class="parish-source" href="https://www.stmacnissirandalstown.com/bulletin" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-even" id="parish-stmarysbelfast">
-  <header class="parish-head">
-    <h2 class="parish-name">St Mary&#x27;s Belfast</h2>
-    <a class="parish-source" href="https://www.stmarysbelfast.org/news" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-even" id="parish-stmarysbelfast">
+  <summary class="parish-head">
+    <span class="parish-name">St Mary&#x27;s Belfast</span>
+    <a class="parish-source" href="https://www.stmarysbelfast.org/news" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-odd" id="parish-stmarysonthehill">
-  <header class="parish-head">
-    <h2 class="parish-name">St Mary&#x27;s on the Hill</h2>
-    <a class="parish-source" href="https://www.stmarysonthehill.online/" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-odd" id="parish-stmarysonthehill">
+  <summary class="parish-head">
+    <span class="parish-name">St Mary&#x27;s on the Hill</span>
+    <a class="parish-source" href="https://www.stmarysonthehill.online/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-even" id="parish-stmatthewsparish">
-  <header class="parish-head">
-    <h2 class="parish-name">St Matthew&#x27;s</h2>
-    <a class="parish-source" href="https://www.stmatthewsparish.com/news" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-even" id="parish-stmatthewsparish">
+  <summary class="parish-head">
+    <span class="parish-name">St Matthew&#x27;s</span>
+    <a class="parish-source" href="https://www.stmatthewsparish.com/news" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-odd" id="parish-stmichaelthearchangel">
-  <header class="parish-head">
-    <h2 class="parish-name">St Michael the Archangel</h2>
-    <a class="parish-source" href="https://saintmichaelthearchangel.godaddysites.com/" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-odd" id="parish-stmichaelthearchangel">
+  <summary class="parish-head">
+    <span class="parish-name">St Michael the Archangel</span>
+    <a class="parish-source" href="https://saintmichaelthearchangel.godaddysites.com/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-even" id="parish-stoliverplunkettparish">
-  <header class="parish-head">
-    <h2 class="parish-name">St Oliver Plunkett</h2>
-    <a class="parish-source" href="https://stoliverplunkettparish.ie" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-even" id="parish-stoliverplunkettparish">
+  <summary class="parish-head">
+    <span class="parish-name">St Oliver Plunkett</span>
+    <a class="parish-source" href="https://stoliverplunkettparish.ie" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-odd" id="parish-stpatricksdownpatrick">
-  <header class="parish-head">
-    <h2 class="parish-name">St Patrick&#x27;s Downpatrick</h2>
-    <a class="parish-source" href="https://stpatricksdownpatrick.com/parish-bulletins/" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-odd" id="parish-stpatricksdownpatrick">
+  <summary class="parish-head">
+    <span class="parish-name">St Patrick&#x27;s Downpatrick</span>
+    <a class="parish-source" href="https://stpatricksdownpatrick.com/parish-bulletins/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-even" id="parish-stpatricksbelfast">
-  <header class="parish-head">
-    <h2 class="parish-name">St Patricks Belfast</h2>
-    <a class="parish-source" href="https://www.stpatricksbelfast.org/category/weekly-bulletins/" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-even" id="parish-stpatricksbelfast">
+  <summary class="parish-head">
+    <span class="parish-name">St Patricks Belfast</span>
+    <a class="parish-source" href="https://www.stpatricksbelfast.org/category/weekly-bulletins/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-odd" id="parish-stteresasparish">
-  <header class="parish-head">
-    <h2 class="parish-name">St Teresas</h2>
-    <a class="parish-source" href="https://stteresasparish.church/parish-news/" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-odd" id="parish-stteresasparish">
+  <summary class="parish-head">
+    <span class="parish-name">St Teresas</span>
+    <a class="parish-source" href="https://stteresasparish.church/parish-news/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section>
-<section class="parish-block parish-even" id="parish-stvincentdepaulparishbelfast">
-  <header class="parish-head">
-    <h2 class="parish-name">St Vincent de Paul Belfast</h2>
-    <a class="parish-source" href="https://www.stvincentdepaulparishbelfast.com/news" target="_blank" rel="noopener noreferrer">Parish newsletter ↗</a>
-  </header>
+</details>
+<details class="parish-block parish-even" id="parish-stvincentdepaulparishbelfast">
+  <summary class="parish-head">
+    <span class="parish-name">St Vincent de Paul Belfast</span>
+    <a class="parish-source" href="https://www.stvincentdepaulparishbelfast.com/news" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
+  </summary>
   <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
-</section></div></div>
+</details></div></div>
     </section>
 
     <p class="disclaimer">Note: The plain-text OCR version is auto-generated and may contain errors so it is always best to double check with the original PDF.</p>
@@ -1443,7 +1476,7 @@ The following parishes do not have a downloadable PDF bulletin. Click a link to 
 
     <section class="parish-section">
       <h2>DOWN AND CONNOR PARISHES WITH WORKING BULLETIN LINKS</h2>
-      <details class="parish-accordion"><summary class="parish-accordion-toggle">Show parish bulletin links (A–Z)</summary><ul class="parish-link-grid"><li><a href="https://www.aghagallonandballinderryparish.ie/newsletter/" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li><a href="https://www.aghagallonandballinderryparish.ie/" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li><a href="https://www.antrimparish.com/bulletinpage/" target="_blank" rel="noopener noreferrer">Antrim</a></li><li><a href="https://raw.githubusercontent.com/Raphoe-Diocese/parish_harvester/main/Bulletins/current/antrimparish.pdf" target="_blank" rel="noopener noreferrer">Antrim</a></li><li><a href="https://www.ballycastleparish.com/bulletins" target="_blank" rel="noopener noreferrer">Ballycastle</a></li><li><a href="https://www.ballycastleparish.com/s/26th-July-2026-nnwh.pdf" target="_blank" rel="noopener noreferrer">Ballycastle</a></li><li><a href="https://ballyclareballygowan.com/notice%20board.htm" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li><a href="https://ballyclareballygowan.com/notice%20board.htm" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li><a href="https://ballymenaparish.org/bulletin-and-parish-documents/" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li><a href="https://ballymenaparish.org/bulletin-and-parish-documents/" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li><a href="http://www.ballymoneyparish.com/news_and_events.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li><a href="http://www.ballymoneyparish.com/news_and_events.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li><a href="https://www.bangorparish.com/parish-bulletin/" target="_blank" rel="noopener noreferrer">Bangor</a></li><li><a href="https://www.bangorparish.com/wp-content/uploads/14-June-2026-NEWSLETTER.pdf" target="_blank" rel="noopener noreferrer">Bangor</a></li><li><a href="https://parishofbright.net/bulletin/" target="_blank" rel="noopener noreferrer">Bright</a></li><li><a href="https://parishofbright.net/bulletin/" target="_blank" rel="noopener noreferrer">Bright</a></li><li><a href="https://www.carrickparish.org/info" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li><a href="https://www.carrickparish.org/info" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li><a href="https://www.christtheredeemer.co.uk/parish-bulletin" target="_blank" rel="noopener noreferrer">Christ the Redeemer</a></li><li><a href="https://www.corpuschristiparishbelfast.com/news" target="_blank" rel="noopener noreferrer">Corpus Christi Belfast</a></li><li><a href="https://www.corpuschristiparishbelfast.com/news" target="_blank" rel="noopener noreferrer">Corpus Christi Belfast</a></li><li><a href="https://derriaghycatholicparish.com/?page_id=262" target="_blank" rel="noopener noreferrer">Derriaghy</a></li><li><a href="https://derriaghycatholicparish.com/?page_id=262" target="_blank" rel="noopener noreferrer">Derriaghy</a></li><li><a href="https://www.drumbocarryduff.ie/#sbp-bulletin" target="_blank" rel="noopener noreferrer">Drumbo and Carryduff</a></li><li><a href="https://www.drumbocarryduff.ie/#sbp-bulletin" target="_blank" rel="noopener noreferrer">Drumbo and Carryduff</a></li><li><a href="https://www.dunsfordandardglassparish.com/?page_id=623" target="_blank" rel="noopener noreferrer">Dunsford and Ardglass</a></li><li><a href="https://www.dunsfordandardglassparish.com/?page_id=623" target="_blank" rel="noopener noreferrer">Dunsford and Ardglass</a></li><li><a href="https://glenariffeparish.org/whats-on" target="_blank" rel="noopener noreferrer">Glenariffe</a></li><li><a href="https://glenariffeparish.org/whats-on" target="_blank" rel="noopener noreferrer">Glenariffe</a></li><li><a href="https://www.glenavyandkilleadparish.com/bulletins/" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li><a href="https://www.glenavyandkilleadparish.com/bulletins/" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li><a href="https://www.parishofhannahstown.com/weekly-bulletins" target="_blank" rel="noopener noreferrer">Hannahstown</a></li><li><a href="https://www.parishofhannahstown.com/weekly-bulletins" target="_blank" rel="noopener noreferrer">Hannahstown</a></li><li><a href="http://www.holycrossparishbelfast.com/parishnews.html" target="_blank" rel="noopener noreferrer">Holy Cross Belfast</a></li><li><a href="http://www.holycrossparishbelfast.com/parishnews.html" target="_blank" rel="noopener noreferrer">Holy Cross Belfast</a></li><li><a href="https://www.holy-familyparish.com/bulletin/" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li><a href="https://www.holy-familyparish.com/bulletin/" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li><a href="https://www.holyfamily-parish.com/pdf/260726.pdf" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li><a href="https://www.holyrosaryparishbelfast.net/weekly-bulletin" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li><a href="https://www.holyrosaryparishbelfast.net/weekly-bulletin" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li><a href="https://holytrinityparishbelfast.com/newsletters/" target="_blank" rel="noopener noreferrer">Holy Trinity Belfast</a></li><li><a href="#" target="_blank" rel="noopener noreferrer">Holy Trinity Belfast</a></li><li><a href="https://www.kilmoreandkillyleagh.com/latest-notices--downloads.html" target="_blank" rel="noopener noreferrer">Kilmore and Killyleagh</a></li><li><a href="https://parishoflisburn.org/about/" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li><a href="https://parishoflisburn.org/about/" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li><a href="https://www.loughshoreparishes.org/sunday-bulletin/" target="_blank" rel="noopener noreferrer">Loughshore</a></li><li><a href="https://www.loughshoreparishes.org/sunday-bulletin/" target="_blank" rel="noopener noreferrer">Loughshore</a></li><li><a href="https://www.parishofmaghera.com/" target="_blank" rel="noopener noreferrer">Maghera</a></li><li><a href="http://www.magheraparishderry.com/parishnews.php" target="_blank" rel="noopener noreferrer">Maghera</a></li><li><a href="https://www.parishofmaghera.com/" target="_blank" rel="noopener noreferrer">Maghera</a></li><li><a href="https://www.nativityparish.com/news" target="_blank" rel="noopener noreferrer">Nativity</a></li><li><a href="https://www.nativityparish.com/news" target="_blank" rel="noopener noreferrer">Nativity</a></li><li><a href="https://www.ourladyqueenofpeacekilwee.com/bulletins" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li><a href="https://www.ourladyqueenofpeacekilwee.com/bulletins" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li><a href="https://stmarysportglenone.org/?page_id=40" target="_blank" rel="noopener noreferrer">Port Glenone (St Mary&#x27;s Portglenone)</a></li><li><a href="https://portaferryparish.com/bulletin" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li><a href="https://portaferryparish.com/images/downloads/Bulletin2019A.pdf" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li><a href="http://portstewartparish.website/bulletins/" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li><a href="http://portstewartparish.website/bulletins/" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li><a href="https://www.sacredheartparishbelfast.com/Parish-Bulletins/" target="_blank" rel="noopener noreferrer">Sacred Heart Belfast</a></li><li><a href="https://www.saintannesparish.net/bulletins/" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li><a href="https://www.saintannesparish.net/bulletins/" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li><a href="https://saintanthonys.uk/parish-bulletin/" target="_blank" rel="noopener noreferrer">Saint Anthony</a></li><li><a href="https://www.saintmalachysparish.com/" target="_blank" rel="noopener noreferrer">Saint Malachy&#x27;s</a></li><li><a href="https://www.saintmalachysparish.com/" target="_blank" rel="noopener noreferrer">Saint Malachy&#x27;s</a></li><li><a href="https://www.saulandballeeparish.com/" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li><a href="https://www.saulandballeeparish.com/" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li><a href="https://www.stagnesbelfast.com/?p=6069" target="_blank" rel="noopener noreferrer">St Agnes Belfast</a></li><li><a href="https://www.stbernadettesparish.org/?page_id=672" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li><a href="https://www.stbernadettesparish.org/?page_id=672" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li><a href="https://stbrigidsparishbelfast.org/bulletins" target="_blank" rel="noopener noreferrer">St Brigids Belfast</a></li><li><a href="https://stbrigidsparishbelfast.org/bulletins" target="_blank" rel="noopener noreferrer">St Brigids Belfast</a></li><li><a href="https://st-colmcilles.net/weekly-bulletins/past-weeks-bulletins/" target="_blank" rel="noopener noreferrer">St Colmcilles</a></li><li><a href="https://st-colmcilles.net/weekly-bulletins/past-weeks-bulletins/" target="_blank" rel="noopener noreferrer">St Colmcilles</a></li><li><a href="https://stgerardsparish.org/" target="_blank" rel="noopener noreferrer">St Gerards</a></li><li><a href="https://stgerardsparish.org/" target="_blank" rel="noopener noreferrer">St Gerards</a></li><li><a href="https://www.stlukesparishbelfast.com/news" target="_blank" rel="noopener noreferrer">St Luke&#x27;s Belfast</a></li><li><a href="#" target="_blank" rel="noopener noreferrer">St Luke&#x27;s Belfast</a></li><li><a href="https://www.stmacnissirandalstown.com/bulletin" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li><a href="https://www.stmarysbelfast.org/news" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Belfast</a></li><li><a href="https://www.stmarysonthehill.online/" target="_blank" rel="noopener noreferrer">St Mary&#x27;s on the Hill</a></li><li><a href="https://www.stmatthewsparish.com/news" target="_blank" rel="noopener noreferrer">St Matthew&#x27;s</a></li><li><a href="https://www.stmatthewsparish.com/news" target="_blank" rel="noopener noreferrer">St Matthew&#x27;s</a></li><li><a href="https://saintmichaelthearchangel.godaddysites.com/" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li><a href="https://saintmichaelthearchangel.godaddysites.com/" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li><a href="https://stoliverplunkettparish.ie/bulletins/" target="_blank" rel="noopener noreferrer">St Oliver Plunkett</a></li><li><a href="https://stoliverplunkettparish.ie/bulletins/" target="_blank" rel="noopener noreferrer">St Oliver Plunkett</a></li><li><a href="https://stpatricksdownpatrick.com/parish-bulletins/" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li><li><a href="https://www.stpatricksbelfast.org/category/weekly-bulletins/" target="_blank" rel="noopener noreferrer">St Patricks Belfast</a></li><li><a href="https://stteresasparish.church/parish-news/" target="_blank" rel="noopener noreferrer">St Teresas</a></li><li><a href="https://stteresasparish.church/2026/06/26/the-st-teresas-parish-bulletin-for-sunday-28th-june-2026/" target="_blank" rel="noopener noreferrer">St Teresas</a></li><li><a href="https://www.stvincentdepaulparishbelfast.com/news" target="_blank" rel="noopener noreferrer">St Vincent de Paul Belfast</a></li><li><a href="#" target="_blank" rel="noopener noreferrer">St Vincent de Paul Belfast</a></li></ul></details>
+      <details class="parish-accordion"><summary class="parish-accordion-toggle">Show parish bulletin links (A–Z)</summary><ul class="parish-link-grid"><li><a href="https://www.aghagallonandballinderryparish.ie/newsletter/" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li><a href="https://www.antrimparish.com/bulletinpage/" target="_blank" rel="noopener noreferrer">Antrim</a></li><li><a href="https://www.ballycastleparish.com/bulletins" target="_blank" rel="noopener noreferrer">Ballycastle</a></li><li><a href="https://ballyclareballygowan.com/notice%20board.htm" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li><a href="https://ballymenaparish.org/bulletin-and-parish-documents/" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li><a href="http://www.ballymoneyparish.com/news_and_events.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li><a href="https://www.bangorparish.com/parish-bulletin/" target="_blank" rel="noopener noreferrer">Bangor</a></li><li><a href="https://parishofbright.net/bulletin/" target="_blank" rel="noopener noreferrer">Bright</a></li><li><a href="https://www.carrickparish.org/info" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li><a href="https://www.christtheredeemer.co.uk/parish-bulletin" target="_blank" rel="noopener noreferrer">Christ the Redeemer</a></li><li><a href="https://www.corpuschristiparishbelfast.com/news" target="_blank" rel="noopener noreferrer">Corpus Christi Belfast</a></li><li><a href="https://derriaghycatholicparish.com/?page_id=262" target="_blank" rel="noopener noreferrer">Derriaghy</a></li><li><a href="https://www.drumbocarryduff.ie/#sbp-bulletin" target="_blank" rel="noopener noreferrer">Drumbo and Carryduff</a></li><li><a href="https://www.dunsfordandardglassparish.com/?page_id=623" target="_blank" rel="noopener noreferrer">Dunsford and Ardglass</a></li><li><a href="https://glenariffeparish.org/whats-on" target="_blank" rel="noopener noreferrer">Glenariffe</a></li><li><a href="https://www.glenavyandkilleadparish.com/bulletins/" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li><a href="https://www.parishofhannahstown.com/weekly-bulletins" target="_blank" rel="noopener noreferrer">Hannahstown</a></li><li><a href="http://www.holycrossparishbelfast.com/parishnews.html" target="_blank" rel="noopener noreferrer">Holy Cross Belfast</a></li><li><a href="https://www.holy-familyparish.com/bulletin/" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li><a href="https://www.holyrosaryparishbelfast.net/weekly-bulletin" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li><a href="https://holytrinityparishbelfast.com/newsletters/" target="_blank" rel="noopener noreferrer">Holy Trinity Belfast</a></li><li><a href="https://www.kilmoreandkillyleagh.com/latest-notices--downloads.html" target="_blank" rel="noopener noreferrer">Kilmore and Killyleagh</a></li><li><a href="https://parishoflisburn.org/about/" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li><a href="https://www.loughshoreparishes.org/sunday-bulletin/" target="_blank" rel="noopener noreferrer">Loughshore</a></li><li><a href="https://www.parishofmaghera.com/" target="_blank" rel="noopener noreferrer">Maghera</a></li><li><a href="https://www.nativityparish.com/news" target="_blank" rel="noopener noreferrer">Nativity</a></li><li><a href="https://www.ourladyqueenofpeacekilwee.com/bulletins" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li><a href="https://stmarysportglenone.org/?page_id=40" target="_blank" rel="noopener noreferrer">Port Glenone (St Mary&#x27;s Portglenone)</a></li><li><a href="https://portaferryparish.com/bulletin" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li><a href="http://portstewartparish.website/bulletins/" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li><a href="https://www.sacredheartparishbelfast.com/Parish-Bulletins/" target="_blank" rel="noopener noreferrer">Sacred Heart Belfast</a></li><li><a href="https://www.saintannesparish.net/bulletins/" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li><a href="https://saintanthonys.uk/parish-bulletin/" target="_blank" rel="noopener noreferrer">Saint Anthony</a></li><li><a href="https://www.saintmalachysparish.com/" target="_blank" rel="noopener noreferrer">Saint Malachy&#x27;s</a></li><li><a href="https://www.saulandballeeparish.com/" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li><a href="https://www.stagnesbelfast.com/?p=6069" target="_blank" rel="noopener noreferrer">St Agnes Belfast</a></li><li><a href="https://www.stbernadettesparish.org/?page_id=672" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li><a href="https://stbrigidsparishbelfast.org/bulletins" target="_blank" rel="noopener noreferrer">St Brigids Belfast</a></li><li><a href="https://st-colmcilles.net/weekly-bulletins/past-weeks-bulletins/" target="_blank" rel="noopener noreferrer">St Colmcilles</a></li><li><a href="https://stgerardsparish.org/" target="_blank" rel="noopener noreferrer">St Gerards</a></li><li><a href="https://www.stlukesparishbelfast.com/news" target="_blank" rel="noopener noreferrer">St Luke&#x27;s Belfast</a></li><li><a href="https://www.stmacnissirandalstown.com/bulletin" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li><a href="https://www.stmarysbelfast.org/news" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Belfast</a></li><li><a href="https://www.stmarysonthehill.online/" target="_blank" rel="noopener noreferrer">St Mary&#x27;s on the Hill</a></li><li><a href="https://www.stmatthewsparish.com/news" target="_blank" rel="noopener noreferrer">St Matthew&#x27;s</a></li><li><a href="https://saintmichaelthearchangel.godaddysites.com/" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li><a href="https://stoliverplunkettparish.ie/bulletins/" target="_blank" rel="noopener noreferrer">St Oliver Plunkett</a></li><li><a href="https://stpatricksdownpatrick.com/parish-bulletins/" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li><li><a href="https://www.stpatricksbelfast.org/category/weekly-bulletins/" target="_blank" rel="noopener noreferrer">St Patricks Belfast</a></li><li><a href="https://stteresasparish.church/parish-news/" target="_blank" rel="noopener noreferrer">St Teresas</a></li><li><a href="https://www.stvincentdepaulparishbelfast.com/news" target="_blank" rel="noopener noreferrer">St Vincent de Paul Belfast</a></li></ul></details>
     </section>
   </main>
 

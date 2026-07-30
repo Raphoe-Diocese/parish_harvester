@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import html
+import re
 from datetime import UTC, datetime
 from pathlib import Path
 from string import Template
@@ -44,11 +45,16 @@ def _render_parish_accordion(parish_links: list[dict]) -> str:
         return '<p class="empty-state">No parish links available yet.</p>'
 
     items: list[str] = []
+    seen: set[str] = set()
     for link in sorted(parish_links, key=lambda item: str(item.get("name") or "").lower()):
-        name = html.escape(str(link.get("name") or "Unnamed Parish"))
-        url = html.escape(str(link.get("url") or "#"), quote=True)
+        name = str(link.get("name") or "Unnamed Parish").strip()
+        url = str(link.get("url") or "#").strip()
+        key = re.sub(r"[^a-z0-9]+", "", name.lower())
+        if not name or key in seen:
+            continue
+        seen.add(key)
         items.append(
-            f'<li><a href="{url}" target="_blank" rel="noopener noreferrer">{name}</a></li>'
+            f'<li><a href="{html.escape(url, quote=True)}" target="_blank" rel="noopener noreferrer">{html.escape(name)}</a></li>'
         )
 
     return (

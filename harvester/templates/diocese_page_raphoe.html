@@ -128,8 +128,8 @@
     }
     .toolbar-btn:hover { background: #f0f8f8; text-decoration: none; }
     .viewer {
-      height: min(82vh, 980px);
-      min-height: 360px;
+      height: calc(100vh - 150px);
+      min-height: 70vh;
       overflow: hidden;
       border: 1px solid #d8e4e3;
       border-radius: 6px;
@@ -186,7 +186,9 @@
     .ocr-search-tools button:disabled { background: #9bbfbd; cursor: not-allowed; }
     .match-count { color: var(--muted); font-size: 0.92rem; font-weight: 700; }
     .ocr-viewer {
-      max-height: min(78vh, 860px);
+      height: calc(100vh - 220px);
+      min-height: 70vh;
+      max-height: none;
       overflow: auto;
       border: 1px solid #d8e4e3;
       border-radius: 6px;
@@ -238,37 +240,44 @@
     }
     .ocr-parish-url:hover { text-decoration: underline; }
     .parish-block {
-      margin: 0 0 0.9rem;
-      padding: 0.1rem 0 0.7rem;
-      border-bottom: 1px solid #e5e7eb;
+      margin: 0 0 0.55rem;
+      padding: 0;
+      border: 1px solid #e5e7eb;
+      border-radius: 4px;
+      background: #fff;
     }
-    .parish-block.parish-odd {
-      background: #f7faf9;
-      margin-left: -6px;
-      margin-right: -6px;
-      padding-left: 6px;
-      padding-right: 6px;
-      border-radius: 3px;
-    }
+    .parish-block.parish-odd { background: #f7faf9; }
+    .parish-block > summary.parish-head,
     .parish-head {
       display: flex;
       flex-wrap: wrap;
       align-items: baseline;
       justify-content: space-between;
       gap: 6px 12px;
-      margin: 0 0 0.35rem;
-      padding: 0.25rem 0 0.25rem 0.5rem;
+      margin: 0;
+      padding: 0.45rem 0.55rem 0.45rem 0.65rem;
       border-left: 3px solid var(--teal);
+      cursor: pointer;
+      list-style: none;
     }
+    .parish-block > summary.parish-head::-webkit-details-marker { display: none; }
+    .parish-odd > summary.parish-head,
     .parish-odd .parish-head { border-left-color: var(--teal-dark); }
     .parish-name {
       margin: 0 !important;
-      font-size: 1.1rem !important;
+      font-size: 1.05rem !important;
       font-family: Georgia, "Times New Roman", Times, serif;
       color: var(--teal-dark) !important;
       border: 0 !important;
       padding: 0 !important;
     }
+    .parish-name::before {
+      content: "▸ ";
+      color: var(--teal);
+      font-family: system-ui, sans-serif;
+      font-size: 0.85em;
+    }
+    .parish-block[open] .parish-name::before { content: "▾ "; }
     .parish-source {
       font-family: "Open Sans", Arial, Helvetica, sans-serif;
       font-size: 0.78rem;
@@ -278,6 +287,7 @@
       color: var(--link-blue);
     }
     .parish-source:hover { text-decoration: underline; }
+    .parish-body { padding: 0.25rem 0.65rem 0.7rem; }
     .parish-empty {
       font-family: "Open Sans", Arial, Helvetica, sans-serif;
       font-size: 0.88rem;
@@ -401,8 +411,8 @@
       .title-card { padding: 8px 10px; }
       .top-actions { gap: 6px; }
       .go-ocr-btn, .download-link, .toolbar-btn { width: 100%; }
-      .viewer { min-height: 280px; height: 62vh; }
-      .ocr-viewer { max-height: 58vh; }
+      .viewer { min-height: 65vh; height: calc(100vh - 180px); }
+      .ocr-viewer { min-height: 65vh; height: calc(100vh - 240px); }
       .parish-link-grid { columns: 1; }
     }
   </style>

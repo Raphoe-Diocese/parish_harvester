@@ -79,7 +79,6 @@ class OcrBulletinPageTests(unittest.TestCase):
             )
 
             self.assertIn("TEST COLLATED BULLETIN", html_output)
-            self.assertIn("Page 1 of 2", html_output)
             self.assertIn("../mega_pdf/test_mega_bulletin.pdf", html_output)
             self.assertIn("PARISHES WITH WORKING BULLETIN LINKS", html_output.upper())
             self.assertIn("https://example.com/one", html_output)
@@ -89,7 +88,9 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertIn("id=\"ocr-next\"", html_output)
             self.assertNotIn("Jump to OCR Text", html_output)
             self.assertIn("test-2026-05-19-ocr.html", html_output)
-            self.assertIn("Next page →", html_output)
+            self.assertNotIn("Next page →", html_output)
+            self.assertNotIn("pdf-controls", html_output)
+            self.assertIn("pdf-frame-wrap", html_output)
             self.assertIn('target="_blank"', html_output)
 
     def test_render_ocr_standalone_page(self) -> None:

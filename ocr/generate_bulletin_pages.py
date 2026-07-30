@@ -117,6 +117,7 @@ DIOCESES = _load_dioceses()
 def parse_parish_links(path: Path) -> list[tuple[str, str]]:
     parish_links: list[tuple[str, str]] = []
     current_name: str | None = None
+    seen: set[str] = set()
     for raw_line in path.read_text(encoding="utf-8").splitlines():
         line = raw_line.strip()
         header = HEADER_PATTERN.match(line)
@@ -126,7 +127,10 @@ def parse_parish_links(path: Path) -> list[tuple[str, str]]:
         if not line or line.startswith("#"):
             continue
         if current_name:
-            parish_links.append((current_name, line))
+            key = re.sub(r"[^a-z0-9]+", "", current_name.lower())
+            if key and key not in seen:
+                seen.add(key)
+                parish_links.append((current_name, line))
             current_name = None
     return parish_links
 
@@ -318,18 +322,18 @@ def build_az_parish_ocr_html(
             safe_href = html.escape(url, quote=True)
             source = (
                 f'<a class="parish-source" href="{safe_href}" target="_blank" '
-                f'rel="noopener noreferrer">Parish newsletter ↗</a>'
+                f'rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>'
             )
         else:
             source = '<span class="parish-source muted">No newsletter URL</span>'
         sections.append(
-            f'<section class="parish-block parish-{stripe}" id="parish-{safe_key}">\n'
-            f'  <header class="parish-head">\n'
-            f'    <h2 class="parish-name">{safe_name}</h2>\n'
+            f'<details class="parish-block parish-{stripe}" id="parish-{safe_key}">\n'
+            f'  <summary class="parish-head">\n'
+            f'    <span class="parish-name">{safe_name}</span>\n'
             f"    {source}\n"
-            f"  </header>\n"
+            f"  </summary>\n"
             f'  <div class="parish-body">{body_html}</div>\n'
-            f"</section>"
+            f"</details>"
         )
     return "\n".join(sections)
 
@@ -489,7 +493,12 @@ def _render_parish_links(parish_links: list[tuple[str, str]]) -> str:
         return '<p class="empty-state">No parish bulletin links were found for this diocese yet.</p>'
     sorted_links = sorted(parish_links, key=lambda pair: pair[0].lower())
     items = []
+    seen: set[str] = set()
     for name, url in sorted_links:
+        key = _normalise_name(name)
+        if not key or key in seen:
+            continue
+        seen.add(key)
         items.append(
             (
                 "<li class=\"parish-item\" data-name=\"{name_key}\">"
@@ -503,8 +512,8 @@ def _render_parish_links(parish_links: list[tuple[str, str]]) -> str:
         )
     return (
         '<div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div>'
-        '<ul id="parish-grid" class="parish-grid">{items}</ul>'
-    ).format(items="".join(items))
+        f'<ul id="parish-grid" class="parish-grid">{"".join(items)}</ul>'
+    )
 
 
 def _diocese_label(display_name: str) -> str:
@@ -579,37 +588,42 @@ def render_ocr_standalone_page(
     .ocr-body mark {{ background: #fff3cd; padding: 0 2px; border-radius: 2px; }}
     .ocr-body mark.search-active {{ background: #fde047; outline: 2px solid #0f5e5e; }}
     .parish-block {{
-      margin: 0 0 1rem;
-      padding: 0.15rem 0 0.85rem;
-      border-bottom: 1px solid #e5e7eb;
+      margin: 0 0 0.5rem;
+      border: 1px solid #e5e7eb;
+      border-radius: 4px;
+      background: #fff;
     }}
-    .parish-block.parish-odd {{
-      background: #f7faf9;
-      margin-left: -8px;
-      margin-right: -8px;
-      padding-left: 8px;
-      padding-right: 8px;
-      border-radius: 3px;
-    }}
-    .parish-head {{
+    .parish-block.parish-odd {{ background: #f7faf9; }}
+    .parish-block > summary.parish-head {{
       display: flex;
       flex-wrap: wrap;
       align-items: baseline;
       justify-content: space-between;
       gap: 6px 12px;
-      margin: 0 0 0.4rem;
-      padding: 0.3rem 0 0.3rem 0.55rem;
+      margin: 0;
+      padding: 0.4rem 0.55rem 0.4rem 0.6rem;
       border-left: 3px solid {TEAL};
+      cursor: pointer;
+      list-style: none;
     }}
-    .parish-odd .parish-head {{ border-left-color: {DEEP_TEAL}; }}
+    .parish-block > summary.parish-head::-webkit-details-marker {{ display: none; }}
+    .parish-odd > summary.parish-head {{ border-left-color: {DEEP_TEAL}; }}
     .parish-name {{
       margin: 0 !important;
-      font-size: 1.12rem !important;
+      font-size: 1.08rem !important;
       font-family: Georgia, "Times New Roman", Times, serif;
       color: {DEEP_TEAL} !important;
       border: 0 !important;
       padding: 0 !important;
+      font-weight: 700;
     }}
+    .parish-name::before {{
+      content: "▸ ";
+      color: {TEAL};
+      font-family: system-ui, sans-serif;
+      font-size: 0.85em;
+    }}
+    .parish-block[open] .parish-name::before {{ content: "▾ "; }}
     .parish-source {{
       font-family: system-ui, sans-serif;
       font-size: 0.78rem;
@@ -620,6 +634,7 @@ def render_ocr_standalone_page(
     }}
     .parish-source:hover {{ text-decoration: underline !important; }}
     .parish-source.muted {{ color: #94a3b8; font-weight: 500; }}
+    .parish-body {{ padding: 0.2rem 0.6rem 0.65rem; }}
     .parish-empty {{
       font-family: system-ui, sans-serif;
       font-size: 0.88rem;
@@ -627,17 +642,14 @@ def render_ocr_standalone_page(
       font-style: italic;
     }}
     .search-panel {{
-      margin-top: 14px;
+      margin: 0 0 10px;
       font-family: system-ui, sans-serif;
-      border-top: 1px solid #e2e8f0;
-      padding-top: 8px;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 8px 10px;
+      background: #f8fafc;
     }}
-    .search-panel summary {{
-      cursor: pointer; font-size: 0.85rem; color: #475569; font-weight: 600;
-      list-style: none;
-    }}
-    .search-panel summary::-webkit-details-marker {{ display: none; }}
-    .search-panel[open] summary {{ margin-bottom: 8px; }}
+    .search-panel .ocr-search-bar {{ margin-bottom: 6px; }}
     .ocr-search-bar {{ position: relative; margin-bottom: 6px; }}
     .search-input {{
       width: 100%; min-height: 36px; border: 1px solid #cbd5e1; border-radius: 6px;
@@ -670,11 +682,9 @@ def render_ocr_standalone_page(
       <a class="back-link" href="{html.escape(viewer_href, quote=True)}">← Viewer</a>
       <span class="title-line">{html.escape(diocese_label)} Text Bulletin · {html.escape(uk_bulletin_date)}</span>
     </div>
-    <div class="ocr-body" id="ocr-text">{ocr_fragment}</div>
-    <details class="search-panel">
-      <summary>Search text ▸</summary>
+    <div class="search-panel" role="search">
       <div class="ocr-search-bar">
-        <input id="ocr-search" class="search-input" type="search" placeholder="mass, bingo, parish…" aria-label="Search bulletin text" />
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search text (mass, bingo, parish…)" aria-label="Search bulletin text" />
         <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
       </div>
       <div class="ocr-search-tools">
@@ -684,7 +694,8 @@ def render_ocr_standalone_page(
           <button id="ocr-next" type="button" disabled>Next →</button>
         </div>
       </div>
-    </details>
+    </div>
+    <div class="ocr-body" id="ocr-text">{ocr_fragment}</div>
     <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
   </div>
   <script>
@@ -755,6 +766,9 @@ def render_ocr_standalone_page(
           }}
           if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
           node.parentNode.replaceChild(fragment, node);
+        }});
+        ocrRoot.querySelectorAll('details.parish-block').forEach((details) => {{
+          details.open = Boolean(details.querySelector('mark'));
         }});
         if (ocrMatches.length) {{
           currentMatchIndex = 0;
@@ -890,42 +904,21 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
       text-decoration: none;
     }}
     
-    /* PDF View */
-    .pdf-controls {{
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 12px;
-      margin: 12px 0;
-      font-weight: 700;
-      flex-wrap: wrap;
-    }}
-    .pdf-controls button {{
-      border: 0;
-      border-radius: 6px;
-      background: {TEAL};
-      color: white;
-      font-weight: 700;
-      padding: 10px 20px;
-      cursor: pointer;
-      font-size: 0.95rem;
-    }}
-    .pdf-controls button:disabled {{ background: #9bbfbd; cursor: not-allowed; }}
-    .pdf-canvas-wrap {{
-      height: 75vh;
-      min-height: 500px;
-      overflow: auto;
+    /* PDF View — native scroll fills the screen; no page-flip controls */
+    .pdf-frame-wrap {{
+      height: calc(100vh - 220px);
+      min-height: 70vh;
+      overflow: hidden;
       border: 1px solid #c7dcda;
       border-radius: 10px;
       background: #f2f5f5;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
-      padding: 10px;
     }}
-    #pdf-canvas {{ display: block; background: white; box-shadow: 0 4px 12px rgba(0,0,0,0.15); max-width: 100%; }}
-    
-    /* OCR View */
+    .pdf-frame-wrap iframe {{
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }}
     .ocr-search-bar {{
       position: relative;
       margin-bottom: 12px;
@@ -977,6 +970,7 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
       font-weight: 600;
     }}
     #ocr-panel {{
+      height: calc(100vh - 280px);
       min-height: 60vh;
       overflow-y: auto;
       border: 1px solid #e2e8f0;
@@ -1050,36 +1044,42 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
     #ocr-panel mark.search-active {{ background: #fde047; outline: 2px solid #0f5e5e; }}
     #ocr-panel a {{ color: {TEAL}; font-weight: 600; }}
     #ocr-panel .parish-block {{
-      margin: 0 0 1rem;
-      padding: 0.15rem 0 0.85rem;
-      border-bottom: 1px solid #e5e7eb;
+      margin: 0 0 0.5rem;
+      padding: 0;
+      border: 1px solid #e5e7eb;
+      border-radius: 4px;
+      background: #fff;
     }}
-    #ocr-panel .parish-block.parish-odd {{
-      background: #f7faf9;
-      margin-left: -8px;
-      margin-right: -8px;
-      padding-left: 8px;
-      padding-right: 8px;
-      border-radius: 3px;
-    }}
-    #ocr-panel .parish-head {{
+    #ocr-panel .parish-block.parish-odd {{ background: #f7faf9; }}
+    #ocr-panel .parish-block > summary.parish-head {{
       display: flex;
       flex-wrap: wrap;
       align-items: baseline;
       justify-content: space-between;
       gap: 6px 12px;
-      margin: 0 0 0.4rem;
-      padding: 0.3rem 0 0.3rem 0.55rem;
+      margin: 0;
+      padding: 0.4rem 0.55rem;
       border-left: 3px solid {TEAL};
+      cursor: pointer;
+      list-style: none;
     }}
-    #ocr-panel .parish-odd .parish-head {{ border-left-color: {DEEP_TEAL}; }}
+    #ocr-panel .parish-block > summary.parish-head::-webkit-details-marker {{ display: none; }}
+    #ocr-panel .parish-odd > summary.parish-head {{ border-left-color: {DEEP_TEAL}; }}
     #ocr-panel .parish-name {{
       margin: 0 !important;
-      font-size: 1.15rem !important;
+      font-size: 1.1rem !important;
       color: {DEEP_TEAL} !important;
       border: 0 !important;
       padding: 0 !important;
+      font-weight: 700;
     }}
+    #ocr-panel .parish-name::before {{
+      content: "▸ ";
+      color: {TEAL};
+      font-family: system-ui, sans-serif;
+      font-size: 0.85em;
+    }}
+    #ocr-panel .parish-block[open] .parish-name::before {{ content: "▾ "; }}
     #ocr-panel .parish-source {{
       font-family: system-ui, sans-serif;
       font-size: 0.78rem;
@@ -1089,6 +1089,7 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
       color: #1d4ed8;
     }}
     #ocr-panel .parish-source:hover {{ text-decoration: underline; }}
+    #ocr-panel .parish-body {{ padding: 0.25rem 0.55rem 0.65rem; }}
     #ocr-panel .parish-empty {{
       font-family: system-ui, sans-serif;
       font-size: 0.9rem;
@@ -1189,13 +1190,12 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
     @media (max-width: 600px) {{
       .page {{ padding: 16px 12px; }}
       ul.parish-grid {{ grid-template-columns: 1fr; }}
-      .pdf-controls, .ocr-search-tools {{ flex-direction: column; }}
-      .pdf-canvas-wrap, #ocr-panel {{
-        height: auto;
+      .pdf-frame-wrap, #ocr-panel {{
+        height: calc(100vh - 200px);
         min-height: 55vh;
-        max-height: 70vh;
       }}
-      .pdf-controls button, .ocr-search-tools button, .tab-btn {{
+      .ocr-search-tools {{ flex-direction: column; }}
+      .ocr-search-tools button, .tab-btn {{
         min-height: 48px;
         width: 100%;
       }}
@@ -1222,19 +1222,14 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
     <!-- Panel Container -->
     <div class="panel-container">
       
-      <!-- PDF Panel -->
+      <!-- PDF Panel: native browser PDF (scroll all pages; links open in viewer) -->
       <div id="panel-pdf" class="view-panel active">
         <div class="panel-toolbar">
           <a class="toolbar-btn" href="{pdf_href}" target="_blank" rel="noopener noreferrer">↗ Open PDF in new tab</a>
           <a class="toolbar-btn" href="{pdf_href}" download>⬇ Download PDF</a>
         </div>
-        <div class="pdf-controls" data-controls="top">
-          <button data-action="prev" type="button" aria-label="Previous PDF page">← Previous page</button>
-          <span data-role="page-indicator">Page 1 of {page_count}</span>
-          <button data-action="next" type="button" aria-label="Next PDF page">Next page →</button>
-        </div>
-        <div id="pdf-canvas-wrap" class="pdf-canvas-wrap">
-          <canvas id="pdf-canvas" title="{html.escape(config.display_name)} bulletin PDF"></canvas>
+        <div class="pdf-frame-wrap">
+          <iframe src="{pdf_href}" title="{html.escape(config.display_name)} bulletin PDF"></iframe>
         </div>
       </div>
 
@@ -1287,7 +1282,6 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
     </div>
   </footer>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
   <script>
     // Tab Switching
     function switchTab(tabName, button) {{
@@ -1304,15 +1298,7 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
     }}
 
     (function () {{
-      const pdfHref = {pdf_href!r};
-      const initialPages = {page_count};
-      const canvas = document.getElementById('pdf-canvas');
-      const canvasWrap = document.getElementById('pdf-canvas-wrap');
-      const context = canvas.getContext('2d');
       const ocrPanel = document.getElementById('ocr-panel');
-      const indicators = Array.from(document.querySelectorAll('[data-role="page-indicator"]'));
-      const prevButtons = Array.from(document.querySelectorAll('button[data-action="prev"]'));
-      const nextButtons = Array.from(document.querySelectorAll('button[data-action="next"]'));
       const ocrSearch = document.getElementById('ocr-search');
       const clearSearch = document.getElementById('clear-search');
       const matchCount = document.getElementById('ocr-match-count');
@@ -1321,122 +1307,23 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
       const parishFilter = document.getElementById('parish-filter');
       const parishItems = Array.from(document.querySelectorAll('.parish-item'));
       const parishEmpty = document.getElementById('parish-empty');
+      if (!ocrPanel || !ocrSearch) return;
       const originalOcrHtml = ocrPanel.innerHTML;
-      const pdfjs = window['pdfjs-dist/build/pdf'] || window.pdfjsLib;
-      let currentPage = 1;
-      let totalPages = initialPages;
-      let pdfDoc = null;
-      let isRendering = false;
-      let pendingPage = null;
       let ocrMatches = [];
       let currentMatchIndex = -1;
-
-      if (!pdfjs) {{
-        return;
-      }}
-
-      pdfjs.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 
       function escapeRegExp(text) {{
         const specials = new Set(['\\\\', '^', '$', '.', '|', '?', '*', '+', '(', ')', '[', ']', '{{', '}}']);
         return Array.from(text).map((ch) => specials.has(ch) ? `\\\\${{ch}}` : ch).join('');
       }}
 
-      function updateControls() {{
-        indicators.forEach((indicator) => {{
-          indicator.textContent = `Page ${{currentPage}} of ${{totalPages}}`;
-        }});
-        prevButtons.forEach((button) => {{
-          button.disabled = currentPage <= 1 || !pdfDoc;
-        }});
-        nextButtons.forEach((button) => {{
-          button.disabled = currentPage >= totalPages || !pdfDoc;
-        }});
-      }}
-
-      function queueRender(pageNumber) {{
-        if (isRendering) {{
-          pendingPage = pageNumber;
-          return;
-        }}
-        renderPage(pageNumber);
-      }}
-
-      async function renderPage(pageNumber) {{
-        if (!pdfDoc) {{
-          return;
-        }}
-        isRendering = true;
-        currentPage = pageNumber;
-        updateControls();
-        const page = await pdfDoc.getPage(pageNumber);
-        const viewport = page.getViewport({{ scale: 1 }});
-        const availableWidth = Math.max(canvasWrap.clientWidth - 16, 100);
-        const scale = availableWidth / viewport.width;
-        const scaledViewport = page.getViewport({{ scale }});
-        canvas.width = Math.floor(scaledViewport.width);
-        canvas.height = Math.floor(scaledViewport.height);
-        canvas.style.width = '100%';
-        canvas.style.height = 'auto';
-        await page.render({{
-          canvasContext: context,
-          viewport: scaledViewport,
-        }}).promise;
-        // PDF page changes do not scroll the bulletin text panel.
-        isRendering = false;
-        if (pendingPage !== null) {{
-          const queued = pendingPage;
-          pendingPage = null;
-          queueRender(queued);
-        }}
-      }}
-
-      function goToPage(nextPage) {{
-        if (!pdfDoc) {{
-          return;
-        }}
-        const clamped = Math.min(Math.max(nextPage, 1), totalPages);
-        if (clamped === currentPage && !isRendering) {{
-          return;
-        }}
-        queueRender(clamped);
-      }}
-
-      prevButtons.forEach((button) => {{
-        button.addEventListener('click', function (event) {{
-          event.preventDefault();
-          event.stopPropagation();
-          goToPage(currentPage - 1);
-        }});
-      }});
-      nextButtons.forEach((button) => {{
-        button.addEventListener('click', function (event) {{
-          event.preventDefault();
-          event.stopPropagation();
-          goToPage(currentPage + 1);
-        }});
-      }});
-
-      new ResizeObserver(function () {{
-        if (pdfDoc) {{
-          queueRender(currentPage);
-        }}
-      }}).observe(canvasWrap);
-
-      pdfjs.getDocument(pdfHref).promise.then(function (doc) {{
-        pdfDoc = doc;
-        totalPages = doc.numPages || initialPages;
-        updateControls();
-        queueRender(currentPage);
-      }}).catch(function () {{
-        updateControls();
-      }});
-
       function scrollToMatch(idx) {{
         if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
         ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
         const target = ocrMatches[idx];
         target.classList.add('search-active');
+        const details = target.closest('details.parish-block');
+        if (details) details.open = true;
         target.scrollIntoView({{ behavior: 'smooth', block: 'center' }});
       }}
 
@@ -1498,6 +1385,9 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
           }}
           node.parentNode.replaceChild(fragment, node);
         }});
+        ocrPanel.querySelectorAll('details.parish-block').forEach((details) => {{
+          details.open = Boolean(details.querySelector('mark'));
+        }});
         if (ocrMatches.length) {{
           currentMatchIndex = 0;
           scrollToMatch(currentMatchIndex);
@@ -1549,7 +1439,6 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
         }}
       }});
 
-      updateControls();
       updateMatchUi();
     }})();
 
@@ -1614,6 +1503,13 @@ def regenerate_viewer_from_existing(existing_path: Path) -> Path:
     raw_html = existing_path.read_text(encoding="utf-8")
     page_match = re.search(r"Page 1 of (\d+)", raw_html)
     page_count = int(page_match.group(1)) if page_match else 1
+    if page_count == 1:
+        pdf_candidate = DOCS_DIR / "mega_pdf" / config.pdf_filename
+        if pdf_candidate.exists():
+            try:
+                page_count = count_pdf_pages(pdf_candidate)
+            except Exception:
+                page_count = 1
     panel_match = OCR_PANEL_PATTERN.search(raw_html)
     if not panel_match:
         panel_match = re.search(
