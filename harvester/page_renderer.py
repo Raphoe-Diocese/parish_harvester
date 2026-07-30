@@ -158,12 +158,14 @@ def render_diocese_raphoe_page(
     template = Template(RAPHOE_TEMPLATE_PATH.read_text(encoding="utf-8"))
     week_suffix = f" — {week_label}" if week_label else ""
     display = str(diocese_display_name or "Diocese").strip()
+    short = display.removesuffix(" Diocese").strip() or display
     payload = {
         "page_title": html.escape(f"{display} Collated Bulletin{week_suffix}"),
         "headline": html.escape(headline),
         "mega_pdf_url": html.escape(mega_pdf_url, quote=True),
         "bulletin_viewer_url": html.escape(bulletin_viewer_url, quote=True),
         "ocr_standalone_url": html.escape(ocr_standalone_url, quote=True),
+        "ocr_iframe_title": html.escape(f"{short} text bulletin", quote=True),
         "ocr_block_html": _build_ocr_block(ocr_text, ocr_is_html=ocr_is_html),
         "parish_heading": html.escape(parish_heading),
         "parish_accordion_html": _render_parish_accordion(parish_links),

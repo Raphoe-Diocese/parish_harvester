@@ -244,7 +244,7 @@ def _load_parish_entries(diocese: str, parish_links: list[tuple[str, str]]) -> l
 
 
 _UI_ARTEFACT_LINE = re.compile(
-    r"^(?:parish\s+newsletter\s*↗?|newsletter|"
+    r"^(?:parish\s+newsletter(?:\s*[↗→»])?|newsletter(?:\s*[↗→»])?|"
     r"no text this week.*|no searchable text available.*|"
     r"no searchable bulletin text.*|"
     r"page\s+\d+|\d+)$",
@@ -319,15 +319,6 @@ def build_az_parish_ocr_html(
         body_text = _strip_parish_title_lines(raw_chunk, display_name, url)
         if _chunk_looks_like_directory(body_text):
             body_text = ""
-        if body_text.strip():
-            body_html = "\n".join(render_markdown_lines(body_text.splitlines()))
-            open_attr = ""
-        else:
-            body_html = (
-                '<p class="parish-empty">No searchable text available this week.</p>'
-            )
-            # Leave empty parishes open so readers see the newsletter link without hunting.
-            open_attr = " open"
         stripe = "even" if idx % 2 == 0 else "odd"
         safe_key = html.escape(parish_key, quote=True)
         safe_name = html.escape(display_name)
@@ -339,15 +330,26 @@ def build_az_parish_ocr_html(
             )
         else:
             source = '<span class="parish-source muted">No newsletter URL</span>'
-        sections.append(
-            f'<details class="parish-block parish-{stripe}" id="parish-{safe_key}"{open_attr}>\n'
-            f'  <summary class="parish-head">\n'
-            f'    <span class="parish-name">{safe_name}</span>\n'
-            f"    {source}\n"
-            f"  </summary>\n"
-            f'  <div class="parish-body">{body_html}</div>\n'
-            f"</details>"
-        )
+        if body_text.strip():
+            body_html = "\n".join(render_markdown_lines(body_text.splitlines()))
+            sections.append(
+                f'<details class="parish-block parish-{stripe}" id="parish-{safe_key}">\n'
+                f'  <summary class="parish-head">\n'
+                f'    <span class="parish-name">{safe_name}</span>\n'
+                f"    {source}\n"
+                f"  </summary>\n"
+                f'  <div class="parish-body">{body_html}</div>\n'
+                f"</details>"
+            )
+        else:
+            # Compact single-row empty parish (no tall open accordion).
+            sections.append(
+                f'<div class="parish-row-empty parish-{stripe}" id="parish-{safe_key}">\n'
+                f'  <span class="parish-name">{safe_name}</span>\n'
+                f'  <span class="parish-empty">No searchable text available this week.</span>\n'
+                f"  {source}\n"
+                f"</div>"
+            )
     return "\n".join(sections)
 
 
@@ -568,12 +570,26 @@ def render_ocr_standalone_page(
     a {{ color: #1d4ed8; text-decoration: underline; font-weight: 600; }}
     .page {{ max-width: 100%; margin: 0; padding: 8px 10px 24px; }}
     .top {{
-      display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px;
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+      gap: 8px 14px;
       margin-bottom: 8px; font-family: Georgia, "Times New Roman", Times, serif;
     }}
+    .top-left {{ display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }}
+    .top-right {{
+      margin-left: auto;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    }}
+    .open-full-text {{
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #1e3a5f;
+      text-decoration: none;
+      white-space: nowrap;
+    }}
+    .open-full-text:hover {{ text-decoration: underline; }}
     .back-link {{
       font-family: system-ui, sans-serif; font-size: 0.85rem; font-weight: 700;
-      color: {TEAL}; text-decoration: none;
+      color: #1e3a5f; text-decoration: none;
     }}
     .title-line {{
       font-size: 1.05rem; font-weight: 700; color: {TEXT};
@@ -670,9 +686,49 @@ def render_ocr_standalone_page(
     .parish-body {{ padding: 0.2rem 0.6rem 0.65rem; }}
     .parish-empty {{
       font-family: system-ui, sans-serif;
-      font-size: 0.88rem;
-      color: #64748b;
-      font-style: italic;
+      font-size: 0.82rem;
+      color: #666666;
+      font-style: normal;
+      font-weight: 400;
+    }}
+    .parish-row-empty {{
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px 12px;
+      min-height: 45px;
+      height: auto;
+      max-height: 65px;
+      padding: 6px 0;
+      margin: 0;
+      border: 0;
+      border-bottom: 1px solid #e5e7eb;
+      background: transparent;
+      box-sizing: border-box;
+    }}
+    .parish-row-empty .parish-name {{
+      margin: 0 !important;
+      font-size: 0.95rem !important;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif !important;
+      color: #1e3a5f !important;
+      font-weight: 600;
+      flex: 0 1 auto;
+    }}
+    .parish-row-empty .parish-name::before {{ content: none !important; }}
+    .parish-row-empty .parish-empty {{
+      flex: 1 1 auto;
+      margin: 0;
+      color: #666666;
+      font-size: 0.78rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }}
+    .parish-row-empty .parish-source {{
+      color: #1e3a5f;
+      font-size: 0.78rem;
+      flex: 0 0 auto;
     }}
     .search-panel {{
       margin: 0 0 10px;
@@ -712,8 +768,13 @@ def render_ocr_standalone_page(
 <body>
   <div class="page">
     <div class="top">
-      <a class="back-link" href="{html.escape(viewer_href, quote=True)}">← Viewer</a>
-      <span class="title-line">{html.escape(diocese_label)} Text Bulletin · {html.escape(uk_bulletin_date)}</span>
+      <div class="top-left">
+        <a class="back-link" href="{html.escape(viewer_href, quote=True)}">← Viewer</a>
+        <span class="title-line">{html.escape(diocese_label)} Text Bulletin · {html.escape(uk_bulletin_date)}</span>
+      </div>
+      <div class="top-right">
+        <a class="open-full-text" href="{html.escape(config.key + '-' + bulletin_date + '-ocr.html', quote=True)}" target="_blank" rel="noopener noreferrer" download>Open full text</a>
+      </div>
     </div>
     <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
       <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
@@ -1186,10 +1247,43 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
     #ocr-panel .parish-body {{ padding: 0.25rem 0.55rem 0.65rem; }}
     #ocr-panel .parish-empty {{
       font-family: system-ui, sans-serif;
-      font-size: 0.9rem;
-      color: #64748b;
-      font-style: italic;
+      font-size: 0.82rem;
+      color: #666666;
+      font-style: normal;
     }}
+    #ocr-panel .parish-row-empty {{
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px 12px;
+      min-height: 45px;
+      max-height: 65px;
+      padding: 6px 0;
+      margin: 0;
+      border: 0;
+      border-bottom: 1px solid #e5e7eb;
+      background: transparent;
+      box-sizing: border-box;
+    }}
+    #ocr-panel .parish-row-empty .parish-name {{
+      margin: 0 !important;
+      font-size: 0.95rem !important;
+      font-family: system-ui, sans-serif !important;
+      color: #1e3a5f !important;
+      font-weight: 600;
+    }}
+    #ocr-panel .parish-row-empty .parish-name::before {{ content: none !important; }}
+    #ocr-panel .parish-row-empty .parish-empty {{
+      flex: 1 1 auto;
+      margin: 0;
+      color: #666666;
+      font-size: 0.78rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }}
+    #ocr-panel .parish-row-empty .parish-source {{ color: #1e3a5f; font-size: 0.78rem; }}
     .note-box {{
       margin-top: 16px;
       padding: 12px 16px;

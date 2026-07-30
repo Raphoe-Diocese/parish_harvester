@@ -26,46 +26,51 @@
       margin: 0 auto;
       padding: 28px 20px 40px;
     }
+    .back-link {
+      display: inline-block;
+      margin: 0 0 12px;
+      padding: 0;
+      border: 0;
+      background: transparent;
+      color: var(--accent);
+      font: inherit;
+      font-size: 0.9rem;
+      font-weight: 600;
+      cursor: pointer;
+      text-decoration: none;
+    }
+    .back-link:hover { text-decoration: underline; }
     header.page-head {
-      margin: 0 0 20px;
+      margin: 0 0 16px;
       padding: 0 0 16px;
       border-bottom: 1px solid var(--border);
     }
     header.page-head h1 {
-      margin: 0 0 14px;
+      margin: 0;
       font-size: 1.5rem;
       font-weight: 600;
       color: var(--accent);
       letter-spacing: -0.01em;
       line-height: 1.25;
     }
-    .top-actions {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 10px;
-    }
-    .btn {
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 40px;
-      padding: 8px 16px;
-      border: 1px solid var(--accent);
-      border-radius: 4px;
-      background: #fff;
-      color: var(--accent);
-      font: inherit;
-      font-size: 0.92rem;
+    .ocr-embed-link {
+      display: inline-block;
+      margin: 0 0 8px;
+      font-size: 0.88rem;
       font-weight: 600;
+      color: var(--accent);
       text-decoration: none;
-      cursor: pointer;
     }
-    .btn:hover { background: #f3f6f9; text-decoration: none; }
-    .btn-primary {
-      background: var(--accent);
-      color: #fff;
+    .ocr-embed-link:hover { text-decoration: underline; }
+    .ocr-embed {
+      width: 100%;
+      height: 75vh;
+      border: 1px solid #e5e7eb;
+      border-radius: 8px;
+      background: #fff;
+      display: block;
+      margin: 0 0 28px;
     }
-    .btn-primary:hover { background: #162c48; color: #fff; }
 
     .section { margin: 0 0 36px; }
     .section-title {
@@ -342,39 +347,26 @@
     @media (max-width: 520px) {
       .page { padding: 20px 14px 32px; }
       header.page-head h1 { font-size: 1.3rem; }
-      .btn { width: 100%; }
       .parish-link-grid { columns: 1; }
     }
   </style>
 </head>
 <body>
   <main class="page">
+    <button type="button" class="back-link" id="back-btn">← Back</button>
     <header class="page-head">
       <h1>${headline}</h1>
-      <div class="top-actions">
-        <a class="btn btn-primary" href="#ocr-section">Read text bulletin</a>
-        <a class="btn" href="${mega_pdf_url}" target="_blank" rel="noopener noreferrer">Open original PDF</a>
-      </div>
     </header>
 
-    <section class="section" id="ocr-section" aria-label="Text bulletin">
-      <div class="section-meta">
-        <h2 class="section-title">Text bulletin</h2>
-        <a class="section-link" href="${ocr_standalone_url}" target="_blank" rel="noopener noreferrer">Open full text</a>
-      </div>
-      <div class="ocr-search-bar">
-        <input type="search" id="ocr-search" placeholder="Search this bulletin" aria-label="Search this bulletin" />
-        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
-      </div>
-      <div class="ocr-search-tools" id="ocr-search-tools" hidden>
-        <span id="ocr-match-count" class="match-count"></span>
-        <div>
-          <button id="ocr-prev" type="button" disabled aria-label="Previous match">Prev</button>
-          <button id="ocr-next" type="button" disabled aria-label="Next match">Next</button>
-        </div>
-      </div>
-      <div class="ocr-reader" id="ocr-viewer">${ocr_block_html}</div>
-    </section>
+    <a class="ocr-embed-link" href="${ocr_standalone_url}" target="_blank" rel="noopener noreferrer">Open full text in new tab</a>
+    <iframe
+      class="ocr-embed"
+      src="${ocr_standalone_url}"
+      title="${ocr_iframe_title}"
+      width="100%"
+      height="75vh"
+      loading="lazy"
+    ></iframe>
 
     <p class="disclaimer">Auto-generated text may contain errors — check the original PDF when accuracy matters.</p>
 
@@ -400,121 +392,13 @@
 
   <script>
     (function () {
-      const ocrRoot = document.getElementById('ocr-text');
-      const ocrSearch = document.getElementById('ocr-search');
-      const clearSearch = document.getElementById('clear-search');
-      const searchTools = document.getElementById('ocr-search-tools');
-      const matchCount = document.getElementById('ocr-match-count');
-      const prevMatchBtn = document.getElementById('ocr-prev');
-      const nextMatchBtn = document.getElementById('ocr-next');
-      if (!ocrRoot || !ocrSearch) return;
-
-      const originalHtml = ocrRoot.innerHTML;
-      let ocrMatches = [];
-      let currentMatchIndex = -1;
-
-      function escapeRegExp(text) {
-        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
-      }
-
-      function scrollToMatch(idx) {
-        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
-        ocrMatches.forEach(function (mark) { mark.classList.remove('search-active'); });
-        const target = ocrMatches[idx];
-        target.classList.add('search-active');
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }
-
-      function updateMatchUi(hasQuery) {
-        if (!hasQuery) {
-          searchTools.hidden = true;
-          matchCount.textContent = '';
-          prevMatchBtn.disabled = true;
-          nextMatchBtn.disabled = true;
-          return;
-        }
-        searchTools.hidden = false;
-        const total = ocrMatches.length;
-        if (!total) {
-          matchCount.textContent = '0 matches';
-          prevMatchBtn.disabled = true;
-          nextMatchBtn.disabled = true;
-          return;
-        }
-        matchCount.textContent = (currentMatchIndex + 1) + ' of ' + total;
-        prevMatchBtn.disabled = false;
-        nextMatchBtn.disabled = false;
-      }
-
-      function applySearch(query) {
-        ocrRoot.innerHTML = originalHtml;
-        ocrMatches = [];
-        currentMatchIndex = -1;
-        if (!query) {
-          clearSearch.hidden = true;
-          updateMatchUi(false);
-          return;
-        }
-        clearSearch.hidden = false;
-        const regex = new RegExp(escapeRegExp(query), 'gi');
-        const walker = document.createTreeWalker(ocrRoot, NodeFilter.SHOW_TEXT, null);
-        const nodes = [];
-        while (walker.nextNode()) {
-          const node = walker.currentNode;
-          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) {
-            nodes.push(node);
-          }
-        }
-        nodes.forEach(function (node) {
-          const text = node.nodeValue;
-          regex.lastIndex = 0;
-          if (!regex.test(text)) return;
-          regex.lastIndex = 0;
-          const fragment = document.createDocumentFragment();
-          let lastIndex = 0;
-          let match;
-          while ((match = regex.exec(text)) !== null) {
-            if (match.index > lastIndex) {
-              fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
-            }
-            const mark = document.createElement('mark');
-            mark.textContent = match[0];
-            fragment.appendChild(mark);
-            ocrMatches.push(mark);
-            lastIndex = match.index + match[0].length;
-          }
-          if (lastIndex < text.length) {
-            fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
-          }
-          node.parentNode.replaceChild(fragment, node);
+      var backBtn = document.getElementById('back-btn');
+      if (backBtn) {
+        backBtn.addEventListener('click', function () {
+          if (window.history.length > 1) window.history.back();
+          else window.location.href = '../../index.html';
         });
-        if (ocrMatches.length) {
-          currentMatchIndex = 0;
-          scrollToMatch(currentMatchIndex);
-        }
-        updateMatchUi(true);
       }
-
-      ocrSearch.addEventListener('input', function (e) {
-        applySearch(e.target.value.trim());
-      });
-      clearSearch.addEventListener('click', function () {
-        ocrSearch.value = '';
-        applySearch('');
-        ocrSearch.focus();
-      });
-      prevMatchBtn.addEventListener('click', function () {
-        if (!ocrMatches.length) return;
-        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
-        updateMatchUi(true);
-        scrollToMatch(currentMatchIndex);
-      });
-      nextMatchBtn.addEventListener('click', function () {
-        if (!ocrMatches.length) return;
-        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
-        updateMatchUi(true);
-        scrollToMatch(currentMatchIndex);
-      });
     })();
   </script>
 </body>

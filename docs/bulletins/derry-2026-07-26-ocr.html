@@ -17,12 +17,26 @@
     a { color: #1d4ed8; text-decoration: underline; font-weight: 600; }
     .page { max-width: 100%; margin: 0; padding: 8px 10px 24px; }
     .top {
-      display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px;
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+      gap: 8px 14px;
       margin-bottom: 8px; font-family: Georgia, "Times New Roman", Times, serif;
     }
+    .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+    .top-right {
+      margin-left: auto;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    }
+    .open-full-text {
+      font-size: 0.85rem;
+      font-weight: 600;
+      color: #1e3a5f;
+      text-decoration: none;
+      white-space: nowrap;
+    }
+    .open-full-text:hover { text-decoration: underline; }
     .back-link {
       font-family: system-ui, sans-serif; font-size: 0.85rem; font-weight: 700;
-      color: #1a6b6b; text-decoration: none;
+      color: #1e3a5f; text-decoration: none;
     }
     .title-line {
       font-size: 1.05rem; font-weight: 700; color: #1a1a2e;
@@ -119,9 +133,49 @@
     .parish-body { padding: 0.2rem 0.6rem 0.65rem; }
     .parish-empty {
       font-family: system-ui, sans-serif;
-      font-size: 0.88rem;
-      color: #64748b;
-      font-style: italic;
+      font-size: 0.82rem;
+      color: #666666;
+      font-style: normal;
+      font-weight: 400;
+    }
+    .parish-row-empty {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px 12px;
+      min-height: 45px;
+      height: auto;
+      max-height: 65px;
+      padding: 6px 0;
+      margin: 0;
+      border: 0;
+      border-bottom: 1px solid #e5e7eb;
+      background: transparent;
+      box-sizing: border-box;
+    }
+    .parish-row-empty .parish-name {
+      margin: 0 !important;
+      font-size: 0.95rem !important;
+      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif !important;
+      color: #1e3a5f !important;
+      font-weight: 600;
+      flex: 0 1 auto;
+    }
+    .parish-row-empty .parish-name::before { content: none !important; }
+    .parish-row-empty .parish-empty {
+      flex: 1 1 auto;
+      margin: 0;
+      color: #666666;
+      font-size: 0.78rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .parish-row-empty .parish-source {
+      color: #1e3a5f;
+      font-size: 0.78rem;
+      flex: 0 0 auto;
     }
     .search-panel {
       margin: 0 0 10px;
@@ -161,8 +215,13 @@
 <body>
   <div class="page">
     <div class="top">
-      <a class="back-link" href="derry-2026-07-26.html">← Viewer</a>
-      <span class="title-line">DERRY Text Bulletin · 26/07/2026</span>
+      <div class="top-left">
+        <a class="back-link" href="derry-2026-07-26.html">← Viewer</a>
+        <span class="title-line">DERRY Text Bulletin · 26/07/2026</span>
+      </div>
+      <div class="top-right">
+        <a class="open-full-text" href="derry-2026-07-26-ocr.html" target="_blank" rel="noopener noreferrer" download>Open full text</a>
+      </div>
     </div>
     <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
       <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
@@ -183,34 +242,26 @@
         </div>
       </div>
     </div>
-    <div class="ocr-body" id="ocr-text"><details class="parish-block parish-even" id="parish-aghyaran" open>
-  <summary class="parish-head">
-    <span class="parish-name">Aghyaran</span>
-    <a class="parish-source" href="https://www.parishofaghyaran.com/news.html" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
-<details class="parish-block parish-odd" id="parish-ardmoreparish" open>
-  <summary class="parish-head">
-    <span class="parish-name">Ardmore</span>
-    <a class="parish-source" href="http://www.ardmoreparish.com/news.html" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
-<details class="parish-block parish-even" id="parish-ardstraweast" open>
-  <summary class="parish-head">
-    <span class="parish-name">Ardstraw East</span>
-    <a class="parish-source" href="http://parishofardstraweast.com/pdf/240526.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
-<details class="parish-block parish-odd" id="parish-ballinascreendesertmartinamalgamated" open>
-  <summary class="parish-head">
-    <span class="parish-name">Ballinascreen (&amp; Desertmartin amalgamated)</span>
-    <a class="parish-source" href="https://www.parishofballinascreen.com/ballinascreen-desertmartin-parishes-21_june_2026" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
+    <div class="ocr-body" id="ocr-text"><div class="parish-row-empty parish-even" id="parish-aghyaran">
+  <span class="parish-name">Aghyaran</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.parishofaghyaran.com/news.html" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-ardmoreparish">
+  <span class="parish-name">Ardmore</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="http://www.ardmoreparish.com/news.html" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-ardstraweast">
+  <span class="parish-name">Ardstraw East</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="http://parishofardstraweast.com/pdf/240526.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-ballinascreendesertmartinamalgamated">
+  <span class="parish-name">Ballinascreen (&amp; Desertmartin amalgamated)</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.parishofballinascreen.com/ballinascreen-desertmartin-parishes-21_june_2026" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
 <details class="parish-block parish-even" id="parish-banagherparish">
   <summary class="parish-head">
     <span class="parish-name">Banagher</span>
@@ -650,20 +701,16 @@ Greenlough: 9.00am<br>
 Anniversary Mass for Joe (the Gringo) O’Neill<br>
 Ballyscullion: 10.15am; Bellaghy: 11.30am</p></div>
 </details>
-<details class="parish-block parish-even" id="parish-buncranaparish" open>
-  <summary class="parish-head">
-    <span class="parish-name">Buncrana</span>
-    <a class="parish-source" href="https://www.buncranaparish.com/pdf/050426.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
-<details class="parish-block parish-odd" id="parish-camusparish" open>
-  <summary class="parish-head">
-    <span class="parish-name">Camus</span>
-    <a class="parish-source" href="https://camusparish.com/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
+<div class="parish-row-empty parish-even" id="parish-buncranaparish">
+  <span class="parish-name">Buncrana</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.buncranaparish.com/pdf/050426.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-camusparish">
+  <span class="parish-name">Camus</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://camusparish.com/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
 <details class="parish-block parish-even" id="parish-carndonaghparish">
   <summary class="parish-head">
     <span class="parish-name">Carndonagh</span>
@@ -790,76 +837,56 @@ Fifteenth Sunday in<br>
 Ordinary Time<br>
 12th July 2026</p></div>
 </details>
-<details class="parish-block parish-odd" id="parish-castledergparish" open>
-  <summary class="parish-head">
-    <span class="parish-name">Castlederg</span>
-    <a class="parish-source" href="https://www.castledergparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
-<details class="parish-block parish-even" id="parish-claudy" open>
-  <summary class="parish-head">
-    <span class="parish-name">Claudy</span>
-    <a class="parish-source" href="http://parishofclaudy.com/onewebmedia/NEWSLETTER%207-6-26.docx" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
-<details class="parish-block parish-odd" id="parish-clonleighstrabanepastoralarea" open>
-  <summary class="parish-head">
-    <span class="parish-name">Clonleigh (Strabane Pastoral Area)</span>
-    <a class="parish-source" href="https://clonleighparish.com/2026/06/12/strabane-pastoral-area-newsletter-for-sunday-14th-june-2026/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
-<details class="parish-block parish-even" id="parish-clonmanyparish" open>
-  <summary class="parish-head">
-    <span class="parish-name">Clonmany</span>
-    <a class="parish-source" href="https://clonmanyparish.ie/wp-content/uploads/2026/04/2026-04-12.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
-<details class="parish-block parish-odd" id="parish-colerainestjohn" open>
-  <summary class="parish-head">
-    <span class="parish-name">Coleraine (St John)</span>
-    <a class="parish-source" href="https://www.parishofstjohncoleraine.com/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
-<details class="parish-block parish-even" id="parish-culdaffparish" open>
-  <summary class="parish-head">
-    <span class="parish-name">Culdaff</span>
-    <a class="parish-source" href="http://www.culdaffparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
-<details class="parish-block parish-odd" id="parish-culmoe" open>
-  <summary class="parish-head">
-    <span class="parish-name">Culmoe</span>
-    <a class="parish-source" href="http://culmoreparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
-<details class="parish-block parish-even" id="parish-desertmartinparish" open>
-  <summary class="parish-head">
-    <span class="parish-name">Desertmartin</span>
-    <a class="parish-source" href="https://www.desertmartinparish.com/?page_id=6" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
-<details class="parish-block parish-odd" id="parish-dmaparish" open>
-  <summary class="parish-head">
-    <span class="parish-name">DMA Parish (Claudy area)</span>
-    <a class="parish-source" href="https://dmaparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
-<details class="parish-block parish-even" id="parish-drumquinparish" open>
-  <summary class="parish-head">
-    <span class="parish-name">Drumquin</span>
-    <a class="parish-source" href="https://drumquinparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
+<div class="parish-row-empty parish-odd" id="parish-castledergparish">
+  <span class="parish-name">Castlederg</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.castledergparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-claudy">
+  <span class="parish-name">Claudy</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="http://parishofclaudy.com/onewebmedia/NEWSLETTER%207-6-26.docx" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-clonleighstrabanepastoralarea">
+  <span class="parish-name">Clonleigh (Strabane Pastoral Area)</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://clonleighparish.com/2026/06/12/strabane-pastoral-area-newsletter-for-sunday-14th-june-2026/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-clonmanyparish">
+  <span class="parish-name">Clonmany</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://clonmanyparish.ie/wp-content/uploads/2026/04/2026-04-12.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-colerainestjohn">
+  <span class="parish-name">Coleraine (St John)</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.parishofstjohncoleraine.com/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-culdaffparish">
+  <span class="parish-name">Culdaff</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="http://www.culdaffparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-culmoe">
+  <span class="parish-name">Culmoe</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="http://culmoreparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-desertmartinparish">
+  <span class="parish-name">Desertmartin</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.desertmartinparish.com/?page_id=6" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-dmaparish">
+  <span class="parish-name">DMA Parish (Claudy area)</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://dmaparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-drumquinparish">
+  <span class="parish-name">Drumquin</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://drumquinparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
 <details class="parish-block parish-odd" id="parish-drumraghparish">
   <summary class="parish-head">
     <span class="parish-name">Drumragh</span>
@@ -1326,30 +1353,18 @@ Calisto - 00120 Vatican City<br>
 Errigal<br>
 Fahan<br>
 Errigal<br>
-Fahan<br>
-Errigal<br>
-Fahan<br>
-Errigal<br>
-Fahan<br>
-Errigal<br>
-Fahan<br>
-Errigal<br>
 Fahan</p></div>
 </details>
-<details class="parish-block parish-odd" id="parish-errigalparish" open>
-  <summary class="parish-head">
-    <span class="parish-name">Errigal</span>
-    <a class="parish-source" href="https://www.errigalparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
-<details class="parish-block parish-even" id="parish-fahanparish" open>
-  <summary class="parish-head">
-    <span class="parish-name">Fahan</span>
-    <a class="parish-source" href="http://www.fahanparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
+<div class="parish-row-empty parish-odd" id="parish-errigalparish">
+  <span class="parish-name">Errigal</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.errigalparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-fahanparish">
+  <span class="parish-name">Fahan</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="http://www.fahanparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
 <details class="parish-block parish-odd" id="parish-granaghanparish">
   <summary class="parish-head">
     <span class="parish-name">Granaghan</span>
@@ -1394,13 +1409,11 @@ Saturday 27 December: Vigil Mass 5.30pm<br>
 Anniversary Mass for Liddy Taggart<br>
 Sunday 28 December: 9.00am</p></div>
 </details>
-<details class="parish-block parish-even" id="parish-greencastleparish" open>
-  <summary class="parish-head">
-    <span class="parish-name">Greencastle</span>
-    <a class="parish-source" href="https://greencastleparish.com/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
+<div class="parish-row-empty parish-even" id="parish-greencastleparish">
+  <span class="parish-name">Greencastle</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://greencastleparish.com/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
 <details class="parish-block parish-odd" id="parish-greenlough">
   <summary class="parish-head">
     <span class="parish-name">Greenlough</span>
@@ -1841,41 +1854,31 @@ Website:<br>
 Thirteenth Sunday<br>
 in Ordinary Time</p></div>
 </details>
-<details class="parish-block parish-even" id="parish-holyfamily-parish" open>
-  <summary class="parish-head">
-    <span class="parish-name">Holy Family</span>
-    <a class="parish-source" href="https://www.holyfamily-parish.com/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
-<details class="parish-block parish-odd" id="parish-iskaheenparish" open>
-  <summary class="parish-head">
-    <span class="parish-name">Iskaheen</span>
-    <a class="parish-source" href="https://i0.wp.com/www.iskaheenparish.com/wp-content/uploads/2026/04/1.jpg?w=1090&amp;ssl=1" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
-<details class="parish-block parish-even" id="parish-kilrea" open>
-  <summary class="parish-head">
-    <span class="parish-name">Kilrea</span>
-    <a class="parish-source" href="https://www.parishofkilrea.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
-<details class="parish-block parish-odd" id="parish-laveyparish" open>
-  <summary class="parish-head">
-    <span class="parish-name">Lavey</span>
-    <a class="parish-source" href="https://www.laveyparish.com/parishsecretary/laveyparishbulletin.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
-<details class="parish-block parish-even" id="parish-leckpatrickparish" open>
-  <summary class="parish-head">
-    <span class="parish-name">Leckpatrick</span>
-    <a class="parish-source" href="https://www.leckpatrickparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
+<div class="parish-row-empty parish-even" id="parish-holyfamily-parish">
+  <span class="parish-name">Holy Family</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.holyfamily-parish.com/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-iskaheenparish">
+  <span class="parish-name">Iskaheen</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://i0.wp.com/www.iskaheenparish.com/wp-content/uploads/2026/04/1.jpg?w=1090&amp;ssl=1" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-kilrea">
+  <span class="parish-name">Kilrea</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.parishofkilrea.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-laveyparish">
+  <span class="parish-name">Lavey</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.laveyparish.com/parishsecretary/laveyparishbulletin.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-leckpatrickparish">
+  <span class="parish-name">Leckpatrick</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.leckpatrickparish.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
 <details class="parish-block parish-odd" id="parish-limavadyparish">
   <summary class="parish-head">
     <span class="parish-name">Limavady</span>
@@ -2003,34 +2006,26 @@ the rota sent by email, please send an email to<br>
 Baptism: We welcome into God’s Family Nancy Ellen Twigg , Church Park, Annie Sarah<br>
 Henry and Jack James Henry , Greencastle who were baptised recently.</p></div>
 </details>
-<details class="parish-block parish-even" id="parish-longtower" open>
-  <summary class="parish-head">
-    <span class="parish-name">Long Tower</span>
-    <a class="parish-source" href="https://longtowerchurch.org/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
-<details class="parish-block parish-odd" id="parish-magheraderry" open>
-  <summary class="parish-head">
-    <span class="parish-name">Maghera (Derry)</span>
-    <a class="parish-source" href="http://www.magheraparishderry.com/pdf/050426.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
-<details class="parish-block parish-even" id="parish-malinparish" open>
-  <summary class="parish-head">
-    <span class="parish-name">Malin</span>
-    <a class="parish-source" href="https://malinparish.ie/wp-content/uploads/2026/04/Bulletin-5th-April-2026.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
-<details class="parish-block parish-odd" id="parish-melmountparish" open>
-  <summary class="parish-head">
-    <span class="parish-name">Melmount (&amp; Camus)</span>
-    <a class="parish-source" href="https://www.melmountparish.com/parishnews.html" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
+<div class="parish-row-empty parish-even" id="parish-longtower">
+  <span class="parish-name">Long Tower</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://longtowerchurch.org/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-magheraderry">
+  <span class="parish-name">Maghera (Derry)</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="http://www.magheraparishderry.com/pdf/050426.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-malinparish">
+  <span class="parish-name">Malin</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://malinparish.ie/wp-content/uploads/2026/04/Bulletin-5th-April-2026.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-melmountparish">
+  <span class="parish-name">Melmount (&amp; Camus)</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.melmountparish.com/parishnews.html" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
 <details class="parish-block parish-even" id="parish-movilleparish">
   <summary class="parish-head">
     <span class="parish-name">Moville</span>
@@ -2186,13 +2181,11 @@ Readers for 25th / 26th July<br>
 12.30 pm Ursula Doherty<br>
 7.00 pm Marian Boyle</p></div>
 </details>
-<details class="parish-block parish-odd" id="parish-sionmills" open>
-  <summary class="parish-head">
-    <span class="parish-name">Sion Mills</span>
-    <a class="parish-source" href="http://www.parishofsionmills.com/news.html" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
+<div class="parish-row-empty parish-odd" id="parish-sionmills">
+  <span class="parish-name">Sion Mills</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="http://www.parishofsionmills.com/news.html" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
 <details class="parish-block parish-even" id="parish-steugenescathedral">
   <summary class="parish-head">
     <span class="parish-name">St Eugene&#x27;s Cathedral (Templemore)</span>
@@ -2463,48 +2456,36 @@ Missing &amp; Online-Only Bulletins<br>
 Generated 26/07/2026<br>
 The following parishes do not have a downloadable PDF bulletin. Click a link to view the bulletin online.</p></div>
 </details>
-<details class="parish-block parish-odd" id="parish-stmarysparishcreggan" open>
-  <summary class="parish-head">
-    <span class="parish-name">St Mary&#x27;s Parish Creggan</span>
-    <a class="parish-source" href="https://www.stmarysparishcreggan.com/bulletins" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
-<details class="parish-block parish-even" id="parish-staroftheseamagilligan" open>
-  <summary class="parish-head">
-    <span class="parish-name">Star of the Sea (Magilligan)</span>
-    <a class="parish-source" href="https://drive.usercontent.google.com/download?id=1cF4BuBrZCRrSwMQeTT8mJrGNpr5aFGpD&amp;export=download" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
-<details class="parish-block parish-odd" id="parish-steelstownparish" open>
-  <summary class="parish-head">
-    <span class="parish-name">Steelstown</span>
-    <a class="parish-source" href="http://www.steelstownparish.com/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
-<details class="parish-block parish-even" id="parish-threepatrons" open>
-  <summary class="parish-head">
-    <span class="parish-name">Three Patrons</span>
-    <a class="parish-source" href="https://www.threepatrons.org/files/10/Weekly-Bulletins/104/Sunday-14th-June-2026" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
-<details class="parish-block parish-odd" id="parish-urneyandcastlefinparish" open>
-  <summary class="parish-head">
-    <span class="parish-name">Urney and Castlefin</span>
-    <a class="parish-source" href="http://urneyandcastlefinparish.com/?page_id=1227" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details>
-<details class="parish-block parish-even" id="parish-watersidestrathfoyleamalgamated" open>
-  <summary class="parish-head">
-    <span class="parish-name">Waterside (&amp; Strathfoyle amalgamated)</span>
-    <a class="parish-source" href="https://watersideparish.net/wp-content/uploads/2026/04/newsletter_120426oo.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable text available this week.</p></div>
-</details></div>
+<div class="parish-row-empty parish-odd" id="parish-stmarysparishcreggan">
+  <span class="parish-name">St Mary&#x27;s Parish Creggan</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.stmarysparishcreggan.com/bulletins" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-staroftheseamagilligan">
+  <span class="parish-name">Star of the Sea (Magilligan)</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://drive.usercontent.google.com/download?id=1cF4BuBrZCRrSwMQeTT8mJrGNpr5aFGpD&amp;export=download" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-steelstownparish">
+  <span class="parish-name">Steelstown</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="http://www.steelstownparish.com/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-threepatrons">
+  <span class="parish-name">Three Patrons</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.threepatrons.org/files/10/Weekly-Bulletins/104/Sunday-14th-June-2026" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-urneyandcastlefinparish">
+  <span class="parish-name">Urney and Castlefin</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="http://urneyandcastlefinparish.com/?page_id=1227" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-watersidestrathfoyleamalgamated">
+  <span class="parish-name">Waterside (&amp; Strathfoyle amalgamated)</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://watersideparish.net/wp-content/uploads/2026/04/newsletter_120426oo.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div></div>
     <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
   </div>
   <script>

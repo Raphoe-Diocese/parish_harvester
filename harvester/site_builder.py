@@ -560,9 +560,13 @@ def _bulletin_viewer_url(diocese_key: str) -> str:
 
 def _ocr_standalone_url(diocese_key: str) -> str:
     standalone = _latest_ocr_standalone(diocese_key)
+    pages_base = "https://raphoe-diocese.github.io/parish_harvester"
     if standalone is not None:
-        return f"../../bulletins/{standalone.name}"
-    return _bulletin_viewer_url(diocese_key)
+        return f"{pages_base}/bulletins/{standalone.name}"
+    viewer_path, _viewer_date = _latest_viewer(diocese_key)
+    if viewer_path is not None:
+        return f"{pages_base}/bulletins/{viewer_path.name}"
+    return f"{pages_base}/bulletins/index.html"
 
 
 def _mega_pdf_url(diocese_key: str) -> str:
