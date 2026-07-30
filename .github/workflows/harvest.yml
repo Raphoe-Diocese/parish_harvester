@@ -347,7 +347,6 @@ jobs:
       - name: Commit bulletins back to repo
         if: steps.harvest_run.outcome == 'success'
         id: commit_harvest
-        continue-on-error: true
         run: |
           set -euo pipefail
           if [ ! -f Bulletins/report.json ]; then
@@ -388,9 +387,9 @@ jobs:
           exit 1
 
       - name: Warn if git commit failed
-        if: steps.harvest_run.outcome == 'success' && steps.commit_harvest.outcome == 'failure'
+        if: failure() && steps.harvest_run.outcome == 'success' && steps.commit_harvest.outcome == 'failure'
         run: |
-          echo "::warning::Harvest finished OK but could not push to main — mega PDF and report artifacts were still uploaded for OCR/Pages deploy."
+          echo "::error::Harvest finished OK but could not push to main — mega PDF and report artifacts were still uploaded for OCR/Pages deploy. This run is now marked failed so it doesn't go unnoticed."
 
       - name: Clean transient bulletin PDFs from repository
         if: false

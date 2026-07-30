@@ -20,7 +20,9 @@ def _recipe_paths(parishes_dir: Path) -> list[Path]:
     recipes_dir = parishes_dir / "recipes"
     if not recipes_dir.is_dir():
         return []
-    return sorted(recipes_dir.glob("*.json"))
+    # Recipes live under parishes/recipes/<diocese>/<key>.json — must recurse
+    # or this silently checks zero recipes (see 2026-07-30 audit).
+    return sorted(recipes_dir.glob("**/*.json"))
 
 
 def apply_dns_inactive_flags(

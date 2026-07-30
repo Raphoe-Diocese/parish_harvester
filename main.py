@@ -373,7 +373,12 @@ def main() -> int:
         write_parish_status()
         print("  📄 Wrote       : parishes/parish_status.json")
     except Exception as exc:
-        print(f"  ⚠️  Parish status generation failed (non-fatal): {exc}")
+        # parishes/parish_status.json is the single source of truth for the
+        # Problems tab (see AGENTS.md). A silent failure here would let the
+        # Problems tab go stale while the harvest still reports success, so
+        # this must be loud and must fail the run rather than continue.
+        print(f"::error::Parish status generation failed — parishes/parish_status.json was NOT updated: {exc}")
+        raise
 
     # Generate dashboard
     print("\n── Dashboard ───────────────────────────────────────────────")

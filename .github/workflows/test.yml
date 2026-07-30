@@ -30,10 +30,4 @@ jobs:
           pip install pytest
 
       - name: Run tests
-        continue-on-error: true
-        id: tests
         run: pytest -v --tb=short
-
-      - name: Note test failures (does not block CI)
-        if: steps.tests.outcome == 'failure'
-        run: echo "::warning::Some tests failed — see logs. CI marked success to avoid failure-email noise."

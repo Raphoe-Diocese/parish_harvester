@@ -7,7 +7,7 @@
 3. **Harvest** current-week PDFs via GitHub Actions (`python main.py`).
 4. **Fix** failures from the extension Problems tab → retrain → Send & test.
 
-Collated Bulletin PDF stitching is **off by default** (`HARVEST_MEGA_PDF=0`). Do not re-enable without explicit user request.
+Collated Bulletin (mega PDF) stitching is **core production behaviour, not optional**. Production GitHub Actions harvests must generate the collated mega PDF (`harvest.yml` sets `HARVEST_MEGA_PDF=1`), because OCR and the public diocesan text-bulletin viewer pages depend on it. Do not disable mega PDF generation unless the user explicitly asks. (Single-parish `--target-parish` test runs still skip it — that's separate and intentional, see `main.py`.)
 
 ## Single source of truth for “what’s wrong?”
 
