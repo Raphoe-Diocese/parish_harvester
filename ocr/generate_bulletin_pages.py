@@ -310,11 +310,14 @@ def build_az_parish_ocr_html(
             body_text = ""
         if body_text.strip():
             body_html = "\n".join(render_markdown_lines(body_text.splitlines()))
+            open_attr = ""
         else:
             body_html = (
                 '<p class="parish-empty">No searchable bulletin text for this parish this week. '
                 "Use the newsletter link for the original.</p>"
             )
+            # Leave empty parishes open so readers see the newsletter link without hunting.
+            open_attr = " open"
         stripe = "even" if idx % 2 == 0 else "odd"
         safe_key = html.escape(parish_key, quote=True)
         safe_name = html.escape(display_name)
@@ -327,7 +330,7 @@ def build_az_parish_ocr_html(
         else:
             source = '<span class="parish-source muted">No newsletter URL</span>'
         sections.append(
-            f'<details class="parish-block parish-{stripe}" id="parish-{safe_key}">\n'
+            f'<details class="parish-block parish-{stripe}" id="parish-{safe_key}"{open_attr}>\n'
             f'  <summary class="parish-head">\n'
             f'    <span class="parish-name">{safe_name}</span>\n'
             f"    {source}\n"
