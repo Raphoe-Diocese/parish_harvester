@@ -1,0 +1,1356 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Down &amp; Connor Diocese Bulletin Viewer — 30/07/2026</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: #fafbfc;
+      color: #1a1a2e;
+      line-height: 1.55;
+    }
+    a { color: #1a6b6b; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .page { max-width: 1100px; margin: 0 auto; padding: 16px 16px 40px; }
+    .back-link { display: inline-block; margin-bottom: 14px; font-weight: 700; color: #1a6b6b; }
+    .header { text-align: center; margin-bottom: 24px; }
+    .diocese-label { margin: 0 0 6px; color: #c0392b; font-size: 0.95rem; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 800; }
+    h1 { margin: 0 0 8px; color: #1a6b6b; font-size: clamp(1.8rem, 3vw, 2.5rem); }
+    .meta { color: #6b7280; font-size: 0.95rem; }
+    
+    /* Tabs */
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      margin: 0 0 20px;
+      padding: 16px 0;
+      background: #e8edf5;
+      border-bottom: 2px solid #c7d2e8;
+    }
+    .tab-btn {
+      padding: 12px 28px;
+      border: 2px solid #1a6b6b;
+      border-radius: 8px;
+      background: white;
+      color: #1a6b6b;
+      font-weight: 700;
+      font-size: 1rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .tab-btn:hover {
+      background: #f0f4f8;
+    }
+    .tab-btn.active {
+      background: #1a6b6b;
+      color: white;
+    }
+    
+    /* Panel container */
+    .panel-container { position: relative; }
+    .view-panel {
+      display: none;
+      background: white;
+      border: 1px solid #d6ecea;
+      border-radius: 16px;
+      padding: 20px;
+      box-shadow: 0 4px 12px rgba(26, 107, 107, 0.08);
+    }
+    .view-panel.active { display: block; }
+    
+    /* Toolbar */
+    .panel-toolbar {
+      display: flex;
+      justify-content: flex-end;
+      align-items: center;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .toolbar-btn {
+      padding: 8px 16px;
+      border: 2px solid #1a6b6b;
+      border-radius: 6px;
+      background: white;
+      color: #1a6b6b;
+      font-weight: 600;
+      font-size: 0.9rem;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+    }
+    .toolbar-btn:hover {
+      background: #1a6b6b;
+      color: white;
+      text-decoration: none;
+    }
+    
+    /* PDF View — native scroll fills the screen; no page-flip controls */
+    .pdf-frame-wrap {
+      height: 92vh;
+      min-height: 92vh;
+      overflow: hidden;
+      border: 1px solid #c7dcda;
+      border-radius: 10px;
+      background: #f2f5f5;
+    }
+    .pdf-frame-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+    .ocr-search-bar {
+      position: relative;
+      margin-bottom: 12px;
+    }
+    .search-input {
+      width: 100%;
+      border: 1px solid #bdd7d5;
+      border-radius: 8px;
+      padding: 12px 44px 12px 16px;
+      font-size: 1rem;
+    }
+    .search-clear {
+      position: absolute;
+      right: 12px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: #6b7280;
+      font-size: 1.3rem;
+      cursor: pointer;
+    }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 0;
+      border-radius: 6px;
+      background: #1a6b6b;
+      color: white;
+      font-weight: 600;
+      padding: 7px 14px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { background: #9bbfbd; cursor: not-allowed; }
+    .match-count {
+      color: #6b7280;
+      font-size: 0.9rem;
+      font-weight: 600;
+    }
+    .font-size-controls { display: none; }
+    .ocr-zoom-bar {
+      position: sticky; top: 0; z-index: 6;
+      display: flex; justify-content: center; align-items: center; gap: 10px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(248, 250, 250, 0.97);
+      border: 1px solid #e2e8f0; border-radius: 6px;
+    }
+    .ocr-zoom-bar button {
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 4px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.15rem; cursor: pointer;
+    }
+    .ocr-zoom-pct {
+      min-width: 3.5rem; text-align: center; font-weight: 700; font-size: 0.95rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.72rem; color: #64748b; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 6px; } }
+    #ocr-panel {
+      height: 92vh;
+      min-height: 92vh;
+      overflow-y: auto;
+      border: 1px solid #e2e8f0;
+      border-radius: 6px;
+      padding: 14px 16px 22px;
+      background: white;
+      font-family: Georgia, "Times New Roman", Times, serif;
+      font-size: calc(1.08rem * var(--ocr-scale, 1));
+      line-height: 1.38;
+      color: #1a1a2e;
+      max-width: min(52rem, 100%);
+      margin: 0 auto;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    #ocr-panel h1, #ocr-panel h2 {
+      color: #14524f;
+      margin-top: 0.9em;
+      margin-bottom: 0.3em;
+      font-weight: 700;
+    }
+    #ocr-panel h2.b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c8d6f0;
+      padding-bottom: 0.12em;
+    }
+    #ocr-panel h3.b-head {
+      font-size: 1.12em;
+      color: #134e9c;
+    }
+    #ocr-panel h4.b-sub {
+      font-size: 1.02em;
+      color: #1f6f4a;
+    }
+    #ocr-panel h3, #ocr-panel h4 {
+      color: #1a6b6b;
+      margin-top: 0.8em;
+      margin-bottom: 0.25em;
+      font-weight: 700;
+    }
+    #ocr-panel .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.1em 0 0.35em;
+      color: #64748b;
+      font-family: system-ui, sans-serif;
+    }
+    #ocr-panel table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      margin: 0.45em 0 0.75em;
+      font-size: 0.95em;
+    }
+    #ocr-panel table.b-table td, #ocr-panel table.b-table th {
+      border: 1px solid #d0d8e8;
+      padding: 4px 8px;
+      text-align: left;
+      vertical-align: top;
+    }
+    #ocr-panel table.b-table th {
+      background: #eef3fb;
+      color: #0f2b5b;
+    }
+    #ocr-panel table.b-table tr:nth-child(even) td {
+      background: #f7f9fd;
+    }
+    #ocr-panel hr { border: 0; border-top: 1px solid #e2e8f0; margin: 0.9em 0; }
+    #ocr-panel p { margin: 0 0 0.35em; }
+    #ocr-panel mark { background: #fef08a; padding: 1px 3px; border-radius: 2px; }
+    #ocr-panel mark.search-active { background: #fde047; outline: 2px solid #0f5e5e; }
+    #ocr-panel a { color: #1a6b6b; font-weight: 600; }
+    #ocr-panel .parish-block {
+      margin: 0 0 0.5rem;
+      padding: 0;
+      border: 1px solid #e5e7eb;
+      border-radius: 4px;
+      background: #fff;
+    }
+    #ocr-panel .parish-block.parish-odd { background: #f7faf9; }
+    #ocr-panel .parish-block > summary.parish-head {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: baseline;
+      justify-content: space-between;
+      gap: 6px 12px;
+      margin: 0;
+      padding: 0.4rem 0.55rem;
+      border-left: 3px solid #1a6b6b;
+      cursor: pointer;
+      list-style: none;
+    }
+    #ocr-panel .parish-block > summary.parish-head::-webkit-details-marker { display: none; }
+    #ocr-panel .parish-odd > summary.parish-head { border-left-color: #14524f; }
+    #ocr-panel .parish-name {
+      margin: 0 !important;
+      font-size: 1.1rem !important;
+      color: #14524f !important;
+      border: 0 !important;
+      padding: 0 !important;
+      font-weight: 700;
+    }
+    #ocr-panel .parish-name::before {
+      content: "▸ ";
+      color: #1a6b6b;
+      font-family: system-ui, sans-serif;
+      font-size: 0.85em;
+    }
+    #ocr-panel .parish-block[open] .parish-name::before { content: "▾ "; }
+    #ocr-panel .parish-source {
+      font-family: system-ui, sans-serif;
+      font-size: 0.78rem;
+      font-weight: 600;
+      white-space: nowrap;
+      text-decoration: none;
+      color: #1d4ed8;
+    }
+    #ocr-panel .parish-source:hover { text-decoration: underline; }
+    #ocr-panel .parish-body { padding: 0.25rem 0.55rem 0.65rem; }
+    #ocr-panel .parish-empty {
+      font-family: system-ui, sans-serif;
+      font-size: 0.82rem;
+      color: #666666;
+      font-style: normal;
+    }
+    #ocr-panel .parish-row-empty {
+      display: flex;
+      flex-wrap: nowrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px 12px;
+      min-height: 45px;
+      max-height: 65px;
+      padding: 6px 0;
+      margin: 0;
+      border: 0;
+      border-bottom: 1px solid #e5e7eb;
+      background: transparent;
+      box-sizing: border-box;
+    }
+    #ocr-panel .parish-row-empty .parish-name {
+      margin: 0 !important;
+      font-size: 0.95rem !important;
+      font-family: system-ui, sans-serif !important;
+      color: #1e3a5f !important;
+      font-weight: 600;
+    }
+    #ocr-panel .parish-row-empty .parish-name::before { content: none !important; }
+    #ocr-panel .parish-row-empty .parish-empty {
+      flex: 1 1 auto;
+      margin: 0;
+      color: #666666;
+      font-size: 0.78rem;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    #ocr-panel .parish-row-empty .parish-source { color: #1e3a5f; font-size: 0.78rem; }
+    .note-box {
+      margin-top: 16px;
+      padding: 12px 16px;
+      border-radius: 10px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.95rem;
+    }
+    
+    /* Parish Section */
+    .parish-section {
+      margin-top: 32px;
+      background: white;
+      border: 1px solid #d6ecea;
+      border-radius: 16px;
+      padding: 24px;
+      box-shadow: 0 4px 12px rgba(26, 107, 107, 0.06);
+    }
+    .parish-section h2 {
+      margin: 0 0 18px;
+      color: #1a6b6b;
+      font-size: 1.4rem;
+      font-weight: 800;
+      text-align: center;
+    }
+    .parish-filter {
+      width: 100%;
+      border: 1px solid #bdd7d5;
+      border-radius: 8px;
+      padding: 12px 16px;
+      font-size: 1rem;
+      margin-bottom: 16px;
+    }
+    ul.parish-grid {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 12px;
+      padding: 0;
+      margin: 0;
+    }
+    .parish-item { margin: 0; }
+    .parish-link {
+      min-height: 48px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      text-decoration: none;
+      color: #1a6b6b;
+      font-size: 1rem;
+      font-weight: 700;
+      background: #f9fcfc;
+      border: 1px solid #d9ecea;
+      border-radius: 8px;
+      padding: 10px 14px;
+      transition: all 0.15s;
+    }
+    .parish-link:hover {
+      background: #e8f4f4;
+      text-decoration: none;
+      transform: translateY(-1px);
+    }
+    .empty-state { margin: 0 0 12px; color: #6b7280; font-size: 0.95rem; }
+    
+    /* Footer */
+    footer {
+      margin-top: 32px;
+      background: #114b4b;
+      color: white;
+      padding: 16px 20px;
+    }
+    .footer-inner {
+      max-width: 1100px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 0.9rem;
+    }
+    .footer-inner a { color: #d8f0ee; font-weight: 700; }
+    .footer-inner a:hover { text-decoration: underline; }
+    
+    /* Responsive */
+    @media (max-width: 900px) {
+      ul.parish-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+      .tabs { flex-direction: column; align-items: stretch; padding: 12px; }
+      .tab-btn { width: 100%; }
+    }
+    @media (max-width: 600px) {
+      .page { padding: 16px 12px; }
+      ul.parish-grid { grid-template-columns: 1fr; }
+      .pdf-frame-wrap, #ocr-panel {
+        height: 90vh;
+        min-height: 90vh;
+      }
+      .ocr-search-tools { flex-direction: column; }
+      .ocr-search-tools button, .tab-btn {
+        min-height: 48px;
+        width: 100%;
+      }
+      .panel-toolbar { justify-content: stretch; }
+      .toolbar-btn { flex: 1; justify-content: center; min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <a class="back-link" href="index.html">← Back to bulletin archive</a>
+    <header class="header">
+      <p class="diocese-label">DOWN &amp; CONNOR</p>
+      <h1>Down &amp; Connor Collated Bulletin</h1>
+      <p class="meta">Generated for 30/07/2026.</p>
+    </header>
+
+    <!-- Tabs -->
+    <div class="tabs" role="tablist" aria-label="Bulletin view">
+      <button class="tab-btn active" type="button" role="tab" aria-selected="true" data-tab="pdf" onclick="switchTab('pdf', this)">📄 Parish Bulletin (PDF)</button>
+      <button class="tab-btn" type="button" role="tab" aria-selected="false" data-tab="ocr" onclick="switchTab('ocr', this)">📝 Text Bulletin</button>
+    </div>
+
+    <!-- Panel Container -->
+    <div class="panel-container">
+      
+      <!-- PDF Panel: native browser PDF (scroll all pages; links open in viewer) -->
+      <div id="panel-pdf" class="view-panel active">
+        <div class="panel-toolbar">
+          <a class="toolbar-btn" href="../mega_pdf/down_and_connor_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer">↗ Open PDF in new tab</a>
+          <a class="toolbar-btn" href="../mega_pdf/down_and_connor_mega_bulletin.pdf" download>⬇ Download PDF</a>
+        </div>
+        <div class="pdf-frame-wrap">
+          <iframe src="../mega_pdf/down_and_connor_mega_bulletin.pdf" title="Down &amp; Connor Diocese bulletin PDF"></iframe>
+        </div>
+      </div>
+
+      <!-- OCR Panel -->
+      <div id="panel-ocr" class="view-panel">
+        <div class="panel-toolbar">
+          <a class="toolbar-btn" href="down_and_connor-2026-07-30-ocr.html" target="_blank" rel="noopener noreferrer">↗ Open bulletin text in new tab</a>
+        </div>
+        <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+          <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+          <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+          <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+          <span class="ocr-zoom-hint">or pinch to zoom</span>
+        </div>
+        <div class="ocr-search-bar">
+          <input id="ocr-search" class="search-input" type="search" placeholder="🔍 Search OCR text..." aria-label="Search OCR text" />
+          <button id="clear-search" class="search-clear" type="button" aria-label="Clear OCR search" hidden>×</button>
+        </div>
+        <div class="ocr-search-tools">
+          <span id="ocr-match-count" class="match-count">0 matches</span>
+          <div>
+            <button id="ocr-prev" type="button" disabled aria-label="Previous search match">← Prev match</button>
+            <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
+          </div>
+        </div>
+        <div id="ocr-panel"><div class="parish-row-empty parish-even" id="parish-aghagallonandballinderryparish">
+  <span class="parish-name">Aghagallon and Ballinderry</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.aghagallonandballinderryparish.ie" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<details class="parish-block parish-odd" id="parish-antrimparish">
+  <summary class="parish-head">
+    <span class="parish-name">Antrim</span>
+    <a class="parish-source" href="https://www.antrimparish.com/bulletinpage/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+  </summary>
+  <div class="parish-body"><p><a href="https://www.antrimparish.com" target="_blank" rel="noopener noreferrer">https://www.antrimparish.com</a><br>
+"Youth 2000 Summer Festival | 13th –16th August Calling all young people aged 16 –<br>
+35! Join us at the Youth 2000 Summer Festival in Newbridge College, Co. Kildare. This<br>
+is a donation -only event, with free buses available across the country and all meals<br>
+included. Expect inspiring talks and workshops, Mass, music, prayer, and plenty of<br>
+opportunities to chill out and meet other young Catholics. Whether you are new to the<br>
+faith or looking to be refreshed, all are welcome.<br>
+To register or find out more, visit youth2000.ie or follow @Youth2000Ireland."<br>
+Abide in His Love Women’s Conference . The Great Northern Hotel, Bundoran, 20 –22<br>
+November 2026 Join women from across Ireland for a faith -filled weekend with inspiring<br>
+speakers including Sarah Swafford, Danielle Noonan, Fr Mark Wharton, Fr Barry Braum,<br>
+Fr Oisín Martin, the Dominican Sisters of Nashville, Bishop Fintan Gavin, and more.<br>
+A conference not to be missed! Register now:<br>
+<a href="https://abideinhislove.eventbrite.com/" target="_blank" rel="noopener noreferrer">https://abideinhislove.eventbrite.com/</a><br>
+Catholic Men’s Retreat: A Catholic Men’s Retreat<br>
+Standing in the Breach: Freedom in Christ, will take place in Portglenone Monastery on<br>
+Saturday 25th July from 9am -1pm. The keynote speaker will be Dr Robert McNamara,<br>
+and the morning will be an opportunity for men to come together for prayer,<br>
+encouragement, fellowship and renewal in the Catholic faith. All men are warmly invit ed<br>
+to attend. For further information or to book a place, please contact Thomas Carey on<br>
+07967 620435 or email Sean at<br>
+<a href="mailto:sean@catholicminute.co.uk" target="_blank" rel="noopener noreferrer">sean@catholicminute.co.uk</a><br>
+Legion of Mary Auxiliary Membership The Legion invites you to become an auxiliary<br>
+member. There are no meetings to attend. You simply pray the Legion prayers at home<br>
+every day. This is a great support to the mission of the Church . Contact Conor on<br>
+Prayer for Vocations On the Feast of St John Vianney, the patron saint of parish priests,<br>
+we warmly invite the faithful from across the Diocese to join us for 24 Hours of Prayer<br>
+for Vocations to the Diocesan Priesthood in The Parish of St Colmcille<br>
+191a Upper Newtownards Road Belfast<br>
+The vigil will begin with Holy Mass at 7pm on Monday, 3 August, and conclude with<br>
+Holy Mass at 7pm on Tuesday, 4 August. Throughout the 24 hours, the Blessed<br>
+Sacrament will be exposed for Eucharistic Adoration<br>
+26th JULY 2026<br>
+17th SUNDAY OF THE YEAR<br>
+For the Church: that our Holy Father, our bishops, priests and deacons may be blessed<br>
+with a spirit of wisdom and discernment like Solomon, guiding the faithful to the pearl<br>
+of great price.<br>
+Let us pray to the Lord<br>
+For our parish community, that we may recognize and value the hidden treasures of<br>
+faith, family, and love, keeping Christ at the centre of our daily lives.<br>
+Let us pray to the Lord.<br>
+For all who do not feel appreciated: that they may find in Christ the courage to<br>
+continue to love and serve without praise or recognition.<br>
+Let us pray to the Lord<br>
+For those who are sick: may they experience the loving kindness of the Lord in and<br>
+through all who journey with them.<br>
+Let us pray to the Lord<br>
+On this Day of Prayer for Grandparents and the Elderly, we pray for our grandparents.<br>
+Bless them with good health, peace of mind, and the joy of seeing their families grow.<br>
+May they feel valued, respected, and deeply loved by their communities.<br>
+Let us pray to the Lord<br>
+For those whose lives are filled with distraction and fears, that their anxieties may be<br>
+calmed and they may be able to rest in the stillness of God’s presence.<br>
+Let us pray to the Lord<br>
+For those who have died:<br>
+Recently Deceased: Pat Dalton , Kieran O ’Malley<br>
+Month ’s Mind : Sean McCooke<br>
+All those named in the bulletin .<br>
+grant them eternal rest .<br>
+Let us pray to the Lo rd<br>
+Priest : My brothers and sisters, with trust and joyful expectation, let<br>
+us present our needs to our Heavenly Father, who knows exactly what<br>
+we need before we ask.<br>
+Priest : Heavenly Father, hear the words of your servant people as we<br>
+voice our needs and concerns before you. We ask this through Christ<br>
+our Lord. Amen .<br>
+Parish Emergency Mobile:<br>
+.<br>
+Parish Office, Mon -Fri 9am -2pm: 20762223<br>
+*Parish office will close on Friday 10th July and re -open on Monday 20th July*<br>
+*There will be no bulletin available for 18th / 19th July or 25th / 26th July****<br>
+<a href="https://www.ballycastleparish.com" target="_blank" rel="noopener noreferrer">www.ballycastleparish.com</a><br>
+<a href="mailto:ballycastle@downandconnor.org" target="_blank" rel="noopener noreferrer">ballycastle@downandconnor.org</a><br>
+12th July 2026 - 15th Sunday in Ordinary Time<br>
+Parish Bulletin<br>
+for<br>
+Ramoan<br>
+(Ballycastle, Glenshesk &amp; Rathlin)<br>
+and<br>
+Ballintoy &amp; Ballinlea<br>
+(Mass Readings: Sunday Cycle A)<br>
+Exposition of the Blessed Sacrament<br>
+every Monday, immediately after 10am Mass until 1.30pm. All welcome Upcoming Mass Schedule<br>
+Glenshesk : Sun 12th July at 9am. Ballinlea : Sun 19th July at 9am. Ballintoy : Sat 1st August at 5.30pm Mass and Confessions Schedule in Ballycastle<br>
+Vigil Mass on Saturday at 6.30pm, and Masses on Sunday at 10am and 12noon.<br>
+Daily Mass:10am, with Sacrament of Reconciliation after Saturday 10am Mass<br>
+Parish Youth Group<br>
+We are hoping to launch a new Parish Youth Group for young people in Years 8–10 from September and<br>
+we are looking for enthusiastic adult volunteers. The youth group will meet once per month in the crypt<br>
+on Saturdays from 4:30pm , followed by the Vigil Mass at 6:30pm. This is a wonderful opportunity to<br>
+support our young people in their faith journey, build community, and have a positive impact in the parish.<br>
+We are seeking volunteers who can:<br>
+Help supervise and support activities<br>
+Assist with organising sessions and events<br>
+Encourage and accompany young people in a welcoming, safe environment<br>
+No previous experience is necessary —just a willingness to help and a friendly, supportive attitude.<br>
+Training and safeguarding guidance will be provided as required.<br>
+If you feel called to be part of this important opportunity for our youth,<br>
+please contact Caroline McAfee<br>
+by emailing<br>
+<a href="mailto:ckellyd@hotmail.com" target="_blank" rel="noopener noreferrer">ckellyd@hotmail.com</a><br>
+, or call<br>
+.<br>
+Words of Spirit and LIife<br>
+An evening with Jeff Cavins<br>
+Sunday 26th July 2026, 7pm Voco Hotel Belfast.<br>
+Spend an inspiring evening with Jeff Cavins, the internationally renowned Bible teacher, author, and<br>
+creator of The Great Adventure Bible Timeline that shaped the hugely popular Bible in a Year podcast ,<br>
+meeting others who love the Word, sharing in a time of prayer led by Fr Conor McGrath,<br>
+and being reminded that the words of Jesus are Spirit and they are Life.<br>
+Register Online:<br>
+<a href="https://tinyurl.com/5h483c83" target="_blank" rel="noopener noreferrer">https://tinyurl.com/5h483c83</a><br>
+Venezuela Earthquake Emergency Appeal<br>
+Church Door collection by “Concern ” at Saturday Vigil Mass18 July and Sunday Masses 19 July<br>
+With thanks to the St Vincent de Paul Society for stepping aside from their usual collection Ballycastle<br>
+<a href="https://www.ballycastleparish.com" target="_blank" rel="noopener noreferrer">https://www.ballycastleparish.com</a><br>
+We pray for our deceased parishioners, relatives and friends, especially those who died recently<br>
+Margaret Hill (Drumawillan Park) and<br>
+Martina Black (Glenarrife)<br>
+and those whose anniversaries occur at this time<br>
+Rosaleen Walsh (1st), Molly Morton, Vera Kelly, Liam (Billy) McKillen, Patrick McShane, John McAfee,<br>
+Florence Laverty, Kathleen &amp; Angela Martin, Harry Mulholland, Alex Lynn, Felix Lynn, Robert Milliken,<br>
+Anne O ’Kane, Frank McCaughan, Elsie McCarry, Imelda Gillan, Gerard McGarry, Peggy Dallat,<br>
+Ben &amp; Ina Wilkinson, Paddy McFall, Mary McCormick, Donal McAuley, Alex &amp; Rosemary Jennings,<br>
+Mairead Walsh, Dan Cunningham, John Hector Molloy, Mary Walker and Maureen Laverty<br>
+Requiescant in Pace<br>
+Useful numbers<br>
+Saint Vincent de Paul<br>
+. Bethany Bereavement Support<br>
+.<br>
+Foodbank<br>
+. BabyBank<br>
+or<br>
+. Legion of Mary<br>
+. Al Anon<br>
+Ballycastle Al Anon meet every Friday at 2.30pm in Moyle Enterprise Unit 13.<br>
+Confidential helplines:<br>
+and<br>
+<a href="tel:+442890682368" style="color:#1d4ed8;font-weight:600;">028 -90682368</a><br>
+. Email: helpline@al -anonuk.org.uk<br>
+Parishioners and visitors who wish to contribute through e -banking can do so to<br>
+Ballycastle Parish, Sort code 95 -02-21 Account number 21000616<br>
+indicating their donation with the reference: “weekly ”<br>
+Collection for the last eight weeks: £1,515, £1,400, £1,701,£1,390, £1,120, £1,850, £1,141 and £1,895<br>
+Contributions, averaging £1,236.55 per week, were also received through 168 standing order.<br>
+The loose money in the collection of Saturday 13th Vigil and Sunday 14th June amounted to £1,352<br>
+and is the parish ’s contribution to the Lourdes Pilgrimage Fund<br>
+Thank you for your continuous support<br>
+Parish office will close on Friday 10th July and re -open on Monday 20th July**<br>
+There will be no bulletin available for18th / 19th July or 25th / 26th July The three -day<br>
+Lough Derg<br>
+pilgrimage season<br>
+has begun and continues until 15th August.<br>
+Pilgrims can begin the pilgrimage on any day up to Thurs 13th Aug<br>
+Further info at<br>
+<a href="https://www.loughderg.org" target="_blank" rel="noopener noreferrer">www.loughderg.org</a><br>
+Catholic Men ’s Retreat :<br>
+“Standing in the Breach: Freedom in Christ ”<br>
+will take place in Portglenone Monastery on Saturday 25th July from 9am -1pm.<br>
+The keynote speaker will be Dr Robert McNamara ,<br>
+with an opportunity for men to come together for prayer, encouragement, fellowship and renewal in the<br>
+Catholic faith.<br>
+All men are warmly invited to attend.<br>
+For further info or to book a place, please contact Thomas Carey on 07967 620435<br>
+or email Sean at<br>
+<a href="mailto:sean@catholicminute.co.uk" target="_blank" rel="noopener noreferrer">sean@catholicminute.co.uk</a><br>
+Notice Board<br>
+(028) 9334 2226 ballyclar e@downandconnor .org<br>
+@ballyclar eballygowanparish26 July 2026The Parish of Ballyclare &amp; Ballygowan<br>
+Offerings: Thank you for your recent offerings.<br>
+12 July – Weekly Offering £269.05<br>
+19 July – Weekly Offering £543.37 Diocesan Needs £197.00<br>
+Masses this week: Monday – Wednesday 9.00 am</p></div>
+</details>
+<div class="parish-row-empty parish-even" id="parish-ballycastleparish">
+  <span class="parish-name">Ballycastle</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.ballycastleparish.com/s/12th-April-2026.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<details class="parish-block parish-odd" id="parish-ballyclareballygowan">
+  <summary class="parish-head">
+    <span class="parish-name">Ballyclare and Ballygowan</span>
+    <a class="parish-source" href="https://ballyclareballygowan.com/notice%20board.htm" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+  </summary>
+  <div class="parish-body"><p><a href="https://ballyclareballygowan.com" target="_blank" rel="noopener noreferrer">https://ballyclareballygowan.com</a><br>
+Please click on the button if you wish to make an online donatation to<br>
+the Parish of Ballyclare and Ballygowan. Thank you.This Week’s Hymns<br>
+Entrance<br>
+OffertoryCommunion<br>
+Recessional395<br>
+Copyright   2025 Ballyclare and Ballygowan Parish<br>
+SACRED HEART PARISH<br>
+Sunday 12th April 2026<br>
+Divine Mercy Sunday<br>
+Parish Office : 1B Glenview Street, Belfast, BT14 7DP<br>
+Email:<br>
+<a href="mailto:sacredheart@downandconnor.org" target="_blank" rel="noopener noreferrer">sacredheart@downandconnor.org</a><br>
+Phone :<br>
+<a href="tel:+442890751543" style="color:#1d4ed8;font-weight:600;">028 9075 1543</a><br>
+Hours open: 9am-2pm , Mon, Tues, Wed, Fri<br>
+Parish Secretary: Cathy Carroll<br>
+Sacristan: Collette Delaney<br>
+Acolyte: Thomas Liddy<br>
+Parish Webpage :<br>
+<a href="https://www.sacredheartparishbelfast.com" target="_blank" rel="noopener noreferrer">https://www.sacredheartparishbelfast.com</a><br>
+Webcam sacredheartparishbelfast.com/Webcam Deacon: Joe Baxter<br>
+~Mass Times ~<br>
+Saturday Vigil: 6.00pm: Vigil Kathleen &amp; Geordie Adams, Colette Donaldson,<br>
+Anniversary Mass<br>
+Sunday Masses : 9:30am: Hugh Larkin, Anniversary Mass<br>
+11:30am: The Curran Family, Anniversary Mass<br>
+2:00pm: DIVINE MERCY<br>
+Weekday Masses : Tuesday 7:00pm: Novena Nan &amp; Hugh Saunders, Anniversary Mass<br>
+Wednesday 10.00am: Patsy &amp; Eileen Haughen<br>
+Confessions &amp; Adoration: Saturday: 5:00pm - 6:00pm.<br>
+~Sacrament of Baptism~<br>
+Baptisms are held on the 1st &amp; 3rd Sundays of each month, at 12.30pm.<br>
+Please contact the parish office to arrange a baptism.<br>
+~Anniversaries~<br>
+Nuala McCartney (nee Marks)<br>
+Danny McCartan<br>
+Irene McIlroy<br>
+Eternal rest grant unto them,<br>
+O Lord<br>
+~Weekly Collection~<br>
+£2138.88<br>
+~Easter Offering~<br>
+£482.65<br>
+~Catholics in the Holyland~<br>
+£283.50<br>
+The Parish Thanks You<br>
+For Your Kindness And Generosity<br>
+~A Spiritual Communion~<br>
+Jesus, I believe that you are present in the Most Blessed Sacrament. I love You above all things, and I<br>
+desire to receive You into my soul. Since I cannot now receive You Sacramentally, come at least<br>
+spiritually into my heart, I embrace You as if you are already there, and I unite myself wholly to You.<br>
+The Lord asks of you only this, that you act justly, love tenderly and walk humbly with your God.<br>
+( Micah 6:8)<br>
+~Sanctuary Candles~<br>
+Danny McCartan<br>
+The MacQuillan Family<br>
+The McFarlane Family<br>
+A Donation of £5 per candle<br>
+is greatly appreciated<br>
+~Recently Deceased~<br>
+Billy Stewart<br>
+Patrick McStravick<br>
+Noel Goodall<br>
+Louise McCullough<br>
+Caitriona O ’Neill<br>
+William Mallaghan<br>
+Bridget Mulvenna<br>
+Eternal rest grant unto them,<br>
+O Lord<br>
+~Baptisms~<br>
+Welcome into our community<br>
+Rossa Jody McDonnell<br>
+Antóin Patrick McCavana<br>
+~Sacrament of Marriage~<br>
+Please contact the Parish Office to arrange.<br>
+~Upcoming Feast Days~<br>
+12th April<br>
+St Teresa of the Andes<br>
+13th April<br>
+St Martin I<br>
+16th April<br>
+St Bernadette Soubirous Sacred Heart Belfast<br>
+<a href="https://www.sacredheartparishbelfast.com" target="_blank" rel="noopener noreferrer">https://www.sacredheartparishbelfast.com</a><br>
+Lifeline -24hr 7 days a week 0808 808 8000<br>
+Samaritans anytime night or day 116 123<br>
+St Vincent De Paul<br>
+<a href="tel:+442890351561" style="color:#1d4ed8;font-weight:600;">028 90351561</a><br>
+Cancer Lifeline 028 90 351999<br>
+AA<br>
+Al-Anon Family Groups<br>
+<a href="tel:+442890682368" style="color:#1d4ed8;font-weight:600;">028 9068 2368</a><br>
+PIPS 0800 088 6042<br>
+Youth Education Health Advise<br>
+<a href="tel:+442890757" style="color:#1d4ed8;font-weight:600;">02890 757</a><br>
+Diocesan Safeguarding Officer Philip O’Hara<br>
+Sacred Heart of Jesus, I place all my trust in Thee AA Meeting upstairs in the Parish Centre every Monday &amp; Friday, 6.30pm -7.30pm, and Thursday at 7pm. (Ladies Group) Chatty Café. Open Wednesday 10.30am to 12.30pm. Come and join us for a cuppa &amp; a chat.<br>
+The Spred Group meet every second Monday in the Parish Hall at 7pm.<br>
+The Stitch and Crocheting Group meet Thursday evenings,7pm in the Parish centre. Come along and learn a new skill. DATES FOR YOUR DIARY<br>
+Narcotics Anonymous (NA) meeting upstairs in the Parish Centre on Wednesday ’s at 7pm -8pm.<br>
+Cocaine Anonymous (CA) meet every Tuesday at 7pm upstairs in the Parish Centre.<br>
+Pope Leo ’s Prayer Intentions for 2026<br>
+April: For priests in crisis.<br>
+Let us pray for priests going through moments of crisis in<br>
+their vocation, that they may find the accompaniment they<br>
+need and that communities may support them with<br>
+understanding and care.<br>
+Amen<br>
+Good Shepherd Sunday. As we move towards Good Shepherd Sunday (Vocations Sunday) on 26th April, we are encour-<br>
+aged to keep vocations to the diocesan priesthood in our prayers in these coming days. The Diocesan Vocations Novena,<br>
+a 9 day journey of prayer will begin on 18th April until 26th April. Join us on line or in your Parish, asking the Lord to bl ess<br>
+our diocese vocations to the priesthood. To join on line visit: Instagram: d ownandconnor_vocations, Facebook: Down and<br>
+Connor – Vocations . Eucharistic Adoration. Calling All Adorers of the Blessed<br>
+Sacrament in Down &amp; Connor Diocese. A National<br>
+Eucharistic Adoration Pilgrimage to Knock is planned<br>
+for Sunday 19th April (weekend after Divine Mercy). Details<br>
+can be found on<br>
+<a href="https://www.eucharisticadoration.ie" target="_blank" rel="noopener noreferrer">www.eucharisticadoration.ie</a><br>
+.<br>
+Phone Patrick on<br>
+(for bus leaving Belfast). PRAYER FOR DIVINE MERCY SUNDAY<br>
+O God of infinite mercy, on this Divine Mercy Sunday,<br>
+we come before You with humble hearts,<br>
+trusting in Your boundless love.<br>
+Through the passion, death, and resurrection<br>
+of Your Son, Jesus Christ,<br>
+You have opened the floodgates of mercy for all humanity.<br>
+We pray with the words You gave to St. Faustina:<br>
+"JESUS, I TRUST IN YOU."<br>
+Grant us the grace to accept Your mercy,<br>
+to share it with others, and to live as instruments of Your peace.<br>
+Forgive our sins, heal our wounds,<br>
+and draw us closer to Your Sacred Heart.<br>
+Bless the world with Your compassion,<br>
+especially those who suffer, those who doubt,<br>
+and those who have strayed.<br>
+May Your Divine Mercy renew the earth<br>
+and lead all souls to the joy of Your eternal kingdom.<br>
+We offer this prayer through Christ our Lord,<br>
+in union with the Holy Spirit, forever and ever.<br>
+Amen!<br>
+Encounter Weekend Donegal . Radisson Blu Hotel, Letterkenny. 6.00pm - 10.30pm Friday 5th June. 9.00am - 10.30pm.<br>
+Saturday 6th June. Expect to experience the presence of God through the celebration of the Sacraments, Spirit -led<br>
+worship, inspiring talks, healing service, and fellowship. Come and be refreshed and empowered by the Holy Spirit and<br>
+learn from the Saints how to live the lifestyle God intended you to live. Keynote Speakers: Patrick Reis: co -founder and<br>
+Executive Director of Encounter Ministries USA &amp; Fr. Patrick Gonyeau who serves with the U.S. Province of the Mission-<br>
+aries of the Precious Blood in Ohio. Bookings at<br>
+<a href="https://encounterschoolofministrydoneg.regfox.com/encounter" target="_blank" rel="noopener noreferrer">https://encounterschoolofministrydoneg.regfox.com/encounter</a><br>
+-conference<br>
+-donegal For more info, email<br>
+<a href="mailto:donegal@encounterschool.org" target="_blank" rel="noopener noreferrer">donegal@encounterschool.org</a><br>
+.<br>
+Missing &amp; Online-Only Bulletins<br>
+Generated 26/07/2026<br>
+The following parishes do not have a downloadable PDF bulletin. Click a link to view the bulletin online.</p></div>
+</details>
+<div class="parish-row-empty parish-even" id="parish-ballymenaparish">
+  <span class="parish-name">Ballymena</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://ballymenaparish.org" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-ballymoneyparish">
+  <span class="parish-name">Ballymoney</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.ballymoneyparish.com" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-bangorparish">
+  <span class="parish-name">Bangor</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.bangorparish.com" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-bright">
+  <span class="parish-name">Bright</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://parishofbright.net/wp-content/uploads/2026/04/Bulletin-5-04-2026.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-carrickfergus">
+  <span class="parish-name">Carrickfergus</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.carrickparish.org" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-christtheredeemer">
+  <span class="parish-name">Christ the Redeemer</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.christtheredeemer.co.uk/parish-bulletin" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-corpuschristiparishbelfast">
+  <span class="parish-name">Corpus Christi Belfast</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.corpuschristiparishbelfast.com/news" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-derriaghy">
+  <span class="parish-name">Derriaghy</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://derriaghycatholicparish.com" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-drumbocarryduff">
+  <span class="parish-name">Drumbo and Carryduff</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.drumbocarryduff.ie/#sbp-bulletin" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-dunsfordandardglassparish">
+  <span class="parish-name">Dunsford and Ardglass</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.dunsfordandardglassparish.com/?page_id=623" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-glenariffeparish">
+  <span class="parish-name">Glenariffe</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://glenariffeparish.org/whats-on" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-glenavyandkilleadparish">
+  <span class="parish-name">Glenavy and Killead</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.glenavyandkilleadparish.com" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-hannahstown">
+  <span class="parish-name">Hannahstown</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.parishofhannahstown.com/weekly-bulletins" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-holycrossbelfast">
+  <span class="parish-name">Holy Cross Belfast</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="http://www.holycrossparishbelfast.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-holy-familyparish">
+  <span class="parish-name">Holy Family</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.holy-familyparish.com/bulletin/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-holyrosarybelfast">
+  <span class="parish-name">Holy Rosary Belfast</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.holyrosaryparishbelfast.net/weekly-bulletin" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-holytrinityparishbelfast">
+  <span class="parish-name">Holy Trinity Belfast</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://holytrinityparishbelfast.com/newsletters/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-kilmoreandkillyleagh">
+  <span class="parish-name">Kilmore and Killyleagh</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.kilmoreandkillyleagh.com" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-lisburn">
+  <span class="parish-name">Lisburn</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://parishoflisburn.org" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-loughshore">
+  <span class="parish-name">Loughshore</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.loughshoreparishes.org/sunday-bulletin/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-maghera">
+  <span class="parish-name">Maghera</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.parishofmaghera.com/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-nativityparish">
+  <span class="parish-name">Nativity</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.nativityparish.com/news" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-ourladyqueenofpeace">
+  <span class="parish-name">Our Lady Queen of Peace</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.ourladyqueenofpeacekilwee.com/bulletins" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-portglenonestmarysportglenone">
+  <span class="parish-name">Port Glenone (St Mary&#x27;s Portglenone)</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://stmarysportglenone.org/?page_id=40" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-portaferryparish">
+  <span class="parish-name">Portaferry</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://portaferryparish.com/bulletin" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-portstewartparish">
+  <span class="parish-name">Portstewart</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="http://portstewartparish.website/bulletins/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-sacredheartbelfast">
+  <span class="parish-name">Sacred Heart Belfast</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.sacredheartparishbelfast.com/gallery/Parish%20Bulletin%2012th%20April%202026.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-saintannesparish">
+  <span class="parish-name">Saint Annes</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.saintannesparish.net" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-saintanthony">
+  <span class="parish-name">Saint Anthony</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://saintanthonys.uk/parish-bulletin/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-saintmalachysparish">
+  <span class="parish-name">Saint Malachy&#x27;s</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.saintmalachysparish.com/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-saulandballeeparish">
+  <span class="parish-name">Saul and Ballee</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.saulandballeeparish.com" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-stagnesbelfast">
+  <span class="parish-name">St Agnes Belfast</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.stagnesbelfast.com/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-stbernadettesparish">
+  <span class="parish-name">St Bernadettes</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.stbernadettesparish.org/bulletin/uploaded/Parish%20Bulletin%2012th%20April%202026.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-stbrigidsbelfast">
+  <span class="parish-name">St Brigids Belfast</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://stbrigidsparishbelfast.org" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-st-colmcilles">
+  <span class="parish-name">St Colmcilles</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://st-colmcilles.net/weekly-bulletins/past-weeks-bulletins/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-stgerardsparish">
+  <span class="parish-name">St Gerards</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://stgerardsparish.org/parish-news-events/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-stlukesparishbelfast">
+  <span class="parish-name">St Luke&#x27;s Belfast</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.stlukesparishbelfast.com/news" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-stmacnissirandalstown">
+  <span class="parish-name">St MacNissi Randalstown</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.stmacnissirandalstown.com/bulletin" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-stmarysbelfast">
+  <span class="parish-name">St Mary&#x27;s Belfast</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.stmarysbelfast.org/news" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-stmarysonthehill">
+  <span class="parish-name">St Mary&#x27;s on the Hill</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.stmarysonthehill.online/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-stmatthewsparish">
+  <span class="parish-name">St Matthew&#x27;s</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.stmatthewsparish.com/news" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-stmichaelthearchangel">
+  <span class="parish-name">St Michael the Archangel</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://saintmichaelthearchangel.godaddysites.com/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-stoliverplunkettparish">
+  <span class="parish-name">St Oliver Plunkett</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://stoliverplunkettparish.ie" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-stpatricksdownpatrick">
+  <span class="parish-name">St Patrick&#x27;s Downpatrick</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://stpatricksdownpatrick.com/parish-bulletins/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-stpatricksbelfast">
+  <span class="parish-name">St Patricks Belfast</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.stpatricksbelfast.org/category/weekly-bulletins/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-odd" id="parish-stteresasparish">
+  <span class="parish-name">St Teresas</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://stteresasparish.church/parish-news/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div>
+<div class="parish-row-empty parish-even" id="parish-stvincentdepaulparishbelfast">
+  <span class="parish-name">St Vincent de Paul Belfast</span>
+  <span class="parish-empty">No searchable text available this week.</span>
+  <a class="parish-source" href="https://www.stvincentdepaulparishbelfast.com/news" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
+</div></div>
+        <div class="note-box">This bulletin text is auto-generated from the PDF. Irish (Gaeilge) and English are kept as printed. Please verify mass times and names against the original PDF.</div>
+      </div>
+
+    </div>
+
+    <!-- Parish Links Section -->
+    <section class="parish-section">
+      <h2>DOWN &amp; CONNOR Parishes with Working Bulletin Links</h2>
+      <input id="parish-filter" class="parish-filter" type="search" placeholder="🔍 Filter parishes..." aria-label="Filter parishes" />
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="https://www.aghagallonandballinderryparish.ie" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Aghagallon and Ballinderry</span></a></li><li class="parish-item" data-name="antrim"><a class="parish-link" href="https://www.antrimparish.com/bulletinpage/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Antrim</span></a></li><li class="parish-item" data-name="ballycastle"><a class="parish-link" href="https://www.ballycastleparish.com/s/12th-April-2026.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Ballycastle</span></a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="https://ballyclareballygowan.com/notice%20board.htm" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Ballyclare and Ballygowan</span></a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="https://ballymenaparish.org" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Ballymena</span></a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="https://www.ballymoneyparish.com" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Ballymoney</span></a></li><li class="parish-item" data-name="bangor"><a class="parish-link" href="https://www.bangorparish.com" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Bangor</span></a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="https://parishofbright.net/wp-content/uploads/2026/04/Bulletin-5-04-2026.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Bright</span></a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="https://www.carrickparish.org" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Carrickfergus</span></a></li><li class="parish-item" data-name="christ the redeemer"><a class="parish-link" href="https://www.christtheredeemer.co.uk/parish-bulletin" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Christ the Redeemer</span></a></li><li class="parish-item" data-name="corpus christi belfast"><a class="parish-link" href="https://www.corpuschristiparishbelfast.com/news" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Corpus Christi Belfast</span></a></li><li class="parish-item" data-name="derriaghy"><a class="parish-link" href="https://derriaghycatholicparish.com" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Derriaghy</span></a></li><li class="parish-item" data-name="drumbo and carryduff"><a class="parish-link" href="https://www.drumbocarryduff.ie/#sbp-bulletin" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Drumbo and Carryduff</span></a></li><li class="parish-item" data-name="dunsford and ardglass"><a class="parish-link" href="https://www.dunsfordandardglassparish.com/?page_id=623" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Dunsford and Ardglass</span></a></li><li class="parish-item" data-name="glenariffe"><a class="parish-link" href="https://glenariffeparish.org/whats-on" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Glenariffe</span></a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="https://www.glenavyandkilleadparish.com" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Glenavy and Killead</span></a></li><li class="parish-item" data-name="hannahstown"><a class="parish-link" href="https://www.parishofhannahstown.com/weekly-bulletins" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Hannahstown</span></a></li><li class="parish-item" data-name="holy cross belfast"><a class="parish-link" href="http://www.holycrossparishbelfast.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Holy Cross Belfast</span></a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="https://www.holy-familyparish.com/bulletin/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Holy Family</span></a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="https://www.holyrosaryparishbelfast.net/weekly-bulletin" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Holy Rosary Belfast</span></a></li><li class="parish-item" data-name="holy trinity belfast"><a class="parish-link" href="https://holytrinityparishbelfast.com/newsletters/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Holy Trinity Belfast</span></a></li><li class="parish-item" data-name="kilmore and killyleagh"><a class="parish-link" href="https://www.kilmoreandkillyleagh.com" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Kilmore and Killyleagh</span></a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="https://parishoflisburn.org" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Lisburn</span></a></li><li class="parish-item" data-name="loughshore"><a class="parish-link" href="https://www.loughshoreparishes.org/sunday-bulletin/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Loughshore</span></a></li><li class="parish-item" data-name="maghera"><a class="parish-link" href="https://www.parishofmaghera.com/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Maghera</span></a></li><li class="parish-item" data-name="nativity"><a class="parish-link" href="https://www.nativityparish.com/news" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Nativity</span></a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="https://www.ourladyqueenofpeacekilwee.com/bulletins" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Our Lady Queen of Peace</span></a></li><li class="parish-item" data-name="port glenone (st mary&#x27;s portglenone)"><a class="parish-link" href="https://stmarysportglenone.org/?page_id=40" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Port Glenone (St Mary&#x27;s Portglenone)</span></a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="https://portaferryparish.com/bulletin" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Portaferry</span></a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="http://portstewartparish.website/bulletins/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Portstewart</span></a></li><li class="parish-item" data-name="sacred heart belfast"><a class="parish-link" href="https://www.sacredheartparishbelfast.com/gallery/Parish%20Bulletin%2012th%20April%202026.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Sacred Heart Belfast</span></a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="https://www.saintannesparish.net" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Saint Annes</span></a></li><li class="parish-item" data-name="saint anthony"><a class="parish-link" href="https://saintanthonys.uk/parish-bulletin/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Saint Anthony</span></a></li><li class="parish-item" data-name="saint malachy&#x27;s"><a class="parish-link" href="https://www.saintmalachysparish.com/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Saint Malachy&#x27;s</span></a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="https://www.saulandballeeparish.com" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Saul and Ballee</span></a></li><li class="parish-item" data-name="st agnes belfast"><a class="parish-link" href="https://www.stagnesbelfast.com/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Agnes Belfast</span></a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="https://www.stbernadettesparish.org/bulletin/uploaded/Parish%20Bulletin%2012th%20April%202026.pdf" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Bernadettes</span></a></li><li class="parish-item" data-name="st brigids belfast"><a class="parish-link" href="https://stbrigidsparishbelfast.org" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Brigids Belfast</span></a></li><li class="parish-item" data-name="st colmcilles"><a class="parish-link" href="https://st-colmcilles.net/weekly-bulletins/past-weeks-bulletins/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Colmcilles</span></a></li><li class="parish-item" data-name="st gerards"><a class="parish-link" href="https://stgerardsparish.org/parish-news-events/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Gerards</span></a></li><li class="parish-item" data-name="st luke&#x27;s belfast"><a class="parish-link" href="https://www.stlukesparishbelfast.com/news" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Luke&#x27;s Belfast</span></a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="https://www.stmacnissirandalstown.com/bulletin" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St MacNissi Randalstown</span></a></li><li class="parish-item" data-name="st mary&#x27;s belfast"><a class="parish-link" href="https://www.stmarysbelfast.org/news" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Mary&#x27;s Belfast</span></a></li><li class="parish-item" data-name="st mary&#x27;s on the hill"><a class="parish-link" href="https://www.stmarysonthehill.online/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Mary&#x27;s on the Hill</span></a></li><li class="parish-item" data-name="st matthew&#x27;s"><a class="parish-link" href="https://www.stmatthewsparish.com/news" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Matthew&#x27;s</span></a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="https://saintmichaelthearchangel.godaddysites.com/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Michael the Archangel</span></a></li><li class="parish-item" data-name="st oliver plunkett"><a class="parish-link" href="https://stoliverplunkettparish.ie" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Oliver Plunkett</span></a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="https://stpatricksdownpatrick.com/parish-bulletins/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Patrick&#x27;s Downpatrick</span></a></li><li class="parish-item" data-name="st patricks belfast"><a class="parish-link" href="https://www.stpatricksbelfast.org/category/weekly-bulletins/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Patricks Belfast</span></a></li><li class="parish-item" data-name="st teresas"><a class="parish-link" href="https://stteresasparish.church/parish-news/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Teresas</span></a></li><li class="parish-item" data-name="st vincent de paul belfast"><a class="parish-link" href="https://www.stvincentdepaulparishbelfast.com/news" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>St Vincent de Paul Belfast</span></a></li></ul>
+    </section>
+  </div>
+  <!-- Support Banner -->
+  <div style="max-width:1100px;margin:24px auto 0;padding:0 16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;background:#fff;border:1px solid #d6ecea;border-radius:12px;padding:14px 18px;">
+      <span style="font-size:0.95rem;color:#4b5563;">📊 <span id="view-count">–</span> views this week</span>
+      <div style="display:flex;gap:10px;flex-wrap:wrap;">
+        <a href="https://github.com/Frankytyrone/parish_harvester" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#24292e;color:#fff;border-radius:8px;font-weight:600;font-size:0.9rem;text-decoration:none;">⭐ Star on GitHub</a>
+        <a href="https://buymeacoffee.com/frankytyrone" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#FFDD00;color:#000;border-radius:8px;font-weight:700;font-size:0.9rem;text-decoration:none;">☕ Buy Me a Coffee</a>
+      </div>
+    </div>
+  </div>
+  <footer>
+    <div class="footer-inner">
+      <span>© 2026 Parish Press — Free forever for all Irish parishes</span>
+      <div style="display:flex;gap:12px;flex-wrap:wrap;">
+        <a href="https://github.com/Frankytyrone/parish_harvester" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://buymeacoffee.com/frankytyrone" target="_blank" rel="noopener noreferrer">☕ Donate</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // Tab Switching
+    function switchTab(tabName, button) {
+      document.querySelectorAll('.view-panel').forEach(function(panel) {
+        panel.classList.remove('active');
+      });
+      document.querySelectorAll('.tab-btn').forEach(function(btn) {
+        btn.classList.remove('active');
+        btn.setAttribute('aria-selected', 'false');
+      });
+      document.getElementById('panel-' + tabName).classList.add('active');
+      button.classList.add('active');
+      button.setAttribute('aria-selected', 'true');
+    }
+
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-panel');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+
+    (function () {
+      const ocrPanel = document.getElementById('ocr-panel');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      const parishFilter = document.getElementById('parish-filter');
+      const parishItems = Array.from(document.querySelectorAll('.parish-item'));
+      const parishEmpty = document.getElementById('parish-empty');
+      if (!ocrPanel || !ocrSearch) return;
+      const originalOcrHtml = ocrPanel.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+
+      function escapeRegExp(text) {
+        const specials = new Set(['\\', '^', '$', '.', '|', '?', '*', '+', '(', ')', '[', ']', '{', '}']);
+        return Array.from(text).map((ch) => specials.has(ch) ? `\\${ch}` : ch).join('');
+      }
+
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        const target = ocrMatches[idx];
+        target.classList.add('search-active');
+        const details = target.closest('details.parish-block');
+        if (details) details.open = true;
+        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+
+      function updateMatchUi() {
+        if (!matchCount || !prevMatchBtn || !nextMatchBtn) return;
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} / ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+
+      function applyOcrSearch(query) {
+        ocrPanel.innerHTML = originalOcrHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrPanel, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) {
+            nodes.push(node);
+          }
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) {
+            return;
+          }
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match = null;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) {
+              fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            }
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) {
+            fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          }
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrPanel.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+
+      ocrSearch.addEventListener('input', function (event) {
+        applyOcrSearch(event.target.value.trim());
+      });
+      clearSearch.addEventListener('click', function () {
+        ocrSearch.value = '';
+        applyOcrSearch('');
+        ocrSearch.focus();
+      });
+      prevMatchBtn.addEventListener('click', function () {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', function () {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' && ocrMatches.length) {
+          event.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+
+      parishFilter.addEventListener('input', function (event) {
+        const term = event.target.value.trim().toLowerCase();
+        let visibleCount = 0;
+        parishItems.forEach((item) => {
+          const matches = item.dataset.name.includes(term);
+          item.hidden = !matches;
+          if (matches) {
+            visibleCount += 1;
+          }
+        });
+        if (parishEmpty) {
+          parishEmpty.hidden = visibleCount !== 0;
+        }
+      });
+
+      updateMatchUi();
+    })();
+
+    // ── View Counter (localStorage) ──────────────────────────────────
+    (function() {
+      var key = 'ph_views_' + location.pathname;
+      var weekKey = 'ph_views_week';
+      var now = new Date();
+      var weekId = now.getFullYear() + '-W' + String(Math.ceil((now - new Date(now.getFullYear(),0,1)) / 86400000 / 7)).padStart(2,'0');
+      try {
+        var views = JSON.parse(localStorage.getItem(key) || '{}'  );
+        if (views.week !== weekId) { views = { week: weekId, count: 0 }; }
+        views.count += 1;
+        localStorage.setItem(key, JSON.stringify(views));
+        // Update total weekly views across all pages
+        var total = JSON.parse(localStorage.getItem(weekKey) || '{}'  );
+        if (total.week !== weekId) { total = { week: weekId, count: 0 }; }
+        total.count += 1;
+        localStorage.setItem(weekKey, JSON.stringify(total));
+        var el = document.getElementById('view-count');
+        if (el) el.textContent = total.count;
+      } catch(e) {}
+    })();
+
+    // ── Self-Check: Is this week's bulletin available? ───────────────
+    (function() {
+      var generated = document.querySelector('.meta');
+      if (!generated) return;
+      var text = generated.textContent || '';
+      var match = text.match(/(\d{4})-(\d{2})-(\d{2})/);
+      if (!match) {
+        match = text.match(/(\d{2})[/](\d{2})[/](\d{4})/);
+        if (match) match = [null, match[3], match[2], match[1]];
+      }
+      if (!match) return;
+      var bulletinDate = new Date(match[1] + '-' + match[2] + '-' + match[3]);
+      var now = new Date();
+      var daysSince = Math.floor((now - bulletinDate) / 86400000);
+      if (daysSince > 8) {
+        var banner = document.createElement('div');
+        banner.style.cssText = 'max-width:1100px;margin:12px auto;padding:0 16px;';
+        banner.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px 16px;color:#991b1b;font-weight:600;text-align:center;">⚠️ This bulletin is ' + daysSince + ' days old. A newer version may be available — check back after Sunday\'s harvest run.</div>';
+        var page = document.querySelector('.page');
+        if (page) page.insertBefore(banner, page.firstChild);
+      }
+    })();
+  </script>
+</body>
+</html>
