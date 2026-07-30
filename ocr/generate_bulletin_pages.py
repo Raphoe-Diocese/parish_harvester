@@ -763,11 +763,13 @@ def render_ocr_standalone_page(
       font-family: system-ui, sans-serif;
       font-style: italic;
     }}
+    body.embed-mode .top {{ display: none !important; }}
+    body.embed-mode .page {{ padding-top: 4px; }}
   </style>
 </head>
 <body>
   <div class="page">
-    <div class="top">
+    <div class="top" id="ocr-top">
       <div class="top-left">
         <a class="back-link" href="{html.escape(viewer_href, quote=True)}">← Viewer</a>
         <span class="title-line">{html.escape(diocese_label)} Text Bulletin · {html.escape(uk_bulletin_date)}</span>
@@ -799,6 +801,13 @@ def render_ocr_standalone_page(
     <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
   </div>
   <script>
+    (function () {{
+      try {{
+        if (new URLSearchParams(window.location.search).get('embed') === '1') {{
+          document.body.classList.add('embed-mode');
+        }}
+      }} catch (e) {{}}
+    }})();
     (function () {{
       var KEY = 'ph_ocr_scale';
       var percents = [75, 85, 100, 115, 130, 150, 175, 200];

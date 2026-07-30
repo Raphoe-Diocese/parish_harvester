@@ -159,12 +159,19 @@ def render_diocese_raphoe_page(
     week_suffix = f" — {week_label}" if week_label else ""
     display = str(diocese_display_name or "Diocese").strip()
     short = display.removesuffix(" Diocese").strip() or display
+    if short == "Down and Connor":
+        short = "Down & Connor"
+    ocr_url = str(ocr_standalone_url or "").strip()
+    ocr_embed = ocr_url
+    if ocr_embed and "embed=1" not in ocr_embed:
+        ocr_embed = f"{ocr_embed}{'&' if '?' in ocr_embed else '?'}embed=1"
     payload = {
         "page_title": html.escape(f"{display} Collated Bulletin{week_suffix}"),
         "headline": html.escape(headline),
         "mega_pdf_url": html.escape(mega_pdf_url, quote=True),
         "bulletin_viewer_url": html.escape(bulletin_viewer_url, quote=True),
-        "ocr_standalone_url": html.escape(ocr_standalone_url, quote=True),
+        "ocr_standalone_url": html.escape(ocr_url, quote=True),
+        "ocr_embed_url": html.escape(ocr_embed, quote=True),
         "ocr_iframe_title": html.escape(f"{short} text bulletin", quote=True),
         "ocr_block_html": _build_ocr_block(ocr_text, ocr_is_html=ocr_is_html),
         "parish_heading": html.escape(parish_heading),

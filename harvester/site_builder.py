@@ -611,6 +611,8 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
             parish_links = _parish_links_for_big_bulletin(diocese.key, report_path)
             ocr_text, ocr_is_html = _ocr_content_for_diocese(diocese.key)
             display_short = diocese.name.removesuffix(" Diocese").strip() or diocese.name
+            if display_short == "Down and Connor":
+                display_short = "Down & Connor"
             render_diocese_raphoe_page(
                 parish_links=parish_links,
                 out_path=out_path,
