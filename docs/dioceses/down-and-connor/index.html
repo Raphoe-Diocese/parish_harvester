@@ -8,6 +8,7 @@
     * { box-sizing: border-box; }
     :root {
       --bg: #ffffff;
+      --panel: #f8fafc;
       --text: #222222;
       --muted: #666666;
       --border: #e5e7eb;
@@ -20,6 +21,7 @@
       color: var(--text);
       -webkit-text-size-adjust: 100%;
       line-height: 1.5;
+      overflow-x: hidden;
     }
     .page {
       max-width: min(1280px, 100%);
@@ -47,7 +49,7 @@
     }
     header.page-head h1 {
       margin: 0 0 10px;
-      font-size: 1.4rem;
+      font-size: 1.35rem;
       font-weight: 600;
       color: var(--accent);
       letter-spacing: -0.01em;
@@ -60,15 +62,21 @@
       font-size: 0.9rem;
       font-weight: 600;
     }
-    .view-switch a {
+    .view-switch button {
+      border: 0;
+      background: transparent;
+      padding: 0;
+      font: inherit;
+      font-weight: 600;
       color: var(--muted);
-      text-decoration: none;
+      cursor: pointer;
     }
-    .view-switch a:hover,
-    .view-switch a.is-active { color: var(--accent); }
-    .view-switch a.is-active { text-decoration: underline; }
+    .view-switch button:hover,
+    .view-switch button.is-active { color: var(--accent); }
+    .view-switch button.is-active { text-decoration: underline; }
     .view-switch .sep { color: var(--border); font-weight: 400; }
-    .section { margin: 0 0 32px; }
+    .panel-section { margin: 0 0 28px; }
+    .panel-section[hidden] { display: none !important; }
     .section-meta {
       display: flex;
       flex-wrap: wrap;
@@ -90,28 +98,30 @@
       text-decoration: none;
     }
     .section-link:hover { text-decoration: underline; }
-    .ocr-embed {
+    .viewer-shell {
       width: 100%;
-      height: max(80vh, calc(100vh - 180px));
-      min-height: 80vh;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      background: #fff;
-      display: block;
-    }
-    .pdf-preview {
+      height: 85vh;
+      min-height: 850px;
       border: 1px solid var(--border);
       border-radius: 8px;
       overflow: hidden;
       background: #fafafa;
-      height: max(80vh, 900px);
-      min-height: 900px;
     }
-    .pdf-preview iframe {
+    .viewer-shell.pdf-shell { background: #fafafa; }
+    .viewer-shell.ocr-shell {
+      background: var(--panel);
+      padding: 10px;
+    }
+    .viewer-shell iframe {
       width: 100%;
       height: 100%;
       border: 0;
       display: block;
+      background: #fff;
+      border-radius: 6px;
+    }
+    .ocr-shell iframe {
+      border: 1px solid var(--border);
     }
     .disclaimer {
       margin: 0 0 20px;
@@ -168,15 +178,18 @@
     }
     .site-footer a { color: var(--accent); text-decoration: none; }
     .site-footer a:hover { text-decoration: underline; }
-    @media (max-width: 800px) {
+    @media (max-width: 900px) {
+      .viewer-shell {
+        height: 75vh;
+        min-height: 75vh;
+      }
       .parish-link-grid { columns: 2; }
-      .pdf-preview { min-height: 70vh; height: 70vh; }
-      .ocr-embed { min-height: 70vh; height: 70vh; }
     }
     @media (max-width: 520px) {
       .page { padding: 16px 12px 32px; }
-      header.page-head h1 { font-size: 1.25rem; }
+      header.page-head h1 { font-size: 1.2rem; }
       .parish-link-grid { columns: 1; }
+      .ocr-shell { padding: 6px; }
     }
   </style>
 </head>
@@ -186,37 +199,38 @@
     <header class="page-head">
       <h1>Down &amp; Connor Collated Bulletin</h1>
       <nav class="view-switch" aria-label="Bulletin view">
-        <a class="is-active" href="#text-bulletin">Text Bulletin</a>
+        <button type="button" class="is-active" data-panel="original-pdf">Original PDF</button>
         <span class="sep" aria-hidden="true">|</span>
-        <a href="#original-pdf">Original PDF</a>
+        <button type="button" data-panel="text-bulletin">Text Bulletin</button>
       </nav>
     </header>
 
-    <section class="section" id="text-bulletin" aria-label="Text bulletin">
-      <div class="section-meta">
-        <h2 class="section-title">Text Bulletin</h2>
-        <a class="section-link" href="https://raphoe-diocese.github.io/parish_harvester/bulletins/down_and_connor-2026-07-26-ocr.html" target="_blank" rel="noopener noreferrer">Open full text</a>
-      </div>
-      <iframe
-        class="ocr-embed"
-        src="https://raphoe-diocese.github.io/parish_harvester/bulletins/down_and_connor-2026-07-26-ocr.html?embed=1"
-        title="Down &amp; Connor text bulletin"
-        width="100%"
-        loading="lazy"
-      ></iframe>
-    </section>
-
-    <p class="disclaimer">Auto-generated text may contain errors — check the original PDF when accuracy matters.</p>
-
-    <section class="section" id="original-pdf" aria-label="Original PDF">
+    <section class="panel-section" id="original-pdf" aria-label="Original PDF">
       <div class="section-meta">
         <h2 class="section-title">Original PDF</h2>
         <a class="section-link" href="../../mega_pdf/down_and_connor_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer">Open original PDF</a>
       </div>
-      <div class="pdf-preview">
+      <div class="viewer-shell pdf-shell">
         <iframe src="../../mega_pdf/down_and_connor_mega_bulletin.pdf" title="Collated bulletin PDF preview"></iframe>
       </div>
     </section>
+
+    <section class="panel-section" id="text-bulletin" aria-label="Text bulletin" hidden>
+      <div class="section-meta">
+        <h2 class="section-title">Text Bulletin</h2>
+        <a class="section-link" href="https://raphoe-diocese.github.io/parish_harvester/bulletins/down_and_connor-2026-07-26-ocr.html" target="_blank" rel="noopener noreferrer">Open full text</a>
+      </div>
+      <div class="viewer-shell ocr-shell">
+        <iframe
+          src="https://raphoe-diocese.github.io/parish_harvester/bulletins/down_and_connor-2026-07-26-ocr.html?embed=1"
+          title="Down &amp; Connor text bulletin"
+          width="100%"
+          loading="lazy"
+        ></iframe>
+      </div>
+    </section>
+
+    <p class="disclaimer">Auto-generated text may contain errors — check the original PDF when accuracy matters. Irish and bilingual wording is kept as printed.</p>
 
     <section class="parish-section">
       <details class="parish-accordion"><summary class="parish-accordion-toggle">Working links</summary><ul class="parish-link-grid"><li><a href="https://www.aghagallonandballinderryparish.ie/newsletter/" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li><a href="https://www.antrimparish.com/bulletinpage/" target="_blank" rel="noopener noreferrer">Antrim</a></li><li><a href="https://www.ballycastleparish.com/bulletins" target="_blank" rel="noopener noreferrer">Ballycastle</a></li><li><a href="https://ballyclareballygowan.com/notice%20board.htm" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li><a href="https://ballymenaparish.org/bulletin-and-parish-documents/" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li><a href="http://www.ballymoneyparish.com/news_and_events.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li><a href="https://www.bangorparish.com/parish-bulletin/" target="_blank" rel="noopener noreferrer">Bangor</a></li><li><a href="https://parishofbright.net/bulletin/" target="_blank" rel="noopener noreferrer">Bright</a></li><li><a href="https://www.carrickparish.org/info" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li><a href="https://www.christtheredeemer.co.uk/parish-bulletin" target="_blank" rel="noopener noreferrer">Christ the Redeemer</a></li><li><a href="https://www.corpuschristiparishbelfast.com/news" target="_blank" rel="noopener noreferrer">Corpus Christi Belfast</a></li><li><a href="https://derriaghycatholicparish.com/?page_id=262" target="_blank" rel="noopener noreferrer">Derriaghy</a></li><li><a href="https://www.drumbocarryduff.ie/#sbp-bulletin" target="_blank" rel="noopener noreferrer">Drumbo and Carryduff</a></li><li><a href="https://www.dunsfordandardglassparish.com/?page_id=623" target="_blank" rel="noopener noreferrer">Dunsford and Ardglass</a></li><li><a href="https://glenariffeparish.org/whats-on" target="_blank" rel="noopener noreferrer">Glenariffe</a></li><li><a href="https://www.glenavyandkilleadparish.com/bulletins/" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li><a href="https://www.parishofhannahstown.com/weekly-bulletins" target="_blank" rel="noopener noreferrer">Hannahstown</a></li><li><a href="http://www.holycrossparishbelfast.com/parishnews.html" target="_blank" rel="noopener noreferrer">Holy Cross Belfast</a></li><li><a href="https://www.holy-familyparish.com/bulletin/" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li><a href="https://www.holyrosaryparishbelfast.net/weekly-bulletin" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li><a href="https://holytrinityparishbelfast.com/newsletters/" target="_blank" rel="noopener noreferrer">Holy Trinity Belfast</a></li><li><a href="https://www.kilmoreandkillyleagh.com/latest-notices--downloads.html" target="_blank" rel="noopener noreferrer">Kilmore and Killyleagh</a></li><li><a href="https://parishoflisburn.org/about/" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li><a href="https://www.loughshoreparishes.org/sunday-bulletin/" target="_blank" rel="noopener noreferrer">Loughshore</a></li><li><a href="https://www.parishofmaghera.com/" target="_blank" rel="noopener noreferrer">Maghera</a></li><li><a href="https://www.nativityparish.com/news" target="_blank" rel="noopener noreferrer">Nativity</a></li><li><a href="https://www.ourladyqueenofpeacekilwee.com/bulletins" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li><a href="https://stmarysportglenone.org/?page_id=40" target="_blank" rel="noopener noreferrer">Port Glenone (St Mary&#x27;s Portglenone)</a></li><li><a href="https://portaferryparish.com/bulletin" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li><a href="http://portstewartparish.website/bulletins/" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li><a href="https://www.sacredheartparishbelfast.com/Parish-Bulletins/" target="_blank" rel="noopener noreferrer">Sacred Heart Belfast</a></li><li><a href="https://www.saintannesparish.net/bulletins/" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li><a href="https://saintanthonys.uk/parish-bulletin/" target="_blank" rel="noopener noreferrer">Saint Anthony</a></li><li><a href="https://www.saintmalachysparish.com/" target="_blank" rel="noopener noreferrer">Saint Malachy&#x27;s</a></li><li><a href="https://www.saulandballeeparish.com/" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li><a href="https://www.stagnesbelfast.com/?p=6069" target="_blank" rel="noopener noreferrer">St Agnes Belfast</a></li><li><a href="https://www.stbernadettesparish.org/?page_id=672" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li><a href="https://stbrigidsparishbelfast.org/bulletins" target="_blank" rel="noopener noreferrer">St Brigids Belfast</a></li><li><a href="https://st-colmcilles.net/weekly-bulletins/past-weeks-bulletins/" target="_blank" rel="noopener noreferrer">St Colmcilles</a></li><li><a href="https://stgerardsparish.org/" target="_blank" rel="noopener noreferrer">St Gerards</a></li><li><a href="https://www.stlukesparishbelfast.com/news" target="_blank" rel="noopener noreferrer">St Luke&#x27;s Belfast</a></li><li><a href="https://www.stmacnissirandalstown.com/bulletin" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li><a href="https://www.stmarysbelfast.org/news" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Belfast</a></li><li><a href="https://www.stmarysonthehill.online/" target="_blank" rel="noopener noreferrer">St Mary&#x27;s on the Hill</a></li><li><a href="https://www.stmatthewsparish.com/news" target="_blank" rel="noopener noreferrer">St Matthew&#x27;s</a></li><li><a href="https://saintmichaelthearchangel.godaddysites.com/" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li><a href="https://stoliverplunkettparish.ie/bulletins/" target="_blank" rel="noopener noreferrer">St Oliver Plunkett</a></li><li><a href="https://stpatricksdownpatrick.com/parish-bulletins/" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li><li><a href="https://www.stpatricksbelfast.org/category/weekly-bulletins/" target="_blank" rel="noopener noreferrer">St Patricks Belfast</a></li><li><a href="https://stteresasparish.church/parish-news/" target="_blank" rel="noopener noreferrer">St Teresas</a></li><li><a href="https://www.stvincentdepaulparishbelfast.com/news" target="_blank" rel="noopener noreferrer">St Vincent de Paul Belfast</a></li></ul></details>
@@ -237,13 +251,26 @@
           else window.location.href = '../../index.html';
         });
       }
-      document.querySelectorAll('.view-switch a[href^="#"]').forEach(function (link) {
-        link.addEventListener('click', function () {
-          document.querySelectorAll('.view-switch a').forEach(function (a) {
-            a.classList.toggle('is-active', a === link);
-          });
+      var buttons = document.querySelectorAll('.view-switch button[data-panel]');
+      var panels = {
+        'original-pdf': document.getElementById('original-pdf'),
+        'text-bulletin': document.getElementById('text-bulletin')
+      };
+      function showPanel(id) {
+        Object.keys(panels).forEach(function (key) {
+          if (!panels[key]) return;
+          panels[key].hidden = key !== id;
+        });
+        buttons.forEach(function (btn) {
+          btn.classList.toggle('is-active', btn.getAttribute('data-panel') === id);
+        });
+      }
+      buttons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          showPanel(btn.getAttribute('data-panel'));
         });
       });
+      showPanel('original-pdf');
     })();
   </script>
 </body>

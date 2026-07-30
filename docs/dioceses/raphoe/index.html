@@ -8,6 +8,7 @@
     * { box-sizing: border-box; }
     :root {
       --bg: #ffffff;
+      --panel: #f8fafc;
       --text: #222222;
       --muted: #666666;
       --border: #e5e7eb;
@@ -20,6 +21,7 @@
       color: var(--text);
       -webkit-text-size-adjust: 100%;
       line-height: 1.5;
+      overflow-x: hidden;
     }
     .page {
       max-width: min(1280px, 100%);
@@ -47,7 +49,7 @@
     }
     header.page-head h1 {
       margin: 0 0 10px;
-      font-size: 1.4rem;
+      font-size: 1.35rem;
       font-weight: 600;
       color: var(--accent);
       letter-spacing: -0.01em;
@@ -60,15 +62,21 @@
       font-size: 0.9rem;
       font-weight: 600;
     }
-    .view-switch a {
+    .view-switch button {
+      border: 0;
+      background: transparent;
+      padding: 0;
+      font: inherit;
+      font-weight: 600;
       color: var(--muted);
-      text-decoration: none;
+      cursor: pointer;
     }
-    .view-switch a:hover,
-    .view-switch a.is-active { color: var(--accent); }
-    .view-switch a.is-active { text-decoration: underline; }
+    .view-switch button:hover,
+    .view-switch button.is-active { color: var(--accent); }
+    .view-switch button.is-active { text-decoration: underline; }
     .view-switch .sep { color: var(--border); font-weight: 400; }
-    .section { margin: 0 0 32px; }
+    .panel-section { margin: 0 0 28px; }
+    .panel-section[hidden] { display: none !important; }
     .section-meta {
       display: flex;
       flex-wrap: wrap;
@@ -90,28 +98,30 @@
       text-decoration: none;
     }
     .section-link:hover { text-decoration: underline; }
-    .ocr-embed {
+    .viewer-shell {
       width: 100%;
-      height: max(80vh, calc(100vh - 180px));
-      min-height: 80vh;
-      border: 1px solid #e5e7eb;
-      border-radius: 8px;
-      background: #fff;
-      display: block;
-    }
-    .pdf-preview {
+      height: 85vh;
+      min-height: 850px;
       border: 1px solid var(--border);
       border-radius: 8px;
       overflow: hidden;
       background: #fafafa;
-      height: max(80vh, 900px);
-      min-height: 900px;
     }
-    .pdf-preview iframe {
+    .viewer-shell.pdf-shell { background: #fafafa; }
+    .viewer-shell.ocr-shell {
+      background: var(--panel);
+      padding: 10px;
+    }
+    .viewer-shell iframe {
       width: 100%;
       height: 100%;
       border: 0;
       display: block;
+      background: #fff;
+      border-radius: 6px;
+    }
+    .ocr-shell iframe {
+      border: 1px solid var(--border);
     }
     .disclaimer {
       margin: 0 0 20px;
@@ -168,15 +178,18 @@
     }
     .site-footer a { color: var(--accent); text-decoration: none; }
     .site-footer a:hover { text-decoration: underline; }
-    @media (max-width: 800px) {
+    @media (max-width: 900px) {
+      .viewer-shell {
+        height: 75vh;
+        min-height: 75vh;
+      }
       .parish-link-grid { columns: 2; }
-      .pdf-preview { min-height: 70vh; height: 70vh; }
-      .ocr-embed { min-height: 70vh; height: 70vh; }
     }
     @media (max-width: 520px) {
       .page { padding: 16px 12px 32px; }
-      header.page-head h1 { font-size: 1.25rem; }
+      header.page-head h1 { font-size: 1.2rem; }
       .parish-link-grid { columns: 1; }
+      .ocr-shell { padding: 6px; }
     }
   </style>
 </head>
@@ -186,37 +199,38 @@
     <header class="page-head">
       <h1>Raphoe Collated Bulletin</h1>
       <nav class="view-switch" aria-label="Bulletin view">
-        <a class="is-active" href="#text-bulletin">Text Bulletin</a>
+        <button type="button" class="is-active" data-panel="original-pdf">Original PDF</button>
         <span class="sep" aria-hidden="true">|</span>
-        <a href="#original-pdf">Original PDF</a>
+        <button type="button" data-panel="text-bulletin">Text Bulletin</button>
       </nav>
     </header>
 
-    <section class="section" id="text-bulletin" aria-label="Text bulletin">
-      <div class="section-meta">
-        <h2 class="section-title">Text Bulletin</h2>
-        <a class="section-link" href="https://raphoe-diocese.github.io/parish_harvester/bulletins/raphoe-2026-07-26-ocr.html" target="_blank" rel="noopener noreferrer">Open full text</a>
-      </div>
-      <iframe
-        class="ocr-embed"
-        src="https://raphoe-diocese.github.io/parish_harvester/bulletins/raphoe-2026-07-26-ocr.html?embed=1"
-        title="Raphoe text bulletin"
-        width="100%"
-        loading="lazy"
-      ></iframe>
-    </section>
-
-    <p class="disclaimer">Auto-generated text may contain errors — check the original PDF when accuracy matters.</p>
-
-    <section class="section" id="original-pdf" aria-label="Original PDF">
+    <section class="panel-section" id="original-pdf" aria-label="Original PDF">
       <div class="section-meta">
         <h2 class="section-title">Original PDF</h2>
         <a class="section-link" href="../../mega_pdf/raphoe_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer">Open original PDF</a>
       </div>
-      <div class="pdf-preview">
+      <div class="viewer-shell pdf-shell">
         <iframe src="../../mega_pdf/raphoe_mega_bulletin.pdf" title="Collated bulletin PDF preview"></iframe>
       </div>
     </section>
+
+    <section class="panel-section" id="text-bulletin" aria-label="Text bulletin" hidden>
+      <div class="section-meta">
+        <h2 class="section-title">Text Bulletin</h2>
+        <a class="section-link" href="https://raphoe-diocese.github.io/parish_harvester/bulletins/raphoe-2026-07-26-ocr.html" target="_blank" rel="noopener noreferrer">Open full text</a>
+      </div>
+      <div class="viewer-shell ocr-shell">
+        <iframe
+          src="https://raphoe-diocese.github.io/parish_harvester/bulletins/raphoe-2026-07-26-ocr.html?embed=1"
+          title="Raphoe text bulletin"
+          width="100%"
+          loading="lazy"
+        ></iframe>
+      </div>
+    </section>
+
+    <p class="disclaimer">Auto-generated text may contain errors — check the original PDF when accuracy matters. Irish and bilingual wording is kept as printed.</p>
 
     <section class="parish-section">
       <details class="parish-accordion"><summary class="parish-accordion-toggle">Working links</summary><ul class="parish-link-grid"><li><a href="https://annagryparish.ie/newsletter-2/" target="_blank" rel="noopener noreferrer">Annagry</a></li><li><a href="http://ardara.ie/news/" target="_blank" rel="noopener noreferrer">Ardara</a></li><li><a href="https://www.facebook.com/donalquinn1959" target="_blank" rel="noopener noreferrer">Ballintra Parish</a></li><li><a href="https://drive.google.com/drive/folders/1jPOi4GRU22vAxeKNe5Y_doBJ3riPh7ZK" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li><a href="https://www.steunanscathedral.ie/newsletter/" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li><a href="https://www.parishpress.net/wp-content/uploads/parish-bulletins/donegal/raphoe/drumholm-parish/bulletin.pdf?t=1782303743" target="_blank" rel="noopener noreferrer">Drumholm</a></li><li><a href="https://mcn.live/Camera/holy-cross-church" target="_blank" rel="noopener noreferrer">Dunfanaghy</a></li><li><a href="https://naomhfionan.com/nuachtlitir/" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li><a href="https://drive.google.com/file/d/1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa/view" target="_blank" rel="noopener noreferrer">Gartan/Termon</a></li><li><a href="https://www.glenfin-parish.com/#sbp-bulletin" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li><a href="https://drive.google.com/file/d/14aLAxt4mv7eYBvYx2GGthpsQnLrsysmK/view" target="_blank" rel="noopener noreferrer">Glenties</a></li><li><a href="https://www.parishpress.net/wp-content/uploads/parish-bulletins/donegal/raphoe/gort-a-choirce/bulletin.pdf?t=1771000171" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li><a href="https://www.inverparish.com/parish-newsletter.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li><a href="https://drive.google.com/file/d/1m6sOGz3dECWvbbpXCnRGdHG77yWiLXxR/view" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li><a href="https://www.kilbarron.org/bulletin" target="_blank" rel="noopener noreferrer">Kilbarron</a></li><li><a href="https://www.mcn.live/Camera/st-carthas-church-kilcar,-f94-h2y5" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li><a href="https://mcn.live/Camera/st-mary-of-the-visitation-church-killybegs" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li><a href="https://drive.google.com/file/d/1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa/view" target="_blank" rel="noopener noreferrer">Kilmacrenan</a></li><li><a href="https://www.kincasslagh.ie/?post_type=kbp_bulletins" target="_blank" rel="noopener noreferrer">Kincasslagh</a></li><li><a href="https://www.facebook.com/profile.php?id=100079250566866" target="_blank" rel="noopener noreferrer">Mevagh</a></li><li><a href="https://milfordrathmullanparishes.ie/bulletins/" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li><a href="https://newtownkilleaparish.ie/bulletin/" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li><a href="https://drive.google.com/file/d/1jmslbrliw1BTtdrxHbqpUbhQEf6wXHy5/view" target="_blank" rel="noopener noreferrer">Raphoe</a></li><li><a href="https://milfordrathmullanparishes.ie/bulletins/" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li><a href="https://www.stranorlarparish.ie/newsletter/" target="_blank" rel="noopener noreferrer">Stranolar</a></li><li><a href="https://tawnawillyparish.ie/bulletin/" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li><a href="https://drive.google.com/file/d/1Hh7w-Ew0vLJUFMihFiVzVJGhjeYposIH/view" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul></details>
@@ -237,13 +251,26 @@
           else window.location.href = '../../index.html';
         });
       }
-      document.querySelectorAll('.view-switch a[href^="#"]').forEach(function (link) {
-        link.addEventListener('click', function () {
-          document.querySelectorAll('.view-switch a').forEach(function (a) {
-            a.classList.toggle('is-active', a === link);
-          });
+      var buttons = document.querySelectorAll('.view-switch button[data-panel]');
+      var panels = {
+        'original-pdf': document.getElementById('original-pdf'),
+        'text-bulletin': document.getElementById('text-bulletin')
+      };
+      function showPanel(id) {
+        Object.keys(panels).forEach(function (key) {
+          if (!panels[key]) return;
+          panels[key].hidden = key !== id;
+        });
+        buttons.forEach(function (btn) {
+          btn.classList.toggle('is-active', btn.getAttribute('data-panel') === id);
+        });
+      }
+      buttons.forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          showPanel(btn.getAttribute('data-panel'));
         });
       });
+      showPanel('original-pdf');
     })();
   </script>
 </body>
