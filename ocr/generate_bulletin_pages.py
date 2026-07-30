@@ -543,7 +543,7 @@ def render_ocr_standalone_page(
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
   <title>{html.escape(config.display_name)} Text Bulletin — {html.escape(uk_bulletin_date)}</title>
   <style>
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
@@ -568,10 +568,21 @@ def render_ocr_standalone_page(
     .title-line {{
       font-size: 1.05rem; font-weight: 700; color: {TEXT};
     }}
+    .font-size-controls {{
+      display: inline-flex; align-items: center; gap: 4px; margin-left: auto;
+      font-family: system-ui, sans-serif;
+    }}
+    .font-size-controls .fs-label {{ font-size: 0.72rem; color: #64748b; margin-right: 2px; }}
+    .font-size-controls button {{
+      min-width: 36px; min-height: 36px; border: 1px solid {TEAL}; border-radius: 4px;
+      background: #fff; color: {TEAL}; font-weight: 700; font-family: Georgia, serif;
+      cursor: pointer; padding: 0 6px;
+    }}
     .ocr-body {{
       background: #fff;
       padding: 0;
       max-width: 100%;
+      font-size: calc(1.05rem * var(--ocr-scale, 1));
     }}
     .ocr-body h1, .ocr-body h2 {{ color: {DEEP_TEAL}; margin: 0.7em 0 0.2em; font-weight: 700; font-size: 1.15em; }}
     .ocr-body h3, .ocr-body h4 {{ color: {TEAL}; margin: 0.6em 0 0.15em; font-weight: 700; }}
@@ -684,6 +695,12 @@ def render_ocr_standalone_page(
     <div class="top">
       <a class="back-link" href="{html.escape(viewer_href, quote=True)}">← Viewer</a>
       <span class="title-line">{html.escape(diocese_label)} Text Bulletin · {html.escape(uk_bulletin_date)}</span>
+      <div class="font-size-controls" role="group" aria-label="Text size">
+        <span class="fs-label">Size</span>
+        <button type="button" data-ocr-font="-1" aria-label="Smaller text">A−</button>
+        <button type="button" data-ocr-font="0" aria-label="Default text size">A</button>
+        <button type="button" data-ocr-font="1" aria-label="Larger text">A+</button>
+      </div>
     </div>
     <div class="search-panel" role="search">
       <div class="ocr-search-bar">
@@ -702,6 +719,38 @@ def render_ocr_standalone_page(
     <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
   </div>
   <script>
+    (function () {{
+      var KEY = 'ph_ocr_scale';
+      var scales = [0.9, 1, 1.15, 1.35, 1.55];
+      var root = document.getElementById('ocr-text');
+      if (!root) return;
+      function apply(scale) {{
+        root.style.setProperty('--ocr-scale', String(scale));
+        try {{ localStorage.setItem(KEY, String(scale)); }} catch (e) {{}}
+      }}
+      var saved = 1;
+      try {{
+        var raw = localStorage.getItem(KEY);
+        if (raw) saved = parseFloat(raw) || 1;
+      }} catch (e) {{}}
+      if (scales.indexOf(saved) < 0) {{
+        saved = scales.reduce(function (best, s) {{
+          return Math.abs(s - saved) < Math.abs(best - saved) ? s : best;
+        }}, 1);
+      }}
+      apply(saved);
+      document.querySelectorAll('[data-ocr-font]').forEach(function (btn) {{
+        btn.addEventListener('click', function () {{
+          var dir = parseInt(btn.getAttribute('data-ocr-font'), 10);
+          var idx = scales.indexOf(parseFloat(getComputedStyle(root).getPropertyValue('--ocr-scale')) || saved);
+          if (idx < 0) idx = scales.indexOf(saved);
+          if (dir === 0) idx = 1;
+          else idx = Math.max(0, Math.min(scales.length - 1, idx + dir));
+          saved = scales[idx];
+          apply(saved);
+        }});
+      }});
+    }})();
     (function () {{
       const ocrRoot = document.getElementById('ocr-text');
       const ocrSearch = document.getElementById('ocr-search');
@@ -981,11 +1030,20 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
       padding: 14px 16px 22px;
       background: white;
       font-family: Georgia, "Times New Roman", Times, serif;
-      font-size: 1.08rem;
+      font-size: calc(1.08rem * var(--ocr-scale, 1));
       line-height: 1.38;
       color: {TEXT};
       max-width: min(52rem, 100%);
       margin: 0 auto;
+    }}
+    .font-size-controls {{
+      display: inline-flex; align-items: center; gap: 4px;
+    }}
+    .font-size-controls .fs-label {{ font-size: 0.72rem; color: #64748b; margin-right: 2px; }}
+    .font-size-controls button {{
+      min-width: 36px; min-height: 36px; border: 1px solid {TEAL}; border-radius: 4px;
+      background: #fff; color: {TEAL}; font-weight: 700; font-family: Georgia, serif;
+      cursor: pointer; padding: 0 6px;
     }}
     #ocr-panel h1, #ocr-panel h2 {{
       color: {DEEP_TEAL};
@@ -1239,6 +1297,12 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
       <!-- OCR Panel -->
       <div id="panel-ocr" class="view-panel">
         <div class="panel-toolbar">
+          <div class="font-size-controls" role="group" aria-label="Text size">
+            <span class="fs-label">Size</span>
+            <button type="button" data-ocr-font="-1" aria-label="Smaller text">A−</button>
+            <button type="button" data-ocr-font="0" aria-label="Default text size">A</button>
+            <button type="button" data-ocr-font="1" aria-label="Larger text">A+</button>
+          </div>
           <a class="toolbar-btn" href="{ocr_standalone_href}" target="_blank" rel="noopener noreferrer">↗ Open bulletin text in new tab</a>
         </div>
         <div class="ocr-search-bar">
@@ -1299,6 +1363,39 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
       button.classList.add('active');
       button.setAttribute('aria-selected', 'true');
     }}
+
+    (function () {{
+      var KEY = 'ph_ocr_scale';
+      var scales = [0.9, 1, 1.15, 1.35, 1.55];
+      var root = document.getElementById('ocr-panel');
+      if (!root) return;
+      function apply(scale) {{
+        root.style.setProperty('--ocr-scale', String(scale));
+        try {{ localStorage.setItem(KEY, String(scale)); }} catch (e) {{}}
+      }}
+      var saved = 1;
+      try {{
+        var raw = localStorage.getItem(KEY);
+        if (raw) saved = parseFloat(raw) || 1;
+      }} catch (e) {{}}
+      if (scales.indexOf(saved) < 0) {{
+        saved = scales.reduce(function (best, s) {{
+          return Math.abs(s - saved) < Math.abs(best - saved) ? s : best;
+        }}, 1);
+      }}
+      apply(saved);
+      document.querySelectorAll('[data-ocr-font]').forEach(function (btn) {{
+        btn.addEventListener('click', function () {{
+          var dir = parseInt(btn.getAttribute('data-ocr-font'), 10);
+          var idx = scales.indexOf(parseFloat(getComputedStyle(root).getPropertyValue('--ocr-scale')) || saved);
+          if (idx < 0) idx = scales.indexOf(saved);
+          if (dir === 0) idx = 1;
+          else idx = Math.max(0, Math.min(scales.length - 1, idx + dir));
+          saved = scales[idx];
+          apply(saved);
+        }});
+      }});
+    }})();
 
     (function () {{
       const ocrPanel = document.getElementById('ocr-panel');

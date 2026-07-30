@@ -66,7 +66,7 @@ Extension Send & test
 
 Until this list is finished, do **not** start other work. Park new ideas for a later list.
 
-1. **OCR reader** — tight modern text, no duplicate words, compact layout (in progress)
+1. **OCR reader** — almost done (magnification + Working links polish in progress)
 2. **Problems console** — full work-queue polish
 3. **Recipe success** — one parish at a time
 4. **parishpress.ie** — live DNS/Pages when user is ready

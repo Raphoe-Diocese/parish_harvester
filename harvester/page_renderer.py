@@ -59,7 +59,7 @@ def _render_parish_accordion(parish_links: list[dict]) -> str:
 
     return (
         '<details class="parish-accordion">'
-        '<summary class="parish-accordion-toggle">Show parish bulletin links (A–Z)</summary>'
+        '<summary class="parish-accordion-toggle">Working links</summary>'
         f'<ul class="parish-link-grid">{"".join(items)}</ul>'
         "</details>"
     )

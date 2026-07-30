@@ -165,11 +165,20 @@
       padding: 14px 16px 22px;
       background: white;
       font-family: Georgia, "Times New Roman", Times, serif;
-      font-size: 1.08rem;
+      font-size: calc(1.08rem * var(--ocr-scale, 1));
       line-height: 1.38;
       color: #1a1a2e;
       max-width: min(52rem, 100%);
       margin: 0 auto;
+    }
+    .font-size-controls {
+      display: inline-flex; align-items: center; gap: 4px;
+    }
+    .font-size-controls .fs-label { font-size: 0.72rem; color: #64748b; margin-right: 2px; }
+    .font-size-controls button {
+      min-width: 36px; min-height: 36px; border: 1px solid #1a6b6b; border-radius: 4px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-family: Georgia, serif;
+      cursor: pointer; padding: 0 6px;
     }
     #ocr-panel h1, #ocr-panel h2 {
       color: #14524f;
@@ -423,6 +432,12 @@
       <!-- OCR Panel -->
       <div id="panel-ocr" class="view-panel">
         <div class="panel-toolbar">
+          <div class="font-size-controls" role="group" aria-label="Text size">
+            <span class="fs-label">Size</span>
+            <button type="button" data-ocr-font="-1" aria-label="Smaller text">A−</button>
+            <button type="button" data-ocr-font="0" aria-label="Default text size">A</button>
+            <button type="button" data-ocr-font="1" aria-label="Larger text">A+</button>
+          </div>
           <a class="toolbar-btn" href="down_and_connor-2026-07-26-ocr.html" target="_blank" rel="noopener noreferrer">↗ Open bulletin text in new tab</a>
         </div>
         <div class="ocr-search-bar">
@@ -442,6 +457,10 @@
     <a class="parish-source" href="https://www.aghagallonandballinderryparish.ie" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
   <div class="parish-body"><p>Parish newsletter ↗<br>
+Parish newsletter ↗<br>
+Parish newsletter ↗<br>
+No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
+Antrim<br>
 Parish newsletter ↗<br>
 No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
 Antrim<br>
@@ -471,6 +490,7 @@ No searchable bulletin text for this parish this week. Use the newsletter link f
     <a class="parish-source" href="https://ballyclareballygowan.com/notice%20board.htm" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
   <div class="parish-body"><p>Parish newsletter ↗<br>
+Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 <a href="https://ballyclareballygowan.com" target="_blank" rel="noopener noreferrer">https://ballyclareballygowan.com</a><br>
 Page 4<br>
@@ -591,6 +611,13 @@ Amen</p></div>
   </summary>
   <div class="parish-body"><p>Parish newsletter ↗<br>
 Parish newsletter ↗<br>
+Parish newsletter ↗<br>
+No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
+Bangor<br>
+Parish newsletter ↗<br>
+No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
+Bright<br>
+Parish newsletter ↗<br>
 No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
 Bangor<br>
 Parish newsletter ↗<br>
@@ -674,6 +701,7 @@ No searchable bulletin text for this parish this week. Use the newsletter link f
     <a class="parish-source" href="https://www.glenavyandkilleadparish.com" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
   <div class="parish-body"><p>Parish newsletter ↗<br>
+Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 Page 6<br>
 27– 3 May 2026 Mass Intentions<br>
@@ -997,6 +1025,10 @@ essential. Visit An Evening With Samuel Munayer</p></div>
   </summary>
   <div class="parish-body"><p>Parish newsletter ↗<br>
 Parish newsletter ↗<br>
+Parish newsletter ↗<br>
+No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
+Lisburn<br>
+Parish newsletter ↗<br>
 No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
 Lisburn<br>
 Parish newsletter ↗<br>
@@ -1018,6 +1050,7 @@ No searchable bulletin text for this parish this week. Use the newsletter link f
     <a class="parish-source" href="https://www.loughshoreparishes.org/sunday-bulletin/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
   <div class="parish-body"><p>Parish newsletter ↗<br>
+Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 <a href="https://www.loughshoreparishes.org" target="_blank" rel="noopener noreferrer">https://www.loughshoreparishes.org</a><br>
 Page 9<br>
@@ -1283,6 +1316,9 @@ Parish newsletter ↗<br>
 No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
 Maghera<br>
 Parish newsletter ↗<br>
+No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
+Maghera<br>
+Parish newsletter ↗<br>
 No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-maghera" open>
@@ -1520,6 +1556,39 @@ No searchable bulletin text for this parish this week. Use the newsletter link f
       button.classList.add('active');
       button.setAttribute('aria-selected', 'true');
     }
+
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var scales = [0.9, 1, 1.15, 1.35, 1.55];
+      var root = document.getElementById('ocr-panel');
+      if (!root) return;
+      function apply(scale) {
+        root.style.setProperty('--ocr-scale', String(scale));
+        try { localStorage.setItem(KEY, String(scale)); } catch (e) {}
+      }
+      var saved = 1;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) saved = parseFloat(raw) || 1;
+      } catch (e) {}
+      if (scales.indexOf(saved) < 0) {
+        saved = scales.reduce(function (best, s) {
+          return Math.abs(s - saved) < Math.abs(best - saved) ? s : best;
+        }, 1);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-font]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-font'), 10);
+          var idx = scales.indexOf(parseFloat(getComputedStyle(root).getPropertyValue('--ocr-scale')) || saved);
+          if (idx < 0) idx = scales.indexOf(saved);
+          if (dir === 0) idx = 1;
+          else idx = Math.max(0, Math.min(scales.length - 1, idx + dir));
+          saved = scales[idx];
+          apply(saved);
+        });
+      });
+    })();
 
     (function () {
       const ocrPanel = document.getElementById('ocr-panel');
