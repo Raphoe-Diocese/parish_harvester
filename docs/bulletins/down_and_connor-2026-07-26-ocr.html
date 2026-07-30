@@ -27,21 +27,30 @@
     .title-line {
       font-size: 1.05rem; font-weight: 700; color: #1a1a2e;
     }
-    .font-size-controls {
-      display: inline-flex; align-items: center; gap: 4px; margin-left: auto;
+    .font-size-controls { display: none; }
+    .ocr-zoom-bar {
+      position: sticky; top: 0; z-index: 6;
+      display: flex; justify-content: center; align-items: center; gap: 10px;
+      margin: 0 0 8px; padding: 6px 10px;
+      background: rgba(248, 250, 250, 0.97);
+      border: 1px solid #e2e8f0; border-radius: 6px;
       font-family: system-ui, sans-serif;
     }
-    .font-size-controls .fs-label { font-size: 0.72rem; color: #64748b; margin-right: 2px; }
-    .font-size-controls button {
-      min-width: 36px; min-height: 36px; border: 1px solid #1a6b6b; border-radius: 4px;
-      background: #fff; color: #1a6b6b; font-weight: 700; font-family: Georgia, serif;
-      cursor: pointer; padding: 0 6px;
+    .ocr-zoom-bar button {
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 4px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.15rem; cursor: pointer;
     }
+    .ocr-zoom-pct {
+      min-width: 3.5rem; text-align: center; font-weight: 700; font-size: 0.95rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.72rem; color: #64748b; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 6px; } }
     .ocr-body {
       background: #fff;
       padding: 0;
       max-width: 100%;
       font-size: calc(1.05rem * var(--ocr-scale, 1));
+      touch-action: pan-x pan-y pinch-zoom;
     }
     .ocr-body h1, .ocr-body h2 { color: #14524f; margin: 0.7em 0 0.2em; font-weight: 700; font-size: 1.15em; }
     .ocr-body h3, .ocr-body h4 { color: #1a6b6b; margin: 0.6em 0 0.15em; font-weight: 700; }
@@ -154,12 +163,12 @@
     <div class="top">
       <a class="back-link" href="down_and_connor-2026-07-26.html">← Viewer</a>
       <span class="title-line">DOWN &amp; CONNOR Text Bulletin · 26/07/2026</span>
-      <div class="font-size-controls" role="group" aria-label="Text size">
-        <span class="fs-label">Size</span>
-        <button type="button" data-ocr-font="-1" aria-label="Smaller text">A−</button>
-        <button type="button" data-ocr-font="0" aria-label="Default text size">A</button>
-        <button type="button" data-ocr-font="1" aria-label="Larger text">A+</button>
-      </div>
+    </div>
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+      <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+      <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+      <span class="ocr-zoom-hint">or pinch to zoom</span>
     </div>
     <div class="search-panel" role="search">
       <div class="ocr-search-bar">
@@ -182,6 +191,10 @@
   <div class="parish-body"><p>Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 Parish newsletter ↗<br>
+Parish newsletter ↗<br>
+No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
+Antrim<br>
+Parish newsletter ↗<br>
 No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
 Antrim<br>
 Parish newsletter ↗<br>
@@ -198,14 +211,14 @@ No searchable bulletin text for this parish this week. Use the newsletter link f
     <span class="parish-name">Antrim</span>
     <a class="parish-source" href="https://www.antrimparish.com/bulletinpage/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-ballycastleparish" open>
   <summary class="parish-head">
     <span class="parish-name">Ballycastle</span>
     <a class="parish-source" href="https://www.ballycastleparish.com/s/12th-April-2026.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-ballyclareballygowan">
   <summary class="parish-head">
@@ -213,6 +226,7 @@ No searchable bulletin text for this parish this week. Use the newsletter link f
     <a class="parish-source" href="https://ballyclareballygowan.com/notice%20board.htm" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
   <div class="parish-body"><p>Parish newsletter ↗<br>
+Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 <a href="https://ballyclareballygowan.com" target="_blank" rel="noopener noreferrer">https://ballyclareballygowan.com</a><br>
@@ -325,7 +339,7 @@ Amen</p></div>
     <span class="parish-name">Ballymena</span>
     <a class="parish-source" href="https://ballymenaparish.org" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-ballymoneyparish">
   <summary class="parish-head">
@@ -334,6 +348,13 @@ Amen</p></div>
   </summary>
   <div class="parish-body"><p>Parish newsletter ↗<br>
 Parish newsletter ↗<br>
+Parish newsletter ↗<br>
+Parish newsletter ↗<br>
+No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
+Bangor<br>
+Parish newsletter ↗<br>
+No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
+Bright<br>
 Parish newsletter ↗<br>
 No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
 Bangor<br>
@@ -360,63 +381,63 @@ No searchable bulletin text for this parish this week. Use the newsletter link f
     <span class="parish-name">Bangor</span>
     <a class="parish-source" href="https://www.bangorparish.com" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-bright" open>
   <summary class="parish-head">
     <span class="parish-name">Bright</span>
     <a class="parish-source" href="https://parishofbright.net/wp-content/uploads/2026/04/Bulletin-5-04-2026.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-carrickfergus" open>
   <summary class="parish-head">
     <span class="parish-name">Carrickfergus</span>
     <a class="parish-source" href="https://www.carrickparish.org" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-christtheredeemer" open>
   <summary class="parish-head">
     <span class="parish-name">Christ the Redeemer</span>
     <a class="parish-source" href="https://www.christtheredeemer.co.uk/parish-bulletin" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-corpuschristiparishbelfast" open>
   <summary class="parish-head">
     <span class="parish-name">Corpus Christi Belfast</span>
     <a class="parish-source" href="https://www.corpuschristiparishbelfast.com/news" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-derriaghy" open>
   <summary class="parish-head">
     <span class="parish-name">Derriaghy</span>
     <a class="parish-source" href="https://derriaghycatholicparish.com" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-drumbocarryduff" open>
   <summary class="parish-head">
     <span class="parish-name">Drumbo and Carryduff</span>
     <a class="parish-source" href="https://www.drumbocarryduff.ie/#sbp-bulletin" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-dunsfordandardglassparish" open>
   <summary class="parish-head">
     <span class="parish-name">Dunsford and Ardglass</span>
     <a class="parish-source" href="https://www.dunsfordandardglassparish.com/?page_id=623" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-glenariffeparish" open>
   <summary class="parish-head">
     <span class="parish-name">Glenariffe</span>
     <a class="parish-source" href="https://glenariffeparish.org/whats-on" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-glenavyandkilleadparish">
   <summary class="parish-head">
@@ -424,6 +445,7 @@ No searchable bulletin text for this parish this week. Use the newsletter link f
     <a class="parish-source" href="https://www.glenavyandkilleadparish.com" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
   <div class="parish-body"><p>Parish newsletter ↗<br>
+Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 Page 6<br>
@@ -711,35 +733,35 @@ essential. Visit An Evening With Samuel Munayer</p></div>
     <span class="parish-name">Hannahstown</span>
     <a class="parish-source" href="https://www.parishofhannahstown.com/weekly-bulletins" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-holycrossbelfast" open>
   <summary class="parish-head">
     <span class="parish-name">Holy Cross Belfast</span>
     <a class="parish-source" href="http://www.holycrossparishbelfast.com/pdf/120426.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-holy-familyparish" open>
   <summary class="parish-head">
     <span class="parish-name">Holy Family</span>
     <a class="parish-source" href="https://www.holy-familyparish.com/bulletin/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-holyrosarybelfast" open>
   <summary class="parish-head">
     <span class="parish-name">Holy Rosary Belfast</span>
     <a class="parish-source" href="https://www.holyrosaryparishbelfast.net/weekly-bulletin" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-holytrinityparishbelfast" open>
   <summary class="parish-head">
     <span class="parish-name">Holy Trinity Belfast</span>
     <a class="parish-source" href="https://holytrinityparishbelfast.com/newsletters/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-kilmoreandkillyleagh">
   <summary class="parish-head">
@@ -748,6 +770,10 @@ essential. Visit An Evening With Samuel Munayer</p></div>
   </summary>
   <div class="parish-body"><p>Parish newsletter ↗<br>
 Parish newsletter ↗<br>
+Parish newsletter ↗<br>
+Parish newsletter ↗<br>
+No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
+Lisburn<br>
 Parish newsletter ↗<br>
 No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
 Lisburn<br>
@@ -765,7 +791,7 @@ No searchable bulletin text for this parish this week. Use the newsletter link f
     <span class="parish-name">Lisburn</span>
     <a class="parish-source" href="https://parishoflisburn.org" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-loughshore">
   <summary class="parish-head">
@@ -773,6 +799,7 @@ No searchable bulletin text for this parish this week. Use the newsletter link f
     <a class="parish-source" href="https://www.loughshoreparishes.org/sunday-bulletin/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
   <div class="parish-body"><p>Parish newsletter ↗<br>
+Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 <a href="https://www.loughshoreparishes.org" target="_blank" rel="noopener noreferrer">https://www.loughshoreparishes.org</a><br>
@@ -1042,6 +1069,9 @@ Parish newsletter ↗<br>
 No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
 Maghera<br>
 Parish newsletter ↗<br>
+No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
+Maghera<br>
+Parish newsletter ↗<br>
 No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-maghera" open>
@@ -1049,221 +1079,226 @@ No searchable bulletin text for this parish this week. Use the newsletter link f
     <span class="parish-name">Maghera</span>
     <a class="parish-source" href="https://www.parishofmaghera.com/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-nativityparish" open>
   <summary class="parish-head">
     <span class="parish-name">Nativity</span>
     <a class="parish-source" href="https://www.nativityparish.com/news" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-ourladyqueenofpeace" open>
   <summary class="parish-head">
     <span class="parish-name">Our Lady Queen of Peace</span>
     <a class="parish-source" href="https://www.ourladyqueenofpeacekilwee.com/bulletins" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-portglenonestmarysportglenone" open>
   <summary class="parish-head">
     <span class="parish-name">Port Glenone (St Mary&#x27;s Portglenone)</span>
     <a class="parish-source" href="https://stmarysportglenone.org/?page_id=40" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-portaferryparish" open>
   <summary class="parish-head">
     <span class="parish-name">Portaferry</span>
     <a class="parish-source" href="https://portaferryparish.com/bulletin" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-portstewartparish" open>
   <summary class="parish-head">
     <span class="parish-name">Portstewart</span>
     <a class="parish-source" href="http://portstewartparish.website/bulletins/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-sacredheartbelfast" open>
   <summary class="parish-head">
     <span class="parish-name">Sacred Heart Belfast</span>
     <a class="parish-source" href="https://www.sacredheartparishbelfast.com/gallery/Parish%20Bulletin%2012th%20April%202026.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-saintannesparish" open>
   <summary class="parish-head">
     <span class="parish-name">Saint Annes</span>
     <a class="parish-source" href="https://www.saintannesparish.net" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-saintanthony" open>
   <summary class="parish-head">
     <span class="parish-name">Saint Anthony</span>
     <a class="parish-source" href="https://saintanthonys.uk/parish-bulletin/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-saintmalachysparish" open>
   <summary class="parish-head">
     <span class="parish-name">Saint Malachy&#x27;s</span>
     <a class="parish-source" href="https://www.saintmalachysparish.com/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-saulandballeeparish" open>
   <summary class="parish-head">
     <span class="parish-name">Saul and Ballee</span>
     <a class="parish-source" href="https://www.saulandballeeparish.com" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-stagnesbelfast" open>
   <summary class="parish-head">
     <span class="parish-name">St Agnes Belfast</span>
     <a class="parish-source" href="https://www.stagnesbelfast.com/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-stbernadettesparish" open>
   <summary class="parish-head">
     <span class="parish-name">St Bernadettes</span>
     <a class="parish-source" href="https://www.stbernadettesparish.org/bulletin/uploaded/Parish%20Bulletin%2012th%20April%202026.pdf" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-stbrigidsbelfast" open>
   <summary class="parish-head">
     <span class="parish-name">St Brigids Belfast</span>
     <a class="parish-source" href="https://stbrigidsparishbelfast.org" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-st-colmcilles" open>
   <summary class="parish-head">
     <span class="parish-name">St Colmcilles</span>
     <a class="parish-source" href="https://st-colmcilles.net/weekly-bulletins/past-weeks-bulletins/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-stgerardsparish" open>
   <summary class="parish-head">
     <span class="parish-name">St Gerards</span>
     <a class="parish-source" href="https://stgerardsparish.org/parish-news-events/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-stlukesparishbelfast" open>
   <summary class="parish-head">
     <span class="parish-name">St Luke&#x27;s Belfast</span>
     <a class="parish-source" href="https://www.stlukesparishbelfast.com/news" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-stmacnissirandalstown" open>
   <summary class="parish-head">
     <span class="parish-name">St MacNissi Randalstown</span>
     <a class="parish-source" href="https://www.stmacnissirandalstown.com/bulletin" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-stmarysbelfast" open>
   <summary class="parish-head">
     <span class="parish-name">St Mary&#x27;s Belfast</span>
     <a class="parish-source" href="https://www.stmarysbelfast.org/news" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-stmarysonthehill" open>
   <summary class="parish-head">
     <span class="parish-name">St Mary&#x27;s on the Hill</span>
     <a class="parish-source" href="https://www.stmarysonthehill.online/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-stmatthewsparish" open>
   <summary class="parish-head">
     <span class="parish-name">St Matthew&#x27;s</span>
     <a class="parish-source" href="https://www.stmatthewsparish.com/news" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-stmichaelthearchangel" open>
   <summary class="parish-head">
     <span class="parish-name">St Michael the Archangel</span>
     <a class="parish-source" href="https://saintmichaelthearchangel.godaddysites.com/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-stoliverplunkettparish" open>
   <summary class="parish-head">
     <span class="parish-name">St Oliver Plunkett</span>
     <a class="parish-source" href="https://stoliverplunkettparish.ie" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-stpatricksdownpatrick" open>
   <summary class="parish-head">
     <span class="parish-name">St Patrick&#x27;s Downpatrick</span>
     <a class="parish-source" href="https://stpatricksdownpatrick.com/parish-bulletins/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-stpatricksbelfast" open>
   <summary class="parish-head">
     <span class="parish-name">St Patricks Belfast</span>
     <a class="parish-source" href="https://www.stpatricksbelfast.org/category/weekly-bulletins/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-stteresasparish" open>
   <summary class="parish-head">
     <span class="parish-name">St Teresas</span>
     <a class="parish-source" href="https://stteresasparish.church/parish-news/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-stvincentdepaulparishbelfast" open>
   <summary class="parish-head">
     <span class="parish-name">St Vincent de Paul Belfast</span>
     <a class="parish-source" href="https://www.stvincentdepaulparishbelfast.com/news" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details></div>
     <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
   </div>
   <script>
     (function () {
       var KEY = 'ph_ocr_scale';
-      var scales = [0.9, 1, 1.15, 1.35, 1.55];
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
       var root = document.getElementById('ocr-text');
+      var label = document.getElementById('ocr-zoom-pct');
       if (!root) return;
-      function apply(scale) {
-        root.style.setProperty('--ocr-scale', String(scale));
-        try { localStorage.setItem(KEY, String(scale)); } catch (e) {}
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
       }
-      var saved = 1;
+      var saved = 100;
       try {
         var raw = localStorage.getItem(KEY);
-        if (raw) saved = parseFloat(raw) || 1;
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
       } catch (e) {}
-      if (scales.indexOf(saved) < 0) {
-        saved = scales.reduce(function (best, s) {
-          return Math.abs(s - saved) < Math.abs(best - saved) ? s : best;
-        }, 1);
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
       }
       apply(saved);
-      document.querySelectorAll('[data-ocr-font]').forEach(function (btn) {
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
         btn.addEventListener('click', function () {
-          var dir = parseInt(btn.getAttribute('data-ocr-font'), 10);
-          var idx = scales.indexOf(parseFloat(getComputedStyle(root).getPropertyValue('--ocr-scale')) || saved);
-          if (idx < 0) idx = scales.indexOf(saved);
-          if (dir === 0) idx = 1;
-          else idx = Math.max(0, Math.min(scales.length - 1, idx + dir));
-          saved = scales[idx];
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
           apply(saved);
         });
       });

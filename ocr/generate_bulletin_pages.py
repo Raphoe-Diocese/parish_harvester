@@ -313,8 +313,7 @@ def build_az_parish_ocr_html(
             open_attr = ""
         else:
             body_html = (
-                '<p class="parish-empty">No searchable bulletin text for this parish this week. '
-                "Use the newsletter link for the original.</p>"
+                '<p class="parish-empty">No text this week — use the newsletter link.</p>'
             )
             # Leave empty parishes open so readers see the newsletter link without hunting.
             open_attr = " open"
@@ -568,21 +567,30 @@ def render_ocr_standalone_page(
     .title-line {{
       font-size: 1.05rem; font-weight: 700; color: {TEXT};
     }}
-    .font-size-controls {{
-      display: inline-flex; align-items: center; gap: 4px; margin-left: auto;
+    .font-size-controls {{ display: none; }}
+    .ocr-zoom-bar {{
+      position: sticky; top: 0; z-index: 6;
+      display: flex; justify-content: center; align-items: center; gap: 10px;
+      margin: 0 0 8px; padding: 6px 10px;
+      background: rgba(248, 250, 250, 0.97);
+      border: 1px solid #e2e8f0; border-radius: 6px;
       font-family: system-ui, sans-serif;
     }}
-    .font-size-controls .fs-label {{ font-size: 0.72rem; color: #64748b; margin-right: 2px; }}
-    .font-size-controls button {{
-      min-width: 36px; min-height: 36px; border: 1px solid {TEAL}; border-radius: 4px;
-      background: #fff; color: {TEAL}; font-weight: 700; font-family: Georgia, serif;
-      cursor: pointer; padding: 0 6px;
+    .ocr-zoom-bar button {{
+      min-width: 40px; min-height: 40px; border: 1px solid {TEAL}; border-radius: 4px;
+      background: #fff; color: {TEAL}; font-weight: 700; font-size: 1.15rem; cursor: pointer;
     }}
+    .ocr-zoom-pct {{
+      min-width: 3.5rem; text-align: center; font-weight: 700; font-size: 0.95rem; color: {DEEP_TEAL};
+    }}
+    .ocr-zoom-hint {{ display: none; font-size: 0.72rem; color: #64748b; }}
+    @media (pointer: coarse) {{ .ocr-zoom-hint {{ display: inline; margin-left: 6px; }} }}
     .ocr-body {{
       background: #fff;
       padding: 0;
       max-width: 100%;
       font-size: calc(1.05rem * var(--ocr-scale, 1));
+      touch-action: pan-x pan-y pinch-zoom;
     }}
     .ocr-body h1, .ocr-body h2 {{ color: {DEEP_TEAL}; margin: 0.7em 0 0.2em; font-weight: 700; font-size: 1.15em; }}
     .ocr-body h3, .ocr-body h4 {{ color: {TEAL}; margin: 0.6em 0 0.15em; font-weight: 700; }}
@@ -695,12 +703,12 @@ def render_ocr_standalone_page(
     <div class="top">
       <a class="back-link" href="{html.escape(viewer_href, quote=True)}">← Viewer</a>
       <span class="title-line">{html.escape(diocese_label)} Text Bulletin · {html.escape(uk_bulletin_date)}</span>
-      <div class="font-size-controls" role="group" aria-label="Text size">
-        <span class="fs-label">Size</span>
-        <button type="button" data-ocr-font="-1" aria-label="Smaller text">A−</button>
-        <button type="button" data-ocr-font="0" aria-label="Default text size">A</button>
-        <button type="button" data-ocr-font="1" aria-label="Larger text">A+</button>
-      </div>
+    </div>
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+      <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+      <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+      <span class="ocr-zoom-hint">or pinch to zoom</span>
     </div>
     <div class="search-panel" role="search">
       <div class="ocr-search-bar">
@@ -721,32 +729,37 @@ def render_ocr_standalone_page(
   <script>
     (function () {{
       var KEY = 'ph_ocr_scale';
-      var scales = [0.9, 1, 1.15, 1.35, 1.55];
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
       var root = document.getElementById('ocr-text');
+      var label = document.getElementById('ocr-zoom-pct');
       if (!root) return;
-      function apply(scale) {{
-        root.style.setProperty('--ocr-scale', String(scale));
-        try {{ localStorage.setItem(KEY, String(scale)); }} catch (e) {{}}
+      function apply(pct) {{
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try {{ localStorage.setItem(KEY, String(pct)); }} catch (e) {{}}
       }}
-      var saved = 1;
+      var saved = 100;
       try {{
         var raw = localStorage.getItem(KEY);
-        if (raw) saved = parseFloat(raw) || 1;
+        if (raw) {{
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }}
       }} catch (e) {{}}
-      if (scales.indexOf(saved) < 0) {{
-        saved = scales.reduce(function (best, s) {{
-          return Math.abs(s - saved) < Math.abs(best - saved) ? s : best;
-        }}, 1);
+      if (percents.indexOf(saved) < 0) {{
+        saved = percents.reduce(function (best, p) {{
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }}, 100);
       }}
       apply(saved);
-      document.querySelectorAll('[data-ocr-font]').forEach(function (btn) {{
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {{
         btn.addEventListener('click', function () {{
-          var dir = parseInt(btn.getAttribute('data-ocr-font'), 10);
-          var idx = scales.indexOf(parseFloat(getComputedStyle(root).getPropertyValue('--ocr-scale')) || saved);
-          if (idx < 0) idx = scales.indexOf(saved);
-          if (dir === 0) idx = 1;
-          else idx = Math.max(0, Math.min(scales.length - 1, idx + dir));
-          saved = scales[idx];
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
           apply(saved);
         }});
       }});
@@ -867,7 +880,7 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
 <html lang="en">
 <head>
   <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
   <title>{html.escape(config.display_name)} Bulletin Viewer — {html.escape(uk_bulletin_date)}</title>
   <style>
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
@@ -1021,6 +1034,23 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
       font-size: 0.9rem;
       font-weight: 600;
     }}
+    .font-size-controls {{ display: none; }}
+    .ocr-zoom-bar {{
+      position: sticky; top: 0; z-index: 6;
+      display: flex; justify-content: center; align-items: center; gap: 10px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(248, 250, 250, 0.97);
+      border: 1px solid #e2e8f0; border-radius: 6px;
+    }}
+    .ocr-zoom-bar button {{
+      min-width: 40px; min-height: 40px; border: 1px solid {TEAL}; border-radius: 4px;
+      background: #fff; color: {TEAL}; font-weight: 700; font-size: 1.15rem; cursor: pointer;
+    }}
+    .ocr-zoom-pct {{
+      min-width: 3.5rem; text-align: center; font-weight: 700; font-size: 0.95rem; color: {DEEP_TEAL};
+    }}
+    .ocr-zoom-hint {{ display: none; font-size: 0.72rem; color: #64748b; }}
+    @media (pointer: coarse) {{ .ocr-zoom-hint {{ display: inline; margin-left: 6px; }} }}
     #ocr-panel {{
       height: calc(100vh - 280px);
       min-height: 60vh;
@@ -1035,15 +1065,7 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
       color: {TEXT};
       max-width: min(52rem, 100%);
       margin: 0 auto;
-    }}
-    .font-size-controls {{
-      display: inline-flex; align-items: center; gap: 4px;
-    }}
-    .font-size-controls .fs-label {{ font-size: 0.72rem; color: #64748b; margin-right: 2px; }}
-    .font-size-controls button {{
-      min-width: 36px; min-height: 36px; border: 1px solid {TEAL}; border-radius: 4px;
-      background: #fff; color: {TEAL}; font-weight: 700; font-family: Georgia, serif;
-      cursor: pointer; padding: 0 6px;
+      touch-action: pan-x pan-y pinch-zoom;
     }}
     #ocr-panel h1, #ocr-panel h2 {{
       color: {DEEP_TEAL};
@@ -1297,13 +1319,13 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
       <!-- OCR Panel -->
       <div id="panel-ocr" class="view-panel">
         <div class="panel-toolbar">
-          <div class="font-size-controls" role="group" aria-label="Text size">
-            <span class="fs-label">Size</span>
-            <button type="button" data-ocr-font="-1" aria-label="Smaller text">A−</button>
-            <button type="button" data-ocr-font="0" aria-label="Default text size">A</button>
-            <button type="button" data-ocr-font="1" aria-label="Larger text">A+</button>
-          </div>
           <a class="toolbar-btn" href="{ocr_standalone_href}" target="_blank" rel="noopener noreferrer">↗ Open bulletin text in new tab</a>
+        </div>
+        <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+          <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+          <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+          <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+          <span class="ocr-zoom-hint">or pinch to zoom</span>
         </div>
         <div class="ocr-search-bar">
           <input id="ocr-search" class="search-input" type="search" placeholder="🔍 Search OCR text..." aria-label="Search OCR text" />
@@ -1366,32 +1388,37 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
 
     (function () {{
       var KEY = 'ph_ocr_scale';
-      var scales = [0.9, 1, 1.15, 1.35, 1.55];
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
       var root = document.getElementById('ocr-panel');
+      var label = document.getElementById('ocr-zoom-pct');
       if (!root) return;
-      function apply(scale) {{
-        root.style.setProperty('--ocr-scale', String(scale));
-        try {{ localStorage.setItem(KEY, String(scale)); }} catch (e) {{}}
+      function apply(pct) {{
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try {{ localStorage.setItem(KEY, String(pct)); }} catch (e) {{}}
       }}
-      var saved = 1;
+      var saved = 100;
       try {{
         var raw = localStorage.getItem(KEY);
-        if (raw) saved = parseFloat(raw) || 1;
+        if (raw) {{
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }}
       }} catch (e) {{}}
-      if (scales.indexOf(saved) < 0) {{
-        saved = scales.reduce(function (best, s) {{
-          return Math.abs(s - saved) < Math.abs(best - saved) ? s : best;
-        }}, 1);
+      if (percents.indexOf(saved) < 0) {{
+        saved = percents.reduce(function (best, p) {{
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }}, 100);
       }}
       apply(saved);
-      document.querySelectorAll('[data-ocr-font]').forEach(function (btn) {{
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {{
         btn.addEventListener('click', function () {{
-          var dir = parseInt(btn.getAttribute('data-ocr-font'), 10);
-          var idx = scales.indexOf(parseFloat(getComputedStyle(root).getPropertyValue('--ocr-scale')) || saved);
-          if (idx < 0) idx = scales.indexOf(saved);
-          if (dir === 0) idx = 1;
-          else idx = Math.max(0, Math.min(scales.length - 1, idx + dir));
-          saved = scales[idx];
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
           apply(saved);
         }});
       }});

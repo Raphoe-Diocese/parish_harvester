@@ -331,35 +331,59 @@
       line-height: 1.3;
     }
     .font-size-controls {
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      margin-left: auto;
+      display: none;
     }
-    .font-size-controls button {
-      min-width: 36px;
-      min-height: 36px;
+    .ocr-zoom-bar {
+      position: sticky;
+      top: 0;
+      z-index: 6;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 10px;
+      margin: 0 0 8px;
+      padding: 6px 10px;
+      background: rgba(248, 250, 250, 0.97);
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      backdrop-filter: blur(4px);
+    }
+    .ocr-zoom-bar button {
+      min-width: 40px;
+      min-height: 40px;
       border: 1px solid var(--teal);
       border-radius: 4px;
       background: #fff;
       color: var(--teal);
       font-weight: 700;
-      font-family: Georgia, "Times New Roman", serif;
+      font-size: 1.15rem;
+      line-height: 1;
       cursor: pointer;
-      padding: 0 6px;
     }
-    .font-size-controls button:hover { background: #f0f8f8; }
-    .font-size-controls .fs-label {
+    .ocr-zoom-bar button:hover { background: #f0f8f8; }
+    .ocr-zoom-pct {
+      min-width: 3.5rem;
+      text-align: center;
+      font-family: "Open Sans", Arial, Helvetica, sans-serif;
+      font-weight: 700;
+      font-size: 0.95rem;
+      color: var(--teal-dark);
+    }
+    .ocr-zoom-hint {
+      display: none;
       font-size: 0.72rem;
       color: var(--muted);
       font-family: "Open Sans", Arial, Helvetica, sans-serif;
-      margin-right: 2px;
+    }
+    @media (pointer: coarse) {
+      .ocr-zoom-hint { display: inline; margin-left: 6px; }
     }
     .ocr-body {
       font-family: Georgia, "Times New Roman", Times, serif;
       font-size: calc(1.05rem * var(--ocr-scale, 1));
       line-height: 1.38;
       max-width: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
     }
     .parish-section {
       margin-bottom: 20px;
@@ -441,7 +465,7 @@
       .page { padding-top: 8px; }
       .title-card { padding: 8px 10px; }
       .top-actions { gap: 6px; }
-      .go-ocr-btn, .download-link, .toolbar-btn { width: 100%; }
+      .go-ocr-btn, .toolbar-btn { width: 100%; }
       .viewer { min-height: 65vh; height: calc(100vh - 180px); }
       .ocr-viewer { min-height: 65vh; height: calc(100vh - 240px); }
       .parish-link-grid { columns: 1; }
@@ -456,7 +480,6 @@
 
     <div class="top-actions">
       <a class="go-ocr-btn" href="#ocr-section">Go to Text Bulletin</a>
-      <a class="download-link" href="../../mega_pdf/raphoe_mega_bulletin.pdf" download>Download PDF</a>
       <a class="toolbar-btn" href="../../mega_pdf/raphoe_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer">↗ Open PDF in new tab</a>
     </div>
 
@@ -470,13 +493,13 @@
     <section class="panel ocr-panel" id="ocr-section" aria-label="OCR plain text bulletin">
       <div class="ocr-panel-head">
         <h2>Text Bulletin</h2>
-        <div class="font-size-controls" role="group" aria-label="Text size">
-          <span class="fs-label">Size</span>
-          <button type="button" data-ocr-font="-1" aria-label="Smaller text">A−</button>
-          <button type="button" data-ocr-font="0" aria-label="Default text size">A</button>
-          <button type="button" data-ocr-font="1" aria-label="Larger text">A+</button>
-        </div>
         <a class="ocr-parish-url" href="../../bulletins/raphoe-2026-07-26-ocr.html" target="_blank" rel="noopener noreferrer">Full text ↗</a>
+      </div>
+      <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+        <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+        <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+        <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+        <span class="ocr-zoom-hint">or pinch to zoom</span>
       </div>
       <div class="ocr-search-bar">
         <input type="search" id="ocr-search" placeholder="Search bulletin text (e.g. mass, bingo, parish name)..." aria-label="Search bulletin text" />
@@ -494,35 +517,35 @@
     <span class="parish-name">Annagry</span>
     <a class="parish-source" href="https://annagryparish.ie/newsletter-2/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-ardara" open>
   <summary class="parish-head">
     <span class="parish-name">Ardara</span>
     <a class="parish-source" href="http://ardara.ie/news/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-ballintra" open>
   <summary class="parish-head">
     <span class="parish-name">Ballintra Parish</span>
     <a class="parish-source" href="https://www.facebook.com/donalquinn1959" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-drive-1rjeey-ayy" open>
   <summary class="parish-head">
     <span class="parish-name">Bruckless</span>
     <a class="parish-source" href="https://drive.google.com/drive/folders/1z9goh6DrkCUkpJMDbwfsi28Yc_t0_ltC" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-steunanscathedral" open>
   <summary class="parish-head">
     <span class="parish-name">Cathedral</span>
     <a class="parish-source" href="https://www.steunanscathedral.ie/newsletter/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-drumholm-parish">
   <summary class="parish-head">
@@ -530,6 +553,7 @@
     <a class="parish-source" href="https://www.parishpress.net/wp-content/uploads/parish-bulletins/donegal/raphoe/drumholm-parish/bulletin.pdf?t=1782303743" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
   <div class="parish-body"><p>Parish newsletter ↗<br>
+Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 Ballintra.<br>
@@ -649,6 +673,7 @@ Page 2</p></div>
     <a class="parish-source" href="https://mcn.live/Camera/holy-cross-church" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
   <div class="parish-body"><p>Parish newsletter ↗<br>
+Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 Page 3<br>
@@ -797,7 +822,7 @@ Kathleen on<br>
     <span class="parish-name">Falcarragh</span>
     <a class="parish-source" href="https://naomhfionan.com/nuachtlitir/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-drive-1kna8f6t54">
   <summary class="parish-head">
@@ -805,6 +830,7 @@ Kathleen on<br>
     <a class="parish-source" href="https://drive.usercontent.google.com/download?id=1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa&amp;export=download" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
   <div class="parish-body"><p>Parish newsletter ↗<br>
+Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 <a href="https://drive.google.com/file/d/1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa/view" target="_blank" rel="noopener noreferrer">https://drive.google.com/file/d/1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa/view</a><br>
@@ -1052,6 +1078,9 @@ Parish newsletter ↗<br>
 No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
 Glenfin<br>
 Parish newsletter ↗<br>
+No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
+Glenfin<br>
+Parish newsletter ↗<br>
 No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-glenfin-parish" open>
@@ -1059,14 +1088,14 @@ No searchable bulletin text for this parish this week. Use the newsletter link f
     <span class="parish-name">Glenfin</span>
     <a class="parish-source" href="https://www.glenfin-parish.com/#sbp-bulletin" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-drive-14alaxt4mv" open>
   <summary class="parish-head">
     <span class="parish-name">Glenties</span>
     <a class="parish-source" href="https://drive.usercontent.google.com/download?id=14aLAxt4mv7eYBvYx2GGthpsQnLrsysmK&amp;export=download" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-gort-a-choirce">
   <summary class="parish-head">
@@ -1074,6 +1103,7 @@ No searchable bulletin text for this parish this week. Use the newsletter link f
     <a class="parish-source" href="https://www.parishpress.net/wp-content/uploads/parish-bulletins/donegal/raphoe/gort-a-choirce/bulletin.pdf?t=1771000171" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
   <div class="parish-body"><p>Parish newsletter ↗<br>
+Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 Page 6<br>
@@ -1362,6 +1392,9 @@ Parish newsletter ↗<br>
 No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
 Inver<br>
 Parish newsletter ↗<br>
+No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
+Inver<br>
+Parish newsletter ↗<br>
 No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-inverparish" open>
@@ -1369,14 +1402,14 @@ No searchable bulletin text for this parish this week. Use the newsletter link f
     <span class="parish-name">Inver</span>
     <a class="parish-source" href="https://www.inverparish.com/parish-newsletter.html" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-drive-1m6sogz3de" open>
   <summary class="parish-head">
     <span class="parish-name">Irish Martyrs</span>
     <a class="parish-source" href="https://drive.usercontent.google.com/download?id=1m6sOGz3dECWvbbpXCnRGdHG77yWiLXxR&amp;export=download" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-kilbarron">
   <summary class="parish-head">
@@ -1384,6 +1417,7 @@ No searchable bulletin text for this parish this week. Use the newsletter link f
     <a class="parish-source" href="https://www.kilbarron.org/bulletin" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
   <div class="parish-body"><p>Parish newsletter ↗<br>
+Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 Page 9<br>
@@ -1641,6 +1675,9 @@ Parish newsletter ↗<br>
 No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
 Kilcar<br>
 Parish newsletter ↗<br>
+No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
+Kilcar<br>
+Parish newsletter ↗<br>
 No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-st-carthas-church-kilcar-f94-h2y5" open>
@@ -1648,7 +1685,7 @@ No searchable bulletin text for this parish this week. Use the newsletter link f
     <span class="parish-name">Kilcar</span>
     <a class="parish-source" href="https://www.mcn.live/Camera/st-carthas-church-kilcar,-f94-h2y5" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-st-mary-of-the-visitation-church-killybegs">
   <summary class="parish-head">
@@ -1656,6 +1693,7 @@ No searchable bulletin text for this parish this week. Use the newsletter link f
     <a class="parish-source" href="https://mcn.live/Camera/st-mary-of-the-visitation-church-killybegs" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
   <div class="parish-body"><p>Parish newsletter ↗<br>
+Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 Page 11<br>
@@ -1855,7 +1893,7 @@ on<br>
     <span class="parish-name">Kilmacrenan</span>
     <a class="parish-source" href="https://drive.google.com/file/d/1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa/view" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-kincasslagh">
   <summary class="parish-head">
@@ -1864,6 +1902,10 @@ on<br>
   </summary>
   <div class="parish-body"><p>Parish newsletter ↗<br>
 Parish newsletter ↗<br>
+Parish newsletter ↗<br>
+Parish newsletter ↗<br>
+No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
+Mevagh<br>
 Parish newsletter ↗<br>
 No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
 Mevagh<br>
@@ -1881,7 +1923,7 @@ No searchable bulletin text for this parish this week. Use the newsletter link f
     <span class="parish-name">Mevagh</span>
     <a class="parish-source" href="https://www.facebook.com/profile.php?id=100079250566866" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-milfordrathmullanparishes">
   <summary class="parish-head">
@@ -1889,6 +1931,7 @@ No searchable bulletin text for this parish this week. Use the newsletter link f
     <a class="parish-source" href="https://milfordrathmullanparishes.ie/bulletins/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
   <div class="parish-body"><p>Parish newsletter ↗<br>
+Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 Page 12<br>
@@ -1964,6 +2007,7 @@ provide a rich harvest, a hundred, or fifty, or thirty -fold. Amen</p></div>
     <a class="parish-source" href="https://newtownkilleaparish.ie/bulletin/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
   <div class="parish-body"><p>Parish newsletter ↗<br>
+Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
@@ -2132,6 +2176,9 @@ Parish newsletter ↗<br>
 No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
 Raphoe<br>
 Parish newsletter ↗<br>
+No searchable bulletin text for this parish this week. Use the newsletter link for the original.<br>
+Raphoe<br>
+Parish newsletter ↗<br>
 No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-drive-1jmslbrliw" open>
@@ -2139,21 +2186,21 @@ No searchable bulletin text for this parish this week. Use the newsletter link f
     <span class="parish-name">Raphoe</span>
     <a class="parish-source" href="https://drive.usercontent.google.com/download?id=1jmslbrliw1BTtdrxHbqpUbhQEf6wXHy5&amp;export=download" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-rathmullan" open>
   <summary class="parish-head">
     <span class="parish-name">Rathmullan</span>
     <a class="parish-source" href="https://milfordrathmullanparishes.ie/bulletins/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-even" id="parish-stranorlarparish" open>
   <summary class="parish-head">
     <span class="parish-name">Stranolar</span>
     <a class="parish-source" href="https://www.stranorlarparish.ie/newsletter/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
-  <div class="parish-body"><p class="parish-empty">No searchable bulletin text for this parish this week. Use the newsletter link for the original.</p></div>
+  <div class="parish-body"><p class="parish-empty">No text this week — use the newsletter link.</p></div>
 </details>
 <details class="parish-block parish-odd" id="parish-tawnawillyparish">
   <summary class="parish-head">
@@ -2161,6 +2208,7 @@ No searchable bulletin text for this parish this week. Use the newsletter link f
     <a class="parish-source" href="https://tawnawillyparish.ie/bulletin/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>
   </summary>
   <div class="parish-body"><p>Parish newsletter ↗<br>
+Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 Page 15<br>
@@ -2565,6 +2613,7 @@ Masses or Parish contributions</p></div>
   <div class="parish-body"><p>Parish newsletter ↗<br>
 Parish newsletter ↗<br>
 Parish newsletter ↗<br>
+Parish newsletter ↗<br>
 DUNGLOE -MEENACROSS -LEITIR -DOOCHARY<br>
 Fr. Pat Ward P.P<br>
 <a href="tel:+353749521008" style="color:#1d4ed8;font-weight:600;">074 95 21008</a><br>
@@ -2595,32 +2644,39 @@ The following parishes do not have a downloadable PDF bulletin. Click a link to 
   <script>
     (function () {
       var KEY = 'ph_ocr_scale';
-      var scales = [0.9, 1, 1.15, 1.35, 1.55];
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
       var root = document.getElementById('ocr-text') || document.querySelector('.ocr-body');
+      var label = document.getElementById('ocr-zoom-pct');
       if (!root) return;
-      function apply(scale) {
+      function apply(pct) {
+        var scale = pct / 100;
         root.style.setProperty('--ocr-scale', String(scale));
-        try { localStorage.setItem(KEY, String(scale)); } catch (e) {}
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
       }
-      var saved = 1;
+      var saved = 100;
       try {
         var raw = localStorage.getItem(KEY);
-        if (raw) saved = parseFloat(raw) || 1;
+        if (raw) {
+          var n = parseFloat(raw);
+          // migrate old 0.9–1.55 scale values
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
       } catch (e) {}
-      if (scales.indexOf(saved) < 0) {
-        saved = scales.reduce(function (best, s) {
-          return Math.abs(s - saved) < Math.abs(best - saved) ? s : best;
-        }, 1);
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
       }
       apply(saved);
-      document.querySelectorAll('[data-ocr-font]').forEach(function (btn) {
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
         btn.addEventListener('click', function () {
-          var dir = parseInt(btn.getAttribute('data-ocr-font'), 10);
-          var idx = scales.indexOf(parseFloat(getComputedStyle(root).getPropertyValue('--ocr-scale')) || saved);
-          if (idx < 0) idx = scales.indexOf(saved);
-          if (dir === 0) idx = 1;
-          else idx = Math.max(0, Math.min(scales.length - 1, idx + dir));
-          saved = scales[idx];
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
           apply(saved);
         });
       });
