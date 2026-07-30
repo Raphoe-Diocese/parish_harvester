@@ -243,6 +243,15 @@ def _load_parish_entries(diocese: str, parish_links: list[tuple[str, str]]) -> l
     return entries
 
 
+_UI_ARTEFACT_LINE = re.compile(
+    r"^(?:parish\s+newsletter\s*↗?|newsletter|"
+    r"no text this week.*|no searchable text available.*|"
+    r"no searchable bulletin text.*|"
+    r"page\s+\d+|\d+)$",
+    re.IGNORECASE,
+)
+
+
 def _strip_parish_title_lines(chunk: str, display_name: str, newsletter_url: str) -> str:
     """Remove stitcher banner lines (name + URL) already shown in the section header."""
     from ocr.parish_splitter import _name_patterns, _line_is_parish_marker
@@ -256,6 +265,8 @@ def _strip_parish_title_lines(chunk: str, display_name: str, newsletter_url: str
         if not stripped:
             if out and out[-1] != "":
                 out.append("")
+            continue
+        if _UI_ARTEFACT_LINE.match(stripped):
             continue
         if _line_is_parish_marker(stripped, patterns):
             continue
@@ -313,7 +324,7 @@ def build_az_parish_ocr_html(
             open_attr = ""
         else:
             body_html = (
-                '<p class="parish-empty">No text this week — use the newsletter link.</p>'
+                '<p class="parish-empty">No searchable text available this week.</p>'
             )
             # Leave empty parishes open so readers see the newsletter link without hunting.
             open_attr = " open"
@@ -324,7 +335,7 @@ def build_az_parish_ocr_html(
             safe_href = html.escape(url, quote=True)
             source = (
                 f'<a class="parish-source" href="{safe_href}" target="_blank" '
-                f'rel="noopener noreferrer" onclick="event.stopPropagation()">Parish newsletter ↗</a>'
+                f'rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>'
             )
         else:
             source = '<span class="parish-source muted">No newsletter URL</span>'

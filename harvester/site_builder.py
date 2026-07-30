@@ -358,45 +358,58 @@ def _ocr_text_from_viewer(path: Path | None) -> str:
 
 def _placeholder_page(diocese: DioceseCard, out_path: Path) -> None:
     parish_links = _parish_links(diocese.key)
-    parish_styles = ""
+    short = diocese.name.removesuffix(" Diocese").strip() or diocese.name
     parish_markup = ""
     if parish_links:
-        parish_styles = """
-    .parish-section { margin-top: 16px; background: #fff; border: 1px solid #d6ecea; border-radius: 12px; padding: 18px; }
-    .parish-section h2 { margin: 0 0 10px; color: #1a6b6b; font-size: 1rem; text-transform: uppercase; }
-    .parish-list { margin: 0; padding-left: 20px; columns: 2; }
-    .parish-list li { margin: 6px 0; }
-    .parish-list a { color: #1a6b6b; text-decoration: none; }
-    .parish-list a:hover { text-decoration: underline; }
-"""
         parish_markup = f"""
-    <section class=\"parish-section\">
-      <h2>{diocese.name.upper()} PARISH LINKS</h2>
+    <section class="parish-section">
+      <h2>Parish links</h2>
       {_render_placeholder_parish_links(parish_links)}
     </section>"""
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(
         f"""<!DOCTYPE html>
-<html lang=\"en\">
+<html lang="en">
 <head>
-  <meta charset=\"utf-8\" />
-  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
-  <title>{diocese.name} — Parish Press</title>
-  <link rel=\"stylesheet\" href=\"../../assets/site.css\" />
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{html.escape(diocese.name)} Collated Bulletin — Parish Press</title>
   <style>
-    body {{ font-family: Arial, Helvetica, sans-serif; margin: 0; background: #f7fbfb; color: #16202a; }}
-    .wrap {{ max-width: 920px; margin: 0 auto; padding: 22px 16px; }}
-    .headline {{ margin: 0 0 16px; background: #1a6b6b; color: #fff; padding: 14px 16px; text-transform: uppercase; }}
-    .card {{ background: #fff; border: 1px solid #d6ecea; border-radius: 12px; padding: 18px; }}
-{parish_styles}
+    * {{ box-sizing: border-box; }}
+    body {{
+      margin: 0;
+      font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+      background: #ffffff;
+      color: #222222;
+      line-height: 1.5;
+    }}
+    .wrap {{ max-width: 1100px; margin: 0 auto; padding: 28px 20px 40px; }}
+    h1 {{
+      margin: 0 0 16px;
+      padding: 0 0 16px;
+      border-bottom: 1px solid #e5e7eb;
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #1e3a5f;
+    }}
+    .note {{ margin: 0 0 24px; color: #666666; font-size: 1rem; }}
+    .parish-section h2 {{
+      margin: 0 0 12px;
+      font-size: 1.05rem;
+      font-weight: 600;
+      color: #1e3a5f;
+    }}
+    .parish-list {{ margin: 0; padding-left: 20px; columns: 2; column-gap: 28px; }}
+    .parish-list li {{ margin: 6px 0; break-inside: avoid; }}
+    .parish-list a {{ color: #1e3a5f; text-decoration: none; font-weight: 500; }}
+    .parish-list a:hover {{ text-decoration: underline; }}
+    @media (max-width: 520px) {{ .parish-list {{ columns: 1; }} }}
   </style>
 </head>
 <body>
-  <main class=\"wrap\">
-    <h1 class=\"headline\">{diocese.name.upper()} DIOCESE COLLATED BULLETIN</h1>
-    <section class=\"card\">
-      <p>We're still collecting bulletins for this diocese. Check back next Sunday.</p>
-    </section>
+  <main class="wrap">
+    <h1>{html.escape(short)} Collated Bulletin</h1>
+    <p class="note">We're still collecting bulletins for this diocese. Check back next Sunday.</p>
 {parish_markup}
   </main>
 </body>
@@ -593,7 +606,7 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
         if diocese.key in LIVE_DIOCESES and trained:
             parish_links = _parish_links_for_big_bulletin(diocese.key, report_path)
             ocr_text, ocr_is_html = _ocr_content_for_diocese(diocese.key)
-            display_upper = diocese.name.upper()
+            display_short = diocese.name.removesuffix(" Diocese").strip() or diocese.name
             render_diocese_raphoe_page(
                 parish_links=parish_links,
                 out_path=out_path,
@@ -604,8 +617,8 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
                 ocr_is_html=ocr_is_html,
                 week_label=week_label if target_date else "",
                 diocese_display_name=diocese.name,
-                headline=f"{display_upper} COLLATED BULLETIN",
-                parish_heading=f"{display_upper} PARISHES WITH WORKING BULLETIN LINKS",
+                headline=f"{display_short} Collated Bulletin",
+                parish_heading="Working parish links",
             )
             updated_label = format_uk_date(target_date) or target_date or "Coming soon"
         else:

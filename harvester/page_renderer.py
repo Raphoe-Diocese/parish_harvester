@@ -85,10 +85,59 @@ def _render_parish_dropdown(parish_links: list[dict]) -> str:
     )
 
 
+def _clean_embedded_ocr_html(fragment: str) -> str:
+    """Remove OCR UI artefacts before embedding on diocese pages."""
+    text = fragment or ""
+    text = re.sub(r'<p\s+class="page-label"[^>]*>.*?</p>', "", text, flags=re.I | re.S)
+    text = re.sub(r">Parish newsletter\s*↗?<", ">Newsletter<", text, flags=re.I)
+    # Normalize / strip repeated empty-state and newsletter lines inside bodies.
+    empty_msg = "No searchable text available this week."
+    text = re.sub(
+        r"No text this week\s*[—\-–]?\s*use the newsletter link\.?",
+        empty_msg,
+        text,
+        flags=re.I,
+    )
+    text = re.sub(
+        r"No searchable bulletin text for this parish this week\.[^.]*\.?",
+        empty_msg,
+        text,
+        flags=re.I,
+    )
+    text = re.sub(
+        r"(?:Parish newsletter\s*↗?|Newsletter)(?:\s*<br\s*/?>\s*)+",
+        "",
+        text,
+        flags=re.I,
+    )
+    text = re.sub(
+        rf"(?:{re.escape(empty_msg)}(?:\s*<br\s*/?>\s*)?)+",
+        empty_msg,
+        text,
+        flags=re.I,
+    )
+    # If a parish body is only the empty message (possibly glued to a name), normalize.
+    text = re.sub(
+        rf'(<div class="parish-body">)\s*<p[^>]*>\s*(?:{re.escape(empty_msg)})+\s*[A-Za-zÀ-ÿ\'’&\- ]{{0,40}}\s*(?:{re.escape(empty_msg)})*\s*</p>\s*(</div>)',
+        rf'\1<p class="parish-empty">{empty_msg}</p>\2',
+        text,
+        flags=re.I,
+    )
+    text = re.sub(
+        rf'(<div class="parish-body">)\s*<p(?![^>]*parish-empty)[^>]*>\s*{re.escape(empty_msg)}\s*</p>\s*(</div>)',
+        rf'\1<p class="parish-empty">{empty_msg}</p>\2',
+        text,
+        flags=re.I,
+    )
+    text = re.sub(r"<p>\s*</p>", "", text, flags=re.I)
+    return text.strip()
+
+
 def _build_ocr_block(ocr_text: str, *, ocr_is_html: bool = False) -> str:
     normalized = (ocr_text or "").strip() or EMPTY_OCR_TEXT
     if ocr_is_html:
-        return f'<div class="ocr-body" id="ocr-text">{normalized}</div>'
+        cleaned = _clean_embedded_ocr_html(normalized)
+        return f'<div class="ocr-body" id="ocr-text">{cleaned}</div>'
     return f'<pre class="ocr-pre" id="ocr-text">{html.escape(normalized)}</pre>'
 
 
@@ -101,8 +150,8 @@ def render_diocese_raphoe_page(
     ocr_is_html: bool = False,
     week_label: str = "",
     diocese_display_name: str = "Raphoe Diocese",
-    headline: str = "RAPHOE DIOCESE COLLATED BULLETIN",
-    parish_heading: str = "RAPHOE PARISHES WITH WORKING BULLETIN LINKS",
+    headline: str = "Raphoe Collated Bulletin",
+    parish_heading: str = "Working parish links",
     bulletin_viewer_url: str = "../../bulletins/index.html",
     ocr_standalone_url: str = "../../bulletins/index.html",
 ) -> None:
