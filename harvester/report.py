@@ -7,6 +7,7 @@ downloaded/html_links/failed counts.
 from __future__ import annotations
 
 import json
+import re
 import shutil
 from datetime import date, datetime, timezone
 from pathlib import Path
@@ -16,6 +17,33 @@ if TYPE_CHECKING:
     from .fetcher import FetchResult
 
 PARISHES_DIR = Path(__file__).resolve().parent.parent / "parishes"
+
+# Website error/security/captcha pages saved as a "PDF" always carry one of
+# these exact phrases and are always short. Deliberately narrow: this must
+# never trigger on "no extractable text", because scanned/photographed
+# bulletin PDFs (image_stack recipes) legitimately have no text layer at all
+# and are a real, working capture method — not junk.
+_ERROR_PAGE_PATTERN = re.compile(
+    r"(?i)(?:security\s*check|403\s*-?\s*forbidden|access denied|"
+    r"page not found|404\s*(?:error|not found)|verify you are human|"
+    r"i['\u2019]?m not a robot|unusual traffic|checking your browser|captcha)"
+)
+_ERROR_PAGE_MAX_CHARS = 1500
+
+
+def _pdf_error_page_reason(path: Path) -> str | None:
+    """Return a reason string if *path* is a scraped error/security page saved
+    as a PDF, else ``None``. Only matches on explicit junk phrases."""
+    try:
+        from PyPDF2 import PdfReader
+        reader = PdfReader(str(path))
+        for page in reader.pages:
+            text = page.extract_text() or ""
+            if len(text) <= _ERROR_PAGE_MAX_CHARS and _ERROR_PAGE_PATTERN.search(text):
+                return "Downloaded file looks like a website error/security page, not a bulletin PDF"
+    except Exception:
+        return None  # unreadable — leave it to other checks, don't guess
+    return None
 
 
 def _recipe_is_inactive(meta: dict | None) -> bool:
@@ -157,7 +185,19 @@ def generate_report(
                 "error": r.error,
             })
             continue
-        if r.status == "ok" and r.file_path and r.file_path.exists():
+        error_reason = (
+            _pdf_error_page_reason(r.file_path)
+            if r.status == "ok" and r.file_path and r.file_path.exists()
+            else None
+        )
+        if error_reason:
+            failed.append({
+                "parish": r.key,
+                "display_name": r.display_name,
+                "url": r.url,
+                "error": error_reason,
+            })
+        elif r.status == "ok" and r.file_path and r.file_path.exists():
             dest = current_dir / r.file_path.name
             shutil.copy2(r.file_path, dest)
             entry = {
@@ -267,6 +307,14 @@ def _result_to_report_entry(r: "FetchResult", current_dir: Path) -> tuple[str, d
             "error": r.error,
         }
     if r.status == "ok" and r.file_path and r.file_path.exists():
+        error_reason = _pdf_error_page_reason(r.file_path)
+        if error_reason:
+            return "failed", {
+                "parish": r.key,
+                "display_name": r.display_name,
+                "url": r.url,
+                "error": error_reason,
+            }
         dest = current_dir / r.file_path.name
         current_dir.mkdir(parents=True, exist_ok=True)
         if r.file_path.resolve() != dest.resolve():

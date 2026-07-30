@@ -335,8 +335,20 @@ def build_az_parish_ocr_html(
         return ""
     url_by_name = {name: url for name, url in parish_links}
     chunks = split_ocr_by_parish(ocr_text or "", entries)
+    # split_ocr_by_parish() returns every chunk empty only when it found zero
+    # parish-name markers anywhere in the text — i.e. OCR produced nothing
+    # usable for the whole diocese, not just one parish having no notice.
+    ocr_failed_whole_diocese = bool(entries) and not any(
+        (chunks.get(key) or "").strip() for key, _ in entries
+    )
     ordered = sorted(entries, key=lambda item: item[1].lower())
     sections: list[str] = []
+    if ocr_failed_whole_diocese:
+        sections.append(
+            '<div class="ocr-failed-banner" role="alert">'
+            "⚠️ OCR failed this week — use the original PDF above for the full text."
+            "</div>"
+        )
     for idx, (parish_key, display_name) in enumerate(ordered):
         url = url_by_name.get(display_name, "")
         raw_chunk = chunks.get(parish_key) or ""
@@ -780,6 +792,16 @@ def render_ocr_standalone_page(
       font-family: system-ui, sans-serif;
       font-style: normal;
       padding: 0;
+    }}
+    .ocr-failed-banner {{
+      margin: 10px 0;
+      padding: 10px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 6px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 13px;
     }}
     body.embed-mode .top {{ display: none !important; }}
     body.embed-mode .page {{ padding-top: 4px; }}
@@ -1316,6 +1338,16 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
       border: 0;
       color: #666666;
       font-weight: 400;
+      font-size: 13px;
+    }}
+    .ocr-failed-banner {{
+      margin: 10px 0;
+      padding: 10px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 6px;
+      color: #713f12;
+      font-weight: 600;
       font-size: 13px;
     }}
     .empty-state[hidden],

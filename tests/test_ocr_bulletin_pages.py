@@ -7,6 +7,7 @@ from pathlib import Path
 from ocr.generate_bulletin_pages import (
     DioceseConfig,
     _fragment_to_plain_text,
+    build_az_parish_ocr_html,
     extract_ocr_fragment,
     format_uk_date,
     parse_parish_links,
@@ -110,6 +111,44 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("Text Bulletin", html_output)
         self.assertIn("Ar dheis Dé go raibh a anam", html_output)
         self.assertIn("Gaeilge", html_output)
+
+
+    def test_az_parish_html_shows_failed_banner_when_no_markers_found(self) -> None:
+        parish_links = [
+            ("Ardara Parish", "https://example.com/ardara"),
+            ("Bangor Parish", "https://example.com/bangor"),
+        ]
+        # Garbage OCR text that names neither parish — simulates OCR failing
+        # for the whole diocese (e.g. a broken/blank OCR run).
+        html_output = build_az_parish_ocr_html("test", "asd asd asd 12345 !!!", parish_links)
+
+        self.assertIn("ocr-failed-banner", html_output)
+        self.assertIn("OCR failed this week", html_output)
+        # Existing per-parish empty-row behaviour must still be present.
+        self.assertIn("No searchable text available this week.", html_output)
+        self.assertIn("Ardara Parish", html_output)
+        self.assertIn("Bangor Parish", html_output)
+
+    def test_az_parish_html_no_banner_when_some_parishes_have_content(self) -> None:
+        parish_links = [
+            ("Ardara Parish", "https://example.com/ardara"),
+            ("Bangor Parish", "https://example.com/bangor"),
+        ]
+        ocr_text = (
+            "Ardara Parish\n"
+            "https://example.com/ardara\n"
+            "Mass times this week: Saturday 6pm, Sunday 11am.\n"
+            "Confessions after Saturday evening Mass.\n"
+            "Parish office open Monday to Friday, 10am-1pm.\n"
+            "Contact Fr Smith on 087 123 4567 for anointing of the sick.\n"
+        )
+        html_output = build_az_parish_ocr_html("test", ocr_text, parish_links)
+
+        self.assertNotIn("ocr-failed-banner", html_output)
+        # Bangor genuinely has no content this week — its own empty row
+        # must be preserved (item 4: don't touch short/empty real notices).
+        self.assertIn("No searchable text available this week.", html_output)
+        self.assertIn("Mass times this week", html_output)
 
 
 if __name__ == "__main__":

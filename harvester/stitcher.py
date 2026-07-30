@@ -32,6 +32,16 @@ _FILLER_PATTERN = re.compile(
 # catches truly blank pages (0 chars), dot/dash separator pages,
 # near-blank pages with only a page number, and control-character-only pages.
 _MIN_MEANINGFUL_CHARS = 30
+# Website error/security/captcha pages saved as a "PDF" (e.g. via print-to-PDF
+# on a blocked page) always carry one of these exact phrases and are always
+# short. Real bulletin pages never match this combination, so this only
+# rejects genuine junk — it never touches real (incl. Irish/bilingual) content.
+_ERROR_PAGE_PATTERN = re.compile(
+    r"(?i)(?:security\s*check|403\s*-?\s*forbidden|access denied|"
+    r"page not found|404\s*(?:error|not found)|verify you are human|"
+    r"i['\u2019]?m not a robot|unusual traffic|checking your browser|captcha)"
+)
+_ERROR_PAGE_MAX_CHARS = 1500
 # Parish bulletins are never longer than 4 pages.  Any PDF with more pages
 # is almost certainly a full document (parish magazine, booklet, etc.) that
 # was accidentally downloaded instead of the weekly bulletin.
@@ -252,6 +262,15 @@ def stitch_mega_pdf(
                         text = page.extract_text() or ""
                         meaningful = _FILLER_PATTERN.sub('', text)
                         if len(meaningful) < _MIN_MEANINGFUL_CHARS:
+                            continue
+                        if (
+                            len(meaningful) < _ERROR_PAGE_MAX_CHARS
+                            and _ERROR_PAGE_PATTERN.search(text)
+                        ):
+                            print(
+                                f"    ⚠️  Skipping a page for {parish_key}: looks like a "
+                                "website error/security page, not a bulletin"
+                            )
                             continue
                     except Exception:
                         pass  # If we can't extract text, include the page to be safe

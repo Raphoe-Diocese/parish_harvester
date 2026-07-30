@@ -12,6 +12,7 @@ from pathlib import Path
 from urllib.parse import parse_qs, unquote, urljoin, urlparse
 
 from playwright.async_api import Browser, Page, TimeoutError as PlaywrightTimeoutError
+from PyPDF2 import PdfReader
 
 from .cloud_folders import (
     is_cloud_folder_click_step,
@@ -26,7 +27,7 @@ from .cloud_urls import (
     normalize_document_url,
     unwrap_docs_viewer_url,
 )
-from .config import PAGE_LOAD_TIMEOUT_MS, PARISHES_DIR
+from .config import MAX_BULLETIN_PAGES, PAGE_LOAD_TIMEOUT_MS, PARISHES_DIR
 from .utils import (
     extract_date_from_string,
     extract_newsletter_number,
@@ -912,6 +913,26 @@ async def _print_page_to_pdf(page: Page, dest: Path) -> None:
     dest.write_bytes(pdf_bytes)
 
 
+def _verify_bulletin_pdf(dest: Path) -> None:
+    """Reject HTML/print captures that are too long to be a real weekly bulletin.
+
+    Mirrors ``fetcher._verify_bulletin_pdf`` so recipe-driven HTML/print_to_pdf
+    steps get the same page-count safety net as direct PDF downloads (previously
+    only the direct-download path was checked; the HTML print fallback below
+    could silently save a full multi-page article/site as the "bulletin").
+    """
+    try:
+        reader = PdfReader(str(dest))
+        page_count = len(reader.pages)
+    except Exception:
+        return  # unreadable — leave it to the caller's PDF checks
+    if page_count > MAX_BULLETIN_PAGES:
+        dest.unlink(missing_ok=True)
+        raise ValueError(
+            f"❌ Too many pages: {page_count} pages (max {MAX_BULLETIN_PAGES})"
+        )
+
+
 async def _smart_print_page_to_pdf(
     page: Page,
     dest: Path,
@@ -928,11 +949,13 @@ async def _smart_print_page_to_pdf(
         dest,
         target,
         print_pdf=_print_page_to_pdf,
+        verify_pdf=_verify_bulletin_pdf,
         wait_ms=wait_ms,
         skip_listing_nav=skip_listing_nav,
     )
     if not ok:
         await _print_page_to_pdf(page, dest)
+        _verify_bulletin_pdf(dest)
 
 
 def _recipe_uses_parish_messenger(recipe: dict) -> bool:
