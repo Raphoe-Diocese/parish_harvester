@@ -104,7 +104,7 @@ def render_diocese_raphoe_page(
     week_suffix = f" — {week_label}" if week_label else ""
     display = str(diocese_display_name or "Diocese").strip()
     payload = {
-        "page_title": html.escape(f"{display} Big Bulletin{week_suffix}"),
+        "page_title": html.escape(f"{display} Collated Bulletin{week_suffix}"),
         "headline": html.escape(headline),
         "mega_pdf_url": html.escape(mega_pdf_url, quote=True),
         "bulletin_viewer_url": html.escape(bulletin_viewer_url, quote=True),
