@@ -251,6 +251,28 @@ _UI_ARTEFACT_LINE = re.compile(
     re.IGNORECASE,
 )
 
+_SCRAPED_JUNK_LINE = re.compile(
+    r"(?i)(?:"
+    r"security\s*check|"
+    r"before we continue to download|"
+    r"i['’]?m a human|"
+    r"privacy\s*terms|"
+    r"403\s*-?\s*forbidden|"
+    r"access to this page is forbidden|"
+    r"404\.?\s*that['’]?s an error|"
+    r"requested url was not found|"
+    r"^not found\.?$|"
+    r"parameters you provided were not valid|"
+    r"download now and reclaim|"
+    r"secure your online searches|"
+    r"home\s+webcam\s+sacraments|"
+    r"copyright\s*©?\s*20\d{2}|"
+    r"all rights reserved|"
+    r"^sorry[,!]?\s+the parameters|"
+    r"^access denied$"
+    r")"
+)
+
 
 def _strip_parish_title_lines(chunk: str, display_name: str, newsletter_url: str) -> str:
     """Remove stitcher banner lines (name + URL) already shown in the section header."""
@@ -267,6 +289,8 @@ def _strip_parish_title_lines(chunk: str, display_name: str, newsletter_url: str
                 out.append("")
             continue
         if _UI_ARTEFACT_LINE.match(stripped):
+            continue
+        if _SCRAPED_JUNK_LINE.search(stripped):
             continue
         if _line_is_parish_marker(stripped, patterns):
             continue
@@ -575,18 +599,6 @@ def render_ocr_standalone_page(
       margin-bottom: 8px; font-family: Georgia, "Times New Roman", Times, serif;
     }}
     .top-left {{ display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }}
-    .top-right {{
-      margin-left: auto;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
-    }}
-    .open-full-text {{
-      font-size: 0.85rem;
-      font-weight: 600;
-      color: #1e3a5f;
-      text-decoration: none;
-      white-space: nowrap;
-    }}
-    .open-full-text:hover {{ text-decoration: underline; }}
     .back-link {{
       font-family: system-ui, sans-serif; font-size: 0.85rem; font-weight: 700;
       color: #1e3a5f; text-decoration: none;
@@ -688,7 +700,7 @@ def render_ocr_standalone_page(
     .parish-body {{ padding: 0.2rem 0.6rem 0.65rem; }}
     .parish-empty {{
       font-family: system-ui, sans-serif;
-      font-size: 0.82rem;
+      font-size: 16px;
       color: #666666;
       font-style: normal;
       font-weight: 400;
@@ -699,10 +711,10 @@ def render_ocr_standalone_page(
       align-items: center;
       justify-content: space-between;
       gap: 8px 12px;
-      min-height: 45px;
+      min-height: 48px;
       height: auto;
-      max-height: 65px;
-      padding: 6px 0;
+      max-height: 64px;
+      padding: 8px 0;
       margin: 0;
       border: 0;
       border-bottom: 1px solid #e5e7eb;
@@ -711,7 +723,7 @@ def render_ocr_standalone_page(
     }}
     .parish-row-empty .parish-name {{
       margin: 0 !important;
-      font-size: 0.95rem !important;
+      font-size: 16px !important;
       font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif !important;
       color: #1e3a5f !important;
       font-weight: 600;
@@ -722,14 +734,14 @@ def render_ocr_standalone_page(
       flex: 1 1 auto;
       margin: 0;
       color: #666666;
-      font-size: 0.78rem;
+      font-size: 16px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }}
     .parish-row-empty .parish-source {{
       color: #1e3a5f;
-      font-size: 0.78rem;
+      font-size: 16px;
       flex: 0 0 auto;
     }}
     .search-panel {{
@@ -760,13 +772,14 @@ def render_ocr_standalone_page(
     .ocr-search-tools button:disabled {{ color: #999; border-color: #e5e7eb; cursor: not-allowed; }}
     .match-count {{ color: #666666; font-size: 0.78rem; font-weight: 600; }}
     .note-box {{
-      margin-top: 12px;
-      color: #78716c;
+      margin-top: 10px;
+      color: #666666;
       font-weight: 400;
-      font-size: 0.72rem;
+      font-size: 13px;
       line-height: 1.35;
       font-family: system-ui, sans-serif;
-      font-style: italic;
+      font-style: normal;
+      padding: 0;
     }}
     body.embed-mode .top {{ display: none !important; }}
     body.embed-mode .page {{ padding-top: 4px; }}
@@ -778,9 +791,6 @@ def render_ocr_standalone_page(
       <div class="top-left">
         <a class="back-link" href="{html.escape(viewer_href, quote=True)}">← Viewer</a>
         <span class="title-line">{html.escape(diocese_label)} Text Bulletin · {html.escape(uk_bulletin_date)}</span>
-      </div>
-      <div class="top-right">
-        <a class="open-full-text" href="{html.escape(config.key + '-' + bulletin_date + '-ocr.html', quote=True)}" target="_blank" rel="noopener noreferrer" download>Open full text</a>
       </div>
     </div>
     <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
@@ -1261,7 +1271,7 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
     #ocr-panel .parish-body {{ padding: 0.25rem 0.55rem 0.65rem; }}
     #ocr-panel .parish-empty {{
       font-family: system-ui, sans-serif;
-      font-size: 0.82rem;
+      font-size: 16px;
       color: #666666;
       font-style: normal;
     }}
@@ -1271,9 +1281,9 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
       align-items: center;
       justify-content: space-between;
       gap: 8px 12px;
-      min-height: 45px;
-      max-height: 65px;
-      padding: 6px 0;
+      min-height: 48px;
+      max-height: 64px;
+      padding: 8px 0;
       margin: 0;
       border: 0;
       border-bottom: 1px solid #e5e7eb;
@@ -1282,7 +1292,7 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
     }}
     #ocr-panel .parish-row-empty .parish-name {{
       margin: 0 !important;
-      font-size: 0.95rem !important;
+      font-size: 16px !important;
       font-family: system-ui, sans-serif !important;
       color: #1e3a5f !important;
       font-weight: 600;
@@ -1292,46 +1302,45 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
       flex: 1 1 auto;
       margin: 0;
       color: #666666;
-      font-size: 0.78rem;
+      font-size: 16px;
       white-space: nowrap;
       overflow: hidden;
       text-overflow: ellipsis;
     }}
-    #ocr-panel .parish-row-empty .parish-source {{ color: #1e3a5f; font-size: 0.78rem; }}
+    #ocr-panel .parish-row-empty .parish-source {{ color: #1e3a5f; font-size: 16px; }}
     .note-box {{
-      margin-top: 16px;
-      padding: 12px 16px;
-      border-radius: 10px;
-      background: #fff4df;
-      border: 1px solid #f5d08d;
-      color: #713f12;
-      font-weight: 600;
-      font-size: 0.95rem;
+      margin-top: 12px;
+      padding: 6px 0;
+      border-radius: 0;
+      background: transparent;
+      border: 0;
+      color: #666666;
+      font-weight: 400;
+      font-size: 13px;
     }}
-    
-    /* Parish Section */
+    .empty-state[hidden],
+    #parish-empty[hidden] {{ display: none !important; }}
     .parish-section {{
-      margin-top: 32px;
-      background: white;
-      border: 1px solid #d6ecea;
-      border-radius: 16px;
-      padding: 24px;
-      box-shadow: 0 4px 12px rgba(26, 107, 107, 0.06);
+      margin-top: 28px;
+      background: #fff;
+      border: 1px solid #e5e7eb;
+      border-radius: 10px;
+      padding: 16px;
     }}
     .parish-section h2 {{
-      margin: 0 0 18px;
-      color: {TEAL};
-      font-size: 1.4rem;
-      font-weight: 800;
-      text-align: center;
+      margin: 0 0 12px;
+      color: #1e3a5f;
+      font-size: 1.05rem;
+      font-weight: 600;
+      text-align: left;
     }}
     .parish-filter {{
       width: 100%;
-      border: 1px solid #bdd7d5;
-      border-radius: 8px;
-      padding: 12px 16px;
-      font-size: 1rem;
-      margin-bottom: 16px;
+      border: 1px solid #e5e7eb;
+      border-radius: 6px;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+      margin-bottom: 12px;
     }}
     ul.parish-grid {{
       list-style: none;
@@ -1670,20 +1679,26 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
         }}
       }});
 
-      parishFilter.addEventListener('input', function (event) {{
-        const term = event.target.value.trim().toLowerCase();
-        let visibleCount = 0;
-        parishItems.forEach((item) => {{
-          const matches = item.dataset.name.includes(term);
-          item.hidden = !matches;
-          if (matches) {{
-            visibleCount += 1;
+      if (parishFilter) {{
+        parishFilter.addEventListener('input', function (event) {{
+          const term = event.target.value.trim().toLowerCase();
+          let visibleCount = 0;
+          parishItems.forEach((item) => {{
+            const name = (item.dataset.name || '').toLowerCase();
+            const matches = !term || name.includes(term);
+            item.hidden = !matches;
+            if (matches) {{
+              visibleCount += 1;
+            }}
+          }});
+          if (parishEmpty) {{
+            parishEmpty.hidden = visibleCount !== 0;
           }}
         }});
-        if (parishEmpty) {{
-          parishEmpty.hidden = visibleCount !== 0;
-        }}
-      }});
+      }}
+      if (parishEmpty) {{
+        parishEmpty.hidden = parishItems.length === 0 ? false : true;
+      }}
 
       updateMatchUi();
     }})();
