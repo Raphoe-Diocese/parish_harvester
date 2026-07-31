@@ -259,6 +259,51 @@ class ClaudyBulletinFilterTests(unittest.TestCase):
         )
         self.assertEqual(page.selector, "img")
 
+    def test_find_stacked_bulletin_image_urls_falls_back_for_lazy_loaded_images(self) -> None:
+        """Lazy-loaded <img> tags report naturalWidth/naturalHeight as 0 until
+        the browser decodes them. The eval_on_selector_all JS must fall back
+        to the rendered box size / width-height attributes so a genuine
+        not-yet-loaded bulletin scan isn't dropped as "too small"."""
+        import asyncio
+
+        from harvester.replay import _find_stacked_bulletin_image_urls
+
+        class _Page:
+            url = "https://example.org/bulletins/"
+            captured_script = ""
+
+            async def eval_on_selector_all(self, selector: str, script: str):
+                self.selector = selector
+                self.captured_script = script
+                return [
+                    {
+                        "index": 0,
+                        "src": "/wp-content/uploads/2026/06/lazy-bulletin.jpg",
+                        # Not yet decoded: natural size is 0, but the fallback
+                        # logic should recover a usable size from these.
+                        "naturalWidth": 900,
+                        "naturalHeight": 1200,
+                    },
+                ]
+
+        page = _Page()
+        urls = asyncio.run(_find_stacked_bulletin_image_urls(page, 1))
+        self.assertEqual(
+            urls,
+            ["https://example.org/wp-content/uploads/2026/06/lazy-bulletin.jpg"],
+        )
+        # The eval_on_selector_all mock above bypasses real browser JS
+        # execution (it returns canned dimensions directly), so it can't
+        # exercise the lazy-load fallback at runtime. Assert the fallback is
+        # actually present in the JS sent to the page, so removing it would
+        # fail this test.
+        script = page.captured_script
+        self.assertIn("naturalWidth", script)
+        self.assertIn("offsetWidth", script)
+        self.assertIn("offsetHeight", script)
+        self.assertIn("getAttribute('width')", script)
+        self.assertIn("getAttribute('height')", script)
+
     def test_find_stacked_bulletin_image_urls_supports_last_position(self) -> None:
         import asyncio
 
