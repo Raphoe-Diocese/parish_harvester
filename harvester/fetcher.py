@@ -220,7 +220,7 @@ def parse_evidence_file(diocese: str, parishes_dir: Path | None = None) -> list[
             # Preserve any explicitly-set date pattern (e.g. Pattern D, clonleigh) so
             # date math can still be applied when building the html_link URL.
             pattern = cur_pattern or "html_link"
-        elif cur_is_image or url_lower.endswith((".jpg", ".jpeg", ".png")):
+        elif cur_is_image or url_lower.endswith((".jpg", ".jpeg", ".png", ".webp", ".gif")):
             content_type = "image"
             pattern = cur_pattern or "F"
         elif cur_is_docx or url_lower.endswith(".docx"):
@@ -374,18 +374,37 @@ def calculate_url(entry: ParishEntry, target: date) -> str:
 # Download helpers
 # ---------------------------------------------------------------------------
 
-def _is_real_pdf(path: Path, tag: str = "") -> bool:
-    """Return True only if path is a valid PDF of at least MIN_PDF_BYTES."""
+def _is_real_pdf(path: Path, tag: str = "", *, min_bytes: int = MIN_PDF_BYTES) -> bool:
+    """Return True only if path is a valid PDF of at least *min_bytes* and at
+    most MAX_BULLETIN_PAGES pages.
+
+    The page-count check used to only run on some capture paths (via
+    ``_verify_bulletin_pdf``); folding it in here means every caller of this
+    shared "is this a real bulletin" check gets it, so a full magazine/archive
+    accidentally captured instead of the weekly bulletin can't be reported as
+    a success just because one particular code path forgot to verify it.
+    """
     if not is_valid_pdf(path):
         return False
     try:
         size = path.stat().st_size
     except OSError:
         return False
-    if size < MIN_PDF_BYTES:
+    if size < min_bytes:
         print(
             f"  🗑️  Discarding tiny PDF{(' for ' + tag) if tag else ''}: "
-            f"{size:,} bytes < {MIN_PDF_BYTES // 1000} KB"
+            f"{size:,} bytes < {min_bytes // 1000} KB"
+        )
+        return False
+    try:
+        page_count = len(PdfReader(str(path)).pages)
+    except Exception:
+        page_count = None  # unreadable page structure — leave to other checks
+    if page_count is not None and page_count > MAX_BULLETIN_PAGES:
+        print(
+            f"  🗑️  Discarding oversized PDF{(' for ' + tag) if tag else ''}: "
+            f"{page_count} pages > {MAX_BULLETIN_PAGES} "
+            "(looks like a full document, not the weekly bulletin)"
         )
         return False
     return True
@@ -723,7 +742,7 @@ async def _try_force_html_to_pdf(
             verify_pdf=_verify_bulletin_pdf,
             wait_ms=wait_after_load_ms,
         )
-        if ok and _rendered_pdf_looks_usable(dest) and _is_real_pdf(dest, key):
+        if ok and _rendered_pdf_looks_usable(dest) and _is_real_pdf(dest, key, min_bytes=HTML_RENDER_MIN_BYTES):
             print(f"  📰 {key}: HTML captured as PDF ({mode})")
             return FetchResult(
                 key=key,
@@ -739,7 +758,7 @@ async def _try_force_html_to_pdf(
     except Exception as exc:
         print(f"  ↩️  {key}: HTML capture failed: {exc}")
     finally:
-        if dest.exists() and not _is_real_pdf(dest, key):
+        if dest.exists() and not _is_real_pdf(dest, key, min_bytes=HTML_RENDER_MIN_BYTES):
             dest.unlink(missing_ok=True)
         try:
             await context.close()
@@ -870,14 +889,23 @@ async def _find_bulletin_image_urls(page: Page) -> list[str]:
               el.getAttribute('data-lazy-src') ||
               el.getAttribute('data-original') ||
               '';
+            // Lazy-loaded images report naturalWidth/Height as 0 until
+            // decoded — fall back to rendered box size / attributes so a
+            // not-yet-loaded bulletin scan isn't dropped as "too small".
+            let width = Number(el.naturalWidth || 0);
+            let height = Number(el.naturalHeight || 0);
+            if (!width || !height) {
+              width = width || el.offsetWidth || Number(el.getAttribute('width') || 0);
+              height = height || el.offsetHeight || Number(el.getAttribute('height') || 0);
+            }
             return {
               index,
               src,
               alt: el.getAttribute('alt') || '',
               className: el.className || '',
               parentClass: el.parentElement ? (el.parentElement.className || '') : '',
-              naturalWidth: Number(el.naturalWidth || 0),
-              naturalHeight: Number(el.naturalHeight || 0),
+              naturalWidth: width,
+              naturalHeight: height,
               inMain: Boolean(nearestMain),
             };
         })
@@ -900,7 +928,10 @@ async def _find_bulletin_image_urls(page: Page) -> list[str]:
         height = int(item.get("naturalHeight") or 0)
         long_side = max(width, height)
         short_side = min(width, height)
-        if long_side < 800 or short_side < 600:
+        # A4 scans are ~595x841 — matches the threshold already used by
+        # replay._find_stacked_bulletin_image_urls (550/500). The old 800/600
+        # cutoff excluded genuine A4 bulletin scans (595 < 600).
+        if long_side < 550 or short_side < 500:
             continue
         score = 0
         haystack = " ".join(
@@ -1386,6 +1417,21 @@ def _verify_bulletin_pdf(dest: Path) -> None:
     print(f"  Verifying pages... {page_count} pages ✓")
 
 
+def _reject_if_oversized(dest: Path) -> None:
+    """Guard against files that slipped past the pre-download HEAD size check
+    (e.g. the server didn't send a Content-Length header) — deletes and
+    raises so the caller's normal failure handling takes over."""
+    try:
+        size_bytes = dest.stat().st_size
+    except OSError:
+        return
+    if size_bytes > MAX_BULLETIN_SIZE_MB * 1_000_000:
+        dest.unlink(missing_ok=True)
+        raise ValueError(
+            f"❌ File too large: {size_bytes / 1_000_000:.1f} MB (max {MAX_BULLETIN_SIZE_MB} MB)"
+        )
+
+
 async def _download_pdf(
     url: str,
     dest: Path,
@@ -1427,7 +1473,10 @@ async def _download_pdf(
                 )
             download = await dl_info.value
             await download.save_as(dest)
+            _reject_if_oversized(dest)
             return
+        except ValueError:
+            raise
         except Exception:
             pass
 
@@ -1439,7 +1488,10 @@ async def _download_pdf(
                 body = await _nav_response.body()
                 if _is_pdf_content(body):
                     dest.write_bytes(body)
+                    _reject_if_oversized(dest)
                     return
+            except ValueError:
+                raise
             except Exception:
                 pass
 
@@ -1451,6 +1503,7 @@ async def _download_pdf(
             # Accept the body if it is a valid PDF regardless of reported content-type
             if _is_pdf_content(body):
                 dest.write_bytes(body)
+                _reject_if_oversized(dest)
                 return
             content_type = response.headers.get("content-type", "")
             if "text/html" in content_type:
@@ -1458,6 +1511,7 @@ async def _download_pdf(
                     f"Server returned HTML instead of a PDF for {url}"
                 )
             dest.write_bytes(body)
+            _reject_if_oversized(dest)
         else:
             raise RuntimeError(f"HTTP {response.status} for {url}")
     except _TargetClosedError:

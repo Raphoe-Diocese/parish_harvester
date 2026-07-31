@@ -312,7 +312,12 @@ async def capture_html_page_as_pdf(
     """Returns (success, capture_mode)."""
     await wait_for_dynamic_bulletin(page, timeout_ms=max(wait_ms, 15_000))
     if not skip_listing_nav:
-        await try_navigate_to_current_bulletin(page, target)
+        navigated_to_article = await try_navigate_to_current_bulletin(page, target)
+        if navigated_to_article:
+            # The dynamic-bulletin wait above ran on the listing page; a
+            # Parish-Messenger-style embed on the article page itself needs
+            # its own wait or a slow embed can still be empty when we print.
+            await wait_for_dynamic_bulletin(page, timeout_ms=max(wait_ms, 15_000))
     if wait_ms > 0:
         wait_for_timeout = getattr(page, "wait_for_timeout", None)
         if callable(wait_for_timeout):

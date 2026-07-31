@@ -9,7 +9,7 @@ from __future__ import annotations
 import re
 from urllib.parse import parse_qs, unquote, urlparse
 
-_GDRIVE_FILE_RE = re.compile(r"drive\.google\.com/file/d/([^/?#]+)")
+_GDRIVE_FILE_RE = re.compile(r"drive\.google\.com/(?:a/[^/]+/)?file/d/([^/?#]+)")
 _GDRIVE_OPEN_RE = re.compile(r"drive\.google\.com/open\?[^#]*\bid=([^&#]+)")
 _GDRIVE_UC_RE = re.compile(r"drive\.google\.com/uc\?[^#]*\bid=([^&#]+)")
 _ONEDRIVE_SHARE_RE = re.compile(
@@ -47,10 +47,17 @@ def rewrite_gdrive_download_url(url: str) -> str:
         match = pattern.search(text)
         if match:
             file_id = match.group(1)
-            return (
+            download_url = (
                 "https://drive.usercontent.google.com/download"
                 f"?id={file_id}&export=download"
             )
+            # Shared-drive / restricted files sometimes need the resourcekey
+            # from the original share URL or the download returns an
+            # error/permission page instead of the PDF.
+            resourcekey = parse_qs(urlparse(text).query).get("resourcekey", [""])[0].strip()
+            if resourcekey:
+                download_url += f"&resourcekey={resourcekey}"
+            return download_url
     return text
 
 
@@ -109,7 +116,10 @@ def gdrive_confirm_token(html: str) -> str:
     text = html or ""
     for pattern in (
         r"confirm=([0-9A-Za-z_]+)",
-        r'name="confirm"\s+value="([0-9A-Za-z_]+)"',
+        # Attribute order on the interstitial's hidden input isn't guaranteed
+        # (e.g. name="confirm" type="hidden" value="t") — match value="..."
+        # anywhere after name="confirm" rather than requiring them adjacent.
+        r'name="confirm"[^>]*value="([0-9A-Za-z_]+)"',
         r"download_warning[^\"']*confirm=([0-9A-Za-z_]+)",
         r"uc-download-link[^>]+href=\"[^\"]*confirm=([0-9A-Za-z_]+)",
     ):
@@ -119,12 +129,33 @@ def gdrive_confirm_token(html: str) -> str:
     return ""
 
 
-def gdrive_download_url_with_confirm(url: str, confirm: str) -> str:
+def gdrive_confirm_uuid(html: str) -> str:
+    """Extract the large-file virus-scan interstitial's ``uuid`` field.
+
+    Modern Drive confirm pages require both ``confirm`` and ``uuid`` on the
+    retry request; without ``uuid`` the retry can still return the
+    interstitial HTML instead of the file.
+    """
+    text = html or ""
+    for pattern in (
+        r"uuid=([-\w]+)",
+        r'name="uuid"[^>]*value="([-\w]+)"',
+    ):
+        match = re.search(pattern, text)
+        if match:
+            return match.group(1)
+    return ""
+
+
+def gdrive_download_url_with_confirm(url: str, confirm: str, uuid: str = "") -> str:
     base = normalize_document_url(url)
     token = (confirm or "").strip()
     if not base or not token:
         return base
     joiner = "&" if "?" in base else "?"
-    if f"confirm={token}" in base:
-        return base
-    return f"{base}{joiner}confirm={token}"
+    if f"confirm={token}" not in base:
+        base = f"{base}{joiner}confirm={token}"
+    uuid_token = (uuid or "").strip()
+    if uuid_token and f"uuid={uuid_token}" not in base:
+        base = f"{base}&uuid={uuid_token}"
+    return base

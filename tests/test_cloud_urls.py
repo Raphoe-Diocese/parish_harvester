@@ -4,6 +4,7 @@ import unittest
 
 from harvester.cloud_urls import (
     gdrive_confirm_token,
+    gdrive_confirm_uuid,
     gdrive_download_url_with_confirm,
     gdrive_file_id_from_url,
     gdrive_view_url,
@@ -63,6 +64,44 @@ class CloudUrlTests(unittest.TestCase):
             token,
         )
         self.assertIn("confirm=t123", out)
+
+    def test_gdrive_confirm_token_tolerates_extra_attributes(self) -> None:
+        # Attribute order isn't guaranteed on the virus-scan interstitial.
+        html = '<input name="confirm" type="hidden" value="t456">'
+        self.assertEqual(gdrive_confirm_token(html), "t456")
+
+    def test_gdrive_confirm_uuid_extracted_and_forwarded(self) -> None:
+        html = '<input name="uuid" value="abc-123-def">'
+        self.assertEqual(gdrive_confirm_uuid(html), "abc-123-def")
+        out = gdrive_download_url_with_confirm(
+            "https://drive.usercontent.google.com/download?id=ABC&export=download",
+            "t123",
+            "abc-123-def",
+        )
+        self.assertIn("confirm=t123", out)
+        self.assertIn("uuid=abc-123-def", out)
+
+    def test_gdrive_download_url_without_uuid_unchanged(self) -> None:
+        out = gdrive_download_url_with_confirm(
+            "https://drive.usercontent.google.com/download?id=ABC&export=download",
+            "t123",
+        )
+        self.assertIn("confirm=t123", out)
+        self.assertNotIn("uuid=", out)
+
+    def test_gdrive_resourcekey_preserved_on_rewrite(self) -> None:
+        url = (
+            "https://drive.google.com/file/d/ABC123xyz/view"
+            "?usp=sharing&resourcekey=0-someKey"
+        )
+        out = rewrite_gdrive_download_url(url)
+        self.assertIn("id=ABC123xyz", out)
+        self.assertIn("resourcekey=0-someKey", out)
+
+    def test_gdrive_workspace_style_file_url_id_extracted(self) -> None:
+        url = "https://drive.google.com/a/parish.org/file/d/WORKSPACE_ID/view"
+        out = rewrite_gdrive_download_url(url)
+        self.assertIn("id=WORKSPACE_ID", out)
 
 
 if __name__ == "__main__":

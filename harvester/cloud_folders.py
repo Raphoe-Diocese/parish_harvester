@@ -55,13 +55,22 @@ def is_cloud_folder_url(url: str) -> bool:
     lower = (url or "").lower()
     if "drive.google.com" in lower and "/folders/" in lower:
         return True
-    if "onedrive.live.com" in lower and ("?id=" in lower or "/redir" in lower):
+    # "?id=" only caught the query as the first param; links like
+    # "?cid=...&id=..." also identify a OneDrive folder.
+    if "onedrive.live.com" in lower and ("id=" in lower or "/redir" in lower):
         return True
     if "sharepoint.com" in lower and any(
         marker in lower for marker in ("/documents", "/shared", "folder", "/forms/allitems.aspx")
     ):
         return True
     if "1drv.ms" in lower:
+        # 1drv.ms short links encode the share type in the path:
+        # /f/... = folder, /b/... or /u/... = a single file ("blob"/upload).
+        # Single-file shares should go through direct document download
+        # instead of folder-row picking.
+        path = lower.split("1drv.ms", 1)[1] if "1drv.ms" in lower else ""
+        if path.startswith(("/b/", "/u/")):
+            return False
         return True
     return False
 

@@ -49,6 +49,22 @@ class CloudFolderTests(unittest.TestCase):
             )
         )
 
+    def test_is_cloud_folder_url_onedrive_id_after_other_params(self) -> None:
+        # "?cid=...&id=..." — the id param isn't first, so a "?id=" substring
+        # check misses it even though this is a genuine OneDrive folder link.
+        self.assertTrue(
+            is_cloud_folder_url("https://onedrive.live.com/?cid=ABC123&id=ABC123%211234")
+        )
+
+    def test_is_cloud_folder_url_1drv_single_file_not_a_folder(self) -> None:
+        # /b/ and /u/ 1drv.ms short links are single-file shares — these
+        # should go through direct document download, not folder-row picking.
+        self.assertFalse(is_cloud_folder_url("https://1drv.ms/b/s!AhCn12345"))
+        self.assertFalse(is_cloud_folder_url("https://1drv.ms/u/s!AhCn12345"))
+
+    def test_is_cloud_folder_url_1drv_folder_still_detected(self) -> None:
+        self.assertTrue(is_cloud_folder_url("https://1drv.ms/f/s!AhCn12345"))
+
     def test_rewrite_click_step_for_target_sunday(self) -> None:
         step = {
             "action": "click",

@@ -22,6 +22,7 @@ from .cloud_folders import (
 )
 from .cloud_urls import (
     gdrive_confirm_token,
+    gdrive_confirm_uuid,
     gdrive_download_url_with_confirm,
     is_cloud_document_url,
     normalize_document_url,
@@ -600,9 +601,11 @@ async def _download_document_url(
         and "drive.usercontent.google.com/download" in url.lower()
         and not _is_pdf_content(body)
     ):
-        confirm = gdrive_confirm_token(body.decode("utf-8", errors="ignore"))
+        interstitial_html = body.decode("utf-8", errors="ignore")
+        confirm = gdrive_confirm_token(interstitial_html)
         if confirm:
-            confirm_url = gdrive_download_url_with_confirm(url, confirm)
+            uuid = gdrive_confirm_uuid(interstitial_html)
+            confirm_url = gdrive_download_url_with_confirm(url, confirm, uuid)
             response = await page.request.get(confirm_url, timeout=timeout_ms)
             if not response.ok:
                 raise RecipeReplayError(f"HTTP {response.status} for {confirm_url}")
@@ -866,11 +869,21 @@ async def _find_stacked_bulletin_image_urls(
               el.getAttribute('data-lazy-src') ||
               el.getAttribute('data-original') ||
               '';
+            // Lazy-loaded images report naturalWidth/Height as 0 until the
+            // browser has decoded them. Fall back to the rendered box size or
+            // explicit width/height attributes so a not-yet-loaded bulletin
+            // image isn't dropped as "too small".
+            let width = Number(el.naturalWidth || 0);
+            let height = Number(el.naturalHeight || 0);
+            if (!width || !height) {
+              width = width || el.offsetWidth || Number(el.getAttribute('width') || 0);
+              height = height || el.offsetHeight || Number(el.getAttribute('height') || 0);
+            }
             return {
               index,
               src,
-              naturalWidth: Number(el.naturalWidth || 0),
-              naturalHeight: Number(el.naturalHeight || 0),
+              naturalWidth: width,
+              naturalHeight: height,
             };
         })
         """,
