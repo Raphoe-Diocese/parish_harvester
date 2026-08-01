@@ -6,24 +6,28 @@
   "start_url": "http://www.ardmoreparish.com/news.html",
   "steps": [
     {
+      "action": "goto",
+      "url": "http://www.ardmoreparish.com/news.html"
+    },
+    {
       "action": "download",
-      "url": "http://www.ardmoreparish.com/pdf/020826.pdf"
+      "url": "http://www.ardmoreparish.com/pdf/280626.pdf"
     }
   ],
-  "observed_load_ms": 469193.5,
-  "timeout_ms": 300000,
-  "total_timeout_s": 900,
-  "navigation_wait_until": "commit",
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
   "playbook_type": "dated_pdf_bulletin",
   "site_type": "dated_pdf_path",
+  "max_bulletin_pages": 12,
   "operator_notes": [
-    "Bulletin is a real PDF (often made in Microsoft Word → Print to PDF).",
-    "Tab title may say .docx or .jpg — ignore that; check the address bar ends in .pdf.",
-    "On the PDF page: tap Save this PDF — saves the full https://… address for Sunday harvest.",
-    "Or start on parishnews.html → point at this week's link → Yes → Save this PDF.",
-    "Harvester rewrites DDMMYY in the URL each Sunday (e.g. 140626 → 210626)."
+    "Bulletin is a real PDF at /pdf/DDMMYY.pdf (e.g. 020826.pdf = 02/08/2026).",
+    "Download step keeps a dated example URL; harvester rewrites DDMMYY each Sunday.",
+    "Do not set use_captured_url on the download step — that freezes the trained week forever.",
+    "Start from news.html so harvest does not download the example PDF before rewrite.",
+    "Ardmore weekly bulletins are normally ~9 pages — max_bulletin_pages=12 allows them."
   ],
   "do_not": [
+    "Do not set use_captured_url: true on dated /pdf/DDMMYY.pdf recipes.",
     "Do not use use_page_url only — GitHub cannot read Chrome's internal PDF viewer address.",
     "Do not worry if Document Properties title mentions Microsoft Word."
   ],

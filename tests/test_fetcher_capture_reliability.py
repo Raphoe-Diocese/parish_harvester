@@ -13,8 +13,13 @@ from pathlib import Path
 
 from reportlab.pdfgen import canvas
 
-from harvester.fetcher import HTML_RENDER_MIN_BYTES, _is_real_pdf, _reject_if_oversized
-from harvester.config import MIN_PDF_BYTES
+from harvester.fetcher import (
+    HTML_RENDER_MIN_BYTES,
+    _is_real_pdf,
+    _reject_if_oversized,
+    recipe_max_bulletin_pages,
+)
+from harvester.config import MAX_BULLETIN_PAGES, MIN_PDF_BYTES
 
 
 def _make_pdf_with_pages(path: Path, page_count: int, filler: str = "x" * 2000) -> None:
@@ -65,6 +70,32 @@ class IsRealPdfTests(unittest.TestCase):
             # not raise, and current behaviour (accept) is unchanged since
             # page count can't be determined.
             _is_real_pdf(pdf)  # must not raise
+
+    def test_recipe_max_pages_override_accepts_longer_bulletin(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "ardmore_style.pdf"
+            _make_pdf_with_pages(pdf, 9)
+            with pdf.open("ab") as fh:
+                fh.write(b"\n% " + b"0" * MIN_PDF_BYTES)
+            self.assertEqual(MAX_BULLETIN_PAGES, 4)
+            self.assertFalse(_is_real_pdf(pdf))  # global default still rejects
+            self.assertTrue(_is_real_pdf(pdf, max_pages=12))  # Ardmore-style override
+
+
+class RecipeMaxBulletinPagesTests(unittest.TestCase):
+    def test_default_is_global_max(self) -> None:
+        self.assertEqual(recipe_max_bulletin_pages(None), MAX_BULLETIN_PAGES)
+        self.assertEqual(recipe_max_bulletin_pages({}), MAX_BULLETIN_PAGES)
+
+    def test_reads_max_bulletin_pages_from_recipe(self) -> None:
+        self.assertEqual(
+            recipe_max_bulletin_pages({"max_bulletin_pages": 12}),
+            12,
+        )
+
+    def test_invalid_or_too_small_falls_back_to_global(self) -> None:
+        self.assertEqual(recipe_max_bulletin_pages({"max_bulletin_pages": 0}), MAX_BULLETIN_PAGES)
+        self.assertEqual(recipe_max_bulletin_pages({"max_bulletin_pages": "nope"}), MAX_BULLETIN_PAGES)
 
 
 class RejectIfOversizedTests(unittest.TestCase):

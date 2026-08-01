@@ -374,9 +374,36 @@ def calculate_url(entry: ParishEntry, target: date) -> str:
 # Download helpers
 # ---------------------------------------------------------------------------
 
-def _is_real_pdf(path: Path, tag: str = "", *, min_bytes: int = MIN_PDF_BYTES) -> bool:
+def recipe_max_bulletin_pages(recipe_meta: dict | None) -> int:
+    """Return the page-count ceiling for a parish recipe.
+
+    Recipes may set ``max_bulletin_pages`` when a parish normally publishes a
+    longer weekly bulletin (e.g. Ardmore's 9-page PDFs). Without that field
+    the global ``MAX_BULLETIN_PAGES`` default applies.
+    """
+    default = MAX_BULLETIN_PAGES
+    if not isinstance(recipe_meta, dict):
+        return default
+    raw = recipe_meta.get("max_bulletin_pages", recipe_meta.get("max_pages"))
+    try:
+        value = int(raw)
+    except (TypeError, ValueError):
+        return default
+    if value < 1:
+        return default
+    # Hard ceiling so a typo cannot accept a full parish magazine.
+    return min(value, 50)
+
+
+def _is_real_pdf(
+    path: Path,
+    tag: str = "",
+    *,
+    min_bytes: int = MIN_PDF_BYTES,
+    max_pages: int | None = None,
+) -> bool:
     """Return True only if path is a valid PDF of at least *min_bytes* and at
-    most MAX_BULLETIN_PAGES pages.
+    most *max_pages* pages (default: MAX_BULLETIN_PAGES).
 
     The page-count check used to only run on some capture paths (via
     ``_verify_bulletin_pdf``); folding it in here means every caller of this
@@ -396,14 +423,15 @@ def _is_real_pdf(path: Path, tag: str = "", *, min_bytes: int = MIN_PDF_BYTES) -
             f"{size:,} bytes < {min_bytes // 1000} KB"
         )
         return False
+    page_limit = MAX_BULLETIN_PAGES if max_pages is None else int(max_pages)
     try:
         page_count = len(PdfReader(str(path)).pages)
     except Exception:
         page_count = None  # unreadable page structure — leave to other checks
-    if page_count is not None and page_count > MAX_BULLETIN_PAGES:
+    if page_count is not None and page_count > page_limit:
         print(
             f"  🗑️  Discarding oversized PDF{(' for ' + tag) if tag else ''}: "
-            f"{page_count} pages > {MAX_BULLETIN_PAGES} "
+            f"{page_count} pages > {page_limit} "
             "(looks like a full document, not the weekly bulletin)"
         )
         return False
@@ -1395,24 +1423,25 @@ async def _scrape_and_download(
             pass
 
 
-def _verify_bulletin_pdf(dest: Path) -> None:
-    """Check that a downloaded PDF does not exceed MAX_BULLETIN_PAGES.
+def _verify_bulletin_pdf(dest: Path, *, max_pages: int | None = None) -> None:
+    """Check that a downloaded PDF does not exceed the page ceiling.
 
     Deletes *dest* and raises ``ValueError`` when the page count is too high so
     that the caller's normal cleanup/retry logic treats the file as a failure.
     Silently returns when the PDF cannot be opened — ``_is_real_pdf`` will
     catch corrupt files separately.
     """
+    page_limit = MAX_BULLETIN_PAGES if max_pages is None else int(max_pages)
     try:
         reader = PdfReader(str(dest))
         page_count = len(reader.pages)
     except Exception:
         return  # unreadable — let _is_real_pdf handle it
 
-    if page_count > MAX_BULLETIN_PAGES:
+    if page_count > page_limit:
         dest.unlink(missing_ok=True)
         raise ValueError(
-            f"❌ Too many pages: {page_count} pages (max {MAX_BULLETIN_PAGES})"
+            f"❌ Too many pages: {page_count} pages (max {page_limit})"
         )
     print(f"  Verifying pages... {page_count} pages ✓")
 
@@ -1820,7 +1849,7 @@ async def _recover_stale_bulletin(
                     browser,
                     timeout_ms=navigation_timeout_ms,
                 )
-                if _is_real_pdf(dest, entry.key):
+                if _is_real_pdf(dest, entry.key, max_pages=recipe_max_bulletin_pages(recipe_meta)):
                     if check_bulletin_freshness(new_url, target).status != "stale":
                         print(f"  ✅ {entry.key}: pattern detect found current-week URL")
                         return FetchResult(
@@ -1834,7 +1863,9 @@ async def _recover_stale_bulletin(
             except Exception as exc:
                 print(f"  ↩️  {entry.key}: date-pattern retry failed: {exc}")
             finally:
-                if dest.exists() and not _is_real_pdf(dest, entry.key):
+                if dest.exists() and not _is_real_pdf(
+                    dest, entry.key, max_pages=recipe_max_bulletin_pages(recipe_meta)
+                ):
                     dest.unlink(missing_ok=True)
 
     return mark_result_stale(result, verdict, entry=entry)
@@ -1925,6 +1956,7 @@ async def _fetch_entry(
     trained_recipe = _trained_recipe_exists(recipe_path, recipe_meta)
     legacy_fallbacks = _legacy_fallbacks_enabled(recipe_path, recipe_meta)
     navigation_timeout_ms = int(host_profile.get("navigation_timeout_ms", PAGE_LOAD_TIMEOUT_MS))
+    recipe_page_limit = recipe_max_bulletin_pages(recipe_meta)
     if recipe_path.exists():
         try:
             replayed_path, replay_file_type, replay_url = await replay_recipe(
@@ -1941,7 +1973,7 @@ async def _fetch_entry(
                 if forced is not None:
                     return forced
                 recipe_error = "Recipe returned HTML page but PDF capture failed"
-            elif _is_real_pdf(replayed_path, key):
+            elif _is_real_pdf(replayed_path, key, max_pages=recipe_page_limit):
                 blocked = _disallow_non_bulletin_url(replay_url)
                 if blocked:
                     recipe_error = blocked
@@ -1969,7 +2001,7 @@ async def _fetch_entry(
             recipe_error = f"Recipe replay failed: {exc}"
             print(f"  ↩️  {key}: recipe replay failed: {exc}")
         finally:
-            if dest.exists() and not _is_real_pdf(dest, key):
+            if dest.exists() and not _is_real_pdf(dest, key, max_pages=recipe_page_limit):
                 dest.unlink(missing_ok=True)
 
         if trained_recipe:

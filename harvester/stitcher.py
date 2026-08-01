@@ -42,10 +42,31 @@ _ERROR_PAGE_PATTERN = re.compile(
     r"i['\u2019]?m not a robot|unusual traffic|checking your browser|captcha)"
 )
 _ERROR_PAGE_MAX_CHARS = 1500
-# Parish bulletins are never longer than 4 pages.  Any PDF with more pages
-# is almost certainly a full document (parish magazine, booklet, etc.) that
-# was accidentally downloaded instead of the weekly bulletin.
+# Parish bulletins are never longer than 4 pages by default.  Any PDF with more
+# pages is almost certainly a full document (parish magazine, booklet, etc.)
+# that was accidentally downloaded instead of the weekly bulletin. Individual
+# recipes may raise this via ``max_bulletin_pages`` (e.g. Ardmore's normal
+# 9-page weekly PDF).
 _MAX_BULLETIN_PAGES = 4
+
+
+def _max_bulletin_pages_for_parish(parish_key: str) -> int:
+    """Load recipe ``max_bulletin_pages`` for *parish_key*, else the global 4."""
+    try:
+        from .config import MAX_BULLETIN_PAGES, PARISHES_DIR
+        from .fetcher import recipe_max_bulletin_pages
+        from .replay import recipe_path_for
+    except Exception:
+        return _MAX_BULLETIN_PAGES
+    try:
+        path = recipe_path_for(parish_key, PARISHES_DIR)
+        if not path.exists():
+            return MAX_BULLETIN_PAGES
+        data = json.loads(path.read_text(encoding="utf-8"))
+        return recipe_max_bulletin_pages(data if isinstance(data, dict) else None)
+    except Exception:
+        return _MAX_BULLETIN_PAGES
+
 
 _HEADER_BANNER_HEIGHT = 18
 _HEADER_TOP_MARGIN = 8
@@ -234,10 +255,11 @@ def stitch_mega_pdf(
                     link_url = None
                 reader = PyPDF2.PdfReader(str(pdf_path))
                 page_count = len(reader.pages)
-                if page_count > _MAX_BULLETIN_PAGES:
+                page_limit = _max_bulletin_pages_for_parish(parish_key)
+                if page_count > page_limit:
                     print(
                         f"    ⚠️  Skipping {parish_key}: {page_count} pages exceeds "
-                        f"the {_MAX_BULLETIN_PAGES}-page bulletin limit (likely a full document)"
+                        f"the {page_limit}-page bulletin limit (likely a full document)"
                     )
                     missing_entries.append((display_name, parish_url, website))
                     continue
