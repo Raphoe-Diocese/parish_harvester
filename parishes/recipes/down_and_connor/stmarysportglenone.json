@@ -12,28 +12,36 @@
     {
       "action": "click",
       "selector": "a.mod_downloadlink[href]",
-      "href": "https://stmarysportglenone.org/download/9/Bulletins/104/13th-Sunday-in-Year-A",
-      "text": ""
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        ".mod_dropfiles_list a.mod_downloadlink[href]",
+        "a.mod_dropfiles_downloadlink[href*='/Bulletins/']"
+      ]
     },
     {
       "action": "download",
-      "url": "https://docs.google.com/viewer?url=https%3A%2F%2Fstmarysportglenone.org%2Fdownload%2F9%2FBulletins%2F104%2F13th-Sunday-in-Year-Adocx%3Ftoken%3D45f7ff1d54e0a822c31f21ed07086545%26preview%3D1&embedded=true",
       "use_captured_url": true
     }
   ],
   "observed_load_ms": 4012,
-  "timeout_ms": 45000,
-  "total_timeout_s": 90,
+  "timeout_ms": 55000,
+  "total_timeout_s": 250,
   "playbook_type": "weekly_bulletin_download",
   "site_type": "joomla_dropfiles",
   "operator_notes": [
     "Joomla Dropfiles — cloud ↓ icon (a.mod_downloadlink) serves Word .docx.",
-    "Click the cloud on this Sunday's row — harvester converts docx → PDF automatically.",
+    "Click the cloud on the top (newest) Sunday row — harvester converts docx → PDF automatically.",
+    "Do not hardcode a Sunday-specific /Bulletins/NNN/ URL — rows rotate weekly.",
     "Do not record diocese GDPR/Privacy PDFs — only mod_downloadlink on the parish host."
   ],
   "do_not": [
     "Do not save a download URL from downandconnor.org or other diocese admin PDFs.",
     "Do not use Pick bulletin image — this is a file download site."
   ],
-  "recorded_date": "2026-06-27"
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  },
+  "recorded_date": "2026-08-01"
 }

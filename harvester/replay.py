@@ -1165,7 +1165,7 @@ def _best_newsletter_link_index(
     *,
     position: str = "top",
 ) -> int | None:
-    """Pattern H: pick highest /Newsletters/NNN/ or /Weekly-Bulletins/NNN/ number."""
+    """Pattern H: pick highest /Newsletters/NNN/, /Weekly-Bulletins/NNN/, or /Bulletins/NNN/ number."""
     ranks: list[tuple[int, int, int]] = []
     for ent in entries:
         resolved = urljoin(page_url, ent["href"])

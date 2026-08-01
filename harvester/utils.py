@@ -632,13 +632,15 @@ def oneweb_newsletter_download_urls(example_url: str, target: date) -> list[str]
 # Pattern H — Sequential newsletter number (Banagher & Three Patrons)
 # ---------------------------------------------------------------------------
 
-# Matches both /Newsletters/NNN/ (Banagher) and /Weekly-Bulletins/NNN/ (Three Patrons)
-_NEWSLETTER_NUM_RE = re.compile(r"(/(?:Newsletters|Weekly-Bulletins)/)(\d+)/")
+# Matches /Newsletters/NNN/ (Banagher), /Weekly-Bulletins/NNN/ (Three Patrons),
+# and /Bulletins/NNN/ (Port Glenone Dropfiles).
+_NEWSLETTER_NUM_RE = re.compile(r"(/(?:Newsletters|Weekly-Bulletins|Bulletins)/)(\d+)/")
 
 
 def extract_newsletter_number(url: str) -> "int | None":
     """
-    Extract the sequential newsletter number from a Banagher- or Three-Patrons-style URL.
+    Extract the sequential newsletter number from a Banagher-, Three-Patrons-,
+    or Port-Glenone-style URL.
 
     Examples::
 
@@ -648,8 +650,10 @@ def extract_newsletter_number(url: str) -> "int | None":
         https://www.threepatrons.org/files/10/Weekly-Bulletins/95/Sunday-12th-April-2026
         → 95
 
-    Returns ``None`` if neither ``/Newsletters/NNN/`` nor ``/Weekly-Bulletins/NNN/``
-    is found.
+        https://stmarysportglenone.org/download/9/Bulletins/109/17th-SUNDAY-IN-ORDINARY-TIME
+        → 109
+
+    Returns ``None`` if no matching ``/.../NNN/`` segment is found.
     """
     m = _NEWSLETTER_NUM_RE.search(url)
     if m:
@@ -672,8 +676,8 @@ def rewrite_newsletter_number_url(url: str, increment: int = 1) -> str:
 
     The slug after the number is removed because it cannot be predicted.
 
-    Returns the original URL unchanged if no ``/Newsletters/NNN/`` or
-    ``/Weekly-Bulletins/NNN/`` segment is found.
+    Returns the original URL unchanged if no ``/Newsletters/NNN/``,
+    ``/Weekly-Bulletins/NNN/``, or ``/Bulletins/NNN/`` segment is found.
     """
     m = _NEWSLETTER_NUM_RE.search(url)
     if not m:

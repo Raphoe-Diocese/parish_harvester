@@ -26,6 +26,16 @@ def test_best_newsletter_link_index_bottom_tiebreak() -> None:
     assert _best_newsletter_link_index(entries, base, position="bottom") == 5
 
 
+def test_best_newsletter_link_index_portglenone_bulletins_folder() -> None:
+    base = "https://stmarysportglenone.org/?page_id=40"
+    entries = [
+        _entry("/download/9/Bulletins/106/15th-Sunday-in-Year-A", 0),
+        _entry("/download/9/Bulletins/109/17th-SUNDAY-IN-ORDINARY-TIME", 1),
+        _entry("/download/9/Bulletins/108/16TH-SUNDAY-IN-ORDINARY-TIME", 2),
+    ]
+    assert _best_newsletter_link_index(entries, base, position="top") == 1
+
+
 def test_best_scored_link_index_prefers_newer_slug_date() -> None:
     base = "https://example.org/bulletins/"
     entries = [
