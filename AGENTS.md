@@ -9,6 +9,46 @@
 
 Collated Bulletin (mega PDF) stitching is **core production behaviour, not optional**. Production GitHub Actions harvests must generate the collated mega PDF (`harvest.yml` sets `HARVEST_MEGA_PDF=1`), because OCR and the public diocesan text-bulletin viewer pages depend on it. Do not disable mega PDF generation unless the user explicitly asks. (Single-parish `--target-parish` test runs still skip it — that's separate and intentional, see `main.py`.)
 
+**Mega PDF is core.** The whole product depends on: harvest parish bulletins → collated mega PDF → OCR → searchable diocesan viewer.
+
+## PHASE PLAN
+
+### Phase 1: Core capture reliability
+- PDF capture
+- HTML bulletin capture
+- image bulletin capture
+- Google Drive / OneDrive / cloud links
+- timeout handling
+- stale/outdated recipe handling
+
+### Phase 2: OCR reliability
+- OCR failure must be visible
+- reject obvious junk pages
+- preserve Irish/Gaeilge/bilingual text exactly
+- do not delete short real notices
+
+### Phase 3: Recipe repair A-Z
+- fix failed parishes in A-Z order
+- one parish at a time or small batches of 3
+- every fix needs a proof pack before commit
+- proof pack must include source page, found bulletin URL, HTTP check, PDF check, date check, files changed, tests run
+
+### Phase 4: Recipe Brain / Referee
+- classify failures more intelligently
+- distinguish stale-but-working from broken recipe
+- remember successful patterns
+- use confidence scores
+- flag human review cases
+
+### Phase 5: Chrome extension
+- simplify recipe maker
+- use fingerprint tools
+- hide confusing extras
+- make success/failure obvious
+
+### Phase 6: UI polish
+- only after capture, OCR, and recipes are reliable
+
 ## Single source of truth for “what’s wrong?”
 
 | File | Role |
