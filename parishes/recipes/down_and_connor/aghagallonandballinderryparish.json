@@ -12,7 +12,8 @@
     {
       "action": "click",
       "fallback_selectors": [
-        "li#menu-item-1134 > a"
+        "li#menu-item-1134 > a",
+        "a[href*='current-newsletter']"
       ],
       "href": "https://www.aghagallonandballinderryparish.ie/current-newsletter/",
       "selector": "a:has-text(\"Current Bulletin (PDF)\")",
@@ -20,12 +21,18 @@
     },
     {
       "action": "download",
-      "url": "https://www.aghagallonandballinderryparish.ie/wp-content/uploads/2026/06/Bulletin-28th-June-2026.pdf",
-      "use_captured_url": true
+      "use_page_url": true
     }
   ],
   "observed_load_ms": 1605,
   "timeout_ms": 45000,
   "total_timeout_s": 90,
-  "recorded_date": "2026-06-29"
+  "operator_notes": [
+    "Current Bulletin (PDF) opens /current-newsletter/ which redirects to this week's PDF.",
+    "Do not hardcode a dated /wp-content/uploads/.../Bulletin-....pdf URL — it goes stale weekly."
+  ],
+  "do_not": [
+    "Do not save a one-week Bulletin-DD-Month-YYYY.pdf URL into the download step."
+  ],
+  "recorded_date": "2026-08-01"
 }
