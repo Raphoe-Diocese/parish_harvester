@@ -1,17 +1,48 @@
 {
+  "version": 1,
   "parish_key": "ballymoneyparish",
   "display_name": "Ballymoney",
-  "recorded_date": "2026-04-28",
-  "start_url": "http://www.ballymoneyparish.com/news_and_events.html",
+  "diocese": "down_and_connor",
+  "start_url": "https://www.ballymoneyparish.com/news_and_events.html",
   "steps": [
     {
       "action": "goto",
-      "url": "http://www.ballymoneyparish.com/news_and_events.html"
+      "url": "https://www.ballymoneyparish.com/news_and_events.html"
+    },
+    {
+      "action": "click",
+      "selector": "a[href*='/media/other/31871/'][href$='.pdf']",
+      "href": "https://www.ballymoneyparish.com/media/other/31871/26-08-02.pdf",
+      "text": "Parish bulletin 2nd August 2026",
+      "pick_strategy": "first_match",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "a[href*='/media/other/31871/'][href*='.pdf']"
+      ]
     },
     {
       "action": "download",
-      "url_pattern": "*.pdf"
+      "url": "https://www.ballymoneyparish.com/media/other/31871/26-08-02.pdf",
+      "url_pattern": "*/media/other/31871/*.pdf"
     }
   ],
-  "diocese": "down_and_connor"
+  "timeout_ms": 55000,
+  "total_timeout_s": 180,
+  "playbook_type": "pdf_download_list",
+  "site_type": "pdf_link_list",
+  "operator_notes": [
+    "News & Events lists weekly Parish bulletin PDFs under /media/other/31871/ — newest is at the top.",
+    "Use first_match on that folder path; do not use bare *.pdf (archive has 190+ PDFs and times out).",
+    "Filenames are YY-MM-DD (e.g. 26-08-02.pdf). Example href/url is illustrative only — pick_strategy selects the current top bulletin."
+  ],
+  "do_not": [
+    "Do not pin one weekly PDF filename as the permanent solution.",
+    "Do not use url_pattern *.pdf on the full news page.",
+    "Do not pick GDPR/admin/financial PDFs outside the 31871 bulletin folder."
+  ],
+  "bulletin_layout": {
+    "strategy": "first_match",
+    "position": "top"
+  },
+  "recorded_date": "2026-08-02"
 }
