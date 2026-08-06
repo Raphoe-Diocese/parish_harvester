@@ -11,7 +11,12 @@ from datetime import date, timedelta
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urljoin, urlparse
 
-from playwright.async_api import Browser, Page, TimeoutError as PlaywrightTimeoutError
+from playwright.async_api import (
+    Browser,
+    Error as PlaywrightError,
+    Page,
+    TimeoutError as PlaywrightTimeoutError,
+)
 from PyPDF2 import PdfReader
 
 from .cloud_folders import (
@@ -1105,7 +1110,16 @@ async def _click_locator_match(
         after_path = urlparse(page.url).path.rstrip("/")
         target_path = urlparse(resolved).path.rstrip("/")
         if after_path == before_path and target_path and target_path != before_path:
-            await _navigate_page(page, resolved, step_timeout_ms, wait_until="commit")
+            try:
+                await _navigate_page(page, resolved, step_timeout_ms, wait_until="commit")
+            except PlaywrightError as exc:
+                if "ERR_ABORTED" not in str(exc):
+                    raise
+                # Chromium aborts goto() when the target is a file download —
+                # the original click already triggered it (see page.on("download")
+                # listener in replay_recipe); nothing to navigate to, so stop here
+                # instead of surfacing this as "Recipe outdated".
+                return
             try:
                 await page.wait_for_load_state(
                     "domcontentloaded", timeout=POST_CLICK_WAIT_TIMEOUT_MS
