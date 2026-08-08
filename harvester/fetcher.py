@@ -1729,6 +1729,16 @@ def _is_placeholder_recipe(recipe_meta: dict | None) -> bool:
     ]
     if any(action in _RECIPE_TERMINAL_ACTIONS for action in actions):
         return False
+    if any(
+        str(step.get("action") or "").strip().lower() == "click"
+        and str(step.get("selector") or "").strip()
+        for step in steps
+        if isinstance(step, dict)
+    ):
+        # A real click step with a real selector is a trained interaction
+        # (e.g. a Joomla Dropfiles cloud-icon click that triggers a file
+        # download directly) — not an auto-seeded/stub placeholder.
+        return False
     if len(actions) == 1 and actions[0] == "goto":
         url = (
             str(steps[0].get("url") or recipe_meta.get("start_url") or "")
@@ -1992,7 +2002,8 @@ async def _fetch_entry(
             if "Recipe outdated" in msg:
                 recipe_error = (
                     f"Recipe for {entry.display_name} is outdated — the website may "
-                    f"have changed. Re-train with: python main.py --train \"{entry.display_name}\""
+                    f"have changed. Re-train with: python main.py --train \"{entry.display_name}\" "
+                    f"(detail: {msg})"
                 )
             else:
                 recipe_error = f"Recipe replay failed: {msg}"

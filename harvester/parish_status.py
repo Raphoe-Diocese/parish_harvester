@@ -86,6 +86,8 @@ def _failure_category(error_text: str, diagnosis: dict | None = None) -> str:
     diag = diagnosis if isinstance(diagnosis, dict) else {}
     if re.search(r"Stale bulletin rejected", text, re.I):
         return "bulletin too old (recipe worked)"
+    if re.search(r"blocking automated access", text, re.I):
+        return "site blocking automated access"
     if re.search(r"Recipe for .* is outdated", text, re.I):
         return "recipe outdated"
     if re.search(r"admin/non-bulletin|not a weekly bulletin", text, re.I):

@@ -441,6 +441,23 @@ async def _wait_for_bulletin_content(page: Page, recipe: dict, timeout_ms: int) 
         await asyncio.sleep(min(wait_after / 1000, 120))
 
 
+_BOT_BLOCK_HTTP_STATUSES = frozenset({403, 429, 503})
+
+
+def _raise_if_blocked_response(response, url: str) -> None:
+    """Surface WAF/bot-block responses distinctly instead of letting the page
+    silently render as an error page that later fails with a confusing
+    'recipe outdated' selector-not-found message."""
+    if response is None:
+        return
+    status = response.status
+    if status in _BOT_BLOCK_HTTP_STATUSES:
+        raise RecipeReplayError(
+            f"HTTP {status} for {url} — site may be blocking automated access "
+            "(not a recipe/selector problem)"
+        )
+
+
 async def _navigate_page(
     page: Page,
     url: str,
@@ -451,7 +468,8 @@ async def _navigate_page(
     """Navigate with recipe/host wait policy — commit avoids hung domcontentloaded."""
     mode = wait_until if wait_until in _VALID_NAV_WAIT_UNTIL else "domcontentloaded"
     if mode == "commit":
-        await page.goto(url, timeout=timeout_ms, wait_until="commit")
+        response = await page.goto(url, timeout=timeout_ms, wait_until="commit")
+        _raise_if_blocked_response(response, url)
         try:
             await page.wait_for_load_state(
                 "domcontentloaded",
@@ -460,7 +478,8 @@ async def _navigate_page(
         except PlaywrightTimeoutError:
             pass
         return
-    await page.goto(url, timeout=timeout_ms, wait_until=mode)
+    response = await page.goto(url, timeout=timeout_ms, wait_until=mode)
+    _raise_if_blocked_response(response, url)
 
 
 def recipe_path_for(parish_key: str, parishes_dir: Path = PARISHES_DIR) -> Path:
