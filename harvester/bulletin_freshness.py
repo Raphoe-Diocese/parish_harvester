@@ -14,7 +14,12 @@ from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
 
-from .utils import extract_date_from_slug, extract_date_from_string
+from .utils import (
+    _is_within_opaque_hash,
+    _opaque_hash_spans,
+    extract_date_from_slug,
+    extract_date_from_string,
+)
 
 if TYPE_CHECKING:
     from .fetcher import FetchResult, ParishEntry
@@ -101,8 +106,13 @@ def extract_bulletin_date(url_or_text: str) -> date | None:
         (_DDMMYY_RE, lambda m: _safe_parse_ddmmyy(m.group(1), m.group(2), m.group(3))),
         (_DDMMYYYY_RE, lambda m: _safe_parse("%d%m%Y", "".join(m.groups()))),
     )
+    # Guard against opaque CDN hashes (Wix/Squarespace-style filenames) whose
+    # random hex digits can coincidentally look like a DDMMYY/DDMMYYYY date.
+    spans = _opaque_hash_spans(text)
     for pattern, parser in patterns:
         for match in pattern.finditer(text):
+            if _is_within_opaque_hash(spans, match.start(), match.end()):
+                continue
             result = parser(match)
             if result:
                 return result

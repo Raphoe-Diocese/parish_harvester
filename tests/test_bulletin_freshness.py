@@ -59,6 +59,19 @@ class BulletinFreshnessTests(unittest.TestCase):
         verdict = check_bulletin_freshness("https://example.com/weekly-bulletin.pdf", target)
         self.assertEqual(verdict.status, "unknown")
 
+    def test_opaque_cdn_hash_is_not_misread_as_a_date(self) -> None:
+        # Wix/Squarespace-style hashed filenames can contain a coincidental
+        # 6-digit run that looks like DDMMYY (e.g. carrickparish.org 2026-08-09
+        # false "2076-07-29" rejection). No genuine date exists in this URL.
+        url = (
+            "https://www.carrickparish.org/_files/ugd/"
+            "15976c_67e290776b824ccfb8ce43943f2620aa.pdf"
+        )
+        self.assertIsNone(extract_bulletin_date(url))
+        target = date(2026, 8, 9)
+        verdict = check_bulletin_freshness(url, target)
+        self.assertEqual(verdict.status, "unknown")
+
     def test_mark_result_stale_sets_retry_metadata(self) -> None:
         target = date(2026, 6, 14)
         entry = ParishEntry(

@@ -84,6 +84,40 @@ _MONTH_NAMES: list[str] = [
 ]
 
 
+# Opaque hash/ID guard — Wix, Squarespace and similar CDNs serve files under
+# random hex hashes (e.g. /_files/ugd/18d125_593092963abf434abc12c3fd7104b6d4.pdf).
+# A bare 6- or 8-digit run inside a long hex token can coincidentally look like
+# a DDMMYY/DDMMYYYY/YYYYMMDD date (e.g. "...e290776b..." parsed as 29/07/76),
+# producing a bogus "bulletin date" that then gets rejected as stale/future.
+# Any digit-run match fully contained inside such a token is not a real date.
+_HEX_TOKEN_RE = re.compile(r"[0-9a-fA-F]+")
+_OPAQUE_HASH_MIN_LEN = 16
+
+
+def _opaque_hash_spans(text: str) -> list[tuple[int, int]]:
+    """Spans of long hex-looking tokens (likely CDN hashes/UUIDs, not dates)."""
+    spans = []
+    for m in _HEX_TOKEN_RE.finditer(text):
+        token = m.group(0)
+        if len(token) >= _OPAQUE_HASH_MIN_LEN and re.search(r"[a-fA-F]", token):
+            spans.append((m.start(), m.end()))
+    return spans
+
+
+def _is_within_opaque_hash(spans: list[tuple[int, int]], start: int, end: int) -> bool:
+    return any(s <= start and end <= e for s, e in spans)
+
+
+def _first_match_outside_hash(
+    pattern: re.Pattern, text: str, spans: list[tuple[int, int]]
+) -> re.Match | None:
+    """Like pattern.search(text), but skips matches inside opaque hash tokens."""
+    for m in pattern.finditer(text):
+        if not _is_within_opaque_hash(spans, m.start(), m.end()):
+            return m
+    return None
+
+
 def _ordinal_suffix(day: int) -> str:
     if 10 <= day % 100 <= 20:
         return "th"
@@ -96,8 +130,10 @@ def _slug_had_ordinal(slug_fragment: str) -> bool:
 
 def extract_date_from_string(text: str) -> date | None:
     """Try to parse a date from a filename/URL fragment. Returns None on failure."""
+    spans = _opaque_hash_spans(text)
+
     # ISO with dashes
-    m = _ISO_RE.search(text)
+    m = _first_match_outside_hash(_ISO_RE, text, spans)
     if m:
         try:
             return date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
@@ -105,7 +141,7 @@ def extract_date_from_string(text: str) -> date | None:
             pass
 
     # ISO without dashes (8 digits)
-    m = _ISO_NODASH_RE.search(text)
+    m = _first_match_outside_hash(_ISO_NODASH_RE, text, spans)
     if m:
         try:
             return date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
@@ -113,7 +149,7 @@ def extract_date_from_string(text: str) -> date | None:
             pass
 
     # DDMMYYYY (8 digits)
-    m = _DDMMYYYY_RE.search(text)
+    m = _first_match_outside_hash(_DDMMYYYY_RE, text, spans)
     if m:
         try:
             return date(int(m.group(3)), int(m.group(2)), int(m.group(1)))
@@ -121,7 +157,7 @@ def extract_date_from_string(text: str) -> date | None:
             pass
 
     # DDMMYY (6 digits) — interpret YY as 2000+YY
-    m = _DDMMYY_RE.search(text)
+    m = _first_match_outside_hash(_DDMMYY_RE, text, spans)
     if m:
         try:
             year = 2000 + int(m.group(3))
@@ -130,7 +166,7 @@ def extract_date_from_string(text: str) -> date | None:
             pass
 
     # YY.MM.DD — Google Drive folder rows (26.06.14 → 2026-06-14, 29.01.05 → 2029-01-05)
-    m = _YY_MM_DD_RE.search(text)
+    m = _first_match_outside_hash(_YY_MM_DD_RE, text, spans)
     if m:
         try:
             year = 2000 + int(m.group(1))
