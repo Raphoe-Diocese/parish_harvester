@@ -7,13 +7,12 @@
   "steps": [
     {
       "action": "click",
-      "selector": "a[href*=\"newsletter_280626oo.pdf\"]",
+      "selector": "a[href$='.pdf']",
       "href": "https://watersideparish.net/wp-content/uploads/2026/06/newsletter_280626oo.pdf",
       "text": "Sunday 28th June 2026 Click Here | Click Here",
       "pick_strategy": "newest_dated",
       "bulletin_position": "middle",
       "fallback_selectors": [
-        "a[href$='.pdf']",
         "a[href*='.pdf']"
       ]
     },
@@ -40,5 +39,8 @@
     "strategy": "newest_dated",
     "position": "middle"
   },
+  "operator_notes_2026_08_09": [
+    "2026-08-09 fix: the recipe's own click selector violated its do_not rule above — it was pinned to the exact trained filename 'newsletter_280626oo.pdf' (28 June), so it matched only that one link every week and newest_dated scoring never ran across the real candidate set. This silently harvested a 6-week-stale bulletin while reporting outcome=ok. Selector generalised to a[href$='.pdf']."
+  ],
   "recorded_date": "2026-07-02"
 }
