@@ -65,6 +65,13 @@ def is_cloud_document_url(url: str) -> bool:
     lower = rewrite_gdrive_download_url(url).lower()
     if lower.endswith(".pdf") or lower.endswith(".docx"):
         return True
+    # A Drive *folder* listing (cloud_folder recipes) is a container, not a
+    # document — treating it as one makes replay.py try to HTTP-GET the
+    # folder page itself as a bulletin, which always returns an HTML listing
+    # and fails with "Server returned HTML instead of document" before the
+    # recipe's click step (which picks this week's file) ever runs.
+    if "drive.google.com/drive/folders/" in lower or "drive.google.com/drive/u/" in lower:
+        return False
     markers = (
         "drive.google.com/",
         "docs.google.com/viewer",
