@@ -1446,7 +1446,25 @@ async def _replay_click_by_strategy(
                 await _click_locator_match(page, locator.nth(best_idx), step_timeout_ms)
                 return True
 
-            fallback_idx = entries[-1]["idx"] if position == "bottom" else entries[0]["idx"]
+            # _best_scored_link_index already excludes non-bulletin URLs
+            # (GDPR/Safeguarding/Privacy notice etc.) and returned None
+            # here because every matched entry was one of those. Never fall
+            # back to blindly clicking entries[0]/entries[-1] in that case —
+            # that silently harvests a GDPR/Safeguarding PDF as "the
+            # bulletin" (seen on camusparish, leckpatrickparish). Only fall
+            # back among the remaining genuine candidates, if any.
+            safe_entries = [
+                ent for ent in entries
+                if not _is_non_bulletin_url(urljoin(page.url, ent["href"]))
+            ]
+            if not safe_entries:
+                errors.append(
+                    f"{sel}: only non-bulletin links matched (GDPR/Safeguarding/"
+                    "Privacy notice etc.) — no genuine bulletin link found"
+                )
+                continue
+
+            fallback_idx = safe_entries[-1]["idx"] if position == "bottom" else safe_entries[0]["idx"]
             await _click_locator_match(page, locator.nth(fallback_idx), step_timeout_ms)
             return True
         except Exception as exc:
@@ -1457,6 +1475,23 @@ async def _replay_click_by_strategy(
     return False
 
 
+async def _open_selected_drive_row(page: Page, timeout_ms: int) -> None:
+    """Open the Drive folder row just clicked.
+
+    A single click on a Drive folder row only selects/highlights it — it
+    does not navigate anywhere and no download fires. The row's real file
+    (with a downloadable /file/d/<id>/view URL) only opens after pressing
+    Enter (or double-clicking) on the selected row. Without this, the
+    click step "succeeds" but the following download step has nothing to
+    find (see Bruckless: "did not find a matching document URL").
+    """
+    try:
+        await page.keyboard.press("Enter")
+        await page.wait_for_load_state("domcontentloaded", timeout=min(timeout_ms, 15_000))
+    except Exception:
+        pass
+
+
 async def _replay_click(
     page: Page,
     step: dict,
@@ -1464,11 +1499,13 @@ async def _replay_click(
     *,
     target_date: date | None = None,
 ) -> None:
+    is_cloud_folder = is_cloud_folder_click_step(step)
     if target_date:
         if is_year_folder_click_step(step):
             step = rewrite_year_folder_click_step(step, target_date)
         if is_cloud_folder_click_step(step):
             step = rewrite_cloud_folder_click_step(step, target_date)
+            is_cloud_folder = True
 
     selectors: list[str] = []
     selector = (step.get("selector") or "").strip()
@@ -1483,12 +1520,16 @@ async def _replay_click(
 
     if step.get("pick_strategy"):
         if await _replay_click_by_strategy(page, step, selectors, step_timeout_ms):
+            if is_cloud_folder:
+                await _open_selected_drive_row(page, step_timeout_ms)
             return
 
     errors: list[str] = []
     for sel in selectors:
         try:
             await _click_locator_match(page, page.locator(sel).first, step_timeout_ms)
+            if is_cloud_folder:
+                await _open_selected_drive_row(page, step_timeout_ms)
             return
         except Exception as exc:
             errors.append(f"{sel}: {exc}")
