@@ -427,9 +427,19 @@ async def _wait_for_bulletin_content(page: Page, recipe: dict, timeout_ms: int) 
                 return
             await asyncio.sleep(0.5)
         return
+    # BUG (found 2026-08-09): this used to give EACH probe the full `budget`
+    # timeout, so a recipe with no site_type/playbook_type (falls through to
+    # the 4-selector default list above) could burn 4x the per-step timeout
+    # just on this one wait — e.g. 4x40s=160s — before ever reaching the
+    # click/download steps. That alone accounted for most of the "Total
+    # timeout exceeded" failures across a whole diocese (Down & Connor:
+    # drumquinparish, carrickparish, holy-familyparish, saintannesparish,
+    # glenariffeparish, and ~15 more all share this exact recipe shape).
+    # Divide the budget across probes instead, same as the pdfemb branch.
+    per_sel = max(3_000, min(budget, budget // max(len(probes), 1)))
     for sel in probes:
         try:
-            await page.wait_for_selector(sel, timeout=budget)
+            await page.wait_for_selector(sel, timeout=per_sel)
             return
         except PlaywrightTimeoutError:
             continue

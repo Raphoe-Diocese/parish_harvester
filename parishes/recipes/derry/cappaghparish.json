@@ -11,12 +11,16 @@
     },
     {
       "action": "click",
-      "selector": "a:has-text(\"Parish News - Sunday, 10th May 2026\")",
+      "selector": "a[href$='.pdf']",
+      "pick_strategy": "newest_dated",
       "fallback_selectors": [
-        "a[href$='.pdf']",
-        "div#banner > div > section > a:nth-of-type(3)"
+        "div#banner > div > section > a:nth-of-type(3)",
+        "a:has-text(\"Parish News - Sunday, 10th May 2026\")"
       ]
     }
+  ],
+  "operator_notes_2026_08_09": [
+    "2026-08-09 fix: primary selector was pinned to the literal trained-week text 'Parish News - Sunday, 10th May 2026' with no pick_strategy — will never match again after that date. Generalised to a[href$='.pdf'] + newest_dated (same class of bug found in watersideparish/drumquinparish). Not currently in parish_status.json (untested this pass) — flag for a live test next sweep."
   ],
   "recorded_date": "2026-05-10"
 }

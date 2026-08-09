@@ -11,16 +11,20 @@
     },
     {
       "action": "click",
+      "selector": "a[href$='.pdf']",
+      "pick_strategy": "newest_dated",
       "fallback_selectors": [
-        "a[href$='.pdf']",
-        "div:nth-of-type(1) > div:nth-of-type(1) > div > div:nth-of-type(1) > div > a"
-      ],
-      "selector": "a:has-text(\"Sunday, 14th June 2026\")"
+        "div:nth-of-type(1) > div:nth-of-type(1) > div > div:nth-of-type(1) > div > a",
+        "a:has-text(\"Sunday, 14th June 2026\")"
+      ]
     },
     {
-      "action": "download",
-      "use_captured_url": true
+      "action": "download"
     }
+  ],
+  "operator_notes_2026_08_09": [
+    "2026-08-09 fix attempt: primary selector was pinned to the literal trained-week text 'Sunday, 14th June 2026' with no pick_strategy — once that date passed, the locator never matched anything and the recipe burned its entire timeout budget waiting for it (category: timeout), never reaching the fallback. Generalised to a[href$='.pdf'] + newest_dated, also dropped use_captured_url on download (was reusing the trained June PDF URL forever).",
+    "Static HTML check found no PDF/bulletin link anywhere on / or /news.html — homepage only links Standing Order/Gift Aid PDFs, and news.html is empty boilerplate with no JS-rendered content visible to a plain HTTP GET. If this still fails after the selector fix, the site likely needs re-training with a live browser/screenshot to find where the newsletter actually now lives."
   ],
   "recorded_date": "2026-06-13",
   "auto_fixed": true
