@@ -11,13 +11,13 @@
     },
     {
       "action": "click",
-      "selector": "#wpsp-24188 article:first-child h2.wp-show-posts-entry-title a",
+      "selector": "h2.wp-show-posts-entry-title a[href*='church-of-the-holy-family-newsletter']",
       "text": "Church of the Holy Family Newsletter",
       "pick_strategy": "first_match",
       "bulletin_position": "top",
       "fallback_selectors": [
-        "h2.wp-show-posts-entry-title a[href*='church-of-the-holy-family-newsletter']",
-        "section.wp-show-posts article h2 a[href*='church-of-the-holy-family-newsletter']"
+        "section.wp-show-posts article h2 a[href*='church-of-the-holy-family-newsletter']",
+        "#wpsp-24188 article:first-child h2.wp-show-posts-entry-title a"
       ]
     },
     {
@@ -38,7 +38,12 @@
   ],
   "do_not": [
     "Do not pin a fixed weekly URL — the slug changes every Sunday.",
-    "Do not remove skip_listing_nav — without it html_capture re-navigates away and prints a blank page."
+    "Do not remove skip_listing_nav — without it html_capture re-navigates away and prints a blank page.",
+    "Do not put the generic '#wpsp-24188 article:first-child' selector first — that widget also shows non-newsletter posts (e.g. a community press release), and first_match blindly clicks whatever is first without checking the title."
+  ],
+  "operator_notes_2026_08_09": [
+    "2026-08-09 fix: the widget's literal first post was a 'PRESS RELEASE' (Ardara/Sardinia twinning event), not the newsletter — first_match clicked it and harvested 0 mass-times content. Reordered so the href*='church-of-the-holy-family-newsletter' selector is tried first; the generic first-child selector is now only a last-resort fallback.",
+    "2026-08-09 fix: html_capture.py's CONTENT_SELECTORS also reordered globally (prefer .entry-content over generic article tag) — the theme's related-posts widget lives inside the same <article> wrapper as the real post body, so selecting 'article' first swept up an extra full newsletter and inflated the page count to 8 (over the 4-page limit) even for a genuinely short ~330-word notice."
   ],
   "recorded_date": "2026-07-29",
   "bulletin_layout": {

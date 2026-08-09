@@ -22,11 +22,19 @@ if TYPE_CHECKING:
 
 CONTENT_SELECTORS: tuple[str, ...] = (
     "[data-ph-bulletin-root]",
-    "article",
+    # Prefer the tightest "just the post body" theme class first — many WP
+    # themes append a "related posts" / "you might also like" widget with
+    # full sibling <article> content *inside* the same outer <article>
+    # wrapper (below .entry-content, but still a descendant of it), so
+    # picking the generic "article" tag first can sweep up extra full
+    # newsletter posts and wrongly balloon the page count (see ardara.ie —
+    # real bulletin is ~2 short paragraphs, but selecting "article" printed
+    # 8 pages because a prior week's full newsletter was bundled in too).
     ".entry-content",
     ".post-content",
-    ".content-area",
     ".inside-article",
+    "article",
+    ".content-area",
     ".site-content",
     '[role="main"]',
     "main",
