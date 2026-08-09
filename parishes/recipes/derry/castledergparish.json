@@ -7,7 +7,8 @@
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.castledergparish.com/pdf/280626.pdf"
+      "url": "https://www.castledergparish.com/pdf/280626.pdf",
+      "use_target_url": true
     },
     {
       "action": "download",
@@ -24,11 +25,18 @@
     "Tab title may say .docx or .jpg — ignore that; check the address bar ends in .pdf.",
     "On the PDF page: tap Save this PDF — saves the full https://… address for Sunday harvest.",
     "Or start on parishnews.html → point at this week's link → Yes → Save this PDF.",
-    "Harvester rewrites DDMMYY in the URL each Sunday (e.g. 140626 → 210626)."
+    "2026-08-09 FIX: goto step was missing use_target_url, so use_captured_url on the",
+    "download step froze the trained week's PDF forever (goto's static URL 404s/redirects",
+    "over time and the recipe was silently grabbing an unrelated PDF from the site,",
+    "e.g. a Gift Aid form, while still reporting outcome=ok). Added use_target_url:true",
+    "on goto so it navigates straight to this week's correctly dated PDF each Sunday",
+    "(same fix already applied to dmaparish.json and documented in ardmoreparish.json)."
   ],
   "do_not": [
     "Do not use use_page_url only — GitHub cannot read Chrome's internal PDF viewer address.",
-    "Do not worry if Document Properties title mentions Microsoft Word."
+    "Do not worry if Document Properties title mentions Microsoft Word.",
+    "Do not remove use_target_url from the goto step — without it this recipe silently",
+    "captures the wrong PDF while still reporting success."
   ],
   "recorded_date": "2026-06-27"
 }

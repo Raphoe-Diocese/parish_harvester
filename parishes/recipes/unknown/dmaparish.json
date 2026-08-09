@@ -3,17 +3,33 @@
   "parish_key": "dmaparish",
   "display_name": "DMA Parish (Claudy Area)",
   "diocese": "",
-  "start_url": "https://dmaparish.com/index.html",
+  "start_url": "https://dmaparish.com/pdf/020826.pdf",
   "steps": [
     {
       "action": "goto",
-      "url": "https://dmaparish.com/index.html"
+      "url": "https://dmaparish.com/pdf/020826.pdf",
+      "use_target_url": true
     },
     {
       "action": "download",
-      "url_pattern": "*.pdf"
+      "url": "https://dmaparish.com/pdf/020826.pdf",
+      "use_captured_url": true
     }
   ],
-  "recorded_date": "2026-06-26",
-  "auto_fixed": true
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "playbook_type": "dated_pdf_bulletin",
+  "site_type": "dated_pdf_path",
+  "operator_notes": [
+    "index.html on this host is very slow/heavy for a headless browser and was timing out the whole recipe.",
+    "The PDF itself lives at a predictable dated path: /pdf/DDMMYY.pdf (e.g. 020826.pdf = 2 Aug 2026).",
+    "Confirmed 2026-08-09: https://dmaparish.com/pdf/090826.pdf already returns HTTP 200 application/pdf via a plain HTTP request.",
+    "Harvester rewrites DDMMYY in the URL each Sunday, same mechanism as castledergparish.json."
+  ],
+  "do_not": [
+    "Do not go back to loading index.html as the start_url — that is what caused the 250s+ timeouts.",
+    "Do not click-hunt for *.pdf on the homepage — go straight to the dated PDF path."
+  ],
+  "recorded_date": "2026-08-09",
+  "auto_fixed": false
 }

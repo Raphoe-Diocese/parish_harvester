@@ -38,6 +38,7 @@ from .utils import (
     extract_date_from_string,
     extract_newsletter_number,
     oneweb_newsletter_download_urls,
+    predict_dropfiles_bulletin_urls,
     rewrite_date_url,
     rewrite_newsletter_number_for_target,
 )
@@ -52,9 +53,13 @@ RECIPE_STEP_TIMEOUT_MS = PAGE_LOAD_TIMEOUT_MS
 POST_CLICK_WAIT_TIMEOUT_MS = 3_000
 MAX_SELECTOR_ERRORS = 3
 DROPFILES_DOWNLOAD_SELECTORS = (
-    "a.mod_downloadlink[href]",
     ".mod_dropfiles_latest a.mod_downloadlink[href]",
     ".mod_dropfiles_list a.mod_downloadlink[href]",
+    "a.mod_downloadlink[href]",
+)
+_DROPFILES_FILE_ID_RE = re.compile(
+    r"/(?:Newsletters|Weekly-Bulletins|Bulletins)/(\d+)/",
+    re.IGNORECASE,
 )
 PDFEMB_SELECTOR = "a.pdfemb-viewer[href]"
 PDFEMB_HREF_EXTRACT_JS = "(els) => els.map(el => el.getAttribute('href')).filter(Boolean)"
@@ -667,26 +672,159 @@ async def _download_document_url(
     return raw_url, "pdf"
 
 
+async def _click_dropfiles_locator_download(
+    page: Page,
+    locator,
+    dest: Path,
+    timeout_ms: int,
+) -> tuple[str, str] | None:
+    """Click one Dropfiles download locator and convert the result to PDF."""
+    try:
+        await locator.wait_for(state="visible", timeout=min(timeout_ms, 10_000))
+        href = (await locator.get_attribute("href") or "").strip()
+        async with page.expect_download(timeout=timeout_ms) as dl_info:
+            await locator.click(timeout=timeout_ms)
+        download = await dl_info.value
+        file_type = await _save_download_to_pdf(download, dest)
+        source = urljoin(page.url, href) if href else page.url
+        return source, file_type
+    except Exception:
+        return None
+
+
+def _dropfiles_example_href_from_recipe(recipe: dict) -> str:
+    for step in recipe.get("steps") or []:
+        if not isinstance(step, dict):
+            continue
+        href = str(step.get("href") or "").strip()
+        if href and extract_newsletter_number(href) is not None:
+            return href
+        url = str(step.get("url") or "").strip()
+        if url and extract_newsletter_number(url) is not None:
+            return url
+    return ""
+
+
+async def _try_dropfiles_predicted_downloads(
+    page: Page,
+    dest: Path,
+    example_href: str,
+    timeout_ms: int,
+    *,
+    target_date: date | None,
+) -> tuple[str, str] | None:
+    """Fallback 3: liturgical-title + sequential ID prediction when listing fails."""
+    if not example_href or target_date is None:
+        return None
+    # Keep prediction cheap — long per-URL timeouts explode under harvest retries.
+    probe_timeout_ms = min(max(int(timeout_ms), 1), 12_000)
+    block_hits = 0
+    for candidate in predict_dropfiles_bulletin_urls(example_href, target_date)[:6]:
+        # Direct browser download only — do not recurse into listing discovery.
+        try:
+            async with page.expect_download(timeout=probe_timeout_ms) as dl_info:
+                response = await page.goto(
+                    candidate, timeout=probe_timeout_ms, wait_until="commit"
+                )
+            if response is not None and response.status in _BOT_BLOCK_HTTP_STATUSES:
+                block_hits += 1
+                if block_hits >= 2:
+                    return None
+                continue
+            download = await dl_info.value
+            file_type = await _save_download_to_pdf(download, dest)
+            return candidate, file_type
+        except Exception:
+            pass
+        try:
+            return await _download_document_url(
+                page, candidate, dest, timeout_ms=probe_timeout_ms
+            )
+        except RecipeReplayError as exc:
+            if "blocking automated access" in str(exc).lower() or "HTTP 403" in str(exc):
+                block_hits += 1
+                if block_hits >= 2:
+                    return None
+            continue
+    return None
+
+
 async def _try_joomla_dropfiles_click_download(
     page: Page,
     dest: Path,
     timeout_ms: int,
+    *,
+    target_date: date | None = None,
+    example_href: str | None = None,
+    allow_prediction: bool = True,
 ) -> tuple[str, str] | None:
-    """Click the first Joomla Dropfiles cloud-download link and save the file."""
-    for selector in DROPFILES_DOWNLOAD_SELECTORS:
-        locator = page.locator(selector).first
-        try:
-            await locator.wait_for(state="visible", timeout=min(timeout_ms, 10_000))
-            href = (await locator.get_attribute("href") or "").strip()
-            async with page.expect_download(timeout=timeout_ms) as dl_info:
-                await locator.click(timeout=timeout_ms)
-            download = await dl_info.value
-            file_type = await _save_download_to_pdf(download, dest)
-            source = urljoin(page.url, href) if href else page.url
-            return source, file_type
-        except Exception:
-            continue
-    return None
+    """
+    Resilient Joomla Dropfiles discovery chain:
+
+    1. Primary — ``.mod_dropfiles_latest`` first bulletin link
+    2. Fallback 1 — highest visible ``/Bulletins|Newsletters|Weekly-Bulletins/NNN/`` file ID
+    3. Fallback 2 — newest by date/keyword scoring among visible download links
+    4. Fallback 3 — liturgical-title + sequential ID URL prediction
+    """
+    # Primary: latest module, first link (newest appears first).
+    primary = page.locator(".mod_dropfiles_latest a.mod_downloadlink[href]").first
+    picked = await _click_dropfiles_locator_download(page, primary, dest, timeout_ms)
+    if picked:
+        return picked
+
+    # Collect all visible Dropfiles download anchors once.
+    entries = await _collect_anchor_entries(page, "a.mod_downloadlink[href]")
+    if entries:
+        # Fallback 1: highest sequential file ID.
+        id_ranks: list[tuple[int, int, int]] = []
+        for ent in entries:
+            resolved = urljoin(page.url, ent["href"])
+            if resolved and _is_non_bulletin_url(resolved):
+                continue
+            m = _DROPFILES_FILE_ID_RE.search(resolved)
+            if not m:
+                continue
+            file_id = int(m.group(1))
+            id_ranks.append((file_id, -ent["idx"], ent["idx"]))
+        if id_ranks:
+            best_idx = max(id_ranks)[2]
+            picked = await _click_dropfiles_locator_download(
+                page, page.locator("a.mod_downloadlink[href]").nth(best_idx), dest, timeout_ms
+            )
+            if picked:
+                return picked
+
+        # Fallback 2: date / keyword scoring.
+        scored_idx = _best_scored_link_index(entries, page.url, position="top")
+        if scored_idx is not None:
+            picked = await _click_dropfiles_locator_download(
+                page,
+                page.locator("a.mod_downloadlink[href]").nth(scored_idx),
+                dest,
+                timeout_ms,
+            )
+            if picked:
+                return picked
+
+        # Last visible-link attempt: selector order (list module, then any).
+        for selector in DROPFILES_DOWNLOAD_SELECTORS[1:]:
+            picked = await _click_dropfiles_locator_download(
+                page, page.locator(selector).first, dest, timeout_ms
+            )
+            if picked:
+                return picked
+
+    if not allow_prediction:
+        return None
+
+    # Fallback 3: predict URL when listing is missing/blocked.
+    return await _try_dropfiles_predicted_downloads(
+        page,
+        dest,
+        example_href or "",
+        timeout_ms,
+        target_date=target_date,
+    )
 
 
 async def _try_browser_nav_download(
@@ -724,7 +862,9 @@ async def _try_browser_nav_download(
         except Exception:
             pass
 
-    picked = await _try_joomla_dropfiles_click_download(page, dest, timeout_ms)
+    picked = await _try_joomla_dropfiles_click_download(
+        page, dest, timeout_ms, allow_prediction=False
+    )
     if picked:
         return picked
 
@@ -750,8 +890,14 @@ def _resolve_download_candidates(
         return [step_url]
     if "newsletter" in step_url.lower() and "onewebmedia" in step_url.lower():
         return oneweb_newsletter_download_urls(step_url, target_date)
-    if re.search(r"/(?:Newsletters|Weekly-Bulletins)/\d+/", step_url, re.I):
-        return [rewrite_newsletter_number_for_target(step_url, target_date)]
+    if re.search(r"/(?:Newsletters|Weekly-Bulletins|Bulletins)/\d+/", step_url, re.I):
+        predicted = predict_dropfiles_bulletin_urls(step_url, target_date)
+        rewritten = rewrite_newsletter_number_for_target(step_url, target_date)
+        out: list[str] = []
+        for url in [*predicted, rewritten, step_url]:
+            if url and url not in out:
+                out.append(url)
+        return out
     return [rewrite_date_url(step_url, target_date)]
 
 
@@ -1349,6 +1495,8 @@ async def replay_recipe(
     if not start_url:
         start_url = (target_url or "").strip()
     host_profile = _host_profile_for_start_url(start_url)
+    site_type = str(recipe.get("site_type") or "").strip().lower()
+    dropfiles_example = _dropfiles_example_href_from_recipe(recipe)
     context_opts: dict = {"accept_downloads": True}
     if host_profile.get("ignore_https_errors"):
         context_opts["ignore_https_errors"] = True
@@ -1380,7 +1528,24 @@ async def replay_recipe(
             if captured:
                 return captured
         elif not _recipe_is_gdrive_static(recipe):
-            await _navigate_page(page, start_url, step_timeout_ms, wait_until=nav_wait_until)
+            try:
+                await _navigate_page(page, start_url, step_timeout_ms, wait_until=nav_wait_until)
+            except RecipeReplayError as exc:
+                # Dropfiles sites may block the listing page but still serve predicted downloads.
+                if (
+                    site_type == "joomla_dropfiles"
+                    and "blocking automated access" in str(exc).lower()
+                ):
+                    predicted = await _try_dropfiles_predicted_downloads(
+                        page,
+                        dest,
+                        dropfiles_example,
+                        step_timeout_ms,
+                        target_date=target_date,
+                    )
+                    if predicted:
+                        return dest, predicted[1], predicted[0]
+                raise
             if _looks_like_http_url(start_url):
                 last_http_url = start_url
 
@@ -1425,7 +1590,13 @@ async def replay_recipe(
                     file_type = await _save_download_to_pdf(downloads.pop(0), dest)
                     source_url = page.url
                     return dest, file_type, source_url
-                picked = await _try_joomla_dropfiles_click_download(page, dest, step_timeout_ms)
+                picked = await _try_joomla_dropfiles_click_download(
+                    page,
+                    dest,
+                    step_timeout_ms,
+                    target_date=target_date,
+                    example_href=dropfiles_example or (step.get("href") or "").strip(),
+                )
                 if picked:
                     return dest, picked[1], picked[0]
                 if _is_document_url(page.url):

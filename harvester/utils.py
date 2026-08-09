@@ -709,6 +709,87 @@ def rewrite_newsletter_number_for_target(url: str, target: date) -> str:
     return url[: m.start()] + m.group(1) + f"{new_number}/"
 
 
+def dropfiles_liturgical_slug(target: date) -> str | None:
+    """
+    Port Glenone / Three Patrons Dropfiles title slug for *target* Sunday.
+
+    Example: 18th_Sunday_in_Ordinary_Time → 18th-SUNDAY-IN-ORDINARY-TIME
+    """
+    from .liturgical import get_liturgical_name
+
+    name = get_liturgical_name(target)
+    if not name:
+        return None
+    parts = [p for p in name.split("_") if p]
+    if not parts:
+        return None
+    # Keep ordinal head (18th / 1st / 2nd / 3rd); upper-case the rest like the live site.
+    head = parts[0]
+    rest = "-".join(p.upper() for p in parts[1:])
+    return f"{head}-{rest}" if rest else head.upper()
+
+
+def predict_dropfiles_bulletin_urls(
+    example_url: str,
+    target: date,
+    *,
+    id_window: int = 3,
+) -> list[str]:
+    """
+    Build resilient Dropfiles download URL candidates from a known example href.
+
+    Tries liturgical title slugs across a small sequential file-ID window so harvest
+    still works when the listing page is empty or blocked.
+    """
+    example_url = (example_url or "").strip()
+    if not example_url:
+        return []
+    m = _NEWSLETTER_NUM_RE.search(example_url)
+    if not m:
+        return []
+
+    prefix = example_url[: m.start()] + m.group(1)
+    example_num = int(m.group(2))
+    rewritten = rewrite_newsletter_number_for_target(example_url, target)
+    predicted_num = extract_newsletter_number(rewritten) or (example_num + 1)
+    slug = dropfiles_liturgical_slug(target)
+
+    nums: list[int] = []
+    for n in (
+        predicted_num,
+        example_num,
+        predicted_num + 1,
+        example_num + 1,
+        predicted_num - 1,
+        example_num - 1,
+    ):
+        if n is None or n < 1:
+            continue
+        if n not in nums:
+            nums.append(n)
+        if len(nums) >= id_window + 2:
+            break
+
+    # Expand a contiguous window around the best guess.
+    center = predicted_num or example_num
+    for n in range(center - id_window, center + id_window + 1):
+        if n >= 1 and n not in nums:
+            nums.append(n)
+
+    out: list[str] = []
+    seen: set[str] = set()
+    for num in nums:
+        candidates = []
+        if slug:
+            candidates.append(f"{prefix}{num}/{slug}")
+        candidates.append(f"{prefix}{num}/")
+        for url in candidates:
+            if url not in seen:
+                seen.add(url)
+                out.append(url)
+    return out
+
+
 def safe_filename(prefix: str, suffix: str) -> str:
     """Combine a sanitized parish prefix with a file suffix."""
     prefix = re.sub(r"[^a-z0-9_-]", "_", prefix.lower())
