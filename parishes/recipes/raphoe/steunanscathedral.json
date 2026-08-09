@@ -11,9 +11,7 @@
       "selector": "a[href$=\".pdf\"], a[href*=\".pdf\"]"
     },
     {
-      "action": "download",
-      "url": "https://www.steunanscathedral.ie/wp-content/uploads/2026/06/Newsletter-28th-June-2026.pdf",
-      "use_captured_url": true
+      "action": "download"
     }
   ],
   "observed_load_ms": 1785,
@@ -23,5 +21,17 @@
     "strategy": "newest_dated",
     "position": "top"
   },
-  "recorded_date": "2026-06-29"
+  "recorded_date": "2026-06-29",
+  "operator_notes_2026_08_09": [
+    "FIX: download step had use_captured_url:true pinned to the 28 June 2026",
+    "trained PDF. replay.py's click-step peek-ahead sees use_captured_url",
+    "and downloads that exact old URL via plain HTTP before the click even",
+    "runs, so the recipe silently froze on a 6-week-old bulletin forever",
+    "while still reporting outcome=ok. Removed use_captured_url + the stale",
+    "url so pick_strategy:newest_dated actually runs the click.",
+    "Confirmed 2026-08-09: the live page's raw HTML has a real",
+    "a[href$='.pdf'] link straight to /wp-content/uploads/2026/08/",
+    "Newsletter-9th-August-2026.pdf (today's bulletin) — this fix should",
+    "let the harvester find it."
+  ]
 }

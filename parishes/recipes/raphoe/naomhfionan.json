@@ -16,10 +16,19 @@
       "pick_strategy": "newest_dated"
     },
     {
-      "action": "download",
-      "url": "https://naomhfionan.com/wp-content/uploads/2026/06/Parish-Newsletter-25-for-Sun-A-21062026.pdf",
-      "use_captured_url": true
+      "action": "download"
     }
   ],
-  "version": 1
+  "version": 1,
+  "operator_notes_2026_08_09": [
+    "FIX: download step had use_captured_url:true pinned to the 21 June 2026",
+    "trained PDF, which silently froze/broke the recipe (replay.py's click",
+    "peek-ahead tries that exact old URL via plain HTTP before the click",
+    "even runs). Removed use_captured_url so pick_strategy:newest_dated",
+    "actually runs the click.",
+    "Confirmed 2026-08-09: the live page's raw HTML has a real",
+    "a[href$='.pdf'] link straight to /wp-content/uploads/2026/08/",
+    "Parish-Newsletter-32-for-Sun-A-09082026.pdf (today's bulletin) —",
+    "this fix should let the harvester find it."
+  ]
 }

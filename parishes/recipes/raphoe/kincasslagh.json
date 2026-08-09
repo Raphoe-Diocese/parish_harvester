@@ -35,9 +35,7 @@
       ]
     },
     {
-      "action": "download",
-      "url": "https://kincasslagh.ie/app/uploads/2026/07/20260705.pdf",
-      "use_captured_url": true
+      "action": "download"
     }
   ],
   "observed_load_ms": 8000,
@@ -46,5 +44,16 @@
   "bulletin_layout": {
     "strategy": "newest_dated",
     "position": "top"
-  }
+  },
+  "operator_notes_2026_08_09": [
+    "FIX: download step had use_captured_url:true pinned to the 5 July 2026",
+    "trained PDF, which silently froze the recipe on that file forever",
+    "(replay.py's click-step peek-ahead downloads the captured URL via",
+    "plain HTTP before the click even runs). Removed use_captured_url so",
+    "pick_strategy:newest_dated actually finds the newest .all-bulletins row.",
+    "NOTE: as of 2026-08-09 the live site itself has nothing newer than",
+    "5 July 2026 and shows a banner saying the parish is mid website",
+    "migration and past bulletins will return shortly — this is a genuine",
+    "content gap on the parish's side, not a recipe bug."
+  ]
 }

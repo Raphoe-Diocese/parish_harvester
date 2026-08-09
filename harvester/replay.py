@@ -1269,7 +1269,19 @@ async def _click_locator_match(
         await locator.click(timeout=step_timeout_ms)
     except PlaywrightTimeoutError:
         if resolved and _looks_like_http_url(resolved):
-            await _navigate_page(page, resolved, step_timeout_ms, wait_until="commit")
+            try:
+                await _navigate_page(page, resolved, step_timeout_ms, wait_until="commit")
+            except PlaywrightError as exc:
+                if "ERR_ABORTED" not in str(exc):
+                    raise
+                # Chromium aborts goto() when the target is a direct file
+                # download (e.g. a bulletin PDF the browser hands off to a
+                # download instead of rendering) — this is expected, not a
+                # broken selector. Without this, every parish whose newest
+                # bulletin link happens to be a direct PDF (not a listing
+                # page) was misreported as "recipe outdated" here even
+                # though the correct link was found (see annagryparish).
+                return
         else:
             raise
     try:
