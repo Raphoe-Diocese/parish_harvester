@@ -11,33 +11,41 @@
     },
     {
       "action": "click",
-      "href": "https://clonleighparish.com/2026/06/19/strabane-pastoral-area-newsletter-for-sunday-21st-june-2026/",
-      "selector": "article#post-9487 > div > section > figure > figcaption > a",
-      "text": "Strabane Pastoral Area Newsletter for Sunday 21st June 2026 "
+      "selector": "article .entry-title a",
+      "pick_strategy": "first_match",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "article h2 a",
+        "a:has-text('Strabane Pastoral Area Newsletter')"
+      ]
     },
     {
-      "action": "click",
-      "href": "https://clonleighparish.com/2026/06/19/strabane-pastoral-area-newsletter-for-sunday-21st-june-2026/",
-      "selector": "html > body > a:nth-of-type(2)",
-      "text": ""
-    },
-    {
-      "action": "print_to_pdf"
+      "action": "print_to_pdf",
+      "skip_listing_nav": true
     }
   ],
   "observed_load_ms": 2354,
   "timeout_ms": 45000,
   "total_timeout_s": 90,
-  "playbook_type": "permanent_bulletin_page",
-  "site_type": "wp_block_file_bulletin",
+  "playbook_type": "html_text_bulletin",
+  "site_type": "html_text_bulletin",
+  "max_bulletin_pages": 16,
   "operator_notes": [
-    "Permanent /parish-bulletin/ URL — PDF filename changes weekly under /wp-content/uploads/YYYY/MM/.",
-    "PDF is in object.wp-block-file__embed[data] — harvest scrapes the embed URL.",
-    "Use url_pattern *bulletin*.pdf — never pin a dated filename."
+    "Newsletter list at /category/newsletter/ — newest post is top entry-title link.",
+    "Bulletin is HTML in article .entry-content — click newest post, then print_to_pdf.",
+    "skip_listing_nav=true prevents html_capture re-navigating away from the article.",
+    "Do not pin post IDs or dated weekly URLs — pick_strategy=first_match selects the current top post.",
+    "Strabane Pastoral Area newsletter covers multiple parishes and is genuinely long —",
+    "confirmed 11 pages for 2 Aug 2026 issue via operator screenshot (not page-chrome bloat).",
+    "max_bulletin_pages raised to 16 (11 + margin) — default cap of 4 was rejecting real content."
   ],
   "do_not": [
-    "Do not train on the homepage — use the dedicated bulletin page only.",
-    "Do not pin saintanthony.co.uk if the parish moved to saintanthonys.uk."
+    "Do not train on the homepage — use /category/newsletter/ only.",
+    "Do not hardcode article#post-NNNN or a dated newsletter slug."
   ],
-  "recorded_date": "2026-06-24"
+  "recorded_date": "2026-08-08",
+  "bulletin_layout": {
+    "strategy": "first_match",
+    "position": "top"
+  }
 }

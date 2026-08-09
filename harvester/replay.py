@@ -1096,23 +1096,28 @@ async def _print_page_to_pdf(page: Page, dest: Path) -> None:
     dest.write_bytes(pdf_bytes)
 
 
-def _verify_bulletin_pdf(dest: Path) -> None:
+def _verify_bulletin_pdf(dest: Path, max_pages: int | None = None) -> None:
     """Reject HTML/print captures that are too long to be a real weekly bulletin.
 
     Mirrors ``fetcher._verify_bulletin_pdf`` so recipe-driven HTML/print_to_pdf
     steps get the same page-count safety net as direct PDF downloads (previously
     only the direct-download path was checked; the HTML print fallback below
     could silently save a full multi-page article/site as the "bulletin").
+
+    *max_pages* lets a recipe override the global default via its own
+    ``max_bulletin_pages`` field (e.g. multi-parish pastoral-area newsletters
+    that are genuinely longer than a normal single-parish bulletin).
     """
+    limit = MAX_BULLETIN_PAGES if max_pages is None else int(max_pages)
     try:
         reader = PdfReader(str(dest))
         page_count = len(reader.pages)
     except Exception:
         return  # unreadable — leave it to the caller's PDF checks
-    if page_count > MAX_BULLETIN_PAGES:
+    if page_count > limit:
         dest.unlink(missing_ok=True)
         raise ValueError(
-            f"❌ Too many pages: {page_count} pages (max {MAX_BULLETIN_PAGES})"
+            f"❌ Too many pages: {page_count} pages (max {limit})"
         )
 
 
@@ -1123,22 +1128,26 @@ async def _smart_print_page_to_pdf(
     *,
     wait_ms: int = 2500,
     skip_listing_nav: bool = False,
+    max_pages: int | None = None,
 ) -> None:
     """Print HTML bulletins using Parish Messenger / content-region detection when possible."""
     from .html_capture import capture_html_page_as_pdf
+
+    def _verify(d: Path) -> None:
+        _verify_bulletin_pdf(d, max_pages)
 
     ok, _mode = await capture_html_page_as_pdf(
         page,
         dest,
         target,
         print_pdf=_print_page_to_pdf,
-        verify_pdf=_verify_bulletin_pdf,
+        verify_pdf=_verify,
         wait_ms=wait_ms,
         skip_listing_nav=skip_listing_nav,
     )
     if not ok:
         await _print_page_to_pdf(page, dest)
-        _verify_bulletin_pdf(dest)
+        _verify_bulletin_pdf(dest, max_pages)
 
 
 def _recipe_uses_parish_messenger(recipe: dict) -> bool:
@@ -1786,7 +1795,10 @@ async def replay_recipe(
                 await _prepare_page_for_html_print(page, recipe, step_timeout_ms)
                 print_wait_ms = 25_000 if _recipe_uses_parish_messenger(recipe) else 2500
                 skip_nav = bool(step.get("skip_listing_nav", False))
-                await _smart_print_page_to_pdf(page, dest, target_date, wait_ms=print_wait_ms, skip_listing_nav=skip_nav)
+                await _smart_print_page_to_pdf(
+                    page, dest, target_date, wait_ms=print_wait_ms, skip_listing_nav=skip_nav,
+                    max_pages=recipe.get("max_bulletin_pages"),
+                )
                 return dest, "print_to_pdf", html_url
 
             if action == "print_to_pdf":
@@ -1799,7 +1811,10 @@ async def replay_recipe(
                 await _prepare_page_for_html_print(page, recipe, step_timeout_ms)
                 print_wait_ms = 25_000 if _recipe_uses_parish_messenger(recipe) else 2500
                 skip_nav = bool(step.get("skip_listing_nav", False))
-                await _smart_print_page_to_pdf(page, dest, target_date, wait_ms=print_wait_ms, skip_listing_nav=skip_nav)
+                await _smart_print_page_to_pdf(
+                    page, dest, target_date, wait_ms=print_wait_ms, skip_listing_nav=skip_nav,
+                    max_pages=recipe.get("max_bulletin_pages"),
+                )
                 return dest, "print_to_pdf", pdf_url
 
             if action == "crop_screenshot":
