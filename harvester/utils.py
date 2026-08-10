@@ -157,6 +157,24 @@ def _slug_had_ordinal(slug_fragment: str) -> bool:
     return bool(re.search(r"\d{1,2}(?:st|nd|rd|th)\b", slug_fragment, re.IGNORECASE))
 
 
+def _is_plausible_bulletin_year(year: int) -> bool:
+    """Reject years so far in the past/future they can only be a parsing
+    artifact, not a real bulletin date.
+
+    A raw 4-digit-year match (ISO/DDMMYYYY) is otherwise only checked by
+    Python's date() constructor, which happily accepts any year 1-9999 — a
+    typo'd archive filename like "22107018.pdf" parses under DDMMYYYY as
+    day=22/month=10/year=7018, a "valid" date() that then silently outranks
+    every genuinely dated 2020s bulletin link on the page (found
+    2026-08-10, kincasslagh: picked an 18th July 2021 PDF instead of the
+    real 5th July 2026 newsletter because of this). Parish bulletin
+    archives realistically span at most a few decades back and are never
+    dated more than ~2 years ahead of today.
+    """
+    today = date.today()
+    return (today.year - 50) <= year <= (today.year + 2)
+
+
 def extract_date_from_string(text: str) -> date | None:
     """Try to parse a date from a filename/URL fragment. Returns None on failure."""
     spans = _opaque_hash_spans(text)
@@ -165,7 +183,9 @@ def extract_date_from_string(text: str) -> date | None:
     m = _first_match_outside_hash(_ISO_RE, text, spans)
     if m:
         try:
-            return date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+            candidate = date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+            if _is_plausible_bulletin_year(candidate.year):
+                return candidate
         except ValueError:
             pass
 
@@ -173,7 +193,9 @@ def extract_date_from_string(text: str) -> date | None:
     m = _first_match_outside_hash(_ISO_NODASH_RE, text, spans)
     if m:
         try:
-            return date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+            candidate = date(int(m.group(1)), int(m.group(2)), int(m.group(3)))
+            if _is_plausible_bulletin_year(candidate.year):
+                return candidate
         except ValueError:
             pass
 
@@ -181,7 +203,9 @@ def extract_date_from_string(text: str) -> date | None:
     m = _first_match_outside_hash(_DDMMYYYY_RE, text, spans)
     if m:
         try:
-            return date(int(m.group(3)), int(m.group(2)), int(m.group(1)))
+            candidate = date(int(m.group(3)), int(m.group(2)), int(m.group(1)))
+            if _is_plausible_bulletin_year(candidate.year):
+                return candidate
         except ValueError:
             pass
 
@@ -240,7 +264,7 @@ def extract_date_from_slug(slug: str) -> date | None:
         day = int(m.group(1))
         month = _MONTH_MAP.get(m.group(2).lower())
         year = int(m.group(3))
-        if month:
+        if month and _is_plausible_bulletin_year(year):
             return date(year, month, day)
     except ValueError:
         pass

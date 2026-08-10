@@ -43,3 +43,28 @@ def test_best_scored_link_index_prefers_newer_slug_date() -> None:
         _entry("/bulletins/21st-june-2026.pdf", 1),
     ]
     assert _best_scored_link_index(entries, base, position="top") == 1
+
+
+def test_best_scored_link_index_ignores_garbled_future_year_filename() -> None:
+    # kincasslagh.ie's old archive has typo'd filenames like "22107018.pdf"
+    # (missing a digit) which parse under DDMMYYYY as day=22/month=10/
+    # year=7018 — a constructible-but-absurd date() that used to silently
+    # outrank the real, current 2026 bulletin (found 2026-08-10).
+    base = "https://kincasslagh.ie/app/uploads/"
+    entries = [
+        _entry("/app/uploads/2021/07/22107018.pdf", 0, "18th July 2021"),
+        _entry("/app/uploads/2026/07/20260705.pdf", 1, "5th July 2026"),
+    ]
+    assert _best_scored_link_index(entries, base, position="top") == 1
+
+
+def test_best_scored_link_index_ignores_garbled_future_year_in_label_text() -> None:
+    # Same site's listing also mislabels some rows with a nonsense far-future
+    # year in the link *text* itself (e.g. "13th August 2107"), which the
+    # slug-date parser used to accept just as readily as a real filename date.
+    base = "https://kincasslagh.ie/app/uploads/"
+    entries = [
+        _entry("/app/uploads/2017/08/2170813.pdf", 0, "13th August 2107"),
+        _entry("/app/uploads/2026/07/20260705.pdf", 1, "5th July 2026"),
+    ]
+    assert _best_scored_link_index(entries, base, position="top") == 1
