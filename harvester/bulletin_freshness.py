@@ -136,6 +136,22 @@ def extract_bulletin_date(url_or_text: str) -> date | None:
             if day_match_4y:
                 day = int(day_match_4y.group(1))
                 return _safe_date(folder_year, folder_month, day)
+            # ISO-dashed filename repeating the upload folder's own year/month,
+            # e.g. "2026-07-26.pdf" (clonmanyparish.ie) inside .../uploads/2026/07/.
+            # Without this, the generic slug_day fallback below finds "07" (the
+            # MONTH segment, isolated by the hyphens on both sides) as the
+            # leftmost 1-2 digit number in the string and returns it as if it
+            # were the day-of-month — misdating this as the 7th instead of the
+            # 26th (found 2026-08-10, clonmanyparish: reported "bulletin date
+            # 2026-07-07" for a file plainly named 2026-07-26.pdf, wrongly
+            # inflating how stale it looked).
+            iso_dash_match = re.search(
+                rf"{folder_year}-{folder_month:02d}-(0[1-9]|[12]\d|3[01])",
+                basename,
+            )
+            if iso_dash_match:
+                day = int(iso_dash_match.group(1))
+                return _safe_date(folder_year, folder_month, day)
             # "19th-Suday-in-ordinary-time-724x1024.png" style filenames lead
             # with the LITURGICAL Sunday-count ordinal (e.g. "19th Sunday in
             # Ordinary Time" — the 19th Sunday of the church year), not a
