@@ -127,6 +127,44 @@ class BulletinFreshnessTests(unittest.TestCase):
         verdict = check_bulletin_freshness(url, date(2026, 8, 9))
         self.assertEqual(verdict.status, "fresh")
 
+    def test_ordinal_day_of_month_still_extracted_when_not_a_sunday_count(
+        self,
+    ) -> None:
+        # Regression guard for the fix above: "9th-August-2026.pdf"
+        # (antrimparish) has a leading ordinal too, but it's a genuine
+        # day-of-month (followed by a month name), not a liturgical
+        # Sunday-count. The ordinal-Sunday-count fix must not blind the
+        # generic slug_day fallback to real ordinal day-of-month filenames
+        # — that regression silently misdated this as 2026-08-01 and only
+        # "passed" by accident via the 8-day grace window instead of the
+        # correct in_bulletin_week match (found 2026-08-10 while auditing
+        # every grace-window "ok" result for hidden freshness bugs).
+        url = (
+            "https://www-static.antrimparish.com/wp-content/uploads/2026/08/"
+            "9th-August-2026.pdf"
+        )
+        self.assertEqual(extract_bulletin_date(url), date(2026, 8, 9))
+        verdict = check_bulletin_freshness(url, date(2026, 8, 9))
+        self.assertEqual(verdict.status, "fresh")
+        self.assertEqual(verdict.reason, "in_bulletin_week")
+
+    def test_wp_uploads_ddmmyyyy_four_digit_year_filename(self) -> None:
+        # "Parish-Bulletin-09082026.pdf" (st-colmcilles) is a genuine
+        # DDMMYYYY filename, but the wp_uploads branch's day_match only
+        # checked for a 2-digit year (folder_year % 100), so it silently
+        # fell through to the day=1 default and never got a chance to hit
+        # the general _DDMMYYYY_RE pattern later in the function (that
+        # branch hard-returns). Only "passed" by accident via the 8-day
+        # grace window (found 2026-08-10).
+        url = (
+            "https://st-colmcilles.net/wp-content/uploads/2026/08/"
+            "Parish-Bulletin-09082026.pdf"
+        )
+        self.assertEqual(extract_bulletin_date(url), date(2026, 8, 9))
+        verdict = check_bulletin_freshness(url, date(2026, 8, 9))
+        self.assertEqual(verdict.status, "fresh")
+        self.assertEqual(verdict.reason, "in_bulletin_week")
+
     def test_mark_result_stale_sets_retry_metadata(self) -> None:
         target = date(2026, 6, 14)
         entry = ParishEntry(

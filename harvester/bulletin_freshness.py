@@ -42,8 +42,18 @@ _DMY_ISO_RE = re.compile(
     r"(?<!\d)(0?[1-9]|[12]\d|3[01])[-_/](0?[1-9]|1[0-2])[-_/]((?:19|20)\d{2})(?!\d)"
 )
 # Matches the leading ordinal in "19th-Suday-in-ordinary-time...", "3rd-Sunday
-# -of-Advent...", etc. — a liturgical Sunday-count, never a day-of-month.
-_LEADING_ORDINAL_RE = re.compile(r"^(\d{1,2})(?:st|nd|rd|th)\b", re.I)
+# -of-Advent...", etc. — a liturgical Sunday-count, never a day-of-month. Must
+# be followed by liturgical-season wording (not e.g. a month name) so genuine
+# day-of-month filenames like "9th-August-2026.pdf" (antrimparish) aren't
+# mistaken for a Sunday-count and lose their real day — that regression let
+# antrimparish silently fall back to day=1 (2026-08-01 instead of 2026-08-09)
+# and only "passed" by accident, via the 8-day grace window, rather than the
+# correct in_bulletin_week match (found 2026-08-10 while auditing every
+# grace-window "ok" for hidden freshness bugs).
+_LEADING_ORDINAL_RE = re.compile(
+    r"^(\d{1,2})(?:st|nd|rd|th)[\s_-]*(?:sun|suday|sunday|ordinary|advent|lent|easter|christmas)",
+    re.I,
+)
 
 
 FreshnessStatus = Literal["fresh", "stale", "unknown"]
@@ -93,6 +103,22 @@ def extract_bulletin_date(url_or_text: str) -> date | None:
             )
             if day_match:
                 day = int(day_match.group(1))
+                return _safe_date(folder_year, folder_month, day)
+            # Same idea as day_match just above, but for a 4-digit year, e.g.
+            # "Parish-Bulletin-09082026.pdf" (DDMMYYYY, contiguous digits).
+            # Without this, the wp_uploads branch hard-returns via the day=1
+            # fallback below before ever reaching the general _DDMMYYYY_RE
+            # pattern later in this function, silently misdating a
+            # perfectly well-formed DDMMYYYY filename as the 1st of the
+            # month (found 2026-08-10, st-colmcilles: only "passed" by
+            # accident via the grace-day window, not the correct
+            # in_bulletin_week match).
+            day_match_4y = re.search(
+                rf"(?<!\d)(0?[1-9]|[12]\d|3[01]){folder_month:02d}{folder_year}(?!\d)",
+                basename,
+            )
+            if day_match_4y:
+                day = int(day_match_4y.group(1))
                 return _safe_date(folder_year, folder_month, day)
             # "19th-Suday-in-ordinary-time-724x1024.png" style filenames lead
             # with the LITURGICAL Sunday-count ordinal (e.g. "19th Sunday in
