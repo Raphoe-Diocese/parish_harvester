@@ -91,6 +91,24 @@ class ClaudyBulletinFilterTests(unittest.TestCase):
         url = "http://parishofclaudy.com/onewebmedia/NEWSLETTER%207-6-26.docx"
         self.assertFalse(_is_non_bulletin_url(url))
 
+    def test_bishops_pastoral_letter_is_non_bulletin(self) -> None:
+        # errigalparish.com's "Current Bulletin" page (news.html) only ever
+        # links GDPR/Privacy/one-off pastoral-letter PDFs, never an actual
+        # weekly bulletin. Neither term matched the old filter, so a stale
+        # 2023 pastoral letter (dated in its own filename, unlike the GDPR/
+        # Privacy links) won the newest_dated scoring by default and was
+        # silently harvested as "the bulletin" (found 2026-08-09).
+        self.assertTrue(
+            _is_non_bulletin_url(
+                "http://www.drumraghparish.com/pdf/bishopletterJanuary2023.pdf"
+            )
+        )
+        self.assertTrue(
+            _is_non_bulletin_url(
+                "https://www.errigalparish.com/pdf/pastoralletter2025.pdf"
+            )
+        )
+
     def test_newer_newsletter_scores_higher(self) -> None:
         older = _score_bulletin_url("http://x/onewebmedia/NEWSLETTER%2031-5-26.docx")
         newer = _score_bulletin_url("http://x/onewebmedia/NEWSLETTER%2014-6-26.docx")
