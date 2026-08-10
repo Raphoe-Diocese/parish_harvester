@@ -2334,7 +2334,26 @@ async def replay_recipe(
                             )
                             if tried:
                                 return dest, tried[1], tried[0]
-                await _replay_click(page, step, step_timeout_ms, target_date=target_date)
+                try:
+                    await _replay_click(page, step, step_timeout_ms, target_date=target_date)
+                except RecipeReplayError:
+                    # joomla_dropfiles sites (threepatrons.org,
+                    # stmarysportglenone.org) sit behind a PROBABILISTIC WAF
+                    # that sometimes lets the initial goto through with a 200
+                    # but serves a challenge page with none of the real
+                    # .mod_downloadlink anchors — _replay_click then fails to
+                    # find the selector at all and raises before we ever
+                    # reach the plain-HTTP-retry fallback below. Swallow that
+                    # one specific failure mode here (not for other site
+                    # types) and fall through to the same
+                    # _try_joomla_dropfiles_click_download fallback chain
+                    # used when the click "succeeds" but produces no
+                    # download — it already ends in
+                    # _try_dropfiles_predicted_downloads, which is far more
+                    # reliable against this WAF than repeating the browser
+                    # click would be.
+                    if site_type != "joomla_dropfiles":
+                        raise
                 if not downloads:
                     try:
                         await page.wait_for_event(
