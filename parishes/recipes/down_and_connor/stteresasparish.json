@@ -1,36 +1,56 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "stteresasparish",
   "display_name": "St Teresas",
   "diocese": "down_and_connor",
-  "start_url": "https://stteresasparish.church/2026/06/26/the-st-teresas-parish-bulletin-for-sunday-28th-june-2026/",
+  "start_url": "https://stteresasparish.church/",
   "steps": [
     {
       "action": "goto",
-      "url": "https://stteresasparish.church/2026/06/26/the-st-teresas-parish-bulletin-for-sunday-28th-june-2026/"
+      "url": "https://stteresasparish.church/"
+    },
+    {
+      "action": "click",
+      "selector": "a[href*=\"the-st-teresas-parish-bulletin-for-sunday\"]",
+      "pick_strategy": "newest_dated",
+      "text": "The St Teresa\u2019s Parish Bulletin for Sunday, 28th June 2026",
+      "fallback_selectors": [
+        "a:has-text('Parish Bulletin')"
+      ]
     },
     {
       "action": "image_stack",
       "count": 2,
-      "urls": [
-        "https://stteresasparish.church/wp-content/uploads/2026/06/microsoft-word-28th-june-2026.docx-1.jpg",
-        "https://stteresasparish.church/wp-content/uploads/2026/06/microsoft-word-28th-june-2026.docx-2.jpg"
-      ]
+      "selector": "img"
     }
   ],
   "observed_load_ms": 2235,
   "timeout_ms": 45000,
-  "total_timeout_s": 90,
+  "total_timeout_s": 120,
   "playbook_type": "stacked_image_bulletin",
   "site_type": "stacked_image_bulletin",
+  "recorded_date": "2026-08-10",
   "operator_notes": [
-    "Bulletins are full-page images stacked on one page — newest week at the top.",
-    "Pick the first two images, or use Pick another image too after the first.",
-    "Harvester grabs the top N large images automatically each Sunday — no dated URLs."
+    "SUPERSEDES the 2026-06-27 version, which had start_url + goto step hardcoded",
+    "to the literal 28-June-2026 post permalink with no use_target_url and a",
+    "hardcoded urls: [] pair of .docx-1.jpg/.docx-2.jpg image URLs on the",
+    "download step \u2014 bug pattern #1/#2, would have served that same 28 June",
+    "post's images forever.",
+    "This WordPress site posts a new dated post at the site root each week",
+    "('The St Teresa\u2019s Parish Bulletin for Sunday, D[thstndrd] Month YYYY'),",
+    "each containing exactly 2 full-page image scans",
+    "(microsoft-word-D-month-YYYY.docx-1.jpg / -2.jpg, ~595x841). Some weeks",
+    "the site instead posts 'Please note there will be no bulletin on Sunday",
+    "...' with a different href/title shape and no images \u2014 the selector",
+    "a[href*=\"the-st-teresas-parish-bulletin-for-sunday\"] deliberately excludes",
+    "that so it doesn't try to image_stack a no-bulletin announcement post.",
+    "CONFIRMED 2026-08-10: newest post is 'Sunday, 9th August 2026', containing",
+    "microsoft-word-9-august-2026.docx.jpg (page 1, 595x841) and",
+    "microsoft-word-9-august-2026.docx-2.jpg (page 2) \u2014 genuinely fresh, not a",
+    "freshness-check bug; the parish posts reliably every week."
   ],
   "do_not": [
-    "Do not hardcode one image URL — it goes stale every week.",
-    "Do not Save page as PDF — that captures every old bulletin on the page."
-  ],
-  "recorded_date": "2026-06-27"
+    "Do not hardcode one post permalink or image URL \u2014 it goes stale every week.",
+    "Do not click the 'no bulletin this week' announcement post as if it had images."
+  ]
 }
