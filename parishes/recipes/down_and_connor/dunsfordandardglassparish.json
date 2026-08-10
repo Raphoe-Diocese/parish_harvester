@@ -1,7 +1,7 @@
 {
   "parish_key": "dunsfordandardglassparish",
   "display_name": "Dunsford and Ardglass",
-  "recorded_date": "2026-04-30",
+  "recorded_date": "2026-08-09",
   "start_url": "https://www.dunsfordandardglassparish.com/?page_id=623",
   "steps": [
     {
@@ -10,11 +10,20 @@
     },
     {
       "action": "click",
-      "selector": "a:has-text('read')",
+      "selector": "a:has-text('Sunday')",
+      "pick_strategy": "newest_dated",
       "fallback_selectors": [
+        "a:has-text('read')",
         "a[href$='.pdf']",
-        "a[href*='.pdf']",
-        "article#post-2876 > div:nth-of-type(2) > a"
+        "a[href*='.pdf']"
+      ]
+    },
+    {
+      "action": "click",
+      "selector": "a[href$='.pdf']",
+      "pick_strategy": "newest_dated",
+      "fallback_selectors": [
+        "a[href*='.pdf']"
       ]
     },
     {
@@ -22,5 +31,9 @@
       "url_pattern": "*.pdf"
     }
   ],
-  "diocese": "down_and_connor"
+  "diocese": "down_and_connor",
+  "operator_notes_2026_08_09": [
+    "2026-08-09 fix: the old recipe's primary selector \"a:has-text('read')\" matched the generic (identical, duplicated) 'read more' text on EVERY blog post teaser on the listing page and always clicked whichever 'read more' link happened to be first in DOM order \u2014 that is not reliably the newest post (this WordPress theme's listing is not in strict date order: observed order was 5th July, 14th June, 28th June, 7th June, 21st June \u2014 not monotonic). Its fallback also pinned a hardcoded old post id (article#post-2876). Replaced with pick_strategy newest_dated over the dated post-title links (e.g. 'Sunday 5th July 2026'), then a second newest_dated click for the single PDF link on the resulting post page.",
+    "As of 2026-08-09 the newest bulletin actually posted on the site is 'Sunday 5th July 2026' (5 weeks stale) \u2014 the parish itself has not posted anything more recent under /?page_id=623. This is a genuine site-side staleness issue, not a recipe bug; harvester.bulletin_freshness correctly flags this as stale/actionable from the dated PDF filename (wp-content/uploads/2026/07/SUNDAY-5th-JULY-2026-1.pdf)."
+  ]
 }
