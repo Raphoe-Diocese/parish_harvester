@@ -9,10 +9,25 @@
       "url": "https://www.saintmalachysparish.com/"
     },
     {
-      "action": "download",
-      "url_pattern": "*.pdf"
-    }
-  ],
-  "diocese": "down_and_connor",
-  "auto_fixed": true
+            "action": "download",
+            "url_pattern": "*.pdf"
+        }
+    ],
+    "diocese": "down_and_connor",
+    "auto_fixed": true,
+    "operator_notes": [
+        "DO NOT raise max_bulletin_pages here despite the 'Discarding oversized",
+        "PDF: 6 pages > 4' rejection looking like the usual multi-page-bulletin",
+        "fix pattern. Investigated 2026-08-10: the site's only bulletin link",
+        "(documents/bulletin.pdf, same evergreen URL every week, labelled",
+        "'BULLETIN'/'View the Bulletin' in the nav) is headed 'Sunday 23rd",
+        "February 2025' — last-modified Feb 2025, 18 months stale — and no",
+        "other bulletin link exists anywhere on the homepage. Because the URL",
+        "has no date in it, check_bulletin_freshness() can't detect the",
+        "staleness from the URL alone; raising max_bulletin_pages would let",
+        "this 18-month-old file through as a false outcome=ok every week.",
+        "Leaving the oversized-page rejection in place is the safer failure",
+        "mode until the parish uploads a current bulletin.pdf; re-check",
+        "manually if this persists for many more weeks."
+    ]
 }
