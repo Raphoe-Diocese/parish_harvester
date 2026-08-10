@@ -173,7 +173,21 @@ async def _goto_or_download(
             if tried:
                 return dest, tried[1], tried[0]
         return None
-    await _navigate_page(page, url, timeout_ms, wait_until=wait_until)
+    try:
+        await _navigate_page(page, url, timeout_ms, wait_until=wait_until)
+    except PlaywrightError as exc:
+        if "ERR_ABORTED" not in str(exc):
+            raise
+        # Chromium aborts goto() when the target is a redirect straight to a
+        # file download (e.g. a "Current Newsletter" page that 302s to that
+        # week's PDF) — the download itself already fired and landed in
+        # *downloads* via the page-level listener set up in replay_recipe,
+        # same as the existing click-step ERR_ABORTED handling (see
+        # _click_locator_match). Without this, any goto step pointed at such
+        # a redirect-to-download URL was misreported as "recipe replay
+        # failed" even though the file downloaded successfully (found
+        # 2026-08-10, bellaghyparish: /current-newsletter/ redirects straight
+        # to that week's uploads/.../DD-Month-YYYY.pdf).
     return await _capture_document_after_navigation(page, dest, url, downloads, timeout_ms)
 
 

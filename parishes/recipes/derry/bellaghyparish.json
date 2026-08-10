@@ -3,22 +3,19 @@
   "parish_key": "bellaghyparish",
   "display_name": "Bellaghy",
   "diocese": "derry",
-  "start_url": "https://bellaghyparish.com/wp-content/uploads/2026/06/28-June-2026.pdf",
+  "start_url": "https://bellaghyparish.com/current-newsletter/",
   "steps": [
     {
       "action": "goto",
-      "url": "https://bellaghyparish.com/wp-content/uploads/2026/06/28-June-2026.pdf",
-      "use_target_url": true
+      "url": "https://bellaghyparish.com/current-newsletter/"
     },
     {
-      "action": "download",
-      "url": "https://bellaghyparish.com/wp-content/uploads/2026/06/28-June-2026.pdf",
-      "use_captured_url": true
+      "action": "download"
     }
   ],
   "timeout_ms": 45000,
   "total_timeout_s": 180,
-  "recorded_date": "2026-06-27",
+  "recorded_date": "2026-08-10",
   "operator_notes_2026_08_09": [
     "FIX: goto step was missing use_target_url:true, so it always navigated",
     "to the 28 June 2026 hardcoded URL forever instead of using the dated",
@@ -26,5 +23,30 @@
     "Pattern D (DD-Month-YYYY slug). Added use_target_url:true so the goto",
     "step uses today's calculated URL (confirmed parish_status.json already",
     "computes .../2026/08/Newsletter-9-August-2026-1.pdf for 2026-08-09)."
+  ],
+  "operator_notes_2026_08_10": [
+    "SUPERSEDES the 08-09 fix above — the 08-09 fix only patched the goto",
+    "step; the download step still had a hardcoded stale 'url' +",
+    "use_captured_url:true (which returns that literal URL unmodified,",
+    "ignoring target_date entirely — see _resolve_download_candidates), so",
+    "every harvest still fell through to the 28 June PDF as a last resort",
+    "and correctly got caught as stale downstream, but wastefully so.",
+    "Root cause of the date-guessing itself: this parish's filename",
+    "convention isn't stable — some weeks it's 'Newsletter-D-Month-YYYY-1.pdf'",
+    "(matches the evidence-file example), other weeks it's plain",
+    "'D-Month-YYYY.pdf' with no prefix/suffix (confirmed 2026-08-10: the",
+    "guessed .../08/Newsletter-9-August-2026-1.pdf 404s, but the real file",
+    "that week is .../08/9-August-2026.pdf) — no single date-rewrite pattern",
+    "covers both.",
+    "REAL FIX: bellaghyparish.com/current-newsletter/ is a WordPress redirect",
+    "page that 302s straight to whatever file is this week's actual",
+    "newsletter, whatever its name — no date-guessing needed at all. Chromium",
+    "aborts page.goto() on that redirect (ERR_ABORTED, ends on about:blank)",
+    "because it hands the response straight to the download manager instead",
+    "of rendering it; this was previously misreported as 'recipe replay",
+    "failed' for any goto step (not just click steps) pointed at a",
+    "redirect-to-download URL — fixed generically in _goto_or_download to",
+    "catch ERR_ABORTED and use the already-captured download, matching the",
+    "existing click-step handling in _click_locator_match."
   ]
 }

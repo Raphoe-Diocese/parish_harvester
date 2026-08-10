@@ -30,5 +30,24 @@
     "a[href$='.pdf'] link straight to /wp-content/uploads/2026/08/",
     "Parish-Newsletter-32-for-Sun-A-09082026.pdf (today's bulletin) —",
     "this fix should let the harvester find it."
+  ],
+  "operator_notes_2026_08_10": [
+    "Re-checked as final status (site owner already confirmed this is not an",
+    "intentional block on this parish). nuachtlitir/ now returns HTTP 403",
+    "with header 'cf-mitigated: challenge' and title 'Just a moment...' — a",
+    "genuine Cloudflare Managed Challenge, confirmed via headless AND headful",
+    "Playwright chromium (both blocked, so this is not a headless-detection",
+    "issue). Direct plain-curl fetch of that day's guessed dated PDF URL",
+    "(.../wp-content/uploads/2026/08/Parish-Newsletter-32-for-Sun-A-09082026.pdf)",
+    "returned HTTP 200 — Cloudflare is only challenging the HTML listing page,",
+    "not the underlying wp-content asset host — but the newsletter number",
+    "('32') and liturgical-cycle letter ('Sun-A') in that filename are not",
+    "derivable from the date alone, so a date-pattern URL guess can't be",
+    "built reliably week to week. No code-level fix available from this",
+    "side; likely IP-reputation-based (matches the CI/cloud-agent IP range",
+    "more than a residential one). Genuine dead-end without either a Cloudflare",
+    "allowlist rule from the site owner or a stable numbering scheme to guess",
+    "the filename — do not keep re-investigating unless the site owner",
+    "changes something."
   ]
 }

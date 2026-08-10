@@ -463,10 +463,34 @@ def rewrite_date_url(url: str, target: date) -> str:
     path = unquote(parsed.path)
 
     def _update_yyyymm_dir(old_d: date, p: str) -> str:
-        """Replace /YYYY/MM/ directory segments matching *old_d* with the target."""
+        """Replace /YYYY/MM/ directory segments matching *old_d* with the target.
+
+        WordPress's uploads folder is the *upload* month, which can differ
+        from the bulletin's own filename date (e.g. a bulletin dated
+        "29-March-2026" uploaded a few days later lands in .../2026/04/, not
+        .../2026/03/) — an exact-match replace on the filename's own date
+        would silently no-op and leave next week's guess in the wrong
+        month's folder forever. Fall back to rewriting whatever /YYYY/MM/
+        segment is actually present (within a year of target, to avoid
+        touching unrelated numeric path segments) when the exact match
+        fails (found 2026-08-10, bellaghyparish: filename said March but
+        the uploads folder was already /2026/04/).
+        """
         old_seg = f"/{old_d.year}/{old_d.month:02d}/"
         new_seg = f"/{target.year}/{target.month:02d}/"
-        return p.replace(old_seg, new_seg)
+        replaced = p.replace(old_seg, new_seg)
+        if replaced != p:
+            return replaced
+
+        def _replace_any_ym(m: re.Match) -> str:
+            try:
+                if abs(int(m.group(1)) - target.year) <= 1:
+                    return new_seg
+            except ValueError:
+                pass
+            return m.group(0)
+
+        return _WP_YEAR_MONTH_RE.sub(_replace_any_ym, p)
 
     # ------------------------------------------------------------------
     # Pattern A: DDMMYYYY (8 consecutive digits)
