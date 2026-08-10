@@ -1146,34 +1146,66 @@ async def _try_cloud_folder_pick(
     return None
 
 
-def _scrape_seed_urls(entry: ParishEntry, target_url: str) -> list[str]:
-    """Generate candidate pages to scrape for bulletin links."""
-    seeds: list[str] = []
+def _scrape_seed_urls(
+    entry: ParishEntry, target_url: str, *, with_generic_flag: bool = False
+) -> "list[str] | list[tuple[str, bool]]":
+    """Generate candidate pages to scrape for bulletin links.
+
+    When *with_generic_flag* is set, returns ``(url, is_generic)`` pairs —
+    "generic" seeds are the domain root and the guessed URL's parent
+    directory, blind last-resort fallbacks with no reason to believe they
+    contain the bulletin itself (unlike bulletin_page/target_url/example_url,
+    which a human or the date-pattern guess specifically pointed at). Callers
+    that render a page as a last-resort PDF (html_render fallback) should
+    skip that render for generic seeds — see the has_dated/is_bare_homepage
+    guards in ``_scrape_and_download``, which cover bulletin_page and the
+    domain root but not other generic fallbacks like the parent directory.
+    """
+    seeds: list[tuple[str, bool]] = []
+    # The trained "# page:" bulletin listing (entry.bulletin_page) is the most
+    # authoritative seed when set — it's the page a human pointed the fetcher
+    # at specifically to find the current bulletin link, as opposed to the
+    # date-guessed target_url (which 404s whenever the parish skips a week or
+    # changes naming) or the original training-time example_url (which is
+    # itself just one specific past week's URL, not a listing). Without this,
+    # a parish whose predicted URL 404s falls back to only the guessed URL,
+    # the stale training-time URL, the domain root, and the guessed URL's
+    # parent directory — never the actual bulletin listing page — so a
+    # genuinely still-working site can silently serve months-old cached
+    # content or fail outright instead of finding the real newest bulletin
+    # (found 2026-08-10, sacredheartparishbelfast: bulletin_page was set to
+    # .../Parish-Bulletins/, which lists newsletters up to 26th July, but was
+    # never tried).
+    if entry.bulletin_page:
+        seeds.append((entry.bulletin_page, False))
     if entry.content_type == "html_link":
-        seeds.append(entry.example_url)
+        seeds.append((entry.example_url, False))
     else:
-        seeds.extend([target_url, entry.example_url])
+        seeds.append((target_url, False))
+        seeds.append((entry.example_url, False))
 
     for src in [target_url, entry.example_url]:
         parsed = urlparse(src)
         if not parsed.scheme or not parsed.netloc:
             continue
         root = f"{parsed.scheme}://{parsed.netloc}/"
-        seeds.append(root)
+        seeds.append((root, True))
         path = parsed.path or "/"
         if "/" in path.strip("/"):
             parent = path.rsplit("/", 1)[0] + "/"
-            seeds.append(f"{parsed.scheme}://{parsed.netloc}{parent}")
+            seeds.append((f"{parsed.scheme}://{parsed.netloc}{parent}", True))
 
-    deduped: list[str] = []
+    deduped: list[tuple[str, bool]] = []
     seen: set[str] = set()
-    for s in seeds:
-        k = s.strip()
+    for url, is_generic in seeds:
+        k = url.strip()
         if not k or k in seen:
             continue
         seen.add(k)
-        deduped.append(k)
-    return deduped
+        deduped.append((k, is_generic))
+    if with_generic_flag:
+        return deduped
+    return [url for url, _is_generic in deduped]
 
 
 async def _scrape_and_download(
@@ -1184,6 +1216,7 @@ async def _scrape_and_download(
     browser: Browser,
     recipe_meta: dict | None = None,
     host_profile: dict | None = None,
+    allow_html_render: bool = True,
 ) -> FetchResult:
     """Scrape a page for bulletin document links and download the best match."""
     context = await new_harvester_context(browser)
@@ -1393,7 +1426,47 @@ async def _scrape_and_download(
                         last_err = str(exc)
                 dest.unlink(missing_ok=True)
 
-        if _is_recipe_fallback_enabled(recipe_meta, "disable_html_render_fallback"):
+        # If this page listed dated bulletin links but none of them could
+        # actually be downloaded as a real PDF, it's a listing/archive index
+        # page, not the bulletin itself — rendering the index page as a
+        # fallback would silently report success with the wrong document
+        # (found 2026-08-10, sacredheartparishbelfast: bulletin_page listed
+        # 30 dated links, none downloadable that week, and the html_render
+        # fallback below happily "captured" the archive listing page itself,
+        # cookie banner and all, as if it were that week's bulletin).
+        if has_dated and _is_recipe_fallback_enabled(recipe_meta, "disable_html_render_fallback"):
+            return FetchResult(
+                key=key,
+                display_name=entry.display_name,
+                status="error",
+                url=scrape_url,
+                error="Dated bulletin links found but none downloaded — refusing to treat the listing page itself as the bulletin",
+            )
+
+        # A bare domain root/homepage is never the bulletin itself — it's one
+        # of _scrape_seed_urls' generic last-resort fallback seeds (tried
+        # after the bulletin_page/target_url/example_url seeds all failed).
+        # Without this guard, a parish with no current-week bulletin
+        # available anywhere just renders its own homepage as a "bulletin"
+        # and reports outcome=ok (found 2026-08-10, sacredheartparishbelfast,
+        # right after the has_dated guard above closed the same hole for its
+        # bulletin_page listing).
+        is_bare_homepage = urlparse(page.url).path in ("", "/")
+        if is_bare_homepage and _is_recipe_fallback_enabled(recipe_meta, "disable_html_render_fallback"):
+            return FetchResult(
+                key=key,
+                display_name=entry.display_name,
+                status="error",
+                url=scrape_url,
+                error="Only the bare homepage was reachable — refusing to treat it as the bulletin",
+            )
+
+        # Generic last-resort seeds (domain root / parent directory — see
+        # _scrape_seed_urls) are blind guesses with no reason to be the
+        # bulletin itself; only render-as-fallback for seeds a human or the
+        # date-pattern guess specifically pointed at (bulletin_page,
+        # target_url, example_url).
+        if allow_html_render and _is_recipe_fallback_enabled(recipe_meta, "disable_html_render_fallback"):
             if await _render_page_to_pdf(page, str(dest)) and _rendered_pdf_looks_usable(dest):
                 try:
                     _verify_bulletin_pdf(dest)
@@ -2158,7 +2231,9 @@ async def _fetch_entry(
 
     # Prediction failed: scrape bulletin pages (PDF parishes only — not html_link).
     if entry.content_type != "html_link":
-        for scrape_url in _scrape_seed_urls(entry, target_url):
+        for scrape_url, is_generic in _scrape_seed_urls(
+            entry, target_url, with_generic_flag=True
+        ):
             scraped = await _scrape_and_download(
                 entry,
                 target,
@@ -2167,6 +2242,7 @@ async def _fetch_entry(
                 browser,
                 recipe_meta=recipe_meta,
                 host_profile=host_profile,
+                allow_html_render=not is_generic,
             )
             if scraped.status == "ok":
                 return scraped
