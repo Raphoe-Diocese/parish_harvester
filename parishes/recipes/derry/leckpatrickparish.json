@@ -11,8 +11,8 @@
     },
     {
       "action": "click",
-      "selector": "a[href*=\"/pdf/\"]",
-      "text": "Safeguarding Notice: Should you have any concerns regarding ",
+      "selector": "a[href*=\"pdf/\"]",
+      "text": "Sunday, 9th August 2026 - Click Here to View",
       "pick_strategy": "newest_dated"
     },
     {
@@ -20,6 +20,27 @@
       "use_captured_url": true
     }
   ],
-  "recorded_date": "2026-06-15",
+  "recorded_date": "2026-08-10",
+  "max_bulletin_pages": 8,
+  "operator_notes": [
+    "Shared Camus/Clonleigh/Leckpatrick pastoral-area newsletter is genuinely",
+    "6 pages — default cap of 4 was rejecting real content as oversized.",
+    "leckpatrickparish.com's own PDF links use a RELATIVE href with no leading",
+    "slash (e.g. href=\"pdf/090826.pdf\"), so a selector requiring a leading",
+    "slash (a[href*=\"/pdf/\"]) only ever matched the two external, absolute-URL",
+    "GDPR/Privacy links from drumraghparish.com and never the parish's own",
+    "dated PDFs — every candidate was correctly rejected as non-bulletin,",
+    "producing a timeout (the old selector matched nothing real to click).",
+    "Fixed selector to a[href*=\"pdf/\"] (no leading slash) to match both.",
+    "NOTE: this parish shares one PDF (Camus, Clonleigh & Leckpatrick",
+    "pastoral area newsletter) with camusparish/clonleighparish — confirmed",
+    "byte-identical across all three sites. As of 2026-08-09/10 the file",
+    "served under the current week's filename (090826.pdf) still contains",
+    "the PREVIOUS week's content (2nd August, not 9th) — a parish-secretary",
+    "upload lag, not a scraper bug. Our freshness check trusts the URL's own",
+    "date pattern (which does match the target week) since we have no",
+    "general mechanism to verify PDF body content against a claimed URL",
+    "date; flag for human review if this keeps recurring."
+  ],
   "auto_fixed": true
 }
