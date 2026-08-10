@@ -67,6 +67,19 @@ jobs:
           set -euo pipefail
           python -m playwright install --with-deps chromium
 
+      - name: Install LibreOffice (DOCX → PDF conversion)
+        run: |
+          set -euo pipefail
+          # Several parishes (Down & Connor + Derry) publish bulletins as .docx,
+          # never PDF (see harvester/fetcher.py:_download_docx_as_pdf). Without
+          # a real LibreOffice binary this silently falls back to a text-only
+          # python-docx+reportlab reconstruction that drops all images/layout
+          # and is often small enough to be discarded by the tiny-PDF guard
+          # (config.MIN_PDF_BYTES) — reporting a false "failed" for parishes
+          # whose bulletin was genuinely available.
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends libreoffice-writer
+
       - name: Run tests
         if: github.event_name != 'workflow_dispatch' || github.event.inputs.run_tests == 'true'
         continue-on-error: true

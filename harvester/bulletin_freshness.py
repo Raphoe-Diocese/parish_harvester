@@ -13,6 +13,7 @@ from dataclasses import dataclass
 from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from typing import TYPE_CHECKING, Literal
+from urllib.parse import unquote
 
 from .utils import (
     _is_within_opaque_hash,
@@ -60,7 +61,14 @@ def week_window(target: date) -> tuple[date, date]:
 
 def extract_bulletin_date(url_or_text: str) -> date | None:
     """Extract the most likely bulletin date from a URL or link label."""
-    text = url_or_text or ""
+    # Wix's `/_files/ugd/<hash>.docx?dn=<original filename>` pattern (and
+    # similar CDNs) puts the human-readable, dated filename in a URL-encoded
+    # query parameter, e.g. "?dn=Bulletin%207th%20June%202026.docx" — without
+    # decoding, "%20" breaks the ordinal/month/year apart so no date pattern
+    # (including the slug matcher below) can match it (found 2026-08-09,
+    # parishofhannahstown, after replay.py started returning the real Wix
+    # file URL instead of the listing page — see _download_source_url).
+    text = unquote(url_or_text or "")
 
     # WordPress media folders are authoritative: /uploads/2026/06/file.pdf
     wp_uploads = re.search(r"/uploads/(20\d{2})/(0?\d{1,2})/", text, re.I)

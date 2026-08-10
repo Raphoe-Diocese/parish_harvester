@@ -175,8 +175,10 @@ async def _capture_document_after_navigation(
     timeout_ms: int,
 ) -> tuple[Path, str, str] | None:
     if downloads:
-        file_type = await _save_download_to_pdf(downloads.pop(0), dest)
-        return dest, file_type, nav_url or page.url
+        download = downloads.pop(0)
+        file_type = await _save_download_to_pdf(download, dest)
+        source_url = _download_source_url(download, page)
+        return dest, file_type, source_url if source_url != page.url else (nav_url or page.url)
     if nav_url and _looks_like_direct_document_url(nav_url):
         tried = await _try_download_page_url(page, dest, nav_url, timeout_ms=timeout_ms)
         if tried:
@@ -662,6 +664,28 @@ async def _convert_docx_to_pdf_bytes(docx_bytes: bytes) -> bytes:
             story.append(Spacer(1, 0.15 * cm))
         pdf_doc.build(story)
         return fallback_pdf.read_bytes()
+
+
+def _download_source_url(download, page: Page) -> str:
+    """Prefer the download's own resource URL over page.url.
+
+    Native browser downloads (e.g. a Wix/GoDaddy ``<a href>`` to a .docx/.pdf
+    with no in-page navigation) commonly leave ``page.url`` pointing at the
+    listing page the link was clicked from, not the dated file itself. That
+    silently defeats URL-based staleness detection (harvester.fetcher calls
+    check_bulletin_freshness(result.url, target)) — a 9-week-stale bulletin
+    reported as the listing page URL has no date to detect and always passes
+    as fresh (found 2026-08-09, parishofhannahstown). ``download.url`` is the
+    actual resource the browser fetched and should be used whenever it looks
+    like a real document URL.
+    """
+    try:
+        url = (download.url or "").strip()
+    except Exception:
+        url = ""
+    if url and _looks_like_http_url(url):
+        return url
+    return page.url
 
 
 async def _save_download_to_pdf(download, dest: Path) -> str:
@@ -1718,8 +1742,9 @@ async def replay_recipe(
                                 return dest, tried[1], tried[0]
                 await _replay_click(page, step, step_timeout_ms, target_date=target_date)
                 if downloads:
-                    file_type = await _save_download_to_pdf(downloads.pop(0), dest)
-                    source_url = page.url
+                    download = downloads.pop(0)
+                    file_type = await _save_download_to_pdf(download, dest)
+                    source_url = _download_source_url(download, page)
                     return dest, file_type, source_url
                 picked = await _try_joomla_dropfiles_click_download(
                     page,
@@ -1756,8 +1781,9 @@ async def replay_recipe(
 
             if action == "download":
                 if downloads:
-                    file_type = await _save_download_to_pdf(downloads.pop(0), dest)
-                    source_url = page.url
+                    download = downloads.pop(0)
+                    file_type = await _save_download_to_pdf(download, dest)
+                    source_url = _download_source_url(download, page)
                     return dest, file_type, source_url
 
                 pattern = (step.get("url_pattern") or "*.pdf").strip() or "*.pdf"
@@ -2029,8 +2055,9 @@ async def replay_recipe(
             raise RecipeReplayError(f"Unsupported recipe action: {action}")
 
         if downloads:
-            file_type = await _save_download_to_pdf(downloads.pop(0), dest)
-            return dest, file_type, page.url
+            download = downloads.pop(0)
+            file_type = await _save_download_to_pdf(download, dest)
+            return dest, file_type, _download_source_url(download, page)
         if _is_document_url(page.url):
             source_url, file_type = await _download_document_url(page, page.url, dest)
             return dest, file_type, source_url

@@ -92,6 +92,24 @@ class BulletinFreshnessTests(unittest.TestCase):
         verdict = check_bulletin_freshness(current_url, target)
         self.assertEqual(verdict.status, "fresh")
 
+    def test_wix_query_string_dated_filename_is_decoded(self) -> None:
+        # parishofhannahstown.com (Wix) serves the real bulletin at an opaque
+        # hashed path with the human-readable, dated filename only in a
+        # URL-encoded query parameter: "?dn=Bulletin%207th%20June%202026.docx".
+        # Without decoding "%20" first, the ordinal/month/year run together
+        # and no date pattern can match, so a 9-week-stale bulletin was
+        # reported as fresh (found 2026-08-09, parishofhannahstown, once
+        # replay.py started returning the real download URL instead of the
+        # listing page it was clicked from).
+        stale_url = (
+            "https://www.parishofhannahstown.com/_files/ugd/"
+            "809bbb_86ee53ed5ed240e0a1c39055e55311b7.docx"
+            "?dn=Bulletin%207th%20June%202026.docx"
+        )
+        self.assertEqual(extract_bulletin_date(stale_url), date(2026, 6, 7))
+        verdict = check_bulletin_freshness(stale_url, date(2026, 8, 9))
+        self.assertEqual(verdict.status, "stale")
+
     def test_mark_result_stale_sets_retry_metadata(self) -> None:
         target = date(2026, 6, 14)
         entry = ParishEntry(
