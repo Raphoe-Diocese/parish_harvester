@@ -8,6 +8,7 @@
     {
       "action": "click",
       "selector": "a.mod_downloadlink[href]",
+      "href": "https://www.threepatrons.org/files/10/Weekly-Bulletins/112/Sunday-9th-August-2026",
       "pick_strategy": "newest_dated",
       "bulletin_position": "top"
     },
@@ -34,5 +35,30 @@
     "strategy": "newest_dated",
     "position": "top"
   },
-  "recorded_date": "2026-07-02"
+  "recorded_date": "2026-08-10",
+  "operator_notes_2026_08_10": [
+    "NOT a genuine dead-end — the earlier 'bot-blocked, no unprotected path' verdict",
+    "was WRONG and is superseded. threepatrons.org fronts its whole origin (listing",
+    "page AND the Joomla Dropfiles download route itself, e.g.",
+    "index.php?option=com_dropfiles&task=frontfile.download&...) with a SiteGround",
+    "'sg-captcha' challenge returning HTTP 202/303-to-home or 403 — but it is",
+    "PROBABILISTIC, not a hard block: direct plain HTTP requests (curl/urllib, no",
+    "browser) got through with the real file roughly 1 attempt in 5-10 across",
+    "repeated manual testing. A full Playwright headless browser navigation to the",
+    "exact same URL failed 0/20 times in a row in the same test session — the",
+    "browser's TLS/JS fingerprint is flagged far more consistently than a bare",
+    "HTTP client, which is why the old click+page.goto prediction fallback",
+    "(_try_dropfiles_predicted_downloads) never worked even though the underlying",
+    "file was never actually unreachable.",
+    "FIX: _try_dropfiles_predicted_downloads now retries via plain urllib (off the",
+    "event loop) instead of page.goto — first re-fetching the listing page itself",
+    "to read the REAL newest mod_downloadlink href (preferred over guessing),",
+    "falling back to sequential-ID prediction (predict_dropfiles_bulletin_urls)",
+    "only if the listing can't be fetched in budget, with the old browser-based",
+    "probe kept as a final tier 3 safety net.",
+    "Confirmed 2026-08-10 via direct curl: /files/10/Weekly-Bulletins/112/... 200s",
+    "with Content-Disposition: attachment; filename=\"Sunday 9th August 2026.pdf\" —",
+    "a real, current, 2-page bulletin (\"Nineteenth Sunday in Ordinary Time\") — item",
+    "112 matches the site's own listing (110=26 July, 111=2 Aug, 112=9 Aug)."
+  ]
 }

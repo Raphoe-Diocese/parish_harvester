@@ -125,3 +125,29 @@ def get_liturgical_sundays(year: int) -> dict[date, str]:
 def get_liturgical_name(target: date) -> str | None:
     """Return the liturgical Sunday name for the given date, or None if not found."""
     return get_liturgical_sundays(target.year).get(target)
+
+
+_CYCLE_LETTER_FOR_YEAR_MOD3 = {0: "C", 1: "A", 2: "B"}
+
+
+def first_advent_sunday(year: int) -> date:
+    """Return the First Sunday of Advent for *year* (always Nov 27 - Dec 3)."""
+    return _sunday_on_or_after(date(year, 11, 27))
+
+
+def liturgical_cycle_letter(target: date) -> str:
+    """Return the Sunday Mass reading cycle letter ('A'/'B'/'C') for *target*.
+
+    The cycle rotates on a 3-year schedule keyed off the calendar year, EXCEPT
+    that the liturgical year itself starts on the First Sunday of Advent (late
+    Nov/early Dec), not Jan 1 — so any date on/after that Sunday already uses
+    next calendar year's letter. Confirmed against naomhfionan.com's own
+    filenames (2022-2026): e.g. "...-SunB-03122023.pdf" for the 3 Dec 2023
+    First Sunday of Advent, immediately after "...-SunA-26112023.pdf" the week
+    before, while 2024 (whose letter B carries the whole liturgical year
+    starting that Advent Sunday) otherwise maps from year%3 as C/A/B.
+    """
+    year = target.year
+    if target >= first_advent_sunday(year):
+        year += 1
+    return _CYCLE_LETTER_FOR_YEAR_MOD3[year % 3]

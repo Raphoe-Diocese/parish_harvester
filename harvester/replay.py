@@ -7,9 +7,11 @@ import json
 import re
 import subprocess
 import tempfile
+import time
 from datetime import date, timedelta
 from pathlib import Path
 from urllib.parse import parse_qs, unquote, urljoin, urlparse
+from urllib.request import Request, urlopen
 
 from playwright.async_api import (
     Browser,
@@ -37,6 +39,7 @@ from .config import MAX_BULLETIN_PAGES, PAGE_LOAD_TIMEOUT_MS, PARISHES_DIR
 from .utils import (
     _is_within_opaque_hash,
     _opaque_hash_spans,
+    extract_date_from_slug,
     extract_date_from_string,
     extract_newsletter_number,
     oneweb_newsletter_download_urls,
@@ -72,6 +75,38 @@ _DROPFILES_FILE_ID_RE = re.compile(
     r"/(?:Newsletters|Weekly-Bulletins|Bulletins)/(\d+)/",
     re.IGNORECASE,
 )
+# Matches a Joomla Dropfiles download anchor regardless of whether the
+# mod_downloadlink class appears before or after the href attribute in the
+# raw HTML (both orders seen in the wild).
+_MOD_DOWNLOADLINK_HREF_RE = re.compile(
+    r'<a\b[^>]*?(?:\bmod_downloadlink\b[^>]*?\bhref="([^"]+)"'
+    r'|\bhref="([^"]+)"[^>]*?\bmod_downloadlink\b)',
+    re.IGNORECASE,
+)
+# threepatrons.org / stmarysportglenone.org (both Joomla Dropfiles on the same
+# SiteGround-hosted infra) front their whole origin with an "sg-captcha"
+# challenge that is PROBABILISTIC, not deterministic — plain HTTP requests
+# (curl/urllib) got through with a real 200 + file roughly 1 attempt in 5-10
+# in manual testing (found 2026-08-10), while a full Playwright headless
+# browser navigation to the exact same URL failed 0/20 times in a row. The
+# browser's TLS/JS fingerprint appears to be flagged far more consistently
+# than a bare urllib request, so retrying via page.goto (the old approach)
+# almost never worked even though the underlying file was never actually
+# unreachable. Retrying a plain HTTP GET a couple of dozen times is fast
+# (~0.3-1.5s per attempt) and far more reliable for this specific WAF.
+_DROPFILES_HTTP_ATTEMPTS = 60
+_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S = 5.0
+_DROPFILES_HTTP_LISTING_BUDGET_S = 45.0
+_DROPFILES_HTTP_FILE_BUDGET_S = 45.0
+_DROPFILES_HTTP_PREDICTED_BUDGET_S = 20.0
+_DROPFILES_HTTP_OVERALL_BUDGET_S = 100.0
+# waf_retry_wordpress needs a bigger shared budget than the dropfiles path:
+# it can require up to 3 sequential HTTP-retry stages (listing -> post ->
+# file, sometimes several files for a multi-page image bulletin) against the
+# same probabilistic sg-captcha challenge, each of which may need its own
+# handful of retries. Must stay comfortably under a recipe's total_timeout_s
+# (190s for these recipes) including the ~5s safety margin per stage.
+_WAF_RETRY_OVERALL_BUDGET_S = 160.0
 PDFEMB_SELECTOR = "a.pdfemb-viewer[href]"
 PDFEMB_HREF_EXTRACT_JS = "(els) => els.map(el => el.getAttribute('href')).filter(Boolean)"
 
@@ -822,6 +857,100 @@ def _dropfiles_example_href_from_recipe(recipe: dict) -> str:
     return ""
 
 
+def _fetch_bytes_with_retries(
+    url: str,
+    *,
+    max_attempts: int,
+    per_attempt_timeout_s: float,
+    total_budget_s: float,
+) -> tuple[bytes, dict[str, str]] | None:
+    """Plain-HTTP (no browser) GET with retries, run off the event loop.
+
+    See the module-level _DROPFILES_HTTP_* comment for why this exists —
+    urllib gets through the sg-captcha challenge far more often than a full
+    Playwright navigation to the identical URL. urlopen already follows the
+    redirect chain (SEF URL -> index.php?task=frontfile.download -> file)
+    transparently, so only the final response matters here.
+    """
+    started = time.monotonic()
+    attempts = 0
+    while attempts < max_attempts and (time.monotonic() - started) < total_budget_s:
+        attempts += 1
+        try:
+            request = Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            with urlopen(request, timeout=per_attempt_timeout_s) as response:
+                body = response.read()
+                if response.status == 200 and body:
+                    headers = {k.lower(): v for k, v in response.headers.items()}
+                    return body, headers
+        except Exception:
+            pass
+    return None
+
+
+def _dropfiles_body_looks_like_file(headers: dict[str, str], body: bytes) -> bool:
+    """Distinguish a real downloaded file from a challenge-passed-through page.
+
+    A successful HTTP 200 through the WAF isn't automatically the right
+    answer — a wrong/nonexistent predicted item ID also returns 200, just
+    with the ordinary homepage HTML (Joomla silently redirects unknown
+    Itemids home) instead of a Content-Disposition: attachment file.
+    """
+    if not body:
+        return False
+    content_type = (headers.get("content-type") or "").lower()
+    content_disposition = (headers.get("content-disposition") or "").lower()
+    if "attachment" in content_disposition:
+        return True
+    if _is_pdf_content(body) or body[:2] == b"PK":  # PK = docx/zip signature
+        return True
+    if body[:3] == b"\xff\xd8\xff" or body[:8] == b"\x89PNG\r\n\x1a\n":  # JPEG / PNG
+        return True
+    if "text/html" in content_type:
+        return False
+    return content_type.startswith(("application/", "image/"))
+
+
+async def _save_dropfiles_bytes_to_pdf(
+    body: bytes, headers: dict[str, str], url: str, dest: Path
+) -> str:
+    content_disposition = headers.get("content-disposition") or ""
+    name_match = re.search(r'filename="?([^";]+)"?', content_disposition, re.IGNORECASE)
+    filename = (name_match.group(1) if name_match else urlparse(url).path).lower()
+    if _is_pdf_content(body):
+        dest.write_bytes(body)
+        return "pdf"
+    if filename.endswith((".docx", ".doc")) or body[:2] == b"PK":
+        pdf_bytes = await _convert_docx_to_pdf_bytes(body)
+        dest.write_bytes(pdf_bytes)
+        return "docx_to_pdf"
+    if body[:3] == b"\xff\xd8\xff" or body[:8] == b"\x89PNG\r\n\x1a\n":
+        try:
+            from PIL import Image as PILImage
+        except ImportError as exc:
+            raise RecipeReplayError(
+                "Pillow is required for image bulletin conversion. Install with: pip install Pillow"
+            ) from exc
+        img = PILImage.open(io.BytesIO(body)).convert("RGB")
+        img.save(str(dest), "PDF")
+        return "image_to_pdf"
+    raise RecipeReplayError(f"Unrecognized Dropfiles file content for {url}")
+
+
+def _extract_dropfiles_candidates_from_html(html: str, base_url: str) -> list[tuple[int, str]]:
+    """Find real mod_downloadlink hrefs in raw listing HTML (no bs4 dependency)."""
+    out: list[tuple[int, str]] = []
+    for match in _MOD_DOWNLOADLINK_HREF_RE.finditer(html):
+        href = match.group(1) or match.group(2)
+        if not href:
+            continue
+        absolute = urljoin(base_url, href)
+        id_match = _DROPFILES_FILE_ID_RE.search(absolute)
+        if id_match:
+            out.append((int(id_match.group(1)), absolute))
+    return out
+
+
 async def _try_dropfiles_predicted_downloads(
     page: Page,
     dest: Path,
@@ -830,10 +959,89 @@ async def _try_dropfiles_predicted_downloads(
     *,
     target_date: date | None,
 ) -> tuple[str, str] | None:
-    """Fallback 3: liturgical-title + sequential ID prediction when listing fails."""
-    if not example_href or target_date is None:
+    """Fallback 3 for WAF-flaky Joomla Dropfiles sites (threepatrons.org,
+    stmarysportglenone.org — same SiteGround-hosted sg-captcha challenge).
+
+    Tier 1: plain-HTTP-retry the listing page itself (bypasses the browser
+            fingerprint the WAF flags) and parse out the REAL newest
+            mod_downloadlink href — preferred over guessing, since the site
+            doesn't always post on the expected weekly cadence (confirmed
+            2026-08-10: stmarysportglenone.org was still one Sunday behind).
+    Tier 2: if the listing itself can't be fetched within budget, fall back
+            to sequential-ID + liturgical-title URL prediction (existing
+            predict_dropfiles_bulletin_urls), each tried via plain-HTTP-retry.
+    Tier 3: last resort, the original browser-navigation probe — kept in case
+            some other WAF variant responds better to a real browser.
+    """
+    if target_date is None:
         return None
-    # Keep prediction cheap — long per-URL timeouts explode under harvest retries.
+    started = time.monotonic()
+
+    def _remaining_budget(safety_margin_s: float = 5.0) -> float:
+        return _DROPFILES_HTTP_OVERALL_BUDGET_S - (time.monotonic() - started) - safety_margin_s
+
+    listing_url = page.url if page and _looks_like_http_url(page.url) else ""
+    if listing_url and _remaining_budget() > 0:
+        listing_result = await asyncio.to_thread(
+            _fetch_bytes_with_retries,
+            listing_url,
+            max_attempts=_DROPFILES_HTTP_ATTEMPTS,
+            per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
+            total_budget_s=min(_DROPFILES_HTTP_LISTING_BUDGET_S, _remaining_budget()),
+        )
+        if listing_result:
+            listing_body, listing_headers = listing_result
+            if "text/html" in (listing_headers.get("content-type") or "").lower():
+                html = listing_body.decode("utf-8", errors="ignore")
+                candidates = _extract_dropfiles_candidates_from_html(html, listing_url)
+                if candidates and _remaining_budget() > 0:
+                    _best_id, best_url = max(candidates)
+                    file_result = await asyncio.to_thread(
+                        _fetch_bytes_with_retries,
+                        best_url,
+                        max_attempts=_DROPFILES_HTTP_ATTEMPTS,
+                        per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
+                        total_budget_s=min(_DROPFILES_HTTP_FILE_BUDGET_S, _remaining_budget()),
+                    )
+                    if file_result:
+                        file_body, file_headers = file_result
+                        if _dropfiles_body_looks_like_file(file_headers, file_body):
+                            try:
+                                file_type = await _save_dropfiles_bytes_to_pdf(
+                                    file_body, file_headers, best_url, dest
+                                )
+                                return best_url, file_type
+                            except RecipeReplayError:
+                                pass
+
+    if example_href:
+        for candidate in predict_dropfiles_bulletin_urls(example_href, target_date)[:4]:
+            if _remaining_budget() <= 0:
+                break
+            candidate_result = await asyncio.to_thread(
+                _fetch_bytes_with_retries,
+                candidate,
+                max_attempts=_DROPFILES_HTTP_ATTEMPTS,
+                per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
+                total_budget_s=min(_DROPFILES_HTTP_PREDICTED_BUDGET_S, _remaining_budget()),
+            )
+            if not candidate_result:
+                continue
+            candidate_body, candidate_headers = candidate_result
+            if not _dropfiles_body_looks_like_file(candidate_headers, candidate_body):
+                continue
+            try:
+                file_type = await _save_dropfiles_bytes_to_pdf(
+                    candidate_body, candidate_headers, candidate, dest
+                )
+                return candidate, file_type
+            except RecipeReplayError:
+                continue
+
+    if not example_href:
+        return None
+
+    # Tier 3 (last resort): original browser-navigation probe.
     probe_timeout_ms = min(max(int(timeout_ms), 1), 12_000)
     block_hits = 0
     for candidate in predict_dropfiles_bulletin_urls(example_href, target_date)[:6]:
@@ -863,6 +1071,249 @@ async def _try_dropfiles_predicted_downloads(
                 if block_hits >= 2:
                     return None
             continue
+    return None
+
+
+_PDFEMB_IFRAME_SRC_RE = re.compile(
+    r'\bpdfembed-iframe\b[^>]*\bsrc="([^"]+)"|\bsrc="([^"]+)"[^>]*\bpdfembed-iframe\b',
+    re.IGNORECASE,
+)
+_WP_UPLOAD_IMAGE_RE = re.compile(
+    r"wp-content/uploads/(20\d{2})/(0[1-9]|1[0-2])/([A-Za-z0-9_.%-]+\.(?:png|jpe?g))",
+    re.IGNORECASE,
+)
+_RESIZED_IMAGE_SUFFIX_RE = re.compile(r"-\d+x\d+\.(?:png|jpe?g)$", re.IGNORECASE)
+
+
+def _extract_matching_hrefs(html: str, base_url: str, keyword_patterns: list[str]) -> list[str]:
+    """Plain-regex href extraction (no bs4 dependency) for WAF-flaky sites where
+    we fetch raw HTML via plain HTTP retries instead of a Playwright DOM."""
+    out: list[str] = []
+    seen: set[str] = set()
+    for href in re.findall(r'href="([^"]+)"', html):
+        low = href.lower()
+        if not any(pat in low for pat in keyword_patterns):
+            continue
+        absolute = urljoin(base_url, href)
+        if absolute not in seen:
+            seen.add(absolute)
+            out.append(absolute)
+    return out
+
+
+def _extract_pdfembed_target_url(html: str) -> str | None:
+    """PDF Embedder plugin iframe: src="...?url=<urlencoded pdf url>&title=...".
+    Same plugin/markup as PDFEMB_SELECTOR (a.pdfemb-viewer) used elsewhere,
+    just accessed via raw HTML regex instead of a Playwright locator."""
+    m = _PDFEMB_IFRAME_SRC_RE.search(html)
+    if not m:
+        return None
+    src = m.group(1) or m.group(2)
+    if not src:
+        return None
+    query = parse_qs(urlparse(unquote(src)).query)
+    urls = query.get("url")
+    return urls[0] if urls else None
+
+
+def _extract_wp_upload_images(html: str, year: int, month: int, base_url: str) -> list[str]:
+    """Full-size (non-thumbnail) image URLs under a specific wp-content/uploads
+    /YYYY/MM/ folder, in first-seen order. Skips WordPress's auto-generated
+    resized variants (e.g. "9th_1-1024x724.png") to avoid downloading the same
+    page multiple times at different resolutions."""
+    out: list[str] = []
+    seen: set[str] = set()
+    for match in _WP_UPLOAD_IMAGE_RE.finditer(html):
+        y, mo, name = int(match.group(1)), int(match.group(2)), match.group(3)
+        if y != year or mo != month or _RESIZED_IMAGE_SUFFIX_RE.search(name):
+            continue
+        key = name.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(urljoin(base_url, f"/wp-content/uploads/{y}/{mo:02d}/{name}"))
+    return out
+
+
+async def _images_bytes_to_pdf(dest: Path, image_bytes_list: list[bytes]) -> None:
+    from PIL import Image as PILImage
+
+    pages = [PILImage.open(io.BytesIO(b)).convert("RGB") for b in image_bytes_list]
+    if not pages:
+        raise RecipeReplayError("No bulletin page images to convert")
+    pages[0].save(str(dest), "PDF", save_all=True, append_images=pages[1:])
+
+
+async def _try_waf_retry_wordpress_bulletin(
+    listing_url: str,
+    dest: Path,
+    *,
+    post_slug_patterns: list[str],
+    target_date: date,
+) -> tuple[str, str] | None:
+    """Discover + download a WordPress bulletin post on a WAF-flaky host by
+    scraping raw HTML fetched via plain-HTTP retries — never via Playwright
+    navigation. Built for stgerardsparish.org (single embedded page image per
+    post) and stpatricksbelfast.org (PDF Embedder plugin iframe per post),
+    both on the same SiteGround-hosted infra as threepatrons.org /
+    stmarysportglenone.org (see _DROPFILES_HTTP_* comment) — a probabilistic
+    'sg-captcha' challenge that plain HTTP retries get through in a handful
+    of attempts far more reliably than a full browser navigation.
+
+    1. Fetch the listing page (homepage or category archive).
+    2. Find post links matching *post_slug_patterns*, score by date extracted
+       from the URL, and pick the newest (this is a genuine scrape of the
+       site's real current post, not a guess — some of these parishes don't
+       post every single week, so guessing a slug/number would be wrong as
+       often as it's right).
+    3. Fetch that post page and pull out either a PDF Embedder iframe's
+       target PDF, or the post's own (non-thumbnail) uploaded page image(s).
+    4. Fetch the actual file(s) and save/convert to *dest* as a PDF.
+
+    Every stage runs off a single shared time budget (_WAF_RETRY_OVERALL_BUDGET_S)
+    rather than a fixed budget per stage — a multi-page image bulletin can need
+    several separate file fetches after the listing+post fetches already ran,
+    and each stage must shrink to fit whatever's left so the whole function
+    still finishes comfortably inside a recipe's total_timeout_s.
+    """
+    started = time.monotonic()
+
+    def _remaining_budget(safety_margin_s: float = 5.0) -> float:
+        return _WAF_RETRY_OVERALL_BUDGET_S - (time.monotonic() - started) - safety_margin_s
+
+    def _stage_budget(preferred_s: float) -> float:
+        return max(1.0, min(preferred_s, _remaining_budget()))
+
+    if _remaining_budget() <= 0:
+        return None
+    listing_result = await asyncio.to_thread(
+        _fetch_bytes_with_retries,
+        listing_url,
+        max_attempts=_DROPFILES_HTTP_ATTEMPTS,
+        per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
+        total_budget_s=_stage_budget(_DROPFILES_HTTP_LISTING_BUDGET_S),
+    )
+    if not listing_result:
+        return None
+    listing_body, listing_headers = listing_result
+    if "text/html" not in (listing_headers.get("content-type") or "").lower():
+        return None
+    listing_html = listing_body.decode("utf-8", errors="ignore")
+
+    candidates = _extract_matching_hrefs(listing_html, listing_url, post_slug_patterns)
+    scored: list[tuple[date, str]] = []
+    for href in candidates:
+        slug = urlparse(href).path.rstrip("/").rsplit("/", 1)[-1]
+        found = extract_date_from_slug(slug) or extract_date_from_string(slug)
+        if found and found <= target_date + timedelta(days=3):
+            scored.append((found, href))
+    if not scored:
+        return None
+    _best_date, post_url = max(scored)
+
+    if _remaining_budget() <= 0:
+        return None
+    post_result = await asyncio.to_thread(
+        _fetch_bytes_with_retries,
+        post_url,
+        max_attempts=_DROPFILES_HTTP_ATTEMPTS,
+        per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
+        total_budget_s=_stage_budget(_DROPFILES_HTTP_FILE_BUDGET_S),
+    )
+    if not post_result:
+        return None
+    post_body, post_headers = post_result
+    if "text/html" not in (post_headers.get("content-type") or "").lower():
+        return None
+    post_html = post_body.decode("utf-8", errors="ignore")
+
+    pdf_url = _extract_pdfembed_target_url(post_html)
+    if pdf_url and _remaining_budget() > 0:
+        pdf_url = urljoin(post_url, pdf_url)
+        file_result = await asyncio.to_thread(
+            _fetch_bytes_with_retries,
+            pdf_url,
+            max_attempts=_DROPFILES_HTTP_ATTEMPTS,
+            per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
+            total_budget_s=_stage_budget(_DROPFILES_HTTP_FILE_BUDGET_S),
+        )
+        if file_result:
+            file_body, file_headers = file_result
+            if _dropfiles_body_looks_like_file(file_headers, file_body) and _is_pdf_content(
+                file_body
+            ):
+                dest.write_bytes(file_body)
+                return pdf_url, "pdf"
+
+    image_urls = _extract_wp_upload_images(
+        post_html, _best_date.year, _best_date.month, post_url
+    )
+    if image_urls:
+        image_bytes: list[bytes] = []
+        for image_url in image_urls[:6]:
+            if _remaining_budget() <= 0:
+                break
+            image_result = await asyncio.to_thread(
+                _fetch_bytes_with_retries,
+                image_url,
+                max_attempts=_DROPFILES_HTTP_ATTEMPTS,
+                per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
+                total_budget_s=_stage_budget(_DROPFILES_HTTP_FILE_BUDGET_S),
+            )
+            if not image_result:
+                continue
+            image_body, image_headers = image_result
+            if _dropfiles_body_looks_like_file(image_headers, image_body):
+                image_bytes.append(image_body)
+        if image_bytes:
+            await _images_bytes_to_pdf(dest, image_bytes)
+            return post_url, "image_to_pdf"
+
+    return None
+
+
+# naomhfionan.com (Falcarragh, Raphoe): the HTML listing page (/nuachtlitir/)
+# sits behind a genuine Cloudflare Managed Challenge that blocks every browser
+# attempt (headless AND headful) — but the actual bulletin PDFs live on the
+# site's wp-content/uploads asset path, which is NOT challenged at all (plain
+# HTTP GETs to a known filename return 200 immediately, confirmed 2026-08-10).
+# The filename itself follows a predictable, non-date-only pattern
+# (Parish-Newsletter-{N}-for-Sun-{A/B/C}-{DDMMYYYY}.pdf) reverse-engineered
+# from ~50 real historical filenames pulled from the Wayback Machine CDX
+# index — see naomhfionan_bulletin_url()/naomhfionan_newsletter_number() in
+# utils.py and liturgical_cycle_letter() in liturgical.py for the derivation
+# and its 2024-2026 verification. A small handful of HTTP retries plus a
+# +-1 number fallback (for the rare skipped-week numbering seen in older
+# filenames) is enough — no browser, no challenge to solve.
+_NAOMHFIONAN_HTTP_ATTEMPTS = 8
+_NAOMHFIONAN_HTTP_PER_ATTEMPT_TIMEOUT_S = 10.0
+_NAOMHFIONAN_HTTP_BUDGET_PER_CANDIDATE_S = 25.0
+
+
+async def _try_naomhfionan_predicted_pdf(
+    dest: Path,
+    target_date: date,
+) -> tuple[str, str] | None:
+    """Predict + fetch naomhfionan.com's bulletin PDF straight from its
+    unprotected wp-content/uploads path, skipping the Cloudflare-challenged
+    listing page entirely. See module comment above for why this is safe."""
+    from .utils import naomhfionan_bulletin_url
+
+    for offset in (0, -1, 1):
+        url = naomhfionan_bulletin_url(target_date, number_offset=offset)
+        result = await asyncio.to_thread(
+            _fetch_bytes_with_retries,
+            url,
+            max_attempts=_NAOMHFIONAN_HTTP_ATTEMPTS,
+            per_attempt_timeout_s=_NAOMHFIONAN_HTTP_PER_ATTEMPT_TIMEOUT_S,
+            total_budget_s=_NAOMHFIONAN_HTTP_BUDGET_PER_CANDIDATE_S,
+        )
+        if not result:
+            continue
+        body, _headers = result
+        if _is_pdf_content(body):
+            dest.write_bytes(body)
+            return url, "pdf"
     return None
 
 
@@ -1753,6 +2204,47 @@ async def replay_recipe(
     host_profile = _host_profile_for_start_url(start_url)
     site_type = str(recipe.get("site_type") or "").strip().lower()
     dropfiles_example = _dropfiles_example_href_from_recipe(recipe)
+
+    # WAF-flaky WordPress sites (stgerardsparish.org, stpatricksbelfast.org —
+    # same SiteGround sg-captcha challenge as the joomla_dropfiles sites
+    # below): skip Playwright/the browser entirely and go straight to the
+    # plain-HTTP-retry scrape, since a full browser was observed to fail far
+    # more often against this specific WAF than a bare urllib request (see
+    # _DROPFILES_HTTP_* comment) — no point paying for a browser context here.
+    if site_type == "waf_retry_wordpress" and target_date is not None:
+        post_slug_patterns = [
+            str(p).strip().lower()
+            for p in (recipe.get("post_slug_patterns") or [])
+            if str(p).strip()
+        ] or ["bulletin"]
+        found = await _try_waf_retry_wordpress_bulletin(
+            start_url,
+            dest,
+            post_slug_patterns=post_slug_patterns,
+            target_date=target_date,
+        )
+        if found:
+            return dest, found[1], found[0]
+        raise RecipeReplayError(
+            f"WAF-flaky site {start_url} — could not fetch listing/post via "
+            "plain-HTTP retries within budget (not a permanent block; retry later)"
+        )
+
+    # naomhfionan.com (Falcarragh): the listing page is a genuine Cloudflare
+    # Managed Challenge (confirmed blocked in both headless AND headful
+    # Playwright), but the bulletin PDF itself lives on an unchallenged
+    # wp-content/uploads asset path with a predictable filename — skip the
+    # browser and the challenged page entirely. See _try_naomhfionan_predicted_pdf.
+    if site_type == "naomhfionan_numbered_pdf" and target_date is not None:
+        found = await _try_naomhfionan_predicted_pdf(dest, target_date)
+        if found:
+            return dest, found[1], found[0]
+        raise RecipeReplayError(
+            f"naomhfionan.com predicted PDF URL(s) for {target_date} did not "
+            "resolve to a real PDF (not the listing-page block; retry later "
+            "or re-check the number/letter prediction)"
+        )
+
     context_opts: dict = {"accept_downloads": True}
     if host_profile.get("ignore_https_errors"):
         context_opts["ignore_https_errors"] = True
@@ -1842,7 +2334,26 @@ async def replay_recipe(
                             )
                             if tried:
                                 return dest, tried[1], tried[0]
-                await _replay_click(page, step, step_timeout_ms, target_date=target_date)
+                try:
+                    await _replay_click(page, step, step_timeout_ms, target_date=target_date)
+                except RecipeReplayError:
+                    # joomla_dropfiles sites (threepatrons.org,
+                    # stmarysportglenone.org) sit behind a PROBABILISTIC WAF
+                    # that sometimes lets the initial goto through with a 200
+                    # but serves a challenge page with none of the real
+                    # .mod_downloadlink anchors — _replay_click then fails to
+                    # find the selector at all and raises before we ever
+                    # reach the plain-HTTP-retry fallback below. Swallow that
+                    # one specific failure mode here (not for other site
+                    # types) and fall through to the same
+                    # _try_joomla_dropfiles_click_download fallback chain
+                    # used when the click "succeeds" but produces no
+                    # download — it already ends in
+                    # _try_dropfiles_predicted_downloads, which is far more
+                    # reliable against this WAF than repeating the browser
+                    # click would be.
+                    if site_type != "joomla_dropfiles":
+                        raise
                 if not downloads:
                     try:
                         await page.wait_for_event(

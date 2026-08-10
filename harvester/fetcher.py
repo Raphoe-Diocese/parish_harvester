@@ -1781,6 +1781,24 @@ def _is_placeholder_recipe(recipe_meta: dict | None) -> bool:
         return True
     if recipe_meta.get("placeholder") or recipe_meta.get("auto_generated"):
         return True
+    # Some site_types are a fully trained, working recipe even though they
+    # only need a single "goto <listing/asset url>" step — the real
+    # discovery/download logic lives entirely in replay.py, dispatched
+    # purely off site_type, never off step count/shape:
+    #   - waf_retry_wordpress: plain-HTTP-retry scrape past a probabilistic
+    #     WAF (_try_waf_retry_wordpress_bulletin).
+    #   - naomhfionan_numbered_pdf: predicted-URL fetch of an unchallenged
+    #     asset path past a Cloudflare-challenged listing page
+    #     (_try_naomhfionan_predicted_pdf).
+    # Without this exemption a transient failure on either path would
+    # incorrectly fall through to legacy scrape/URL-guess fallbacks (which
+    # face the exact same block, just less reliably) instead of surfacing a
+    # clean "genuinely down right now" error.
+    if str(recipe_meta.get("site_type") or "").strip().lower() in {
+        "waf_retry_wordpress",
+        "naomhfionan_numbered_pdf",
+    }:
+        return False
     steps = recipe_meta.get("steps")
     if not isinstance(steps, list) or not steps:
         return True
