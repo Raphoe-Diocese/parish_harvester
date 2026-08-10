@@ -1,21 +1,57 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "bangorparish",
   "display_name": "Bangor",
   "diocese": "down_and_connor",
-  "start_url": "https://www.bangorparish.com/wp-content/uploads/14-June-2026-NEWSLETTER.pdf",
+  "start_url": "https://www.bangorparish.com/parish-bulletin/",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.bangorparish.com/wp-content/uploads/14-June-2026-NEWSLETTER.pdf"
+      "url": "https://www.bangorparish.com/parish-bulletin/"
     },
     {
-      "action": "download",
-      "url": "https://www.bangorparish.com/wp-content/uploads/14-June-2026-NEWSLETTER.pdf",
-      "use_captured_url": true
+      "action": "click",
+      "selector": "a[href$='.pdf']",
+      "href": "https://www.bangorparish.com/wp-content/uploads/14-June-2026-NEWSLETTER.pdf",
+      "text": "Download Parish Newsletter",
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "a[href$='.pdf']",
+        "a[href*='.pdf']"
+      ]
+    },
+    {
+      "action": "download"
     }
   ],
   "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-06-27"
+  "total_timeout_s": 190,
+  "playbook_type": "pdf_download_list",
+  "site_type": "pdf_link_list",
+  "recorded_date": "2026-08-10",
+  "operator_notes": [
+    "SUPERSEDES the 2026-06-27 version — that recipe had a goto step",
+    "hardcoded to the literal 14-June-2026-NEWSLETTER.pdf with NO",
+    "use_target_url, plus a download step with use_captured_url:true",
+    "returning that same literal URL unmodified — bug pattern #1, it would",
+    "have downloaded the 14 June 2026 PDF forever even after the site",
+    "posted newer newsletters.",
+    "This page (/parish-bulletin/) lists two PDFs per week — 'Download",
+    "Parish Newsletter' (the actual bulletin) and 'Download Missalette'",
+    "(a separate weekly Mass-readings booklet, same date, NOT the bulletin).",
+    "pick_strategy:newest_dated + the newsletter/bulletin keyword bonus in",
+    "_score_bulletin_link correctly prefers the Newsletter link over the",
+    "Missalette one when both share the same date score.",
+    "CONFIRMED 2026-08-10: the site itself has not posted anything newer",
+    "than 14 June 2026 on this page (checked full listing, newest-first,",
+    "nothing from July/August present) — genuinely stale, not a scraper",
+    "bug. This recipe will now pick up whatever is newest automatically",
+    "once the parish resumes posting; re-check manually if it persists at",
+    "outcome=stale for many more weeks."
+  ],
+  "do_not": [
+    "Do not pin a dated filename in the selector — it breaks every week.",
+    "Do not pick 'Download Missalette' links — that's a different weekly document."
+  ]
 }

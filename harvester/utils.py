@@ -105,12 +105,26 @@ _OPAQUE_HASH_MIN_LEN = 16
 _UUID_TOKEN_RE = re.compile(
     r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
 )
+# WordPress media-library auto-generated filenames like
+# "Document_240328_120527.pdf" (upload YYMMDD_HHMMSS timestamp, not a
+# bulletin date). The trailing 6 digits are themselves a valid-looking
+# HHMMSS, and the leading 6 digits can independently misparse as a *valid*
+# DDMMYY date (e.g. "240328" -> day=24/month=03/year=2028) — since it's a
+# real constructible date(), the existing date()-validation guard doesn't
+# catch it, and being a future year it silently outranks every genuinely
+# dated bulletin link on the page (found 2026-08-10, bangorparish:
+# pick_strategy:newest_dated grabbed an unrelated 2024-uploaded PDF instead
+# of the real June 2026 newsletter because of this). Treat the whole
+# 6-digit_6-digit pair as opaque, like a hash/UUID.
+_TIMESTAMP_PAIR_RE = re.compile(r"(?<!\d)\d{6}[_-]\d{6}(?!\d)")
 
 
 def _opaque_hash_spans(text: str) -> list[tuple[int, int]]:
     """Spans of long hex-looking tokens (likely CDN hashes/UUIDs, not dates)."""
     spans = []
     for m in _UUID_TOKEN_RE.finditer(text):
+        spans.append((m.start(), m.end()))
+    for m in _TIMESTAMP_PAIR_RE.finditer(text):
         spans.append((m.start(), m.end()))
     for m in _HEX_TOKEN_RE.finditer(text):
         token = m.group(0)
