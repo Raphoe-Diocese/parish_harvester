@@ -1,23 +1,55 @@
 {
+  "version": 2,
   "parish_key": "stpatricksbelfast",
   "display_name": "St Patricks Belfast",
-  "recorded_date": "2026-04-30",
-  "start_url": "https://www.stpatricksbelfast.org/category/weekly-bulletins/",
+  "diocese": "down_and_connor",
+  "start_url": "https://www.stpatricksbelfast.org/category/weekly-bulletins",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.stpatricksbelfast.org/category/weekly-bulletins/"
-    },
-    {
-      "action": "download",
-      "url_pattern": "*.pdf",
-      "captured_url": "no_bulletin"
+      "url": "https://www.stpatricksbelfast.org/category/weekly-bulletins"
     }
   ],
-  "diocese": "down_and_connor",
-  "placeholder": true,
-  "auto_generated": true,
-  "auto_fixed": true,
-  "needs_retraining": true,
-  "retraining_reason": "stpatricksbelfast.org returns HTTP 202 then a client-side redirect to a '403 - Forbidden' Sucuri WAF challenge page before any real content loads, in a full browser — site may be blocking automated access, not a recipe/selector problem. Same WAF family as stgerardsparish/longtowerchurch/threepatrons. Dead-end without a manual-upload fallback (checked 2026-08-10)."
+  "site_type": "waf_retry_wordpress",
+  "post_slug_patterns": ["weekly-bulletin-for-sunday-"],
+  "timeout_ms": 45000,
+  "total_timeout_s": 190,
+  "recorded_date": "2026-08-10",
+  "operator_notes_2026_08_10": [
+    "NOT a genuine dead-end — the earlier 'bot-blocked, no unprotected path'",
+    "verdict (needs_retraining/placeholder) was WRONG and is superseded. Same",
+    "SiteGround 'sg-captcha' challenge and shared-hosting fingerprint (host-",
+    "header: 8441280...) as threepatrons.org/stmarysportglenone.org/",
+    "stgerardsparish.org — PROBABILISTIC, not a hard block: plain HTTP retries",
+    "(curl/urllib) got through with real content in a handful of attempts,",
+    "while a full Playwright browser navigation to the same URL failed far more",
+    "consistently in testing.",
+    "Site structure: the .../category/weekly-bulletins archive lists each week's",
+    "post via a stable, predictable slug",
+    "'weekly-bulletin-for-sunday-D-month-YYYY' (no inconsistent prefix, unlike",
+    "stgerardsparish) — but the parish does NOT reliably post every week, so",
+    "still scrape the real archive rather than guess the slug. Each post embeds",
+    "the actual bulletin via the PDF Embedder plugin",
+    "(<iframe class=\"pdfembed-iframe\" src=\"...?url=<urlencoded pdf>&...\">),",
+    "pointing at a wp-content/uploads/YYYY/MM/*.pdf.",
+    "site_type:waf_retry_wordpress (harvester/replay.py) skips Playwright/the",
+    "browser entirely for this recipe: fetches the category archive via plain-",
+    "HTTP retries, regex-extracts the newest post link matching",
+    "post_slug_patterns with a real date <= target, fetches that post, decodes",
+    "the pdfembed-iframe's url= query param, and downloads the actual PDF.",
+    "IMPORTANT — confirmed genuinely stale via the site's own wp-sitemap.xml",
+    "<lastmod> timestamps (authoritative, not a guess) as of 2026-08-10: the",
+    "newest post is still 'weekly-bulletin-for-sunday-5-july-2026' (lastmod",
+    "2026-07-03) — 5 weeks stale against the 9 August 2026 target, nothing",
+    "posted since. Expect this recipe to legitimately report outcome=stale/",
+    "failed some weeks purely because the parish stopped posting, same as any",
+    "other genuinely-stale parish; do not re-open the WAF-block investigation",
+    "unless even that 5 July 2026 PDF stops being downloadable at all."
+  ],
+  "do_not": [
+    "Do not guess/hardcode next week's post slug — this parish skips weeks;",
+    "always scrape the real category archive for the newest real post.",
+    "Do not switch this back to a Playwright goto/click recipe — a full browser",
+    "was measurably less reliable than plain HTTP retries against this WAF."
+  ]
 }
