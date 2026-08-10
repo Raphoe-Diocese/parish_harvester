@@ -1430,6 +1430,24 @@ def _peek_next_download_step(steps: list, index: int) -> dict | None:
     return None
 
 
+def _next_step_is_image_action(steps: list, index: int) -> bool:
+    """True when the step right after this ``goto`` is ``image``/``image_stack``.
+
+    ``_wait_for_bulletin_content`` only ever waits for PDF-shaped selectors
+    (mdocs tables, pdfemb viewers, ``a[href$='.pdf']``, ...). Image-gallery
+    recipes (a bare full-page scan ``<img>`` in the post body, no PDF link at
+    all — e.g. derriaghycatholicparish) never satisfy any of those probes, so
+    this wait always burns its full budget (up to 240s) doing nothing useful
+    before the ``image``/``image_stack`` step below runs its own
+    networkidle+scroll wait anyway (found 2026-08-09).
+    """
+    for step in steps[index + 1 :]:
+        if not isinstance(step, dict):
+            continue
+        return str(step.get("action") or "").strip().lower() in {"image", "image_stack"}
+    return False
+
+
 _ANCHOR_BATCH_JS = """
 (els) => els.map((el, idx) => ({
   href: el.href || el.getAttribute('href') || '',
@@ -1732,7 +1750,8 @@ async def replay_recipe(
                     return captured
                 if _looks_like_http_url(url):
                     last_http_url = url
-                await _wait_for_bulletin_content(page, recipe, step_timeout_ms)
+                if not _next_step_is_image_action(steps, step_index):
+                    await _wait_for_bulletin_content(page, recipe, step_timeout_ms)
                 continue
 
             if action == "click":

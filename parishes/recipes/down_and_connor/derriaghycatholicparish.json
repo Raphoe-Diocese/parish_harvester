@@ -1,22 +1,32 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "derriaghycatholicparish",
   "display_name": "Derriaghy",
   "diocese": "down_and_connor",
   "start_url": "https://derriaghycatholicparish.com/?page_id=262",
+  "site_type": "wordpress_image_gallery",
+  "operator_notes_2026_08_09": [
+    "Previous recipe hardcoded a single image URL from the week it was trained (11th Sunday, 27/06) — froze forever, silently re-downloading the same stale scan while reporting outcome=ok.",
+    "Page ?page_id=262 lists every past week's bulletin scan as a plain <img> in .entry-content, NEWEST FIRST in DOM order (confirmed 2026-08-09: index 0 = '19th-Suday-in-ordinary-time...png', the current week; index 1 is a recurring ~822x1024 parish crest image that also happens to pass the size filter, so position must stay 'first' with count=1, not a larger count).",
+    "domcontentloaded/load navigation wait hung/timed out repeatedly in testing (site seems to have a slow/hanging subresource); 'commit' wait_until (already set below) loads fine and fast — kept explicit.",
+    "Verified: image_stack count=1 position=first correctly downloads the newest-first bulletin PNG (724x1024, '19th Sunday in Ordinary Time' matching 09/08/2026 target)."
+  ],
   "steps": [
     {
       "action": "goto",
       "url": "https://derriaghycatholicparish.com/?page_id=262"
     },
     {
-      "action": "image",
-      "url": "https://derriaghycatholicparish.com/wp-content/uploads/2026/06/11th-Suday-in-ordinary-time-724x1024.png"
+      "action": "image_stack",
+      "count": 1,
+      "position": "first",
+      "min_long_side": 700,
+      "min_short_side": 500
     }
   ],
   "observed_load_ms": 2343,
   "timeout_ms": 180000,
   "total_timeout_s": 300,
   "navigation_wait_until": "commit",
-  "recorded_date": "2026-06-27"
+  "recorded_date": "2026-08-09"
 }
