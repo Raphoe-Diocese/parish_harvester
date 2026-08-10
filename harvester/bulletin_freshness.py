@@ -41,6 +41,9 @@ _ISO_RE = re.compile(
 _DMY_ISO_RE = re.compile(
     r"(?<!\d)(0?[1-9]|[12]\d|3[01])[-_/](0?[1-9]|1[0-2])[-_/]((?:19|20)\d{2})(?!\d)"
 )
+# Matches the leading ordinal in "19th-Suday-in-ordinary-time...", "3rd-Sunday
+# -of-Advent...", etc. — a liturgical Sunday-count, never a day-of-month.
+_LEADING_ORDINAL_RE = re.compile(r"^(\d{1,2})(?:st|nd|rd|th)\b", re.I)
 
 
 FreshnessStatus = Literal["fresh", "stale", "unknown"]
@@ -91,8 +94,23 @@ def extract_bulletin_date(url_or_text: str) -> date | None:
             if day_match:
                 day = int(day_match.group(1))
                 return _safe_date(folder_year, folder_month, day)
+            # "19th-Suday-in-ordinary-time-724x1024.png" style filenames lead
+            # with the LITURGICAL Sunday-count ordinal (e.g. "19th Sunday in
+            # Ordinary Time" — the 19th Sunday of the church year), not a
+            # day-of-month, even though it's a 1-2 digit number that happens
+            # to look like a valid day. The generic slug_day fallback below
+            # was blindly treating that ordinal as the day, misdating this
+            # filename as 2026-08-19 (10 days ahead of the actual 2026-08-09
+            # target) and getting it wrongly rejected as stale (found
+            # 2026-08-10, derriaghycatholicparish: the real content matched
+            # "19th Sunday in Ordinary Time", which is genuinely correct for
+            # 09/08/2026, but the filename's leading "19" isn't a date at
+            # all). Skip slug_day when it matched that same leading ordinal.
+            ordinal_match = _LEADING_ORDINAL_RE.match(basename)
             slug_day = re.search(r"(?<!\d)(0?[1-9]|[12]\d|3[01])(?!\d)", basename)
-            if slug_day:
+            if slug_day and not (
+                ordinal_match and slug_day.start(1) == ordinal_match.start(1)
+            ):
                 return _safe_date(folder_year, folder_month, int(slug_day.group(1)))
             return _safe_date(folder_year, folder_month, 1)
         except (TypeError, ValueError):

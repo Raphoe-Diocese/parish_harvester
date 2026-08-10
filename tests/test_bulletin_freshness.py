@@ -110,6 +110,23 @@ class BulletinFreshnessTests(unittest.TestCase):
         verdict = check_bulletin_freshness(stale_url, date(2026, 8, 9))
         self.assertEqual(verdict.status, "stale")
 
+    def test_ordinal_sunday_count_in_wp_filename_is_not_a_day(self) -> None:
+        # derriaghycatholicparish.com names its weekly image
+        # "19th-Suday-in-ordinary-time-724x1024.png" — the leading "19" is
+        # the LITURGICAL Sunday-count ("19th Sunday in Ordinary Time" is the
+        # correct bulletin for 09/08/2026), not a day-of-month. The generic
+        # slug_day fallback previously misread it as day=19, producing
+        # 2026-08-19 (10 days ahead of target) and wrongly rejecting a
+        # genuinely correct, fresh bulletin as stale (found 2026-08-10).
+        url = (
+            "https://derriaghycatholicparish.com/wp-content/uploads/2026/08/"
+            "19th-Suday-in-ordinary-time-724x1024.png"
+        )
+        extracted = extract_bulletin_date(url)
+        self.assertNotEqual(extracted, date(2026, 8, 19))
+        verdict = check_bulletin_freshness(url, date(2026, 8, 9))
+        self.assertEqual(verdict.status, "fresh")
+
     def test_mark_result_stale_sets_retry_metadata(self) -> None:
         target = date(2026, 6, 14)
         entry = ParishEntry(
