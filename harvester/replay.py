@@ -53,6 +53,15 @@ class RecipeReplayError(RuntimeError):
 DOCX_CONVERSION_TIMEOUT_S = 60
 RECIPE_STEP_TIMEOUT_MS = PAGE_LOAD_TIMEOUT_MS
 POST_CLICK_WAIT_TIMEOUT_MS = 3_000
+# Extra grace period to wait for a native download event after a click when
+# none has arrived yet. _click_locator_match's own settle window
+# (POST_CLICK_WAIT_TIMEOUT_MS) is tuned for navigation, but some servers are
+# slow enough (~2.5-3s observed) that the download event fires just *after*
+# that window closes — the download was genuinely in flight, not missing.
+# Without this, replay falls through to fallback discovery chains that don't
+# apply to the recipe and eventually times out (found 2026-08-09,
+# parishoflisburn).
+DELAYED_DOWNLOAD_WAIT_MS = 10_000
 MAX_SELECTOR_ERRORS = 3
 DROPFILES_DOWNLOAD_SELECTORS = (
     ".mod_dropfiles_latest a.mod_downloadlink[href]",
@@ -1741,6 +1750,13 @@ async def replay_recipe(
                             if tried:
                                 return dest, tried[1], tried[0]
                 await _replay_click(page, step, step_timeout_ms, target_date=target_date)
+                if not downloads:
+                    try:
+                        await page.wait_for_event(
+                            "download", timeout=min(DELAYED_DOWNLOAD_WAIT_MS, step_timeout_ms)
+                        )
+                    except Exception:
+                        pass
                 if downloads:
                     download = downloads.pop(0)
                     file_type = await _save_download_to_pdf(download, dest)
@@ -1774,9 +1790,24 @@ async def replay_recipe(
                         )
                         if tried:
                             return dest, tried[1], tried[0]
-                tried = await _try_download_page_url(page, dest, timeout_ms=step_timeout_ms)
-                if tried:
-                    return dest, tried[1], tried[0]
+                # Skip the blind "maybe page.url is secretly a document" probe
+                # when more steps still follow this click. It duplicates the
+                # _is_document_url(page.url) check just above (already False
+                # here) with a real network round-trip, and _try_browser_nav_
+                # download's fallback chain inside it can take ~200s on a
+                # plain HTML listing page — for a click that only navigated
+                # to an intermediate listing/category page (a later click or
+                # a "download" step still to come), that time is wasted
+                # since the next step handles the actual capture (found
+                # 2026-08-09, parishoflisburn: click #1 navigated NEWS ->
+                # /category/news/, this probe alone burned most of a 3-attempt
+                # harvest budget before the real "Download" click on the next
+                # step — which succeeds in under a second — ever ran).
+                is_last_step = step_index == len(steps) - 1
+                if is_last_step:
+                    tried = await _try_download_page_url(page, dest, timeout_ms=step_timeout_ms)
+                    if tried:
+                        return dest, tried[1], tried[0]
                 continue
 
             if action == "download":
