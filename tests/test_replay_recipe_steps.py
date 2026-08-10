@@ -123,6 +123,25 @@ class ClaudyBulletinFilterTests(unittest.TestCase):
         )
         self.assertEqual(hashed[0], 0)
 
+    def test_dd_mm_yy_dot_filename_outscores_yy_mm_dd_misreading(self) -> None:
+        # stbrigidsparishbelfast.org 2026-08-09: UK-convention DD.MM.YY
+        # filenames ("09.08.26") collide with the YY.MM.DD dot pattern used
+        # for Google Drive folder rows. Reading "09.08.26" as YY.MM.DD gives
+        # a bogus 2009-08-26, which lost to an older bulletin whose digits
+        # happened to parse as a "newer-looking" fake YY.MM.DD year
+        # (26.07.26 -> 2026-07-26). Both interpretations must be scored so
+        # the genuinely current bulletin wins.
+        current = _score_bulletin_url(
+            "https://stbrigidsparishbelfast.org/assets/documents/"
+            "Parish-Bulletin-09.08.26-FOR-PRINTING.pdf"
+        )
+        older = _score_bulletin_url(
+            "https://stbrigidsparishbelfast.org/assets/documents/"
+            "Parish-Bulletin-26.07.26-FOR-PRINTING.pdf"
+        )
+        self.assertEqual(current[0], 20260809)
+        self.assertEqual(older[0], 20260726)
+        self.assertGreater(current[0], older[0])
 
     async def test_find_pdfemb_url_prefers_pdf_embedder_links(self) -> None:
         class _Page:

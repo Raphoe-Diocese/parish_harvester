@@ -74,6 +74,15 @@ _NON_BULLETIN_RE = re.compile(
 )
 _BULLETIN_KEYWORD_RE = re.compile(r"\b(bulletin|newsletter)\b", re.IGNORECASE)
 _D_M_YY_IN_URL_RE = re.compile(r"(?<!\d)(\d{1,2})-(\d{1,2})-(\d{2})(?!\d)")
+# Dot-separated DD.MM.YY (UK convention) — e.g. stbrigidsparishbelfast.org's
+# "Parish-Bulletin-09.08.26-FOR-PRINTING.pdf". harvester.utils.extract_date_from_string
+# treats this same N.N.NN dot shape as YY.MM.DD (needed for Google Drive folder-row
+# dates and locked in by tests/test_cloud_folders.py), which silently misreads UK
+# DD.MM.YY filenames — "09.08.26" as YY.MM.DD is 2009-08-26, so it always lost to an
+# older bulletin whose digits happened to parse as a more "recent-looking" fake
+# YY.MM.DD year (found live: 26.07.26 beat 09.08.26 because misread as 2026-07-26).
+# Score both interpretations and let max() pick whichever is more plausible.
+_D_M_YY_DOT_IN_URL_RE = re.compile(r"(?<!\d)(\d{1,2})\.(\d{1,2})\.(\d{2})(?!\d)")
 # WordPress media folders (/wp-content/uploads/YYYY/MM/) are authoritative for the
 # *upload* month even when the filename itself carries no date at all (e.g. a slug
 # named after the liturgical feast: "Sixteenth-Sunday-of-Ordinary-Time.pdf"). Used
@@ -192,6 +201,15 @@ def _score_bulletin_url(url: str) -> tuple[int, int]:
         try:
             day, month, year = int(match.group(1)), int(match.group(2)), 2000 + int(match.group(3))
             date_score = max(date_score, year * 10000 + month * 100 + day)
+        except ValueError:
+            continue
+    for match in _D_M_YY_DOT_IN_URL_RE.finditer(text):
+        if _is_within_opaque_hash(hash_spans, match.start(), match.end()):
+            continue
+        try:
+            day, month, year = int(match.group(1)), int(match.group(2)), 2000 + int(match.group(3))
+            if 1 <= day <= 31 and 1 <= month <= 12:
+                date_score = max(date_score, year * 10000 + month * 100 + day)
         except ValueError:
             continue
     for m in re.finditer(r"(?<!\d)(\d{2})(\d{2})(\d{2})(?!\d)", text):

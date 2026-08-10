@@ -72,6 +72,26 @@ class BulletinFreshnessTests(unittest.TestCase):
         verdict = check_bulletin_freshness(url, target)
         self.assertEqual(verdict.status, "unknown")
 
+    def test_dd_mm_yy_dot_filename_not_misread_as_yy_mm_dd(self) -> None:
+        # stbrigidsparishbelfast.org uses UK-convention DD.MM.YY filenames
+        # ("Parish-Bulletin-09.08.26-FOR-PRINTING.pdf"). The same N.N.NN dot
+        # shape is also used by Google Drive folder rows as YY.MM.DD, so a
+        # naive single-interpretation parse misread "09.08.26" as 2009-08-26
+        # and rejected a genuinely current bulletin as 17-years stale.
+        current_url = (
+            "https://stbrigidsparishbelfast.org/assets/documents/"
+            "Parish-Bulletin-09.08.26-FOR-PRINTING.pdf"
+        )
+        older_url = (
+            "https://stbrigidsparishbelfast.org/assets/documents/"
+            "Parish-Bulletin-26.07.26-FOR-PRINTING.pdf"
+        )
+        self.assertEqual(extract_bulletin_date(current_url), date(2026, 8, 9))
+        self.assertEqual(extract_bulletin_date(older_url), date(2026, 7, 26))
+        target = date(2026, 8, 9)
+        verdict = check_bulletin_freshness(current_url, target)
+        self.assertEqual(verdict.status, "fresh")
+
     def test_mark_result_stale_sets_retry_metadata(self) -> None:
         target = date(2026, 6, 14)
         entry = ParishEntry(

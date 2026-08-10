@@ -165,14 +165,30 @@ def extract_date_from_string(text: str) -> date | None:
         except ValueError:
             pass
 
-    # YY.MM.DD — Google Drive folder rows (26.06.14 → 2026-06-14, 29.01.05 → 2029-01-05)
+    # Dot-separated N.N.NN — ambiguous between YY.MM.DD (Google Drive folder
+    # rows: 26.06.14 → 2026-06-14, 29.01.05 → 2029-01-05; locked by
+    # tests/test_cloud_folders.py) and UK-convention DD.MM.YY filenames
+    # (stbrigidsparishbelfast.org's "Parish-Bulletin-09.08.26-FOR-PRINTING.pdf",
+    # where reading it as YY.MM.DD gives a bogus 2009-08-26 and makes a genuinely
+    # current bulletin look 17 years stale). The middle group is the month
+    # under both readings, so only the outer two groups swap between "day" and
+    # "year". Try both, keep only the readings that are calendar-valid, and
+    # prefer whichever implies the later (more plausible/current) year — this
+    # matches both locked Drive-folder cases above and the UK bulletin case.
     m = _first_match_outside_hash(_YY_MM_DD_RE, text, spans)
     if m:
+        g1, g2, g3 = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        candidates: list[date] = []
         try:
-            year = 2000 + int(m.group(1))
-            return date(year, int(m.group(2)), int(m.group(3)))
+            candidates.append(date(2000 + g1, g2, g3))  # YY.MM.DD
         except ValueError:
             pass
+        try:
+            candidates.append(date(2000 + g3, g2, g1))  # DD.MM.YY
+        except ValueError:
+            pass
+        if candidates:
+            return max(candidates, key=lambda d: d.year)
 
     # Ordinal month-name slugs: 26th-July-2026, 5_april_2026
     slug_date = extract_date_from_slug(text)
