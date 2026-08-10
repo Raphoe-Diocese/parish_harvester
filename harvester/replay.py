@@ -35,6 +35,8 @@ from .cloud_urls import (
 )
 from .config import MAX_BULLETIN_PAGES, PAGE_LOAD_TIMEOUT_MS, PARISHES_DIR
 from .utils import (
+    _is_within_opaque_hash,
+    _opaque_hash_spans,
     extract_date_from_string,
     extract_newsletter_number,
     oneweb_newsletter_download_urls,
@@ -72,6 +74,12 @@ _NON_BULLETIN_RE = re.compile(
 )
 _BULLETIN_KEYWORD_RE = re.compile(r"\b(bulletin|newsletter)\b", re.IGNORECASE)
 _D_M_YY_IN_URL_RE = re.compile(r"(?<!\d)(\d{1,2})-(\d{1,2})-(\d{2})(?!\d)")
+# WordPress media folders (/wp-content/uploads/YYYY/MM/) are authoritative for the
+# *upload* month even when the filename itself carries no date at all (e.g. a slug
+# named after the liturgical feast: "Sixteenth-Sunday-of-Ordinary-Time.pdf"). Used
+# as a score floor so a recent undated bulletin still outranks an old but
+# explicitly-dated one from a prior year (see glenariffeparish 2026-08-09 fix).
+_WP_UPLOADS_YEAR_MONTH_RE = re.compile(r"/wp-content/uploads/(20\d{2})/(0?[1-9]|1[0-2])/", re.IGNORECASE)
 
 
 def _is_non_bulletin_url(url: str) -> bool:
@@ -177,22 +185,36 @@ def _score_bulletin_url(url: str) -> tuple[int, int]:
     text = unquote(url or "").lower()
     keyword_bonus = 10 if _BULLETIN_KEYWORD_RE.search(text) else 0
     date_score = 0
+    hash_spans = _opaque_hash_spans(text)
     for match in _D_M_YY_IN_URL_RE.finditer(text):
+        if _is_within_opaque_hash(hash_spans, match.start(), match.end()):
+            continue
         try:
             day, month, year = int(match.group(1)), int(match.group(2)), 2000 + int(match.group(3))
             date_score = max(date_score, year * 10000 + month * 100 + day)
         except ValueError:
             continue
-    m = re.search(r"(?<!\d)(\d{2})(\d{2})(\d{2})(?!\d)", text)
-    if m:
+    for m in re.finditer(r"(?<!\d)(\d{2})(\d{2})(\d{2})(?!\d)", text):
+        if _is_within_opaque_hash(hash_spans, m.start(), m.end()):
+            continue
         try:
             day, month, year = int(m.group(1)), int(m.group(2)), 2000 + int(m.group(3))
             date_score = max(date_score, year * 10000 + month * 100 + day)
         except ValueError:
-            pass
+            continue
     parsed = extract_date_from_string(text)
     if parsed:
         date_score = max(date_score, parsed.year * 10000 + parsed.month * 100 + parsed.day)
+    # Floor: an undated slug still belongs to its upload month (WordPress
+    # /uploads/YYYY/MM/ folder), so it should outrank an older bulletin that
+    # merely happens to have an explicit (but stale) date in its filename.
+    wp_folder = _WP_UPLOADS_YEAR_MONTH_RE.search(text)
+    if wp_folder:
+        try:
+            folder_score = int(wp_folder.group(1)) * 10000 + int(wp_folder.group(2)) * 100 + 1
+            date_score = max(date_score, folder_score)
+        except ValueError:
+            pass
     return date_score, keyword_bonus
 
 
@@ -435,14 +457,22 @@ async def _wait_for_bulletin_content(page: Page, recipe: dict, timeout_ms: int) 
     # timeout exceeded" failures across a whole diocese (Down & Connor:
     # drumquinparish, carrickparish, holy-familyparish, saintannesparish,
     # glenariffeparish, and ~15 more all share this exact recipe shape).
-    # Divide the budget across probes instead, same as the pdfemb branch.
-    per_sel = max(3_000, min(budget, budget // max(len(probes), 1)))
-    for sel in probes:
-        try:
-            await page.wait_for_selector(sel, timeout=per_sel)
-            return
-        except PlaywrightTimeoutError:
-            continue
+    #
+    # BUG 2 (found 2026-08-09, later same day): dividing the budget still
+    # checked probes ONE AT A TIME in sequence, so a slow-rendering site
+    # (e.g. holyrosaryparishbelfast's Wix page) burned the full divided
+    # timeout on each of the 3 probes that never match (pdfemb/mdocs/
+    # wp-block markup this site doesn't use) before finally reaching the
+    # 4th ("a[href$='.pdf']") — which the download step's own instant DOM
+    # query finds immediately once the page has actually finished
+    # rendering. Waiting on all probes AT ONCE (comma-joined CSS selector,
+    # matches if ANY of them appears) returns as soon as the real content
+    # shows up instead of wasting time walking irrelevant probes first.
+    try:
+        await page.wait_for_selector(", ".join(probes), timeout=budget)
+        return
+    except PlaywrightTimeoutError:
+        pass
     try:
         wait_after = int(
             _host_profile_for_start_url(recipe.get("start_url") or page.url).get(

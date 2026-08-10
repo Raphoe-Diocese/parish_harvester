@@ -96,6 +96,33 @@ class ClaudyBulletinFilterTests(unittest.TestCase):
         newer = _score_bulletin_url("http://x/onewebmedia/NEWSLETTER%2014-6-26.docx")
         self.assertGreater(newer[0], older[0])
 
+    def test_recent_undated_slug_outscores_old_dated_slug(self) -> None:
+        # glenariffeparish 2026-08-09: the current bulletin's WordPress slug
+        # is named after the liturgical feast ("Sixteenth-Sunday-of-Ordinary
+        # -Time.pdf", no date at all) while an archived bulletin from over a
+        # year earlier has an explicit date in its filename. Without a floor
+        # based on the /uploads/YYYY/MM/ folder, the old-but-dated file always
+        # outscored the current-but-undated one, so the fallback grabbed a
+        # 2025 Easter bulletin instead of the current one.
+        current = _score_bulletin_url(
+            "https://glenariffeparish.org/wp-content/uploads/2026/07/"
+            "Sixteenth-Sunday-of-Ordinary-Time.pdf"
+        )
+        old_dated = _score_bulletin_url(
+            "https://glenariffeparish.org/wp-content/uploads/2025/04/"
+            "Easter-Sunday-20th-April-2025.pdf"
+        )
+        self.assertGreater(current[0], old_dated[0])
+
+    def test_opaque_hash_does_not_inflate_bulletin_score(self) -> None:
+        # carrickparish.org 2026-08-09: a Wix hashed filename can contain a
+        # coincidental 6-digit run that looks like a DDMMYY date.
+        hashed = _score_bulletin_url(
+            "https://www.carrickparish.org/_files/ugd/"
+            "15976c_67e290776b824ccfb8ce43943f2620aa.pdf"
+        )
+        self.assertEqual(hashed[0], 0)
+
 
     async def test_find_pdfemb_url_prefers_pdf_embedder_links(self) -> None:
         class _Page:
