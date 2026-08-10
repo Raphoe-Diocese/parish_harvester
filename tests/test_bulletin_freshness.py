@@ -165,6 +165,21 @@ class BulletinFreshnessTests(unittest.TestCase):
         self.assertEqual(verdict.status, "fresh")
         self.assertEqual(verdict.reason, "in_bulletin_week")
 
+    def test_wp_uploads_bare_yyyymmdd_filename_no_separators(self) -> None:
+        # "20260705.pdf" (kincasslagh.ie) repeats the upload folder's own
+        # year/month verbatim as the filename's leading digits with no
+        # separator anywhere — the whole basename is one contiguous 8-digit
+        # run, so day_match/day_match_4y/slug_day all fail to find an
+        # isolated day-like substring and it silently fell through to the
+        # day=1 default (found 2026-08-10: misdated 2026-07-05 as
+        # 2026-07-01, which also let a stale bulletin narrowly look fresh
+        # via the 8-day grace window in some weeks).
+        url = "https://kincasslagh.ie/app/uploads/2026/07/20260705.pdf"
+        self.assertEqual(extract_bulletin_date(url), date(2026, 7, 5))
+        verdict = check_bulletin_freshness(url, date(2026, 7, 5))
+        self.assertEqual(verdict.status, "fresh")
+        self.assertEqual(verdict.reason, "in_bulletin_week")
+
     def test_mark_result_stale_sets_retry_metadata(self) -> None:
         target = date(2026, 6, 14)
         entry = ParishEntry(

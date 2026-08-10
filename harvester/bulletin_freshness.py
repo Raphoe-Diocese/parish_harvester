@@ -97,6 +97,22 @@ def extract_bulletin_date(url_or_text: str) -> date | None:
                     month = int(bulletin_dm.group(2))
                     if month == folder_month:
                         return _safe_date(folder_year, folder_month, day)
+            # Bare YYYYMMDD filename with no separators at all, e.g.
+            # "20260705.pdf" (kincasslagh.ie) — the WordPress upload
+            # folder's own year/month are repeated verbatim as the
+            # filename's leading digits, so read the day straight off the
+            # trailing 2 digits. Without this the whole basename is one
+            # contiguous 8-digit run with no isolated day-like substring for
+            # day_match/day_match_4y/slug_day below to find, silently
+            # falling through to the day=1 default (found 2026-08-10,
+            # kincasslagh: misdated 20260705.pdf as 2026-07-01).
+            yyyymmdd_match = re.match(
+                rf"{folder_year}{folder_month:02d}(0[1-9]|[12]\d|3[01])$",
+                basename.rsplit(".", 1)[0],
+            )
+            if yyyymmdd_match:
+                day = int(yyyymmdd_match.group(1))
+                return _safe_date(folder_year, folder_month, day)
             day_match = re.search(
                 rf"(?<!\d)(0?[1-9]|[12]\d|3[01]){folder_month:02d}{folder_year % 100:02d}(?!\d)",
                 basename,
