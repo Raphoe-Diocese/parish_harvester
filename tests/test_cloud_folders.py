@@ -88,6 +88,26 @@ class CloudFolderTests(unittest.TestCase):
         self.assertIn("28.06.11", rewritten["selector"])
         self.assertTrue(rewritten.get("cloud_folder"))
 
+    def test_rewrite_click_step_selector_is_row_scoped_not_bare(self) -> None:
+        """A bare, unscoped :has-text(...) primary selector matches the first
+        ancestor anywhere on the page containing that date substring — which
+        in a real Google Drive folder listing can be a large layout
+        container, not the specific file row, so .first clicks whatever
+        that happens to be instead of the intended row (found 2026-08-09,
+        Bruckless: this picked an unrelated January file for an August
+        target). The primary selector must stay scoped to the file row."""
+        step = {
+            "action": "click",
+            "text": "26.06.28.pdf",
+            "cloud_folder": True,
+            "date_format": "YY.MM.DD",
+            "selector": "[role=\"row\"]:has-text('26.06.28.pdf')",
+        }
+        rewritten = rewrite_cloud_folder_click_step(step, date(2026, 8, 9))
+        self.assertTrue(rewritten["selector"].startswith('[role="row"]'))
+        self.assertIn("26.08.09", rewritten["selector"])
+        self.assertNotIn(rewritten["selector"], rewritten["fallback_selectors"])
+
     def test_cloud_folder_date_tokens(self) -> None:
         tokens = cloud_folder_date_tokens(date(2027, 6, 14))
         self.assertIn("27.06.14.pdf", tokens)

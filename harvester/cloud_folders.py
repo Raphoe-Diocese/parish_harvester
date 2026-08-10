@@ -166,13 +166,22 @@ def rewrite_cloud_folder_click_step(step: dict, target: date) -> dict:
     if not fmt:
         return step
     label_pdf = format_cloud_folder_label(target, fmt, with_pdf=True)
-    label_bare = format_cloud_folder_label(target, fmt, with_pdf=False)
     rewritten = dict(step)
     rewritten["text"] = label_pdf
     rewritten["date_format"] = fmt
     rewritten["cloud_folder"] = True
-    rewritten["selector"] = f':has-text("{label_bare}")'
-    fallbacks = cloud_folder_selector_candidates(target, fmt)
+    candidates = cloud_folder_selector_candidates(target, fmt)
+    # candidates[0] is the most tightly-scoped selector (a role="row" match on
+    # the full "YY.MM.DD.pdf" label). A bare, unscoped ":has-text(...)" used to
+    # be the *primary* selector here — CSS :has-text() with no element/role
+    # qualifier matches the first ancestor anywhere on the page containing that
+    # date substring (which can be a large layout container, not the file row),
+    # so .first frequently clicked the wrong element and selected an unrelated
+    # row (found 2026-08-09, Bruckless: selecting for "26.08.09" landed on the
+    # 26.02.01.pdf row instead). Use the scoped selector first; keep the bare
+    # ones only as last-resort fallbacks.
+    rewritten["selector"] = candidates[0]
+    fallbacks = candidates[1:]
     existing = [
         s.strip()
         for s in (step.get("fallback_selectors") or [])
@@ -180,7 +189,7 @@ def rewrite_cloud_folder_click_step(step: dict, target: date) -> dict:
     ]
     merged: list[str] = []
     for sel in [*fallbacks, *existing]:
-        if sel not in merged:
+        if sel not in merged and sel != rewritten["selector"]:
             merged.append(sel)
     rewritten["fallback_selectors"] = merged
     return rewritten

@@ -1439,7 +1439,9 @@ _NO_PDF_PROBE_ACTIONS = {
 }
 
 
-_PDF_LIKE_SELECTOR_RE = re.compile(r"pdf|mdocs|dropfile", re.IGNORECASE)
+_PDF_LIKE_SELECTOR_RE = re.compile(
+    r"pdfemb|mdocs|dropfile|wp-block-file|href\s*[*$^]?=[^)]*pdf", re.IGNORECASE
+)
 
 
 def _next_step_skips_pdf_probe(steps: list, index: int, recipe: dict | None = None) -> bool:
@@ -1473,6 +1475,8 @@ def _next_step_skips_pdf_probe(steps: list, index: int, recipe: dict | None = No
         if action in _NO_PDF_PROBE_ACTIONS:
             return True
         if action == "click":
+            if is_cloud_folder_click_step(step):
+                return True
             playbook = str((recipe or {}).get("playbook_type") or (recipe or {}).get("site_type") or "")
             if any(tag in playbook.lower() for tag in ("pdfemb", "mdocs", "wp_block", "permanent_bulletin", "mcn_live", "mcn_pdf")):
                 return False
@@ -1633,13 +1637,34 @@ async def _replay_click_by_strategy(
 async def _open_selected_drive_row(page: Page, timeout_ms: int) -> None:
     """Open the Drive folder row just clicked.
 
-    A single click on a Drive folder row only selects/highlights it — it
-    does not navigate anywhere and no download fires. The row's real file
-    (with a downloadable /file/d/<id>/view URL) only opens after pressing
-    Enter (or double-clicking) on the selected row. Without this, the
-    click step "succeeds" but the following download step has nothing to
-    find (see Bruckless: "did not find a matching document URL").
+    A single click on a Drive folder row only selects/highlights it (sets
+    ``aria-selected="true"`` on the ``<tr>``) — it does not navigate
+    anywhere and no download fires. Pressing Enter/double-clicking to "open"
+    the file inside Drive's own viewer is slow and flaky to automate, but
+    the row's ``<tr data-id="...">`` attribute already exposes the file's
+    Drive ID directly in the DOM — construct the direct-download URL from it
+    and navigate straight there. That either fires a native browser
+    "download" event (picked up by the following ``download`` step's
+    ``downloads.pop(0)``) or gets abandoned as ERR_ABORTED once Chromium
+    hands the response to its download manager, which is expected and
+    ignored (see Bruckless: previously the click step "succeeded" but the
+    following download step had nothing to find, "did not find a matching
+    document URL").
     """
+    try:
+        file_id = await page.evaluate(
+            "() => { const row = document.querySelector('[role=\"row\"][aria-selected=\"true\"]'); "
+            "return row ? row.getAttribute('data-id') : null; }"
+        )
+    except Exception:
+        file_id = None
+    if file_id:
+        download_url = f"https://drive.google.com/uc?export=download&id={file_id}"
+        try:
+            await page.goto(download_url, timeout=min(timeout_ms, 30_000))
+        except Exception:
+            pass
+        return
     try:
         await page.keyboard.press("Enter")
         await page.wait_for_load_state("domcontentloaded", timeout=min(timeout_ms, 15_000))
