@@ -3,10 +3,10 @@
   "parish_key": "portstewartparish",
   "display_name": "Portstewart",
   "diocese": "down_and_connor",
-  "start_url": "http://portstewartparish.website/bulletins/",
+  "start_url": "https://portstewartparish.website/bulletins/",
   "site_type": "mdocs_bulletin_list",
   "playbook_type": "mdocs_download_list",
-  "recorded_date": "2026-06-24",
+  "recorded_date": "2026-08-09",
   "timeout_ms": 180000,
   "total_timeout_s": 600,
   "observed_load_ms": 300000,
@@ -14,14 +14,15 @@
   "steps": [
     {
       "action": "goto",
-      "url": "http://portstewartparish.website/bulletins/"
+      "url": "https://portstewartparish.website/bulletins/"
     },
     {
       "action": "click",
-      "selector": "table.mdocs tbody tr:first-child a[href*='.pdf']",
+      "selector": "a[href*='mdocs-file']",
       "pick_strategy": "first_match",
       "bulletin_position": "top",
       "fallback_selectors": [
+        "table.mdocs tbody tr:first-child a[href*='.pdf']",
         "table.mdocs a[href$='.pdf']",
         "a.mdocs-download[href*='.pdf']",
         ".mdocs a[href*='.pdf']",
@@ -35,14 +36,17 @@
     }
   ],
   "operator_notes": [
-    "Real PDF files in mDocs table — click Download, then capture PDF. Never Save page as PDF.",
-    "HTTP only — HTTPS certificate is expired (harvest fails on https://).",
-    "mDocs table on /bulletins/ — latest PDF is always the first row (21st June 2026 at top).",
-    "Site can take 3–5 minutes to show the table — harvest budget is up to 10 minutes.",
-    "PDF href is on the Download link in column 3, not the homepage."
+    "Real PDF files behind mDocs download links (?mdocs-file=NNNN, served with Content-Disposition: attachment) — click Download, then capture PDF. Never Save page as PDF.",
+    "mDocs table on /bulletins/ — latest PDF is always the first row/first download link in DOM order.",
+    "Site can take 3\u20135 minutes to show the table — harvest budget is up to 10 minutes.",
+    "PDF href is on the Download link, not the homepage."
+  ],
+  "operator_notes_2026_08_09": [
+    "2026-08-09 fix: (1) the site's SSL certificate has been renewed (valid to 2026-10-22) and HTTP now hard-redirects to HTTPS, so the old 'HTTP only' workaround broke the harvest (ERR_ABORTED on the forced https redirect) — switched start_url/goto back to https://.",
+    "(2) the mDocs plugin markup changed: the table itself no longer has class 'mdocs' (it's now a plain Bootstrap table.table-hover.table-condensed nested inside a wrapping div.mdocs), so 'table.mdocs tbody tr:first-child a[href*=.pdf]' never matched and wait_for_selector burned the full budget. Primary selector is now the plugin-structure-independent a[href*='mdocs-file'], which is still first-in-DOM-order = newest; old selectors kept as fallbacks in case the theme reverts.",
+    "Verified live: first mdocs-file link is 9507 = '09 August 2026.pdf' (current target week), confirmed via direct HTTP fetch (Content-Disposition: attachment; filename=\"09 August 2026.pdf\")."
   ],
   "do_not": [
-    "Do not use Save page as PDF — bulletins are downloadable PDF files, not HTML text.",
-    "Do not use https://portstewartparish.website — certificate expired; use http://."
+    "Do not use Save page as PDF — bulletins are downloadable PDF files, not HTML text."
   ]
 }
