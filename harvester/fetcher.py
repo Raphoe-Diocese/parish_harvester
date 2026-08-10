@@ -1408,7 +1408,22 @@ async def _scrape_and_download(
                 if dest.exists() and not _is_real_pdf(dest, key):
                     dest.unlink(missing_ok=True)
 
-        if _is_recipe_fallback_enabled(recipe_meta, "disable_image_pdf_fallback"):
+        # If this page listed dated bulletin links but none of them could
+        # actually be downloaded as a real PDF, it's a listing/archive index
+        # page, not the bulletin itself — grabbing a generic image/render
+        # fallback from it would silently report success with the wrong
+        # document (found 2026-08-10, sacredheartparishbelfast: bulletin_page
+        # listed 30 dated links, none downloadable that week, and the
+        # html_render fallback happily "captured" the archive listing page
+        # itself, cookie banner and all, as if it were that week's bulletin).
+        is_bare_homepage = urlparse(page.url).path in ("", "/")
+        skip_generic_fallbacks = (
+            has_dated or is_bare_homepage
+        ) and _is_recipe_fallback_enabled(recipe_meta, "disable_html_render_fallback")
+
+        if not skip_generic_fallbacks and _is_recipe_fallback_enabled(
+            recipe_meta, "disable_image_pdf_fallback"
+        ):
             image_urls = await _find_bulletin_image_urls(page)
             if image_urls and await _download_images_as_single_pdf(image_urls, str(dest), page=page):
                 if _is_real_pdf(dest, key):
@@ -1426,39 +1441,18 @@ async def _scrape_and_download(
                         last_err = str(exc)
                 dest.unlink(missing_ok=True)
 
-        # If this page listed dated bulletin links but none of them could
-        # actually be downloaded as a real PDF, it's a listing/archive index
-        # page, not the bulletin itself — rendering the index page as a
-        # fallback would silently report success with the wrong document
-        # (found 2026-08-10, sacredheartparishbelfast: bulletin_page listed
-        # 30 dated links, none downloadable that week, and the html_render
-        # fallback below happily "captured" the archive listing page itself,
-        # cookie banner and all, as if it were that week's bulletin).
-        if has_dated and _is_recipe_fallback_enabled(recipe_meta, "disable_html_render_fallback"):
+        if skip_generic_fallbacks:
             return FetchResult(
                 key=key,
                 display_name=entry.display_name,
                 status="error",
                 url=scrape_url,
-                error="Dated bulletin links found but none downloaded — refusing to treat the listing page itself as the bulletin",
-            )
-
-        # A bare domain root/homepage is never the bulletin itself — it's one
-        # of _scrape_seed_urls' generic last-resort fallback seeds (tried
-        # after the bulletin_page/target_url/example_url seeds all failed).
-        # Without this guard, a parish with no current-week bulletin
-        # available anywhere just renders its own homepage as a "bulletin"
-        # and reports outcome=ok (found 2026-08-10, sacredheartparishbelfast,
-        # right after the has_dated guard above closed the same hole for its
-        # bulletin_page listing).
-        is_bare_homepage = urlparse(page.url).path in ("", "/")
-        if is_bare_homepage and _is_recipe_fallback_enabled(recipe_meta, "disable_html_render_fallback"):
-            return FetchResult(
-                key=key,
-                display_name=entry.display_name,
-                status="error",
-                url=scrape_url,
-                error="Only the bare homepage was reachable — refusing to treat it as the bulletin",
+                error=(
+                    "Dated bulletin links found but none downloaded — refusing to "
+                    "treat the listing page itself as the bulletin"
+                    if has_dated
+                    else "Only the bare homepage was reachable — refusing to treat it as the bulletin"
+                ),
             )
 
         # Generic last-resort seeds (domain root / parent directory — see
@@ -1887,8 +1881,12 @@ async def _recover_stale_bulletin(
     )
     recipe_meta = recipe_meta or {}
 
-    if strategy == "rescrape_bulletin_page":
-        for scrape_url in _scrape_seed_urls(entry, result.url):
+    if strategy == "rescrape_bulletin_page" and _is_recipe_fallback_enabled(
+        recipe_meta, "disable_stale_rescrape_fallback"
+    ):
+        for scrape_url, is_generic in _scrape_seed_urls(
+            entry, result.url, with_generic_flag=True
+        ):
             if dest.exists():
                 dest.unlink(missing_ok=True)
             if entry.content_type == "html_link":
@@ -1913,6 +1911,7 @@ async def _recover_stale_bulletin(
                 browser,
                 recipe_meta=recipe_meta,
                 host_profile=host_profile,
+                allow_html_render=not is_generic,
             )
             if scraped.status != "ok" or not scraped.url:
                 continue

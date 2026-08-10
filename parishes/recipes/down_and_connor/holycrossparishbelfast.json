@@ -22,5 +22,20 @@
       "url_pattern": "*.pdf"
     }
   ],
-  "diocese": "down_and_connor"
+  "diocese": "down_and_connor",
+  "operator_notes": [
+    "DO NOT raise max_bulletin_pages here despite the 'Too many pages: 13'",
+    "rejection looking like the usual oversized-bulletin fix pattern.",
+    "Investigated 2026-08-10: the site's own newest-dated link (090826.pdf,",
+    "labelled 'Sunday, 9th August 2026 - 19th Sunday Ord. Time') and last",
+    "week's (020826.pdf) are byte-identical — same stale content headed",
+    "'Bulletin 11th & 12th July 2026', padded out to 13 pages with blank/",
+    "dotted-line filler pages (an unrelated form template), served under a",
+    "fresh-looking weekly filename each week. This is a site-side content",
+    "problem (parish secretary not updating the real file), not a scraper",
+    "bug — raising the page cap would just serve 2+ month stale content as",
+    "a false 'ok'. Leaving the oversized-page rejection in place is the",
+    "safer failure mode until the site starts serving genuinely fresh PDFs",
+    "again; re-check manually if this persists for many more weeks."
+  ]
 }
