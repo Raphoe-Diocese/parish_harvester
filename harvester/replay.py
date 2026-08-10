@@ -200,6 +200,7 @@ def _score_bulletin_url(url: str) -> tuple[int, int]:
             continue
         try:
             day, month, year = int(match.group(1)), int(match.group(2)), 2000 + int(match.group(3))
+            date(year, month, day)  # validate before scoring — see UUID note below
             date_score = max(date_score, year * 10000 + month * 100 + day)
         except ValueError:
             continue
@@ -208,15 +209,25 @@ def _score_bulletin_url(url: str) -> tuple[int, int]:
             continue
         try:
             day, month, year = int(match.group(1)), int(match.group(2)), 2000 + int(match.group(3))
-            if 1 <= day <= 31 and 1 <= month <= 12:
-                date_score = max(date_score, year * 10000 + month * 100 + day)
+            date(year, month, day)
+            date_score = max(date_score, year * 10000 + month * 100 + day)
         except ValueError:
             continue
+    # BUG (found 2026-08-09, saintmichaelthearchangel): a GoDaddy/wsimg CDN
+    # UUID path segment like ".../108951e4-fc38-.../Parish-Bulletin-31st..."
+    # isn't caught by _opaque_hash_spans (each dash-separated UUID group is
+    # <16 hex chars, below the "long opaque hash" threshold), so "108951"
+    # inside "108951e4" matched this 6-digit DDMMYY probe as day=10 month=89
+    # year=2051 — an *unvalidated* month=89 still produced a huge bogus score
+    # (20518910) that beat every real, correctly-dated candidate on the page.
+    # Constructing a real date() (below) rejects invalid month/day combos
+    # regardless of whether the hash-span guard catches the token.
     for m in re.finditer(r"(?<!\d)(\d{2})(\d{2})(\d{2})(?!\d)", text):
         if _is_within_opaque_hash(hash_spans, m.start(), m.end()):
             continue
         try:
             day, month, year = int(m.group(1)), int(m.group(2)), 2000 + int(m.group(3))
+            date(year, month, day)
             date_score = max(date_score, year * 10000 + month * 100 + day)
         except ValueError:
             continue

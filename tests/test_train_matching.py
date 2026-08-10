@@ -569,6 +569,21 @@ class UrlDateParsingAndScoringTests(unittest.TestCase):
         from datetime import date as _date
         self.assertEqual(extract_date_from_slug("5_april_2026"), _date(2026, 4, 5))
 
+    def test_extract_date_slug_spaces(self) -> None:
+        # saintmichaelthearchangel.godaddysites.com 2026-08-09: GoDaddy/wsimg
+        # CDN downloads are named "Parish Bulletin 9th August 2026.pdf" —
+        # %20-decoded filenames use literal spaces, not dashes/underscores.
+        from harvester.utils import extract_date_from_slug
+        from datetime import date as _date
+        self.assertEqual(
+            extract_date_from_slug("parish bulletin 9th august 2026"),
+            _date(2026, 8, 9),
+        )
+        self.assertEqual(
+            extract_date_from_slug("parish bulletin 31st may 2026"),
+            _date(2026, 5, 31),
+        )
+
     def test_rewrite_date_url_wix_slug_across_years(self) -> None:
         from harvester.utils import rewrite_date_url
         from datetime import date as _date

@@ -33,6 +33,18 @@ class CloudFolderTests(unittest.TestCase):
         self.assertEqual(extract_date_from_string("folder/26.06.14.pdf"), date(2026, 6, 14))
         self.assertEqual(extract_date_from_string("29.01.05"), date(2029, 1, 5))
 
+    def test_extract_date_from_string_dd_mm_yy_dot_disambiguation(self) -> None:
+        # stbrigidsparishbelfast.org 2026-08-09: UK-convention DD.MM.YY dot
+        # filenames collide with the Drive-folder YY.MM.DD dot shape above.
+        # "09.08.26" read as YY.MM.DD is a bogus 2009-08-26; read as DD.MM.YY
+        # it's the genuinely current 2026-08-09. Both readings are tried and
+        # the more plausible (later-year) one wins, without breaking the
+        # locked YY.MM.DD Drive-folder cases above.
+        self.assertEqual(
+            extract_date_from_string("Parish-Bulletin-09.08.26-FOR-PRINTING.pdf"),
+            date(2026, 8, 9),
+        )
+
     def test_detect_cloud_date_format(self) -> None:
         self.assertEqual(detect_cloud_date_format("26.06.14.pdf"), "YY.MM.DD")
         self.assertIsNone(detect_cloud_date_format("bulletin.pdf"))

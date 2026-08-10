@@ -71,10 +71,13 @@ _MONTH_MAP: dict[str, int] = {
     "december": 12, "dec": 12,
 }
 
-# Matches date slugs like "5_april_2026", "15-february-2026", "5th-April-2026"
-# The optional ordinal suffix (?:st|nd|rd|th)? handles formats like "5th" or "12th".
+# Matches date slugs like "5_april_2026", "15-february-2026", "5th-April-2026",
+# and space-separated filenames decoded from URLs like "Parish Bulletin 9th
+# August 2026.pdf" (GoDaddy/wsimg CDN downloads — %20 unquotes to a literal
+# space, not a dash/underscore). The optional ordinal suffix
+# (?:st|nd|rd|th)? handles formats like "5th" or "12th".
 _SLUG_DATE_RE = re.compile(
-    r"(\d{1,2})(?:st|nd|rd|th)?[_\-]([a-z]+)[_\-](\d{4})",
+    r"(\d{1,2})(?:st|nd|rd|th)?[_\-\s]([a-z]+)[_\-\s](\d{4})",
     re.IGNORECASE,
 )
 
@@ -92,11 +95,23 @@ _MONTH_NAMES: list[str] = [
 # Any digit-run match fully contained inside such a token is not a real date.
 _HEX_TOKEN_RE = re.compile(r"[0-9a-fA-F]+")
 _OPAQUE_HASH_MIN_LEN = 16
+# GoDaddy/wsimg-style CDN paths embed standard RFC4122 UUIDs
+# (8-4-4-4-12 hex groups, hyphen-separated), e.g.
+# ".../108951e4-fc38-47c8-9aaf-adae09d28d1b/Parish-Bulletin-...". Each
+# dash-separated group is individually shorter than _OPAQUE_HASH_MIN_LEN, so
+# the bare hex-run check above misses them — "108951" inside "108951e4" was
+# read as day=10/month=89/year=2051 (found 2026-08-09,
+# saintmichaelthearchangel). Match the whole hyphenated UUID as one span.
+_UUID_TOKEN_RE = re.compile(
+    r"[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}"
+)
 
 
 def _opaque_hash_spans(text: str) -> list[tuple[int, int]]:
     """Spans of long hex-looking tokens (likely CDN hashes/UUIDs, not dates)."""
     spans = []
+    for m in _UUID_TOKEN_RE.finditer(text):
+        spans.append((m.start(), m.end()))
     for m in _HEX_TOKEN_RE.finditer(text):
         token = m.group(0)
         if len(token) >= _OPAQUE_HASH_MIN_LEN and re.search(r"[a-fA-F]", token):

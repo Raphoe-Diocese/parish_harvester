@@ -143,6 +143,30 @@ class ClaudyBulletinFilterTests(unittest.TestCase):
         self.assertEqual(older[0], 20260726)
         self.assertGreater(current[0], older[0])
 
+    def test_godaddy_uuid_path_does_not_fake_a_date(self) -> None:
+        # saintmichaelthearchangel.godaddysites.com 2026-08-09: the CDN path
+        # embeds a hyphenated UUID ("108951e4-fc38-47c8-9aaf-adae09d28d1b").
+        # Each dash-separated hex group is individually too short for the
+        # long-opaque-hash guard, so "108951" inside "108951e4" was read as
+        # an unvalidated day=10/month=89/year=2051 and produced a bogus score
+        # (20518910) that beat every real "Nth Month YYYY" filename on the
+        # page — a 31st-May bulletin outscored the genuinely current 9th-
+        # August one. Confirm the UUID span is now excluded and the space-
+        # separated ordinal slug in the filename scores correctly instead.
+        stale_uuid_path = _score_bulletin_url(
+            "https://img1.wsimg.com/blobby/go/e73a69df-356f-43e2-b8ea-"
+            "e6260e39aad7/downloads/108951e4-fc38-47c8-9aaf-adae09d28d1b/"
+            "Parish%20Bulletin%2031st%20May%202026.pdf?ver=1786104942649"
+        )
+        current_bulletin = _score_bulletin_url(
+            "https://img1.wsimg.com/blobby/go/e73a69df-356f-43e2-b8ea-"
+            "e6260e39aad7/downloads/6bb3d787-d560-4b3d-90b1-922f2c8650fb/"
+            "Parish%20Bulletin%209th%20August%202026.pdf?ver=1786104942649"
+        )
+        self.assertEqual(stale_uuid_path[0], 20260531)
+        self.assertEqual(current_bulletin[0], 20260809)
+        self.assertGreater(current_bulletin[0], stale_uuid_path[0])
+
     async def test_find_pdfemb_url_prefers_pdf_embedder_links(self) -> None:
         class _Page:
             url = "https://example.org/news/"
