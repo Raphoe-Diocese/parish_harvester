@@ -1430,21 +1430,55 @@ def _peek_next_download_step(steps: list, index: int) -> dict | None:
     return None
 
 
-def _next_step_is_image_action(steps: list, index: int) -> bool:
-    """True when the step right after this ``goto`` is ``image``/``image_stack``.
+_NO_PDF_PROBE_ACTIONS = {
+    "image",
+    "image_stack",
+    "print_to_pdf",
+    "html",
+    "crop_screenshot",
+}
+
+
+_PDF_LIKE_SELECTOR_RE = re.compile(r"pdf|mdocs|dropfile", re.IGNORECASE)
+
+
+def _next_step_skips_pdf_probe(steps: list, index: int, recipe: dict | None = None) -> bool:
+    """True when the step right after this ``goto`` doesn't need a PDF link.
 
     ``_wait_for_bulletin_content`` only ever waits for PDF-shaped selectors
-    (mdocs tables, pdfemb viewers, ``a[href$='.pdf']``, ...). Image-gallery
-    recipes (a bare full-page scan ``<img>`` in the post body, no PDF link at
-    all — e.g. derriaghycatholicparish) never satisfy any of those probes, so
-    this wait always burns its full budget (up to 240s) doing nothing useful
-    before the ``image``/``image_stack`` step below runs its own
-    networkidle+scroll wait anyway (found 2026-08-09).
+    (mdocs tables, pdfemb viewers, ``a[href$='.pdf']``, ...). Recipes whose
+    next step is ``image``/``image_stack`` (a bare full-page scan ``<img>``,
+    no PDF link at all — e.g. derriaghycatholicparish) or
+    ``print_to_pdf``/``html``/``crop_screenshot`` (which print the page's own
+    HTML and run their own dedicated wait via ``_prepare_page_for_html_print``,
+    including parish_messenger-specific handling) never satisfy any of those
+    probes, so this wait always burns its full budget (up to 240s) doing
+    nothing useful before the real step's own wait logic runs anyway (found
+    2026-08-09: derriaghycatholicparish and parishofardstraweast both timed
+    out here despite their actual capture step succeeding in seconds once
+    reached).
+
+    Also skip when the next step is a ``click`` on a selector that plainly
+    isn't PDF-shaped (e.g. picking a dated "...Newsletter" link by text) and
+    the recipe hasn't opted into one of the PDF-widget playbooks that the
+    probe's non-default selector lists target — same wasted-budget issue,
+    just one step later (found 2026-08-09, parishofardstraweast: the click
+    target is a plain dated link, not a PDF, so the probe list is
+    irrelevant, yet it still burned the full timeout before the click ran).
     """
     for step in steps[index + 1 :]:
         if not isinstance(step, dict):
             continue
-        return str(step.get("action") or "").strip().lower() in {"image", "image_stack"}
+        action = str(step.get("action") or "").strip().lower()
+        if action in _NO_PDF_PROBE_ACTIONS:
+            return True
+        if action == "click":
+            playbook = str((recipe or {}).get("playbook_type") or (recipe or {}).get("site_type") or "")
+            if any(tag in playbook.lower() for tag in ("pdfemb", "mdocs", "wp_block", "permanent_bulletin", "mcn_live", "mcn_pdf")):
+                return False
+            selector = str(step.get("selector") or "")
+            return not _PDF_LIKE_SELECTOR_RE.search(selector)
+        return False
     return False
 
 
@@ -1750,7 +1784,7 @@ async def replay_recipe(
                     return captured
                 if _looks_like_http_url(url):
                     last_http_url = url
-                if not _next_step_is_image_action(steps, step_index):
+                if not _next_step_skips_pdf_probe(steps, step_index, recipe):
                     await _wait_for_bulletin_content(page, recipe, step_timeout_ms)
                 continue
 

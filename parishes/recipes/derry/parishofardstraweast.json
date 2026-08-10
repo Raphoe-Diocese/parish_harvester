@@ -1,5 +1,5 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "parishofardstraweast",
   "display_name": "Ardstraw East",
   "diocese": "derry",
@@ -10,9 +10,19 @@
       "url": "http://parishofardstraweast.com/parishnews.html"
     },
     {
+      "action": "click",
+      "selector": "a:has-text('Ardstraw East Parish Newsletter')",
+      "pick_strategy": "newest_dated"
+    },
+    {
       "action": "print_to_pdf"
     }
   ],
-  "recorded_date": "2026-06-15",
-  "notes": "HTML bulletin lives on parishnews.html every week — no link click needed. Harvester prints this page into the mega PDF each Sunday."
+  "recorded_date": "2026-08-09",
+  "notes": "HTML bulletin lives on parishnews.html every week — no link click needed. Harvester prints this page into the mega PDF each Sunday.",
+  "operator_notes_2026_08_09": [
+    "The original 'no link click needed' assumption stopped being true: the page's own 'Latest Parish Newsletter' widget slot is broken/empty (literally contains placeholder text '...') — printing parishnews.html directly captured header chrome + nav + an unrelated image, no bulletin text at all.",
+    "The real content lives in the 'Past Newsletters' list, each a target=_blank link to a legacy IP-hosted CMS article (http://109.228.27.39/templates/?a=<id>&z=19) whose link text is 'Sunday, Dth Month YYYY - Ardstraw East Parish Newsletter'. Added a click step with pick_strategy:newest_dated on that link text, then print_to_pdf the resulting article page (confirmed it's a real HTML page with full liturgy/notices text, not another PDF/embed).",
+    "STILL STALE at time of fix: newest available link in the Past Newsletters list was 'Sunday, 5th July 2026' — 5 weeks behind the 09/08/2026 target. This is a genuine site-content gap (the site's own newest-newsletter widget is broken and no newer article has been published in that legacy CMS either) — the recipe now correctly surfaces whatever the newest *real* content is instead of an empty placeholder page, but will keep reporting 'stale' until the parish either fixes their widget or the legacy CMS gets a newer entry. Not further fixable from the harvester side; flag for human review if it doesn't self-resolve in a few weeks."
+  ]
 }
