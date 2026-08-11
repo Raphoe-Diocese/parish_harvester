@@ -46,6 +46,137 @@ TEXT = "#1a1a2e"
 ACCENT = "#c0392b"
 FOOTER = "#114b4b"
 
+# Calm reading palette for OCR text (viewer pane + distraction-free page).
+# Soft cool stone paper — easier on the eye than harsh white; not cream/terracotta.
+OCR_PAPER = "#eef1f0"
+OCR_INK = "#1a1f1e"
+OCR_MEASURE = "min(72ch, 100%)"
+OCR_LINE_HEIGHT = "1.65"
+OCR_BASE_SIZE = "1.125rem"  # 18px at default root — readable on phones
+
+
+def ocr_reading_css(selector: str) -> str:
+    """Shared OCR body typography for the viewer panel and standalone page.
+
+    Keep measure, type size, line-height and contrast in one place so the
+    embedded pane and the distraction-free tab always match.
+    """
+    return f"""
+    {selector} {{
+      background: {OCR_PAPER};
+      color: {OCR_INK};
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc({OCR_BASE_SIZE} * var(--ocr-scale, 1));
+      line-height: {OCR_LINE_HEIGHT};
+      max-width: {OCR_MEASURE};
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }}
+    {selector} h1, {selector} h2 {{
+      color: {DEEP_TEAL};
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }}
+    {selector} h2.b-title, {selector} .b-title {{
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }}
+    {selector} h3.b-head, {selector} .b-head {{
+      font-size: 1.12em;
+      color: #134e9c;
+      margin: 1.1em 0 0.35em;
+    }}
+    {selector} h4.b-sub, {selector} .b-sub {{
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }}
+    {selector} h3, {selector} h4 {{
+      color: {TEAL};
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }}
+    {selector} h3.ocr-page-heading,
+    {selector} .page-label {{
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }}
+    {selector} p {{
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }}
+    {selector} hr {{
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }}
+    {selector} strong {{ color: #0f2b5b; }}
+    {selector} a {{
+      color: {TEAL};
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }}
+    {selector} mark {{
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }}
+    {selector} mark.search-active {{
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }}
+    {selector} table.b-table {{
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }}
+    {selector} table.b-table td, {selector} table.b-table th {{
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }}
+    {selector} table.b-table th {{
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }}
+    {selector} table.b-table tr:nth-child(even) td {{
+      background: #f7f9f8;
+    }}
+    {selector} img, {selector} iframe, {selector} video {{
+      max-width: 100%;
+      height: auto;
+    }}
+    {selector} > :first-child {{
+      margin-top: 0;
+    }}
+"""
+
 
 @dataclass(frozen=True)
 class DioceseConfig:
@@ -674,215 +805,107 @@ def render_ocr_standalone_page(
   <style>
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
     body {{
-      font-family: Georgia, "Times New Roman", Times, serif;
-      background: #fff;
-      color: {TEXT};
-      line-height: 1.35;
-      font-size: 1.05rem;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: {OCR_PAPER};
+      color: {OCR_INK};
+      line-height: {OCR_LINE_HEIGHT};
+      font-size: {OCR_BASE_SIZE};
       -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
     }}
-    a {{ color: #1d4ed8; text-decoration: underline; font-weight: 600; }}
-    .page {{ max-width: 100%; margin: 0; padding: 8px 10px 24px; }}
+    a {{ color: {TEAL}; text-decoration: underline; font-weight: 600; }}
+    .page {{
+      max-width: {OCR_MEASURE};
+      margin: 0 auto;
+      padding: 14px 18px 40px;
+    }}
     .top {{
       display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
       gap: 8px 14px;
-      margin-bottom: 8px; font-family: Georgia, "Times New Roman", Times, serif;
+      margin-bottom: 12px;
     }}
     .top-left {{ display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }}
     .back-link {{
-      font-family: system-ui, sans-serif; font-size: 0.85rem; font-weight: 700;
-      color: #1e3a5f; text-decoration: none;
+      font-size: 0.9rem; font-weight: 700;
+      color: {DEEP_TEAL}; text-decoration: none;
     }}
     .title-line {{
-      font-size: 1.05rem; font-weight: 700; color: {TEXT};
+      font-size: 1rem; font-weight: 700; color: {OCR_INK};
     }}
     .font-size-controls {{ display: none; }}
     .ocr-zoom-bar {{
       position: sticky; top: 0; z-index: 6;
-      display: flex; justify-content: center; align-items: center; gap: 6px;
-      margin: 0 0 6px; padding: 4px 8px;
-      background: #f8fafc;
-      border: 1px solid #e5e7eb; border-radius: 6px;
-      font-family: system-ui, sans-serif;
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
     }}
     .ocr-zoom-bar button {{
-      min-width: 32px; min-height: 32px; border: 1px solid #1e3a5f; border-radius: 4px;
-      background: #fff; color: #1e3a5f; font-weight: 700; font-size: 1rem; cursor: pointer;
+      min-width: 40px; min-height: 40px; border: 1px solid {TEAL}; border-radius: 6px;
+      background: #fff; color: {TEAL}; font-weight: 700; font-size: 1.1rem; cursor: pointer;
       line-height: 1;
     }}
     .ocr-zoom-pct {{
-      min-width: 3rem; text-align: center; font-weight: 700; font-size: 0.85rem; color: #1e3a5f;
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: {DEEP_TEAL};
     }}
-    .ocr-zoom-hint {{ display: none; font-size: 0.7rem; color: #666666; }}
+    .ocr-zoom-hint {{ display: none; font-size: 0.75rem; color: #5a6a68; }}
     @media (pointer: coarse) {{ .ocr-zoom-hint {{ display: inline; margin-left: 4px; }} }}
+    {ocr_reading_css(".ocr-body")}
     .ocr-body {{
-      background: #fff;
-      padding: 0 2px;
-      max-width: 100%;
-      font-size: calc(1.05rem * var(--ocr-scale, 1));
-      touch-action: pan-x pan-y pinch-zoom;
-      color: #222222;
-    }}
-    .ocr-body h1, .ocr-body h2 {{ color: {DEEP_TEAL}; margin: 0.7em 0 0.2em; font-weight: 700; font-size: 1.15em; }}
-    .ocr-body h3, .ocr-body h4 {{ color: {TEAL}; margin: 0.6em 0 0.15em; font-weight: 700; }}
-    .ocr-body h2.b-title, .ocr-body .b-title {{
-      font-size: 1.2em; border-bottom: 1px solid #c8d6f0; padding-bottom: 0.1em;
-    }}
-    .ocr-body h3.ocr-page-heading, .ocr-body .page-label {{
-      font-size: 0.72rem;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      margin: 0.85em 0 0.25em;
-      font-family: system-ui, sans-serif;
-      color: #64748b;
-    }}
-    .ocr-body p {{ margin: 0 0 0.35em; }}
-    .ocr-body hr {{ border: 0; border-top: 1px solid #e2e8f0; margin: 0.7em 0; }}
-    .ocr-body mark {{ background: #fff3cd; padding: 0 2px; border-radius: 2px; }}
-    .ocr-body mark.search-active {{ background: #fde047; outline: 2px solid #0f5e5e; }}
-    .parish-block {{
-      margin: 0 0 0.5rem;
-      border: 1px solid #e5e7eb;
-      border-radius: 4px;
-      background: #fff;
-    }}
-    .parish-block.parish-odd {{ background: #f7faf9; }}
-    .parish-block > summary.parish-head {{
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 6px 12px;
-      margin: 0;
-      padding: 0.4rem 0.55rem 0.4rem 0.6rem;
-      border-left: 3px solid {TEAL};
-      cursor: pointer;
-      list-style: none;
-    }}
-    .parish-block > summary.parish-head::-webkit-details-marker {{ display: none; }}
-    .parish-odd > summary.parish-head {{ border-left-color: {DEEP_TEAL}; }}
-    .parish-name {{
-      margin: 0 !important;
-      font-size: 1.08rem !important;
-      font-family: Georgia, "Times New Roman", Times, serif;
-      color: {DEEP_TEAL} !important;
-      border: 0 !important;
-      padding: 0 !important;
-      font-weight: 700;
-    }}
-    .parish-name::before {{
-      content: "▸ ";
-      color: {TEAL};
-      font-family: system-ui, sans-serif;
-      font-size: 0.85em;
-    }}
-    .parish-block[open] .parish-name::before {{ content: "▾ "; }}
-    .parish-source {{
-      font-family: system-ui, sans-serif;
-      font-size: 0.78rem;
-      font-weight: 600;
-      white-space: nowrap;
-      text-decoration: none !important;
-      color: #1d4ed8;
-    }}
-    .parish-source:hover {{ text-decoration: underline !important; }}
-    .parish-source.muted {{ color: #94a3b8; font-weight: 500; }}
-    .parish-body {{ padding: 0.2rem 0.6rem 0.65rem; }}
-    .parish-empty {{
-      font-family: system-ui, sans-serif;
-      font-size: 16px;
-      color: #666666;
-      font-style: normal;
-      font-weight: 400;
-    }}
-    .parish-row-empty {{
-      display: flex;
-      flex-wrap: nowrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px 12px;
-      min-height: 48px;
-      height: auto;
-      max-height: 64px;
-      padding: 8px 0;
-      margin: 0;
-      border: 0;
-      border-bottom: 1px solid #e5e7eb;
-      background: transparent;
-      box-sizing: border-box;
-    }}
-    .parish-row-empty .parish-name {{
-      margin: 0 !important;
-      font-size: 16px !important;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif !important;
-      color: #1e3a5f !important;
-      font-weight: 600;
-      flex: 0 1 auto;
-    }}
-    .parish-row-empty .parish-name::before {{ content: none !important; }}
-    .parish-row-empty .parish-empty {{
-      flex: 1 1 auto;
-      margin: 0;
-      color: #666666;
-      font-size: 16px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }}
-    .parish-row-empty .parish-source {{
-      color: #1e3a5f;
-      font-size: 16px;
-      flex: 0 0 auto;
+      padding: 4px 2px 8px;
     }}
     .search-panel {{
-      margin: 0 0 8px;
-      font-family: system-ui, sans-serif;
-      border: 1px solid #e5e7eb;
-      border-radius: 6px;
-      padding: 6px 8px;
-      background: #f8fafc;
+      margin: 0 0 12px;
+      border: 1px solid #d4ddd9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
     }}
-    .search-panel .ocr-search-bar {{ margin-bottom: 4px; }}
-    .ocr-search-bar {{ position: relative; margin-bottom: 4px; }}
+    .search-panel .ocr-search-bar {{ margin-bottom: 6px; }}
+    .ocr-search-bar {{ position: relative; margin-bottom: 6px; }}
     .search-input {{
-      width: 100%; min-height: 34px; border: 1px solid #e5e7eb; border-radius: 5px;
-      padding: 5px 30px 5px 10px; font-size: 0.92rem;
-      font-family: system-ui, sans-serif; color: #222222; background: #fff;
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: {OCR_INK}; background: #fff;
     }}
-    .search-clear {{ position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; border: 0; background: transparent; color: #666666; font-size: 1rem; cursor: pointer; }}
+    .search-clear {{ position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }}
     .search-clear[hidden] {{ display: none; }}
     .ocr-search-tools {{
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
       flex-wrap: wrap;
     }}
     .ocr-search-tools button {{
-      border: 1px solid #1e3a5f; border-radius: 4px; background: #fff; color: #1e3a5f;
-      font-weight: 600; min-height: 30px; padding: 3px 10px; cursor: pointer; font-size: 0.8rem;
+      border: 1px solid {TEAL}; border-radius: 6px; background: #fff; color: {TEAL};
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
     }}
-    .ocr-search-tools button:disabled {{ color: #999; border-color: #e5e7eb; cursor: not-allowed; }}
-    .match-count {{ color: #666666; font-size: 0.78rem; font-weight: 600; }}
+    .ocr-search-tools button:disabled {{ color: #999; border-color: #d4ddd9; cursor: not-allowed; }}
+    .match-count {{ color: #5a6a68; font-size: 0.85rem; font-weight: 600; }}
     .note-box {{
-      margin-top: 10px;
-      color: #666666;
+      margin-top: 18px;
+      color: #5a6a68;
       font-weight: 400;
-      font-size: 13px;
-      line-height: 1.35;
-      font-family: system-ui, sans-serif;
-      font-style: normal;
+      font-size: 0.85rem;
+      line-height: 1.5;
       padding: 0;
     }}
     .ocr-failed-banner {{
-      margin: 10px 0;
-      padding: 10px 14px;
+      margin: 12px 0;
+      padding: 12px 14px;
       background: #fff4df;
       border: 1px solid #f5d08d;
-      border-radius: 6px;
+      border-radius: 8px;
       color: #713f12;
       font-weight: 600;
-      font-size: 13px;
+      font-size: 0.9rem;
+      line-height: 1.45;
     }}
     body.embed-mode .top {{ display: none !important; }}
-    body.embed-mode .page {{ padding-top: 4px; }}
+    body.embed-mode .page {{ padding-top: 8px; }}
+    @media (max-width: 600px) {{
+      .page {{ padding: 12px 14px 32px; }}
+      .ocr-search-tools button {{ min-height: 48px; }}
+    }}
   </style>
 </head>
 <body>
@@ -1389,198 +1412,48 @@ def render_bulletin_viewer_shell(
       position: sticky; top: 0; z-index: 6;
       display: flex; justify-content: center; align-items: center; gap: 10px;
       margin: 0 0 10px; padding: 6px 10px;
-      background: rgba(248, 250, 250, 0.97);
-      border: 1px solid #e2e8f0; border-radius: 6px;
+      background: rgba(255, 255, 255, 0.94);
+      border: 1px solid #d4ddd9; border-radius: 8px;
     }}
     .ocr-zoom-bar button {{
-      min-width: 40px; min-height: 40px; border: 1px solid {TEAL}; border-radius: 4px;
+      min-width: 40px; min-height: 40px; border: 1px solid {TEAL}; border-radius: 6px;
       background: #fff; color: {TEAL}; font-weight: 700; font-size: 1.15rem; cursor: pointer;
     }}
     .ocr-zoom-pct {{
       min-width: 3.5rem; text-align: center; font-weight: 700; font-size: 0.95rem; color: {DEEP_TEAL};
     }}
-    .ocr-zoom-hint {{ display: none; font-size: 0.72rem; color: #64748b; }}
+    .ocr-zoom-hint {{ display: none; font-size: 0.75rem; color: #5a6a68; }}
     @media (pointer: coarse) {{ .ocr-zoom-hint {{ display: inline; margin-left: 6px; }} }}
+    {ocr_reading_css("#ocr-panel")}
     #ocr-panel {{
       height: 92vh;
       min-height: 92vh;
       overflow-y: auto;
-      border: 1px solid #e2e8f0;
-      border-radius: 6px;
-      padding: 14px 16px 22px;
-      background: white;
-      font-family: Georgia, "Times New Roman", Times, serif;
-      font-size: calc(1.08rem * var(--ocr-scale, 1));
-      line-height: 1.38;
-      color: {TEXT};
-      max-width: min(52rem, 100%);
-      margin: 0 auto;
-      touch-action: pan-x pan-y pinch-zoom;
+      border: 1px solid #d4ddd9;
+      border-radius: 10px;
+      padding: 22px 26px 32px;
     }}
-    #ocr-panel h1, #ocr-panel h2 {{
-      color: {DEEP_TEAL};
-      margin-top: 0.9em;
-      margin-bottom: 0.3em;
-      font-weight: 700;
-    }}
-    #ocr-panel h2.b-title {{
-      font-size: 1.28em;
-      color: #0f2b5b;
-      border-bottom: 2px solid #c8d6f0;
-      padding-bottom: 0.12em;
-    }}
-    #ocr-panel h3.b-head {{
-      font-size: 1.12em;
-      color: #134e9c;
-    }}
-    #ocr-panel h4.b-sub {{
-      font-size: 1.02em;
-      color: #1f6f4a;
-    }}
-    #ocr-panel h3, #ocr-panel h4 {{
-      color: {TEAL};
-      margin-top: 0.8em;
-      margin-bottom: 0.25em;
-      font-weight: 700;
-    }}
-    #ocr-panel .page-label {{
-      font-size: 0.78rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      margin: 1.1em 0 0.35em;
-      color: #64748b;
-      font-family: system-ui, sans-serif;
-    }}
-    #ocr-panel table.b-table {{
-      border-collapse: collapse;
-      width: 100%;
-      margin: 0.45em 0 0.75em;
-      font-size: 0.95em;
-    }}
-    #ocr-panel table.b-table td, #ocr-panel table.b-table th {{
-      border: 1px solid #d0d8e8;
-      padding: 4px 8px;
-      text-align: left;
-      vertical-align: top;
-    }}
-    #ocr-panel table.b-table th {{
-      background: #eef3fb;
-      color: #0f2b5b;
-    }}
-    #ocr-panel table.b-table tr:nth-child(even) td {{
-      background: #f7f9fd;
-    }}
-    #ocr-panel hr {{ border: 0; border-top: 1px solid #e2e8f0; margin: 0.9em 0; }}
-    #ocr-panel p {{ margin: 0 0 0.35em; }}
-    #ocr-panel mark {{ background: #fef08a; padding: 1px 3px; border-radius: 2px; }}
-    #ocr-panel mark.search-active {{ background: #fde047; outline: 2px solid #0f5e5e; }}
-    #ocr-panel a {{ color: {TEAL}; font-weight: 600; }}
-    #ocr-panel .parish-block {{
-      margin: 0 0 0.5rem;
-      padding: 0;
-      border: 1px solid #e5e7eb;
-      border-radius: 4px;
-      background: #fff;
-    }}
-    #ocr-panel .parish-block.parish-odd {{ background: #f7faf9; }}
-    #ocr-panel .parish-block > summary.parish-head {{
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 6px 12px;
-      margin: 0;
-      padding: 0.4rem 0.55rem;
-      border-left: 3px solid {TEAL};
-      cursor: pointer;
-      list-style: none;
-    }}
-    #ocr-panel .parish-block > summary.parish-head::-webkit-details-marker {{ display: none; }}
-    #ocr-panel .parish-odd > summary.parish-head {{ border-left-color: {DEEP_TEAL}; }}
-    #ocr-panel .parish-name {{
-      margin: 0 !important;
-      font-size: 1.1rem !important;
-      color: {DEEP_TEAL} !important;
-      border: 0 !important;
-      padding: 0 !important;
-      font-weight: 700;
-    }}
-    #ocr-panel .parish-name::before {{
-      content: "▸ ";
-      color: {TEAL};
-      font-family: system-ui, sans-serif;
-      font-size: 0.85em;
-    }}
-    #ocr-panel .parish-block[open] .parish-name::before {{ content: "▾ "; }}
-    #ocr-panel .parish-source {{
-      font-family: system-ui, sans-serif;
-      font-size: 0.78rem;
-      font-weight: 600;
-      white-space: nowrap;
-      text-decoration: none;
-      color: #1d4ed8;
-    }}
-    #ocr-panel .parish-source:hover {{ text-decoration: underline; }}
-    #ocr-panel .parish-body {{ padding: 0.25rem 0.55rem 0.65rem; }}
-    #ocr-panel .parish-empty {{
-      font-family: system-ui, sans-serif;
-      font-size: 16px;
-      color: #666666;
-      font-style: normal;
-    }}
-    #ocr-panel .parish-row-empty {{
-      display: flex;
-      flex-wrap: nowrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px 12px;
-      min-height: 48px;
-      max-height: 64px;
-      padding: 8px 0;
-      margin: 0;
-      border: 0;
-      border-bottom: 1px solid #e5e7eb;
-      background: transparent;
-      box-sizing: border-box;
-    }}
-    #ocr-panel .parish-row-empty .parish-name {{
-      margin: 0 !important;
-      font-size: 16px !important;
-      font-family: system-ui, sans-serif !important;
-      color: #1e3a5f !important;
-      font-weight: 600;
-    }}
-    #ocr-panel .parish-row-empty .parish-name::before {{ content: none !important; }}
-    #ocr-panel .parish-row-empty .parish-empty {{
-      flex: 1 1 auto;
-      margin: 0;
-      color: #666666;
-      font-size: 16px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }}
-    #ocr-panel .parish-row-empty .parish-source {{ color: #1e3a5f; font-size: 16px; }}
     .note-box {{
-      margin-top: 12px;
+      margin-top: 14px;
       padding: 6px 0;
       border-radius: 0;
       background: transparent;
       border: 0;
-      color: #666666;
+      color: #5a6a68;
       font-weight: 400;
-      font-size: 13px;
+      font-size: 0.85rem;
+      line-height: 1.5;
     }}
     .ocr-failed-banner {{
-      margin: 10px 0;
-      padding: 10px 14px;
+      margin: 12px 0;
+      padding: 12px 14px;
       background: #fff4df;
       border: 1px solid #f5d08d;
-      border-radius: 6px;
+      border-radius: 8px;
       color: #713f12;
       font-weight: 600;
-      font-size: 13px;
+      font-size: 0.9rem;
+      line-height: 1.45;
     }}
     .empty-state[hidden],
     #parish-empty[hidden] {{ display: none !important; }}
@@ -1672,6 +1545,9 @@ def render_bulletin_viewer_shell(
       .pdf-frame-wrap, #ocr-panel {{
         height: 90vh;
         min-height: 90vh;
+      }}
+      #ocr-panel {{
+        padding: 16px 14px 28px;
       }}
       .ocr-search-tools {{ flex-direction: column; }}
       .ocr-search-tools button {{

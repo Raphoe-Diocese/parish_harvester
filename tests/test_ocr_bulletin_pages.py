@@ -181,6 +181,87 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("Text Bulletin", html_output)
         self.assertIn("Ar dheis Dé go raibh a anam", html_output)
         self.assertIn("Gaeilge", html_output)
+        self.assertIn("19/05/2026", html_output)
+
+    def test_ocr_reading_styles_are_legible(self) -> None:
+        """OCR pane must stay easy to read: soft paper, generous measure/line-height,
+        no harsh white glare, and no horizontal overflow on phones."""
+        from ocr.generate_bulletin_pages import (
+            OCR_BASE_SIZE,
+            OCR_INK,
+            OCR_LINE_HEIGHT,
+            OCR_MEASURE,
+            OCR_PAPER,
+            ocr_reading_css,
+        )
+
+        shared = ocr_reading_css("#ocr-panel")
+        self.assertIn(OCR_PAPER, shared)
+        self.assertIn(OCR_INK, shared)
+        self.assertIn(f"line-height: {OCR_LINE_HEIGHT}", shared)
+        self.assertIn(f"max-width: {OCR_MEASURE}", shared)
+        self.assertIn("overflow-wrap: anywhere", shared)
+        self.assertIn("72ch", OCR_MEASURE)
+        self.assertEqual(OCR_LINE_HEIGHT, "1.65")
+        self.assertEqual(OCR_BASE_SIZE, "1.125rem")
+        # Soft cool stone — not pure white, not cream/terracotta cliché.
+        self.assertNotEqual(OCR_PAPER.lower(), "#ffffff")
+        self.assertNotEqual(OCR_PAPER.lower(), "#fff")
+
+        viewer = render_bulletin_viewer_shell(
+            page_title="Example Diocese Collated Bulletin",
+            diocese_label="EXAMPLE",
+            display_name="Example Diocese",
+            headline="Example Collated Bulletin",
+            meta_line="This week's bulletin — 19/05/2026.",
+            back_href="../../index.html",
+            back_label="← Back to home",
+            pdf_href="https://example.com/example_mega_bulletin.pdf",
+            pdf_download_href="https://example.com/example_mega_bulletin.pdf",
+            pdf_standalone_href="https://example.com/example-pdf.html",
+            ocr_standalone_href="https://example.com/example-ocr.html",
+            ocr_fragment="<h2>Ardara</h2><p>Mass on Sunday at 11am.</p>",
+            parish_section_heading="EXAMPLE Parishes with Working Bulletin Links",
+            parish_links_html='<ul class="parish-grid"><li>Example Parish</li></ul>',
+        )
+        self.assertIn(f"line-height: {OCR_LINE_HEIGHT}", viewer)
+        self.assertIn(f"max-width: {OCR_MEASURE}", viewer)
+        self.assertIn(OCR_PAPER, viewer)
+        self.assertIn("overflow-wrap: anywhere", viewer)
+        self.assertIn('id="ocr-panel"', viewer)
+        # Cramped legacy OCR body values must not return.
+        self.assertNotRegex(viewer, r"#ocr-panel\s*\{[^}]*line-height:\s*1\.38")
+        self.assertRegex(viewer, r"#ocr-panel p\s*\{[^}]*margin:\s*0 0 0\.9em")
+        self.assertNotRegex(viewer, r"#ocr-panel p\s*\{[^}]*margin:\s*0 0 0\.35em")
+
+        config = DioceseConfig(
+            key="test",
+            display_name="Test Diocese",
+            headline="TEST DIOCESE BIG BULLETIN",
+            evidence_path=Path("unused.txt"),
+            pdf_filename="test_mega_bulletin.pdf",
+        )
+        standalone = render_ocr_standalone_page(
+            config=config,
+            bulletin_date="2026-05-19",
+            ocr_fragment="<p>Sunday notices</p>",
+            viewer_href="test-2026-05-19.html",
+        )
+        self.assertIn(f"line-height: {OCR_LINE_HEIGHT}", standalone)
+        self.assertIn(OCR_PAPER, standalone)
+        self.assertIn("overflow-wrap: anywhere", standalone)
+        self.assertIn('class="ocr-body"', standalone)
+        # Body/OCR reading measure — not the old cramped 1.35 body default.
+        self.assertIn(f"line-height: {OCR_LINE_HEIGHT}", standalone)
+        self.assertRegex(standalone, r"\.ocr-body\s*\{[^}]*line-height:\s*1\.65")
+        self.assertNotRegex(standalone, r"body\s*\{[^}]*line-height:\s*1\.35")
+
+        from ocr import convert_bulletin
+
+        self.assertIn("line-height: 1.65", convert_bulletin.CSS)
+        self.assertIn("min(72ch, 100%)", convert_bulletin.CSS)
+        self.assertIn("#eef1f0", convert_bulletin.CSS)
+        self.assertIn("overflow-wrap: anywhere", convert_bulletin.CSS)
 
 
     def test_az_parish_html_shows_failed_banner_when_no_markers_found(self) -> None:
