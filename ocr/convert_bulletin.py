@@ -18,82 +18,100 @@ from pdf2image import convert_from_path
 
 from ocr.text_extract import extract_text_pages
 
+# Keep in sync with ocr.generate_bulletin_pages.ocr_reading_css (presentation only).
 CSS = """
 <style>
   html, body {
     margin: 0;
     padding: 0;
     overflow-x: hidden;
+    background: #eef1f0;
+    color: #1a1f1e;
   }
   .scrollable-viewer {
-    max-width: min(52rem, 100%);
+    max-width: min(72ch, 100%);
     margin: 0 auto;
-    background: #ffffff;
-    font-family: Georgia, "Times New Roman", Times, serif;
+    background: #eef1f0;
+    font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
     font-size: 1.125rem;
-    line-height: 1.45;
-    padding: 12px 16px 28px;
+    line-height: 1.65;
+    padding: 22px 26px 36px;
+    overflow-wrap: anywhere;
+    word-wrap: break-word;
+    -webkit-text-size-adjust: 100%;
   }
   .page-label {
-    font-size: 0.8rem;
+    font-size: 0.78rem;
     font-weight: 700;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    margin: 1.1em 0 0.4em;
-    color: #64748b;
-    font-family: system-ui, sans-serif;
+    margin: 1.6em 0 0.55em;
+    color: #5a6a68;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
   }
   .page-label:first-child {
     margin-top: 0;
   }
   p {
-    margin: 0 0 0.65em;
+    margin: 0 0 0.9em;
   }
   hr {
-    margin: 0.9em 0;
+    margin: 1.35em 0;
     border: none;
-    border-top: 1px solid #e2e8f0;
+    border-top: 1px solid #d4ddd9;
   }
   .b-title {
     font-size: 1.28em;
     font-weight: 700;
     color: #0f2b5b;
-    margin: 0.85em 0 0.25em;
-    border-bottom: 2px solid #c8d6f0;
-    padding-bottom: 0.12em;
+    margin: 1.5em 0 0.45em;
+    border-bottom: 2px solid #c5d0c9;
+    padding-bottom: 0.18em;
+    line-height: 1.3;
   }
   .b-head {
     font-size: 1.12em;
     font-weight: 700;
     color: #134e9c;
-    margin: 0.7em 0 0.2em;
+    margin: 1.1em 0 0.35em;
+    line-height: 1.35;
   }
   .b-sub {
-    font-size: 1.02em;
+    font-size: 1.04em;
     font-weight: 700;
     color: #1f6f4a;
-    margin: 0.55em 0 0.15em;
+    margin: 0.95em 0 0.3em;
+    line-height: 1.35;
   }
   strong { color: #0f2b5b; }
-  a { color: #1d4ed8; }
+  a { color: #1a6b6b; font-weight: 600; overflow-wrap: anywhere; }
   table.b-table {
     border-collapse: collapse;
     width: 100%;
-    margin: 0.45em 0 0.75em;
+    max-width: 100%;
+    margin: 0.55em 0 1em;
     font-size: 0.95em;
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
   }
   table.b-table td, table.b-table th {
-    border: 1px solid #d0d8e8;
-    padding: 4px 8px;
+    border: 1px solid #c9d4cf;
+    padding: 6px 10px;
     text-align: left;
     vertical-align: top;
   }
   table.b-table th {
-    background: #eef3fb;
+    background: #e4ebe8;
     color: #0f2b5b;
   }
   table.b-table tr:nth-child(even) td {
-    background: #f7f9fd;
+    background: #f7f9f8;
+  }
+  @media (max-width: 600px) {
+    .scrollable-viewer {
+      padding: 16px 14px 28px;
+    }
   }
 </style>
 """
