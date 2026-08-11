@@ -69,11 +69,16 @@ class SiteBuilderTests(unittest.TestCase):
             self.assertIn("Download PDF", derry_page)
             self.assertIn("Open PDF in new tab", derry_page)
             self.assertIn("Open bulletin text in new tab", derry_page)
+            self.assertIn("Distraction-free view", derry_page)
             self.assertIn("Line one", derry_page)
             self.assertIn("DERRY", derry_page)
-            self.assertIn("BIG BULLETIN", derry_page)
+            self.assertIn("Derry Collated Bulletin", derry_page)
             self.assertIn("Parish of Raphoe", raphoe_page)
             self.assertIn("We're still collecting bulletins for this diocese", armagh_page)
+
+            # Same canonical viewer design used for every trained live diocese page.
+            self.assertIn('id="panel-pdf"', derry_page)
+            self.assertIn('id="panel-ocr"', derry_page)
 
 
 if __name__ == "__main__":

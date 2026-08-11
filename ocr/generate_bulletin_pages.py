@@ -539,7 +539,8 @@ def _write_parish_reader_outputs(
             repo_root=REPO_ROOT,
         )
 
-def _render_parish_links(parish_links: list[tuple[str, str]]) -> str:
+def render_parish_link_grid(parish_links: list[tuple[str, str]]) -> str:
+    """Searchable A–Z parish link grid — shared by every canonical viewer page."""
     if not parish_links:
         return '<p class="empty-state">No parish bulletin links were found for this diocese yet.</p>'
     sorted_links = sorted(parish_links, key=lambda pair: pair[0].lower())
@@ -988,18 +989,141 @@ def render_ocr_standalone_page(
 """
 
 
+def _pdf_href(config: DioceseConfig) -> str:
+    return f"../mega_pdf/{config.pdf_filename}"
+
+
+def _ocr_standalone_href(config: DioceseConfig, bulletin_date: str) -> str:
+    return f"{config.key}-{bulletin_date}-ocr.html"
+
+
+def _pdf_standalone_href(config: DioceseConfig, bulletin_date: str) -> str:
+    return f"{config.key}-{bulletin_date}-pdf.html"
+
+
 def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: int, ocr_fragment: str, parish_links: list[tuple[str, str]]) -> str:
-    pdf_href = f"../mega_pdf/{config.pdf_filename}"
-    ocr_standalone_href = f"{config.key}-{bulletin_date}-ocr.html"
-    archive_href = "index.html"
+    """Dated bulletin-archive viewer page (docs/bulletins/{diocese}-{date}.html).
+
+    Thin wrapper around :func:`render_bulletin_viewer_shell`, the single
+    canonical viewer design shared with the per-diocese "current" pages
+    rendered by ``harvester.page_renderer.render_diocese_raphoe_page``.
+    """
+    diocese_label = _diocese_label(config.display_name)
+    uk_bulletin_date = format_uk_date(bulletin_date)
+    return render_bulletin_viewer_shell(
+        page_title=f"{config.display_name} Bulletin Viewer — {uk_bulletin_date}",
+        diocese_label=diocese_label,
+        display_name=config.display_name,
+        headline=config.headline.replace("DIOCESE ", "").replace("BIG BULLETIN", "COLLATED BULLETIN"),
+        meta_line=f"Generated for {uk_bulletin_date}.",
+        back_href="index.html",
+        back_label="← Back to bulletin archive",
+        pdf_href=_pdf_href(config),
+        pdf_download_href=_pdf_href(config),
+        pdf_standalone_href=_pdf_standalone_href(config, bulletin_date),
+        ocr_standalone_href=_ocr_standalone_href(config, bulletin_date),
+        ocr_fragment=ocr_fragment,
+        parish_section_heading=f"{diocese_label} Parishes with Working Bulletin Links",
+        parish_links_html=render_parish_link_grid(parish_links),
+    )
+
+
+def render_pdf_standalone_page(config: DioceseConfig, bulletin_date: str, pdf_href: str, viewer_href: str) -> str:
+    """Distraction-free, chrome-free full-page PDF view — mirrors render_ocr_standalone_page."""
     diocese_label = _diocese_label(config.display_name)
     uk_bulletin_date = format_uk_date(bulletin_date)
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>{html.escape(config.display_name)} PDF — {html.escape(uk_bulletin_date)}</title>
+  <style>
+    * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+    html, body {{ height: 100%; }}
+    body {{
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: #525659;
+      color: {TEXT};
+      display: flex;
+      flex-direction: column;
+    }}
+    .top {{
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 8px 14px;
+      padding: 8px 12px;
+      background: #fff;
+      border-bottom: 1px solid #d6ecea;
+    }}
+    .top-left {{ display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }}
+    .back-link {{ font-weight: 700; color: {TEAL}; text-decoration: none; font-size: 0.9rem; }}
+    .title-line {{ font-weight: 700; font-size: 0.9rem; color: {TEXT}; }}
+    .download-link {{ font-weight: 700; color: {TEAL}; text-decoration: none; font-size: 0.85rem; white-space: nowrap; }}
+    .pdf-frame {{ flex: 1 1 auto; border: 0; width: 100%; height: 100%; background: #525659; }}
+    body.embed-mode .top {{ display: none !important; }}
+  </style>
+</head>
+<body>
+  <div class="top" id="pdf-top">
+    <div class="top-left">
+      <a class="back-link" href="{html.escape(viewer_href, quote=True)}">← Viewer</a>
+      <span class="title-line">{html.escape(diocese_label)} · {html.escape(uk_bulletin_date)}</span>
+    </div>
+    <a class="download-link" href="{html.escape(pdf_href, quote=True)}" download>⬇ Download PDF</a>
+  </div>
+  <iframe class="pdf-frame" src="{html.escape(pdf_href, quote=True)}" title="{html.escape(config.display_name)} bulletin PDF"></iframe>
+  <script>
+    (function () {{
+      try {{
+        if (new URLSearchParams(window.location.search).get('embed') === '1') {{
+          document.body.classList.add('embed-mode');
+        }}
+      }} catch (e) {{}}
+    }})();
+  </script>
+</body>
+</html>
+"""
+
+
+def render_bulletin_viewer_shell(
+    *,
+    page_title: str,
+    diocese_label: str,
+    display_name: str,
+    headline: str,
+    meta_line: str,
+    back_href: str,
+    back_label: str,
+    pdf_href: str,
+    pdf_download_href: str,
+    pdf_standalone_href: str,
+    ocr_standalone_href: str,
+    ocr_fragment: str,
+    parish_section_heading: str,
+    parish_links_html: str,
+) -> str:
+    """The single canonical PDF + Text Bulletin viewer design for this project.
+
+    Used for both the dated bulletin-archive pages
+    (``docs/bulletins/{diocese}-{date}.html``, via :func:`render_viewer_page`)
+    and the per-diocese "current" pages
+    (``docs/dioceses/{key}/index.html``, via
+    ``harvester.page_renderer.render_diocese_raphoe_page``) so Raphoe, Derry
+    and Down & Connor always share one visual/structural design. Includes a
+    genuine distraction-free full-page mode for both the PDF (``pdf_standalone_href``)
+    and the OCR text (``ocr_standalone_href``), each surfaced as an
+    "open in new tab" toolbar link.
+    """
+    return f"""<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>{html.escape(config.display_name)} Bulletin Viewer — {html.escape(uk_bulletin_date)}</title>
+  <title>{html.escape(page_title)}</title>
   <style>
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
     body {{
@@ -1449,11 +1573,11 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
 </head>
 <body>
   <div class="page">
-    <a class="back-link" href="{archive_href}">← Back to bulletin archive</a>
+    <a class="back-link" href="{html.escape(back_href, quote=True)}">{html.escape(back_label)}</a>
     <header class="header">
       <p class="diocese-label">{html.escape(diocese_label)}</p>
-      <h1>{html.escape(config.headline.replace("DIOCESE ", "").replace("BIG BULLETIN", "COLLATED BULLETIN"))}</h1>
-      <p class="meta">Generated for {html.escape(uk_bulletin_date)}.</p>
+      <h1>{html.escape(headline)}</h1>
+      <p class="meta">{html.escape(meta_line)}</p>
     </header>
 
     <!-- Tabs -->
@@ -1468,18 +1592,19 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
       <!-- PDF Panel: native browser PDF (scroll all pages; links open in viewer) -->
       <div id="panel-pdf" class="view-panel active">
         <div class="panel-toolbar">
-          <a class="toolbar-btn" href="{pdf_href}" target="_blank" rel="noopener noreferrer">↗ Open PDF in new tab</a>
-          <a class="toolbar-btn" href="{pdf_href}" download>⬇ Download PDF</a>
+          <a class="toolbar-btn" href="{html.escape(pdf_href, quote=True)}" target="_blank" rel="noopener noreferrer">↗ Open PDF in new tab</a>
+          <a class="toolbar-btn" href="{html.escape(pdf_standalone_href, quote=True)}" target="_blank" rel="noopener noreferrer">🖥 Distraction-free view</a>
+          <a class="toolbar-btn" href="{html.escape(pdf_download_href, quote=True)}" download>⬇ Download PDF</a>
         </div>
         <div class="pdf-frame-wrap">
-          <iframe src="{pdf_href}" title="{html.escape(config.display_name)} bulletin PDF"></iframe>
+          <iframe src="{html.escape(pdf_href, quote=True)}" title="{html.escape(display_name)} bulletin PDF"></iframe>
         </div>
       </div>
 
       <!-- OCR Panel -->
       <div id="panel-ocr" class="view-panel">
         <div class="panel-toolbar">
-          <a class="toolbar-btn" href="{ocr_standalone_href}" target="_blank" rel="noopener noreferrer">↗ Open bulletin text in new tab</a>
+          <a class="toolbar-btn" href="{html.escape(ocr_standalone_href, quote=True)}" target="_blank" rel="noopener noreferrer">↗ Open bulletin text in new tab (distraction-free)</a>
         </div>
         <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
           <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
@@ -1506,9 +1631,9 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
 
     <!-- Parish Links Section -->
     <section class="parish-section">
-      <h2>{html.escape(diocese_label)} Parishes with Working Bulletin Links</h2>
+      <h2>{html.escape(parish_section_heading)}</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="🔍 Filter parishes..." aria-label="Filter parishes" />
-      {_render_parish_links(parish_links)}
+      {parish_links_html}
     </section>
   </div>
   <!-- Support Banner -->
@@ -1825,6 +1950,11 @@ def regenerate_viewer_from_existing(existing_path: Path) -> Path:
         render_ocr_standalone_page(config, bulletin_date, ocr_fragment, viewer_href=output_path.name),
         encoding="utf-8",
     )
+    pdf_only_path = BULLETINS_DIR / f"{diocese}-{bulletin_date}-pdf.html"
+    pdf_only_path.write_text(
+        render_pdf_standalone_page(config, bulletin_date, pdf_href=_pdf_href(config), viewer_href=output_path.name),
+        encoding="utf-8",
+    )
     return output_path
 
 
@@ -1843,6 +1973,11 @@ def write_viewer_page(diocese: str, bulletin_date: str, pdf_path: Path, ocr_html
     ocr_only_path = BULLETINS_DIR / f"{diocese}-{bulletin_date}-ocr.html"
     ocr_only_path.write_text(
         render_ocr_standalone_page(config, bulletin_date, ocr_fragment, viewer_href=output_path.name),
+        encoding="utf-8",
+    )
+    pdf_only_path = BULLETINS_DIR / f"{diocese}-{bulletin_date}-pdf.html"
+    pdf_only_path.write_text(
+        render_pdf_standalone_page(config, bulletin_date, pdf_href=_pdf_href(config), viewer_href=output_path.name),
         encoding="utf-8",
     )
     _write_parish_reader_outputs(diocese, bulletin_date, ocr_plain_text, parish_links)

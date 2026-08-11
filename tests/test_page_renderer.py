@@ -4,65 +4,14 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from harvester.page_renderer import EMPTY_OCR_TEXT, render_diocese_page, render_diocese_raphoe_page
+from harvester.page_renderer import render_diocese_raphoe_page
 
 
 class PageRendererTests(unittest.TestCase):
-    def test_render_diocese_page_escapes_user_content(self) -> None:
-        with tempfile.TemporaryDirectory() as tmpdir:
-            out_path = Path(tmpdir) / "index.html"
-            render_diocese_page(
-                diocese_key="raphoe",
-                diocese_display_name="Raphoe <script>",
-                mega_pdf_url='../../mega_pdf/raphoe_mega_bulletin.pdf?x="1"',
-                ocr_text="danger <b>tag</b>",
-                parish_links=[{"name": "Parish <A>", "url": "https://example.com/?q=<x>"}],
-                out_path=out_path,
-            )
-            html = out_path.read_text(encoding="utf-8")
-
-            self.assertIn("Raphoe &lt;script&gt;", html)
-            self.assertIn("danger &lt;b&gt;tag&lt;/b&gt;", html)
-            self.assertIn("Parish &lt;A&gt;", html)
-            self.assertIn("https://example.com/?q=&lt;x&gt;", html)
-            self.assertNotIn("Raphoe <script>", html)
-            self.assertNotIn("danger <b>tag</b>", html)
-            self.assertIn("function applySearch(query)", html)
-
-    def test_render_diocese_page_uses_placeholder_when_ocr_missing(self) -> None:
-        with tempfile.TemporaryDirectory() as tmpdir:
-            out_path = Path(tmpdir) / "index.html"
-            render_diocese_page(
-                diocese_key="raphoe",
-                diocese_display_name="Raphoe",
-                mega_pdf_url="../../mega_pdf/raphoe_mega_bulletin.pdf",
-                ocr_text="",
-                parish_links=[],
-                out_path=out_path,
-            )
-            html = out_path.read_text(encoding="utf-8")
-            self.assertIn("We&#x27;re still collecting OCR text for this diocese. Check back next Sunday.", html)
-
-    def test_render_diocese_page_renders_parish_list(self) -> None:
-        with tempfile.TemporaryDirectory() as tmpdir:
-            out_path = Path(tmpdir) / "index.html"
-            render_diocese_page(
-                diocese_key="derry",
-                diocese_display_name="Derry",
-                mega_pdf_url="../../mega_pdf/derry_mega_bulletin.pdf",
-                ocr_text="hello",
-                parish_links=[
-                    {"name": "B Parish", "url": "https://example.com/b"},
-                    {"name": "A Parish", "url": "https://example.com/a"},
-                ],
-                out_path=out_path,
-            )
-            html = out_path.read_text(encoding="utf-8")
-            self.assertIn("A Parish", html)
-            self.assertIn("B Parish", html)
-            self.assertIn("DERRY PARISHES WITH WORKING BULLETIN LINKS", html)
-
-    def test_render_diocese_raphoe_page_stacked_layout_and_dropdown(self) -> None:
+    def test_render_diocese_raphoe_page_uses_canonical_viewer_shell(self) -> None:
+        """render_diocese_raphoe_page must build the same canonical design as
+        ocr.generate_bulletin_pages.render_bulletin_viewer_shell — the single
+        source of truth for every diocese's bulletin viewer page."""
         with tempfile.TemporaryDirectory() as tmpdir:
             out_path = Path(tmpdir) / "index.html"
             render_diocese_raphoe_page(
@@ -72,24 +21,80 @@ class PageRendererTests(unittest.TestCase):
                 ],
                 out_path=out_path,
                 mega_pdf_url="../../mega_pdf/raphoe_mega_bulletin.pdf",
-                bulletin_viewer_url="../../bulletins/raphoe-2026-06-29.html",
                 ocr_standalone_url="../../bulletins/raphoe-2026-06-29-ocr.html",
+                pdf_standalone_url="../../bulletins/raphoe-2026-06-29-pdf.html",
                 ocr_text="Sunday mass at 10am",
+                week_label="29/06/2026",
+                diocese_display_name="Raphoe Diocese",
+                headline="Raphoe Collated Bulletin",
             )
             html = out_path.read_text(encoding="utf-8")
-            self.assertIn("Go to OCR version", html)
-            self.assertIn('id="ocr-section"', html)
+
+            # Same canonical structure as the dated bulletin-archive viewer page.
+            self.assertIn('id="panel-pdf"', html)
+            self.assertIn('id="panel-ocr"', html)
+            self.assertIn('id="ocr-panel"', html)
             self.assertIn("Open PDF in new tab", html)
-            self.assertNotIn("Open full bulletin in new tab", html)
             self.assertIn("Open bulletin text in new tab", html)
-            self.assertIn("parish-accordion", html)
-            self.assertIn("parish-link-grid", html)
-            self.assertNotIn("parish-select", html)
+            # Distraction-free full-page links for both PDF and OCR text.
+            self.assertIn("raphoe-2026-06-29-pdf.html", html)
+            self.assertIn("raphoe-2026-06-29-ocr.html", html)
+            self.assertIn("Distraction-free view", html)
             self.assertIn("A Parish", html)
             self.assertIn("Z Parish", html)
             self.assertLess(html.index("A Parish"), html.index("Z Parish"))
             self.assertIn("raphoe_mega_bulletin.pdf", html)
             self.assertIn("Sunday mass at 10am", html)
+            self.assertIn("← Back to home", html)
+
+    def test_render_diocese_raphoe_page_escapes_user_content(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            out_path = Path(tmpdir) / "index.html"
+            render_diocese_raphoe_page(
+                parish_links=[{"name": "Parish <A>", "url": "https://example.com/?q=<x>"}],
+                out_path=out_path,
+                mega_pdf_url='../../mega_pdf/raphoe_mega_bulletin.pdf?x="1"',
+                ocr_text="danger <b>tag</b>",
+                ocr_is_html=False,
+                diocese_display_name="Raphoe <script>",
+                headline="Raphoe Collated Bulletin",
+            )
+            html = out_path.read_text(encoding="utf-8")
+
+            self.assertIn("Parish &lt;A&gt;", html)
+            self.assertIn("https://example.com/?q=&lt;x&gt;", html)
+            self.assertIn("danger &lt;b&gt;tag&lt;/b&gt;", html)
+            self.assertNotIn("danger <b>tag</b>", html)
+            self.assertIn("function applyOcrSearch(query)", html)
+
+    def test_render_diocese_raphoe_page_uses_placeholder_when_ocr_missing(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            out_path = Path(tmpdir) / "index.html"
+            render_diocese_raphoe_page(
+                parish_links=[],
+                out_path=out_path,
+                mega_pdf_url="../../mega_pdf/raphoe_mega_bulletin.pdf",
+                ocr_text="",
+                diocese_display_name="Raphoe Diocese",
+                headline="Raphoe Collated Bulletin",
+            )
+            html = out_path.read_text(encoding="utf-8")
+            self.assertIn("We&#x27;re still collecting OCR text for this diocese. Check back next Sunday.", html)
+
+    def test_render_diocese_raphoe_page_down_and_connor_ampersand(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            out_path = Path(tmpdir) / "index.html"
+            render_diocese_raphoe_page(
+                parish_links=[{"name": "Antrim", "url": "https://example.com/antrim"}],
+                out_path=out_path,
+                mega_pdf_url="../../mega_pdf/down_and_connor_mega_bulletin.pdf",
+                ocr_text="hello",
+                diocese_display_name="Down and Connor",
+                headline="Down & Connor Collated Bulletin",
+            )
+            html = out_path.read_text(encoding="utf-8")
+            self.assertIn("DOWN &amp; CONNOR", html)
+            self.assertIn("Down &amp; Connor Collated Bulletin", html)
 
 
 if __name__ == "__main__":
