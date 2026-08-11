@@ -389,18 +389,69 @@ def build_az_parish_ocr_html(
     return "\n".join(sections)
 
 
+_LEGACY_PARISH_DETAILS_RE = re.compile(
+    r'<details class="parish-block[^"]*"[^>]*>\s*'
+    r'<summary class="parish-head">\s*'
+    r'<span class="parish-name">(.*?)</span>.*?'
+    r"</summary>\s*"
+    r'<div class="parish-body">(.*?)</div>\s*'
+    r"</details>",
+    re.DOTALL,
+)
+
+
+def _flatten_legacy_parish_accordions(fragment: str) -> str:
+    """Backward-compat for already-generated pages.
+
+    Pages regenerated from on-disk HTML (:func:`regenerate_viewer_from_existing`)
+    extract their OCR fragment from whatever is already published — which,
+    for anything built while the previous (collapsible per-parish
+    ``<details>``) design was live, is already wrapped in that accordion
+    markup. Flatten any such legacy sections into plain headings so the
+    dropdown/collapse behaviour Frank objected to cannot resurface just
+    because the source file predates this fix. Fresh OCR conversions never
+    contain this markup, so this is a no-op for them.
+    """
+
+    def _replace(match: re.Match[str]) -> str:
+        name, body = match.group(1), match.group(2)
+        return f'<h2 class="b-title">{name}</h2>\n{body}'
+
+    return _LEGACY_PARISH_DETAILS_RE.sub(_replace, fragment or "")
+
+
 def prepare_ocr_fragment(
     diocese: str,
     ocr_fragment: str,
     parish_links: list[tuple[str, str]] | None = None,
 ) -> str:
-    """Clean OCR HTML and, when possible, rebuild as A–Z parish sections."""
-    cleaned = tighten_ocr_paragraphs(ocr_fragment or "")
+    """Clean OCR HTML into one continuous, page-ordered scrollable document.
+
+    This used to rebuild the text into collapsible per-parish ``<details>``
+    accordion sections (see :func:`build_az_parish_ocr_html`, still kept for
+    its own tests/possible future use). Frank asked for that dropdown
+    behaviour to go — the OCR panel should read exactly like the original
+    PDF, page by page, with no per-parish collapse. This keeps the natural
+    page order from the OCR pipeline and only prepends a failure banner when
+    OCR produced nothing usable at all for any known parish this week.
+    """
+    cleaned = tighten_ocr_paragraphs(_flatten_legacy_parish_accordions(ocr_fragment or ""))
     if not parish_links:
         return cleaned
+    entries = _load_parish_entries(diocese, parish_links)
+    if not entries:
+        return cleaned
     plain = _fragment_to_plain_text(cleaned)
-    rebuilt = build_az_parish_ocr_html(diocese, plain, parish_links)
-    return rebuilt if rebuilt.strip() else cleaned
+    chunks = split_ocr_by_parish(plain, entries)
+    ocr_failed_whole_diocese = not any((chunks.get(key) or "").strip() for key, _ in entries)
+    if not ocr_failed_whole_diocese:
+        return cleaned
+    banner = (
+        '<div class="ocr-failed-banner" role="alert">'
+        "⚠️ OCR failed this week — use the original PDF above for the full text."
+        "</div>"
+    )
+    return f"{banner}\n{cleaned}"
 
 
 def _fragment_to_plain_text(ocr_fragment: str) -> str:
@@ -1113,8 +1164,15 @@ def render_bulletin_viewer_shell(
     and the per-diocese "current" pages
     (``docs/dioceses/{key}/index.html``, via
     ``harvester.page_renderer.render_diocese_raphoe_page``) so Raphoe, Derry
-    and Down & Connor always share one visual/structural design. Includes a
-    genuine distraction-free full-page mode for both the PDF (``pdf_standalone_href``)
+    and Down & Connor always share one visual/structural design.
+
+    Matches the flat, single-column layout Frank's own reference page uses:
+    headline -> plain "Download PDF" link -> "Original PDF Version" heading
+    -> PDF viewer (always visible, not behind a tab) -> a find-text-instantly
+    callout -> "OCR Extracted Plain Text" heading -> one continuous,
+    page-ordered OCR panel (no per-parish accordion/dropdown) -> the A-Z
+    parish link grid, all on this one page. Includes a genuine
+    distraction-free full-page mode for both the PDF (``pdf_standalone_href``)
     and the OCR text (``ocr_standalone_href``), each surfaced as an
     "open in new tab" toolbar link.
     """
@@ -1141,46 +1199,51 @@ def render_bulletin_viewer_shell(
     h1 {{ margin: 0 0 8px; color: {TEAL}; font-size: clamp(1.8rem, 3vw, 2.5rem); }}
     .meta {{ color: #6b7280; font-size: 0.95rem; }}
     
-    /* Tabs */
-    .tabs {{
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin: 0 0 20px;
-      padding: 16px 0;
-      background: #e8edf5;
-      border-bottom: 2px solid #c7d2e8;
-    }}
-    .tab-btn {{
-      padding: 12px 28px;
-      border: 2px solid {TEAL};
-      border-radius: 8px;
-      background: white;
-      color: {TEAL};
+    /* Top download link — plain, prominent, right under the headline */
+    .download-link-top {{
+      display: inline-block;
+      margin-top: 4px;
       font-weight: 700;
       font-size: 1rem;
-      cursor: pointer;
-      transition: all 0.2s;
+      color: {TEAL};
     }}
-    .tab-btn:hover {{
-      background: #f0f4f8;
+
+    /* Section headings — "BULLETIN — ORIGINAL PDF VERSION" style dividers
+       between the always-visible PDF and OCR panels below (no tabs). */
+    .section-heading {{
+      margin: 30px 0 14px;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: {DEEP_TEAL};
     }}
-    .tab-btn.active {{
-      background: {TEAL};
-      color: white;
+
+    /* Pro-tip callout between the PDF and OCR sections */
+    .callout-tip {{
+      margin: 18px auto;
+      max-width: 720px;
+      text-align: center;
+      background: #fff4df;
+      border: 1px solid #f5c451;
+      border-radius: 999px;
+      padding: 10px 22px;
+      color: #7a4a00;
+      font-size: 0.92rem;
+      font-weight: 600;
     }}
-    
-    /* Panel container */
-    .panel-container {{ position: relative; }}
-    .view-panel {{
-      display: none;
+    .callout-tip strong {{ font-weight: 800; }}
+
+    /* Viewer blocks — PDF and OCR are both always visible, stacked, no tabs */
+    .viewer-block {{
       background: white;
       border: 1px solid #d6ecea;
       border-radius: 16px;
       padding: 20px;
       box-shadow: 0 4px 12px rgba(26, 107, 107, 0.08);
+      margin-bottom: 8px;
     }}
-    .view-panel.active {{ display: block; }}
     
     /* Toolbar */
     .panel-toolbar {{
@@ -1211,8 +1274,11 @@ def render_bulletin_viewer_shell(
       text-decoration: none;
     }}
     
-    /* PDF View — native scroll fills the screen; no page-flip controls */
+    /* PDF View — the browser's own PDF viewer supplies page number, zoom
+       and print/download controls inside the iframe; we only add a small
+       fullscreen shortcut on top of it. */
     .pdf-frame-wrap {{
+      position: relative;
       height: 92vh;
       min-height: 92vh;
       overflow: hidden;
@@ -1226,6 +1292,22 @@ def render_bulletin_viewer_shell(
       border: 0;
       display: block;
     }}
+    .fullscreen-btn {{
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 5;
+      width: 36px;
+      height: 36px;
+      border: 1px solid {TEAL};
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.92);
+      color: {TEAL};
+      font-size: 1.1rem;
+      line-height: 1;
+      cursor: pointer;
+    }}
+    .fullscreen-btn:hover {{ background: #fff; }}
     .ocr-search-bar {{
       position: relative;
       margin-bottom: 12px;
@@ -1483,12 +1565,9 @@ def render_bulletin_viewer_shell(
       border-radius: 10px;
       padding: 16px;
     }}
-    .parish-section h2 {{
-      margin: 0 0 12px;
+    .parish-section h2.section-heading {{
       color: #1e3a5f;
-      font-size: 1.05rem;
-      font-weight: 600;
-      text-align: left;
+      font-size: 1.2rem;
     }}
     .parish-filter {{
       width: 100%;
@@ -1551,8 +1630,6 @@ def render_bulletin_viewer_shell(
     /* Responsive */
     @media (max-width: 900px) {{
       ul.parish-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
-      .tabs {{ flex-direction: column; align-items: stretch; padding: 12px; }}
-      .tab-btn {{ width: 100%; }}
     }}
     @media (max-width: 600px) {{
       .page {{ padding: 16px 12px; }}
@@ -1562,12 +1639,13 @@ def render_bulletin_viewer_shell(
         min-height: 90vh;
       }}
       .ocr-search-tools {{ flex-direction: column; }}
-      .ocr-search-tools button, .tab-btn {{
+      .ocr-search-tools button {{
         min-height: 48px;
         width: 100%;
       }}
       .panel-toolbar {{ justify-content: stretch; }}
       .toolbar-btn {{ flex: 1; justify-content: center; min-height: 48px; }}
+      .callout-tip {{ margin-left: 8px; margin-right: 8px; }}
     }}
   </style>
 </head>
@@ -1578,60 +1656,57 @@ def render_bulletin_viewer_shell(
       <p class="diocese-label">{html.escape(diocese_label)}</p>
       <h1>{html.escape(headline)}</h1>
       <p class="meta">{html.escape(meta_line)}</p>
+      <a class="download-link-top" href="{html.escape(pdf_download_href, quote=True)}" download>⬇ Download PDF</a>
     </header>
 
-    <!-- Tabs -->
-    <div class="tabs" role="tablist" aria-label="Bulletin view">
-      <button class="tab-btn active" type="button" role="tab" aria-selected="true" data-tab="pdf" onclick="switchTab('pdf', this)">📄 Parish Bulletin (PDF)</button>
-      <button class="tab-btn" type="button" role="tab" aria-selected="false" data-tab="ocr" onclick="switchTab('ocr', this)">📝 Text Bulletin</button>
+    <!-- PDF section: always visible (no tab click needed), original PDF first -->
+    <h2 class="section-heading">Bulletin — Original PDF Version</h2>
+    <div id="panel-pdf" class="viewer-block">
+      <div class="panel-toolbar">
+        <a class="toolbar-btn" href="{html.escape(pdf_href, quote=True)}" target="_blank" rel="noopener noreferrer">↗ Open PDF in new tab</a>
+        <a class="toolbar-btn" href="{html.escape(pdf_standalone_href, quote=True)}" target="_blank" rel="noopener noreferrer">🖥 Distraction-free view</a>
+        <a class="toolbar-btn" href="{html.escape(pdf_download_href, quote=True)}" download>⬇ Download PDF</a>
+      </div>
+      <div class="pdf-frame-wrap" id="pdf-frame-wrap">
+        <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
+        <iframe src="{html.escape(pdf_href, quote=True)}" title="{html.escape(display_name)} bulletin PDF"></iframe>
+      </div>
     </div>
 
-    <!-- Panel Container -->
-    <div class="panel-container">
-      
-      <!-- PDF Panel: native browser PDF (scroll all pages; links open in viewer) -->
-      <div id="panel-pdf" class="view-panel active">
-        <div class="panel-toolbar">
-          <a class="toolbar-btn" href="{html.escape(pdf_href, quote=True)}" target="_blank" rel="noopener noreferrer">↗ Open PDF in new tab</a>
-          <a class="toolbar-btn" href="{html.escape(pdf_standalone_href, quote=True)}" target="_blank" rel="noopener noreferrer">🖥 Distraction-free view</a>
-          <a class="toolbar-btn" href="{html.escape(pdf_download_href, quote=True)}" download>⬇ Download PDF</a>
-        </div>
-        <div class="pdf-frame-wrap">
-          <iframe src="{html.escape(pdf_href, quote=True)}" title="{html.escape(display_name)} bulletin PDF"></iframe>
+    <p class="callout-tip">🔍 <strong>Pro tip: find text instantly.</strong> Use the search box below (or your browser's Ctrl/Cmd+F) to jump straight to a parish, name or notice in the text version underneath.</p>
+
+    <!-- OCR section: one continuous, page-ordered document — no per-parish
+         dropdown/accordion. Reads exactly like the PDF, just as searchable
+         text. -->
+    <h2 class="section-heading">Bulletin — OCR Extracted Plain Text</h2>
+    <div id="panel-ocr" class="viewer-block">
+      <div class="panel-toolbar">
+        <a class="toolbar-btn" href="{html.escape(ocr_standalone_href, quote=True)}" target="_blank" rel="noopener noreferrer">↗ Open bulletin text in new tab (distraction-free)</a>
+      </div>
+      <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+        <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+        <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+        <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+        <span class="ocr-zoom-hint">or pinch to zoom</span>
+      </div>
+      <div class="ocr-search-bar">
+        <input id="ocr-search" class="search-input" type="search" placeholder="🔍 Search OCR text..." aria-label="Search OCR text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear OCR search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled aria-label="Previous search match">← Prev match</button>
+          <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
         </div>
       </div>
-
-      <!-- OCR Panel -->
-      <div id="panel-ocr" class="view-panel">
-        <div class="panel-toolbar">
-          <a class="toolbar-btn" href="{html.escape(ocr_standalone_href, quote=True)}" target="_blank" rel="noopener noreferrer">↗ Open bulletin text in new tab (distraction-free)</a>
-        </div>
-        <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
-          <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
-          <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
-          <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
-          <span class="ocr-zoom-hint">or pinch to zoom</span>
-        </div>
-        <div class="ocr-search-bar">
-          <input id="ocr-search" class="search-input" type="search" placeholder="🔍 Search OCR text..." aria-label="Search OCR text" />
-          <button id="clear-search" class="search-clear" type="button" aria-label="Clear OCR search" hidden>×</button>
-        </div>
-        <div class="ocr-search-tools">
-          <span id="ocr-match-count" class="match-count">0 matches</span>
-          <div>
-            <button id="ocr-prev" type="button" disabled aria-label="Previous search match">← Prev match</button>
-            <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
-          </div>
-        </div>
-        <div id="ocr-panel">{ocr_fragment}</div>
-        <div class="note-box">This bulletin text is auto-generated from the PDF. Irish (Gaeilge) and English are kept as printed. Please verify mass times and names against the original PDF.</div>
-      </div>
-
+      <div id="ocr-panel">{ocr_fragment}</div>
+      <div class="note-box">The plain text OCR version is auto-generated and may contain errors so it is always best to double check with the original PDF. OCR (Optical Character Recognition) is technology that turns images of text into editable, searchable digital text.</div>
     </div>
 
     <!-- Parish Links Section -->
     <section class="parish-section">
-      <h2>{html.escape(parish_section_heading)}</h2>
+      <h2 class="section-heading">{html.escape(parish_section_heading)}</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="🔍 Filter parishes..." aria-label="Filter parishes" />
       {parish_links_html}
     </section>
@@ -1657,19 +1732,22 @@ def render_bulletin_viewer_shell(
   </footer>
 
   <script>
-    // Tab Switching
-    function switchTab(tabName, button) {{
-      document.querySelectorAll('.view-panel').forEach(function(panel) {{
-        panel.classList.remove('active');
+    // PDF fullscreen shortcut (the browser's own PDF viewer already
+    // supplies page number / zoom / print controls inside the iframe).
+    (function () {{
+      var wrap = document.getElementById('pdf-frame-wrap');
+      var btn = document.getElementById('pdf-fullscreen-btn');
+      if (!wrap || !btn) return;
+      btn.addEventListener('click', function () {{
+        try {{
+          if (wrap.requestFullscreen) {{
+            wrap.requestFullscreen();
+          }} else if (wrap.webkitRequestFullscreen) {{
+            wrap.webkitRequestFullscreen();
+          }}
+        }} catch (e) {{}}
       }});
-      document.querySelectorAll('.tab-btn').forEach(function(btn) {{
-        btn.classList.remove('active');
-        btn.setAttribute('aria-selected', 'false');
-      }});
-      document.getElementById('panel-' + tabName).classList.add('active');
-      button.classList.add('active');
-      button.setAttribute('aria-selected', 'true');
-    }}
+    }})();
 
     (function () {{
       var KEY = 'ph_ocr_scale';
