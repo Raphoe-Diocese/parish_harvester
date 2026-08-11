@@ -34,10 +34,21 @@ EVIDENCE_DIOCESE_KEYS = {
 class HeroSlide:
     """One slide of the homepage hero slider.
 
-    Set ``image`` to a path relative to ``docs/`` (e.g.
-    ``"assets/hero/slide-1.jpg"``) to use a real photo instead of the CSS
-    gradient placeholder — see ``docs/assets/hero/README.md`` for details.
-    Frank can swap these in without touching any generated HTML.
+    Set ``image`` to a photo URL (a full ``https://`` URL, e.g. a Wikimedia
+    Commons hotlink, or a path relative to ``docs/`` such as
+    ``"assets/hero/slide-1.jpg"`` for a locally-hosted file) to use a real
+    photo instead of the CSS gradient placeholder — see
+    ``docs/assets/hero/README.md`` for details. Frank can swap these in
+    without touching any generated HTML.
+
+    ``credit`` is the small on-image attribution line legally required by
+    CC-licensed photos (e.g. ``"Photo: Jane Doe / Wikimedia Commons / CC
+    BY-SA 4.0"``) — leave as ``None`` for public-domain images or your own
+    photos that need no credit.
+
+    ``position`` is a CSS ``background-position`` value (default
+    ``"center"``) — useful for tall/portrait source photos where the
+    interesting part (e.g. cathedral spires) isn't in the vertical middle.
     """
 
     gradient: str
@@ -45,31 +56,52 @@ class HeroSlide:
     title: str
     subtitle: str
     image: str | None = None
+    credit: str | None = None
+    position: str = "center"
 
 
-# Placeholder slides — tasteful CSS gradients with overlaid text. No real
-# photos have been supplied yet; see docs/assets/hero/README.md for how to
-# add them (just set `image=` below, nothing else needs to change).
+# Cathedral photos for the 3 live dioceses, sourced from Wikimedia Commons
+# (all confirmed Creative Commons licensed on their individual file pages —
+# see the "Photo credits" section of docs/assets/hero/README.md for the
+# full license/author/source details for each). Falls back to a CSS
+# gradient automatically if `image` is ever cleared — see HeroSlide above
+# and docs/assets/hero/README.md for how to swap any of these out.
 HERO_SLIDES: list[HeroSlide] = [
     HeroSlide(
-        image=None,
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/"
+            "Letterkenny_-_Cathedral_of_St._Eunan_and_St._Columba_-_20190421142600.jpg/"
+            "1280px-Letterkenny_-_Cathedral_of_St._Eunan_and_St._Columba_-_20190421142600.jpg"
+        ),
+        credit="Photo: Dieglop / Wikimedia Commons / CC BY-SA 4.0",
         gradient="linear-gradient(135deg, #0f3d3d 0%, #1a6b6b 55%, #3fae9a 100%)",
-        eyebrow="Raphoe · Derry · Down & Connor",
-        title="Parish bulletins, all in one place",
+        eyebrow="Raphoe Diocese",
+        title="Cathedral of St. Eunan and St. Columba, Letterkenny",
         subtitle="Auto-collected every Sunday, free forever.",
     ),
     HeroSlide(
-        image=None,
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/"
+            "Derry_St._Eugene%27s_Cathedral_2019_09_29.jpg/"
+            "1280px-Derry_St._Eugene%27s_Cathedral_2019_09_29.jpg"
+        ),
+        credit="Photo: Andreas F. Borchert / Wikimedia Commons / CC BY-SA 4.0",
         gradient="linear-gradient(135deg, #1f2f52 0%, #35508f 55%, #6f8fd4 100%)",
-        eyebrow="Every parish, every week",
-        title="Read the bulletin, or search the text",
+        eyebrow="Derry Diocese",
+        title="St Eugene's Cathedral, Derry",
         subtitle="Full PDF viewer and searchable OCR text for every bulletin we collect.",
     ),
     HeroSlide(
-        image=None,
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/"
+            "BELFAST%2C_St_Peter%27s_Cathedral_Ext_%2851103078079%29.jpg/"
+            "1280px-BELFAST%2C_St_Peter%27s_Cathedral_Ext_%2851103078079%29.jpg"
+        ),
+        credit="Photo: The National Churches Trust / Wikimedia Commons / CC BY 2.0",
+        position="center 35%",
         gradient="linear-gradient(135deg, #4a2545 0%, #7a3b66 55%, #c47a9a 100%)",
-        eyebrow="Built for the whole community",
-        title="No app, no login — just open and read",
+        eyebrow="Down & Connor Diocese",
+        title="St Peter's Cathedral, Belfast",
         subtitle="Works on any phone, tablet or computer. Subscribe by RSS or calendar if you'd like a nudge.",
     ),
 ]
@@ -83,11 +115,14 @@ def _hero_slider_html() -> str:
     for i, slide in enumerate(HERO_SLIDES):
         bg = (
             f"linear-gradient(180deg, rgba(10,20,20,0.15) 0%, rgba(10,20,20,0.72) 100%), "
-            f"url('{html.escape(slide.image, quote=True)}') center/cover no-repeat"
+            f"url('{html.escape(slide.image, quote=True)}') {slide.position}/cover no-repeat"
             if slide.image
             else slide.gradient
         )
         active = " is-active" if i == 0 else ""
+        credit_html = (
+            f'<p class="hero-slide-credit">{html.escape(slide.credit)}</p>' if slide.credit else ""
+        )
         slides_html.append(
             f'<div class="hero-slide{active}" style="background:{bg};" '
             f'role="group" aria-roledescription="slide" aria-label="{i + 1} of {len(HERO_SLIDES)}" '
@@ -95,6 +130,7 @@ def _hero_slider_html() -> str:
             f'<p class="hero-slide-eyebrow">{html.escape(slide.eyebrow)}</p>'
             f'<h1 class="hero-slide-title">{html.escape(slide.title)}</h1>'
             f'<p class="hero-slide-subtitle">{html.escape(slide.subtitle)}</p>'
+            f"{credit_html}"
             "</div>"
         )
         dots_html.append(
@@ -645,6 +681,7 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     .hero-slide-eyebrow {{ margin: 0; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #d8f3ee; text-shadow: 0 1px 3px rgba(0,0,0,0.35); }}
     .hero-slide-title {{ margin: 0; font-size: clamp(1.4rem, 4vw, 2.35rem); line-height: 1.15; font-weight: 800; max-width: 46rem; text-shadow: 0 2px 8px rgba(0,0,0,0.35); }}
     .hero-slide-subtitle {{ margin: 0; font-size: clamp(0.9rem, 1.6vw, 1.05rem); color: #eef7f5; max-width: 40rem; text-shadow: 0 1px 4px rgba(0,0,0,0.35); }}
+    .hero-slide-credit {{ position: absolute; right: 10px; bottom: 8px; margin: 0; font-size: 0.7rem; color: rgba(255,255,255,0.85); text-shadow: 0 1px 3px rgba(0,0,0,0.6); }}
     .hero-nav {{
       position: absolute; top: 50%; transform: translateY(-50%);
       width: 38px; height: 38px; border-radius: 999px; border: none;
