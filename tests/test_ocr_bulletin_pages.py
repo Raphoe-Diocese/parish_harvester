@@ -11,7 +11,9 @@ from ocr.generate_bulletin_pages import (
     extract_ocr_fragment,
     format_uk_date,
     parse_parish_links,
+    render_bulletin_viewer_shell,
     render_ocr_standalone_page,
+    render_pdf_standalone_page,
     render_viewer_page,
 )
 
@@ -93,6 +95,57 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertNotIn("pdf-controls", html_output)
             self.assertIn("pdf-frame-wrap", html_output)
             self.assertIn('target="_blank"', html_output)
+            # Both "open in new tab, no distractions" links must be visible
+            # from the main viewer page's toolbar (audit gap fix).
+            self.assertIn("test-2026-05-19-pdf.html", html_output)
+            self.assertIn("Distraction-free view", html_output)
+            self.assertIn("test-2026-05-19-ocr.html", html_output)
+            self.assertIn("distraction-free", html_output.lower())
+
+    def test_render_pdf_standalone_page(self) -> None:
+        config = DioceseConfig(
+            key="test",
+            display_name="Test Diocese",
+            headline="TEST DIOCESE BIG BULLETIN",
+            evidence_path=Path("unused.txt"),
+            pdf_filename="test_mega_bulletin.pdf",
+        )
+        html_output = render_pdf_standalone_page(
+            config=config,
+            bulletin_date="2026-05-19",
+            pdf_href="../mega_pdf/test_mega_bulletin.pdf",
+            viewer_href="test-2026-05-19.html",
+        )
+        self.assertIn("../mega_pdf/test_mega_bulletin.pdf", html_output)
+        self.assertIn('href="test-2026-05-19.html"', html_output)
+        self.assertIn("<iframe", html_output)
+        self.assertIn("embed-mode", html_output)
+
+    def test_render_bulletin_viewer_shell_is_shared_canonical_design(self) -> None:
+        """harvester.page_renderer.render_diocese_raphoe_page also calls this —
+        this is the single source of truth for the bulletin viewer design."""
+        html_output = render_bulletin_viewer_shell(
+            page_title="Example Diocese Collated Bulletin",
+            diocese_label="EXAMPLE",
+            display_name="Example Diocese",
+            headline="Example Collated Bulletin",
+            meta_line="This week's bulletin — 19/05/2026.",
+            back_href="../../index.html",
+            back_label="← Back to home",
+            pdf_href="https://example.com/example_mega_bulletin.pdf",
+            pdf_download_href="https://example.com/example_mega_bulletin.pdf",
+            pdf_standalone_href="https://example.com/example-pdf.html",
+            ocr_standalone_href="https://example.com/example-ocr.html",
+            ocr_fragment="<p>Sunday mass at 10am</p>",
+            parish_section_heading="EXAMPLE Parishes with Working Bulletin Links",
+            parish_links_html='<ul class="parish-grid"><li>Example Parish</li></ul>',
+        )
+        self.assertIn("Sunday mass at 10am", html_output)
+        self.assertIn('id="panel-pdf"', html_output)
+        self.assertIn('id="panel-ocr"', html_output)
+        self.assertIn("https://example.com/example-pdf.html", html_output)
+        self.assertIn("https://example.com/example-ocr.html", html_output)
+        self.assertIn("← Back to home", html_output)
 
     def test_render_ocr_standalone_page(self) -> None:
         config = DioceseConfig(

@@ -6,9 +6,7 @@ from datetime import UTC, datetime
 from pathlib import Path
 from string import Template
 
-TEMPLATE_PATH = Path(__file__).resolve().parent / "templates" / "diocese_page.html"
 CURRENT_TEMPLATE_PATH = Path(__file__).resolve().parent / "templates" / "diocese_page_current.html"
-RAPHOE_TEMPLATE_PATH = Path(__file__).resolve().parent / "templates" / "diocese_page_raphoe.html"
 ISSUES_URL = "https://github.com/Raphoe-Diocese/parish_harvester/issues/new"
 EMPTY_OCR_TEXT = "We're still collecting OCR text for this diocese. Check back next Sunday."
 GITHUB_RAW_BASE = "https://raw.githubusercontent.com/Raphoe-Diocese/parish_harvester/main/Bulletins/current"
@@ -38,31 +36,6 @@ def _render_parish_links(
             f'<li{li_class}><a href="{url}" target="_blank" rel="noopener noreferrer">{name}{suffix}</a></li>'
         )
     return f'<ul class="parish-list">{"".join(items)}</ul>'
-
-
-def _render_parish_accordion(parish_links: list[dict]) -> str:
-    if not parish_links:
-        return '<p class="empty-state">No parish links available yet.</p>'
-
-    items: list[str] = []
-    seen: set[str] = set()
-    for link in sorted(parish_links, key=lambda item: str(item.get("name") or "").lower()):
-        name = str(link.get("name") or "Unnamed Parish").strip()
-        url = str(link.get("url") or "#").strip()
-        key = re.sub(r"[^a-z0-9]+", "", name.lower())
-        if not name or key in seen:
-            continue
-        seen.add(key)
-        items.append(
-            f'<li><a href="{html.escape(url, quote=True)}" target="_blank" rel="noopener noreferrer">{html.escape(name)}</a></li>'
-        )
-
-    return (
-        '<details class="parish-accordion">'
-        '<summary class="parish-accordion-toggle">Working links</summary>'
-        f'<ul class="parish-link-grid">{"".join(items)}</ul>'
-        "</details>"
-    )
 
 
 def _render_parish_dropdown(parish_links: list[dict]) -> str:
@@ -133,12 +106,12 @@ def _clean_embedded_ocr_html(fragment: str) -> str:
     return text.strip()
 
 
-def _build_ocr_block(ocr_text: str, *, ocr_is_html: bool = False) -> str:
+def _build_ocr_fragment(ocr_text: str, *, ocr_is_html: bool = False) -> str:
+    """Prepare OCR content for the shared ``#ocr-panel`` slot (see ocr.generate_bulletin_pages)."""
     normalized = (ocr_text or "").strip() or EMPTY_OCR_TEXT
     if ocr_is_html:
-        cleaned = _clean_embedded_ocr_html(normalized)
-        return f'<div class="ocr-body" id="ocr-text">{cleaned}</div>'
-    return f'<pre class="ocr-pre" id="ocr-text">{html.escape(normalized)}</pre>'
+        return _clean_embedded_ocr_html(normalized)
+    return f'<pre style="white-space:pre-wrap;margin:0;font-family:inherit;">{html.escape(normalized)}</pre>'
 
 
 def render_diocese_raphoe_page(
@@ -151,36 +124,51 @@ def render_diocese_raphoe_page(
     week_label: str = "",
     diocese_display_name: str = "Raphoe Diocese",
     headline: str = "Raphoe Collated Bulletin",
-    parish_heading: str = "Working parish links",
-    bulletin_viewer_url: str = "../../bulletins/index.html",
     ocr_standalone_url: str = "../../bulletins/index.html",
+    pdf_standalone_url: str = "",
 ) -> None:
-    template = Template(RAPHOE_TEMPLATE_PATH.read_text(encoding="utf-8"))
+    """Render a diocese's "current" landing page.
+
+    Uses :func:`ocr.generate_bulletin_pages.render_bulletin_viewer_shell` — the
+    same canonical PDF + Text Bulletin viewer design used for the dated
+    bulletin-archive pages — so Raphoe, Derry and Down & Connor always look
+    and behave identically. Despite the historical function name this now
+    renders every live diocese's page, not just Raphoe's.
+    """
+    from ocr.generate_bulletin_pages import render_bulletin_viewer_shell, render_parish_link_grid
+
     week_suffix = f" — {week_label}" if week_label else ""
     display = str(diocese_display_name or "Diocese").strip()
     short = display.removesuffix(" Diocese").strip() or display
     if short == "Down and Connor":
         short = "Down & Connor"
-    ocr_url = str(ocr_standalone_url or "").strip()
-    ocr_embed = ocr_url
-    if ocr_embed and "embed=1" not in ocr_embed:
-        ocr_embed = f"{ocr_embed}{'&' if '?' in ocr_embed else '?'}embed=1"
-    payload = {
-        "page_title": html.escape(f"{display} Collated Bulletin{week_suffix}"),
-        "headline": html.escape(headline),
-        "mega_pdf_url": html.escape(mega_pdf_url, quote=True),
-        "bulletin_viewer_url": html.escape(bulletin_viewer_url, quote=True),
-        "ocr_standalone_url": html.escape(ocr_url, quote=True),
-        "ocr_embed_url": html.escape(ocr_embed, quote=True),
-        "ocr_iframe_title": html.escape(f"{short} text bulletin", quote=True),
-        "ocr_block_html": _build_ocr_block(ocr_text, ocr_is_html=ocr_is_html),
-        "parish_heading": html.escape(parish_heading),
-        "parish_accordion_html": _render_parish_accordion(parish_links),
-        "year": str(datetime.now(UTC).year),
-        "issues_url": html.escape(ISSUES_URL, quote=True),
-    }
+    diocese_label = short.upper()
+    meta_line = f"This week's bulletin — {week_label}." if week_label else "Updated automatically every Sunday."
+    pdf_url = str(mega_pdf_url or "").strip()
+
+    tuple_links = [
+        (str(link.get("name") or "Unnamed Parish"), str(link.get("url") or ""))
+        for link in parish_links
+    ]
+
+    html_doc = render_bulletin_viewer_shell(
+        page_title=f"{display} Collated Bulletin{week_suffix}",
+        diocese_label=diocese_label,
+        display_name=display,
+        headline=headline,
+        meta_line=meta_line,
+        back_href="../../index.html",
+        back_label="← Back to home",
+        pdf_href=pdf_url,
+        pdf_download_href=pdf_url,
+        pdf_standalone_href=str(pdf_standalone_url or "").strip() or pdf_url,
+        ocr_standalone_href=str(ocr_standalone_url or "").strip(),
+        ocr_fragment=_build_ocr_fragment(ocr_text, ocr_is_html=ocr_is_html),
+        parish_section_heading=f"{diocese_label} Parishes with Working Bulletin Links",
+        parish_links_html=render_parish_link_grid(tuple_links),
+    )
     out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(template.safe_substitute(payload), encoding="utf-8")
+    out_path.write_text(html_doc, encoding="utf-8")
 
 
 def render_diocese_current_page(
@@ -225,37 +213,5 @@ def render_diocese_current_page(
         "year": str(datetime.now(UTC).year),
         "issues_url": html.escape(ISSUES_URL, quote=True),
     }
-    out_path.parent.mkdir(parents=True, exist_ok=True)
-    out_path.write_text(template.safe_substitute(payload), encoding="utf-8")
-
-
-def render_diocese_page(
-    diocese_key: str,
-    diocese_display_name: str,
-    mega_pdf_url: str,
-    ocr_text: str,
-    parish_links: list[dict],
-    out_path: Path,
-    archive_viewer_url: str = "../../bulletins/index.html",
-    ocr_standalone_url: str = "../../bulletins/index.html",
-) -> None:
-    template = Template(TEMPLATE_PATH.read_text(encoding="utf-8"))
-    display = str(diocese_display_name or diocese_key).strip() or diocese_key
-    normalized_ocr = (ocr_text or "").strip() or EMPTY_OCR_TEXT
-
-    payload = {
-        "page_title": html.escape(f"{display} Diocese Big Bulletin"),
-        "diocese_display_name": html.escape(display),
-        "headline": html.escape(f"{display.upper()} DIOCESE COLLATED BULLETIN"),
-        "mega_pdf_url": html.escape(mega_pdf_url, quote=True),
-        "archive_viewer_url": html.escape(archive_viewer_url, quote=True),
-        "ocr_standalone_url": html.escape(ocr_standalone_url, quote=True),
-        "ocr_text": html.escape(normalized_ocr),
-        "parish_heading": html.escape(f"{display.upper()} PARISHES WITH WORKING BULLETIN LINKS"),
-        "parish_links_html": _render_parish_links(parish_links),
-        "year": str(datetime.now(UTC).year),
-        "issues_url": html.escape(ISSUES_URL, quote=True),
-    }
-
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(template.safe_substitute(payload), encoding="utf-8")
