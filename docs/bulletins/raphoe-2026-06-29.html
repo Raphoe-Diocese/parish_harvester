@@ -21,46 +21,51 @@
     h1 { margin: 0 0 8px; color: #1a6b6b; font-size: clamp(1.8rem, 3vw, 2.5rem); }
     .meta { color: #6b7280; font-size: 0.95rem; }
     
-    /* Tabs */
-    .tabs {
-      display: flex;
-      justify-content: center;
-      gap: 10px;
-      margin: 0 0 20px;
-      padding: 16px 0;
-      background: #e8edf5;
-      border-bottom: 2px solid #c7d2e8;
-    }
-    .tab-btn {
-      padding: 12px 28px;
-      border: 2px solid #1a6b6b;
-      border-radius: 8px;
-      background: white;
-      color: #1a6b6b;
+    /* Top download link — plain, prominent, right under the headline */
+    .download-link-top {
+      display: inline-block;
+      margin-top: 4px;
       font-weight: 700;
       font-size: 1rem;
-      cursor: pointer;
-      transition: all 0.2s;
+      color: #1a6b6b;
     }
-    .tab-btn:hover {
-      background: #f0f4f8;
+
+    /* Section headings — "BULLETIN — ORIGINAL PDF VERSION" style dividers
+       between the always-visible PDF and OCR panels below (no tabs). */
+    .section-heading {
+      margin: 30px 0 14px;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.06em;
+      font-weight: 800;
+      font-size: 1.05rem;
+      color: #14524f;
     }
-    .tab-btn.active {
-      background: #1a6b6b;
-      color: white;
+
+    /* Pro-tip callout between the PDF and OCR sections */
+    .callout-tip {
+      margin: 18px auto;
+      max-width: 720px;
+      text-align: center;
+      background: #fff4df;
+      border: 1px solid #f5c451;
+      border-radius: 999px;
+      padding: 10px 22px;
+      color: #7a4a00;
+      font-size: 0.92rem;
+      font-weight: 600;
     }
-    
-    /* Panel container */
-    .panel-container { position: relative; }
-    .view-panel {
-      display: none;
+    .callout-tip strong { font-weight: 800; }
+
+    /* Viewer blocks — PDF and OCR are both always visible, stacked, no tabs */
+    .viewer-block {
       background: white;
       border: 1px solid #d6ecea;
       border-radius: 16px;
       padding: 20px;
       box-shadow: 0 4px 12px rgba(26, 107, 107, 0.08);
+      margin-bottom: 8px;
     }
-    .view-panel.active { display: block; }
     
     /* Toolbar */
     .panel-toolbar {
@@ -91,8 +96,11 @@
       text-decoration: none;
     }
     
-    /* PDF View — native scroll fills the screen; no page-flip controls */
+    /* PDF View — the browser's own PDF viewer supplies page number, zoom
+       and print/download controls inside the iframe; we only add a small
+       fullscreen shortcut on top of it. */
     .pdf-frame-wrap {
+      position: relative;
       height: 92vh;
       min-height: 92vh;
       overflow: hidden;
@@ -106,6 +114,22 @@
       border: 0;
       display: block;
     }
+    .fullscreen-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 5;
+      width: 36px;
+      height: 36px;
+      border: 1px solid #1a6b6b;
+      border-radius: 6px;
+      background: rgba(255, 255, 255, 0.92);
+      color: #1a6b6b;
+      font-size: 1.1rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .fullscreen-btn:hover { background: #fff; }
     .ocr-search-bar {
       position: relative;
       margin-bottom: 12px;
@@ -363,12 +387,9 @@
       border-radius: 10px;
       padding: 16px;
     }
-    .parish-section h2 {
-      margin: 0 0 12px;
+    .parish-section h2.section-heading {
       color: #1e3a5f;
-      font-size: 1.05rem;
-      font-weight: 600;
-      text-align: left;
+      font-size: 1.2rem;
     }
     .parish-filter {
       width: 100%;
@@ -431,8 +452,6 @@
     /* Responsive */
     @media (max-width: 900px) {
       ul.parish-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-      .tabs { flex-direction: column; align-items: stretch; padding: 12px; }
-      .tab-btn { width: 100%; }
     }
     @media (max-width: 600px) {
       .page { padding: 16px 12px; }
@@ -442,12 +461,13 @@
         min-height: 90vh;
       }
       .ocr-search-tools { flex-direction: column; }
-      .ocr-search-tools button, .tab-btn {
+      .ocr-search-tools button {
         min-height: 48px;
         width: 100%;
       }
       .panel-toolbar { justify-content: stretch; }
       .toolbar-btn { flex: 1; justify-content: center; min-height: 48px; }
+      .callout-tip { margin-left: 8px; margin-right: 8px; }
     }
   </style>
 </head>
@@ -458,52 +478,51 @@
       <p class="diocese-label">RAPHOE</p>
       <h1>Raphoe Collated Bulletin</h1>
       <p class="meta">Generated for 29/06/2026.</p>
+      <a class="download-link-top" href="../mega_pdf/raphoe_mega_bulletin.pdf" download>⬇ Download PDF</a>
     </header>
 
-    <!-- Tabs -->
-    <div class="tabs" role="tablist" aria-label="Bulletin view">
-      <button class="tab-btn active" type="button" role="tab" aria-selected="true" data-tab="pdf" onclick="switchTab('pdf', this)">📄 Parish Bulletin (PDF)</button>
-      <button class="tab-btn" type="button" role="tab" aria-selected="false" data-tab="ocr" onclick="switchTab('ocr', this)">📝 Text Bulletin</button>
+    <!-- PDF section: always visible (no tab click needed), original PDF first -->
+    <h2 class="section-heading">Bulletin — Original PDF Version</h2>
+    <div id="panel-pdf" class="viewer-block">
+      <div class="panel-toolbar">
+        <a class="toolbar-btn" href="../mega_pdf/raphoe_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer">↗ Open PDF in new tab</a>
+        <a class="toolbar-btn" href="raphoe-2026-06-29-pdf.html" target="_blank" rel="noopener noreferrer">🖥 Distraction-free view</a>
+        <a class="toolbar-btn" href="../mega_pdf/raphoe_mega_bulletin.pdf" download>⬇ Download PDF</a>
+      </div>
+      <div class="pdf-frame-wrap" id="pdf-frame-wrap">
+        <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
+        <iframe src="../mega_pdf/raphoe_mega_bulletin.pdf" title="Raphoe Diocese bulletin PDF"></iframe>
+      </div>
     </div>
 
-    <!-- Panel Container -->
-    <div class="panel-container">
-      
-      <!-- PDF Panel: native browser PDF (scroll all pages; links open in viewer) -->
-      <div id="panel-pdf" class="view-panel active">
-        <div class="panel-toolbar">
-          <a class="toolbar-btn" href="../mega_pdf/raphoe_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer">↗ Open PDF in new tab</a>
-          <a class="toolbar-btn" href="raphoe-2026-06-29-pdf.html" target="_blank" rel="noopener noreferrer">🖥 Distraction-free view</a>
-          <a class="toolbar-btn" href="../mega_pdf/raphoe_mega_bulletin.pdf" download>⬇ Download PDF</a>
-        </div>
-        <div class="pdf-frame-wrap">
-          <iframe src="../mega_pdf/raphoe_mega_bulletin.pdf" title="Raphoe Diocese bulletin PDF"></iframe>
+    <p class="callout-tip">🔍 <strong>Pro tip: find text instantly.</strong> Use the search box below (or your browser's Ctrl/Cmd+F) to jump straight to a parish, name or notice in the text version underneath.</p>
+
+    <!-- OCR section: one continuous, page-ordered document — no per-parish
+         dropdown/accordion. Reads exactly like the PDF, just as searchable
+         text. -->
+    <h2 class="section-heading">Bulletin — OCR Extracted Plain Text</h2>
+    <div id="panel-ocr" class="viewer-block">
+      <div class="panel-toolbar">
+        <a class="toolbar-btn" href="raphoe-2026-06-29-ocr.html" target="_blank" rel="noopener noreferrer">↗ Open bulletin text in new tab (distraction-free)</a>
+      </div>
+      <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+        <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+        <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+        <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+        <span class="ocr-zoom-hint">or pinch to zoom</span>
+      </div>
+      <div class="ocr-search-bar">
+        <input id="ocr-search" class="search-input" type="search" placeholder="🔍 Search OCR text..." aria-label="Search OCR text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear OCR search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled aria-label="Previous search match">← Prev match</button>
+          <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
         </div>
       </div>
-
-      <!-- OCR Panel -->
-      <div id="panel-ocr" class="view-panel">
-        <div class="panel-toolbar">
-          <a class="toolbar-btn" href="raphoe-2026-06-29-ocr.html" target="_blank" rel="noopener noreferrer">↗ Open bulletin text in new tab (distraction-free)</a>
-        </div>
-        <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
-          <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
-          <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
-          <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
-          <span class="ocr-zoom-hint">or pinch to zoom</span>
-        </div>
-        <div class="ocr-search-bar">
-          <input id="ocr-search" class="search-input" type="search" placeholder="🔍 Search OCR text..." aria-label="Search OCR text" />
-          <button id="clear-search" class="search-clear" type="button" aria-label="Clear OCR search" hidden>×</button>
-        </div>
-        <div class="ocr-search-tools">
-          <span id="ocr-match-count" class="match-count">0 matches</span>
-          <div>
-            <button id="ocr-prev" type="button" disabled aria-label="Previous search match">← Prev match</button>
-            <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
-          </div>
-        </div>
-        <div id="ocr-panel"><div class="parish-row-empty parish-even" id="parish-annagryparish">
+      <div id="ocr-panel"><div class="parish-row-empty parish-even" id="parish-annagryparish">
   <span class="parish-name">Annagry</span>
   <span class="parish-empty">No searchable text available this week.</span>
   <a class="parish-source" href="https://annagryparish.ie/newsletter-2/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
@@ -528,468 +547,459 @@
   <span class="parish-empty">No searchable text available this week.</span>
   <a class="parish-source" href="https://www.steunanscathedral.ie/newsletter/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
 </div>
-<details class="parish-block parish-odd" id="parish-drumholm-parish">
-  <summary class="parish-head">
-    <span class="parish-name">Drumholm</span>
-    <a class="parish-source" href="https://www.parishpress.net/wp-content/uploads/parish-bulletins/donegal/raphoe/drumholm-parish/bulletin.pdf?t=1782303743" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p>Bailtín.<br>
-Fr Adrian Gavigan.<br>
-Tel:<br>
-<a href="tel:+353743734642" style="color:#1d4ed8;font-weight:600;">074 37 34642</a><br>
-or<br>
-<a href="tel:+353879685480" style="color:#1d4ed8;font-weight:600;">087 9685480</a><br>
-EMAIL:<br>
-<a href="mailto:drumholmparish@gmail.com" target="_blank" rel="noopener noreferrer">drumholmparish@gmail.com</a><br>
-FACEBOOK: DRUMHOLM RC PARISH.<br>
-ST VINCENT DE PAUL:<br>
-<a href="tel:+353879338430" style="color:#1d4ed8;font-weight:600;">087 9338430</a><br>
-12TH SUNDAY IN ORDINARY TIME<br>
-SATURDAY 20TH JUNE.<br>
-06.30pm<br>
-CHARLES TIMONEY.<br>
-MARY &amp; HUGH McGROGRY.<br>
-JOHN CLEARY.<br>
-SUNDAY 21ST JUNE.<br>
-11.00am<br>
-MARGARET GALLAGHER.<br>
-MONDAY 2ND JUNE.<br>
-NO MASS<br>
-TUESDAY 23RD JUNE.<br>
-NO MASS<br>
-WEDNESDAY 24TH JUNE.<br>
-NO MASS<br>
-THURSDAY 25TH JUNE.<br>
-NO MASS<br>
-FRIDAY 26TH JUNE.<br>
-10.00am<br>
-MASS<br>
-06.30pm<br>
-SATURDAY 27TH JUNE.<br>
-PRO POPULO<br>
-11.00am<br>
-SUNDAY 28TH JUNE.<br>
-AISLINN ANDERSON - Months Mind.<br>
-SIGNED MASS CARDS<br>
-Signed Mass Cards / Bouquets will be available from the Sacristy and Parochial House.<br>
-Signed L.<br>
-MASS INTENTIONS;<br>
-Anniversaries: Names for inclusion on the July Anniversaries will be offered at your Mass early.<br>
-PARISH COLLECTIONS<br>
-A big thank you to everyone who continues to support the parish.<br>
-Contributions can be made in the normal way or they can be made electronically:<br>
-Bank: Bank Ireland, Donegal.<br>
-Acc Name: Drumholm RC Parish;<br>
-Account No: 27936239;<br>
-IBAN: IE50BOI84091527396239.<br>
-BIC: BOFII E2D<br>
-If electronic payments please include your name and the envelope number.<br>
-Collection - €1,360.00<br>
-UPCOMING EVENTS IN ST BRIDGET'S CHURCH.<br>
-Graveyard Sunday 2nd Aug 2026.<br>
-Mass will be outdoors weather permitting.<br>
-ANNUAL FRANCISCAN PILGRIMAGE TO KNOCK.<br>
-on Sunday the 28th of June - €30 euro return trip. Mass in the Basilica and rosary procession. Leaving Ards at 7am with pick-ups in Creeslough &amp; Letterkenny. For more info contact<br>
-<a href="mailto:info@ardsfriary.ie" target="_blank" rel="noopener noreferrer">info@ardsfriary.ie</a><br>
-or<br>
-<a href="tel:+353749138050" style="color:#1d4ed8;font-weight:600;">074 9138050</a><br>
-.<br>
-VOCATIONS MONSTRANCE - FROM 9TH TO 1TH JULY.<br>
-The “Vocations Monstrance” is part of the Church's ongoing commitment to promote and foster vocations to the priesthood and religious life. The monstrance will be in various churches in the Diocese to encourage prayer for vocations and to deepen young people’s awareness of God’s call in their lives. Through prayer before the Blessed Sacrament, we ask the Lord to raise up generous and joyful servants for His Church.<br>
-Vocations are born in prayer, sustained by prayer, and strengthened through prayer.<br>
-Any parish wishing to have the “Vocations Monstrance” during these 2 weeks, please see Fr. Roy Brady at<br>
-<a href="mailto:vocations@raphoediocese.ie" target="_blank" rel="noopener noreferrer">vocations@raphoediocese.ie</a><br>
-.<br>
-CELEBRATING THE WORLD DAY FOR GRANDPARENTS AND THE ELDERLY.<br>
-Sun 26th July 2026 - KNOCK SHRINE<br>
-Commencing at 2.30pm with The Anointing of the Sick, A day of Grace &amp; BLESSING for the whole FAMILY as we Honor GRANDPARENTS &amp; THE ELDERLY. All are welcome. Visit our Web for resources:<br>
-<a href="https://www.nationalgrandparentsassociation.org" target="_blank" rel="noopener noreferrer">www.nationalgrandparentsassociation.org</a><br>
-- POSTER IN ADDITIONAL NEWS.<br>
-DAY OF LIFE SUN 21ST JUNE.<br>
-On this year’s Day for Life, Sunday 21st June, we reflect on the wonder of human life from the moment of conception. We remember how the LORD JESUS Christ Himself sanctified and experienced the beginning of life in the world as an unborn child, hidden in the womb of Mary. Mary knew that she was carrying the Son of God - God and man - as soon as He was conceived. John the Baptist leapt in his mother Elizabeth’s womb when Mary greeted her.<br>
-Our Lady treasured our Lord in her heart and womb until his birth. To read the full bishops' message visit<br>
-<a href="https://www.councilforlife.ie" target="_blank" rel="noopener noreferrer">www.councilforlife.ie</a><br>
-.<br>
-PRAYER FOR THE 19TH SUNDAY IN ORDINARY TIME.<br>
-“Lord, our guide and protector, Grant us an undiluting respect for your name And keep us always in your love. When the storms of life surround us, Give us the courage to not be afraid. Remind us of our worth in your eyes, And help us to place all our trust in your guiding providence. Through our Lord Jesus Christ, your Son, Who lives and reigns with you and the Holy Spirit, God, forever and ever. Amen.”<br>
-Holy Cross Church, Dunfanaghy<br>
-Fr. Martin Doohan P.P<br>
-Clondahorkey. (Dunfanaghy &amp; Creeslough).<br>
-Tel:<br>
-<a href="tel:+353749136163" style="color:#1d4ed8;font-weight:600;">074-91-36163</a><br>
-Mobile:<br>
-<a href="tel:+353876132132" style="color:#1d4ed8;font-weight:600;">087-6132132</a><br>
-Fr. John Joe Duffy C.C. Creeslough<br>
-Tel:<br>
-<a href="tel:+353749138011" style="color:#1d4ed8;font-weight:600;">074-91-38011</a><br>
-Mobile:<br>
-<a href="tel:+353873143532" style="color:#1d4ed8;font-weight:600;">087-3143532</a><br>
-12th Sunday in Ordinary Time - 21st June 2026<br>
-Masses for the Coming Week<br>
-Day<br>
-Time<br>
-Mon<br>
-No Mass<br>
-Tue<br>
-7pm A Special Intention<br>
-Wed<br>
-9.30am Mass of St. Peregrine R.I.P. - Willie Canon, Noreen Gallagher Martin McElhinney (50th Anniversary Mass)<br>
-Thur<br>
-9.30am Holy Cross National School end of year Mass<br>
-Fri<br>
-9.30am The Holy Souls<br>
-Sat<br>
-6.00pm Mass for all Our Beloved Dead<br>
-Sun<br>
-10.00am Dorothy McCarry, Kildarragh<br>
-11.30am Mass Pro Populo<br>
-3.00pm GRAVEYARD SERVICE FOR ALL OUR DEAD<br>
-Prayers for our Dead<br>
-John Cox, Ards; Bob Faught, Florida; Brigid Sieyes, California; Willie Canon, Carrowcannon, Noreen Gallagher, Creeslough; Martin McElhinney, Creeslough; Dorothy McCarry, Kildarragh; Paddy &amp; Sadie McGinley, The Cottages; Sally Doohan, Ballyboes; Seamus O'Donnell, Falconaragh; Neil McMullan, Meederry/Cushendall; Mickey &amp; Sally McFadden (Handsome), Derrygull.<br>
-Eucharistic Adoration<br>
-Each Tuesday in Our Lady’s Oratory from 7.30pm – 8.45pm. Concludes with Rosary at 8pm. All welcome.<br>
-Confessions<br>
-Confessions each Saturday from 5pm – 5.45pm and before and after each Mass upon request.<br>
-Collection<br>
-Last week's Offertory Collection came to €1,100. Thank you for your gift to God and His Church.<br>
-Graveyard Service for all our Dead<br>
-The Graveyard Service for all our Dead will take place in Holy Cross Graveyard on Sunday 28th June at 3pm. (Weather Permitting) otherwise it will be held in Holy Cross Church if weather is inclement. Mass for all our Dead in Holy Cross Church on Saturday 27th June at 6pm.<br>
-Prayers of the Angel<br>
-“My God, I believe, I adore, I hope and I love You! I ask pardon of You for all those who do not believe, do not adore, do not hope and do not love You!”<br>
-“Most Holy Trinity: Father, Son, and Holy Spirit, I adore You profoundly, and I offer You the most precious Body, Soul and Divinity of Jesus Christ, present in all tabernacles of the world, in reparation for the outrages, sacrileges and indifferences with which He Himself is offended. And, through the infinite merits of His most Sacred Heart, and the Immaculate Heart of Mary, I beg of You the conversion of poor sinners.”<br>
-Charles Péguy<br>
-The Candle of Remembrance for the coming week will be lit in loving memory of<br>
-Paddy &amp; Sadie McGinley,<br>
-The Cottages<br>
-Lord, I entrust my past to Your mercy,<br>
-my present to your love,<br>
-and my future to your care.<br>
-Paróiste Naomh Fionnán<br>
-21ú Meitheamh 2026 - An Dara Domhnach Déag - A<br>
-Reflection<br>
-In March 2018, Fr Tony Coote, a 63 year old Dublin priest, was diagnosed with the dreaded Motor Neuron Disease, and died 18 months later. Before his death he wrote an inspiring memoir about his life entitled Live While you Can. It became an instant best-seller. The final words of Tony's memoir were: 'When the train stops, I will step onto that platform with hope and no fear.' The words 'Fear not' are the most frequent words spoken by Jesus to his disciples. In today’s gospel they occur three times. But what is Jesus really saying when he tells them not to be afraid? Certainly, he is not giving them, or us, the false assurance that we have nothing to fear. Down through the centuries, early disciples of Jesus have met with opposition from those who benefit from the unjust status quo. In recent decades, violent persecution of Christians has been on the rise. Speaking to diplomats on the 9th January this year, Pope Leo stated that ‘the persecution of Christians remains one of the most widespread human rights' crises today, affecting over 380 million believers worldwide. They suffer high or extreme levels of discrimination, violence or oppression because of their faith’. According to the 2026 World Watch List (WWL) report, the number of Christians suffering persecution rose by 8 million over the past year. In face of such opposition and persecution, Jesus urges his disciples not to allow their genuine fears to cripple them, but to continue to proclaim the truth of the gospel and witness to him publicly. He assures them that the truth that the powerful elites try to cover up will eventually be revealed: 'Nothing is covered up that will not be uncovered, and nothing secret that will not become known' (Mt 10:26). He reassures them of the Father’s love and care for them: 'Even the hairs of your head are all counted' (Mt 10:30). And he ends by making them this promise: 'Everyone therefore who acknowledges me before others, I will also acknowledge before my Father in heaven' (Mt 10:32).<br>
-So we pray: Lord, grant us the courage to stake our lives on the truth of your word. Amen.<br>
-Cuimhneacháin Báis<br>
-John Cox, Ards, Creeslough, whose funeral was in Creeslough on Friday. (Father of Dominic Cox, Balliness).<br>
-Bob Faught who died in Florida. (Husband of Frances McCarry, Ray).<br>
-Sally Doohan, Ballyboes, whose Month's Mind Mass is on Saturday.<br>
-Anniversaries<br>
-Danny Jack Rua McFadden, Carrownacon. Joe McGarvey, Main Street. Willie Cannon, Noreen Gallagher and Martin McElhinney.<br>
-MASS TIMES AND INTENTIONS FOR THE WEEK<br>
-Day<br>
-Time<br>
-| Saturday 20th | 7:00 pm | Sally Doohan Month’s Mind<br>
-| | | Danny Jack Rua McFadden Anniversary<br>
-| Sunday 21st | 9:00 am | Airfnear don Phobal<br>
-| | 10:30 am | Joe McGarvey Anniversary<br>
-| Monday 2nd | 9:30 am | Katie Sayers and Peter McGee Anniversaries<br>
-| Tuesday 23rd | 9:30 am | Private Intention<br>
-| Wednesday 24th| 9:30 am | Private Intention<br>
-| Thursday 25th | 9:30 am | Private Intention<br>
-| Friday 26th | 7:00 pm | Bernard McElhinney Month’s Mind<br>
-| Saturday 27th | 11:00 am | Latin Mass<br>
-| | 7:00 pm | Seamus O’Donnell Month’s Mind<br>
-| Sunday 28th | 9:00 am | Airfnear don Phobal<br>
-| | 10:30 am | Rosie and Hugo McGee and deceased members of the McCarry family Anniversaries<br>
-Confessions<br>
-6:15pm–6:45pm<br>
-Saturdays<br>
-Eucharistic Adoration<br>
-Wednesday:<br>
-Holy Hour: 9-10 pm<br>
-Thursday: 10:00 am – 9:00 pm.<br>
-Thursday adoration includes the Divine Mercy @ 5:30 pm and concludes with Rosary @ 8:30 pm<br>
-All Masses are available live on:<br>
-<a href="https://www.naomhfionn.com" target="_blank" rel="noopener noreferrer">www.naomhfionn.com</a><br>
-&amp; Parish Radio @ 106.5 FM<br>
-Please scan the QR code below to donate to either Falcarraigh Church or Graveyard Collection<br>
-Church Collection<br>
-Graveyard Collection<br>
-Fr. John Boyce P.P.<br>
-Parochial House, Falcaragh, Co. Donegal, F92 N6Y9.<br>
-<a href="tel:+353749135196" style="color:#1d4ed8;font-weight:600;">074 91 35196</a><br>
-|<br>
-<a href="mailto:fionnnewsletter@gmail.com" target="_blank" rel="noopener noreferrer">fionnnewsletter@gmail.com</a><br>
-<a href="https://www.naomhfionn.com" target="_blank" rel="noopener noreferrer">www.naomhfionn.com</a><br>
-| Church Webcam:<br>
-<a href="https://www.mcn.live" target="_blank" rel="noopener noreferrer">www.mcn.live</a><br>
-| Facebook: @falcarraighparish<br>
-Fógrái<br>
-Freagra an tSáile:<br>
-Éist liom do dhúchas, a Thiarna.<br>
-HOW TO REPORT CLERICAL ABUSE<br>
-If you have a concern, or complaint of child abuse, either current or historical, please contact:<br>
-Designated Liaison Person, Margaret Northage on<br>
-<a href="tel:+353862183011" style="color:#1d4ed8;font-weight:600;">086 2183 011</a><br>
-or by email:<br>
-<a href="mailto:safeguarding@priordocese.ie" target="_blank" rel="noopener noreferrer">safeguarding@priordocese.ie</a><br>
-.<br>
-You are advised also to contact statutory authorities:<br>
-Tusla (Child &amp; Family Agency) - Tel:<br>
-<a href="tel:+353749120233" style="color:#1d4ed8;font-weight:600;">074 9120233</a><br>
-Gardaí National Protective Services Bureau - Tel: 01 6663430/6663435 or email: GNPSB.SMC@ Garda.ie.<br>
-Free Counselling &amp; Support is available through Towards Healing:<br>
-Freephone - RoI: 1800 303416<br>
-Freephone - N.Ireland &amp; UK: 0800 0963315<br>
-Freephone - Hearing impaired: 1850 8022859<br>
-Ways to donate to parish funds<br>
-You can now make a donation to the Parish online by scanning the QR codes on the front of this newsletter, with your mobile phone camera. One QR code is for the Sunday Collection and one QR code is for the Graveyard Collection. You can also make donations by going to the parish website and clicking on the DONATE button. All donations are gratefully accepted.<br>
-Sick and Housebound<br>
-I will visit the sick and housebound of the parish on the following days:<br>
-Monday 2nd June<br>
-- Drumminaph, Bailieswell, Ball Breac, Ballymullen and Ballina.<br>
-Tuesday 23rd June<br>
-- Carronvan, Kay, Ballyboes, Erraroeey and Derrylear.<br>
-Thursday 25th June<br>
-- Station Rd, Rocktown, Ballinlemp, Clonbara and Dunmore.<br>
-PROPOSED REGULATIONS FOR NEW GRAVEYARD<br>
-1. ONLY THE NEXT GRAVE SITE IN LINE IS AVAILABLE<br>
-2. GRAVES ARE ALLOCATED FROM RIGHT TO LEFT<br>
-3. GRAVES TO BE IN LINE WITH MARKS ON FOOTPATH<br>
-4. THIS IS A LAWN GRAVEYARD<br>
-5. NO SURROUNDS ON GRAVES TO ALLOW GRASS CUTTING<br>
-6. NO PLANTING OF SHRUBS OR TREES<br>
-7. ALL ITEMS ARE RESTRICTED TO THE PLINTH ON WHICH THE HEADSTONE RESTS TO ALLOW GRASS CUTTING<br>
-8. ALL PETS MUST BE ON A LEASH<br>
-9. PLEASE CLEAN UP AFTER YOUR PETS<br>
-10. PLEASE TAKE OLD WREATHS HOME<br>
-11. MAXIMUM HEADSTONE HEIGHT: 5 FEET<br>
-12. NO ARTIFICIAL GRASS ON GRAVES<br>
-13. ALL INSCRIPTIONS ON HEADSTONES MUST BE IN KEEPING WITH THE CATHOLIC CHARACTER OF THIS GRAVEYARD<br>
-1st Saturday Devotions<br>
-Prayers will be recited at 10:40 am prior to 11am Mass.<br>
-Knock Pilgrimage<br>
-Annual Franciscan Pilgrimage to Knock on Sunday the 28th of June - €30 return trip. Mass in the Basilica and Rosary procession. Leaving Ards at 7am with pick-ups in Cresslough &amp; Letterkenny.<br>
-For more info contact<br>
-<a href="mailto:info@ardfinnigreavy.ie" target="_blank" rel="noopener noreferrer">info@ardfinnigreavy.ie</a><br>
-or<br>
-<a href="tel:+353749138005" style="color:#1d4ed8;font-weight:600;">074 9138005</a><br>
-,<br>
-Home Life International Ireland<br>
-Missions with rests of St Therese &amp; The Holy Face.<br>
-Sunday 5th July; St Mary's Hall, Duncrana, 2pm-4pm.<br>
-Tuesday 7th July; The Abbey Hotel, Donegal Town. 6:30pm-8:30pm. Thursday 9th July; Mount Errigal Hotel Letterkenny, 7pm-9pm.<br>
-Food Bank Appeal<br>
-The Food Bank is very low on supplies at the moment so any non perishable goods are urgently required. Food bins have been left in the 4 porches for any goods donated. If anyone needs help please contact us on<br>
-or call on Thursday mornings 10am to 12pm.<br>
-National Grandparents Pilgrimage<br>
-Knock Shrine on Sunday, 26th June 2022, celebrating the sixth World Day for Grandparents and the Elderly,<br>
-Ionad Nann Fhionn<br>
-Congratulations to Martin Ferry, Dunmore, who was this week’s lucky winner of our 50/50 Draw. Go raibh maith agat thar do thacaíocht.<br>
-We were delighted to welcome Fcarraí Cheile last Friday to their fundraising event Ionad Nann Fhionn. A great event and we enjoyed meeting everyone.<br>
-Thank you to Fearghal Karate Club who joined us at the weekend for the Don Can Karate and Martial Arts seminar.<br>
-We are taking bookings for our Summer Camp, limited numbers available. All bookings can be made on our website.<br>
-We will be holding a Paediatric First Aid training day on Saturday 1th July at 10am. Enable First Aid will teach essential skills to adults responding to emergencies with children and infants. Advanced booking is essential. If this is of interest to you please contact us by email or WhatsApp to book.<br>
-All our freestyle Gymnastics classes start at 5pm each Wednesday for all age groups.<br>
-An tSean Bheairic Arts &amp; Cultural Festival 26-27 June 2026<br>
-De Náine/Friday 26 June<br>
-7.30am. Seoladh na Réile Brian Dany Naimh<br>
-Festival opening with Brian Dany Naimh<br>
-8.00in Ceolchoirm le Daniel Cullen agus Cairde<br>
-Concert with Daniel Cullen and Friends<br>
-27 Meitheamh/Saturday 27 Jun<br>
-11.00am Ceardann Ar Bhriathraicha ar an tSean Nó to Pháistí le Patricia Nic Ruairí<br>
-Sean’s no singing workshop for children with Patricia NicRuairí<br>
-12.00in Con Eamon Ghráinne do Pháistí<br>
-Children's Sean's no singing competition<br>
-12.00in Ceol, Bia &amp; Ceardalóireacht<br>
-Seisiún ceol traidisiúnta le Coimhlitas, taispeántas ceardhoíche, féidireachtaí císe agus tuileadh – ar tsráid ambasciún de an tSean-Bheairic.<br>
-Outdoor Festival of Music, Food &amp; Crafts<br>
-Traditional Irish music session with Coimhlitas, craft stalls, basket weaving workshop, and more – on the street outside An tSean Bheairic.<br>
-2.00in Ceardlann Damhsa ar an tSean - Nos/Cimeanna Rial agus Port le Frank agus Eileen Beveney<br>
-Traditional dancing workshop with Frank and Eileen Sweaney – explore a variety of traditional dances.<br>
-Ceol le Martin Duggan / Music with Martin Duggan.<br>
-8.00in Con Gréinne Meirion/ Eamon Ghrainne, Coimhlitas Arnaomhdach ar an sean nós<br>
-Eamón Ghrainne Memorial Cup sean nós singing competition.<br>
-9.30in Céilí Mór le Martin Duggan<br>
-Save the Date<br>
-Vernacular Architecture Seminar hosted by the County Donegal Heritage Office takes place on Saturday, 4 July from 9 am—4 pm at Ionad Cois Locha, Dún Lúiche. This free seminar will explore the significance of Donegal's traditional buildings, highlighting their cultural value, conservation, and the traditional skills and materials associated with them.<br>
-Further details, including the seminar programme, will be circulated in the coming weeks. Places at this free seminar will be limited so, don’t delay, reserve a place today at<br>
-<a href="tel:+353749163842" style="color:#1d4ed8;font-weight:600;">074 9163842</a><br>
-.<br>
-Dates for 2026<br>
-Graveyard Sunday Mass - 2nd August @ 1:00 pm<br>
-St. Vincent de Paul:<br>
-Local number:<br>
-<a href="tel:+353871443464" style="color:#1d4ed8;font-weight:600;">087 1443464</a><br>
-Cloughaney Food Bank:<br>
-<a href="tel:+353857560177" style="color:#1d4ed8;font-weight:600;">085 7560177</a><br>
-MABS Gweadore:<br>
-0818 072650<br>
-St Columba's Church, Kilcameran<br>
-Mass Times in St Columba's Church, Kilcameran<br>
-Date<br>
-Time<br>
-Intention<br>
-Saturday 27th June<br>
-6:00pm<br>
-Eddie Mc Ginley Anniversary Mass<br>
-Josie Russell Anniversary Mass<br>
-Sunday 28th June<br>
-11:00am<br>
-Bridget Russell Anniversary Mass<br>
-Monday 29th June<br>
-9:30am<br>
-Priest's Intention<br>
-Thursday 2nd July<br>
-9:30am<br>
-Eddie Mc Ginley, Ballykerrin, Anniversary Mass<br>
-Saturday 4th July<br>
-6:00pm<br>
-Margaret Mc Acre Anniversary Mass<br>
-Patsy Mulvihill Anniversary Mass<br>
-Rose &amp; Tommy O'Brien Anniversary Mass<br>
-Sunday 5th July<br>
-11:00am<br>
-Sunday Mass - Priest's Intention<br>
-Mass Times in Immaculate Conception, Coole<br>
-Day<br>
-Time<br>
-Sunday 28th June<br>
-9:30am<br>
-James &amp; Rose Mc Bride Anniversary Mass<br>
-Mass Times in St Brigid's Church, Golan<br>
-Day<br>
-Time<br>
-Sunday 5th July<br>
-9:30am<br>
-Sunday Mass - Priest's Intention<br>
-Mass Times in St Columba's Church, Termon<br>
-Day<br>
-Time<br>
-Saturday 27th June<br>
-6:30pm<br>
-Vigil Mass - Priest's Intention<br>
-Sunday 28th June<br>
-9:00am<br>
-Pro Populo Mass<br>
-Monday 29th June<br>
-9:30am<br>
-Priest's Intention<br>
-Wednesday 1st July<br>
-9:30am<br>
-Mass for the Holy Souls<br>
-Friday 3rd July<br>
-9:30am<br>
-Patsy &amp; Eleanor Harkin Anniversary Mass<br>
-Saturday 4th July<br>
-6:30pm<br>
-Teresa Mc Gettigan Anniversary Mass<br>
-Sunday 5th July<br>
-9:00am<br>
-Pro Populo Mass<br>
-Mass Times in St Colmcille's Church, Glendowan<br>
-Day<br>
-Time<br>
-Saturday 27th June<br>
-8:00pm<br>
-Vigil Mass - Priest's Intention<br>
-Sunday 28th June<br>
-10:30am<br>
-Sunday Mass - Priest's Intention<br>
-Thursday 2nd July<br>
-7:00pm<br>
-Anne Doherty Month's Mind &amp; Seamus Doherty Anniversary Mass<br>
-Saturday 4th July<br>
-8:00pm<br>
-Kieran Callaghan, Roshin, Anniversary Mass<br>
-Sheila &amp; James Harley, Churchill and Canada, Anniversary Mass<br>
-Sunday 5th July<br>
-10:30am<br>
-Sunday Mass - Priest's Intention<br>
-Parish Pilgrimage to Lough Derg<br>
-We are organising a Parish Pilgrimage to Lough Derg on Saturday 29th August. If you would like to join us please contact Termon Parochial House on 9139016 or<br>
-<a href="mailto:gartantnermon@raphoediocese.ie" target="_blank" rel="noopener noreferrer">gartantnermon@raphoediocese.ie</a><br>
-.<br>
-Thank You - Bishop Boyce<br>
-I received so many expressions of congratulations for the Diamond Jubilee of my Ordination as a Priest. I thank you sincerely for your prayers and good wishes. As I look back on sixty years as a priest, I can only praise the Lord for his goodness and fidelity. To you all who helped me in any way I express my sincere gratitude. I remembered you all in your intentions at Masses in Lourdes and at the Grotto. With renewed thanks and gratitude to one and all, with my blessing + Philip Boyce o.c.<br>
-Solemnity of Saint's Peter &amp; Paul<br>
-Monday 29th June<br>
-Prayer to Saint's Peter &amp; Paul<br>
-Grant, we pray, O Lord our God, that we may be upheld by the intercession of the blessed Apostles Peter and Paul, that, as though they gave your Church the foundations of her heavenly office, so, through them you may help her to eternal salvation. Through our Lord Jesus Christ, your Son, who lives and reigns with you in the unity of the Holy Spirit, one God, for ever and ever. Amen.<br>
-Pilgrimage to Medjugorje<br>
-A Pilgrimage to Medjugorje will take place on 2nd September 2026 for 7 nights with Spiritual Director. Cost €949 per person sharing. Contact Mairead on<br>
-<a href="tel:+353877698195" style="color:#1d4ed8;font-weight:600;">087-7698195</a><br>
-or<br>
-<a href="tel:+353873719262" style="color:#1d4ed8;font-weight:600;">087-3719262</a><br>
-.<br>
-Graveyard Masses 2026:<br>
-Gartan Graveyard: Next Sunday 5th July at 3pm<br>
-Termon Graveyard: Next Sunday 7th July at 7pm<br>
-Kilcameran Graveyard: Saturday 14th August after 6pm Mass<br>
-Old Abbey Blessing of Graves: Sunday 2nd August at 12noon.<br>
-Weekly Collections:<br>
-Church<br>
-Date<br>
-Amount<br>
-St Colmcille's Church<br>
-Sunday 21st June<br>
-€615<br>
-Building Fund<br>
-€245<br>
-St Columba's Church Kilcameran<br>
-€846<br>
-Building Fund<br>
-€73<br>
-Golan<br>
-€530<br>
-Thank you for your generosity and support.<br>
-Parish of Iniskeel/Paróiste Inis Caoil<br>
-Fr Gerard Cunningham<br>
-Email:<br>
-<a href="mailto:parishofiniskeel@gmail.com" target="_blank" rel="noopener noreferrer">parishofiniskeel@gmail.com</a><br>
-Webpage:<br>
-<a href="https://www.parishpress.net/parishofiniskeel" target="_blank" rel="noopener noreferrer">www.parishpress.net/parishofiniskeel</a><br>
-Telephone:<br>
-<a href="tel:+353749551117" style="color:#1d4ed8;font-weight:600;">074 9551117</a><br>
-Facebook: Parish of Iniskeel<br>
-St Connell's Church, Glenties<br>
-Webcam:<br>
-<a href="https://www.churchservices.tv/glenties" target="_blank" rel="noopener noreferrer">www.churchservices.tv/glenties</a><br>
-Day<br>
-Time<br>
-Saturday<br>
-27th June<br>
-7:30 a.m.<br>
-Willie Ward R.I.P.<br>
-29th June<br>
-7-9 p.m.<br>
-Adhviala na Naomh Shracmhaire<br>
-Tuesday<br>
-30th June<br>
-7:30 a.m.<br>
-Hugh Gerard McMonagle R.I.P. Anniversary<br>
-4th July<br>
-11:00 a.m.<br>
-Maureen Connell C.L. 6th Anniversary<br>
-1th July<br>
-6:15 p.m.<br>
-Adoration<br>
-7:30 p.m.<br>
-Molly McDermott R.I.P.<br>
-Wednesday<br>
-2nd July<br>
-9:30 a.m.<br>
-Madge Boyle R.I.P. Stracastle, 3rd Anniversary<br>
-Saturday<br>
-4th July<br>
-11:00 a.m.<br>
-Paddy, Mary, &amp; John &amp; Peter Conaghan R.I.P. &amp; Deceased Family R.I.P.<br>
-3:00 p.m.<br>
-Glenties Graveyard Prayers &amp; Blessing<br>
-Teach Pobail Chloichne, Naofa, Baile na Finne<br>
-Day<br>
-Time<br>
-Sunday<br>
-28th June<br>
-9:30 a.m.<br>
-Leo Joyner R.I.P.<br>
-Tangavine &amp; Oireacht Islands<br>
-Sunday<br>
-5th July<br>
-9:30 a.m.<br>
-Sunday Collection</p></div>
-</details>
+<h2 class="b-title">Drumholm</h2>
+<p>Bailtín.
+Fr Adrian Gavigan.
+Tel:
+<a href="tel:+353743734642" style="color:#1d4ed8;font-weight:600;">074 37 34642</a>
+or
+<a href="tel:+353879685480" style="color:#1d4ed8;font-weight:600;">087 9685480</a>
+EMAIL:
+<a href="mailto:drumholmparish@gmail.com" target="_blank" rel="noopener noreferrer">drumholmparish@gmail.com</a>
+FACEBOOK: DRUMHOLM RC PARISH.
+ST VINCENT DE PAUL:
+<a href="tel:+353879338430" style="color:#1d4ed8;font-weight:600;">087 9338430</a>
+12TH SUNDAY IN ORDINARY TIME
+SATURDAY 20TH JUNE.
+06.30pm
+CHARLES TIMONEY.
+MARY &amp; HUGH McGROGRY.
+JOHN CLEARY.
+SUNDAY 21ST JUNE.
+11.00am
+MARGARET GALLAGHER.
+MONDAY 2ND JUNE.
+NO MASS
+TUESDAY 23RD JUNE.
+NO MASS
+WEDNESDAY 24TH JUNE.
+NO MASS
+THURSDAY 25TH JUNE.
+NO MASS
+FRIDAY 26TH JUNE.
+10.00am
+MASS
+06.30pm
+SATURDAY 27TH JUNE.
+PRO POPULO
+11.00am
+SUNDAY 28TH JUNE.
+AISLINN ANDERSON - Months Mind.
+SIGNED MASS CARDS / Bouquets will be available from the Sacristy and Parochial House.
+Signed L.
+MASS INTENTIONS;
+Anniversaries: Names for inclusion on the July Anniversaries will be offered at your Mass early.
+PARISH COLLECTIONS
+A big thank you to everyone who continues to support the parish.
+Contributions can be made in the normal way or they can be made electronically:
+Bank: Bank Ireland, Donegal.
+Acc Name: Drumholm RC Parish;
+Account No: 27936239;
+IBAN: IE50BOI84091527396239.
+BIC: BOFII E2D
+If electronic payments please include your name and the envelope number.
+Collection - €1,360.00
+UPCOMING EVENTS IN ST BRIDGET'S CHURCH.
+Graveyard Sunday 2nd Aug 2026.
+Mass will be outdoors weather permitting.
+ANNUAL FRANCISCAN PILGRIMAGE TO KNOCK.
+on Sunday the 28th of June - €30 euro return trip. Mass in the Basilica and rosary procession. Leaving Ards at 7am with pick-ups in Creeslough &amp; Letterkenny. For more info contact
+<a href="mailto:info@ardsfriary.ie" target="_blank" rel="noopener noreferrer">info@ardsfriary.ie</a>
+or
+<a href="tel:+353749138050" style="color:#1d4ed8;font-weight:600;">074 9138050</a>
+.
+VOCATIONS MONSTRANCE - FROM 9TH TO 1TH JULY.
+The “Vocations Monstrance” is part of the Church's ongoing commitment to promote and foster vocations to the priesthood and religious life. The monstrance will be in various churches in the Diocese to encourage prayer for vocations and to deepen young people’s awareness of God’s call in their lives. Through prayer before the Blessed Sacrament, we ask the Lord to raise up generous and joyful servants for His Church.
+Vocations are born in prayer, sustained by prayer, and strengthened through prayer.
+Any parish wishing to have the “Vocations Monstrance” during these 2 weeks, please see Fr. Roy Brady at
+<a href="mailto:vocations@raphoediocese.ie" target="_blank" rel="noopener noreferrer">vocations@raphoediocese.ie</a>
+.
+CELEBRATING THE WORLD DAY FOR GRANDPARENTS AND THE ELDERLY.
+Sun 26th July 2026 - KNOCK SHRINE
+Commencing at 2.30pm with The Anointing of the Sick, A day of Grace &amp; BLESSING for the whole FAMILY as we Honor GRANDPARENTS &amp; THE ELDERLY. All are welcome. Visit our Web for resources:
+<a href="https://www.nationalgrandparentsassociation.org" target="_blank" rel="noopener noreferrer">www.nationalgrandparentsassociation.org</a>
+- POSTER IN ADDITIONAL NEWS.
+DAY OF LIFE SUN 21ST JUNE.
+On this year’s Day for Life, Sunday 21st June, we reflect on the wonder of human life from the moment of conception. We remember how the LORD JESUS Christ Himself sanctified and experienced the beginning of life in the world as an unborn child, hidden in the womb of Mary. Mary knew that she was carrying the Son of God - God and man - as soon as He was conceived. John the Baptist leapt in his mother Elizabeth’s womb when Mary greeted her.
+Our Lady treasured our Lord in her heart and womb until his birth. To read the full bishops' message visit
+<a href="https://www.councilforlife.ie" target="_blank" rel="noopener noreferrer">www.councilforlife.ie</a>
+.
+PRAYER FOR THE 19TH SUNDAY IN ORDINARY TIME.
+“Lord, our guide and protector, Grant us an undiluting respect for your name And keep us always in your love. When the storms of life surround us, Give us the courage to not be afraid. Remind us of our worth in your eyes, And help us to place all our trust in your guiding providence. Through our Lord Jesus Christ, your Son, Who lives and reigns with you and the Holy Spirit, God, forever and ever. Amen.”
+Holy Cross Church, Dunfanaghy
+Fr. Martin Doohan P.P
+Clondahorkey. (Dunfanaghy &amp; Creeslough).
+Tel:
+<a href="tel:+353749136163" style="color:#1d4ed8;font-weight:600;">074-91-36163</a>
+Mobile:
+<a href="tel:+353876132132" style="color:#1d4ed8;font-weight:600;">087-6132132</a>
+Fr. John Joe Duffy C.C. Creeslough
+Tel:
+<a href="tel:+353749138011" style="color:#1d4ed8;font-weight:600;">074-91-38011</a>
+Mobile:
+<a href="tel:+353873143532" style="color:#1d4ed8;font-weight:600;">087-3143532</a>
+12th Sunday in Ordinary Time - 21st June 2026
+Masses for the Coming Week
+Day
+Time
+Mon
+No Mass
+Tue
+7pm A Special Intention
+Wed
+9.30am Mass of St. Peregrine R.I.P. - Willie Canon, Noreen Gallagher Martin McElhinney (50th Anniversary Mass)
+Thur
+9.30am Holy Cross National School end of year Mass
+Fri
+9.30am The Holy Souls
+Sat
+6.00pm Mass for all Our Beloved Dead
+Sun
+10.00am Dorothy McCarry, Kildarragh
+11.30am Mass Pro Populo
+3.00pm GRAVEYARD SERVICE FOR ALL OUR DEAD
+Prayers for our Dead
+John Cox, Ards; Bob Faught, Florida; Brigid Sieyes, California; Willie Canon, Carrowcannon, Noreen Gallagher, Creeslough; Martin McElhinney, Creeslough; Dorothy McCarry, Kildarragh; Paddy &amp; Sadie McGinley, The Cottages; Sally Doohan, Ballyboes; Seamus O'Donnell, Falconaragh; Neil McMullan, Meederry/Cushendall; Mickey &amp; Sally McFadden (Handsome), Derrygull.
+Eucharistic Adoration
+Each Tuesday in Our Lady’s Oratory from 7.30pm – 8.45pm. Concludes with Rosary at 8pm. All welcome.
+Confessions each Saturday from 5pm – 5.45pm and before and after each Mass upon request.
+Collection
+Last week's Offertory Collection came to €1,100. Thank you for your gift to God and His Church.
+Graveyard Service for all our Dead
+The Graveyard Service for all our Dead will take place in Holy Cross Graveyard on Sunday 28th June at 3pm. (Weather Permitting) otherwise it will be held in Holy Cross Church if weather is inclement. Mass for all our Dead in Holy Cross Church on Saturday 27th June at 6pm.
+Prayers of the Angel
+“My God, I believe, I adore, I hope and I love You! I ask pardon of You for all those who do not believe, do not adore, do not hope and do not love You!”
+“Most Holy Trinity: Father, Son, and Holy Spirit, I adore You profoundly, and I offer You the most precious Body, Soul and Divinity of Jesus Christ, present in all tabernacles of the world, in reparation for the outrages, sacrileges and indifferences with which He Himself is offended. And, through the infinite merits of His most Sacred Heart, and the Immaculate Heart of Mary, I beg of You the conversion of poor sinners.”
+Charles Péguy
+The Candle of Remembrance for the coming week will be lit in loving memory of
+Paddy &amp; Sadie McGinley,
+The Cottages
+Lord, I entrust my past to Your mercy,
+my present to your love,
+and my future to your care.
+Paróiste Naomh Fionnán
+21ú Meitheamh 2026 - An Dara Domhnach Déag - A
+Reflection
+In March 2018, Fr Tony Coote, a 63 year old Dublin priest, was diagnosed with the dreaded Motor Neuron Disease, and died 18 months later. Before his death he wrote an inspiring memoir about his life entitled Live While you Can. It became an instant best-seller. The final words of Tony's memoir were: 'When the train stops, I will step onto that platform with hope and no fear.' The words 'Fear not' are the most frequent words spoken by Jesus to his disciples. In today’s gospel they occur three times. But what is Jesus really saying when he tells them not to be afraid? Certainly, he is not giving them, or us, the false assurance that we have nothing to fear. Down through the centuries, early disciples of Jesus have met with opposition from those who benefit from the unjust status quo. In recent decades, violent persecution of Christians has been on the rise. Speaking to diplomats on the 9th January this year, Pope Leo stated that ‘the persecution of Christians remains one of the most widespread human rights' crises today, affecting over 380 million believers worldwide. They suffer high or extreme levels of discrimination, violence or oppression because of their faith’. According to the 2026 World Watch List (WWL) report, the number of Christians suffering persecution rose by 8 million over the past year. In face of such opposition and persecution, Jesus urges his disciples not to allow their genuine fears to cripple them, but to continue to proclaim the truth of the gospel and witness to him publicly. He assures them that the truth that the powerful elites try to cover up will eventually be revealed: 'Nothing is covered up that will not be uncovered, and nothing secret that will not become known' (Mt 10:26). He reassures them of the Father’s love and care for them: 'Even the hairs of your head are all counted' (Mt 10:30). And he ends by making them this promise: 'Everyone therefore who acknowledges me before others, I will also acknowledge before my Father in heaven' (Mt 10:32).
+So we pray: Lord, grant us the courage to stake our lives on the truth of your word. Amen.
+Cuimhneacháin Báis
+John Cox, Ards, Creeslough, whose funeral was in Creeslough on Friday. (Father of Dominic Cox, Balliness).
+Bob Faught who died in Florida. (Husband of Frances McCarry, Ray).
+Sally Doohan, Ballyboes, whose Month's Mind Mass is on Saturday.
+Anniversaries
+Danny Jack Rua McFadden, Carrownacon. Joe McGarvey, Main Street. Willie Cannon, Noreen Gallagher and Martin McElhinney.
+MASS TIMES AND INTENTIONS FOR THE WEEK
+Day
+Time
+| Saturday 20th | 7:00 pm | Sally Doohan Month’s Mind
+| | | Danny Jack Rua McFadden Anniversary
+| Sunday 21st | 9:00 am | Airfnear don Phobal
+| | 10:30 am | Joe McGarvey Anniversary
+| Monday 2nd | 9:30 am | Katie Sayers and Peter McGee Anniversaries
+| Tuesday 23rd | 9:30 am | Private Intention
+| Wednesday 24th| 9:30 am | Private Intention
+| Thursday 25th | 9:30 am | Private Intention
+| Friday 26th | 7:00 pm | Bernard McElhinney Month’s Mind
+| Saturday 27th | 11:00 am | Latin Mass
+| | 7:00 pm | Seamus O’Donnell Month’s Mind
+| Sunday 28th | 9:00 am | Airfnear don Phobal
+| | 10:30 am | Rosie and Hugo McGee and deceased members of the McCarry family Anniversaries
+Confessions
+6:15pm–6:45pm
+Saturdays
+Eucharistic Adoration
+Wednesday:
+Holy Hour: 9-10 pm
+Thursday: 10:00 am – 9:00 pm.
+Thursday adoration includes the Divine Mercy @ 5:30 pm and concludes with Rosary @ 8:30 pm
+All Masses are available live on:
+<a href="https://www.naomhfionn.com" target="_blank" rel="noopener noreferrer">www.naomhfionn.com</a>
+&amp; Parish Radio @ 106.5 FM
+Please scan the QR code below to donate to either Falcarraigh Church or Graveyard Collection
+Church Collection
+Graveyard Collection
+Fr. John Boyce P.P.
+Parochial House, Falcaragh, Co. Donegal, F92 N6Y9.
+<a href="tel:+353749135196" style="color:#1d4ed8;font-weight:600;">074 91 35196</a>
+|
+<a href="mailto:fionnnewsletter@gmail.com" target="_blank" rel="noopener noreferrer">fionnnewsletter@gmail.com</a>
+<a href="https://www.naomhfionn.com" target="_blank" rel="noopener noreferrer">www.naomhfionn.com</a>
+| Church Webcam:
+<a href="https://www.mcn.live" target="_blank" rel="noopener noreferrer">www.mcn.live</a>
+| Facebook: @falcarraighparish
+Fógrái
+Freagra an tSáile:
+Éist liom do dhúchas, a Thiarna.
+HOW TO REPORT CLERICAL ABUSE
+If you have a concern, or complaint of child abuse, either current or historical, please contact:
+Designated Liaison Person, Margaret Northage on
+<a href="tel:+353862183011" style="color:#1d4ed8;font-weight:600;">086 2183 011</a>
+or by email:
+<a href="mailto:safeguarding@priordocese.ie" target="_blank" rel="noopener noreferrer">safeguarding@priordocese.ie</a>
+.
+You are advised also to contact statutory authorities:
+Tusla (Child &amp; Family Agency) - Tel:
+<a href="tel:+353749120233" style="color:#1d4ed8;font-weight:600;">074 9120233</a>
+Gardaí National Protective Services Bureau - Tel: 01 6663430/6663435 or email: GNPSB.SMC@ Garda.ie.
+Free Counselling &amp; Support is available through Towards Healing:
+Freephone - RoI: 1800 303416
+Freephone - N.Ireland &amp; UK: 0800 0963315
+Freephone - Hearing impaired: 1850 8022859
+Ways to donate to parish funds
+You can now make a donation to the Parish online by scanning the QR codes on the front of this newsletter, with your mobile phone camera. One QR code is for the Sunday Collection and one QR code is for the Graveyard Collection. You can also make donations by going to the parish website and clicking on the DONATE button. All donations are gratefully accepted.
+Sick and Housebound
+I will visit the sick and housebound of the parish on the following days:
+Monday 2nd June
+- Drumminaph, Bailieswell, Ball Breac, Ballymullen and Ballina.
+Tuesday 23rd June
+- Carronvan, Kay, Ballyboes, Erraroeey and Derrylear.
+Thursday 25th June
+- Station Rd, Rocktown, Ballinlemp, Clonbara and Dunmore.
+PROPOSED REGULATIONS FOR NEW GRAVEYARD
+1. ONLY THE NEXT GRAVE SITE IN LINE IS AVAILABLE
+2. GRAVES ARE ALLOCATED FROM RIGHT TO LEFT
+3. GRAVES TO BE IN LINE WITH MARKS ON FOOTPATH
+4. THIS IS A LAWN GRAVEYARD
+5. NO SURROUNDS ON GRAVES TO ALLOW GRASS CUTTING
+6. NO PLANTING OF SHRUBS OR TREES
+7. ALL ITEMS ARE RESTRICTED TO THE PLINTH ON WHICH THE HEADSTONE RESTS TO ALLOW GRASS CUTTING
+8. ALL PETS MUST BE ON A LEASH
+9. PLEASE CLEAN UP AFTER YOUR PETS
+10. PLEASE TAKE OLD WREATHS HOME
+11. MAXIMUM HEADSTONE HEIGHT: 5 FEET
+12. NO ARTIFICIAL GRASS ON GRAVES
+13. ALL INSCRIPTIONS ON HEADSTONES MUST BE IN KEEPING WITH THE CATHOLIC CHARACTER OF THIS GRAVEYARD
+1st Saturday Devotions
+Prayers will be recited at 10:40 am prior to 11am Mass.
+Knock Pilgrimage
+Annual Franciscan Pilgrimage to Knock on Sunday the 28th of June - €30 return trip. Mass in the Basilica and Rosary procession. Leaving Ards at 7am with pick-ups in Cresslough &amp; Letterkenny.
+For more info contact
+<a href="mailto:info@ardfinnigreavy.ie" target="_blank" rel="noopener noreferrer">info@ardfinnigreavy.ie</a>
+or
+<a href="tel:+353749138005" style="color:#1d4ed8;font-weight:600;">074 9138005</a>
+,
+Home Life International Ireland
+Missions with rests of St Therese &amp; The Holy Face.
+Sunday 5th July; St Mary's Hall, Duncrana, 2pm-4pm.
+Tuesday 7th July; The Abbey Hotel, Donegal Town. 6:30pm-8:30pm. Thursday 9th July; Mount Errigal Hotel Letterkenny, 7pm-9pm.
+Food Bank Appeal
+The Food Bank is very low on supplies at the moment so any non perishable goods are urgently required. Food bins have been left in the 4 porches for any goods donated. If anyone needs help please contact us on
+or call on Thursday mornings 10am to 12pm.
+National Grandparents Pilgrimage
+Knock Shrine on Sunday, 26th June 2022, celebrating the sixth World Day for Grandparents and the Elderly,
+Ionad Nann Fhionn
+Congratulations to Martin Ferry, Dunmore, who was this week’s lucky winner of our 50/50 Draw. Go raibh maith agat thar do thacaíocht.
+We were delighted to welcome Fcarraí Cheile last Friday to their fundraising event Ionad Nann Fhionn. A great event and we enjoyed meeting everyone.
+Thank you to Fearghal Karate Club who joined us at the weekend for the Don Can Karate and Martial Arts seminar.
+We are taking bookings for our Summer Camp, limited numbers available. All bookings can be made on our website.
+We will be holding a Paediatric First Aid training day on Saturday 1th July at 10am. Enable First Aid will teach essential skills to adults responding to emergencies with children and infants. Advanced booking is essential. If this is of interest to you please contact us by email or WhatsApp to book.
+All our freestyle Gymnastics classes start at 5pm each Wednesday for all age groups.
+An tSean Bheairic Arts &amp; Cultural Festival 26-27 June 2026
+De Náine/Friday 26 June
+7.30am. Seoladh na Réile Brian Dany Naimh
+Festival opening with Brian Dany Naimh
+8.00in Ceolchoirm le Daniel Cullen agus Cairde
+Concert with Daniel Cullen and Friends
+27 Meitheamh/Saturday 27 Jun
+11.00am Ceardann Ar Bhriathraicha ar an tSean Nó to Pháistí le Patricia Nic Ruairí
+Sean’s no singing workshop for children with Patricia NicRuairí
+12.00in Con Eamon Ghráinne do Pháistí
+Children's Sean's no singing competition
+12.00in Ceol, Bia &amp; Ceardalóireacht
+Seisiún ceol traidisiúnta le Coimhlitas, taispeántas ceardhoíche, féidireachtaí císe agus tuileadh – ar tsráid ambasciún de an tSean-Bheairic.
+Outdoor Festival of Music, Food &amp; Crafts
+Traditional Irish music session with Coimhlitas, craft stalls, basket weaving workshop, and more – on the street outside An tSean Bheairic.
+2.00in Ceardlann Damhsa ar an tSean - Nos/Cimeanna Rial agus Port le Frank agus Eileen Beveney
+Traditional dancing workshop with Frank and Eileen Sweaney – explore a variety of traditional dances.
+Ceol le Martin Duggan / Music with Martin Duggan.
+8.00in Con Gréinne Meirion/ Eamon Ghrainne, Coimhlitas Arnaomhdach ar an sean nós
+Eamón Ghrainne Memorial Cup sean nós singing competition.
+9.30in Céilí Mór le Martin Duggan
+Save the Date
+Vernacular Architecture Seminar hosted by the County Donegal Heritage Office takes place on Saturday, 4 July from 9 am—4 pm at Ionad Cois Locha, Dún Lúiche. This free seminar will explore the significance of Donegal's traditional buildings, highlighting their cultural value, conservation, and the traditional skills and materials associated with them.
+Further details, including the seminar programme, will be circulated in the coming weeks. Places at this free seminar will be limited so, don’t delay, reserve a place today at
+<a href="tel:+353749163842" style="color:#1d4ed8;font-weight:600;">074 9163842</a>
+.
+Dates for 2026
+Graveyard Sunday Mass - 2nd August @ 1:00 pm
+St. Vincent de Paul:
+Local number:
+<a href="tel:+353871443464" style="color:#1d4ed8;font-weight:600;">087 1443464</a>
+Cloughaney Food Bank:
+<a href="tel:+353857560177" style="color:#1d4ed8;font-weight:600;">085 7560177</a>
+MABS Gweadore:
+0818 072650
+St Columba's Church, Kilcameran
+Mass Times in St Columba's Church, Kilcameran
+Date
+Time
+Intention
+Saturday 27th June
+6:00pm
+Eddie Mc Ginley Anniversary Mass
+Josie Russell Anniversary Mass
+Sunday 28th June
+11:00am
+Bridget Russell Anniversary Mass
+Monday 29th June
+9:30am
+Priest's Intention
+Thursday 2nd July
+9:30am
+Eddie Mc Ginley, Ballykerrin, Anniversary Mass
+Saturday 4th July
+6:00pm
+Margaret Mc Acre Anniversary Mass
+Patsy Mulvihill Anniversary Mass
+Rose &amp; Tommy O'Brien Anniversary Mass
+Sunday 5th July
+11:00am
+Sunday Mass - Priest's Intention
+Mass Times in Immaculate Conception, Coole
+Day
+Time
+Sunday 28th June
+9:30am
+James &amp; Rose Mc Bride Anniversary Mass Times in St Brigid's Church, Golan
+Day
+Time
+Sunday 5th July
+9:30am
+Sunday Mass - Priest's Intention
+Mass Times in St Columba's Church, Termon
+Day
+Time
+Saturday 27th June
+6:30pm
+Vigil Mass - Priest's Intention
+Sunday 28th June
+9:00am
+Pro Populo Mass
+Monday 29th June
+9:30am
+Priest's Intention
+Wednesday 1st July
+9:30am
+Mass for the Holy Souls
+Friday 3rd July
+9:30am
+Patsy &amp; Eleanor Harkin Anniversary Mass
+Saturday 4th July
+6:30pm
+Teresa Mc Gettigan Anniversary Mass
+Sunday 5th July
+9:00am
+Pro Populo Mass Times in St Colmcille's Church, Glendowan
+Day
+Time
+Saturday 27th June
+8:00pm
+Vigil Mass - Priest's Intention
+Sunday 28th June
+10:30am
+Sunday Mass - Priest's Intention
+Thursday 2nd July
+7:00pm
+Anne Doherty Month's Mind &amp; Seamus Doherty Anniversary Mass
+Saturday 4th July
+8:00pm
+Kieran Callaghan, Roshin, Anniversary Mass
+Sheila &amp; James Harley, Churchill and Canada, Anniversary Mass
+Sunday 5th July
+10:30am
+Sunday Mass - Priest's Intention
+Parish Pilgrimage to Lough Derg
+We are organising a Parish Pilgrimage to Lough Derg on Saturday 29th August. If you would like to join us please contact Termon Parochial House on 9139016 or
+<a href="mailto:gartantnermon@raphoediocese.ie" target="_blank" rel="noopener noreferrer">gartantnermon@raphoediocese.ie</a>
+.
+Thank You - Bishop Boyce
+I received so many expressions of congratulations for the Diamond Jubilee of my Ordination as a Priest. I thank you sincerely for your prayers and good wishes. As I look back on sixty years as a priest, I can only praise the Lord for his goodness and fidelity. To you all who helped me in any way I express my sincere gratitude. I remembered you all in your intentions at Masses in Lourdes and at the Grotto. With renewed thanks and gratitude to one and all, with my blessing + Philip Boyce o.c.
+Solemnity of Saint's Peter &amp; Paul
+Monday 29th June
+Prayer to Saint's Peter &amp; Paul
+Grant, we pray, O Lord our God, that we may be upheld by the intercession of the blessed Apostles Peter and Paul, that, as though they gave your Church the foundations of her heavenly office, so, through them you may help her to eternal salvation. Through our Lord Jesus Christ, your Son, who lives and reigns with you in the unity of the Holy Spirit, one God, for ever and ever. Amen.
+Pilgrimage to Medjugorje
+A Pilgrimage to Medjugorje will take place on 2nd September 2026 for 7 nights with Spiritual Director. Cost €949 per person sharing. Contact Mairead on
+<a href="tel:+353877698195" style="color:#1d4ed8;font-weight:600;">087-7698195</a>
+or
+<a href="tel:+353873719262" style="color:#1d4ed8;font-weight:600;">087-3719262</a>
+.
+Graveyard Masses 2026:
+Gartan Graveyard: Next Sunday 5th July at 3pm
+Termon Graveyard: Next Sunday 7th July at 7pm
+Kilcameran Graveyard: Saturday 14th August after 6pm Mass
+Old Abbey Blessing of Graves: Sunday 2nd August at 12noon.
+Weekly Collections:
+Church
+Date
+Amount
+St Colmcille's Church
+Sunday 21st June
+€615
+Building Fund
+€245
+St Columba's Church Kilcameran
+€846
+Building Fund
+€73
+Golan
+€530
+Thank you for your generosity and support.
+Parish of Iniskeel/Paróiste Inis Caoil
+Fr Gerard Cunningham
+Email:
+<a href="mailto:parishofiniskeel@gmail.com" target="_blank" rel="noopener noreferrer">parishofiniskeel@gmail.com</a>
+Webpage:
+<a href="https://www.parishpress.net/parishofiniskeel" target="_blank" rel="noopener noreferrer">www.parishpress.net/parishofiniskeel</a>
+Telephone:
+<a href="tel:+353749551117" style="color:#1d4ed8;font-weight:600;">074 9551117</a>
+Facebook: Parish of Iniskeel
+St Connell's Church, Glenties
+Webcam:
+<a href="https://www.churchservices.tv/glenties" target="_blank" rel="noopener noreferrer">www.churchservices.tv/glenties</a>
+Day
+Time
+Saturday
+27th June
+7:30 a.m.
+Willie Ward R.I.P.
+29th June
+7-9 p.m.
+Adhviala na Naomh Shracmhaire
+Tuesday
+30th June
+7:30 a.m.
+Hugh Gerard McMonagle R.I.P. Anniversary
+4th July
+11:00 a.m.
+Maureen Connell C.L. 6th Anniversary
+1th July
+6:15 p.m.
+Adoration
+7:30 p.m.
+Molly McDermott R.I.P.
+Wednesday
+2nd July
+9:30 a.m.
+Madge Boyle R.I.P. Stracastle, 3rd Anniversary
+Saturday
+4th July
+11:00 a.m.
+Paddy, Mary, &amp; John &amp; Peter Conaghan R.I.P. &amp; Deceased Family R.I.P.
+3:00 p.m.
+Glenties Graveyard Prayers &amp; Blessing
+Teach Pobail Chloichne, Naofa, Baile na Finne
+Day
+Time
+Sunday
+28th June
+9:30 a.m.
+Leo Joyner R.I.P.
+Tangavine &amp; Oireacht Islands
+Sunday
+5th July
+9:30 a.m.
+Sunday Collection</p>
 <div class="parish-row-empty parish-even" id="parish-holy-cross-church">
   <span class="parish-name">Dunfanaghy</span>
   <span class="parish-empty">No searchable text available this week.</span>
@@ -1010,253 +1020,247 @@ Sunday Collection</p></div>
   <span class="parish-empty">No searchable text available this week.</span>
   <a class="parish-source" href="https://www.glenfin-parish.com/#sbp-bulletin" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
 </div>
-<details class="parish-block parish-even" id="parish-drive-14alaxt4mv">
-  <summary class="parish-head">
-    <span class="parish-name">Glenties</span>
-    <a class="parish-source" href="https://drive.usercontent.google.com/download?id=14aLAxt4mv7eYBvYx2GGthpsQnLrsysmK&amp;export=download" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p>€2,025<br>
-Fintown<br>
-€546<br>
-Edeninfagh<br>
-€300<br>
-Bingo Every Tuesday Night in the Market Hall STARTING THIS TUESDAY AT 8:30 P.M.<br>
-Snowball on 45 numbers or less, if not won €200 will be paid out. We appreciate your support!<br>
-The Annual Parish Climb of Croagh Patrick will take place on Friday 10th July. Bus departing Glenties at 7am, returning that evening. For more information and to book contact: Martin Doc<br>
-<a href="tel:+353868565132" style="color:#1d4ed8;font-weight:600;">086 8565132</a><br>
-or Michael Regan<br>
-<a href="tel:+353861682125" style="color:#1d4ed8;font-weight:600;">086 1682125</a><br>
-Good level of fitness required.<br>
-EDEN INFAGH CHURCH/HALL FUNDRAISER<br>
-Congratulations to Grace McDade, Castleblayney, Co Louth on winning €1,190<br>
-Thank you to all who contributed to the draw. Next draw takes place on Saturday 27th June.<br>
-Envelopes available in the three local churches and in local businesses for any community member. Entries via also revolve: Frank<br>
-<a href="tel:+353879186211" style="color:#1d4ed8;font-weight:600;">087 9186211</a><br>
-(€10 per entry).<br>
-Spás Seirbhíse Poiblí do Chomhoibriún<br>
-Community Employment Scheme Vacancies:<br>
-Tá poist sa Scéim Fostaíochta Poiblí ag fáil in Ginearálta. Má tá suim agatsa b'fhéidir teigh i dteagmháil le Aoibhinn ar<br>
-<a href="tel:+353877362747" style="color:#1d4ed8;font-weight:600;">087-7362747</a><br>
-.<br>
-Altar Society Team A<br>
-Taicíochta Foilsiu Fotaisleachta Aras Shéaghain Bháin, Baile na Finne ar Dé Mairt, 7úil - 10:00.<br>
-Fáilte Roimh Uile. Seachad Posit, lTríiteach Cláodol, Seisleanna Aoibhinn.<br>
-Fáilte Roimh Uile, Sraith. Ring 074 95 468701 to book your appointment. Spaces limited.<br>
-Repositories<br>
-Saint Connell's Museum are hosting tea/coffee &amp; refreshments in the Market Hall on Sunday 5th July after the Blessing of Graves. We would love to see you there. And donations of food would be greatly appreciated and can be dropped into the Market Hall after 11am Mass.<br>
-Those who assisted with prayers and collection in the graveyard in Glenties, if they might kindly be in a position to carry out the same duties this year. (If not, please contact Fr Gerard)<br>
-POBAL CHRÍOST RÍ GORT A' CHOIRCE<br>
-An tAth. Donnchadh Ó Baoill<br>
-(086) 603 1749 / (074) 91 35214<br>
-<a href="mailto:tpcr1906@gmail.com" target="_blank" rel="noopener noreferrer">tpcr1906@gmail.com</a><br>
-28ú Meitheamh 2026<br>
-<a href="https://www.pobalchriostir.ie" target="_blank" rel="noopener noreferrer">www.pobalchriostir.ie</a><br>
-/<br>
-<a href="https://www.mcn.live" target="_blank" rel="noopener noreferrer">www.mcn.live</a><br>
-AIFRINN O SEACHTAIN<br>
-Day<br>
-Time<br>
-27.06<br>
-Satharn 7 i.n.<br>
-27.06<br>
-Bernard Ó Domhnaill &amp; a mhac Joe, An Ard a Mhór<br>
-28.06<br>
-Domhnach 9 r.n.<br>
-28.06<br>
-Domhnach 11 r.n<br>
-29.06<br>
-Luain 7 i.n.<br>
-30.06<br>
-Máirt 10 r.n.<br>
-01.07<br>
-Céadaoin 7 i.n.<br>
-02.07<br>
-Déardaoin 7 i.n.<br>
-03.07<br>
-Aoine 7 i.n.<br>
-04.07<br>
-Mary McGee, Seanbhaile<br>
-04.07<br>
-Mary O'Leary, Gort a' Choirec<br>
-An Chéad Sathairn - Faoi 10.15-11.00.<br>
-Comaoineach. Páid. 15 boimate ag machnamh ar Rún Diamhair an Chreidimh<br>
-04.07<br>
-Satharn 7 i.n.<br>
-Rosie, Eddie &amp; James Mac Pháidín, An Ard a' Bhéag<br>
-05.07<br>
-Domhnach 9 r.n.<br>
-Séamus Mac Géidigh, An Ailt<br>
-05.07<br>
-Domhnach 11 r.n.<br>
-Betty agus Michael Woods, Fána Bhúi Uacht.<br>
-AN TRÍÚ DOMHNACH DEÁG A<br>
-AN CHÉAD LÉACHT<br>
-Sliocht as dára leabhar na Rithe. 4:8-11, 14-16.<br>
-Lá amháin ag Elisea ar a bhealach go Siunan, chuir bean uasal a bhí in cónai ansin faithe nóin agus d'iarraidh ar fanacht agus tábha a bhéithe goine. Ó láisiú amach dhéanadh sé moill le haghaidh bíde a bheith aige nuar a thagadh sé an bealach sin. Lá amháin, dúirt sé lena fear ceile: "Féach! táim cinnte gur féidir le Dia an fear seo a bhionn ag soirtheaisteál an bealach seo. Tógfaidh seomra beag ar an dón do agus cuirimid leaba ann fa chomhars an táb agus cathaoir agus lamp. Ansiar ur bith aid dtagnan sé chugainn, is feidir leis a scíste a dhéanamh ann." Lá amháin a thàinig sé, feictear leis seomra agus chuáigh sé i lár. D'fhiafraigh sé: "Cad is féidir doimhne a dhéanamh ar son seo uilig?" D'fhreagair Gehazi: "Leoga, níl mac ar bith aici agus tá fear céile aosta." Dúirt Elisha: "Cuirfá na coinne." Ghlaoigh an seirbhíseach uirthi agus sheas sí ag an doras. "Blaín ón am seo," ar sise, "Béidh mac i do bhachlainn agat." Bríathar an Tiarna. FR. Buíochas do Dhia.<br>
-FREAGRA AN T'SALM<br>
-Canafidh mé shór faoi do bhuanghráid, a Thiarna.<br>
-AN DARA LÉACHT (6:3-4, 8-11.)<br>
-Sliocht as litir Naomh Pól chuig na Rómhánaigh.<br>
-A bhráithre, an é nach dtigeann sibh, gach duine againn a baisteadh in Íosa Críost, gur ina bhás sin a baisteadh é. Go dtí sin comhdháladh sinn a bhás leis trid an mbaisteadh i dtreo siúlfinnse fós i meabha úrna, faoi mar a thógadh Críost ó mháirth rud chumhacht an Athar. Ach má táimid tar éis bás a fháil le Críost, creidimid go mairfidh beo leis chomh maith. Tá a fhios againn nach bhfhaighidh Críost bás arís tar éis a aisíraí ó na mairbh; ní bheidh cinnanas ag an mbás airís níos mó. An bás a fháil se, ba don pheacadh a fuair sé é an t-aon uair amháin, ach is beatha do Dhia an beatha a chaitheann sé anois. Ar an dóch céanna, caithfidh sibhse a mheas gur duine sibh comh maith atá marbh ó gheall an pheacadh agus beo le Dia i bpáirt le hÍosa Críost. Bríathar an Tiarna. FR. Buíochas do Dhia.<br>
-ALLELUIA<br>
-Alleluia, alleluia!<br>
-Is mise solas an tsaoil, a deir an Tiarna.<br>
-An t-é le leanfaidh mise, beidh aige solas na beatha.<br>
-Alleluia.<br>
-SOISCEALT (10:37-42.)<br>
-Sliocht as an Soiscéal naofa de réir Naoimh Maitiú.<br>
-PARISH OF INVER Saturday 27th – Sunday 28th June 2026 – 13th SUNDAY IN ORDINARY TIME ~ Year A<br>
-Fr Liam Boyle, PP, Parochial House, Froses Tel:<br>
-<a href="tel:+353749736006" style="color:#1d4ed8;font-weight:600;">074 9736006</a><br>
-• In case of emergency only ring<br>
-<a href="tel:+353899712498" style="color:#1d4ed8;font-weight:600;">089 9712498</a><br>
-Email:<br>
-<a href="mailto:inverparish@gmail.com" target="_blank" rel="noopener noreferrer">inverparish@gmail.com</a><br>
-• Website:<br>
-<a href="https://www.inverparish.com" target="_blank" rel="noopener noreferrer">www.inverparish.com</a><br>
-Mass Times<br>
-Day<br>
-Time<br>
-Saturday 27th June<br>
-Ardaraigh<br>
-6:00pm<br>
-Dirmanna<br>
-7:30pm<br>
-Sunday 28th June<br>
-Froses<br>
-10:00am<br>
-Mountcharles<br>
-11:30am<br>
-Anniversaries/Intentions<br>
-- Saturday 27th June<br>
-- Dirmanna: Cahal and Marie Cassidy<br>
-- Sunday 28th June<br>
-- Froses: John Meehan, Coolum<br>
-- Brian Monaghan, Jr.<br>
-- Esther Dunlevy<br>
-- Willie Kane, Dirmanna and Kilmur<br>
-Upcoming Events<br>
-- Monday 29th June<br>
-- No Mass<br>
-- Tuesday 30th June<br>
-- Froses: 10:00am People of the Parish<br>
-- 1:00pm Wedding<br>
-- Wednesday 1st July<br>
-- No Mass<br>
-- Thursday 2nd July<br>
-- Dirmanna: 10:00am Holy Mass<br>
-- Friday 3rd July<br>
-- Froses: 7:00pm Bernadette Gallagher<br>
-- Saturday 4th July<br>
-- Ardaraigh: 6:00pm Maura McHugh<br>
-- Mary Griffin<br>
-- May Agnes and Eddie Mulreany<br>
-- Maggie Josie Watters<br>
-- Dirmanna: 7:30pm Holy Mass<br>
-- Sunday 5th July<br>
-- Froses: 10:00am Holy Mass<br>
-- Mountcharles: 11:30am Holy Mass<br>
-Eucharistic Adoration<br>
-- Tuesdays: Froses 10:30am–11:30am<br>
-- Thursdays: Ardaraigh 7:00pm–8:00pm<br>
-- Fridays: Mountcharles 3:00pm–4:00pm<br>
-Personal Intentions<br>
-- Annalise Conroy 2nd August<br>
-- Mary McCarthy 25th July<br>
-Supporting Your Church<br>
-Please remember making your contributions by online banking, standing order/direct debit when supporting your Church. Bank details for each Church is as follows:<br>
-- Froses: Inver Parish Account: IBAN IE75 BOFI 9014 3566 8632<br>
-- Froses Development Fund Account: IBAN IE29 BOFI 9014 3566 8642 (Building Fund)<br>
-- Ardaraigh: St. Naul's Ardagh EBAN: IE75 BOFI 9014 3566 8611<br>
-- Mountcharles: Mountcharles Church Account: IBAN: IE06 BOFI 9014 3566 8681<br>
-- Dirmanna: Dirmanna Church Account: IBAN: IE27 BOFI 9014 3566 8672<br>
-Other Notices<br>
-Why Sunday Matters<br>
-Our invitation to reflect on Sundays has been the theme of Synodality - Communion, Participation, and Mission – reminding us that it is not a personal reminder with Christ but a communal act of worship. We go to do together. The Sunday Mass where the Church is most visibly alive, and where every member of the community plays an essential role, their participation is needed for the Church to truly live.<br>
-We are deeply thankful to priests, ministers and all those who celebrate Mass. Special gratitude goes to those involved in liturgical ministries, those who assist in the Word, of Holy Ministers, Sacristans, and Altar Servers. Encouraging the number of people as Altar Servers is especially important and should be actively supported by their families and parish.<br>
-Upcoming Fundraising Events<br>
-- Sandra's Run: We are the organisers (parents of Sandra's McCormick Run and we are going through the 1st stop to Froses on 4th July. To help fundraising, please feel free to encourage children and give them encouragement.<br>
-- A defibrillator has been installed in the Football Club grounds in Tymeen. Eircode F94 W974.<br>
-- Thank you: I would like to express my sincere thanks to everyone who joined me on Friday, 19th June, to celebrate the 40th Anniversary of my Ordination, and to all who traveled from various Parishes to mark this important occasion for me. Your presence was greatly appreciated. My heartfelt thanks to you all.<br>
-Fr. James Sweeney<br>
-Notices for Newsletter<br>
-Notices of community/non-commercial nature are always welcome for our newsletter. Email<br>
-<a href="mailto:inverparish@gmail.com" target="_blank" rel="noopener noreferrer">inverparish@gmail.com</a><br>
-, deadline 12 noon on Thursday.<br>
-Church of the Irish Martyrs<br>
-Fr Ciaran Harkin P.P./Fr Dominic Thomuzhky C.C.<br>
-Ballyraine, Letterkenny.<br>
-<a href="tel:+353749127600" style="color:#1d4ed8;font-weight:600;">074 91 27600</a><br>
-;<br>
-<a href="mailto:irishmartyschurch@gmail.com" target="_blank" rel="noopener noreferrer">irishmartyschurch@gmail.com</a><br>
-Newsletter 28 June 2026<br>
-MASS TIMES<br>
-Day<br>
-Time<br>
-27th June Saturday<br>
-9.30am<br>
-6.30pm<br>
-28th June Sunday<br>
-9.30am<br>
-11.30am<br>
-5.00pm<br>
-29th June Monday<br>
-9.30am<br>
-4.00pm<br>
-30th June Tuesday<br>
-9.30am<br>
-1st July Wednesday<br>
-9.30am<br>
-2nd July Thursday<br>
-9.30am<br>
-3rd July Friday<br>
-9.30am<br>
-4th July Saturday<br>
-9.30am<br>
-6.30pm<br>
-5th July Sunday<br>
-9.30am<br>
-11.30am<br>
-5.00pm<br>
-WE EXTEND OUR DEEPEST SYMPATHY<br>
-to the families of Tadhg Callaghan Carter, Bernie Greene (Clonmel), John Coleman, Ken Kirwan, Hannah Glackin, &amp; Eunan Doherty who died recently. May they rest in peace.<br>
-CONFESSIONS:<br>
-12noon - 1pm and after the 6.30pm Mass on Saturday each week.<br>
-PILGRIMAGE TO LISIEUX,<br>
-Sept 18 - 21, staying in a beautiful hotel across the road from the Carmel of St Therese. Cost €795 which includes flights, coaches, full religious programme, all dinners and some lunches. Phone<br>
-<a href="tel:+353579355050" style="color:#1d4ed8;font-weight:600;">057 93 55050</a><br>
-or email<br>
-<a href="mailto:info@myriam.ie" target="_blank" rel="noopener noreferrer">info@myriam.ie</a><br>
-.<br>
-MEN'S ROSARY,<br>
-Saturday 4th July, 1.00pm at the Market Square, Letterkenny.<br>
-DONEGAL PRO LIFE GATHERING,<br>
-Hospital Roundabout, Letterkenny, Friday 3rd July, 1 - 2pm. Support welcome. Rally For Life, Belfast, Saturday 4th July. To book a seat on sponsored bus contact: Mgt<br>
-, Teresa<br>
-<a href="tel:+353862647235" style="color:#1d4ed8;font-weight:600;">086 2647235</a><br>
-or Brian<br>
-<a href="tel:+353872913186" style="color:#1d4ed8;font-weight:600;">087 2913186</a><br>
-.<br>
-FIRST FRIDAY:<br>
-Fr Dominic will visit the sick &amp; housebound of the parish on Thursday 2nd &amp; Friday 3rd July. Fr Ciaran will do his visits on Monday 6th July.<br>
-GRAVEYARD SERVICES:<br>
-Conwal Graveyard, Sunday 5th July at 4pm; Aughnish Graveyard, Monday 6th July at 7pm; Old Leck Graveyard, Sunday 12th July at 3pm; New Leck Graveyard, Sunday 12th July at 4pm. Over the coming weeks, we encourage you to tidy up your loved ones graves and the graveyards in general. Please place any wreaths/flowers in the skips provided. These skips are provided solely for this purpose and not for household waste.<br>
-THANK YOU:<br>
-Dear Friends. I received so many expressions of congratulations for the Diamond Jubilee of my Ordination as a Priest. I thank you sincerely for your prayers and good wishes. As I look back on sixty years as a priest, I can only praise the Lord for his goodness and fidelity. To all who helped me in any way I express my sincere gratitude. I remembered you all and your intentions at Masses in Lourdes and at the Grotto. With renewed thanks and gratitude to one and all, with my blessing + Philip Boyce c.c.d.<br>
-HLI IRELAND 32 COUNTY MISSIONS<br>
-with relics of St Thérèse &amp; The Holy Face. Thurs 9th July, Mount Errigal Hotel, Letterkenny, 7pm-9pm. The event comprises recitation of the rosary, a reminder of the mission of laity through Gospel and the Catechism, as well as information on the work of Human Life International Ireland.<br>
-SENIOR SUMMER PROJECT AT CARA HOUSE:<br>
-Week 1; 13th – 15th July, 10am – 4pm<br>
-Week 2; 20th – 2nd July, 10am – 4pm. Light breakfast &amp; lunch provided. Activities and a day out each week. €30 per week<br>
-MARY'S MEALS<br>
-are delighted to announce that Fr Eamonn Kelly is getting rid of the beard in a sponsored beard and head shave at the Diamond, Donegal Town on Saturday 1th July from Noon to 4pm. Mary’s Meals are presently feeding 3,060,011 Children every day in school and €22 provides food for a child for a school year. Any support is greatly appreciated. Donate -<br>
-<a href="https://www.idonate.ie/event/frkellysbeardshavechallenge" target="_blank" rel="noopener noreferrer">https://www.idonate.ie/event/frkellysbeardshavechallenge</a><br>
-DANCE<br>
-in aid of the Alzheimer Society, with Evelyn and special guests Hugh McLean Jnr, Martin Orr, Caz Hunter &amp; Raymond McIntyre, Station House Hotel, Friday 3rd July. Doors open 9.00pm. Dancing 9.30pm – 12.30am. Dancing Competition and spot prizes. Station House Hotel in association with Alzheimer Society of Ireland Donegal Branch, hope to make this a night to remember and remember those who cannot remember. Tickets €15, available at Station House hotel or at the door on the night.<br>
-CONGRATULATIONS<br>
-to Eimear Roarty &amp; David Daly who were married here in the Church on Friday. Wishing you many blessings in your married life together.<br>
-If you wish to donate to the Church online, you can do so by scanning the QR Code to the left and following the instructions on the online form. Thank you.</p></div>
-</details>
+<h2 class="b-title">Glenties</h2>
+<p>€2,025
+Fintown
+€546
+Edeninfagh
+€300
+Bingo Every Tuesday Night in the Market Hall STARTING THIS TUESDAY AT 8:30 P.M.
+Snowball on 45 numbers or less, if not won €200 will be paid out. We appreciate your support!
+The Annual Parish Climb of Croagh Patrick will take place on Friday 10th July. Bus departing Glenties at 7am, returning that evening. For more information and to book contact: Martin Doc
+<a href="tel:+353868565132" style="color:#1d4ed8;font-weight:600;">086 8565132</a>
+or Michael Regan
+<a href="tel:+353861682125" style="color:#1d4ed8;font-weight:600;">086 1682125</a>
+Good level of fitness required.
+EDEN INFAGH CHURCH/HALL FUNDRAISER
+Congratulations to Grace McDade, Castleblayney, Co Louth on winning €1,190
+Thank you to all who contributed to the draw. Next draw takes place on Saturday 27th June.
+Envelopes available in the three local churches and in local businesses for any community member. Entries via also revolve: Frank
+<a href="tel:+353879186211" style="color:#1d4ed8;font-weight:600;">087 9186211</a>
+(€10 per entry).
+Spás Seirbhíse Poiblí do Chomhoibriún
+Community Employment Scheme Vacancies:
+Tá poist sa Scéim Fostaíochta Poiblí ag fáil in Ginearálta. Má tá suim agatsa b'fhéidir teigh i dteagmháil le Aoibhinn ar
+<a href="tel:+353877362747" style="color:#1d4ed8;font-weight:600;">087-7362747</a>
+.
+Altar Society Team A
+Taicíochta Foilsiu Fotaisleachta Aras Shéaghain Bháin, Baile na Finne ar Dé Mairt, 7úil - 10:00.
+Fáilte Roimh Uile. Seachad Posit, lTríiteach Cláodol, Seisleanna Aoibhinn.
+Fáilte Roimh Uile, Sraith. Ring 074 95 468701 to book your appointment. Spaces limited.
+Repositories
+Saint Connell's Museum are hosting tea/coffee &amp; refreshments in the Market Hall on Sunday 5th July after the Blessing of Graves. We would love to see you there. And donations of food would be greatly appreciated and can be dropped into the Market Hall after 11am Mass.
+Those who assisted with prayers and collection in the graveyard in Glenties, if they might kindly be in a position to carry out the same duties this year. (If not, please contact Fr Gerard)
+POBAL CHRÍOST RÍ GORT A' CHOIRCE
+An tAth. Donnchadh Ó Baoill
+(086) 603 1749 / (074) 91 35214
+<a href="mailto:tpcr1906@gmail.com" target="_blank" rel="noopener noreferrer">tpcr1906@gmail.com</a>
+28ú Meitheamh 2026
+<a href="https://www.pobalchriostir.ie" target="_blank" rel="noopener noreferrer">www.pobalchriostir.ie</a>
+/
+<a href="https://www.mcn.live" target="_blank" rel="noopener noreferrer">www.mcn.live</a>
+AIFRINN O SEACHTAIN
+Day
+Time
+27.06
+Satharn 7 i.n.
+27.06
+Bernard Ó Domhnaill &amp; a mhac Joe, An Ard a Mhór
+28.06
+Domhnach 9 r.n.
+28.06
+Domhnach 11 r.n
+29.06
+Luain 7 i.n.
+30.06
+Máirt 10 r.n.
+01.07
+Céadaoin 7 i.n.
+02.07
+Déardaoin 7 i.n.
+03.07
+Aoine 7 i.n.
+04.07
+Mary McGee, Seanbhaile
+04.07
+Mary O'Leary, Gort a' Choirec
+An Chéad Sathairn - Faoi 10.15-11.00.
+Comaoineach. Páid. 15 boimate ag machnamh ar Rún Diamhair an Chreidimh
+04.07
+Satharn 7 i.n.
+Rosie, Eddie &amp; James Mac Pháidín, An Ard a' Bhéag
+05.07
+Domhnach 9 r.n.
+Séamus Mac Géidigh, An Ailt
+05.07
+Domhnach 11 r.n.
+Betty agus Michael Woods, Fána Bhúi Uacht.
+AN TRÍÚ DOMHNACH DEÁG A
+AN CHÉAD LÉACHT
+Sliocht as dára leabhar na Rithe. 4:8-11, 14-16.
+Lá amháin ag Elisea ar a bhealach go Siunan, chuir bean uasal a bhí in cónai ansin faithe nóin agus d'iarraidh ar fanacht agus tábha a bhéithe goine. Ó láisiú amach dhéanadh sé moill le haghaidh bíde a bheith aige nuar a thagadh sé an bealach sin. Lá amháin, dúirt sé lena fear ceile: "Féach! táim cinnte gur féidir le Dia an fear seo a bhionn ag soirtheaisteál an bealach seo. Tógfaidh seomra beag ar an dón do agus cuirimid leaba ann fa chomhars an táb agus cathaoir agus lamp. Ansiar ur bith aid dtagnan sé chugainn, is feidir leis a scíste a dhéanamh ann." Lá amháin a thàinig sé, feictear leis seomra agus chuáigh sé i lár. D'fhiafraigh sé: "Cad is féidir doimhne a dhéanamh ar son seo uilig?" D'fhreagair Gehazi: "Leoga, níl mac ar bith aici agus tá fear céile aosta." Dúirt Elisha: "Cuirfá na coinne." Ghlaoigh an seirbhíseach uirthi agus sheas sí ag an doras. "Blaín ón am seo," ar sise, "Béidh mac i do bhachlainn agat." Bríathar an Tiarna. FR. Buíochas do Dhia.
+FREAGRA AN T'SALM
+Canafidh mé shór faoi do bhuanghráid, a Thiarna.
+AN DARA LÉACHT (6:3-4, 8-11.)
+Sliocht as litir Naomh Pól chuig na Rómhánaigh.
+A bhráithre, an é nach dtigeann sibh, gach duine againn a baisteadh in Íosa Críost, gur ina bhás sin a baisteadh é. Go dtí sin comhdháladh sinn a bhás leis trid an mbaisteadh i dtreo siúlfinnse fós i meabha úrna, faoi mar a thógadh Críost ó mháirth rud chumhacht an Athar. Ach má táimid tar éis bás a fháil le Críost, creidimid go mairfidh beo leis chomh maith. Tá a fhios againn nach bhfhaighidh Críost bás arís tar éis a aisíraí ó na mairbh; ní bheidh cinnanas ag an mbás airís níos mó. An bás a fháil se, ba don pheacadh a fuair sé é an t-aon uair amháin, ach is beatha do Dhia an beatha a chaitheann sé anois. Ar an dóch céanna, caithfidh sibhse a mheas gur duine sibh comh maith atá marbh ó gheall an pheacadh agus beo le Dia i bpáirt le hÍosa Críost. Bríathar an Tiarna. FR. Buíochas do Dhia.
+ALLELUIA, alleluia!
+Is mise solas an tsaoil, a deir an Tiarna.
+An t-é le leanfaidh mise, beidh aige solas na beatha.
+Alleluia.
+SOISCEALT (10:37-42.)
+Sliocht as an Soiscéal naofa de réir Naoimh Maitiú.
+PARISH OF INVER Saturday 27th – Sunday 28th June 2026 – 13th SUNDAY IN ORDINARY TIME ~ Year A
+Fr Liam Boyle, PP, Parochial House, Froses Tel:
+<a href="tel:+353749736006" style="color:#1d4ed8;font-weight:600;">074 9736006</a>
+• In case of emergency only ring
+<a href="tel:+353899712498" style="color:#1d4ed8;font-weight:600;">089 9712498</a>
+Email:
+<a href="mailto:inverparish@gmail.com" target="_blank" rel="noopener noreferrer">inverparish@gmail.com</a>
+• Website:
+<a href="https://www.inverparish.com" target="_blank" rel="noopener noreferrer">www.inverparish.com</a>
+Mass Times
+Day
+Time
+Saturday 27th June
+Ardaraigh
+6:00pm
+Dirmanna
+7:30pm
+Sunday 28th June
+Froses
+10:00am
+Mountcharles
+11:30am
+Anniversaries/Intentions
+- Saturday 27th June
+- Dirmanna: Cahal and Marie Cassidy
+- Sunday 28th June
+- Froses: John Meehan, Coolum
+- Brian Monaghan, Jr.
+- Esther Dunlevy
+- Willie Kane, Dirmanna and Kilmur
+Upcoming Events
+- Monday 29th June
+- No Mass
+- Tuesday 30th June
+- Froses: 10:00am People of the Parish
+- 1:00pm Wedding
+- Wednesday 1st July
+- No Mass
+- Thursday 2nd July
+- Dirmanna: 10:00am Holy Mass
+- Friday 3rd July
+- Froses: 7:00pm Bernadette Gallagher
+- Saturday 4th July
+- Ardaraigh: 6:00pm Maura McHugh
+- Mary Griffin
+- May Agnes and Eddie Mulreany
+- Maggie Josie Watters
+- Dirmanna: 7:30pm Holy Mass
+- Sunday 5th July
+- Froses: 10:00am Holy Mass
+- Mountcharles: 11:30am Holy Mass
+Eucharistic Adoration
+- Tuesdays: Froses 10:30am–11:30am
+- Thursdays: Ardaraigh 7:00pm–8:00pm
+- Fridays: Mountcharles 3:00pm–4:00pm
+Personal Intentions
+- Annalise Conroy 2nd August
+- Mary McCarthy 25th July
+Supporting Your Church
+Please remember making your contributions by online banking, standing order/direct debit when supporting your Church. Bank details for each Church is as follows:
+- Froses: Inver Parish Account: IBAN IE75 BOFI 9014 3566 8632
+- Froses Development Fund Account: IBAN IE29 BOFI 9014 3566 8642 (Building Fund)
+- Ardaraigh: St. Naul's Ardagh EBAN: IE75 BOFI 9014 3566 8611
+- Mountcharles: Mountcharles Church Account: IBAN: IE06 BOFI 9014 3566 8681
+- Dirmanna: Dirmanna Church Account: IBAN: IE27 BOFI 9014 3566 8672
+Other Notices
+Why Sunday Matters
+Our invitation to reflect on Sundays has been the theme of Synodality - Communion, Participation, and Mission – reminding us that it is not a personal reminder with Christ but a communal act of worship. We go to do together. The Sunday Mass where the Church is most visibly alive, and where every member of the community plays an essential role, their participation is needed for the Church to truly live.
+We are deeply thankful to priests, ministers and all those who celebrate Mass. Special gratitude goes to those involved in liturgical ministries, those who assist in the Word, of Holy Ministers, Sacristans, and Altar Servers. Encouraging the number of people as Altar Servers is especially important and should be actively supported by their families and parish.
+Upcoming Fundraising Events
+- Sandra's Run: We are the organisers (parents of Sandra's McCormick Run and we are going through the 1st stop to Froses on 4th July. To help fundraising, please feel free to encourage children and give them encouragement.
+- A defibrillator has been installed in the Football Club grounds in Tymeen. Eircode F94 W974.
+- Thank you: I would like to express my sincere thanks to everyone who joined me on Friday, 19th June, to celebrate the 40th Anniversary of my Ordination, and to all who traveled from various Parishes to mark this important occasion for me. Your presence was greatly appreciated. My heartfelt thanks to you all.
+Fr. James Sweeney
+Notices for Newsletter
+Notices of community/non-commercial nature are always welcome for our newsletter. Email
+<a href="mailto:inverparish@gmail.com" target="_blank" rel="noopener noreferrer">inverparish@gmail.com</a>
+, deadline 12 noon on Thursday.
+Church of the Irish Martyrs
+Fr Ciaran Harkin P.P./Fr Dominic Thomuzhky C.C.
+Ballyraine, Letterkenny.
+<a href="tel:+353749127600" style="color:#1d4ed8;font-weight:600;">074 91 27600</a>
+;
+<a href="mailto:irishmartyschurch@gmail.com" target="_blank" rel="noopener noreferrer">irishmartyschurch@gmail.com</a>
+Newsletter 28 June 2026
+MASS TIMES
+Day
+Time
+27th June Saturday
+9.30am
+6.30pm
+28th June Sunday
+9.30am
+11.30am
+5.00pm
+29th June Monday
+9.30am
+4.00pm
+30th June Tuesday
+9.30am
+1st July Wednesday
+9.30am
+2nd July Thursday
+9.30am
+3rd July Friday
+9.30am
+4th July Saturday
+9.30am
+6.30pm
+5th July Sunday
+9.30am
+11.30am
+5.00pm
+WE EXTEND OUR DEEPEST SYMPATHY
+to the families of Tadhg Callaghan Carter, Bernie Greene (Clonmel), John Coleman, Ken Kirwan, Hannah Glackin, &amp; Eunan Doherty who died recently. May they rest in peace.
+CONFESSIONS:
+12noon - 1pm and after the 6.30pm Mass on Saturday each week.
+PILGRIMAGE TO LISIEUX,
+Sept 18 - 21, staying in a beautiful hotel across the road from the Carmel of St Therese. Cost €795 which includes flights, coaches, full religious programme, all dinners and some lunches. Phone
+<a href="tel:+353579355050" style="color:#1d4ed8;font-weight:600;">057 93 55050</a>
+or email
+<a href="mailto:info@myriam.ie" target="_blank" rel="noopener noreferrer">info@myriam.ie</a>
+.
+MEN'S ROSARY,
+Saturday 4th July, 1.00pm at the Market Square, Letterkenny.
+DONEGAL PRO LIFE GATHERING,
+Hospital Roundabout, Letterkenny, Friday 3rd July, 1 - 2pm. Support welcome. Rally For Life, Belfast, Saturday 4th July. To book a seat on sponsored bus contact: Mgt
+, Teresa
+<a href="tel:+353862647235" style="color:#1d4ed8;font-weight:600;">086 2647235</a>
+or Brian
+<a href="tel:+353872913186" style="color:#1d4ed8;font-weight:600;">087 2913186</a>
+.
+FIRST FRIDAY:
+Fr Dominic will visit the sick &amp; housebound of the parish on Thursday 2nd &amp; Friday 3rd July. Fr Ciaran will do his visits on Monday 6th July.
+GRAVEYARD SERVICES:
+Conwal Graveyard, Sunday 5th July at 4pm; Aughnish Graveyard, Monday 6th July at 7pm; Old Leck Graveyard, Sunday 12th July at 3pm; New Leck Graveyard, Sunday 12th July at 4pm. Over the coming weeks, we encourage you to tidy up your loved ones graves and the graveyards in general. Please place any wreaths/flowers in the skips provided. These skips are provided solely for this purpose and not for household waste.
+THANK YOU:
+Dear Friends. I received so many expressions of congratulations for the Diamond Jubilee of my Ordination as a Priest. I thank you sincerely for your prayers and good wishes. As I look back on sixty years as a priest, I can only praise the Lord for his goodness and fidelity. To all who helped me in any way I express my sincere gratitude. I remembered you all and your intentions at Masses in Lourdes and at the Grotto. With renewed thanks and gratitude to one and all, with my blessing + Philip Boyce c.c.d.
+HLI IRELAND 32 COUNTY MISSIONS
+with relics of St Thérèse &amp; The Holy Face. Thurs 9th July, Mount Errigal Hotel, Letterkenny, 7pm-9pm. The event comprises recitation of the rosary, a reminder of the mission of laity through Gospel and the Catechism, as well as information on the work of Human Life International Ireland.
+SENIOR SUMMER PROJECT AT CARA HOUSE:
+Week 1; 13th – 15th July, 10am – 4pm
+Week 2; 20th – 2nd July, 10am – 4pm. Light breakfast &amp; lunch provided. Activities and a day out each week. €30 per week
+MARY'S MEALS
+are delighted to announce that Fr Eamonn Kelly is getting rid of the beard in a sponsored beard and head shave at the Diamond, Donegal Town on Saturday 1th July from Noon to 4pm. Mary’s Meals are presently feeding 3,060,011 Children every day in school and €22 provides food for a child for a school year. Any support is greatly appreciated. Donate -
+<a href="https://www.idonate.ie/event/frkellysbeardshavechallenge" target="_blank" rel="noopener noreferrer">https://www.idonate.ie/event/frkellysbeardshavechallenge</a>
+DANCE
+in aid of the Alzheimer Society, with Evelyn and special guests Hugh McLean Jnr, Martin Orr, Caz Hunter &amp; Raymond McIntyre, Station House Hotel, Friday 3rd July. Doors open 9.00pm. Dancing 9.30pm – 12.30am. Dancing Competition and spot prizes. Station House Hotel in association with Alzheimer Society of Ireland Donegal Branch, hope to make this a night to remember and remember those who cannot remember. Tickets €15, available at Station House hotel or at the door on the night.
+CONGRATULATIONS
+to Eimear Roarty &amp; David Daly who were married here in the Church on Friday. Wishing you many blessings in your married life together.
+If you wish to donate to the Church online, you can do so by scanning the QR Code to the left and following the instructions on the online form. Thank you.</p>
 <div class="parish-row-empty parish-odd" id="parish-gort-a-choirce">
   <span class="parish-name">Gortahork</span>
   <span class="parish-empty">No searchable text available this week.</span>
@@ -1272,697 +1276,684 @@ If you wish to donate to the Church online, you can do so by scanning the QR Cod
   <span class="parish-empty">No searchable text available this week.</span>
   <a class="parish-source" href="https://drive.usercontent.google.com/download?id=1m6sOGz3dECWvbbpXCnRGdHG77yWiLXxR&amp;export=download" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
 </div>
-<details class="parish-block parish-even" id="parish-kilbarron">
-  <summary class="parish-head">
-    <span class="parish-name">Kilbarron</span>
-    <a class="parish-source" href="https://www.kilbarron.org/bulletin" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p>BALLYSHANNON<br>
-St. Patrick's Church<br>
-Saturday 20th - The Irish Martyrs<br>
-6.15 pm Dympna Cronin, Lawne Park<br>
-Irene Coughlin, Ernedale Heights<br>
-Patrick Kirley, Rosnowlagh<br>
-Celine A. Jim O'Donnell Rosnowlagh Rd<br>
-Anne, Noel and Shane Cunningham<br>
-Eddie Gillespie, Boston, Hugh Gillespie,<br>
-Bolton &amp; Deceased, Gillespie family<br>
-Nicholas Maloney, Abbey<br>
-Sunday 21st<br>
-9.00 am<br>
-11 am Priest’s Intention<br>
-Monday 2nd<br>
-9.30 am Sean Rooney and Deceased members of Rooney family, St. Benildus Avenue<br>
-Tuesday 23rd<br>
-9.30 am Freddie &amp; Molly McDonagh and the<br>
-Deceased members of McDonagh &amp;<br>
-Meehan families<br>
-Wed 24th - Feast of St. John the Baptist<br>
-9.30 am Deon Doherty, Coolcrena<br>
-Thursday 25th<br>
-9.30 am Margaret Ellen Gil &amp; Deceased members of Gillet Family<br>
-Friday 26th<br>
-9.30 am Priest’s Intention<br>
-Saturday 27th<br>
-6.15 pm Danny Logan, Ernedale Heights<br>
-Mary, Katherina, Anthony &amp; Deceased members of Rannagh Family, Legislation<br>
-Margaret and Benny Fox, Legislation<br>
-Pat, John &amp; Joseph Roopeer, Corker<br>
-Mary Ann Duffy, Cluain Barron<br>
-Seamus Duffy, St. Catherines Avenue<br>
-Sonny &amp; Mary Lister and Jimmy &amp; Cait Kiley<br>
-St. Mary's, Castlefinn<br>
-Sunday 21st<br>
-10 am Liam Droghan, Kistenal<br>
-Leo McCafferty, Greysteel, Derry<br>
-Sunday 28th<br>
-10 am Mary Jane Barron, Ballymagrorty<br>
-Mary Kelleher, Clifden and Echy<br>
-We Pray for the Dead<br>
-Died Recently<br>
-Dessie Devanney, St. Benildus Avenue<br>
-Month's Mind<br>
-Dympna Cronin, Lawne Park<br>
-First Anniversary<br>
-Irene Coughlin, Ernedale Heights<br>
-Anniversary<br>
-Barney Rafferty<br>
-Eternal Rest grant unto Them O Lord<br>
-Sacrament of Baptism<br>
-Next Baptisms<br>
-Saturday 4th July at 4.30 pm<br>
-Saturday 25th July at 12 noon<br>
-Anyone wishing to register is asked to contact the parish office on<br>
-<a href="tel:+353719851295" style="color:#1d4ed8;font-weight:600;">071 98 51295</a><br>
-Annual Grandparents Pilgrimage<br>
-Celebrating the World Day for Grandparents and the Elderly. Sunday, 26th July at Knock Shrine.<br>
-Commencing at 2.30 pm with the Anointing of the Sick. A Day of Grace and Blessing for the whole family as we honour Grandparents and the elderly. All are welcome. Visit the website for more information:<br>
-<a href="https://www.eucharisticpcongressassociation.org" target="_blank" rel="noopener noreferrer">www.eucharisticpcongressassociation.org</a><br>
-Donegal Missions Nights 2026<br>
-Human Life International host upcoming Mission Nights in St. Mary's Hall, Buncarrin on Wednesday 1st July at 2pm, The Abbey Hotel, Donegal Town on Tuesday, 7th July at 6.30pm and Mount Errigal Hotel, Letterkenny on Thursday 9th July at 7pm. 100 years of Feast of Christ the King, 100 years of St. Therese’s Canonisation. Venere relives of St. Therese &amp; The Holy Face of Jesus. See<br>
-<a href="https://www.humanlife.ie" target="_blank" rel="noopener noreferrer">www.humanlife.ie</a><br>
-for more.<br>
-Rockfield Community Evening<br>
-The Rockfield Community Coop are hosting a neighborhood gathering this Tuesday, 23rd of June<br>
-7pm in Rockfield Community Hall. Tea and coffee served with music from local musicians. All welcome!<br>
-Kilbarron Parish Cemetery Sunday<br>
-Mass for our deceased relatives and friends and Blessing of graves will take place on<br>
-5th July - St. Mary's, Castlefinn at 10am<br>
-2nd August - Abbey Graveyard at 11 am<br>
-Please make an effort to tidy up your plots within the next few weeks. Thank you.<br>
-Day for Life<br>
-Today, Sunday 21st June the Church across Ireland celebrates Day for Life in the<br>
-Humanity of the Unborn Child which invites us to reflect on the wonder of human life from<br>
-the moment of conception. We remember how the Lord Jesus Christ Himself sanctified and experienced the beginning of life in the womb of Mary, Mary knew that she was carrying the Son of God – God<br>
-and man – as soon as He was conceived. John the Baptist leapt in his mother Elizabeth’s womb when Mary greeted her. Our Lady treasured Our Lord in her heart and womb until His birth. To read full bishops’ message visit councilforlife.ie<br>
-Thought for the Day<br>
-“O Mary, bright dawn of the new world, Mother of living hope, you are the extent of life. Look down, O Mother, upon the vast numbers of babies not allowed to be born, of the poor whose lives are met difficult, of men and women who are victims of brutal violence, of the elderly and the sick children burdened under much suffering and social mercy.<br>
-Grant that all who believe in your Son may proclaim the Gospel of life with courage and love to the people of our time.<br>
-To the praise and glory of God, the Creator and lover of life."<br>
-- Pope John Paul II<br>
-Evangelium Vitae, The Gospel of Life, 10<br>
-St Carthas Church, Kilcar<br>
-Fr Willie Peoples P.P<br>
-<a href="tel:+353749738007" style="color:#1d4ed8;font-weight:600;">074 9738007</a><br>
-/<br>
-<a href="tel:+353877449461" style="color:#1d4ed8;font-weight:600;">087 7449461</a><br>
-<a href="mailto:stcarthaschurch@gmail.com" target="_blank" rel="noopener noreferrer">stcarthaschurch@gmail.com</a><br>
-Sunday 28th June 2026<br>
-Live Streaming:<br>
-<a href="https://www.mcn.live" target="_blank" rel="noopener noreferrer">www.mcn.live</a><br>
-Mass Times<br>
-Day<br>
-Time<br>
-Saturday 27th<br>
-6pm<br>
-Sunday 28th<br>
-11am<br>
-Monday 29th<br>
-NO MASS<br>
-Tuesday 30th<br>
-10am<br>
-Wednesday 1st<br>
-10am<br>
-Thursday 2nd<br>
-10am<br>
-Friday 3rd<br>
-10am<br>
-Saturday 4th<br>
-6pm<br>
-Sunday 5th<br>
-11am<br>
-Parish Collection - € 2115<br>
-Graveyard Mass<br>
-This years Graveyard Mass will be on Friday 7th August at 7pm.<br>
-Donegal Pro Life<br>
-Donegal Pro Life monthly Vigil at Hospital Roundabout, Letterkenny on Friday the 3rd July from 1pm-2pm. Support welcome.<br>
-Eucharistic Adoration<br>
-Eucharistic adoration will resume in the month of August, on Wednesdays at 7:30pm. Thank you.<br>
-Confessions will be heard after all Masses during the week<br>
-Mary's Meals<br>
-We are delighted, in fact thrilled, to announce that Fr Eamonn Kelly is getting rid of the beard in a sponsored beard &amp; head shave. It will take place at the Diamond, Donegal Town on Saturday 1th July from 12-4pm.<br>
-Mary's Meals are presently feeding 3,060,011 Children every day in school &amp; €22 provides food for a child for a full school year. Any support is greatly appreciated.<br>
-<a href="https://www.idonate.ie/event/frkellvsbeardshavechallenge" target="_blank" rel="noopener noreferrer">https://www.idonate.ie/event/frkellvsbeardshavechallenge</a><br>
-We Remember:<br>
-Recently Deceased –<br>
-Mary McDowall, Derry<br>
-Mother of Ann Gallagher, Bavin<br>
-Suaimhneas Síoraí<br>
-Áisle Chilli Chartha<br>
-Our summer camp (4th-7th August) has no spaces left.<br>
-Local Artist Sinead Gallagher Art Exhibition in the main hallway.<br>
-Upcoming Concerts:<br>
-Monday 27th July Alán, Wednesday 29th July the Seeger Sessions, Friday 16th September Oiréar &amp; Friday 25th September Frankie Gavan &amp; Catherine Mc Hugh.<br>
-All tickets available at reception, For all info call<br>
-<a href="tel:+353749738376" style="color:#1d4ed8;font-weight:600;">074 9738376</a><br>
-or message our media pages.<br>
-Sandra’s Run<br>
-The organisers of Sandra's run would like to ask anyone who can help in any way to make our run a good one.<br>
-We are asking if you can put teddies or cuddly toys on route Killybegs to Glencolmcille via the line &amp; out to Kilcar via Roxborough.<br>
-We are stopping in Kilcar roughly 1-2 &amp; we would love to get a great shot of the bikes lined up on Kilcar Street &amp; to come out to put a small donation in the bucket.<br>
-It's on July 4th.<br>
-Thanking you Kilcar, Carrick &amp; Glencolmcille.<br>
-Leitir Corn Mill Kilcar<br>
-‘Echo’s At The Mill’ by Well of Urd<br>
-Friday 3rd &amp; 10th July 7:30-9pm<br>
-(WhatsApp<br>
-<a href="tel:+353899804628" style="color:#1d4ed8;font-weight:600;">089 9804628</a><br>
-)<br>
-Car boat sale Saturday 1th July 10am - 1pm text<br>
-<a href="tel:+353876123184" style="color:#1d4ed8;font-weight:600;">087 6123184</a><br>
-or<br>
-<a href="tel:+353872435210" style="color:#1d4ed8;font-weight:600;">087 2435210</a><br>
-Book Launch<br>
-Údarás na Gaeltachta &amp; Áisle Chilli Charthaigh will launch the bilingual book The Story of Textiles in the Southwest Donegal Gaeltacht — a book that tells the story of wool, yarn &amp; tweed in this area over the last hundred years.<br>
-The launch takes place on Friday, 3rd July, at 7.30 pm, in Áisle Charthaigh, Charthai. Everyone is welcome. We hope to see you there.<br>
-St Peregrine<br>
-A blessing with the relic of St Peregrine can be obtained after Mass every Friday at 10am.<br>
-This kindly Saint, born in Italy in 1260, is the Patron Saint of cancer patients.</p></div>
-</details>
+<h2 class="b-title">Kilbarron</h2>
+<p>BALLYSHANNON
+St. Patrick's Church
+Saturday 20th - The Irish Martyrs
+6.15 pm Dympna Cronin, Lawne Park
+Irene Coughlin, Ernedale Heights
+Patrick Kirley, Rosnowlagh
+Celine A. Jim O'Donnell Rosnowlagh Rd
+Anne, Noel and Shane Cunningham
+Eddie Gillespie, Boston, Hugh Gillespie,
+Bolton &amp; Deceased, Gillespie family
+Nicholas Maloney, Abbey
+Sunday 21st
+9.00 am
+11 am Priest’s Intention
+Monday 2nd
+9.30 am Sean Rooney and Deceased members of Rooney family, St. Benildus Avenue
+Tuesday 23rd
+9.30 am Freddie &amp; Molly McDonagh and the
+Deceased members of McDonagh &amp;
+Meehan families
+Wed 24th - Feast of St. John the Baptist
+9.30 am Deon Doherty, Coolcrena
+Thursday 25th
+9.30 am Margaret Ellen Gil &amp; Deceased members of Gillet Family
+Friday 26th
+9.30 am Priest’s Intention
+Saturday 27th
+6.15 pm Danny Logan, Ernedale Heights
+Mary, Katherina, Anthony &amp; Deceased members of Rannagh Family, Legislation
+Margaret and Benny Fox, Legislation
+Pat, John &amp; Joseph Roopeer, Corker
+Mary Ann Duffy, Cluain Barron
+Seamus Duffy, St. Catherines Avenue
+Sonny &amp; Mary Lister and Jimmy &amp; Cait Kiley
+St. Mary's, Castlefinn
+Sunday 21st
+10 am Liam Droghan, Kistenal
+Leo McCafferty, Greysteel, Derry
+Sunday 28th
+10 am Mary Jane Barron, Ballymagrorty
+Mary Kelleher, Clifden and Echy
+We Pray for the Dead
+Died Recently
+Dessie Devanney, St. Benildus Avenue
+Month's Mind
+Dympna Cronin, Lawne Park
+First Anniversary
+Irene Coughlin, Ernedale Heights
+Anniversary
+Barney Rafferty
+Eternal Rest grant unto Them O Lord
+Sacrament of Baptism
+Next Baptisms
+Saturday 4th July at 4.30 pm
+Saturday 25th July at 12 noon
+Anyone wishing to register is asked to contact the parish office on
+<a href="tel:+353719851295" style="color:#1d4ed8;font-weight:600;">071 98 51295</a>
+Annual Grandparents Pilgrimage
+Celebrating the World Day for Grandparents and the Elderly. Sunday, 26th July at Knock Shrine.
+Commencing at 2.30 pm with the Anointing of the Sick. A Day of Grace and Blessing for the whole family as we honour Grandparents and the elderly. All are welcome. Visit the website for more information:
+<a href="https://www.eucharisticpcongressassociation.org" target="_blank" rel="noopener noreferrer">www.eucharisticpcongressassociation.org</a>
+Donegal Missions Nights 2026
+Human Life International host upcoming Mission Nights in St. Mary's Hall, Buncarrin on Wednesday 1st July at 2pm, The Abbey Hotel, Donegal Town on Tuesday, 7th July at 6.30pm and Mount Errigal Hotel, Letterkenny on Thursday 9th July at 7pm. 100 years of Feast of Christ the King, 100 years of St. Therese’s Canonisation. Venere relives of St. Therese &amp; The Holy Face of Jesus. See
+<a href="https://www.humanlife.ie" target="_blank" rel="noopener noreferrer">www.humanlife.ie</a>
+for more.
+Rockfield Community Evening
+The Rockfield Community Coop are hosting a neighborhood gathering this Tuesday, 23rd of June
+7pm in Rockfield Community Hall. Tea and coffee served with music from local musicians. All welcome!
+Kilbarron Parish Cemetery Sunday
+Mass for our deceased relatives and friends and Blessing of graves will take place on
+5th July - St. Mary's, Castlefinn at 10am
+2nd August - Abbey Graveyard at 11 am
+Please make an effort to tidy up your plots within the next few weeks. Thank you.
+Day for Life
+Today, Sunday 21st June the Church across Ireland celebrates Day for Life in the
+Humanity of the Unborn Child which invites us to reflect on the wonder of human life from
+the moment of conception. We remember how the Lord Jesus Christ Himself sanctified and experienced the beginning of life in the womb of Mary, Mary knew that she was carrying the Son of God – God
+and man – as soon as He was conceived. John the Baptist leapt in his mother Elizabeth’s womb when Mary greeted her. Our Lady treasured Our Lord in her heart and womb until His birth. To read full bishops’ message visit councilforlife.ie
+Thought for the Day
+“O Mary, bright dawn of the new world, Mother of living hope, you are the extent of life. Look down, O Mother, upon the vast numbers of babies not allowed to be born, of the poor whose lives are met difficult, of men and women who are victims of brutal violence, of the elderly and the sick children burdened under much suffering and social mercy.
+Grant that all who believe in your Son may proclaim the Gospel of life with courage and love to the people of our time.
+To the praise and glory of God, the Creator and lover of life."
+- Pope John Paul II
+Evangelium Vitae, The Gospel of Life, 10
+St Carthas Church, Kilcar
+Fr Willie Peoples P.P
+<a href="tel:+353749738007" style="color:#1d4ed8;font-weight:600;">074 9738007</a>
+/
+<a href="tel:+353877449461" style="color:#1d4ed8;font-weight:600;">087 7449461</a>
+<a href="mailto:stcarthaschurch@gmail.com" target="_blank" rel="noopener noreferrer">stcarthaschurch@gmail.com</a>
+Sunday 28th June 2026
+Live Streaming:
+<a href="https://www.mcn.live" target="_blank" rel="noopener noreferrer">www.mcn.live</a>
+Mass Times
+Day
+Time
+Saturday 27th
+6pm
+Sunday 28th
+11am
+Monday 29th
+NO MASS
+Tuesday 30th
+10am
+Wednesday 1st
+10am
+Thursday 2nd
+10am
+Friday 3rd
+10am
+Saturday 4th
+6pm
+Sunday 5th
+11am
+Parish Collection - € 2115
+Graveyard Mass
+This years Graveyard Mass will be on Friday 7th August at 7pm.
+Donegal Pro Life monthly Vigil at Hospital Roundabout, Letterkenny on Friday the 3rd July from 1pm-2pm. Support welcome.
+Eucharistic Adoration will resume in the month of August, on Wednesdays at 7:30pm. Thank you.
+Confessions will be heard after all Masses during the week
+Mary's Meals
+We are delighted, in fact thrilled, to announce that Fr Eamonn Kelly is getting rid of the beard in a sponsored beard &amp; head shave. It will take place at the Diamond, Donegal Town on Saturday 1th July from 12-4pm.
+Mary's Meals are presently feeding 3,060,011 Children every day in school &amp; €22 provides food for a child for a full school year. Any support is greatly appreciated.
+<a href="https://www.idonate.ie/event/frkellvsbeardshavechallenge" target="_blank" rel="noopener noreferrer">https://www.idonate.ie/event/frkellvsbeardshavechallenge</a>
+We Remember:
+Recently Deceased –
+Mary McDowall, Derry
+Mother of Ann Gallagher, Bavin
+Suaimhneas Síoraí
+Áisle Chilli Chartha
+Our summer camp (4th-7th August) has no spaces left.
+Local Artist Sinead Gallagher Art Exhibition in the main hallway.
+Upcoming Concerts:
+Monday 27th July Alán, Wednesday 29th July the Seeger Sessions, Friday 16th September Oiréar &amp; Friday 25th September Frankie Gavan &amp; Catherine Mc Hugh.
+All tickets available at reception, For all info call
+<a href="tel:+353749738376" style="color:#1d4ed8;font-weight:600;">074 9738376</a>
+or message our media pages.
+Sandra’s Run
+The organisers of Sandra's run would like to ask anyone who can help in any way to make our run a good one.
+We are asking if you can put teddies or cuddly toys on route Killybegs to Glencolmcille via the line &amp; out to Kilcar via Roxborough.
+We are stopping in Kilcar roughly 1-2 &amp; we would love to get a great shot of the bikes lined up on Kilcar Street &amp; to come out to put a small donation in the bucket.
+It's on July 4th.
+Thanking you Kilcar, Carrick &amp; Glencolmcille.
+Leitir Corn Mill Kilcar
+‘Echo’s At The Mill’ by Well of Urd
+Friday 3rd &amp; 10th July 7:30-9pm
+(WhatsApp
+<a href="tel:+353899804628" style="color:#1d4ed8;font-weight:600;">089 9804628</a>
+)
+Car boat sale Saturday 1th July 10am - 1pm text
+<a href="tel:+353876123184" style="color:#1d4ed8;font-weight:600;">087 6123184</a>
+or
+<a href="tel:+353872435210" style="color:#1d4ed8;font-weight:600;">087 2435210</a>
+Book Launch
+Údarás na Gaeltachta &amp; Áisle Chilli Charthaigh will launch the bilingual book The Story of Textiles in the Southwest Donegal Gaeltacht — a book that tells the story of wool, yarn &amp; tweed in this area over the last hundred years.
+The launch takes place on Friday, 3rd July, at 7.30 pm, in Áisle Charthaigh, Charthai. Everyone is welcome. We hope to see you there.
+St Peregrine
+A blessing with the relic of St Peregrine can be obtained after Mass every Friday at 10am.
+This kindly Saint, born in Italy in 1260, is the Patron Saint of cancer patients.</p>
 <div class="parish-row-empty parish-odd" id="parish-st-carthas-church-kilcar-f94-h2y5">
   <span class="parish-name">Kilcar</span>
   <span class="parish-empty">No searchable text available this week.</span>
   <a class="parish-source" href="https://www.mcn.live/Camera/st-carthas-church-kilcar,-f94-h2y5" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
 </div>
-<details class="parish-block parish-even" id="parish-st-mary-of-the-visitation-church-killybegs">
-  <summary class="parish-head">
-    <span class="parish-name">Killybegs</span>
-    <a class="parish-source" href="https://mcn.live/Camera/st-mary-of-the-visitation-church-killybegs" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p>St. Mary of the Visitation Parish, Killybegs<br>
-Parish Office, Killybegs, Co. Donegal, F94 CY56<br>
-Tel: +353 (0)74 9731013<br>
-Parish Secretary: Ann O'Donnell Office (Mon to Fri, 9.45am to 2.45pm)<br>
-Email:<br>
-<a href="mailto:info@killybegsparish.com" target="_blank" rel="noopener noreferrer">info@killybegsparish.com</a><br>
-Website: killybegsparish.com<br>
-Parish Priest: Fr. Colin Gallagher Tel:<br>
-<a href="tel:+353749731013" style="color:#1d4ed8;font-weight:600;">074 9731013</a><br>
-Masses and Services: Live streaming<br>
-<a href="https://www.mqtlive.com" target="_blank" rel="noopener noreferrer">www.mqtlive.com</a><br>
-(on website)<br>
-A Word from Fr. Colm<br>
-I will celebrate a Mass of Thanksgiving this Sunday 28th June 1.00pm to mark the Golden Jubilee of my Ordination. I feel very blessed to be granted the gift of twenty years in priestly ministry, made possible through the grace of God, the support of others, good health and my own humble efforts. The friendship and generosity of parishioners, family, friends and fellow priests and those in Killybegs for 23 years has been such a great blessing. My constant companion for nearly 17 of those years was the late Charlie Boyle who made me feel so much at home in this parish. I am eternally grateful to Charlie. I was so energized but also involved in different ministries and communities, in the schools and in the parish. The Sunday Masses are always a weekly highlight with the participation of all generations, including the young and the Parish Choir. Christmas and Easter were always so memorable. The enthusiasm, generosity and expertise of all involved in the restoration of the Church building were overwhelming. Parish Secretary Ann O’Donnell has been invaluable for her cheerful presence and as a friend and parish Sacristan Patricia O’Boyle has been ever reliable on the altar. It is a privilege to serve in this parish in the midst of all the joy and sorrows, the challenges and opportunities. Having been ordained on the 27th June 1996, I spent 8 years with the Irish Chaplaincy in Britain, serving in four different London parishes and on my return home for 6 years in Milford and Killybegs. I have so much to be grateful for. After the Mass of Thanksgiving, there will be refreshments in Foresters Hall and everyone is welcome.<br>
-A Word from Ann, our Parish Secretary<br>
-On behalf of the Parish I would like to send our warmest congratulations to Fr. Colm on the occasion of his Golden Jubilee, celebrating 50 years of priesthood, the last 23 years here in Killybegs. Thank you for your kindness, compassion and unwavering dedication to the parish community. Wishing you good health and happiness and many more years of ministry.<br>
-A Blessing for Priesthood by John O'Donohue<br>
-May the blessings released through your hands<br>
-Cause windows to open in darkened minds.<br>
-May the sufferings your calling brings<br>
-Be but winter before the spring.<br>
-May your solitude be a voyage<br>
-Into the wilderness and wonder of God.<br>
-May you find worlds full of divine warmth<br>
-To clothe the shining in the fragile day dawn.<br>
-May the slow light of the Eucharist<br>
-Be a sheer shelter around your future.<br>
-Liturgy of the Word for Children<br>
-Sunday 5th July 11am.<br>
-Parish Choir Practice<br>
-Monday 7.15pm.<br>
-Day<br>
-Time<br>
-Saturday<br>
-27th June<br>
-07.00pm - Patsy Rowan (15th Anniversary)<br>
-Sunday<br>
-28th June<br>
-09.00am - Breid &amp; James Cunningham (Anniversaries)<br>
-11.00am - Thanksgiving (Fr Colm)<br>
-Monday<br>
-29th June<br>
-10.00am - Special Intention<br>
-Tuesday<br>
-30th June<br>
-10.00am - Special Intention<br>
-Thursday<br>
-2nd July<br>
-10.00am - Dymphna Harvey (48th), Maureen (45th), Roger (21st)<br>
-Friday<br>
-3rd July<br>
-10.00am - Special Intention<br>
-Saturday<br>
-4th July<br>
-07.00pm - Patsy O'Rourke (Anniversary)<br>
-10.00am - Marie Boyle (12th Anniversary)<br>
-Sunday<br>
-5th July<br>
-09.00am - Baby Margaret Callaghan (50th Anniversary)<br>
-11.00am - Patsy McGowan (7th Anniversary)<br>
-Adoration of the Blessed Sacrament: Monday 1am to 7pm.<br>
-Pray for: Tadhg Callaghan - Carter (15) who died tragically at The Donegal Rally last weekend.<br>
-For those whose anniversaries occur: Jimmy Cassidy, Frankie Martin, Bill Tyler. Suainimhneas Siard.<br>
-First Friday Calls<br>
-Fr. Colm will begin the calls this week. If anyone on the list would like a visit, please let him know, or tell just let him know.<br>
-Mary's Meals<br>
-A sponsored bread and head shave by Fr. McGowan in aid of Mary's Meals in the Diamond, Donegal Town, Saturday 1th July from 10am to 4pm.<br>
-Mary's Meals are feeding 3,060,011 children every day in school and can provide food for each child for a full school year. Any support greatly appreciated.<br>
-<a href="https://www.ioae.net/irelandkillybegsbreakfastchallenge" target="_blank" rel="noopener noreferrer">www.ioae.net/irelandkillybegsbreakfastchallenge</a><br>
-Annual Pilgrimage to Iniskeel Island<br>
-St. Conal’s Turas, Narin, Sunday 12th July, leaving beach at 9.30am. Everyone is most welcome.<br>
-Ceili in Glencolmcille<br>
-Date for Ceili Saturday 1th July 10am - 1pm.<br>
-Text<br>
-or<br>
-.<br>
-The Story of Textiles in the Southwest Donegal<br>
-Gaeltacht Book Launch in Killybegs Community Centre Friday 3rd July 7.30pm. A significant section of the book covers the story of the Killybegs Carpet Factory and the people connected to it.<br>
-Sandra's 21st Annual Run Saturday 4th July<br>
-Please put your tidies and supports out for this great occasion. Dancing in Bay View from 9pm. Music by the Merry Times. Free to all. Everyone welcome.<br>
-Sunday Collection<br>
-Date<br>
-Amount<br>
-21st June<br>
-€1140.00<br>
-Maintenance Fund<br>
-€1420.00<br>
-St. Vincent de Paul Notice:<br>
-<a href="tel:+353873507777" style="color:#1d4ed8;font-weight:600;">087 3507777</a><br>
-Adoration in the Adoration Room<br>
-Every Wednesday evening 6-7pm. All welcome.<br>
-Congratulations and Best Wishes to Eimear Gallagher and Dermot McElchar who were married recently.<br>
-A Family Prayer for the holidays<br>
-Heavenly Father, please bless our holiday. Help our family to have patience &amp; understanding. Guide us to be mindful of this time together. Help us to make good memories when necessary, and remind each of us to show your love and grace. Open our eyes to see the beauty of the moments we are creating that will last a lifetime. Amen.<br>
-Niall Mor Community &amp; Enterprise Centre<br>
-Tel:<br>
-<a href="tel:+353749748163" style="color:#1d4ed8;font-weight:600;">074 9748163</a><br>
-Driver CPC Safety Training Module 5 - Saferlect<br>
-Ltd: Saturday July 18th 9am-5pm<br>
-Citizens Advice Service - Free Legal Advice: Tuesday 18th 10am - 2pm<br>
-We also do posters, leaflets, printing &amp; much more.<br>
-NEWTOWNCUNNINGHAM MASSES<br>
-Day<br>
-Time<br>
-27th June<br>
-Saturday<br>
-7.30pm Eileen Boyce RIP<br>
-28th June<br>
-Sunday<br>
-11am Pro Populo<br>
-30th June<br>
-Tuesday<br>
-NO MASS<br>
-01st July<br>
-Wednesday<br>
-9.30am Mass<br>
-02nd July<br>
-Thursday<br>
-9.30am Mass<br>
-04th July<br>
-Saturday<br>
-7.30pm Rory McMenamin RIP<br>
-05th July<br>
-Sunday<br>
-11am John Doran RIP<br>
-KILLEA MASSES<br>
-Day<br>
-Time<br>
-28th June<br>
-Sunday<br>
-9.30am Mass<br>
-03rd July<br>
-Friday<br>
-9.30am Mass<br>
-05th July<br>
-Sunday<br>
-9.30am Mass<br>
-ST. BAITHIN'S MASSES<br>
-Day<br>
-Time<br>
-27th June<br>
-Saturday<br>
-6pm Mass<br>
-28th June<br>
-Sunday<br>
-12.15pm Marie Bryson RIP<br>
-30th June<br>
-Tuesday<br>
-9.30am Mass<br>
-01st July<br>
-Wednesday<br>
-NO MASS<br>
-02nd July<br>
-Thursday<br>
-7pm Mass<br>
-03rd July<br>
-Friday<br>
-7pm Annette Devine RIP (Month's Mind)<br>
-04th July<br>
-Saturday<br>
-6pm Pro Populo<br>
-05th July<br>
-Sunday<br>
-12.15pm Mass<br>
-Anniversaries:<br>
-Hugh Bovaird RIP, Ar Baithin, Kathleen Curran RIP, Dundee and Sally McDaid RIP, Trensallagh. May their souls and the souls of all the faithful departed rest in peace.<br>
-Litany of Remembrance<br>
-In the rising of the sun and in it’s going down ~ We remember them<br>
-In the blowing of the wind and in the chill of winter ~ We remember them<br>
-In the blueness of the sky and in the warmth of the summer ~ We remember them<br>
-In the rustling of the leaves and in the beauty of Autumn ~ We remember them<br>
-In the beginning of the year and when it ends ~ We remember them<br>
-When we are lost and sick at heart ~ We remember them<br>
-When we have joys, we yearn to share ~ We remember them<br>
-So long as we live, they too shall live ~ We will remember them<br>
-WEEKLY NEWSLETTER<br>
-28th June 2026 – Thirteenth Sunday of Ordinary Time<br>
-Fr Philip Kemmy, PP<br>
-Office Address: Parochial House, Main Street, Newtowncunningham<br>
-<a href="tel:+353749156138" style="color:#1d4ed8;font-weight:600;">074 9156138</a><br>
-STEP BY STEP THROUGH THE MASS<br>
-The Liturgy of the Word (Part 12) – The Prayers of the Faithful<br>
-Once we have made our Profession of faith with the recitation of the Creed, we move on to the final part of the Liturgy of the Word at Mass; namely: The Prayers of the Faithful – sometimes called the Bidding Prayers. These prayers are not inconsequential pious throw-aways – they are an expression of our union with Christ, praying as the Body of Christ in response to the Word of God – praying through him, with him and in him – which is why the prayers are ordinarily made (though not bindingly prescribed) as an addressed to God the Father.<br>
-The Church asks that this prayer be relatively short, as opposed to long winded paragraphs, and that they should ordinarily be prayers that gather the whole Church and World into the intentions of this congregation gathered for this Mass on this Sunday. These prayers, therefore, are not ordinarily a moment to be specific about a given private or very local issue. For example, while we might pray for good weather for the farming community to do its important business, we wouldn’t be so specific as to pray that Farmer John gets his farming work done. Of course, anyone who knows our local Farmer John can include him in their participation in the prayer – the prayer spoken from the Ambo is usually more wide ranging rather than specific. Exceptions are permitted by the Church when the congregation is gathered for a specific ceremony or celebration: Funerals, Confirmations, Weddings etc.<br>
-For the Prayers of the Faithful the Church has guidelines to follow. The order of the prayers is usually: for the needs of the Church, for public authorities and the Salvation of the whole world; for grave difficulties that afflict people and even nations; then finally for the local community. At the end of each prayer the acclamation is spoken: “Lord hear us!” The congregation replies: “Lord, graciously hear us!” We call out to God, confident that he will hear us. We are encouraged by the Word of God which we have recounted to us something of God’s past interventions with the human race; especially in sending His Only Begotten Son, Jesus. In effect, in faith we are presenting him the difficulties that afflict our present world asking him to intervene with his grace, power, mercy and love as we know he has done in the past, especially as we have heard from the Sacred Scriptures.<br>
-So, the Bidding Prayers are no mere formality. They are meant to be heartfelt pleas to God the Father, made IN the Holy Spirit, BY us, THROUGH Christ Jesus. In faith we call out: “Lord graciously hear us!”<br>
-Parish of Newtowncunningham &amp; Killea<br>
-Email:<br>
-<a href="mailto:office@newtownkilleaparish.ie" target="_blank" rel="noopener noreferrer">office@newtownkilleaparish.ie</a><br>
-Website:<br>
-<a href="https://www.newtownkilleaparish.ie" target="_blank" rel="noopener noreferrer">www.newtownkilleaparish.ie</a><br>
-Sunday Collections:<br>
-€1485; Retired Clergy: €390. Thank you for your continued generosity to your Parish. The recent Ceili in aid of Killea Chapel Refurbishment brought in €685. Well done and thank you to all involved and all who donated.<br>
-Sacrament of Confession:<br>
-All Saints Newtown every Saturday 10.30am – 11.30am.<br>
-Eucharistic Adoration:<br>
-will take place on Wednesday in Newtown from 11am – 7pm and in Killea from 2pm – 6pm on Friday.<br>
-Fr Damien will visit the housebound sick of his areas in Newtown on Thursday of this week.<br>
-Please note: Fr Philip will NOT visit housebound sick this week.<br>
-Items for the Parish Newsletter must be submitted to the Parish office no later than 12 Noon on a Thursday to be considered for the Newsletter.<br>
-Parish of Taughboyne, St Baithin's<br>
-Email:<br>
-<a href="mailto:stbaithins@yahoo.com" target="_blank" rel="noopener noreferrer">stbaithins@yahoo.com</a><br>
-Sunday Collections:<br>
-€1610. Development Fund: €85; Retired Priests: €265. Thank you for your continued generosity to your Parish.<br>
-Sacrament of Confession:<br>
-St. Baithin's each Saturday from 4.30 – 5.30pm.<br>
-Eucharistic Adoration:<br>
-Every Tuesday from 10am – 2pm.<br>
-Adoration and Holy Rosary<br>
-this Thursday in St. Baithin’s led by Fr. Damien at 6pm – followed by Mass at 7pm.<br>
-Fr Damien will visit the housebound sick of Carrigans/St Johnston areas on Friday of this week.<br>
-PLEASE NOTE THAT THERE WILL BE NO 12.15PM MASS IN ST. BAITHIN’S ON SUNDAY 12TH JULY – as we will have Mass at 3pm that day for the Annual Blessing of the Graves.<br>
-Parish Emergency Number:<br>
-Annual Blessing of the Graves:<br>
-Newtown Saturday 1th July at 7.30pm<br>
-St. Johnston Sunday 12th July at 3pm<br>
-PLEASE NOTE that there will be buckets at the various entrances to our graveyards at the Annual Blessing of the Graves. These funds will help with the upkeep and development of our graveyards, which can be a considerable cost on the parish. Please give what you can on the day.<br>
-"DONEGAL PRO LIFE monthly Vigil/Gathering at Hospital Roundabout, Letterkenny on Friday 3rd July from 1.00pm-2.00 pm. Support welcome."<br>
-RALLY FOR LIFE<br>
-in Belfast this year will take place on Saturday 4th of July. A bus will leave Letterkenny Car Park at 9am travelling via Derry. For further information or to book a seat on the sponsored bus contact: Margaret on<br>
-<a href="tel:+353892469599" style="color:#1d4ed8;font-weight:600;">089 2469599</a><br>
-; Teresa on<br>
-<a href="tel:+353862472345" style="color:#1d4ed8;font-weight:600;">086 2472345</a><br>
-or Brian on<br>
-<a href="tel:+353872913186" style="color:#1d4ed8;font-weight:600;">087 2913186</a><br>
-.<br>
-"DONEGAL PRO LIFE monthly Vigil/Gathering at Hospital Roundabout, Letterkenny on Friday 3rd July from 1.00pm-2.00 pm. Support welcome."<br>
-NATIONAL GRANDPARENTS PILGRIMAGE<br>
-will take place at Knock Shrine on Sunday 26th July celebrating the sixth World Day for Grandparents and the Elderly. For many Grandparents and elderly people, this pilgrimage is one of the most important and joyful days of the year – a day when they feel.<br>
-MEN'S ROSARY:<br>
-Saturday 4th July at Market Square, Letterkenny commencing 1pm.<br>
-Raphoe<br>
-WEBSITE parishofraphoe.ie<br>
-Fr Kelly:<br>
-<a href="tel:+353879077985" style="color:#1d4ed8;font-weight:600;">087 9077985</a><br>
-Office Phone<br>
-EMAIL:<br>
-<a href="mailto:raphoepairsh@gmail.com" target="_blank" rel="noopener noreferrer">raphoepairsh@gmail.com</a><br>
-Sunday 21 June 2026<br>
-Monday 22 June<br>
-Day<br>
-Time<br>
-Raphoe<br>
-7.30am: Office of Readings, Morning Prayer, Rosary, Divine Mercy Chaplet and Benediction.<br>
-Raphoe<br>
-9am: Mass<br>
-7pm: Jesus visits His people (The Longlands, Convoy)<br>
-Tuesday<br>
-Day<br>
-Time<br>
-Raphoe<br>
-7.30am: Office of Readings, Morning Prayer, Rosary, Divine Mercy Chaplet and Benediction.<br>
-Drumkeen<br>
-10am: Mass<br>
-7pm: Jesus visits His people (Demesne, Raphoe)<br>
-Drumkeen<br>
-Adoration Noon – 9pm<br>
-Wednesday<br>
-Day<br>
-Time<br>
-Raphoe<br>
-7.30am: Office of Readings, Morning Prayer, Rosary, Divine Mercy Chaplet and Benediction.<br>
-Convoy<br>
-9am: Mass<br>
-Raphoe<br>
-9.30am - 8pm: Adoration<br>
-Convoy<br>
-2.15pm: Mass in Brindley Manor NH<br>
-7pm: Jesus visits His people (Carpark at Rosie’s Bar, Drumkeen)<br>
-Thursday<br>
-Day<br>
-Time<br>
-Raphoe<br>
-7.30am: Office of Readings, Morning Prayer, Rosary, Divine Mercy Chaplet and Benediction.<br>
-Raphoe<br>
-9am: Mass<br>
-Convoy<br>
-Noon – 6pm: Adoration<br>
-Convoy<br>
-2.15pm: Mass in Brentwood NH<br>
-7pm: Jesus visits His people (Meetinghouse St, Raphoe)<br>
-Convoy<br>
-Parochial House: 8pm: Legion of Mary<br>
-JESUS VISITS HIS PEOPLE<br>
-You are invited to gather and pray with us<br>
-Monday 22 June at 7pm beside Susan Coyle’s House, The Longlands, Convoy, (F93YCW4)<br>
-Tuesday 23 June at 7pm at Pauline O’Donnell’s House, Demesne, Raphoe, (F93E763)<br>
-Wednesday 24 June at 7pm at the upper Carpark at Rosie’s Bar, Drumkeen<br>
-Thursday 25 June at 7pm at Natasha McCarron’s House, Raphoe, (F93NN24)<br>
-Friday 26 June at 7pm outside Concepta and Eugene McNamee’s House, 16 St Bridget’s Crescent, Drumkeen |<br>
-Friday<br>
-Day<br>
-Time<br>
-Raphoe<br>
-7.30am: Office of Readings, Morning Prayer, Rosary, Divine Mercy Chaplet and Benediction.<br>
-Convoy<br>
-9am Mass<br>
-7pm: Jesus visits His people (St Bridget’s Crescent, Drumkeen)<br>
-Saturday<br>
-Day<br>
-Time<br>
-Raphoe<br>
-8am: Office of Readings, Morning Prayer, Rosary, Divine Mercy Chaplet and Benediction.<br>
-Convoy<br>
-9.30am: Prayer Time in the Divine Mercy Alcove. Chaplet, Morning Prayer, etc All welcome for part of it or all of it.<br>
-Convoy<br>
-Old Graveyard: 3pm: Public Prayers for Our Beloved Dead<br>
-Convoy<br>
-New Graveyard: 4.30pm: Public Prayers for Our Beloved Dead<br>
-Convoy<br>
-6pm: Mass (Josie Mulrine, Ann Toner RIP)<br>
-Drumkeen<br>
-7.30pm: Mass (Brenda Bonnar, Patsy Patton, Francie Patton RIP)<br>
-After Mass: Confessions<br>
-Sunday<br>
-Day<br>
-Time<br>
-Raphoe<br>
-8am: Office of Readings, Morning Prayer, Rosary, Divine Mercy Chaplet and Benediction.<br>
-Convoy<br>
-9.30am: Mass<br>
-Raphoe<br>
-11am: Mass (Tommy and Cassie Murphy RIP)<br>
-Convoy<br>
-Noon: Baptism<br>
-Drumkeen<br>
-1.30pm: Latin Mass<br>
-Raphoe<br>
-3pm: Public Prayers for Our Beloved Dead<br>
-Drumkeen<br>
-5pm: Public Prayers for Our Beloved Dead<br>
-Parish Bulletin<br>
-Announcements<br>
-Volunteers are required to help tidy up the Old Graveyard in Convoy. If you are available to help please meet at the Old Graveyard on Tuesday 23 June at 10am. Thank you for your help.<br>
-The Mass at the Mass Rock is marked in for Tuesday 30 June at 7pm.<br>
-Blessing and distribution of brown scapulars will take place on the weekend of 11/12 July.<br>
-Thanks to all who prayed the novena to the Sacred Heart of Jesus.<br>
-Someone asked Fr Eamonn for a couple of replacement Pioneer pins, but he cannot remember who. Was it you?<br>
-The CHY forms have been sent out to our parishioners. It would be great if we could get the forms signed and returned as soon as possible. The CHY has proven to be very beneficial to the parish over the last few years, taking in over €20,000 per year.<br>
-The new contact number for St Vincent de Paul for Drumkeen is<br>
-<a href="tel:+353879953531" style="color:#1d4ed8;font-weight:600;">087-9953531</a><br>
-and the Raphoe Office number is<br>
-<a href="tel:+353749173933" style="color:#1d4ed8;font-weight:600;">074-9173933</a><br>
-.<br>
-What is worse than finding a worm in your apple? Finding half a worm.<br>
-The Annual Franciscan Pilgrimage to Knock will take place on Sunday, 28 June, Cost €30 euro return trip. Mass in the Basilica and rosary procession. A bus will leave Ards at 7am with pick-ups in Creeslough and Letterkenny. For more info contact<br>
-<a href="mailto:info@ardsfriary.ie" target="_blank" rel="noopener noreferrer">info@ardsfriary.ie</a><br>
-or on<br>
-<a href="tel:+353749138005" style="color:#1d4ed8;font-weight:600;">074 9138005</a><br>
-.<br>
-You are invited to attend the opening of The Shared Space Convoy on Monday 22 June at 12:30pm behind The Black Memorial Hall, Convoy F93 HW08. Light refreshments will be served in Hall.<br>
-Drumkeen United FC News: The Weekly Lotto: the jackpot not won but Hugh Bonner, Henry Patton, Mary McGavigan, Macca, and Patricia Peoples each won €20. The next draw is on 21 June with a jackpot of €1260.<br>
-Adoration of Jesus in the Blessed Sacrament has been established in this parish for a long time. However, over the years, times and days have been changed to accommodate people and situations. We are presently undertaking a review of the Adoration times and days in all three parish churches. You might let Fr Kelly or any members of the Parish of Raphoe Committee know your ideas.<br>
-When we have listened to your ideas we will be in a much better position to make the right decisions regarding Adoration in the parish of Raphoe. Every hour is in itself a commitment and so all the adorers have to make good commitment. It seems nowadays people do not like making such commitments. So please pray about this and let Fr Kelly or anyone on the Parish of Raphoe Committee know your thoughts on Adoration in our parish.<br>
-Teacher: “Frankie, what is water?”<br>
-Frankie: “Water is a colourless liquid that turns black when I put my hands into it.”<br>
-The Public Prayers for our Beloved Dead will take place in the Old Graveyard, Convoy on Saturday 27 June at 3pm, and in the New Graveyard, Convoy on Saturday 27 June at 4.30pm. (please note time)<br>
-The Public Prayers for our Beloved Dead will take place in the Graveyard in Raphoe on Sunday 28 June at 3pm.<br>
-The Public Prayers for our Beloved Dead will be in the Graveyard in Drumkeen on Sunday 28 June at 5pm.<br>
-Who will tell the children the truth?<br>
-Tawnywilly Parish Newsletter<br>
-Sunday 28th June 2026<br>
-13th Sunday in Ordinary Time/A<br>
-Parish Website<br>
-<a href="https://www.tawnawillyparish.ie" target="_blank" rel="noopener noreferrer">www.tawnawillyparish.ie</a><br>
-Facebook<br>
-@tawnawillyparish<br>
-Mass Times Intentions for this Week<br>
-Day<br>
-St. Agatha’s<br>
-St. Patrick’s<br>
-Intention<br>
-Saturday 27th June<br>
-6.00 pm<br>
-Doreen Browne Months Mind<br>
-Sunday 28th 13th Sunday in Ordinary Time/A<br>
-10.00 am<br>
-William Kerrigan, Kathleen Forde, Peter, Barry &amp; Patrick, Thomas, Mary Mullin, Mary Mc Cormack Months Mind, Anniversary, Anniversaries<br>
-11:30 am<br>
-Sean Griffin, Teresa Mc Connon, Nora Mullin, Betty Quinlan Anniversaries<br>
-Monday 29th<br>
-10.00 am<br>
-Intention<br>
-Tuesday 30th<br>
-10.00 am<br>
-Intention<br>
-Wednesday 1st July<br>
-10.00 am<br>
-Intention<br>
-10.00 am<br>
-Spencer Sherwin 1st Anniversary<br>
-Thursday 2nd<br>
-12 noon<br>
-Stephen Mc Girr Funeral Mass<br>
-Friday 3rd<br>
-10.00 am<br>
-Intention<br>
-Saturday 4th<br>
-6.00 pm<br>
-Sr. Magdalene Moore 1st Anniversary<br>
-Sunday 5th 14th Sunday in Ordinary Time/A<br>
-11:30 am<br>
-Mary Doherty Anniversary<br>
-1.00 pm<br>
-Graveyard Mass &amp; Blessing<br>
-Parish Priest<br>
-Fr. James Gillespie, P. P.<br>
-Parochial House, Upper Main St.,<br>
-Donegal Town, Co. Donegal<br>
-F94 D8XO<br>
-Phone:<br>
-<a href="tel:+353749721026" style="color:#1d4ed8;font-weight:600;">074 97 21026</a><br>
-Email:<br>
-<a href="mailto:ppdonegal@gmail.com" target="_blank" rel="noopener noreferrer">ppdonegal@gmail.com</a><br>
-Parish Office<br>
-Parish Centre, Upper Main St.,<br>
-Donegal Town, Co. Donegal.<br>
-F94 EWR4<br>
-Phone:<br>
-<a href="tel:+353749721026" style="color:#1d4ed8;font-weight:600;">074 97 21026</a><br>
-/ 97 40461<br>
-<a href="mailto:stpatricksparishcentre@gmail.com" target="_blank" rel="noopener noreferrer">stpatricksparishcentre@gmail.com</a><br>
-Opening Times:<br>
-Mon., Tues., Thurs. &amp; Friday<br>
-9:30 am – 2:30 pm<br>
-Parish Bookings<br>
-To book a baptism, wedding or to book the Parish Centre itself, please contact the Parish Office<br>
-Baptisms<br>
-Baptisms take place in St. Patrick’s on the 1st &amp; 3rd weekends and in St. Agatha’s Church on the 2nd &amp; 4th weekends of each month.<br>
-Baptisms are held on Saturdays at 4:00 pm or Sundays at 1:00 pm.<br>
-Baptismal Preparation course takes place in the Parish Centre on the last Tuesday of each month for all families requiring their child to be baptised.<br>
-Weddings<br>
-Please allow at least four month’s notice for weddings in the parish. Please see our website for further information on parish weddings.<br>
-Please submit items for the Newsletter to the parish office no later than 12 noon on Thursday’s, by phone, email or dropping in a note.<br>
-Eucharistic Adoration<br>
-Tuesday’s St. Agatha’s Church<br>
-Adoration 3pm – 6pm<br>
-Thursday’s: St. Patrick’s Church<br>
-10:00 am – 7.00 pm<br>
-Confession<br>
-Upon request or after any Mass.<br>
-All Masses in both Churches are broadcast live on our parish website or on<br>
-<a href="https://www.mcn" target="_blank" rel="noopener noreferrer">www.mcn</a><br>
-live and follow the links.<br>
-Notices<br>
-Lourdes Pilgrimage 14 September 2026<br>
-Accompanied by Spiritual Director Fr. James Gillespie. Group Organisers: Fran Mc Donagh &amp; Tina Martin. 5 nights €599 per person sharing. For info &amp; bookings, please contact: Fran Mc Donagh:<br>
-<a href="tel:+353876676476" style="color:#1d4ed8;font-weight:600;">087-667 6476</a><br>
-or Tina Martin:<br>
-<a href="tel:+353876963094" style="color:#1d4ed8;font-weight:600;">087-696 3094</a><br>
-Memorial Walk<br>
-There will be a Memorial Walk in memory of Amanda Grey Conlin taking place on Sun 28th June at 12.30pm, leaving from the Parish Centre, Donegal Town in aid of the Kevin Bell Repatriation Trust. Draw will take place on the day. All donations welcome. Refreshments after the walk in Parish Centre.<br>
-Annual National Grandparents Pilgrimage<br>
-Celebrating the World Day for Grandparents and the Elderly at Knock Shrine on Sunday 26th of July 2026. A Day of Grace and Blessing for the whole family as we honour grandparents and the elderly. All are welcome.<br>
-Anointing - 2.30pm Mass - 3.00pm<br>
-Rosary Procession (Weather Permitting)<br>
-Celebrant Archbishop Eamon Martin, Primate of All Ireland.<br>
-Music: Una Nolan &amp; Choirs.<br>
-Guest Soloist Diana Rosemary Scully.<br>
-Visit our website for resources:<br>
-<a href="https://www.catholicgrandparentsassociation.org" target="_blank" rel="noopener noreferrer">www.catholicgrandparentsassociation.org</a><br>
-.<br>
-St Agatha’s Church Mass Sunday 5th July<br>
-Please note there will be no 10am Mass on Sunday 5th July as the Graveyard Mass &amp; Blessing will take place at 2pm.<br>
-Graveyard Mass &amp; Blessing<br>
-Will take place at St. Agatha’s Graveyard in Lair on Sunday 5th at 2pm.<br>
-Graveyard - Cleaning<br>
-In preparation for the Graveyard Mass, when tidying graves, we would ask you to please remove old wreaths, etc. from the graveyard and bring them home for disposal. Please do not dump anything in the graveyard or in adjacent properties. Thank you.<br>
-Knock Shrine Diocesan Pilgrimage<br>
-The Raphoe Pilgrimage to Knock will take place on Saturday the 15th August. The Parish is hoping to organise a bus to from Donegal Town and return on the day. If you are interested in going, please contact Sean asap on<br>
-<a href="tel:+353872332162" style="color:#1d4ed8;font-weight:600;">087 2332162</a><br>
-, to prebook.<br>
-"Don Pro Life Monthly Vigil/Gathering:<br>
-at Hospital Roundabout, Letterkenny on Friday the 3rd July from 1.00pm-2.00 pm. Support welcome."<br>
-"Rally For Life"<br>
-In Belfast this year on Saturday the 4th July. To book a seat on sponsored bus contact: Mgt. on<br>
-or Teresa on<br>
-<a href="tel:+353862647235" style="color:#1d4ed8;font-weight:600;">086 2647235</a><br>
-or Brian on<br>
-<a href="tel:+353872913186" style="color:#1d4ed8;font-weight:600;">087 2913186</a><br>
-.<br>
-HLI Ireland 32 County Missions with relics of St Thérèse &amp; The Holy Face.<br>
-Sunday 5th July; St Mary's Hall, Buncrana, 2pm-4pm.<br>
-Tuesday 7th July; The Abbey Hotel, Donegal Town, 6:30pm-8:30pm.<br>
-Thursday 9th July; Mount Errigal Hotel Letterkenny, 7pm-9pm.<br>
-The events comprise recitation of the rosary, a reminder of the mission of laity through Gospel and the Catechism, as well as information on the work of Human Life International Ireland, sponsoring seminarians to priesthood in Tanzania (13 ordinations taking place this Summer), helping women in crisis pregnancy situations (630 babies lives saved so far), Holy Face devotion, and promoting the authentic teachings of the Catholic faith, working for an Ireland where God is First, Life is Sacred and the Family is Cherished. Feedback for the nights has been excellent and some clergy have attended the events including Bishop Cullen in Waterford and Lismore.<br>
-Vocations Monstrance (Blessed by Pope Leo) in the Diocese of Raphoe from 21st to 4th July<br>
-The “Vocations Monstrance” is part of the Church’s ongoing commitment to promote and foster vocations to the priesthood and to religious life. The Monstrance will be in various churches in the Diocese to encourage prayer for vocations and to deepen young people’s awareness of God’s call in their lives. Through prayer before the Blessed Sacrament, we ask the Lord to raise up generous and joyful servants for His Church. Vocations are born in prayer, sustained by prayer, and strengthened through prayer. Any parish wishing to have the “Vocations Monstrance” during these 2 weeks, please contact Fr Rnry Brady at<br>
-<a href="mailto:vocations@raphoediocese.ie" target="_blank" rel="noopener noreferrer">vocations@raphoediocese.ie</a><br>
-.<br>
-Thank you<br>
-I would like to express my sincere thanks to everyone who joined with me on Friday, 19th June, to celebrate the 40th Anniversary of my Ordination, and to all who travelled from various Parishes to mark this important occasion for me. Your presence was greatly appreciated. My heartfelt thanks to you all.<br>
-Fr. James Sweeney<br>
-Collection for Peter’s Pence on June 28th<br>
-- Sunday before the liturgical feast of Saints Peter and Paul – the traditional Peter’s Pence collection takes place. This is a concrete way to support the Holy Father in his mission of service to the universal Church. Donating to Peter’s Pence is a concrete gesture of communion with the Holy Father and of solidarity with his mission to bring the Gospel throughout the world.<br>
-Youth Pilgrimage to Medjugorje<br>
-This pilgrimage for teenagers (15 – 18 year olds) will take place on 5th – 12th August 2026. Cost €500 Eur. Limited number of places are still available if interested.<br>
-Also 2 Free tickets will be made available from Donegal Town Parish for a limited period. For further information please contact Keith Kelly ASAP.<br>
-<a href="tel:+353877851282" style="color:#1d4ed8;font-weight:600;">087 7851282</a><br>
-, or email<br>
-<a href="mailto:youthministry@raphoediocese.ie" target="_blank" rel="noopener noreferrer">youthministry@raphoediocese.ie</a><br>
-. Organised by Marian Pilgrimages.<br>
-Mary's Meals<br>
-Are delighted, in fact thrilled, to announce that Fr Eamon Kelly is getting rid of the beard in a sponsored beard and head shave. It will take place at the Diamond, Donegal Town on Saturday 11 July from Noon to 4pm. Mary's Meals are presently feeding 3,060,011 Children every day in school and €22 provides food for a child for a full school year. Any support is greatly appreciated.<br>
-Community Employment<br>
-We have vacancies at our local Church for a general maintenance/Caretaker position. 19.5 hrs weekly, flexible hours. If you are unemployed and interested, please contact<br>
-<a href="tel:+353877694024" style="color:#1d4ed8;font-weight:600;">087 7694024</a><br>
-.<br>
-Sunday Collections – Sunday 21st June<br>
-St. Patrick’s Church: €1,530<br>
-St. Agatha’s Church: €1,260<br>
-You can also use your card or phone to ‘Tap to Donate’ in Donegal Church, to make your contributions and donations to St. Patrick’s Church.</p></div>
-</details>
+<h2 class="b-title">Killybegs</h2>
+<p>St. Mary of the Visitation Parish, Killybegs
+Parish Office, Killybegs, Co. Donegal, F94 CY56
+Tel: +353 (0)74 9731013
+Parish Secretary: Ann O'Donnell Office (Mon to Fri, 9.45am to 2.45pm)
+Email:
+<a href="mailto:info@killybegsparish.com" target="_blank" rel="noopener noreferrer">info@killybegsparish.com</a>
+Website: killybegsparish.com
+Parish Priest: Fr. Colin Gallagher Tel:
+<a href="tel:+353749731013" style="color:#1d4ed8;font-weight:600;">074 9731013</a>
+Masses and Services: Live streaming
+<a href="https://www.mqtlive.com" target="_blank" rel="noopener noreferrer">www.mqtlive.com</a>
+(on website)
+A Word from Fr. Colm
+I will celebrate a Mass of Thanksgiving this Sunday 28th June 1.00pm to mark the Golden Jubilee of my Ordination. I feel very blessed to be granted the gift of twenty years in priestly ministry, made possible through the grace of God, the support of others, good health and my own humble efforts. The friendship and generosity of parishioners, family, friends and fellow priests and those in Killybegs for 23 years has been such a great blessing. My constant companion for nearly 17 of those years was the late Charlie Boyle who made me feel so much at home in this parish. I am eternally grateful to Charlie. I was so energized but also involved in different ministries and communities, in the schools and in the parish. The Sunday Masses are always a weekly highlight with the participation of all generations, including the young and the Parish Choir. Christmas and Easter were always so memorable. The enthusiasm, generosity and expertise of all involved in the restoration of the Church building were overwhelming. Parish Secretary Ann O’Donnell has been invaluable for her cheerful presence and as a friend and parish Sacristan Patricia O’Boyle has been ever reliable on the altar. It is a privilege to serve in this parish in the midst of all the joy and sorrows, the challenges and opportunities. Having been ordained on the 27th June 1996, I spent 8 years with the Irish Chaplaincy in Britain, serving in four different London parishes and on my return home for 6 years in Milford and Killybegs. I have so much to be grateful for. After the Mass of Thanksgiving, there will be refreshments in Foresters Hall and everyone is welcome.
+A Word from Ann, our Parish Secretary
+On behalf of the Parish I would like to send our warmest congratulations to Fr. Colm on the occasion of his Golden Jubilee, celebrating 50 years of priesthood, the last 23 years here in Killybegs. Thank you for your kindness, compassion and unwavering dedication to the parish community. Wishing you good health and happiness and many more years of ministry.
+A Blessing for Priesthood by John O'Donohue
+May the blessings released through your hands
+Cause windows to open in darkened minds.
+May the sufferings your calling brings
+Be but winter before the spring.
+May your solitude be a voyage
+Into the wilderness and wonder of God.
+May you find worlds full of divine warmth
+To clothe the shining in the fragile day dawn.
+May the slow light of the Eucharist
+Be a sheer shelter around your future.
+Liturgy of the Word for Children
+Sunday 5th July 11am.
+Parish Choir Practice
+Monday 7.15pm.
+Day
+Time
+Saturday
+27th June
+07.00pm - Patsy Rowan (15th Anniversary)
+Sunday
+28th June
+09.00am - Breid &amp; James Cunningham (Anniversaries)
+11.00am - Thanksgiving (Fr Colm)
+Monday
+29th June
+10.00am - Special Intention
+Tuesday
+30th June
+10.00am - Special Intention
+Thursday
+2nd July
+10.00am - Dymphna Harvey (48th), Maureen (45th), Roger (21st)
+Friday
+3rd July
+10.00am - Special Intention
+Saturday
+4th July
+07.00pm - Patsy O'Rourke (Anniversary)
+10.00am - Marie Boyle (12th Anniversary)
+Sunday
+5th July
+09.00am - Baby Margaret Callaghan (50th Anniversary)
+11.00am - Patsy McGowan (7th Anniversary)
+Adoration of the Blessed Sacrament: Monday 1am to 7pm.
+Pray for: Tadhg Callaghan - Carter (15) who died tragically at The Donegal Rally last weekend.
+For those whose anniversaries occur: Jimmy Cassidy, Frankie Martin, Bill Tyler. Suainimhneas Siard.
+First Friday Calls
+Fr. Colm will begin the calls this week. If anyone on the list would like a visit, please let him know, or tell just let him know.
+Mary's Meals
+A sponsored bread and head shave by Fr. McGowan in aid of Mary's Meals in the Diamond, Donegal Town, Saturday 1th July from 10am to 4pm.
+Mary's Meals are feeding 3,060,011 children every day in school and can provide food for each child for a full school year. Any support greatly appreciated.
+<a href="https://www.ioae.net/irelandkillybegsbreakfastchallenge" target="_blank" rel="noopener noreferrer">www.ioae.net/irelandkillybegsbreakfastchallenge</a>
+Annual Pilgrimage to Iniskeel Island
+St. Conal’s Turas, Narin, Sunday 12th July, leaving beach at 9.30am. Everyone is most welcome.
+Ceili in Glencolmcille
+Date for Ceili Saturday 1th July 10am - 1pm.
+Text
+or
+.
+The Story of Textiles in the Southwest Donegal
+Gaeltacht Book Launch in Killybegs Community Centre Friday 3rd July 7.30pm. A significant section of the book covers the story of the Killybegs Carpet Factory and the people connected to it.
+Sandra's 21st Annual Run Saturday 4th July
+Please put your tidies and supports out for this great occasion. Dancing in Bay View from 9pm. Music by the Merry Times. Free to all. Everyone welcome.
+Sunday Collection
+Date
+Amount
+21st June
+€1140.00
+Maintenance Fund
+€1420.00
+St. Vincent de Paul Notice:
+<a href="tel:+353873507777" style="color:#1d4ed8;font-weight:600;">087 3507777</a>
+Adoration in the Adoration Room
+Every Wednesday evening 6-7pm. All welcome.
+Congratulations and Best Wishes to Eimear Gallagher and Dermot McElchar who were married recently.
+A Family Prayer for the holidays
+Heavenly Father, please bless our holiday. Help our family to have patience &amp; understanding. Guide us to be mindful of this time together. Help us to make good memories when necessary, and remind each of us to show your love and grace. Open our eyes to see the beauty of the moments we are creating that will last a lifetime. Amen.
+Niall Mor Community &amp; Enterprise Centre
+Tel:
+<a href="tel:+353749748163" style="color:#1d4ed8;font-weight:600;">074 9748163</a>
+Driver CPC Safety Training Module 5 - Saferlect
+Ltd: Saturday July 18th 9am-5pm
+Citizens Advice Service - Free Legal Advice: Tuesday 18th 10am - 2pm
+We also do posters, leaflets, printing &amp; much more.
+NEWTOWNCUNNINGHAM MASSES
+Day
+Time
+27th June
+Saturday
+7.30pm Eileen Boyce RIP
+28th June
+Sunday
+11am Pro Populo
+30th June
+Tuesday
+NO MASS
+01st July
+Wednesday
+9.30am Mass
+02nd July
+Thursday
+9.30am Mass
+04th July
+Saturday
+7.30pm Rory McMenamin RIP
+05th July
+Sunday
+11am John Doran RIP
+KILLEA MASSES
+Day
+Time
+28th June
+Sunday
+9.30am Mass
+03rd July
+Friday
+9.30am Mass
+05th July
+Sunday
+9.30am Mass
+ST. BAITHIN'S MASSES
+Day
+Time
+27th June
+Saturday
+6pm Mass
+28th June
+Sunday
+12.15pm Marie Bryson RIP
+30th June
+Tuesday
+9.30am Mass
+01st July
+Wednesday
+NO MASS
+02nd July
+Thursday
+7pm Mass
+03rd July
+Friday
+7pm Annette Devine RIP (Month's Mind)
+04th July
+Saturday
+6pm Pro Populo
+05th July
+Sunday
+12.15pm Mass
+Anniversaries:
+Hugh Bovaird RIP, Ar Baithin, Kathleen Curran RIP, Dundee and Sally McDaid RIP, Trensallagh. May their souls and the souls of all the faithful departed rest in peace.
+Litany of Remembrance
+In the rising of the sun and in it’s going down ~ We remember them
+In the blowing of the wind and in the chill of winter ~ We remember them
+In the blueness of the sky and in the warmth of the summer ~ We remember them
+In the rustling of the leaves and in the beauty of Autumn ~ We remember them
+In the beginning of the year and when it ends ~ We remember them
+When we are lost and sick at heart ~ We remember them
+When we have joys, we yearn to share ~ We remember them
+So long as we live, they too shall live ~ We will remember them
+WEEKLY NEWSLETTER
+28th June 2026 – Thirteenth Sunday of Ordinary Time
+Fr Philip Kemmy, PP
+Office Address: Parochial House, Main Street, Newtowncunningham
+<a href="tel:+353749156138" style="color:#1d4ed8;font-weight:600;">074 9156138</a>
+STEP BY STEP THROUGH THE MASS
+The Liturgy of the Word (Part 12) – The Prayers of the Faithful
+Once we have made our Profession of faith with the recitation of the Creed, we move on to the final part of the Liturgy of the Word at Mass; namely: The Prayers of the Faithful – sometimes called the Bidding Prayers. These prayers are not inconsequential pious throw-aways – they are an expression of our union with Christ, praying as the Body of Christ in response to the Word of God – praying through him, with him and in him – which is why the prayers are ordinarily made (though not bindingly prescribed) as an addressed to God the Father.
+The Church asks that this prayer be relatively short, as opposed to long winded paragraphs, and that they should ordinarily be prayers that gather the whole Church and World into the intentions of this congregation gathered for this Mass on this Sunday. These prayers, therefore, are not ordinarily a moment to be specific about a given private or very local issue. For example, while we might pray for good weather for the farming community to do its important business, we wouldn’t be so specific as to pray that Farmer John gets his farming work done. Of course, anyone who knows our local Farmer John can include him in their participation in the prayer – the prayer spoken from the Ambo is usually more wide ranging rather than specific. Exceptions are permitted by the Church when the congregation is gathered for a specific ceremony or celebration: Funerals, Confirmations, Weddings etc.
+For the Prayers of the Faithful the Church has guidelines to follow. The order of the prayers is usually: for the needs of the Church, for public authorities and the Salvation of the whole world; for grave difficulties that afflict people and even nations; then finally for the local community. At the end of each prayer the acclamation is spoken: “Lord hear us!” The congregation replies: “Lord, graciously hear us!” We call out to God, confident that he will hear us. We are encouraged by the Word of God which we have recounted to us something of God’s past interventions with the human race; especially in sending His Only Begotten Son, Jesus. In effect, in faith we are presenting him the difficulties that afflict our present world asking him to intervene with his grace, power, mercy and love as we know he has done in the past, especially as we have heard from the Sacred Scriptures.
+So, the Bidding Prayers are no mere formality. They are meant to be heartfelt pleas to God the Father, made IN the Holy Spirit, BY us, THROUGH Christ Jesus. In faith we call out: “Lord graciously hear us!”
+Parish of Newtowncunningham &amp; Killea
+Email:
+<a href="mailto:office@newtownkilleaparish.ie" target="_blank" rel="noopener noreferrer">office@newtownkilleaparish.ie</a>
+Website:
+<a href="https://www.newtownkilleaparish.ie" target="_blank" rel="noopener noreferrer">www.newtownkilleaparish.ie</a>
+Sunday Collections:
+€1485; Retired Clergy: €390. Thank you for your continued generosity to your Parish. The recent Ceili in aid of Killea Chapel Refurbishment brought in €685. Well done and thank you to all involved and all who donated.
+Sacrament of Confession:
+All Saints Newtown every Saturday 10.30am – 11.30am.
+Eucharistic Adoration:
+will take place on Wednesday in Newtown from 11am – 7pm and in Killea from 2pm – 6pm on Friday.
+Fr Damien will visit the housebound sick of his areas in Newtown on Thursday of this week.
+Please note: Fr Philip will NOT visit housebound sick this week.
+Items for the Parish Newsletter must be submitted to the Parish office no later than 12 Noon on a Thursday to be considered for the Newsletter.
+Parish of Taughboyne, St Baithin's
+Email:
+<a href="mailto:stbaithins@yahoo.com" target="_blank" rel="noopener noreferrer">stbaithins@yahoo.com</a>
+Sunday Collections:
+€1610. Development Fund: €85; Retired Priests: €265. Thank you for your continued generosity to your Parish.
+Sacrament of Confession:
+St. Baithin's each Saturday from 4.30 – 5.30pm.
+Eucharistic Adoration:
+Every Tuesday from 10am – 2pm.
+Adoration and Holy Rosary
+this Thursday in St. Baithin’s led by Fr. Damien at 6pm – followed by Mass at 7pm.
+Fr Damien will visit the housebound sick of Carrigans/St Johnston areas on Friday of this week.
+PLEASE NOTE THAT THERE WILL BE NO 12.15PM MASS IN ST. BAITHIN’S ON SUNDAY 12TH JULY – as we will have Mass at 3pm that day for the Annual Blessing of the Graves.
+Parish Emergency Number:
+Annual Blessing of the Graves:
+Newtown Saturday 1th July at 7.30pm
+St. Johnston Sunday 12th July at 3pm
+PLEASE NOTE that there will be buckets at the various entrances to our graveyards at the Annual Blessing of the Graves. These funds will help with the upkeep and development of our graveyards, which can be a considerable cost on the parish. Please give what you can on the day.
+"DONEGAL PRO LIFE monthly Vigil/Gathering at Hospital Roundabout, Letterkenny on Friday 3rd July from 1.00pm-2.00 pm. Support welcome."
+RALLY FOR LIFE
+in Belfast this year will take place on Saturday 4th of July. A bus will leave Letterkenny Car Park at 9am travelling via Derry. For further information or to book a seat on the sponsored bus contact: Margaret on
+<a href="tel:+353892469599" style="color:#1d4ed8;font-weight:600;">089 2469599</a>
+; Teresa on
+<a href="tel:+353862472345" style="color:#1d4ed8;font-weight:600;">086 2472345</a>
+or Brian on
+<a href="tel:+353872913186" style="color:#1d4ed8;font-weight:600;">087 2913186</a>
+.
+"DONEGAL PRO LIFE monthly Vigil/Gathering at Hospital Roundabout, Letterkenny on Friday 3rd July from 1.00pm-2.00 pm. Support welcome."
+NATIONAL GRANDPARENTS PILGRIMAGE
+will take place at Knock Shrine on Sunday 26th July celebrating the sixth World Day for Grandparents and the Elderly. For many Grandparents and elderly people, this pilgrimage is one of the most important and joyful days of the year – a day when they feel.
+MEN'S ROSARY:
+Saturday 4th July at Market Square, Letterkenny commencing 1pm.
+Raphoe
+WEBSITE parishofraphoe.ie
+Fr Kelly:
+<a href="tel:+353879077985" style="color:#1d4ed8;font-weight:600;">087 9077985</a>
+Office Phone
+EMAIL:
+<a href="mailto:raphoepairsh@gmail.com" target="_blank" rel="noopener noreferrer">raphoepairsh@gmail.com</a>
+Sunday 21 June 2026
+Monday 22 June
+Day
+Time
+Raphoe
+7.30am: Office of Readings, Morning Prayer, Rosary, Divine Mercy Chaplet and Benediction.
+Raphoe
+9am: Mass
+7pm: Jesus visits His people (The Longlands, Convoy)
+Tuesday
+Day
+Time
+Raphoe
+7.30am: Office of Readings, Morning Prayer, Rosary, Divine Mercy Chaplet and Benediction.
+Drumkeen
+10am: Mass
+7pm: Jesus visits His people (Demesne, Raphoe)
+Drumkeen
+Adoration Noon – 9pm
+Wednesday
+Day
+Time
+Raphoe
+7.30am: Office of Readings, Morning Prayer, Rosary, Divine Mercy Chaplet and Benediction.
+Convoy
+9am: Mass
+Raphoe
+9.30am - 8pm: Adoration
+Convoy
+2.15pm: Mass in Brindley Manor NH
+7pm: Jesus visits His people (Carpark at Rosie’s Bar, Drumkeen)
+Thursday
+Day
+Time
+Raphoe
+7.30am: Office of Readings, Morning Prayer, Rosary, Divine Mercy Chaplet and Benediction.
+Raphoe
+9am: Mass
+Convoy
+Noon – 6pm: Adoration
+Convoy
+2.15pm: Mass in Brentwood NH
+7pm: Jesus visits His people (Meetinghouse St, Raphoe)
+Convoy
+Parochial House: 8pm: Legion of Mary
+JESUS VISITS HIS PEOPLE
+You are invited to gather and pray with us
+Monday 22 June at 7pm beside Susan Coyle’s House, The Longlands, Convoy, (F93YCW4)
+Tuesday 23 June at 7pm at Pauline O’Donnell’s House, Demesne, Raphoe, (F93E763)
+Wednesday 24 June at 7pm at the upper Carpark at Rosie’s Bar, Drumkeen
+Thursday 25 June at 7pm at Natasha McCarron’s House, Raphoe, (F93NN24)
+Friday 26 June at 7pm outside Concepta and Eugene McNamee’s House, 16 St Bridget’s Crescent, Drumkeen |
+Friday
+Day
+Time
+Raphoe
+7.30am: Office of Readings, Morning Prayer, Rosary, Divine Mercy Chaplet and Benediction.
+Convoy
+9am Mass
+7pm: Jesus visits His people (St Bridget’s Crescent, Drumkeen)
+Saturday
+Day
+Time
+Raphoe
+8am: Office of Readings, Morning Prayer, Rosary, Divine Mercy Chaplet and Benediction.
+Convoy
+9.30am: Prayer Time in the Divine Mercy Alcove. Chaplet, Morning Prayer, etc All welcome for part of it or all of it.
+Convoy
+Old Graveyard: 3pm: Public Prayers for Our Beloved Dead
+Convoy
+New Graveyard: 4.30pm: Public Prayers for Our Beloved Dead
+Convoy
+6pm: Mass (Josie Mulrine, Ann Toner RIP)
+Drumkeen
+7.30pm: Mass (Brenda Bonnar, Patsy Patton, Francie Patton RIP)
+After Mass: Confessions
+Sunday
+Day
+Time
+Raphoe
+8am: Office of Readings, Morning Prayer, Rosary, Divine Mercy Chaplet and Benediction.
+Convoy
+9.30am: Mass
+Raphoe
+11am: Mass (Tommy and Cassie Murphy RIP)
+Convoy
+Noon: Baptism
+Drumkeen
+1.30pm: Latin Mass
+Raphoe
+3pm: Public Prayers for Our Beloved Dead
+Drumkeen
+5pm: Public Prayers for Our Beloved Dead
+Parish Bulletin
+Announcements
+Volunteers are required to help tidy up the Old Graveyard in Convoy. If you are available to help please meet at the Old Graveyard on Tuesday 23 June at 10am. Thank you for your help.
+The Mass at the Mass Rock is marked in for Tuesday 30 June at 7pm.
+Blessing and distribution of brown scapulars will take place on the weekend of 11/12 July.
+Thanks to all who prayed the novena to the Sacred Heart of Jesus.
+Someone asked Fr Eamonn for a couple of replacement Pioneer pins, but he cannot remember who. Was it you?
+The CHY forms have been sent out to our parishioners. It would be great if we could get the forms signed and returned as soon as possible. The CHY has proven to be very beneficial to the parish over the last few years, taking in over €20,000 per year.
+The new contact number for St Vincent de Paul for Drumkeen is
+<a href="tel:+353879953531" style="color:#1d4ed8;font-weight:600;">087-9953531</a>
+and the Raphoe Office number is
+<a href="tel:+353749173933" style="color:#1d4ed8;font-weight:600;">074-9173933</a>
+.
+What is worse than finding a worm in your apple? Finding half a worm.
+The Annual Franciscan Pilgrimage to Knock will take place on Sunday, 28 June, Cost €30 euro return trip. Mass in the Basilica and rosary procession. A bus will leave Ards at 7am with pick-ups in Creeslough and Letterkenny. For more info contact
+<a href="mailto:info@ardsfriary.ie" target="_blank" rel="noopener noreferrer">info@ardsfriary.ie</a>
+or on
+<a href="tel:+353749138005" style="color:#1d4ed8;font-weight:600;">074 9138005</a>
+.
+You are invited to attend the opening of The Shared Space Convoy on Monday 22 June at 12:30pm behind The Black Memorial Hall, Convoy F93 HW08. Light refreshments will be served in Hall.
+Drumkeen United FC News: The Weekly Lotto: the jackpot not won but Hugh Bonner, Henry Patton, Mary McGavigan, Macca, and Patricia Peoples each won €20. The next draw is on 21 June with a jackpot of €1260.
+Adoration of Jesus in the Blessed Sacrament has been established in this parish for a long time. However, over the years, times and days have been changed to accommodate people and situations. We are presently undertaking a review of the Adoration times and days in all three parish churches. You might let Fr Kelly or any members of the Parish of Raphoe Committee know your ideas.
+When we have listened to your ideas we will be in a much better position to make the right decisions regarding Adoration in the parish of Raphoe. Every hour is in itself a commitment and so all the adorers have to make good commitment. It seems nowadays people do not like making such commitments. So please pray about this and let Fr Kelly or anyone on the Parish of Raphoe Committee know your thoughts on Adoration in our parish.
+Teacher: “Frankie, what is water?”
+Frankie: “Water is a colourless liquid that turns black when I put my hands into it.”
+The Public Prayers for our Beloved Dead will take place in the Old Graveyard, Convoy on Saturday 27 June at 3pm, and in the New Graveyard, Convoy on Saturday 27 June at 4.30pm. (please note time)
+The Public Prayers for our Beloved Dead will take place in the Graveyard in Raphoe on Sunday 28 June at 3pm.
+The Public Prayers for our Beloved Dead will be in the Graveyard in Drumkeen on Sunday 28 June at 5pm.
+Who will tell the children the truth?
+Tawnywilly Parish Newsletter
+Sunday 28th June 2026
+13th Sunday in Ordinary Time/A
+Parish Website
+<a href="https://www.tawnawillyparish.ie" target="_blank" rel="noopener noreferrer">www.tawnawillyparish.ie</a>
+Facebook
+@tawnawillyparish
+Mass Times Intentions for this Week
+Day
+St. Agatha’s
+St. Patrick’s
+Intention
+Saturday 27th June
+6.00 pm
+Doreen Browne Months Mind
+Sunday 28th 13th Sunday in Ordinary Time/A
+10.00 am
+William Kerrigan, Kathleen Forde, Peter, Barry &amp; Patrick, Thomas, Mary Mullin, Mary Mc Cormack Months Mind, Anniversary, Anniversaries
+11:30 am
+Sean Griffin, Teresa Mc Connon, Nora Mullin, Betty Quinlan Anniversaries
+Monday 29th
+10.00 am
+Intention
+Tuesday 30th
+10.00 am
+Intention
+Wednesday 1st July
+10.00 am
+Intention
+10.00 am
+Spencer Sherwin 1st Anniversary
+Thursday 2nd
+12 noon
+Stephen Mc Girr Funeral Mass
+Friday 3rd
+10.00 am
+Intention
+Saturday 4th
+6.00 pm
+Sr. Magdalene Moore 1st Anniversary
+Sunday 5th 14th Sunday in Ordinary Time/A
+11:30 am
+Mary Doherty Anniversary
+1.00 pm
+Graveyard Mass &amp; Blessing
+Parish Priest
+Fr. James Gillespie, P. P.
+Parochial House, Upper Main St.,
+Donegal Town, Co. Donegal
+F94 D8XO
+Phone:
+<a href="tel:+353749721026" style="color:#1d4ed8;font-weight:600;">074 97 21026</a>
+Email:
+<a href="mailto:ppdonegal@gmail.com" target="_blank" rel="noopener noreferrer">ppdonegal@gmail.com</a>
+Parish Office
+Parish Centre, Upper Main St.,
+Donegal Town, Co. Donegal.
+F94 EWR4
+Phone:
+<a href="tel:+353749721026" style="color:#1d4ed8;font-weight:600;">074 97 21026</a>
+/ 97 40461
+<a href="mailto:stpatricksparishcentre@gmail.com" target="_blank" rel="noopener noreferrer">stpatricksparishcentre@gmail.com</a>
+Opening Times:
+Mon., Tues., Thurs. &amp; Friday
+9:30 am – 2:30 pm
+Parish Bookings
+To book a baptism, wedding or to book the Parish Centre itself, please contact the Parish Office
+Baptisms take place in St. Patrick’s on the 1st &amp; 3rd weekends and in St. Agatha’s Church on the 2nd &amp; 4th weekends of each month.
+Baptisms are held on Saturdays at 4:00 pm or Sundays at 1:00 pm.
+Baptismal Preparation course takes place in the Parish Centre on the last Tuesday of each month for all families requiring their child to be baptised.
+Weddings
+Please allow at least four month’s notice for weddings in the parish. Please see our website for further information on parish weddings.
+Please submit items for the Newsletter to the parish office no later than 12 noon on Thursday’s, by phone, email or dropping in a note.
+Eucharistic Adoration
+Tuesday’s St. Agatha’s Church
+Adoration 3pm – 6pm
+Thursday’s: St. Patrick’s Church
+10:00 am – 7.00 pm
+Confession
+Upon request or after any Mass.
+All Masses in both Churches are broadcast live on our parish website or on
+<a href="https://www.mcn" target="_blank" rel="noopener noreferrer">www.mcn</a>
+live and follow the links.
+Notices
+Lourdes Pilgrimage 14 September 2026
+Accompanied by Spiritual Director Fr. James Gillespie. Group Organisers: Fran Mc Donagh &amp; Tina Martin. 5 nights €599 per person sharing. For info &amp; bookings, please contact: Fran Mc Donagh:
+<a href="tel:+353876676476" style="color:#1d4ed8;font-weight:600;">087-667 6476</a>
+or Tina Martin:
+<a href="tel:+353876963094" style="color:#1d4ed8;font-weight:600;">087-696 3094</a>
+Memorial Walk
+There will be a Memorial Walk in memory of Amanda Grey Conlin taking place on Sun 28th June at 12.30pm, leaving from the Parish Centre, Donegal Town in aid of the Kevin Bell Repatriation Trust. Draw will take place on the day. All donations welcome. Refreshments after the walk in Parish Centre.
+Annual National Grandparents Pilgrimage
+Celebrating the World Day for Grandparents and the Elderly at Knock Shrine on Sunday 26th of July 2026. A Day of Grace and Blessing for the whole family as we honour grandparents and the elderly. All are welcome.
+Anointing - 2.30pm Mass - 3.00pm
+Rosary Procession (Weather Permitting)
+Celebrant Archbishop Eamon Martin, Primate of All Ireland.
+Music: Una Nolan &amp; Choirs.
+Guest Soloist Diana Rosemary Scully.
+Visit our website for resources:
+<a href="https://www.catholicgrandparentsassociation.org" target="_blank" rel="noopener noreferrer">www.catholicgrandparentsassociation.org</a>
+.
+St Agatha’s Church Mass Sunday 5th July
+Please note there will be no 10am Mass on Sunday 5th July as the Graveyard Mass &amp; Blessing will take place at 2pm.
+Graveyard Mass &amp; Blessing
+Will take place at St. Agatha’s Graveyard in Lair on Sunday 5th at 2pm.
+Graveyard - Cleaning
+In preparation for the Graveyard Mass, when tidying graves, we would ask you to please remove old wreaths, etc. from the graveyard and bring them home for disposal. Please do not dump anything in the graveyard or in adjacent properties. Thank you.
+Knock Shrine Diocesan Pilgrimage
+The Raphoe Pilgrimage to Knock will take place on Saturday the 15th August. The Parish is hoping to organise a bus to from Donegal Town and return on the day. If you are interested in going, please contact Sean asap on
+<a href="tel:+353872332162" style="color:#1d4ed8;font-weight:600;">087 2332162</a>
+, to prebook.
+"Don Pro Life Monthly Vigil/Gathering:
+at Hospital Roundabout, Letterkenny on Friday the 3rd July from 1.00pm-2.00 pm. Support welcome."
+"Rally For Life"
+In Belfast this year on Saturday the 4th July. To book a seat on sponsored bus contact: Mgt. on
+or Teresa on
+<a href="tel:+353862647235" style="color:#1d4ed8;font-weight:600;">086 2647235</a>
+or Brian on
+<a href="tel:+353872913186" style="color:#1d4ed8;font-weight:600;">087 2913186</a>
+.
+HLI Ireland 32 County Missions with relics of St Thérèse &amp; The Holy Face.
+Sunday 5th July; St Mary's Hall, Buncrana, 2pm-4pm.
+Tuesday 7th July; The Abbey Hotel, Donegal Town, 6:30pm-8:30pm.
+Thursday 9th July; Mount Errigal Hotel Letterkenny, 7pm-9pm.
+The events comprise recitation of the rosary, a reminder of the mission of laity through Gospel and the Catechism, as well as information on the work of Human Life International Ireland, sponsoring seminarians to priesthood in Tanzania (13 ordinations taking place this Summer), helping women in crisis pregnancy situations (630 babies lives saved so far), Holy Face devotion, and promoting the authentic teachings of the Catholic faith, working for an Ireland where God is First, Life is Sacred and the Family is Cherished. Feedback for the nights has been excellent and some clergy have attended the events including Bishop Cullen in Waterford and Lismore.
+Vocations Monstrance (Blessed by Pope Leo) in the Diocese of Raphoe from 21st to 4th July
+The “Vocations Monstrance” is part of the Church’s ongoing commitment to promote and foster vocations to the priesthood and to religious life. The Monstrance will be in various churches in the Diocese to encourage prayer for vocations and to deepen young people’s awareness of God’s call in their lives. Through prayer before the Blessed Sacrament, we ask the Lord to raise up generous and joyful servants for His Church. Vocations are born in prayer, sustained by prayer, and strengthened through prayer. Any parish wishing to have the “Vocations Monstrance” during these 2 weeks, please contact Fr Rnry Brady at
+<a href="mailto:vocations@raphoediocese.ie" target="_blank" rel="noopener noreferrer">vocations@raphoediocese.ie</a>
+.
+Thank you
+I would like to express my sincere thanks to everyone who joined with me on Friday, 19th June, to celebrate the 40th Anniversary of my Ordination, and to all who travelled from various Parishes to mark this important occasion for me. Your presence was greatly appreciated. My heartfelt thanks to you all.
+Fr. James Sweeney
+Collection for Peter’s Pence on June 28th
+- Sunday before the liturgical feast of Saints Peter and Paul – the traditional Peter’s Pence collection takes place. This is a concrete way to support the Holy Father in his mission of service to the universal Church. Donating to Peter’s Pence is a concrete gesture of communion with the Holy Father and of solidarity with his mission to bring the Gospel throughout the world.
+Youth Pilgrimage to Medjugorje
+This pilgrimage for teenagers (15 – 18 year olds) will take place on 5th – 12th August 2026. Cost €500 Eur. Limited number of places are still available if interested.
+Also 2 Free tickets will be made available from Donegal Town Parish for a limited period. For further information please contact Keith Kelly ASAP.
+<a href="tel:+353877851282" style="color:#1d4ed8;font-weight:600;">087 7851282</a>
+, or email
+<a href="mailto:youthministry@raphoediocese.ie" target="_blank" rel="noopener noreferrer">youthministry@raphoediocese.ie</a>
+. Organised by Marian Pilgrimages.
+Mary's Meals
+Are delighted, in fact thrilled, to announce that Fr Eamon Kelly is getting rid of the beard in a sponsored beard and head shave. It will take place at the Diamond, Donegal Town on Saturday 11 July from Noon to 4pm. Mary's Meals are presently feeding 3,060,011 Children every day in school and €22 provides food for a child for a full school year. Any support is greatly appreciated.
+Community Employment
+We have vacancies at our local Church for a general maintenance/Caretaker position. 19.5 hrs weekly, flexible hours. If you are unemployed and interested, please contact
+<a href="tel:+353877694024" style="color:#1d4ed8;font-weight:600;">087 7694024</a>
+.
+Sunday Collections – Sunday 21st June
+St. Patrick’s Church: €1,530
+St. Agatha’s Church: €1,260
+You can also use your card or phone to ‘Tap to Donate’ in Donegal Church, to make your contributions and donations to St. Patrick’s Church.</p>
 <div class="parish-row-empty parish-odd" id="parish-kilmacrenan">
   <span class="parish-name">Kilmacrenan</span>
   <span class="parish-empty">No searchable text available this week.</span>
@@ -2008,112 +1999,105 @@ You can also use your card or phone to ‘Tap to Donate’ in Donegal Church, to
   <span class="parish-empty">No searchable text available this week.</span>
   <a class="parish-source" href="https://tawnawillyparish.ie/bulletin/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
 </div>
-<details class="parish-block parish-even" id="parish-drive-1hh7w-ew0v">
-  <summary class="parish-head">
-    <span class="parish-name">Templecrone</span>
-    <a class="parish-source" href="https://drive.usercontent.google.com/download?id=1Hh7w-Ew0vLJUFMihFiVzVJGhjeYposIH&amp;export=download" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
-  </summary>
-  <div class="parish-body"><p>DUNGLOE-MEENACROSS-LEITIR-DOCHARA<br>
-Fr. Johnny Moore P.P<br>
-(074) 95 21084<br>
-Fr Johnny Moore Mob (087) 953 5510<br>
-Email:<br>
-<a href="mailto:office@templecroneparish.ie" target="_blank" rel="noopener noreferrer">office@templecroneparish.ie</a><br>
-Administrator &amp; Director of Music: Lisa Philbin (087) 123 9354<br>
-Newsletter: Maureen Mc Calh (087) 673 7821<br>
-ST. CRONA’S CHURCH, CHAPEL ROAD, DUNGLOE, CO.DONEGAL, F94 W2P2<br>
-THIRTEENTH SUNDAY IN ORDINARY TIME<br>
-ST. CRONA’S DUNGLOE<br>
-SAT 27th JUNE<br>
-6.30PM Mairead Coll<br>
-Kathleen O’Donnell, Chapel Rd<br>
-Sara &amp; John O’Donnell, Tully House<br>
-SUN 28th JUNE - 13th SUNDAY IN ORDINARY TIME<br>
-11AM Anthony Doherty Main St. 1st Anniversary<br>
-Lorna Hughes<br>
-Paddy Gillispie, Lettercaugh<br>
-Dolty Mc Cole<br>
-MON 29th JUNE - ST. PETER &amp; PAUL, APOSTLES<br>
-10AM Rose O’Donnell<br>
-Nora &amp; Barney Mc Brearty<br>
-TUE 30th JUNE.<br>
-Ella bo Dónall, Sarah O Dónall, Patrick<br>
-O’Donnell &amp; Susan S. Rourkes.<br>
-WED 1st JULY, ST. OLIVER PLUNKETT, BISHOP &amp; MARTYR<br>
-*6.30PM Farewell Mass (Holy Souls)*<br>
-THU 2nd JULY<br>
-10AM Priests Ints.<br>
-FRI 3rd JULY, ST. THOMAS THE APOSTLE<br>
-11AM Priests Ints.<br>
-SAT 4th JULY<br>
-6.30PM Charlie Rory. Lettercugh.<br>
-11AM Missa Pro Populo<br>
-ST. PATRICK’S MEENACROSS<br>
-SUN 28th JUNE. 13th SUNDAY IN ORDINARY TIME<br>
-9AM M.M. Mary Cannon<br>
-SUN 5th JULY. 14th SUNDAY IN ORDINARY TIME<br>
-11AM Missa Pro Populo<br>
-ST. BRIDGET’S LEITIR<br>
-SAT 27th JUNE<br>
-Michael, John &amp; Charlie Bonner, Mullyroe<br>
-FRI 3rd JULY - ST. THOMAS THE APOSTLE<br>
-10AM FIRST FRIDAY<br>
-SAT 4th JULY<br>
-7PM Eddie, Patrick &amp; Tony Mc Gettigan &amp;<br>
-deceased members of the Mc Gettigan &amp;<br>
-Severney Families<br>
-ST. CONAL’S DOCHARA<br>
-SUN 28th JUNE. 13th SUNDAY IN ORDINARY TIME<br>
-11.30AM<br>
-SUN 5th JULY. 14th SUNDAY IN ORDINARY TIME<br>
-11.30AM<br>
-PARISH NOTICES:<br>
-DONATIONS: You may wish to contribute to the Parish by setting up a standing order.<br>
-Our bank details as follows:<br>
-A/c: Parish of Templecrone<br>
-IBAN: IE27 AIBK 9373 3925 7690 14<br>
-Vincent de Paul Local Branch<br>
-Tel:<br>
-<a href="tel:+353860389322" style="color:#1d4ed8;font-weight:600;">086 038 9322</a><br>
-- For Masses &amp; Liturgies online please go to our Church Services website:<br>
-<a href="https://www.churchservices.tv/dungloe" target="_blank" rel="noopener noreferrer">www.churchservices.tv/dungloe</a><br>
-Tel: 01 607 7150<br>
-NEWSLETTER DEADLINE – 12 NOON THURSDAY<br>
-ADVANCE NOTICE BLESSING OF THE GRAVERYARDS<br>
-In Dungloe and Maghery Sunday 19th July 2026<br>
-in Leitir &amp; Clonbailte Saturday 13th August 2026<br>
-PLEASE NOTE: Masses can only be booked via the<br>
-Mass booking form, available from the Sacristy in all of our<br>
-Churches or the Parochial House.<br>
-GRAVEYARDS LETTERMACAWARD/DOCHARA<br>
-The digging season has begun and graveyards in Madavy &amp;<br>
-Docharra are very well tended this year however you are<br>
-asked to cover your graves please do so!<br>
-PAY FOR MASS<br>
-Please note that the Tap and Go payment system is<br>
-now fully functional and in operation. If you don’t carry<br>
-coins and coins on your person don’t be afraid to use it.<br>
-TEA PARTY in aid of Declarations &amp; Maghery Fire &amp; Drum<br>
-Band on Saturday 8th July at 1.30pm in Dungloe<br>
-Hall, Evening of Community Music &amp;<br>
-Entertainment. EVERYONE WELCOME.<br>
-JR JOHNNY'S FAREWELL MASS<br>
-will be in St. Crona’s Church, Dungloe<br>
-Wednesday evening 1st July at 6.30pm<br>
-followed by refreshments in Social Circle.<br>
-ALL WELCOME.<br>
-Missing &amp; Online-Only Bulletins<br>
-Generated 28/06/2026<br>
+<h2 class="b-title">Templecrone</h2>
+<p>DUNGLOE-MEENACROSS-LEITIR-DOCHARA
+Fr. Johnny Moore P.P
+(074) 95 21084
+Fr Johnny Moore Mob (087) 953 5510
+Email:
+<a href="mailto:office@templecroneparish.ie" target="_blank" rel="noopener noreferrer">office@templecroneparish.ie</a>
+Administrator &amp; Director of Music: Lisa Philbin (087) 123 9354
+Newsletter: Maureen Mc Calh (087) 673 7821
+ST. CRONA’S CHURCH, CHAPEL ROAD, DUNGLOE, CO.DONEGAL, F94 W2P2
+THIRTEENTH SUNDAY IN ORDINARY TIME
+ST. CRONA’S DUNGLOE
+SAT 27th JUNE
+6.30PM Mairead Coll
+Kathleen O’Donnell, Chapel Rd
+Sara &amp; John O’Donnell, Tully House
+SUN 28th JUNE - 13th SUNDAY IN ORDINARY TIME
+11AM Anthony Doherty Main St. 1st Anniversary
+Lorna Hughes
+Paddy Gillispie, Lettercaugh
+Dolty Mc Cole
+MON 29th JUNE - ST. PETER &amp; PAUL, APOSTLES
+10AM Rose O’Donnell
+Nora &amp; Barney Mc Brearty
+TUE 30th JUNE.
+Ella bo Dónall, Sarah O Dónall, Patrick
+O’Donnell &amp; Susan S. Rourkes.
+WED 1st JULY, ST. OLIVER PLUNKETT, BISHOP &amp; MARTYR
+*6.30PM Farewell Mass (Holy Souls)*
+THU 2nd JULY
+10AM Priests Ints.
+FRI 3rd JULY, ST. THOMAS THE APOSTLE
+11AM Priests Ints.
+SAT 4th JULY
+6.30PM Charlie Rory. Lettercugh.
+11AM Missa Pro Populo
+ST. PATRICK’S MEENACROSS
+SUN 28th JUNE. 13th SUNDAY IN ORDINARY TIME
+9AM M.M. Mary Cannon
+SUN 5th JULY. 14th SUNDAY IN ORDINARY TIME
+11AM Missa Pro Populo
+ST. BRIDGET’S LEITIR
+SAT 27th JUNE
+Michael, John &amp; Charlie Bonner, Mullyroe
+FRI 3rd JULY - ST. THOMAS THE APOSTLE
+10AM FIRST FRIDAY
+SAT 4th JULY
+7PM Eddie, Patrick &amp; Tony Mc Gettigan &amp;
+deceased members of the Mc Gettigan &amp;
+Severney Families
+ST. CONAL’S DOCHARA
+SUN 28th JUNE. 13th SUNDAY IN ORDINARY TIME
+11.30AM
+SUN 5th JULY. 14th SUNDAY IN ORDINARY TIME
+11.30AM
+PARISH NOTICES:
+DONATIONS: You may wish to contribute to the Parish by setting up a standing order.
+Our bank details as follows:
+A/c: Parish of Templecrone
+IBAN: IE27 AIBK 9373 3925 7690 14
+Vincent de Paul Local Branch
+Tel:
+<a href="tel:+353860389322" style="color:#1d4ed8;font-weight:600;">086 038 9322</a>
+- For Masses &amp; Liturgies online please go to our Church Services website:
+<a href="https://www.churchservices.tv/dungloe" target="_blank" rel="noopener noreferrer">www.churchservices.tv/dungloe</a>
+Tel: 01 607 7150
+NEWSLETTER DEADLINE – 12 NOON THURSDAY
+ADVANCE NOTICE BLESSING OF THE GRAVERYARDS
+In Dungloe and Maghery Sunday 19th July 2026
+in Leitir &amp; Clonbailte Saturday 13th August 2026
+PLEASE NOTE: Masses can only be booked via the
+Mass booking form, available from the Sacristy in all of our
+Churches or the Parochial House.
+GRAVEYARDS LETTERMACAWARD/DOCHARA
+The digging season has begun and graveyards in Madavy &amp;
+Docharra are very well tended this year however you are
+asked to cover your graves please do so!
+PAY FOR MASS
+Please note that the Tap and Go payment system is
+now fully functional and in operation. If you don’t carry
+coins and coins on your person don’t be afraid to use it.
+TEA PARTY in aid of Declarations &amp; Maghery Fire &amp; Drum
+Band on Saturday 8th July at 1.30pm in Dungloe
+Hall, Evening of Community Music &amp;
+Entertainment. EVERYONE WELCOME.
+JR JOHNNY'S FAREWELL MASS
+will be in St. Crona’s Church, Dungloe
+Wednesday evening 1st July at 6.30pm
+followed by refreshments in Social Circle.
+ALL WELCOME.
+Missing &amp; Online-Only Bulletins
+Generated 28/06/2026
 The following parishes do not have a downloadable PDF bulletin. Click a link to view the bulletin online.</p></div>
-</details></div>
-        <div class="note-box">This bulletin text is auto-generated from the PDF. Irish (Gaeilge) and English are kept as printed. Please verify mass times and names against the original PDF.</div>
-      </div>
-
+      <div class="note-box">The plain text OCR version is auto-generated and may contain errors so it is always best to double check with the original PDF. OCR (Optical Character Recognition) is technology that turns images of text into editable, searchable digital text.</div>
     </div>
 
     <!-- Parish Links Section -->
     <section class="parish-section">
-      <h2>RAPHOE Parishes with Working Bulletin Links</h2>
+      <h2 class="section-heading">RAPHOE Parishes with Working Bulletin Links</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="🔍 Filter parishes..." aria-label="Filter parishes" />
       <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="https://annagryparish.ie/newsletter-2/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Annagry</span></a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="http://ardara.ie/news/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Ardara</span></a></li><li class="parish-item" data-name="ballintra parish"><a class="parish-link" href="https://www.facebook.com/donalquinn1959" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Ballintra Parish</span></a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="https://drive.google.com/drive/folders/1z9goh6DrkCUkpJMDbwfsi28Yc_t0_ltC" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Bruckless</span></a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="https://www.steunanscathedral.ie/newsletter/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Cathedral</span></a></li><li class="parish-item" data-name="drumholm"><a class="parish-link" href="https://www.parishpress.net/wp-content/uploads/parish-bulletins/donegal/raphoe/drumholm-parish/bulletin.pdf?t=1782303743" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Drumholm</span></a></li><li class="parish-item" data-name="dunfanaghy"><a class="parish-link" href="https://mcn.live/Camera/holy-cross-church" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Dunfanaghy</span></a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="https://naomhfionan.com/nuachtlitir/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Falcarragh</span></a></li><li class="parish-item" data-name="gartan/termon"><a class="parish-link" href="https://drive.usercontent.google.com/download?id=1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa&amp;export=download" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Gartan/Termon</span></a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="https://www.glenfin-parish.com/#sbp-bulletin" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Glenfin</span></a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="https://drive.usercontent.google.com/download?id=14aLAxt4mv7eYBvYx2GGthpsQnLrsysmK&amp;export=download" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Glenties</span></a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="https://www.parishpress.net/wp-content/uploads/parish-bulletins/donegal/raphoe/gort-a-choirce/bulletin.pdf?t=1771000171" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Gortahork</span></a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="https://www.inverparish.com/parish-newsletter.html" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Inver</span></a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="https://drive.usercontent.google.com/download?id=1m6sOGz3dECWvbbpXCnRGdHG77yWiLXxR&amp;export=download" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Irish Martyrs</span></a></li><li class="parish-item" data-name="kilbarron"><a class="parish-link" href="https://www.kilbarron.org/bulletin" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Kilbarron</span></a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="https://www.mcn.live/Camera/st-carthas-church-kilcar,-f94-h2y5" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Kilcar</span></a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="https://mcn.live/Camera/st-mary-of-the-visitation-church-killybegs" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Killybegs</span></a></li><li class="parish-item" data-name="kilmacrenan"><a class="parish-link" href="https://drive.google.com/file/d/1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa/view" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Kilmacrenan</span></a></li><li class="parish-item" data-name="kincasslagh"><a class="parish-link" href="https://www.kincasslagh.ie/?post_type=kbp_bulletins" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Kincasslagh</span></a></li><li class="parish-item" data-name="mevagh"><a class="parish-link" href="https://www.facebook.com/profile.php?id=100079250566866" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Mevagh</span></a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="https://milfordrathmullanparishes.ie/bulletins/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Milford Kilkeel</span></a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="https://newtownkilleaparish.ie/bulletin/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Newtown Killea</span></a></li><li class="parish-item" data-name="raphoe"><a class="parish-link" href="https://drive.usercontent.google.com/download?id=1jmslbrliw1BTtdrxHbqpUbhQEf6wXHy5&amp;export=download" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Raphoe</span></a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="https://milfordrathmullanparishes.ie/bulletins/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Rathmullan</span></a></li><li class="parish-item" data-name="stranolar"><a class="parish-link" href="https://www.stranorlarparish.ie/newsletter/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Stranolar</span></a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="https://tawnawillyparish.ie/bulletin/" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Tawnawilly</span></a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="https://drive.usercontent.google.com/download?id=1Hh7w-Ew0vLJUFMihFiVzVJGhjeYposIH&amp;export=download" target="_blank" rel="noopener noreferrer"><span aria-hidden="true">⛪</span> <span>Templecrone</span></a></li></ul>
     </section>
@@ -2139,19 +2123,22 @@ The following parishes do not have a downloadable PDF bulletin. Click a link to 
   </footer>
 
   <script>
-    // Tab Switching
-    function switchTab(tabName, button) {
-      document.querySelectorAll('.view-panel').forEach(function(panel) {
-        panel.classList.remove('active');
+    // PDF fullscreen shortcut (the browser's own PDF viewer already
+    // supplies page number / zoom / print controls inside the iframe).
+    (function () {
+      var wrap = document.getElementById('pdf-frame-wrap');
+      var btn = document.getElementById('pdf-fullscreen-btn');
+      if (!wrap || !btn) return;
+      btn.addEventListener('click', function () {
+        try {
+          if (wrap.requestFullscreen) {
+            wrap.requestFullscreen();
+          } else if (wrap.webkitRequestFullscreen) {
+            wrap.webkitRequestFullscreen();
+          }
+        } catch (e) {}
       });
-      document.querySelectorAll('.tab-btn').forEach(function(btn) {
-        btn.classList.remove('active');
-        btn.setAttribute('aria-selected', 'false');
-      });
-      document.getElementById('panel-' + tabName).classList.add('active');
-      button.classList.add('active');
-      button.setAttribute('aria-selected', 'true');
-    }
+    })();
 
     (function () {
       var KEY = 'ph_ocr_scale';

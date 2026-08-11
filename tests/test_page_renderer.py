@@ -47,6 +47,14 @@ class PageRendererTests(unittest.TestCase):
             self.assertIn("Sunday mass at 10am", html)
             self.assertIn("← Back to home", html)
 
+            # PDF and OCR are both always visible, stacked, no tabs/accordion
+            # (Frank round-2 feedback: match his reference page layout).
+            self.assertNotIn("switchTab", html)
+            self.assertNotIn("tab-btn", html)
+            self.assertIn("Bulletin — Original PDF Version", html)
+            self.assertIn("Bulletin — OCR Extracted Plain Text", html)
+            self.assertIn("PRO TIP", html.upper())
+
     def test_render_diocese_raphoe_page_escapes_user_content(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             out_path = Path(tmpdir) / "index.html"

@@ -11,6 +11,7 @@ from ocr.generate_bulletin_pages import (
     extract_ocr_fragment,
     format_uk_date,
     parse_parish_links,
+    prepare_ocr_fragment,
     render_bulletin_viewer_shell,
     render_ocr_standalone_page,
     render_pdf_standalone_page,
@@ -101,6 +102,22 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertIn("Distraction-free view", html_output)
             self.assertIn("test-2026-05-19-ocr.html", html_output)
             self.assertIn("distraction-free", html_output.lower())
+            # PDF is shown immediately (no tab click) — the PDF and OCR
+            # panels are both always visible, stacked, matching Frank's
+            # reference page layout (Frank feedback, round 2).
+            self.assertNotIn("switchTab", html_output)
+            self.assertNotIn("tab-btn", html_output)
+            self.assertNotIn('role="tablist"', html_output)
+            self.assertIn("Bulletin — Original PDF Version", html_output)
+            self.assertIn("Bulletin — OCR Extracted Plain Text", html_output)
+            self.assertIn("PRO TIP", html_output.upper())
+            self.assertIn("Download PDF", html_output)
+            self.assertIn("pdf-fullscreen-btn", html_output)
+            # PDF section must appear before the OCR section in document order.
+            self.assertLess(
+                html_output.index("Bulletin — Original PDF Version"),
+                html_output.index("Bulletin — OCR Extracted Plain Text"),
+            )
 
     def test_render_pdf_standalone_page(self) -> None:
         config = DioceseConfig(
@@ -181,6 +198,74 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("No searchable text available this week.", html_output)
         self.assertIn("Ardara Parish", html_output)
         self.assertIn("Bangor Parish", html_output)
+
+    def test_prepare_ocr_fragment_is_continuous_no_accordion(self) -> None:
+        """Frank: 'i absolutely hate the ocr the way its layed out the
+        dropdown for each parish' — prepare_ocr_fragment must no longer
+        rebuild the OCR text into collapsible per-parish <details> sections;
+        it should read straight through, page by page, like the PDF."""
+        parish_links = [
+            ("Ardara Parish", "https://example.com/ardara"),
+            ("Bangor Parish", "https://example.com/bangor"),
+        ]
+        ocr_fragment = (
+            '<p class="page-label">Page 1</p>'
+            "<h2>Ardara Parish</h2>"
+            "<p>Mass times this week: Saturday 6pm, Sunday 11am.</p>"
+            "<h2>Bangor Parish</h2>"
+            "<p>Confessions after Saturday evening Mass.</p>"
+        )
+        result = prepare_ocr_fragment("test", ocr_fragment, parish_links)
+
+        self.assertNotIn("<details", result)
+        self.assertNotIn("parish-block", result)
+        self.assertNotIn("parish-head", result)
+        self.assertIn("Page 1", result)
+        self.assertIn("Ardara Parish", result)
+        self.assertIn("Mass times this week", result)
+        self.assertIn("Bangor Parish", result)
+        # Original page order is preserved (Ardara's content appears before
+        # Bangor's, exactly as extracted — not re-sorted A-Z into sections).
+        self.assertLess(result.index("Mass times this week"), result.index("Confessions"))
+
+    def test_prepare_ocr_fragment_flattens_legacy_accordion_markup(self) -> None:
+        """Pages regenerated from already-published HTML (which may still
+        carry the old collapsible <details class="parish-block"> markup from
+        before Frank's round-2 fix) must come out flattened too — not just
+        freshly-converted OCR."""
+        parish_links = [
+            ("Ardara Parish", "https://example.com/ardara"),
+            ("Bangor Parish", "https://example.com/bangor"),
+        ]
+        legacy_fragment = (
+            '<details class="parish-block parish-even" id="parish-ardaraparish">\n'
+            '  <summary class="parish-head">\n'
+            '    <span class="parish-name">Ardara Parish</span>\n'
+            '    <a class="parish-source" href="https://example.com/ardara" target="_blank" '
+            'rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>\n'
+            "  </summary>\n"
+            '  <div class="parish-body"><p>Mass times this week: Saturday 6pm.</p></div>\n'
+            "</details>"
+        )
+        result = prepare_ocr_fragment("test", legacy_fragment, parish_links)
+
+        self.assertNotIn("<details", result)
+        self.assertNotIn("parish-block", result)
+        self.assertNotIn("parish-head", result)
+        self.assertNotIn("summary", result)
+        self.assertIn("Ardara Parish", result)
+        self.assertIn("Mass times this week", result)
+
+    def test_prepare_ocr_fragment_keeps_failed_banner_when_no_parish_markers(self) -> None:
+        parish_links = [
+            ("Ardara Parish", "https://example.com/ardara"),
+            ("Bangor Parish", "https://example.com/bangor"),
+        ]
+        result = prepare_ocr_fragment("test", "<p>asd asd asd 12345 !!!</p>", parish_links)
+        self.assertIn("ocr-failed-banner", result)
+        self.assertIn("OCR failed this week", result)
+        # Still no accordion — even the failure case is a continuous document.
+        self.assertNotIn("<details", result)
 
     def test_az_parish_html_no_banner_when_some_parishes_have_content(self) -> None:
         parish_links = [
