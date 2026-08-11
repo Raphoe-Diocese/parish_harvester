@@ -590,11 +590,23 @@ def _write_parish_reader_outputs(
             repo_root=REPO_ROOT,
         )
 
-def render_parish_link_grid(parish_links: list[tuple[str, str]]) -> str:
-    """Searchable A–Z parish link grid — shared by every canonical viewer page."""
+def render_parish_link_grid(
+    parish_links: list[tuple[str, str]],
+    internal_hrefs: dict[str, str] | None = None,
+) -> str:
+    """Searchable A–Z parish link grid — shared by every canonical viewer page.
+
+    *internal_hrefs* optionally maps a normalised parish name (see
+    :func:`_normalise_name`) to this diocese's own per-parish bulletin page
+    (see :mod:`ocr.parish_pages`). When present, that becomes the primary
+    link and the parish's external site becomes a small secondary "🔗 Site"
+    link; parishes without a generated page keep the old external-only
+    behaviour unchanged.
+    """
     if not parish_links:
         return '<p class="empty-state">No parish bulletin links were found for this diocese yet.</p>'
     sorted_links = sorted(parish_links, key=lambda pair: pair[0].lower())
+    internal_hrefs = internal_hrefs or {}
     items = []
     seen: set[str] = set()
     for name, url in sorted_links:
@@ -602,17 +614,31 @@ def render_parish_link_grid(parish_links: list[tuple[str, str]]) -> str:
         if not key or key in seen:
             continue
         seen.add(key)
-        items.append(
-            (
-                "<li class=\"parish-item\" data-name=\"{name_key}\">"
-                "<a class=\"parish-link\" href=\"{url}\" target=\"_blank\" rel=\"noopener noreferrer\">"
-                "<span aria-hidden=\"true\">⛪</span> <span>{name}</span></a></li>"
-            ).format(
-                name_key=html.escape(name.lower(), quote=True),
-                url=html.escape(url, quote=True),
-                name=html.escape(name),
+        name_key = html.escape(name.lower(), quote=True)
+        safe_name = html.escape(name)
+        internal_href = internal_hrefs.get(key)
+        if internal_href:
+            safe_internal = html.escape(internal_href, quote=True)
+            safe_url = html.escape(url, quote=True)
+            site_link = (
+                f'<a class="parish-site-link" href="{safe_url}" target="_blank" '
+                f'rel="noopener noreferrer">🔗 Site</a>'
+                if url
+                else ""
             )
-        )
+            items.append(
+                f'<li class="parish-item" data-name="{name_key}">'
+                f'<a class="parish-link" href="{safe_internal}">'
+                f'<span aria-hidden="true">⛪</span> <span>{safe_name}</span></a>'
+                f"{site_link}</li>"
+            )
+        else:
+            safe_url = html.escape(url, quote=True)
+            items.append(
+                f'<li class="parish-item" data-name="{name_key}">'
+                f'<a class="parish-link" href="{safe_url}" target="_blank" rel="noopener noreferrer">'
+                f'<span aria-hidden="true">⛪</span> <span>{safe_name}</span></a></li>'
+            )
     return (
         '<div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div>'
         f'<ul id="parish-grid" class="parish-grid">{"".join(items)}</ul>'
@@ -1585,7 +1611,16 @@ def render_bulletin_viewer_shell(
       padding: 0;
       margin: 0;
     }}
-    .parish-item {{ margin: 0; }}
+    .parish-item {{ margin: 0; display: flex; flex-direction: column; gap: 4px; }}
+    .parish-site-link {{
+      align-self: flex-start;
+      margin-left: 4px;
+      font-size: 0.78rem;
+      font-weight: 600;
+      color: #6b7280;
+      text-decoration: none;
+    }}
+    .parish-site-link:hover {{ color: {TEAL}; text-decoration: underline; }}
     .parish-link {{
       min-height: 48px;
       display: flex;
@@ -2039,10 +2074,10 @@ def regenerate_viewer_from_existing(existing_path: Path) -> Path:
 def write_viewer_page(diocese: str, bulletin_date: str, pdf_path: Path, ocr_html_path: Path) -> Path:
     config = DIOCESES[diocese]
     page_count = count_pdf_pages(pdf_path)
-    ocr_fragment = extract_ocr_fragment(ocr_html_path)
+    raw_ocr_fragment = extract_ocr_fragment(ocr_html_path)
     parish_links = parse_parish_links(config.evidence_path)
-    ocr_plain_text = _fragment_to_plain_text(ocr_fragment)
-    ocr_fragment = prepare_ocr_fragment(diocese, ocr_fragment, parish_links)
+    ocr_plain_text = _fragment_to_plain_text(raw_ocr_fragment)
+    ocr_fragment = prepare_ocr_fragment(diocese, raw_ocr_fragment, parish_links)
     output_path = BULLETINS_DIR / f"{diocese}-{bulletin_date}.html"
     output_path.write_text(
         render_viewer_page(config, bulletin_date, page_count, ocr_fragment, parish_links),
@@ -2059,7 +2094,30 @@ def write_viewer_page(diocese: str, bulletin_date: str, pdf_path: Path, ocr_html
         encoding="utf-8",
     )
     _write_parish_reader_outputs(diocese, bulletin_date, ocr_plain_text, parish_links)
+    _write_parish_bulletin_pages(diocese, bulletin_date, pdf_path, raw_ocr_fragment)
     return output_path
+
+
+def _write_parish_bulletin_pages(diocese: str, bulletin_date: str, pdf_path: Path, raw_ocr_fragment: str) -> None:
+    """Best-effort per-parish page generation — never breaks the diocese
+    viewer page if it fails (see ``ocr.parish_pages``)."""
+    try:
+        from ocr.parish_pages import write_parish_pages_for_diocese
+
+        config = DIOCESES[diocese]
+        written = write_parish_pages_for_diocese(
+            diocese,
+            bulletin_date,
+            pdf_path,
+            raw_ocr_fragment,
+            diocese_pdf_href=f"../../mega_pdf/{config.pdf_filename}",
+        )
+        if written:
+            print(f"  📄 Wrote {len(written)} per-parish bulletin page(s) for {diocese}")
+        else:
+            print(f"  ℹ️  No 'ok' parishes found for {diocese} in parish_status.json — no per-parish pages written")
+    except Exception as exc:
+        print(f"  ⚠️  Per-parish bulletin pages failed for {diocese} (non-fatal): {exc}")
 
 
 def scan_viewer_entries() -> list[ViewerEntry]:

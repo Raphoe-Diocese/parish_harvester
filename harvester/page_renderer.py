@@ -126,6 +126,7 @@ def render_diocese_raphoe_page(
     headline: str = "Raphoe Collated Bulletin",
     ocr_standalone_url: str = "../../bulletins/index.html",
     pdf_standalone_url: str = "",
+    internal_parish_hrefs: dict[str, str] | None = None,
 ) -> None:
     """Render a diocese's "current" landing page.
 
@@ -134,6 +135,11 @@ def render_diocese_raphoe_page(
     bulletin-archive pages — so Raphoe, Derry and Down & Connor always look
     and behave identically. Despite the historical function name this now
     renders every live diocese's page, not just Raphoe's.
+
+    *internal_parish_hrefs* optionally maps a normalised parish name to this
+    diocese's own generated per-parish bulletin page (see
+    :mod:`ocr.parish_pages`) — see
+    :func:`ocr.generate_bulletin_pages.render_parish_link_grid`.
     """
     from ocr.generate_bulletin_pages import render_bulletin_viewer_shell, render_parish_link_grid
 
@@ -165,7 +171,7 @@ def render_diocese_raphoe_page(
         ocr_standalone_href=str(ocr_standalone_url or "").strip(),
         ocr_fragment=_build_ocr_fragment(ocr_text, ocr_is_html=ocr_is_html),
         parish_section_heading=f"{diocese_label} Parishes with Working Bulletin Links",
-        parish_links_html=render_parish_link_grid(tuple_links),
+        parish_links_html=render_parish_link_grid(tuple_links, internal_hrefs=internal_parish_hrefs),
     )
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(html_doc, encoding="utf-8")

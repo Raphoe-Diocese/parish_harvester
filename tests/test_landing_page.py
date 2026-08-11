@@ -102,6 +102,139 @@ class LandingPageTests(unittest.TestCase):
             for key in links:
                 self.assertTrue((docs / "dioceses" / key / "index.html").exists(), key)
 
+            # Homepage hero image/gradient slider: auto-advancing carousel
+            # with prev/next controls, dot indicators, and reduced-motion
+            # support — plain CSS/vanilla JS, no framework.
+            self.assertIn('data-hero-slider', index_html)
+            self.assertEqual(
+                index_html.count('aria-roledescription="slide"'), len(site_builder.HERO_SLIDES)
+            )
+            self.assertIn('hero-prev', index_html)
+            self.assertIn('hero-next', index_html)
+            self.assertEqual(index_html.count('data-slide-index="'), len(site_builder.HERO_SLIDES))
+            self.assertIn('prefers-reduced-motion', index_html)
+            self.assertIn('matchMedia', index_html)
+
+            # Real cathedral photos (not gradient placeholders) with the
+            # legally-required CC attribution credit shown on each slide.
+            self.assertIn('upload.wikimedia.org', index_html)
+            self.assertIn('Wikimedia Commons', index_html)
+            self.assertIn('hero-slide-credit', index_html)
+
+
+class HeroSliderRenderTests(unittest.TestCase):
+    def test_hero_slider_html_uses_gradient_when_no_image(self) -> None:
+        original = site_builder.HERO_SLIDES
+        try:
+            site_builder.HERO_SLIDES = [
+                site_builder.HeroSlide(
+                    image=None,
+                    gradient="linear-gradient(135deg, #000, #fff)",
+                    eyebrow="Test",
+                    title="Test title",
+                    subtitle="Test subtitle",
+                )
+            ]
+            markup = site_builder._hero_slider_html()
+        finally:
+            site_builder.HERO_SLIDES = original
+        self.assertIn('linear-gradient', markup)
+        self.assertNotIn('url(', markup)
+
+    def test_hero_slider_html_uses_photo_when_image_set(self) -> None:
+        original = site_builder.HERO_SLIDES
+        try:
+            site_builder.HERO_SLIDES = [
+                site_builder.HeroSlide(
+                    image="assets/hero/slide-1.jpg",
+                    gradient="linear-gradient(135deg, #000, #fff)",
+                    eyebrow="Test",
+                    title="Test title",
+                    subtitle="Test subtitle",
+                )
+            ]
+            markup = site_builder._hero_slider_html()
+        finally:
+            site_builder.HERO_SLIDES = original
+        self.assertIn("url('assets/hero/slide-1.jpg')", markup)
+        self.assertIn("Test title", markup)
+
+    def test_hero_slider_html_supports_full_url_image_and_custom_position(self) -> None:
+        original = site_builder.HERO_SLIDES
+        try:
+            site_builder.HERO_SLIDES = [
+                site_builder.HeroSlide(
+                    image="https://upload.wikimedia.org/wikipedia/commons/thumb/x/y/photo.jpg/1280px-photo.jpg",
+                    position="center 25%",
+                    gradient="linear-gradient(135deg, #000, #fff)",
+                    eyebrow="Test",
+                    title="Test title",
+                    subtitle="Test subtitle",
+                )
+            ]
+            markup = site_builder._hero_slider_html()
+        finally:
+            site_builder.HERO_SLIDES = original
+        self.assertIn(
+            "url('https://upload.wikimedia.org/wikipedia/commons/thumb/x/y/photo.jpg/1280px-photo.jpg') "
+            "center 25%/cover no-repeat",
+            markup,
+        )
+
+    def test_hero_slider_html_renders_required_cc_attribution_credit(self) -> None:
+        original = site_builder.HERO_SLIDES
+        try:
+            site_builder.HERO_SLIDES = [
+                site_builder.HeroSlide(
+                    image="assets/hero/slide-1.jpg",
+                    credit="Photo: Jane Doe / Wikimedia Commons / CC BY-SA 4.0",
+                    gradient="linear-gradient(135deg, #000, #fff)",
+                    eyebrow="Test",
+                    title="Test title",
+                    subtitle="Test subtitle",
+                ),
+                site_builder.HeroSlide(
+                    image="assets/hero/slide-2.jpg",
+                    credit=None,
+                    gradient="linear-gradient(135deg, #000, #fff)",
+                    eyebrow="Test 2",
+                    title="Test title 2",
+                    subtitle="Test subtitle 2",
+                ),
+            ]
+            markup = site_builder._hero_slider_html()
+        finally:
+            site_builder.HERO_SLIDES = original
+        self.assertIn('hero-slide-credit">Photo: Jane Doe / Wikimedia Commons / CC BY-SA 4.0<', markup)
+        self.assertEqual(markup.count('class="hero-slide-credit"'), 1)
+
+    def test_default_hero_slides_are_real_cathedral_photos_with_cc_credit(self) -> None:
+        # Frank asked for real cathedral photos (not gradient placeholders)
+        # for the 3 live dioceses — each must be a verified CC-licensed
+        # Wikimedia Commons photo with an on-image attribution credit.
+        self.assertEqual(len(site_builder.HERO_SLIDES), 3)
+        for slide in site_builder.HERO_SLIDES:
+            self.assertTrue(slide.image and slide.image.startswith("https://upload.wikimedia.org/"))
+            self.assertTrue(slide.credit and "Wikimedia Commons" in slide.credit)
+            self.assertTrue(any(lic in slide.credit for lic in ("CC BY-SA", "CC BY")))
+
+        titles = {slide.title for slide in site_builder.HERO_SLIDES}
+        self.assertIn("Cathedral of St. Eunan and St. Columba, Letterkenny", titles)
+        self.assertIn("St Eugene's Cathedral, Derry", titles)
+        self.assertIn("St Peter's Cathedral, Belfast", titles)
+
+        eyebrows = {slide.eyebrow for slide in site_builder.HERO_SLIDES}
+        self.assertEqual(eyebrows, {"Raphoe Diocese", "Derry Diocese", "Down & Connor Diocese"})
+
+    def test_hero_slider_html_empty_when_no_slides(self) -> None:
+        original = site_builder.HERO_SLIDES
+        try:
+            site_builder.HERO_SLIDES = []
+            markup = site_builder._hero_slider_html()
+        finally:
+            site_builder.HERO_SLIDES = original
+        self.assertEqual(markup, "")
+
 
 if __name__ == "__main__":
     unittest.main()
