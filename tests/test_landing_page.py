@@ -78,15 +78,27 @@ class LandingPageTests(unittest.TestCase):
                 site_builder.RECIPES_DIR, site_builder.BULLETINS_DIR, site_builder.RELIABILITY_PATH, site_builder.REPO_ROOT = old
 
             index_html = (docs / "index.html").read_text(encoding="utf-8")
-            self.assertEqual(index_html.count("Open →"), 26)
-            self.assertIn("Derry", index_html)
-            self.assertIn("Down and Connor", index_html)
+
+            # The 3 live dioceses are prominent, near the top, each with a
+            # one-click link to its collated (mega) bulletin and its text
+            # bulletin — not a full-size "coming soon" card.
+            self.assertIn("Live dioceses", index_html)
+            self.assertEqual(index_html.count("live-card\""), 3)
+            self.assertIn("Derry Diocese", index_html)
+            self.assertIn("Down and Connor Diocese", index_html)
             self.assertIn("Raphoe Diocese", index_html)
-            self.assertIn("Parish of Raphoe", index_html)
+            self.assertIn("Open Collated Bulletin", index_html)
+            self.assertIn("Mega PDF", index_html)
+            self.assertIn("Text Bulletin", index_html)
             self.assertIn("🟢", index_html)
             self.assertIn("🔴", index_html)
 
+            # The other 23 dioceses collapse into one small expandable list.
+            self.assertIn("More dioceses — coming soon (23)", index_html)
+            self.assertNotIn("Parish of Raphoe", index_html)
+
             links = re.findall(r'href="dioceses/([a-z0-9-]+)/"', index_html)
+            self.assertEqual(len(links), 26)
             for key in links:
                 self.assertTrue((docs / "dioceses" / key / "index.html").exists(), key)
 

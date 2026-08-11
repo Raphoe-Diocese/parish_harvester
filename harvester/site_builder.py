@@ -436,35 +436,47 @@ def _status_dot(avg_success_rate: float | None) -> str:
     if avg_success_rate >= 0.8:
         return "🟢"
     if avg_success_rate >= 0.5:
-        return "��"
+        return "🟡"
     return "🔴"
 
 
 def _landing_page(rows: list[dict[str, str]]) -> str:
-    live_sections = "".join(
-        (
-            "<section class=\"live-diocese\">"
-            f"<div class=\"live-diocese-head\"><h2>{html_name} Diocese</h2>"
-            f"<a href=\"dioceses/{row['key']}/\">Open parish bulletins →</a></div>"
-            "<p class=\"live-diocese-note\">Parish links below come from the bulletin evidence file.</p>"
-            f"{_render_placeholder_parish_links(_parish_links(row['key']))}"
-            "</section>"
-        )
-        for row in rows
-        if row["key"] in LIVE_DIOCESES and _parish_links(row["key"])
-        for html_name in [row["name"]]
+    """Homepage: the 3 live dioceses prominent up top, the other 23 collapsed.
+
+    Only Raphoe, Derry and Down & Connor have real reliability data today
+    (see ``LIVE_DIOCESES``), so they get full cards with one-click links to
+    their collated (mega) bulletin and text bulletin. Every other diocese —
+    still "coming soon" — collapses into one small expandable list instead of
+    23 near-empty placeholder cards, entirely driven by the same per-diocese
+    rows (dot/status/updated) computed in :func:`run`.
+    """
+    live_rows = [row for row in rows if row["key"] in LIVE_DIOCESES]
+    other_rows = sorted(
+        (row for row in rows if row["key"] not in LIVE_DIOCESES),
+        key=lambda row: row["name"],
     )
-    cards_html = "".join(
+
+    live_cards_html = "".join(
         (
-            "<article class=\"diocese-card\">"
-            f"<h2>{row['name']}</h2>"
-            f"<p><strong>{row['dot']}</strong> {row['status_label']}</p>"
-            f"<p>Last updated: {row['updated']}</p>"
-            f"<a href=\"dioceses/{row['key']}/\">Open →</a>"
+            "<article class=\"live-card\">"
+            f"<p class=\"live-card-eyebrow\">{row['dot']} {html.escape(row['status_label'])}</p>"
+            f"<h2>{html.escape(row['name'])} Diocese</h2>"
+            f"<p class=\"live-card-updated\">Last updated: {html.escape(row['updated'])}</p>"
+            "<div class=\"live-card-actions\">"
+            f"<a class=\"live-btn primary\" href=\"dioceses/{row['key']}/\">Open Collated Bulletin →</a>"
+            f"<a class=\"live-btn secondary\" href=\"{html.escape(_mega_pdf_url(row['key']), quote=True)}\" target=\"_blank\" rel=\"noopener noreferrer\">📄 Mega PDF</a>"
+            f"<a class=\"live-btn secondary\" href=\"{html.escape(_ocr_standalone_url(row['key']), quote=True)}\" target=\"_blank\" rel=\"noopener noreferrer\">📝 Text Bulletin</a>"
+            "</div>"
             "</article>"
         )
-        for row in rows
+        for row in live_rows
     )
+
+    other_rows_html = "".join(
+        f"<li>{row['dot']} <a href=\"dioceses/{row['key']}/\">{html.escape(row['name'])}</a></li>"
+        for row in other_rows
+    )
+
     return f"""<!DOCTYPE html>
 <html lang=\"en\">
 <head>
@@ -477,26 +489,34 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     .hero {{ background: #1a6b6b; color: #fff; padding: 26px 18px; }}
     .hero-inner, .content, .footer {{ max-width: 1180px; margin: 0 auto; }}
     .banner {{ background: #fff4df; border: 1px solid #f5d08d; color: #704d0f; border-radius: 10px; padding: 10px 12px; margin-top: 12px; }}
-    .grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); gap: 14px; margin-top: 18px; }}
-    .diocese-card {{ background: #fff; border: 1px solid #d6ecea; border-radius: 12px; padding: 14px; }}
-    .diocese-card h2 {{ margin: 0 0 8px; font-size: 1.08rem; }}
-    .diocese-card p {{ margin: 0 0 8px; color: #4b5563; }}
-    .diocese-card a {{ color: #1a6b6b; font-weight: 700; text-decoration: none; }}
-    .diocese-card a:hover {{ text-decoration: underline; }}
     .content {{ padding: 20px 16px 10px; }}
-    .live-diocese {{ margin-top: 20px; background: #fff; border: 1px solid #d6ecea; border-radius: 12px; padding: 16px; }}
-    .live-diocese-head {{ display: flex; justify-content: space-between; align-items: baseline; gap: 10px; flex-wrap: wrap; }}
-    .live-diocese-head h2 {{ margin: 0; color: #1a6b6b; }}
-    .live-diocese-head a {{ color: #1a6b6b; font-weight: 700; text-decoration: none; }}
-    .live-diocese-head a:hover {{ text-decoration: underline; }}
-    .live-diocese-note {{ margin: 8px 0 12px; color: #4b5563; }}
-    .parish-list {{ margin: 0; padding-left: 18px; columns: 3; }}
-    .parish-list li {{ margin: 6px 0; }}
-    .parish-list a {{ color: #1a6b6b; text-decoration: none; }}
-    .parish-list a:hover {{ text-decoration: underline; }}
+    .section-title {{ margin: 4px 0 14px; font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #4b5563; }}
+    .live-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 16px; }}
+    .live-card {{ background: #fff; border: 1px solid #d6ecea; border-radius: 14px; padding: 18px; box-shadow: 0 6px 18px rgba(26, 107, 107, 0.06); }}
+    .live-card-eyebrow {{ margin: 0 0 8px; font-size: 0.82rem; font-weight: 700; color: #4b5563; text-transform: uppercase; letter-spacing: 0.04em; }}
+    .live-card h2 {{ margin: 0 0 6px; font-size: 1.35rem; color: #114b4b; }}
+    .live-card-updated {{ margin: 0 0 16px; color: #4b5563; font-size: 0.9rem; }}
+    .live-card-actions {{ display: flex; flex-wrap: wrap; gap: 8px; }}
+    .live-btn {{ display: inline-flex; align-items: center; padding: 9px 14px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; text-decoration: none; }}
+    .live-btn.primary {{ background: #1a6b6b; color: #fff; }}
+    .live-btn.secondary {{ background: #eef8f7; color: #1a6b6b; border: 1px solid #cfe8e6; }}
+    .live-btn:hover {{ opacity: 0.92; text-decoration: none; }}
+    .more-dioceses {{ margin-top: 26px; background: #fff; border: 1px solid #d6ecea; border-radius: 12px; padding: 14px 18px; }}
+    .more-dioceses summary {{ cursor: pointer; font-weight: 700; color: #1a6b6b; list-style: none; }}
+    .more-dioceses summary::-webkit-details-marker {{ display: none; }}
+    .more-dioceses summary::before {{ content: "▸ "; }}
+    .more-dioceses[open] summary::before {{ content: "▾ "; }}
+    .more-dioceses-note {{ margin: 10px 0 12px; color: #6b7280; font-size: 0.88rem; }}
+    .more-dioceses-grid {{ list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px 16px; }}
+    .more-dioceses-grid li {{ margin: 0; font-size: 0.92rem; }}
+    .more-dioceses-grid a {{ color: #375569; text-decoration: none; }}
+    .more-dioceses-grid a:hover {{ text-decoration: underline; color: #1a6b6b; }}
     .footer {{ border-top: 1px solid #d6ecea; margin-top: 18px; padding: 14px 16px 24px; color: #4b5563; font-size: 0.95rem; }}
     .footer a {{ color: #1a6b6b; text-decoration: none; }}
     .footer a:hover {{ text-decoration: underline; }}
+    @media (max-width: 640px) {{
+      .live-btn {{ flex: 1 1 auto; justify-content: center; }}
+    }}
   </style>
 </head>
 <body>
@@ -508,8 +528,13 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     </div>
   </header>
   <main class=\"content\">
-    <section class=\"grid\">{cards_html}</section>
-    {live_sections}
+    <p class=\"section-title\">Live dioceses</p>
+    <section class=\"live-grid\">{live_cards_html}</section>
+    <details class=\"more-dioceses\">
+      <summary>More dioceses — coming soon ({len(other_rows)})</summary>
+      <p class=\"more-dioceses-note\">These dioceses don't have reliability data yet. Tap a name to see what's available so far.</p>
+      <ul class=\"more-dioceses-grid\">{other_rows_html}</ul>
+    </details>
   </main>
   <footer class=\"footer\">
     <p><a href=\"bulletins/index.html\">Browse the full OCR bulletin archive</a></p>
@@ -551,13 +576,6 @@ def _subscribe_page(dioceses: list[DioceseCard]) -> str:
 """
 
 
-def _bulletin_viewer_url(diocese_key: str) -> str:
-    viewer_path, _viewer_date = _latest_viewer(diocese_key)
-    if viewer_path is None:
-        return "../../bulletins/index.html"
-    return f"../../bulletins/{viewer_path.name}"
-
-
 def _ocr_standalone_url(diocese_key: str) -> str:
     standalone = _latest_ocr_standalone(diocese_key)
     pages_base = "https://raphoe-diocese.github.io/parish_harvester"
@@ -573,6 +591,31 @@ def _mega_pdf_url(diocese_key: str) -> str:
     stem = diocese_key.replace("-", "_")
     pages_base = "https://raphoe-diocese.github.io/parish_harvester"
     return f"{pages_base}/mega_pdf/{stem}_mega_bulletin.pdf"
+
+
+def _latest_pdf_standalone(diocese_key: str) -> Path | None:
+    """Latest distraction-free PDF-only page (`{diocese}-{date}-pdf.html`)."""
+    if not BULLETINS_DIR.exists():
+        return None
+    stem = diocese_key.replace("-", "[-_]")
+    regex = re.compile(rf"^{stem}-(\d{{4}}-\d{{2}}-\d{{2}})-pdf\.html$")
+    latest: tuple[Path, str] | None = None
+    for path in sorted(BULLETINS_DIR.glob("*.html")):
+        match = regex.match(path.name)
+        if not match:
+            continue
+        date_text = match.group(1)
+        if latest is None or date_text > latest[1]:
+            latest = (path, date_text)
+    return latest[0] if latest else None
+
+
+def _pdf_standalone_url(diocese_key: str) -> str:
+    standalone = _latest_pdf_standalone(diocese_key)
+    pages_base = "https://raphoe-diocese.github.io/parish_harvester"
+    if standalone is not None:
+        return f"{pages_base}/bulletins/{standalone.name}"
+    return _mega_pdf_url(diocese_key)
 
 
 def _parish_links_for_big_bulletin(diocese_key: str, report_path: Path) -> list[dict[str, str]]:
@@ -618,14 +661,13 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
                 parish_links=parish_links,
                 out_path=out_path,
                 mega_pdf_url=_mega_pdf_url(diocese.key),
-                bulletin_viewer_url=_bulletin_viewer_url(diocese.key),
                 ocr_standalone_url=_ocr_standalone_url(diocese.key),
+                pdf_standalone_url=_pdf_standalone_url(diocese.key),
                 ocr_text=ocr_text,
                 ocr_is_html=ocr_is_html,
                 week_label=week_label if target_date else "",
                 diocese_display_name=diocese.name,
                 headline=f"{display_short} Collated Bulletin",
-                parish_heading="Working parish links",
             )
             updated_label = format_uk_date(target_date) or target_date or "Coming soon"
         else:
