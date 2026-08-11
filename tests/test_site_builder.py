@@ -52,6 +52,30 @@ class SiteBuilderTests(unittest.TestCase):
                 encoding="utf-8",
             )
 
+            # A per-parish page already generated for this diocese this week
+            # (see ocr.parish_pages) — the diocese A-Z grid should link to it.
+            parish_status_path = parishes_dir / "parish_status.json"
+            parish_status_path.write_text(
+                json.dumps(
+                    {
+                        "parishes": {
+                            "ardmoreparish": {
+                                "outcome": "ok",
+                                "diocese": "Derry Diocese",
+                                "display_name": "Ardmore",
+                                "url": "https://example.com/ardmore",
+                            }
+                        }
+                    }
+                ),
+                encoding="utf-8",
+            )
+            derry_parish_pages_dir = docs / "parishes" / "derry"
+            derry_parish_pages_dir.mkdir(parents=True, exist_ok=True)
+            (derry_parish_pages_dir / "ardmoreparish.html").write_text(
+                "<html><body>Ardmore parish page</body></html>", encoding="utf-8"
+            )
+
             old = (site_builder.RECIPES_DIR, site_builder.BULLETINS_DIR, site_builder.RELIABILITY_PATH, site_builder.REPO_ROOT)
             site_builder.RECIPES_DIR = recipes
             site_builder.BULLETINS_DIR = bulletins
@@ -79,6 +103,11 @@ class SiteBuilderTests(unittest.TestCase):
             # Same canonical viewer design used for every trained live diocese page.
             self.assertIn('id="panel-pdf"', derry_page)
             self.assertIn('id="panel-ocr"', derry_page)
+
+            # A-Z grid links to the already-generated internal parish page
+            # (ocr.parish_pages) instead of only the external parish site.
+            self.assertIn('href="../../parishes/derry/ardmoreparish.html"', derry_page)
+            self.assertIn("🔗 Site", derry_page)
 
 
 if __name__ == "__main__":

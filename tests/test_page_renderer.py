@@ -89,6 +89,29 @@ class PageRendererTests(unittest.TestCase):
             html = out_path.read_text(encoding="utf-8")
             self.assertIn("We&#x27;re still collecting OCR text for this diocese. Check back next Sunday.", html)
 
+    def test_render_diocese_raphoe_page_links_to_internal_parish_pages(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            out_path = Path(tmpdir) / "index.html"
+            render_diocese_raphoe_page(
+                parish_links=[
+                    {"name": "Ardara", "url": "https://example.com/ardara"},
+                    {"name": "Annagry", "url": "https://example.com/annagry"},
+                ],
+                out_path=out_path,
+                mega_pdf_url="../../mega_pdf/raphoe_mega_bulletin.pdf",
+                diocese_display_name="Raphoe Diocese",
+                headline="Raphoe Collated Bulletin",
+                internal_parish_hrefs={"ardara": "../../parishes/raphoe/ardara.html"},
+            )
+            html = out_path.read_text(encoding="utf-8")
+
+            # Ardara has a generated parish page — internal link is primary,
+            # its own site becomes a small secondary link.
+            self.assertIn('href="../../parishes/raphoe/ardara.html"', html)
+            self.assertIn("🔗 Site", html)
+            # Annagry has no generated page yet — unchanged external-only link.
+            self.assertIn('href="https://example.com/annagry"', html)
+
     def test_render_diocese_raphoe_page_down_and_connor_ampersand(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             out_path = Path(tmpdir) / "index.html"
