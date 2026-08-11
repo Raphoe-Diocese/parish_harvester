@@ -1,0 +1,1143 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Moville Text Bulletin — 11/08/2026</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #eef1f0;
+      color: #1a1f1e;
+      line-height: 1.65;
+      font-size: 1.125rem;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
+    }
+    a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
+    .page {
+      max-width: min(72ch, 100%);
+      margin: 0 auto;
+      padding: 14px 18px 40px;
+    }
+    .top {
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+      gap: 8px 14px;
+      margin-bottom: 12px;
+    }
+    .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+    .back-link {
+      font-size: 0.9rem; font-weight: 700;
+      color: #14524f; text-decoration: none;
+    }
+    .title-line {
+      font-size: 1rem; font-weight: 700; color: #1a1f1e;
+    }
+    .font-size-controls { display: none; }
+    .ocr-zoom-bar {
+      position: sticky; top: 0; z-index: 6;
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
+    }
+    .ocr-zoom-bar button {
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+      line-height: 1;
+    }
+    .ocr-zoom-pct {
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 4px; } }
+    
+    .ocr-body {
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    .ocr-body h1, .ocr-body h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h2.b-title, .ocr-body .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    .ocr-body h3.b-head, .ocr-body .b-head {
+      font-size: 1.12em;
+      color: #134e9c;
+      margin: 1.1em 0 0.35em;
+    }
+    .ocr-body h4.b-sub, .ocr-body .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    .ocr-body h3, .ocr-body h4 {
+      color: #1a6b6b;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    .ocr-body h3.ocr-page-heading,
+    .ocr-body .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    .ocr-body hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    .ocr-body strong { color: #0f2b5b; }
+    .ocr-body a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .ocr-body mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    .ocr-body mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    .ocr-body table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ocr-body table.b-table td, .ocr-body table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .ocr-body table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    .ocr-body table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    .ocr-body img, .ocr-body iframe, .ocr-body video {
+      max-width: 100%;
+      height: auto;
+    }
+    .ocr-body > :first-child {
+      margin-top: 0;
+    }
+
+    .ocr-body {
+      padding: 4px 2px 8px;
+    }
+    .search-panel {
+      margin: 0 0 12px;
+      border: 1px solid #d4ddd9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .search-panel .ocr-search-bar { margin-bottom: 6px; }
+    .ocr-search-bar { position: relative; margin-bottom: 6px; }
+    .search-input {
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: #1a1f1e; background: #fff;
+    }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 1px solid #1a6b6b; border-radius: 6px; background: #fff; color: #1a6b6b;
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { color: #999; border-color: #d4ddd9; cursor: not-allowed; }
+    .match-count { color: #5a6a68; font-size: 0.85rem; font-weight: 600; }
+    .note-box {
+      margin-top: 18px;
+      color: #5a6a68;
+      font-weight: 400;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      padding: 0;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 8px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    body.embed-mode .top { display: none !important; }
+    body.embed-mode .page { padding-top: 8px; }
+    @media (max-width: 600px) {
+      .page { padding: 12px 14px 32px; }
+      .ocr-search-tools button { min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top" id="ocr-top">
+      <div class="top-left">
+        <a class="back-link" href="movilleparish.html">← Viewer</a>
+        <span class="title-line">MOVILLE Text Bulletin · 11/08/2026</span>
+      </div>
+    </div>
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+      <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+      <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+      <span class="ocr-zoom-hint">or pinch to zoom</span>
+    </div>
+    <div class="search-panel" role="search">
+      <div class="ocr-search-bar">
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search text (mass, bingo, parish…)" aria-label="Search bulletin text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled>← Prev</button>
+          <button id="ocr-next" type="button" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+    <div class="ocr-body" id="ocr-text"><div class="ocr-failed-banner" role="status">ℹ️ Matched by parish name only (not exact PDF pages) this week — check the PDF above for the definitive version.</div>
+<p>Moville<br>
+https://movilleparish.com<br>
+Page 83<br>
+Baptism: We welcome into God’s Family Sophie Ella Treacy Daly , Gulladuff and Rían Oscar Gillespie ,<br>
+Gulladuff Heights who were baptised recently.<br>
+Prayer for Vocations: For our seminarians and the men considering priesthood that, in moments of doubt,<br>
+they&#x27;ll hear Jesus say what He says to the disciples in today&#x27;s gospel, &quot;Courage! It is I. Do not be afraid!&quot; We<br>
+pray to the Lord.<br>
+“It is to the glory of my Father that you should bear much fruit and then you will be my disciples.” Are you<br>
+being called to love the Lord and His people as a priest, sister or brother? Anyone interested in serving the<br>
+Church as a priest of the diocese of Derry should contact the diocesan Vocations Director, Fr Pat O’Hagan,<br>
+PP Bellaghy and Greenlough, at<br>
+0487938 6259<br>
+or at<br>
+pgoh2111@gmail.com<br>
+Music continues on Thursday evenings at 8pm in Moville Men’s Shed. Love Music? Just Show Up! Singers,<br>
+players, and socialisers alike are all welcome for a relaxing evening at one of the few Shed activities open to<br>
+both men and women.<br>
+A Feast of Folk with Patsy Cavanagh and friends in The Cairn, at 8pm every Tuesday during July and<br>
+August. Ballads and Folk songs from Ireland and further afield as seating is limited, please call 9381104.<br>
+Summer Teas in the Glencrow Hall on Saturday 22 August from 11am to 4.00pm. Scones, cakes and good<br>
+company. Also, a stall of pre-loved items for sale. Admission €8, children free. Proceeds to ongoing work in<br>
+war-torn Myanmar.<br>
+Donegal Down Sydrome Association Annual church-gate collection will take place on the weekend of 29 /30<br>
+August.<br>
+The National Novena to Our Lady of Knock takes place at Knock Shrine from Thursday 13 to Friday 21<br>
+August. Ceremonies celebrated daily at 3pm and 8pm, with workshops and guided prayer sessions. This<br>
+year’s theme is “Sheltered in God’s Love.” Full programme at:<br>
+https://www.knockshrine.ie/national-novena-<br>
+2026-guest-speakers-and-programme/<br>
+Carrowmena Community Centre (9367061) Cream Teas every Tuesday during August from between 2 and<br>
+4pm. Cost €5. Special summer dance (The Holiday Hop ), for regulars, holiday makers and visitors, on Sunday<br>
+16 August at 8pm. Admission €5, including supper. All welcome. Carrowmena Community Centre,<br>
+Carrowmena Residents Association and Tremone Historical Society will hold an afternoon celebrating the<br>
+heritage, people and stories of the area on Sunday 30 August at 2pm. It will include a guided historical walk,<br>
+talks about the memorial garden and a draw for a painting by Jenny Craven followed by tea in the Centre.<br>
+Proceeds to the Residents Association and the Memorial Garden Renovation Fund. Tickets €10. Booking<br>
+essential.<br>
+Congratulations to the winners of the August Parish Draw.<br>
+Prize Number Name Promoter<br>
+€700 253 Ellie McDermott Agnes Cavanagh<br>
+€400 227 Seamus &amp; Mary Bovaird Agnes Cavanagh<br>
+€250 108 Fr Pat O’Hagan Bridget McGhee<br>
+€150 147 Margaret Lynch Helen Gillen<br>
+€100 188 Siobhan Price Kay Doherty<br>
+Safeguarding If you have any concerns with regards to Safeguarding children or adults, please contact<br>
+Marie O’Kane, The Diocesan Designated Liaison Person at 00447596500793 or<br>
+dlp@derrydiocese.org<br>
+.<br>
+Local Safeguarding Representatives are Mary McGranaghan and Brídín Hannaway<br>
+Page 84<br>
+15 Sunday in Ordinary Time (Year A)<br>
+12 July 2026<br>
+The Soil of Our Lives<br>
+This Sunday Jesus tells us the parable of the sower . It is one of the most<br>
+familiar stories in the Gospels. A farmer scatters seed. Some falls on the<br>
+path, some on rocky ground, some among thorns, and some on rich soil.<br>
+Only the rich soil produces a harvest.<br>
+Anyone who has ever grown anything in soil knows that you can have the<br>
+best seed in the world, but if the ground isn&#x27;t ready , nothing will come of<br>
+it. The work is in the preparation. The digging, the clearing, the weeding.<br>
+It is slow and unspectacular , and nobody sees it. But it makes all the<br>
+difference.<br>
+Isaiah reminds us this weekend that God&#x27;s W ord never returns to Him<br>
+empty . Like the rain and the snow that water the earth, His word always<br>
+accomplishes what it was sent to do. The seed is never the problem. God<br>
+is endlessly generous. He scatters His grace everywhere, on all of us,<br>
+without measure and without favourites. The question the parable puts to<br>
+each of us is a simple one: what kind of ground is He landing on?<br>
+Every one of us has been planted with gifts. Gifts of faith, of kindness, of<br>
+patience, of prayer . Some of them are lying dormant because the soil of<br>
+our lives has become hardened, or crowded, or shallow . The worries of<br>
+the week, the busyness, the old hurts we haven&#x27;t let go of — these are<br>
+the thorns and the stones. They don&#x27;t destroy the seed. They just stop it<br>
+growing.<br>
+The good news is that soil can always be worked: A little time in prayer<br>
+each day . An honest look at what is choking the W ord in us. A return to<br>
+the Sacraments. Small, quiet acts of clearing the ground! When we do<br>
+that, our roots go down deeper into God, and we find a steadiness that<br>
+the heat of life cannot wither .<br>
+St Paul tells us the whole of creation is groaning, waiting to be set free.<br>
+That freedom begins in small plots of ground, that is in hearts like yours<br>
+and mine that let the W ord take root and grow .<br>
+thSion Mills<br>
+http://www.parishofsionmills.com<br>
+Page 85<br>
+So this week, ask the Lord: what needs clearing in me? Then let Him in<br>
+with the spade! The harvest He promises is thirty , sixty , a hundredfold.<br>
+Fr Sean<br>
+FATIMA PILGRIMAGE<br>
+I’m in Fatima with Fr Stephen Baxter (our newly ordained) and 60 others<br>
+from our Parishes and others in Fatima. Please be assured of our<br>
+prayers at all our Masses, Rosaries and Processions for you all and your<br>
+intentions, and I ask for yours for us as well. Thanks to Fr Michael Canny<br>
+PP, Fr Patrick Lagan CC and Fr Joshy Parokkaran CC from W aterside for<br>
+providing cover while I’m away .<br>
+We welcome into God’ s Family through the Sacrament of Baptism:<br>
+Lottie Kimberley Jowett<br>
+Remy Petroosbabakhan<br>
+May they Rest in Peace<br>
+Deaths<br>
+Gerard O’Connell , 60 Belldoo<br>
+Bernard O’Brien , 2 Mourne Park<br>
+Jackie Begley , 217 Ballycolman Estate<br>
+Jim Harley , 1 Melmount Park<br>
+Thomas Martin Roulston , 89 Carlton Drive<br>
+Anniversaries<br>
+Sr. Monica O’Kane , Mary Kate Mullen, William Robinson<br>
+Conor McCarron, Tony McAleer , Susan Logue<br>
+Vincent Gormley , Betty McColgan , Ellen Jane McCormick<br>
+John Ellis, Frances O’Connor , Tommy McGarrigle<br>
+Gerard Blake, Joe Millar , Tom Skehan<br>
+Kay McGuigan , William Devine , Jude Crotty<br>
+Frank Molloy , Maureen Devine, Eunan Herron<br>
+Tommy Finlay , Harry McCrossan, Anne McCay<br>
+Magdalene Curry , Molly McDaid , David Coyle<br>
+Deirdre Drumm Pearce, Dessie Drumm, Grace Drumm<br>
+Noel Brennan , Joe McNulty , Alice Alexander<br>
+Robert Brennan, George Fitzpatrick, Francis Moss<br>
+Margaret Quigley , Packie Duncan , Frank McElwee<br>
+Michael McDaid, Ann McShane , Patrick Early<br>
+George Early , Sarah Early , George Devenney<br>
+David McDaid, Marie Henderson<br>
+Announcements<br>
+Page 86<br>
+Last week’ s collections amounted to: Melmount: £3373.00; Sion Mills :<br>
+£1465.00. Thank you. Those who pay to the weekly collection or any<br>
+special collections, including Priest’ s Collection by cheque are asked that<br>
+all cheques should be made payable to ‘Melmount Parish’ or ‘Sion Mills<br>
+Parish’ depending on the Parish. This is a banking requirement.<br>
+Parishioners can still leave their contributions in the Parish Office. If the<br>
+Office is closed, please use the letterbox.<br>
+Parish Bulletin This is the last bulletin until September .<br>
+Exposition of the Blessed Sacrament will take place in St. Mary’ s,<br>
+Melmount tomorrow , Monday 13 July after 10.00am Mass until 6.30pm.<br>
+Vocations We pray for the men called to serve the Church as priests of<br>
+our diocese, that their hearts will be the fertile soil Jesus needs to receive<br>
+the seed which is His W ord, and that they will spread His W ord, His Good<br>
+News, by their preaching and by the example of their lives.<br>
+Adoration Everyday The Blessed Sacrament can be adored in the<br>
+Adoration Room, St. Theresa’ s, Sion Mills anytime while the church is<br>
+open.<br>
+Baptism Dates Melmount<br>
+July: Sunday 19; Saturday 25; Sunday 26.<br>
+August: Saturday 8; Saturday 29.<br>
+September: Saturday 5; Sunday 13; Saturday 19.<br>
+October: Sunday 4; Saturday 10; Saturday 17; Saturday 24.<br>
+November: Sunday 8; Saturday 14; Saturday 21; Saturday 28.<br>
+Baptisms will be at 3.30pm on a Saturday and 12.45pm on a Sunday .<br>
+To book a Baptism contact the Parish Of fice on 71383777 during of fice<br>
+hours.<br>
+Accord Marriage Preparation Courses (Pre-Marriage Courses) will<br>
+take place in September 25/26 and November 20/21. All courses are now<br>
+online for booking at www .accordni.com<br>
+Please Note: These courses are in person and not online courses.<br>
+Accord Derry will NOT be facilitating courses during October or<br>
+December .<br>
+Safeguarding Notice If you have any concerns with regard to the<br>
+Safeguarding of children within the church please contact Marie O’Kane,<br>
+the Diocesan Designated Liaison Person (DLP) on<br>
++447596500793<br>
+or<br>
+email@<br>
+dlp@derrydiocese.org<br>
+. Northern Ireland emergency services:<br>
+PSNI on 101; Social Services: Gateway Services, W estern HSC Trust,<br>
+028 71314090<br>
+and ask for the Duty Social W orker . Regional Emergency<br>
+Social W ork Services 0800 1979 995.<br>
+Page 87<br>
+The Parish Draws for July and August took place on W ednesday 8<br>
+July. The winners are as follows:<br>
+July Draw<br>
+£500: 1027 Genevieve O’Neill – Genevieve O’Neill<br>
+£250: 1350 Concepta McGarrigle – Ann Donaghey<br>
+£250: 1708 Thomas Moore – Teresa Quigg<br>
+£250: 1338 Marianne Patton – Carol-ann Stewart<br>
+£150: 1995 Tammy McNulty – Irene Callan<br>
+£150: 1304 Ina O’Neill – Sheelagh McKelvey<br>
+£150: 1719 Christine McHugh – Teresa Quigg<br>
+£100: 1243 Bronagh L ynch – Declan Duffy<br>
+£100: 1669 Declan McColgan – Madeleine McColgan<br>
+£100: 1702 Terrie Logue - Genevieve O’Neill<br>
+August Draw<br>
+£500: 1756 V incent McCarron – Katrina Houston<br>
+£250: 1626 Anne Neeson – Madeleine McColgan<br>
+£250: 1379 Gary McNicholl – Sheelagh McKelvey<br>
+£250: 1862 Emma L ynch – Elizabeth O’Hare<br>
+£150: 1825 Susan McGuinness – John Donohoe<br>
+£150: 1684 Teresa Boggs – Katrina Houston<br>
+£150: 1380 Bridget McCrory – Sheelagh McKelvey<br>
+£100: 1010 Mya McNulty – Dolores Houston<br>
+£100: 1258 Corrine Hannigan – Elizabeth O’Hare<br>
+£100: 1507 Jacintha Gillespie - Elizabeth O’Hare<br>
+Click here to view Daily Readings from CatholicIreland.net<br>
+Click here to view Sunday Readings from CatholicIreland.net<br>
+Page 88<br>
+1 Latest News<br>
+2 Remembering our Dead.<br>
+3 WEBCAM<br>
+4 Prayers For Protection<br>
+5 Mass Times<br>
+6 Getting MarriedSite Links<br>
+Page 89<br>
+A short reflection on today’s Gospel Matthew 1 4:22-33<br>
+In today’s Gospel, the disciples find themselves struggling against strong winds while Jesus<br>
+comes to them, walking on the water. At first, they are filled with fear, but Jesus reassures<br>
+them with the simple yet powerful words: &quot;Take courage! It is I. Do not be afraid.&quot;<br>
+Like the disciples, we all encounter storms in our lives - times of uncertainty, anxiety,<br>
+illness, or loss. Peter&#x27;s experience reminds us that faith is not about never doubting, but about<br>
+keeping our eyes fixed on Christ. When Peter focuses on Jesus, he walks on the water; when<br>
+he focuses on the wind and waves, he begins t o sink. Yet even then, Jesus immediately<br>
+reaches out His hand to save him.<br>
+This Gospel is a beautiful reminder that the Lord is always present, even when He seems<br>
+distant. He does not promise a life free from storms, but He does promise that we will never<br>
+face them alone. As we gather around the Lord&#x27;s table this Sunday, may we h ear His<br>
+reassuring voice, trust in His presence, and reach out to Him in faith, knowing that His hand<br>
+is always extended towards us.<br>
+Prayer for Vocations to the Priesthood : For our seminarians and the men considering<br>
+priesthood that, in moments of doubt, they&#x27;ll hear Jesus say what He says to the disciples in<br>
+today&#x27;s gospel, &quot;Courage! It is I. Do not be afraid!&quot;<br>
+On Saturday 15th August, the Church celebrates the Solemnity of the Assumption of<br>
+the Blessed Virgin Mary, a Holy Day of Obligation. We gather to give thanks to God for<br>
+the gift of Our Lady, who was assumed body and soul into heavenly glory, and to renew our<br>
+hope in the promise of the Resurrection.<br>
+Mass times are as follows:<br>
+Friday 14th August – 6.15pm and 7.30pm<br>
+Saturday 15th August – 7.00am, 9.30am, 11.00am, and 12.30pm .<br>
+The Collection on the Feast of the Assumption of the Blessed Virgin Mary will be for Parish<br>
+Youth Ministry. All parishioners are warmly encouraged to join us in celebrating this joyful<br>
+feast.<br>
+“Bishop Daly - A Man for all Seasons” 2026 Exhibition celebrates the life, influence, work<br>
+and legacy of Bishop Edward Daly opens on Saturday 8th August at 11.00am . Exhibition<br>
+times are 11.00am to 4.00pm in the Conference Room above the Sacristy in Saint Eugene’s<br>
+Cathedral, Creggan Street, Derry, BT48 9AP . The Exhibition will run until 18th August and<br>
+everyone is welcome.<br>
+On 14th August, the Church celebrates the Memorial of St Maximilian Kolbe, a Polish<br>
+Franciscan priest and martyr of charity . Imprisoned in Auschwitz during the Second<br>
+World War, he freely offered his life in place of a fellow prisoner who had been selected to<br>
+die. His extraordinary act of self -sacrificing love reflects Christ&#x27;s own words: &quot;No one has<br>
+greater love than this, to lay down one&#x27;s life for one&#x27;s friends&quot; (John 15:13).<br>
+St Maximilian had a deep devotion to the Blessed Virgin Mary and dedicated his priesthood<br>
+to spreading the Gospel through prayer, the media, and missionary work. His courage, faith,<br>
+and love continue to inspire Christians throughout the world.<br>
+As we honour St Maximilian Kolbe, may we ask for his intercession, that we too may grow<br>
+in faith, charity, and the courage to bear witness to Christ in our daily lives.<br>
+Lunchtime Concert - Grúpa Ceoil Beag, a group of young traditional Irish music<br>
+students and performers will be performing in The Cathedral Hall on Wednesday 12th<br>
+August at 1.30pm. Entry is free, and everyone is welcome. With thanks to Derry City &amp;<br>
+Strabane District Council for supporting this event.<br>
+Job Opportunity, Derry Diocesan Trust : Administrative &amp; Financial Officer (18 hours<br>
+per week), Waterside Parish, Parochial House, 32 Chapel Road, Derry. Rate of pay: £12.88<br>
+per hr - £13.50 per hr. For application packs please email:<br>
+recruitment@derrydiocese.org<br>
+or tel ephone<br>
+028 7126 2302<br>
+. Completed applications must be returned to Personnel,<br>
+Bishop’s House, St Eugene’s Cathedral, Francis Street, Derry, BT48 9AP or via email to<br>
+recruitment@derrydiocese.org<br>
+no later than 12 noon Monday 24 August 2026. Derry<br>
+Diocesan Trust is an Equal Opportunities Employer. We welcome applications from all men<br>
+and women and from members of all communities.<br>
+Thank you<br>
+Fr Farren acknowledges with thanks the<br>
+following donations for:<br>
+Smile Train: £20 £60 £20<br>
+Sightsavers : £100<br>
+Mary’s Meals : £60<br>
+Trócaire : £10<br>
+SVdP : £20<br>
+Anniversaries<br>
+Please pray for the repose of the souls<br>
+of:<br>
+Mary Theresa ( Maureen ) O’Doherty<br>
+Seamus Mullan<br>
+Cissie McLaughlin<br>
+Brother Gabriel McKinney S.J.<br>
+Richard Gillespie<br>
+Peggy Carlin<br>
+May they rest in peace<br>
+Baptisms<br>
+We welcome as a member of God’s<br>
+family:<br>
+Cora Doyle<br>
+To book a Baptism contact the<br>
+Parish Office 02871 262894<br>
+Collection<br>
+Weekly Collection: £5,362<br>
+Parish Development: £ 986<br>
+Thank you for your generosity<br>
+Readers for 14th/15th August<br>
+6.15pm Mary Feeney<br>
+7.30pm Mary Morrison<br>
+9.30am Marie Canning<br>
+11.00am Helen Sweeney<br>
+12.30pm Eilish Friel<br>
+Readers for 15th /16th August<br>
+6.15 pm Claire O’Kane<br>
+7.30 pm Amulya George<br>
+9.30 am Barry McDaid/<br>
+Caragh McSheffrey<br>
+11.00 am Angela McCallion<br>
+12.30 pm Rosemary Finan<br>
+7.00 pm Anna Begley<br>
+Sacrament of Marriage<br>
+We congratulate<br>
+Cara McLaughlin &amp;<br>
+Alexander Gittings<br>
+who celebrated the Sacrament of<br>
+Marriage recently in the Cathedral<br>
+May God bless you abundantly in love,<br>
+joy and happiness<br>
+St Eugene&#x27;s Cathedral (Templemore)<br>
+https://steugenescathedral.com<br>
+Page 90<br>
+The National Novena to Our Lady of Knock takes place at Knock Shrine from<br>
+Thursday 13th to Friday 21st August 2026. Novena ceremonies will be celebrated daily at<br>
+3.00pm and 8.00pm, with workshops and guided prayer sessions also taking place<br>
+throughout the nine days. This year’s theme is “Sheltered in God’s Love.” See the full<br>
+program at<br>
+www.knockshrine.ie<br>
+.<br>
+Mary’s Meals – Step by Step Walk - Mary’s Meals is currently feeding over 3 million<br>
+children a daily school meal across 16 countries. Our Annual Step by Step to Feed the Next<br>
+Child 2 Bridges Walk (Foyle and Peace Bridges Derry) takes place on Sunday 9th August.<br>
+Starting Point is at Sainsbury’s Car Park, Strand Road at 12 noon. All Welcome to<br>
+participate even for a mile or two. For further details and to register online visit<br>
+www.marysmeals.org.uk/step<br>
+or contact Caoimhe on<br>
+07394564065<br>
+. Please do keep all our<br>
+walkers in your prayers.<br>
+Accord Derry – Marriage Preparation Workshops 2026 - Accord Derry is pleased to<br>
+announce upcoming Marriage Preparation Workshops taking place in 2026. These courses<br>
+are designed to support couples as they prepare for the Sacrament of Marriage.<br>
+The remaining available dates for 2026 are as follows:<br>
+• September: 25th–26th 2026<br>
+• November: 20th–21st 2026<br>
+All courses are now available for online booking at:<br>
+www.accordni.com<br>
+.<br>
+Please note that Accord Derry will not be facilitating Marriage Preparation Courses<br>
+during October or December 2026 . Couples are encouraged to book early to secure a<br>
+place on their preferred date.<br>
+ATU St Angela’s is now accepting applications for the Part -Time Certificate in<br>
+Religious Education for Primary School (online delivery), beginning in Autumn 2026.<br>
+The programme is open to qualified primary school teachers, qualified post -primary<br>
+teachers wishing to transfer to primary teaching, and parents, sacramental preparation teams,<br>
+and parish catechists with an interest in primary religious education. The clo sing date for<br>
+applications is Friday, 14th August 2026 . For further information, contact Mary Kearns,<br>
+Senior Administrator, Education Department, ATU St Angela’s, Lough Gill, Sligo, at<br>
+mary.kearns@atu.ie<br>
+, or visit<br>
+www.atu.ie<br>
+.<br>
+St Eugene’s Cathedral is monitored by CCTV cameras and by two live streaming<br>
+cameras. Live streaming can be viewed online at<br>
+www.churchservices.tv<br>
+,<br>
+www.watchmcnmedia<br>
+or the parish website. The Diocese of Derry Privacy Notice is<br>
+displayed on the parish website and Cathedral notice board, or you may obtain a copy from<br>
+the Parish Office.<br>
+Safeguarding Notice : If you have any concerns with regard to the Safeguarding of children<br>
+within the Church please contact Marie O’Kane, the Diocesan Designated Liaison Person<br>
+(DLP) on<br>
++447596500793<br>
+or email :<br>
+dlp@derrydiocese.org<br>
+Northern Ireland emergency services: PSNI (Police Service of Northern Ireland): 101 Social<br>
+Services: Gateway Services, Western HSC Trust:<br>
+028 7131 4090<br>
+(and ask for the Duty<br>
+Social Worker), Gateway Services, Northern HSC Trust:<br>
+028 9442 4459<br>
+, Regional<br>
+Emergency Social Work Services: 0800 197 9 995. Republic of Ireland emergency services:<br>
+Garda Síochána Buncrana: 00353 749 320 540 Letterkenny: 00353 749 167 100, TUSLA<br>
+(ROI) Child and Family Agency: 00353 749 102 23<br>
+Vol 5 4 No 31<br>
+Nineteenth Sunday<br>
+in Ordinar y Time<br>
+9th August 2026<br>
+Priests: Fr Paul Farren, Fr Shaun Doherty<br>
+Page 91<br>
+Bulletin Donate Call Us<br>
+HOME WEBCAM SACRAMENTS ABOUT<br>
+NEWS/EVENTS SCHOOLS<br>
+Sunday 9th AugustSunday 2nd AugustSunday 26th JulySunday 19th JulySunday 12th JulySunday 5th JulySunday 28th JuneSunday 21st JuneSunday 14th JuneSunday 7th JuneSunday 31st MaySunday 24th MaySunday 17th MaySunday 10th MaySunday 3rd MaySunday 26th AprilSunday 19th AprilSunday 12th AprilSunday 5th AprilSunday 29th MarchSunday 15th MarchSunday 8th MarchSunday 1st MarchSunday 2nd FebruarySunday 15th FebruarySunday 8th FebruarySunday 1st FebruarySunday 25th JanuarySunday 18th JanuarySunday 1th JanuarySunday 4th JanuarySunday 28th DecemberSunday 21st DecemberSunday 14th DecemberSunday 7th DecemberSunday 30th NovemberSunday 23rd NovemberSunday 16th NovemberSunday 9th NovemberSunday 2nd November<br>
+Sd26hObSt Mary&#x27;s Parish Creggan<br>
+https://www.stmarysparishcreggan.com<br>
+Page 92<br>
+Sunday 26th OctoberSunday 19th OctoberSunday 12th OctoberSunday 5th OctoberSunday 28th SeptemberSunday 21st SeptemberSunday 14th SeptemberSunday 7th SeptemberSunday 31st AugustSunday 24th AugustSunday 17th AugustSunday 10th AugustSunday 3rd AugustSunday 27th JulySunday 20th JulySunday 13th JulySunday 6th JulySunday 29th June<br>
+Sunday 2nd June<br>
+Sunday 15th June<br>
+Sunday 8th June<br>
+Sunday 1st June<br>
+Sunday 25th May<br>
+Sunday 18th May<br>
+Sunday 1th May<br>
+Sunday 4th May<br>
+Sunday 27th April<br>
+Sunday 20th April<br>
+Sunday 13th April<br>
+Sunday 6th April<br>
+Sunday 30th March<br>
+Sunday 23rd March<br>
+Sunday 16th March<br>
+Sunday 9th March<br>
+Sunday 2nd March<br>
+Sunday 23rd February<br>
+Sunday 16th February<br>
+Sunday 9th February<br>
+Sunday 2nd February<br>
+Sunday 26th January<br>
+Sunday 19th January<br>
+Sunday 12th January<br>
+Sunday 5th January<br>
+Sunday 2nd December<br>
+Sunday 15th December<br>
+Sunday 8th December<br>
+Sunday 1st December<br>
+Sunday 24th November<br>
+Sunday 17th November<br>
+Sunday 10th November<br>
+Page 93<br>
+Sunday 3rd November<br>
+Sunday 27th October<br>
+Sunday 20th October<br>
+Sunday 13th October<br>
+Saint Mary&#x27;s Creggan<br>
+ADDRESS: 1 Fanad Dr, Derry BT48 9QE|PHONE:<br>
+02871263152<br>
+Copyright © 2025 . All rights reserved. Derry<br>
+Page 94<br>
+Steelstown Parish Newsletter<br>
+Eighteenth Sunday in Ordinary Time<br>
+Sunday 2nd August 2026<br>
+Thoughts on the Gospel<br>
+Matthew 14:13 –21 – The Feeding of the Five Thousand<br>
+The miracle of the loaves and fishes begins with compassion . Before Jesus fed the<br>
+crowd, He first recognised their suffering and their need. His heart was moved by those<br>
+who were tired, hungry, and searching for hope.<br>
+In our own busy lives, God gently calls us to notice those around us who may be lonely,<br>
+discouraged, forgotten, or struggling. A simple word of encouragement, a listening ear,<br>
+or a small act of kindness may become someone else&#x27;s miracle.<br>
+The disciples looked only at what they didn&#x27;t have . Faced with thousands of hungry<br>
+people, they saw only five loaves and two fish. Jesus, however, asked them to offer what<br>
+they already possessed.<br>
+God rarely asks us for what we do not have. Instead, He asks us to place before Him our<br>
+time, our talents, our compassion, and our willingness to serve. However small these<br>
+gifts may seem, He is able to multiply them beyond anything we could imagine.<br>
+Before distributing the food, Jesus lifted everything to His Father in prayer. This reminds<br>
+us that surrender is not a sign of weakness or defeat. Rather, it is an act of trust. We all<br>
+carry burdens that feel too heavy or situations that seem impossible, y et when we place<br>
+them into God&#x27;s hands, what appears insufficient can become more than enough.<br>
+Finally, the twelve baskets of leftovers remind us of God&#x27;s overwhelming generosity. His<br>
+blessings are never intended to stop with us but to flow through us. When we forgive<br>
+generously, encourage freely, and share what we have with others, God&#x27;s grace<br>
+continues to multiply in countless lives.<br>
+Prayer<br>
+Lord, fill our hearts with compassion. Use the little we have to accomplish great<br>
+things for Your Kingdom. Teach us to trust You completely, to surrender our<br>
+limitations into Your hands, and to share Your blessings generously with all whom<br>
+we meet. Amen.<br>
+Readings for Next Sunday Steelstown<br>
+http://www.steelstownparish.com<br>
+Page 95<br>
+Sunday 9th August 2026<br>
+First Reading: 1 Kings 19:9a, 11 –13a<br>
+Psalm: Psalm 85:9 –14<br>
+Second Reading: Romans 9:1 –5<br>
+Gospel: Matthew 14:22 –33<br>
+Saints of the Coming Week<br>
+Tuesday<br>
+• St John Vianney, Priest<br>
+Wednesday<br>
+• The Dedication of the Basilica of St Mary Major (Rome)<br>
+Thursday<br>
+• The Transfiguration of the Lord<br>
+Friday<br>
+• St Cajetan, Priest<br>
+• St Sixtus II, Pope, and Companions, Martyrs<br>
+Saturday<br>
+• St Dominic, Priest<br>
+Pope&#x27;s Prayer Intention for August<br>
+For Evangelisation in the City<br>
+Let us pray that in large cities, often marked by anonymity and loneliness, we may<br>
+discover new ways of proclaiming the Gospel, finding creative paths to build genuine<br>
+Christian communities.<br>
+Prayer for Vocations<br>
+We pray for men whom God is calling to the priesthood.<br>
+Page 96<br>
+Like Jesus in today&#x27;s Gospel, may they never turn away from the poor, the hungry, the<br>
+vulnerable or those most in need, but always reflect the compassionate love of Christ<br>
+as they nourish His people through the Word of God and the Eucharist.<br>
+Parish &amp; Diocesan Notices<br>
+Rosary on the Coast<br>
+Today (Sunday) at 3.00 pm<br>
+Lisfannon Beach<br>
+Praying for peace, Ireland and our unborn children.<br>
+Everyone is warmly welcome.<br>
+Give Blood – Save Lives<br>
+The Northern Ireland Blood Transfusion Service will hold a blood donor session at:<br>
+Lisneal College<br>
+70 Crescent Link<br>
+Derry BT47 5FQ<br>
+Monday 4th August<br>
+• 12.30 pm – 4.00 pm<br>
+• 5.00 pm – 7.30 pm<br>
+Freephone: 0808 553 4653 to book.<br>
+Franciscan Friary, Rossnowlagh<br>
+Monthly Healing Service<br>
+Today (Sunday)<br>
+• Rosary – 2.45 pm<br>
+• Mass &amp; Healing Service – 3.00 pm<br>
+• Confessions – 2.00 pm – 5.00 pm<br>
+ACCORD Marriage Preparation<br>
+Page 97<br>
+Marriage preparation courses are available throughout the year.<br>
+Please visit<br>
+www.accordni.com<br>
+for dates and booking information.<br>
+Monthly Mass for Sr Clare Crockett<br>
+Sunday 9th August<br>
+7.00 pm<br>
+Carmelite Retreat Centre<br>
+Termonbacca, Derry<br>
+Day of Healing &amp; Prayer<br>
+House of Prayer, Clonfert<br>
+Saturday 15th August<br>
+Led by Eddie Stone<br>
+A bus will travel from Letterkenny , collecting pilgrims in Ballybofey and Donegal Town .<br>
+A priest will accompany the pilgrimage.<br>
+Contact:<br>
+086 393 6547<br>
+Walk in Our Patron Saint&#x27;s Footsteps<br>
+St Patrick&#x27;s Way Pilgrim Walk<br>
+Saturday 8th August<br>
+9.00 am – 3.00 pm<br>
+Downpatrick<br>
+Guides:<br>
+• Martina Purdy<br>
+• Elaine Kelly<br>
+Cost: £55<br>
+028 4461 9000<br>
+Visit<br>
+www.saintpatrickcentre.com<br>
+Page 98<br>
+Youth &amp; Young Adults<br>
+Embrace the Grace<br>
+Legion of Mary Young Adult Catholic Conference<br>
+(Ages 18–40)<br>
+Saturday 29th August<br>
+9.30 am – 6.00 pm<br>
+De Montfort House<br>
+Morning Star Avenue<br>
+Dublin D07 VA03<br>
+Tickets available through Eventbrite (search Embrace the Grace ).<br>
+Youth 2000 Summer Festival<br>
+13th–16th August<br>
+Newbridge College, Kildare<br>
+Young people aged 16–35 are invited to enjoy:<br>
+• Inspiring talks<br>
+• Workshops<br>
+• Daily Mass<br>
+• Music and Prayer<br>
+• Fellowship<br>
+• Free buses<br>
+• All meals included<br>
+Visit youth2000.ie or follow @Youth2000Ireland .<br>
+Anam Óg Summer Scheme<br>
+3rd–7th August<br>
+12.00 pm – 4.00 pm daily<br>
+Termonbacca, Derry<br>
+For children aged 8–14<br>
+Page 99<br>
+Faith, friendship, games, arts &amp; crafts, adventure and prayer.<br>
+Email:<br>
+termonbaccaderry@ocd.ie<br>
+Community &amp; Charity<br>
+Mary&#x27;s Meals<br>
+Annual Step by Step Walk<br>
+Sunday 9th August<br>
+12.00 noon<br>
+Starting from:<br>
+Sainsbury&#x27;s Car Park<br>
+Strand Road, Derry<br>
+Walking the Foyle Bridge and Peace Bridge.<br>
+Everyone is welcome —even if only for part of the walk.<br>
+Mary&#x27;s Meals currently provides a daily school meal to over 3 million children across<br>
+16 countries.<br>
+Please keep all participants in your prayers.<br>
+Family Carers Ireland<br>
+Remote one -to-one support clinics are available every Tuesday throughout August .<br>
+Carers can speak privately from the comfort of their own homes.<br>
+086 836 3842<br>
+Donegalcs@familycarers.ie<br>
+Pro-Life Events<br>
+Donegal Pro Life Church Gate Collection<br>
+Saturday 15th &amp; Sunday 16th August<br>
+Countywide Collection<br>
+Volunteers are greatly appreciated.<br>
+Page 100<br>
+Margaret:<br>
+00353 89 246 9599<br>
+Míle buíochas.<br>
+Monthly Pro -Life Witness<br>
+Friday 7th August<br>
+1.00 pm – 2.00 pm<br>
+Roundabout at Letterkenny University Hospital.<br>
+Everyone welcome.<br>
+Pilgrimages<br>
+Lough Derg Annual Fundraising Draw<br>
+Support Station Island and help preserve this special place of pilgrimage for future<br>
+generations.<br>
+Tickets<br>
+• Single: €10<br>
+• Book of 6: €50<br>
+Those returning a full book will also be entered into the Early Bird Draw on 28th August<br>
+2026.<br>
+Main Draw<br>
+23rd October 2026<br>
+Prizes<br>
+€10,000<br>
+€5,000<br>
+€2,000<br>
+4th – €1,500<br>
+5th – €1,000<br>
+6th – €500<br>
+Page 101<br>
+Lough Derg Day Retreats<br>
+As the Three -Day Pilgrimage season concludes (final day to begin is 13th August ), Day<br>
+Retreats resume on:<br>
+• August: 18, 22, 23, 29 &amp; 31<br>
+• September: 5, 6, 9, 12, 15, 19 &amp; 20<br>
+Take time away from the busyness of everyday life for guided prayer, quiet reflection and<br>
+spiritual renewal.<br>
+Advance booking is essential.<br>
+Employment Opportunity<br>
+Administrative &amp; Financial Officer<br>
+Clonmany Parish<br>
+The Derry Diocesan Trust invites applications for the position of:<br>
+Administrative &amp; Financial Officer<br>
+Hours: 9 per week<br>
+Application packs are available from:<br>
+Bishop&#x27;s House<br>
+St Eugene&#x27;s Cathedral<br>
+Derry BT48 9AP<br>
+028 7126 2302<br>
+recruitment@derrydiocese.org<br>
+Closing Date: Tuesday 1th August 2026<br>
+Publications<br>
+Reflections Through Poetry<br>
+A beautiful collection by Fr John P. Forbes<br>
+Available from the Pastoral Office<br>
+Price: £10<br>
+Page 102<br>
+All proceeds support Children in Crossfire and the Cause for the Canonisation of Sr<br>
+Clare Crockett.<br>
+Sharing the Good News<br>
+Read the latest weekly Catholic e -zine featuring news, reflections and resources from<br>
+across Ireland.<br>
+Visit theway.ie/ezine -2/.<br>
+Closing Prayer<br>
+May the Lord bless us with compassionate hearts, generous spirits, and unwavering<br>
+trust in His providence. May we recognise Christ in those around us, offer Him the little<br>
+we possess, and witness His abundant blessings multiplying in our families, our pari sh,<br>
+and our community.<br>
+May Almighty God bless you, the Father, ✠ the Son, and the Holy Spirit. Amen.<br>
+Page 103<br>
+Fr Micheál McGavigan PP – Fr Roni Zacharias CC – Fr Stephen Ward CC<br>
+Sunday 9th August 2026 – Nineteenth Sunday in Ordinary Time – Year A<br>
+In this Sunday&#x27;s Gospel, Peter steps out of the boat and begins to walk towards Jesus. But when he focuses on the<br>
+wind and the waves around him, fear takes over and he begins to sink. It is a powerful reminder of how easily we can<br>
+lose sight of the Lord am id the worries and pressures of everyday life. The storms we face may be illness, family<br>
+difficulties, financial concerns, loneliness, grief, or anxiety about an uncertain world. Like Peter, we can find ourselves<br>
+overwhelmed by what is happening around us. Yet the Gospel offers a message of hope. Jesus does not abandon Peter<br>
+when he falters. Instead, he reaches out his hand and saves him. God never promises a life without storms, but he does<br>
+promise that we will never face them alone. Christ remains present in every trial, inviting us to place our trust in him and<br>
+to pray with confidence: &quot;Lord, save me .”<br>
+WELCOME TO GOD’S FAMILY<br>
+Oisin Eanna McGeoghegan; Lochlan Doherty -O&#x27;Neill;<br>
+Ellie-Mae Donegan; Jordan James Cooper.<br>
+REQUIESCANT IN PACE<br>
+We offer our sympathies to the family and friends of:<br>
+Tom Lavy, Ederowen Park ; Michael McMahon, Clon Elag h;<br>
+Kay Callaghan, Lisfannon Park ; John Donegan, Foyle Fold<br>
+ANNIVERSARIES<br>
+Mary McNally; Elizabeth Harding; Gary Stewart; Teresa Hurford;<br>
+Brendan Saunders; Bernadette &amp; Jim Sheerin; Martin Tope;<br>
+Fr Jimmy Doherty; Mary Gillespie; Thomas Gillespie; Jim<br>
+Dunn e; Willie Wilson ; Emily Villa; Sam Carli n; Margaret Stewart.<br>
+VISITATION OF THE SICK &amp; HOUSEBOUND<br>
+Fr Stephen Ward will visit those in his care on Monday and<br>
+Tuesday and Fr Roni will visit those in his care on Thursday and<br>
+Friday of next week. If you have a relative or neighbour on the<br>
+list, please let them know to expect a visit. Moreover, if you have<br>
+a relative or neighbour who would like added to the monthly sick<br>
+visitation in our Parish, please contact the Parish Office.<br>
+A WORD OF THANKS FROM CASEY BURGESS<br>
+My month in Three Patrons Parish was a great gift in my<br>
+formation for priesthood. I learned much from Fr. Micheál, Fr.<br>
+Stephen, and Fr. Roni, and I was grateful to meet so many of<br>
+you in the churches, schools, and Life Camp. Derry has helped<br>
+to form a prie stly heart in me, and so I thank all of you for helping<br>
+me along the way!<br>
+THE ASSUMPTION OF THE BLESSED VIRGIN MARY<br>
+Mass times for the Solemnity: Friday Vigil: 7pm St Joseph’s<br>
+Church, Galliagh. Saturday: 10am St Patrick’s Church,<br>
+Pennyburn; 11am St Brigid’s Church, Carnhill<br>
+READINGS FOR SUNDAY 16th AUGUST<br>
+1st Isiah 56:1, 6 -7. Psalm: 66:2 -3, 5-6, 8, R/v4.<br>
+2nd Romans 11:13 -15, 29 -32. Gospel Matthew 15: 21 -28<br>
+WEDDING CONGRATULATIONS!<br>
+Emma Smith &amp; Christopher Fagan ; Rosie McGinley &amp; Hugh<br>
+Diver , and Leanne McConnell &amp; Gavin Nicholl , who celebrated<br>
+the Sacrament of Matrimony recently.<br>
+SIMPLE FAMILY PRAYER BOOK<br>
+This Sunday begins psalter week 3.<br>
+PILGRIMAGE TO CYPRUS<br>
+The parish is considering a 7-night pilgrimage to Cyprus from<br>
+16–23 May 2027 , following in the footsteps of St Paul and St<br>
+Barnabas . The pilgrimage would include visits to many of<br>
+Cyprus’s most important Christian and historical sites, with the<br>
+opportunity to celebrate Mass in places closely associated with<br>
+the early Church. The package includes direct flights from<br>
+Belfast , full-board accommodation in a four -star seafront hotel,<br>
+and a guided programme of pilgrimage visits throughout the<br>
+week. The estimated cost is £1,675 per person . At this stage,<br>
+we are simply seeking expressions of interest . If you think you<br>
+may wish to join the pilgrimage, please contact the parish office.<br>
+Registering your interest is not a commitment to travel.<br>
+LAST WEEK’S OFFERTORY COLLECTION<br>
+St Patrick’s Church: £ 1,367 - St Brigid’s Church: £ 2,310 - St Joseph’s Church: £ 1,115<br>
+2nd Collection (Maintenance &amp; Pastoral Outreach ): £1,173.<br>
+Thank you for your continued generosity .<br>
+BANK DETAILS FOR ONLINE DONATIONS : A/C Name: The Parish of the Three Patrons<br>
+Sort Code: 95 -06-79 A/C No: 60320021</p></div>
+    <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
+  </div>
+  <script>
+    (function () {
+      try {
+        if (new URLSearchParams(window.location.search).get('embed') === '1') {
+          document.body.classList.add('embed-mode');
+        }
+      } catch (e) {}
+    })();
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-text');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+    (function () {
+      const ocrRoot = document.getElementById('ocr-text');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      if (!ocrRoot || !ocrSearch) return;
+      const originalHtml = ocrRoot.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+      function escapeRegExp(text) {
+        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        ocrMatches[idx].classList.add('search-active');
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      function updateMatchUi() {
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} of ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+      function applySearch(query) {
+        ocrRoot.innerHTML = originalHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrRoot, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) nodes.push(node);
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) return;
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrRoot.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+      ocrSearch.addEventListener('input', (e) => applySearch(e.target.value.trim()));
+      clearSearch.addEventListener('click', () => { ocrSearch.value = ''; applySearch(''); ocrSearch.focus(); });
+      prevMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && ocrMatches.length) {
+          e.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

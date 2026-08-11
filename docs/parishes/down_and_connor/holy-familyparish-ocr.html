@@ -1,0 +1,661 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Holy Family Text Bulletin — 11/08/2026</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #eef1f0;
+      color: #1a1f1e;
+      line-height: 1.65;
+      font-size: 1.125rem;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
+    }
+    a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
+    .page {
+      max-width: min(72ch, 100%);
+      margin: 0 auto;
+      padding: 14px 18px 40px;
+    }
+    .top {
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+      gap: 8px 14px;
+      margin-bottom: 12px;
+    }
+    .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+    .back-link {
+      font-size: 0.9rem; font-weight: 700;
+      color: #14524f; text-decoration: none;
+    }
+    .title-line {
+      font-size: 1rem; font-weight: 700; color: #1a1f1e;
+    }
+    .font-size-controls { display: none; }
+    .ocr-zoom-bar {
+      position: sticky; top: 0; z-index: 6;
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
+    }
+    .ocr-zoom-bar button {
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+      line-height: 1;
+    }
+    .ocr-zoom-pct {
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 4px; } }
+    
+    .ocr-body {
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    .ocr-body h1, .ocr-body h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h2.b-title, .ocr-body .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    .ocr-body h3.b-head, .ocr-body .b-head {
+      font-size: 1.12em;
+      color: #134e9c;
+      margin: 1.1em 0 0.35em;
+    }
+    .ocr-body h4.b-sub, .ocr-body .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    .ocr-body h3, .ocr-body h4 {
+      color: #1a6b6b;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    .ocr-body h3.ocr-page-heading,
+    .ocr-body .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    .ocr-body hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    .ocr-body strong { color: #0f2b5b; }
+    .ocr-body a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .ocr-body mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    .ocr-body mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    .ocr-body table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ocr-body table.b-table td, .ocr-body table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .ocr-body table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    .ocr-body table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    .ocr-body img, .ocr-body iframe, .ocr-body video {
+      max-width: 100%;
+      height: auto;
+    }
+    .ocr-body > :first-child {
+      margin-top: 0;
+    }
+
+    .ocr-body {
+      padding: 4px 2px 8px;
+    }
+    .search-panel {
+      margin: 0 0 12px;
+      border: 1px solid #d4ddd9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .search-panel .ocr-search-bar { margin-bottom: 6px; }
+    .ocr-search-bar { position: relative; margin-bottom: 6px; }
+    .search-input {
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: #1a1f1e; background: #fff;
+    }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 1px solid #1a6b6b; border-radius: 6px; background: #fff; color: #1a6b6b;
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { color: #999; border-color: #d4ddd9; cursor: not-allowed; }
+    .match-count { color: #5a6a68; font-size: 0.85rem; font-weight: 600; }
+    .note-box {
+      margin-top: 18px;
+      color: #5a6a68;
+      font-weight: 400;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      padding: 0;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 8px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    body.embed-mode .top { display: none !important; }
+    body.embed-mode .page { padding-top: 8px; }
+    @media (max-width: 600px) {
+      .page { padding: 12px 14px 32px; }
+      .ocr-search-tools button { min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top" id="ocr-top">
+      <div class="top-left">
+        <a class="back-link" href="holy-familyparish.html">← Viewer</a>
+        <span class="title-line">HOLY FAMILY Text Bulletin · 11/08/2026</span>
+      </div>
+    </div>
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+      <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+      <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+      <span class="ocr-zoom-hint">or pinch to zoom</span>
+    </div>
+    <div class="search-panel" role="search">
+      <div class="ocr-search-bar">
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search text (mass, bingo, parish…)" aria-label="Search bulletin text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled>← Prev</button>
+          <button id="ocr-next" type="button" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+    <div class="ocr-body" id="ocr-text"><div class="ocr-failed-banner" role="status">ℹ️ Matched by parish name only (not exact PDF pages) this week — check the PDF above for the definitive version.</div>
+<p>Holy Family Parish<br>
+A praying, caring community, centred in Christ<br>
+Holy Family Parish is a member of a Family of Parishes,<br>
+comprising the parishes of St Patrick ’s, Holy Family and<br>
+St Gerard ’s.<br>
+MASS SCHEDULE<br>
+SUNDAYS<br>
+Holy Family Church: 6pm Vigil &amp; 10.30am<br>
+St Thérèse of Lisieux Church: 9am &amp; 12noon<br>
+WEEKDAYS<br>
+Holy Family Church: 9.15am Monday, Tuesday &amp; Wednesday<br>
+St Thérèse of Lisieux Church: 10.00am Thursday, Friday &amp; Saturday<br>
+SACRAMENT OF RECONCILIATION<br>
+Holy Family Church: Saturday 5.15pm -5.45pm<br>
+St Thérèse of Lisieux Church: Saturday after 10am Mass<br>
+BAPTISMS<br>
+(Prior booking via Parish Office)<br>
+Holy Family Church: Saturdays at 4pm<br>
+St Thérèse of Lisieux Church: Sundays at 1pm<br>
+DEVOTIONS<br>
+Eucharistic Adoration: Daily 10am -10pm (St Thérèse)<br>
+Pilgrim Prayer: Tuesday 8pm on the Parish Facebook page<br>
+Novena to Our Mother of Perpetual Help: Wed 9:15am Mass<br>
+First Saturday: 10am (Holy Family)<br>
+Taizé Prayer: last Friday of the month 8 -9pm (Holy Family)<br>
+MASS INTENTIONS<br>
+Sat 8 (6pm): For the People of the Parish<br>
+Sun 9 (9am): Patrick Vallely<br>
+Sun 9 (10.30am): Jim McAlea<br>
+Sun 9 (12 Noon): Paddy Lavery (1st)<br>
+Mon 10 : Kevin Leonard<br>
+Tue 11: Ben Cullinan (1st)<br>
+Wed 12: Priest ’s Intention<br>
+Thu 13: Thomas Devlin<br>
+Fri 14 (10am): Milagros C. Inal (1st)<br>
+Fri 14 (7pm): Brian Mulvenna<br>
+Sat 15 (9.15am): Ita Goan<br>
+Sat 15 (10am): Oona &amp; Roger Laverty<br>
+FLEADH CHEOIL NA h’ÉIREANN. As Belfast<br>
+nears the end of Fleadh Cheoil na hÉireann, we bid a<br>
+warm slán abhaile to the many visitors who have<br>
+come to our city, and to our parish. As part of the<br>
+final Fleadh celebrations, a special Mass will be<br>
+celebrated in Irish in St. Patrick ’s church, Donegall<br>
+Street TODAY Sunday 9th August, at 11am. Bishop<br>
+Alan will be the main celebrant. All welcome.<br>
+PRAYER:<br>
+Breath of Summer<br>
+Creator God who<br>
+breathed this world<br>
+into being, who is dis-<br>
+cernible within the har-<br>
+mony of nature, the<br>
+perfection of a butter-<br>
+fly&#x27;s wing, the grandeur<br>
+of a mountain range,<br>
+the soaring eagle and<br>
+humming bird, thank<br>
+you for this world<br>
+which you have creat-<br>
+ed. Thank you for sum-<br>
+mer sun, which re-<br>
+minds us that your cre-<br>
+ative breath is still<br>
+alive and active. Thank<br>
+you for the warmth of<br>
+your love, sustaining<br>
+this world, your<br>
+garden.<br>
+Jubilee Year of Saint Francis<br>
+“Consider, O people, in what great excellence the<br>
+Lord God has placed you, for God created and<br>
+formed you to the image of his beloved Son’s body<br>
+and to the likeness of his Spirit.”<br>
+(St. Francis)<br>
+Father, help me to take delight in being formed in the image of Your<br>
+beloved Son. May I always look for Christ in the face of each person I<br>
+meet. Amen. REST IN PEACE<br>
+Recently Deceased: Maureen Bradley, Danny O ’Connor,<br>
+Mary Hanvey<br>
+Anniversaries: Christopher Whitson, Eileen Bell, Gerard<br>
+Doherty, Harry Morgan (10th), Patrick Vallely, Paddy<br>
+Lavery (1st), Jim McAlea, Kevin Leonard, Ben Cullinan<br>
+(5th), Thomas Devlin, Milagros C. Inal (1st), Brian<br>
+Mulvenna<br>
+Eternal rest grant unto them, O Lord!<br>
+SAINTS OF THE WEEK<br>
+Mon 10: St Lawrence<br>
+Tue 11: St Clare<br>
+Wed 12: St Attracta of Killaraght<br>
+Thu 13: St Fachtna<br>
+Fri 14: St Maximillian Kolbe<br>
+Sat 15: The Assumption of the Blessed Virgin<br>
+St Attracta was born into a noble family in County Sligo in the fifth century. She desired<br>
+to consecrate her life to God, so Attracta fled home and sought out St Patrick, from<br>
+whom she received the veil as a consecrated virgin. In Killaraght, Attracta established a<br>
+monastery, an oratory, and most notably a hospice for travellers, pilgrims, the poor, and the sick.<br>
+THE ASSUMPTION OF<br>
+THE BLESSED VIRGIN MARY<br>
+Mass Times for Holy Day of Obligation<br>
+Fri. 14th August: 7pm (Vigil) St Thérèse<br>
+Sat. 15th August: 9.15am Holy Family<br>
+&amp; 10am St Thérèse<br>
+PRAYER FOR STUDENTS WHO WILL RECEIVE EXAM RESULTS IN THE COMING WEEKS.<br>
+Lord, remind me that You hold me safe, You understand me, and you cherish me. I lay<br>
+down my fears before You. I leave them at the foot of the cross, for You have overcome<br>
+the world. I choose to give You all my concerns, worries and fears of failure. I trust that<br>
+Your loving hand will hold me through these exam results, and lead into a bright future.<br>
+Amen.<br>
+Holy Family Parish<br>
+Day Trip to<br>
+Glenarm Castle Gardens and<br>
+dinner in Ballycastle<br>
+Thursday 20th August 2026<br>
+Coach departing from the church gates, Limestone<br>
+Road at 11am to Glenarm Castle Gardens .<br>
+Travelling on to Ballycastle with free time and a meal<br>
+with tea / coffee in the Marine Court Hotel,<br>
+Ballycastle. Arriving back at 8.30pm.<br>
+Cost: £60<br>
+Cost includes coach travel, Gardens entrance fee and<br>
+dinner in Marine Court Hotel.<br>
+Booking with payment [non -refundable] through the<br>
+Parish Office before Thursday 13th August 2026<br>
+Holy Family<br>
+https://www.holy-familyparish.com<br>
+Page 7<br>
+NINETEENTH SUNDAY IN ORDINARY TIME<br>
+SUNDAY<br>
+9TH AUGUST<br>
+Readings: A (I) ❖ Psalter: Week 3<br>
+Fr. Brendan Hickland, PP (028) 90642446 (Option 1)<br>
+b.hickland@downandconnor.org<br>
+Fr. Jose Bharanikulangara Assistant Priest (028) 9079 3023.<br>
+j.thomas@downandconnor.org<br>
+Rev. Patrick Keown (Deacon)<br>
+p.keown@downandconnor.org<br>
+Kylee (Parish Support Officer ) Office Hours<br>
+Mon-Thurs 9.15a.m - 1p.m. Closed Fridays<br>
+Holy Rosary Parish Office (028) 90642446 Option 2<br>
+holyrosary@downandconnor.org<br>
+Philomena (Finance Officer)<br>
+p.dawson@downandconnor.org<br>
+More Information and resources:<br>
+holyrosaryparishbelfast.net and<br>
+www.st.bernadettesparish.org<br>
+CONTACT INFORMATION Please keep Fr. Paul Fleming and Fr. Jose Bharanikulangara in your prayers<br>
+as they prepare to minister in new parishes with effect from the<br>
+15th August 2026. Fr. Paul as Parish Priest of Our Lady Queen of Peace,<br>
+Kilwee and Fr. Jose as Assistant Priest in Antrim.<br>
+We thank them for their dedicated service, friendship, and pastoral care, and<br>
+wish them every blessing and happiness in their new appointments.<br>
+“May the Lord guide and strengthen them in their ministry. ”<br>
+Holy Rosary Christmas Craft Fair<br>
+After the success of last year ’s Christmas Craft Fair, we hope to hold another<br>
+one on Sunday 6th December, from 9.30am to 2.00pm in the Parish Centre.<br>
+Would you be interested in booking a stall at this year ’s fair?<br>
+The Price is £25 per table. Please email<br>
+holyrosaryfair@gmail.com<br>
+to book your table. Please let us know what you will be selling on the day,<br>
+as we would like to ensure we have a wide range of stalls.<br>
+Confirmation of your booking will be sent by email.<br>
+Man and Woman,<br>
+He Created Them<br>
+The Priory Institute one week<br>
+online Summer School is<br>
+reflective, informative and interactive<br>
+and will run from 10th August.<br>
+The course includes four recorded<br>
+presentations and one online zoom<br>
+discussion and is very flexible<br>
+as it is delivered entirely online.<br>
+Register: prioryinstitute.com MASS SCHEDULE<br>
+SUNDAYS<br>
+St Bernadette ’s Parish<br>
+Vigil 6.00pm &amp; 11am<br>
+Holy Rosary Parish<br>
+9am, 10.30am &amp; 12.30pm<br>
+WEEKDAYS<br>
+St Bernadette ’s Parish :<br>
+Mon, Tues &amp; Wed 9.30am<br>
+Holy Rosary Parish:<br>
+Thurs, Fri &amp; Sat 10.00am<br>
+SACRAMENT OF RECONCILIATION<br>
+Good Shepherd church Saturday 10.30am<br>
+St. Bernadette ’s church Saturday 5.15pm<br>
+Feast of the Assumption 15th August<br>
+(Holy day of Obligation)<br>
+Vigil Mass in St. Bernadette ’s church at 7p.m. on the<br>
+14th August<br>
+Mass in Good Shepherd church at 10 a.m. on the<br>
+15th August PARISH NEWS &amp; EVENTS<br>
+WEEKLY COLLECTION: Holy Rosary: £1663.00<br>
+St. Bernadette&#x27;s: £1187.07<br>
+MONTHLY COLLECTION: Holy Rosary: £1354.00<br>
+St. Bernadette&#x27;s: £1032.81<br>
+Many thanks for your continued generosity and support<br>
+The Building Fund will be taken up this weekend, after Communion in<br>
+Holy Rosary. The Diocesan Cathedral Fund will be taken up next week.<br>
+Collection offering can be made by standing order<br>
+or the Dona machines in the church porch.<br>
+Many thanks for the donation of £200 toward the running cost of the<br>
+parish centre from the Thursday morning Hospitality group.<br>
+Very much appreciated.<br>
+UPDATE ON THE DONA MACHINES are installed in both churches<br>
+and we thank those who are using them.<br>
+Holy Rosary Parish has received £3,077.30 from 160 donors<br>
+St Bernadette ’s Parish has received £806 from 53 donors<br>
+If you opt to Gift Aid your contribution, you only need to do this once as long<br>
+as you use the same credit/debit card each time<br>
+St Bernadette&#x27;s Retirement Group<br>
+Our Thursday weekly walk. We meet at 10.15 in St Bernadette ’s Church<br>
+carpark. The weekly walks run throughout July &amp; August. All members are<br>
+welcome to join at any time. Registration for the year is £5.<br>
+New members are always welcome<br>
+St Bernadette ’s St V De Paul<br>
+The Senior Citizens outing will take place on 17th September<br>
+to Mount Stewart. All senior citizens are welcome.<br>
+If you wish to come along please contact Frances @<br>
+078 0056 2398<br>
+and leave<br>
+your name and number or alternatively leave your name in the sacristy.<br>
+REST IN PEACE<br>
+Recently Deceased:<br>
+Mary Hanvey<br>
+Bernadette (Barnie) Ward<br>
+Robert (Bobby) Graham<br>
+Mona Smyth<br>
+Winifred McCartney<br>
+Anniversaries:<br>
+Mona Smyth (MM 6pm)<br>
+Gerard McDowell (9am)<br>
+Vera Holmes (10.30am)<br>
+John Savage (12.30pm)<br>
+Mary Teresa Marner, Nicky McCormick<br>
+Gerard McDowell, Dolores Quinn<br>
+Mariam Breen, Siobhan Desgranges<br>
+Michael Collins, Susan Collins, Pat Collins<br>
+Eternal rest grant unto them, O Lord<br>
+Abide in His Love Women ’s Conference.<br>
+The Great Northern Hotel, Bundoran, 20–22 November<br>
+2026. Join women from across Ireland for a faith -filled<br>
+weekend with inspiring speakers including Sarah Swafford,<br>
+Danielle Noonan, Fr Mark Wharton, Fr Barry Braum,<br>
+Fr Oisín Martin, the Dominican Sisters of Nashville,<br>
+Bishop Fintan Gavin, and more.<br>
+Register now:<br>
+https://abideinhislove.eventbrite.com/<br>
+A Year of Ignatian Prayer 2026 -2027 – Belfast Jesuit Centre<br>
+Our immersive programme in Ignatian Spirituality returns in September<br>
+offering ten in person Saturdays (10am -4pm) in the BJC and seven online<br>
+Integrative Practice Pause Points to support prayer, discernment and<br>
+reflective living. Open to those new to Ignatian Spirituality and those seeking<br>
+to deepen their practice. Suggested donation: £200 –£280 .<br>
+For dates and registration, please visit:<br>
+https://belfastjesuitcentre.co.uk/a<br>
+-year-of-ignatian -prayer -2026 -2027/</p></div>
+    <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
+  </div>
+  <script>
+    (function () {
+      try {
+        if (new URLSearchParams(window.location.search).get('embed') === '1') {
+          document.body.classList.add('embed-mode');
+        }
+      } catch (e) {}
+    })();
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-text');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+    (function () {
+      const ocrRoot = document.getElementById('ocr-text');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      if (!ocrRoot || !ocrSearch) return;
+      const originalHtml = ocrRoot.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+      function escapeRegExp(text) {
+        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        ocrMatches[idx].classList.add('search-active');
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      function updateMatchUi() {
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} of ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+      function applySearch(query) {
+        ocrRoot.innerHTML = originalHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrRoot, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) nodes.push(node);
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) return;
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrRoot.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+      ocrSearch.addEventListener('input', (e) => applySearch(e.target.value.trim()));
+      clearSearch.addEventListener('click', () => { ocrSearch.value = ''; applySearch(''); ocrSearch.focus(); });
+      prevMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && ocrMatches.length) {
+          e.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

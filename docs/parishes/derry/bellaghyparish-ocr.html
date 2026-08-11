@@ -1,0 +1,909 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Bellaghy Text Bulletin — 11/08/2026</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #eef1f0;
+      color: #1a1f1e;
+      line-height: 1.65;
+      font-size: 1.125rem;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
+    }
+    a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
+    .page {
+      max-width: min(72ch, 100%);
+      margin: 0 auto;
+      padding: 14px 18px 40px;
+    }
+    .top {
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+      gap: 8px 14px;
+      margin-bottom: 12px;
+    }
+    .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+    .back-link {
+      font-size: 0.9rem; font-weight: 700;
+      color: #14524f; text-decoration: none;
+    }
+    .title-line {
+      font-size: 1rem; font-weight: 700; color: #1a1f1e;
+    }
+    .font-size-controls { display: none; }
+    .ocr-zoom-bar {
+      position: sticky; top: 0; z-index: 6;
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
+    }
+    .ocr-zoom-bar button {
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+      line-height: 1;
+    }
+    .ocr-zoom-pct {
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 4px; } }
+    
+    .ocr-body {
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    .ocr-body h1, .ocr-body h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h2.b-title, .ocr-body .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    .ocr-body h3.b-head, .ocr-body .b-head {
+      font-size: 1.12em;
+      color: #134e9c;
+      margin: 1.1em 0 0.35em;
+    }
+    .ocr-body h4.b-sub, .ocr-body .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    .ocr-body h3, .ocr-body h4 {
+      color: #1a6b6b;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    .ocr-body h3.ocr-page-heading,
+    .ocr-body .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    .ocr-body hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    .ocr-body strong { color: #0f2b5b; }
+    .ocr-body a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .ocr-body mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    .ocr-body mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    .ocr-body table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ocr-body table.b-table td, .ocr-body table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .ocr-body table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    .ocr-body table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    .ocr-body img, .ocr-body iframe, .ocr-body video {
+      max-width: 100%;
+      height: auto;
+    }
+    .ocr-body > :first-child {
+      margin-top: 0;
+    }
+
+    .ocr-body {
+      padding: 4px 2px 8px;
+    }
+    .search-panel {
+      margin: 0 0 12px;
+      border: 1px solid #d4ddd9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .search-panel .ocr-search-bar { margin-bottom: 6px; }
+    .ocr-search-bar { position: relative; margin-bottom: 6px; }
+    .search-input {
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: #1a1f1e; background: #fff;
+    }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 1px solid #1a6b6b; border-radius: 6px; background: #fff; color: #1a6b6b;
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { color: #999; border-color: #d4ddd9; cursor: not-allowed; }
+    .match-count { color: #5a6a68; font-size: 0.85rem; font-weight: 600; }
+    .note-box {
+      margin-top: 18px;
+      color: #5a6a68;
+      font-weight: 400;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      padding: 0;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 8px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    body.embed-mode .top { display: none !important; }
+    body.embed-mode .page { padding-top: 8px; }
+    @media (max-width: 600px) {
+      .page { padding: 12px 14px 32px; }
+      .ocr-search-tools button { min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top" id="ocr-top">
+      <div class="top-left">
+        <a class="back-link" href="bellaghyparish.html">← Viewer</a>
+        <span class="title-line">BELLAGHY Text Bulletin · 11/08/2026</span>
+      </div>
+    </div>
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+      <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+      <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+      <span class="ocr-zoom-hint">or pinch to zoom</span>
+    </div>
+    <div class="search-panel" role="search">
+      <div class="ocr-search-bar">
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search text (mass, bingo, parish…)" aria-label="Search bulletin text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled>← Prev</button>
+          <button id="ocr-next" type="button" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+    <div class="ocr-body" id="ocr-text"><div class="ocr-failed-banner" role="status">ℹ️ Matched by parish name only (not exact PDF pages) this week — check the PDF above for the definitive version.</div>
+<p>BELLAGHY<br>
+Aug 8, 1pm<br>
+Sep 26, 1pm<br>
+Oct 10, 1pm<br>
+Nov 7, 1pm<br>
+Dec 5, 1pm GREENLOUGH<br>
+Aug 22 4.15pm<br>
+Sep 13, 12.30pm<br>
+Oct 24, 4.15pm<br>
+Nov 21, 4.15pm<br>
+Dec 19, 4.15pm For our seminarians and the men<br>
+considering priesthood that, in mo-<br>
+ments of doubt, they&#x27;ll hear Jesus say<br>
+what He says to the disciples in<br>
+today&#x27;s gospel,<br>
+&quot;Courage! It is I. Do not be afraid!&quot;<br>
+The next printed bulletin will be on the weekend of<br>
+22/23 August.<br>
+Please have all notices and anniversaries in to the<br>
+Parish Office by Wednesday 19 August at 11am. Bishop McKeown will be the<br>
+main celebrant of the 5:30pm<br>
+Mass in Clady on 15 August,<br>
+and will bless the new GroƩo<br>
+aŌerwards. Bellaghy<br>
+https://bellaghyparish.com<br>
+Page 17<br>
+The collection for Desertegney Graveyard<br>
+Sunday totalled €7,067.<br>
+The combined total of the two Graveyard<br>
+Sunday Collections totalled €20,547.<br>
+Sincere thanks. Email:<br>
+buncranaparish@gmail.com<br>
+Website:<br>
+www.buncranaparish.com<br>
+Nineteenth Sunday in Ordinary Time<br>
+9th August 2026 Fr Bradley 9363455<br>
+Fr Walsh 9361393<br>
+Fr Baker 9360151<br>
+Parish Office 9361253<br>
+Parish Catechist<br>
+086 785 3726<br>
+Community Corner<br>
+EMBRACE THE GRACE YOUNG ADULT<br>
+CATHOLIC CONFERENCE 29 Aug 2026 -<br>
+Legion of Mary: &#x27;Embrace the Grace&#x27; is a<br>
+conference on faith and culture for young<br>
+adults (18 -40) with talks, prayer, Mass,<br>
+confession, workshops, food and social in<br>
+the historic Legion of Mary headquarters at<br>
+De Montfort House, North Brunswick<br>
+Street, Dublin 7. This event is on Sat 30<br>
+August from 9.30am to 6pm with a social<br>
+after. Tickets €20 and can be booked on the<br>
+eventbrite website by looking up &#x27;Embrace<br>
+the Grace&#x27;. Any queries email<br>
+deusetpatria@gmail.com<br>
+.<br>
+YOUTH 2000 S UMMER FESTIVAL 13th –<br>
+16th Aug Calling all young people aged 16<br>
+–35! Join us at the Youth 2000 Summer<br>
+Festival in Newbridge College, Co. Kildare.<br>
+This is a donation -only event, with free<br>
+buses available across the country and all<br>
+meals included. Expect inspiring talks and<br>
+workshops, Mass, music, prayer, and plenty<br>
+of opportunities to chill out and meet other<br>
+young Catholics. Whether you are new to<br>
+the faith or looking to be refreshed, all are<br>
+welcome. To register or find out more, visit<br>
+youth2000.ie or follow<br>
+@Youth2000Ireland.<br>
+MARRIAGE ENRICHMENT WEEKEND :<br>
+Marriage Encounter Ireland invites married<br>
+couples to a residential Weekend from Fri 2<br>
+to Sun 4 Oct 2026 at the Focolare Centre,<br>
+Curryhills, Prosperous, Co. Kildare. Step<br>
+away from daily distractions to deepen your<br>
+communication, renew your love, and redis-<br>
+cover the joy of your marriage.<br>
+Visit<br>
+www.marriageencounter.ie<br>
+COFFEE MORNING being held in<br>
+O’Flaherty&#x27;s Bar on Fri 14th Aug 11am -<br>
+2.30pm. Proceeds in aid of the ICU &amp; Re-<br>
+hab units at Letterkenny Hospital<br>
+SPORTS DAY at Cockhill Celtic Youth &amp;<br>
+Football Club. Sunday 16th August 3pm -<br>
+6pm. Adults €5 entry fee - U16s free<br>
+COFFEE MORNING The final of the Team<br>
+To Improve Fundraiser Coffee Mornings in<br>
+St Mary’s Hall this Sunday 9 August from<br>
+11am! You can book a table on<br>
+0876482182<br>
+. We would be honoured if you<br>
+could stop by for some tae or coffee and<br>
+fresh homemade pancakes with toppings<br>
+aplenty, or just to show your support. Thank<br>
+you. SLIABH SNEACHT CENTRE Drumfries Walking Group<br>
+(The Walkie Talkies) will be meeting on Friday<br>
+14th August at the car park in Ballyliffin village at 10am<br>
+everyone welcome. We have an all-terrain wheelchair<br>
+(Hippocampe) here at the centre. This wheelchair is a<br>
+free service and would be ideal for family/friends visit-<br>
+ing over the Summer, to access local beaches, scenic<br>
+walks &amp; festivals, for further information or to book this<br>
+service please contact the centre<br>
+0749361742<br>
+.<br>
+THE CHILD BEHAVIOUR CONSULTANCY Roisín<br>
+Doherty - Behaviour Analyst consults with parents of<br>
+children 3 -12 years of age (with or without a diagnosis)<br>
+to help their child accept ‘no’, listen, regulate their big<br>
+emotions etc. Contact<br>
+0894511432<br>
+to get a consultation<br>
+set up.<br>
+ALCOHOLICS ANONYMOUS Amazing Grace Group,<br>
+Buncrana have 5 meetings per week as follows: Sun<br>
+8pm, Tues 8pm, Thurs 11.30am, Fri 8pm &amp; Sat<br>
+11.30am. If you think you may have a problem with<br>
+alcohol, come along. Meeting in St Teresa’s Room.<br>
+AL-ANON GROUP (for anyone whose life is or has been<br>
+affected by someone else’s drinking) meet in St Teresa’s<br>
+Room on Thurs at 6:45pm.<br>
+GAMBLERS ANONYMOUS weekly meeting in St Teresa’s<br>
+Room each Sun 5pm -6.30pm for anyone struggling with<br>
+a gambling addiction.<br>
+GAMBLERS ANONYMOUS HELPLINE Is gambling<br>
+affecting your life? We would like to help. Pick up the<br>
+phone and ring<br>
+048 7135 1329<br>
+.<br>
+THE PLAZA Social Dances: Sat 8 August Peter<br>
+McCloskey Country Way; Sat 15 August Fanadian; Sat<br>
+22 August Michael Cleary and Jackie Bannon; Sat 29<br>
+August Trevor Loughery. Doors 9pm, Dancing 9:30pm.<br>
+Admission €10. Hall available for hire &amp; for children’s<br>
+birthday parties. Contact Ursula on<br>
+0877538317<br>
+INISHOWEN MEDICAL Hearing loss? Earache? Blocked<br>
+ears? It could just be wax. Inishowen Medical can help<br>
+with that. We can offer both our patients and non -<br>
+patients microsuction. Microsuction is a newer and<br>
+more patient friendly way of clearing wax from ears. It is<br>
+considered comfortable for the patient and can be used in<br>
+every ear, even if there is a history of perforations. Get<br>
+your hearing back today by calling Inishowen Medical to<br>
+make an appointment on<br>
+074 93 61800<br>
+or<br>
+074 76173<br>
+.<br>
+DANCE FITNESS CLASS Every Tues 7 -8pm in St Mary’s<br>
+Hall, Buncrana. All welcome to this full body workout to<br>
+music.<br>
+PIANO LESSONS Beginner piano lessons available in the<br>
+Buncrana area, contact Lauren on<br>
+0864558483<br>
+for<br>
+more details.<br>
+LIFELINE INISHOWEN Domestic Violence Support Ser-<br>
+vices have free counselling sessions available for<br>
+Women &amp; Children, We also offer support, drop -in and<br>
+outreach services. Contact us on our HELPLINE<br>
+074<br>
+9373232<br>
+or 086 0065035330 between 10am - 1.30pm<br>
+SAMARITANS Call Free 116 123, Text<br>
+087 2609090<br>
+. Priest on Call<br>
+074 9361253<br>
+ST MARY’S ORATORY<br>
+Masses streamed on churchservices.tv/buncrana<br>
+Monday 10 Aug - Mass at 10am<br>
+John -Joe and Nancy Orohoe<br>
+Tuesday 11 Aug - Mass at 10am<br>
+Margaret Cutliffe (MM), plus<br>
+Danny McLaughlin<br>
+Wednesday 12 Aug - Mass at 10am<br>
+Special Intention<br>
+Thursday 13 Aug - Mass at 10am<br>
+Pete Nash, plus May and Willie Diver<br>
+Saturday 15 Aug - Mass at 10am<br>
+Fr Jackie Fitzgerald (36th A)<br>
+Saturday 15 Aug - Mass at 4:30pm<br>
+Rosamund McHugh (MM)<br>
+Sunday 16 Aug - Mass at 8:30am<br>
+Sunday 16 Aug - Mass at 12:30pm<br>
+Benny and Deirdre Barber Anniversary Masses &amp; Times<br>
+ST. MARY’S, COCKHILL<br>
+Masses streamed on churchservices.tv/cockhill<br>
+Tuesday 11 August - Mass at 7pm<br>
+Kathleen Doherty (1st A)<br>
+Friday 14 Aug - Mass at 7pm<br>
+Sunday 16 Aug - Mass at 11am<br>
+STAR OF THE SEA, DESERTEGNEY<br>
+Masses streamed on<br>
+www.youtube.com/@BuncranaParish<br>
+Saturday 15 Aug - Mass at 11am<br>
+Sunday 16 Aug - Mass at 9:45am<br>
+SAFEGUARDING NOTICE : If you have any concerns with regards to Safeguarding Children or adults in need of protection within the<br>
+Church please contact Marie O’Kane, the Diocesan Designated Liaison Person (DLP) at 0044 7596500793, or at<br>
+dlp@derrydiocese.org<br>
+or Garda Síochána, Buncrana<br>
+074 9320540<br>
+, Letterkenny HQ<br>
+074 9167100<br>
+or TUSLA Family &amp; Child<br>
+Agency 00353 749102233 ROI Vetting Office:<br>
+074 93 63108<br>
+PARISH DRAW<br>
+PRIVACY NOTICE : The Diocese of Derry complies with GDPR regulations. A Privacy Notice is available on the Parish Website or by contacting The Parish Office. Live stream and re-<br>
+cordings of Mass and Services in St Mary’s Oratory and St Mary’s Cockhill are available online. Parishioners should note that the first two rows of seats are visible online in St Mary’s<br>
+Oratory and the first seven rows of seats are visible in St Mary’s Cockhill. SLIMMING WORLD Buncrana : The Exchange<br>
+every Tues 8am, 9.30am &amp; 11am with Ann<br>
+Marie<br>
+0860848705<br>
+, 6pm with Marie<br>
+0877389059<br>
+. Carndonagh: The Colgan Hall<br>
+every Thurs at 6pm with Marie<br>
+0877389059<br>
+.<br>
+Newtowncunningham: The Orange Hall<br>
+every Wed at 6.30pm with Ann Marie<br>
+0860848705<br>
+.<br>
+GET THE GRADE English Tuition. Friendly,<br>
+exam -focused, Junior &amp; Leaving Cert tuition<br>
+with experienced teacher of English &amp; SEC<br>
+Examiner (Teaching Council and Garda vetted).<br>
+Text/Call Mark<br>
+0866655334<br>
+INISHOWEN INJURY CLINIC Treatment of back,<br>
+neck and shoulder pain / sports injuries /<br>
+rehabilitation. Contact Cahir McLaughlin NMT,<br>
+Maginn Ave<br>
+0860753296<br>
+HEALTH &amp; WELLBEING PARK RUN Come and<br>
+join our community of walkers, runners and<br>
+volunteers every Sat at 9.15am by the shore<br>
+front play park. All welcome<br>
+GENTLE EXERCISE CLASS for people living<br>
+with Parkinson&#x27;s every Wed at 2pm in The Ex-<br>
+change.<br>
+COCKHILL CEILI CLUB Classes have now<br>
+stopped for the summer months.<br>
+BUNCRANA PARENT AND TODDLERS GROUP<br>
+has finished for the summer. We hope to start<br>
+again on 9 and 10 September 2026.<br>
+GAELSCOIL BHUN CRANNCHA Give us a call<br>
+on<br>
+074 9361988<br>
+or an email at<br>
+gsbc1999@gmail.com<br>
+to discuss how an Irish<br>
+medium education can benefit your child. If you<br>
+don’t speak Irish, don’t worry. That won’t hold<br>
+your child back.<br>
+COMMUNITY EMPLOYMENT PROGRAMME<br>
+VACANCIES for a grounds worker for the grave-<br>
+yard at St Mary’s Cockhill. Contact<br>
+buncrana@swillycep.ie<br>
+for more info or<br>
+application.<br>
+A F EAST OF FOLK MUSIC in The Cairn, Green-<br>
+castle every Tuesday at 8pm in July and Au-<br>
+gust. Limited Seating Tel<br>
+0749381104<br>
+.<br>
+DOG FREE ZONE A reminder that dogs are not<br>
+permitted in Cockhill or Desertegney grave-<br>
+yards. Thank you.<br>
+SCOIL TRAD BHUN CRANNCHA (School of<br>
+Irish Traditional Music). Lessons for children<br>
+(7+); Tin Whistle, Bodhrán, Accordion, Banjo,<br>
+Mandolin, Fiddle. Registration on Wednesday,<br>
+September 2nd, 6-7pm, Buncrana Youth Club,<br>
+Castle Ave. Contact: Jim Woods on<br>
+087<br>
+4186082<br>
+(Classes start back September 9th)<br>
+RACHEL ’S VINEYARD Have you been affected<br>
+or hurt by abortion? Please contact Michelle on<br>
+00447871765181<br>
+NOWDOC Phone Number:<br>
+0818400911<br>
+BUNCRANA CINEMA See all show times<br>
+www.thecinemabuncrana.com<br>
+BINGO<br>
+Friday 31 July: Week 71st Prize: €500<br>
+Pat Doherty, c/o Promoter: Noeleen Tynan<br>
+2nd Prize: €300<br>
+Stuart Donaghey, Clonblosk<br>
+Promoter: Jacinta Coyle<br>
+3rd Prize: €150<br>
+Gloria McGinley, Millbrae<br>
+Promoter: Noeleen Tynan ADORATION CHAPEL<br>
+Please consider spending an hour in the<br>
+Adoration Chapel<br>
+Sunday 2pm - 10pm<br>
+Monday - Wednesday 6am - 10pm<br>
+Friday 6am - 10pm<br>
+GUIDED HOLY HOUR<br>
+The Holy Hour in honour of the Holy Face<br>
+of Jesus continues this Sunday at 6pm in St<br>
+Mary’s Oratory. All Welcome. SPIDER -MAN: BRAND NEW DAY<br>
+12A | 145mins<br>
+Saturday 8th August - 5pm &amp; 8.15pm<br>
+Sunday 9th - 3pm &amp; 8.15pm<br>
+Monday 10th - Thursday 13th 8.15pm<br>
+ROSARY<br>
+The Rosary is said in the Oratory at 9.30am<br>
+before Mass Monday to Thursday.<br>
+JOB OPPORTUNITIES<br>
+Derry Diocesan Trust<br>
+(1) Clonmany Parish: Administrative &amp; Financial<br>
+Officer.<br>
+Hours of work: 9 hours per week. This is a job -share<br>
+role. Place of work: Parish House, Clonmany.<br>
+Completed applications to be returned no later than<br>
+12noon Tues 11 August 2026.<br>
+(2) Waterside Parish: Administrative &amp; Financial<br>
+Officer (18 hours per week), Parochial House, 32<br>
+Chapel Road, Derry. Rate of pay: £12.88 per hr -<br>
+£13.50 per hr. Completed applications to be re-<br>
+turned no later than 12noon Mon 24 August 2026<br>
+For application packs for either position please<br>
+email:<br>
+recruitment@derrydiocese.org<br>
+or tel<br>
+028 7126<br>
+2302<br>
+. Completed applications must be returned to Per-<br>
+sonnel, Bishop’s House, St Eugene’s Cathedral, Francis<br>
+Street, Derry, BT48 9AP or via email<br>
+to<br>
+recruitment@derrydiocese.org<br>
+Derry Diocesan Trust is an Equal Opportunities Em-<br>
+ployer. We welcome applications from all men and<br>
+women and from members of all communities. DEATHS<br>
+Your prayers are asked for<br>
+Liam Grant<br>
+Aodhan McCallum<br>
+Hugh Dick<br>
+who died recently and for their<br>
+families &amp; friends saddened by their loss. St Mary’s Hall<br>
+Fridays at 8pm<br>
+Single book €11<br>
+Double €17<br>
+Snowball: €4900<br>
+DONEGAL DOWN SYNDROME<br>
+ASSOCIATION<br>
+Annual church -gate collection will take<br>
+place on the weekend of 29 /30 Aug. Any-<br>
+one interested in helping on the day can<br>
+contact the Donegal Down Syndrome As-<br>
+sociation office by email<br>
+at<br>
+info@donegal.downsyndrome.ie<br>
+or call<br>
+0857870075<br>
+. Your financial support for<br>
+this important fundraising event would be<br>
+greatly appreciated and will help in con-<br>
+tinuing to provide vital services and sup-<br>
+ports to children and adults with Down<br>
+Syndrome and their families across Done-<br>
+gal. READINGS FOR 19TH SUNDAY IN ORDINARY TIME<br>
+First Reading: 1 K. 19:9, 11 -13. In the time of Solo-<br>
+mon (from 970 BC) and after him Israel had become<br>
+prosperous but corrupt. The prophet Elijah (active 870 -<br>
+850 BC) was threatened by Queen Jezebel and had fled<br>
+to Mount Horeb where Moses had received the 10 com-<br>
+mandments. There God revealed himself to him in a<br>
+&#x27;gentle breeze&#x27; (and gives him firm instructions, as he<br>
+had done for Moses.)<br>
+Second Reading: Rm 9:1 -5. St Paul is heart -broken<br>
+that his Jewish brothers and sisters, who from the time<br>
+of Abraham had been prepared so carefully by God to<br>
+receive the world’s Redeemer, had rejected Him. They<br>
+had not known ‘the time of their visitation.’ (Lk 19:44).<br>
+Gospel: Mt. 14:22 -33. The ‘fourth watch’ was between<br>
+3 and 6 am. A scary time in a storm. St Matthew’s mes-<br>
+sage is that in troubled times, when we find ourselves<br>
+caught between doubt and belief, we must venture forth<br>
+in faith, relying confidently upon God’s grace. It is<br>
+always there for us through Jesus, to make up our short-<br>
+fall in courage.<br>
+DIVINE MERCY DEVOTIONS<br>
+will take place on Fri 14 August at 6.15pm<br>
+in St. Mary’s Church, Cockhill, followed by<br>
+Mass at 7pm. All Welcome GARDEN FETE 2026<br>
+The Annual Garden Fete will take place on Sunday 23<br>
+August from 3pm -6pm in the grounds of Scoil Mhuire.<br>
+This event can only take place because of the<br>
+generosity of a team of volunteers. Please leave your<br>
+details in the Parish Office if you can help out on or<br>
+before the day.<br>
+DRAW CARDS for hampers and other great prizes are<br>
+available from the Parish Office and promoters are<br>
+required. Please contact the office to get your card or to<br>
+buy a line.<br>
+CALLING ALL CRAFTERS<br>
+Book your table for the Garden Fete to display and sell<br>
+your crafts, €20 per table. Limited tables available. For<br>
+more details contact the Parish Office<br>
+074 -9361253<br>
+FEAST OF THE ASSUMPTION<br>
+Mass Times<br>
+Friday 14 August<br>
+7pm in St Mary’s, Cockhill<br>
+Saturday 15 August<br>
+10am in St Mary’s Oratory<br>
+11am in Star of the Sea, Desertegney<br>
+A T HOUGHT .<br>
+My therapist told me the way to achieve<br>
+true inner peace is to finish what I start. So<br>
+far I’ve finished two bags of M&amp;Ms and a<br>
+chocolate cake. I feel better already. 33 D AY CONSECRATION TO THE<br>
+EUCHARIST<br>
+Consecrate yourself to the Eucharist on the<br>
+Feast of Our Lady of Knock! Human Life<br>
+International Ireland will be leading a 33<br>
+Day Consecration to the Eucharist online<br>
+with videos uploaded each day. Starting<br>
+19th July - 20th August, on the HLI Ireland<br>
+YouTube Channel. You can participate by<br>
+watching the videos, or get the book &quot;How<br>
+to Be His&quot; by Fr Jesse Maingot OP.<br>
+PRAYER FOR VOCATIONS<br>
+For our seminarians and the men consider-<br>
+ing priesthood that, in moments of doubt,<br>
+they&#x27;ll hear Jesus say what He says to the<br>
+disciples in today&#x27;s gospel, &quot;Courage! It is I.<br>
+Do not be afraid!&quot; THE NATIONAL NOVENA TO OUR LADY<br>
+OF KNOCK<br>
+takes place at Knock Shrine from Thurs 13<br>
+to Fri 21 August 2026. Novena ceremonies<br>
+will be celebrated daily at 3pm and 8pm,<br>
+with workshops and guided prayer sessions<br>
+also taking place throughout the nine days.<br>
+This year’s theme is “Sheltered in God’s<br>
+Love.” See the full programme at: https://<br>
+www.knockshrine.ie/national<br>
+-novena -2026<br>
+-guest -speakers -and-programme/<br>
+DONEGAL PRO LIFE<br>
+Annual Church Gate Collection is on<br>
+Sat.15th /Sun 16th Aug countywide. If you<br>
+can help in taking up a collection it would<br>
+be appreciated.<br>
+Contact Margaret on<br>
+0892469599<br>
+. Buncrana<br>
+https://www.buncranaparish.com<br>
+Page 18<br>
+Parishes of Camus, Clonleigh and Leckpatrick<br>
+Eigh teenth Sunday in Ordinary Time – Year A – 2nd August 2026<br>
+Parish Clergy<br>
+Fr Michael McCaughey, PP: (028) 71882274 / (028) 71882215<br>
+Fr Declan Boland (priest in residence)<br>
+Email :<br>
+leckpatrickparish@derrydiocese.org<br>
+; Website :<br>
+www.leckpatrickparish.com<br>
+Email :<br>
+strabaneparish@derrydiocese.org<br>
+; Website:<br>
+www.camusparish.com<br>
+Email:<br>
+clonleighparish@derrydiocese.org<br>
+; Website :<br>
+www.clonleighparish.com<br>
+Thoughts on the Gospel (Matthew 14:13 -21)<br>
+The miracle of the loaves and fishes began with compassio n. Jesus first noticed the<br>
+crowd’s pain before providing for their hunger. In our busy lives, God invites us to see<br>
+those who are lonely, discouraged, or forgotten. Even small acts of kindness can<br>
+become someone’s miracle.<br>
+The disciples focused on what they lacked, yet Jesus asked them to offer what they did<br>
+have. God rarely asks for what we do not possess. When we offer our time, talents,<br>
+and resources — however small — He multiplies them in ways we cannot imagine.<br>
+Before the food was shared, Jesus surrendered everything to the Father. We too carry<br>
+burdens that feel heavy, but surrender is not giving up; it is trusting God with our<br>
+limitations. What seems insufficient to us becomes more than enough in His hands.<br>
+The abundance left over reminds us that God’s blessings are meant to flow through<br>
+us. When we share generously, encourage others, and forgive freely, His grace<br>
+continues to multiply.<br>
+Lord, fill us with compassion, use what little we offer, and multiply it for Your glory.<br>
+Teach us to trust You and to share Your blessings generously. Amen.<br>
+Monthly Mass in Honour of St Pio will be celebrated on Wednesday 5th August at<br>
+7.00 pm in Immaculate Conception Church, Strabane. We ask God’s blessing on all<br>
+through the intercession of St Pio. Everyone welcome.<br>
+Due to the Current Holiday Perio d, we wish to notify parishioners that there will be<br>
+no newsletter until 2nd/23rd August. Apologies for any inconvenience. The office will<br>
+be open as follows for the following two weeks: 10 am - 2 pm, Monday - Friday. Normal<br>
+hours will resume on Monday 17t h August .<br>
+The Assumption of the Blessed Virgin Mary<br>
+Saturday 15th August is the Feast of the Assumption of the Blessed Virgin Mary<br>
+and is a holy day of obligation. On this feast, we recall Mary’s role in the life<br>
+of Jesus and in salvation. Mass times for the holy day are as follows:<br>
+Vigil Mass on Friday 14th August at 6.30 pm in Immaculate Conception Church<br>
+Mass on Saturday 15th August at 8.30 am in Sacred Heart Church, Derry Road<br>
+Mass on Saturday 15th August at 10.00 am in St Patrick’s Church, Murlog.<br>
+Masses at the usual times on the evening of Saturday 15th &amp; Sunday 16th August .</p></div>
+    <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
+  </div>
+  <script>
+    (function () {
+      try {
+        if (new URLSearchParams(window.location.search).get('embed') === '1') {
+          document.body.classList.add('embed-mode');
+        }
+      } catch (e) {}
+    })();
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-text');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+    (function () {
+      const ocrRoot = document.getElementById('ocr-text');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      if (!ocrRoot || !ocrSearch) return;
+      const originalHtml = ocrRoot.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+      function escapeRegExp(text) {
+        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        ocrMatches[idx].classList.add('search-active');
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      function updateMatchUi() {
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} of ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+      function applySearch(query) {
+        ocrRoot.innerHTML = originalHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrRoot, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) nodes.push(node);
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) return;
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrRoot.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+      ocrSearch.addEventListener('input', (e) => applySearch(e.target.value.trim()));
+      clearSearch.addEventListener('click', () => { ocrSearch.value = ''; applySearch(''); ocrSearch.focus(); });
+      prevMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && ocrMatches.length) {
+          e.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

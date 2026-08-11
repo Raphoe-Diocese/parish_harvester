@@ -1,0 +1,598 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>St MacNissi Randalstown Text Bulletin — 11/08/2026</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #eef1f0;
+      color: #1a1f1e;
+      line-height: 1.65;
+      font-size: 1.125rem;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
+    }
+    a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
+    .page {
+      max-width: min(72ch, 100%);
+      margin: 0 auto;
+      padding: 14px 18px 40px;
+    }
+    .top {
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+      gap: 8px 14px;
+      margin-bottom: 12px;
+    }
+    .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+    .back-link {
+      font-size: 0.9rem; font-weight: 700;
+      color: #14524f; text-decoration: none;
+    }
+    .title-line {
+      font-size: 1rem; font-weight: 700; color: #1a1f1e;
+    }
+    .font-size-controls { display: none; }
+    .ocr-zoom-bar {
+      position: sticky; top: 0; z-index: 6;
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
+    }
+    .ocr-zoom-bar button {
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+      line-height: 1;
+    }
+    .ocr-zoom-pct {
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 4px; } }
+    
+    .ocr-body {
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    .ocr-body h1, .ocr-body h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h2.b-title, .ocr-body .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    .ocr-body h3.b-head, .ocr-body .b-head {
+      font-size: 1.12em;
+      color: #134e9c;
+      margin: 1.1em 0 0.35em;
+    }
+    .ocr-body h4.b-sub, .ocr-body .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    .ocr-body h3, .ocr-body h4 {
+      color: #1a6b6b;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    .ocr-body h3.ocr-page-heading,
+    .ocr-body .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    .ocr-body hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    .ocr-body strong { color: #0f2b5b; }
+    .ocr-body a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .ocr-body mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    .ocr-body mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    .ocr-body table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ocr-body table.b-table td, .ocr-body table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .ocr-body table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    .ocr-body table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    .ocr-body img, .ocr-body iframe, .ocr-body video {
+      max-width: 100%;
+      height: auto;
+    }
+    .ocr-body > :first-child {
+      margin-top: 0;
+    }
+
+    .ocr-body {
+      padding: 4px 2px 8px;
+    }
+    .search-panel {
+      margin: 0 0 12px;
+      border: 1px solid #d4ddd9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .search-panel .ocr-search-bar { margin-bottom: 6px; }
+    .ocr-search-bar { position: relative; margin-bottom: 6px; }
+    .search-input {
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: #1a1f1e; background: #fff;
+    }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 1px solid #1a6b6b; border-radius: 6px; background: #fff; color: #1a6b6b;
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { color: #999; border-color: #d4ddd9; cursor: not-allowed; }
+    .match-count { color: #5a6a68; font-size: 0.85rem; font-weight: 600; }
+    .note-box {
+      margin-top: 18px;
+      color: #5a6a68;
+      font-weight: 400;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      padding: 0;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 8px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    body.embed-mode .top { display: none !important; }
+    body.embed-mode .page { padding-top: 8px; }
+    @media (max-width: 600px) {
+      .page { padding: 12px 14px 32px; }
+      .ocr-search-tools button { min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top" id="ocr-top">
+      <div class="top-left">
+        <a class="back-link" href="stmacnissirandalstown.html">← Viewer</a>
+        <span class="title-line">ST MACNISSI RANDALSTOWN Text Bulletin · 11/08/2026</span>
+      </div>
+    </div>
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+      <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+      <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+      <span class="ocr-zoom-hint">or pinch to zoom</span>
+    </div>
+    <div class="search-panel" role="search">
+      <div class="ocr-search-bar">
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search text (mass, bingo, parish…)" aria-label="Search bulletin text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled>← Prev</button>
+          <button id="ocr-next" type="button" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+    <div class="ocr-body" id="ocr-text"><div class="ocr-failed-banner" role="status">ℹ️ Matched by parish name only (not exact PDF pages) this week — check the PDF above for the definitive version.</div>
+<p>St MacNissi Randalstown<br>
+https://www.stmacnissirandalstown.com<br>
+Page 41<br>
+&quot;MEDJUGORJE YOUTH PILGRIMAGE 2027:<br>
+Our Youth Minister Dean Millar will be taking a<br>
+group of young people aged 14 - 18 from<br>
+Antrim, Randalstown &amp; Duneane Parishes to<br>
+Medjugorje next summer. If you would be<br>
+interested in this, please share an expression of<br>
+interest with Dean at<br>
+d.millar@downandconnor.org<br>
+or via Whatsapp at<br>
+07593 925676&quot;<br>
+24 Hours of Adoration on the Feast of Our<br>
+Lady&#x27;s Assumption ST AGNES BELFAST<br>
+To honour the Feast of Our Lady&#x27;s Assumption<br>
+the Legion of Mary are organising 24 hours of<br>
+Eucharistic Adoration in St Agnes Church.<br>
+Adoration will begin after the 7pm Mass on<br>
+Friday 14th August and will continue throughout<br>
+the night and throughout the day, ending before<br>
+6.30 vigil Mass on 15th August.<br>
+August &amp; September 2026 @ Lough Derg<br>
+A pilgrimage has a vital part to play in our<br>
+life of faith, for it removes us from our daily<br>
+routines, and gives us time and space to<br>
+encounter God more deeply. Pope Leo XIV<br>
+Three Day Pilgrimages – In the tradition of<br>
+prayer, fasting and keeping Vigil<br>
+Begin on any day of the week until Thursday<br>
+13th August. Admission €85. Discounts<br>
+available for Groups, Seniors &amp; Students.<br>
+One Day Retreats – Guided Days of Prayer and<br>
+Reflection - places available on<br>
+August 18th, 2nd, 23rd, 29th and 31st<br>
+September 5th, 6th, 9th, 12th, 15th, 19th and 20th<br>
+Admission €50. Group discounts available.<br>
+Advance Booking Essential .<br>
+Catholic Mothers Ireland – Family Day<br>
+Catholic Mothers Ireland will hold its Annual<br>
+National Mass on Sunday, 6 September at<br>
+Termonbacca Retreat Centre, Derry City .<br>
+The day will begin with Mass at 2.00pm , For<br>
+more information and booking details, please<br>
+email<br>
+info@catholicmothers.ie<br>
+.<br>
+Wanted: Female Direct Payments Personal<br>
+Assistant (25 years+ with clean UK Full driving<br>
+license), 3 days per week, Mon. Tues. &amp; Wed., 7<br>
+hours per day, for Vulnerable Adult female with<br>
+Complex Special Needs in Toomebridge.<br>
+Full training will be provided.<br>
+Drive a ramp wheelchair van to transport<br>
+manual wheelchair client as needed.<br>
+Gravity Peg feed client, also hoist and change<br>
+her as needed. Call John on 07840 605507 TUESDAY 1th AUGUST 8.00pm to 9:30pm<br>
+Snowball £3 70<br>
+THURSDAY 10.30am Our WALKING CLUB<br>
+meets at the Parish Centre. Welcome Tea and<br>
+Coffee on return.<br>
+TÍR NA NÓG LOTTO Tues 04/08/2026<br>
+JACKPOT WINNER ☺ Ada O’Donnell<br>
+WINNING NUMBERS :4 8 16 21<br>
+£25 WINNERS: Sean McLoughlin, Mia McMullan,<br>
+Claire Neeson, Ellen Magee<br>
+Next week<br>
+Tues 11/08/2026<br>
+LET’S LUNCH – TÍR NA NÓG is delighted to invite our past and<br>
+present members, and the local community aged<br>
+65+, to join us for ‘Let’s Lunch’.<br>
+It’s a lovely opportunity to catch up, enjoy a<br>
+warm meal, and connect with neighbours old and<br>
+new.<br>
+Venue: Tír na nÓg Clubrooms, Barnish Road<br>
+Date: Saturday 15th August<br>
+Time: 12.30pm – 2.30pm<br>
+This is a free event, kindly sponsored by The<br>
+National Lottery.<br>
+To book your place please contact Bronagh<br>
+(<br>
+07762731620<br>
+) or Sinead<br>
+(<br>
+07545238986<br>
+) between 7 –9pm.<br>
+This is the sixth of several planned dates, so if<br>
+you are unable to attend on this occasion, further<br>
+dates will be announced in due course.<br>
+We can’t wait to see you there!<br>
+MONDAY WEEKLY SALSA CLASSES<br>
+7-8pm in Tir na nÓg old clubhouse. All welcome,<br>
+no partner required Contact<br>
+07713388035<br>
+Kickham’s GAC Wed 05/08/2026<br>
+WINNING NUMBERS: 7,15,16,25<br>
+£30 WINNERS: Doreen Devlin &amp;<br>
+Dominic Graham<br>
+Next week&#x27;s draw is on Wednesday 12/08/2026<br>
+at 8.30pm. Tickets must be bought by 7.30pm.<br>
+Jackpot £ 6,300 Tickets are available online at<br>
+https://member.clubspot.app/club/creggan<br>
+-<br>
+Kickhams -gac/fundraisers from outlets in town or<br>
+your usual ticket sellers.<br>
+COMMUNITY ADVICE Antrim and N’Abbey<br>
+(Formerly Citizens Advice)<br>
+Monday from 1.30 pm to 4.30 pm, in Arches. No<br>
+appointment needed as this is a drop-in service<br>
+Jackpot<br>
+£5,000<br>
+Page 42<br>
+.<br>
+PRIESTS OF THE PARISH<br>
+Fr Pat Sheehan &amp; Fr Aidan Kerr<br>
+PARISH OFFICE<br>
+028 90832979<br>
+Lorraine Carlin &amp; Patricia Gillespie<br>
+Opens Mon – Friday 9am – 1pm<br>
+165 Antrim Road. BT36 7QR<br>
+e-mail :<br>
+stmarysoth@downandconnor.org<br>
+website:<br>
+www.stmarysonthehill.online<br>
+RECENTLY DECEASED<br>
+Patricia Duffy<br>
+Dolores McDaid<br>
+MONTH’S MIND<br>
+Grace Fitzpatrick<br>
+ANNIVERSA RIES<br>
+Gerry McCullagh, Paul Brennan, Malone Family, Mark<br>
+Anthony Kelly, Patricia Byrne, Isabel Casey.<br>
+MASS INTENTIONS THIS WEEK<br>
+Sat 8th<br>
+Mass online 6.00pm Gerry McCullagh<br>
+Sun 9th<br>
+Mass online 9.00am<br>
+Mass online 11.00am<br>
+Mon 10th 9.45am<br>
+SMOTH Mark Anthony Kelly<br>
+1st Anniversary<br>
+Tues 1th 9.45am<br>
+SMOTH Funeral Dolores McDaid<br>
+Wed 12th 9.45am<br>
+SMOTH<br>
+Thur 13th 9.45am<br>
+SMOTH<br>
+Fri 14th 9.45am<br>
+SMOTH<br>
+Sat 15th 12 NOON<br>
+ST BERNARDS Paul Brennan &amp; Malone<br>
+Family<br>
+We welcome<br>
+Eimear Cook ,<br>
+Aria Lin ,<br>
+Odhrán Walsh ,<br>
+Darragh McCleery<br>
+recently baptised in the parish.<br>
+ST BERNARD’S SITE CLOSURE<br>
+3rd-14th AUGUST<br>
+There will be no access to St Bernard’s site from 3rd -<br>
+14th August for g roundworks. The whole site will<br>
+undergo re -tarmac king. Daily masses and funerals<br>
+will be celebrated in St Marys on the Hill and the Sat.<br>
+Vigil and Sun.morning masses 8/9Aug will be online.<br>
+Weather permitting St Bernard’s will re -open on<br>
+Saturday 15th August for Mass of the Feast of the<br>
+Assumption at 12noon. In the event the Church<br>
+cannot re -open that weekend Sunday masses will be<br>
+online and the GATES WILL REMAIN CLOSED .<br>
+SUNDAY MASSES 8th &amp; 9th AUGUST<br>
+NO Divine Mercy in JULY &amp; AUGUST<br>
+Back to normal for September.<br>
+Baptisms on a Sunday will be at 12.30pm .<br>
+FEAST OF THE ASSUMPTION<br>
+Mass on the 15TH August is at<br>
+12.00 noon in St. Bernard’s Church<br>
+PARISH COLLECTIONS JULY<br>
+Week 1 Week 2 Week 3 Week 4<br>
+£3953.53 £3698.18 £3749.54 £4337.82<br>
+Monthly<br>
+Stipend Building Fund Pastoral<br>
+Services<br>
+£4156.10 £1017.21 £1039.77<br>
+Thank you for your generosity<br>
+St Bernard’s Vigil 6.00pm<br>
+ONLINE<br>
+St Bernard’s 9.00am<br>
+ONLINE<br>
+St Mary’s on the Hill 10.00am<br>
+St Bernard’s 11.00am<br>
+ONLINE<br>
+St Bernard’s 12.30pm Parish of S t MARY’S on the HILL 9th Aug 2026<br>
+Churches: St Mary’s on the Hill &amp; St Bernard’s</p></div>
+    <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
+  </div>
+  <script>
+    (function () {
+      try {
+        if (new URLSearchParams(window.location.search).get('embed') === '1') {
+          document.body.classList.add('embed-mode');
+        }
+      } catch (e) {}
+    })();
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-text');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+    (function () {
+      const ocrRoot = document.getElementById('ocr-text');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      if (!ocrRoot || !ocrSearch) return;
+      const originalHtml = ocrRoot.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+      function escapeRegExp(text) {
+        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        ocrMatches[idx].classList.add('search-active');
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      function updateMatchUi() {
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} of ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+      function applySearch(query) {
+        ocrRoot.innerHTML = originalHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrRoot, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) nodes.push(node);
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) return;
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrRoot.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+      ocrSearch.addEventListener('input', (e) => applySearch(e.target.value.trim()));
+      clearSearch.addEventListener('click', () => { ocrSearch.value = ''; applySearch(''); ocrSearch.focus(); });
+      prevMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && ocrMatches.length) {
+          e.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

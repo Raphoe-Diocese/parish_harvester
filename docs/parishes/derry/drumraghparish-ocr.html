@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Drumragh Text Bulletin — 11/08/2026</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #eef1f0;
+      color: #1a1f1e;
+      line-height: 1.65;
+      font-size: 1.125rem;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
+    }
+    a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
+    .page {
+      max-width: min(72ch, 100%);
+      margin: 0 auto;
+      padding: 14px 18px 40px;
+    }
+    .top {
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+      gap: 8px 14px;
+      margin-bottom: 12px;
+    }
+    .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+    .back-link {
+      font-size: 0.9rem; font-weight: 700;
+      color: #14524f; text-decoration: none;
+    }
+    .title-line {
+      font-size: 1rem; font-weight: 700; color: #1a1f1e;
+    }
+    .font-size-controls { display: none; }
+    .ocr-zoom-bar {
+      position: sticky; top: 0; z-index: 6;
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
+    }
+    .ocr-zoom-bar button {
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+      line-height: 1;
+    }
+    .ocr-zoom-pct {
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 4px; } }
+    
+    .ocr-body {
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    .ocr-body h1, .ocr-body h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h2.b-title, .ocr-body .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    .ocr-body h3.b-head, .ocr-body .b-head {
+      font-size: 1.12em;
+      color: #134e9c;
+      margin: 1.1em 0 0.35em;
+    }
+    .ocr-body h4.b-sub, .ocr-body .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    .ocr-body h3, .ocr-body h4 {
+      color: #1a6b6b;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    .ocr-body h3.ocr-page-heading,
+    .ocr-body .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    .ocr-body hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    .ocr-body strong { color: #0f2b5b; }
+    .ocr-body a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .ocr-body mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    .ocr-body mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    .ocr-body table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ocr-body table.b-table td, .ocr-body table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .ocr-body table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    .ocr-body table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    .ocr-body img, .ocr-body iframe, .ocr-body video {
+      max-width: 100%;
+      height: auto;
+    }
+    .ocr-body > :first-child {
+      margin-top: 0;
+    }
+
+    .ocr-body {
+      padding: 4px 2px 8px;
+    }
+    .search-panel {
+      margin: 0 0 12px;
+      border: 1px solid #d4ddd9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .search-panel .ocr-search-bar { margin-bottom: 6px; }
+    .ocr-search-bar { position: relative; margin-bottom: 6px; }
+    .search-input {
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: #1a1f1e; background: #fff;
+    }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 1px solid #1a6b6b; border-radius: 6px; background: #fff; color: #1a6b6b;
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { color: #999; border-color: #d4ddd9; cursor: not-allowed; }
+    .match-count { color: #5a6a68; font-size: 0.85rem; font-weight: 600; }
+    .note-box {
+      margin-top: 18px;
+      color: #5a6a68;
+      font-weight: 400;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      padding: 0;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 8px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    body.embed-mode .top { display: none !important; }
+    body.embed-mode .page { padding-top: 8px; }
+    @media (max-width: 600px) {
+      .page { padding: 12px 14px 32px; }
+      .ocr-search-tools button { min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top" id="ocr-top">
+      <div class="top-left">
+        <a class="back-link" href="drumraghparish.html">← Viewer</a>
+        <span class="title-line">DRUMRAGH Text Bulletin · 11/08/2026</span>
+      </div>
+    </div>
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+      <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+      <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+      <span class="ocr-zoom-hint">or pinch to zoom</span>
+    </div>
+    <div class="search-panel" role="search">
+      <div class="ocr-search-bar">
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search text (mass, bingo, parish…)" aria-label="Search bulletin text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled>← Prev</button>
+          <button id="ocr-next" type="button" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+    <div class="ocr-body" id="ocr-text"><div class="ocr-failed-banner" role="status">ℹ️ Matched by parish name only (not exact PDF pages) this week — check the PDF above for the definitive version.</div>
+<p>Parish of Drumragh<br>
+Sacred Heart Church, Omagh<br>
+St Mary’s Church, Drumragh<br>
+028 82242092<br>
+Sacred Heart Church, Omagh<br>
+Vigil: 5.30pm Sunday Mass: 10am &amp; 12.30pm<br>
+Weekday Mass Times this week<br>
+10.00am Monday, Tuesday &amp;<br>
+Wednesday in St. Mary ’s, Killyclogher<br>
+10.00am Wed, Thurs, Fri &amp; Sat.<br>
+in Sacred Heart Church<br>
+7.30pm Wednesday Sacred Heart<br>
+Eucharistic Adoration on Wednesday<br>
+from 10am until 6.45pm.<br>
+Rosary before 7.30pm Mass<br>
+St. Mary ’s Church, Drumragh<br>
+Sunday Mass: 10.30am Weekend Mass Schedule<br>
+Fr Kevin McElhennon P.P:<br>
+028 8225 8108<br>
+/<br>
+k.mcelhennon@derrydiocese.org<br>
+Fr Malachy Gallagher C.C:<br>
+028 8225 1055<br>
+/<br>
+malachy.gallagher@derrydiocese.org<br>
+Parish Office, Omagh<br>
+028 8224 2092<br>
+/<br>
+info@drumraghparish.com<br>
+Cappagh Parish Office<br>
+028 8224 3375<br>
+/<br>
+info@cappaghparish.com<br>
+Confessions:<br>
+Sacred Heart Church : Saturday ’s after<br>
+morning Mass unless there is a funeral.<br>
+Christ the King, Strathroy:<br>
+Saturday 6.15pm -6.45pm<br>
+REST A WHILE<br>
+In our day -to-day life’s journey, oftentimes we are overwhelmed with<br>
+our daily routines, individual tasks as well as duties and responsibilities.<br>
+It seems that the 24 hours of the day are not enough because we are too<br>
+busy with so many things. We do not have time to “stop and smell the<br>
+roses.” We do not have time to relax and to take time out of our busy<br>
+schedules to appreciate and enjoy God ’s gift of the beauty of life. We<br>
+need time to rest, to recognises our human limitations that we need essential respite to<br>
+prevent us from being exhausted and to avoid the possible danger of breakdown.<br>
+According to the mechanical engineers, even machines need cooling -off time to prevent<br>
+overheating. When we approach our “hallowed space ” like spending time praying in front<br>
+of the Blessed Sacrament or lighting candles inside the church, we are refreshed and<br>
+strengthened. We will be inspired to go on despite all the burdens, challenges, and<br>
+obstacles in life. That is why after the tiresome and successful mission of the Apostles the<br>
+Lord told them, “Come away by yourselves to a deserted place and rest a while. ”<br>
+Following Jesus ’ command, these first followers were spiritually and physically recharged<br>
+to do the next job. We also badly need to have some “refreshment ” of the Lord and to<br>
+spend time with Him in silent prayer to find meaning in every life ’s situation. In this way,<br>
+we are far from being “worn out” and preventing ourselves from “falling apart. ” And so,<br>
+let us all find time to relax and rest for a while with Him.<br>
+Mass times for Sat. 15th August (Feast of the Assumption)<br>
+Vigil 7.30pm Friday 14th – Christ the King, Strathroy<br>
+10am Saturday 15th Sacred Heart Church &amp; St Mary ’s, Killyclogher Drumragh<br>
+https://www.drumraghparish.com<br>
+Page 52<br>
+Recently Deceased<br>
+Patricia Daly<br>
+Louisa Brochet (nee Kelly) May they rest in peace<br>
+Recent Weddings<br>
+We congratulate the following<br>
+couple who were married<br>
+here recently<br>
+Kerrie Anne O ’Hagan &amp; Ronan Grogan<br>
+May the grace of the sacrament<br>
+remain with them all their lives.<br>
+Sacrament of Baptism<br>
+We welcome new members of<br>
+our Parish Community who<br>
+received the<br>
+Sacrament of Baptism:<br>
+Mabel Frances McGale<br>
+Callen Brendan Gray<br>
+Tadhg Michael Drumm<br>
+Poppy Leslie Paula Marshall<br>
+Cadhla Jacqueline Finnegan<br>
+Eucharistic Ministers will<br>
+bring Holy Communion to<br>
+the sick and housebound<br>
+next Sunday 9th August Sacred Heart Church Mass Intentions<br>
+Wednesday 5th August 7.30pm Louise Rodgers - Month Mind<br>
+Kevin McCrory - 1st Anniversary<br>
+Martin McDonagh - 5th Anniversary<br>
+Saturday 8th August 5.30pm Marie Chesters - 6th Anniversary<br>
+Wednesday 12th August 7.30pm Brenda Drumm - Month Mind<br>
+Wednesday 19th August 7.30pm Eamon McAlynn - 2nd Anniversary<br>
+Thursday 20th August 10.00am Joseph Martin - 3rd Anniversary<br>
+ST. MARY ’S, DRUMRAGH Mass Intentions<br>
+Sunday 16th August 10.30pm Paddy (Patricia) Doherty – 1stAnniversary<br>
+VOCATIONS<br>
+We pray for the men called to<br>
+priesthood. Like Jesus in today&#x27;s gospel,<br>
+may they never turn away from the poor,<br>
+the hungry, the most vulnerable, or those<br>
+in need, but always reflect the love of<br>
+Christ for them as they nourish and<br>
+strengthen them with the Word of God.<br>
+Parish Office Closed until Monday 24th August<br>
+Parish email:<br>
+info@drumraghparish.com<br>
+Derry Diocesan Society<br>
+The following names have been added to the list of Deceased Members of the<br>
+Derry Diocesan Society<br>
+Martin Gerard Rodgers Seamus McGlone Kevin McCaskie<br>
+Rene Colton Ann Marie Taggart Shareen McNamee<br>
+Charles (Edmund) Fisher Alice Oddy Gary Oddy<br>
+James (Anthony) McCauley Mary Maguire Carmel Rippington<br>
+William (Billy) Wilson Padriag Doherty Edward McGlinchey<br>
+Michelle McElhill Veronica Conroy<br>
+We pray that all who sleep in Christ find in your presence, light,<br>
+happiness and peace.<br>
+Page 53<br>
+BINGO in St. Joseph ’s Hall continues on Tuesday ’s<br>
+during August at 8.30pm<br>
+Parish Draw<br>
+The July draw takes place this week. Promoters are asked to please make their returns<br>
+before 7.30pm on Tuesday 4th August . Please note, the deadline of 7.30pm is strict and<br>
+late returns may not be accepted.<br>
+The List of August winners will be published on the noticeboard in the porch at the<br>
+main door.<br>
+Omagh Library<br>
+Tuesday 4th August 2:00pm - 3:00pm<br>
+Create your own Comic - whether you ’re into superheroes or cute animals you can create<br>
+your very own comic to take home with you.<br>
+For children aged 5 - 11 Years old<br>
+Children under 8 must be accompanied by an adult. Booking Essential<br>
+Monday 10th August 9:30am - 5:00pm<br>
+Calling all budding detectives! Can you help us solve the library mysteries?<br>
+Crack the code, solve the clues, and earn your detective badge.<br>
+For children aged 4 - 11 years old<br>
+Children under 8 must be accompanied by an adult. Everyone Welcome<br>
+Weekly Bulletin<br>
+Please note that throughout the month of August the parish newsletter will be<br>
+published on 23rd August only. The Parish Office will be closed until 24th August. The Royal National institute of the deaf are holding their bimonthly free drop in event in<br>
+Omagh Methodist church hall on Thursday 27th August from 10 -30 to 12.30.<br>
+Come along and have your hearing checked and new batteries provided plus advise on how<br>
+to get the best from your aids.<br>
+Parish Notice – Holiday Closure<br>
+During the parish holiday closure, anyone wishing to book an Anniversary Mass, or<br>
+arrange a baptism or wedding, is asked to please contact Orla (Monday to Thursday) in<br>
+the Cappagh Office on<br>
+02882243375<br>
+or<br>
+info@cappaghparish.com<br>
+.<br>
+She will be happy to assist with all bookings during this period.<br>
+Please note there are no available dates in August for Baptisms in Omagh or Killyclogher.<br>
+SONGS FROM HOME<br>
+Come together with Harmonise and fellow local singers as we share Songs from Home.<br>
+Participants must attend FREE five week choir practice followed by the Final Song Trail<br>
+10th October at Ulster American Folk Park. Refreshments provided.<br>
+EVERYONE WELCOME - Contact Claire Sharkey for more details<br>
+07751371800<br>
+Dates<br>
+August 19th 7.30pm-9.30pm – Silverbirch Hotel<br>
+August 30th 1pm-4pm – Dromore Sports Complex<br>
+September 23rd 7.30-10pm – Silverbirch Hotel<br>
+September 30th 7.30-10pm – Dromore Sports Complex<br>
+October 7th 7.30pm -9.30pm – Silverbirch Hotel<br>
+Page 54<br>
+DIOCESAN SAFEGUARDING<br>
+REPRESENTATIVE<br>
+Marie O’Kane DLP<br>
+07596500793<br>
+dlp@derrydiocese.org<br>
+Parish email:<br>
+info@drumraghparish.com<br>
+Al-Anon Family Group<br>
+028 9068 2368<br>
+Alcoholics Anonymous<br>
+028 9035 1222<br>
+Aware<br>
+028 7126 0602<br>
+Care for Cancer<br>
+028 8224 6599<br>
+Gamblers Anonymous<br>
+028 7135 1329<br>
+Drug Awareness 0800 7766 00<br>
+Legion of Mary<br>
+07733551846<br>
+/<br>
+07864926719<br>
+Pioneers 07775 810297<br>
+Safeguarding Team 07596 500793<br>
+Samaritans<br>
+028 8224 4944<br>
+SVDP Thrift Shop<br>
+028 8225 2000<br>
+SVDP Helpline<br>
+07738837991<br>
+GAMBLERS ANONYMOUS:<br>
+Is gambling affecting your life? We<br>
+would like to help. Pick up the phone and<br>
+ring<br>
+028 7135 1329<br>
+.<br>
+Walk in the footsteps of our Patron Saint on Saint Patrick&#x27;s Way Pilgrim Walk in<br>
+Downpatrick with Martina Purdy and Elaine Kelly on 8th August . Begin at Saint<br>
+Patrick&#x27;s Centre with the fabulous 180° IMAX film of St Patrick. Price includes entrance<br>
+fees, internal bus transfers, pilgrimage lunch at the famous Saul Barn, plus a stamped<br>
+Camino passport and a 6 -mile pilgrimage walk, finishing at Saint Patrick ’s grave.<br>
+Come and Be Amazed!<br>
+(Duration 9am -approx 3pm, all for just £55) To book ring 02844 619000<br>
+or go to website<br>
+www.saintpatrickcentre.com<br>
+PUBLIC OPENING 2026 ST JOSEPH ’S HALL<br>
+The Uniform Exchange will be open to the public in<br>
+St Joseph ’s Hall from Wednesday 5th August<br>
+until Sunday 9th August from 10am – 4pm each day.<br>
+For everyone – All schools from Castlederg to<br>
+Ballybofey.<br>
+Good quality pre -loved uniforms, for all ages and all<br>
+local schools.<br>
+NO COST / NO CHARGE The service is completely free<br>
+REUSE RELOVE REDUCE WAST<br>
+Celebration of Christian Marriage<br>
+Any couple intending to celebrate their marriage in the church are advised to have their<br>
+(1) Pre-nuptial Enquiry Forms (canonical church papers) completed no later than<br>
+3 months prior to their wedding.<br>
+(2) Your pre -marriage course with Accord should also be completed before your papers<br>
+are signed (<br>
+info@accordni.com<br>
+).<br>
+(3) The Marriage Schedule (civil documents) (Ref GRO 446 v06/22) should also be<br>
+“served with the Registrar at least 28 days before the date of the intended marriage ”.<br>
+(It is recommended that all civil and canonical papers are completed no later than 3<br>
+months prior to the wedding).<br>
+Page 55<br>
+SUNDAY MASS TIMES<br>
+Sat. 4.30 pm. - Gortnaghey<br>
+Sat. 6.00 pm. - Dungiven<br>
+Sun. 9.00 am. - Dungiven<br>
+Sun. 10.15 am. - Drumsurn<br>
+Sun. 11.30 am. - Dungiven<br>
+THE FEAST OF THE ASSUMPTION OF<br>
+OUR LADY INTO HEAVEN.<br>
+SATURDAY 15TH AUGUST</p></div>
+    <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
+  </div>
+  <script>
+    (function () {
+      try {
+        if (new URLSearchParams(window.location.search).get('embed') === '1') {
+          document.body.classList.add('embed-mode');
+        }
+      } catch (e) {}
+    })();
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-text');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+    (function () {
+      const ocrRoot = document.getElementById('ocr-text');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      if (!ocrRoot || !ocrSearch) return;
+      const originalHtml = ocrRoot.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+      function escapeRegExp(text) {
+        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        ocrMatches[idx].classList.add('search-active');
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      function updateMatchUi() {
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} of ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+      function applySearch(query) {
+        ocrRoot.innerHTML = originalHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrRoot, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) nodes.push(node);
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) return;
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrRoot.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+      ocrSearch.addEventListener('input', (e) => applySearch(e.target.value.trim()));
+      clearSearch.addEventListener('click', () => { ocrSearch.value = ''; applySearch(''); ocrSearch.focus(); });
+      prevMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && ocrMatches.length) {
+          e.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

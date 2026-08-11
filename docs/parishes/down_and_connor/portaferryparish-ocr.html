@@ -1,0 +1,584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Portaferry Text Bulletin — 11/08/2026</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #eef1f0;
+      color: #1a1f1e;
+      line-height: 1.65;
+      font-size: 1.125rem;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
+    }
+    a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
+    .page {
+      max-width: min(72ch, 100%);
+      margin: 0 auto;
+      padding: 14px 18px 40px;
+    }
+    .top {
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+      gap: 8px 14px;
+      margin-bottom: 12px;
+    }
+    .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+    .back-link {
+      font-size: 0.9rem; font-weight: 700;
+      color: #14524f; text-decoration: none;
+    }
+    .title-line {
+      font-size: 1rem; font-weight: 700; color: #1a1f1e;
+    }
+    .font-size-controls { display: none; }
+    .ocr-zoom-bar {
+      position: sticky; top: 0; z-index: 6;
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
+    }
+    .ocr-zoom-bar button {
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+      line-height: 1;
+    }
+    .ocr-zoom-pct {
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 4px; } }
+    
+    .ocr-body {
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    .ocr-body h1, .ocr-body h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h2.b-title, .ocr-body .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    .ocr-body h3.b-head, .ocr-body .b-head {
+      font-size: 1.12em;
+      color: #134e9c;
+      margin: 1.1em 0 0.35em;
+    }
+    .ocr-body h4.b-sub, .ocr-body .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    .ocr-body h3, .ocr-body h4 {
+      color: #1a6b6b;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    .ocr-body h3.ocr-page-heading,
+    .ocr-body .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    .ocr-body hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    .ocr-body strong { color: #0f2b5b; }
+    .ocr-body a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .ocr-body mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    .ocr-body mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    .ocr-body table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ocr-body table.b-table td, .ocr-body table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .ocr-body table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    .ocr-body table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    .ocr-body img, .ocr-body iframe, .ocr-body video {
+      max-width: 100%;
+      height: auto;
+    }
+    .ocr-body > :first-child {
+      margin-top: 0;
+    }
+
+    .ocr-body {
+      padding: 4px 2px 8px;
+    }
+    .search-panel {
+      margin: 0 0 12px;
+      border: 1px solid #d4ddd9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .search-panel .ocr-search-bar { margin-bottom: 6px; }
+    .ocr-search-bar { position: relative; margin-bottom: 6px; }
+    .search-input {
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: #1a1f1e; background: #fff;
+    }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 1px solid #1a6b6b; border-radius: 6px; background: #fff; color: #1a6b6b;
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { color: #999; border-color: #d4ddd9; cursor: not-allowed; }
+    .match-count { color: #5a6a68; font-size: 0.85rem; font-weight: 600; }
+    .note-box {
+      margin-top: 18px;
+      color: #5a6a68;
+      font-weight: 400;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      padding: 0;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 8px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    body.embed-mode .top { display: none !important; }
+    body.embed-mode .page { padding-top: 8px; }
+    @media (max-width: 600px) {
+      .page { padding: 12px 14px 32px; }
+      .ocr-search-tools button { min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top" id="ocr-top">
+      <div class="top-left">
+        <a class="back-link" href="portaferryparish.html">← Viewer</a>
+        <span class="title-line">PORTAFERRY Text Bulletin · 11/08/2026</span>
+      </div>
+    </div>
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+      <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+      <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+      <span class="ocr-zoom-hint">or pinch to zoom</span>
+    </div>
+    <div class="search-panel" role="search">
+      <div class="ocr-search-bar">
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search text (mass, bingo, parish…)" aria-label="Search bulletin text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled>← Prev</button>
+          <button id="ocr-next" type="button" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+    <div class="ocr-body" id="ocr-text"><div class="ocr-failed-banner" role="status">ℹ️ Matched by parish name only (not exact PDF pages) this week — check the PDF above for the definitive version.</div>
+<p>Portaferry<br>
+https://portaferryparish.com<br>
+Page 23<br>
+HOLY HOUR IN HONOUR OF JESUS THE DIVINE MERCY will be held this<br>
+Sunday 2nd August in St Patrick’s Church, Ballygalget at 3.00pm.<br>
+BAPTISM: Welcome into the Catholic Church, Sunday 26th July<br>
+Grace C aira Monan, Ashmount Park<br>
+ROSARY IN ST. COOEY&#x27;S ORATORY : on Tuesday 4th August at 7pm, the Feast of St. John<br>
+Mary Vianney. We will offer this Rosary for priests.<br>
+&quot;If we really understood the Mass we would die of joy.&quot; (St. John Mary Vianney)<br>
+MASS WITH THE ANOINTING OF THE SICK will be held on Wednesday 5th August in St<br>
+Cooey’s Oratory at 7.30pm<br>
+MASS INTENTIONS<br>
+Saturday 1st August: Sean Sands<br>
+Sunday 2nd August: Benedict Crawford (First Anniversary) , Frank Duff<br>
+Sunday 9th August: Seamus Donaldson, Isobel McGrattan<br>
+PARISH PILGRIMAGE TO KNOCK<br>
+For those travelling from Portaferry, the bus will leave the Square at 7.30am<br>
+sharp on Saturday 8th August .<br>
+Bishop Alan - will be celebrating Mass in Irish as part of the Fleadh on Sunday August 9th at<br>
+11am in St Patrick’s Church, Donegall Street.<br>
+Weekly Offering : £1,372.00 Thank you for your continued support and genero sity.<br>
+One day Pilgrimage to Lough Derg, On Saturday 5th September. Bus departs The Square,<br>
+Portaferry @ 6am. Cost £57.00. If interested, Contact: Donna<br>
+07549443799<br>
+School UNIFORM expenses. . We can help .<br>
+Ring our Confidential telephone : 07508 549701<br>
+All requests considered, l ift that phone and make the call.<br>
+Total Church donations for July came to £1,817.00.<br>
+Sing Praise – PresenCe donated £350 to SVP.<br>
+Many thanks to all our donors and their continued support, it is very much appreciated.<br>
+St. Patrick’s Community Centre, Portaferry<br>
+Mondays: Social Morning at 11.00am (come along and learn to play Whist – there are no<br>
+experts here !; New series of Guitar Lessons at 12.30pm (Free)<br>
+Tuesdays: Portaferry Crafters (Textiles) 10.30am – 12.30pm<br>
+Wednesdays: Gently Does it at 9.30am, Judo 5pm -9pm<br>
+Thursdays: The Hive (Arts and Crafts) 12.30pm – 2.30pm<br>
+Fridays : Party Dance at 9.30am; Walking Group 11.00am; Youth Club<br>
+The Ferry Film Club meets on the last Thursday of each month at 6.30pm. We are<br>
+welcoming younger members 16 to 30 to become involved.<br>
+Coming Soon! Netball Summer Camp. Be alert for details.<br>
+The facilities may be hired for family events and community events. Text<br>
+07542530006<br>
+This Photo by<br>
+Page 24<br>
+Fire Safety Training<br>
+St Patrick&#x27;s Community Centre Portaferry on Saturday 8th August at 9.30 am.<br>
+If you are an organization who would like to take advantage of this training, please text the word<br>
+FIRE to<br>
+07999945936<br>
+and leave your name before 1st August.<br>
+PORTAFERRY AND BALLYGALGET BAPTISM MINISTRY<br>
+Our newly commissioned Parish Baptism Team is a voluntary ministry that supports<br>
+parents, families and Priests as they prepare to celebrate the Sacrament of Baptism.<br>
+Central to their role is ensuring that every family experiences their Parish as a place of genuine<br>
+welcome and encouraging faith within the home beyond the day of their Baptism. Our Baptism<br>
+Ministers will help parents understand the meaning of the Rite and what it involves by:<br>
+• Welcoming parents and children into the Parish community.<br>
+• Providing a preparation session for parents (and Godparents if they wish to attend).<br>
+• Offering guidance on the symbols, prayers and commitments involved in the Sacrament.<br>
+• Helping parents participate more fully in the celebration on the day of Baptism.<br>
+May the time of preparation for Baptism be filled with peace, gratitude, and the loving presence of<br>
+God in our families.<br>
+BAPTISMS: Portaferry Parish: 2nd &amp; 4th Sunday of the month<br>
+Ballygalget Parish: 1st &amp; 3rd Sunday<br>
+Please book with the parish office, ( Not the parochial house.) Portaferry:<br>
+02842728373<br>
+Mon - Fri 9am - 1pm. Ballygalget:<br>
+07398623134<br>
+Wed or Fri 9am -1pm.<br>
+A copy of your child’s Birth Certificate (Long version) is required prior to Baptism date.<br>
+On the day, please bring a Baptism candle &amp; a White Shawl / Blanket.<br>
+Notices for the parish bulletin need to be with the parish office by Wednesday 12noon.<br>
+Anniversary notices can be left in the anniversary boxes in either church ,<br>
+(Boxes beside the candle shrines), sent by email, or rang into the office.<br>
+24 Hours of Prayer for Priestly Vocations, taking place on the Feast of St John Vianney.<br>
+The time of prayer will begin with Mass at 7.00 pm on Monday 3 August and conclude with Mass<br>
+at 7.00 pm on Tuesday 4 August.<br>
+Please encourage parish groups and parishioners to come along at any stage during the 24 hours<br>
+to pray for an increase in vocations to the diocesan priesthood. Hospitality will be available<br>
+throughout.<br>
+Our seminarians will be in attendance, along with some of our newly ordained priests. We would<br>
+especially encourage any young man who may be considering a vocation to the priesthood to<br>
+come and spend some time in prayer and meet those already discerning or living this vocation.<br>
+I would also be grateful if any priests who are available to assist with Confessions during the 24<br>
+hours could please let me know -<br>
+c.mcgrath@downandconnor.org<br>
+Man and Woman, He Created Them<br>
+The Priory Institute one week on -line Summer School is reflective, informative and interactive<br>
+and will run from 10 August. The course includes four recorded presentations and one online<br>
+zoom discussion and is very flexible as it is delivered entirely onli ne. Find out more and register<br>
+prioryinstitute.com<br>
+Page 25<br>
+Fuaimlaoi in Concert Thursday 6th August 7:00pm St Peter’s Cathedral<br>
+Experience the soul of Ireland with Fuaimlaoi —a captivating ensemble that blends ancient Irish<br>
+tradition with powerful sacred music by renowned Irish liturgical composer Ronan McDonagh .<br>
+Their rich harmonies, lyrical beauty and authentic spirit create a deeply moving concert<br>
+experience, connecting audiences with Ireland’s heritage, faith and timeless song. This<br>
+unforgettable performance is sure to be one of the highlights of the Fleadh Belfast Fringe<br>
+programme. Tickets: £5.50<br>
+Book now:<br>
+https://fleadhfringe.ticketsolve.com/ticketbooth/shows/1173683951<br>
+Don&#x27;t miss this special evening of music in the stunning surroundings of St Peter’s Cathedral.<br>
+24 Hours of Adoration on the Feast of Our Lady&#x27;s<br>
+Assumption<br>
+To honour the Feast of Our Lady&#x27;s Assumption the<br>
+Legion of Mary are organising 24 hours of Eucharistic<br>
+Adoration in St Agnes Church.<br>
+Adoration will begin after the 7pm Mass on Friday<br>
+14th August and will continue throughout the night<br>
+and throughout the day, ending before 6.30 vigil<br>
+Mass on 15th August.<br>
+St Theresa of Calcutta described time spent with<br>
+Jesus in the Blessed Sacrament as the &quot;best time<br>
+you will spend on earth&quot;.<br>
+Please come along and give thanks to Our Lady and<br>
+her Son Jesus.<br>
+Burren Outdoor Retreat , Friday 4th September to Sunday 6th September. Would you like to<br>
+come with us on a journey through the Burren with its limestone pavements, rare flora and ancient<br>
+sacred sites? Let the beauty of this place renew you in body and soul. Residential (people within<br>
+easy reach may commute). Contact Mary at<br>
+087 970 1130<br>
+for information or Des at<br>
+085 161 4951<br>
+for bookings.<br>
+Join us for the inaugural Féile tours of St Peter’s Cathedral, led by Stevie Corr, as we<br>
+celebrate its 160th anniversary!<br>
+Officially opened with great ceremony on 14 October 1866, St Peter’s Cathedral, with its iconic<br>
+twin spires, has stood at the heart of West Belfast ever since.<br>
+This special guided tour offers a unique opportunity to explore areas of the Cathedral that are rich<br>
+in history and significance, including:<br>
+The Chapel of the Resurrection, where three Bishops of Down and Connor are laid to rest.<br>
+The Sanctuary, home to the Bishop’s Cathedra (official seat).<br>
+The Aumbry, which houses the Holy Oils donated in memory of Fr Hugh Mullan and Fr Noel<br>
+Fitzpatrick, who lost their lives while anointing the wounded during the Ballymurphy shootings.<br>
+Tour dates: Monday 3 August at 3pm , Tuesday 4 August at 3 pm, Wednesday 5 August at 3pm<br>
+Thursday 6 August at 3pm<br>
+Tickets: £5 per person , payable at the entrance (please bring the exact amount).<br>
+Come and discover the history, heritage, and stories of one of Belfast’s most treasured landmarks.<br>
+Page 26<br>
+THE PARISHES OF POR TSTEWART, PORTRUSH &amp; BUSHMILL S &amp; ST. MALACHY’S COLERAINE<br>
+North Connor Pastoral Comm unity<br>
+Fr Kevin McGuckien PP Telephone:<br>
+028 7083 2534<br>
+Email:<br>
+k.mcguckien@downandconnor.org<br>
+9th August 2026 NINETEEN TH SUNDAY IN ORDINARY TIME Sunday A / Psalter Week 3<br>
+PORTSTEWART: 07508 549572 / PORTRUSH: 07508 549574 / COLERAINE: 07738 837959 If you have any item for inclusion in the parish weekend bulletin, please email:<br>
+portstewart@downandconnor.org<br>
+by 11am on Thursday. Thank you.<br>
+MASS TIMES<br>
+STAR OF THE SEA CHURCH, PORTSTEWART<br>
+TUESDAY : 7.00pm<br>
+WEDNESDAY – FRIDAY : 9.30am<br>
+FRIDAY – For Assumption: 7.00pm<br>
+SATURDAY - For Assumption : 9.30am<br>
+SATURDAY VIGIL MASS: 4.30 pm<br>
+SUNDAY MASS: 10.00am<br>
+CONFESSION:<br>
+SATURDAY: 4.00pm<br>
+EUCHARISTIC ADORATION - THURSDAY 10am -5pm<br>
+ST. MALACHY’S CHURCH , COLERAINE<br>
+TUES &amp; THURS : 10.00am<br>
+FRIDAY – Vigil for Assumption: 6.00pm<br>
+SATURDAY – For Assumption: 11.00am<br>
+SUNDAY MASS : 11.30am &amp; 5.00pm<br>
+CONFESSION:<br>
+SATURDAYS: After 10.00am Mass<br>
+SUNDAYS: 4.30 -4.50pm<br>
+ST. PATRICK’S CHURCH, PORTRUSH<br>
+MON , TUES &amp; FRI : 10.30am<br>
+SATURDAY – For Assumption: 10.30am<br>
+SUNDAY MASS: 12 Noon<br>
+EUCHARISTIC ADORATION - FRIDAY 11am -1pm<br>
+OUR LADY &amp; ST PATRICK’S CHURCH, BALLYMONEY<br>
+MON &amp; WED : 10.00am<br>
+SATURDAY – For Assumption 10.00a m<br>
+SATURDAY VIGIL MASS: 6.00pm<br>
+SUNDAY MASS: 9.30am<br>
+COLLECTIONS</p></div>
+    <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
+  </div>
+  <script>
+    (function () {
+      try {
+        if (new URLSearchParams(window.location.search).get('embed') === '1') {
+          document.body.classList.add('embed-mode');
+        }
+      } catch (e) {}
+    })();
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-text');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+    (function () {
+      const ocrRoot = document.getElementById('ocr-text');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      if (!ocrRoot || !ocrSearch) return;
+      const originalHtml = ocrRoot.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+      function escapeRegExp(text) {
+        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        ocrMatches[idx].classList.add('search-active');
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      function updateMatchUi() {
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} of ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+      function applySearch(query) {
+        ocrRoot.innerHTML = originalHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrRoot, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) nodes.push(node);
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) return;
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrRoot.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+      ocrSearch.addEventListener('input', (e) => applySearch(e.target.value.trim()));
+      clearSearch.addEventListener('click', () => { ocrSearch.value = ''; applySearch(''); ocrSearch.focus(); });
+      prevMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && ocrMatches.length) {
+          e.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>
