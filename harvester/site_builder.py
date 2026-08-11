@@ -30,6 +30,91 @@ EVIDENCE_DIOCESE_KEYS = {
     "raphoe": "raphoe_diocese",
 }
 
+@dataclass(frozen=True)
+class HeroSlide:
+    """One slide of the homepage hero slider.
+
+    Set ``image`` to a path relative to ``docs/`` (e.g.
+    ``"assets/hero/slide-1.jpg"``) to use a real photo instead of the CSS
+    gradient placeholder — see ``docs/assets/hero/README.md`` for details.
+    Frank can swap these in without touching any generated HTML.
+    """
+
+    gradient: str
+    eyebrow: str
+    title: str
+    subtitle: str
+    image: str | None = None
+
+
+# Placeholder slides — tasteful CSS gradients with overlaid text. No real
+# photos have been supplied yet; see docs/assets/hero/README.md for how to
+# add them (just set `image=` below, nothing else needs to change).
+HERO_SLIDES: list[HeroSlide] = [
+    HeroSlide(
+        image=None,
+        gradient="linear-gradient(135deg, #0f3d3d 0%, #1a6b6b 55%, #3fae9a 100%)",
+        eyebrow="Raphoe · Derry · Down & Connor",
+        title="Parish bulletins, all in one place",
+        subtitle="Auto-collected every Sunday, free forever.",
+    ),
+    HeroSlide(
+        image=None,
+        gradient="linear-gradient(135deg, #1f2f52 0%, #35508f 55%, #6f8fd4 100%)",
+        eyebrow="Every parish, every week",
+        title="Read the bulletin, or search the text",
+        subtitle="Full PDF viewer and searchable OCR text for every bulletin we collect.",
+    ),
+    HeroSlide(
+        image=None,
+        gradient="linear-gradient(135deg, #4a2545 0%, #7a3b66 55%, #c47a9a 100%)",
+        eyebrow="Built for the whole community",
+        title="No app, no login — just open and read",
+        subtitle="Works on any phone, tablet or computer. Subscribe by RSS or calendar if you'd like a nudge.",
+    ),
+]
+
+
+def _hero_slider_html() -> str:
+    if not HERO_SLIDES:
+        return ""
+    slides_html = []
+    dots_html = []
+    for i, slide in enumerate(HERO_SLIDES):
+        bg = (
+            f"linear-gradient(180deg, rgba(10,20,20,0.15) 0%, rgba(10,20,20,0.72) 100%), "
+            f"url('{html.escape(slide.image, quote=True)}') center/cover no-repeat"
+            if slide.image
+            else slide.gradient
+        )
+        active = " is-active" if i == 0 else ""
+        slides_html.append(
+            f'<div class="hero-slide{active}" style="background:{bg};" '
+            f'role="group" aria-roledescription="slide" aria-label="{i + 1} of {len(HERO_SLIDES)}" '
+            f'aria-hidden="{"false" if i == 0 else "true"}">'
+            f'<p class="hero-slide-eyebrow">{html.escape(slide.eyebrow)}</p>'
+            f'<h1 class="hero-slide-title">{html.escape(slide.title)}</h1>'
+            f'<p class="hero-slide-subtitle">{html.escape(slide.subtitle)}</p>'
+            "</div>"
+        )
+        dots_html.append(
+            f'<button type="button" class="hero-dot{" is-active" if i == 0 else ""}" '
+            f'data-slide-index="{i}" aria-label="Go to slide {i + 1}"></button>'
+        )
+    controls = (
+        '<button type="button" class="hero-nav hero-prev" aria-label="Previous slide">&#8249;</button>'
+        '<button type="button" class="hero-nav hero-next" aria-label="Next slide">&#8250;</button>'
+        if len(HERO_SLIDES) > 1
+        else ""
+    )
+    dots = f'<div class="hero-dots">{"".join(dots_html)}</div>' if len(HERO_SLIDES) > 1 else ""
+    return f"""<section class="hero-slider" data-hero-slider aria-roledescription="carousel" aria-label="Featured">
+    <div class="hero-slider-track">{"".join(slides_html)}</div>
+    {controls}
+    {dots}
+  </section>"""
+
+
 _CANONICAL_DIOCESES = [
     "Armagh",
     "Dublin",
@@ -519,23 +604,84 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
   <title>Parish Press — Irish Catholic Bulletins</title>
   <link rel=\"stylesheet\" href=\"assets/site.css\" />
   <style>
-    body {{ margin: 0; font-family: Arial, Helvetica, sans-serif; background: #f7fbfb; color: #16202a; }}
-    .hero {{ background: #1a6b6b; color: #fff; padding: 26px 18px; }}
-    .hero-inner, .content, .footer {{ max-width: 1180px; margin: 0 auto; }}
-    .banner {{ background: #fff4df; border: 1px solid #f5d08d; color: #704d0f; border-radius: 10px; padding: 10px 12px; margin-top: 12px; }}
-    .content {{ padding: 20px 16px 10px; }}
-    .section-title {{ margin: 4px 0 14px; font-size: 1rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.04em; color: #4b5563; }}
-    .live-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 16px; }}
-    .live-card {{ background: #fff; border: 1px solid #d6ecea; border-radius: 14px; padding: 18px; box-shadow: 0 6px 18px rgba(26, 107, 107, 0.06); }}
-    .live-card-eyebrow {{ margin: 0 0 8px; font-size: 0.82rem; font-weight: 700; color: #4b5563; text-transform: uppercase; letter-spacing: 0.04em; }}
+    * {{ box-sizing: border-box; }}
+    body {{
+      margin: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Arial, Helvetica, sans-serif;
+      background: #f5f8f8;
+      color: #16202a;
+      -webkit-font-smoothing: antialiased;
+    }}
+    a {{ color: #1a6b6b; }}
+    .topbar {{ background: #0f2f2f; color: #eafaf7; padding: 12px 18px; }}
+    .topbar-inner, .content, .footer {{ max-width: 1180px; margin: 0 auto; }}
+    .topbar-inner {{ display: flex; align-items: baseline; justify-content: space-between; flex-wrap: wrap; gap: 4px 16px; }}
+    .brand {{ font-weight: 800; font-size: 1.05rem; letter-spacing: 0.01em; }}
+    .brand span {{ opacity: 0.75; font-weight: 500; }}
+    .topbar-tagline {{ margin: 0; font-size: 0.85rem; color: #b9dfd9; }}
+
+    /* Hero image/gradient slider */
+    .hero-slider {{
+      position: relative;
+      overflow: hidden;
+      height: min(52vw, 360px);
+      min-height: 220px;
+      background: #0f2f2f;
+    }}
+    .hero-slider-track {{ position: relative; width: 100%; height: 100%; }}
+    .hero-slide {{
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      gap: 6px;
+      padding: 22px 20px 30px;
+      opacity: 0;
+      transition: opacity 900ms ease;
+      color: #fff;
+    }}
+    .hero-slide.is-active {{ opacity: 1; z-index: 1; }}
+    .hero-slide-eyebrow {{ margin: 0; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #d8f3ee; text-shadow: 0 1px 3px rgba(0,0,0,0.35); }}
+    .hero-slide-title {{ margin: 0; font-size: clamp(1.4rem, 4vw, 2.35rem); line-height: 1.15; font-weight: 800; max-width: 46rem; text-shadow: 0 2px 8px rgba(0,0,0,0.35); }}
+    .hero-slide-subtitle {{ margin: 0; font-size: clamp(0.9rem, 1.6vw, 1.05rem); color: #eef7f5; max-width: 40rem; text-shadow: 0 1px 4px rgba(0,0,0,0.35); }}
+    .hero-nav {{
+      position: absolute; top: 50%; transform: translateY(-50%);
+      width: 38px; height: 38px; border-radius: 999px; border: none;
+      background: rgba(10, 25, 25, 0.38); color: #fff; font-size: 1.4rem; line-height: 1;
+      cursor: pointer; display: flex; align-items: center; justify-content: center;
+      z-index: 2; transition: background 150ms ease;
+    }}
+    .hero-nav:hover {{ background: rgba(10, 25, 25, 0.6); }}
+    .hero-prev {{ left: 12px; }}
+    .hero-next {{ right: 12px; }}
+    .hero-dots {{ position: absolute; left: 0; right: 0; bottom: 10px; z-index: 2; display: flex; justify-content: center; gap: 7px; }}
+    .hero-dot {{ width: 8px; height: 8px; padding: 0; border-radius: 999px; border: none; background: rgba(255,255,255,0.45); cursor: pointer; }}
+    .hero-dot.is-active {{ background: #fff; width: 20px; }}
+    .hero-dot {{ transition: width 200ms ease, background 200ms ease; }}
+    @media (prefers-reduced-motion: reduce) {{
+      .hero-slide {{ transition: none; }}
+      .hero-dot {{ transition: none; }}
+    }}
+
+    .intro {{ padding: 22px 16px 4px; text-align: center; }}
+    .intro p {{ margin: 0 auto; max-width: 46rem; color: #45565f; font-size: 1.02rem; line-height: 1.5; }}
+    .banner {{ background: #fff4df; border: 1px solid #f5d08d; color: #704d0f; border-radius: 10px; padding: 10px 14px; margin: 14px auto 0; max-width: 46rem; font-size: 0.9rem; }}
+
+    .content {{ padding: 22px 16px 10px; }}
+    .section-title {{ margin: 8px 0 14px; font-size: 0.92rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #4b5563; }}
+    .live-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 18px; }}
+    .live-card {{ background: #fff; border: 1px solid #d6ecea; border-radius: 16px; padding: 20px; box-shadow: 0 8px 22px rgba(15, 47, 47, 0.07); transition: transform 150ms ease, box-shadow 150ms ease; }}
+    .live-card:hover {{ transform: translateY(-2px); box-shadow: 0 12px 28px rgba(15, 47, 47, 0.11); }}
+    .live-card-eyebrow {{ margin: 0 0 8px; font-size: 0.8rem; font-weight: 700; color: #4b5563; text-transform: uppercase; letter-spacing: 0.04em; }}
     .live-card h2 {{ margin: 0 0 6px; font-size: 1.35rem; color: #114b4b; }}
-    .live-card-updated {{ margin: 0 0 16px; color: #4b5563; font-size: 0.9rem; }}
+    .live-card-updated {{ margin: 0 0 16px; color: #6b7686; font-size: 0.88rem; }}
     .live-card-actions {{ display: flex; flex-wrap: wrap; gap: 8px; }}
     .live-btn {{ display: inline-flex; align-items: center; padding: 9px 14px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; text-decoration: none; }}
     .live-btn.primary {{ background: #1a6b6b; color: #fff; }}
     .live-btn.secondary {{ background: #eef8f7; color: #1a6b6b; border: 1px solid #cfe8e6; }}
     .live-btn:hover {{ opacity: 0.92; text-decoration: none; }}
-    .more-dioceses {{ margin-top: 26px; background: #fff; border: 1px solid #d6ecea; border-radius: 12px; padding: 14px 18px; }}
+    .more-dioceses {{ margin-top: 28px; background: #fff; border: 1px solid #d6ecea; border-radius: 14px; padding: 16px 20px; }}
     .more-dioceses summary {{ cursor: pointer; font-weight: 700; color: #1a6b6b; list-style: none; }}
     .more-dioceses summary::-webkit-details-marker {{ display: none; }}
     .more-dioceses summary::before {{ content: "▸ "; }}
@@ -545,23 +691,28 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     .more-dioceses-grid li {{ margin: 0; font-size: 0.92rem; }}
     .more-dioceses-grid a {{ color: #375569; text-decoration: none; }}
     .more-dioceses-grid a:hover {{ text-decoration: underline; color: #1a6b6b; }}
-    .footer {{ border-top: 1px solid #d6ecea; margin-top: 18px; padding: 14px 16px 24px; color: #4b5563; font-size: 0.95rem; }}
+    .footer {{ border-top: 1px solid #d6ecea; margin-top: 28px; padding: 16px 16px 28px; color: #5a6672; font-size: 0.92rem; line-height: 1.8; }}
     .footer a {{ color: #1a6b6b; text-decoration: none; }}
     .footer a:hover {{ text-decoration: underline; }}
     @media (max-width: 640px) {{
       .live-btn {{ flex: 1 1 auto; justify-content: center; }}
+      .hero-nav {{ width: 32px; height: 32px; font-size: 1.2rem; }}
     }}
   </style>
 </head>
 <body>
-  <header class=\"hero\">
-    <div class=\"hero-inner\">
-      <h1>Parish Press — Irish Catholic Bulletins</h1>
-      <p>Auto-collected every Sunday. Free forever.</p>
+  <div class=\"topbar\">
+    <div class=\"topbar-inner\">
+      <div class=\"brand\">Parish Press <span>· Irish Catholic Bulletins</span></div>
+      <p class=\"topbar-tagline\">Auto-collected every Sunday. Free forever.</p>
+    </div>
+  </div>
+  {_hero_slider_html()}
+  <main class=\"content\">
+    <div class=\"intro\">
+      <p>Every week we automatically fetch each parish's bulletin, stitch them into one collated PDF per diocese, and make the text searchable — so you can read your parish notices without hunting through a website.</p>
       <p class=\"banner\">🤖 Bulletins are auto-collected from parish websites. OCR may contain errors. Always check the original PDF.</p>
     </div>
-  </header>
-  <main class=\"content\">
     <p class=\"section-title\">Live dioceses</p>
     <section class=\"live-grid\">{live_cards_html}</section>
     <details class=\"more-dioceses\">
@@ -582,6 +733,59 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     <p><a href=\"subscribe/\">📬 Subscribe for reminders</a></p>
     <p>© 2026 Parish Press</p>
   </footer>
+  <script>
+  (function () {{
+    var slider = document.querySelector('[data-hero-slider]');
+    if (!slider) return;
+    var slides = Array.prototype.slice.call(slider.querySelectorAll('.hero-slide'));
+    var dots = Array.prototype.slice.call(slider.querySelectorAll('.hero-dot'));
+    if (slides.length < 2) return;
+
+    var current = 0;
+    var reduceMotion = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var AUTO_ADVANCE_MS = 6000;
+    var timer = null;
+
+    function show(index) {{
+      current = (index + slides.length) % slides.length;
+      slides.forEach(function (slide, i) {{
+        var active = i === current;
+        slide.classList.toggle('is-active', active);
+        slide.setAttribute('aria-hidden', active ? 'false' : 'true');
+      }});
+      dots.forEach(function (dot, i) {{
+        dot.classList.toggle('is-active', i === current);
+      }});
+    }}
+
+    function next() {{ show(current + 1); }}
+    function prev() {{ show(current - 1); }}
+
+    function startAuto() {{
+      if (reduceMotion) return;
+      stopAuto();
+      timer = window.setInterval(next, AUTO_ADVANCE_MS);
+    }}
+    function stopAuto() {{
+      if (timer) {{ window.clearInterval(timer); timer = null; }}
+    }}
+
+    var prevBtn = slider.querySelector('.hero-prev');
+    var nextBtn = slider.querySelector('.hero-next');
+    if (prevBtn) prevBtn.addEventListener('click', function () {{ prev(); startAuto(); }});
+    if (nextBtn) nextBtn.addEventListener('click', function () {{ next(); startAuto(); }});
+    dots.forEach(function (dot, i) {{
+      dot.addEventListener('click', function () {{ show(i); startAuto(); }});
+    }});
+
+    slider.addEventListener('mouseenter', stopAuto);
+    slider.addEventListener('mouseleave', startAuto);
+    slider.addEventListener('focusin', stopAuto);
+    slider.addEventListener('focusout', startAuto);
+
+    startAuto();
+  }})();
+  </script>
 </body>
 </html>
 """

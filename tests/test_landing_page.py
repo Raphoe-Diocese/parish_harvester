@@ -102,6 +102,53 @@ class LandingPageTests(unittest.TestCase):
             for key in links:
                 self.assertTrue((docs / "dioceses" / key / "index.html").exists(), key)
 
+            # Homepage hero image/gradient slider: auto-advancing carousel
+            # with prev/next controls, dot indicators, and reduced-motion
+            # support — plain CSS/vanilla JS, no framework.
+            self.assertIn('data-hero-slider', index_html)
+            self.assertEqual(
+                index_html.count('aria-roledescription="slide"'), len(site_builder.HERO_SLIDES)
+            )
+            self.assertIn('hero-prev', index_html)
+            self.assertIn('hero-next', index_html)
+            self.assertEqual(index_html.count('data-slide-index="'), len(site_builder.HERO_SLIDES))
+            self.assertIn('prefers-reduced-motion', index_html)
+            self.assertIn('matchMedia', index_html)
+
+
+class HeroSliderRenderTests(unittest.TestCase):
+    def test_hero_slider_html_uses_gradient_when_no_image(self) -> None:
+        markup = site_builder._hero_slider_html()
+        self.assertIn('linear-gradient', markup)
+        self.assertNotIn('url(', markup)
+
+    def test_hero_slider_html_uses_photo_when_image_set(self) -> None:
+        original = site_builder.HERO_SLIDES
+        try:
+            site_builder.HERO_SLIDES = [
+                site_builder.HeroSlide(
+                    image="assets/hero/slide-1.jpg",
+                    gradient="linear-gradient(135deg, #000, #fff)",
+                    eyebrow="Test",
+                    title="Test title",
+                    subtitle="Test subtitle",
+                )
+            ]
+            markup = site_builder._hero_slider_html()
+        finally:
+            site_builder.HERO_SLIDES = original
+        self.assertIn("url('assets/hero/slide-1.jpg')", markup)
+        self.assertIn("Test title", markup)
+
+    def test_hero_slider_html_empty_when_no_slides(self) -> None:
+        original = site_builder.HERO_SLIDES
+        try:
+            site_builder.HERO_SLIDES = []
+            markup = site_builder._hero_slider_html()
+        finally:
+            site_builder.HERO_SLIDES = original
+        self.assertEqual(markup, "")
+
 
 if __name__ == "__main__":
     unittest.main()
