@@ -3,42 +3,27 @@
   "parish_key": "newtownkilleaparish",
   "display_name": "Newtown Killea",
   "diocese": "raphoe",
-  "start_url": "https://newtownkilleaparish.ie/wp-content/uploads/2026/07/Newsletter-12th-July-2026.pdf",
+  "start_url": "https://newtownkilleaparish.ie/bulletin/",
   "steps": [
-    {
-      "action": "goto",
-      "url": "https://newtownkilleaparish.ie/wp-content/uploads/2026/07/Newsletter-12th-July-2026.pdf"
-    },
     {
       "action": "download",
       "url": "https://newtownkilleaparish.ie/wp-content/uploads/2026/07/Newsletter-12th-July-2026.pdf",
       "use_captured_url": true
     }
   ],
-  "observed_load_ms": 1377,
-  "timeout_ms": 45000,
-  "total_timeout_s": 90,
-  "recorded_date": "2026-08-10",
-  "operator_notes_2026_08_10": [
-    "Investigated (not a recipe/selector bug): newtownkilleaparish.ie is",
-    "entirely behind a Cloudflare Managed Challenge \u2014 the homepage, /bulletin/,",
-    "and even the /wp-content/uploads/YYYY/MM/ directory all return HTTP 403",
-    "'Just a moment...' in both headless AND headful Playwright chromium (same",
-    "signature as naomhfionan). There is no listing page to scrape to find the",
-    "true newest bulletin \u2014 use_target_url + date-rewrite guessing was tried",
-    "against the wp-content/uploads static path (which is NOT behind the",
-    "challenge) but the parish does not post every single week under a",
-    "predictable ordinal-date filename: probed ~12 candidate dates between",
-    "28 June and 10 August 2026 directly and only 28th-June and 12th-July",
-    "actually exist (200), everything else in between/since 404s \u2014 so a",
-    "target-date guess this week would 404 most weeks and turn a soft 'stale'",
-    "into a hard 'failed', which is worse. Updated the pinned URL from the old",
-    "trained 28th-June-2026.pdf to the newer confirmed-real 12th-July-2026.pdf",
-    "(verified real bulletin content, not a placeholder) \u2014 4 weeks less stale",
-    "than before, though still stale.",
-    "Genuine dead-end without either a Cloudflare allowlist rule from the site",
-    "owner or the parish adopting a guessable weekly URL; re-probe manually",
-    "every few weeks by trying nearby wp-content/uploads/YYYY/MM/Newsletter-",
-    "Dth-Month-YYYY.pdf dates directly with curl."
-  ]
+  "observed_load_ms": 17447.60009765625,
+  "timeout_ms": 55000,
+  "total_timeout_s": 190,
+  "playbook_type": "pdf_download_list",
+  "site_type": "pdf_link_list",
+  "operator_notes": [
+    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
+    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+    "Do not worry if the filename or date in the link text changes every week."
+  ],
+  "do_not": [
+    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
+    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+  ],
+  "recorded_date": "2026-08-16"
 }
