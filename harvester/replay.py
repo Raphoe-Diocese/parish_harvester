@@ -24,6 +24,7 @@ from PyPDF2 import PdfReader
 from .cloud_folders import (
     is_cloud_folder_click_step,
     is_year_folder_click_step,
+    newest_yy_mm_dd_label,
     rewrite_cloud_folder_click_step,
     rewrite_year_folder_click_step,
 )
@@ -2099,8 +2100,86 @@ async def _replay_click_by_strategy(
     return False
 
 
+async def _drive_folder_rows(page: Page) -> list[dict]:
+    try:
+        rows = await page.evaluate(
+            """() => Array.from(document.querySelectorAll('[role="row"]')).map((row) => ({
+              text: ((row.innerText || row.textContent || '') + '').replace(/\\s+/g, ' ').trim().slice(0, 300),
+              id: row.getAttribute('data-id')
+            }))"""
+        )
+    except Exception:
+        return []
+    if not isinstance(rows, list):
+        return []
+    out: list[dict] = []
+    for row in rows:
+        if not isinstance(row, dict):
+            continue
+        out.append(
+            {
+                "text": str(row.get("text") or ""),
+                "id": str(row.get("id") or "").strip(),
+            }
+        )
+    return out
+
+
+async def _open_drive_year_folder(page: Page, year: int, timeout_ms: int) -> None:
+    """Open the year-named subfolder by Drive data-id (no brittle UI clicks)."""
+    year_label = str(year)
+    folder_id = None
+    # Drive folder listings hydrate after first paint — retry briefly.
+    deadline = asyncio.get_event_loop().time() + min(max(timeout_ms / 1000, 5), 45)
+    while folder_id is None and asyncio.get_event_loop().time() < deadline:
+        for row in await _drive_folder_rows(page):
+            text = (row.get("text") or "").strip()
+            if not text.startswith(year_label):
+                continue
+            # Accept "2026 …"; reject longer numeric tokens like "20260".
+            if len(text) > len(year_label) and text[len(year_label)].isdigit():
+                continue
+            folder_id = row.get("id") or None
+            if folder_id:
+                break
+        if folder_id:
+            break
+        await page.wait_for_timeout(500)
+    if not folder_id:
+        raise RecipeReplayError(
+            f"Cloud year folder {year_label} not found on Drive listing — "
+            "check the parent folder URL / sharing"
+        )
+    await page.goto(
+        f"https://drive.google.com/drive/folders/{folder_id}",
+        timeout=min(timeout_ms, 60_000),
+        wait_until="domcontentloaded",
+    )
+    try:
+        await page.wait_for_load_state("networkidle", timeout=min(timeout_ms, 8_000))
+    except Exception:
+        pass
+    await page.wait_for_timeout(1500)
+    if f"/folders/{folder_id}" not in (page.url or ""):
+        raise RecipeReplayError(
+            f"Failed to open Drive year folder {year_label} ({folder_id})"
+        )
+
+
+async def _selected_drive_row_id(page: Page) -> str | None:
+    try:
+        file_id = await page.evaluate(
+            "() => { const row = document.querySelector('[role=\"row\"][aria-selected=\"true\"]'); "
+            "return row ? row.getAttribute('data-id') : null; }"
+        )
+    except Exception:
+        return None
+    token = str(file_id or "").strip()
+    return token or None
+
+
 async def _open_selected_drive_row(page: Page, timeout_ms: int) -> None:
-    """Open the Drive folder row just clicked.
+    """Open the Drive *file* row just clicked.
 
     A single click on a Drive folder row only selects/highlights it (sets
     ``aria-selected="true"`` on the ``<tr>``) — it does not navigate
@@ -2116,13 +2195,7 @@ async def _open_selected_drive_row(page: Page, timeout_ms: int) -> None:
     following download step had nothing to find, "did not find a matching
     document URL").
     """
-    try:
-        file_id = await page.evaluate(
-            "() => { const row = document.querySelector('[role=\"row\"][aria-selected=\"true\"]'); "
-            "return row ? row.getAttribute('data-id') : null; }"
-        )
-    except Exception:
-        file_id = None
+    file_id = await _selected_drive_row_id(page)
     if file_id:
         download_url = f"https://drive.google.com/uc?export=download&id={file_id}"
         try:
@@ -2137,6 +2210,37 @@ async def _open_selected_drive_row(page: Page, timeout_ms: int) -> None:
         pass
 
 
+async def _click_newest_cloud_pdf_row(page: Page, timeout_ms: int) -> bool:
+    """Download the Drive row with the newest YY.MM.DD.pdf filename via data-id."""
+    rows = await _drive_folder_rows(page)
+    if not rows:
+        return False
+    label = newest_yy_mm_dd_label([row.get("text") or "" for row in rows])
+    if not label:
+        return False
+    file_id = None
+    for row in rows:
+        if label in (row.get("text") or ""):
+            file_id = row.get("id") or None
+            if file_id:
+                break
+    if file_id:
+        download_url = f"https://drive.google.com/uc?export=download&id={file_id}"
+        try:
+            await page.goto(download_url, timeout=min(timeout_ms, 30_000))
+        except Exception:
+            pass
+        return True
+    try:
+        escaped = label.replace("'", "\\'")
+        locator = page.locator(f'[role="row"]:has-text("{escaped}")').first
+        await _click_locator_match(page, locator, timeout_ms)
+        await _open_selected_drive_row(page, timeout_ms)
+        return True
+    except Exception:
+        return False
+
+
 async def _replay_click(
     page: Page,
     step: dict,
@@ -2144,13 +2248,28 @@ async def _replay_click(
     *,
     target_date: date | None = None,
 ) -> None:
+    is_year_folder = is_year_folder_click_step(step)
     is_cloud_folder = is_cloud_folder_click_step(step)
+    pick_strategy = (step.get("pick_strategy") or "").strip().lower()
+    prefer_newest_cloud = is_cloud_folder and pick_strategy == "newest_dated"
+
     if target_date:
-        if is_year_folder_click_step(step):
+        if is_year_folder:
             step = rewrite_year_folder_click_step(step, target_date)
-        if is_cloud_folder_click_step(step):
+        elif is_cloud_folder and not prefer_newest_cloud:
             step = rewrite_cloud_folder_click_step(step, target_date)
             is_cloud_folder = True
+        elif is_cloud_folder:
+            is_cloud_folder = True
+
+    # Year folders: resolve data-id from the listing and navigate directly.
+    # A lone click only highlights the row; Enter/open is flaky in headless Drive.
+    if is_year_folder:
+        year = target_date.year if target_date else int(str(step.get("text") or "0") or 0)
+        if year < 2000:
+            raise RecipeReplayError("Cloud year folder click missing target year")
+        await _open_drive_year_folder(page, year, step_timeout_ms)
+        return
 
     selectors: list[str] = []
     selector = (step.get("selector") or "").strip()
@@ -2163,10 +2282,23 @@ async def _replay_click(
     if not selectors:
         raise RecipeReplayError("Recipe click step missing selector")
 
-    if step.get("pick_strategy"):
+    # Drive folder listings are role=row grids, not <a href> lists — the
+    # generic newest_dated anchor scorer cannot see them.
+    if prefer_newest_cloud:
+        if await _click_newest_cloud_pdf_row(page, step_timeout_ms):
+            return
+        if target_date:
+            step = rewrite_cloud_folder_click_step(step, target_date)
+            selectors = [(step.get("selector") or "").strip()]
+            selectors.extend(
+                s.strip()
+                for s in step.get("fallback_selectors", [])
+                if isinstance(s, str) and s.strip()
+            )
+            selectors = [s for s in selectors if s]
+
+    if step.get("pick_strategy") and not is_cloud_folder and not is_year_folder:
         if await _replay_click_by_strategy(page, step, selectors, step_timeout_ms):
-            if is_cloud_folder:
-                await _open_selected_drive_row(page, step_timeout_ms)
             return
 
     errors: list[str] = []

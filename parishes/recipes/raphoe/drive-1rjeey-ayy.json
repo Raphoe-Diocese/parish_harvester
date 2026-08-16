@@ -1,5 +1,5 @@
 {
-  "version": 3,
+  "version": 4,
   "parish_key": "drive-1rjeey-ayy",
   "parish_name": "Bruckless",
   "display_name": "Bruckless",
@@ -8,32 +8,46 @@
   "playbook_type": "cloud_folder",
   "cloud_folder": true,
   "date_format": "YY.MM.DD",
-  "recorded_date": "2026-07-05",
-  "start_url": "https://drive.google.com/drive/folders/1z9goh6DrkCUkpJMDbwfsi28Yc_t0_ltC",
+  "recorded_date": "2026-08-16",
+  "start_url": "https://drive.google.com/drive/folders/1jPOi4GRU22vAxeKNe5Y_doBJ3riPh7ZK",
   "auto_fixed": true,
   "operator_notes": [
-    "Google Drive 2026 folder — bulletins named YY.MM.DD.pdf (e.g. 26.07.05.pdf for 5 July 2026).",
-    "Parent folder (1jPOi4…) lists year subfolders; harvest opens the 2026 folder directly.",
-    "Harvester rewrites the click to this Sunday's filename each week — do not pin a fixed date."
+    "Church of St Joseph & St Conal, Bruckless — Google Drive yearly archive.",
+    "Parent (Parish Newsletter): 1jPOi4GRU22vAxeKNe5Y_doBJ3riPh7ZK — year folders 2021…2026.",
+    "Current-year folder (2026 PDFs): 1z9goh6DrkCUkpJMDbwfsi28Yc_t0_ltC — do not hardcode as start_url; year IDs change.",
+    "Harvest: open parent → click target year row → pick newest YY.MM.DD.pdf (e.g. 26.08.16.pdf = 16 Aug 2026).",
+    "Filenames are YY.MM.DD (not DD.MM.YY). New file ID each week — never pin /file/d/… permanently."
   ],
   "do_not": [
-    "Do not use the parent Drive folder URL as the harvest start — it returns HTML, not a PDF.",
-    "Do not pin June-2026-style filenames — harvest picks the current Sunday row automatically."
+    "Do not train Drive 'More actions' / three-dot menu CSS selectors — they break every week.",
+    "Do not start harvest on the year-folder ID alone — start on the parent so 2027 works automatically.",
+    "Do not pin a permanent /file/d/FILE_ID link — Bruckless uploads a new file each week."
   ],
   "steps": [
     {
       "action": "goto",
-      "url": "https://drive.google.com/drive/folders/1z9goh6DrkCUkpJMDbwfsi28Yc_t0_ltC"
+      "url": "https://drive.google.com/drive/folders/1jPOi4GRU22vAxeKNe5Y_doBJ3riPh7ZK"
     },
     {
       "action": "click",
-      "text": "26.06.28.pdf",
+      "text": "2026",
+      "year_folder": true,
+      "selector": "[role=\"row\"]:has-text('2026')",
+      "fallback_selectors": [
+        "[role=\"gridcell\"]:has-text('2026')",
+        ":has-text('2026')"
+      ]
+    },
+    {
+      "action": "click",
+      "text": "26.08.16.pdf",
       "cloud_folder": true,
       "date_format": "YY.MM.DD",
-      "selector": "[role=\"row\"]:has-text('26.06.28.pdf')",
+      "pick_strategy": "newest_dated",
+      "selector": "[role=\"row\"]:has-text('26.08.16.pdf')",
       "fallback_selectors": [
-        "[role=\"gridcell\"]:has-text('26.06.28.pdf')",
-        ":has-text('26.06.28.pdf')"
+        "[role=\"gridcell\"]:has-text('26.08.16.pdf')",
+        ":has-text('26.08.16.pdf')"
       ]
     },
     {
