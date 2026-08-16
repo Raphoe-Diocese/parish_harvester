@@ -2,16 +2,16 @@
   "generated_at": "2026-08-16",
   "target_date": "2026-08-16",
   "summary": {
-    "downloaded": 75,
+    "downloaded": 76,
     "html_links": 0,
     "skipped": 15,
-    "failed": 33,
+    "failed": 32,
     "stale_rejected": 0
   },
   "action_counts": {
-    "ok": 73,
+    "ok": 74,
     "retrain": 4,
-    "investigate": 26,
+    "investigate": 25,
     "skip": 15
   },
   "parishes": [
@@ -253,25 +253,17 @@
       "recipe_file": "parishes/recipes/down_and_connor/antrimparish.json",
       "recipe": {
         "start_url": "https://www.antrimparish.com/bulletinpage/",
-        "site_type": "wp_pdfemb",
-        "playbook_type": "pdfemb",
+        "site_type": "",
+        "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 2,
+        "step_count": 1,
         "click_count": 0,
         "has_terminal": true,
-        "operator_notes": [
-          "PDF Embedder shows weekly PDFs as canvases (no a.pdfemb-viewer href) \u2014 harvester reads network *.pdf URLs.",
-          "Newest current-week PDF is preferred (e.g. 26th-July-2026.pdf). Ignore Volunteer-EOI.",
-          "Site SSL certificate is often expired \u2014 host profile sets ignore_https_errors."
-        ],
-        "do_not": [
-          "Do not hardcode one dated PDF URL \u2014 it changes every week.",
-          "Do not download Volunteer-EOI or other non-bulletin PDFs on the page.",
-          "Do not wait forever for a.pdfemb-viewer[href] \u2014 this site uses canvas embeds."
-        ],
-        "recorded_date": "2026-07-29"
+        "operator_notes": [],
+        "do_not": [],
+        "recorded_date": "2026-08-16"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
@@ -285,10 +277,10 @@
         "notes": "SSL cert often expired. PDF Embedder loads PDFs from www-static.antrimparish.com via network (may have no a.pdfemb-viewer href)."
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: Page.goto: Timeout 90000ms exceeded.\nCall log:\n  - navigating to \"https://www.antrimparish.com/bulletinpage/\", waiting until \"commit\"\n",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: Page.goto: Timeout 90000ms exceeded.\nCall log:\n  - navigating to \"https://www.antrimparish.com/bulletinpage/\", waiting until \"commit\"\n"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "ardara",
@@ -3770,18 +3762,25 @@
       "diocese": "raphoe",
       "recipe_file": "parishes/recipes/raphoe/tawnawillyparish.json",
       "recipe": {
-        "start_url": "https://tawnawillyparish.ie/wp-content/uploads/Sunday-28th-June.pdf",
-        "site_type": "",
-        "playbook_type": "",
+        "start_url": "https://tawnawillyparish.ie/bulletin/",
+        "site_type": "pdf_link_list",
+        "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 2,
+        "step_count": 1,
         "click_count": 0,
         "has_terminal": true,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-06-27"
+        "operator_notes": [
+          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
+          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+          "Do not worry if the filename or date in the link text changes every week."
+        ],
+        "do_not": [
+          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
+          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+        ],
+        "recorded_date": "2026-08-16"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
