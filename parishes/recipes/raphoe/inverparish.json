@@ -3,20 +3,42 @@
   "parish_key": "inverparish",
   "display_name": "Inver",
   "diocese": "raphoe",
-  "start_url": "https://www.inverparish.com/uploads/2/5/2/9/25295787/inver_parish_newsletter_-_sat_27th__-_sun_28th__june_2026.pdf",
+  "start_url": "https://www.inverparish.com/parish-newsletter.html",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.inverparish.com/uploads/2/5/2/9/25295787/inver_parish_newsletter_-_sat_27th__-_sun_28th__june_2026.pdf"
+      "action": "click",
+      "selector": "a:has-text(\"Download File\")",
+      "href": "/uploads/2/5/2/9/25295787/inver_parish_newsletter_-_sat_15th__-_sun_16th_august_2026.pdf",
+      "text": "Download File",
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "bottom",
+      "fallback_selectors": [
+        "a[href$='.pdf']",
+        "a[href*='.pdf']"
+      ]
     },
     {
       "action": "download",
-      "url": "https://www.inverparish.com/uploads/2/5/2/9/25295787/inver_parish_newsletter_-_sat_27th__-_sun_28th__june_2026.pdf",
-      "use_captured_url": true
+      "url": "https://www.inverparish.com/uploads/2/5/2/9/25295787/inver_parish_newsletter_-_sat_15th__-_sun_16th_august_2026.pdf"
     }
   ],
-  "observed_load_ms": 1211,
-  "timeout_ms": 45000,
-  "total_timeout_s": 90,
-  "recorded_date": "2026-06-27"
+  "observed_load_ms": 4927.60009765625,
+  "timeout_ms": 55000,
+  "total_timeout_s": 250,
+  "playbook_type": "pdf_download_list",
+  "site_type": "pdf_link_list",
+  "operator_notes": [
+    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
+    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+    "Do not worry if the filename or date in the link text changes every week."
+  ],
+  "do_not": [
+    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
+    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "bottom"
+  },
+  "recorded_date": "2026-08-16"
 }
