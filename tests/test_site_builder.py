@@ -114,6 +114,10 @@ class SiteBuilderTests(unittest.TestCase):
             self.assertNotIn("callout-tip", derry_page)
             self.assertIn("min-height: 850px", derry_page)
             self.assertIn("Georgia", derry_page)
+            self.assertIn("pdf-inpage-viewer", derry_page)
+            self.assertIn("/assets/pdf-inpage-viewer.js", derry_page)
+            self.assertIn('src="/mega_pdf/derry_mega_bulletin.pdf"', derry_page)
+            self.assertIn('data-pdf-src="/mega_pdf/derry_mega_bulletin.pdf"', derry_page)
 
 
 if __name__ == "__main__":

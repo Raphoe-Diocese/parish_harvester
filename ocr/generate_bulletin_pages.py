@@ -1101,46 +1101,86 @@ def prefers_native_pdf_js() -> str:
 """
 
 
-def pdf_mobile_fallback_css() -> str:
-    """Phone/tablet PDF panel.
+PDF_INPAGE_VIEWER_SRC = "/assets/pdf-inpage-viewer.js"
 
-    Primary path is CSS ``max-width: 1024px`` (no JS required): hide the
-    iframe/embed and show View PDF + Download buttons. JS ``is-native-pdf``
-    remains as a backup for wide tablets that still cannot embed PDFs.
+
+def pdf_inpage_viewer_css() -> str:
+    """Phone/tablet: hide the raw-PDF iframe, show the in-page PDF.js viewer.
+
+    Desktop keeps the native iframe (850px). Mobile/tablet use a 450px-tall
+    canvas viewer so the bulletin is visible on the page — not a new tab.
     """
     return f"""
+    .pdf-inpage-viewer,
     .pdf-mobile-fallback {{
       display: none;
       flex-direction: column;
+      min-height: 0;
+      flex: 1 1 auto;
+      background: #3a3f42;
+      color: #e8eeed;
+    }}
+    .pdf-inpage-toolbar {{
+      display: flex;
+      flex-wrap: wrap;
       align-items: center;
-      justify-content: center;
-      gap: 12px;
-      padding: 36px 20px;
-      text-align: center;
-      min-height: 220px;
-      background: #eef2f2;
+      justify-content: space-between;
+      gap: 8px;
+      padding: 8px 10px;
+      background: {DEEP_TEAL};
+      color: #fff;
+      flex: 0 0 auto;
+    }}
+    .pdf-inpage-nav {{ display: flex; align-items: center; gap: 8px; }}
+    .pdf-inpage-nav button {{
+      min-width: 44px;
+      min-height: 40px;
+      border: 1px solid rgba(255,255,255,0.35);
+      border-radius: 6px;
+      background: {TEAL};
+      color: #fff;
+      font-size: 1.25rem;
+      font-weight: 700;
+    }}
+    .pdf-inpage-page-label {{ font-size: 0.9rem; font-weight: 700; min-width: 7rem; text-align: center; }}
+    .pdf-inpage-backup {{ display: flex; gap: 8px; flex-wrap: wrap; }}
+    .pdf-inpage-backup a {{ color: #fff; font-weight: 700; font-size: 0.85rem; }}
+    .pdf-inpage-status {{ padding: 10px 12px; background: #1f3d3c; color: #d8f0ee; font-size: 0.9rem; }}
+    .pdf-inpage-pages {{
+      flex: 1 1 auto;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      background: #525659;
+      padding: 8px 0 16px;
     }}
     .pdf-frame-wrap.is-native-pdf,
     body.is-native-pdf .pdf-standalone-shell {{
-      height: auto;
-      min-height: 0;
-      background: #eef2f2;
+      height: 70vh;
+      min-height: 450px;
+      display: flex;
+      flex-direction: column;
+      background: #3a3f42;
     }}
     .pdf-frame-wrap.is-native-pdf iframe,
     .pdf-frame-wrap.is-native-pdf .fullscreen-btn,
     body.is-native-pdf iframe.pdf-frame {{
       display: none !important;
     }}
+    .pdf-frame-wrap.is-native-pdf .pdf-inpage-viewer,
     .pdf-frame-wrap.is-native-pdf .pdf-mobile-fallback,
+    body.is-native-pdf .pdf-inpage-viewer,
     body.is-native-pdf .pdf-mobile-fallback {{
       display: flex !important;
       flex: 1 1 auto;
+      min-height: 0;
     }}
     @media (max-width: 1024px) {{
       .pdf-frame-wrap {{
-        height: auto !important;
-        min-height: 0 !important;
-        background: #eef2f2;
+        height: 70vh !important;
+        min-height: 450px !important;
+        display: flex;
+        flex-direction: column;
+        background: #3a3f42;
       }}
       .pdf-frame-wrap iframe,
       .pdf-frame-wrap .fullscreen-btn,
@@ -1148,87 +1188,50 @@ def pdf_mobile_fallback_css() -> str:
         display: none !important;
       }}
       .pdf-standalone-shell {{
-        height: auto;
-        min-height: 0;
-        background: #eef2f2;
+        height: 70vh;
+        min-height: 450px;
+        display: flex;
+        flex-direction: column;
+        background: #3a3f42;
       }}
+      .pdf-inpage-viewer,
       .pdf-mobile-fallback {{
         display: flex !important;
         flex: 1 1 auto;
+        min-height: 0;
       }}
-    }}
-    .pdf-mobile-fallback-title {{
-      margin: 0;
-      font-size: 1.15rem;
-      font-weight: 800;
-      color: {DEEP_TEAL};
-    }}
-    .pdf-mobile-fallback-note {{
-      margin: 0;
-      max-width: 28rem;
-      color: #4b5563;
-      font-size: 0.95rem;
-      line-height: 1.45;
-    }}
-    .pdf-mobile-fallback-actions {{
-      display: flex;
-      flex-direction: column;
-      gap: 10px;
-      width: min(100%, 22rem);
-      margin-top: 4px;
-    }}
-    .pdf-mobile-fallback-btn {{
-      display: inline-flex;
-      align-items: center;
-      justify-content: center;
-      min-height: 48px;
-      padding: 12px 18px;
-      border-radius: 8px;
-      border: 2px solid {TEAL};
-      background: {TEAL};
-      color: #fff;
-      font-weight: 700;
-      font-size: 1rem;
-      text-decoration: none;
-    }}
-    .pdf-mobile-fallback-btn:hover {{
-      background: {DEEP_TEAL};
-      border-color: {DEEP_TEAL};
-      color: #fff;
-      text-decoration: none;
-    }}
-    .pdf-mobile-fallback-btn.secondary {{
-      background: #fff;
-      color: {TEAL};
-    }}
-    .pdf-mobile-fallback-btn.secondary:hover {{
-      background: {TEAL};
-      color: #fff;
     }}
 """
 
 
-def pdf_mobile_fallback_html(pdf_href: str) -> str:
-    """Friendly phone panel: open in native viewer + download (no broken iframe).
+def pdf_inpage_viewer_html(pdf_href: str) -> str:
+    """In-page PDF.js host. Visible on phones/tablets; hidden on desktop.
 
-    Visibility is CSS-driven (desktop: hidden; <=1024px or .is-native-pdf: shown).
-    Do not use the HTML ``hidden`` attribute — browsers apply
-    ``[hidden] {{ display: none !important }}`` which fights the media query.
+    Buttons remain as backup. Do not use the HTML ``hidden`` attribute —
+    browsers apply ``[hidden] {{ display: none !important }}`` which fights
+    the media query.
     """
     safe = html.escape(pdf_href, quote=True)
     return f"""
-        <div class="pdf-mobile-fallback" id="pdf-mobile-fallback">
-          <p class="pdf-mobile-fallback-title">View this bulletin PDF</p>
-          <p class="pdf-mobile-fallback-note">On phones, PDFs open best in the browser&rsquo;s built-in viewer. Tap below to read or download.</p>
-          <div class="pdf-mobile-fallback-actions">
-            <a class="pdf-mobile-fallback-btn" href="{safe}" target="_blank" rel="noopener noreferrer">View PDF</a>
-            <a class="pdf-mobile-fallback-btn secondary" href="{safe}" download>Download PDF</a>
+        <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="{safe}">
+          <div class="pdf-inpage-toolbar">
+            <div class="pdf-inpage-nav">
+              <button type="button" class="pdf-inpage-prev" aria-label="Previous page">‹</button>
+              <span class="pdf-inpage-page-label">Loading…</span>
+              <button type="button" class="pdf-inpage-next" aria-label="Next page">›</button>
+            </div>
+            <div class="pdf-inpage-backup">
+              <a href="{safe}" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="{safe}" download>Download</a>
+            </div>
           </div>
+          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>"""
 
 
-def pdf_mobile_fallback_boot_js() -> str:
-    """Backup: stop loading the iframe on phones/tablets (CSS already hides it)."""
+def pdf_inpage_viewer_boot_js() -> str:
+    """Load the PDF.js in-page viewer on phones/tablets; leave desktop iframe."""
     return f"""
     (function () {{
 {prefers_native_pdf_js()}
@@ -1239,8 +1242,6 @@ def pdf_mobile_fallback_boot_js() -> str:
           return false;
         }}
       }}
-      // CSS media query is the main fix; JS only unloads the iframe to save
-      // bandwidth / avoid the sad-doc flash on known-broken UAs or narrow screens.
       if (!prefersNativePdf() && !narrowViewport()) return;
 
       function activateWrap(wrap) {{
@@ -1257,15 +1258,37 @@ def pdf_mobile_fallback_boot_js() -> str:
 
       document.querySelectorAll('.pdf-frame-wrap').forEach(activateWrap);
 
-      // Distraction-free PDF page: iframe is a direct child of body.
       var standalone = document.querySelector('iframe.pdf-frame');
       if (standalone && !standalone.closest('.pdf-frame-wrap')) {{
         document.body.classList.add('is-native-pdf');
         standalone.setAttribute('hidden', '');
         try {{ standalone.removeAttribute('src'); }} catch (e) {{}}
       }}
+
+      if (!document.querySelector('script[src="{PDF_INPAGE_VIEWER_SRC}"]')) {{
+        var s = document.createElement('script');
+        s.src = '{PDF_INPAGE_VIEWER_SRC}';
+        s.defer = true;
+        document.head.appendChild(s);
+      }}
     }})();
 """
+
+
+def pdf_mobile_fallback_css() -> str:
+    """Back-compat alias — mobile path is now the in-page PDF.js viewer."""
+    return pdf_inpage_viewer_css()
+
+
+def pdf_mobile_fallback_html(pdf_href: str) -> str:
+    """Back-compat alias — mobile path is now the in-page PDF.js viewer."""
+    return pdf_inpage_viewer_html(pdf_href)
+
+
+def pdf_mobile_fallback_boot_js() -> str:
+    """Back-compat alias — mobile path is now the in-page PDF.js viewer."""
+    return pdf_inpage_viewer_boot_js()
+
 
 
 def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: int, ocr_fragment: str, parish_links: list[tuple[str, str]]) -> str:
@@ -1339,10 +1362,11 @@ def render_pdf_standalone_page(config: DioceseConfig, bulletin_date: str, pdf_hr
     }}
     .pdf-frame {{ flex: 1 1 auto; border: 0; width: 100%; height: 100%; background: #525659; }}
     body.embed-mode .top {{ display: none !important; }}
-    {pdf_mobile_fallback_css()}
-    body.is-native-pdf {{ background: #eef2f2; }}
-    body.is-native-pdf .pdf-standalone-shell {{ background: #eef2f2; }}
+    {pdf_inpage_viewer_css()}
+    body.is-native-pdf {{ background: #3a3f42; }}
+    body.is-native-pdf .pdf-standalone-shell {{ background: #3a3f42; }}
   </style>
+  <script src="{PDF_INPAGE_VIEWER_SRC}" defer></script>
 </head>
 <body>
   <div class="top" id="pdf-top">
@@ -1354,7 +1378,7 @@ def render_pdf_standalone_page(config: DioceseConfig, bulletin_date: str, pdf_hr
   </div>
   <div class="pdf-standalone-shell">
     <iframe class="pdf-frame" src="{safe_pdf}" title="{html.escape(config.display_name)} bulletin PDF"></iframe>
-    {pdf_mobile_fallback_html(pdf_href)}
+    {pdf_inpage_viewer_html(pdf_href)}
   </div>
   <script>
     (function () {{
@@ -1364,7 +1388,7 @@ def render_pdf_standalone_page(config: DioceseConfig, bulletin_date: str, pdf_hr
         }}
       }} catch (e) {{}}
     }})();
-    {pdf_mobile_fallback_boot_js()}
+    {pdf_inpage_viewer_boot_js()}
   </script>
 </body>
 </html>
@@ -1545,7 +1569,7 @@ def render_bulletin_viewer_shell(
       cursor: pointer;
     }}
     .fullscreen-btn:hover {{ background: #fff; }}
-    {pdf_mobile_fallback_css()}
+    {pdf_inpage_viewer_css()}
 
     .ocr-search-bar {{ position: relative; margin-bottom: 10px; }}
     .search-input {{
@@ -1709,7 +1733,7 @@ def render_bulletin_viewer_shell(
     .footer-inner a {{ color: #d8f0ee; font-weight: 600; }}
 
     @media (max-width: 1024px) {{
-      /* PDF wrap height is overridden by pdf_mobile_fallback_css (iframe hidden). */
+      /* PDF wrap: 450px in-page PDF.js viewer. OCR panel matches. */
       #ocr-panel {{
         height: 70vh;
         min-height: 450px;
@@ -1734,6 +1758,7 @@ def render_bulletin_viewer_shell(
       }}
     }}
   </style>
+  <script src="{PDF_INPAGE_VIEWER_SRC}" defer></script>
 </head>
 <body>
   <div class="page">
@@ -1759,7 +1784,7 @@ def render_bulletin_viewer_shell(
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
         <iframe src="{html.escape(pdf_href, quote=True)}" title="{html.escape(display_name)} bulletin PDF"></iframe>
-        {pdf_mobile_fallback_html(pdf_href)}
+        {pdf_inpage_viewer_html(pdf_href)}
       </div>
     </div>
 
@@ -1823,7 +1848,7 @@ def render_bulletin_viewer_shell(
       }});
     }})();
 
-    {pdf_mobile_fallback_boot_js()}
+    {pdf_inpage_viewer_boot_js()}
 
     (function () {{
       var KEY = 'ph_ocr_scale';
