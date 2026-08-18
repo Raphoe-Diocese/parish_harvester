@@ -81,6 +81,17 @@ _SLUG_DATE_RE = re.compile(
     re.IGNORECASE,
 )
 
+# Yearless "9th-August" / "5th July" slugs (Milford & Rathmullan overwrite
+# Parish-Newsletter-Sunday-9th-August.pdf each week with no year in the
+# filename). Negative lookahead refuses a following 4-digit year so the
+# dated slug matcher above still owns "9th-August-2026".
+_MONTH_ALT = "|".join(sorted(_MONTH_MAP.keys(), key=len, reverse=True))
+_YEARLESS_SLUG_RE = re.compile(
+    rf"(?<!\d)(\d{{1,2}})(?:st|nd|rd|th)?[_\-\s]({_MONTH_ALT})"
+    rf"(?![a-z])(?![_\-\s](?:19|20)\d{{2}})",
+    re.IGNORECASE,
+)
+
 _MONTH_NAMES: list[str] = [
     "", "january", "february", "march", "april", "may", "june",
     "july", "august", "september", "october", "november", "december",
@@ -249,6 +260,67 @@ def extract_date_from_string(text: str) -> date | None:
         return slug_date
 
     return None
+
+
+def yearless_slug_date(
+    text: str,
+    assume_year: int,
+    *,
+    near: date | None = None,
+) -> date | None:
+    """Parse a yearless '9th-August' / '5th July' slug using *assume_year*.
+
+    If the resulting date is more than 14 days ahead of *near* (typically
+    the harvest Sunday), try the previous year — so a 04/01 harvest still
+    reads '28th-December' as last December, not next December.
+    """
+    m = _YEARLESS_SLUG_RE.search(unquote(text or ""))
+    if not m:
+        return None
+    month = _MONTH_MAP.get(m.group(2).lower())
+    if not month:
+        return None
+    try:
+        candidate = date(assume_year, month, int(m.group(1)))
+    except ValueError:
+        return None
+    if near is not None and (candidate - near).days > 14:
+        try:
+            return date(assume_year - 1, month, int(m.group(1)))
+        except ValueError:
+            return candidate
+    return candidate
+
+
+def predicted_dated_upload_urls(
+    example_url: str,
+    target: date,
+    *,
+    weeks_back: int = 8,
+) -> list[str]:
+    """Rewrite a dated upload URL for *target* and the previous *weeks_back* Sundays.
+
+    Also tries .docx/.jpg/.jpeg/.png siblings of each .pdf guess (uploader
+    fallback). First match in the returned list is the current Sunday.
+    """
+    seen: list[str] = []
+
+    def _add(url: str) -> None:
+        url = (url or "").strip()
+        if url and url not in seen:
+            seen.append(url)
+
+    for i in range(weeks_back + 1):
+        rewritten = rewrite_date_url(example_url, target - timedelta(days=7 * i))
+        _add(rewritten)
+        lower = rewritten.lower()
+        if lower.endswith(".pdf"):
+            stem = rewritten[:-4]
+            for ext in (".docx", ".jpg", ".jpeg", ".png"):
+                _add(stem + ext)
+        elif lower.endswith(".docx"):
+            _add(rewritten[:-5] + ".pdf")
+    return seen
 
 
 def extract_date_from_slug(slug: str) -> date | None:

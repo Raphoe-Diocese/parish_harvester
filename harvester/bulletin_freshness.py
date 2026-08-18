@@ -20,6 +20,7 @@ from .utils import (
     _opaque_hash_spans,
     extract_date_from_slug,
     extract_date_from_string,
+    yearless_slug_date,
 )
 
 if TYPE_CHECKING:
@@ -235,6 +236,14 @@ def check_bulletin_freshness(url: str, target: date) -> FreshnessVerdict:
     * stale   — explicit date clearly outside the acceptable window
     """
     extracted = extract_bulletin_date(url)
+    if extracted is None:
+        # Yearless "Sunday-9th-August.pdf" / "5th-July.pdf" (no calendar
+        # year in the filename). Use the harvest Sunday's year so these
+        # can still be freshness-checked instead of silently passing as
+        # unknown (found 2026-08-18, milfordrathmullanparishes: a pinned
+        # July file was reported ok because extract_bulletin_date returned
+        # None).
+        extracted = yearless_slug_date(url, target.year, near=target)
     if extracted is None:
         return FreshnessVerdict(status="unknown", reason="no_date_in_url")
 

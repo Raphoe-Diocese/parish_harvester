@@ -264,6 +264,38 @@ class BulletinFreshnessTests(unittest.TestCase):
         self.assertEqual(start, target - timedelta(days=6))
         self.assertEqual(end, target)
 
+    def test_yearless_month_day_slug_uses_harvest_year(self) -> None:
+        # milfordrathmullanparishes.ie / rathmullan — filenames have no year.
+        # 09/08/2026 is 7 days behind 16/08/2026 so it is still inside the
+        # 8-day grace window. 05/07/2026 is 42 days behind and must be stale
+        # (previously these URLs were "unknown" and silently accepted).
+        target = date(2026, 8, 16)
+        august = (
+            "https://milfordrathmullanparishes.ie/wp-content/uploads/"
+            "Parish-Newsletter-Sunday-9th-August.pdf"
+        )
+        july = (
+            "https://milfordrathmullanparishes.ie/wp-content/uploads/"
+            "Parish-Newsletter-5th-July.pdf"
+        )
+        self.assertIsNone(extract_bulletin_date(august))
+        self.assertIsNone(extract_bulletin_date(july))
+        august_verdict = check_bulletin_freshness(august, target)
+        self.assertEqual(august_verdict.status, "fresh")
+        self.assertEqual(august_verdict.extracted_date, date(2026, 8, 9))
+        july_verdict = check_bulletin_freshness(july, target)
+        self.assertEqual(july_verdict.status, "stale")
+        self.assertEqual(july_verdict.extracted_date, date(2026, 7, 5))
+
+    def test_yearless_slug_does_not_override_full_year_filename(self) -> None:
+        url = (
+            "https://newtownkilleaparish.ie/wp-content/uploads/2026/07/"
+            "Newsletter-12th-July-2026.pdf"
+        )
+        self.assertEqual(extract_bulletin_date(url), date(2026, 7, 12))
+        verdict = check_bulletin_freshness(url, date(2026, 8, 16))
+        self.assertEqual(verdict.status, "stale")
+
 
 if __name__ == "__main__":
     unittest.main()

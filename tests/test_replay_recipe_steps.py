@@ -108,6 +108,11 @@ class ClaudyBulletinFilterTests(unittest.TestCase):
                 "https://www.errigalparish.com/pdf/pastoralletter2025.pdf"
             )
         )
+        self.assertTrue(
+            _is_non_bulletin_url(
+                "https://www.catholicbishops.ie/wp-content/uploads/2011/02/Order-of-Mass.pdf"
+            )
+        )
 
     def test_newer_newsletter_scores_higher(self) -> None:
         older = _score_bulletin_url("http://x/onewebmedia/NEWSLETTER%2031-5-26.docx")

@@ -10,6 +10,7 @@ import tempfile
 import time
 from datetime import date, timedelta
 from pathlib import Path
+from urllib.error import HTTPError
 from urllib.parse import parse_qs, unquote, urljoin, urlparse
 from urllib.request import Request, urlopen
 
@@ -44,8 +45,10 @@ from .utils import (
     extract_newsletter_number,
     oneweb_newsletter_download_urls,
     predict_dropfiles_bulletin_urls,
+    predicted_dated_upload_urls,
     rewrite_date_url,
     rewrite_newsletter_number_for_target,
+    yearless_slug_date,
 )
 
 
@@ -114,6 +117,7 @@ _NON_BULLETIN_RE = re.compile(
     r"dataentry|giftaid|standingorder|donation|prayer|safeguarding|privacy|gdpr|diocese|"
     r"sitemap|application|registration|volunteer|finances|financial|parishdraw|mcn\s*media|"
     r"gaza|bishops-call|bishops?[-_]?letter|pastoral[-_]?letter|draw_poster|poster_20\d{2}|"
+    r"order[-_]?of[-_]?mass|catholicbishops\.ie|"
     r"fbcdn\.net|facebook\.com",
     re.IGNORECASE,
 )
@@ -874,15 +878,24 @@ def _fetch_bytes_with_retries(
     """
     started = time.monotonic()
     attempts = 0
+    headers_out = {"User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
+    )}
     while attempts < max_attempts and (time.monotonic() - started) < total_budget_s:
         attempts += 1
         try:
-            request = Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            request = Request(url, headers=headers_out)
             with urlopen(request, timeout=per_attempt_timeout_s) as response:
                 body = response.read()
                 if response.status == 200 and body:
                     headers = {k.lower(): v for k, v in response.headers.items()}
                     return body, headers
+        except HTTPError as exc:
+            # Missing predicted files are a hard miss — do not burn the
+            # shared retry budget on 404/410 (newtownkillea dated uploads).
+            if exc.code in {404, 410}:
+                return None
         except Exception:
             pass
     return None
@@ -1090,7 +1103,7 @@ def _extract_matching_hrefs(html: str, base_url: str, keyword_patterns: list[str
     we fetch raw HTML via plain HTTP retries instead of a Playwright DOM."""
     out: list[str] = []
     seen: set[str] = set()
-    for href in re.findall(r'href="([^"]+)"', html):
+    for href in re.findall(r"""href=["']([^"']+)["']""", html, re.IGNORECASE):
         low = href.lower()
         if not any(pat in low for pat in keyword_patterns):
             continue
@@ -1099,6 +1112,126 @@ def _extract_matching_hrefs(html: str, base_url: str, keyword_patterns: list[str
             seen.add(absolute)
             out.append(absolute)
     return out
+
+
+def _score_http_scrape_pdf_hrefs(
+    hrefs: list[str],
+    target_date: date,
+) -> list[tuple[date, str]]:
+    """Rank listing-page PDF hrefs by extracted bulletin date.
+
+    Drops non-bulletin URLs (Order of Mass, GDPR, …) and anything dated
+    more than 3 days after the harvest Sunday. Yearless slugs such as
+    Parish-Newsletter-Sunday-9th-August.pdf are dated with the harvest year.
+    """
+    from .bulletin_freshness import extract_bulletin_date
+
+    scored: list[tuple[date, str]] = []
+    for href in hrefs:
+        if _is_non_bulletin_url(href):
+            continue
+        path = urlparse(href).path.lower()
+        if not path.endswith((".pdf", ".docx", ".doc")):
+            continue
+        found = extract_bulletin_date(href) or yearless_slug_date(
+            href, target_date.year, near=target_date
+        )
+        if found and found <= target_date + timedelta(days=3):
+            scored.append((found, href))
+    return scored
+
+
+async def _try_http_scrape_newest_pdf(
+    listing_url: str,
+    dest: Path,
+    *,
+    href_patterns: list[str],
+    target_date: date,
+) -> tuple[str, str] | None:
+    """Fetch a listing page via plain HTTP and download the newest matching PDF.
+
+    Built for Extra/Divi toggle pages (milfordrathmullanparishes.ie) where the
+    Parish-Newsletter PDF is in the HTML but hidden inside a closed accordion,
+    so Playwright ``visible`` waits time out. The listing itself is not WAF
+    blocked — we just must not click.
+    """
+    listing_result = await asyncio.to_thread(
+        _fetch_bytes_with_retries,
+        listing_url,
+        max_attempts=_DROPFILES_HTTP_ATTEMPTS,
+        per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
+        total_budget_s=_DROPFILES_HTTP_LISTING_BUDGET_S,
+    )
+    if not listing_result:
+        return None
+    listing_body, listing_headers = listing_result
+    if "text/html" not in (listing_headers.get("content-type") or "").lower():
+        return None
+    listing_html = listing_body.decode("utf-8", errors="ignore")
+    hrefs = _extract_matching_hrefs(listing_html, listing_url, href_patterns)
+    scored = _score_http_scrape_pdf_hrefs(hrefs, target_date)
+    if not scored:
+        return None
+    _best_date, pdf_url = max(scored)
+    file_result = await asyncio.to_thread(
+        _fetch_bytes_with_retries,
+        pdf_url,
+        max_attempts=_DROPFILES_HTTP_ATTEMPTS,
+        per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
+        total_budget_s=_DROPFILES_HTTP_FILE_BUDGET_S,
+    )
+    if not file_result:
+        return None
+    file_body, file_headers = file_result
+    if not (
+        _dropfiles_body_looks_like_file(file_headers, file_body)
+        and (_is_pdf_content(file_body) or file_body[:2] == b"PK")
+    ):
+        return None
+    if file_body[:2] == b"PK" and not _is_pdf_content(file_body):
+        pdf_bytes = await _convert_docx_to_pdf_bytes(file_body)
+        dest.write_bytes(pdf_bytes)
+        return pdf_url, "docx_to_pdf"
+    dest.write_bytes(file_body)
+    return pdf_url, "pdf"
+
+
+async def _try_predicted_dated_pdf(
+    example_url: str,
+    dest: Path,
+    target_date: date,
+    *,
+    weeks_back: int = 8,
+) -> tuple[str, str] | None:
+    """Try rewrite_date_url guesses for *target_date* and previous Sundays.
+
+    Skips any listing page entirely — used when the HTML index is
+    Cloudflare-challenged but ``wp-content/uploads`` dated files are not
+    (newtownkilleaparish.ie).
+    """
+    for url in predicted_dated_upload_urls(
+        example_url, target_date, weeks_back=weeks_back
+    ):
+        file_result = await asyncio.to_thread(
+            _fetch_bytes_with_retries,
+            url,
+            max_attempts=3,
+            per_attempt_timeout_s=8.0,
+            total_budget_s=12.0,
+        )
+        if not file_result:
+            continue
+        file_body, file_headers = file_result
+        if not _dropfiles_body_looks_like_file(file_headers, file_body):
+            continue
+        if _is_pdf_content(file_body):
+            dest.write_bytes(file_body)
+            return url, "pdf"
+        if file_body[:2] == b"PK":
+            pdf_bytes = await _convert_docx_to_pdf_bytes(file_body)
+            dest.write_bytes(pdf_bytes)
+            return url, "docx_to_pdf"
+    return None
 
 
 def _extract_pdfembed_target_url(html: str) -> str | None:
@@ -2243,6 +2376,51 @@ async def replay_recipe(
             f"naomhfionan.com predicted PDF URL(s) for {target_date} did not "
             "resolve to a real PDF (not the listing-page block; retry later "
             "or re-check the number/letter prediction)"
+        )
+
+    # Listing page is reachable via plain HTTP but the current PDF lives
+    # inside a closed accordion (Playwright visible-wait times out). Scrape
+    # the raw HTML for matching PDF hrefs and download the newest dated one.
+    if site_type == "http_scrape_newest_pdf" and target_date is not None:
+        href_patterns = [
+            str(p).strip().lower()
+            for p in (recipe.get("href_patterns") or [])
+            if str(p).strip()
+        ] or ["parish-newsletter", ".pdf"]
+        found = await _try_http_scrape_newest_pdf(
+            start_url,
+            dest,
+            href_patterns=href_patterns,
+            target_date=target_date,
+        )
+        if found:
+            return dest, found[1], found[0]
+        raise RecipeReplayError(
+            f"HTTP-scrape listing {start_url} — no dated bulletin PDF matching "
+            f"{href_patterns} (not a selector problem; parish may not have posted)"
+        )
+
+    # Listing/index is Cloudflare-challenged; dated wp-content/uploads files
+    # are not. Predict this Sunday and a few previous Sundays and fetch
+    # directly. Never navigate to the challenged HTML page.
+    if site_type == "predicted_dated_pdf" and target_date is not None:
+        example_url = ""
+        for step in steps:
+            if isinstance(step, dict) and (step.get("url") or "").strip():
+                example_url = str(step.get("url") or "").strip()
+                if _looks_like_direct_document_url(example_url):
+                    break
+        if not example_url:
+            example_url = start_url
+        weeks_back = int(recipe.get("weeks_back") or 8)
+        found = await _try_predicted_dated_pdf(
+            example_url, dest, target_date, weeks_back=weeks_back
+        )
+        if found:
+            return dest, found[1], found[0]
+        raise RecipeReplayError(
+            f"Predicted dated PDF URL(s) from {example_url} for {target_date} "
+            "did not resolve to a real file (listing page was not opened)"
         )
 
     context_opts: dict = {"accept_downloads": True}
