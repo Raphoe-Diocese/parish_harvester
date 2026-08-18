@@ -1366,8 +1366,9 @@ def render_bulletin_viewer_shell(
 
     Calm Parish Press teal/white layout shared by every diocese:
     serif title -> (mobile-only: jump to OCR + Download PDF) -> Original PDF
-    (min-height 850px on desktop) -> searchable OCR plain text -> simple
-    teal bullet parish links. No pro-tip callout; no separate Site links.
+    and searchable OCR plain text (both min-height 850px desktop /
+    450px tablet+phone) -> simple teal bullet parish links. No pro-tip
+    callout; no separate Site links.
     Outbound links open in a new tab; the mobile OCR jump is same-tab scroll.
     """
     blank = 'target="_blank" rel="noopener noreferrer"'
@@ -1575,8 +1576,8 @@ def render_bulletin_viewer_shell(
     @media (pointer: coarse) {{ .ocr-zoom-hint {{ display: inline; margin-left: 6px; }} }}
     {ocr_reading_css("#ocr-panel")}
     #ocr-panel {{
-      height: 70vh;
-      min-height: 480px;
+      height: 85vh;
+      min-height: 850px;
       overflow-y: auto;
       border: 1px solid #d4ddd9;
       padding: 22px 24px 32px;
@@ -1674,6 +1675,16 @@ def render_bulletin_viewer_shell(
     }}
     .footer-inner a {{ color: #d8f0ee; font-weight: 600; }}
 
+    @media (max-width: 1024px) {{
+      .pdf-frame-wrap {{
+        height: 70vh;
+        min-height: 450px;
+      }}
+      #ocr-panel {{
+        height: 70vh;
+        min-height: 450px;
+      }}
+    }}
     @media (max-width: 900px) {{
       ul.parish-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
     }}
@@ -1683,13 +1694,7 @@ def render_bulletin_viewer_shell(
       .download-link-top {{ display: none; }}
       .quiet-links {{ justify-content: center; }}
       ul.parish-grid {{ grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }}
-      .pdf-frame-wrap {{
-        height: 70vh;
-        min-height: 420px;
-      }}
       #ocr-panel {{
-        height: 65vh;
-        min-height: 360px;
         padding: 16px 14px 28px;
       }}
       .ocr-search-tools {{ flex-direction: column; }}

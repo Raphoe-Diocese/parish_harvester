@@ -124,6 +124,17 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertNotIn("callout-tip", html_output)
             self.assertNotIn("🔗 Site", html_output)
             self.assertIn("min-height: 850px", html_output)
+            self.assertRegex(
+                html_output,
+                r"#ocr-panel\s*\{[^}]*min-height:\s*850px",
+            )
+            self.assertRegex(
+                html_output,
+                r"\.pdf-frame-wrap\s*\{[^}]*min-height:\s*850px",
+            )
+            # Tablet/phone: shorter balanced panels (not desktop 850px).
+            self.assertIn("@media (max-width: 1024px)", html_output)
+            self.assertIn("min-height: 450px", html_output)
             self.assertIn("Georgia", html_output)
             self.assertIn("Download PDF", html_output)
             self.assertIn("pdf-fullscreen-btn", html_output)
@@ -208,6 +219,16 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotIn("callout-tip", html_output)
         self.assertNotIn("PRO TIP", html_output.upper())
         self.assertIn("min-height: 850px", html_output)
+        self.assertRegex(
+            html_output,
+            r"#ocr-panel\s*\{[^}]*min-height:\s*850px",
+        )
+        self.assertRegex(
+            html_output,
+            r"\.pdf-frame-wrap\s*\{[^}]*min-height:\s*850px",
+        )
+        self.assertIn("@media (max-width: 1024px)", html_output)
+        self.assertIn("min-height: 450px", html_output)
         self.assertNotIn("parish-site-link", html_output)
         self.assertIn("mobile-jump", html_output)
         self.assertIn("Tap to go to plain text bulletin", html_output)
