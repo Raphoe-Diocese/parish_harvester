@@ -91,9 +91,12 @@ class SiteBuilderTests(unittest.TestCase):
             armagh_page = (docs / "dioceses" / "armagh" / "index.html").read_text(encoding="utf-8")
 
             self.assertIn("Download PDF", derry_page)
-            self.assertIn("Open PDF in new tab", derry_page)
-            self.assertIn("Open bulletin text in new tab", derry_page)
+            self.assertIn("Open PDF", derry_page)
+            self.assertIn("Open text in new tab", derry_page)
             self.assertIn("Distraction-free view", derry_page)
+            self.assertIn("Tap to go to plain text bulletin", derry_page)
+            self.assertIn("mobile-jump", derry_page)
+            self.assertIn('id="ocr-search"', derry_page)
             self.assertIn("Line one", derry_page)
             self.assertIn("DERRY", derry_page)
             self.assertIn("Derry Collated Bulletin", derry_page)
@@ -105,9 +108,12 @@ class SiteBuilderTests(unittest.TestCase):
             self.assertIn('id="panel-ocr"', derry_page)
 
             # A-Z grid links to the already-generated internal parish page
-            # (ocr.parish_pages) instead of only the external parish site.
+            # (ocr.parish_pages) — parish name only, no separate "Site" link.
             self.assertIn('href="../../parishes/derry/ardmoreparish.html"', derry_page)
-            self.assertIn("🔗 Site", derry_page)
+            self.assertNotIn("🔗 Site", derry_page)
+            self.assertNotIn("callout-tip", derry_page)
+            self.assertIn("min-height: 850px", derry_page)
+            self.assertIn("Georgia", derry_page)
 
 
 if __name__ == "__main__":

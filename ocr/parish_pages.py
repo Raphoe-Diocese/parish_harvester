@@ -113,17 +113,18 @@ def _render_other_parishes_grid(parishes: list[OkParish], current_key: str) -> s
     if not others:
         return '<p class="empty-state">No other parish bulletin pages are available yet for this diocese.</p>'
     items = []
+    blank = 'target="_blank" rel="noopener noreferrer"'
     for parish in others:
         href = f"{parish.key}.html"
         items.append(
             (
                 '<li class="parish-item" data-name="{name_key}">'
-                '<a class="parish-link" href="{href}">'
-                '<span aria-hidden="true">⛪</span> <span>{name}</span></a></li>'
+                '<a class="parish-link" href="{href}" {blank}>{name}</a></li>'
             ).format(
                 name_key=html.escape(parish.display_name.lower(), quote=True),
                 href=html.escape(href, quote=True),
                 name=html.escape(parish.display_name),
+                blank=blank,
             )
         )
     return (
