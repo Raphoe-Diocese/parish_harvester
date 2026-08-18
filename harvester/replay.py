@@ -1133,8 +1133,13 @@ def _score_http_scrape_pdf_hrefs(
         path = urlparse(href).path.lower()
         if not path.endswith((".pdf", ".docx", ".doc")):
             continue
-        found = extract_bulletin_date(href) or yearless_slug_date(
-            href, target_date.year, near=target_date
+        # Prefer the filename's own date over WordPress /uploads/YYYY/MM/
+        # folder dates — Malin uploads March bulletins into /2026/04/, and
+        # extract_bulletin_date then treats "29th-March" as 29/04.
+        found = (
+            extract_date_from_string(href)
+            or extract_bulletin_date(href)
+            or yearless_slug_date(href, target_date.year, near=target_date)
         )
         if found and found <= target_date + timedelta(days=3):
             scored.append((found, href))

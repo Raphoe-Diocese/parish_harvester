@@ -287,6 +287,19 @@ class BulletinFreshnessTests(unittest.TestCase):
         self.assertEqual(july_verdict.status, "stale")
         self.assertEqual(july_verdict.extracted_date, date(2026, 7, 5))
 
+    def test_d_m_yy_oneweb_filenames_are_dated(self) -> None:
+        target = date(2026, 8, 16)
+        limavady = "https://www.limavadyparish.org/onewebmedia/16-8-26.pdf"
+        claudy = "http://parishofclaudy.com/onewebmedia/NEWSLETTER 9-8-26.docx"
+        self.assertEqual(extract_bulletin_date(limavady), date(2026, 8, 16))
+        self.assertEqual(
+            check_bulletin_freshness(limavady, target).status, "fresh"
+        )
+        self.assertEqual(extract_bulletin_date(claudy), date(2026, 8, 9))
+        self.assertEqual(
+            check_bulletin_freshness(claudy, target).reason, "within_grace_days"
+        )
+
     def test_yearless_slug_does_not_override_full_year_filename(self) -> None:
         url = (
             "https://newtownkilleaparish.ie/wp-content/uploads/2026/07/"

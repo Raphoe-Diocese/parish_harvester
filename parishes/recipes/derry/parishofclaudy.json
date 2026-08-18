@@ -1,36 +1,28 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "parishofclaudy",
   "display_name": "Claudy",
   "diocese": "derry",
-  "start_url": "https://parishofclaudy.com/welcome/weekly-bulletin.html",
+  "start_url": "http://parishofclaudy.com/onewebmedia/NEWSLETTER 9-8-26.docx",
   "steps": [
     {
       "action": "download",
-      "url": "http://parishofclaudy.com/onewebmedia/NEWSLETTER 21-6-26.docx",
-      "use_captured_url": false
+      "url": "http://parishofclaudy.com/onewebmedia/NEWSLETTER 21-6-26.docx"
     }
   ],
-  "observed_load_ms": 7647,
+  "site_type": "predicted_dated_pdf",
+  "weeks_back": 8,
   "timeout_ms": 45000,
   "total_timeout_s": 90,
   "playbook_type": "oneweb_docx",
-  "site_type": "oneweb_newsletter",
-  "auto_direct": true,
+  "recorded_date": "2026-08-18",
   "operator_notes": [
-    "Many docs.google.com/viewer iframes load slowly (2–4 min) — ignore previews.",
-    "Bulletin is a Word file at onewebmedia/NEWSLETTER D-M-YY.docx — download directly.",
-    "Iframe src URLs are in the HTML immediately; no need to wait for previews.",
-    "Harvester rewrites the date each Sunday and tries filename variants (spaces before .docx)."
+    "Word bulletin at onewebmedia/NEWSLETTER D-M-YY.docx. Harvester converts docx→PDF.",
+    "2026-08-18 FIX: start_url was the weekly-bulletin.html listing, which times out in Playwright (45s). The file itself is a direct onewebmedia download. Confirmed 18/08/2026: NEWSLETTER 16-8-26.docx is 404 (parish has not posted this Sunday yet); NEWSLETTER 9-8-26.docx is HTTP 200 (25,820 bytes, PK zip/docx). predicted_dated_pdf tries this Sunday then previous weeks and never opens the listing."
   ],
   "do_not": [
-    "Do not pick the first iframe PDF — often a GDPR or Privacy notice.",
-    "Do not use goto-only recipes on this page.",
-    "Do not train on financial-statement or admin docx files.",
-    "Do not set use_captured_url:true on the download step — it disables the date-rewriting in oneweb_newsletter_download_urls() that this recipe depends on (see operator_notes above), silently freezing on the trained week's file forever (bug pattern #1, found 2026-08-09: was still serving the 21/06/2026 file 7 weeks later)."
-  ],
-  "operator_notes_2026_08_09": [
-    "use_captured_url was true, which short-circuits _resolve_download_candidates to return only the literal trained URL (harvester/replay.py: 'if use_captured_url or not target_date: return [step_url]') — the date-rewrite candidates from oneweb_newsletter_download_urls() were never tried. Set to false; verified locally that it now generates 'NEWSLETTER 9-8-26.docx' (+ space-suffix variants) for the 09/08/2026 target."
-  ],
-  "recorded_date": "2026-08-09"
+    "Do not set start_url to weekly-bulletin.html — Playwright times out there before the download step runs.",
+    "Do not set use_captured_url.",
+    "Do not pick GDPR/Privacy iframes on the listing page."
+  ]
 }

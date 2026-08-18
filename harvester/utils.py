@@ -229,6 +229,20 @@ def extract_date_from_string(text: str) -> date | None:
         except ValueError:
             pass
 
+    # Pattern B: D-M-YY (1–2 digit day/month) — limavady 16-8-26.pdf,
+    # claudy NEWSLETTER 9-8-26.docx. Must come after the 6/8-digit compact
+    # forms so "160826" is not split into 16-08-26 by accident (those have
+    # no dashes).
+    m = _first_match_outside_hash(_D_M_YY_RE, text, spans)
+    if m:
+        try:
+            year = 2000 + int(m.group(3))
+            candidate = date(year, int(m.group(2)), int(m.group(1)))
+            if _is_plausible_bulletin_year(candidate.year):
+                return candidate
+        except ValueError:
+            pass
+
     # Dot-separated N.N.NN — ambiguous between YY.MM.DD (Google Drive folder
     # rows: 26.06.14 → 2026-06-14, 29.01.05 → 2029-01-05; locked by
     # tests/test_cloud_folders.py) and UK-convention DD.MM.YY filenames
@@ -311,8 +325,12 @@ def predicted_dated_upload_urls(
             seen.append(url)
 
     for i in range(weeks_back + 1):
-        rewritten = rewrite_date_url(example_url, target - timedelta(days=7 * i))
+        week = target - timedelta(days=7 * i)
+        rewritten = rewrite_date_url(example_url, week)
         _add(rewritten)
+        if "onewebmedia" in rewritten.lower() and "newsletter" in rewritten.lower():
+            for extra in oneweb_newsletter_download_urls(example_url, week):
+                _add(extra)
         lower = rewritten.lower()
         if lower.endswith(".pdf"):
             stem = rewritten[:-4]
@@ -320,6 +338,9 @@ def predicted_dated_upload_urls(
                 _add(stem + ext)
         elif lower.endswith(".docx"):
             _add(rewritten[:-5] + ".pdf")
+            parsed = urlparse(rewritten)
+            quoted = parsed._replace(path=quote(unquote(parsed.path), safe="/")).geturl()
+            _add(quoted)
     return seen
 
 
