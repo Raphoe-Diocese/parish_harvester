@@ -618,7 +618,7 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
             f"<h2>{html.escape(row['name'])} Diocese</h2>"
             f"<p class=\"live-card-updated\">Last updated: {html.escape(row['updated'])}</p>"
             "<div class=\"live-card-actions\">"
-            f"<a class=\"live-btn primary\" href=\"dioceses/{row['key']}/\">Open Collated Bulletin →</a>"
+            f"<a class=\"live-btn primary\" href=\"dioceses/{row['key']}/\" target=\"_blank\" rel=\"noopener noreferrer\">Open Collated Bulletin →</a>"
             f"<a class=\"live-btn secondary\" href=\"{html.escape(_mega_pdf_url(row['key']), quote=True)}\" target=\"_blank\" rel=\"noopener noreferrer\">📄 Mega PDF</a>"
             f"<a class=\"live-btn secondary\" href=\"{html.escape(_ocr_standalone_url(row['key']), quote=True)}\" target=\"_blank\" rel=\"noopener noreferrer\">📝 Text Bulletin</a>"
             "</div>"
@@ -628,7 +628,7 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     )
 
     other_rows_html = "".join(
-        f"<li>{row['dot']} <a href=\"dioceses/{row['key']}/\">{html.escape(row['name'])}</a></li>"
+        f"<li>{row['dot']} <a href=\"dioceses/{row['key']}/\" target=\"_blank\" rel=\"noopener noreferrer\">{html.escape(row['name'])}</a></li>"
         for row in other_rows
     )
 
@@ -759,15 +759,15 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     </details>
   </main>
   <footer class=\"footer\">
-    <p><a href=\"bulletins/index.html\">Browse the full OCR bulletin archive</a></p>
-    <p><a href=\"mega_pdf/index.html\">Open the Collated Bulletin PDF viewer</a></p>
-    <p><a href=\"EMBEDDING.md\">Read the embedding guide</a> · <a href=\"embed-examples.html\">Open copy/paste embed examples</a></p>
-    <p><a href=\"badges/\">Parish reliability scores</a></p>
-    <p>Subscribe (RSS): <a href=\"feeds/derry_diocese.xml\">Derry Diocese</a> · <a href=\"feeds/down_and_connor.xml\">Down &amp; Connor</a></p>
-    <p><a href=\"search/\">Search all bulletins</a></p>
-    <p>📅 Subscribe in Google/Apple Calendar: <a href=\"calendars/derry.ics\">Derry Diocese</a> · <a href=\"calendars/down_and_connor.ics\">Down &amp; Connor</a> · <a href=\"calendars/all.ics\">All parishes</a></p>
-    <p><a href=\"sitemap.html\">🗺️ Site map — every public URL</a> · <a href=\"COST_DASHBOARD.md\">💷 Cost dashboard</a></p>
-    <p><a href=\"subscribe/\">📬 Subscribe for reminders</a></p>
+    <p><a href=\"bulletins/index.html\" target=\"_blank\" rel=\"noopener noreferrer\">Browse the full OCR bulletin archive</a></p>
+    <p><a href=\"mega_pdf/index.html\" target=\"_blank\" rel=\"noopener noreferrer\">Open the Collated Bulletin PDF viewer</a></p>
+    <p><a href=\"EMBEDDING.md\" target=\"_blank\" rel=\"noopener noreferrer\">Read the embedding guide</a> · <a href=\"embed-examples.html\" target=\"_blank\" rel=\"noopener noreferrer\">Open copy/paste embed examples</a></p>
+    <p><a href=\"badges/\" target=\"_blank\" rel=\"noopener noreferrer\">Parish reliability scores</a></p>
+    <p>Subscribe (RSS): <a href=\"feeds/derry_diocese.xml\" target=\"_blank\" rel=\"noopener noreferrer\">Derry Diocese</a> · <a href=\"feeds/down_and_connor.xml\" target=\"_blank\" rel=\"noopener noreferrer\">Down &amp; Connor</a></p>
+    <p><a href=\"search/\" target=\"_blank\" rel=\"noopener noreferrer\">Search all bulletins</a></p>
+    <p>📅 Subscribe in Google/Apple Calendar: <a href=\"calendars/derry.ics\" target=\"_blank\" rel=\"noopener noreferrer\">Derry Diocese</a> · <a href=\"calendars/down_and_connor.ics\" target=\"_blank\" rel=\"noopener noreferrer\">Down &amp; Connor</a> · <a href=\"calendars/all.ics\" target=\"_blank\" rel=\"noopener noreferrer\">All parishes</a></p>
+    <p><a href=\"sitemap.html\" target=\"_blank\" rel=\"noopener noreferrer\">🗺️ Site map — every public URL</a> · <a href=\"COST_DASHBOARD.md\" target=\"_blank\" rel=\"noopener noreferrer\">💷 Cost dashboard</a></p>
+    <p><a href=\"subscribe/\" target=\"_blank\" rel=\"noopener noreferrer\">📬 Subscribe for reminders</a></p>
     <p>© 2026 Parish Press</p>
   </footer>
   <script>
@@ -830,7 +830,7 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
 
 def _subscribe_page(dioceses: list[DioceseCard]) -> str:
     items = "".join(
-        f'<li><a href="../dioceses/{d.key}/">{d.name}</a></li>' for d in dioceses
+        f'<li><a href="../dioceses/{d.key}/" target="_blank" rel="noopener noreferrer">{d.name}</a></li>' for d in dioceses
     )
     return f"""<!DOCTYPE html>
 <html lang=\"en\">

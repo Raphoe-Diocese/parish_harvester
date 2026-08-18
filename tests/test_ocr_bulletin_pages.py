@@ -91,17 +91,24 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertIn("id=\"ocr-prev\"", html_output)
             self.assertIn("id=\"ocr-next\"", html_output)
             self.assertNotIn("Jump to OCR Text", html_output)
+            self.assertIn("Tap to go to plain text bulletin", html_output)
+            self.assertIn("mobile-jump", html_output)
+            self.assertIn('href="#panel-ocr"', html_output)
             self.assertIn("test-2026-05-19-ocr.html", html_output)
             self.assertNotIn("Next page →", html_output)
             self.assertNotIn("pdf-controls", html_output)
             self.assertIn("pdf-frame-wrap", html_output)
             self.assertIn('target="_blank"', html_output)
-            # Both "open in new tab, no distractions" links must be visible
-            # from the main viewer page's toolbar (audit gap fix).
+            # Quiet new-tab links for PDF / distraction-free / OCR text.
             self.assertIn("test-2026-05-19-pdf.html", html_output)
             self.assertIn("Distraction-free view", html_output)
             self.assertIn("test-2026-05-19-ocr.html", html_output)
-            self.assertIn("distraction-free", html_output.lower())
+            self.assertIn("Open PDF", html_output)
+            self.assertIn("Open text in new tab", html_output)
+            # OCR search must remain available.
+            self.assertIn('id="ocr-search"', html_output)
+            self.assertIn('id="ocr-prev"', html_output)
+            self.assertIn('id="ocr-next"', html_output)
             # PDF is shown immediately (no tab click) — the PDF and OCR
             # panels are both always visible, stacked, matching Frank's
             # reference page layout (Frank feedback, round 2).
@@ -110,7 +117,11 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertNotIn('role="tablist"', html_output)
             self.assertIn("Bulletin — Original PDF Version", html_output)
             self.assertIn("Bulletin — OCR Extracted Plain Text", html_output)
-            self.assertIn("PRO TIP", html_output.upper())
+            self.assertNotIn("PRO TIP", html_output.upper())
+            self.assertNotIn("callout-tip", html_output)
+            self.assertNotIn("🔗 Site", html_output)
+            self.assertIn("min-height: 850px", html_output)
+            self.assertIn("Georgia", html_output)
             self.assertIn("Download PDF", html_output)
             self.assertIn("pdf-fullscreen-btn", html_output)
             # PDF section must appear before the OCR section in document order.
@@ -163,6 +174,14 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("https://example.com/example-pdf.html", html_output)
         self.assertIn("https://example.com/example-ocr.html", html_output)
         self.assertIn("← Back to home", html_output)
+        self.assertNotIn("callout-tip", html_output)
+        self.assertNotIn("PRO TIP", html_output.upper())
+        self.assertIn("min-height: 850px", html_output)
+        self.assertNotIn("parish-site-link", html_output)
+        self.assertIn("mobile-jump", html_output)
+        self.assertIn("Tap to go to plain text bulletin", html_output)
+        self.assertIn('id="ocr-search"', html_output)
+        self.assertIn("Georgia", html_output)
 
     def test_render_ocr_standalone_page(self) -> None:
         config = DioceseConfig(

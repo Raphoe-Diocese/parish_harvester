@@ -34,8 +34,11 @@ class PageRendererTests(unittest.TestCase):
             self.assertIn('id="panel-pdf"', html)
             self.assertIn('id="panel-ocr"', html)
             self.assertIn('id="ocr-panel"', html)
-            self.assertIn("Open PDF in new tab", html)
-            self.assertIn("Open bulletin text in new tab", html)
+            self.assertIn("Open PDF", html)
+            self.assertIn("Open text in new tab", html)
+            self.assertIn('id="ocr-search"', html)
+            self.assertIn("Tap to go to plain text bulletin", html)
+            self.assertIn("mobile-jump", html)
             # Distraction-free full-page links for both PDF and OCR text.
             self.assertIn("raphoe-2026-06-29-pdf.html", html)
             self.assertIn("raphoe-2026-06-29-ocr.html", html)
@@ -53,7 +56,10 @@ class PageRendererTests(unittest.TestCase):
             self.assertNotIn("tab-btn", html)
             self.assertIn("Bulletin — Original PDF Version", html)
             self.assertIn("Bulletin — OCR Extracted Plain Text", html)
-            self.assertIn("PRO TIP", html.upper())
+            self.assertNotIn("PRO TIP", html.upper())
+            self.assertNotIn("callout-tip", html)
+            self.assertIn("min-height: 850px", html)
+            self.assertIn("Georgia", html)
 
     def test_render_diocese_raphoe_page_escapes_user_content(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -105,11 +111,13 @@ class PageRendererTests(unittest.TestCase):
             )
             html = out_path.read_text(encoding="utf-8")
 
-            # Ardara has a generated parish page — internal link is primary,
-            # its own site becomes a small secondary link.
+            # Ardara has a generated parish page — name links to that bulletin
+            # page only (no separate external "Site" link).
             self.assertIn('href="../../parishes/raphoe/ardara.html"', html)
-            self.assertIn("🔗 Site", html)
-            # Annagry has no generated page yet — unchanged external-only link.
+            self.assertNotIn("🔗 Site", html)
+            self.assertNotIn("parish-site-link", html)
+            self.assertIn('target="_blank"', html)
+            # Annagry has no generated page yet — external bulletin URL only.
             self.assertIn('href="https://example.com/annagry"', html)
 
     def test_render_diocese_raphoe_page_down_and_connor_ampersand(self) -> None:

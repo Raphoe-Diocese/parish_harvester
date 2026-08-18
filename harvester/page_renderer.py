@@ -138,8 +138,8 @@ def render_diocese_raphoe_page(
 
     *internal_parish_hrefs* optionally maps a normalised parish name to this
     diocese's own generated per-parish bulletin page (see
-    :mod:`ocr.parish_pages`) — see
-    :func:`ocr.generate_bulletin_pages.render_parish_link_grid`.
+    :mod:`ocr.parish_pages`) — the parish name then links to that bulletin
+    page only (see :func:`ocr.generate_bulletin_pages.render_parish_link_grid`).
     """
     from ocr.generate_bulletin_pages import render_bulletin_viewer_shell, render_parish_link_grid
 
