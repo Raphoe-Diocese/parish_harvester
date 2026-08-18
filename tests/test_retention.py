@@ -24,26 +24,23 @@ class RetentionDryRunTests(unittest.TestCase):
     def test_dry_run_makes_no_changes(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
-            # Write a very old PDF
             old_pdf = _write_file(root / "Bulletins" / "current" / "old.pdf", age_days=70)
-            # Apply with dry_run
             report = apply_retention(root, dry_run=True)
-            # File must still exist
             self.assertTrue(old_pdf.exists(), "dry_run must not delete files")
-            # Report should have recorded it
             self.assertIn("before_bytes", report)
             self.assertIn("after_bytes", report)
+            self.assertEqual(report["zipped_files"], [])
 
 
 class RetentionOldFilesTests(unittest.TestCase):
     def setUp(self) -> None:
         self._tmp = tempfile.mkdtemp()
         self.root = Path(self._tmp)
-        # Write a minimal retention_policy with short windows for testing
         policy = {
+            "create_archives": False,
             "keep_weeks_individual": 1,
             "keep_weeks_mega_pdf": 1,
-            "keep_months_archive": 1,
+            "keep_months_archive": 0,
             "hard_size_cap_gb": 100.0,
         }
         (self.root / "parishes").mkdir(parents=True, exist_ok=True)
@@ -55,22 +52,20 @@ class RetentionOldFilesTests(unittest.TestCase):
         import shutil
         shutil.rmtree(self._tmp, ignore_errors=True)
 
-    def test_old_individual_pdfs_zipped_and_removed(self) -> None:
+    def test_old_individual_pdfs_deleted_without_zip(self) -> None:
         old_pdf = _write_file(
             self.root / "Bulletins" / "current" / "old_parish.pdf",
             content=b"%PDF-1.4 old",
-            age_days=14,  # > 1 week
+            age_days=14,
         )
         report = apply_retention(self.root, dry_run=False)
 
-        # Original should be gone
-        self.assertFalse(old_pdf.exists(), "Old PDF should be removed after zipping")
-        # At least one zip should exist
+        self.assertFalse(old_pdf.exists(), "Old PDF should be removed without archiving")
         archive_dir = self.root / "Bulletins" / "archive"
-        zips = list(archive_dir.glob("*.zip"))
-        self.assertGreater(len(zips), 0, "Expected at least one archive zip")
-        # Report should list the file
-        self.assertGreater(len(report["zipped_files"]), 0)
+        zips = list(archive_dir.glob("*.zip")) if archive_dir.is_dir() else []
+        self.assertEqual(zips, [], "Must not create archive zip files")
+        self.assertEqual(report["zipped_files"], [])
+        self.assertGreater(len(report["deleted_files"]), 0)
 
     def test_recent_pdfs_not_touched(self) -> None:
         new_pdf = _write_file(
@@ -81,6 +76,24 @@ class RetentionOldFilesTests(unittest.TestCase):
         apply_retention(self.root, dry_run=False)
         self.assertTrue(new_pdf.exists(), "Recent PDF should NOT be removed")
 
+    def test_mega_pdfs_never_deleted(self) -> None:
+        mega = _write_file(
+            self.root / "mega_pdf" / "raphoe_mega_bulletin.pdf",
+            content=b"%PDF-1.4 mega",
+            age_days=400,
+        )
+        docs_mega = _write_file(
+            self.root / "docs" / "mega_pdf" / "derry_mega_bulletin.pdf",
+            content=b"%PDF-1.4 docs mega",
+            age_days=400,
+        )
+        apply_retention(self.root, dry_run=False)
+        self.assertTrue(mega.exists(), "Mega PDF must stay for OCR/viewer")
+        self.assertTrue(docs_mega.exists(), "docs/mega_pdf must stay")
+        archive_dir = self.root / "Bulletins" / "archive"
+        zips = list(archive_dir.glob("*.zip")) if archive_dir.is_dir() else []
+        self.assertEqual(zips, [])
+
     def test_report_keys_present(self) -> None:
         report = apply_retention(self.root, dry_run=False)
         for key in ("before_bytes", "after_bytes", "zipped_files", "deleted_files", "warnings"):
@@ -88,14 +101,17 @@ class RetentionOldFilesTests(unittest.TestCase):
 
     def test_old_archives_deleted(self) -> None:
         archive_dir = self.root / "Bulletins" / "archive"
-        # Write an old zip (> 1 month ago)
         old_zip = _write_file(
             archive_dir / "2024-01-individual-pdfs.zip",
-            content=b"PK\x03\x04",  # ZIP magic bytes
-            age_days=400,  # > 1 month
+            content=b"PK\x03\x04",
+            age_days=1,
         )
         apply_retention(self.root, dry_run=False)
-        self.assertFalse(old_zip.exists(), "Very old archive zip should be deleted")
+        self.assertFalse(old_zip.exists(), "Leftover archive zip should be deleted")
+
+    def test_default_policy_disables_archives(self) -> None:
+        self.assertFalse(DEFAULT_POLICY["create_archives"])
+        self.assertEqual(DEFAULT_POLICY["keep_months_archive"], 0)
 
 
 class RetentionHardCapTests(unittest.TestCase):
@@ -103,16 +119,16 @@ class RetentionHardCapTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             policy = {
+                "create_archives": False,
                 "keep_weeks_individual": 1,
                 "keep_weeks_mega_pdf": 1,
-                "keep_months_archive": 1,
-                "hard_size_cap_gb": 0.000001,  # 1 KB cap — will always trigger
+                "keep_months_archive": 0,
+                "hard_size_cap_gb": 0.000001,
             }
             (root / "parishes").mkdir(parents=True, exist_ok=True)
             (root / "parishes" / "retention_policy.json").write_text(
                 json.dumps(policy), encoding="utf-8"
             )
-            # Write enough data to exceed cap
             _write_file(root / "Bulletins" / "current" / "big.pdf", content=b"x" * 2048)
 
             report = apply_retention(root, dry_run=False)
@@ -120,12 +136,14 @@ class RetentionHardCapTests(unittest.TestCase):
                 any("hard cap" in w.lower() or "exceeds" in w.lower() for w in report["warnings"]),
                 f"Expected a hard cap warning, got: {report['warnings']}",
             )
+            self.assertEqual(report["zipped_files"], [])
 
     def test_default_policy_loaded_when_no_file(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             report = apply_retention(root, dry_run=True)
             self.assertIn("before_bytes", report)
+            self.assertEqual(report["zipped_files"], [])
 
 
 class RetentionPolicyTests(unittest.TestCase):
@@ -133,16 +151,16 @@ class RetentionPolicyTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             policy = {
-                "keep_weeks_individual": 52,  # very long — nothing should be pruned
+                "create_archives": False,
+                "keep_weeks_individual": 52,
                 "keep_weeks_mega_pdf": 52,
-                "keep_months_archive": 24,
+                "keep_months_archive": 0,
                 "hard_size_cap_gb": 100.0,
             }
             (root / "parishes").mkdir(parents=True, exist_ok=True)
             (root / "parishes" / "retention_policy.json").write_text(
                 json.dumps(policy), encoding="utf-8"
             )
-            # Write a 3-week-old PDF — should be kept under 52-week policy
             old_pdf = _write_file(
                 root / "Bulletins" / "current" / "old.pdf",
                 content=b"%PDF-1.4",
@@ -150,6 +168,14 @@ class RetentionPolicyTests(unittest.TestCase):
             )
             apply_retention(root, dry_run=False)
             self.assertTrue(old_pdf.exists(), "File within retention window should NOT be pruned")
+
+
+class RetentionWorkflowTests(unittest.TestCase):
+    def test_workflow_does_not_auto_run_after_harvest(self) -> None:
+        workflow = Path(".github/workflows/retention.yml").read_text(encoding="utf-8")
+        self.assertNotIn("workflow_run:", workflow)
+        self.assertIn("archives disabled", workflow.lower())
+        self.assertNotIn("zip old", workflow.lower())
 
 
 if __name__ == "__main__":
