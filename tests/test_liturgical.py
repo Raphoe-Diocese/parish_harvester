@@ -3,7 +3,11 @@ from __future__ import annotations
 import unittest
 from datetime import date
 
-from harvester.liturgical import get_liturgical_name, get_liturgical_sundays
+from harvester.liturgical import (
+    get_liturgical_name,
+    get_liturgical_sundays,
+    liturgical_date_from_text,
+)
 from harvester.utils import rewrite_greenlough_url
 
 
@@ -72,6 +76,31 @@ class LiturgicalCalendarTests(unittest.TestCase):
             get_liturgical_name(date(2027, 4, 4)),
             "2nd_Sunday_of_Easter_-_Divine_Mercy_Sunday",
         )
+
+    def test_liturgical_date_from_text_word_and_typo_filenames(self) -> None:
+        self.assertEqual(
+            liturgical_date_from_text(
+                "Twentieth-Sunday-in-Ordinary-Time.pdf", 2026
+            ),
+            date(2026, 8, 16),
+        )
+        self.assertEqual(
+            liturgical_date_from_text(
+                "19th-Suday-in-ordinary-time-724x1024.png", 2026
+            ),
+            date(2026, 8, 9),
+        )
+        self.assertEqual(
+            liturgical_date_from_text(
+                "Sixteenth-Sunday-of-Ordinary-Time.pdf", 2026
+            ),
+            date(2026, 7, 19),
+        )
+        self.assertEqual(
+            liturgical_date_from_text("20th-sunday-in-ordinary-time-3", 2026),
+            date(2026, 8, 16),
+        )
+        self.assertIsNone(liturgical_date_from_text("ordinary-time.pdf", 2026))
 
     def test_rewrite_greenlough_url_uses_dynamic_liturgical_name(self) -> None:
         original = "http://www.greenlough.com/publications/newsletter/Easter_Sunday_2026_[2026-4-5].pdf"

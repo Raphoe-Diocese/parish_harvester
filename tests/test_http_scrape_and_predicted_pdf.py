@@ -92,6 +92,39 @@ class HttpScrapeScoreTests(unittest.TestCase):
         self.assertEqual(best_date, date(2026, 4, 5))
         self.assertIn("5th-April", best_url)
 
+    def test_liturgical_and_glenavy_filenames_score_current_week(self) -> None:
+        hrefs = [
+            "https://www.holy-familyparish.com/app/uploads/2026/08/Nineteenth-Sunday-in-Ordinary-Time.pdf",
+            "https://www.holy-familyparish.com/app/uploads/2026/08/Twentieth-Sunday-in-Ordinary-Time.pdf",
+            "https://ballymenaparish.org/wp-content/uploads/2025/01/Wedding-Parish.pdf",
+        ]
+        scored = _score_http_scrape_pdf_hrefs(hrefs, date(2026, 8, 16))
+        best_date, best_url = max(scored)
+        self.assertEqual(best_date, date(2026, 8, 16))
+        self.assertIn("Twentieth-Sunday", best_url)
+        self.assertTrue(all("Wedding-Parish" not in url for _, url in scored))
+
+    def test_old_year_liturgical_file_does_not_beat_current(self) -> None:
+        hrefs = [
+            "https://glenariffeparish.org/wp-content/uploads/2024/08/Twentieth-Sunday-of-Ordinary-time.pdf",
+            "https://glenariffeparish.org/wp-content/uploads/2026/07/Sixteenth-Sunday-of-Ordinary-Time.pdf",
+        ]
+        scored = _score_http_scrape_pdf_hrefs(hrefs, date(2026, 8, 16))
+        best_date, best_url = max(scored)
+        self.assertEqual(best_date, date(2026, 7, 19))
+        self.assertIn("2026/07/Sixteenth", best_url)
+
+    def test_glenavy_year_monthname_day_filename(self) -> None:
+        hrefs = [
+            "https://www.glenavyandkilleadparish.com/app/uploads/2026/04/2026-April-26-Fourth-Sunday-of-Easter.pdf",
+            "https://www.glenavyandkilleadparish.com/app/uploads/2026/08/2026-August-16-Twentieth-Sunday-in-Ordinary-Time.pdf",
+            "https://www.glenavyandkilleadparish.com/app/uploads/2026/08/2026-August-9-nineteenth-Sunday-in-Ordinary-Time.pdf",
+        ]
+        scored = _score_http_scrape_pdf_hrefs(hrefs, date(2026, 8, 16))
+        best_date, best_url = max(scored)
+        self.assertEqual(best_date, date(2026, 8, 16))
+        self.assertIn("August-16", best_url)
+
 
 if __name__ == "__main__":
     unittest.main()

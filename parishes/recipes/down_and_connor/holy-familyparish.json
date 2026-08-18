@@ -1,27 +1,26 @@
 {
+  "version": 2,
   "parish_key": "holy-familyparish",
   "display_name": "Holy Family",
-  "recorded_date": "2026-04-30",
+  "diocese": "down_and_connor",
+  "recorded_date": "2026-08-18",
   "start_url": "https://www.holy-familyparish.com/bulletin/",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [".pdf", "sunday", "ordinary"],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
   "steps": [
     {
       "action": "goto",
       "url": "https://www.holy-familyparish.com/bulletin/"
-    },
-    {
-      "action": "click",
-      "selector": "a:has-text('Bulletin')",
-      "fallback_selectors": [
-        "a[href*='fourth'][href$='.pdf']",
-        "a[href$='.pdf']",
-        "a[href*='.pdf']",
-        "div > div > div > ul > li:nth-of-type(1) > a"
-      ]
-    },
-    {
-      "action": "download",
-      "url_pattern": "*.pdf"
     }
   ],
-  "diocese": "down_and_connor"
+  "operator_notes": [
+    "Listing already has /app/uploads/2026/08/Twentieth-Sunday-in-Ordinary-Time.pdf (HTTP 200, 1019586 bytes, 18/08/2026).",
+    "Previous harvest dated that liturgical filename as 01/08/2026 (WordPress folder day=1) and stale-rejected a current bulletin. liturgical_date_from_text now maps Twentieth Sunday → 16/08/2026.",
+    "site_type:http_scrape_newest_pdf. Do not click a:has-text('Bulletin') — too generic."
+  ],
+  "do_not": [
+    "Do not treat the /uploads/YYYY/MM/ folder day as the bulletin date when the filename is only a liturgical Sunday name."
+  ]
 }

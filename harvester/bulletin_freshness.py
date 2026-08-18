@@ -153,6 +153,24 @@ def extract_bulletin_date(url_or_text: str) -> date | None:
             if iso_dash_match:
                 day = int(iso_dash_match.group(1))
                 return _safe_date(folder_year, folder_month, day)
+            # Filename-first: 16.8.26-20th-Sunday.pdf, 2026-August-16-…,
+            # Twentieth-Sunday-in-Ordinary-Time.pdf. Must run before the
+            # day=1 folder default — that default dated Holy Family's
+            # current Twentieth-Sunday file as 01/08/2026 and rejected it
+            # as 15 days stale against 16/08/2026 (found 2026-08-18).
+            filename_date = extract_date_from_string(basename)
+            if filename_date:
+                return filename_date
+            from .liturgical import liturgical_date_from_text
+
+            liturgical = liturgical_date_from_text(basename, folder_year)
+            if liturgical:
+                return liturgical
+            # UUID/hash scans (Iskaheen) have no day-of-month. Do not let
+            # slug_day pick a hex digit out of the hash; freshness then
+            # treats same-month hashes as current-month.
+            if _opaque_hash_spans(basename):
+                return _safe_date(folder_year, folder_month, 1)
             # "19th-Suday-in-ordinary-time-724x1024.png" style filenames lead
             # with the LITURGICAL Sunday-count ordinal (e.g. "19th Sunday in
             # Ordinary Time" — the 19th Sunday of the church year), not a
@@ -184,6 +202,14 @@ def extract_bulletin_date(url_or_text: str) -> date | None:
     parsed = extract_date_from_string(text)
     if parsed:
         return parsed
+
+    from .liturgical import liturgical_date_from_text
+
+    year_hint_match = re.search(r"/uploads/(20\d{2})/", text, re.I)
+    year_hint = int(year_hint_match.group(1)) if year_hint_match else date.today().year
+    liturgical = liturgical_date_from_text(text, year_hint)
+    if liturgical:
+        return liturgical
 
     patterns = (
         (_ISO_RE, lambda m: _safe_date(int(m.group(1)), int(m.group(2)), int(m.group(3)))),
@@ -246,6 +272,24 @@ def check_bulletin_freshness(url: str, target: date) -> FreshnessVerdict:
         extracted = yearless_slug_date(url, target.year, near=target)
     if extracted is None:
         return FreshnessVerdict(status="unknown", reason="no_date_in_url")
+
+    # Hashed/UUID page scans (Iskaheen /2026/08/<uuid>-rotated.jpg) have no
+    # day-of-month. extract_bulletin_date then uses the 1st of the upload
+    # folder, which is 15 days behind a mid-month Sunday and fails the 8-day
+    # grace window even when the parish posted this month's bulletin.
+    basename = unquote(url or "").rsplit("/", 1)[-1]
+    if (
+        extracted.day == 1
+        and extracted.year == target.year
+        and extracted.month == target.month
+        and _opaque_hash_spans(basename)
+    ):
+        return FreshnessVerdict(
+            status="fresh",
+            extracted_date=target,
+            reason="upload_folder_matches_target_month",
+            days_from_target=0,
+        )
 
     week_start, week_end = week_window(target)
     if week_start <= extracted <= week_end:

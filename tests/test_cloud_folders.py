@@ -44,6 +44,15 @@ class CloudFolderTests(unittest.TestCase):
             extract_date_from_string("Parish-Bulletin-09.08.26-FOR-PRINTING.pdf"),
             date(2026, 8, 9),
         )
+        # Ballymena unpadded D.M.YY (16.8.26 / 9.8.26)
+        self.assertEqual(
+            extract_date_from_string("16.8.26-20th-Sunday.pdf"),
+            date(2026, 8, 16),
+        )
+        self.assertEqual(
+            extract_date_from_string("9.8.26-19th-Sunday.pdf"),
+            date(2026, 8, 9),
+        )
 
     def test_detect_cloud_date_format(self) -> None:
         self.assertEqual(detect_cloud_date_format("26.06.14.pdf"), "YY.MM.DD")

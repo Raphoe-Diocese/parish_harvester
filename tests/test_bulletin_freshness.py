@@ -124,8 +124,51 @@ class BulletinFreshnessTests(unittest.TestCase):
         )
         extracted = extract_bulletin_date(url)
         self.assertNotEqual(extracted, date(2026, 8, 19))
+        self.assertEqual(extracted, date(2026, 8, 9))
         verdict = check_bulletin_freshness(url, date(2026, 8, 9))
         self.assertEqual(verdict.status, "fresh")
+        self.assertEqual(verdict.reason, "in_bulletin_week")
+        # Same file must stay fresh against the following Sunday (8-day grace).
+        later = check_bulletin_freshness(url, date(2026, 8, 16))
+        self.assertEqual(later.status, "fresh")
+
+    def test_liturgical_only_filename_is_not_folder_day_one(self) -> None:
+        # Holy Family / Loughshore: Twentieth-Sunday-in-Ordinary-Time.pdf
+        # inside /uploads/2026/08/ used to date as 01/08/2026 and fail the
+        # 16/08/2026 harvest as 15 days stale.
+        url = (
+            "https://www.holy-familyparish.com/app/uploads/2026/08/"
+            "Twentieth-Sunday-in-Ordinary-Time.pdf"
+        )
+        self.assertEqual(extract_bulletin_date(url), date(2026, 8, 16))
+        verdict = check_bulletin_freshness(url, date(2026, 8, 16))
+        self.assertEqual(verdict.status, "fresh")
+        self.assertEqual(verdict.reason, "in_bulletin_week")
+
+    def test_ballymena_unpadded_dot_date_and_glenavy_year_month_day(self) -> None:
+        self.assertEqual(
+            extract_bulletin_date(
+                "https://ballymenaparish.org/wp-content/uploads/2026/08/"
+                "16.8.26-20th-Sunday.pdf"
+            ),
+            date(2026, 8, 16),
+        )
+        self.assertEqual(
+            extract_bulletin_date(
+                "https://www.glenavyandkilleadparish.com/app/uploads/2026/08/"
+                "2026-August-16-Twentieth-Sunday-in-Ordinary-Time.pdf"
+            ),
+            date(2026, 8, 16),
+        )
+
+    def test_hashed_upload_same_month_is_fresh(self) -> None:
+        url = (
+            "https://www.iskaheenparish.com/wp-content/uploads/2026/08/"
+            "240be8f2-b7ae-49f3-8748-f9290e30bcb2-rotated.jpg"
+        )
+        verdict = check_bulletin_freshness(url, date(2026, 8, 16))
+        self.assertEqual(verdict.status, "fresh")
+        self.assertEqual(verdict.reason, "upload_folder_matches_target_month")
 
     def test_ordinal_day_of_month_still_extracted_when_not_a_sunday_count(
         self,

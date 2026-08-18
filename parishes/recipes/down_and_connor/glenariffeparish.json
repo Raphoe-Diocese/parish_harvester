@@ -1,18 +1,26 @@
 {
+  "version": 2,
   "parish_key": "glenariffeparish",
   "display_name": "Glenariffe",
-  "recorded_date": "2026-06-26",
+  "diocese": "down_and_connor",
+  "recorded_date": "2026-08-18",
   "start_url": "https://glenariffeparish.org/whats-on",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [".pdf", "sunday", "ordinary"],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
   "steps": [
     {
       "action": "goto",
       "url": "https://glenariffeparish.org/whats-on"
-    },
-    {
-      "action": "download",
-      "url_pattern": "*.pdf"
     }
   ],
-  "diocese": "down_and_connor",
-  "auto_fixed": true
+  "operator_notes": [
+    "Listing HTML already contains the weekly PDFs. Newest on 18/08/2026 is /2026/07/Sixteenth-Sunday-of-Ordinary-Time.pdf (16th Sunday = 19/07/2026). Predicted later liturgical filenames were not checked as needed — the parish has not posted 17th–20th.",
+    "Previous harvest dated that liturgical file as 01/07/2026 (folder day=1). liturgical_date_from_text now maps it to 19/07/2026; still stale vs 16/08/2026, correctly.",
+    "site_type:http_scrape_newest_pdf so harvest does not depend on a bare download *.pdf click."
+  ],
+  "do_not": [
+    "Do not treat this as a recipe failure while the listing's newest file is still July."
+  ]
 }
