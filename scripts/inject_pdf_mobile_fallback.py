@@ -1,4 +1,4 @@
-"""Inject mobile PDF fallback script into existing bulletin viewer HTML pages.
+"""Inject the in-page PDF.js viewer script into existing bulletin HTML pages.
 
 Uses binary I/O so Windows CRLF line endings are preserved (avoids huge noisy diffs).
 """
@@ -7,8 +7,8 @@ from __future__ import annotations
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent / "docs"
-MARKER = b"pdf-mobile-fallback.js"
-TAG = b'<script src="/assets/pdf-mobile-fallback.js" defer></script>\n'
+MARKERS = (b"pdf-inpage-viewer.js", b"pdf-mobile-fallback.js")
+TAG = b'<script src="/assets/pdf-inpage-viewer.js" defer></script>\n'
 
 
 def needs_pdf_embed(data: bytes) -> bool:
@@ -19,6 +19,10 @@ def needs_pdf_embed(data: bytes) -> bool:
     )
 
 
+def already_has_script(data: bytes) -> bool:
+    return any(marker in data for marker in MARKERS)
+
+
 def main() -> None:
     changed = 0
     skipped = 0
@@ -27,7 +31,7 @@ def main() -> None:
         data = path.read_bytes()
         if not needs_pdf_embed(data):
             continue
-        if MARKER in data:
+        if already_has_script(data):
             skipped += 1
             continue
         lower = data.lower()

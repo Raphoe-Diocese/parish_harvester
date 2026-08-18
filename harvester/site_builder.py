@@ -619,7 +619,7 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
             f"<p class=\"live-card-updated\">Last updated: {html.escape(row['updated'])}</p>"
             "<div class=\"live-card-actions\">"
             f"<a class=\"live-btn primary\" href=\"dioceses/{row['key']}/\" target=\"_blank\" rel=\"noopener noreferrer\">Open Collated Bulletin →</a>"
-            f"<a class=\"live-btn secondary\" href=\"{html.escape(_mega_pdf_url(row['key']), quote=True)}\" target=\"_blank\" rel=\"noopener noreferrer\">📄 Mega PDF</a>"
+            f"<a class=\"live-btn secondary\" href=\"{html.escape(_mega_pdf_url(row['key'], same_origin=True), quote=True)}\" target=\"_blank\" rel=\"noopener noreferrer\">📄 Mega PDF</a>"
             f"<a class=\"live-btn secondary\" href=\"{html.escape(_ocr_standalone_url(row['key']), quote=True)}\" target=\"_blank\" rel=\"noopener noreferrer\">📝 Text Bulletin</a>"
             "</div>"
             "</article>"
@@ -862,10 +862,15 @@ def _ocr_standalone_url(diocese_key: str) -> str:
     return f"{pages_base}/bulletins/index.html"
 
 
-def _mega_pdf_url(diocese_key: str) -> str:
+def _mega_pdf_url(diocese_key: str, *, same_origin: bool = False) -> str:
     stem = diocese_key.replace("-", "_")
+    filename = f"{stem}_mega_bulletin.pdf"
+    # Same-origin path avoids the github.io → parishpress.ie 301, which
+    # breaks or delays HTTP Range requests on phones (14–20 MB mega PDFs).
+    if same_origin:
+        return f"/mega_pdf/{filename}"
     pages_base = "https://raphoe-diocese.github.io/parish_harvester"
-    return f"{pages_base}/mega_pdf/{stem}_mega_bulletin.pdf"
+    return f"{pages_base}/mega_pdf/{filename}"
 
 
 def _latest_pdf_standalone(diocese_key: str) -> Path | None:
@@ -890,7 +895,7 @@ def _pdf_standalone_url(diocese_key: str) -> str:
     pages_base = "https://raphoe-diocese.github.io/parish_harvester"
     if standalone is not None:
         return f"{pages_base}/bulletins/{standalone.name}"
-    return _mega_pdf_url(diocese_key)
+    return _mega_pdf_url(diocese_key, same_origin=True)
 
 
 def _parish_links_for_big_bulletin(diocese_key: str, report_path: Path) -> list[dict[str, str]]:
@@ -935,7 +940,7 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
             render_diocese_raphoe_page(
                 parish_links=parish_links,
                 out_path=out_path,
-                mega_pdf_url=_mega_pdf_url(diocese.key),
+                mega_pdf_url=_mega_pdf_url(diocese.key, same_origin=True),
                 ocr_standalone_url=_ocr_standalone_url(diocese.key),
                 pdf_standalone_url=_pdf_standalone_url(diocese.key),
                 ocr_text=ocr_text,

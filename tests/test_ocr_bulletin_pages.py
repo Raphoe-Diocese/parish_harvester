@@ -11,6 +11,9 @@ from ocr.generate_bulletin_pages import (
     extract_ocr_fragment,
     format_uk_date,
     parse_parish_links,
+    pdf_inpage_viewer_boot_js,
+    pdf_inpage_viewer_css,
+    pdf_inpage_viewer_html,
     pdf_mobile_fallback_boot_js,
     pdf_mobile_fallback_css,
     pdf_mobile_fallback_html,
@@ -139,23 +142,22 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertIn("Georgia", html_output)
             self.assertIn("Download PDF", html_output)
             self.assertIn("pdf-fullscreen-btn", html_output)
-            # Mobile phones cannot embed PDFs in iframes — CSS media query
-            # hides the iframe and shows View/Download (no UA sniff required).
-            self.assertIn("pdf-mobile-fallback", html_output)
-            self.assertIn("View PDF", html_output)
+            # Mobile/tablet: hide the raw-PDF iframe and show PDF.js in-page.
+            self.assertIn("pdf-inpage-viewer", html_output)
+            self.assertIn("/assets/pdf-inpage-viewer.js", html_output)
+            self.assertIn("data-pdf-src", html_output)
             self.assertIn("prefersNativePdf", html_output)
             self.assertIn("is-native-pdf", html_output)
             self.assertIn("matchMedia", html_output)
-            # Media-query block must hide iframe and show the fallback panel.
             media_idx = html_output.find("@media (max-width: 1024px)")
             self.assertGreaterEqual(media_idx, 0)
-            # Prefer the fallback CSS block (first 1024px media query in page head).
-            media_chunk = html_output[media_idx : media_idx + 800]
-            self.assertIn(".pdf-mobile-fallback", media_chunk)
+            media_chunk = html_output[media_idx : media_idx + 900]
+            self.assertIn(".pdf-inpage-viewer", media_chunk)
             self.assertIn("display: flex !important", media_chunk)
             self.assertIn(".pdf-frame-wrap iframe", media_chunk)
             self.assertIn("display: none !important", media_chunk)
-            self.assertNotIn('id="pdf-mobile-fallback" hidden', html_output)
+            self.assertIn("min-height: 450px", media_chunk)
+            self.assertNotIn('id="pdf-inpage-viewer" hidden', html_output)
             # PDF section must appear before the OCR section in document order.
             self.assertLess(
                 html_output.index("Bulletin — Original PDF Version"),
@@ -180,36 +182,44 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn('href="test-2026-05-19.html"', html_output)
         self.assertIn("<iframe", html_output)
         self.assertIn("embed-mode", html_output)
-        self.assertIn("pdf-mobile-fallback", html_output)
+        self.assertIn("pdf-inpage-viewer", html_output)
+        self.assertIn("/assets/pdf-inpage-viewer.js", html_output)
         self.assertIn("prefersNativePdf", html_output)
-        self.assertIn("View PDF", html_output)
+        self.assertIn("data-pdf-src", html_output)
 
-    def test_mobile_pdf_fallback_helpers(self) -> None:
-        """Phone/tablet detection + panel markup stay wired for native PDF open."""
+    def test_mobile_pdf_inpage_viewer_helpers(self) -> None:
+        """Phone/tablet path is PDF.js in-page, not a new-tab-only fallback."""
         det = prefers_native_pdf_js()
         self.assertIn("prefersNativePdf", det)
         self.assertIn("Android", det)
         self.assertIn("iPhone", det)
         self.assertIn("maxTouchPoints", det)
 
-        panel = pdf_mobile_fallback_html("../mega_pdf/raphoe_mega_bulletin.pdf")
-        self.assertIn('id="pdf-mobile-fallback"', panel)
-        self.assertIn("../mega_pdf/raphoe_mega_bulletin.pdf", panel)
-        self.assertIn("View PDF", panel)
-        self.assertIn("Download PDF", panel)
+        panel = pdf_inpage_viewer_html("../mega_pdf/raphoe_mega_bulletin.pdf")
+        self.assertIn('id="pdf-inpage-viewer"', panel)
+        self.assertIn('data-pdf-src="../mega_pdf/raphoe_mega_bulletin.pdf"', panel)
+        self.assertIn("pdf-inpage-pages", panel)
+        self.assertIn("Open PDF", panel)
+        self.assertIn("Download", panel)
         self.assertIn('target="_blank"', panel)
+        self.assertEqual(panel, pdf_mobile_fallback_html("../mega_pdf/raphoe_mega_bulletin.pdf"))
 
-        boot = pdf_mobile_fallback_boot_js()
+        boot = pdf_inpage_viewer_boot_js()
         self.assertIn("is-native-pdf", boot)
         self.assertIn("pdf-frame-wrap", boot)
         self.assertIn("removeAttribute('src')", boot)
         self.assertIn("matchMedia", boot)
         self.assertIn("max-width: 1024px", boot)
+        self.assertIn("/assets/pdf-inpage-viewer.js", boot)
+        self.assertEqual(boot, pdf_mobile_fallback_boot_js())
 
-        css = pdf_mobile_fallback_css()
+        css = pdf_inpage_viewer_css()
         self.assertIn("@media (max-width: 1024px)", css)
         self.assertIn("display: flex !important", css)
         self.assertIn(".pdf-frame-wrap iframe", css)
+        self.assertIn("min-height: 450px", css)
+        self.assertIn(".pdf-inpage-viewer", css)
+        self.assertEqual(css, pdf_mobile_fallback_css())
 
     def test_render_bulletin_viewer_shell_is_shared_canonical_design(self) -> None:
         """harvester.page_renderer.render_diocese_raphoe_page also calls this —
@@ -254,22 +264,44 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("Tap to go to plain text bulletin", html_output)
         self.assertIn('id="ocr-search"', html_output)
         self.assertIn("Georgia", html_output)
-        self.assertIn("pdf-mobile-fallback", html_output)
-        self.assertIn("View PDF", html_output)
+        self.assertIn("pdf-inpage-viewer", html_output)
+        self.assertIn("/assets/pdf-inpage-viewer.js", html_output)
         self.assertIn("prefersNativePdf", html_output)
         self.assertIn("matchMedia", html_output)
-        self.assertNotIn('id="pdf-mobile-fallback" hidden', html_output)
+        self.assertNotIn('id="pdf-inpage-viewer" hidden', html_output)
 
-    def test_pdf_mobile_fallback_asset_exists(self) -> None:
-        asset = Path(__file__).resolve().parent.parent / "docs" / "assets" / "pdf-mobile-fallback.js"
-        self.assertTrue(asset.is_file(), "docs/assets/pdf-mobile-fallback.js must exist for live pages")
-        text = asset.read_text(encoding="utf-8")
+    def test_pdf_inpage_viewer_asset_streams_first_page(self) -> None:
+        assets = Path(__file__).resolve().parent.parent / "docs" / "assets"
+        viewer = assets / "pdf-inpage-viewer.js"
+        self.assertTrue(viewer.is_file(), "docs/assets/pdf-inpage-viewer.js must exist for live pages")
+        text = viewer.read_text(encoding="utf-8")
+        self.assertIn("pdfjs", text.lower())
+        self.assertIn("disableAutoFetch", text)
+        self.assertIn("disableStream", text)
+        self.assertIn("disableRange", text)
+        self.assertIn("cdnjs.cloudflare.com/ajax/libs/pdf.js", text)
+        self.assertNotIn("docs.google.com", text)
         self.assertIn("prefersNativePdf", text)
-        self.assertIn("View PDF", text)
         self.assertIn("is-native-pdf", text)
-        self.assertIn("@media (max-width:1024px)", text)
-        self.assertIn("matchMedia", text)
         self.assertIn("narrowViewport", text)
+        loader = assets / "pdf-mobile-fallback.js"
+        self.assertTrue(loader.is_file())
+        self.assertIn("pdf-inpage-viewer.js", loader.read_text(encoding="utf-8"))
+
+    def test_live_diocese_html_ships_inpage_viewer(self) -> None:
+        """Generator-only changes are invisible on parishpress.ie — live HTML must include PDF.js."""
+        docs = Path(__file__).resolve().parent.parent / "docs"
+        for rel in (
+            "dioceses/raphoe/index.html",
+            "dioceses/derry/index.html",
+            "dioceses/down-and-connor/index.html",
+        ):
+            html_live = (docs / rel).read_text(encoding="utf-8")
+            self.assertIn("pdf-inpage-viewer", html_live, rel)
+            self.assertIn("/assets/pdf-inpage-viewer.js", html_live, rel)
+            self.assertIn("data-pdf-src", html_live, rel)
+            self.assertIn('src="/mega_pdf/', html_live, rel)
+            self.assertNotIn("View this bulletin PDF", html_live, rel)
 
     def test_render_ocr_standalone_page(self) -> None:
         config = DioceseConfig(
