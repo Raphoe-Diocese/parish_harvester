@@ -6,10 +6,9 @@ import unittest
 from pathlib import Path
 
 
-ROOT = Path(__file__).resolve().parents[1]
-PARENT = ROOT.parent
-THREEPATRONS_SNIPPET = (PARENT / "threepatrons.txt").read_text(encoding="utf-8", errors="replace")[:120000]
-CLONLEIGH_SNIPPET = (PARENT / "clonleighparish.txt").read_text(encoding="utf-8", errors="replace")[:200000]
+FIXTURES = Path(__file__).resolve().parent / "fixtures"
+THREEPATRONS_SNIPPET = (FIXTURES / "threepatrons.txt").read_text(encoding="utf-8", errors="replace")[:120000]
+CLONLEIGH_SNIPPET = (FIXTURES / "clonleighparish.txt").read_text(encoding="utf-8", errors="replace")[:200000]
 
 WP_HTML_MARKERS = [
     (r'wp-block-paragraph|class="entry-content', 14, "WP entry content blocks"),
