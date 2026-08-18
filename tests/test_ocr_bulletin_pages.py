@@ -12,6 +12,7 @@ from ocr.generate_bulletin_pages import (
     format_uk_date,
     parse_parish_links,
     pdf_mobile_fallback_boot_js,
+    pdf_mobile_fallback_css,
     pdf_mobile_fallback_html,
     prefers_native_pdf_js,
     prepare_ocr_fragment,
@@ -138,11 +139,23 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertIn("Georgia", html_output)
             self.assertIn("Download PDF", html_output)
             self.assertIn("pdf-fullscreen-btn", html_output)
-            # Mobile phones cannot embed PDFs in iframes — show a clear panel.
+            # Mobile phones cannot embed PDFs in iframes — CSS media query
+            # hides the iframe and shows View/Download (no UA sniff required).
             self.assertIn("pdf-mobile-fallback", html_output)
             self.assertIn("View PDF", html_output)
             self.assertIn("prefersNativePdf", html_output)
             self.assertIn("is-native-pdf", html_output)
+            self.assertIn("matchMedia", html_output)
+            # Media-query block must hide iframe and show the fallback panel.
+            media_idx = html_output.find("@media (max-width: 1024px)")
+            self.assertGreaterEqual(media_idx, 0)
+            # Prefer the fallback CSS block (first 1024px media query in page head).
+            media_chunk = html_output[media_idx : media_idx + 800]
+            self.assertIn(".pdf-mobile-fallback", media_chunk)
+            self.assertIn("display: flex !important", media_chunk)
+            self.assertIn(".pdf-frame-wrap iframe", media_chunk)
+            self.assertIn("display: none !important", media_chunk)
+            self.assertNotIn('id="pdf-mobile-fallback" hidden', html_output)
             # PDF section must appear before the OCR section in document order.
             self.assertLess(
                 html_output.index("Bulletin — Original PDF Version"),
@@ -190,6 +203,13 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("is-native-pdf", boot)
         self.assertIn("pdf-frame-wrap", boot)
         self.assertIn("removeAttribute('src')", boot)
+        self.assertIn("matchMedia", boot)
+        self.assertIn("max-width: 1024px", boot)
+
+        css = pdf_mobile_fallback_css()
+        self.assertIn("@media (max-width: 1024px)", css)
+        self.assertIn("display: flex !important", css)
+        self.assertIn(".pdf-frame-wrap iframe", css)
 
     def test_render_bulletin_viewer_shell_is_shared_canonical_design(self) -> None:
         """harvester.page_renderer.render_diocese_raphoe_page also calls this —
@@ -237,6 +257,8 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("pdf-mobile-fallback", html_output)
         self.assertIn("View PDF", html_output)
         self.assertIn("prefersNativePdf", html_output)
+        self.assertIn("matchMedia", html_output)
+        self.assertNotIn('id="pdf-mobile-fallback" hidden', html_output)
 
     def test_pdf_mobile_fallback_asset_exists(self) -> None:
         asset = Path(__file__).resolve().parent.parent / "docs" / "assets" / "pdf-mobile-fallback.js"
@@ -245,6 +267,9 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("prefersNativePdf", text)
         self.assertIn("View PDF", text)
         self.assertIn("is-native-pdf", text)
+        self.assertIn("@media (max-width:1024px)", text)
+        self.assertIn("matchMedia", text)
+        self.assertIn("narrowViewport", text)
 
     def test_render_ocr_standalone_page(self) -> None:
         config = DioceseConfig(
