@@ -1102,7 +1102,12 @@ def prefers_native_pdf_js() -> str:
 
 
 def pdf_mobile_fallback_css() -> str:
-    """Styles for the phone/tablet PDF panel (desktop iframe stays unchanged)."""
+    """Phone/tablet PDF panel.
+
+    Primary path is CSS ``max-width: 1024px`` (no JS required): hide the
+    iframe/embed and show View PDF + Download buttons. JS ``is-native-pdf``
+    remains as a backup for wide tablets that still cannot embed PDFs.
+    """
     return f"""
     .pdf-mobile-fallback {{
       display: none;
@@ -1128,8 +1133,29 @@ def pdf_mobile_fallback_css() -> str:
     }}
     .pdf-frame-wrap.is-native-pdf .pdf-mobile-fallback,
     body.is-native-pdf .pdf-mobile-fallback {{
-      display: flex;
+      display: flex !important;
       flex: 1 1 auto;
+    }}
+    @media (max-width: 1024px) {{
+      .pdf-frame-wrap {{
+        height: auto !important;
+        min-height: 0 !important;
+        background: #eef2f2;
+      }}
+      .pdf-frame-wrap iframe,
+      .pdf-frame-wrap .fullscreen-btn,
+      .pdf-standalone-shell iframe.pdf-frame {{
+        display: none !important;
+      }}
+      .pdf-standalone-shell {{
+        height: auto;
+        min-height: 0;
+        background: #eef2f2;
+      }}
+      .pdf-mobile-fallback {{
+        display: flex !important;
+        flex: 1 1 auto;
+      }}
     }}
     .pdf-mobile-fallback-title {{
       margin: 0;
@@ -1183,10 +1209,15 @@ def pdf_mobile_fallback_css() -> str:
 
 
 def pdf_mobile_fallback_html(pdf_href: str) -> str:
-    """Friendly phone panel: open in native viewer + download (no broken iframe)."""
+    """Friendly phone panel: open in native viewer + download (no broken iframe).
+
+    Visibility is CSS-driven (desktop: hidden; <=1024px or .is-native-pdf: shown).
+    Do not use the HTML ``hidden`` attribute — browsers apply
+    ``[hidden] {{ display: none !important }}`` which fights the media query.
+    """
     safe = html.escape(pdf_href, quote=True)
     return f"""
-        <div class="pdf-mobile-fallback" id="pdf-mobile-fallback" hidden>
+        <div class="pdf-mobile-fallback" id="pdf-mobile-fallback">
           <p class="pdf-mobile-fallback-title">View this bulletin PDF</p>
           <p class="pdf-mobile-fallback-note">On phones, PDFs open best in the browser&rsquo;s built-in viewer. Tap below to read or download.</p>
           <div class="pdf-mobile-fallback-actions">
@@ -1197,11 +1228,20 @@ def pdf_mobile_fallback_html(pdf_href: str) -> str:
 
 
 def pdf_mobile_fallback_boot_js() -> str:
-    """Swap broken iframe embeds for the native open/download panel on mobile."""
+    """Backup: stop loading the iframe on phones/tablets (CSS already hides it)."""
     return f"""
     (function () {{
 {prefers_native_pdf_js()}
-      if (!prefersNativePdf()) return;
+      function narrowViewport() {{
+        try {{
+          return window.matchMedia && window.matchMedia('(max-width: 1024px)').matches;
+        }} catch (e) {{
+          return false;
+        }}
+      }}
+      // CSS media query is the main fix; JS only unloads the iframe to save
+      // bandwidth / avoid the sad-doc flash on known-broken UAs or narrow screens.
+      if (!prefersNativePdf() && !narrowViewport()) return;
 
       function activateWrap(wrap) {{
         if (!wrap) return;
@@ -1209,13 +1249,10 @@ def pdf_mobile_fallback_boot_js() -> str:
         var iframe = wrap.querySelector('iframe');
         if (iframe) {{
           iframe.setAttribute('hidden', '');
-          // Stop the broken in-page PDF load; user opens it deliberately.
           try {{ iframe.removeAttribute('src'); }} catch (e) {{}}
         }}
         var fs = wrap.querySelector('.fullscreen-btn');
         if (fs) fs.setAttribute('hidden', '');
-        var panel = wrap.querySelector('.pdf-mobile-fallback');
-        if (panel) panel.removeAttribute('hidden');
       }}
 
       document.querySelectorAll('.pdf-frame-wrap').forEach(activateWrap);
@@ -1226,10 +1263,6 @@ def pdf_mobile_fallback_boot_js() -> str:
         document.body.classList.add('is-native-pdf');
         standalone.setAttribute('hidden', '');
         try {{ standalone.removeAttribute('src'); }} catch (e) {{}}
-        var panel = document.getElementById('pdf-mobile-fallback');
-        if (panel) {{
-          panel.removeAttribute('hidden');
-        }}
       }}
     }})();
 """
@@ -1676,10 +1709,7 @@ def render_bulletin_viewer_shell(
     .footer-inner a {{ color: #d8f0ee; font-weight: 600; }}
 
     @media (max-width: 1024px) {{
-      .pdf-frame-wrap {{
-        height: 70vh;
-        min-height: 450px;
-      }}
+      /* PDF wrap height is overridden by pdf_mobile_fallback_css (iframe hidden). */
       #ocr-panel {{
         height: 70vh;
         min-height: 450px;

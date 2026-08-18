@@ -163,8 +163,29 @@
     }
     .pdf-frame-wrap.is-native-pdf .pdf-mobile-fallback,
     body.is-native-pdf .pdf-mobile-fallback {
-      display: flex;
+      display: flex !important;
       flex: 1 1 auto;
+    }
+    @media (max-width: 1024px) {
+      .pdf-frame-wrap {
+        height: auto !important;
+        min-height: 0 !important;
+        background: #eef2f2;
+      }
+      .pdf-frame-wrap iframe,
+      .pdf-frame-wrap .fullscreen-btn,
+      .pdf-standalone-shell iframe.pdf-frame {
+        display: none !important;
+      }
+      .pdf-standalone-shell {
+        height: auto;
+        min-height: 0;
+        background: #eef2f2;
+      }
+      .pdf-mobile-fallback {
+        display: flex !important;
+        flex: 1 1 auto;
+      }
     }
     .pdf-mobile-fallback-title {
       margin: 0;
@@ -492,10 +513,7 @@
     .footer-inner a { color: #d8f0ee; font-weight: 600; }
 
     @media (max-width: 1024px) {
-      .pdf-frame-wrap {
-        height: 70vh;
-        min-height: 450px;
-      }
+      /* PDF wrap height is overridden by pdf_mobile_fallback_css (iframe hidden). */
       #ocr-panel {
         height: 70vh;
         min-height: 450px;
@@ -546,7 +564,7 @@
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
         <iframe src="../mega_pdf/down_and_connor_mega_bulletin.pdf" title="Down &amp; Connor Diocese bulletin PDF"></iframe>
         
-        <div class="pdf-mobile-fallback" id="pdf-mobile-fallback" hidden>
+        <div class="pdf-mobile-fallback" id="pdf-mobile-fallback">
           <p class="pdf-mobile-fallback-title">View this bulletin PDF</p>
           <p class="pdf-mobile-fallback-note">On phones, PDFs open best in the browser&rsquo;s built-in viewer. Tap below to read or download.</p>
           <div class="pdf-mobile-fallback-actions">
@@ -4090,7 +4108,16 @@ St Vincent de Paul Belfast: <a href="https://www.stvincentdepaulparishbelfast.co
         return false;
       }
 
-      if (!prefersNativePdf()) return;
+      function narrowViewport() {
+        try {
+          return window.matchMedia && window.matchMedia('(max-width: 1024px)').matches;
+        } catch (e) {
+          return false;
+        }
+      }
+      // CSS media query is the main fix; JS only unloads the iframe to save
+      // bandwidth / avoid the sad-doc flash on known-broken UAs or narrow screens.
+      if (!prefersNativePdf() && !narrowViewport()) return;
 
       function activateWrap(wrap) {
         if (!wrap) return;
@@ -4098,13 +4125,10 @@ St Vincent de Paul Belfast: <a href="https://www.stvincentdepaulparishbelfast.co
         var iframe = wrap.querySelector('iframe');
         if (iframe) {
           iframe.setAttribute('hidden', '');
-          // Stop the broken in-page PDF load; user opens it deliberately.
           try { iframe.removeAttribute('src'); } catch (e) {}
         }
         var fs = wrap.querySelector('.fullscreen-btn');
         if (fs) fs.setAttribute('hidden', '');
-        var panel = wrap.querySelector('.pdf-mobile-fallback');
-        if (panel) panel.removeAttribute('hidden');
       }
 
       document.querySelectorAll('.pdf-frame-wrap').forEach(activateWrap);
@@ -4115,10 +4139,6 @@ St Vincent de Paul Belfast: <a href="https://www.stvincentdepaulparishbelfast.co
         document.body.classList.add('is-native-pdf');
         standalone.setAttribute('hidden', '');
         try { standalone.removeAttribute('src'); } catch (e) {}
-        var panel = document.getElementById('pdf-mobile-fallback');
-        if (panel) {
-          panel.removeAttribute('hidden');
-        }
       }
     })();
 
