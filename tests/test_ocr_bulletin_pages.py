@@ -11,6 +11,9 @@ from ocr.generate_bulletin_pages import (
     extract_ocr_fragment,
     format_uk_date,
     parse_parish_links,
+    pdf_mobile_fallback_boot_js,
+    pdf_mobile_fallback_html,
+    prefers_native_pdf_js,
     prepare_ocr_fragment,
     render_bulletin_viewer_shell,
     render_ocr_standalone_page,
@@ -124,6 +127,11 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertIn("Georgia", html_output)
             self.assertIn("Download PDF", html_output)
             self.assertIn("pdf-fullscreen-btn", html_output)
+            # Mobile phones cannot embed PDFs in iframes — show a clear panel.
+            self.assertIn("pdf-mobile-fallback", html_output)
+            self.assertIn("View PDF", html_output)
+            self.assertIn("prefersNativePdf", html_output)
+            self.assertIn("is-native-pdf", html_output)
             # PDF section must appear before the OCR section in document order.
             self.assertLess(
                 html_output.index("Bulletin — Original PDF Version"),
@@ -148,6 +156,29 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn('href="test-2026-05-19.html"', html_output)
         self.assertIn("<iframe", html_output)
         self.assertIn("embed-mode", html_output)
+        self.assertIn("pdf-mobile-fallback", html_output)
+        self.assertIn("prefersNativePdf", html_output)
+        self.assertIn("View PDF", html_output)
+
+    def test_mobile_pdf_fallback_helpers(self) -> None:
+        """Phone/tablet detection + panel markup stay wired for native PDF open."""
+        det = prefers_native_pdf_js()
+        self.assertIn("prefersNativePdf", det)
+        self.assertIn("Android", det)
+        self.assertIn("iPhone", det)
+        self.assertIn("maxTouchPoints", det)
+
+        panel = pdf_mobile_fallback_html("../mega_pdf/raphoe_mega_bulletin.pdf")
+        self.assertIn('id="pdf-mobile-fallback"', panel)
+        self.assertIn("../mega_pdf/raphoe_mega_bulletin.pdf", panel)
+        self.assertIn("View PDF", panel)
+        self.assertIn("Download PDF", panel)
+        self.assertIn('target="_blank"', panel)
+
+        boot = pdf_mobile_fallback_boot_js()
+        self.assertIn("is-native-pdf", boot)
+        self.assertIn("pdf-frame-wrap", boot)
+        self.assertIn("removeAttribute('src')", boot)
 
     def test_render_bulletin_viewer_shell_is_shared_canonical_design(self) -> None:
         """harvester.page_renderer.render_diocese_raphoe_page also calls this —
@@ -182,6 +213,17 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("Tap to go to plain text bulletin", html_output)
         self.assertIn('id="ocr-search"', html_output)
         self.assertIn("Georgia", html_output)
+        self.assertIn("pdf-mobile-fallback", html_output)
+        self.assertIn("View PDF", html_output)
+        self.assertIn("prefersNativePdf", html_output)
+
+    def test_pdf_mobile_fallback_asset_exists(self) -> None:
+        asset = Path(__file__).resolve().parent.parent / "docs" / "assets" / "pdf-mobile-fallback.js"
+        self.assertTrue(asset.is_file(), "docs/assets/pdf-mobile-fallback.js must exist for live pages")
+        text = asset.read_text(encoding="utf-8")
+        self.assertIn("prefersNativePdf", text)
+        self.assertIn("View PDF", text)
+        self.assertIn("is-native-pdf", text)
 
     def test_render_ocr_standalone_page(self) -> None:
         config = DioceseConfig(
