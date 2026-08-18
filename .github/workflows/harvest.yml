@@ -136,14 +136,37 @@ jobs:
             exit 1
           fi
 
+      - name: Require mega PDFs for full harvest
+        if: steps.harvest_run.outcome == 'success' && github.event.inputs.target_parish == ''
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          pdfs=(mega_pdf/*_mega_bulletin.pdf)
+          if [ ${#pdfs[@]} -eq 0 ]; then
+            echo "::error::Full harvest produced no mega_pdf/*_mega_bulletin.pdf files. OCR and the searchable diocesan viewers depend on them (HARVEST_MEGA_PDF=1)."
+            ls -la mega_pdf || true
+            exit 1
+          fi
+          echo "Full harvest mega PDFs ready for OCR/Pages:"
+          for pdf in "${pdfs[@]}"; do
+            if [ ! -s "${pdf}" ]; then
+              echo "::error::Mega PDF is missing or empty: ${pdf}"
+              exit 1
+            fi
+            if ! python -c "import sys; sig=open(sys.argv[1],'rb').read(5); sys.exit(0 if sig==b'%PDF-' else 1)" "${pdf}"; then
+              echo "::error::File does not look like a PDF: ${pdf}"
+              exit 1
+            fi
+            ls -lh "${pdf}"
+          done
+
       - name: Upload mega PDF artifacts
         if: steps.harvest_run.outcome == 'success' && github.event.inputs.target_parish == ''
-        continue-on-error: true
         uses: actions/upload-artifact@v4
         with:
           name: all-mega-bulletin-pdf
           path: mega_pdf/*_mega_bulletin.pdf
-          if-no-files-found: warn
+          if-no-files-found: error
           retention-days: 30
 
       # Upload BEFORE commit — if git push fails later, OCR/deploy still get fresh outputs.

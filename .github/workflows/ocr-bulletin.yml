@@ -24,7 +24,108 @@ jobs:
         with:
           ref: main
 
+      - name: Resolve harvest run for mega PDF artifacts
+        id: harvest_run
+        env:
+          GH_TOKEN: ${{ github.token }}
+          EVENT_NAME: ${{ github.event_name }}
+          TRIGGER_RUN_ID: ${{ github.event.workflow_run.id || '' }}
+        run: |
+          set -euo pipefail
+          has_mega_artifact() {
+            local run_id="$1"
+            local count
+            count="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/artifacts" --jq '[.artifacts[] | select(.name | test("mega-bulletin-pdf"; "i"))] | length')"
+            [ "${count:-0}" -gt 0 ]
+          }
+          has_full_harvest_docs_artifact() {
+            local run_id="$1"
+            local count
+            # harvest-docs-* is uploaded only when target_parish is empty (full harvest).
+            count="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/artifacts" --jq '[.artifacts[] | select(.name | test("^harvest-docs-"; "i"))] | length')"
+            [ "${count:-0}" -gt 0 ]
+          }
+          pick_run_with_mega_artifact() {
+            local exclude="${1:-}"
+            local run_id=""
+            while IFS= read -r candidate; do
+              [ -n "${candidate}" ] || continue
+              if [ -n "${exclude}" ] && [ "${candidate}" = "${exclude}" ]; then
+                continue
+              fi
+              if has_mega_artifact "${candidate}"; then
+                run_id="${candidate}"
+                break
+              fi
+            done < <(gh run list --repo "${GITHUB_REPOSITORY}" --workflow harvest.yml --limit 25 --json databaseId,conclusion --jq '.[] | select(.conclusion == "success" or .conclusion == "failure") | .databaseId')
+            echo "${run_id}"
+          }
+
+          TRIGGER_HAS_MEGA=0
+          TRIGGER_IS_FULL=0
+          if [ -n "${TRIGGER_RUN_ID}" ]; then
+            if has_mega_artifact "${TRIGGER_RUN_ID}"; then
+              TRIGGER_HAS_MEGA=1
+            fi
+            if has_full_harvest_docs_artifact "${TRIGGER_RUN_ID}"; then
+              TRIGGER_IS_FULL=1
+            fi
+          fi
+          FALLBACK_ID="$(pick_run_with_mega_artifact "${TRIGGER_RUN_ID}")"
+
+          DECISION="$(
+            EVENT_NAME="${EVENT_NAME}" \
+            TRIGGER_RUN_ID="${TRIGGER_RUN_ID}" \
+            TRIGGER_HAS_MEGA="${TRIGGER_HAS_MEGA}" \
+            TRIGGER_IS_FULL="${TRIGGER_IS_FULL}" \
+            FALLBACK_ID="${FALLBACK_ID}" \
+            python - <<'PY'
+          import os
+          from harvester.ocr_mega_resolve import decide_ocr_mega_source
+
+          decision = decide_ocr_mega_source(
+              event_name=os.environ.get("EVENT_NAME", ""),
+              trigger_run_id=os.environ.get("TRIGGER_RUN_ID") or None,
+              trigger_has_mega=os.environ.get("TRIGGER_HAS_MEGA") == "1",
+              trigger_is_full_harvest=os.environ.get("TRIGGER_IS_FULL") == "1",
+              fallback_run_id=os.environ.get("FALLBACK_ID") or None,
+          )
+          print(decision["skip"] and "1" or "0")
+          print(decision["run_id"] or "none")
+          print(decision["reason"])
+          PY
+          )"
+
+          SKIP="$(printf '%s\n' "${DECISION}" | sed -n '1p')"
+          RUN_ID="$(printf '%s\n' "${DECISION}" | sed -n '2p')"
+          REASON="$(printf '%s\n' "${DECISION}" | sed -n '3,$p')"
+
+          echo "skip=${SKIP}" >> "$GITHUB_OUTPUT"
+          echo "run_id=${RUN_ID}" >> "$GITHUB_OUTPUT"
+          {
+            echo "reason<<EOF"
+            echo "${REASON}"
+            echo "EOF"
+          } >> "$GITHUB_OUTPUT"
+          echo "${REASON}"
+
+      - name: Skip OCR when harvest has no mega PDF
+        if: steps.harvest_run.outputs.skip == '1'
+        run: |
+          set -euo pipefail
+          {
+            echo "## OCR skipped"
+            echo ""
+            echo "${{ steps.harvest_run.outputs.reason }}"
+            echo ""
+            echo "Single-parish Send & test runs intentionally skip mega PDF stitching."
+            echo "OCR will run after the next **full** harvest (or via workflow_dispatch),"
+            echo "using the latest available mega PDF artifacts."
+          } >> "$GITHUB_STEP_SUMMARY"
+          echo "Skipping OCR — ${{ steps.harvest_run.outputs.reason }}"
+
       - name: Set up Python 3.12
+        if: steps.harvest_run.outputs.skip != '1'
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
@@ -34,60 +135,18 @@ jobs:
             requirements-ocr.txt
 
       - name: Install poppler
+        if: steps.harvest_run.outputs.skip != '1'
         run: |
           sudo apt-get update -y
           sudo apt-get install -y poppler-utils
 
       - name: Install Python dependencies
+        if: steps.harvest_run.outputs.skip != '1'
         run: |
           pip install -r requirements.txt -r requirements-ocr.txt
 
-      - name: Resolve harvest run for mega PDF artifacts
-        id: harvest_run
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: |
-          set -euo pipefail
-          has_mega_artifact() {
-            local run_id="$1"
-            local count
-            count="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/artifacts" --jq '[.artifacts[] | select(.name | test("mega-bulletin-pdf"; "i"))] | length')"
-            [ "${count:-0}" -gt 0 ]
-          }
-          pick_run_with_mega_artifact() {
-            local run_id=""
-            while IFS= read -r candidate; do
-              [ -n "${candidate}" ] || continue
-              if has_mega_artifact "${candidate}"; then
-                run_id="${candidate}"
-                break
-              fi
-            done < <(gh run list --repo "${GITHUB_REPOSITORY}" --workflow harvest.yml --limit 25 --json databaseId,conclusion --jq '.[] | select(.conclusion == "success" or .conclusion == "failure") | .databaseId')
-            echo "${run_id}"
-          }
-
-          if [ "${{ github.event_name }}" = "workflow_run" ]; then
-            RUN_ID="${{ github.event.workflow_run.id }}"
-            if has_mega_artifact "${RUN_ID}"; then
-              echo "run_id=${RUN_ID}" >> "$GITHUB_OUTPUT"
-              echo "Using harvest workflow run ${RUN_ID} (has mega PDF artifact)"
-            else
-              echo "run_id=none" >> "$GITHUB_OUTPUT"
-              echo "Harvest run ${RUN_ID} has no mega PDF artifact — will use GitHub Pages fallback"
-            fi
-          else
-            RUN_ID="$(pick_run_with_mega_artifact)"
-            if [ -n "${RUN_ID}" ]; then
-              echo "run_id=${RUN_ID}" >> "$GITHUB_OUTPUT"
-              echo "Manual OCR run — using harvest run ${RUN_ID} (has mega PDF artifact)"
-            else
-              echo "run_id=none" >> "$GITHUB_OUTPUT"
-              echo "No harvest run with mega PDF artifacts — will use GitHub Pages fallback"
-            fi
-          fi
-
       - name: Download mega PDF artifacts from harvest run
-        if: steps.harvest_run.outputs.run_id != 'none'
+        if: steps.harvest_run.outputs.skip != '1' && steps.harvest_run.outputs.run_id != 'none'
         continue-on-error: true
         uses: actions/download-artifact@v4.1.3
         with:
@@ -98,7 +157,7 @@ jobs:
           merge-multiple: true
 
       - name: Download harvest report for site rebuild
-        if: steps.harvest_run.outputs.run_id != 'none'
+        if: steps.harvest_run.outputs.skip != '1' && steps.harvest_run.outputs.run_id != 'none'
         continue-on-error: true
         uses: actions/download-artifact@v4.1.3
         with:
@@ -109,7 +168,7 @@ jobs:
           merge-multiple: true
 
       - name: Download harvest docs snapshot
-        if: steps.harvest_run.outputs.run_id != 'none'
+        if: steps.harvest_run.outputs.skip != '1' && steps.harvest_run.outputs.run_id != 'none'
         continue-on-error: true
         uses: actions/download-artifact@v4.1.3
         with:
@@ -120,6 +179,7 @@ jobs:
           merge-multiple: true
 
       - name: Apply harvest docs snapshot
+        if: steps.harvest_run.outputs.skip != '1'
         run: |
           set -euo pipefail
           if [ -d _harvest_docs/docs/dioceses ]; then
@@ -133,6 +193,7 @@ jobs:
           fi
 
       - name: Stage mega PDFs for OCR
+        if: steps.harvest_run.outputs.skip != '1'
         run: |
           set -euo pipefail
           STAGED="/tmp/ocr-bulletins/staged"
@@ -153,6 +214,19 @@ jobs:
             ls -lh "${dest}"
           done
 
+          # Prefer committed mega PDFs from checkout when artifacts are missing.
+          for pdf in mega_pdf/*_mega_bulletin.pdf docs/mega_pdf/*_mega_bulletin.pdf; do
+            [ -f "${pdf}" ] || continue
+            name="$(basename "${pdf}")"
+            dest="${STAGED}/${name}"
+            if [ -f "${dest}" ]; then
+              continue
+            fi
+            cp "${pdf}" "${dest}"
+            echo "Staged from checkout: ${pdf}"
+            ls -lh "${dest}"
+          done
+
           PAGES_BASE="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}"
           for diocese in $(python -c "import json;print(' '.join(d['key'] for d in json.load(open('parishes/dioceses.json'))['dioceses']))"); do
             dest="${STAGED}/${diocese}_mega_bulletin.pdf"
@@ -166,19 +240,20 @@ jobs:
               ls -lh "${dest}"
             else
               rm -f "${dest}.tmp"
-              echo "Warning: no mega PDF for ${diocese} in artifacts or on Pages"
+              echo "Warning: no mega PDF for ${diocese} in artifacts, checkout, or on Pages"
             fi
           done
 
           mapfile -d '' STAGED_PDFS < <(find "${STAGED}" -maxdepth 1 -type f -name '*_mega_bulletin.pdf' -print0)
           if [ ${#STAGED_PDFS[@]} -eq 0 ]; then
-            echo "::error::No mega PDF files found (checked harvest artifacts and ${PAGES_BASE}/mega_pdf/)."
+            echo "::error::No mega PDF files found (checked harvest artifacts, checkout mega_pdf/, and ${PAGES_BASE}/mega_pdf/)."
             find "${RAW}" -type f 2>/dev/null | head -20 || true
             exit 1
           fi
           echo "Staged ${#STAGED_PDFS[@]} mega PDF(s) for OCR"
 
       - name: Generate OCR viewer pages
+        if: steps.harvest_run.outputs.skip != '1'
         id: ocr_generate
         env:
           MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
@@ -232,7 +307,7 @@ jobs:
           fi
 
       - name: Rebuild diocese pages (embed OCR on Raphoe page)
-        if: steps.ocr_generate.outputs.processed != '0'
+        if: steps.harvest_run.outputs.skip != '1' && steps.ocr_generate.outputs.processed != '0'
         run: |
           set -euo pipefail
           if [ ! -f Bulletins/report.json ]; then
@@ -243,7 +318,7 @@ jobs:
           echo "Rebuilt docs/dioceses/*/index.html with latest OCR content"
 
       - name: Upload OCR docs snapshot
-        if: steps.ocr_generate.outputs.processed != '0'
+        if: steps.harvest_run.outputs.skip != '1' && steps.ocr_generate.outputs.processed != '0'
         uses: actions/upload-artifact@v4
         with:
           name: ocr-docs-${{ github.run_id }}
@@ -254,7 +329,7 @@ jobs:
           retention-days: 14
 
       - name: Commit generated bulletin pages
-        if: steps.ocr_generate.outputs.processed != '0'
+        if: steps.harvest_run.outputs.skip != '1' && steps.ocr_generate.outputs.processed != '0'
         id: commit_ocr
         continue-on-error: true
         run: |
@@ -284,6 +359,6 @@ jobs:
           exit 1
 
       - name: Warn if OCR git commit failed
-        if: steps.ocr_generate.outputs.processed != '0' && steps.commit_ocr.outcome == 'failure'
+        if: steps.harvest_run.outputs.skip != '1' && steps.ocr_generate.outputs.processed != '0' && steps.commit_ocr.outcome == 'failure'
         run: |
           echo "::warning::OCR viewers were generated but could not push to main — ocr-docs artifact was uploaded for Pages deploy."

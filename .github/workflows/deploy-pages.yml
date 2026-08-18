@@ -105,20 +105,32 @@ jobs:
             echo "No workflow docs snapshots to apply — using git checkout docs/"
           fi
 
-      - name: Download mega PDFs from latest harvest (OCR/docs-only deploys)
-        if: github.event_name != 'workflow_run' || github.event.workflow_run.name == 'Generate OCR bulletin viewers'
+      - name: Download mega PDFs from latest harvest when missing
+        # Single-parish harvests upload no mega artifacts. Always fall back to the
+        # latest full-harvest mega so Pages is not wiped of collated bulletins.
         env:
           GH_TOKEN: ${{ github.token }}
+          TRIGGER_RUN_ID: ${{ github.event.workflow_run.id || '' }}
         run: |
           set -euo pipefail
           mkdir -p _harvest_artifacts
+          if find _harvest_artifacts -type f -name '*_mega_bulletin.pdf' 2>/dev/null | grep -q .; then
+            echo "Mega PDFs already present from triggering workflow run"
+            exit 0
+          fi
           FOUND=""
           while IFS= read -r run_id; do
             [ -n "${run_id}" ] || continue
+            if [ -n "${TRIGGER_RUN_ID}" ] && [ "${run_id}" = "${TRIGGER_RUN_ID}" ]; then
+              continue
+            fi
             count="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/artifacts" --jq '[.artifacts[] | select(.name | test("mega-bulletin-pdf"; "i"))] | length')"
             if [ "${count:-0}" -gt 0 ]; then
-              echo "Downloading mega PDF artifact from harvest run ${run_id}"
-              gh run download "${run_id}" --repo "${GITHUB_REPOSITORY}" --dir _harvest_artifacts
+              echo "Downloading mega PDF artifact from harvest run ${run_id} (fallback — trigger had none)"
+              # Prefer the dedicated mega artifact; fall back to downloading all if name differs.
+              if ! gh run download "${run_id}" --repo "${GITHUB_REPOSITORY}" --dir _harvest_artifacts -n all-mega-bulletin-pdf; then
+                gh run download "${run_id}" --repo "${GITHUB_REPOSITORY}" --dir _harvest_artifacts
+              fi
               FOUND="yes"
               break
             fi
