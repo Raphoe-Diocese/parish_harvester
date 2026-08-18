@@ -1,47 +1,28 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "milfordrathmullanparishes",
   "display_name": "Milford Kilkeel",
   "diocese": "raphoe",
-  "site_type": "dated_pdf_path",
-  "playbook_type": "dated_pdf_bulletin",
-  "recorded_date": "2026-07-05",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": ["parish-newsletter"],
+  "playbook_type": "pdf_download_list",
+  "recorded_date": "2026-08-18",
   "start_url": "https://milfordrathmullanparishes.ie/bulletins/",
-  "auto_fixed": true,
-  "operator_notes": [
-    "This week's bulletin is under 'This week's bulletin' toggle — Parish-Newsletter-*.pdf.",
-    "Ignore menu links (Order of Mass on bishops.ie) — only pick Parish-Newsletter PDFs.",
-    "Rathmullan shares this bulletin page."
-  ],
-  "do_not": [
-    "Do not use generic a[href$='.pdf'] — it grabs Order-of-Mass.pdf from the site menu."
-  ],
   "steps": [
     {
       "action": "goto",
       "url": "https://milfordrathmullanparishes.ie/bulletins/"
-    },
-    {
-      "action": "click",
-      "selector": "a[href*='Parish-Newsletter'], .et_pb_toggle_content a[href$='.pdf']",
-      "text": "Parish Newsletter 5th July",
-      "pick_strategy": "newest_dated",
-      "bulletin_position": "top",
-      "fallback_selectors": [
-        "a[href*='Parish-Newsletter'][href$='.pdf']"
-      ]
-    },
-    {
-      "action": "download",
-      "url": "https://milfordrathmullanparishes.ie/wp-content/uploads/Parish-Newsletter-5th-July.pdf",
-      "use_captured_url": true
     }
   ],
-  "observed_load_ms": 8000,
-  "timeout_ms": 90000,
+  "timeout_ms": 45000,
   "total_timeout_s": 180,
-  "bulletin_layout": {
-    "strategy": "newest_dated",
-    "position": "top"
-  }
+  "operator_notes": [
+    "This week's bulletin is under the Extra/Divi 'This week's bulletin' toggle — Parish-Newsletter-*.pdf.",
+    "Rathmullan shares this bulletin page.",
+    "2026-08-18 FIX: download step had use_captured_url pinned to Parish-Newsletter-5th-July.pdf. The filename has no year, so freshness reported unknown and the harvest was marked ok while serving a June/July file. Same HTTP-scrape helper as rathmullan.json — picks the newest Parish-Newsletter PDF from the listing HTML each Sunday."
+  ],
+  "do_not": [
+    "Do not use generic a[href$='.pdf'] — it grabs Order-of-Mass.pdf from the site menu.",
+    "Do not set use_captured_url on a dated Parish-Newsletter filename — it freezes the recipe and freshness cannot see a year."
+  ]
 }

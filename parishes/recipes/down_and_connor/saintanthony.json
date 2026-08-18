@@ -1,35 +1,27 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "saintanthony",
   "display_name": "Saint Anthony",
   "diocese": "down_and_connor",
   "start_url": "https://saintanthonys.uk/parish-bulletin/",
+  "site_type": "wp_json_newest_media",
+  "href_patterns": ["bulletin"],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
   "steps": [
     {
       "action": "goto",
       "url": "https://saintanthonys.uk/parish-bulletin/"
-    },
-    {
-      "action": "download",
-      "url_pattern": "*bulletin*.pdf"
     }
   ],
-  "observed_load_ms": 4102,
-  "timeout_ms": 45000,
-  "total_timeout_s": 90,
-  "operator_notes_2026_08_09": [
-    "2026-08-09 fix: download step had a pinned dated 'url' (June's bulletin210611sunot.pdf) that the recipe's own operator_notes say never to pin. The date-rewrite regex doesn't recognise this filename's DDMMYY placement, so it kept 404ing on the exact trained June URL every week instead of falling straight through to live-page pattern matching (url_pattern already correctly set to *bulletin*.pdf). Removed the pinned url field."
-  ],
-  "playbook_type": "permanent_bulletin_page",
-  "site_type": "wp_block_file_bulletin",
   "operator_notes": [
-    "Permanent /parish-bulletin/ URL — PDF filename changes weekly under /wp-content/uploads/YYYY/MM/.",
-    "On the bulletin page: tap the green Save bulletin PDF (from embed) button.",
-    "Use url_pattern *bulletin*.pdf — never pin a dated filename."
+    "Permanent /parish-bulletin/ page no longer embeds a PDF href (Playwright 'did not find a matching document URL').",
+    "wp-json media on 18/08/2026 has Bulletin090826SunOT19afpub.pdf (HTTP 200, 587456 bytes, 19th Sunday in Ordinary Time = 09/08/2026, within 8-day grace of 16/08/2026). No 16/08 file uploaded yet.",
+    "site_type:wp_json_newest_media with href_patterns [bulletin]. Never pin bulletinDDMMYY. Never open Playwright on this page."
   ],
   "do_not": [
-    "Do not train on the homepage — use the dedicated bulletin page only.",
-    "Do not pin saintanthony.co.uk if the parish moved to saintanthonys.uk."
+    "Do not pin a dated bulletinDDMMYYsunot filename.",
+    "Do not train on the homepage."
   ],
-  "recorded_date": "2026-06-27"
+  "recorded_date": "2026-08-18"
 }

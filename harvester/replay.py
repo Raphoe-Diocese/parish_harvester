@@ -10,6 +10,7 @@ import tempfile
 import time
 from datetime import date, timedelta
 from pathlib import Path
+from urllib.error import HTTPError
 from urllib.parse import parse_qs, unquote, urljoin, urlparse
 from urllib.request import Request, urlopen
 
@@ -36,6 +37,7 @@ from .cloud_urls import (
     unwrap_docs_viewer_url,
 )
 from .config import MAX_BULLETIN_PAGES, PAGE_LOAD_TIMEOUT_MS, PARISHES_DIR
+from .liturgical import liturgical_date_from_text, year_hint_from_upload_url
 from .utils import (
     _is_within_opaque_hash,
     _opaque_hash_spans,
@@ -44,8 +46,10 @@ from .utils import (
     extract_newsletter_number,
     oneweb_newsletter_download_urls,
     predict_dropfiles_bulletin_urls,
+    predicted_dated_upload_urls,
     rewrite_date_url,
     rewrite_newsletter_number_for_target,
+    yearless_slug_date,
 )
 
 
@@ -114,6 +118,7 @@ _NON_BULLETIN_RE = re.compile(
     r"dataentry|giftaid|standingorder|donation|prayer|safeguarding|privacy|gdpr|diocese|"
     r"sitemap|application|registration|volunteer|finances|financial|parishdraw|mcn\s*media|"
     r"gaza|bishops-call|bishops?[-_]?letter|pastoral[-_]?letter|draw_poster|poster_20\d{2}|"
+    r"order[-_]?of[-_]?mass|catholicbishops\.ie|wedding[-_]?parish|"
     r"fbcdn\.net|facebook\.com",
     re.IGNORECASE,
 )
@@ -874,15 +879,24 @@ def _fetch_bytes_with_retries(
     """
     started = time.monotonic()
     attempts = 0
+    headers_out = {"User-Agent": (
+        "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+        "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
+    )}
     while attempts < max_attempts and (time.monotonic() - started) < total_budget_s:
         attempts += 1
         try:
-            request = Request(url, headers={"User-Agent": "Mozilla/5.0"})
+            request = Request(url, headers=headers_out)
             with urlopen(request, timeout=per_attempt_timeout_s) as response:
                 body = response.read()
                 if response.status == 200 and body:
                     headers = {k.lower(): v for k, v in response.headers.items()}
                     return body, headers
+        except HTTPError as exc:
+            # Missing predicted files are a hard miss — do not burn the
+            # shared retry budget on 404/410 (newtownkillea dated uploads).
+            if exc.code in {404, 410}:
+                return None
         except Exception:
             pass
     return None
@@ -1090,7 +1104,7 @@ def _extract_matching_hrefs(html: str, base_url: str, keyword_patterns: list[str
     we fetch raw HTML via plain HTTP retries instead of a Playwright DOM."""
     out: list[str] = []
     seen: set[str] = set()
-    for href in re.findall(r'href="([^"]+)"', html):
+    for href in re.findall(r"""href=["']([^"']+)["']""", html, re.IGNORECASE):
         low = href.lower()
         if not any(pat in low for pat in keyword_patterns):
             continue
@@ -1099,6 +1113,324 @@ def _extract_matching_hrefs(html: str, base_url: str, keyword_patterns: list[str
             seen.add(absolute)
             out.append(absolute)
     return out
+
+
+def _score_http_scrape_pdf_hrefs(
+    hrefs: list[str],
+    target_date: date,
+) -> list[tuple[date, str]]:
+    """Rank listing-page PDF hrefs by extracted bulletin date.
+
+    Drops non-bulletin URLs (Order of Mass, GDPR, …) and anything dated
+    more than 3 days after the harvest Sunday. Yearless slugs such as
+    Parish-Newsletter-Sunday-9th-August.pdf are dated with the harvest year.
+    """
+    from .bulletin_freshness import extract_bulletin_date
+
+    scored: list[tuple[date, str]] = []
+    for href in hrefs:
+        if _is_non_bulletin_url(href):
+            continue
+        path = urlparse(href).path.lower()
+        if not path.endswith((".pdf", ".docx", ".doc")):
+            continue
+        # Prefer the filename's own date over WordPress /uploads/YYYY/MM/
+        # folder dates — Malin uploads March bulletins into /2026/04/, and
+        # extract_bulletin_date then treats "29th-March" as 29/04.
+        found = (
+            extract_date_from_string(href)
+            or liturgical_date_from_text(
+                href, year_hint_from_upload_url(href, target_date.year)
+            )
+            or extract_bulletin_date(href)
+            or yearless_slug_date(href, target_date.year, near=target_date)
+        )
+        if found and found <= target_date + timedelta(days=3):
+            scored.append((found, href))
+    return scored
+
+
+async def _try_http_scrape_newest_pdf(
+    listing_url: str,
+    dest: Path,
+    *,
+    href_patterns: list[str],
+    target_date: date,
+) -> tuple[str, str] | None:
+    """Fetch a listing page via plain HTTP and download the newest matching PDF.
+
+    Built for Extra/Divi toggle pages (milfordrathmullanparishes.ie) where the
+    Parish-Newsletter PDF is in the HTML but hidden inside a closed accordion,
+    so Playwright ``visible`` waits time out. The listing itself is not WAF
+    blocked — we just must not click.
+    """
+    listing_result = await asyncio.to_thread(
+        _fetch_bytes_with_retries,
+        listing_url,
+        max_attempts=_DROPFILES_HTTP_ATTEMPTS,
+        per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
+        total_budget_s=_DROPFILES_HTTP_LISTING_BUDGET_S,
+    )
+    if not listing_result:
+        return None
+    listing_body, listing_headers = listing_result
+    if "text/html" not in (listing_headers.get("content-type") or "").lower():
+        return None
+    listing_html = listing_body.decode("utf-8", errors="ignore")
+    hrefs = _extract_matching_hrefs(listing_html, listing_url, href_patterns)
+    scored = _score_http_scrape_pdf_hrefs(hrefs, target_date)
+    if not scored:
+        return None
+    _best_date, pdf_url = max(scored)
+    file_result = await asyncio.to_thread(
+        _fetch_bytes_with_retries,
+        pdf_url,
+        max_attempts=_DROPFILES_HTTP_ATTEMPTS,
+        per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
+        total_budget_s=_DROPFILES_HTTP_FILE_BUDGET_S,
+    )
+    if not file_result:
+        return None
+    file_body, file_headers = file_result
+    if not (
+        _dropfiles_body_looks_like_file(file_headers, file_body)
+        and (_is_pdf_content(file_body) or file_body[:2] == b"PK")
+    ):
+        return None
+    if file_body[:2] == b"PK" and not _is_pdf_content(file_body):
+        pdf_bytes = await _convert_docx_to_pdf_bytes(file_body)
+        dest.write_bytes(pdf_bytes)
+        return pdf_url, "docx_to_pdf"
+    dest.write_bytes(file_body)
+    return pdf_url, "pdf"
+
+
+async def _try_predicted_dated_pdf(
+    example_url: str,
+    dest: Path,
+    target_date: date,
+    *,
+    weeks_back: int = 8,
+) -> tuple[str, str] | None:
+    """Try rewrite_date_url guesses for *target_date* and previous Sundays.
+
+    Skips any listing page entirely — used when the HTML index is
+    Cloudflare-challenged but ``wp-content/uploads`` dated files are not
+    (newtownkilleaparish.ie).
+    """
+    for url in predicted_dated_upload_urls(
+        example_url, target_date, weeks_back=weeks_back
+    ):
+        file_result = await asyncio.to_thread(
+            _fetch_bytes_with_retries,
+            url,
+            max_attempts=3,
+            per_attempt_timeout_s=8.0,
+            total_budget_s=12.0,
+        )
+        if not file_result:
+            continue
+        file_body, file_headers = file_result
+        if not _dropfiles_body_looks_like_file(file_headers, file_body):
+            continue
+        if _is_pdf_content(file_body):
+            dest.write_bytes(file_body)
+            return url, "pdf"
+        if file_body[:2] == b"PK":
+            pdf_bytes = await _convert_docx_to_pdf_bytes(file_body)
+            dest.write_bytes(pdf_bytes)
+            return url, "docx_to_pdf"
+    return None
+
+
+_SKIP_IMAGE_NAME_RE = re.compile(
+    r"screenshot|logo|icon|favicon|crest|cropped-|banner|avatar",
+    re.IGNORECASE,
+)
+
+
+def _href_matches_patterns(url: str, patterns: list[str]) -> bool:
+    if not patterns:
+        return True
+    low = unquote(url or "").lower()
+    return any(pat.lower() in low for pat in patterns)
+
+
+async def _try_wp_json_newest_media(
+    start_url: str,
+    dest: Path,
+    *,
+    href_patterns: list[str],
+    target_date: date,
+) -> tuple[str, str] | None:
+    """Download the newest dated media PDF from /wp-json/wp/v2/media.
+
+    Built for All Saints Ballymena: the public bulletin page still links a
+    2025 Wedding-Parish.pdf, but the media library has this week's
+    16.8.26-20th-Sunday.pdf (confirmed 2026-08-18). Never opens Playwright.
+    """
+    parsed = urlparse(start_url)
+    if not parsed.scheme or not parsed.netloc:
+        return None
+    api = (
+        f"{parsed.scheme}://{parsed.netloc}/wp-json/wp/v2/media"
+        "?per_page=20&orderby=date&order=desc"
+    )
+    result = await asyncio.to_thread(
+        _fetch_bytes_with_retries,
+        api,
+        max_attempts=6,
+        per_attempt_timeout_s=10.0,
+        total_budget_s=25.0,
+    )
+    if not result:
+        return None
+    body, headers = result
+    ct = (headers.get("content-type") or "").lower()
+    if "json" not in ct and not body[:1] == b"[":
+        return None
+    try:
+        items = json.loads(body.decode("utf-8", errors="replace"))
+    except json.JSONDecodeError:
+        return None
+    if not isinstance(items, list):
+        return None
+    hrefs: list[str] = []
+    for item in items:
+        if not isinstance(item, dict):
+            continue
+        src = str(item.get("source_url") or "").strip()
+        slug = str(item.get("slug") or "")
+        title = ""
+        raw_title = item.get("title")
+        if isinstance(raw_title, dict):
+            title = str(raw_title.get("rendered") or "")
+        blob = f"{src} {slug} {title}"
+        if not src or _is_non_bulletin_url(src):
+            continue
+        if href_patterns and not _href_matches_patterns(blob, href_patterns):
+            continue
+        hrefs.append(src)
+    scored = _score_http_scrape_pdf_hrefs(hrefs, target_date)
+    if not scored:
+        return None
+    _best_date, pdf_url = max(scored)
+    file_result = await asyncio.to_thread(
+        _fetch_bytes_with_retries,
+        pdf_url,
+        max_attempts=4,
+        per_attempt_timeout_s=10.0,
+        total_budget_s=20.0,
+    )
+    if not file_result:
+        return None
+    file_body, file_headers = file_result
+    if not (
+        _dropfiles_body_looks_like_file(file_headers, file_body)
+        and (_is_pdf_content(file_body) or file_body[:2] == b"PK")
+    ):
+        return None
+    if file_body[:2] == b"PK" and not _is_pdf_content(file_body):
+        pdf_bytes = await _convert_docx_to_pdf_bytes(file_body)
+        dest.write_bytes(pdf_bytes)
+        return pdf_url, "docx_to_pdf"
+    dest.write_bytes(file_body)
+    return pdf_url, "pdf"
+
+
+def _extract_scored_upload_images(
+    html: str,
+    base_url: str,
+    *,
+    href_patterns: list[str],
+    target_date: date,
+) -> list[tuple[date, str]]:
+    """Newest-first bulletin page images from raw HTML (no Playwright)."""
+    from .bulletin_freshness import extract_bulletin_date
+
+    scored: list[tuple[date, str]] = []
+    seen: set[str] = set()
+    for match in _WP_UPLOAD_IMAGE_RE.finditer(html):
+        year, month, name = int(match.group(1)), int(match.group(2)), match.group(3)
+        if _RESIZED_IMAGE_SUFFIX_RE.search(name) or _SKIP_IMAGE_NAME_RE.search(name):
+            continue
+        url = urljoin(base_url, f"/wp-content/uploads/{year}/{month:02d}/{name}")
+        if url in seen:
+            continue
+        seen.add(url)
+        if href_patterns and not _href_matches_patterns(url, href_patterns):
+            continue
+        if _is_non_bulletin_url(url):
+            continue
+        found = (
+            extract_date_from_string(name)
+            or liturgical_date_from_text(name, year)
+            or extract_bulletin_date(url)
+            or date(year, month, 1)
+        )
+        if found <= target_date + timedelta(days=3):
+            scored.append((found, url))
+    return scored
+
+
+async def _try_http_scrape_newest_images(
+    listing_url: str,
+    dest: Path,
+    *,
+    href_patterns: list[str],
+    target_date: date,
+    count: int = 1,
+) -> tuple[str, str] | None:
+    """Fetch listing HTML and stack the newest week's page images into a PDF.
+
+    Built for Derriaghy (Playwright navigation times out) and Iskaheen
+    (stacked August scans on /bulletin). Never opens a browser.
+    """
+    listing_result = await asyncio.to_thread(
+        _fetch_bytes_with_retries,
+        listing_url,
+        max_attempts=_DROPFILES_HTTP_ATTEMPTS,
+        per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
+        total_budget_s=_DROPFILES_HTTP_LISTING_BUDGET_S,
+    )
+    if not listing_result:
+        return None
+    listing_body, listing_headers = listing_result
+    if "text/html" not in (listing_headers.get("content-type") or "").lower():
+        return None
+    listing_html = listing_body.decode("utf-8", errors="ignore")
+    scored = _extract_scored_upload_images(
+        listing_html,
+        listing_url,
+        href_patterns=href_patterns,
+        target_date=target_date,
+    )
+    if not scored:
+        return None
+    best_date = max(item[0] for item in scored)
+    # Keep document order so stacked pages stay page-1, page-2.
+    week_urls = [url for found, url in scored if found == best_date]
+    week_urls = week_urls[: max(1, count)]
+    image_bytes: list[bytes] = []
+    source_url = week_urls[0]
+    for image_url in week_urls:
+        image_result = await asyncio.to_thread(
+            _fetch_bytes_with_retries,
+            image_url,
+            max_attempts=4,
+            per_attempt_timeout_s=10.0,
+            total_budget_s=20.0,
+        )
+        if not image_result:
+            continue
+        image_body, image_headers = image_result
+        if _dropfiles_body_looks_like_file(image_headers, image_body):
+            image_bytes.append(image_body)
+            source_url = image_url
+    if not image_bytes:
+        return None
+    await _images_bytes_to_pdf(dest, image_bytes)
+    return source_url, "image_to_pdf"
 
 
 def _extract_pdfembed_target_url(html: str) -> str | None:
@@ -1204,7 +1536,11 @@ async def _try_waf_retry_wordpress_bulletin(
     scored: list[tuple[date, str]] = []
     for href in candidates:
         slug = urlparse(href).path.rstrip("/").rsplit("/", 1)[-1]
-        found = extract_date_from_slug(slug) or extract_date_from_string(slug)
+        found = (
+            extract_date_from_slug(slug)
+            or extract_date_from_string(slug)
+            or liturgical_date_from_text(slug, target_date.year)
+        )
         if found and found <= target_date + timedelta(days=3):
             scored.append((found, href))
     if not scored:
@@ -1223,7 +1559,14 @@ async def _try_waf_retry_wordpress_bulletin(
     if not post_result:
         return None
     post_body, post_headers = post_result
-    if "text/html" not in (post_headers.get("content-type") or "").lower():
+    post_ct = (post_headers.get("content-type") or "").lower()
+    # Loughshore (and similar) 302 the Sunday post straight to the PDF.
+    if _is_pdf_content(post_body) or (
+        _dropfiles_body_looks_like_file(post_headers, post_body) and _is_pdf_content(post_body)
+    ):
+        dest.write_bytes(post_body)
+        return post_url, "pdf"
+    if "text/html" not in post_ct:
         return None
     post_html = post_body.decode("utf-8", errors="ignore")
 
@@ -2243,6 +2586,98 @@ async def replay_recipe(
             f"naomhfionan.com predicted PDF URL(s) for {target_date} did not "
             "resolve to a real PDF (not the listing-page block; retry later "
             "or re-check the number/letter prediction)"
+        )
+
+    # Listing page is reachable via plain HTTP but the current PDF lives
+    # inside a closed accordion (Playwright visible-wait times out). Scrape
+    # the raw HTML for matching PDF hrefs and download the newest dated one.
+    if site_type == "http_scrape_newest_pdf" and target_date is not None:
+        href_patterns = [
+            str(p).strip().lower()
+            for p in (recipe.get("href_patterns") or [])
+            if str(p).strip()
+        ] or ["parish-newsletter", ".pdf"]
+        found = await _try_http_scrape_newest_pdf(
+            start_url,
+            dest,
+            href_patterns=href_patterns,
+            target_date=target_date,
+        )
+        if found:
+            return dest, found[1], found[0]
+        raise RecipeReplayError(
+            f"HTTP-scrape listing {start_url} — no dated bulletin PDF matching "
+            f"{href_patterns} (not a selector problem; parish may not have posted)"
+        )
+
+    # Listing/index is Cloudflare-challenged; dated wp-content/uploads files
+    # are not. Predict this Sunday and a few previous Sundays and fetch
+    # directly. Never navigate to the challenged HTML page.
+    if site_type == "predicted_dated_pdf" and target_date is not None:
+        example_url = ""
+        for step in steps:
+            if isinstance(step, dict) and (step.get("url") or "").strip():
+                example_url = str(step.get("url") or "").strip()
+                if _looks_like_direct_document_url(example_url):
+                    break
+        if not example_url:
+            example_url = start_url
+        weeks_back = int(recipe.get("weeks_back") or 8)
+        found = await _try_predicted_dated_pdf(
+            example_url, dest, target_date, weeks_back=weeks_back
+        )
+        if found:
+            return dest, found[1], found[0]
+        raise RecipeReplayError(
+            f"Predicted dated PDF URL(s) from {example_url} for {target_date} "
+            "did not resolve to a real file (listing page was not opened)"
+        )
+
+    if site_type == "wp_json_newest_media" and target_date is not None:
+        href_patterns = [
+            str(p).strip().lower()
+            for p in (recipe.get("href_patterns") or [])
+            if str(p).strip()
+        ] or ["sunday", "bulletin", "newsletter"]
+        found = await _try_wp_json_newest_media(
+            start_url,
+            dest,
+            href_patterns=href_patterns,
+            target_date=target_date,
+        )
+        if found:
+            return dest, found[1], found[0]
+        raise RecipeReplayError(
+            f"wp-json media at {start_url} — no dated bulletin PDF matching "
+            f"{href_patterns} (listing page was not opened)"
+        )
+
+    if site_type == "http_scrape_newest_images" and target_date is not None:
+        href_patterns = [
+            str(p).strip().lower()
+            for p in (recipe.get("href_patterns") or [])
+            if str(p).strip()
+        ]
+        image_count = int(recipe.get("image_count") or 1)
+        for step in steps:
+            if isinstance(step, dict) and step.get("action") == "image_stack":
+                try:
+                    image_count = int(step.get("count") or image_count)
+                except (TypeError, ValueError):
+                    pass
+                break
+        found = await _try_http_scrape_newest_images(
+            start_url,
+            dest,
+            href_patterns=href_patterns,
+            target_date=target_date,
+            count=image_count,
+        )
+        if found:
+            return dest, found[1], found[0]
+        raise RecipeReplayError(
+            f"HTTP-scrape images {start_url} — no bulletin page images matching "
+            f"{href_patterns or ['wp-content/uploads']} (browser was not opened)"
         )
 
     context_opts: dict = {"accept_downloads": True}

@@ -1,29 +1,30 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "newtownkilleaparish",
   "display_name": "Newtown Killea",
   "diocese": "raphoe",
-  "start_url": "https://newtownkilleaparish.ie/bulletin/",
+  "start_url": "https://newtownkilleaparish.ie/wp-content/uploads/2026/07/Newsletter-12th-July-2026.pdf",
   "steps": [
     {
       "action": "download",
-      "url": "https://newtownkilleaparish.ie/wp-content/uploads/2026/07/Newsletter-12th-July-2026.pdf",
-      "use_captured_url": true
+      "url": "https://newtownkilleaparish.ie/wp-content/uploads/2026/07/Newsletter-12th-July-2026.pdf"
     }
   ],
-  "observed_load_ms": 17447.60009765625,
-  "timeout_ms": 55000,
+  "site_type": "predicted_dated_pdf",
+  "weeks_back": 8,
+  "timeout_ms": 45000,
   "total_timeout_s": 190,
-  "playbook_type": "pdf_download_list",
-  "site_type": "pdf_link_list",
+  "playbook_type": "dated_pdf_bulletin",
+  "recorded_date": "2026-08-18",
   "operator_notes": [
-    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
-    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-    "Do not worry if the filename or date in the link text changes every week."
+    "Listing page /bulletin/ is a genuine Cloudflare Managed Challenge (HTTP 403, cf-mitigated: challenge) for both headless and headful Playwright — confirmed 2026-08-16 and again 2026-08-18. wp-json/wp/v2/media is also challenged.",
+    "The PDF itself is on an unchallenged wp-content/uploads path. Known working file: Newsletter-12th-July-2026.pdf (HTTP 200, application/pdf, last-modified 10/07/2026).",
+    "2026-08-18: predicted URLs for 16/08, 09/08, 02/08, 26/07 and 19/07 all 404. Only 12/07 exists. site_type:predicted_dated_pdf skips the listing page and tries rewrite_date_url for this Sunday plus 8 previous Sundays, then .docx/.jpg/.png siblings. When the parish uploads a new week it will start working automatically.",
+    "Until a file newer than 12/07/2026 is uploaded, harvest will download that July PDF and the freshness safety net will reject it as stale. That is an honest content gap, not a bot-block on the file."
   ],
   "do_not": [
-    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
-    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
-  ],
-  "recorded_date": "2026-08-16"
+    "Do not set start_url to https://newtownkilleaparish.ie/bulletin/ — replay navigates there first and the Cloudflare challenge fails the whole recipe before the PDF download runs.",
+    "Do not set use_captured_url — that freezes the recipe on 12th July forever.",
+    "Do not try to click through the Cloudflare challenge."
+  ]
 }

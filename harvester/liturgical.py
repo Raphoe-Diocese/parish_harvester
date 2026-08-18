@@ -1,8 +1,10 @@
 """
 liturgical.py — Catholic liturgical calendar lookup for Greenlough URL prediction.
 """
+import re
 from datetime import date, timedelta
 from functools import lru_cache
+from urllib.parse import unquote
 
 
 def _ordinal(n: int) -> str:
@@ -125,6 +127,138 @@ def get_liturgical_sundays(year: int) -> dict[date, str]:
 def get_liturgical_name(target: date) -> str | None:
     """Return the liturgical Sunday name for the given date, or None if not found."""
     return get_liturgical_sundays(target.year).get(target)
+
+
+# Word ordinals used in filenames (Holy Family "Twentieth-Sunday-in-Ordinary-Time.pdf",
+# Glenariffe "Sixteenth-Sunday-of-Ordinary-Time.pdf") instead of 20th / 16th.
+_WORD_ORDINALS: dict[str, int] = {
+    "first": 1,
+    "second": 2,
+    "third": 3,
+    "fourth": 4,
+    "fifth": 5,
+    "sixth": 6,
+    "seventh": 7,
+    "eighth": 8,
+    "ninth": 9,
+    "tenth": 10,
+    "eleventh": 11,
+    "twelfth": 12,
+    "thirteenth": 13,
+    "fourteenth": 14,
+    "fifteenth": 15,
+    "sixteenth": 16,
+    "seventeenth": 17,
+    "eighteenth": 18,
+    "nineteenth": 19,
+    "twentieth": 20,
+    "twenty-first": 21,
+    "twenty first": 21,
+    "twenty-second": 22,
+    "twenty second": 22,
+    "twenty-third": 23,
+    "twenty third": 23,
+    "twenty-fourth": 24,
+    "twenty fourth": 24,
+    "twenty-fifth": 25,
+    "twenty fifth": 25,
+    "twenty-sixth": 26,
+    "twenty sixth": 26,
+    "twenty-seventh": 27,
+    "twenty seventh": 27,
+    "twenty-eighth": 28,
+    "twenty eighth": 28,
+    "twenty-ninth": 29,
+    "twenty ninth": 29,
+    "thirtieth": 30,
+    "thirty-first": 31,
+    "thirty first": 31,
+    "thirty-second": 32,
+    "thirty second": 32,
+    "thirty-third": 33,
+    "thirty third": 33,
+}
+
+# Filename is specific enough to match a calendar name as a substring
+# ("20th sunday" → 20th Sunday in Ordinary Time) without matching every
+# "ordinary time" file against every Ordinary Time Sunday.
+_SPECIFIC_LITURGICAL_RE = re.compile(
+    r"\b(?:\d{1,2}(?:st|nd|rd|th)\s+sunday|"
+    r"pentecost|trinity|palm sunday|easter sunday|epiphany|"
+    r"baptism of the lord|body and blood|corpus christi|"
+    r"christ the king|all saints|holy family|"
+    r"\d{1,2}(?:st|nd|rd|th)\s+sunday of advent|"
+    r"\d{1,2}(?:st|nd|rd|th)\s+sunday of lent)\b",
+    re.IGNORECASE,
+)
+
+
+def normalize_liturgical_phrase(text: str) -> str:
+    """Lowercase, fix Suday typo, turn Twentieth into 20th, of→in Ordinary Time."""
+    phrase = unquote(text or "").lower().replace("suday", "sunday")
+    phrase = phrase.replace("&amp;", " ")
+    phrase = re.sub(r"[_\-/]+", " ", phrase)
+    phrase = re.sub(r"[^a-z0-9 ]+", " ", phrase)
+    phrase = re.sub(r"\s+", " ", phrase).strip()
+    phrase = phrase.replace(" of ordinary time", " in ordinary time")
+    for word, number in sorted(_WORD_ORDINALS.items(), key=lambda item: len(item[0]), reverse=True):
+        phrase = re.sub(rf"\b{re.escape(word)}\b", _ordinal(number), phrase)
+    phrase = re.sub(r"\b(\d{1,2})\s+(st|nd|rd|th)\b", r"\1\2", phrase)
+    return phrase
+
+
+def year_hint_from_upload_url(text: str, fallback: int) -> int:
+    """Prefer /uploads/YYYY/ (or /app/uploads/YYYY/) over the harvest year.
+
+    Scoring a 2024 'Twentieth-Sunday' archive file with the 2026 harvest
+    year would treat it as this week's bulletin (found 2026-08-18,
+    glenariffeparish.org/whats-on).
+    """
+    match = re.search(r"/uploads/(20\d{2})/", unquote(text or ""), re.IGNORECASE)
+    if match:
+        return int(match.group(1))
+    return fallback
+
+
+def liturgical_date_from_text(text: str, year: int) -> date | None:
+    """Map a filename/slug like 'Twentieth-Sunday-in-Ordinary-Time' onto *year*.
+
+    Used when the parish names the file after the liturgical Sunday and the
+    WordPress /uploads/YYYY/MM/ folder would otherwise default the day to the
+    1st (Holy Family / Loughshore / Derriaghy, found 2026-08-18).
+    """
+    raw = unquote(text or "")
+    basename = raw.rsplit("/", 1)[-1]
+    needle = normalize_liturgical_phrase(basename)
+    if len(needle) < 8:
+        return None
+
+    def _best_in_year(lookup_year: int) -> date | None:
+        best_date: date | None = None
+        best_len = 0
+        for sunday, name in get_liturgical_sundays(lookup_year).items():
+            hay = normalize_liturgical_phrase(name)
+            if len(hay) < 8:
+                continue
+            matched = hay in needle
+            if not matched and _SPECIFIC_LITURGICAL_RE.search(needle) and needle in hay:
+                matched = True
+            if matched and len(hay) > best_len:
+                best_date = sunday
+                best_len = len(hay)
+        return best_date
+
+    found = _best_in_year(year)
+    if found:
+        return found
+    # Early January / late December filenames may belong to the adjacent year.
+    for other in (year - 1, year + 1):
+        if other < 2000:
+            continue
+        found = _best_in_year(other)
+        if found:
+            return found
+    return None
 
 
 _CYCLE_LETTER_FOR_YEAR_MOD3 = {0: "C", 1: "A", 2: "B"}

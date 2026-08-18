@@ -1797,6 +1797,10 @@ def _is_placeholder_recipe(recipe_meta: dict | None) -> bool:
     if str(recipe_meta.get("site_type") or "").strip().lower() in {
         "waf_retry_wordpress",
         "naomhfionan_numbered_pdf",
+        "http_scrape_newest_pdf",
+        "predicted_dated_pdf",
+        "wp_json_newest_media",
+        "http_scrape_newest_images",
     }:
         return False
     steps = recipe_meta.get("steps")

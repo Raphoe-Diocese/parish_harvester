@@ -51,6 +51,11 @@ _WP_DATE_PATH_RE = re.compile(r"/(\d{4})/(\d{2})/(\d{2})/")
 # e.g. 5-4-26, 12-4-26, 15-3-26  (Limavady parish pattern)
 _D_M_YY_RE = re.compile(r"(?<!\d)(\d{1,2})-(\d{1,2})-(\d{2})(?!\d)")
 
+# Pattern B-dot: D.M.YY with optional unpadded month/day — Ballymena
+# 16.8.26-20th-Sunday.pdf / 9.8.26-19th-Sunday.pdf. The 2-digit-only
+# _YY_MM_DD_RE above does not match these.
+_D_M_YY_DOT_RE = re.compile(r"(?<!\d)(\d{1,2})\.(\d{1,2})\.(\d{2})(?!\d)")
+
 # Pattern E: [YYYY-M-D] bracketed ISO variant
 # e.g. [2026-4-12], [2026-12-25]  (Greenlough parish pattern)
 _BRACKETED_ISO_RE = re.compile(r"\[(\d{4})-(\d{1,2})-(\d{1,2})\]")
@@ -78,6 +83,23 @@ _MONTH_MAP: dict[str, int] = {
 # (?:st|nd|rd|th)? handles formats like "5th" or "12th".
 _SLUG_DATE_RE = re.compile(
     r"(\d{1,2})(?:st|nd|rd|th)?[_\-\s]([a-z]+)[_\-\s](\d{4})",
+    re.IGNORECASE,
+)
+
+# Yearless "9th-August" / "5th July" slugs (Milford & Rathmullan overwrite
+# Parish-Newsletter-Sunday-9th-August.pdf each week with no year in the
+# filename). Negative lookahead refuses a following 4-digit year so the
+# dated slug matcher above still owns "9th-August-2026".
+_MONTH_ALT = "|".join(sorted(_MONTH_MAP.keys(), key=len, reverse=True))
+_YEARLESS_SLUG_RE = re.compile(
+    rf"(?<!\d)(\d{{1,2}})(?:st|nd|rd|th)?[_\-\s]({_MONTH_ALT})"
+    rf"(?![a-z])(?![_\-\s](?:19|20)\d{{2}})",
+    re.IGNORECASE,
+)
+
+# Glenavy: 2026-August-16-Twentieth-Sunday-in-Ordinary-Time.pdf
+_YEAR_MONTHNAME_DAY_RE = re.compile(
+    rf"(20\d{{2}})[_\-\s]({_MONTH_ALT})[_\-\s](\d{{1,2}})(?:st|nd|rd|th)?(?!\d)",
     re.IGNORECASE,
 )
 
@@ -218,6 +240,20 @@ def extract_date_from_string(text: str) -> date | None:
         except ValueError:
             pass
 
+    # Pattern B: D-M-YY (1–2 digit day/month) — limavady 16-8-26.pdf,
+    # claudy NEWSLETTER 9-8-26.docx. Must come after the 6/8-digit compact
+    # forms so "160826" is not split into 16-08-26 by accident (those have
+    # no dashes).
+    m = _first_match_outside_hash(_D_M_YY_RE, text, spans)
+    if m:
+        try:
+            year = 2000 + int(m.group(3))
+            candidate = date(year, int(m.group(2)), int(m.group(1)))
+            if _is_plausible_bulletin_year(candidate.year):
+                return candidate
+        except ValueError:
+            pass
+
     # Dot-separated N.N.NN — ambiguous between YY.MM.DD (Google Drive folder
     # rows: 26.06.14 → 2026-06-14, 29.01.05 → 2029-01-05; locked by
     # tests/test_cloud_folders.py) and UK-convention DD.MM.YY filenames
@@ -243,12 +279,111 @@ def extract_date_from_string(text: str) -> date | None:
         if candidates:
             return max(candidates, key=lambda d: d.year)
 
+    # Pattern B-dot with unpadded day/month (16.8.26 / 9.8.26). Same dual
+    # year reading as the 2-digit dotted form above. Must run after that
+    # form so 26.06.14 still hits the locked Drive-folder tests first.
+    m = _first_match_outside_hash(_D_M_YY_DOT_RE, text, spans)
+    if m:
+        g1, g2, g3 = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        candidates = []
+        try:
+            candidates.append(date(2000 + g1, g2, g3))  # YY.MM.DD
+        except ValueError:
+            pass
+        try:
+            candidates.append(date(2000 + g3, g2, g1))  # DD.MM.YY
+        except ValueError:
+            pass
+        plausible = [c for c in candidates if _is_plausible_bulletin_year(c.year)]
+        if plausible:
+            return max(plausible, key=lambda d: d.year)
+
     # Ordinal month-name slugs: 26th-July-2026, 5_april_2026
     slug_date = extract_date_from_slug(text)
     if slug_date:
         return slug_date
 
+    # Year-first month-name: 2026-August-16 (Glenavy / Killead)
+    m = _first_match_outside_hash(_YEAR_MONTHNAME_DAY_RE, text, spans)
+    if m:
+        month = _MONTH_MAP.get(m.group(2).lower())
+        if month:
+            try:
+                candidate = date(int(m.group(1)), month, int(m.group(3)))
+                if _is_plausible_bulletin_year(candidate.year):
+                    return candidate
+            except ValueError:
+                pass
+
     return None
+
+
+def yearless_slug_date(
+    text: str,
+    assume_year: int,
+    *,
+    near: date | None = None,
+) -> date | None:
+    """Parse a yearless '9th-August' / '5th July' slug using *assume_year*.
+
+    If the resulting date is more than 14 days ahead of *near* (typically
+    the harvest Sunday), try the previous year — so a 04/01 harvest still
+    reads '28th-December' as last December, not next December.
+    """
+    m = _YEARLESS_SLUG_RE.search(unquote(text or ""))
+    if not m:
+        return None
+    month = _MONTH_MAP.get(m.group(2).lower())
+    if not month:
+        return None
+    try:
+        candidate = date(assume_year, month, int(m.group(1)))
+    except ValueError:
+        return None
+    if near is not None and (candidate - near).days > 14:
+        try:
+            return date(assume_year - 1, month, int(m.group(1)))
+        except ValueError:
+            return candidate
+    return candidate
+
+
+def predicted_dated_upload_urls(
+    example_url: str,
+    target: date,
+    *,
+    weeks_back: int = 8,
+) -> list[str]:
+    """Rewrite a dated upload URL for *target* and the previous *weeks_back* Sundays.
+
+    Also tries .docx/.jpg/.jpeg/.png siblings of each .pdf guess (uploader
+    fallback). First match in the returned list is the current Sunday.
+    """
+    seen: list[str] = []
+
+    def _add(url: str) -> None:
+        url = (url or "").strip()
+        if url and url not in seen:
+            seen.append(url)
+
+    for i in range(weeks_back + 1):
+        week = target - timedelta(days=7 * i)
+        rewritten = rewrite_date_url(example_url, week)
+        _add(rewritten)
+        if "onewebmedia" in rewritten.lower() and "newsletter" in rewritten.lower():
+            for extra in oneweb_newsletter_download_urls(example_url, week):
+                _add(extra)
+        lower = rewritten.lower()
+        if lower.endswith(".pdf"):
+            stem = rewritten[:-4]
+            for ext in (".docx", ".jpg", ".jpeg", ".png"):
+                _add(stem + ext)
+        elif lower.endswith(".docx"):
+            _add(rewritten[:-5] + ".pdf")
+            parsed = urlparse(rewritten)
+            quoted = parsed._replace(path=quote(unquote(parsed.path), safe="/")).geturl()
+            _add(quoted)
+    return seen
 
 
 def extract_date_from_slug(slug: str) -> date | None:
@@ -603,6 +738,20 @@ def rewrite_date_url(url: str, target: date) -> str:
         return m.group(0)
 
     new_path = _D_M_YY_RE.sub(_replace_d_m_yy, path)
+    if new_path != path:
+        return parsed._replace(path=new_path).geturl()
+
+    def _replace_d_m_yy_dot(m: re.Match) -> str:
+        try:
+            year = 2000 + int(m.group(3))
+            orig = date(year, int(m.group(2)), int(m.group(1)))
+            if abs((orig - target).days) < 365:
+                return f"{target.day}.{target.month}.{target.year % 100:02d}"
+        except ValueError:
+            pass
+        return m.group(0)
+
+    new_path = _D_M_YY_DOT_RE.sub(_replace_d_m_yy_dot, path)
     if new_path != path:
         return parsed._replace(path=new_path).geturl()
 

@@ -1,30 +1,26 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "errigalparish",
   "display_name": "Errigalparish",
-  "diocese": "",
-  "start_url": "https://www.errigalparish.com/news.html",
+  "diocese": "derry",
+  "start_url": "https://www.errigalparish.com/pdf/160826.pdf",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.errigalparish.com/news.html"
-    },
-    {
-      "action": "click",
-      "selector": "a[href*=\"pdf\"]",
-      "text": "Latest Parish News",
-      "pick_strategy": "newest_dated"
+      "action": "download",
+      "url": "https://www.errigalparish.com/pdf/090826.pdf"
     }
   ],
-  "recorded_date": "2026-08-10",
+  "site_type": "predicted_dated_pdf",
+  "weeks_back": 8,
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-08-18",
   "operator_notes": [
-    "errigalparish.com's own dated PDF links use a RELATIVE href with no",
-    "leading slash (e.g. href=\"pdf/090826.pdf\"), so a[href*=\"/pdf/\"] only",
-    "ever matched the external drumraghparish.com GDPR/Privacy/Bishops-Letter",
-    "links (correctly rejected as non-bulletin, producing a hard failure).",
-    "Widened selector to a[href*=\"pdf\"] (no leading slash) to match it.",
-    "Verified 2026-08-10: 090826.pdf genuinely contains 9th August content",
-    "(Nineteenth Sunday in Ordinary Time), 4 pages."
+    "Weekly PDF at /pdf/DDMMYY.pdf (e.g. 160826.pdf = 16/08/2026).",
+    "2026-08-18 FIX: click on news.html failed ('No valid content found') even though this week's file is a direct unchallenged asset. Confirmed 16/08/2026 via curl: HTTP 200, 295,551 bytes, text 'Errigal Parish News - 16th August 2026'. site_type:predicted_dated_pdf fetches the rewritten /pdf/DDMMYY.pdf and never clicks the listing (which also links GDPR/pastoral-letter PDFs)."
   ],
-  "auto_fixed": true
+  "do_not": [
+    "Do not click a[href*=\"pdf\"] on news.html — it can pick drumraghparish.com GDPR/Privacy/Bishops-Letter links.",
+    "Do not set use_captured_url."
+  ]
 }
