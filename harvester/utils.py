@@ -4,6 +4,7 @@ utils.py — Shared helper utilities for the Parish Bulletin Harvester.
 from __future__ import annotations
 
 import re
+import time
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from urllib.parse import quote, unquote, urlparse
@@ -1035,6 +1036,59 @@ def naomhfionan_bulletin_url(target: date, *, number_offset: int = 0) -> str:
     ddmmyyyy = target.strftime("%d%m%Y")
     filename = f"Parish-Newsletter-{number}-for-Sun-{letter}-{ddmmyyyy}.pdf"
     return f"https://naomhfionan.com/wp-content/uploads/{target.year}/{target.month:02d}/{filename}"
+
+
+# ---------------------------------------------------------------------------
+# Parish Press Uploader helpers
+# ---------------------------------------------------------------------------
+
+# Matches Parish Press Uploader storage URLs specifically (parishpress.net,
+# under the fixed /wp-content/uploads/parish-bulletins/ path), which always
+# serve a single current file named exactly "bulletin.<ext>" per parish (any
+# query string, e.g. a "?t=<timestamp>" cache-buster, is preserved as a
+# separate group). Deliberately scoped to this one host/path rather than any
+# URL ending in "bulletin.<ext>" — plenty of unrelated parish sites also name
+# their weekly file bulletin.pdf, and those must not be affected.
+# The uploader's own client-side JS already merges multiple photos into one
+# multi-page bulletin.pdf via pdf-lib before upload, and only a Word document
+# (.doc/.docx) is ever stored unconverted — so the harvester side only needs
+# to know which filename to try each week, not how to build a PDF from a
+# batch of separate images.
+_PARISH_UPLOADER_BULLETIN_RE = re.compile(
+    r"^(?P<base>https?://(?:www\.)?parishpress\.net/wp-content/uploads/"
+    r"parish-bulletins/[^?]*/bulletin)\.(?P<ext>pdf|docx|doc|jpe?g|png)(?P<query>\?.*)?$",
+    re.IGNORECASE,
+)
+
+# Try the most common/expected format first (pdf), then the two upload
+# formats the harvester already knows how to convert to PDF.
+PARISH_UPLOADER_EXT_PRIORITY: tuple[str, ...] = ("pdf", "docx", "doc", "jpg", "jpeg", "png")
+
+
+def is_parish_uploader_bulletin_url(url: str) -> bool:
+    """Return True if *url* points at a Parish Press Uploader ``bulletin.<ext>`` file."""
+    return bool(_PARISH_UPLOADER_BULLETIN_RE.match((url or "").strip()))
+
+
+def parish_uploader_bulletin_candidates(url: str) -> list[str]:
+    """Build the ordered list of ``bulletin.<ext>`` URLs to try for a Parish Press Uploader parish.
+
+    The parish secretary might upload a PDF one week and a Word document or a
+    single photo the next — whichever they last uploaded is the only file
+    that exists on the server, so the harvester must try every supported
+    extension rather than assuming ``bulletin.pdf`` is always there. Returns
+    ``[]`` if *url* is not a recognised uploader bulletin URL.
+    """
+    match = _PARISH_UPLOADER_BULLETIN_RE.match((url or "").strip())
+    if not match:
+        return []
+    base = match.group("base")
+    matched_ext = match.group("ext").lower()
+    ordered_exts = [matched_ext] + [
+        ext for ext in PARISH_UPLOADER_EXT_PRIORITY if ext != matched_ext
+    ]
+    cache_bust = int(time.time())
+    return [f"{base}.{ext}?t={cache_bust}" for ext in ordered_exts]
 
 
 # ---------------------------------------------------------------------------
