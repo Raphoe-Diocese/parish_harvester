@@ -28,19 +28,116 @@
     .back-link { font-weight: 700; color: #1a6b6b; text-decoration: none; font-size: 0.9rem; }
     .title-line { font-weight: 700; font-size: 0.9rem; color: #1a1a2e; }
     .download-link { font-weight: 700; color: #1a6b6b; text-decoration: none; font-size: 0.85rem; white-space: nowrap; }
+    .pdf-standalone-shell {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      background: #525659;
+    }
     .pdf-frame { flex: 1 1 auto; border: 0; width: 100%; height: 100%; background: #525659; }
     body.embed-mode .top { display: none !important; }
+    
+    .pdf-mobile-fallback {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 36px 20px;
+      text-align: center;
+      min-height: 220px;
+      background: #eef2f2;
+    }
+    .pdf-frame-wrap.is-native-pdf,
+    body.is-native-pdf .pdf-standalone-shell {
+      height: auto;
+      min-height: 0;
+      background: #eef2f2;
+    }
+    .pdf-frame-wrap.is-native-pdf iframe,
+    .pdf-frame-wrap.is-native-pdf .fullscreen-btn,
+    body.is-native-pdf iframe.pdf-frame {
+      display: none !important;
+    }
+    .pdf-frame-wrap.is-native-pdf .pdf-mobile-fallback,
+    body.is-native-pdf .pdf-mobile-fallback {
+      display: flex;
+      flex: 1 1 auto;
+    }
+    .pdf-mobile-fallback-title {
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: #14524f;
+    }
+    .pdf-mobile-fallback-note {
+      margin: 0;
+      max-width: 28rem;
+      color: #4b5563;
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }
+    .pdf-mobile-fallback-actions {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: min(100%, 22rem);
+      margin-top: 4px;
+    }
+    .pdf-mobile-fallback-btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 12px 18px;
+      border-radius: 8px;
+      border: 2px solid #1a6b6b;
+      background: #1a6b6b;
+      color: #fff;
+      font-weight: 700;
+      font-size: 1rem;
+      text-decoration: none;
+    }
+    .pdf-mobile-fallback-btn:hover {
+      background: #14524f;
+      border-color: #14524f;
+      color: #fff;
+      text-decoration: none;
+    }
+    .pdf-mobile-fallback-btn.secondary {
+      background: #fff;
+      color: #1a6b6b;
+    }
+    .pdf-mobile-fallback-btn.secondary:hover {
+      background: #1a6b6b;
+      color: #fff;
+    }
+
+    body.is-native-pdf { background: #eef2f2; }
+    body.is-native-pdf .pdf-standalone-shell { background: #eef2f2; }
   </style>
 </head>
 <body>
   <div class="top" id="pdf-top">
     <div class="top-left">
-      <a class="back-link" href="derry-2026-08-02.html">← Viewer</a>
+      <a class="back-link" href="derry-2026-08-02.html" target="_blank" rel="noopener noreferrer">← Viewer</a>
       <span class="title-line">DERRY · 02/08/2026</span>
     </div>
-    <a class="download-link" href="../mega_pdf/derry_mega_bulletin.pdf" download>⬇ Download PDF</a>
+    <a class="download-link" href="../mega_pdf/derry_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer" download>⬇ Download PDF</a>
   </div>
-  <iframe class="pdf-frame" src="../mega_pdf/derry_mega_bulletin.pdf" title="Derry Diocese bulletin PDF"></iframe>
+  <div class="pdf-standalone-shell">
+    <iframe class="pdf-frame" src="../mega_pdf/derry_mega_bulletin.pdf" title="Derry Diocese bulletin PDF"></iframe>
+    
+        <div class="pdf-mobile-fallback" id="pdf-mobile-fallback" hidden>
+          <p class="pdf-mobile-fallback-title">View this bulletin PDF</p>
+          <p class="pdf-mobile-fallback-note">On phones, PDFs open best in the browser&rsquo;s built-in viewer. Tap below to read or download.</p>
+          <div class="pdf-mobile-fallback-actions">
+            <a class="pdf-mobile-fallback-btn" href="../mega_pdf/derry_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer">View PDF</a>
+            <a class="pdf-mobile-fallback-btn secondary" href="../mega_pdf/derry_mega_bulletin.pdf" download>Download PDF</a>
+          </div>
+        </div>
+  </div>
   <script>
     (function () {
       try {
@@ -49,6 +146,52 @@
         }
       } catch (e) {}
     })();
+    
+    (function () {
+
+      function prefersNativePdf() {
+        var ua = navigator.userAgent || '';
+        if (/Android/i.test(ua)) return true;
+        if (/iPhone|iPod/i.test(ua)) return true;
+        if (/iPad/i.test(ua)) return true;
+        // iPadOS 13+ may report as Macintosh with touch points.
+        if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) return true;
+        return false;
+      }
+
+      if (!prefersNativePdf()) return;
+
+      function activateWrap(wrap) {
+        if (!wrap) return;
+        wrap.classList.add('is-native-pdf');
+        var iframe = wrap.querySelector('iframe');
+        if (iframe) {
+          iframe.setAttribute('hidden', '');
+          // Stop the broken in-page PDF load; user opens it deliberately.
+          try { iframe.removeAttribute('src'); } catch (e) {}
+        }
+        var fs = wrap.querySelector('.fullscreen-btn');
+        if (fs) fs.setAttribute('hidden', '');
+        var panel = wrap.querySelector('.pdf-mobile-fallback');
+        if (panel) panel.removeAttribute('hidden');
+      }
+
+      document.querySelectorAll('.pdf-frame-wrap').forEach(activateWrap);
+
+      // Distraction-free PDF page: iframe is a direct child of body.
+      var standalone = document.querySelector('iframe.pdf-frame');
+      if (standalone && !standalone.closest('.pdf-frame-wrap')) {
+        document.body.classList.add('is-native-pdf');
+        standalone.setAttribute('hidden', '');
+        try { standalone.removeAttribute('src'); } catch (e) {}
+        var panel = document.getElementById('pdf-mobile-fallback');
+        if (panel) {
+          panel.removeAttribute('hidden');
+        }
+      }
+    })();
+
   </script>
+<script src="/assets/pdf-mobile-fallback.js" defer></script>
 </body>
 </html>

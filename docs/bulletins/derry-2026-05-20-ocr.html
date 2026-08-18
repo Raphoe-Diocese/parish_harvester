@@ -7,222 +7,228 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: Georgia, "Times New Roman", Times, serif;
-      background: #fff;
-      color: #1a1a2e;
-      line-height: 1.35;
-      font-size: 1.05rem;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #eef1f0;
+      color: #1a1f1e;
+      line-height: 1.65;
+      font-size: 1.125rem;
       -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
     }
-    a { color: #1d4ed8; text-decoration: underline; font-weight: 600; }
-    .page { max-width: 100%; margin: 0; padding: 8px 10px 24px; }
+    a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
+    .page {
+      max-width: min(72ch, 100%);
+      margin: 0 auto;
+      padding: 14px 18px 40px;
+    }
     .top {
       display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
       gap: 8px 14px;
-      margin-bottom: 8px; font-family: Georgia, "Times New Roman", Times, serif;
+      margin-bottom: 12px;
     }
     .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
     .back-link {
-      font-family: system-ui, sans-serif; font-size: 0.85rem; font-weight: 700;
-      color: #1e3a5f; text-decoration: none;
+      font-size: 0.9rem; font-weight: 700;
+      color: #14524f; text-decoration: none;
     }
     .title-line {
-      font-size: 1.05rem; font-weight: 700; color: #1a1a2e;
+      font-size: 1rem; font-weight: 700; color: #1a1f1e;
     }
     .font-size-controls { display: none; }
     .ocr-zoom-bar {
       position: sticky; top: 0; z-index: 6;
-      display: flex; justify-content: center; align-items: center; gap: 6px;
-      margin: 0 0 6px; padding: 4px 8px;
-      background: #f8fafc;
-      border: 1px solid #e5e7eb; border-radius: 6px;
-      font-family: system-ui, sans-serif;
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
     }
     .ocr-zoom-bar button {
-      min-width: 32px; min-height: 32px; border: 1px solid #1e3a5f; border-radius: 4px;
-      background: #fff; color: #1e3a5f; font-weight: 700; font-size: 1rem; cursor: pointer;
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.1rem; cursor: pointer;
       line-height: 1;
     }
     .ocr-zoom-pct {
-      min-width: 3rem; text-align: center; font-weight: 700; font-size: 0.85rem; color: #1e3a5f;
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
     }
-    .ocr-zoom-hint { display: none; font-size: 0.7rem; color: #666666; }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
     @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 4px; } }
+    
     .ocr-body {
-      background: #fff;
-      padding: 0 2px;
-      max-width: 100%;
-      font-size: calc(1.05rem * var(--ocr-scale, 1));
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
       touch-action: pan-x pan-y pinch-zoom;
-      color: #222222;
     }
-    .ocr-body h1, .ocr-body h2 { color: #14524f; margin: 0.7em 0 0.2em; font-weight: 700; font-size: 1.15em; }
-    .ocr-body h3, .ocr-body h4 { color: #1a6b6b; margin: 0.6em 0 0.15em; font-weight: 700; }
-    .ocr-body h2.b-title, .ocr-body .b-title {
-      font-size: 1.2em; border-bottom: 1px solid #c8d6f0; padding-bottom: 0.1em;
-    }
-    .ocr-body h3.ocr-page-heading, .ocr-body .page-label {
-      font-size: 0.72rem;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      margin: 0.85em 0 0.25em;
-      font-family: system-ui, sans-serif;
-      color: #64748b;
-    }
-    .ocr-body p { margin: 0 0 0.35em; }
-    .ocr-body hr { border: 0; border-top: 1px solid #e2e8f0; margin: 0.7em 0; }
-    .ocr-body mark { background: #fff3cd; padding: 0 2px; border-radius: 2px; }
-    .ocr-body mark.search-active { background: #fde047; outline: 2px solid #0f5e5e; }
-    .parish-block {
-      margin: 0 0 0.5rem;
-      border: 1px solid #e5e7eb;
-      border-radius: 4px;
-      background: #fff;
-    }
-    .parish-block.parish-odd { background: #f7faf9; }
-    .parish-block > summary.parish-head {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 6px 12px;
-      margin: 0;
-      padding: 0.4rem 0.55rem 0.4rem 0.6rem;
-      border-left: 3px solid #1a6b6b;
-      cursor: pointer;
-      list-style: none;
-    }
-    .parish-block > summary.parish-head::-webkit-details-marker { display: none; }
-    .parish-odd > summary.parish-head { border-left-color: #14524f; }
-    .parish-name {
-      margin: 0 !important;
-      font-size: 1.08rem !important;
-      font-family: Georgia, "Times New Roman", Times, serif;
-      color: #14524f !important;
-      border: 0 !important;
-      padding: 0 !important;
+    .ocr-body h1, .ocr-body h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
       font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
     }
-    .parish-name::before {
-      content: "▸ ";
+    .ocr-body h2.b-title, .ocr-body .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    .ocr-body h3.b-head, .ocr-body .b-head {
+      font-size: 1.12em;
+      color: #134e9c;
+      margin: 1.1em 0 0.35em;
+    }
+    .ocr-body h4.b-sub, .ocr-body .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    .ocr-body h3, .ocr-body h4 {
       color: #1a6b6b;
-      font-family: system-ui, sans-serif;
-      font-size: 0.85em;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
     }
-    .parish-block[open] .parish-name::before { content: "▾ "; }
-    .parish-source {
-      font-family: system-ui, sans-serif;
+    .ocr-body h3.ocr-page-heading,
+    .ocr-body .page-label {
       font-size: 0.78rem;
-      font-weight: 600;
-      white-space: nowrap;
-      text-decoration: none !important;
-      color: #1d4ed8;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
     }
-    .parish-source:hover { text-decoration: underline !important; }
-    .parish-source.muted { color: #94a3b8; font-weight: 500; }
-    .parish-body { padding: 0.2rem 0.6rem 0.65rem; }
-    .parish-empty {
-      font-family: system-ui, sans-serif;
-      font-size: 16px;
-      color: #666666;
-      font-style: normal;
-      font-weight: 400;
+    .ocr-body p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
     }
-    .parish-row-empty {
-      display: flex;
-      flex-wrap: nowrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px 12px;
-      min-height: 48px;
-      height: auto;
-      max-height: 64px;
-      padding: 8px 0;
-      margin: 0;
+    .ocr-body hr {
       border: 0;
-      border-bottom: 1px solid #e5e7eb;
-      background: transparent;
-      box-sizing: border-box;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
     }
-    .parish-row-empty .parish-name {
-      margin: 0 !important;
-      font-size: 16px !important;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif !important;
-      color: #1e3a5f !important;
+    .ocr-body strong { color: #0f2b5b; }
+    .ocr-body a {
+      color: #1a6b6b;
       font-weight: 600;
-      flex: 0 1 auto;
+      overflow-wrap: anywhere;
     }
-    .parish-row-empty .parish-name::before { content: none !important; }
-    .parish-row-empty .parish-empty {
-      flex: 1 1 auto;
-      margin: 0;
-      color: #666666;
-      font-size: 16px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    .ocr-body mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
     }
-    .parish-row-empty .parish-source {
-      color: #1e3a5f;
-      font-size: 16px;
-      flex: 0 0 auto;
+    .ocr-body mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    .ocr-body table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ocr-body table.b-table td, .ocr-body table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .ocr-body table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    .ocr-body table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    .ocr-body img, .ocr-body iframe, .ocr-body video {
+      max-width: 100%;
+      height: auto;
+    }
+    .ocr-body > :first-child {
+      margin-top: 0;
+    }
+
+    .ocr-body {
+      padding: 4px 2px 8px;
     }
     .search-panel {
-      margin: 0 0 8px;
-      font-family: system-ui, sans-serif;
-      border: 1px solid #e5e7eb;
-      border-radius: 6px;
-      padding: 6px 8px;
-      background: #f8fafc;
+      margin: 0 0 12px;
+      border: 1px solid #d4ddd9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
     }
-    .search-panel .ocr-search-bar { margin-bottom: 4px; }
-    .ocr-search-bar { position: relative; margin-bottom: 4px; }
+    .search-panel .ocr-search-bar { margin-bottom: 6px; }
+    .ocr-search-bar { position: relative; margin-bottom: 6px; }
     .search-input {
-      width: 100%; min-height: 34px; border: 1px solid #e5e7eb; border-radius: 5px;
-      padding: 5px 30px 5px 10px; font-size: 0.92rem;
-      font-family: system-ui, sans-serif; color: #222222; background: #fff;
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: #1a1f1e; background: #fff;
     }
-    .search-clear { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; border: 0; background: transparent; color: #666666; font-size: 1rem; cursor: pointer; }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }
     .search-clear[hidden] { display: none; }
     .ocr-search-tools {
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
       flex-wrap: wrap;
     }
     .ocr-search-tools button {
-      border: 1px solid #1e3a5f; border-radius: 4px; background: #fff; color: #1e3a5f;
-      font-weight: 600; min-height: 30px; padding: 3px 10px; cursor: pointer; font-size: 0.8rem;
+      border: 1px solid #1a6b6b; border-radius: 6px; background: #fff; color: #1a6b6b;
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
     }
-    .ocr-search-tools button:disabled { color: #999; border-color: #e5e7eb; cursor: not-allowed; }
-    .match-count { color: #666666; font-size: 0.78rem; font-weight: 600; }
+    .ocr-search-tools button:disabled { color: #999; border-color: #d4ddd9; cursor: not-allowed; }
+    .match-count { color: #5a6a68; font-size: 0.85rem; font-weight: 600; }
     .note-box {
-      margin-top: 10px;
-      color: #666666;
+      margin-top: 18px;
+      color: #5a6a68;
       font-weight: 400;
-      font-size: 13px;
-      line-height: 1.35;
-      font-family: system-ui, sans-serif;
-      font-style: normal;
+      font-size: 0.85rem;
+      line-height: 1.5;
       padding: 0;
     }
     .ocr-failed-banner {
-      margin: 10px 0;
-      padding: 10px 14px;
+      margin: 12px 0;
+      padding: 12px 14px;
       background: #fff4df;
       border: 1px solid #f5d08d;
-      border-radius: 6px;
+      border-radius: 8px;
       color: #713f12;
       font-weight: 600;
-      font-size: 13px;
+      font-size: 0.9rem;
+      line-height: 1.45;
     }
     body.embed-mode .top { display: none !important; }
-    body.embed-mode .page { padding-top: 4px; }
+    body.embed-mode .page { padding-top: 8px; }
+    @media (max-width: 600px) {
+      .page { padding: 12px 14px 32px; }
+      .ocr-search-tools button { min-height: 48px; }
+    }
   </style>
 </head>
 <body>
   <div class="page">
     <div class="top" id="ocr-top">
       <div class="top-left">
-        <a class="back-link" href="derry-2026-05-20.html">← Viewer</a>
+        <a class="back-link" href="derry-2026-05-20.html" target="_blank" rel="noopener noreferrer">← Viewer</a>
         <span class="title-line">DERRY Text Bulletin · 20/05/2026</span>
       </div>
     </div>
@@ -479,7 +485,7 @@ Clara McDermott
 Phia Porter
 Elly McFeeley
 Cheylah Loftus
-Annalaina Duffy<br>
+Annalaina Duffy
 FIRST HOLY COMMUNION CLASS 2026
 May God Bless all the Children making Their First Communion.</p>
 <h2 class="b-title">St Boden's N.S. School</h2>
@@ -587,7 +593,7 @@ Weekday Mass Times this week
 in Sacred Heart Church
 7.30pm Wednesday Sacred Heart
 Eucharistic Adoration on Wednesday
-from 10am until 7pm. |<br>
+from 10am until 7pm. |
 | St. Mary's Church, Drumragh
 Sunday Mass: 10.30am | |
 | Confessions:
@@ -645,7 +651,7 @@ Aisling Taggart &amp; Eoin O’Neill
 May the grace of the sacrament remain with them all their lives. |
 | VOCATIONS On Ascension Sunday we celebrate World Communications Day. We pray for those who will be called as priests to preach the Gospel, to communicate the Good News of God's love as God reveals it to us in His Word and in the person of Jesus Christ. | Sacrament of First Holy Communion
 We congratulate the pupils, parents/guardians and teachers from St Conor’s, Holy Family,
-All Saints’ &amp; Sacred Heart Primary Schools who made their Sacrament of First Holy Communion over the last three weeks. |<br>
+All Saints’ &amp; Sacred Heart Primary Schools who made their Sacrament of First Holy Communion over the last three weeks. |
 | Pope Leo’s Message for World Communications Day 2026
 In his message for the 60th World Day of Social Communications, Pope Leo XIV highlights the importance of ensuring that technological innovation, particularly artificial intelligence, serves the human person rather than replacing or diminishing human dignity. | A Petition book is available at the front of the Sanctuary for examination students and their families who are preparing for exams. |</p>
 <h3 class="b-head">Derry Diocesan Society</h3>
@@ -661,7 +667,7 @@ In his message for the 60th World Day of Social Communications, Pope Leo XIV hig
 <h2 class="b-title">BINGO in St. Joseph's Hall on Tuesday 19th May</h2>
 <p>| Walk in the footsteps of our Patron Saint on Saint Patrick's Way Pilgrim Walk in Downpatrick with guides Martina Purdy and Elaine Kelly on Sat 6th June and 8th August, and Mairead Sweeney on Sat 4th July. Begin at Saint Patrick's Centre with the fabulous 180° IMAX film of St Patrick. Price includes entrance fees, internal bus transfers, pilgrimage lunch at the famous Saul Barn, plus a stamped Camino passport and a 6-mile pilgrimage walk, finishing at Saint Patrick's grave. Come and Be Amazed! (Duration 9am-approx 3pm, all for just £55) To book ring 02844 619000 or go to website
 <a href="https://www.saintpatrickcentre.com" target="_blank" rel="noopener noreferrer">www.saintpatrickcentre.com</a>
-|<br>
+|
 | Lough Derg will host their *Day of Friendship and Prayer* this Wednesday, 20thMay. This special annual event promotes Christian unity. Archbishop Eamon Martin and Archbishop John McDowell will join Fr La Flynn, Prior of Lough Derg, for a day of spirituality, friendship and reflection. The day begins at 10am, finishing at 3pm on Station Island, an oasis of calm &amp; peace with over 15,000 years of history. Admission fee of €25 includes boat fare, refreshments and lunch. Advance booking is essential.
 <a href="https://www.loughderg.org" target="_blank" rel="noopener noreferrer">www.loughderg.org</a>
 <a href="mailto:info@loughderg.org" target="_blank" rel="noopener noreferrer">info@loughderg.org</a>
@@ -775,7 +781,7 @@ Fergiveness and acceptance were the themes for the second night and on the Tuesd
 At the start of the retreat, parishioners were encouraged to write their mothers' and fathers' surnames on an altar cloth. During the liturgy of healing, these names were read out and then the cloth was carried to the front and used to dress the altar before Mass at 10 pm. It was a very beautiful and moving experience listening to the names of those who came before - the names were threads connecting parishioners to their community, their family members and members of Granaghan faith community through the ages.
 The final session of the retreat was based around serenity and trust, and holding on to the threads which connect our parish to the Lord.
 Throughout the retreat, there was a palpable sense of faith and holiness, and a willingness to participate, from the children in the school who were joined by Sr Perpetua and Geraldine to explore expressing their faith through music, stories and meditation, to the congregation in the church, and it was obvious that the Holy Spirit was at work.
-Heartfelt thanks were extended to the team from Thornhill Ministries for leading us in this very special time of prayer, and everyone got a chance to express their appreciation and chat about the experience over a cuppa in the local primary school at the close of the retreat.<br>
+Heartfelt thanks were extended to the team from Thornhill Ministries for leading us in this very special time of prayer, and everyone got a chance to express their appreciation and chat about the experience over a cuppa in the local primary school at the close of the retreat.
 THE NET | APRIL 2019
 Granaghan Parish reaping the rewards as.</p>
 <h2 class="b-title">Re-energised Fr Keaney reflects on priesthood and importance of sabbatical</h2>
@@ -844,7 +850,7 @@ Northern Ireland emergency services PSNI (Police Service of Northern Ireland) 10
 <a href="tel:+442894424459" style="color:#1d4ed8;font-weight:600;">028 9442 4459</a>
 Regional Emergency Social Work Services 0800 1979 99
 PRIVACY NOTICE The Diocese of Derry complies with GDPR regulations. A privacy notice is available on the Parish Website Live stream and recordings of Mass and Services in Holy Family Church are available on line. Parishioners should note that the first 2 rows of seats are visible on line.
-Sun 17th May 2026<br>
+Sun 17th May 2026
 Vol. 44 No 20</p>
 <h2 class="b-title">MASSES</h2>
 <p>Saturday Vigil 6.00pm
@@ -868,7 +874,7 @@ Parish Office 9.45am-1.45pm Mon-Fri
 Parish Priest: Fr Joseph Gormley
 Curate: Fr Kevin Mulhern</p>
 <h2 class="b-title">FEAST OF THE ASCENSION</h2>
-<p>On Ascension Sunday, the Gospel of Matthew reminds us that the Ascension is not about Jesus leaving His disciples behind, but about sending them forth with confidence and hope. On the mountain in Galilee, the risen Christ gives His disciples the great mission: “Go therefore and make disciples of all nations.” Significantly, Matthew tells us that even as they worshipped Him, “some doubted.” The Church’s mission begins not with perfect people, but with ordinary disciples learning to trust in the Lord. Jesus declares that “all authority in heaven and on earth” belongs to Him. The Ascension celebrates Christ not absent, but reigning — Lord of heaven and earth, guiding His Church through every age. And finally comes the promise that sustains every Christian life: “I am with you always, to the close of the age.” Though Christ ascends to the Father, He remains present to us — in Word and Sacrament, in prayer, and in one another. The Ascension calls us to lift our hearts toward heaven while continuing Christ’s work faithfully here on earth<br>
+<p>On Ascension Sunday, the Gospel of Matthew reminds us that the Ascension is not about Jesus leaving His disciples behind, but about sending them forth with confidence and hope. On the mountain in Galilee, the risen Christ gives His disciples the great mission: “Go therefore and make disciples of all nations.” Significantly, Matthew tells us that even as they worshipped Him, “some doubted.” The Church’s mission begins not with perfect people, but with ordinary disciples learning to trust in the Lord. Jesus declares that “all authority in heaven and on earth” belongs to Him. The Ascension celebrates Christ not absent, but reigning — Lord of heaven and earth, guiding His Church through every age. And finally comes the promise that sustains every Christian life: “I am with you always, to the close of the age.” Though Christ ascends to the Father, He remains present to us — in Word and Sacrament, in prayer, and in one another. The Ascension calls us to lift our hearts toward heaven while continuing Christ’s work faithfully here on earth
 SYMPATHY We offer our sympathy to the family of Jimmy Kivelehan, Sheelin Park, and Michael Cunningham, Killary Rd. who died during the week. May he rest in peace.
 ANNIVERSARIES We pray for those whose anniversaries occur at this time Michael Barr., Annie &amp; Spike Nolan, Joe Donnelly,
 PRAYER FOR VOCATIONS TO THE DIOCESAN PRIESTHOOD On Ascension Sunday we celebrate World Communications Day. We pray for those who will be called as priests to preach the Gospel, to communicate the Good News of God’s love as God reveals it to us in His Word and in the person of Jesus Christ.
@@ -951,7 +957,7 @@ THE ST. PEREGRINE NOVENA MASS &amp; BLESSING WITH THE RELIC WILL BE HELD ON FRID
 <p><a href="https://www.parishofkilrea.com" target="_blank" rel="noopener noreferrer">https://www.parishofkilrea.com</a></p>
 <h2 class="b-title">Parish of Kilrea &amp; Desertohill</h2>
 <p>Rev. Christopher McDermott
-Parish Secretary: Mrs Kim Convery<br>
+Parish Secretary: Mrs Kim Convery
 The Ascension Of The Lord
 17th May 2026
 <a href="https://www.parishofkilrea.com" target="_blank" rel="noopener noreferrer">www.parishofkilrea.com</a>
@@ -972,7 +978,7 @@ whose anniversaries occur at this time.
 Eternal rest grant unto them, O Lord.
 Our parish family welcomes
 Éire Catherine McPeake
-who was baptised recently.<br>
+who was baptised recently.
 May she always walk as a child of the light!
 SVP summer outing on Saturday 6th June 2026
 .Pick-up at St Vincent de Paul shop, Kilrea at 11am
@@ -994,7 +1000,7 @@ Hugh McAuley
 on Saturday 23rd May at 7pm in St Anne’s Oratory.
 First Anniversary Mass for
 Peggy Gilmore
-on Sunday 31st May at 10am in Drumagarner.<br>
+on Sunday 31st May at 10am in Drumagarner.
 First Communion 2026: Warmest congratulations to the children from Crossroads P.S, St Columba’s P.S. and Carhill Integrated P.S. who celebrated their First Eucharist recently. Our gratitude is extended to everyone who accompanied the young people as they prepared for this special occasion.</p>
 <h3 class="b-head">Annual Fundraising Big Breakfast in Marian Hall on Sunday 17th May from 9am to 12noon.</h3>
 <p>It’s fantastic to see Hall up and running again and it has become an integral part of our Parish Community.
@@ -1023,7 +1029,7 @@ Centenary Gala Dinner
 Saturday 21st November 2026
 Tullyglass House Hotel
 To book a table or your place
-contact the Club on 7964 3202. | |<br>
+contact the Club on 7964 3202. | |
 | Weekdays:
 Mon - Fri: 9.15am | An Carn
 Mood Matters Workshop with
@@ -1116,7 +1122,7 @@ Father Johnny Doherty, C.Ss.R.</p>
 <p>*Assumpta, Paul (McDonnell) and family would like to sincerely show their thanks to Father Graham and the whole community for all the prayers, kindness and support on the day of the accident and over the last year. A Mass will be offered in thanksgiving for the people of the parish in gratitude for the support.*
 DIOCESE OF DERRY LOUGH DERG
 - Three-Day Pilgrimage to Lough Derg will take place from Friday 24th July to Sunday 26th July 2026. Lough Derg continues to welcome people seeking prayer, peace, reflection and renewal. A bus will travel from St Eugene's Cathedral. Cost: £95 including bus transport. You are welcome, of course, to use your own means of transport. Booking and full details available at:
-<a href="https://www.derrydiocese/lough-derg" target="_blank" rel="noopener noreferrer">www.derrydiocese/lough-derg</a><br>
+<a href="https://www.derrydiocese/lough-derg" target="_blank" rel="noopener noreferrer">www.derrydiocese/lough-derg</a>
 Parish Collections - 10/05/026
 Weekly: £1123.00; Building: £1015.15; Loose Coin: £514.97.
 Thank you for your continued support!</p>
@@ -1129,7 +1135,7 @@ St. Brigid's P.S. End of the School Year Mass
 *Friday 26th June at 1.15 pm*
 Cemetery Sunday
 *Sunday 28th June at 11.00 am Mass
-On Ascension Sunday we celebrate World Communications Day. We pray for those who will be called as priests to preach the Gospel, to communicate the Good News of God’s love as God reveals it to us in His Word and in the person of Jesus Christ.<br>
+On Ascension Sunday we celebrate World Communications Day. We pray for those who will be called as priests to preach the Gospel, to communicate the Good News of God’s love as God reveals it to us in His Word and in the person of Jesus Christ.
 The Novena of St Thérèse closing ceremony will take place today Sunday 17th May at 3.00pm in St. Eugene’s Cathedral.</p>
 <h2 class="b-title">SOLEMN CLONARD NOVENA</h2>
 <p>17TH - 25TH JUNE 2025
@@ -1153,10 +1159,10 @@ DIOCESE OF DERRY LOUGH DERG PILGRIMAGE 2026: The Diocese of Derry Three-Day Pilg
 LCDI and ROE RUNNERS invite you to a 5km FUN RUN/WALK on SATURDAY 23 MAY, STARTING AT 1.00PM, FROM LCDI CAR PARK
 1km Children's Superhero Run/Walk.
 Registration open from 12 noon.
-For more information telephone (028) 777 65438<br>
+For more information telephone (028) 777 65438
 Parish Youth Ministry Evening: Derry Diocesan Youth will host an evening for Parish Youth Ministry leaders and volunteers on Wednesday 20 May in Claudy Parish Centre at 7.00pm. The evening will provide an opportunity for parishes to reflect on their current ministries for young people and share practice. The focus of the evening will be on the GIFT Programme. This is a post-confirmation programme aimed at Year 8 initially and delivered through parish. If you would like more information or would like to attend, please contact
 <a href="mailto:yvonne.rooney@derrydiocese.org" target="_blank" rel="noopener noreferrer">yvonne.rooney@derrydiocese.org</a>
-.<br>
+.
 ACCORD NI: There are still a few places available on the June 19th/20th Course being held in the Everglades Hotel, Derry.
 Booking online now at
 <a href="https://www.accordni.com" target="_blank" rel="noopener noreferrer">www.accordni.com</a>
@@ -1223,7 +1229,7 @@ James Anthony Carten, 12 Carten's Road, Limavady</p>
 <h3 class="b-head">Month's Mind Mass</h3>
 <p>The Month's Mind Mass for Winifred Brolly and Winifred Canning will be celebrated on Saturday 23 May at 6.00pm in St. Finlough's Church.</p>
 <h3 class="b-head">First Anniversary Mass</h3>
-<p>The First Anniversary Mass for David Butler will be celebrated on Saturday 23 May at 4.30 pm in Christ the King Church.<br>
+<p>The First Anniversary Mass for David Butler will be celebrated on Saturday 23 May at 4.30 pm in Christ the King Church.
 The Parish of Limavady invites you to celebrate Msgr Bryan McCanny's 40 years of Priesthood on Friday 2nd May 2026
 7.00pm Mass in Christ the King Church
 8.00pm Refreshments in Bethany Community Centre</p>
@@ -1231,7 +1237,7 @@ The Parish of Limavady invites you to celebrate Msgr Bryan McCanny's 40 years of
 <p>The next meeting of the Society will take place on Tuesday 19 May 2026 after 10.00am Mass and rosary in Christ the King conference room. Please pray for vocations to the priesthood.</p>
 <h3 class="b-head">Weekly Envelope Collection</h3>
 <p>Weekly Collection: £4,130
-Thank you for your continued support.<br>
+Thank you for your continued support.
 Please pray for our parishioner Conan McGonagle who will be ordained to the Sacred Priesthood on the 28th May at the Cathedral of St. Cecilia in Omaha, Nebraska. Fr. Conan will offer his First Mass in St. Marys on the 1st June at 7.00pm. There will be a plenary indulgence for those who attend this Mass. Prayers for the intentions of the Holy Father. Refreshments will be served in Bethany after the Mass.</p>
 <h3 class="b-head">EUCHARISTIC ADORATION</h3>
 <p>will take place in St. Mary's church on Thursdays from 1.00pm-6.00pm.
@@ -1245,7 +1251,7 @@ Anyone interested please leave your name and number at the parish office or cont
 <h3 class="b-head">40TH ANNIVERSARY OF ST. FINLOUGH'S HALL</h3>
 <p>on Saturday 30th May after 6.00pm Mass
 Tea and refreshments will be served in the Hall Admission: free.
-All welcome to attend.<br>
+All welcome to attend.
 Rosary on Benone Beach at 3.00pm on Sunday 17 May. All welcome.</p>
 <h3 class="b-head">Limavady Parish</h3>
 <h4 class="b-sub">CEMETERY SUNDAYS 2026</h4>
@@ -1333,7 +1339,7 @@ If you pay Income Tax at the higher or additional rate and want to receive the a
 <h2 class="b-title">Moville</h2>
 <p><a href="https://movilleparish.com" target="_blank" rel="noopener noreferrer">https://movilleparish.com</a></p>
 <h2 class="b-title">The Parish of Moville</h2>
-<p>St Pius X, Moville St Mary's, Ballybrack<br>
+<p>St Pius X, Moville St Mary's, Ballybrack
 St Columba's, Ballinacrae St Joseph's Oratory, Shrove
 Parish Priest: Fr Colm O'Doherty (074) 9382057
 Parish Office: (074) 9382057/
@@ -1450,7 +1456,7 @@ See you soon!
 <h2 class="b-title">The Little Way Novena in honour of St Therese of Lisieux</h2>
 <p>"My peace consists in remaining little."
 "It is not the greatness of our actions that matters, but the love with which we do them."
-(Extract from a Story of a Soul: The Autobiography of St Thérèse)<br>
+(Extract from a Story of a Soul: The Autobiography of St Thérèse)
 At 3.00pm today (Sunday), our Little Way Novena will conclude with a ceremony of prayer and thanksgiving. We sincerely thank everyone who contributed to the success of the Novena — our speakers, readers, singers, candle sellers, and all who work in the Cathedral, Parochial House, and grounds. The witness of faith and commitment throughout the Novena has been truly uplifting.
 Through the intercession of St Thérèse, we have opened our hearts to God and entrusted to Him our intentions. You are warmly invited to bring a rose to this afternoon's service as a symbol of your prayer at this time. St Thérèse candles will also be blessed during the ceremony.</p>
 <h2 class="b-title">A short reflection on today's Gospel Matthew 28:16-20</h2>
@@ -1572,7 +1578,7 @@ I'm ready now, Lord Jesus,
 To show how much I care.
 I'm ready now to give your love
 At home and everywhere.
-Amen.<br>
+Amen.
 BAPTISMS Saturday at 5pm Contact the Parish Office 71263152 between 10am-12 noon Mon-Fri
 MARRIAGES At least 3 months notice must be given to the Parish. Contact Parish Office to arrange Pre-Marriage Preparation Course.
 THE WEBCAM: To join us for the live streaming of all Masses via the webcam, log into
@@ -1630,7 +1636,7 @@ Tel
 <a href="mailto:stmaryscreggan@derrydiocese.org" target="_blank" rel="noopener noreferrer">stmaryscreggan@derrydiocese.org</a>
 <a href="https://www.stmaryscreggan.com" target="_blank" rel="noopener noreferrer">www.stmaryscreggan.com</a>
 10th May 2026
-6th Sunday of Easter<br>
+6th Sunday of Easter
 Bene Merenti Medal: The Bene Merenti Medal is one of the highest honours that can be bestowed by the Holy Father upon a lay person. The Latin words Bene Merenti mean "well deserved," reflecting the Church's deep appreciation for faithful and generous service.
 We are delighted to announce that Kathleen Doherty has been awarded this high and prestigious Papal honour by Pope Leo XIV. The medal will be conferred on her by Bishop Donal McKeown at the 12.15 pm Mass today Sunday 10th May 2026.
 This papal award recognises Kathleen's exceptional dedication, faithful service, and generous commitment to our parish community over many years. Her quiet witness, willingness to serve, and deep faith have enriched the life of our parish in countless ways.
@@ -1638,7 +1644,7 @@ As a parish, we are immensely proud of Kathleen. With full hearts, we congratula
 May her example continue to inspire us all.</p>
 <hr>
 <p>First Holy Communion: We remember in our prayers the P4 children from Holy Child Primary School who will celebrate their First Holy Communion in this Church on Friday 15th May, at 12.30pm Mass.
-The P4 children from St John's PS will make their First Holy Communion on Friday 5th June, at 12.30pm Mass. Please keep them in your prayers.<br>
+The P4 children from St John's PS will make their First Holy Communion on Friday 5th June, at 12.30pm Mass. Please keep them in your prayers.
 A Marian Evening of Prayer will be here, in St Mary's Church, Creggan, on Wednesday, 27th May. (please note the change of date). The event is hosted by Derry Youth Ministry, who are preparing for their diocesan pilgrimage to Fatima in August of this year. The night will begin at 7:00pm with a rosary procession (outdoors, weather permitting), followed by a short talk on Our Lady and the Eucharist, Adoration, and Benediction. Music will be provided by the Diocesan Youth music group, with refreshments following in the community room. All ages welcome! Contact Bethany at
 <a href="mailto:bethany.doherty@derrydiocese.org" target="_blank" rel="noopener noreferrer">bethany.doherty@derrydiocese.org</a>
 for more details.
@@ -1691,7 +1697,7 @@ O live with Him today
 We sing thee Lord Divine
 With all our hearts and powers
 For we are ever thine
-And thou art ever ours.<br>
+And thou art ever ours.
 Thank you. Keep it up!
 During Lent it was most encouraging to see how many parishioners attended weekday Mass,
 If you are free to do so, please come along to weekday Mass because by doing so you cannot imagine the number of graces and blessing that you bring upon yourself, your loved ones, the sick and all who stand in need of God's help, protection, comfort and healing.
@@ -1702,8 +1708,8 @@ Easter Sunday
 Welcome to parish Mass today.
 The priests of the parish wish you a happy and holy Easter.
 Website:
-<a href="https://www.starofttheseacatholic.com" target="_blank" rel="noopener noreferrer">www.starofttheseacatholic.com</a><br>
-Star of the Sea, Faughanvale<br>
+<a href="https://www.starofttheseacatholic.com" target="_blank" rel="noopener noreferrer">www.starofttheseacatholic.com</a>
+Star of the Sea, Faughanvale
 St Mary's, Tamnaherin
 Sunday Masses:
 Vigil: 5:00 p.m.

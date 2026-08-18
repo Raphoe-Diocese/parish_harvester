@@ -1086,6 +1086,155 @@ def _pdf_standalone_href(config: DioceseConfig, bulletin_date: str) -> str:
     return f"{config.key}-{bulletin_date}-pdf.html"
 
 
+def prefers_native_pdf_js() -> str:
+    """Detect phones/tablets where PDF-in-iframe usually shows a broken icon."""
+    return """
+      function prefersNativePdf() {
+        var ua = navigator.userAgent || '';
+        if (/Android/i.test(ua)) return true;
+        if (/iPhone|iPod/i.test(ua)) return true;
+        if (/iPad/i.test(ua)) return true;
+        // iPadOS 13+ may report as Macintosh with touch points.
+        if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) return true;
+        return false;
+      }
+"""
+
+
+def pdf_mobile_fallback_css() -> str:
+    """Styles for the phone/tablet PDF panel (desktop iframe stays unchanged)."""
+    return f"""
+    .pdf-mobile-fallback {{
+      display: none;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      padding: 36px 20px;
+      text-align: center;
+      min-height: 220px;
+      background: #eef2f2;
+    }}
+    .pdf-frame-wrap.is-native-pdf,
+    body.is-native-pdf .pdf-standalone-shell {{
+      height: auto;
+      min-height: 0;
+      background: #eef2f2;
+    }}
+    .pdf-frame-wrap.is-native-pdf iframe,
+    .pdf-frame-wrap.is-native-pdf .fullscreen-btn,
+    body.is-native-pdf iframe.pdf-frame {{
+      display: none !important;
+    }}
+    .pdf-frame-wrap.is-native-pdf .pdf-mobile-fallback,
+    body.is-native-pdf .pdf-mobile-fallback {{
+      display: flex;
+      flex: 1 1 auto;
+    }}
+    .pdf-mobile-fallback-title {{
+      margin: 0;
+      font-size: 1.15rem;
+      font-weight: 800;
+      color: {DEEP_TEAL};
+    }}
+    .pdf-mobile-fallback-note {{
+      margin: 0;
+      max-width: 28rem;
+      color: #4b5563;
+      font-size: 0.95rem;
+      line-height: 1.45;
+    }}
+    .pdf-mobile-fallback-actions {{
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+      width: min(100%, 22rem);
+      margin-top: 4px;
+    }}
+    .pdf-mobile-fallback-btn {{
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 48px;
+      padding: 12px 18px;
+      border-radius: 8px;
+      border: 2px solid {TEAL};
+      background: {TEAL};
+      color: #fff;
+      font-weight: 700;
+      font-size: 1rem;
+      text-decoration: none;
+    }}
+    .pdf-mobile-fallback-btn:hover {{
+      background: {DEEP_TEAL};
+      border-color: {DEEP_TEAL};
+      color: #fff;
+      text-decoration: none;
+    }}
+    .pdf-mobile-fallback-btn.secondary {{
+      background: #fff;
+      color: {TEAL};
+    }}
+    .pdf-mobile-fallback-btn.secondary:hover {{
+      background: {TEAL};
+      color: #fff;
+    }}
+"""
+
+
+def pdf_mobile_fallback_html(pdf_href: str) -> str:
+    """Friendly phone panel: open in native viewer + download (no broken iframe)."""
+    safe = html.escape(pdf_href, quote=True)
+    return f"""
+        <div class="pdf-mobile-fallback" id="pdf-mobile-fallback" hidden>
+          <p class="pdf-mobile-fallback-title">View this bulletin PDF</p>
+          <p class="pdf-mobile-fallback-note">On phones, PDFs open best in the browser&rsquo;s built-in viewer. Tap below to read or download.</p>
+          <div class="pdf-mobile-fallback-actions">
+            <a class="pdf-mobile-fallback-btn" href="{safe}" target="_blank" rel="noopener noreferrer">View PDF</a>
+            <a class="pdf-mobile-fallback-btn secondary" href="{safe}" download>Download PDF</a>
+          </div>
+        </div>"""
+
+
+def pdf_mobile_fallback_boot_js() -> str:
+    """Swap broken iframe embeds for the native open/download panel on mobile."""
+    return f"""
+    (function () {{
+{prefers_native_pdf_js()}
+      if (!prefersNativePdf()) return;
+
+      function activateWrap(wrap) {{
+        if (!wrap) return;
+        wrap.classList.add('is-native-pdf');
+        var iframe = wrap.querySelector('iframe');
+        if (iframe) {{
+          iframe.setAttribute('hidden', '');
+          // Stop the broken in-page PDF load; user opens it deliberately.
+          try {{ iframe.removeAttribute('src'); }} catch (e) {{}}
+        }}
+        var fs = wrap.querySelector('.fullscreen-btn');
+        if (fs) fs.setAttribute('hidden', '');
+        var panel = wrap.querySelector('.pdf-mobile-fallback');
+        if (panel) panel.removeAttribute('hidden');
+      }}
+
+      document.querySelectorAll('.pdf-frame-wrap').forEach(activateWrap);
+
+      // Distraction-free PDF page: iframe is a direct child of body.
+      var standalone = document.querySelector('iframe.pdf-frame');
+      if (standalone && !standalone.closest('.pdf-frame-wrap')) {{
+        document.body.classList.add('is-native-pdf');
+        standalone.setAttribute('hidden', '');
+        try {{ standalone.removeAttribute('src'); }} catch (e) {{}}
+        var panel = document.getElementById('pdf-mobile-fallback');
+        if (panel) {{
+          panel.removeAttribute('hidden');
+        }}
+      }}
+    }})();
+"""
+
+
 def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: int, ocr_fragment: str, parish_links: list[tuple[str, str]]) -> str:
     """Dated bulletin-archive viewer page (docs/bulletins/{diocese}-{date}.html).
 
@@ -1117,6 +1266,7 @@ def render_pdf_standalone_page(config: DioceseConfig, bulletin_date: str, pdf_hr
     """Distraction-free, chrome-free full-page PDF view — mirrors render_ocr_standalone_page."""
     diocese_label = _diocese_label(config.display_name)
     uk_bulletin_date = format_uk_date(bulletin_date)
+    safe_pdf = html.escape(pdf_href, quote=True)
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1147,8 +1297,18 @@ def render_pdf_standalone_page(config: DioceseConfig, bulletin_date: str, pdf_hr
     .back-link {{ font-weight: 700; color: {TEAL}; text-decoration: none; font-size: 0.9rem; }}
     .title-line {{ font-weight: 700; font-size: 0.9rem; color: {TEXT}; }}
     .download-link {{ font-weight: 700; color: {TEAL}; text-decoration: none; font-size: 0.85rem; white-space: nowrap; }}
+    .pdf-standalone-shell {{
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      background: #525659;
+    }}
     .pdf-frame {{ flex: 1 1 auto; border: 0; width: 100%; height: 100%; background: #525659; }}
     body.embed-mode .top {{ display: none !important; }}
+    {pdf_mobile_fallback_css()}
+    body.is-native-pdf {{ background: #eef2f2; }}
+    body.is-native-pdf .pdf-standalone-shell {{ background: #eef2f2; }}
   </style>
 </head>
 <body>
@@ -1157,9 +1317,12 @@ def render_pdf_standalone_page(config: DioceseConfig, bulletin_date: str, pdf_hr
       <a class="back-link" href="{html.escape(viewer_href, quote=True)}" target="_blank" rel="noopener noreferrer">← Viewer</a>
       <span class="title-line">{html.escape(diocese_label)} · {html.escape(uk_bulletin_date)}</span>
     </div>
-    <a class="download-link" href="{html.escape(pdf_href, quote=True)}" target="_blank" rel="noopener noreferrer" download>⬇ Download PDF</a>
+    <a class="download-link" href="{safe_pdf}" target="_blank" rel="noopener noreferrer" download>⬇ Download PDF</a>
   </div>
-  <iframe class="pdf-frame" src="{html.escape(pdf_href, quote=True)}" title="{html.escape(config.display_name)} bulletin PDF"></iframe>
+  <div class="pdf-standalone-shell">
+    <iframe class="pdf-frame" src="{safe_pdf}" title="{html.escape(config.display_name)} bulletin PDF"></iframe>
+    {pdf_mobile_fallback_html(pdf_href)}
+  </div>
   <script>
     (function () {{
       try {{
@@ -1168,6 +1331,7 @@ def render_pdf_standalone_page(config: DioceseConfig, bulletin_date: str, pdf_hr
         }}
       }} catch (e) {{}}
     }})();
+    {pdf_mobile_fallback_boot_js()}
   </script>
 </body>
 </html>
@@ -1347,6 +1511,7 @@ def render_bulletin_viewer_shell(
       cursor: pointer;
     }}
     .fullscreen-btn:hover {{ background: #fff; }}
+    {pdf_mobile_fallback_css()}
 
     .ocr-search-bar {{ position: relative; margin-bottom: 10px; }}
     .search-input {{
@@ -1559,6 +1724,7 @@ def render_bulletin_viewer_shell(
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
         <iframe src="{html.escape(pdf_href, quote=True)}" title="{html.escape(display_name)} bulletin PDF"></iframe>
+        {pdf_mobile_fallback_html(pdf_href)}
       </div>
     </div>
 
@@ -1621,6 +1787,8 @@ def render_bulletin_viewer_shell(
         }} catch (e) {{}}
       }});
     }})();
+
+    {pdf_mobile_fallback_boot_js()}
 
     (function () {{
       var KEY = 'ph_ocr_scale';
