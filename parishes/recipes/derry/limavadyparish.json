@@ -1,44 +1,27 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "limavadyparish",
   "display_name": "Limavady",
   "diocese": "derry",
-  "start_url": "https://www.limavadyparish.org/parish%20bulletins.html",
+  "start_url": "https://www.limavadyparish.org/onewebmedia/16-8-26.pdf",
   "steps": [
     {
-      "action": "click",
-      "selector": "a[href*=\"16-8-26.pdf\"]",
-      "href": "/onewebmedia/16-8-26.pdf",
-      "text": "16th August 2026 | 16th August 2026",
-      "pick_strategy": "newest_dated",
-      "bulletin_position": "top",
-      "fallback_selectors": [
-        "a[href$='.pdf']",
-        "a[href*='.pdf']"
-      ]
-    },
-    {
       "action": "download",
-      "url": "https://www.limavadyparish.org/onewebmedia/16-8-26.pdf"
+      "url": "https://www.limavadyparish.org/onewebmedia/28-6-26.pdf"
     }
   ],
-  "observed_load_ms": 2662.10009765625,
-  "timeout_ms": 55000,
-  "total_timeout_s": 250,
-  "playbook_type": "pdf_download_list",
-  "site_type": "pdf_link_list",
+  "site_type": "predicted_dated_pdf",
+  "weeks_back": 8,
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "playbook_type": "dated_pdf_bulletin",
+  "recorded_date": "2026-08-18",
   "operator_notes": [
-    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
-    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-    "Do not worry if the filename or date in the link text changes every week."
+    "Dated PDF at /onewebmedia/D-M-YY.pdf (e.g. 16-8-26.pdf = 16/08/2026).",
+    "2026-08-18 FIX: recipe was pinned with use_captured_url to 28-6-26.pdf. Playwright then failed ENETUNREACH on that host's IPv6 address. The file itself is fine over IPv4 — a plain HTTP GET of the rewritten 16-8-26.pdf returns 200 application/pdf (703,960 bytes). site_type:predicted_dated_pdf skips the browser (and IPv6) and tries rewrite_date_url for this Sunday plus previous weeks."
   ],
   "do_not": [
-    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
-    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
-  ],
-  "bulletin_layout": {
-    "strategy": "newest_dated",
-    "position": "top"
-  },
-  "recorded_date": "2026-08-19"
+    "Do not set use_captured_url — it freezes the recipe on the trained week's file.",
+    "Do not open the homepage in Playwright on this host — IPv6 from GitHub/Actions can ENETUNREACH."
+  ]
 }
