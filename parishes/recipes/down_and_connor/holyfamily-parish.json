@@ -3,15 +3,15 @@
   "parish_key": "holyfamily-parish",
   "display_name": "Holy Family",
   "diocese": "down_and_connor",
-  "start_url": "https://www.holyfamily-parish.com/",
+  "start_url": "https://www.holy-familyparish.com/bulletin/",
   "steps": [
     {
       "action": "click",
-      "selector": "a[href$='.pdf']",
-      "href": "pdf/280626.pdf",
-      "text": "Sunday, 28th June 2026 13th Sunday Ord. Time Click to downlo",
+      "selector": "a[href*=\"Twentieth-Sunday-in-Ordinary-Time.pdf\"]",
+      "href": "https://www.holy-familyparish.com/app/uploads/2026/08/Twentieth-Sunday-in-Ordinary-Time.pdf",
+      "text": "Bulletin 16 August 2026 | Bulletin 16 August 2026",
       "pick_strategy": "newest_dated",
-      "bulletin_position": "middle",
+      "bulletin_position": "top",
       "fallback_selectors": [
         "a[href$='.pdf']",
         "a[href*='.pdf']"
@@ -19,28 +19,26 @@
     },
     {
       "action": "download",
-      "url": "https://www.holyfamily-parish.com/pdf/280626.pdf"
+      "url": "https://www.holy-familyparish.com/app/uploads/2026/08/Twentieth-Sunday-in-Ordinary-Time.pdf"
     }
   ],
-  "observed_load_ms": 21502.199951171875,
+  "observed_load_ms": 13870.199951171875,
   "timeout_ms": 55000,
   "total_timeout_s": 250,
-  "playbook_type": "dated_pdf_bulletin",
-  "site_type": "dated_pdf_path",
+  "playbook_type": "pdf_download_list",
+  "site_type": "pdf_link_list",
   "operator_notes": [
-    "Bulletin is a real PDF (often made in Microsoft Word → Print to PDF).",
-    "Tab title may say .docx or .jpg — ignore that; check the address bar ends in .pdf.",
-    "On the PDF page: tap Save this PDF — saves the full https://… address for Sunday harvest.",
-    "Or start on parishnews.html → point at this week's link → Yes → Save this PDF.",
-    "Harvester rewrites DDMMYY in the URL each Sunday (e.g. 140626 → 210626)."
+    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
+    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+    "Do not worry if the filename or date in the link text changes every week."
   ],
   "do_not": [
-    "Do not use use_page_url only — GitHub cannot read Chrome's internal PDF viewer address.",
-    "Do not worry if Document Properties title mentions Microsoft Word."
+    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
+    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
-    "position": "middle"
+    "position": "top"
   },
-  "recorded_date": "2026-07-02"
+  "recorded_date": "2026-08-19"
 }
