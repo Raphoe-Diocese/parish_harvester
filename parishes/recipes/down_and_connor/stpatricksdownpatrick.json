@@ -1,18 +1,44 @@
 {
+  "version": 1,
   "parish_key": "stpatricksdownpatrick",
   "display_name": "St Patrick's Downpatrick",
-  "recorded_date": "2026-06-26",
+  "diocese": "down_and_connor",
   "start_url": "https://stpatricksdownpatrick.com/parish-bulletins/",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://stpatricksdownpatrick.com/parish-bulletins/"
+      "action": "click",
+      "selector": "a[href$='.pdf']",
+      "href": "https://stpatricksdownpatrick.com/wp-content/uploads/2026/08/16-August-2026.pdf",
+      "text": "August 2026 16th August 2026 9th August 2026 | 16th August 2",
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "middle",
+      "fallback_selectors": [
+        "a[href$='.pdf']",
+        "a[href*='.pdf']"
+      ]
     },
     {
       "action": "download",
-      "url_pattern": "*.pdf"
+      "url": "https://stpatricksdownpatrick.com/wp-content/uploads/2026/08/16-August-2026.pdf"
     }
   ],
-  "diocese": "down_and_connor",
-  "auto_fixed": true
+  "observed_load_ms": 6183.300048828125,
+  "timeout_ms": 55000,
+  "total_timeout_s": 250,
+  "playbook_type": "pdf_download_list",
+  "site_type": "pdf_link_list",
+  "operator_notes": [
+    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
+    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+    "Do not worry if the filename or date in the link text changes every week."
+  ],
+  "do_not": [
+    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
+    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "middle"
+  },
+  "recorded_date": "2026-08-19"
 }
