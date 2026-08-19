@@ -44,7 +44,11 @@ from .utils import (
     dropfiles_task_download_url,
     extract_date_from_slug,
     extract_date_from_string,
+    extract_mcn_church_id,
     extract_newsletter_number,
+    looks_like_permanent_bulletin_url,
+    mcn_newsletter_url_from_profile,
+    mcn_profile_data_url,
     oneweb_newsletter_download_urls,
     predict_dropfiles_bulletin_urls,
     predicted_dated_upload_urls,
@@ -159,6 +163,8 @@ def _looks_like_direct_document_url(url: str) -> bool:
     if not _looks_like_http_url(lower):
         return False
     if "drive.usercontent.google.com/download" in lower:
+        return True
+    if looks_like_permanent_bulletin_url(url):
         return True
     path = urlparse(lower).path
     return path.endswith((".pdf", ".docx", ".doc")) or "/pdf/" in path
@@ -951,6 +957,65 @@ async def _save_dropfiles_bytes_to_pdf(
         img.save(str(dest), "PDF")
         return "image_to_pdf"
     raise RecipeReplayError(f"Unrecognized Dropfiles file content for {url}")
+
+
+def _mcn_fetch_newsletter_url(camera_url: str) -> str | None:
+    """Plain-HTTP: camera page church id → ProfileDataByJson → newsLetterUrl."""
+    html_hit = _fetch_bytes_with_retries(
+        camera_url,
+        max_attempts=2,
+        per_attempt_timeout_s=15,
+        total_budget_s=25,
+    )
+    if not html_hit:
+        return None
+    body, _headers = html_hit
+    church_id = extract_mcn_church_id(body.decode("utf-8", "ignore"))
+    if not church_id:
+        return None
+    api = mcn_profile_data_url(camera_url, church_id)
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
+        ),
+        "Content-Type": "application/json;charset=UTF-8",
+        "Accept": "application/json",
+    }
+    try:
+        request = Request(api, data=b"{}", method="POST", headers=headers)
+        with urlopen(request, timeout=20) as response:
+            payload = json.loads(response.read().decode("utf-8", "ignore") or "{}")
+    except Exception:
+        return None
+    return mcn_newsletter_url_from_profile(payload if isinstance(payload, dict) else None)
+
+
+async def _try_http_document_url(url: str, dest: Path) -> tuple[str, str] | None:
+    """Follow redirects and save PDF/DOCX/image without opening Playwright."""
+    hit = _fetch_bytes_with_retries(
+        url,
+        max_attempts=3,
+        per_attempt_timeout_s=20,
+        total_budget_s=40,
+    )
+    if not hit:
+        return None
+    body, headers = hit
+    if not _dropfiles_body_looks_like_file(headers, body):
+        return None
+    try:
+        kind = await _save_dropfiles_bytes_to_pdf(body, headers, url, dest)
+    except RecipeReplayError:
+        return None
+    return url, kind
+
+
+async def _try_mcn_live_newsletter(start_url: str, dest: Path) -> tuple[str, str] | None:
+    newsletter_url = await asyncio.to_thread(_mcn_fetch_newsletter_url, start_url)
+    if not newsletter_url:
+        return None
+    return await _try_http_document_url(newsletter_url, dest)
 
 
 def _extract_dropfiles_candidates_from_html(html: str, base_url: str) -> list[tuple[int, str]]:
@@ -1875,11 +1940,13 @@ def _resolve_download_candidates(
     *,
     target_date: date | None,
     use_captured_url: bool = False,
+    use_target_url: bool = False,
 ) -> list[str]:
     step_url = (step_url or "").strip()
     if not step_url:
         return []
-    if use_captured_url or not target_date:
+    # Permanent / ParishPress paths must not be date-rewritten into 404 guesses.
+    if use_captured_url or use_target_url or looks_like_permanent_bulletin_url(step_url) or not target_date:
         return [step_url]
     if "newsletter" in step_url.lower() and "onewebmedia" in step_url.lower():
         return oneweb_newsletter_download_urls(step_url, target_date)
@@ -2630,6 +2697,32 @@ async def replay_recipe(
     site_type = str(recipe.get("site_type") or "").strip().lower()
     dropfiles_example = _dropfiles_example_href_from_recipe(recipe)
 
+    # Permanent ParishPress path (Newtown Killea): /bulletin/raphoe/slug/
+    # redirects to this week's PDF. Never open /bulletin/ — that 403s bots.
+    if site_type == "permanent_redirect_document" or looks_like_permanent_bulletin_url(start_url):
+        download_url = start_url
+        for step in steps:
+            if isinstance(step, dict) and str(step.get("url") or "").strip():
+                download_url = str(step.get("url") or "").strip()
+                break
+        found = await _try_http_document_url(download_url, dest)
+        if found:
+            return dest, found[1], found[0]
+        if site_type == "permanent_redirect_document":
+            raise RecipeReplayError(
+                f"Permanent bulletin URL {download_url} did not return a PDF/DOCX "
+                "(listing page was not opened)"
+            )
+
+    # MCN.live camera pages expose the weekly newsletter via JSON, not the
+    # webcam. HTTP-first so Send & test does not need Playwright for Glenfin.
+    if site_type == "mcn_live_parish_page" or (
+        "/camera/" in start_url.lower() and "mcn.live" in start_url.lower()
+    ):
+        found = await _try_mcn_live_newsletter(start_url, dest)
+        if found:
+            return dest, found[1], found[0]
+
     # WAF-flaky WordPress sites (stgerardsparish.org, stpatricksbelfast.org —
     # same SiteGround sg-captcha challenge as the joomla_dropfiles sites
     # below): skip Playwright/the browser entirely and go straight to the
@@ -2980,6 +3073,7 @@ async def replay_recipe(
                         step_url,
                         target_date=target_date,
                         use_captured_url=use_captured,
+                        use_target_url=bool(step.get("use_target_url")),
                     )
                 for candidate in download_candidates:
                     tried = await _try_download_page_url(

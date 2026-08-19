@@ -1277,3 +1277,62 @@ def is_valid_pdf(path: Path) -> bool:
             return fh.read(4) == b"%PDF"
     except OSError:
         return False
+
+
+# ---------------------------------------------------------------------------
+# Permanent ParishPress bulletin paths + MCN.live newsletter JSON
+# ---------------------------------------------------------------------------
+
+_PERMANENT_BULLETIN_PATH_RE = re.compile(
+    r"^/bulletin/[a-z0-9_-]+/[a-z0-9._-]+/?$",
+    re.IGNORECASE,
+)
+_MCN_CHURCH_ID_RE = re.compile(
+    r'id=["\']hfChurchId["\'][^>]*value=["\'](\d+)["\']'
+    r'|value=["\'](\d+)["\'][^>]*id=["\']hfChurchId["\']',
+    re.IGNORECASE,
+)
+
+
+def looks_like_permanent_bulletin_url(url: str) -> bool:
+    """True for always-current ParishPress paths that redirect to this week's file.
+
+    Example: https://newtownkilleaparish.ie/bulletin/raphoe/newtown-killea/
+    Do not treat the listing page /bulletin/ as permanent — that 403s bots.
+    """
+    raw = unquote((url or "").strip())
+    if not raw.lower().startswith(("http://", "https://")):
+        return False
+    path = urlparse(raw).path.rstrip("/") + "/"
+    if _PERMANENT_BULLETIN_PATH_RE.match(path.rstrip("/") + "/" if not path.endswith("/") else path):
+        return True
+    lower_path = urlparse(raw.lower()).path
+    return "/parish-bulletins/" in lower_path and lower_path.endswith("bulletin.pdf")
+
+
+def extract_mcn_church_id(html: str) -> str | None:
+    """Read hidden ``hfChurchId`` from an MCN.live camera page."""
+    match = _MCN_CHURCH_ID_RE.search(html or "")
+    if not match:
+        return None
+    return match.group(1) or match.group(2) or None
+
+
+def mcn_profile_data_url(camera_page_url: str, church_id: str | int) -> str:
+    """Build POST URL for ``/Website/ProfileDataByJson/{churchId}``."""
+    parsed = urlparse((camera_page_url or "").strip())
+    origin = f"{parsed.scheme}://{parsed.netloc}" if parsed.scheme and parsed.netloc else "https://mcn.live"
+    return f"{origin}/Website/ProfileDataByJson/{int(church_id)}"
+
+
+def mcn_newsletter_url_from_profile(payload: dict | None) -> str | None:
+    """Return ``newsletter.newsLetterUrl`` from an MCN ProfileDataByJson body."""
+    if not isinstance(payload, dict):
+        return None
+    newsletter = payload.get("newsletter")
+    if not isinstance(newsletter, dict):
+        return None
+    url = str(newsletter.get("newsLetterUrl") or "").strip()
+    if url.lower().startswith(("http://", "https://")):
+        return url
+    return None

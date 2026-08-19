@@ -7329,10 +7329,12 @@
             onProgress: ({ elapsed, runStatus, queued }) => {
               if (token !== _postPushWatchToken) return;
               let statusLabel = "checking result";
-              if (queued || runStatus === "queued") {
-                statusLabel = "queued (full harvest may be ahead)";
+              if (runStatus === "no_actions_read") {
+                statusLabel = "waiting for parish_status (PAT needs Actions: Read)";
+              } else if (queued || runStatus === "queued") {
+                statusLabel = "queued on GitHub";
               } else if (runStatus === "in_progress") {
-                statusLabel = "running on GitHub";
+                statusLabel = "running on GitHub (setup can take 4–6 min)";
               } else if (runStatus === "starting" || runStatus === "waiting") {
                 statusLabel = "waiting for GitHub Actions";
               } else if (runStatus === "pending") {
@@ -8003,7 +8005,7 @@
               updated: pushResult.updated,
               dispatchOk: dispatchResult.ok,
               dispatchError: dispatchResult.ok ? "" : (dispatchResult.error || "Dispatch failed"),
-              dispatchPending: !dispatchResult.ok,
+              dispatchPending: false,
               stepsPushed: Array.isArray(recipeToPush.steps) ? recipeToPush.steps.length : 0,
               stepsPreservedFromOld: false,
             };

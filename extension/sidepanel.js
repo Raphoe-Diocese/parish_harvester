@@ -473,6 +473,13 @@ function _pdDecodeGithubContent(data) {
   );
 }
 
+function _pdAuthHeader(pat) {
+  const mod = globalThis.phGithubRecipePush;
+  if (mod?.authHeaderValue) return mod.authHeaderValue(pat);
+  const p = String(pat || "").trim();
+  return p.startsWith("github_pat_") ? `Bearer ${p}` : `token ${p}`;
+}
+
 async function _pdGhFetch(path) {
   const cfg = await _pdGetGithubConfig();
   if (!cfg) throw new Error("GitHub PAT or repo not configured.");
@@ -484,7 +491,7 @@ async function _pdGhFetch(path) {
     const resp = await fetch(apiUrl, {
       signal: controller.signal,
       headers: {
-        Authorization: `token ${cfg.ghPat}`,
+        Authorization: _pdAuthHeader(cfg.ghPat),
         Accept: "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
       },
@@ -634,7 +641,9 @@ async function _pdDispatchHarvest(parishKey, dioceseName) {
       {
         method: "POST",
         headers: {
-          Authorization: `token ${cfg.ghPat}`,
+          Authorization: (globalThis.phGithubRecipePush?.authHeaderValue
+            ? globalThis.phGithubRecipePush.authHeaderValue(cfg.ghPat)
+            : (String(cfg.ghPat || "").startsWith("github_pat_") ? `Bearer ${cfg.ghPat}` : `token ${cfg.ghPat}`)),
           Accept: "application/vnd.github+json",
           "Content-Type": "application/json",
           "X-GitHub-Api-Version": "2022-11-28",
@@ -910,7 +919,7 @@ async function _pdFetchLatestCommitTime(path) {
   try {
     const resp = await fetch(endpoint, {
       headers: {
-        Authorization: `token ${cfg.ghPat}`,
+        Authorization: _pdAuthHeader(cfg.ghPat),
         Accept: "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
       },
@@ -1626,7 +1635,9 @@ async function _problemsFindLatestWorkflowRun(ghPat, ghRepo, afterMs) {
       `https://api.github.com/repos/${ghRepo}/actions/workflows/harvest.yml/runs?per_page=20&event=workflow_dispatch`,
       {
         headers: {
-          Authorization: `token ${ghPat}`,
+          Authorization: (globalThis.phGithubRecipePush?.authHeaderValue
+            ? globalThis.phGithubRecipePush.authHeaderValue(ghPat)
+            : (String(ghPat || "").startsWith("github_pat_") ? `Bearer ${ghPat}` : `token ${ghPat}`)),
           Accept: "application/vnd.github+json",
           "X-GitHub-Api-Version": "2022-11-28",
         },
@@ -1635,9 +1646,9 @@ async function _problemsFindLatestWorkflowRun(ghPat, ghRepo, afterMs) {
     if (!resp.ok) return null;
     const data = await resp.json();
     const runs = Array.isArray(data.workflow_runs) ? data.workflow_runs : [];
-    const cutoff = afterMs - 120_000;
+    const cutoff = afterMs - 30_000;
     const recent = runs.filter((run) => new Date(run.created_at).getTime() >= cutoff);
-    return recent[0] || runs[0] || null;
+    return recent[0] || null;
   } catch (_e) {
     return null;
   }

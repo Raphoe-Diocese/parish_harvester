@@ -274,6 +274,13 @@
     if (resp.status === 403) {
       return { ok: false, error: "PAT missing 'workflow' scope — regenerate token with workflow checked." };
     }
+    if (resp.status === 404) {
+      return {
+        ok: false,
+        error:
+          `GitHub could not start harvest.yml (404). Check repo is ${gh_repo}, the workflow is on main and not disabled, and the PAT can write Actions.`,
+      };
+    }
     return { ok: false, error: await githubApiError(resp) };
   };
 
@@ -370,21 +377,38 @@
   };
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+  const SEND_TEST_MAX_WAIT_MS = 15 * 60 * 1000;
 
-  async function findLatestHarvestRun(gh_pat, gh_repo, afterMs) {
+  function isFreshHarvestTimestamp(iso, startedAt, skewMs = 120000) {
+    const ms = iso ? new Date(iso).getTime() : NaN;
+    return Number.isFinite(ms) && ms >= Number(startedAt) - skewMs;
+  }
+
+  function harvestRunMatchesParish(run, parishKey, afterMs) {
+    if (!run) return false;
+    const created = new Date(run.created_at).getTime();
+    if (!Number.isFinite(created) || created < afterMs - 30_000) return false;
+    const key = String(parishKey || "").trim().toLowerCase();
+    if (!key) return true;
+    const title = `${run.display_title || ""} ${run.name || ""}`.toLowerCase();
+    if (title.includes(key)) return true;
+    return created >= afterMs - 30_000;
+  }
+
+  async function findLatestHarvestRun(gh_pat, gh_repo, afterMs, parishKey) {
     try {
       const resp = await fetchGithub(
-        `https://api.github.com/repos/${gh_repo}/actions/workflows/harvest.yml/runs?per_page=20&event=workflow_dispatch`,
+        `https://api.github.com/repos/${gh_repo}/actions/workflows/harvest.yml/runs?per_page=25&event=workflow_dispatch`,
         authHeaders(gh_pat),
         15000
       );
-      if (!resp.ok) return null;
+      if (!resp.ok) return { run: null, listError: `GitHub Actions list ${resp.status}` };
       const data = await resp.json();
       const runs = Array.isArray(data.workflow_runs) ? data.workflow_runs : [];
-      const cutoff = afterMs - 120_000;
-      return runs.find((run) => new Date(run.created_at).getTime() >= cutoff) || runs[0] || null;
+      const matches = runs.filter((run) => harvestRunMatchesParish(run, parishKey, afterMs));
+      return { run: matches[0] || null, listError: null };
     } catch (_e) {
-      return null;
+      return { run: null, listError: "Could not list GitHub Actions runs" };
     }
   }
 
@@ -417,81 +441,121 @@
     return { status: "unknown", item: null };
   }
 
-  /** Poll GitHub until single-parish harvest succeeds, fails, or times out. */
+  function outcomeFromFreshStatus(parishStatus, runUrl, elapsed) {
+    if (!parishStatus || parishStatus.status === "unknown") return null;
+    if (parishStatus.status === "ok") {
+      return { ok: true, runUrl, item: parishStatus.item, elapsed };
+    }
+    if (parishStatus.status === "stale") {
+      return {
+        ok: false,
+        stale: true,
+        runUrl,
+        item: parishStatus.item,
+        elapsed,
+        reason: parishStatus.item?.error || parishStatus.item?.reason || "Bulletin too old (recipe worked)",
+      };
+    }
+    if (parishStatus.status === "html_link") {
+      return {
+        ok: false,
+        runUrl,
+        item: parishStatus.item,
+        elapsed,
+        reason: "HTML-only bulletin (no PDF saved)",
+      };
+    }
+    if (parishStatus.status === "failed") {
+      return {
+        ok: false,
+        runUrl,
+        item: parishStatus.item,
+        elapsed,
+        reason: parishStatus.item?.reason || parishStatus.item?.error || "Harvest failed",
+      };
+    }
+    return null;
+  }
+
+  /** Poll GitHub until parish_status updates, the run finishes, or we time out. */
   async function pollHarvestUntilDone({
     gh_pat,
     gh_repo: storedRepo,
     parish_key,
     startedAt,
     onProgress,
-    maxAttempts = 40,
+    maxWaitMs = SEND_TEST_MAX_WAIT_MS,
   }) {
     const gh_repo = resolveGhRepo(storedRepo);
     const key = String(parish_key || "").trim().toLowerCase();
     const started = Number(startedAt) || Date.now();
     let runUrl = `https://github.com/${gh_repo}/actions/workflows/harvest.yml`;
-    let trackedRunId = null;
+    let tracked = null;
+    let listError = null;
+    let attempt = 0;
 
-    for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
+    while (Date.now() - started < maxWaitMs) {
       if (attempt > 0) {
-        const delay = attempt < 12 ? 5000 : 10000;
-        await sleep(delay);
+        await sleep(attempt < 12 ? 5000 : 10000);
       }
       const elapsed = Math.round((Date.now() - started) / 1000);
-      const run = await findLatestHarvestRun(gh_pat, gh_repo, started);
+      const listed = await findLatestHarvestRun(gh_pat, gh_repo, started, key);
+      listError = listed.listError;
+      const run = listed.run;
       if (run?.html_url) runUrl = run.html_url;
-
-      const runStartedMs = run ? new Date(run.created_at).getTime() : 0;
-      const runBelongsToUs = run && runStartedMs >= started - 60_000;
-      if (runBelongsToUs && !trackedRunId) trackedRunId = run.id;
-
-      const isOurRun = trackedRunId && run && run.id === trackedRunId;
-      const workflowDone = isOurRun && run.status === "completed";
-      const workflowRunning =
-        isOurRun && (run.status === "in_progress" || run.status === "queued" || run.status === "pending");
-      const workflowFailed = workflowDone && run.conclusion === "failure";
-      const workflowSucceeded = workflowDone && run.conclusion === "success";
-
-      let parishStatus = { status: "unknown", item: null };
-      let pdfOk = false;
-      if (workflowDone || workflowRunning || attempt >= 2) {
-        const statusDoc = await fetchParishStatusJson({ gh_pat, gh_repo: storedRepo });
-        const fromStatus = statusDoc ? parishStatusFromDoc(statusDoc, key) : null;
-        const testedAt = fromStatus?.item?.last_tested_at || statusDoc?.last_patched_at || "";
-        const testedMs = testedAt ? new Date(testedAt).getTime() : 0;
-        const freshResult = Number.isFinite(testedMs) && testedMs >= started - 120_000;
-        if (freshResult && fromStatus) {
-          parishStatus = fromStatus;
-        } else {
-          const report = await fetchReportJson({ gh_pat, gh_repo: storedRepo });
-          parishStatus = report ? parishHarvestStatus(report, key) : { status: "unknown", item: null };
-        }
-        if (workflowSucceeded) {
-          pdfOk = await parishPdfExists({ gh_pat, gh_repo: storedRepo, parish_key: key });
-        }
+      if (run && (!tracked || run.id !== tracked.id)) {
+        const runNewer = !tracked || new Date(run.created_at).getTime() >= new Date(tracked.created_at).getTime();
+        if (runNewer) tracked = run;
       }
 
-      const runStatus = isOurRun ? run.status : trackedRunId ? "waiting" : "starting";
+      const isOurRun = Boolean(tracked && run && run.id === tracked.id);
+      const active = isOurRun ? run : tracked;
+      const workflowDone = Boolean(active && active.status === "completed");
+      const workflowRunning = Boolean(
+        active && (active.status === "in_progress" || active.status === "queued" || active.status === "pending")
+      );
+      const workflowFailed = workflowDone && active.conclusion === "failure";
+      const workflowCancelled = workflowDone && (active.conclusion === "cancelled" || active.conclusion === "skipped");
+      const workflowSucceeded = workflowDone && active.conclusion === "success";
+
+      const statusDoc = await fetchParishStatusJson({ gh_pat, gh_repo: storedRepo });
+      const fromStatus = statusDoc ? parishStatusFromDoc(statusDoc, key) : null;
+      const testedAt = fromStatus?.item?.last_tested_at || statusDoc?.last_patched_at || "";
+      const freshResult = isFreshHarvestTimestamp(testedAt, started);
+      let parishStatus = { status: "unknown", item: null };
+      if (freshResult && fromStatus) {
+        parishStatus = fromStatus;
+      }
+
+      let runStatus = "starting";
+      if (listError && !tracked) runStatus = "no_actions_read";
+      else if (isOurRun && active) runStatus = active.status;
+      else if (tracked) runStatus = "waiting";
+      else if (elapsed > 45) runStatus = "queued";
+
       onProgress?.({
         attempt,
         elapsed,
         runUrl,
         runStatus,
         parishStatus: parishStatus.status,
-        queued: !trackedRunId && elapsed > 45,
+        queued: !tracked && elapsed > 45,
       });
 
-      if (workflowSucceeded && (parishStatus.status === "ok" || pdfOk)) {
-        return { ok: true, runUrl, item: parishStatus.item, elapsed };
+      const freshOutcome = outcomeFromFreshStatus(parishStatus, runUrl, elapsed);
+      if (freshOutcome) return freshOutcome;
+
+      if (workflowSucceeded) {
+        const pdfOk = await parishPdfExists({ gh_pat, gh_repo: storedRepo, parish_key: key });
+        if (pdfOk) return { ok: true, runUrl, item: parishStatus.item, elapsed };
       }
-      if (workflowDone && parishStatus.status === "stale") {
+      if (workflowCancelled) {
         return {
           ok: false,
-          stale: true,
           runUrl,
           item: parishStatus.item,
           elapsed,
-          reason: parishStatus.item?.error || parishStatus.item?.reason || "Bulletin too old (recipe worked)",
+          reason: "GitHub cancelled this test (another Send & test for the same parish may have replaced it).",
         };
       }
       if (workflowFailed) {
@@ -503,43 +567,37 @@
           reason: parishStatus.item?.reason || parishStatus.item?.error || "GitHub Actions run failed",
         };
       }
-      if (workflowDone && parishStatus.status === "failed") {
+      if (workflowDone && !freshResult && elapsed > 90) {
         return {
           ok: false,
           runUrl,
           item: parishStatus.item,
           elapsed,
-          reason: parishStatus.item?.reason || parishStatus.item?.error || "Harvest failed",
+          reason:
+            "Harvest finished but parish_status.json did not update. Open Actions, then refresh Problems.",
         };
       }
-      if (workflowDone && parishStatus.status === "html_link") {
-        return {
-          ok: false,
-          runUrl,
-          item: parishStatus.item,
-          elapsed,
-          reason: "HTML-only bulletin (no PDF saved)",
-        };
-      }
-      if (workflowRunning) continue;
-
-      if (!trackedRunId && elapsed > 90) {
+      if (!tracked && elapsed > 120 && listError) {
         onProgress?.({
           attempt,
           elapsed,
           runUrl,
-          runStatus: "queued",
+          runStatus: "no_actions_read",
           parishStatus: "unknown",
-          queued: true,
+          queued: false,
         });
       }
+      attempt += 1;
     }
 
     return {
-      ok: null,
+      ok: false,
       runUrl,
       elapsed: Math.round((Date.now() - started) / 1000),
-      reason: "Timed out waiting for harvest result",
+      reason:
+        listError
+          ? `${listError}. PAT needs Actions: Read so the extension can watch the run — or wait and refresh Problems from parish_status.json.`
+          : "Timed out waiting for parish_status.json (GitHub setup can take 6–10 min). Open Actions.",
     };
   }
 
@@ -648,7 +706,10 @@
     parishPdfExists,
     pollHarvestUntilDone,
     findLatestHarvestRun,
+    harvestRunMatchesParish,
+    isFreshHarvestTimestamp,
     parishHarvestStatus,
     parishStatusFromDoc,
+    authHeaderValue,
   };
 })(typeof globalThis !== "undefined" ? globalThis : self);
