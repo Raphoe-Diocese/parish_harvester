@@ -435,6 +435,86 @@ def rewrite_slug_url(url: str, target: date) -> str:
     return url[: m.start()] + new_slug + url[m.end() :]
 
 
+_WIX_COPY_OF_PREFIX = "copy-of-"
+_DROPFILES_SEF_RE = re.compile(
+    r"(?P<origin>https?://[^/]+)/files/(?P<catid>\d+)/"
+    r"(?:Newsletters|Weekly-Bulletins|Bulletins)/(?P<fid>\d+)/",
+    re.IGNORECASE,
+)
+
+
+def _strip_wix_copy_of_prefix(url: str) -> str:
+    parsed = urlparse(url)
+    path = parsed.path
+    leaf = path.rstrip("/").rsplit("/", 1)[-1] if path else ""
+    if leaf.lower().startswith(_WIX_COPY_OF_PREFIX):
+        new_leaf = leaf[len(_WIX_COPY_OF_PREFIX) :]
+        new_path = path[: path.rstrip("/").rfind(leaf)] + new_leaf
+        if path.endswith("/"):
+            new_path += "/"
+        return parsed._replace(path=new_path).geturl()
+    return url
+
+
+def _with_wix_copy_of_prefix(url: str) -> str:
+    parsed = urlparse(url)
+    path = parsed.path
+    leaf = path.rstrip("/").rsplit("/", 1)[-1] if path else ""
+    if not leaf or leaf.lower().startswith(_WIX_COPY_OF_PREFIX):
+        return url
+    new_path = path[: path.rstrip("/").rfind(leaf)] + _WIX_COPY_OF_PREFIX + leaf
+    if path.endswith("/"):
+        new_path += "/"
+    return parsed._replace(path=new_path).geturl()
+
+
+def wix_dated_slug_candidates(
+    example_url: str,
+    target: date,
+    *,
+    weeks_back: int = 3,
+) -> list[str]:
+    """Rewrite a Wix dated page slug for *target* and prior Sundays.
+
+    Wix often publishes a duplicated bulletin as ``copy-of-<original-slug>``
+    when the editor copies last week's page (Ballinascreen 16/08/2026).
+    Each week tries the canonical slug first, then the copy-of- variant.
+    """
+    example_url = (example_url or "").strip()
+    if not example_url:
+        return []
+    seen: list[str] = []
+
+    def _add(url: str) -> None:
+        url = (url or "").strip()
+        if url and url not in seen:
+            seen.append(url)
+
+    for i in range(weeks_back + 1):
+        week = target - timedelta(days=7 * i)
+        rewritten = rewrite_date_url(example_url, week)
+        canonical = _strip_wix_copy_of_prefix(rewritten)
+        _add(canonical)
+        _add(_with_wix_copy_of_prefix(canonical))
+    return seen
+
+
+def dropfiles_task_download_url(example_url: str) -> str | None:
+    """Convert a Dropfiles SEF ``/files/{catid}/Newsletters/{id}/…`` href.
+
+    Some SiteGround hosts 403 the pretty URL but still serve
+    ``index.php?option=com_dropfiles&task=frontfile.download&catid=&id=``
+    (Banagher, confirmed 19/08/2026).
+    """
+    m = _DROPFILES_SEF_RE.search(example_url or "")
+    if not m:
+        return None
+    return (
+        f"{m.group('origin')}/index.php?option=com_dropfiles"
+        f"&task=frontfile.download&catid={m.group('catid')}&id={m.group('fid')}"
+    )
+
+
 def rewrite_wp_url(url: str, target: date) -> str:
     """
     Rewrite a WordPress-style URL by updating both the ``YYYY/MM`` path
