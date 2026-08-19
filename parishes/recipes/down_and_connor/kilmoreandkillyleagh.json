@@ -1,30 +1,44 @@
 {
+  "version": 1,
   "parish_key": "kilmoreandkillyleagh",
   "display_name": "Kilmore and Killyleagh",
-  "recorded_date": "2026-06-26",
+  "diocese": "down_and_connor",
   "start_url": "https://www.kilmoreandkillyleagh.com/latest-notices--downloads.html",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.kilmoreandkillyleagh.com/latest-notices--downloads.html"
+      "action": "click",
+      "selector": "a[href*=\"9th_august_2026__1_.pdf\"]",
+      "href": "/uploads/8/7/4/5/8745725/9th_august_2026__1_.pdf",
+      "text": "9th August 2026 Download File | ",
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "a[href$='.pdf']",
+        "a[href*='.pdf']"
+      ]
     },
     {
       "action": "download",
-      "url_pattern": "*.pdf"
+      "url": "https://www.kilmoreandkillyleagh.com/uploads/8/7/4/5/8745725/9th_august_2026__1_.pdf"
     }
   ],
-  "diocese": "down_and_connor",
-  "timeout": 60000,
-  "timeout_ms": 60000,
-  "observed_load_ms": 1094,
-  "total_timeout_s": 240,
-  "version": 1,
+  "observed_load_ms": 7757.5,
+  "timeout_ms": 55000,
+  "total_timeout_s": 250,
   "playbook_type": "pdf_download_list",
   "site_type": "pdf_link_list",
-  "page_type": "pdf_link_list",
+  "operator_notes": [
+    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
+    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+    "Do not worry if the filename or date in the link text changes every week."
+  ],
+  "do_not": [
+    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
+    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+  ],
   "bulletin_layout": {
     "strategy": "newest_dated",
     "position": "top"
   },
-  "auto_fixed": true
+  "recorded_date": "2026-08-19"
 }
