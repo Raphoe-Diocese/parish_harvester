@@ -6,22 +6,23 @@
   "start_url": "https://malinparish.ie/index.php/bulletin/",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://malinparish.ie/index.php/bulletin/"
+      "action": "download",
+      "url": "http://malinparish.ie/wp-content/uploads/2026/04/Bulletin-5th-April-2026.pdf"
     }
   ],
-  "site_type": "http_scrape_newest_pdf",
-  "href_patterns": ["bulletin-"],
-  "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-08-18",
+  "observed_load_ms": 14595.800048828125,
+  "timeout_ms": 55000,
+  "total_timeout_s": 190,
+  "playbook_type": "pdf_download_list",
+  "site_type": "pdf_link_list",
   "operator_notes": [
-    "CASUALTY 2026-08-18: /index.php/bulletin/ lists dated Bulletin-Dth-Month-YYYY.pdf files. Newest on the live page is Bulletin-5th-April-2026.pdf. Predicted August 2026 filenames 404. The homepage also links Synod-2023.pdf — that is how the old harvest grabbed 2022 and reported stale.",
-    "site_type:http_scrape_newest_pdf with href_patterns [bulletin-] picks the newest real parish bulletin and never grabs Synod/SHARING-THE-GOOD-NEWS. Until the parish uploads a post-April file this will correctly harvest then freshness-reject as stale.",
-    "2026-08-19: listing + predicted Bulletin-16th-August-2026.pdf / 9th-August still 404. Newest remains Bulletin-5th-April-2026.pdf. /index.php/wp-json/media newest items are the April 2026 bulk upload. Did not grab Synod-2023.pdf."
+    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
+    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+    "Do not worry if the filename or date in the link text changes every week."
   ],
   "do_not": [
-    "Do not start on the homepage — it links Synod-2023.pdf in the menu.",
-    "Do not use generic a[href$='.pdf']."
-  ]
+    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
+    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+  ],
+  "recorded_date": "2026-08-19"
 }
