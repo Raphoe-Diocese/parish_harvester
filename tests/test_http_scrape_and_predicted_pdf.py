@@ -4,10 +4,15 @@ from __future__ import annotations
 import unittest
 from datetime import date
 
-from harvester.replay import _is_non_bulletin_url, _score_http_scrape_pdf_hrefs
+from harvester.replay import _is_non_bulletin_url, _resolve_download_candidates, _score_http_scrape_pdf_hrefs
 from harvester.utils import (
     dropfiles_task_download_url,
+    extract_mcn_church_id,
+    looks_like_permanent_bulletin_url,
+    mcn_newsletter_url_from_profile,
+    mcn_profile_data_url,
     predicted_dated_upload_urls,
+    rewrite_date_url,
     wix_dated_slug_candidates,
     yearless_slug_date,
 )
@@ -187,6 +192,61 @@ class DropfilesTaskUrlTests(unittest.TestCase):
                 "https://www.banagherparish.com/information"
             )
         )
+
+
+class PermanentBulletinUrlTests(unittest.TestCase):
+    def test_newtown_deep_path_is_permanent(self) -> None:
+        url = "https://newtownkilleaparish.ie/bulletin/raphoe/newtown-killea/"
+        self.assertTrue(looks_like_permanent_bulletin_url(url))
+        self.assertEqual(rewrite_date_url(url, date(2026, 8, 16)), url)
+        self.assertEqual(
+            _resolve_download_candidates(url, target_date=date(2026, 8, 16)),
+            [url],
+        )
+
+    def test_listing_bulletin_slash_is_not_permanent(self) -> None:
+        self.assertFalse(
+            looks_like_permanent_bulletin_url("https://newtownkilleaparish.ie/bulletin/")
+        )
+
+    def test_predicted_august_filename_is_not_used_for_permanent_path(self) -> None:
+        guessed = predicted_dated_upload_urls(
+            "https://newtownkilleaparish.ie/wp-content/uploads/2026/07/Newsletter-12th-July-2026.pdf",
+            date(2026, 8, 16),
+            weeks_back=0,
+        )
+        self.assertTrue(any("Newsletter-16th-August-2026.pdf" in u for u in guessed))
+        self.assertFalse(
+            looks_like_permanent_bulletin_url(guessed[0]),
+        )
+
+
+class McnNewsletterHelperTests(unittest.TestCase):
+    def test_extracts_church_id_and_profile_url(self) -> None:
+        html = '<input type="hidden" value="164" id="hfChurchId" />'
+        self.assertEqual(extract_mcn_church_id(html), "164")
+        self.assertEqual(
+            mcn_profile_data_url(
+                "https://mcn.live/Camera/our-lady-of-perpetual-succour-glenfinn",
+                "164",
+            ),
+            "https://mcn.live/Website/ProfileDataByJson/164",
+        )
+
+    def test_reads_newsletter_url_from_profile_json(self) -> None:
+        payload = {
+            "newsletter": {
+                "newsLetterTitle": "SUNDAY NEWSLETTER FOR SUNDAY AUGUST 16th 2026",
+                "newsLetterUrl": (
+                    "https://d3gxiup807zlof.cloudfront.net/live/Uploads/164/"
+                    "NewsLetter/fede99e0-206f-4ce5-9787-810dbbe0ceb4.pdf"
+                ),
+            }
+        }
+        self.assertTrue(
+            str(mcn_newsletter_url_from_profile(payload)).endswith(".pdf")
+        )
+        self.assertIsNone(mcn_newsletter_url_from_profile({"newsletter": {}}))
 
 
 if __name__ == "__main__":

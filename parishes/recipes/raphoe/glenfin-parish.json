@@ -1,28 +1,36 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "glenfin-parish",
   "display_name": "Glenfin",
   "diocese": "raphoe",
   "start_url": "https://mcn.live/Camera/our-lady-of-perpetual-succour-glenfinn",
+  "site_type": "mcn_live_parish_page",
+  "playbook_type": "mcn_pdf_near_camera",
+  "recorded_date": "2026-08-19",
+  "mcn_church_id": 164,
+  "timeout_ms": 90000,
+  "total_timeout_s": 180,
+  "navigation_wait_until": "commit",
   "steps": [
     {
+      "action": "goto",
+      "url": "https://mcn.live/Camera/our-lady-of-perpetual-succour-glenfinn"
+    },
+    {
       "action": "download",
-      "url": "https://d3gxiup807zlof.cloudfront.net/live/Uploads/164/NewsLetter/fede99e0-206f-4ce5-9787-810dbbe0ceb4.pdf"
+      "url_pattern": "*.pdf"
     }
   ],
-  "observed_load_ms": 16742.39990234375,
-  "timeout_ms": 55000,
-  "total_timeout_s": 190,
-  "playbook_type": "pdf_download_list",
-  "site_type": "pdf_link_list",
   "operator_notes": [
-    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
-    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-    "Do not worry if the filename or date in the link text changes every week."
+    "Parish moved to MCN.live camera page. The webcam is not the bulletin.",
+    "Weekly newsletter is loaded by JS: POST /Website/ProfileDataByJson/164 → newsletter.newsLetterUrl (CloudFront PDF).",
+    "Confirmed 19/08/2026: title SUNDAY NEWSLETTER FOR SUNDAY AUGUST 16th 2026, churchNewsLetterId 15921.",
+    "Harvester HTTP-fetches that JSON first (no browser). Playwright goto + download *.pdf is the fallback.",
+    "Do not pin the CloudFront UUID — it changes every week."
   ],
   "do_not": [
-    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
-    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
-  ],
-  "recorded_date": "2026-08-19"
+    "Do not screenshot the camera feed.",
+    "Do not use glenfin-parish.com (SSL expired; old widget still pointed at March 2025).",
+    "Do not set use_captured_url on a CloudFront UUID PDF."
+  ]
 }

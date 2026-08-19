@@ -1,28 +1,30 @@
 {
-  "version": 1,
+  "version": 3,
   "parish_key": "newtownkilleaparish",
   "display_name": "Newtown Killea",
   "diocese": "raphoe",
-  "start_url": "https://newtownkilleaparish.ie/bulletin/",
+  "start_url": "https://newtownkilleaparish.ie/bulletin/raphoe/newtown-killea/",
+  "site_type": "permanent_redirect_document",
+  "playbook_type": "direct_download",
+  "recorded_date": "2026-08-19",
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
   "steps": [
     {
       "action": "download",
-      "url": "https://newtownkilleaparish.ie/wp-content/uploads/2024/06/Newsletter-23rd-June-2024.pdf"
+      "url": "https://newtownkilleaparish.ie/bulletin/raphoe/newtown-killea/",
+      "use_target_url": true
     }
   ],
-  "observed_load_ms": 21414.300048828125,
-  "timeout_ms": 55000,
-  "total_timeout_s": 190,
-  "playbook_type": "pdf_download_list",
-  "site_type": "pdf_link_list",
   "operator_notes": [
-    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
-    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-    "Do not worry if the filename or date in the link text changes every week."
+    "Permanent ParishPress path /bulletin/raphoe/newtown-killea/ redirects to this week's PDF (confirmed 19/08/2026: HTTP 200, application/pdf, 206KB, last-modified 15/08/2026 → .../parish-bulletins/unassigned/raphoe/newtown-killea/bulletin.pdf).",
+    "Do not use predicted Newsletter-16th-August-2026.pdf — that filename 404s.",
+    "Do not start at /bulletin/ — that listing is a Cloudflare 403 for bots and only shows a June 2024 leftover.",
+    "use_target_url keeps this path as-is (no date rewrite). DOCX conversion runs if the redirect ever serves Word."
   ],
   "do_not": [
-    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
-    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
-  ],
-  "recorded_date": "2026-08-19"
+    "Do not set start_url to https://newtownkilleaparish.ie/bulletin/",
+    "Do not use site_type predicted_dated_pdf or Newsletter-Dth-Month-YYYY.pdf guesses.",
+    "Do not pin a dated wp-content/uploads/2026/07/ filename."
+  ]
 }
