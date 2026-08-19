@@ -499,6 +499,58 @@ def wix_dated_slug_candidates(
     return seen
 
 
+def predicted_wordpress_dated_post_urls(
+    example_url: str,
+    target: date,
+    *,
+    weeks_back: int = 3,
+    post_days_before: tuple[int, ...] = (3, 2, 4, 1, 5, 6),
+) -> list[str]:
+    """Guess WordPress permalinks where slug Sunday ≠ /YYYY/MM/DD/ post date.
+
+    St Teresa's (and similar) posts look like::
+
+        /2026/08/06/the-st-teresas-parish-bulletin-for-sunday-9th-august-2026/
+
+    The leaf date is the bulletin Sunday; the folder date is when they hit
+    Publish (usually 2–4 days earlier). ``rewrite_date_url`` would keep the
+    old folder day and invent a 404 such as ``/2026/08/06/…-16th-august-2026/``.
+    This helper rewrites the Sunday slug and tries a small range of post
+    dates for this Sunday, then previous Sundays.
+    """
+    example_url = (example_url or "").strip()
+    if not example_url:
+        return []
+    parsed = urlparse(example_url)
+    if not parsed.scheme or not parsed.netloc:
+        return []
+    leaf = parsed.path.rstrip("/").rsplit("/", 1)[-1]
+    slug_m = _SLUG_DATE_RE.search(leaf)
+    if not slug_m:
+        return []
+    prefix = leaf[: slug_m.start()]
+    suffix = leaf[slug_m.end() :]
+    origin = f"{parsed.scheme}://{parsed.netloc}"
+    seen: list[str] = []
+
+    def _add(url: str) -> None:
+        if url and url not in seen:
+            seen.append(url)
+
+    for i in range(weeks_back + 1):
+        week = target - timedelta(days=7 * i)
+        day_str = f"{week.day}{_ordinal_suffix(week.day)}"
+        month_str = _MONTH_NAMES[week.month]
+        slug = f"{prefix}{day_str}-{month_str}-{week.year}{suffix}"
+        for offset in post_days_before:
+            posted = week - timedelta(days=offset)
+            _add(
+                f"{origin}/{posted.year}/{posted.month:02d}/"
+                f"{posted.day:02d}/{slug}/"
+            )
+    return seen
+
+
 def dropfiles_task_download_url(example_url: str) -> str | None:
     """Convert a Dropfiles SEF ``/files/{catid}/Newsletters/{id}/…`` href.
 

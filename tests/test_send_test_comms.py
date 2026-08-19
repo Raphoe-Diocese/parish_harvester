@@ -55,6 +55,16 @@ class SendTestCommsTests(unittest.TestCase):
         self.assertIn("image_stack", recipe)
         self.assertNotIn('"action": "print_to_pdf"', recipe)
 
+    def test_stteresas_uses_wp_json_post_images(self) -> None:
+        recipe = (
+            REPO / "parishes" / "recipes" / "down_and_connor" / "stteresasparish.json"
+        ).read_text(encoding="utf-8")
+        self.assertIn("wp_json_newest_post_images", recipe)
+        self.assertIn("the-st-teresas-parish-bulletin-for-sunday", recipe)
+        self.assertIn("image_stack", recipe)
+        self.assertIn('"count": 2', recipe)
+        self.assertNotIn('"action": "print_to_pdf"', recipe)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -1,22 +1,21 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "stteresasparish",
   "display_name": "St Teresas",
   "diocese": "down_and_connor",
   "start_url": "https://stteresasparish.church/",
+  "site_type": "wp_json_newest_post_images",
+  "playbook_type": "stacked_image_bulletin",
+  "post_slug_patterns": [
+    "the-st-teresas-parish-bulletin-for-sunday"
+  ],
+  "example_post_url": "https://stteresasparish.church/2026/08/06/the-st-teresas-parish-bulletin-for-sunday-9th-august-2026/",
+  "weeks_back": 3,
+  "image_count": 2,
   "steps": [
     {
       "action": "goto",
       "url": "https://stteresasparish.church/"
-    },
-    {
-      "action": "click",
-      "selector": "a[href*=\"the-st-teresas-parish-bulletin-for-sunday\"]",
-      "pick_strategy": "newest_dated",
-      "text": "The St Teresa\u2019s Parish Bulletin for Sunday, 28th June 2026",
-      "fallback_selectors": [
-        "a:has-text('Parish Bulletin')"
-      ]
     },
     {
       "action": "image_stack",
@@ -27,30 +26,28 @@
   "observed_load_ms": 2235,
   "timeout_ms": 45000,
   "total_timeout_s": 120,
-  "playbook_type": "stacked_image_bulletin",
-  "site_type": "stacked_image_bulletin",
-  "recorded_date": "2026-08-10",
+  "recorded_date": "2026-08-20",
   "operator_notes": [
-    "SUPERSEDES the 2026-06-27 version, which had start_url + goto step hardcoded",
-    "to the literal 28-June-2026 post permalink with no use_target_url and a",
-    "hardcoded urls: [] pair of .docx-1.jpg/.docx-2.jpg image URLs on the",
-    "download step \u2014 bug pattern #1/#2, would have served that same 28 June",
-    "post's images forever.",
-    "This WordPress site posts a new dated post at the site root each week",
-    "('The St Teresa\u2019s Parish Bulletin for Sunday, D[thstndrd] Month YYYY'),",
-    "each containing exactly 2 full-page image scans",
-    "(microsoft-word-D-month-YYYY.docx-1.jpg / -2.jpg, ~595x841). Some weeks",
-    "the site instead posts 'Please note there will be no bulletin on Sunday",
-    "...' with a different href/title shape and no images \u2014 the selector",
-    "a[href*=\"the-st-teresas-parish-bulletin-for-sunday\"] deliberately excludes",
-    "that so it doesn't try to image_stack a no-bulletin announcement post.",
-    "CONFIRMED 2026-08-10: newest post is 'Sunday, 9th August 2026', containing",
-    "microsoft-word-9-august-2026.docx.jpg (page 1, 595x841) and",
-    "microsoft-word-9-august-2026.docx-2.jpg (page 2) \u2014 genuinely fresh, not a",
-    "freshness-check bug; the parish posts reliably every week."
+    "WordPress.com site. Each bulletin is a dated post with exactly two",
+    "full-page scans (microsoft-word-D-month-YYYY.docx.jpg and .docx-2.jpg).",
+    "Permalink pattern: /{YYYY}/{MM}/{DD}/the-st-teresas-parish-bulletin-for-sunday-{Nth}-{month}-{YYYY}/",
+    "Slug Sunday is the bulletin Sunday; path YYYY/MM/DD is the post date",
+    "(usually 2–4 days earlier). rewrite_date_url would keep the old post-day",
+    "folder and 404 (e.g. /2026/08/06/…-16th-august-2026/).",
+    "On-site /wp-json/wp/v2/posts is an HTML 404. Prefer",
+    "public-api.wordpress.com/wp/v2/sites/stteresasparish.church/posts,",
+    "then /feed/, then homepage links, then a small post-date range.",
+    "site_type:wp_json_newest_post_images then image_stack count=2.",
+    "CONFIRMED 2026-08-20: 16 Aug 2026 post and images are not up yet.",
+    "Newest real post is Sunday 9 Aug 2026 at /2026/08/06/…-9th-august-2026/.",
+    "Recipe must surface that 9 Aug permalink (not invent a 16 Aug URL).",
+    "The 'no bulletin this Sunday' announcement uses a different slug and is",
+    "excluded by post_slug_patterns."
   ],
   "do_not": [
-    "Do not hardcode one post permalink or image URL \u2014 it goes stale every week.",
-    "Do not click the 'no bulletin this week' announcement post as if it had images."
+    "Do not hardcode one post permalink or image URL — it goes stale every week.",
+    "Do not use rewrite_date_url on the permalink — it keeps the old /DD/ folder.",
+    "Do not click the 'no bulletin this week' announcement as if it had images.",
+    "Do not print_to_pdf the homepage."
   ]
 }
