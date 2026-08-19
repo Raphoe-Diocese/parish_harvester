@@ -210,29 +210,76 @@
         background: #075985;
         margin-bottom: 6px;
       }
-      .problems-table-wrap {
+      .problems-cards {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
         max-height: 560px;
         overflow: auto;
-        border: 1px solid #374151;
-        border-radius: 6px;
       }
-      #problems-table {
-        width: 100%;
-        border-collapse: collapse;
-        font-size: 10px;
-      }
-      #problems-table th, #problems-table td {
-        border-bottom: 1px solid #334155;
-        padding: 4px 5px;
-        text-align: left;
-        vertical-align: top;
-      }
-      #problems-table th {
-        position: sticky;
-        top: 0;
+      .problems-card {
         background: #0f172a;
-        color: #93c5fd;
+        border: 1px solid #334155;
+        border-radius: 8px;
+        padding: 8px;
       }
+      .problems-card-head {
+        display: flex;
+        justify-content: space-between;
+        gap: 8px;
+        align-items: flex-start;
+      }
+      .problems-card-name {
+        font-size: 12px;
+        font-weight: 700;
+        color: #f9fafb;
+        line-height: 1.25;
+      }
+      .problems-card-diocese {
+        font-size: 10px;
+        color: #93c5fd;
+        margin-top: 2px;
+      }
+      .problems-status {
+        font-size: 10px;
+        font-weight: 700;
+        border-radius: 999px;
+        padding: 2px 7px;
+        white-space: nowrap;
+        flex-shrink: 0;
+      }
+      .problems-status.failed { background: #7f1d1d; color: #fecaca; }
+      .problems-status.too-old { background: #78350f; color: #fde68a; }
+      .problems-status.no-pdf,
+      .problems-status.html-only { background: #1e3a5f; color: #93c5fd; }
+      .problems-status.blocked { background: #4c1d95; color: #ddd6fe; }
+      .problems-card-meta {
+        font-size: 10px;
+        color: #cbd5e1;
+        margin-top: 5px;
+        line-height: 1.4;
+      }
+      .problems-card-error {
+        font-size: 10px;
+        color: #e2e8f0;
+        margin-top: 5px;
+        line-height: 1.4;
+      }
+      .problems-card-actions {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 5px;
+        margin-top: 7px;
+      }
+      .problems-open-btn,
+      .problems-send-btn {
+        width: auto;
+        padding: 6px 10px;
+        font-size: 11px;
+        font-weight: 700;
+      }
+      .problems-open-btn { background: #2563eb; }
+      .problems-send-btn { background: #16a34a; }
       .problems-url-cell a {
         color: #93c5fd;
         word-break: break-all;
@@ -416,16 +463,31 @@
       #stale-list a.stale-open-link:visited {
         color: #86efac;
       }
+      #drive-trainer-warning {
+        display: none;
+        margin-bottom: 8px;
+        border: 1px solid #854d0e;
+        background: #713f12;
+        color: #fde68a;
+        border-radius: 6px;
+        padding: 7px 8px;
+        font-size: 11px;
+        line-height: 1.45;
+      }
     </style>
   </head>
   <body>
     <div class="wrap">
-      <h1>Parish Fixer <span class="guided-badge">3-step ✓</span></h1>
+      <h1>Back room <span class="guided-badge">operator</span></h1>
 
       <p id="status">Ready.</p>
+      <div id="drive-trainer-warning">
+        Google Drive: do not use ⋮ More actions. Use <strong>Save this PDF</strong>.
+        If this is a folder, open the newest bulletin, then Save this PDF.
+      </div>
 
       <div class="sp-tabs">
-        <button id="tab-problems" class="sp-tab active" type="button">🚨 Fix broken</button>
+        <button id="tab-problems" class="sp-tab active" type="button">🔧 Back room</button>
         <button id="tab-trainer" class="sp-tab" type="button">📖 Directory</button>
       </div>
 
@@ -434,9 +496,9 @@
         <div class="section" id="problems-howto" style="display:none;background:#0c4a6e;border-color:#0284c7;margin-bottom:8px;">
           <div style="font-size:11px;font-weight:700;color:#f9fafb;margin-bottom:5px;">How to fix a parish (3 steps)</div>
           <ol style="margin:0 0 0 18px;padding:0;font-size:10px;line-height:1.55;color:#e2e8f0;">
-            <li><strong>Fix now</strong> — opens the parish news page in a new tab.</li>
-            <li>On that page: record steps → <strong>Send & test</strong> (saves recipe + runs one-parish test).</li>
-            <li>Or skip re-push: tap <strong>▶ Test parish</strong> here to harvest that parish only.</li>
+            <li><strong>Open site</strong> — opens the parish page so the trainer toolbar appears.</li>
+            <li>On that page: record the bulletin → tap <strong>Send & test</strong> (saves the recipe and tests this parish only).</li>
+            <li>Or skip a re-push: tap <strong>▶ Test parish</strong> here to harvest that parish only.</li>
             <li>When the parish leaves this list (Refresh), you're done.</li>
           </ol>
         </div>
@@ -452,25 +514,14 @@
           <div class="problems-filters">
             <select id="problems-filter-diocese" title="Filter by diocese"><option value="">All dioceses</option></select>
             <select id="problems-filter-category" title="Filter by reason"><option value="">All reasons</option></select>
+            <select id="problems-sort" title="Sort order">
+              <option value="queue">Work queue</option>
+              <option value="az">A–Z</option>
+            </select>
             <span id="problems-auto-refresh-note" style="font-size:9px;color:#64748b;">Auto-refresh 20 min</span>
           </div>
           <div id="problems-verify-result"></div>
-          <div class="problems-table-wrap">
-            <table id="problems-table">
-              <thead>
-                <tr>
-                  <th>Parish</th>
-                  <th>Diocese</th>
-                  <th>Reason</th>
-                  <th>Bulletin / PDF</th>
-                  <th>Last test</th>
-                  <th>#</th>
-                  <th>Action</th>
-                </tr>
-              </thead>
-              <tbody id="problems-body"></tbody>
-            </table>
-          </div>
+          <div id="problems-cards" class="problems-cards"></div>
           <div id="problems-empty" class="problems-empty">Loading…</div>
         </div>
       </div>

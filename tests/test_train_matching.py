@@ -203,8 +203,11 @@ https://www.antrimparish.com
         self.assertIn("pd-subfolder", sidepanel_js)
         self.assertIn('id="tab-problems"', sidepanel_html)
         self.assertIn('id="tab-trainer"', sidepanel_html)
+        self.assertIn('id="problems-cards"', sidepanel_html)
         self.assertIn('"Raphoe Diocese"', sidepanel_js)
         self.assertIn("parishes/recipes/raphoe/${key}.json", sidepanel_js)
+        self.assertIn("_problemsPlainStatus", sidepanel_js)
+        self.assertIn("formatUkDate", sidepanel_js)
 
     def test_training_uses_persistent_context_with_extension_args(self) -> None:
         train_source = (REPO_ROOT / "train.py").read_text(encoding="utf-8")

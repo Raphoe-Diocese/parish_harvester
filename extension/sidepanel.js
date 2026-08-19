@@ -22,7 +22,9 @@ const _spPanels = {
 
 const PROBLEMS_FIX_VISITED_KEY = "ph_problems_fix_visited";
 const PROBLEMS_RECIPE_RETRAINED_KEY = "ph_recipe_retrained";
+const PROBLEMS_UI_KEY = "ph_problems_ui";
 const PH_LAST_DISPATCH_KEY = "ph_last_parish_dispatch";
+const PROBLEMS_DEFAULT_DIOCESE = "Raphoe Diocese";
 
 async function _problemsBeginFixNowSession(startUrl, parishKey) {
   const navStartedAt = Date.now();
@@ -88,6 +90,7 @@ function _spShowPanel(name) {
   if (name === "problems") {
     void loadProblemsDashboard();
   }
+  void _updateDriveTrainerWarning();
 }
 
 const _spStorageGet = (keys) => new Promise((resolve) => {
@@ -1253,6 +1256,73 @@ function _problemsFormatLastSeen(item, report) {
   return formatUkDate(String(report?.target_date || ""));
 }
 
+function _problemsBulletinDateFromStatus(item) {
+  const fromDiag = item?.diagnosis && typeof item.diagnosis === "object"
+    ? item.diagnosis.bulletin_date
+    : "";
+  if (fromDiag) return formatUkDate(fromDiag);
+  const err = String(item?.error || item?.reason || "");
+  const match = err.match(/bulletin date\s+(\d{4}-\d{2}-\d{2})/i);
+  return match ? formatUkDate(match[1]) : "";
+}
+
+function _problemsPlainStatus(row) {
+  const outcome = String(row?.outcome || "").toLowerCase();
+  const category = String(row?.category || "").toLowerCase();
+  if (outcome === "stale" || category.includes("too old")) return "too old";
+  if (outcome === "html_only" || category.includes("html only")) return "html only";
+  if (category === "no_pdf" || category.includes("no pdf") || category.includes("no_pdf")) return "no PDF";
+  if (category.includes("blocked") || category.includes("blocking")) return "blocked";
+  if (outcome === "failed") return "failed";
+  return "failed";
+}
+
+function _problemsStatusClass(label) {
+  const key = String(label || "").toLowerCase().replace(/\s+/g, "-");
+  if (key === "too-old") return "too-old";
+  if (key === "html-only") return "html-only";
+  if (key === "no-pdf") return "no-pdf";
+  if (key === "blocked") return "blocked";
+  return "failed";
+}
+
+function _isGoogleDriveUrl(url) {
+  try {
+    const host = new URL(String(url || "")).hostname.toLowerCase();
+    return host.includes("drive.google") || host.includes("docs.google");
+  } catch (_e) {
+    return /drive\.google|docs\.google/i.test(String(url || ""));
+  }
+}
+
+async function _updateDriveTrainerWarning() {
+  const banner = document.getElementById("drive-trainer-warning");
+  if (!banner) return;
+  let url = "";
+  try {
+    const [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+    url = String(tab?.url || "");
+  } catch (_e) {
+    url = "";
+  }
+  banner.style.display = _isGoogleDriveUrl(url) ? "block" : "none";
+}
+
+async function _problemsLoadUiPrefs() {
+  const data = await _spStorageGet([PROBLEMS_UI_KEY]);
+  const prefs = data[PROBLEMS_UI_KEY];
+  return prefs && typeof prefs === "object" ? prefs : {};
+}
+
+async function _problemsSaveUiPrefs() {
+  const prefs = {
+    diocese: String(document.getElementById("problems-filter-diocese")?.value || ""),
+    category: String(document.getElementById("problems-filter-category")?.value || ""),
+    sort: String(document.getElementById("problems-sort")?.value || "queue"),
+  };
+  await _spStorageSet({ [PROBLEMS_UI_KEY]: prefs });
+}
+
 async function _problemsFetchParishStatus(repo, ghPat) {
   const mod = globalThis.phGithubRecipePush;
   if (mod?.fetchParishStatusJson && ghPat) {
@@ -1295,6 +1365,8 @@ function _problemsRowsFromStatus(status, retrainedMap) {
       url: String(item.url || ""),
       error_text: errorText,
       diagnosis,
+      outcome: String(item.outcome || ""),
+      bulletin_date: _problemsBulletinDateFromStatus(item),
       advice: _problemsFailureAdvice(errorText, diagnosis),
       category: retrainedPending
         ? `retrained — ${item.category || _problemsCategory(errorText, { retrainedPending, diagnosis })}`
@@ -1360,6 +1432,8 @@ async function _problemsFilterActionableRows(report, consecutiveFailures, retrai
       url: String(item?.url || ""),
       error_text: errorText,
       diagnosis,
+      outcome: String(defaults.outcome || item?.outcome || ""),
+      bulletin_date: _problemsBulletinDateFromStatus(item),
       advice: _problemsFailureAdvice(errorText, diagnosis),
       category: defaults.category || _problemsCategory(errorText, { retrainedPending, diagnosis }),
       last_seen: _problemsFormatLastSeen(item, report) || defaultLastSeen,
@@ -1368,7 +1442,10 @@ async function _problemsFilterActionableRows(report, consecutiveFailures, retrai
     });
   };
 
-  problemItems.forEach((item, idx) => pushRow(item, idx));
+  problemItems.forEach((item, idx) => {
+    const isStale = /Stale bulletin rejected/i.test(String(item?.error || ""));
+    pushRow(item, idx, { outcome: isStale ? "stale" : "failed" });
+  });
 
   htmlLinks.forEach((item, offset) => {
     const parish = String(item?.parish || "").trim();
@@ -1394,6 +1471,9 @@ async function _problemsFilterActionableRows(report, consecutiveFailures, retrai
       diocese: _pdDioceseForKey(parish),
       start_url: String(item?.start_url || item?.url || ""),
       url: String(item?.url || ""),
+      outcome: "html_only",
+      bulletin_date: _problemsBulletinDateFromStatus(item),
+      error_text: String(item?.error || item?.reason || ""),
       category: "no_pdf",
       last_seen: _problemsFormatLastSeen(item, report) || defaultLastSeen,
       consecutive_failures: Number(consecutiveFailures[parish] || 0),
@@ -1963,14 +2043,20 @@ async function _problemsVerifyHarvest(row, verifyBtn, { forceDispatch = false } 
   });
 }
 
-function _problemsPopulateFilters(rows) {
+function _problemsPopulateFilters(rows, prefs = {}) {
   const dioceseSel = document.getElementById("problems-filter-diocese");
   const categorySel = document.getElementById("problems-filter-category");
+  const sortSel = document.getElementById("problems-sort");
   if (!dioceseSel || !categorySel) return;
-  const dioceses = [...new Set(rows.map((r) => r.diocese).filter(Boolean))].sort((a, b) => a.localeCompare(b));
+  const dioceses = [...new Set(rows.map((r) => r.diocese).filter(Boolean))].sort((a, b) => {
+    if (a === PROBLEMS_DEFAULT_DIOCESE) return -1;
+    if (b === PROBLEMS_DEFAULT_DIOCESE) return 1;
+    return a.localeCompare(b);
+  });
   const categories = [...new Set(rows.map((r) => r.category).filter(Boolean))].sort((a, b) => a.localeCompare(b));
-  const keepDiocese = dioceseSel.value;
-  const keepCategory = categorySel.value;
+  const hasSavedDiocese = Object.prototype.hasOwnProperty.call(prefs, "diocese");
+  const keepDiocese = hasSavedDiocese ? String(prefs.diocese) : dioceseSel.value;
+  const keepCategory = prefs.category != null ? String(prefs.category) : categorySel.value;
   dioceseSel.innerHTML = '<option value="">All dioceses</option>';
   for (const d of dioceses) {
     const opt = document.createElement("option");
@@ -1985,17 +2071,31 @@ function _problemsPopulateFilters(rows) {
     opt.textContent = c;
     categorySel.appendChild(opt);
   }
-  if ([...dioceseSel.options].some((o) => o.value === keepDiocese)) dioceseSel.value = keepDiocese;
+  const preferredDiocese = hasSavedDiocese
+    ? keepDiocese
+    : (keepDiocese || (dioceses.includes(PROBLEMS_DEFAULT_DIOCESE) ? PROBLEMS_DEFAULT_DIOCESE : ""));
+  if ([...dioceseSel.options].some((o) => o.value === preferredDiocese)) dioceseSel.value = preferredDiocese;
   if ([...categorySel.options].some((o) => o.value === keepCategory)) categorySel.value = keepCategory;
+  if (sortSel) {
+    const keepSort = prefs.sort === "az" ? "az" : "queue";
+    sortSel.value = keepSort;
+  }
 }
 
 function _problemsFilteredRows() {
   const diocese = String(document.getElementById("problems-filter-diocese")?.value || "");
   const category = String(document.getElementById("problems-filter-category")?.value || "");
+  const sortMode = String(document.getElementById("problems-sort")?.value || "queue");
   let rows = _problemsAllRows.slice();
   if (diocese) rows = rows.filter((r) => r.diocese === diocese);
   if (category) rows = rows.filter((r) => r.category === category);
-  // Sort: fewer failures first within same reason, then by name — easier wins first.
+  if (sortMode === "az") {
+    rows.sort((a, b) =>
+      String(a.display_name || a.parish).localeCompare(String(b.display_name || b.parish), undefined, { sensitivity: "base" })
+    );
+    return rows;
+  }
+  // Work queue: fewer failures first within same reason, then by name.
   rows.sort((a, b) => {
     const ca = String(a.category || "");
     const cb = String(b.category || "");
@@ -2020,15 +2120,87 @@ function _problemsShortUrl(url) {
   }
 }
 
+async function _problemsOpenSite(row, openBtn) {
+  const startUrl = await _problemsResolveFixUrl(row);
+  if (!/^https?:\/\//i.test(startUrl)) {
+    setStatus("❌ No valid start URL for this parish.", "err");
+    return "";
+  }
+  void _problemsMarkFixVisited(row.parish, openBtn);
+  const { navStartedAt } = await _problemsBeginFixNowSession(startUrl, row.parish);
+  setStatus(
+    `✅ Opened ${row.display_name || row.parish} — on that page record the bulletin, then tap Send & test.`,
+    "ok"
+  );
+  const match = _pdAllParishes.find((p) => p.key === row.parish);
+  if (match) {
+    chrome.storage.local.set({
+      ph_training_parish: {
+        key: match.key,
+        name: match.name,
+        diocese: match.diocese,
+        hostname: (() => {
+          try { return new URL(startUrl).hostname.toLowerCase(); } catch (_e) { return ""; }
+        })(),
+      },
+    });
+  }
+  chrome.tabs.create({ url: startUrl, active: true }, (tab) => {
+    const tabId = tab?.id;
+    if (!tabId) return;
+    _scheduleFixNowToolbar(tabId, row.parish, navStartedAt, startUrl);
+  });
+  return startUrl;
+}
+
+async function _problemsSendAndTest(row) {
+  const startUrl = await _problemsResolveFixUrl(row);
+  let tab = null;
+  try {
+    [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
+  } catch (_e) {
+    tab = null;
+  }
+  const tabUrl = String(tab?.url || "");
+  let sameHost = false;
+  try {
+    sameHost = Boolean(startUrl) && new URL(tabUrl).hostname === new URL(startUrl).hostname;
+  } catch (_e) {
+    sameHost = false;
+  }
+  if (tab?.id && sameHost && /^https?:\/\//i.test(tabUrl)) {
+    chrome.runtime.sendMessage({
+      type: "dispatch_to_tab",
+      tabId: tab.id,
+      payload: { type: "ph_send_and_test" },
+      allowInject: true,
+    }, (result) => {
+      if (chrome.runtime.lastError || !result?.ok) {
+        setStatus(
+          "Open the parish page, record the bulletin, then tap Send & test on the green toolbar.",
+          "warn"
+        );
+        return;
+      }
+      setStatus(result?.reason || "Send & test started on this page. Wait for the GitHub result.", "ok");
+    });
+    return;
+  }
+  setStatus(
+    "Open site first. Record the bulletin on that page, then tap Send & test.",
+    "warn"
+  );
+}
+
 async function _problemsRenderRows(rows) {
-  const tbody = document.getElementById("problems-body");
+  const list = document.getElementById("problems-cards");
   const empty = document.getElementById("problems-empty");
-  if (!tbody || !empty) return;
-  _clearElement(tbody);
+  if (!list || !empty) return;
+  _clearElement(list);
   if (!rows.length) {
     empty.textContent = _problemsAllRows.length
-      ? "No rows match these filters."
-      : "No current problem rows.";
+      ? "No parishes match these filters."
+      : "No current problem parishes.";
     return;
   }
   empty.textContent = "";
@@ -2036,96 +2208,70 @@ async function _problemsRenderRows(rows) {
   const ghCfg = await _pdGetGithubConfig();
   const ghRepo = ghCfg?.ghRepo || "Raphoe-Diocese/parish_harvester";
   for (const row of rows) {
-    const tr = document.createElement("tr");
+    const card = document.createElement("article");
+    card.className = "problems-card";
 
-    const parish = document.createElement("td");
-    parish.textContent = row.display_name || row.parish || "Unknown";
-    tr.appendChild(parish);
+    const head = document.createElement("div");
+    head.className = "problems-card-head";
+    const titleWrap = document.createElement("div");
+    const nameEl = document.createElement("div");
+    nameEl.className = "problems-card-name";
+    nameEl.textContent = row.display_name || row.parish || "Unknown";
+    const dioceseEl = document.createElement("div");
+    dioceseEl.className = "problems-card-diocese";
+    dioceseEl.textContent = row.diocese || "—";
+    titleWrap.appendChild(nameEl);
+    titleWrap.appendChild(dioceseEl);
+    const statusLabel = _problemsPlainStatus(row);
+    const statusEl = document.createElement("span");
+    statusEl.className = `problems-status ${_problemsStatusClass(statusLabel)}`;
+    statusEl.textContent = statusLabel;
+    if (row.retrainedPending) statusEl.classList.add("problems-retrained");
+    head.appendChild(titleWrap);
+    head.appendChild(statusEl);
+    card.appendChild(head);
 
-    const diocese = document.createElement("td");
-    diocese.textContent = row.diocese || "—";
-    tr.appendChild(diocese);
-
-    const category = document.createElement("td");
-    category.textContent = row.category;
-    if (row.retrainedPending) category.classList.add("problems-retrained");
-    const tipParts = [];
-    if (row.error_text) tipParts.push(row.error_text);
-    if (row.advice) tipParts.push(row.advice);
-    if (row.diagnosis?.recipe_recorded_date) {
-      tipParts.push(`GitHub recipe dated: ${formatUkDate(row.diagnosis.recipe_recorded_date)}`);
+    const meta = document.createElement("div");
+    meta.className = "problems-card-meta";
+    const bulletinDate = row.bulletin_date || "—";
+    const lastTest = row.last_seen || "—";
+    meta.textContent = `Last bulletin: ${bulletinDate} · Last test: ${lastTest}`;
+    if (Number(row.consecutive_failures || 0) > 0) {
+      meta.textContent += ` · ${row.consecutive_failures} failed weeks`;
     }
-    if (row.diagnosis?.step_count != null) {
-      tipParts.push(`Recipe steps on harvest: ${row.diagnosis.step_count}`);
+    card.appendChild(meta);
+
+    const diagnosisText = String(row.error_text || "").replace(/\s+/g, " ").trim();
+    if (diagnosisText) {
+      const errorEl = document.createElement("div");
+      errorEl.className = "problems-card-error";
+      errorEl.textContent = diagnosisText.length > 220 ? `${diagnosisText.slice(0, 217)}…` : diagnosisText;
+      card.appendChild(errorEl);
     }
-    if (tipParts.length) category.title = tipParts.join("\n\n");
-    tr.appendChild(category);
 
-    const urlCell = document.createElement("td");
-    urlCell.className = "problems-url-cell";
-    const bulletinUrl = String(row.url || row.start_url || "").trim();
-    if (/^https?:\/\//i.test(bulletinUrl)) {
-      const a = document.createElement("a");
-      a.href = bulletinUrl;
-      a.target = "_blank";
-      a.rel = "noopener noreferrer";
-      a.textContent = _problemsShortUrl(bulletinUrl);
-      a.title = bulletinUrl;
-      urlCell.appendChild(a);
-    } else {
-      urlCell.textContent = "—";
-    }
-    tr.appendChild(urlCell);
+    const actions = document.createElement("div");
+    actions.className = "problems-card-actions";
 
-    const lastSeen = document.createElement("td");
-    lastSeen.textContent = row.last_seen;
-    tr.appendChild(lastSeen);
-
-    const consecutive = document.createElement("td");
-    consecutive.textContent = String(row.consecutive_failures);
-    tr.appendChild(consecutive);
-
-    const action = document.createElement("td");
-    action.className = "problems-action-cell";
-    const fixBtn = document.createElement("button");
-    fixBtn.type = "button";
-    fixBtn.className = "problems-fix-btn";
-    fixBtn.textContent = "🔧 Fix now";
-    if (visitedMap[row.parish]) fixBtn.classList.add("visited");
-    fixBtn.addEventListener("click", () => {
-      void (async () => {
-        const startUrl = await _problemsResolveFixUrl(row);
-        if (!/^https?:\/\//i.test(startUrl)) {
-          setStatus("❌ No valid start URL for this parish.", "err");
-          return;
-        }
-        void _problemsMarkFixVisited(row.parish, fixBtn);
-        const { navStartedAt } = await _problemsBeginFixNowSession(startUrl, row.parish);
-        setStatus(
-          `✅ Opened ${row.display_name || row.parish} — toolbar should appear automatically. Wait for the load timer.`,
-          "ok"
-        );
-        const match = _pdAllParishes.find((p) => p.key === row.parish);
-        if (match) {
-          chrome.storage.local.set({
-            ph_training_parish: {
-              key: match.key,
-              name: match.name,
-              diocese: match.diocese,
-              hostname: (() => {
-                try { return new URL(startUrl).hostname.toLowerCase(); } catch (_e) { return ""; }
-              })(),
-            },
-          });
-        }
-        chrome.tabs.create({ url: startUrl, active: true }, (tab) => {
-          const tabId = tab?.id;
-          if (!tabId) return;
-          _scheduleFixNowToolbar(tabId, row.parish, navStartedAt, startUrl);
-        });
-      })();
+    const openBtn = document.createElement("button");
+    openBtn.type = "button";
+    openBtn.className = "problems-fix-btn problems-open-btn";
+    openBtn.textContent = "Open site";
+    if (visitedMap[row.parish]) openBtn.classList.add("visited");
+    openBtn.addEventListener("click", () => {
+      void _problemsOpenSite(row, openBtn);
     });
-    action.appendChild(fixBtn);
+    actions.appendChild(openBtn);
+
+    const sendBtn = document.createElement("button");
+    sendBtn.type = "button";
+    sendBtn.className = "problems-send-btn";
+    sendBtn.textContent = "Send & test";
+    sendBtn.title = "Push the recorded recipe from the open parish page and run one-parish test";
+    sendBtn.addEventListener("click", () => {
+      void _problemsSendAndTest(row);
+    });
+    actions.appendChild(sendBtn);
+
     const testBtn = document.createElement("button");
     testBtn.type = "button";
     testBtn.className = "problems-verify-btn";
@@ -2136,7 +2282,7 @@ async function _problemsRenderRows(rows) {
     testBtn.addEventListener("click", () => {
       void _problemsVerifyHarvest(row, testBtn, { forceDispatch: !row.retrainedPending });
     });
-    action.appendChild(testBtn);
+    actions.appendChild(testBtn);
 
     const recipeSlug = _pdDioceseSlug(row.diocese || "");
     if (recipeSlug && row.parish) {
@@ -2147,7 +2293,7 @@ async function _problemsRenderRows(rows) {
       ghLink.rel = "noopener noreferrer";
       ghLink.textContent = "GitHub";
       ghLink.title = "Open recipe JSON on GitHub";
-      action.appendChild(ghLink);
+      actions.appendChild(ghLink);
     }
 
     const removeBtn = document.createElement("button");
@@ -2178,10 +2324,9 @@ async function _problemsRenderRows(rows) {
         }
       })();
     });
-    action.appendChild(removeBtn);
-    tr.appendChild(action);
-
-    tbody.appendChild(tr);
+    actions.appendChild(removeBtn);
+    card.appendChild(actions);
+    list.appendChild(card);
   }
 }
 
@@ -2234,7 +2379,8 @@ async function loadProblemsDashboard() {
     }
 
     _problemsAllRows = rows;
-    _problemsPopulateFilters(rows);
+    const uiPrefs = await _problemsLoadUiPrefs();
+    _problemsPopulateFilters(rows, uiPrefs);
     const visible = _problemsFilteredRows();
 
     if (hint) {
@@ -3133,10 +3279,11 @@ if (problemsHowtoToggle && problemsHowto) {
     problemsHowtoToggle.textContent = open ? "Show how-to ▸" : "Hide how-to ▾";
   });
 }
-for (const id of ["problems-filter-diocese", "problems-filter-category"]) {
+for (const id of ["problems-filter-diocese", "problems-filter-category", "problems-sort"]) {
   const el = document.getElementById(id);
   if (!el) continue;
   el.addEventListener("change", () => {
+    void _problemsSaveUiPrefs();
     void _problemsRenderRows(_problemsFilteredRows());
   });
 }
@@ -3181,6 +3328,17 @@ if (problemsFullHarvestBtn) {
 }
 _spShowPanel("problems");
 void loadProblemsDashboard();
+void _updateDriveTrainerWarning();
+if (chrome.tabs?.onActivated) {
+  chrome.tabs.onActivated.addListener(() => {
+    void _updateDriveTrainerWarning();
+  });
+}
+if (chrome.tabs?.onUpdated) {
+  chrome.tabs.onUpdated.addListener((_tabId, change) => {
+    if (change.url || change.status === "complete") void _updateDriveTrainerWarning();
+  });
+}
 
 chrome.storage.onChanged.addListener((changes, area) => {
   if (area !== "local") return;
