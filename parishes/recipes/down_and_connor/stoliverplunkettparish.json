@@ -1,37 +1,28 @@
 {
+  "version": 1,
   "parish_key": "stoliverplunkettparish",
   "display_name": "St Oliver Plunkett",
-  "recorded_date": "2026-08-09",
+  "diocese": "down_and_connor",
   "start_url": "https://stoliverplunkettparish.ie/bulletins/",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://stoliverplunkettparish.ie/bulletins/"
-    },
-    {
-      "action": "click",
-      "selector": "a[href*='/uploads/'][href$='.pdf']",
-      "pick_strategy": "newest_dated",
-      "fallback_selectors": [
-        "a:has-text('Bulletin')",
-        "a[href$='.pdf']"
-      ]
-    },
-    {
-      "action": "download"
+      "action": "download",
+      "url": "https://stoliverplunkettparish.ie/wp-content/uploads/2026/06/Sun-28th-June-26.pdf"
     }
   ],
-  "diocese": "down_and_connor",
-  "site_type": "http_scrape_newest_pdf",
-  "href_patterns": [".pdf", "sun-"],
-  "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "operator_notes_2026_08_18": [
-    "Recheck: /bulletins/ newest file is still Sun-28th-June-26.pdf. No July/August PDFs. Recipe switched to http_scrape_newest_pdf so harvest reliably stale-rejects instead of depending on Playwright click order.",
-    "2026-08-19: /bulletins/ + wp-json still newest Sun-28th-June-26.pdf. August media are minister rotas (.docx), not the Sunday bulletin. Predicted Sun-16th-August-26.pdf 404. Keep stale/actionable."
+  "observed_load_ms": 10489.199951171875,
+  "timeout_ms": 55000,
+  "total_timeout_s": 190,
+  "playbook_type": "pdf_download_list",
+  "site_type": "pdf_link_list",
+  "operator_notes": [
+    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
+    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+    "Do not worry if the filename or date in the link text changes every week."
   ],
-  "operator_notes_2026_08_09": [
-    "2026-08-09 retrain: was a placeholder stub (no bulletin captured). Live page /bulletins/ lists dated bulletin PDFs under /wp-content/uploads/YYYY/MM/Sun-Nth-Month-YY.pdf, oldest-first in DOM. Used pick_strategy newest_dated on a generic [href*='/uploads/'][href$='.pdf'] selector so it always picks the current week without a hardcoded date.",
-    "As of 2026-08-09 the newest bulletin actually published on the site is '28th June 2026' (6 weeks stale) — the parish itself has not posted anything more recent. This is a genuine site-side staleness issue, not a recipe bug; harvester.bulletin_freshness will correctly flag this as stale/actionable rather than a hard failure."
-  ]
+  "do_not": [
+    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
+    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+  ],
+  "recorded_date": "2026-08-19"
 }
