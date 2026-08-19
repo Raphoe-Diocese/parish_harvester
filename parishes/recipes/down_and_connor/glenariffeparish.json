@@ -1,29 +1,44 @@
 {
-  "version": 2,
+  "version": 1,
   "parish_key": "glenariffeparish",
   "display_name": "Glenariffe",
   "diocese": "down_and_connor",
-  "recorded_date": "2026-08-18",
   "start_url": "https://glenariffeparish.org/whats-on",
-  "site_type": "http_scrape_newest_pdf",
-  "href_patterns": [".pdf", "sunday", "ordinary"],
-  "timeout_ms": 45000,
-  "total_timeout_s": 180,
   "steps": [
     {
-      "action": "goto",
-      "url": "https://glenariffeparish.org/whats-on"
+      "action": "click",
+      "selector": "a[href*=\"Sixteenth-Sunday-of-Ordinary-Time.pdf\"]",
+      "href": "https://glenariffeparish.org/wp-content/uploads/2026/07/Sixteenth-Sunday-of-Ordinary-Time.pdf",
+      "text": "SIXTEENTH SUNDAY OF ORDINARY TIME FIFTEENTH SUNDAY OF ORDINA",
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "a[href$='.pdf']",
+        "a[href*='.pdf']"
+      ]
+    },
+    {
+      "action": "download",
+      "url": "https://glenariffeparish.org/wp-content/uploads/2025/04/Easter-Sunday-20th-April-2025.pdf"
     }
   ],
+  "observed_load_ms": 7570.5,
+  "timeout_ms": 55000,
+  "total_timeout_s": 250,
+  "playbook_type": "pdf_download_list",
+  "site_type": "pdf_link_list",
   "operator_notes": [
-    "Listing HTML already contains the weekly PDFs. Newest on 18/08/2026 is /2026/07/Sixteenth-Sunday-of-Ordinary-Time.pdf (16th Sunday = 19/07/2026). Predicted later liturgical filenames were not checked as needed — the parish has not posted 17th–20th.",
-    "Previous harvest dated that liturgical file as 01/07/2026 (folder day=1). liturgical_date_from_text now maps it to 19/07/2026; still stale vs 16/08/2026, correctly.",
-    "site_type:http_scrape_newest_pdf so harvest does not depend on a bare download *.pdf click."
+    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
+    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+    "Do not worry if the filename or date in the link text changes every week."
   ],
   "do_not": [
-    "Do not treat this as a recipe failure while the listing's newest file is still July."
+    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
+    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
   ],
-  "operator_notes_2026_08_19": [
-    "CASUALTY recheck: /whats-on + wp-json media still newest Sixteenth-Sunday-of-Ordinary-Time.pdf (19/07/2026). Predicted 17th–20th Ordinary Time filenames in July/August 404. Recipe already HTTP-scrapes newest. Keep stale/actionable."
-  ]
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  },
+  "recorded_date": "2026-08-19"
 }
