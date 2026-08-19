@@ -1,13 +1,10 @@
 {
+  "version": 1,
   "parish_key": "parishofhannahstown",
   "display_name": "Hannahstown",
-  "recorded_date": "2026-08-09",
+  "diocese": "down_and_connor",
   "start_url": "https://www.parishofhannahstown.com/weekly-bulletins",
   "steps": [
-    {
-      "action": "goto",
-      "url": "https://www.parishofhannahstown.com/weekly-bulletins"
-    },
     {
       "action": "click",
       "selector": "a[href*='.docx']",
@@ -21,16 +18,23 @@
       "url_pattern": "*.docx"
     }
   ],
-  "diocese": "down_and_connor",
-  "auto_fixed": true,
-  "operator_notes_2026_08_09": [
-    "2026-08-09 fix: recipe only ever had a bare download step with url_pattern *.pdf, but this site's weekly bulletins are published as Wix-hosted .docx files (e.g. 'Bulletin 7th June 2026.docx'), never PDFs \u2014 so the download step always failed with 'did not find a matching document URL'. Added a click step to pick the newest-dated .docx link, and switched url_pattern to *.docx.",
-    "As of 2026-08-09 the newest bulletin actually published on the site is '7th of June 2026' (9 weeks stale) \u2014 the parish itself has not posted anything more recent under /weekly-bulletins. This is a genuine site-side staleness issue, not a recipe bug; harvester.bulletin_freshness should now correctly flag this as stale/actionable instead of a hard failure. There is also a 'Bulletins: 2022-Present' legacy-bulletins page linked from this page, not checked further."
+  "observed_load_ms": 9165.60009765625,
+  "timeout_ms": 55000,
+  "total_timeout_s": 250,
+  "playbook_type": "wix_html",
+  "site_type": "html_text_bulletin",
+  "operator_notes": [
+    "Bulletin text is on the web page — not a downloadable PDF file.",
+    "Use Save page as PDF on the newsletter article page.",
+    "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
   ],
-  "operator_notes_2026_08_18": [
-    "Recheck: Wix /weekly-bulletins newest dn= is still Bulletin 7th June 2026.docx. No July/August files."
+  "do_not": [
+    "Do not use Pick bulletin image when the page is mostly text paragraphs.",
+    "Do not stop at click-only — need print_to_pdf as the final step."
   ],
-  "operator_notes_2026_08_19": [
-    "CASUALTY recheck: /weekly-bulletins still newest Bulletin 7th June 2026.docx, then 31 May / 22 May / 17 May. No July/August docx. Keep stale/actionable."
-  ]
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  },
+  "recorded_date": "2026-08-19"
 }
