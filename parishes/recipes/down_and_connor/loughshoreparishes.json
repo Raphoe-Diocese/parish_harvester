@@ -1,32 +1,27 @@
 {
-  "version": 2,
+  "version": 1,
   "parish_key": "loughshoreparishes",
   "display_name": "Loughshore",
   "diocese": "down_and_connor",
-  "recorded_date": "2026-08-18",
   "start_url": "https://www.loughshoreparishes.org/sunday-bulletin/",
-  "site_type": "waf_retry_wordpress",
-  "post_slug_patterns": [
-    "sunday-in-ordinary-time",
-    "sunday-of-easter",
-    "pentecost",
-    "holy-trinity",
-    "body-and-blood"
-  ],
-  "timeout_ms": 45000,
-  "total_timeout_s": 190,
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.loughshoreparishes.org/sunday-bulletin/"
+      "action": "print_to_pdf"
     }
   ],
+  "observed_load_ms": 5738.800048828125,
+  "timeout_ms": 55000,
+  "total_timeout_s": 190,
+  "playbook_type": "wix_html",
+  "site_type": "html_text_bulletin",
   "operator_notes": [
-    "Category lists dated Sunday posts; the newest on 18/08/2026 is /sunday-bulletin/20th-sunday-in-ordinary-time-3/ which 302s straight to /app/uploads/2026/08/20th-Sunday-in-Ordinary-Time.pdf.",
-    "Old recipe clicked a:has-text('Sunday') and freshness-dated the liturgical file as 01/08/2026.",
-    "site_type:waf_retry_wordpress scores post slugs with liturgical_date_from_text and accepts a PDF body when the post URL redirects to the file. No Playwright."
+    "Bulletin text is on the web page — not a downloadable PDF file.",
+    "Use Save page as PDF on the newsletter article page.",
+    "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
   ],
   "do_not": [
-    "Do not click generic 'Sunday' text on the archive — it is not newest-dated."
-  ]
+    "Do not use Pick bulletin image when the page is mostly text paragraphs.",
+    "Do not stop at click-only — need print_to_pdf as the final step."
+  ],
+  "recorded_date": "2026-08-19"
 }
