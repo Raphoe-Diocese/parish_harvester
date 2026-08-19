@@ -1105,15 +1105,15 @@ PDF_INPAGE_VIEWER_SRC = "/assets/pdf-inpage-viewer.js"
 
 
 def pdf_inpage_viewer_css() -> str:
-    """Phone/tablet: hide the raw-PDF iframe, show the in-page PDF.js viewer.
+    """Hide the raw-PDF iframe on every device; show stacked PDF.js pages.
 
-    Desktop keeps the native iframe (850px). Mobile/tablet use a 450px-tall
-    canvas viewer so the bulletin is visible on the page — not a new tab.
+    Desktop wrap stays 850px. Tablet/phone use 450px. Users scroll pages
+    inside the viewer — no Page X of Y / prev-next chrome.
     """
     return f"""
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {{
-      display: none;
+      display: flex !important;
       flex-direction: column;
       min-height: 0;
       flex: 1 1 auto;
@@ -1124,25 +1124,13 @@ def pdf_inpage_viewer_css() -> str:
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-end;
       gap: 8px;
       padding: 8px 10px;
       background: {DEEP_TEAL};
       color: #fff;
       flex: 0 0 auto;
     }}
-    .pdf-inpage-nav {{ display: flex; align-items: center; gap: 8px; }}
-    .pdf-inpage-nav button {{
-      min-width: 44px;
-      min-height: 40px;
-      border: 1px solid rgba(255,255,255,0.35);
-      border-radius: 6px;
-      background: {TEAL};
-      color: #fff;
-      font-size: 1.25rem;
-      font-weight: 700;
-    }}
-    .pdf-inpage-page-label {{ font-size: 0.9rem; font-weight: 700; min-width: 7rem; text-align: center; }}
     .pdf-inpage-backup {{ display: flex; gap: 8px; flex-wrap: wrap; }}
     .pdf-inpage-backup a {{ color: #fff; font-weight: 700; font-size: 0.85rem; }}
     .pdf-inpage-status {{ padding: 10px 12px; background: #1f3d3c; color: #d8f0ee; font-size: 0.9rem; }}
@@ -1153,29 +1141,37 @@ def pdf_inpage_viewer_css() -> str:
       background: #525659;
       padding: 8px 0 16px;
     }}
-    .pdf-frame-wrap.is-native-pdf,
-    body.is-native-pdf .pdf-standalone-shell {{
-      height: 70vh;
-      min-height: 450px;
+    .pdf-inpage-page-slot {{
+      margin: 0 auto 10px;
+      background: #3a3f42;
+      min-height: 180px;
+    }}
+    .pdf-inpage-page-slot canvas {{ display: block; width: 100%; height: auto; background: #fff; }}
+    .pdf-frame-wrap,
+    .pdf-standalone-shell {{
       display: flex;
       flex-direction: column;
-      background: #3a3f42;
     }}
-    .pdf-frame-wrap.is-native-pdf iframe,
-    .pdf-frame-wrap.is-native-pdf .fullscreen-btn,
+    .pdf-frame-wrap iframe,
+    .pdf-standalone-shell iframe.pdf-frame,
     body.is-native-pdf iframe.pdf-frame {{
       display: none !important;
     }}
-    .pdf-frame-wrap.is-native-pdf .pdf-inpage-viewer,
-    .pdf-frame-wrap.is-native-pdf .pdf-mobile-fallback,
-    body.is-native-pdf .pdf-inpage-viewer,
-    body.is-native-pdf .pdf-mobile-fallback {{
-      display: flex !important;
-      flex: 1 1 auto;
-      min-height: 0;
+    .pdf-frame-wrap.is-native-pdf,
+    .pdf-standalone-shell.is-native-pdf,
+    body.is-native-pdf .pdf-standalone-shell {{
+      display: flex;
+      flex-direction: column;
+      height: 85vh !important;
+      min-height: 850px !important;
+      background: #3a3f42;
     }}
     @media (max-width: 1024px) {{
-      .pdf-frame-wrap {{
+      .pdf-frame-wrap,
+      .pdf-standalone-shell,
+      .pdf-frame-wrap.is-native-pdf,
+      .pdf-standalone-shell.is-native-pdf,
+      body.is-native-pdf .pdf-standalone-shell {{
         height: 70vh !important;
         min-height: 450px !important;
         display: flex;
@@ -1183,43 +1179,24 @@ def pdf_inpage_viewer_css() -> str:
         background: #3a3f42;
       }}
       .pdf-frame-wrap iframe,
-      .pdf-frame-wrap .fullscreen-btn,
       .pdf-standalone-shell iframe.pdf-frame {{
         display: none !important;
-      }}
-      .pdf-standalone-shell {{
-        height: 70vh;
-        min-height: 450px;
-        display: flex;
-        flex-direction: column;
-        background: #3a3f42;
-      }}
-      .pdf-inpage-viewer,
-      .pdf-mobile-fallback {{
-        display: flex !important;
-        flex: 1 1 auto;
-        min-height: 0;
       }}
     }}
 """
 
 
 def pdf_inpage_viewer_html(pdf_href: str) -> str:
-    """In-page PDF.js host. Visible on phones/tablets; hidden on desktop.
+    """In-page PDF.js host. Visible on desktop and phones.
 
-    Buttons remain as backup. Do not use the HTML ``hidden`` attribute —
-    browsers apply ``[hidden] {{ display: none !important }}`` which fights
-    the media query.
+    Open PDF / Download stay as backup. No Page X of Y navigator.
+    Do not use the HTML ``hidden`` attribute — browsers apply
+    ``[hidden] {{ display: none !important }}`` which fights flex layout.
     """
     safe = html.escape(pdf_href, quote=True)
     return f"""
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="{safe}">
           <div class="pdf-inpage-toolbar">
-            <div class="pdf-inpage-nav">
-              <button type="button" class="pdf-inpage-prev" aria-label="Previous page">‹</button>
-              <span class="pdf-inpage-page-label">Loading…</span>
-              <button type="button" class="pdf-inpage-next" aria-label="Next page">›</button>
-            </div>
             <div class="pdf-inpage-backup">
               <a href="{safe}" target="_blank" rel="noopener noreferrer">Open PDF</a>
               <a href="{safe}" download>Download</a>
@@ -1231,19 +1208,9 @@ def pdf_inpage_viewer_html(pdf_href: str) -> str:
 
 
 def pdf_inpage_viewer_boot_js() -> str:
-    """Load the PDF.js in-page viewer on phones/tablets; leave desktop iframe."""
+    """Always load the stacked PDF.js viewer; hide the native iframe."""
     return f"""
     (function () {{
-{prefers_native_pdf_js()}
-      function narrowViewport() {{
-        try {{
-          return window.matchMedia && window.matchMedia('(max-width: 1024px)').matches;
-        }} catch (e) {{
-          return false;
-        }}
-      }}
-      if (!prefersNativePdf() && !narrowViewport()) return;
-
       function activateWrap(wrap) {{
         if (!wrap) return;
         wrap.classList.add('is-native-pdf');
@@ -1252,8 +1219,6 @@ def pdf_inpage_viewer_boot_js() -> str:
           iframe.setAttribute('hidden', '');
           try {{ iframe.removeAttribute('src'); }} catch (e) {{}}
         }}
-        var fs = wrap.querySelector('.fullscreen-btn');
-        if (fs) fs.setAttribute('hidden', '');
       }}
 
       document.querySelectorAll('.pdf-frame-wrap').forEach(activateWrap);

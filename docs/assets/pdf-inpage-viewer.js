@@ -1,9 +1,10 @@
 /**
- * Parish Press — in-page PDF viewer (mobile / tablet)
+ * Parish Press — in-page PDF viewer (desktop + mobile)
  *
- * Phones cannot embed a raw PDF in <iframe> (sad-document icon). This script
- * paints the bulletin on a canvas with Mozilla PDF.js, streaming the first
- * page as soon as range requests allow. Desktop keeps the native iframe.
+ * Phones cannot embed a raw PDF in <iframe> (sad-document icon). Desktop
+ * Chrome/Edge iframes show a "Page X of Y" toolbar Frank asked to remove.
+ * This script paints every page on stacked canvases with Mozilla PDF.js so
+ * users scroll continuously inside the viewer. Open PDF / Download stay.
  *
  * Progressive load: disableAutoFetch + streaming + HTTP Range. Mega PDFs are
  * 14–20 MB; we must not wait for the whole file before showing page 1.
@@ -21,54 +22,30 @@
     "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js",
   ];
 
-  function prefersNativePdf() {
-    var ua = navigator.userAgent || "";
-    if (/Android/i.test(ua)) return true;
-    if (/iPhone|iPod/i.test(ua)) return true;
-    if (/iPad/i.test(ua)) return true;
-    if (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) return true;
-    return false;
-  }
-
-  function narrowViewport() {
-    try {
-      return window.matchMedia && window.matchMedia("(max-width: 1024px)").matches;
-    } catch (e) {
-      return false;
-    }
-  }
-
-  function needsInpage() {
-    return prefersNativePdf() || narrowViewport();
-  }
-
   function ensureStyles() {
     if (document.getElementById("pdf-inpage-viewer-style")) return;
     var style = document.createElement("style");
     style.id = "pdf-inpage-viewer-style";
     style.textContent =
-      ".pdf-inpage-viewer{display:none;flex-direction:column;min-height:0;flex:1 1 auto;background:#3a3f42;color:#e8eeed}" +
-      ".pdf-inpage-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:8px;padding:8px 10px;background:#14524f;color:#fff;flex:0 0 auto}" +
-      ".pdf-inpage-nav{display:flex;align-items:center;gap:8px}" +
-      ".pdf-inpage-nav button{min-width:44px;min-height:40px;border:1px solid rgba(255,255,255,.35);border-radius:6px;background:#1a6b6b;color:#fff;font-size:1.25rem;font-weight:700}" +
-      ".pdf-inpage-page-label{font-size:.9rem;font-weight:700;min-width:7rem;text-align:center}" +
+      ".pdf-inpage-viewer{display:flex!important;flex-direction:column;min-height:0;flex:1 1 auto;background:#3a3f42;color:#e8eeed}" +
+      ".pdf-inpage-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:8px;padding:8px 10px;background:#14524f;color:#fff;flex:0 0 auto}" +
       ".pdf-inpage-backup{display:flex;gap:8px;flex-wrap:wrap}" +
       ".pdf-inpage-backup a{color:#fff;font-weight:700;font-size:.85rem}" +
       ".pdf-inpage-status{padding:10px 12px;background:#1f3d3c;color:#d8f0ee;font-size:.9rem}" +
       ".pdf-inpage-pages{flex:1 1 auto;overflow:auto;-webkit-overflow-scrolling:touch;background:#525659;padding:8px 0 16px}" +
       ".pdf-inpage-page-slot{margin:0 auto 10px;background:#3a3f42;min-height:180px}" +
       ".pdf-inpage-page-slot canvas{display:block;width:100%;height:auto;background:#fff}" +
-      ".pdf-frame-wrap.is-native-pdf,.pdf-standalone-shell.is-native-pdf,body.is-native-pdf .pdf-standalone-shell{" +
-      "height:70vh!important;min-height:450px!important;display:flex;flex-direction:column;background:#3a3f42}" +
-      ".pdf-frame-wrap.is-native-pdf iframe,.pdf-frame-wrap.is-native-pdf .fullscreen-btn," +
-      "body.is-native-pdf iframe.pdf-frame,.pdf-standalone-shell.is-native-pdf iframe.pdf-frame{display:none!important}" +
-      ".pdf-frame-wrap.is-native-pdf .pdf-inpage-viewer,.pdf-frame-wrap.is-native-pdf .pdf-mobile-fallback," +
-      "body.is-native-pdf .pdf-inpage-viewer,body.is-native-pdf .pdf-mobile-fallback," +
-      ".pdf-standalone-shell.is-native-pdf .pdf-inpage-viewer{display:flex!important;flex:1 1 auto;min-height:0}" +
+      ".pdf-frame-wrap,.pdf-standalone-shell{display:flex;flex-direction:column}" +
+      ".pdf-frame-wrap iframe,.pdf-standalone-shell iframe.pdf-frame," +
+      "body.is-native-pdf iframe.pdf-frame{display:none!important}" +
+      ".pdf-frame-wrap.is-native-pdf,.pdf-standalone-shell.is-native-pdf," +
+      "body.is-native-pdf .pdf-standalone-shell{" +
+      "display:flex;flex-direction:column;height:85vh!important;min-height:850px!important;background:#3a3f42}" +
       "@media (max-width:1024px){" +
-      ".pdf-frame-wrap,.pdf-standalone-shell{height:70vh!important;min-height:450px!important;display:flex;flex-direction:column;background:#3a3f42}" +
-      ".pdf-frame-wrap iframe,.pdf-frame-wrap .fullscreen-btn,.pdf-standalone-shell iframe.pdf-frame{display:none!important}" +
-      ".pdf-inpage-viewer,.pdf-mobile-fallback{display:flex!important;flex:1 1 auto;min-height:0}" +
+      ".pdf-frame-wrap,.pdf-standalone-shell," +
+      ".pdf-frame-wrap.is-native-pdf,.pdf-standalone-shell.is-native-pdf," +
+      "body.is-native-pdf .pdf-standalone-shell{" +
+      "height:70vh!important;min-height:450px!important}" +
       "}";
     document.head.appendChild(style);
   }
@@ -137,11 +114,6 @@
     host.setAttribute("data-pdf-src", pdfUrl);
     host.innerHTML =
       '<div class="pdf-inpage-toolbar">' +
-      '<div class="pdf-inpage-nav">' +
-      '<button type="button" class="pdf-inpage-prev" aria-label="Previous page">‹</button>' +
-      '<span class="pdf-inpage-page-label">Loading…</span>' +
-      '<button type="button" class="pdf-inpage-next" aria-label="Next page">›</button>' +
-      "</div>" +
       '<div class="pdf-inpage-backup">' +
       '<a href="' +
       pdfUrl.replace(/"/g, "&quot;") +
@@ -165,8 +137,6 @@
         iframe.removeAttribute("src");
       } catch (e) {}
     }
-    var fs = wrap.querySelector(".fullscreen-btn");
-    if (fs) fs.setAttribute("hidden", "");
   }
 
   function renderPageToSlot(page, slot, width) {
@@ -182,6 +152,7 @@
     canvas.style.height = Math.floor(unscaled.height * (cssWidth / unscaled.width)) + "px";
     if (!canvas.parentNode) slot.appendChild(canvas);
     slot.style.width = cssWidth + "px";
+    slot.style.minHeight = canvas.style.height;
     return page.render({ canvasContext: canvas.getContext("2d", { alpha: false }), viewport: viewport }).promise;
   }
 
@@ -189,22 +160,11 @@
     if (host.getAttribute("data-pdf-started") === "1") return;
     host.setAttribute("data-pdf-started", "1");
     var pagesEl = host.querySelector(".pdf-inpage-pages");
-    var label = host.querySelector(".pdf-inpage-page-label");
-    var prevBtn = host.querySelector(".pdf-inpage-prev");
-    var nextBtn = host.querySelector(".pdf-inpage-next");
-    var currentPage = 1;
     var pdfDoc = null;
     var rendering = Object.create(null);
 
     function pageWidth() {
       return Math.floor((pagesEl && pagesEl.clientWidth) || host.clientWidth || 320);
-    }
-
-    function updateLabel() {
-      if (!label || !pdfDoc) return;
-      label.textContent = "Page " + currentPage + " of " + pdfDoc.numPages;
-      if (prevBtn) prevBtn.disabled = currentPage <= 1;
-      if (nextBtn) nextBtn.disabled = currentPage >= pdfDoc.numPages;
     }
 
     function ensureSlot(num) {
@@ -232,17 +192,17 @@
       return rendering[num];
     }
 
-    function showPage(num) {
+    function stackAllPages() {
       if (!pdfDoc) return;
-      currentPage = Math.max(1, Math.min(pdfDoc.numPages, num));
-      updateLabel();
-      var slot = ensureSlot(currentPage);
-      paint(currentPage).then(function () {
-        try {
-          slot.scrollIntoView({ block: "nearest" });
-        } catch (e) {}
-      });
-      if (currentPage < pdfDoc.numPages) paint(currentPage + 1);
+      var n;
+      for (n = 1; n <= pdfDoc.numPages; n++) ensureSlot(n);
+      var next = 1;
+      function paintNext() {
+        if (next > pdfDoc.numPages) return;
+        var num = next++;
+        paint(num).then(paintNext);
+      }
+      paintNext();
     }
 
     setStatus(host, "Showing first page…");
@@ -259,44 +219,13 @@
       .then(function (pdf) {
         pdfDoc = pdf;
         setStatus(host, "");
-        showPage(1);
+        stackAllPages();
       })
       .catch(function (err) {
         console.warn("PDF.js failed", err);
         setStatus(host, "Could not show the PDF here. Use Open PDF or Download.", true);
         host.setAttribute("data-pdf-started", "0");
       });
-
-    if (prevBtn) {
-      prevBtn.addEventListener("click", function () {
-        showPage(currentPage - 1);
-      });
-    }
-    if (nextBtn) {
-      nextBtn.addEventListener("click", function () {
-        showPage(currentPage + 1);
-      });
-    }
-
-    var touchStartX = 0;
-    pagesEl.addEventListener(
-      "touchstart",
-      function (ev) {
-        if (!ev.changedTouches || !ev.changedTouches[0]) return;
-        touchStartX = ev.changedTouches[0].clientX;
-      },
-      { passive: true }
-    );
-    pagesEl.addEventListener(
-      "touchend",
-      function (ev) {
-        if (!ev.changedTouches || !ev.changedTouches[0]) return;
-        var dx = ev.changedTouches[0].clientX - touchStartX;
-        if (dx > 60) showPage(currentPage - 1);
-        else if (dx < -60) showPage(currentPage + 1);
-      },
-      { passive: true }
-    );
   }
 
   function activateWrap(wrap, pdfUrl) {
@@ -317,7 +246,6 @@
 
   function run() {
     ensureStyles();
-    if (!needsInpage()) return;
 
     document.querySelectorAll(".pdf-frame-wrap").forEach(function (wrap) {
       activateWrap(wrap, resolvePdfUrl(wrap));
