@@ -1,44 +1,26 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "glenavyandkilleadparish",
   "display_name": "Glenavy and Killead",
   "diocese": "down_and_connor",
+  "recorded_date": "2026-08-18",
   "start_url": "https://www.glenavyandkilleadparish.com/bulletins/",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [".pdf", "sunday", "ordinary"],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
   "steps": [
     {
-      "action": "click",
-      "selector": "a[href$='.pdf']",
-      "href": "https://www.glenavyandkilleadparish.com/app/uploads/2026/08/2026-August-16-Twentieth-Sunday-in-Ordinary-Time.pdf",
-      "text": "Twentieth Sunday in Ordinary Time 16/08/2026",
-      "pick_strategy": "newest_dated",
-      "bulletin_position": "top",
-      "fallback_selectors": [
-        "a[href$='.pdf']",
-        "a[href*='.pdf']"
-      ]
-    },
-    {
-      "action": "download",
-      "url": "https://www.glenavyandkilleadparish.com/app/uploads/2026/08/2026-August-16-Twentieth-Sunday-in-Ordinary-Time.pdf"
+      "action": "goto",
+      "url": "https://www.glenavyandkilleadparish.com/bulletins/"
     }
   ],
-  "observed_load_ms": 7202.800048828125,
-  "timeout_ms": 55000,
-  "total_timeout_s": 250,
-  "playbook_type": "pdf_download_list",
-  "site_type": "pdf_link_list",
   "operator_notes": [
-    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
-    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-    "Do not worry if the filename or date in the link text changes every week."
+    "Old recipe clicked a:has-text('Fourth') leftover from Easter and harvested 26/04/2026 forever.",
+    "Live listing (18/08/2026) has dated /app/uploads/ PDFs including 2026-August-16-Twentieth-Sunday-in-Ordinary-Time.pdf (HTTP 200, 479672 bytes).",
+    "site_type:http_scrape_newest_pdf picks the newest dated PDF from the raw HTML. No Playwright, no cookie-banner click."
   ],
   "do_not": [
-    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
-    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
-  ],
-  "bulletin_layout": {
-    "strategy": "newest_dated",
-    "position": "top"
-  },
-  "recorded_date": "2026-08-19"
+    "Do not click liturgical-season words (Fourth, Pentecost) — those freeze on one Sunday."
+  ]
 }
