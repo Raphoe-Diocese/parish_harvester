@@ -1,17 +1,46 @@
 {
+  "version": 1,
   "parish_key": "st-colmcilles",
   "display_name": "St Colmcilles",
-  "recorded_date": "2026-04-30",
+  "diocese": "down_and_connor",
   "start_url": "https://st-colmcilles.net/weekly-bulletins/past-weeks-bulletins/",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://st-colmcilles.net/weekly-bulletins/past-weeks-bulletins/"
+      "action": "click",
+      "selector": "a[href$='.pdf']",
+      "href": "https://st-colmcilles.net/wp-content/uploads/2026/08/Parish-Bulletin-16082026.pdf",
+      "text": "Parish Bulletin 16th August 2026Download Parish Bulletin 9th",
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "middle",
+      "fallback_selectors": [
+        "a[href$='.pdf']",
+        "a[href*='.pdf']"
+      ]
     },
     {
       "action": "download",
-      "url_pattern": "*.pdf"
+      "url": "https://st-colmcilles.net/wp-content/uploads/2026/08/Parish-Bulletin-16082026.pdf",
+      "url_pattern": "*bulletin*.pdf"
     }
   ],
-  "diocese": "down_and_connor"
+  "observed_load_ms": 46386.300048828125,
+  "timeout_ms": 300000,
+  "total_timeout_s": 600,
+  "navigation_wait_until": "commit",
+  "playbook_type": "permanent_bulletin_page",
+  "site_type": "wp_block_file_bulletin",
+  "operator_notes": [
+    "Permanent /parish-bulletin/ URL — PDF filename changes weekly under /wp-content/uploads/YYYY/MM/.",
+    "On the bulletin page: tap the green Save bulletin PDF (from embed) button.",
+    "Use url_pattern *bulletin*.pdf — never pin a dated filename."
+  ],
+  "do_not": [
+    "Do not train on the homepage — use the dedicated bulletin page only.",
+    "Do not pin saintanthony.co.uk if the parish moved to saintanthonys.uk."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "middle"
+  },
+  "recorded_date": "2026-08-19"
 }
