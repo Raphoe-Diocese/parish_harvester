@@ -1,47 +1,46 @@
 {
+  "version": 1,
   "parish_key": "holycrossparishbelfast",
   "display_name": "Holy Cross Belfast",
-  "recorded_date": "2026-04-30",
+  "diocese": "down_and_connor",
   "start_url": "http://www.holycrossparishbelfast.com/parishnews.html",
   "steps": [
     {
-      "action": "goto",
-      "url": "http://www.holycrossparishbelfast.com/parishnews.html"
-    },
-    {
       "action": "click",
-      "selector": "a:has-text('Newsletter')",
+      "selector": "a[href$='.pdf']",
+      "href": "/pdf/160826.pdf",
+      "text": "Click To Load Newsletter Sunday, 16th August 2026 20th Sunda",
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "top",
       "fallback_selectors": [
         "a[href$='.pdf']",
-        "a[href*='.pdf']",
-        "div#newsContainer > div:nth-of-type(1) > a"
+        "a[href*='.pdf']"
       ]
     },
     {
       "action": "download",
-      "url_pattern": "*.pdf"
+      "url": "http://www.holycrossparishbelfast.com/pdf/160826.pdf"
     }
   ],
-  "diocese": "down_and_connor",
+  "observed_load_ms": 6422.5,
+  "timeout_ms": 55000,
+  "total_timeout_s": 250,
+  "playbook_type": "dated_pdf_bulletin",
+  "site_type": "dated_pdf_path",
   "operator_notes": [
-    "DO NOT raise max_bulletin_pages here despite the 'Too many pages: 13'",
-    "rejection looking like the usual oversized-bulletin fix pattern.",
-    "Investigated 2026-08-10: the site's own newest-dated link (090826.pdf,",
-    "labelled 'Sunday, 9th August 2026 - 19th Sunday Ord. Time') and last",
-    "week's (020826.pdf) are byte-identical — same stale content headed",
-    "'Bulletin 11th & 12th July 2026', padded out to 13 pages with blank/",
-    "dotted-line filler pages (an unrelated form template), served under a",
-    "fresh-looking weekly filename each week. This is a site-side content",
-    "problem (parish secretary not updating the real file), not a scraper",
-    "bug — raising the page cap would just serve 2+ month stale content as",
-    "a false 'ok'. Leaving the oversized-page rejection in place is the",
-    "safer failure mode until the site starts serving genuinely fresh PDFs",
-    "again; re-check manually if this persists for many more weeks."
+    "Bulletin is a real PDF (often made in Microsoft Word → Print to PDF).",
+    "Tab title may say .docx or .jpg — ignore that; check the address bar ends in .pdf.",
+    "On the PDF page: tap Save this PDF — saves the full https://… address for Sunday harvest.",
+    "Or start on parishnews.html → point at this week's link → Yes → Save this PDF.",
+    "Harvester rewrites DDMMYY in the URL each Sunday (e.g. 140626 → 210626)."
   ],
-  "operator_notes_2026_08_18": [
-    "Recheck: parishnews.html no longer lists weekly newsletter links (only GiftAidForm.pdf). Direct files pdf/160826.pdf, pdf/090826.pdf and pdf/020826.pdf all exist (HTTP 200) but are byte-identical (md5 ac67defb…, 13 pages, body text still 'Bulletin 11th & 12th July 2026'). Do not switch to predicted_dated_pdf — the filename date would pass freshness and serve July content as a false ok. Leave the oversized-page rejection in place."
+  "do_not": [
+    "Do not use use_page_url only — GitHub cannot read Chrome's internal PDF viewer address.",
+    "Do not worry if Document Properties title mentions Microsoft Word."
   ],
-  "operator_notes_2026_08_19": [
-    "CASUALTY recheck: 160826/090826/020826 still byte-identical (md5 ac67defb3de0, 455913 bytes). 170826/180826/190826/230826 404. Do not predict-download — that would fake a 16/08 success with July content."
-  ]
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  },
+  "recorded_date": "2026-08-19"
 }
