@@ -3,58 +3,42 @@
   "parish_key": "glenfin-parish",
   "display_name": "Glenfin",
   "diocese": "raphoe",
-  "site_type": "dated_pdf_path",
-  "playbook_type": "dated_pdf_bulletin",
-  "recorded_date": "2026-07-05",
-  "start_url": "https://www.glenfin-parish.com/#sbp-bulletin",
-  "auto_fixed": true,
-  "operator_notes": [
-    "Download Latest Bulletin button on #sbp-bulletin section.",
-    "Parish website may lag — if bulletin date is months old, ask parish to update the button link."
-  ],
+  "start_url": "https://mcn.live/Camera/our-lady-of-perpetual-succour-glenfinn",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.glenfin-parish.com/#sbp-bulletin"
-    },
-    {
       "action": "click",
-      "selector": ".sbp-download-bulletin a[href$='.pdf'], a.sbp-download-bulletin[href$='.pdf'], #sbp-bulletin a[target='_blank'][href*='uploads'][href$='.pdf']",
-      "text": "Download Latest Bulletin",
+      "selector": "a[href*=\"fede99e0-206f-4ce5-9787-810dbbe0ceb4.pdf\"]",
+      "href": "https://d3gxiup807zlof.cloudfront.net/live/Uploads/164/NewsLetter/fede99e0-206f-4ce5-9787-810dbbe0ceb4.pdf",
+      "text": "Play Video Main Camera Oratory Weekly Schedule Today 19-Aug-",
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "top",
       "fallback_selectors": [
-        "#sbp-bulletin a[href$='.pdf']"
+        "a[href$='.pdf']",
+        "a[href*='.pdf']"
       ]
     },
     {
-      "action": "download"
+      "action": "download",
+      "url": "https://d3gxiup807zlof.cloudfront.net/live/Uploads/164/NewsLetter/fede99e0-206f-4ce5-9787-810dbbe0ceb4.pdf"
     }
   ],
-  "observed_load_ms": 8000,
-  "timeout_ms": 90000,
-  "total_timeout_s": 180,
-  "operator_notes_2026_08_09": [
-    "FIX: download step had use_captured_url:true pinned to the March 2025",
-    "trained PDF. replay.py's click-step peek-ahead sees use_captured_url",
-    "and downloads that exact old URL via plain HTTP BEFORE ever running",
-    "the click — so the recipe silently froze on a 2025 bulletin forever",
-    "while still reporting outcome=ok. Removed use_captured_url + the",
-    "stale url so the click step's pick_strategy:newest_dated actually runs.",
-    "NOTE: as of 2026-08-09 the parish's own 'Download Latest Bulletin'",
-    "button on the site still points at the March 2025 PDF (confirmed via",
-    "direct HTML fetch) — the site itself has not been updated in ~17",
-    "months. This fix stops the harvester from being MORE stale than the",
-    "site, but the parish needs to update their own bulletin widget for",
-    "this to ever show a current bulletin."
+  "observed_load_ms": 16742.39990234375,
+  "timeout_ms": 55000,
+  "total_timeout_s": 250,
+  "playbook_type": "pdf_download_list",
+  "site_type": "pdf_link_list",
+  "operator_notes": [
+    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
+    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+    "Do not worry if the filename or date in the link text changes every week."
   ],
-  "operator_notes_2026_08_18": [
-    "CASUALTY recheck: homepage + #sbp-bulletin still only expose",
-    "Fourth-Sunday-Lent-C-March-30th-2025.pdf. wp-json/wp/v2/media newest",
-    "item is that same 29/03/2025 upload. No ParishPress path. Diocese",
-    "directory lists Facebook (Glenfin-Parish-101556014824374). Recipe",
-    "already finds the newest file the site publishes — there is nothing",
-    "newer online. Keep as stale/actionable; do not skip (website still live)."
+  "do_not": [
+    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
+    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
   ],
-  "operator_notes_2026_08_19": [
-    "CASUALTY recheck: homepage + wp-json/media still newest Fourth-Sunday-Lent-C-March-30th-2025.pdf (29/03/2025). No August 2026 upload. glenfinparish.com is Cloudflare 403; parishpress.ie/glenfin 404. Facebook blocked from this network. Keep stale/actionable."
-  ]
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  },
+  "recorded_date": "2026-08-19"
 }
