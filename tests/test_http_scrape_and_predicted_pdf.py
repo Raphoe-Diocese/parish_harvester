@@ -5,7 +5,12 @@ import unittest
 from datetime import date
 
 from harvester.replay import _is_non_bulletin_url, _score_http_scrape_pdf_hrefs
-from harvester.utils import predicted_dated_upload_urls, yearless_slug_date
+from harvester.utils import (
+    dropfiles_task_download_url,
+    predicted_dated_upload_urls,
+    wix_dated_slug_candidates,
+    yearless_slug_date,
+)
 
 
 class YearlessSlugTests(unittest.TestCase):
@@ -124,6 +129,64 @@ class HttpScrapeScoreTests(unittest.TestCase):
         best_date, best_url = max(scored)
         self.assertEqual(best_date, date(2026, 8, 16))
         self.assertIn("August-16", best_url)
+
+
+class WixDatedSlugCandidateTests(unittest.TestCase):
+    def test_ballinascreen_includes_copy_of_variant(self) -> None:
+        example = (
+            "https://www.parishofballinascreen.com/"
+            "ballinascreen-desertmartin-parishes-21_june_2026"
+        )
+        urls = wix_dated_slug_candidates(example, date(2026, 8, 16), weeks_back=1)
+        self.assertEqual(
+            urls[0],
+            "https://www.parishofballinascreen.com/"
+            "ballinascreen-desertmartin-parishes-16_august_2026",
+        )
+        self.assertEqual(
+            urls[1],
+            "https://www.parishofballinascreen.com/"
+            "copy-of-ballinascreen-desertmartin-parishes-16_august_2026",
+        )
+        self.assertIn(
+            "https://www.parishofballinascreen.com/"
+            "ballinascreen-desertmartin-parishes-9_august_2026",
+            urls,
+        )
+
+    def test_copy_of_example_does_not_double_prefix(self) -> None:
+        example = (
+            "https://www.parishofballinascreen.com/"
+            "copy-of-ballinascreen-desertmartin-parishes-9_august_2026"
+        )
+        urls = wix_dated_slug_candidates(example, date(2026, 8, 16), weeks_back=0)
+        copy_ofs = [u for u in urls if "/copy-of-copy-of-" in u]
+        self.assertEqual(copy_ofs, [])
+        self.assertIn(
+            "https://www.parishofballinascreen.com/"
+            "copy-of-ballinascreen-desertmartin-parishes-16_august_2026",
+            urls,
+        )
+
+
+class DropfilesTaskUrlTests(unittest.TestCase):
+    def test_banagher_sef_to_task_download(self) -> None:
+        sef = (
+            "https://www.banagherparish.com/files/9/Newsletters/395/"
+            "Bulletin---13th-Sunday-in-Ordinary-Time---28th-June-2026"
+        )
+        self.assertEqual(
+            dropfiles_task_download_url(sef),
+            "https://www.banagherparish.com/index.php?option=com_dropfiles"
+            "&task=frontfile.download&catid=9&id=395",
+        )
+
+    def test_non_dropfiles_url_returns_none(self) -> None:
+        self.assertIsNone(
+            dropfiles_task_download_url(
+                "https://www.banagherparish.com/information"
+            )
+        )
 
 
 if __name__ == "__main__":

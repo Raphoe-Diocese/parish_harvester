@@ -41,6 +41,7 @@ from .liturgical import liturgical_date_from_text, year_hint_from_upload_url
 from .utils import (
     _is_within_opaque_hash,
     _opaque_hash_spans,
+    dropfiles_task_download_url,
     extract_date_from_slug,
     extract_date_from_string,
     extract_newsletter_number,
@@ -49,6 +50,7 @@ from .utils import (
     predicted_dated_upload_urls,
     rewrite_date_url,
     rewrite_newsletter_number_for_target,
+    wix_dated_slug_candidates,
     yearless_slug_date,
 )
 
@@ -965,6 +967,77 @@ def _extract_dropfiles_candidates_from_html(html: str, base_url: str) -> list[tu
     return out
 
 
+def _dropfiles_download_url_variants(url: str) -> list[str]:
+    """SEF Dropfiles href plus the unblocked ``task=frontfile.download`` form."""
+    out: list[str] = []
+    url = (url or "").strip()
+    if url:
+        out.append(url)
+    task = dropfiles_task_download_url(url)
+    if task and task not in out:
+        out.append(task)
+    return out
+
+
+_WIX_ERROR_PAGE_RE = re.compile(
+    r"page you.?re looking for|isn.?t here|doesn.?t exist|errorPage|wix-error",
+    re.IGNORECASE,
+)
+
+
+def _wix_html_looks_live(url: str, headers: dict[str, str], body: bytes) -> bool:
+    """True when a Wix dated-slug GET is a real bulletin page, not a 404 shell."""
+    if not body:
+        return False
+    if body[:4] == b"%PDF":
+        return True
+    if len(body) < 80_000:
+        return False
+    ct = (headers.get("content-type") or "").lower()
+    if "html" not in ct and not body[:30].lower().lstrip().startswith((b"<!doctype", b"<html")):
+        return False
+    text = body.decode("utf-8", errors="replace")
+    if _WIX_ERROR_PAGE_RE.search(text[:20_000]):
+        return False
+    leaf = urlparse(url).path.rstrip("/").rsplit("/", 1)[-1]
+    leaf = re.sub(r"^copy-of-", "", leaf, flags=re.IGNORECASE)
+    slug_bits = leaf.replace("-", "_")
+    return bool(slug_bits) and slug_bits.lower() in text.lower().replace("-", "_")
+
+
+async def _try_resolve_wix_dated_slug(
+    example_urls: list[str],
+    target_date: date,
+    *,
+    weeks_back: int = 3,
+) -> str | None:
+    """HTTP-probe canonical and ``copy-of-`` Wix slugs; return the first live page."""
+    candidates: list[str] = []
+    for example in example_urls:
+        example = (example or "").strip()
+        if not example:
+            continue
+        for url in wix_dated_slug_candidates(
+            example, target_date, weeks_back=weeks_back
+        ):
+            if url not in candidates:
+                candidates.append(url)
+    for url in candidates:
+        result = await asyncio.to_thread(
+            _fetch_bytes_with_retries,
+            url,
+            max_attempts=2,
+            per_attempt_timeout_s=8.0,
+            total_budget_s=10.0,
+        )
+        if not result:
+            continue
+        body, headers = result
+        if _wix_html_looks_live(url, headers, body):
+            return url
+    return None
+
+
 async def _try_dropfiles_predicted_downloads(
     page: Page,
     dest: Path,
@@ -1010,26 +1083,35 @@ async def _try_dropfiles_predicted_downloads(
                 candidates = _extract_dropfiles_candidates_from_html(html, listing_url)
                 if candidates and _remaining_budget() > 0:
                     _best_id, best_url = max(candidates)
-                    file_result = await asyncio.to_thread(
-                        _fetch_bytes_with_retries,
-                        best_url,
-                        max_attempts=_DROPFILES_HTTP_ATTEMPTS,
-                        per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
-                        total_budget_s=min(_DROPFILES_HTTP_FILE_BUDGET_S, _remaining_budget()),
-                    )
-                    if file_result:
+                    for file_url in _dropfiles_download_url_variants(best_url):
+                        if _remaining_budget() <= 0:
+                            break
+                        file_result = await asyncio.to_thread(
+                            _fetch_bytes_with_retries,
+                            file_url,
+                            max_attempts=_DROPFILES_HTTP_ATTEMPTS,
+                            per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
+                            total_budget_s=min(_DROPFILES_HTTP_FILE_BUDGET_S, _remaining_budget()),
+                        )
+                        if not file_result:
+                            continue
                         file_body, file_headers = file_result
                         if _dropfiles_body_looks_like_file(file_headers, file_body):
                             try:
                                 file_type = await _save_dropfiles_bytes_to_pdf(
-                                    file_body, file_headers, best_url, dest
+                                    file_body, file_headers, file_url, dest
                                 )
-                                return best_url, file_type
+                                return file_url, file_type
                             except RecipeReplayError:
-                                pass
+                                continue
 
     if example_href:
+        predicted: list[str] = []
         for candidate in predict_dropfiles_bulletin_urls(example_href, target_date)[:4]:
+            for variant in _dropfiles_download_url_variants(candidate):
+                if variant not in predicted:
+                    predicted.append(variant)
+        for candidate in predicted:
             if _remaining_budget() <= 0:
                 break
             candidate_result = await asyncio.to_thread(
@@ -2740,6 +2822,17 @@ async def replay_recipe(
                 url = (step.get("url") or "").strip()
                 if step.get("use_target_url") and target_url:
                     url = target_url.strip()
+                playbook = str(
+                    recipe.get("playbook_type") or recipe.get("site_type") or ""
+                ).strip().lower()
+                if playbook == "wix_dated_slug" and target_date is not None:
+                    resolved = await _try_resolve_wix_dated_slug(
+                        [url, str(step.get("url") or ""), start_url],
+                        target_date,
+                        weeks_back=int(recipe.get("weeks_back") or 3),
+                    )
+                    if resolved:
+                        url = resolved
                 if not url:
                     raise RecipeReplayError("Recipe goto step missing URL")
                 captured = await _goto_or_download(
