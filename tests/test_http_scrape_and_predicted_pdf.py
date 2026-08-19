@@ -65,6 +65,16 @@ class PredictedDatedUploadTests(unittest.TestCase):
         )
         self.assertIn(example, urls)
 
+    def test_holyfamily_parish_derry_ddmmyy_path(self) -> None:
+        example = "https://www.holyfamily-parish.com/pdf/090826.pdf"
+        urls = predicted_dated_upload_urls(example, date(2026, 8, 16), weeks_back=2)
+        self.assertEqual(urls[0], "https://www.holyfamily-parish.com/pdf/160826.pdf")
+        self.assertIn("https://www.holyfamily-parish.com/pdf/090826.pdf", urls)
+        self.assertTrue(
+            all("holy-familyparish.com" not in u for u in urls),
+            urls[:6],
+        )
+
     def test_claudy_oneweb_space_variants_are_quoted(self) -> None:
         example = "http://parishofclaudy.com/onewebmedia/NEWSLETTER 21-6-26.docx"
         urls = predicted_dated_upload_urls(example, date(2026, 8, 9), weeks_back=0)
