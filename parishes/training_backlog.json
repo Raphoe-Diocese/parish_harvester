@@ -2,16 +2,16 @@
   "generated_at": "2026-08-19",
   "target_date": "2026-08-16",
   "summary": {
-    "downloaded": 77,
+    "downloaded": 78,
     "html_links": 0,
     "skipped": 17,
-    "failed": 29,
+    "failed": 28,
     "stale_rejected": 0
   },
   "action_counts": {
-    "ok": 75,
+    "ok": 76,
     "retrain": 2,
-    "investigate": 25,
+    "investigate": 24,
     "skip": 17
   },
   "parishes": [
@@ -1549,28 +1549,31 @@
     },
     {
       "parish_key": "errigalparish",
-      "display_name": "Errigalparish",
-      "diocese": "derry",
+      "display_name": "Errigal",
+      "diocese": "unknown",
       "recipe_file": "parishes/recipes/unknown/errigalparish.json",
       "recipe": {
-        "start_url": "https://www.errigalparish.com/pdf/160826.pdf",
-        "site_type": "predicted_dated_pdf",
-        "playbook_type": "",
+        "start_url": "https://www.errigalparish.com/news.html",
+        "site_type": "dated_pdf_path",
+        "playbook_type": "dated_pdf_bulletin",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
-        "click_count": 0,
+        "step_count": 2,
+        "click_count": 1,
         "has_terminal": true,
         "operator_notes": [
-          "Weekly PDF at /pdf/DDMMYY.pdf (e.g. 160826.pdf = 16/08/2026).",
-          "2026-08-18 FIX: click on news.html failed ('No valid content found') even though this week's file is a direct unchallenged asset. Confirmed 16/08/2026 via curl: HTTP 200, 295,551 bytes, text 'Errigal Parish News - 16th August 2026'. site_type:predicted_dated_pdf fetches the rewritten /pdf/DDMMYY.pdf and never clicks the listing (which also links GDPR/pastoral-letter PDFs)."
+          "Bulletin is a real PDF (often made in Microsoft Word \u2192 Print to PDF).",
+          "Tab title may say .docx or .jpg \u2014 ignore that; check the address bar ends in .pdf.",
+          "On the PDF page: tap Save this PDF \u2014 saves the full https://\u2026 address for Sunday harvest.",
+          "Or start on parishnews.html \u2192 point at this week's link \u2192 Yes \u2192 Save this PDF.",
+          "Harvester rewrites DDMMYY in the URL each Sunday (e.g. 140626 \u2192 210626)."
         ],
         "do_not": [
-          "Do not click a[href*=\"pdf\"] on news.html \u2014 it can pick drumraghparish.com GDPR/Privacy/Bishops-Letter links.",
-          "Do not set use_captured_url."
+          "Do not use use_page_url only \u2014 GitHub cannot read Chrome's internal PDF viewer address.",
+          "Do not worry if Document Properties title mentions Microsoft Word."
         ],
-        "recorded_date": "2026-08-18"
+        "recorded_date": "2026-08-19"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
@@ -2556,33 +2559,34 @@
       "diocese": "derry",
       "recipe_file": "parishes/recipes/derry/limavadyparish.json",
       "recipe": {
-        "start_url": "https://www.limavadyparish.org/onewebmedia/16-8-26.pdf",
-        "site_type": "predicted_dated_pdf",
-        "playbook_type": "dated_pdf_bulletin",
+        "start_url": "https://www.limavadyparish.org/parish%20bulletins.html",
+        "site_type": "pdf_link_list",
+        "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
-        "click_count": 0,
+        "step_count": 2,
+        "click_count": 1,
         "has_terminal": true,
         "operator_notes": [
-          "Dated PDF at /onewebmedia/D-M-YY.pdf (e.g. 16-8-26.pdf = 16/08/2026).",
-          "2026-08-18 FIX: recipe was pinned with use_captured_url to 28-6-26.pdf. Playwright then failed ENETUNREACH on that host's IPv6 address. The file itself is fine over IPv4 \u2014 a plain HTTP GET of the rewritten 16-8-26.pdf returns 200 application/pdf (703,960 bytes). site_type:predicted_dated_pdf skips the browser (and IPv6) and tries rewrite_date_url for this Sunday plus previous weeks."
+          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
+          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+          "Do not worry if the filename or date in the link text changes every week."
         ],
         "do_not": [
-          "Do not set use_captured_url \u2014 it freezes the recipe on the trained week's file.",
-          "Do not open the homepage in Playwright on this host \u2014 IPv6 from GitHub/Actions can ENETUNREACH."
+          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
+          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
         ],
-        "recorded_date": "2026-08-18"
+        "recorded_date": "2026-08-19"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: APIRequestContext.get: connect ENETUNREACH 2a02:2350:5:106:802e:8351:626a:2480:443 - Local (:::0)\nCall log:\n  - \u2192 GET https://www.limavadyparish.org/onewebmedia/28-6-26.pdf\n  -     - user-agent: Mozilla/5.0 (X11; Linux",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: APIRequestContext.get: connect ENETUNREACH 2a02:2350:5:106:802e:8351:626a:2480:443 - Local (:::0)\nCall log:\n  - \u2192 GET https://www.limavady"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "parishoflisburn",
