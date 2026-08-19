@@ -1,27 +1,34 @@
 {
-  "version": 2,
+  "version": 1,
   "parish_key": "ballymenaparish",
   "display_name": "Ballymena",
   "diocese": "down_and_connor",
-  "recorded_date": "2026-08-18",
   "start_url": "https://ballymenaparish.org/bulletin-and-parish-documents/",
-  "site_type": "wp_json_newest_media",
-  "href_patterns": ["sunday"],
-  "timeout_ms": 45000,
-  "total_timeout_s": 180,
   "steps": [
     {
-      "action": "goto",
-      "url": "https://ballymenaparish.org/bulletin-and-parish-documents/"
+      "action": "click",
+      "selector": "a:has-text(\"Bulletin\")",
+      "href": "http://Ladies%20Activity%20class%20continues%20–%2011%2000am%20-%2012noon%20",
+      "text": "Bulletin"
+    },
+    {
+      "action": "download",
+      "url": "https://ballymenaparish.org/wp-content/uploads/2025/01/Wedding-Parish.pdf"
     }
   ],
+  "observed_load_ms": 5779.39990234375,
+  "timeout_ms": 55000,
+  "total_timeout_s": 250,
+  "playbook_type": "wix_html",
+  "site_type": "html_text_bulletin",
   "operator_notes": [
-    "The public bulletin page still labels 'This week's bulletin can be viewed here' but that link is Wedding-Parish.pdf (2025). Do not scrape the HTML listing.",
-    "The media library is current: /wp-json/wp/v2/media newest PDF 16.8.26-20th-Sunday.pdf (HTTP 200, 237530 bytes, 18/08/2026).",
-    "site_type:wp_json_newest_media downloads the newest media PDF whose slug/filename contains 'sunday'. Never opens Playwright. Never grabs Wedding-Parish.pdf."
+    "Bulletin text is on the web page — not a downloadable PDF file.",
+    "Use Save page as PDF on the newsletter article page.",
+    "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
   ],
   "do_not": [
-    "Do not click the on-page 'this week's bulletin' link — it is Wedding-Parish.pdf.",
-    "Do not use generic a[href$='.pdf'] on this page."
-  ]
+    "Do not use Pick bulletin image when the page is mostly text paragraphs.",
+    "Do not stop at click-only — need print_to_pdf as the final step."
+  ],
+  "recorded_date": "2026-08-19"
 }
