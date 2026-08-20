@@ -17,6 +17,14 @@ class HostProfilesTests(unittest.TestCase):
         self.assertEqual(profile["navigation_timeout_ms"], 60000)
         self.assertEqual(profile["max_retries"], 3)
 
+    def test_get_host_profile_matches_www_alias(self) -> None:
+        profile = fetcher._get_host_profile(
+            "https://www.ballyclareballygowan.com/notice%20board.htm"
+        )
+
+        self.assertEqual(profile["navigation_timeout_ms"], 60000)
+        self.assertEqual(profile["max_retries"], 3)
+
     def test_get_host_profile_threepatrons_has_long_timeout(self) -> None:
         profile = fetcher._get_host_profile("https://www.threepatrons.org/")
 
