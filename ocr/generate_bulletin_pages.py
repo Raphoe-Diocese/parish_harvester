@@ -16,6 +16,7 @@ from PyPDF2 import PdfReader
 from harvester.ai_summaries import summarise_bulletin
 from harvester.events_extractor import extract_events, write_events_json
 from harvester.weekly_diff import diff_bulletins
+from ocr.bulletin_layout import ocr_masthead_css, structure_ocr_html
 from ocr.parish_splitter import split_ocr_by_parish
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
@@ -175,6 +176,7 @@ def ocr_reading_css(selector: str) -> str:
     {selector} > :first-child {{
       margin-top: 0;
     }}
+    {ocr_masthead_css(selector)}
 """
 
 
@@ -572,6 +574,7 @@ def prepare_ocr_fragment(
     diocese: str,
     ocr_fragment: str,
     parish_links: list[tuple[str, str]] | None = None,
+    bulletin_date: str = "",
 ) -> str:
     """Clean OCR HTML into one continuous, page-ordered scrollable document.
 
@@ -580,26 +583,35 @@ def prepare_ocr_fragment(
     its own tests/possible future use). Frank asked for that dropdown
     behaviour to go — the OCR panel should read exactly like the original
     PDF, page by page, with no per-parish collapse. This keeps the natural
-    page order from the OCR pipeline and only prepends a failure banner when
-    OCR produced nothing usable at all for any known parish this week.
+    page order from the OCR pipeline, inserts a visible parish name header
+    and real section headings (see :mod:`ocr.bulletin_layout`), and only
+    prepends a failure banner when OCR produced nothing usable at all for
+    any known parish this week.
     """
     cleaned = tighten_ocr_paragraphs(_flatten_legacy_parish_accordions(ocr_fragment or ""))
-    if not parish_links:
-        return cleaned
-    entries = _load_parish_entries(diocese, parish_links)
-    if not entries:
-        return cleaned
-    plain = _fragment_to_plain_text(cleaned)
+    entries = _load_parish_entries(diocese, parish_links or []) if parish_links else []
+    url_by_name = {name: url for name, url in (parish_links or [])}
+    structured = structure_ocr_html(
+        cleaned,
+        parish_entries=entries,
+        bulletin_date=bulletin_date,
+        parish_urls=url_by_name,
+    )
+    if not parish_links or not entries:
+        return structured
+    plain = _fragment_to_plain_text(structured)
     chunks = split_ocr_by_parish(plain, entries)
     ocr_failed_whole_diocese = not any((chunks.get(key) or "").strip() for key, _ in entries)
     if not ocr_failed_whole_diocese:
-        return cleaned
+        return structured
     banner = (
         '<div class="ocr-failed-banner" role="alert">'
         "⚠️ OCR failed this week — use the original PDF above for the full text."
         "</div>"
     )
-    return f"{banner}\n{cleaned}"
+    if "ocr-failed-banner" in structured:
+        return structured
+    return f"{banner}\n{structured}"
 
 
 def _fragment_to_plain_text(ocr_fragment: str) -> str:
@@ -1162,8 +1174,14 @@ def pdf_inpage_viewer_css() -> str:
       margin: 0 auto 10px;
       background: #3a3f42;
       min-height: 180px;
+      position: relative;
     }}
     .pdf-inpage-page-slot canvas {{ display: block; width: 100%; height: auto; background: #fff; }}
+    .pdf-link-layer {{ position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }}
+    .pdf-annot-link {{
+      position: absolute; z-index: 2; pointer-events: auto;
+      background: rgba(26, 107, 107, 0.08); border-radius: 2px;
+    }}
     .pdf-frame-wrap,
     .pdf-standalone-shell {{
       display: flex;
@@ -2102,7 +2120,7 @@ def regenerate_viewer_from_existing(existing_path: Path) -> Path:
         raise ValueError(f"Could not find OCR panel in {existing_path}")
     raw_ocr_fragment = panel_match.group(1).strip()
     parish_links = parse_parish_links(config.evidence_path)
-    ocr_fragment = prepare_ocr_fragment(diocese, raw_ocr_fragment, parish_links)
+    ocr_fragment = prepare_ocr_fragment(diocese, raw_ocr_fragment, parish_links, bulletin_date=bulletin_date)
     output_path = BULLETINS_DIR / existing_path.name
     output_path.write_text(
         render_viewer_page(config, bulletin_date, page_count, ocr_fragment, parish_links),
@@ -2122,7 +2140,13 @@ def regenerate_viewer_from_existing(existing_path: Path) -> Path:
     if not pdf_candidate.exists():
         pdf_candidate = REPO_ROOT / "mega_pdf" / config.pdf_filename
     if pdf_candidate.exists():
-        _write_parish_bulletin_pages(diocese, bulletin_date, pdf_candidate, raw_ocr_fragment)
+        _write_parish_bulletin_pages(
+            diocese,
+            bulletin_date,
+            pdf_candidate,
+            raw_ocr_fragment,
+            preserve_existing_pdfs=True,
+        )
     return output_path
 
 
@@ -2132,7 +2156,7 @@ def write_viewer_page(diocese: str, bulletin_date: str, pdf_path: Path, ocr_html
     raw_ocr_fragment = extract_ocr_fragment(ocr_html_path, tighten=False)
     parish_links = parse_parish_links(config.evidence_path)
     ocr_plain_text = _fragment_to_plain_text(tighten_ocr_paragraphs(raw_ocr_fragment))
-    ocr_fragment = prepare_ocr_fragment(diocese, raw_ocr_fragment, parish_links)
+    ocr_fragment = prepare_ocr_fragment(diocese, raw_ocr_fragment, parish_links, bulletin_date=bulletin_date)
     output_path = BULLETINS_DIR / f"{diocese}-{bulletin_date}.html"
     output_path.write_text(
         render_viewer_page(config, bulletin_date, page_count, ocr_fragment, parish_links),
@@ -2153,7 +2177,14 @@ def write_viewer_page(diocese: str, bulletin_date: str, pdf_path: Path, ocr_html
     return output_path
 
 
-def _write_parish_bulletin_pages(diocese: str, bulletin_date: str, pdf_path: Path, raw_ocr_fragment: str) -> None:
+def _write_parish_bulletin_pages(
+    diocese: str,
+    bulletin_date: str,
+    pdf_path: Path,
+    raw_ocr_fragment: str,
+    *,
+    preserve_existing_pdfs: bool = False,
+) -> None:
     """Best-effort per-parish page generation — never breaks the diocese
     viewer page if it fails (see ``ocr.parish_pages``)."""
     try:
@@ -2166,6 +2197,7 @@ def _write_parish_bulletin_pages(diocese: str, bulletin_date: str, pdf_path: Pat
             pdf_path,
             raw_ocr_fragment,
             diocese_pdf_href=f"../../mega_pdf/{config.pdf_filename}",
+            preserve_existing_pdfs=preserve_existing_pdfs,
         )
         if written:
             print(f"  📄 Wrote {len(written)} per-parish bulletin page(s) for {diocese}")

@@ -94,6 +94,22 @@ def _xml_escape(text: str) -> str:
     )
 
 
+def _absolute_http_url(url: str | None) -> str | None:
+    """Parish header links must be clickable http(s) URLs, not bare hostnames."""
+    raw = (url or "").strip()
+    if not raw:
+        return None
+    if raw.startswith(("http://", "https://")):
+        return raw
+    if raw.startswith("//"):
+        return "https:" + raw
+    if " " in raw:
+        return None
+    if raw.startswith("www.") or "." in raw:
+        return "https://" + raw.lstrip("/")
+    return None
+
+
 def _build_parish_header_pdf(
     display_name: str,
     website: str | None,
@@ -115,18 +131,20 @@ def _build_parish_header_pdf(
     c.setFillColor(colors_module.black)
     c.drawString(_HEADER_SIDE_MARGIN, top - 8, display_name)
 
-    if website:
+    link_href = _absolute_http_url(website)
+    if link_href:
+        label = website if website.startswith(("http://", "https://", "www.")) else link_href
         c.setFont("Helvetica", 8)
         c.setFillColor(colors_module.blue)
-        c.drawRightString(width - _HEADER_SIDE_MARGIN, top - 8, website)
-        text_w = c.stringWidth(website, "Helvetica", 8)
+        c.drawRightString(width - _HEADER_SIDE_MARGIN, top - 8, label)
+        text_w = c.stringWidth(label, "Helvetica", 8)
         c.linkURL(
-            website,
+            link_href,
             (
                 width - _HEADER_SIDE_MARGIN - text_w,
-                top - 11,
+                top - 16,
                 width - _HEADER_SIDE_MARGIN,
-                top - 2,
+                top + 3,
             ),
             relative=0,
             thickness=0,
@@ -248,12 +266,7 @@ def stitch_mega_pdf(
 
         if pdf_path and pdf_path.exists():
             try:
-                if website and website.startswith("http"):
-                    link_url = website
-                elif parish_url and parish_url.startswith("http"):
-                    link_url = parish_url
-                else:
-                    link_url = None
+                link_url = _absolute_http_url(website) or _absolute_http_url(parish_url)
                 reader = PyPDF2.PdfReader(str(pdf_path))
                 page_count = len(reader.pages)
                 page_limit = _max_bulletin_pages_for_parish(parish_key)
@@ -343,7 +356,7 @@ def stitch_mega_pdf(
         missing_entries.sort(key=lambda x: x[0].lower())
         for display_name, parish_url, website in missing_entries:
             name_esc = _xml_escape(display_name)
-            link_url = parish_url if (parish_url and parish_url.startswith("http")) else website
+            link_url = _absolute_http_url(parish_url) or _absolute_http_url(website)
             if link_url:
                 safe_link = _xml_escape(link_url)
                 line = (

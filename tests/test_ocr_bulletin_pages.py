@@ -298,6 +298,10 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("is-native-pdf", text)
         self.assertIn("stackAllPages", text)
         self.assertIn("numPages", text)
+        self.assertIn("getAnnotations", text)
+        self.assertIn("pdf-annot-link", text)
+        self.assertIn('target = "_blank"', text)
+        self.assertIn("noopener noreferrer", text)
         self.assertIn("Open PDF", text)
         self.assertIn("Download", text)
         self.assertNotIn("pdf-inpage-prev", text)
@@ -334,6 +338,8 @@ class OcrBulletinPageTests(unittest.TestCase):
                 r"#ocr-panel\s*\{[^}]*min-height:\s*850px",
                 msg=f"{rel} lost desktop OCR min-height 850px",
             )
+            self.assertIn("ocr-parish-masthead", html_live, rel)
+            self.assertIn("pdf-annot-link", html_live, rel)
             self.assertNotIn("PRO TIP", html_live.upper(), rel)
             self.assertNotIn("callout-tip", html_live, rel)
             self.assertNotIn("pdf-inpage-prev", html_live, rel)
