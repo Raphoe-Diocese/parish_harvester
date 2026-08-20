@@ -288,6 +288,8 @@ https://www.antrimparish.com
         self.assertIn("continue-on-error: true", workflow)
         self.assertIn("id: commit_harvest", workflow)
         self.assertIn("docs/mega_pdf/*_mega_bulletin.pdf", workflow)
+        self.assertIn("scripts/push_harvest_results.py", workflow)
+        self.assertIn('HARVEST_MEGA_PDF: "1"', workflow)
         self.assertIn("Warn if git commit failed", workflow)
         self.assertLess(workflow.index("- name: Run tests"), workflow.index("- name: Run Bulletin Harvester"))
 
