@@ -117,24 +117,32 @@ jobs:
             echo "No workflow docs snapshots to apply — using git checkout docs/"
           fi
 
+      # Single-parish harvests have no mega artifacts. If we skip this fallback,
+      # Pages replaces the whole site and /mega_pdf/*.pdf 404s. Always recover
+      # the latest harvest that actually uploaded *_mega_bulletin.pdf.
       - name: Download mega PDFs from latest harvest (OCR/docs-only deploys)
-        if: github.event_name != 'workflow_run' || github.event.workflow_run.name == 'Generate OCR bulletin viewers'
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
           mkdir -p _harvest_artifacts
+          if find _harvest_artifacts -type f -name '*_mega_bulletin.pdf' | grep -q .; then
+            echo "Mega PDFs already present from the triggering harvest run"
+            exit 0
+          fi
           FOUND=""
           while IFS= read -r run_id; do
             [ -n "${run_id}" ] || continue
-            count="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/artifacts" --jq '[.artifacts[] | select(.name | test("mega-bulletin-pdf"; "i"))] | length')"
+            count="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/artifacts" --jq '[.artifacts[] | select((.name | test("mega-bulletin-pdf"; "i")) and (.expired == false))] | length')"
             if [ "${count:-0}" -gt 0 ]; then
               echo "Downloading mega PDF artifact from harvest run ${run_id}"
-              gh run download "${run_id}" --repo "${GITHUB_REPOSITORY}" --dir _harvest_artifacts
+              gh run download "${run_id}" --repo "${GITHUB_REPOSITORY}" --name all-mega-bulletin-pdf --dir _harvest_artifacts || \
+                gh run download "${run_id}" --repo "${GITHUB_REPOSITORY}" --dir _harvest_artifacts
               FOUND="yes"
               break
             fi
-          done < <(gh run list --repo "${GITHUB_REPOSITORY}" --workflow harvest.yml --limit 25 --json databaseId,conclusion --jq '.[] | select(.conclusion == "success" or .conclusion == "failure") | .databaseId')
+          done < <(gh run list --repo "${GITHUB_REPOSITORY}" --workflow harvest.yml --limit 80 --json databaseId,conclusion --jq '.[] | select(.conclusion == "success" or .conclusion == "failure") | .databaseId')
           if [ -z "${FOUND}" ]; then
             echo "::warning::No harvest run with mega PDF artifacts found — Pages deploy may omit mega PDFs."
           fi
