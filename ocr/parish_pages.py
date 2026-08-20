@@ -210,6 +210,7 @@ def write_parish_pages_for_diocese(
     diocese_pdf_href: str,
     out_dir: Path | None = None,
     parish_status_path: Path | None = None,
+    preserve_existing_pdfs: bool = False,
 ) -> list[str]:
     """Generate one bulletin page per currently-"ok" parish in *diocese_key*.
 
@@ -292,7 +293,14 @@ def write_parish_pages_for_diocese(
             f"Part of the {config.display_name} collated bulletin."
         )
         if pdf_bytes:
-            (out_root / f"{parish.key}.pdf").write_bytes(pdf_bytes)
+            pdf_out = out_root / f"{parish.key}.pdf"
+            existing_ok = (
+                preserve_existing_pdfs
+                and pdf_out.exists()
+                and pdf_out.stat().st_size > 2048
+            )
+            if not existing_ok:
+                pdf_out.write_bytes(pdf_bytes)
             pdf_href = f"{parish.key}.pdf"
             meta_line = base_meta
             fail_reason = ""
@@ -338,6 +346,14 @@ def write_parish_pages_for_diocese(
                     '<div class="ocr-failed-banner" role="status">'
                     f"⚠️ {html.escape(why)}</div>"
                 )
+
+        from ocr.bulletin_layout import structure_ocr_html
+
+        ocr_fragment = structure_ocr_html(
+            tighten_ocr_paragraphs(ocr_fragment),
+            bulletin_date=bulletin_date,
+            single_parish_name=parish.display_name,
+        )
 
         parish_config = DioceseConfig(
             key=parish.key,

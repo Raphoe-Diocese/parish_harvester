@@ -33,8 +33,11 @@
       ".pdf-inpage-backup a{color:#fff;font-weight:700;font-size:.85rem}" +
       ".pdf-inpage-status{padding:10px 12px;background:#1f3d3c;color:#d8f0ee;font-size:.9rem}" +
       ".pdf-inpage-pages{flex:1 1 auto;overflow:auto;-webkit-overflow-scrolling:touch;background:#525659;padding:8px 0 16px}" +
-      ".pdf-inpage-page-slot{margin:0 auto 10px;background:#3a3f42;min-height:180px}" +
+      ".pdf-inpage-page-slot{margin:0 auto 10px;background:#3a3f42;min-height:180px;position:relative}" +
       ".pdf-inpage-page-slot canvas{display:block;width:100%;height:auto;background:#fff}" +
+      ".pdf-link-layer{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}" +
+      ".pdf-annot-link{position:absolute;z-index:2;pointer-events:auto;background:rgba(26,107,107,0.08);border-radius:2px}" +
+      ".pdf-annot-link:focus{outline:2px solid #1a6b6b;outline-offset:1px}" +
       ".pdf-frame-wrap,.pdf-standalone-shell{display:flex;flex-direction:column}" +
       ".pdf-frame-wrap iframe,.pdf-standalone-shell iframe.pdf-frame," +
       "body.is-native-pdf iframe.pdf-frame{display:none!important}" +
@@ -139,6 +142,56 @@
     }
   }
 
+  function overlayPageLinks(page, slot, cssWidth) {
+    var unscaled = page.getViewport({ scale: 1 });
+    var cssScale = cssWidth / unscaled.width;
+    var cssViewport = page.getViewport({ scale: cssScale });
+    var layer = slot.querySelector(".pdf-link-layer");
+    if (!layer) {
+      layer = document.createElement("div");
+      layer.className = "pdf-link-layer";
+      slot.appendChild(layer);
+    }
+    layer.innerHTML = "";
+    var Util = (window.pdfjsLib && window.pdfjsLib.Util) || null;
+    return page.getAnnotations({ intent: "display" }).then(function (annots) {
+      (annots || []).forEach(function (annot) {
+        if (!annot || String(annot.subtype || annot.annotationType || "") === "") return;
+        var isLink = annot.subtype === "Link" || annot.annotationType === 2;
+        if (!isLink) return;
+        var url = annot.url || annot.unsafeUrl || "";
+        if (!url && annot.dest) return;
+        if (!url) return;
+        if (!/^https?:\/\//i.test(url) && /^www\./i.test(url)) url = "https://" + url;
+        if (!/^https?:\/\//i.test(url)) return;
+        var rect = annot.rect || [0, 0, 0, 0];
+        var viewed = cssViewport.convertToViewportRectangle(rect);
+        if (Util && Util.normalizeRect) viewed = Util.normalizeRect(viewed);
+        else {
+          var x1 = Math.min(viewed[0], viewed[2]);
+          var y1 = Math.min(viewed[1], viewed[3]);
+          var x2 = Math.max(viewed[0], viewed[2]);
+          var y2 = Math.max(viewed[1], viewed[3]);
+          viewed = [x1, y1, x2, y2];
+        }
+        var a = document.createElement("a");
+        a.className = "pdf-annot-link";
+        a.href = url;
+        a.target = "_blank";
+        a.rel = "noopener noreferrer";
+        a.title = url;
+        a.setAttribute("aria-label", "Open parish website in a new tab");
+        a.style.left = Math.max(0, viewed[0]) + "px";
+        a.style.top = Math.max(0, viewed[1]) + "px";
+        a.style.width = Math.max(18, viewed[2] - viewed[0]) + "px";
+        a.style.height = Math.max(18, viewed[3] - viewed[1]) + "px";
+        layer.appendChild(a);
+      });
+    }).catch(function (err) {
+      console.warn("PDF link overlay failed", err);
+    });
+  }
+
   function renderPageToSlot(page, slot, width) {
     var unscaled = page.getViewport({ scale: 1 });
     var cssWidth = Math.max(240, width || slot.clientWidth || 320);
@@ -151,9 +204,14 @@
     canvas.style.width = cssWidth + "px";
     canvas.style.height = Math.floor(unscaled.height * (cssWidth / unscaled.width)) + "px";
     if (!canvas.parentNode) slot.appendChild(canvas);
+    slot.style.position = "relative";
     slot.style.width = cssWidth + "px";
     slot.style.minHeight = canvas.style.height;
-    return page.render({ canvasContext: canvas.getContext("2d", { alpha: false }), viewport: viewport }).promise;
+    return page
+      .render({ canvasContext: canvas.getContext("2d", { alpha: false }), viewport: viewport })
+      .promise.then(function () {
+        return overlayPageLinks(page, slot, cssWidth);
+      });
   }
 
   function startViewer(host, pdfUrl) {

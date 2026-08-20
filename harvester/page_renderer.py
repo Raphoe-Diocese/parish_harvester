@@ -106,11 +106,31 @@ def _clean_embedded_ocr_html(fragment: str) -> str:
     return text.strip()
 
 
-def _build_ocr_fragment(ocr_text: str, *, ocr_is_html: bool = False) -> str:
+def _build_ocr_fragment(
+    ocr_text: str,
+    *,
+    ocr_is_html: bool = False,
+    parish_links: list[dict] | None = None,
+    bulletin_date: str = "",
+) -> str:
     """Prepare OCR content for the shared ``#ocr-panel`` slot (see ocr.generate_bulletin_pages)."""
     normalized = (ocr_text or "").strip() or EMPTY_OCR_TEXT
     if ocr_is_html:
-        return _clean_embedded_ocr_html(normalized)
+        from ocr.bulletin_layout import structure_ocr_html
+
+        cleaned = _clean_embedded_ocr_html(normalized)
+        if "ocr-parish-masthead" in cleaned:
+            return cleaned
+        entries = [
+            (str(link.get("name") or "").strip(), str(link.get("name") or "").strip())
+            for link in (parish_links or [])
+            if str(link.get("name") or "").strip()
+        ]
+        return structure_ocr_html(
+            cleaned,
+            parish_entries=entries,
+            bulletin_date=bulletin_date,
+        )
     return f'<pre style="white-space:pre-wrap;margin:0;font-family:inherit;">{html.escape(normalized)}</pre>'
 
 
@@ -169,7 +189,12 @@ def render_diocese_raphoe_page(
         pdf_download_href=pdf_url,
         pdf_standalone_href=str(pdf_standalone_url or "").strip() or pdf_url,
         ocr_standalone_href=str(ocr_standalone_url or "").strip(),
-        ocr_fragment=_build_ocr_fragment(ocr_text, ocr_is_html=ocr_is_html),
+        ocr_fragment=_build_ocr_fragment(
+            ocr_text,
+            ocr_is_html=ocr_is_html,
+            parish_links=parish_links,
+            bulletin_date=week_label,
+        ),
         parish_section_heading=f"{diocese_label} Parishes with Working Bulletin Links",
         parish_links_html=render_parish_link_grid(tuple_links, internal_hrefs=internal_parish_hrefs),
     )

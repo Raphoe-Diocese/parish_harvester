@@ -7,15 +7,7 @@ import re
 import html as html_utils
 import sys
 
-import google.generativeai as genai
-from openai import OpenAI
-# mistralai package layouts differ across versions; support both import paths.
-try:
-    from mistralai import Mistral
-except ImportError:
-    from mistralai.client import Mistral
-from pdf2image import convert_from_path
-
+from ocr.bulletin_layout import split_heading_prefix
 from ocr.text_extract import extract_text_pages
 
 # Keep in sync with ocr.generate_bulletin_pages.ocr_reading_css (presentation only).
@@ -69,11 +61,37 @@ CSS = """
     padding-bottom: 0.18em;
     line-height: 1.3;
   }
+  .ocr-parish-masthead {
+    margin: 2.1em 0 1.15em;
+    padding: 0.85em 0 0.7em;
+    border-top: 3px solid #14524f;
+    border-bottom: 1px solid #c5d0c9;
+  }
+  .ocr-parish-masthead:first-child { margin-top: 0; }
+  .ocr-parish-name {
+    font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+    font-size: 1.45em;
+    font-weight: 700;
+    letter-spacing: 0.02em;
+    color: #14524f;
+    margin: 0 0 0.2em;
+    line-height: 1.25;
+  }
+  .ocr-parish-date {
+    margin: 0;
+    font-size: 0.88rem;
+    font-weight: 600;
+    letter-spacing: 0.04em;
+    color: #5a6a68;
+    font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  }
   .b-head {
     font-size: 1.12em;
     font-weight: 700;
     color: #134e9c;
-    margin: 1.1em 0 0.35em;
+    margin: 1.45em 0 0.5em;
+    padding-bottom: 0.12em;
+    border-bottom: 1px solid #d4ddd9;
     line-height: 1.35;
   }
   .b-sub {
@@ -200,6 +218,8 @@ IMAGE_MD_PATTERN = re.compile(r"!\[[^\]]*\]\([^)]*\)")
 
 
 def pdf_to_images(pdf_path):
+    from pdf2image import convert_from_path
+
     return convert_from_path(pdf_path, dpi=150)
 
 
@@ -208,6 +228,11 @@ def ocr_with_mistral(pdf_path):
     api_key = os.environ.get("MISTRAL_API_KEY")
     if not api_key:
         raise RuntimeError("MISTRAL_API_KEY is not set.")
+
+    try:
+        from mistralai import Mistral
+    except ImportError:
+        from mistralai.client import Mistral
 
     client = Mistral(api_key=api_key)
 
@@ -247,6 +272,8 @@ def ocr_images_with_gemini(images):
     if not api_key:
         raise RuntimeError("GEMINI_API_KEY is not set.")
 
+    import google.generativeai as genai
+
     genai.configure(api_key=api_key)
     model = genai.GenerativeModel("gemini-2.5-flash")
     pages_text = []
@@ -267,6 +294,8 @@ def ocr_images_with_github_models(images):
     github_token = os.environ.get("GITHUB_TOKEN")
     if not github_token:
         raise RuntimeError("GITHUB_TOKEN is not set.")
+
+    from openai import OpenAI
 
     client = OpenAI(
         api_key=github_token,
@@ -305,6 +334,8 @@ def ocr_images_with_openai(images):
     openai_api_key = os.environ.get("OPENAI_API_KEY")
     if not openai_api_key:
         raise RuntimeError("OPENAI_API_KEY is not set.")
+
+    from openai import OpenAI
 
     client = OpenAI(api_key=openai_api_key)
     pages_text = []
@@ -575,6 +606,18 @@ def render_markdown_lines(lines: list[str]) -> list[str]:
             parts.append(
                 f'<{tag} class="{css_class}">{_render_inline(heading.group(2).strip())}</{tag}>'
             )
+            i += 1
+            continue
+        head, rest = split_heading_prefix(line.strip())
+        if head and not rest:
+            flush_body()
+            parts.append(f'<h3 class="b-head">{_render_inline(head)}</h3>')
+            i += 1
+            continue
+        if head and rest:
+            flush_body()
+            parts.append(f'<h3 class="b-head">{_render_inline(head)}</h3>')
+            body_buf.append(rest)
             i += 1
             continue
         body_buf.append(line)

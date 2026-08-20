@@ -11,6 +11,8 @@ Collated Bulletin (mega PDF) stitching is **core production behaviour, not optio
 
 **Mega PDF is core.** The whole product depends on: harvest parish bulletins → collated mega PDF → OCR → searchable diocesan viewer.
 
+**Website / OCR backlog:** before any viewer, OCR, or `docs/` page work, read and update [`docs/WEBSITE_OCR_BACKLOG.md`](docs/WEBSITE_OCR_BACKLOG.md). That file is the living checklist (850px desktop / 450px mobile, parish OCR headers, new-tab links, mega PDF stays on). Do not start a second competing list.
+
 ## PHASE PLAN
 
 ### Phase 1: Core capture reliability
