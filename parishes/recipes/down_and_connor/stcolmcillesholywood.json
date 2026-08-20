@@ -1,0 +1,32 @@
+{
+  "version": 1,
+  "parish_key": "stcolmcillesholywood",
+  "display_name": "St Colmcille's Holywood",
+  "diocese": "down_and_connor",
+  "start_url": "https://www.stcolmcillesholywood.org/weekly-bulletins/",
+  "example_post_url": "https://www.stcolmcillesholywood.org/bulletins/bulletin-notice-sunday-16th-august-2026/",
+  "steps": [
+    {
+      "action": "goto",
+      "url": "https://www.stcolmcillesholywood.org/weekly-bulletins/"
+    }
+  ],
+  "site_type": "waf_retry_wordpress",
+  "post_slug_patterns": ["bulletin-notice-sunday-", "bulletin-notice-"],
+  "weeks_back": 8,
+  "timeout_ms": 45000,
+  "total_timeout_s": 190,
+  "recorded_date": "2026-08-20",
+  "operator_notes": [
+    "St Colmcille's Holywood — dated notice pages, PDF hidden in a PDF Embedder Premium iframe (class pdfembed-iframe, src=?pdfemb-data=<base64 json {url:...}>), not a public a.pdfemb-viewer href.",
+    "Stable slug: /bulletins/bulletin-notice-sunday-{Dth}-{month}-{YYYY}/. Confirmed live 20/08/2026: 16th August 2026 exists; 23rd August 2026 is HTTP 404. Do not invent next Sunday.",
+    "Iframe target for 16 Aug 2026: https://www.stcolmcillesholywood.org/wp-content/uploads/2026/08/Bulletin-Notice-16th-August-2026.pdf (HTTP 200, application/pdf, 380331 bytes, 3 pages, body text '16th August' + Holywood).",
+    "Listing /weekly-bulletins/ also lists the same posts, but can look stale in search snippets. site_type:waf_retry_wordpress scrapes that listing first, then predicts rewrite_date_url Sundays and skips 404s.",
+    "Origin is SiteGround-style 403-flaky (curl often 403; plain urllib retries get 200). Skip Playwright."
+  ],
+  "do_not": [
+    "Do not hardcode /bulletin-notice-sunday-23rd-august-2026/ — that slug 404s until the parish posts it.",
+    "Do not treat the listing as a direct PDF page — the PDF is only inside the notice-page iframe.",
+    "Do not switch this to a Playwright click recipe — the origin 403s browsers more often than plain HTTP."
+  ]
+}

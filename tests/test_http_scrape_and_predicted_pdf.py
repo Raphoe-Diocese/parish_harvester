@@ -5,7 +5,9 @@ import unittest
 from datetime import date
 
 from harvester.replay import (
+    _decode_pdfemb_data_url,
     _extract_matching_hrefs,
+    _extract_pdfembed_target_url,
     _extract_post_page_images,
     _extract_wp_upload_images,
     _is_non_bulletin_url,
@@ -456,6 +458,101 @@ class StGerardsListingImageTests(unittest.TestCase):
             urls,
             ["https://stgerardsparish.org/wp-content/uploads/2026/08/16th_1.png"],
         )
+
+
+class PdfembedIframeTests(unittest.TestCase):
+    PDF = (
+        "https://www.stcolmcillesholywood.org/wp-content/uploads/2026/08/"
+        "Bulletin-Notice-16th-August-2026.pdf"
+    )
+
+    def test_legacy_url_query_still_decoded(self) -> None:
+        html = (
+            '<iframe class="pdfembed-iframe" '
+            'src="https://example.org/viewer/?url='
+            "https%3A%2F%2Fexample.org%2Fwp-content%2Fuploads%2F2026%2F08%2Fbulletin.pdf"
+            '&title=bulletin.pdf"></iframe>'
+        )
+        self.assertEqual(
+            _extract_pdfembed_target_url(html),
+            "https://example.org/wp-content/uploads/2026/08/bulletin.pdf",
+        )
+
+    def test_premium_pdfemb_data_base64_json(self) -> None:
+        import base64
+        import json
+
+        raw = base64.b64encode(
+            json.dumps({"url": self.PDF, "title": "Bulletin-Notice-16th-August-2026.pdf"}).encode()
+        ).decode()
+        html = (
+            f'<iframe class="pdfembed-iframe nonfullscreen wppdf-emb-iframe-1"\n'
+            f'\tsrc="https://www.stcolmcillesholywood.org/?pdfemb-data={raw}"\n'
+            f'\tscrolling="yes"></iframe>'
+        )
+        self.assertEqual(_extract_pdfembed_target_url(html), self.PDF)
+        self.assertEqual(_decode_pdfemb_data_url(raw), self.PDF)
+
+
+class HolywoodNoticePageTests(unittest.TestCase):
+    """stcolmcillesholywood.org — predict dated notice page, then iframe PDF."""
+
+    LISTING = "https://www.stcolmcillesholywood.org/weekly-bulletins/"
+    POST_16 = (
+        "https://www.stcolmcillesholywood.org/bulletins/"
+        "bulletin-notice-sunday-16th-august-2026/"
+    )
+    POST_9 = (
+        "https://www.stcolmcillesholywood.org/bulletins/"
+        "bulletin-notice-sunday-9th-august-2026/"
+    )
+    POST_23 = (
+        "https://www.stcolmcillesholywood.org/bulletins/"
+        "bulletin-notice-sunday-23rd-august-2026/"
+    )
+    PATTERNS = ["bulletin-notice-sunday-", "bulletin-notice-"]
+
+    def test_recipe_predicts_notice_pages_not_a_pinned_pdf(self) -> None:
+        import json
+        from pathlib import Path
+
+        recipe = json.loads(
+            Path("parishes/recipes/down_and_connor/stcolmcillesholywood.json").read_text()
+        )
+        self.assertEqual(recipe["parish_key"], "stcolmcillesholywood")
+        self.assertEqual(recipe["start_url"], self.LISTING)
+        self.assertEqual(recipe["site_type"], "waf_retry_wordpress")
+        self.assertEqual(recipe["example_post_url"], self.POST_16)
+        self.assertTrue(
+            any("bulletin-notice-sunday-" in p for p in recipe["post_slug_patterns"])
+        )
+        self.assertNotIn("Bulletin-Notice-16th-August-2026.pdf", json.dumps(recipe["steps"]))
+        self.assertNotIn(
+            "bulletin-notice-sunday-23rd-august-2026",
+            recipe.get("example_post_url", ""),
+        )
+
+    def test_rewrite_skips_unposted_next_sunday(self) -> None:
+        self.assertEqual(rewrite_date_url(self.POST_16, date(2026, 8, 23)), self.POST_23)
+        self.assertEqual(rewrite_date_url(self.POST_16, date(2026, 8, 9)), self.POST_9)
+        urls = predicted_dated_upload_urls(self.POST_16, date(2026, 8, 16), weeks_back=2)
+        self.assertEqual(urls[0], self.POST_16)
+        self.assertIn(self.POST_9, urls)
+        self.assertNotIn(self.POST_23, urls)
+
+    def test_listing_picks_newest_notice_not_older_week(self) -> None:
+        html = f"""
+        <a href="{self.POST_16}">Bulletin Notice Sunday 16th August 2026</a>
+        <a href="{self.POST_9}">Bulletin Notice Sunday 9th August 2026</a>
+        <a href="https://www.stcolmcillesholywood.org/news-and-events/prayers-for-marriage-and-family-life-august-2026/">Prayers</a>
+        """
+        hrefs = _extract_matching_hrefs(html, self.LISTING, self.PATTERNS)
+        self.assertIn(self.POST_16, hrefs)
+        self.assertIn(self.POST_9, hrefs)
+        self.assertTrue(all("prayers-for-marriage" not in href for href in hrefs))
+        scored = _score_wordpress_post_hrefs(hrefs, date(2026, 8, 16))
+        self.assertEqual(max(scored)[1], self.POST_16)
+        self.assertEqual(max(scored)[0], date(2026, 8, 16))
 
 
 if __name__ == "__main__":
