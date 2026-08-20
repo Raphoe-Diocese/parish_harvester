@@ -51,6 +51,7 @@ from .utils import (
     mcn_newsletter_url_from_profile,
     mcn_profile_data_url,
     oneweb_newsletter_download_urls,
+    parish_uploader_bulletin_candidates,
     predict_dropfiles_bulletin_urls,
     predicted_dated_upload_urls,
     predicted_wordpress_dated_post_urls,
@@ -215,9 +216,14 @@ async def _goto_or_download(
     """Navigate or fetch a direct document URL (Drive downloads abort normal goto)."""
     if _looks_like_direct_document_url(url):
         # HTTP first — Drive usercontent URLs abort Playwright goto with ERR_ABORTED.
-        tried = await _try_download_page_url(page, dest, url, timeout_ms=timeout_ms)
-        if tried:
-            return dest, tried[1], tried[0]
+        # Parish Press Uploader parishes may have swapped this week's file to a
+        # different extension (docx/jpg/...); try every candidate here so the
+        # goto step succeeds directly instead of falling through to a slower
+        # browser-nav fallback and then the recipe's separate download step.
+        for candidate in parish_uploader_bulletin_candidates(url) or [url]:
+            tried = await _try_download_page_url(page, dest, candidate, timeout_ms=timeout_ms)
+            if tried:
+                return dest, tried[1], tried[0]
         if not _is_gdrive_usercontent_url(url):
             tried = await _try_browser_nav_download(page, dest, url, timeout_ms)
             if tried:
@@ -2238,6 +2244,13 @@ def _resolve_download_candidates(
     step_url = (step_url or "").strip()
     if not step_url:
         return []
+    # Parish Press Uploader parishes serve a single current file named
+    # exactly "bulletin.<ext>" — the parish might upload a PDF one week and a
+    # Word doc or a bare photo the next (see harvester.utils for details), so
+    # always try every supported extension regardless of use_captured_url.
+    uploader_candidates = parish_uploader_bulletin_candidates(step_url)
+    if uploader_candidates:
+        return uploader_candidates
     # Permanent / ParishPress paths must not be date-rewritten into 404 guesses.
     if use_captured_url or use_target_url or looks_like_permanent_bulletin_url(step_url) or not target_date:
         return [step_url]

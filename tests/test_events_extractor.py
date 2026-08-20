@@ -156,7 +156,7 @@ class ExtractEventsTests(unittest.TestCase):
         mock.call_ai.assert_not_called()
 
     def test_text_truncated_to_max_chars(self) -> None:
-        from harvester.events_extractor import MAX_INPUT_CHARS
+        from harvester.events_extractor import MAX_INPUT_CHARS, _EVENTS_PROMPT
 
         captured = []
         def fake_call_ai(prompt: str):
@@ -167,7 +167,12 @@ class ExtractEventsTests(unittest.TestCase):
         mock.call_ai.side_effect = fake_call_ai
         long_text = "x" * (MAX_INPUT_CHARS + 5000)
         extract_events(long_text, "Parish", "p", "derry", ai_router=mock)
-        self.assertTrue(len(captured[0]) <= MAX_INPUT_CHARS + 500)  # 500 = safe upper bound for prompt template overhead
+        self.assertEqual(len(captured), 1)
+        prompt = captured[0]
+        self.assertTrue(prompt.endswith("x" * MAX_INPUT_CHARS))
+        overhead = len(prompt) - MAX_INPUT_CHARS
+        self.assertLessEqual(overhead, len(_EVENTS_PROMPT) + 200)
+        self.assertIn(_EVENTS_PROMPT, prompt)
 
 
 class WriteEventsJsonTests(unittest.TestCase):

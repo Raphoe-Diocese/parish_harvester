@@ -39,7 +39,22 @@ class _FakePage:
             async def scroll_into_view_if_needed(self, timeout: int = 0) -> None:
                 return None
 
+            async def get_attribute(self, _name: str):
+                return None
+
+            async def wait_for(self, state: str = "visible", timeout: int = 0) -> None:
+                return None
+
+            async def click(self, timeout: int = 0) -> None:
+                return None
+
         return _FakeLocator()
+
+    async def evaluate(self, _script: str):
+        return []
+
+    async def wait_for_event(self, _event: str, timeout: int = 0):
+        raise TimeoutError("no download")
 
     async def goto(self, url: str, timeout: int = 0, wait_until: str = "domcontentloaded") -> None:
         self.goto_calls += 1
@@ -190,7 +205,9 @@ class ClaudyBulletinFilterTests(unittest.TestCase):
         self.assertEqual(current_bulletin[0], 20260809)
         self.assertGreater(current_bulletin[0], stale_uuid_path[0])
 
-    async def test_find_pdfemb_url_prefers_pdf_embedder_links(self) -> None:
+    def test_find_pdfemb_url_prefers_pdf_embedder_links(self) -> None:
+        import asyncio
+
         class _Page:
             url = "https://example.org/news/"
 
@@ -198,12 +215,17 @@ class ClaudyBulletinFilterTests(unittest.TestCase):
                 self.selector = selector
                 return ["/wp-content/uploads/2026/04/bulletin.pdf", "/other.html"]
 
+            async def evaluate(self, _script: str):
+                return []
+
         page = _Page()
-        found = await _find_pdfemb_url(page)
+        found = asyncio.run(_find_pdfemb_url(page))
         self.assertEqual(page.selector, "a.pdfemb-viewer[href]")
         self.assertEqual(found, "https://example.org/wp-content/uploads/2026/04/bulletin.pdf")
 
-    async def test_replay_recipe_supports_html_step(self) -> None:
+    def test_replay_recipe_supports_html_step(self) -> None:
+        import asyncio
+
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             recipe_path = root / "recipe.json"
@@ -215,14 +237,16 @@ class ClaudyBulletinFilterTests(unittest.TestCase):
             context = _FakeContext()
             browser = _FakeBrowser(context)
 
-            out_path, file_type, source_url = await replay_recipe(recipe_path, dest, browser)
+            out_path, file_type, source_url = asyncio.run(replay_recipe(recipe_path, dest, browser))
 
             self.assertEqual(out_path, dest)
             self.assertEqual(file_type, "print_to_pdf")
             self.assertEqual(source_url, "https://example.org/bulletin")
             self.assertTrue(dest.exists())
 
-    async def test_replay_recipe_uses_recipe_timeout_field(self) -> None:
+    def test_replay_recipe_uses_recipe_timeout_field(self) -> None:
+        import asyncio
+
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             recipe_path = root / "recipe.json"
@@ -242,11 +266,13 @@ class ClaudyBulletinFilterTests(unittest.TestCase):
             context = _FakeContext()
             browser = _FakeBrowser(context)
 
-            _out_path, _file_type, _source_url = await replay_recipe(recipe_path, dest, browser)
+            _out_path, _file_type, _source_url = asyncio.run(replay_recipe(recipe_path, dest, browser))
 
             self.assertEqual(context.page.last_goto_timeout, 30000)
 
-    async def test_replay_recipe_supports_image_step(self) -> None:
+    def test_replay_recipe_supports_image_step(self) -> None:
+        import asyncio
+
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             recipe_path = root / "recipe.json"
@@ -260,7 +286,7 @@ class ClaudyBulletinFilterTests(unittest.TestCase):
 
             fake_download = AsyncMock(return_value=("https://example.org/bulletin.jpg", "image_to_pdf"))
             with patch("harvester.replay._download_image_url_as_pdf", fake_download):
-                out_path, file_type, source_url = await replay_recipe(recipe_path, dest, browser)
+                out_path, file_type, source_url = asyncio.run(replay_recipe(recipe_path, dest, browser))
 
             self.assertEqual(out_path, dest)
             self.assertEqual(file_type, "image_to_pdf")
@@ -425,7 +451,9 @@ class ClaudyBulletinFilterTests(unittest.TestCase):
             ],
         )
 
-    async def test_replay_recipe_supports_print_to_pdf_step(self) -> None:
+    def test_replay_recipe_supports_print_to_pdf_step(self) -> None:
+        import asyncio
+
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             recipe_path = root / "recipe.json"
@@ -444,7 +472,7 @@ class ClaudyBulletinFilterTests(unittest.TestCase):
             context = _FakeContext()
             browser = _FakeBrowser(context)
 
-            out_path, file_type, source_url = await replay_recipe(recipe_path, dest, browser)
+            out_path, file_type, source_url = asyncio.run(replay_recipe(recipe_path, dest, browser))
 
             self.assertEqual(out_path, dest)
             self.assertEqual(file_type, "print_to_pdf")
@@ -454,7 +482,9 @@ class ClaudyBulletinFilterTests(unittest.TestCase):
             self.assertEqual(context.page.goto_calls, 1)
             self.assertTrue(context.closed)
 
-    async def test_replay_recipe_supports_crop_screenshot_step(self) -> None:
+    def test_replay_recipe_supports_crop_screenshot_step(self) -> None:
+        import asyncio
+
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             recipe_path = root / "recipe.json"
@@ -481,7 +511,7 @@ class ClaudyBulletinFilterTests(unittest.TestCase):
             context = _FakeContext()
             browser = _FakeBrowser(context)
 
-            out_path, file_type, source_url = await replay_recipe(recipe_path, dest, browser)
+            out_path, file_type, source_url = asyncio.run(replay_recipe(recipe_path, dest, browser))
 
             self.assertEqual(out_path, dest)
             self.assertEqual(file_type, "crop_screenshot_to_pdf")
@@ -509,7 +539,7 @@ class ClaudyBulletinFilterTests(unittest.TestCase):
             browser = _FakeBrowser(context)
             page = context.page
 
-            async def _fake_dropfiles(_page, _dest, _timeout):
+            async def _fake_dropfiles(_page, _dest, _timeout, **_kwargs):
                 _dest.write_bytes(b"%PDF-1.4\n%fake-bulletin\n")
                 return "https://threepatrons.org/files/10/Weekly-Bulletins/104/", "pdf"
 
