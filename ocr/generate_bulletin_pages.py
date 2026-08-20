@@ -266,13 +266,30 @@ def parse_parish_links(path: Path) -> list[tuple[str, str]]:
     return parish_links
 
 
-def extract_ocr_fragment(path: Path) -> str:
+def extract_ocr_fragment(path: Path, *, tighten: bool = True) -> str:
     raw_html = path.read_text(encoding="utf-8")
     match = OCR_BODY_PATTERN.search(raw_html)
     if not match:
         raise ValueError(f"Could not find OCR content wrapper in {path}")
     fragment = OCR_PAGE_HEADING_PATTERN.sub(r"<h3>PAGE \1</h3>", match.group(1).strip())
-    return tighten_ocr_paragraphs(fragment)
+    if tighten:
+        return tighten_ocr_paragraphs(fragment)
+    return fragment
+
+
+def extract_ocr_panel_from_viewer(path: Path) -> str:
+    """OCR panel HTML from an already-published viewer page."""
+    raw_html = path.read_text(encoding="utf-8")
+    panel_match = OCR_PANEL_PATTERN.search(raw_html)
+    if not panel_match:
+        panel_match = re.search(
+            r'<div class="ocr-panel">(.*?)</div>\s*<div class="note-box">',
+            raw_html,
+            re.DOTALL | re.IGNORECASE,
+        )
+    if not panel_match:
+        raise ValueError(f"Could not find OCR panel in {path}")
+    return panel_match.group(1).strip()
 
 
 def tighten_ocr_paragraphs(fragment: str) -> str:
@@ -1698,7 +1715,9 @@ def render_bulletin_viewer_shell(
     .footer-inner a {{ color: #d8f0ee; font-weight: 600; }}
 
     @media (max-width: 1024px) {{
-      /* PDF wrap: 450px in-page PDF.js viewer. OCR panel matches. */
+      /* Harvest + OCR both call this generator — keep both panels here.
+         Desktop: 850px. Tablet/phone (max-width 1024px): ~450px. */
+      .pdf-frame-wrap,
       #ocr-panel {{
         height: 70vh;
         min-height: 450px;
@@ -2081,9 +2100,9 @@ def regenerate_viewer_from_existing(existing_path: Path) -> Path:
         )
     if not panel_match:
         raise ValueError(f"Could not find OCR panel in {existing_path}")
-    ocr_fragment = panel_match.group(1).strip()
+    raw_ocr_fragment = panel_match.group(1).strip()
     parish_links = parse_parish_links(config.evidence_path)
-    ocr_fragment = prepare_ocr_fragment(diocese, ocr_fragment, parish_links)
+    ocr_fragment = prepare_ocr_fragment(diocese, raw_ocr_fragment, parish_links)
     output_path = BULLETINS_DIR / existing_path.name
     output_path.write_text(
         render_viewer_page(config, bulletin_date, page_count, ocr_fragment, parish_links),
@@ -2099,15 +2118,20 @@ def regenerate_viewer_from_existing(existing_path: Path) -> Path:
         render_pdf_standalone_page(config, bulletin_date, pdf_href=_pdf_href(config), viewer_href=output_path.name),
         encoding="utf-8",
     )
+    pdf_candidate = DOCS_DIR / "mega_pdf" / config.pdf_filename
+    if not pdf_candidate.exists():
+        pdf_candidate = REPO_ROOT / "mega_pdf" / config.pdf_filename
+    if pdf_candidate.exists():
+        _write_parish_bulletin_pages(diocese, bulletin_date, pdf_candidate, raw_ocr_fragment)
     return output_path
 
 
 def write_viewer_page(diocese: str, bulletin_date: str, pdf_path: Path, ocr_html_path: Path) -> Path:
     config = DIOCESES[diocese]
     page_count = count_pdf_pages(pdf_path)
-    raw_ocr_fragment = extract_ocr_fragment(ocr_html_path)
+    raw_ocr_fragment = extract_ocr_fragment(ocr_html_path, tighten=False)
     parish_links = parse_parish_links(config.evidence_path)
-    ocr_plain_text = _fragment_to_plain_text(raw_ocr_fragment)
+    ocr_plain_text = _fragment_to_plain_text(tighten_ocr_paragraphs(raw_ocr_fragment))
     ocr_fragment = prepare_ocr_fragment(diocese, raw_ocr_fragment, parish_links)
     output_path = BULLETINS_DIR / f"{diocese}-{bulletin_date}.html"
     output_path.write_text(
@@ -2304,6 +2328,11 @@ def main() -> None:
     parser.add_argument("--ocr-html", type=Path)
     parser.add_argument("--rebuild-indexes", action="store_true")
     parser.add_argument("--regenerate-from", type=Path, help="Rebuild viewer HTML from an existing on-disk viewer file")
+    parser.add_argument(
+        "--write-parish-pages",
+        action="store_true",
+        help="Write per-parish PDF slices + HTML from --pdf and --ocr-html (or a published viewer).",
+    )
     args = parser.parse_args()
 
     DOCS_DIR.mkdir(parents=True, exist_ok=True)
@@ -2316,6 +2345,20 @@ def main() -> None:
     if args.regenerate_from:
         regenerate_viewer_from_existing(args.regenerate_from.resolve())
         rebuild_indexes()
+        return
+
+    if args.write_parish_pages:
+        if not args.diocese or not args.date:
+            parser.error("--write-parish-pages requires --diocese and --date.")
+        pdf_path = args.pdf
+        if pdf_path is None:
+            pdf_path = DOCS_DIR / "mega_pdf" / DIOCESES[args.diocese].pdf_filename
+        if args.ocr_html:
+            raw_fragment = extract_ocr_fragment(args.ocr_html, tighten=False)
+        else:
+            viewer = BULLETINS_DIR / f"{args.diocese}-{args.date}.html"
+            raw_fragment = extract_ocr_panel_from_viewer(viewer)
+        _write_parish_bulletin_pages(args.diocese, args.date, pdf_path, raw_fragment)
         return
 
     if not all([args.diocese, args.date, args.pdf, args.ocr_html]):

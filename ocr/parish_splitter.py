@@ -53,6 +53,9 @@ def _cleaned_title(line: str) -> str:
     return re.sub(r"\s+", " ", cleaned).strip()
 
 
+_INLINE_URL_RE = re.compile(r"(?:https?://|www\.)\S+", re.IGNORECASE)
+
+
 def _line_matches_patterns(cleaned: str, patterns: list[str]) -> bool:
     if not cleaned or len(cleaned) > 80:
         return False
@@ -65,6 +68,50 @@ def _line_matches_patterns(cleaned: str, patterns: list[str]) -> bool:
             return True
         if lower == f"the parish of {p}":
             return True
+        if lower == f"{p} parish":
+            return True
+        if lower == f"{p} parish newsletter":
+            return True
+        if lower == f"{p} newsletter":
+            return True
+    return False
+
+
+def _strip_inline_url(cleaned: str) -> str:
+    return _cleaned_title(_INLINE_URL_RE.sub("", cleaned or ""))
+
+
+def _line_matches_banner(
+    cleaned: str,
+    patterns: list[str],
+    *,
+    next_is_url: bool,
+    self_has_url: bool,
+) -> bool:
+    """Match a stitcher banner line from real mega-OCR HTML.
+
+    Live convert_bulletin output often puts ``Name`` and the newsletter URL
+    in the *same* ``<p>`` (newline, no ``<br>``), or glues the name onto the
+    last body words of the first page (``Recent DeathsArdara`` + URL). Exact
+    standalone titles still match; URL-adjacent suffix matches cover the
+    glued-banner case without treating every body mention as a marker.
+    """
+    if _line_matches_patterns(cleaned, patterns):
+        return True
+    name_part = _strip_inline_url(cleaned) if self_has_url else cleaned
+    if self_has_url and _line_matches_patterns(name_part, patterns):
+        return True
+    if not (self_has_url or next_is_url):
+        return False
+    lower = (name_part or "").lower()
+    if not lower:
+        return False
+    for pattern in patterns:
+        p = pattern.lower()
+        if len(p) < 4:
+            continue
+        if lower == p or lower.endswith(p):
+            return True
     return False
 
 
@@ -75,7 +122,11 @@ def _line_is_parish_marker(line: str, patterns: list[str]) -> bool:
 
 def _next_line_is_url(next_line: str) -> bool:
     nxt = (next_line or "").strip().lower()
-    return nxt.startswith("http://") or nxt.startswith("https://") or nxt.startswith("www.")
+    if nxt.startswith("http://") or nxt.startswith("https://") or nxt.startswith("www."):
+        return True
+    plain = re.sub(r"<[^>]+>", " ", nxt)
+    plain = _html_utils.unescape(plain).strip().lower()
+    return plain.startswith("http://") or plain.startswith("https://") or plain.startswith("www.")
 
 
 def split_ocr_by_parish(
@@ -117,11 +168,17 @@ def split_ocr_by_parish(
             offset += len(line)
             continue
         if cleaned:
+            self_has_url = bool(_INLINE_URL_RE.search(raw_stripped))
+            nxt_url = _next_line_is_url(next_nonempty[i])
             for key, (strong, weak) in pattern_map.items():
-                if _line_matches_patterns(cleaned, strong):
-                    markers.append((offset, key))
-                    break
-                if _line_matches_patterns(cleaned, weak) and _next_line_is_url(next_nonempty[i]):
+                if _line_matches_banner(
+                    cleaned, strong, next_is_url=nxt_url, self_has_url=self_has_url
+                ) or (
+                    (nxt_url or self_has_url)
+                    and _line_matches_banner(
+                        cleaned, weak, next_is_url=nxt_url, self_has_url=self_has_url
+                    )
+                ):
                     markers.append((offset, key))
                     break
         offset += len(line)
@@ -177,7 +234,16 @@ def _block_plain_text(html_fragment: str) -> str:
 
 
 def _split_br_lines(inner_html: str) -> list[str]:
-    return [seg.strip() for seg in re.split(r"<br\s*/?>\s*\n?", inner_html) if seg.strip()]
+    """Split a ``<p>`` inner HTML into original OCR lines.
+
+    ``convert_bulletin`` joins lines with ``<br>``. After
+    ``tighten_ocr_paragraphs`` re-renders inline markup, the live diocese
+    pages often keep a raw newline between the stitcher name and the
+    newsletter ``<a href>`` instead of a ``<br>``. Treat both as line breaks
+    so name-marker matching can see the banner.
+    """
+    chunks = re.split(r"(?:<br\s*/?>)|(?:\n+)", inner_html or "")
+    return [seg.strip() for seg in chunks if seg.strip()]
 
 
 def _tokenize_ocr_units(fragment: str) -> list[tuple[str, str]]:
@@ -287,13 +353,19 @@ def split_ocr_html_by_parish(
         cleaned = _cleaned_title(plain_texts[i])
         if not cleaned:
             continue
-        if cleaned.endswith(":") and not _next_line_is_url(next_nonempty[i]):
+        nxt_url = _next_line_is_url(next_nonempty[i])
+        if cleaned.endswith(":") and not nxt_url:
             continue
+        self_has_url = bool(_INLINE_URL_RE.search(plain_texts[i]))
         for key, (strong, weak) in pattern_map.items():
-            if _line_matches_patterns(cleaned, strong):
-                markers.append((i, key))
-                break
-            if _line_matches_patterns(cleaned, weak) and _next_line_is_url(next_nonempty[i]):
+            if _line_matches_banner(
+                cleaned, strong, next_is_url=nxt_url, self_has_url=self_has_url
+            ) or (
+                (nxt_url or self_has_url)
+                and _line_matches_banner(
+                    cleaned, weak, next_is_url=nxt_url, self_has_url=self_has_url
+                )
+            ):
                 markers.append((i, key))
                 break
 
@@ -306,12 +378,19 @@ def split_ocr_html_by_parish(
             earliest[key] = idx
 
     def _extend_start_backward(idx: int) -> int:
-        """Pull a marker's start index back over its own leading ``<hr>`` +
-        ``<p class="page-label">`` pair (see ``build_html_content``: every
-        page except the first is preceded by exactly that pair), so each
-        parish's chunk starts with its own page marker instead of dangling
-        off the end of the previous parish's chunk."""
+        """Start a parish at the beginning of the mega-PDF page that holds
+        its first banner, not at the banner line itself.
+
+        The 9pt stitcher overlay is often OCR'd mid-page (glued onto
+        ``Recent DeathsArdara`` after other first-page lines). Walking back
+        only over a leading ``<hr>`` + page-label left those earlier lines
+        stuck on the previous parish and leaked the next parish's first
+        page into the PDF slice.
+        """
+        marker_page = page_at[idx]
         j = idx
+        while j > 0 and page_at[j - 1] == marker_page:
+            j -= 1
         while j > 0 and (
             tokens[j - 1][0] == "page"
             or (tokens[j - 1][0] == "block" and tokens[j - 1][1].strip().lower().startswith("<hr"))
@@ -343,4 +422,56 @@ def split_ocr_html_by_parish(
         start_page = _first_page_in_range(start_idx, end_idx)
         end_page = page_at[end_idx - 1] if end_idx > start_idx else start_page
         chunks[key] = ParishPageChunk(html=chunk_html, start_page=start_page, end_page=end_page)
+    return chunks
+
+
+def split_ocr_html_by_page_ranges(
+    raw_ocr_fragment: str,
+    page_ranges: dict[str, tuple[int, int]],
+) -> dict[str, ParishPageChunk]:
+    """Slice OCR HTML using authoritative 1-indexed inclusive page ranges.
+
+    Used when the stitcher wrote ``*.pages.json`` next to the mega PDF so
+    parish boundaries do not depend on OCR reading the 9pt banner.
+    """
+    from ocr.generate_bulletin_pages import tighten_ocr_paragraphs
+
+    ranges = {str(key): (int(start), int(end)) for key, (start, end) in page_ranges.items()}
+    empty = {
+        key: ParishPageChunk(html="", start_page=None, end_page=None) for key in ranges
+    }
+    fragment = (raw_ocr_fragment or "").strip()
+    if not fragment or not ranges:
+        return empty
+
+    tokens = _tokenize_ocr_units(fragment)
+    if not tokens:
+        return empty
+
+    current_page = 1
+    page_at: list[int] = []
+    for kind, content in tokens:
+        if kind == "page":
+            page_match = _PAGE_LABEL_RE.match(content.strip())
+            if page_match:
+                current_page = int(page_match.group(1))
+        page_at.append(current_page)
+
+    chunks: dict[str, ParishPageChunk] = dict(empty)
+    for key, (start_page, end_page) in ranges.items():
+        if end_page < start_page:
+            continue
+        pieces: list[str] = []
+        first = last = None
+        for (kind, content), page in zip(tokens, page_at):
+            if page < start_page or page > end_page:
+                continue
+            pieces.append(f"<p>{content}</p>" if kind == "line" else content)
+            first = page if first is None else first
+            last = page
+        if not pieces:
+            continue
+        raw_chunk_html = "\n".join(pieces)
+        chunk_html = tighten_ocr_paragraphs(raw_chunk_html).strip()
+        chunks[key] = ParishPageChunk(html=chunk_html, start_page=first, end_page=last)
     return chunks

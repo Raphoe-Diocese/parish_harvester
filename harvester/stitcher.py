@@ -235,6 +235,7 @@ def stitch_mega_pdf(
     merger = PyPDF2.PdfWriter()
     real_count = 0
     styles = getSampleStyleSheet()
+    page_ranges: dict[str, dict[str, str | int]] = {}
 
     # Collect parishes without a PDF for the compact summary section
     missing_entries: list[tuple[str, str, str | None]] = []
@@ -263,6 +264,7 @@ def stitch_mega_pdf(
                     )
                     missing_entries.append((display_name, parish_url, website))
                     continue
+                start_page = len(merger.pages) + 1
                 for idx, page in enumerate(reader.pages):
                     if idx == 0:
                         page_w = float(page.mediabox.width)
@@ -297,6 +299,13 @@ def stitch_mega_pdf(
                     except Exception:
                         pass  # If we can't extract text, include the page to be safe
                     merger.add_page(page)
+                end_page = len(merger.pages)
+                if end_page >= start_page:
+                    page_ranges[parish_key] = {
+                        "display_name": display_name,
+                        "start_page": start_page,
+                        "end_page": end_page,
+                    }
                 real_count += 1
             except Exception as exc:
                 print(f"    ⚠️  Could not merge {parish_key}: {exc}")
@@ -358,10 +367,42 @@ def stitch_mega_pdf(
 
     if real_count + summary_page_count > 0:
         bulletins_dir.mkdir(parents=True, exist_ok=True)
+        output_path.parent.mkdir(parents=True, exist_ok=True)
         with output_path.open("wb") as fh:
             merger.write(fh)
+        index_payload = {
+            "date": target.isoformat(),
+            "pdf": output_path.name,
+            "parishes": page_ranges,
+        }
+        index_path = output_path.with_name(output_path.stem + ".pages.json")
+        index_path.write_text(json.dumps(index_payload, indent=2) + "\n", encoding="utf-8")
         print(f"  📖 Mega PDF      : {output_path}")
+        print(f"     Page index     : {index_path} ({len(page_ranges)} parish range(s))")
         print(f"     Real PDFs      : {real_count}")
         print(f"     Online-only    : {len(missing_entries)} (condensed to {summary_page_count} summary page(s))")
+        publish_mega_to_docs(output_path)
     else:
         print("  ⚠️  No pages to include in mega PDF — skipping.")
+
+
+def publish_mega_to_docs(pdf_path: Path, docs_mega_dir: Path | None = None) -> Path | None:
+    """Copy a diocese mega PDF + page index into ``docs/mega_pdf`` for Pages.
+
+    Only publishes files named ``*_mega_bulletin.pdf`` so test stitcher
+    outputs (``all_bulletins_*.pdf``) stay out of the public docs tree.
+    """
+    import shutil
+
+    pdf_path = Path(pdf_path)
+    if not pdf_path.exists() or not pdf_path.name.endswith("_mega_bulletin.pdf"):
+        return None
+    dest_dir = docs_mega_dir or (Path(__file__).resolve().parent.parent / "docs" / "mega_pdf")
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    dest = dest_dir / pdf_path.name
+    shutil.copy2(pdf_path, dest)
+    index_src = pdf_path.with_name(pdf_path.stem + ".pages.json")
+    if index_src.exists():
+        shutil.copy2(index_src, dest_dir / index_src.name)
+    print(f"     Published     : {dest}")
+    return dest

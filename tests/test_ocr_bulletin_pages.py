@@ -324,6 +324,18 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertIn("data-pdf-src", html_live, rel)
             self.assertIn('src="/mega_pdf/', html_live, rel)
             self.assertNotIn("View this bulletin PDF", html_live, rel)
+            self.assertRegex(
+                html_live,
+                r"\.pdf-frame-wrap\s*\{[^}]*min-height:\s*850px",
+                msg=f"{rel} lost desktop PDF min-height 850px",
+            )
+            self.assertRegex(
+                html_live,
+                r"#ocr-panel\s*\{[^}]*min-height:\s*850px",
+                msg=f"{rel} lost desktop OCR min-height 850px",
+            )
+            self.assertNotIn("PRO TIP", html_live.upper(), rel)
+            self.assertNotIn("callout-tip", html_live, rel)
             self.assertNotIn("pdf-inpage-prev", html_live, rel)
             self.assertNotIn("pdf-inpage-next", html_live, rel)
             self.assertNotIn('class="pdf-inpage-page-label"', html_live, rel)

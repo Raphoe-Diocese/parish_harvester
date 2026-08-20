@@ -4,6 +4,7 @@ Must not remove real (incl. short) bulletin pages or Irish/bilingual text.
 """
 from __future__ import annotations
 
+import json
 import tempfile
 import unittest
 from datetime import date
@@ -87,6 +88,13 @@ class StitcherJunkPageTests(unittest.TestCase):
             reader = PyPDF2.PdfReader(str(output))
             all_text = "\n".join(page.extract_text() or "" for page in reader.pages)
             self.assertIn("Aifreann", all_text)
+            index_path = output.with_name(output.stem + ".pages.json")
+            self.assertTrue(index_path.exists())
+            payload = json.loads(index_path.read_text(encoding="utf-8"))
+            self.assertIn("gaeilgeparish", payload["parishes"])
+            rng = payload["parishes"]["gaeilgeparish"]
+            self.assertEqual(rng["start_page"], 1)
+            self.assertGreaterEqual(rng["end_page"], 1)
 
 
 if __name__ == "__main__":

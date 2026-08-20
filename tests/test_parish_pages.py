@@ -215,10 +215,93 @@ class WriteParishPagesForDioceseTests(unittest.TestCase):
             )
             self.assertEqual(written, ["unmatched-parish"])
             html_out = (out_dir / "unmatched-parish.html").read_text(encoding="utf-8")
-            self.assertIn("No searchable text was found", html_out)
-            # No page range could be found, so it falls back to the full diocese PDF.
-            self.assertIn('href="../../mega_pdf/raphoe_mega_bulletin.pdf"', html_out)
-            self.assertFalse((out_dir / "unmatched-parish.pdf").exists())
+            self.assertIn("page range could not be found", html_out)
+            self.assertNotIn(
+                "Exact PDF pages for this parish could not be auto-detected this week, so this links to the full diocese bulletin instead.",
+                html_out,
+            )
+            # Always write a local PDF so the viewer does not 404.
+            self.assertTrue((out_dir / "unmatched-parish.pdf").exists())
+            self.assertIn('href="unmatched-parish.pdf"', html_out)
+            self.assertGreater((out_dir / "unmatched-parish.pdf").stat().st_size, 32)
+
+    def test_skips_holy_cross_even_when_marked_ok(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            status_path = root / "parish_status.json"
+            status_path.write_text(
+                json.dumps(
+                    {
+                        "parishes": {
+                            "holy-cross-church": {
+                                "outcome": "ok",
+                                "diocese": "Raphoe Diocese",
+                                "display_name": "Dunfanaghy",
+                            },
+                            "ardara": {
+                                "outcome": "ok",
+                                "diocese": "Raphoe Diocese",
+                                "display_name": "Ardara",
+                            },
+                        }
+                    }
+                ),
+                encoding="utf-8",
+            )
+            keys = [p.key for p in parish_pages.load_ok_parishes("raphoe", parish_status_path=status_path)]
+            self.assertEqual(keys, ["ardara"])
+            self.assertNotIn("holy-cross-church", keys)
+
+    def test_page_index_writes_non_empty_parish_pdf(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            status_path = root / "parish_status.json"
+            status_path.write_text(
+                json.dumps(
+                    {
+                        "parishes": {
+                            "ardara": {
+                                "outcome": "ok",
+                                "diocese": "Raphoe Diocese",
+                                "display_name": "Ardara",
+                                "url": "http://ardara.ie",
+                            },
+                        }
+                    }
+                ),
+                encoding="utf-8",
+            )
+            pdf_path = root / "raphoe_mega_bulletin.pdf"
+            pdf_path.write_bytes(_make_pdf(3))
+            (root / "raphoe_mega_bulletin.pages.json").write_text(
+                json.dumps(
+                    {
+                        "date": "2026-08-16",
+                        "pdf": "raphoe_mega_bulletin.pdf",
+                        "parishes": {"ardara": {"display_name": "Ardara", "start_page": 2, "end_page": 3}},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            out_dir = root / "docs" / "parishes" / "raphoe"
+            written = parish_pages.write_parish_pages_for_diocese(
+                "raphoe",
+                "2026-08-16",
+                pdf_path,
+                _RAW_FRAGMENT,
+                diocese_pdf_href="../../mega_pdf/raphoe_mega_bulletin.pdf",
+                out_dir=out_dir,
+                parish_status_path=status_path,
+            )
+            self.assertEqual(written, ["ardara"])
+            parish_pdf = out_dir / "ardara.pdf"
+            self.assertTrue(parish_pdf.exists())
+            self.assertGreater(parish_pdf.stat().st_size, 32)
+            reader = PdfReader(str(parish_pdf))
+            self.assertEqual(len(reader.pages), 2)
+            html_out = (out_dir / "ardara.html").read_text(encoding="utf-8")
+            self.assertIn("Sunday mass at 10am", html_out)
+            self.assertIn('href="ardara.pdf"', html_out)
 
 
 if __name__ == "__main__":
