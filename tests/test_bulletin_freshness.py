@@ -352,6 +352,30 @@ class BulletinFreshnessTests(unittest.TestCase):
         verdict = check_bulletin_freshness(url, date(2026, 8, 16))
         self.assertEqual(verdict.status, "stale")
 
+    def test_stteresas_post_url_is_9_aug_not_unknown(self) -> None:
+        post = (
+            "https://stteresasparish.church/2026/08/06/"
+            "the-st-teresas-parish-bulletin-for-sunday-9th-august-2026/"
+        )
+        image = (
+            "https://stteresasparish.church/wp-content/uploads/2026/08/"
+            "microsoft-word-9-august-2026.docx.jpg"
+        )
+        target = date(2026, 8, 16)
+        self.assertEqual(extract_bulletin_date(post), date(2026, 8, 9))
+        self.assertEqual(extract_bulletin_date(image), date(2026, 8, 9))
+        self.assertEqual(
+            check_bulletin_freshness(post, target).reason, "within_grace_days"
+        )
+        self.assertEqual(
+            check_bulletin_freshness(
+                "https://stteresasparish.church/2026/07/30/"
+                "the-st-teresas-parish-bulletin-for-sunday-2nd-august-2026/",
+                target,
+            ).status,
+            "stale",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

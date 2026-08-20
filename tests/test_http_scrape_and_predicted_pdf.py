@@ -4,7 +4,16 @@ from __future__ import annotations
 import unittest
 from datetime import date
 
-from harvester.replay import _is_non_bulletin_url, _resolve_download_candidates, _score_http_scrape_pdf_hrefs
+from harvester.replay import (
+    _extract_post_page_images,
+    _is_non_bulletin_url,
+    _pick_newest_dated_post_url,
+    _resolve_download_candidates,
+    _score_http_scrape_pdf_hrefs,
+    _wordpress_feed_post_links,
+    _wordpress_post_links_from_payload,
+    _wordpress_posts_api_urls,
+)
 from harvester.utils import (
     dropfiles_task_download_url,
     extract_mcn_church_id,
@@ -12,6 +21,7 @@ from harvester.utils import (
     mcn_newsletter_url_from_profile,
     mcn_profile_data_url,
     predicted_dated_upload_urls,
+    predicted_wordpress_dated_post_urls,
     rewrite_date_url,
     wix_dated_slug_candidates,
     yearless_slug_date,
@@ -247,6 +257,137 @@ class McnNewsletterHelperTests(unittest.TestCase):
             str(mcn_newsletter_url_from_profile(payload)).endswith(".pdf")
         )
         self.assertIsNone(mcn_newsletter_url_from_profile({"newsletter": {}}))
+
+
+class StTeresasPredictedPostTests(unittest.TestCase):
+    EXAMPLE = (
+        "https://stteresasparish.church/2026/08/06/"
+        "the-st-teresas-parish-bulletin-for-sunday-9th-august-2026/"
+    )
+    SLUG = "the-st-teresas-parish-bulletin-for-sunday"
+
+    def test_predicts_sunday_slug_and_nearby_post_dates(self) -> None:
+        urls = predicted_wordpress_dated_post_urls(
+            self.EXAMPLE, date(2026, 8, 16), weeks_back=1
+        )
+        self.assertEqual(
+            urls[0],
+            "https://stteresasparish.church/2026/08/13/"
+            "the-st-teresas-parish-bulletin-for-sunday-16th-august-2026/",
+        )
+        self.assertIn(
+            "https://stteresasparish.church/2026/08/14/"
+            "the-st-teresas-parish-bulletin-for-sunday-16th-august-2026/",
+            urls,
+        )
+        self.assertIn(
+            "https://stteresasparish.church/2026/08/06/"
+            "the-st-teresas-parish-bulletin-for-sunday-9th-august-2026/",
+            urls,
+        )
+        self.assertNotIn(
+            "https://stteresasparish.church/2026/08/06/"
+            "the-st-teresas-parish-bulletin-for-sunday-16th-august-2026/",
+            urls,
+        )
+
+    def test_rewrite_date_url_keeps_stale_post_day(self) -> None:
+        guessed = rewrite_date_url(self.EXAMPLE, date(2026, 8, 16))
+        self.assertEqual(
+            guessed,
+            "https://stteresasparish.church/2026/08/06/"
+            "the-st-teresas-parish-bulletin-for-sunday-16th-august-2026/",
+        )
+
+    def test_wp_json_picks_newest_sunday_and_skips_no_bulletin(self) -> None:
+        payload = [
+            {
+                "slug": "please-note-there-will-be-no-st-teresas-parish-bulletin-on-sunday-14th-june-2026",
+                "link": (
+                    "https://stteresasparish.church/2026/06/11/"
+                    "please-note-there-will-be-no-st-teresas-parish-bulletin-on-sunday-14th-june-2026/"
+                ),
+                "title": {"rendered": "Please note there will be no bulletin"},
+            },
+            {
+                "slug": "the-st-teresas-parish-bulletin-for-sunday-9th-august-2026",
+                "link": self.EXAMPLE,
+                "title": {"rendered": "The St Teresa’s Parish Bulletin for Sunday, 9th August 2026"},
+            },
+            {
+                "slug": "the-st-teresas-parish-bulletin-for-sunday-2nd-august-2026",
+                "link": (
+                    "https://stteresasparish.church/2026/07/30/"
+                    "the-st-teresas-parish-bulletin-for-sunday-2nd-august-2026/"
+                ),
+                "title": {"rendered": "The St Teresa’s Parish Bulletin for Sunday, 2nd August 2026"},
+            },
+        ]
+        links = _wordpress_post_links_from_payload(payload, [self.SLUG])
+        self.assertEqual(links[0], self.EXAMPLE)
+        self.assertTrue(all("please-note" not in link for link in links))
+        self.assertEqual(
+            _pick_newest_dated_post_url(links, date(2026, 8, 16)),
+            self.EXAMPLE,
+        )
+
+    def test_wp_json_prefers_this_sunday_when_it_exists(self) -> None:
+        live_16 = (
+            "https://stteresasparish.church/2026/08/13/"
+            "the-st-teresas-parish-bulletin-for-sunday-16th-august-2026/"
+        )
+        links = _wordpress_post_links_from_payload(
+            [
+                {
+                    "slug": "the-st-teresas-parish-bulletin-for-sunday-16th-august-2026",
+                    "link": live_16,
+                },
+                {
+                    "slug": "the-st-teresas-parish-bulletin-for-sunday-9th-august-2026",
+                    "link": self.EXAMPLE,
+                },
+            ],
+            [self.SLUG],
+        )
+        self.assertEqual(_pick_newest_dated_post_url(links, date(2026, 8, 16)), live_16)
+
+    def test_rss_and_public_api_urls(self) -> None:
+        xml = """
+        <rss><channel>
+          <link>https://stteresasparish.church</link>
+          <item>
+            <title>The St Teresa’s Parish Bulletin for Sunday, 9th August 2026</title>
+            <link>https://stteresasparish.church/2026/08/06/the-st-teresas-parish-bulletin-for-sunday-9th-august-2026/</link>
+          </item>
+          <item>
+            <title>Please note there will be no bulletin</title>
+            <link>https://stteresasparish.church/2026/06/11/please-note-there-will-be-no-st-teresas-parish-bulletin-on-sunday-14th-june-2026/</link>
+          </item>
+        </channel></rss>
+        """
+        links = _wordpress_feed_post_links(xml, [self.SLUG])
+        self.assertEqual(links, [self.EXAMPLE])
+        apis = _wordpress_posts_api_urls("https://stteresasparish.church/")
+        self.assertIn(
+            "https://public-api.wordpress.com/wp/v2/sites/stteresasparish.church/posts?per_page=10&orderby=date&order=desc",
+            apis,
+        )
+
+    def test_extracts_two_page_images_any_upload_month(self) -> None:
+        html = """
+        <img src="https://stteresasparish.church/wp-content/uploads/2023/01/st-teresas-logo-placeholder.png" />
+        <img src="https://stteresasparish.church/wp-content/uploads/2026/07/microsoft-word-2-august-2026.docx.jpg" />
+        <img src="https://stteresasparish.church/wp-content/uploads/2026/07/microsoft-word-2-august-2026.docx-2.jpg" />
+        <img src="https://stteresasparish.church/wp-content/uploads/2026/07/microsoft-word-2-august-2026.docx-300x424.jpg" />
+        """
+        urls = _extract_post_page_images(html, self.EXAMPLE)
+        self.assertEqual(
+            urls,
+            [
+                "https://stteresasparish.church/wp-content/uploads/2026/07/microsoft-word-2-august-2026.docx.jpg",
+                "https://stteresasparish.church/wp-content/uploads/2026/07/microsoft-word-2-august-2026.docx-2.jpg",
+            ],
+        )
 
 
 if __name__ == "__main__":

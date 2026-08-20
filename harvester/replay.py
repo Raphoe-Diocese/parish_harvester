@@ -52,6 +52,7 @@ from .utils import (
     oneweb_newsletter_download_urls,
     predict_dropfiles_bulletin_urls,
     predicted_dated_upload_urls,
+    predicted_wordpress_dated_post_urls,
     rewrite_date_url,
     rewrite_newsletter_number_for_target,
     wix_dated_slug_candidates,
@@ -1485,6 +1486,297 @@ async def _try_wp_json_newest_media(
     return pdf_url, "pdf"
 
 
+_RSS_ITEM_RE = re.compile(r"<item\b.*?</item>", re.IGNORECASE | re.DOTALL)
+_RSS_LINK_RE = re.compile(r"<link>\s*(https?://[^<\s]+)\s*</link>", re.IGNORECASE)
+
+
+def _normalize_wp_post_url(url: str) -> str:
+    parsed = urlparse((url or "").strip())
+    if not parsed.scheme or not parsed.netloc:
+        return ""
+    path = parsed.path or "/"
+    if not path.endswith("/"):
+        path += "/"
+    return parsed._replace(path=path, query="", fragment="").geturl()
+
+
+def _score_wordpress_post_hrefs(
+    hrefs: list[str],
+    target_date: date,
+) -> list[tuple[date, str]]:
+    scored: list[tuple[date, str]] = []
+    for href in hrefs:
+        slug = urlparse(href).path.rstrip("/").rsplit("/", 1)[-1]
+        found = (
+            extract_date_from_slug(slug)
+            or extract_date_from_string(slug)
+            or liturgical_date_from_text(slug, target_date.year)
+        )
+        if found and found <= target_date + timedelta(days=3):
+            scored.append((found, href))
+    return scored
+
+
+def _pick_newest_dated_post_url(
+    hrefs: list[str],
+    target_date: date,
+) -> str | None:
+    scored = _score_wordpress_post_hrefs(hrefs, target_date)
+    if scored:
+        return max(scored)[1]
+    return hrefs[0] if hrefs else None
+
+
+def _wordpress_post_records(payload: object) -> list[dict]:
+    if isinstance(payload, list):
+        return [item for item in payload if isinstance(item, dict)]
+    if isinstance(payload, dict):
+        posts = payload.get("posts")
+        if isinstance(posts, list):
+            return [item for item in posts if isinstance(item, dict)]
+    return []
+
+
+def _wordpress_post_links_from_payload(
+    payload: object,
+    slug_patterns: list[str],
+) -> list[str]:
+    """Collect public permalinks from wp-json / WP.com public-api JSON."""
+    out: list[str] = []
+    seen: set[str] = set()
+    for item in _wordpress_post_records(payload):
+        link = str(item.get("link") or item.get("URL") or "").strip()
+        slug = str(item.get("slug") or "")
+        raw_title = item.get("title")
+        if isinstance(raw_title, dict):
+            title = str(raw_title.get("rendered") or "")
+        else:
+            title = str(raw_title or "")
+        blob = f"{link} {slug} {title}".lower()
+        if not link or not _href_matches_patterns(blob, slug_patterns):
+            continue
+        norm = _normalize_wp_post_url(link)
+        if norm and norm not in seen:
+            seen.add(norm)
+            out.append(norm)
+    return out
+
+
+def _wordpress_feed_post_links(xml: str, slug_patterns: list[str]) -> list[str]:
+    """Item permalinks from a WordPress RSS feed."""
+    out: list[str] = []
+    seen: set[str] = set()
+    for item in _RSS_ITEM_RE.findall(xml or ""):
+        match = _RSS_LINK_RE.search(item)
+        if not match:
+            continue
+        link = match.group(1).strip()
+        if not _href_matches_patterns(link, slug_patterns):
+            continue
+        norm = _normalize_wp_post_url(link)
+        if norm and norm not in seen:
+            seen.add(norm)
+            out.append(norm)
+    return out
+
+
+def _wordpress_posts_api_urls(start_url: str) -> list[str]:
+    parsed = urlparse(start_url)
+    if not parsed.scheme or not parsed.netloc:
+        return []
+    origin = f"{parsed.scheme}://{parsed.netloc}"
+    host = parsed.netloc
+    query = "per_page=10&orderby=date&order=desc"
+    return [
+        f"{origin}/wp-json/wp/v2/posts?{query}",
+        f"https://public-api.wordpress.com/wp/v2/sites/{host}/posts?{query}",
+        f"{origin}/?rest_route=/wp/v2/posts&{query}",
+    ]
+
+
+def _listing_wordpress_post_links(
+    html: str,
+    base_url: str,
+    slug_patterns: list[str],
+) -> list[str]:
+    out: list[str] = []
+    seen: set[str] = set()
+    base_host = urlparse(base_url).netloc.lower()
+    for href in _extract_matching_hrefs(html, base_url, slug_patterns):
+        parsed = urlparse(href)
+        if parsed.netloc.lower() != base_host:
+            continue
+        if parsed.query or "/feed/" in parsed.path.lower():
+            continue
+        norm = _normalize_wp_post_url(href)
+        if norm and norm not in seen:
+            seen.add(norm)
+            out.append(norm)
+    return out
+
+
+def _extract_post_page_images(html: str, base_url: str) -> list[str]:
+    """Full-size upload images on one post page, any upload month.
+
+    Skip logos and WordPress resized variants. A July-posted August bulletin
+    can live under /uploads/2026/07/ while the slug Sunday is in August.
+    """
+    out: list[str] = []
+    seen: set[str] = set()
+    for match in _WP_UPLOAD_IMAGE_RE.finditer(html or ""):
+        year, month, name = int(match.group(1)), int(match.group(2)), match.group(3)
+        if _SKIP_IMAGE_NAME_RE.search(name) or _RESIZED_IMAGE_SUFFIX_RE.search(name):
+            continue
+        key = name.lower()
+        if key in seen:
+            continue
+        seen.add(key)
+        out.append(urljoin(base_url, f"/wp-content/uploads/{year}/{month:02d}/{name}"))
+    return out
+
+
+async def _try_wp_json_newest_post_images(
+    start_url: str,
+    dest: Path,
+    *,
+    slug_patterns: list[str],
+    target_date: date,
+    example_post_url: str | None = None,
+    weeks_back: int = 3,
+    image_count: int = 2,
+) -> tuple[str, str] | None:
+    """Find the newest Sunday bulletin post, then stack its page images.
+
+    Built for stteresasparish.church: WordPress.com hides on-site /wp-json/
+    (HTML 404) but public-api.wordpress.com and /feed/ list real posts.
+    The permalink folder is the *post* date, a few days before the Sunday
+    in the slug — prefer JSON/RSS/listing over guessing that folder.
+
+    If this Sunday's post is missing, returns the newest older Sunday
+    (freshness then stale-rejects or grace-accepts it). Never invents a
+    16 Aug URL when only 9 Aug exists.
+    """
+    wanted = max(1, image_count)
+    candidates: list[str] = []
+
+    def _remember(url: str) -> None:
+        norm = _normalize_wp_post_url(url)
+        if norm and norm not in candidates:
+            candidates.append(norm)
+
+    for api in _wordpress_posts_api_urls(start_url):
+        result = await asyncio.to_thread(
+            _fetch_bytes_with_retries,
+            api,
+            max_attempts=4,
+            per_attempt_timeout_s=10.0,
+            total_budget_s=18.0,
+        )
+        if not result:
+            continue
+        body, headers = result
+        ct = (headers.get("content-type") or "").lower()
+        if "json" not in ct and body[:1] not in {b"[", b"{"}:
+            continue
+        try:
+            payload = json.loads(body.decode("utf-8", errors="replace"))
+        except json.JSONDecodeError:
+            continue
+        for link in _wordpress_post_links_from_payload(payload, slug_patterns):
+            _remember(link)
+        if candidates:
+            break
+
+    if not candidates:
+        parsed = urlparse(start_url)
+        feed_url = f"{parsed.scheme}://{parsed.netloc}/feed/"
+        feed_result = await asyncio.to_thread(
+            _fetch_bytes_with_retries,
+            feed_url,
+            max_attempts=4,
+            per_attempt_timeout_s=10.0,
+            total_budget_s=15.0,
+        )
+        if feed_result:
+            feed_body, feed_headers = feed_result
+            feed_ct = (feed_headers.get("content-type") or "").lower()
+            if (
+                "xml" in feed_ct
+                or "rss" in feed_ct
+                or feed_body.lstrip()[:5] in {b"<?xml", b"<rss ", b"<feed"}
+            ):
+                xml = feed_body.decode("utf-8", errors="ignore")
+                for link in _wordpress_feed_post_links(xml, slug_patterns):
+                    _remember(link)
+
+    if not candidates:
+        listing_result = await asyncio.to_thread(
+            _fetch_bytes_with_retries,
+            start_url,
+            max_attempts=4,
+            per_attempt_timeout_s=10.0,
+            total_budget_s=15.0,
+        )
+        if listing_result:
+            listing_body, listing_headers = listing_result
+            if "html" in (listing_headers.get("content-type") or "").lower():
+                listing_html = listing_body.decode("utf-8", errors="ignore")
+                for link in _listing_wordpress_post_links(
+                    listing_html, start_url, slug_patterns
+                ):
+                    _remember(link)
+
+    picked = _pick_newest_dated_post_url(candidates, target_date)
+    probe_urls: list[str] = []
+    if picked:
+        probe_urls.append(picked)
+    if example_post_url:
+        for url in predicted_wordpress_dated_post_urls(
+            example_post_url, target_date, weeks_back=weeks_back
+        ):
+            if url not in probe_urls:
+                probe_urls.append(url)
+    if not probe_urls:
+        return None
+
+    for post_url in probe_urls:
+        post_result = await asyncio.to_thread(
+            _fetch_bytes_with_retries,
+            post_url,
+            max_attempts=3,
+            per_attempt_timeout_s=10.0,
+            total_budget_s=14.0,
+        )
+        if not post_result:
+            continue
+        post_body, post_headers = post_result
+        if "html" not in (post_headers.get("content-type") or "").lower():
+            continue
+        post_html = post_body.decode("utf-8", errors="ignore")
+        image_urls = _extract_post_page_images(post_html, post_url)[:wanted]
+        if len(image_urls) < wanted:
+            continue
+        image_bytes: list[bytes] = []
+        for image_url in image_urls:
+            image_result = await asyncio.to_thread(
+                _fetch_bytes_with_retries,
+                image_url,
+                max_attempts=3,
+                per_attempt_timeout_s=10.0,
+                total_budget_s=14.0,
+            )
+            if not image_result:
+                continue
+            image_body, image_headers = image_result
+            if _dropfiles_body_looks_like_file(image_headers, image_body):
+                image_bytes.append(image_body)
+        if len(image_bytes) < wanted:
+            continue
+        await _images_bytes_to_pdf(dest, image_bytes[:wanted])
+        return post_url, "image_to_pdf"
+    return None
+
+
 def _extract_scored_upload_images(
     html: str,
     base_url: str,
@@ -2825,6 +3117,36 @@ async def replay_recipe(
         raise RecipeReplayError(
             f"wp-json media at {start_url} — no dated bulletin PDF matching "
             f"{href_patterns} (listing page was not opened)"
+        )
+
+    if site_type == "wp_json_newest_post_images" and target_date is not None:
+        slug_patterns = [
+            str(p).strip().lower()
+            for p in (recipe.get("post_slug_patterns") or [])
+            if str(p).strip()
+        ] or ["bulletin-for-sunday"]
+        image_count = int(recipe.get("image_count") or 2)
+        for step in steps:
+            if isinstance(step, dict) and step.get("action") == "image_stack":
+                try:
+                    image_count = int(step.get("count") or image_count)
+                except (TypeError, ValueError):
+                    pass
+                break
+        found = await _try_wp_json_newest_post_images(
+            start_url,
+            dest,
+            slug_patterns=slug_patterns,
+            target_date=target_date,
+            example_post_url=str(recipe.get("example_post_url") or "").strip() or None,
+            weeks_back=int(recipe.get("weeks_back") or 3),
+            image_count=image_count,
+        )
+        if found:
+            return dest, found[1], found[0]
+        raise RecipeReplayError(
+            f"wp-json/RSS/predicted post images at {start_url} — no Sunday "
+            "bulletin post with enough page images (browser was not opened)"
         )
 
     if site_type == "http_scrape_newest_images" and target_date is not None:
