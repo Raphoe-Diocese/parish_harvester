@@ -143,7 +143,7 @@ https://www.antrimparish.com
         self.assertEqual(manifest["manifest_version"], 3)
         self.assertEqual(
             manifest["permissions"],
-            ["activeTab", "scripting", "contextMenus", "storage"],
+            ["activeTab", "tabs", "scripting", "contextMenus", "storage", "downloads"],
         )
         self.assertEqual(manifest.get("host_permissions"), ["<all_urls>"])
         self.assertNotIn("sidePanel", manifest.get("permissions", []))
@@ -178,7 +178,7 @@ https://www.antrimparish.com
         self.assertRegex(manifest.get("version", ""), r"^\d+\.\d+\.\d+$")
         self.assertEqual(
             manifest.get("update_url"),
-            "https://frankytyrone.github.io/parish_harvester/updates.xml",
+            "https://raphoe-diocese.github.io/parish_harvester/updates.xml",
         )
         self.assertIn('id="ext-version"', popup_html)
         self.assertIn('id="gh-pat"', popup_html)
@@ -189,8 +189,8 @@ https://www.antrimparish.com
         self.assertIn("chrome.runtime.getManifest()", popup_js)
         self.assertIn("gh_pat", popup_js)
         self.assertIn("gh_repo", popup_js)
-        self.assertIn('dispatchToActiveTab({ type: "ping" })', popup_js)
-        self.assertIn('dispatchToActiveTab({ type: "ph_ping" })', popup_js)
+        self.assertIn("dispatchToActiveTab", popup_js)
+        self.assertIn('tabsSend(tabId, { type: "ph_ping" })', popup_js)
 
     def test_operator_console_hides_wizard_and_uses_directory_details(self) -> None:
         repo_root = REPO_ROOT
@@ -245,26 +245,29 @@ https://www.antrimparish.com
         self.assertIn("chrome.runtime.onMessage.addListener", content_js)
         self.assertIn("ph_ping", content_js)
         self.assertIn("sendResponse(result)", content_js)
-        self.assertIn('if (message.type === "ph_ping") return { ok: true };', content_js)
+        self.assertIn('if (message.type === "ph_ping" || message.type === "ping") return { ok: true };', content_js)
         # Must print the confirmation message when toolbar is auto-shown
         self.assertIn("Parish Trainer toolbar ready", content_js)
 
     def test_background_js_does_not_auto_show_toolbar(self) -> None:
         repo_root = REPO_ROOT
         background_js = (repo_root / "extension" / "background.js").read_text(encoding="utf-8")
-        # The toolbar must NOT be shown automatically on every page load.
-        # Removing the tabs.onUpdated auto-show listener is the fix for the
-        # disruptive behaviour where the toolbar appeared on every webpage.
-        self.assertNotIn("tabs.onUpdated", background_js)
-        # The toolbar can still be shown manually via the popup "Show Toolbar"
-        # button or by clicking the extension icon (toggle_toolbar).
+        # onUpdated is used to re-inject the trainer and to honor an explicit
+        # Fix-now session. It must not auto-open the toolbar on every page.
+        self.assertIn("tabs.onUpdated", background_js)
+        self.assertIn("ph_show_toolbar", background_js)
+        self.assertIn("reason: \"fix_now\"", background_js)
         self.assertIn("toggle_toolbar", background_js)
+        self.assertNotIn("reason: \"auto_show\"", background_js)
 
     def test_background_normalizes_recipe_to_single_terminal_url(self) -> None:
         repo_root = REPO_ROOT
         background_js = (repo_root / "extension" / "background.js").read_text(encoding="utf-8")
         self.assertIn("function _normalizeRecipeTerminalSteps", background_js)
-        self.assertIn('new Set(["download", "image", "html"])', background_js)
+        self.assertIn(
+            'new Set(["download", "image", "image_stack", "html", "print_to_pdf", "crop_screenshot"])',
+            background_js,
+        )
         self.assertIn("idx === lastTerminalIdx", background_js)
 
     def test_main_deletes_single_pdfs_after_diocese_mega(self) -> None:
@@ -388,7 +391,7 @@ https://www.antrimparish.com
     def test_ocr_convert_beautifying_markup(self) -> None:
         source = (REPO_ROOT / "ocr" / "convert_bulletin.py").read_text(encoding="utf-8")
         self.assertIn('class="b-table"', source)
-        self.assertIn('class="b-title"', source)
+        self.assertIn('"b-title"', source)
         self.assertIn("_is_table_separator", source)
         self.assertIn('class="page-label"', source)
 
