@@ -5,11 +5,14 @@ import unittest
 from datetime import date
 
 from harvester.replay import (
+    _extract_matching_hrefs,
     _extract_post_page_images,
+    _extract_wp_upload_images,
     _is_non_bulletin_url,
     _pick_newest_dated_post_url,
     _resolve_download_candidates,
     _score_http_scrape_pdf_hrefs,
+    _score_wordpress_post_hrefs,
     _wordpress_feed_post_links,
     _wordpress_post_links_from_payload,
     _wordpress_posts_api_urls,
@@ -397,6 +400,61 @@ class StTeresasPredictedPostTests(unittest.TestCase):
                 "https://stteresasparish.church/wp-content/uploads/2026/07/microsoft-word-2-august-2026.docx.jpg",
                 "https://stteresasparish.church/wp-content/uploads/2026/07/microsoft-word-2-august-2026.docx-2.jpg",
             ],
+        )
+
+
+class StGerardsListingImageTests(unittest.TestCase):
+    """stgerardsparish.org — listing scrape then one full-page scan to PDF."""
+
+    LISTING = "https://stgerardsparish.org/parish-news-events/"
+    POST_16 = "https://stgerardsparish.org/sunday-bulletin-16th-august-2026/"
+    POST_9 = "https://stgerardsparish.org/parish-bulletin-9th-august-2026/"
+    PATTERNS = ["parish-bulletin-", "sunday-bulletin-", "bulletin"]
+
+    def test_recipe_scrapes_news_listing_not_a_hardcoded_post(self) -> None:
+        import json
+        from pathlib import Path
+
+        recipe = json.loads(
+            Path("parishes/recipes/down_and_connor/stgerardsparish.json").read_text()
+        )
+        self.assertEqual(recipe["start_url"], self.LISTING)
+        self.assertEqual(recipe["site_type"], "waf_retry_wordpress")
+        self.assertNotIn("sunday-bulletin-16th-august-2026", json.dumps(recipe["steps"]))
+        self.assertTrue(
+            any("sunday-bulletin-" in p for p in recipe["post_slug_patterns"])
+        )
+
+    def test_listing_picks_newest_sunday_bulletin_not_older_parish_bulletin(self) -> None:
+        html = f"""
+        <a href="{self.POST_16}">Sunday Bulletin: 16th August 2026</a>
+        <a href="{self.POST_9}">Parish Bulletin: 9th August 2026</a>
+        <a href="https://stgerardsparish.org/sunday-bulletin-2nd-august-2026/">2nd August</a>
+        <a href="https://stgerardsparish.org/sunday-message-16th-august-2026/">Sunday Message</a>
+        """
+        hrefs = _extract_matching_hrefs(html, self.LISTING, self.PATTERNS)
+        self.assertIn(self.POST_16, hrefs)
+        self.assertIn(self.POST_9, hrefs)
+        self.assertTrue(all("sunday-message" not in href for href in hrefs))
+        scored = _score_wordpress_post_hrefs(hrefs, date(2026, 8, 16))
+        self.assertEqual(max(scored)[1], self.POST_16)
+        self.assertEqual(max(scored)[0], date(2026, 8, 16))
+
+    def test_extracts_full_size_scan_and_skips_wp_thumbnails(self) -> None:
+        html = """
+        <figure class="wp-block-image size-large">
+          <img src="https://stgerardsparish.org/wp-content/uploads/2026/08/16th_1-1024x724.png"
+               srcset="https://stgerardsparish.org/wp-content/uploads/2026/08/16th_1-300x212.png 300w,
+                       https://stgerardsparish.org/wp-content/uploads/2026/08/16th_1-768x543.png 768w,
+                       https://stgerardsparish.org/wp-content/uploads/2026/08/16th_1-1024x724.png 1024w,
+                       https://stgerardsparish.org/wp-content/uploads/2026/08/16th_1-1536x1086.png 1536w,
+                       https://stgerardsparish.org/wp-content/uploads/2026/08/16th_1.png 1588w" />
+        </figure>
+        """
+        urls = _extract_wp_upload_images(html, 2026, 8, self.POST_16)
+        self.assertEqual(
+            urls,
+            ["https://stgerardsparish.org/wp-content/uploads/2026/08/16th_1.png"],
         )
 
 
