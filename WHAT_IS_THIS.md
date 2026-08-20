@@ -80,7 +80,7 @@ parish_harvester/
 7. **The manifest builder runs** — it writes the manifest file, RSS feeds, and public .ics calendar files.
 8. **The cost dashboard is updated** — traffic-light status of all free-tier limits.
 9. **The website is published** — all of `docs/` is pushed to GitHub Pages.
-10. **The retention workflow runs** — files older than 8 weeks are compressed into zip archives.
+10. **Old leftover parish PDFs can be purged** — zip archives stay off. Current-week PDFs and mega PDFs stay (the website and OCR need them).
 
 ---
 
@@ -152,7 +152,7 @@ See the live cost dashboard: [docs/COST_DASHBOARD.md](docs/COST_DASHBOARD.md)
 | Repository storage | 5 GB hard cap | See dashboard |
 | AI (Gemini + Groq + Mistral) | Free tiers | £0 |
 
-The only real risk to ongoing £0 cost is **repository storage**. The retention workflow automatically archives old files to keep the repo under 5 GB. If you ever see a 🔴 on the cost dashboard, run the retention workflow manually.
+The only real risk to ongoing £0 cost is **repository storage**. Zip archives stay off (they made extra copies in git). Deleting a file from the tree does not shrink GitHub's stored history. If you ever see a 🔴 on the cost dashboard, ask before anyone rewrites git history.
 
 ---
 
