@@ -1,9 +1,10 @@
-name: Retention — archive and purge old bulletins
+name: Retention — purge leftover old PDFs (archives disabled)
+
+# Zip archives are off. This job only deletes leftover old individual PDFs
+# and any unused Bulletins/archive/*.zip. Current-week PDFs and mega PDFs stay.
+# Manual only — do not auto-run after harvest (that used to create zip copies).
 
 on:
-  workflow_run:
-    workflows: ["Harvest Parish Bulletins"]
-    types: [completed]
   workflow_dispatch:
     inputs:
       dry_run:
@@ -21,10 +22,6 @@ permissions:
 
 jobs:
   retention:
-    if: >-
-      github.event_name == 'workflow_dispatch' ||
-      (github.event_name == 'workflow_run' &&
-       github.event.workflow_run.conclusion != 'cancelled')
     runs-on: ubuntu-latest
     timeout-minutes: 15
 
@@ -47,7 +44,7 @@ jobs:
       - name: Run retention policy
         id: retention
         env:
-          DRY_RUN: ${{ github.event.inputs.dry_run || 'false' }}
+          DRY_RUN: ${{ github.event.inputs.dry_run || 'true' }}
         run: |
           set -euo pipefail
           python - <<'PYEOF'
@@ -55,55 +52,52 @@ jobs:
           from pathlib import Path
           from harvester.retention import apply_retention
 
-          dry_run = os.getenv("DRY_RUN", "false").strip().lower() == "true"
+          dry_run = os.getenv("DRY_RUN", "true").strip().lower() == "true"
           if dry_run:
-              print("⚠️  DRY RUN — no files will be changed.")
+              print("DRY RUN — no files will be changed.")
 
           report = apply_retention(Path("."), dry_run=dry_run)
 
           print("=== Retention report ===")
           print(f"Before: {report['before_bytes'] / 1024**3:.3f} GB")
           print(f"After:  {report['after_bytes'] / 1024**3:.3f} GB")
-          print(f"Zipped: {len(report['zipped_files'])} file(s)")
+          print(f"Zipped: {len(report['zipped_files'])} file(s) (always 0 — archives disabled)")
           print(f"Deleted: {len(report['deleted_files'])} file(s)")
           if report['warnings']:
               print("Warnings:")
               for w in report['warnings']:
-                  print(f"  ⚠️  {w}")
+                  print(f"  {w}")
 
-          # Write report for later steps
           with open("retention_report.json", "w") as fh:
               json.dump(report, fh, indent=2)
 
-          # Exit non-zero if warnings include hard cap breach
-          cap_warning = any("exceeds hard cap" in w for w in report['warnings'])
-          if cap_warning and not dry_run:
-              sys.exit(2)  # signal step to open issue
+          if report['zipped_files']:
+              print("ERROR: archives are disabled but files were zipped.")
+              sys.exit(1)
           PYEOF
 
-      - name: Commit retention changes
+      - name: Commit purge changes
         if: github.event.inputs.dry_run != 'true' && steps.retention.outcome == 'success'
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add -A Bulletins/archive/ docs/bulletins/ mega_pdf/ 2>/dev/null || true
-          git add -A Bulletins/current/ 2>/dev/null || true
+          git add -A Bulletins/archive/ Bulletins/current/ 2>/dev/null || true
           if git diff --cached --quiet; then
-            echo "ℹ️  No changes from retention — nothing to commit."
+            echo "No leftover files to purge — nothing to commit."
             exit 0
           fi
           BEFORE=$(python -c "import json; r=json.load(open('retention_report.json')); print(f\"{r['before_bytes']/1024**3:.3f}\")")
           AFTER=$(python -c "import json; r=json.load(open('retention_report.json')); print(f\"{r['after_bytes']/1024**3:.3f}\")")
-          git commit -m "chore: retention — archive old bulletins (${BEFORE} GB → ${AFTER} GB) [skip ci]"
+          git commit -m "chore: retention — purge leftover old PDFs (${BEFORE} GB → ${AFTER} GB) [skip ci]"
           for attempt in 1 2 3; do
             if git push origin HEAD:main; then
-              echo "✅ Pushed on attempt ${attempt}"
+              echo "Pushed on attempt ${attempt}"
               exit 0
             fi
             git pull --rebase origin main
           done
-          echo "❌ Could not push after 3 attempts."
+          echo "Could not push after 3 attempts."
           exit 1
 
       - name: Open storage cap warning issue
@@ -112,26 +106,24 @@ jobs:
           GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          REPORT=$(cat retention_report.json 2>/dev/null || echo '{}')
-          AFTER_GB=$(python -c "import json; r=$REPORT; print(f\"{r.get('after_bytes',0)/1024**3:.3f}\")" 2>/dev/null || echo "unknown")
+          AFTER_GB=$(python -c "import json; r=json.load(open('retention_report.json')); print(f\"{r.get('after_bytes',0)/1024**3:.3f}\")" 2>/dev/null || echo "unknown")
           WARNINGS=$(python -c "
           import json
           r = json.load(open('retention_report.json'))
           print('\n'.join(f'- {w}' for w in r.get('warnings', [])))
           " 2>/dev/null || echo "- See retention_report.json for details")
           gh issue create \
-            --title "🚨 Storage cap warning — repo is ${AFTER_GB} GB" \
+            --title "Storage cap warning — repo is ${AFTER_GB} GB" \
             --body "## Storage cap warning
 
-          The retention workflow detected that the repository has exceeded or approached the 4 GB hard cap.
+          The retention purge saw the repository at or over the 4 GB hard cap.
+
+          Zip archives are **disabled**. Deleting files from the tree does **not** shrink GitHub quota until git history is rewritten. Do not force-push unless Frank asks.
+
+          Official path if quota must drop: ask GitHub Support about removing bulky blobs, or a history rewrite with \`git filter-repo\` / BFG **only after an explicit yes**.
 
           ### Warnings
           ${WARNINGS}
-
-          ### What to do
-          1. Trigger the retention workflow manually with \`dry_run: false\`.
-          2. If the problem persists, reduce \`keep_months_archive\` in \`parishes/retention_policy.json\`.
-          3. In the worst case, a full Git history purge (\`git filter-repo\`) may be needed.
 
           _This issue was auto-opened by the retention workflow._" \
             --label "storage" || true
