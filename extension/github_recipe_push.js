@@ -56,7 +56,12 @@
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
     try {
-      return await fetch(url, { ...init, headers, signal: controller.signal });
+      return await fetch(url, {
+        cache: "no-store",
+        ...init,
+        headers,
+        signal: controller.signal,
+      });
     } catch (err) {
       if (err && err.name === "AbortError") {
         throw new Error(`GitHub timed out after ${Math.round(timeoutMs / 1000)}s`);
@@ -310,30 +315,69 @@
     return raw.json();
   };
 
+  const fetchLatestFileCommit = async ({ gh_pat, gh_repo, path }) => {
+    const repo = resolveGhRepo(gh_repo);
+    const pat = String(gh_pat || "").trim();
+    if (!pat || !path) return null;
+    try {
+      const resp = await fetchGithub(
+        `https://api.github.com/repos/${repo}/commits?path=${encodeURIComponent(path)}&sha=main&per_page=1`,
+        { ...authHeaders(pat), "Cache-Control": "no-cache" },
+        12000,
+        { cache: "no-store" }
+      );
+      if (!resp.ok) return null;
+      const data = await resp.json();
+      const first = Array.isArray(data) ? data[0] : null;
+      if (!first?.sha) return null;
+      return {
+        sha: first.sha,
+        date: first.commit?.committer?.date || first.commit?.author?.date || "",
+      };
+    } catch (_e) {
+      return null;
+    }
+  };
+
+  const attachStatusFetchMeta = (doc, commit) => {
+    if (!doc || typeof doc !== "object") return doc;
+    doc._ext_fetched_at = new Date().toISOString();
+    if (commit?.date) doc._ext_repo_updated_at = commit.date;
+    if (commit?.sha) doc._ext_repo_sha = commit.sha;
+    return doc;
+  };
+
   const fetchParishStatusJson = async ({ gh_pat, gh_repo: storedRepo }) => {
     const gh_repo = resolveGhRepo(storedRepo);
     const pat = String(gh_pat || "").trim();
+    const commit = await fetchLatestFileCommit({
+      gh_pat: pat,
+      gh_repo,
+      path: "parishes/parish_status.json",
+    });
+    const ref = commit?.sha || "main";
     if (pat) {
       try {
         const resp = await fetchGithub(
-          `https://api.github.com/repos/${gh_repo}/contents/parishes/parish_status.json`,
-          authHeaders(pat),
-          15000
+          `https://api.github.com/repos/${gh_repo}/contents/parishes/parish_status.json?ref=${encodeURIComponent(ref)}`,
+          { ...authHeaders(pat), "Cache-Control": "no-cache" },
+          15000,
+          { cache: "no-store" }
         );
         if (resp.ok) {
           const data = await resp.json();
-          return JSON.parse(decodeGithubContent(data.content) || "{}");
+          return attachStatusFetchMeta(JSON.parse(decodeGithubContent(data.content) || "{}"), commit);
         }
       } catch (_e) {
-        // fall through to raw
+        // fall through to raw at the same commit
       }
     }
     const raw = await fetch(
-      `https://raw.githubusercontent.com/${gh_repo}/main/parishes/parish_status.json?t=${Date.now()}`,
+      `https://raw.githubusercontent.com/${gh_repo}/${ref}/parishes/parish_status.json?t=${Date.now()}`,
       { cache: "no-store" }
     );
     if (!raw.ok) return null;
-    return raw.json();
+    return attachStatusFetchMeta(await raw.json(), commit);
   };
 
   function parishStatusFromDoc(statusDoc, parishKey) {
@@ -702,6 +746,7 @@
     verifyRecipe,
     dispatchHarvestTest,
     fetchReportJson,
+    fetchLatestFileCommit,
     fetchParishStatusJson,
     parishPdfExists,
     pollHarvestUntilDone,
