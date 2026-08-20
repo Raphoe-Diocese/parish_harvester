@@ -55,6 +55,16 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 
 ---
 
+## Harvest vs UI merge (do not panic)
+
+A full harvest that **started** before a viewer-chrome merge (parish mastheads / 850px / new-tab) can commit and deploy `docs/dioceses/` from the old checkout and briefly overwrite live HTML. That is temporary.
+
+`ocr-bulletin.yml` then checks out latest `main` (`ref: main`), runs `ocr/generate_bulletin_pages.py` (parish pages + dated viewers) and `harvester.site_builder.run()` (diocese `index.html` via `render_bulletin_viewer_shell` + `structure_ocr_html`), and restores the same files. Example: harvest [32384891762](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/32384891762) started 2026-08-20 15:14 UTC on `ac41d567` (no `ocr/bulletin_layout.py`); after it finishes, OCR on current main restores #52 chrome.
+
+Harvest.yml also refreshes viewer templates from `origin/main` before writing the docs snapshot, so a later in-flight UI merge is less likely to clobber.
+
+---
+
 ## Verify after every harvest regenerate
 
 Harvest rewrites `docs/dioceses/*/index.html` from `render_bulletin_viewer_shell`. After a harvest or `harvester.site_builder.run()`, confirm:

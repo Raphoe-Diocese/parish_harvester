@@ -285,6 +285,12 @@ https://www.antrimparish.com
         self.assertIn("- name: Run tests", workflow)
         self.assertIn("pytest -v --tb=short", workflow)
         self.assertIn("Upload harvest docs snapshot", workflow)
+        self.assertIn("Rebuild diocese pages from latest main templates", workflow)
+        self.assertIn("ocr/bulletin_layout.py", workflow)
+        self.assertLess(
+            workflow.index("Rebuild diocese pages from latest main templates"),
+            workflow.index("Upload harvest docs snapshot"),
+        )
         self.assertIn("continue-on-error: true", workflow)
         self.assertIn("id: commit_harvest", workflow)
         self.assertIn("docs/mega_pdf/*_mega_bulletin.pdf", workflow)

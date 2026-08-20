@@ -150,6 +150,28 @@ jobs:
             exit 1
           fi
 
+      # Full harvests can start on an older SHA, then a viewer-chrome PR lands on
+      # main while this job is still running. Re-render diocese HTML with the
+      # latest templates so the docs snapshot / commit do not wipe parish
+      # mastheads, 850px panels, or new-tab links. Does not touch mega PDFs.
+      - name: Rebuild diocese pages from latest main templates
+        if: steps.harvest_run.outcome == 'success' && github.event.inputs.target_parish == ''
+        continue-on-error: true
+        run: |
+          set -euo pipefail
+          git fetch origin main
+          git checkout origin/main -- \
+            ocr/bulletin_layout.py \
+            ocr/generate_bulletin_pages.py \
+            ocr/parish_pages.py \
+            harvester/page_renderer.py
+          if [ ! -f Bulletins/report.json ]; then
+            echo "No report.json — skip template refresh rebuild"
+            exit 0
+          fi
+          python -c "from pathlib import Path; from harvester.site_builder import run; run(report_path=Path('Bulletins/report.json'), docs_dir=Path('docs'))"
+          echo "Rebuilt docs/dioceses from origin/main viewer templates"
+
       - name: Upload mega PDF artifacts
         if: steps.harvest_run.outcome == 'success' && github.event.inputs.target_parish == ''
         continue-on-error: true
