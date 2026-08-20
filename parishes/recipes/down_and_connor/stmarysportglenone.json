@@ -3,21 +3,16 @@
   "parish_key": "stmarysportglenone",
   "display_name": "Port Glenone (St Mary's Portglenone)",
   "diocese": "down_and_connor",
-  "start_url": "https://stmarysportglenone.org/?page_id=40",
+  "start_url": "https://stmarysportglenone.org/?page_id=98",
   "steps": [
     {
       "action": "click",
       "selector": "a.mod_downloadlink[href]",
-      "href": "https://stmarysportglenone.org/download/9/Bulletins/110/18th-SUNDAY-IN-ORDINARY-TIME",
-      "text": "",
-      "pick_strategy": "first_match",
-      "bulletin_position": "top",
-      "fallback_selectors": [
-        "a.mod_downloadlink[href]"
-      ]
+      "href": "https://stmarysportglenone.org/download/9/Bulletins/112/20th-SUNDAY-IN-ORDINARY-TIME",
+      "text": "20th SUNDAY IN ORDINARY TIME"
     }
   ],
-  "observed_load_ms": 10547.89990234375,
+  "observed_load_ms": 12324.39990234375,
   "timeout_ms": 55000,
   "total_timeout_s": 190,
   "playbook_type": "weekly_bulletin_download",
@@ -31,28 +26,5 @@
     "Do not save a download URL from downandconnor.org or other diocese admin PDFs.",
     "Do not use Pick bulletin image — this is a file download site."
   ],
-  "recorded_date": "2026-08-10",
-  "operator_notes_2026_08_10": [
-    "NOT a genuine dead-end — the earlier 'bot-blocked, no unprotected path' verdict",
-    "was WRONG and is superseded. Same SiteGround 'sg-captcha' challenge as",
-    "threepatrons.org (same Joomla Dropfiles component, same hosting fingerprint) —",
-    "the listing page AND the download route are both intermittently (not",
-    "permanently) challenged: plain HTTP retries (curl/urllib) got through with a",
-    "real file in roughly 1 attempt in 5-25 across repeated manual testing, while a",
-    "full Playwright headless browser retried the same URL 0/20 times successfully.",
-    "FIX: _try_dropfiles_predicted_downloads (harvester/replay.py) now retries via",
-    "plain urllib instead of page.goto, preferring to re-fetch the real listing",
-    "page and read its current newest mod_downloadlink href over guessing a",
-    "sequential ID (this site doesn't post on a strict weekly cadence — see below).",
-    "IMPORTANT — this parish is genuinely often stale, not just blocked: confirmed",
-    "2026-08-10 via direct curl to https://stmarysportglenone.org/?page_id=40 that",
-    "the site's own newest posted item is still /download/9/Bulletins/110/18th-",
-    "SUNDAY-IN-ORDINARY-TIME (2 Aug 2026) — the 19th Sunday (9 Aug) bulletin had",
-    "not been posted yet as of this check. Item 111 returns the homepage (200,",
-    "no Content-Disposition) rather than a file, confirming it doesn't exist yet —",
-    "do not treat that as a WAF failure. Expect this recipe to legitimately report",
-    "outcome=stale some weeks purely because the parish is slow to post, same as",
-    "any other parish; only re-investigate the WAF angle again if even the",
-    "definitely-existing item 110 stops being downloadable at all."
-  ]
+  "recorded_date": "2026-08-20"
 }
