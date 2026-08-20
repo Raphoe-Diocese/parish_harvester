@@ -1,18 +1,38 @@
 {
   "parish_key": "ballyclareballygowan",
   "display_name": "Ballyclare and Ballygowan",
-  "recorded_date": "2026-06-16",
-  "start_url": "https://ballyclareballygowan.com/notice%20board.htm",
+  "diocese": "down_and_connor",
+  "start_url": "https://www.ballyclareballygowan.com/notice%20board.htm",
   "steps": [
     {
       "action": "goto",
-      "url": "https://ballyclareballygowan.com/notice%20board.htm"
+      "url": "https://www.ballyclareballygowan.com/notice%20board.htm"
     },
     {
-      "action": "print_to_pdf"
+      "action": "print_to_pdf",
+      "skip_listing_nav": true
     }
   ],
-  "diocese": "down_and_connor",
-  "timeout": 30000,
-  "version": 1
+  "timeout": 60000,
+  "timeout_ms": 60000,
+  "total_timeout_s": 90,
+  "version": 1,
+  "playbook_type": "html_text_bulletin",
+  "site_type": "html_text_bulletin",
+  "operator_notes": [
+    "Permanent Xara HTML noticeboard — not a downloadable PDF. Same URL every week; parish overwrites the page.",
+    "print_to_pdf the notice board itself. skip_listing_nav=true so html_capture does not leave the page.",
+    "Do not invent a dated URL. Do not click photos/video/donate nav."
+  ],
+  "do_not": [
+    "Do not pin a dated weekly URL — the notice board is overwritten in place.",
+    "Do not remove skip_listing_nav.",
+    "Do not treat this as a PDF download site."
+  ],
+  "recorded_date": "2026-06-16",
+  "operator_notes_2026_08_20": [
+    "Live probe 20/08/2026: https://www.ballyclareballygowan.com/notice%20board.htm and the non-www twin both HTTP 200, content-type text/html, last-modified Sat 15 Aug 2026.",
+    "Page masthead text is 16 August 2026 (this harvest week). No .pdf links on the page.",
+    "Xara canvas (#xr_xr) — no article/main/entry-content, so hide-chrome correctly falls through to full-page print."
+  ]
 }

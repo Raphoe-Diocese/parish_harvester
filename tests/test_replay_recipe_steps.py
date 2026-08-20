@@ -482,6 +482,56 @@ class ClaudyBulletinFilterTests(unittest.TestCase):
             self.assertEqual(context.page.goto_calls, 1)
             self.assertTrue(context.closed)
 
+    def test_print_to_pdf_honours_skip_listing_nav(self) -> None:
+        import asyncio
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            recipe_path = root / "recipe.json"
+            recipe_path.write_text(
+                json.dumps(
+                    {
+                        "start_url": "https://www.ballyclareballygowan.com/notice%20board.htm",
+                        "steps": [
+                            {
+                                "action": "goto",
+                                "url": "https://www.ballyclareballygowan.com/notice%20board.htm",
+                            },
+                            {"action": "print_to_pdf", "skip_listing_nav": True},
+                        ],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            dest = root / "bulletin.pdf"
+            context = _FakeContext()
+            browser = _FakeBrowser(context)
+            captured: dict[str, object] = {}
+
+            async def _fake_smart_print(
+                _page,
+                dest_path,
+                _target,
+                *,
+                wait_ms=2500,
+                skip_listing_nav=False,
+                max_pages=None,
+            ):
+                captured["skip_listing_nav"] = skip_listing_nav
+                dest_path.write_bytes(b"%PDF-1.4\n%fake\n")
+
+            with patch("harvester.replay._smart_print_page_to_pdf", _fake_smart_print):
+                out_path, file_type, source_url = asyncio.run(
+                    replay_recipe(recipe_path, dest, browser)
+                )
+
+            self.assertEqual(out_path, dest)
+            self.assertEqual(file_type, "print_to_pdf")
+            self.assertEqual(
+                source_url, "https://www.ballyclareballygowan.com/notice%20board.htm"
+            )
+            self.assertTrue(captured.get("skip_listing_nav"))
+
     def test_replay_recipe_supports_crop_screenshot_step(self) -> None:
         import asyncio
 
