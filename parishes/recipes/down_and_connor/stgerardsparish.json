@@ -3,18 +3,18 @@
   "parish_key": "stgerardsparish",
   "display_name": "St Gerards",
   "diocese": "down_and_connor",
-  "start_url": "https://stgerardsparish.org/",
+  "start_url": "https://stgerardsparish.org/parish-news-events/",
   "steps": [
     {
       "action": "goto",
-      "url": "https://stgerardsparish.org/"
+      "url": "https://stgerardsparish.org/parish-news-events/"
     }
   ],
   "site_type": "waf_retry_wordpress",
   "post_slug_patterns": ["parish-bulletin-", "sunday-bulletin-", "bulletin"],
   "timeout_ms": 45000,
   "total_timeout_s": 190,
-  "recorded_date": "2026-08-10",
+  "recorded_date": "2026-08-20",
   "operator_notes_2026_08_10": [
     "NOT a genuine dead-end — the earlier 'bot-blocked, no unprotected path'",
     "verdict (needs_retraining/placeholder) was WRONG and is superseded. Same",
@@ -23,24 +23,31 @@
     "PROBABILISTIC (~10-50% of plain HTTP requests get straight through with real",
     "content), not a hard block. A full Playwright browser navigation to the same",
     "URL failed far more consistently than plain curl/urllib in testing.",
-    "Site structure: homepage lists recent posts via Elementor 'Read more about",
-    "...' links; each week's post slug is INCONSISTENT ('parish-bulletin-Dth-",
-    "month-YYYY' some weeks, 'sunday-bulletin-Dth-month-YYYY' others) — cannot",
-    "hardcode a URL pattern, must scrape the real homepage each time. Each post",
-    "embeds exactly one full-page scan image named '{Dth}_1.png' (e.g. 9th_1.png",
-    "for 9 Aug) under wp-content/uploads/YYYY/MM/ — no separate PDF.",
     "site_type:waf_retry_wordpress (harvester/replay.py) skips Playwright/the",
-    "browser entirely for this recipe: fetches the homepage via plain-HTTP",
+    "browser entirely for this recipe: fetches the listing via plain-HTTP",
     "retries, regex-extracts the newest post link matching post_slug_patterns",
     "with a real date, fetches that post, and pulls out its embedded page",
-    "image(s) (or a PDF Embedder iframe target, if a future week uses one).",
-    "Confirmed 2026-08-10 via direct curl: homepage links",
-    "'.../parish-bulletin-9th-august-2026/' (today's target) containing",
-    "wp-content/uploads/2026/08/9th_1.png — a real, current, single-page scan."
+    "image(s) (or a PDF Embedder iframe target, if a future week uses one)."
+  ],
+  "operator_notes_2026_08_20": [
+    "Listing is /parish-news-events/ (not the homepage). Homepage Elementor",
+    "widgets only surface a couple of recent posts; the news listing has the",
+    "full Sunday/Parish Bulletin history. Do not hardcode a post permalink.",
+    "Slug prefix is INCONSISTENT week to week ('sunday-bulletin-Dth-month-YYYY'",
+    "or 'parish-bulletin-Dth-month-YYYY') — scrape the listing and pick the",
+    "newest dated match. Each post embeds one full-page scan named '{Dth}_1.png'",
+    "(e.g. 16th_1.png for 16 Aug 2026) under wp-content/uploads/YYYY/MM/ — no",
+    "separate PDF. Convert that full-size image (skip -1024x724 etc. thumbnails).",
+    "CONFIRMED 2026-08-20 via plain-HTTP retries: newest listing post is",
+    "'Sunday Bulletin: 16th August 2026' at /sunday-bulletin-16th-august-2026/",
+    "with wp-content/uploads/2026/08/16th_1.png (1588x1123 PNG). No 23 Aug",
+    "bulletin was posted yet — do not invent one."
   ],
   "do_not": [
-    "Do not hardcode the post URL prefix ('parish-bulletin-' vs 'sunday-bulletin-')",
-    "— it changes week to week; always scrape the homepage for the real link.",
+    "Do not hardcode the post URL or prefix ('parish-bulletin-' vs",
+    "'sunday-bulletin-') — it changes week to week; always scrape",
+    "/parish-news-events/ for the newest real dated post.",
+    "Do not start from the homepage — that listing is incomplete.",
     "Do not switch this back to a Playwright goto/click recipe — a full browser",
     "was measurably less reliable than plain HTTP retries against this WAF."
   ]

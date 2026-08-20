@@ -1979,16 +1979,7 @@ async def _try_waf_retry_wordpress_bulletin(
     listing_html = listing_body.decode("utf-8", errors="ignore")
 
     candidates = _extract_matching_hrefs(listing_html, listing_url, post_slug_patterns)
-    scored: list[tuple[date, str]] = []
-    for href in candidates:
-        slug = urlparse(href).path.rstrip("/").rsplit("/", 1)[-1]
-        found = (
-            extract_date_from_slug(slug)
-            or extract_date_from_string(slug)
-            or liturgical_date_from_text(slug, target_date.year)
-        )
-        if found and found <= target_date + timedelta(days=3):
-            scored.append((found, href))
+    scored = _score_wordpress_post_hrefs(candidates, target_date)
     if not scored:
         return None
     _best_date, post_url = max(scored)
