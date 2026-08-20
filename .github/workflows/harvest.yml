@@ -3,7 +3,9 @@ run-name: Harvest ${{ inputs.target_parish || 'full' }}
 
 on:
   schedule:
-    - cron: '0 13 * * 0'   # Every Sunday at 13:00 UTC
+    # Sunday 09:00 UTC = 10:00 Irish summer time (IST, UTC+1).
+    # A 4-hour full harvest then finishes around 14:00 Irish.
+    - cron: '0 9 * * 0'
   workflow_dispatch:
     inputs:
       diocese:
@@ -36,6 +38,10 @@ permissions:
 
 # Full harvest and single-parish tests must not share one queue — otherwise
 # "Send & test" waits 30–60+ min behind a running full harvest.
+# Do not add a diocese matrix: one job writes report.json, parish_status.json,
+# mega PDFs, and commits to main. Parallel diocese jobs would race on git push
+# and overwrite shared status. Future (26 dioceses): one job per diocese writes
+# its own artifact; a final stitch job builds megas + parish_status + pages.
 concurrency:
   group: harvest-${{ github.event.inputs.target_parish || 'full' }}
   cancel-in-progress: ${{ github.event.inputs.target_parish != '' }}
