@@ -78,6 +78,36 @@ class SplitOcrHtmlByParishTests(unittest.TestCase):
         self.assertEqual(set(chunks), {"ardara", "annagryparish"})
         self.assertTrue(all(c.html == "" for c in chunks.values()))
 
+    def test_live_shaped_banner_same_paragraph_newline_no_br(self) -> None:
+        """Real published OCR puts Name + URL in one <p> with a raw newline."""
+        fragment = """
+<p class="page-label">Page 1</p>
+<p>Annagry
+<a href="https://annagryparish.ie/newsletter-2/">https://annagryparish.ie/newsletter-2/</a></p>
+<hr>
+<p class="page-label">Page 2</p>
+<p>Weekend Mass Times
+Recent DeathsArdara
+<a href="http://ardara.ie/news/">http://ardara.ie/news/</a></p>
+<p>Sunday mass at 10am.</p>
+"""
+        chunks = split_ocr_html_by_parish(fragment, self.entries)
+        self.assertEqual((chunks["annagryparish"].start_page, chunks["annagryparish"].end_page), (1, 1))
+        self.assertEqual((chunks["ardara"].start_page, chunks["ardara"].end_page), (2, 2))
+        self.assertIn("Sunday mass at 10am", chunks["ardara"].html)
+        self.assertNotIn("Sunday mass at 10am", chunks["annagryparish"].html)
+
+
+class SplitOcrHtmlByPageRangesTests(unittest.TestCase):
+    def test_slices_by_authoritative_page_index(self) -> None:
+        from ocr.parish_splitter import split_ocr_html_by_page_ranges
+
+        chunks = split_ocr_html_by_page_ranges(_FRAGMENT, {"ardara": (2, 2), "annagryparish": (3, 4)})
+        self.assertEqual((chunks["ardara"].start_page, chunks["ardara"].end_page), (2, 2))
+        self.assertIn("Recently deceased", chunks["ardara"].html)
+        self.assertIn("Second page for annagry", chunks["annagryparish"].html)
+        self.assertNotIn("Recently deceased", chunks["annagryparish"].html)
+
 
 if __name__ == "__main__":
     unittest.main()

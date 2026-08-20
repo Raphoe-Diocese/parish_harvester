@@ -101,6 +101,18 @@ jobs:
             echo "Applied OCR docs/dioceses snapshot"
             applied=true
           fi
+          if [ -d _ocr_docs/docs/parishes ]; then
+            mkdir -p docs/parishes
+            cp -a _ocr_docs/docs/parishes/. docs/parishes/
+            echo "Applied OCR docs/parishes snapshot"
+            applied=true
+          fi
+          if [ -d _ocr_docs/docs/mega_pdf ]; then
+            mkdir -p docs/mega_pdf
+            cp -a _ocr_docs/docs/mega_pdf/. docs/mega_pdf/
+            echo "Applied OCR docs/mega_pdf snapshot"
+            applied=true
+          fi
           if [ "${applied}" = "false" ]; then
             echo "No workflow docs snapshots to apply — using git checkout docs/"
           fi
@@ -274,48 +286,7 @@ jobs:
             echo "| Deployed Pages URL | ${{ steps.deployment.outputs.page_url }} |"
           } >> "$GITHUB_STEP_SUMMARY"
 
-      - name: Clean mega PDFs from repository after deploy
-        if: github.event_name == 'workflow_run' && env.HAD_NEW_ARTIFACTS == 'true'
-        continue-on-error: true
-        id: cleanup_repo
+      - name: Keep mega PDFs in docs/ after deploy
         run: |
-          set -euo pipefail
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          mkdir -p mega_pdf Bulletins/current docs/mega_pdf
-          find mega_pdf -maxdepth 1 -type f -name '*.pdf' -delete || true
-          find docs/mega_pdf -maxdepth 1 -type f -name '*.pdf' -delete || true
-          find Bulletins/current -maxdepth 1 -type f -name '*.pdf' -delete || true
-          find Bulletins -maxdepth 1 -type f -name 'all_bulletins_*.pdf' -delete || true
-          touch mega_pdf/.gitkeep docs/mega_pdf/.gitkeep Bulletins/current/.gitkeep
-          shopt -s nullglob
-          pdfs=(Bulletins/all_bulletins_*.pdf)
-          if [ ${#pdfs[@]} -gt 0 ]; then
-            git add -A mega_pdf docs/mega_pdf Bulletins/current "${pdfs[@]}"
-          else
-            git add -A mega_pdf docs/mega_pdf Bulletins/current
-          fi
-          if git diff --cached --quiet; then
-            echo "No staged cleanup changes — skipping commit."
-            exit 0
-          fi
-          git commit -m "chore: clean deployed PDFs [skip ci]"
-          for attempt in 1 2 3 4 5; do
-            if git push origin HEAD:main; then
-              echo "Cleanup pushed on attempt ${attempt}"
-              exit 0
-            fi
-            echo "Cleanup push attempt ${attempt} failed; pulling --rebase and retrying…"
-            git pull --rebase origin main || {
-              echo "Rebase failed during cleanup; aborting."
-              git rebase --abort || true
-              exit 1
-            }
-          done
-          echo "Could not push cleanup commit after 5 attempts."
-          exit 1
-
-      - name: Warn if repo cleanup push failed
-        if: steps.cleanup_repo.outcome == 'failure'
-        run: |
-          echo "::warning::Pages deploy succeeded but could not push PDF cleanup commit to main."
+          echo "Mega PDFs stay in docs/mega_pdf — they are the public diocese files."
+          echo "Do not delete docs/mega_pdf/*.pdf after Pages deploy."

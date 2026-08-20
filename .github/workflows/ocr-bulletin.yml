@@ -177,6 +177,13 @@ jobs:
             exit 1
           fi
           echo "Staged ${#STAGED_PDFS[@]} mega PDF(s) for OCR"
+          mkdir -p docs/mega_pdf
+          for pdf in "${STAGED_PDFS[@]}"; do
+            [ -n "${pdf}" ] || continue
+            cp "${pdf}" "docs/mega_pdf/$(basename "${pdf}")"
+            ls -lh "docs/mega_pdf/$(basename "${pdf}")"
+          done
+          echo "Copied staged mega PDFs into docs/mega_pdf for Pages"
 
       - name: Generate OCR viewer pages
         id: ocr_generate
@@ -250,6 +257,8 @@ jobs:
           path: |
             docs/bulletins/
             docs/dioceses/
+            docs/parishes/
+            docs/mega_pdf/
           if-no-files-found: warn
           retention-days: 14
 
@@ -262,6 +271,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add docs Bulletins
+          git add -f docs/mega_pdf/*_mega_bulletin.pdf docs/mega_pdf/*.pages.json docs/parishes 2>/dev/null || true
           if git diff --cached --quiet; then
             echo "::warning::OCR ran but nothing changed in docs/ — nothing to commit."
             exit 0

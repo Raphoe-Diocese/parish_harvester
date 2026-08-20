@@ -287,6 +287,7 @@ https://www.antrimparish.com
         self.assertIn("Upload harvest docs snapshot", workflow)
         self.assertIn("continue-on-error: true", workflow)
         self.assertIn("id: commit_harvest", workflow)
+        self.assertIn("docs/mega_pdf/*_mega_bulletin.pdf", workflow)
         self.assertIn("Warn if git commit failed", workflow)
         self.assertLess(workflow.index("- name: Run tests"), workflow.index("- name: Run Bulletin Harvester"))
 
@@ -333,6 +334,9 @@ https://www.antrimparish.com
         self.assertIn("cp -a docs/. _site/", workflow)
         self.assertIn("mkdir -p _site/mega_pdf", workflow)
         self.assertIn("cp -a mega_pdf/. _site/mega_pdf/", workflow)
+        self.assertIn("Applied OCR docs/parishes snapshot", workflow)
+        self.assertNotIn("find docs/mega_pdf -maxdepth 1 -type f -name '*.pdf' -delete", workflow)
+        self.assertIn("Mega PDFs stay in docs/mega_pdf", workflow)
         self.assertIn("parish_trainer.zip", workflow)
         self.assertIn("_site/updates.xml", workflow)
 
@@ -343,6 +347,9 @@ https://www.antrimparish.com
         self.assertIn("github.event.workflow_run.conclusion != 'cancelled'", workflow)
         self.assertIn("Download harvest report for site rebuild", workflow)
         self.assertIn("Upload OCR docs snapshot", workflow)
+        self.assertIn("docs/parishes/", workflow)
+        self.assertIn("docs/mega_pdf/", workflow)
+        self.assertIn("Copied staged mega PDFs into docs/mega_pdf", workflow)
         self.assertIn("id: commit_ocr", workflow)
         self.assertIn("OCR push attempt", workflow)
         self.assertIn("github.event_name == 'workflow_dispatch'", workflow)
