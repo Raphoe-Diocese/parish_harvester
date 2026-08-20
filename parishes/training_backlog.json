@@ -3114,7 +3114,7 @@
       "diocese": "down_and_connor",
       "recipe_file": "parishes/recipes/down_and_connor/stmarysportglenone.json",
       "recipe": {
-        "start_url": "https://stmarysportglenone.org/?page_id=40",
+        "start_url": "https://stmarysportglenone.org/?page_id=98",
         "site_type": "joomla_dropfiles",
         "playbook_type": "weekly_bulletin_download",
         "status": "",
@@ -3132,7 +3132,7 @@
           "Do not save a download URL from downandconnor.org or other diocese admin PDFs.",
           "Do not use Pick bulletin image \u2014 this is a file download site."
         ],
-        "recorded_date": "2026-08-10"
+        "recorded_date": "2026-08-20"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "Joomla Dropfiles cloud download (.docx \u2192 PDF)",
@@ -3191,25 +3191,26 @@
       "diocese": "down_and_connor",
       "recipe_file": "parishes/recipes/down_and_connor/portstewartparish.json",
       "recipe": {
-        "start_url": "https://portstewartparish.website/bulletins/",
+        "start_url": "http://portstewartparish.website/weekly-bulletin/",
         "site_type": "mdocs_bulletin_list",
         "playbook_type": "mdocs_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 3,
+        "step_count": 2,
         "click_count": 1,
         "has_terminal": true,
         "operator_notes": [
-          "Real PDF files behind mDocs download links (?mdocs-file=NNNN, served with Content-Disposition: attachment) \u2014 click Download, then capture PDF. Never Save page as PDF.",
-          "mDocs table on /bulletins/ \u2014 latest PDF is always the first row/first download link in DOM order.",
-          "Site can take 3\u20135 minutes to show the table \u2014 harvest budget is up to 10 minutes.",
-          "PDF href is on the Download link, not the homepage."
+          "mDocs WordPress plugin lists dated PDFs \u2014 newest row is usually at the top.",
+          "Click Download on this week's row, then capture PDF download (not Save page as PDF).",
+          "Slow sites: use http:// if HTTPS certificate is expired (portstewartparish.website).",
+          "Harvester waits up to 7 minutes for the table on very slow hosts."
         ],
         "do_not": [
-          "Do not use Save page as PDF \u2014 bulletins are downloadable PDF files, not HTML text."
+          "Do not use Save page as PDF \u2014 bulletins are real PDF files in the mDocs table.",
+          "Do not use https://portstewartparish.website \u2014 certificate expired; use http://."
         ],
-        "recorded_date": "2026-08-09"
+        "recorded_date": "2026-08-20"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
@@ -3625,19 +3626,26 @@
       "recipe_file": "parishes/recipes/down_and_connor/stmacnissirandalstown.json",
       "recipe": {
         "start_url": "https://www.stmacnissirandalstown.com/bulletin",
-        "site_type": "",
-        "playbook_type": "",
+        "site_type": "html_text_bulletin",
+        "playbook_type": "wix_html",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 2,
-        "click_count": 0,
+        "click_count": 1,
         "has_terminal": true,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-06-26"
+        "operator_notes": [
+          "Bulletin text is on the web page \u2014 not a downloadable PDF file.",
+          "Use Save page as PDF on the newsletter article page.",
+          "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
+        ],
+        "do_not": [
+          "Do not use Pick bulletin image when the page is mostly text paragraphs.",
+          "Do not stop at click-only \u2014 need print_to_pdf as the final step."
+        ],
+        "recorded_date": "2026-08-20"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "html",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
