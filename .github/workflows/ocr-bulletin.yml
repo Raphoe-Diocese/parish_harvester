@@ -5,6 +5,10 @@ on:
     workflows: ["Harvest Parish Bulletins"]
     types:
       - completed
+  # Fallback if workflow_run does not fire: Sunday 13:00 UTC (14:00 Irish).
+  # Primary trigger is workflow_run after a full harvest finishes.
+  schedule:
+    - cron: '0 13 * * 0'
   workflow_dispatch:
 
 permissions:
@@ -13,10 +17,15 @@ permissions:
 
 jobs:
   generate-ocr-viewers:
+    # Full harvests only (run-name "Harvest full"). Skip single-parish
+    # Send & test runs — those do not upload mega PDFs.
     if: >-
       github.event_name == 'workflow_dispatch' ||
+      github.event_name == 'schedule' ||
       (github.event_name == 'workflow_run' &&
-       github.event.workflow_run.conclusion != 'cancelled')
+       github.event.workflow_run.conclusion != 'cancelled' &&
+       (github.event.workflow_run.event == 'schedule' ||
+        github.event.workflow_run.display_title == 'Harvest full'))
     runs-on: ubuntu-latest
     steps:
       - name: Checkout repository

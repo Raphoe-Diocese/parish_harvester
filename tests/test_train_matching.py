@@ -290,8 +290,13 @@ https://www.antrimparish.com
         self.assertIn("docs/mega_pdf/*_mega_bulletin.pdf", workflow)
         self.assertIn("scripts/push_harvest_results.py", workflow)
         self.assertIn('HARVEST_MEGA_PDF: "1"', workflow)
+        self.assertIn("cron: '0 9 * * 0'", workflow)
+        self.assertNotIn("cron: '0 13 * * 0'", workflow)
+        self.assertIn("timeout-minutes: 360", workflow)
         self.assertIn("Warn if git commit failed", workflow)
         self.assertLess(workflow.index("- name: Run tests"), workflow.index("- name: Run Bulletin Harvester"))
+        commit_step = workflow.split("- name: Commit bulletins back to repo", 1)[1]
+        self.assertNotIn("continue-on-error: true", commit_step.split("- name:", 1)[0])
 
     def test_deploy_pages_builds_extension_update_assets(self) -> None:
         workflow = (REPO_ROOT / ".github" / "workflows" / "deploy-pages.yml").read_text(encoding="utf-8")
@@ -345,8 +350,12 @@ https://www.antrimparish.com
     def test_ocr_bulletin_workflow_configuration(self) -> None:
         workflow = (REPO_ROOT / ".github" / "workflows" / "ocr-bulletin.yml").read_text(encoding="utf-8")
         self.assertIn("workflow_dispatch:", workflow)
+        self.assertIn("schedule:", workflow)
+        self.assertIn("cron: '0 13 * * 0'", workflow)
         self.assertIn('workflows: ["Harvest Parish Bulletins"]', workflow)
         self.assertIn("github.event.workflow_run.conclusion != 'cancelled'", workflow)
+        self.assertIn("github.event.workflow_run.display_title == 'Harvest full'", workflow)
+        self.assertIn("github.event_name == 'schedule'", workflow)
         self.assertIn("Download harvest report for site rebuild", workflow)
         self.assertIn("Upload OCR docs snapshot", workflow)
         self.assertIn("docs/parishes/", workflow)
