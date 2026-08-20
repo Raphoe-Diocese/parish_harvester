@@ -1,17 +1,17 @@
 {
-  "generated_at": "2026-08-19",
+  "generated_at": "2026-08-20",
   "target_date": "2026-08-16",
   "summary": {
-    "downloaded": 81,
+    "downloaded": 80,
     "html_links": 0,
     "skipped": 17,
-    "failed": 25,
+    "failed": 26,
     "stale_rejected": 0
   },
   "action_counts": {
     "ok": 82,
     "retrain": 2,
-    "investigate": 21,
+    "investigate": 22,
     "skip": 17
   },
   "parishes": [
@@ -2675,27 +2675,34 @@
       "diocese": "down_and_connor",
       "recipe_file": "parishes/recipes/down_and_connor/parishoflisburn.json",
       "recipe": {
-        "start_url": "https://parishoflisburn.org/about/",
-        "site_type": "",
-        "playbook_type": "",
+        "start_url": "https://parishoflisburn.org/category/news/",
+        "site_type": "pdf_link_list",
+        "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 4,
-        "click_count": 2,
+        "step_count": 2,
+        "click_count": 1,
         "has_terminal": true,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-04-30"
+        "operator_notes": [
+          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
+          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+          "Do not worry if the filename or date in the link text changes every week."
+        ],
+        "do_not": [
+          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
+          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+        ],
+        "recorded_date": "2026-08-20"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "No valid content found",
+      "suggested_action": "investigate",
+      "suggested_reason": "No valid content found"
     },
     {
       "parish_key": "loughshoreparishes",
@@ -3063,6 +3070,34 @@
         "operator_notes": [],
         "do_not": [],
         "recorded_date": "2026-04-30"
+      },
+      "bulletin_format": "download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "parishofardkeen",
+      "display_name": "Parishofardkeen",
+      "diocese": "down_and_connor",
+      "recipe_file": "parishes/recipes/down_and_connor/parishofardkeen.json",
+      "recipe": {
+        "start_url": "https://parishofardkeen.co.uk/parish-bulletin/",
+        "site_type": "",
+        "playbook_type": "",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 3,
+        "click_count": 2,
+        "has_terminal": true,
+        "operator_notes": [],
+        "do_not": [],
+        "recorded_date": "2026-08-19"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
@@ -3840,38 +3875,38 @@
       "recipe_file": "parishes/recipes/down_and_connor/stteresasparish.json",
       "recipe": {
         "start_url": "https://stteresasparish.church/",
-        "site_type": "stacked_image_bulletin",
+        "site_type": "wp_json_newest_post_images",
         "playbook_type": "stacked_image_bulletin",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 3,
-        "click_count": 1,
+        "step_count": 2,
+        "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "SUPERSEDES the 2026-06-27 version, which had start_url + goto step hardcoded",
-          "to the literal 28-June-2026 post permalink with no use_target_url and a",
-          "hardcoded urls: [] pair of .docx-1.jpg/.docx-2.jpg image URLs on the",
-          "download step \u2014 bug pattern #1/#2, would have served that same 28 June",
-          "post's images forever.",
-          "This WordPress site posts a new dated post at the site root each week",
-          "('The St Teresa\u2019s Parish Bulletin for Sunday, D[thstndrd] Month YYYY'),",
-          "each containing exactly 2 full-page image scans",
-          "(microsoft-word-D-month-YYYY.docx-1.jpg / -2.jpg, ~595x841). Some weeks",
-          "the site instead posts 'Please note there will be no bulletin on Sunday",
-          "...' with a different href/title shape and no images \u2014 the selector",
-          "a[href*=\"the-st-teresas-parish-bulletin-for-sunday\"] deliberately excludes",
-          "that so it doesn't try to image_stack a no-bulletin announcement post.",
-          "CONFIRMED 2026-08-10: newest post is 'Sunday, 9th August 2026', containing",
-          "microsoft-word-9-august-2026.docx.jpg (page 1, 595x841) and",
-          "microsoft-word-9-august-2026.docx-2.jpg (page 2) \u2014 genuinely fresh, not a",
-          "freshness-check bug; the parish posts reliably every week."
+          "WordPress.com site. Each bulletin is a dated post with exactly two",
+          "full-page scans (microsoft-word-D-month-YYYY.docx.jpg and .docx-2.jpg).",
+          "Permalink pattern: /{YYYY}/{MM}/{DD}/the-st-teresas-parish-bulletin-for-sunday-{Nth}-{month}-{YYYY}/",
+          "Slug Sunday is the bulletin Sunday; path YYYY/MM/DD is the post date",
+          "(usually 2\u20134 days earlier). rewrite_date_url would keep the old post-day",
+          "folder and 404 (e.g. /2026/08/06/\u2026-16th-august-2026/).",
+          "On-site /wp-json/wp/v2/posts is an HTML 404. Prefer",
+          "public-api.wordpress.com/wp/v2/sites/stteresasparish.church/posts,",
+          "then /feed/, then homepage links, then a small post-date range.",
+          "site_type:wp_json_newest_post_images then image_stack count=2.",
+          "CONFIRMED 2026-08-20: 16 Aug 2026 post and images are not up yet.",
+          "Newest real post is Sunday 9 Aug 2026 at /2026/08/06/\u2026-9th-august-2026/.",
+          "Recipe must surface that 9 Aug permalink (not invent a 16 Aug URL).",
+          "The 'no bulletin this Sunday' announcement uses a different slug and is",
+          "excluded by post_slug_patterns."
         ],
         "do_not": [
           "Do not hardcode one post permalink or image URL \u2014 it goes stale every week.",
-          "Do not click the 'no bulletin this week' announcement post as if it had images."
+          "Do not use rewrite_date_url on the permalink \u2014 it keeps the old /DD/ folder.",
+          "Do not click the 'no bulletin this week' announcement as if it had images.",
+          "Do not print_to_pdf the homepage."
         ],
-        "recorded_date": "2026-08-10"
+        "recorded_date": "2026-08-20"
       },
       "bulletin_format": "image_stack",
       "learned_pattern": "Wix HTML bulletin",
