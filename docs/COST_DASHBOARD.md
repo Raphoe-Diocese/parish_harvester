@@ -31,7 +31,7 @@
 
 | Risk | When | What to do |
 |------|------|------------|
-| 🔴 Repository over 5 GB | At ~1000 parishes × ~500 KB × 52 weeks ≈ 26 GB/year raw, hitting 5 GB cap in ~1–2 weeks without retention | Run the retention workflow — it archives old files into zips |
+| 🔴 Repository over 5 GB | At ~1000 parishes × ~500 KB × 52 weeks ≈ 26 GB/year raw, hitting 5 GB cap in ~1–2 weeks without retention | Zip archives stay off. Tree deletes do not shrink GitHub quota until a history rewrite (ask first). |
 | 🟡 AI rate limits hit | If more than ~1,400 parishes run per day | The router falls back to the next free provider automatically |
 | 🟡 GitHub Pages over 100 GB/month | Very unlikely at this scale | No action needed yet |
 
@@ -43,7 +43,7 @@
 1. Go to GitHub Actions tab.
 2. Click "Retention" workflow.
 3. Click "Run workflow" → set `dry_run: false` → click green button.
-4. The workflow will zip old files and delete originals. Repeat weekly until green.
+4. The workflow can delete leftover old individual PDFs. It will not create zip archives. Tree deletes do not shrink GitHub quota until a history rewrite (ask first).
 
 **🔴 AI limits:**
 1. Check the API key is still valid (Settings → Secrets → Actions).

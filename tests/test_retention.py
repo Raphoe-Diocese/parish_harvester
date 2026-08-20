@@ -177,6 +177,11 @@ class RetentionWorkflowTests(unittest.TestCase):
         self.assertIn("archives disabled", workflow.lower())
         self.assertNotIn("zip old", workflow.lower())
 
+    def test_harvest_workflow_has_no_disabled_pdf_cleanup(self) -> None:
+        workflow = Path(".github/workflows/harvest.yml").read_text(encoding="utf-8")
+        self.assertNotIn("Clean transient bulletin PDFs from repository", workflow)
+        self.assertNotIn("if: false", workflow)
+
 
 if __name__ == "__main__":
     unittest.main()

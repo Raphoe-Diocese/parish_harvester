@@ -12,7 +12,7 @@ Large files (`fetcher.py`, `content.js`) stay until slices are proven. New logic
 Harvest (per-parish errors isolated)
   → Stitch mega PDF
   → Deploy Pages (mega PDFs removed from git after deploy)
-  → Retention (zip old files)
+  → Retention (purge leftover old PDFs; zip archives stay off)
   → OCR per diocese (one failure does not abort others)
        Tier 0: ocr/text_extract.py (free, born-digital PDFs)
        Tier 1: Mistral OCR
