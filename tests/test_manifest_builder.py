@@ -56,7 +56,9 @@ class ManifestBuilderTests(unittest.TestCase):
             self.assertEqual("2026-05-22", manifest["target_date"])
             self.assertIn("generated_at", manifest)
             self.assertIn("derry_diocese", manifest["dioceses"])
-            self.assertNotIn("down_and_connor", manifest["dioceses"])
+            # Dioceses without a mega PDF still appear; mega_pdf falls back to
+            # the diocese page so the public index does not drop them.
+            self.assertIn("down_and_connor", manifest["dioceses"])
 
             derry = manifest["dioceses"]["derry_diocese"]
             self.assertEqual("Derry Diocese", derry["display_name"])
@@ -64,7 +66,12 @@ class ManifestBuilderTests(unittest.TestCase):
             self.assertEqual(1, derry["html_links"])
             self.assertEqual(1, derry["failed"])
             self.assertEqual("66.7%", derry["success_rate"])
+            self.assertIn("/mega_pdf/derry_mega_bulletin.pdf", derry["mega_pdf"])
             self.assertNotIn("ocr_viewer", derry)
+
+            dac = manifest["dioceses"]["down_and_connor"]
+            self.assertEqual(dac["mega_pdf"], dac["parish_page"])
+            self.assertNotIn("ocr_viewer", dac)
 
     def test_build_manifest_writes_reliability_tiers_and_rss_feed(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

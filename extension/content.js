@@ -2163,8 +2163,8 @@
         emoji: "☁️",
         summary: "Cloud folder — weekly PDFs listed by date (YY.MM.DD).",
         advice: rowVisible
-          ? `Tap Pick this Sunday's row (${expected}), then Save this PDF on the file page.`
-          : `This Sunday's file (${expected}) not visible yet — pick the newest dated row, then Save PDF.`,
+          ? `Do not use ⋮ More actions. Tap Pick this Sunday's row (${expected}), then Save this PDF on the file page.`
+          : `Do not use ⋮ More actions. This Sunday's file (${expected}) not visible yet — pick the newest dated row, then Save this PDF.`,
         type: "cloud_folder",
         expectedLabel: expected,
         rowVisible,
@@ -2180,7 +2180,7 @@
         emoji: "📁",
         summary: "Google Drive — permanent bulletin file (same link each week).",
         advice:
-          "Train on this Drive preview page — tap the green Save Drive bulletin button (one step). Do not open the instant-download link.",
+          "Do not use ⋮ More actions. Train on this Drive preview page — tap Save this PDF / Save Drive bulletin. Do not open the instant-download link.",
         type: "google_drive_static",
         htmlFingerprint: "google_drive_file",
         autoDownloadUrl: downloadUrl,
@@ -4433,7 +4433,7 @@
         nextStepBanner.style.display = "block";
         nextStepBanner.textContent =
           pageCtx.type === "google_drive_static"
-            ? "👇 Train on this Drive preview page — tap Save Drive bulletin, then Send & test. Do not open the instant-download link."
+            ? "👇 Google Drive: do not use ⋮ More actions. Tap Save this PDF / Save Drive bulletin, then Send & test."
             : "👇 Tap the green Save bulletin PDF button below (one step). Then Send & test.";
         if (moreOptionsSection) moreOptionsSection.style.display = "";
       } else if (onDirectPdf) {
@@ -7329,10 +7329,12 @@
             onProgress: ({ elapsed, runStatus, queued }) => {
               if (token !== _postPushWatchToken) return;
               let statusLabel = "checking result";
-              if (queued || runStatus === "queued") {
-                statusLabel = "queued (full harvest may be ahead)";
+              if (runStatus === "no_actions_read") {
+                statusLabel = "waiting for parish_status (PAT needs Actions: Read)";
+              } else if (queued || runStatus === "queued") {
+                statusLabel = "queued on GitHub";
               } else if (runStatus === "in_progress") {
-                statusLabel = "running on GitHub";
+                statusLabel = "running on GitHub (setup can take 4–6 min)";
               } else if (runStatus === "starting" || runStatus === "waiting") {
                 statusLabel = "waiting for GitHub Actions";
               } else if (runStatus === "pending") {
@@ -7466,6 +7468,7 @@
 
       const pushBtn = document.createElement("button");
       pushBtn.type = "button";
+      pushBtn.id = "ph-send-and-test-btn";
       pushBtn.textContent = "🚀 Send & test on GitHub";
       pushBtn.style.cssText = [
         "border:none",
@@ -8002,7 +8005,7 @@
               updated: pushResult.updated,
               dispatchOk: dispatchResult.ok,
               dispatchError: dispatchResult.ok ? "" : (dispatchResult.error || "Dispatch failed"),
-              dispatchPending: !dispatchResult.ok,
+              dispatchPending: false,
               stepsPushed: Array.isArray(recipeToPush.steps) ? recipeToPush.steps.length : 0,
               stepsPreservedFromOld: false,
             };
@@ -8268,6 +8271,22 @@
     if (message.type === "restore_recording_session") {
       void _restoreRecordingSessionFromStorage();
       return { ok: true };
+    }
+    if (message.type === "ph_send_and_test") {
+      try {
+        _ensureToolbar(true);
+        const btn = document.getElementById("ph-send-and-test-btn");
+        if (!btn) {
+          return {
+            ok: false,
+            reason: "Send & test is on the parish page toolbar. Open the site, record the bulletin, then tap Send & test.",
+          };
+        }
+        btn.click();
+        return { ok: true, reason: "Send & test started on this page." };
+      } catch (err) {
+        return { ok: false, reason: String(err) };
+      }
     }
 
     if (message.type === "push_recipe_followup") {

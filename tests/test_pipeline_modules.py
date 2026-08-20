@@ -35,12 +35,15 @@ class TextExtractTests(unittest.TestCase):
 
 class ParishSplitterTests(unittest.TestCase):
     def test_split_finds_parish_sections(self) -> None:
+        # Short bare names (Culdaff) only count with a stitcher URL banner;
+        # longer titles / "* Parish" stand alone. Match production OCR shape.
         text = (
             "PAGE 1\n"
-            "Banagher\n"
+            "Banagher Parish\n"
             "Mass Sunday 10am\n"
             "PAGE 2\n"
             "Culdaff\n"
+            "https://culdaff.example/newsletter\n"
             "Bingo Friday 8pm\n"
         )
         chunks = split_ocr_by_parish(

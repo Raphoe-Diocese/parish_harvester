@@ -1,35 +1,44 @@
 {
+  "version": 1,
   "parish_key": "glenavyandkilleadparish",
   "display_name": "Glenavy and Killead",
-  "recorded_date": "2026-04-30",
+  "diocese": "down_and_connor",
   "start_url": "https://www.glenavyandkilleadparish.com/bulletins/",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.glenavyandkilleadparish.com/bulletins/"
-    },
-    {
       "action": "click",
-      "selector": "div#cmplz-cookiebanner-container > div > div:nth-of-type(1) > div:nth-of-type(3) > svg",
+      "selector": "a[href$='.pdf']",
+      "href": "https://www.glenavyandkilleadparish.com/app/uploads/2026/08/2026-August-16-Twentieth-Sunday-in-Ordinary-Time.pdf",
+      "text": "Twentieth Sunday in Ordinary Time 16/08/2026",
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "top",
       "fallback_selectors": [
         "a[href$='.pdf']",
         "a[href*='.pdf']"
       ]
     },
     {
-      "action": "click",
-      "selector": "a:has-text('Fourth')",
-      "fallback_selectors": [
-        "a[href*='fourth'][href$='.pdf']",
-        "a[href$='.pdf']",
-        "a[href*='.pdf']",
-        "section > section:nth-of-type(2) > section > div:nth-of-type(1) > h5 > a"
-      ]
-    },
-    {
       "action": "download",
-      "url_pattern": "*.pdf"
+      "url": "https://www.glenavyandkilleadparish.com/app/uploads/2026/08/2026-August-16-Twentieth-Sunday-in-Ordinary-Time.pdf"
     }
   ],
-  "diocese": "down_and_connor"
+  "observed_load_ms": 20370,
+  "timeout_ms": 55000,
+  "total_timeout_s": 250,
+  "playbook_type": "pdf_download_list",
+  "site_type": "pdf_link_list",
+  "operator_notes": [
+    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
+    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+    "Do not worry if the filename or date in the link text changes every week."
+  ],
+  "do_not": [
+    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
+    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  },
+  "recorded_date": "2026-08-19"
 }

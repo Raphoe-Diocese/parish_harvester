@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Glenavy and Killead Text Bulletin — 20/08/2026</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #eef1f0;
+      color: #1a1f1e;
+      line-height: 1.65;
+      font-size: 1.125rem;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
+    }
+    a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
+    .page {
+      max-width: min(72ch, 100%);
+      margin: 0 auto;
+      padding: 14px 18px 40px;
+    }
+    .top {
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+      gap: 8px 14px;
+      margin-bottom: 12px;
+    }
+    .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+    .back-link {
+      font-size: 0.9rem; font-weight: 700;
+      color: #14524f; text-decoration: none;
+    }
+    .title-line {
+      font-size: 1rem; font-weight: 700; color: #1a1f1e;
+    }
+    .font-size-controls { display: none; }
+    .ocr-zoom-bar {
+      position: sticky; top: 0; z-index: 6;
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
+    }
+    .ocr-zoom-bar button {
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+      line-height: 1;
+    }
+    .ocr-zoom-pct {
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 4px; } }
+    
+    .ocr-body {
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    .ocr-body h1, .ocr-body h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h2.b-title, .ocr-body .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    .ocr-body h3.b-head, .ocr-body .b-head {
+      font-size: 1.12em;
+      color: #134e9c;
+      margin: 1.1em 0 0.35em;
+    }
+    .ocr-body h4.b-sub, .ocr-body .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    .ocr-body h3, .ocr-body h4 {
+      color: #1a6b6b;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    .ocr-body h3.ocr-page-heading,
+    .ocr-body .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    .ocr-body hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    .ocr-body strong { color: #0f2b5b; }
+    .ocr-body a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .ocr-body mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    .ocr-body mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    .ocr-body table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ocr-body table.b-table td, .ocr-body table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .ocr-body table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    .ocr-body table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    .ocr-body img, .ocr-body iframe, .ocr-body video {
+      max-width: 100%;
+      height: auto;
+    }
+    .ocr-body > :first-child {
+      margin-top: 0;
+    }
+
+    .ocr-body {
+      padding: 4px 2px 8px;
+    }
+    .search-panel {
+      margin: 0 0 12px;
+      border: 1px solid #d4ddd9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .search-panel .ocr-search-bar { margin-bottom: 6px; }
+    .ocr-search-bar { position: relative; margin-bottom: 6px; }
+    .search-input {
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: #1a1f1e; background: #fff;
+    }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 1px solid #1a6b6b; border-radius: 6px; background: #fff; color: #1a6b6b;
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { color: #999; border-color: #d4ddd9; cursor: not-allowed; }
+    .match-count { color: #5a6a68; font-size: 0.85rem; font-weight: 600; }
+    .note-box {
+      margin-top: 18px;
+      color: #5a6a68;
+      font-weight: 400;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      padding: 0;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 8px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    body.embed-mode .top { display: none !important; }
+    body.embed-mode .page { padding-top: 8px; }
+    @media (max-width: 600px) {
+      .page { padding: 12px 14px 32px; }
+      .ocr-search-tools button { min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top" id="ocr-top">
+      <div class="top-left">
+        <a class="back-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">← Viewer</a>
+        <span class="title-line">GLENAVY AND KILLEAD Text Bulletin · 20/08/2026</span>
+      </div>
+    </div>
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+      <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+      <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+      <span class="ocr-zoom-hint">or pinch to zoom</span>
+    </div>
+    <div class="search-panel" role="search">
+      <div class="ocr-search-bar">
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search text (mass, bingo, parish…)" aria-label="Search bulletin text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled>← Prev</button>
+          <button id="ocr-next" type="button" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+    <div class="ocr-body" id="ocr-text"><div class="ocr-failed-banner" role="status">ℹ️ Matched by parish name only (not exact PDF pages) this week — check the PDF above for the definitive version.</div>
+<p>Glenavy and Killead<br>
+https://www.glenavyandkilleadparish.com<br>
+Page 12<br>
+17 —23 August 2026 Mass Intentions<br>
+ST JOSEPH ’S MATER DEI St James<br>
+Monday<br>
+Adoration<br>
+7pm —8pm<br>
+Sun Adoration<br>
+6.30pm —<br>
+7.30pm<br>
+Divine Mercy<br>
+Chaplet, Chaplet<br>
+for Holy Souls &amp;<br>
+Rosary after-<br>
+wards starts at<br>
+6.15pm<br>
+Mon Adoration<br>
+11am —12pm Mon 9.30am Communion Service<br>
+Tue 10am Funeral<br>
+7pm Margaret Murray (Anniv)<br>
+Danny McArdle (Anniv)<br>
+6.30pm Rosary<br>
+7.30pm Divine Mercy Chaplet<br>
+7.30 —8.30 pm Adoration<br>
+Wed 9.30am P.I.<br>
+No Adoration in July or August<br>
+Thurs 9.30am Joseph McCann<br>
+(Anniv)<br>
+Aodh Cormican (Anniv)<br>
+Adoration 7pm —9pm<br>
+Fri 9.30am Liam Grant (RIP)<br>
+In Honour of The Immaculate<br>
+Heart<br>
+Sat 6pm Martin Reilly (10th Anniv)<br>
+Baby Sean Jude O ’Brien (Anniv)<br>
+Sun 9.30am Paddy Gallagher<br>
+(Anniv)<br>
+Simone McCambridge (Anniv)<br>
+12.00pm David Bradley<br>
+(Anniv)<br>
+Rose &amp; Peter Gilbride (Anniv) 10. 45am P.P.<br>
+Recently Deceased Brian McKenna ( Tromery Drive), Shaun Brown (Glenoak<br>
+Gdns)<br>
+Anniversaries Ethel O ’Neill, Harry O ’Neill, Ciaran O ’Neill, John McNeice,<br>
+Monica McNeice, Jerome Cleary, Ambrose McKeever, Kenneth Nelson,<br>
+Patrick Boyle, Maura Babington, Margaret Murray, Danny McArdle, Joseph<br>
+McCann, Aodh Cormican, William McGarrell, Daniel Crossey, Kathleen Henry,<br>
+Fr Eamon O ’Brien, Jim Brazier, Maureen O ’Rourke.<br>
+Sanctuary lamp intentions: Liz Donnelly, G &amp; M<br>
+Adoration No Adoration in Mater Dei on Wednesday mornings in July &amp;<br>
+August.<br>
+Collection 9 August 2026<br>
+Weekly Offering: £3,356<br>
+Thank you for your generosity Feumore Mass<br>
+Centre<br>
+Parish Draw 2026 -27 (Week 15)<br>
+Winner £50 Lorraine McCaffrey (Glenavy)<br>
+Winner £100 Will Fitzpatrick (Ballinderry<br>
+Upper)<br>
+Winner £500 Kathleen McCormick (Glenavy)<br>
+Congratulations to our winners! CELEBRATION IN ST CLARE’S HALL ON 27 S EPTEMBER 2026 It is our intention<br>
+to have a celebration for Canon Colm on 27 September 2026. Anyone<br>
+willing to help with organising the celebration is invited to a meeting<br>
+on Monday 17 August 2026 in the Annex of St Clare ’s Hall @ 7.30pm.<br>
+A parish collection for Canon Colm will follow in due course.<br>
+COFFEE IN THE COURTYARD during the summer months after 10.45am<br>
+Mass in Mater Dei, weather permitting. Volunteers are needed. If you<br>
+can help, please contact the Parish office.<br>
+SAINT VINCENT DE PAUL—CRUMLIN CONFERENCE (ST JAMES) Emergency<br>
+helpline<br>
+07754427088<br>
+. Donations can be made via the Crumlin SVP<br>
+conference bank account. Account number 41965035, sort code<br>
+980460. ST JOSEPH ’S GLENAVY CONFERENCE SVDP Emergency helpline<br>
+07784955647<br>
+. Donation can be made to our bank account, Sort Code<br>
+98-04-60. Account Number 41966009. Your support is very much<br>
+appreciated as we support those most vulnerable in your local<br>
+community.<br>
+CATHOLIC MOTHERS IRELAND – FAMILY DAY Catholic Mothers Ireland will hold its<br>
+Annual National Mass on Sunday, 6 September at Termonbacca Retreat Centre,<br>
+Derry City. The day will begin with Mass at 2.00pm, celebrated by Bishop Donal<br>
+McKeown, followed by refreshments, children&#x27;s activities, and a talk for parents.<br>
+This promises to be a lovely day for the whole family. For more information and<br>
+booking details, please email<br>
+info@catholicmothers.ie<br>
+. All are welcome.<br>
+ASSOCIATE MEMBERSHIP —2026 DIOCESAN PILGRIMAGE TO LOURDES Many<br>
+thanks to the parishioners of Glenavy &amp; Killead for their generous<br>
+donation of £1,355 in support of the Diocesan Pilgrimage. The donation<br>
+will help provide the equipment and supplies needed to care for the sick<br>
+and vulnerable pilgrims who are at the heart of the pilgrimage. They<br>
+also support our staff with subsidized fares. Please be assured that all<br>
+our associate pilgrims a re remembered each day during the pilgrimage in<br>
+Lourdes. Following Christ<br>
+Monday Evenings from 7 September – 17 October 26,<br>
+7 - 9pm in Mater Dei Pastoral Centre.<br>
+Following Christ is a 7-week journey of Catholic discipleship. It is designed for<br>
+those interested in learning about the Catholic Faith or those seeking to deepen or<br>
+revitalize their faith. It offers practical ways in which to live out the Christian life - to<br>
+think like, act like and to love like Jesus Christ.<br>
+Session 1: Personal Prayer<br>
+Session 2: Hearing God in Scripture<br>
+Session 3: The Power of the Sacraments<br>
+Session 4: Forgiving One Another<br>
+Session 5: The Spirit -Empowered Life,<br>
+Session 6: The Heart of a Disciple<br>
+Session 7: Going On with the Lord.<br>
+Book your place before the 24 August as numbers are limited by leaving<br>
+your name and contact details in the parish office Tel.<br>
+02894422278<br>
+or email<br>
+glenavy@downandconnor.org<br>
+Page 13<br>
+Liturgical ‘Sign of Peace ’ The Sign of Peace remains an integral part of<br>
+the celebration of the Eucharist and has been reintroduced as a normal<br>
+practice across the Diocese. The customary expression of the Sign of Peace<br>
+in Ireland is a handshake. However, other non -contact forms of the sign of<br>
+peace such as a nod, a bow or a smile are also legitimate expressions of the<br>
+Sign of Peace. No offence should be taken if someone prefers to express a<br>
+non-contact Sign of Peace. The Diocese encourages all to continue to<br>
+exercise good hygienic practices, and if you exhibit flu -like symptoms, you<br>
+are encouraged to remain at home.<br>
+Church Webcam The church webcam for live stream of Masses can be<br>
+accessed via the Parish Website<br>
+www.glenavyandkilleadparish.com<br>
+Go to<br>
+the top line and click on webcams and pick either Mater Dei or Glenavy . It<br>
+can also be accessed at<br>
+www.churchmedia.tv<br>
+. Select Antrim &amp; search for St<br>
+Joseph ’s, Glenavy or Mater Dei, Crumlin and the churches will appear. Click<br>
+on the play button to view live stream. The webcams enable us to attend Mass,<br>
+however they do not allow us to receive the Eucharist, The Body of Christ. When possi-<br>
+ble, we should attend Mass in the Church whenever our circumstances permit in order<br>
+to receive Holy Communion.<br>
+MUSIC AT ST JOSEPH ’S There is an urgent need to recruit an organist or<br>
+guitarist or pianist, if you or someone you know would be interested in<br>
+this position please contact Canon McBride as soon as possible.<br>
+Making your offering to the church Parishioners are encouraged to<br>
+make donations to the parish either by using the parish envelopes or by<br>
+means of bank transfer. It is of great benefit to the parish when we can<br>
+record donations so that gift aid can be claimed, if applicable. If you would<br>
+like to donate using envelopes and don ’t already do so, please contact the<br>
+parish office. Alternatively, if you are able, you are encouraged to<br>
+make a monthly offering to the Church by means of a Bank Transfer to:<br>
+Parish of Glenavy and Killead Sort Code 98 04 60, Account<br>
+10654677 . The relevant forms are available at the back of the Churches.<br>
+Both forms need to be completed with one sent to your Bank and the other<br>
+to the parish office. If you have any queries, please contact the Parish Sup-<br>
+port Officer in confidence. Please note that there is a separate account<br>
+number for the Parish Draw and this should not be used when making a<br>
+weekly donation.<br>
+DEACONS Those who are discerning a vocation to the permanent diac-<br>
+onate are encouraged to make contact with the Diocesan Director, Rev<br>
+Brett Lockhart for the Permanent Diaconate,<br>
+b.lockhart@downandconnor.org<br>
+.<br>
+CCTV C AMERA ’S Please be aware that St Joseph ’s Church and graveyard and<br>
+Mater Dei Church and grounds are monitored by CCTV.<br>
+A BLESSED STATUE OF OUR LADY OF FATIMA is available through The Legion of<br>
+Mary to any sick parishioner for one week. If you would like to avail of<br>
+the statue, please contact the parish office.<br>
+Sanctuary lamp intentions: A Sanctuary Lamp burns for a week in each of our<br>
+two churches. If you would like to dedicate a lamp for a loved one or a special<br>
+Intention please contact the Parish Office. There is a suggested offering of £5<br>
+Page 14<br>
+20TH SUNDAY IN ORDINARY TIME<br>
+16TH AUGUST 2026<br>
+Readings: A (II) Psalter: Week IV<br>
+Parish Clergy: Very Rev. Michael Spence PP,<br>
+Rev. John O ’Laverty CC &amp; Rev. Deacon Brendan Dowd<br>
+Parish Telephone (Office hours): 90743119<br>
+Office hours: Mon -Thu 9.30am -2.30pm, Fri 9.30am -1.30pm<br>
+Address: 226-228 Limestone Road, Belfast BT15 3AP<br>
+Emergency Sick Calls only (24hrs):<br>
+07928968773<br>
+Society of St Vincent de Paul (Helpline):<br>
+028 90351561<br>
+Email:<br>
+holyfamily@downandconnor.org<br>
+Website &amp; Webcam:<br>
+www.holy<br>
+-familyparish.com CONTACT INFORMATION For more information and resources:<br>
+www.holy<br>
+-familyparish.com PARISH NEWS &amp; EVENTS<br>
+WEEKLY OFFERING. The weekly collection on Sunday 9nd August came to<br>
+£2,521.14. Thank you for your continued generosity and support. The second<br>
+collection this Sunday will be taken up after Communion, for the Diocesan<br>
+Cathedral Fund. This Diocesan Collection has been established to help defray the<br>
+costs relating to the usage of the Cathedral, for Diocesan celebrations throughout<br>
+the year, for the benefit of the whole Diocese. For information on standing order<br>
+and contactless methods of donation, please contact the parish office.<br>
+PARISH 100 CLUB. Week 14 winners: Anne McConvey, Kevin Keenan, Martin<br>
+Cromie &amp; Bridie McCusker (Promoter). Congratulations to all the winners.<br>
+LOUGH DERG . Visit<br>
+www.loughderg.com<br>
+, for details of events during<br>
+August &amp; September, incl. one day retreats, Heritage Day tours, and the<br>
+Lakeshore Pilgrim Path Pilgrimage.<br>
+EMBRACE THE GRACE. Young Adult Youth Conference on 29th August,<br>
+9.30am —6pm at Legion of Mary, De Montfort House, Dublin. Tickets at www.<br>
+eventbrite.ie and for information, contact<br>
+deusetpatria@gmail.com<br>
+.<br>
+MATT TALBOT – URBAN MYSTIC. Newcastle Community Cinema, St<br>
+Mary&#x27;s Hall, Main St. on 4th September at 7pm. Matt Talbot&#x27;s remarkable true<br>
+story of faith, struggle, addiction and redemption. Guest speaker, Michael Murphy.<br>
+Admission free, suggested donation of £3. All welcome.<br>
+ST JOSEPH MEN&#x27;S CAMI NO. A 25km pilgrimage through the Boyne Valley<br>
+on 12th September, beginning in Drogheda. The day includes Mass, Adoration,<br>
+Rosary, Confessions, lunch &amp; dinner, with after dinner speaker Fr. Mark Quinn.<br>
+Open to men aged 18+. Cost: €65 (student €55).<br>
+www.dominicans.ie/events<br>
+or<br>
+E:<br>
+op.evangelisation@gmail.com<br>
+.<br>
+SAFEGUARDING. Please note that, in the interests of safeguarding, it is im-<br>
+portant that children are accompanied at all times, when in our church buildings.</p></div>
+    <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
+  </div>
+  <script>
+    (function () {
+      try {
+        if (new URLSearchParams(window.location.search).get('embed') === '1') {
+          document.body.classList.add('embed-mode');
+        }
+      } catch (e) {}
+    })();
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-text');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+    (function () {
+      const ocrRoot = document.getElementById('ocr-text');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      if (!ocrRoot || !ocrSearch) return;
+      const originalHtml = ocrRoot.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+      function escapeRegExp(text) {
+        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        ocrMatches[idx].classList.add('search-active');
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
+      function updateMatchUi() {
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} of ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+      function applySearch(query) {
+        ocrRoot.innerHTML = originalHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrRoot, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) nodes.push(node);
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) return;
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrRoot.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+      ocrSearch.addEventListener('input', (e) => applySearch(e.target.value.trim()));
+      clearSearch.addEventListener('click', () => { ocrSearch.value = ''; applySearch(''); ocrSearch.focus(); });
+      prevMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && ocrMatches.length) {
+          e.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+    })();
+  </script>
+</body>
+</html>

@@ -1,27 +1,33 @@
 {
+  "version": 1,
   "parish_key": "loughshoreparishes",
   "display_name": "Loughshore",
-  "recorded_date": "2026-04-30",
+  "diocese": "down_and_connor",
   "start_url": "https://www.loughshoreparishes.org/sunday-bulletin/",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.loughshoreparishes.org/sunday-bulletin/"
-    },
-    {
       "action": "click",
-      "selector": "a:has-text('Sunday')",
-      "fallback_selectors": [
-        "a[href*='sunday'][href$='.pdf']",
-        "a[href$='.pdf']",
-        "a[href*='.pdf']",
-        "section > section > div:nth-of-type(2) > p:nth-of-type(2) > strong > a"
-      ]
+      "selector": "a:has-text(\"20th Sunday in Ordinary Time\")",
+      "href": "https://www.loughshoreparishes.org/sunday-bulletin/20th-sunday-in-ordinary-time-3/",
+      "text": "20th Sunday in Ordinary Time – 16 August 2026 | 20th Sunday "
     },
     {
-      "action": "download",
-      "url_pattern": "*.pdf"
+      "action": "print_to_pdf"
     }
   ],
-  "diocese": "down_and_connor"
+  "observed_load_ms": 6594.199951171875,
+  "timeout_ms": 55000,
+  "total_timeout_s": 250,
+  "playbook_type": "wix_html",
+  "site_type": "html_text_bulletin",
+  "operator_notes": [
+    "Bulletin text is on the web page — not a downloadable PDF file.",
+    "Use Save page as PDF on the newsletter article page.",
+    "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
+  ],
+  "do_not": [
+    "Do not use Pick bulletin image when the page is mostly text paragraphs.",
+    "Do not stop at click-only — need print_to_pdf as the final step."
+  ],
+  "recorded_date": "2026-08-19"
 }

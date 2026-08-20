@@ -8,6 +8,7 @@ from harvester.cloud_folders import (
     detect_cloud_date_format,
     format_cloud_folder_label,
     is_cloud_folder_url,
+    newest_yy_mm_dd_label,
     parse_yy_mm_dd,
     recipe_uses_cloud_folder,
     rewrite_cloud_folder_click_step,
@@ -42,6 +43,15 @@ class CloudFolderTests(unittest.TestCase):
         # locked YY.MM.DD Drive-folder cases above.
         self.assertEqual(
             extract_date_from_string("Parish-Bulletin-09.08.26-FOR-PRINTING.pdf"),
+            date(2026, 8, 9),
+        )
+        # Ballymena unpadded D.M.YY (16.8.26 / 9.8.26)
+        self.assertEqual(
+            extract_date_from_string("16.8.26-20th-Sunday.pdf"),
+            date(2026, 8, 16),
+        )
+        self.assertEqual(
+            extract_date_from_string("9.8.26-19th-Sunday.pdf"),
             date(2026, 8, 9),
         )
 
@@ -130,6 +140,20 @@ class CloudFolderTests(unittest.TestCase):
         rewritten = rewrite_year_folder_click_step(step, date(2028, 1, 9))
         self.assertEqual(rewritten["text"], "2028")
         self.assertIn("2028", rewritten["selector"])
+
+    def test_newest_yy_mm_dd_label(self) -> None:
+        self.assertEqual(
+            newest_yy_mm_dd_label(
+                [
+                    "26.08.02.pdf Shared 30 Jul",
+                    "26.08.16.pdf Shared 14 Aug",
+                    "26.08.09.pdf Shared 6 Aug",
+                    "folder 2026",
+                ]
+            ),
+            "26.08.16.pdf",
+        )
+        self.assertIsNone(newest_yy_mm_dd_label(["README", "notes.txt"]))
 
 
 if __name__ == "__main__":

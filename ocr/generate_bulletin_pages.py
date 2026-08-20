@@ -729,10 +729,11 @@ def render_parish_link_grid(
 
     *internal_hrefs* optionally maps a normalised parish name (see
     :func:`_normalise_name`) to this diocese's own per-parish bulletin page
-    (see :mod:`ocr.parish_pages`). When present, that becomes the primary
-    link and the parish's external site becomes a small secondary "🔗 Site"
-    link; parishes without a generated page keep the old external-only
-    behaviour unchanged.
+    (see :mod:`ocr.parish_pages`). When present, the parish name links to that
+    bulletin page only (no separate external "Site" link). Parishes without a
+    generated page keep the external bulletin URL as the name link.
+
+    Every parish name opens in a new tab.
     """
     if not parish_links:
         return '<p class="empty-state">No parish bulletin links were found for this diocese yet.</p>'
@@ -740,6 +741,7 @@ def render_parish_link_grid(
     internal_hrefs = internal_hrefs or {}
     items = []
     seen: set[str] = set()
+    blank = 'target="_blank" rel="noopener noreferrer"'
     for name, url in sorted_links:
         key = _normalise_name(name)
         if not key or key in seen:
@@ -747,29 +749,12 @@ def render_parish_link_grid(
         seen.add(key)
         name_key = html.escape(name.lower(), quote=True)
         safe_name = html.escape(name)
-        internal_href = internal_hrefs.get(key)
-        if internal_href:
-            safe_internal = html.escape(internal_href, quote=True)
-            safe_url = html.escape(url, quote=True)
-            site_link = (
-                f'<a class="parish-site-link" href="{safe_url}" target="_blank" '
-                f'rel="noopener noreferrer">🔗 Site</a>'
-                if url
-                else ""
-            )
-            items.append(
-                f'<li class="parish-item" data-name="{name_key}">'
-                f'<a class="parish-link" href="{safe_internal}">'
-                f'<span aria-hidden="true">⛪</span> <span>{safe_name}</span></a>'
-                f"{site_link}</li>"
-            )
-        else:
-            safe_url = html.escape(url, quote=True)
-            items.append(
-                f'<li class="parish-item" data-name="{name_key}">'
-                f'<a class="parish-link" href="{safe_url}" target="_blank" rel="noopener noreferrer">'
-                f'<span aria-hidden="true">⛪</span> <span>{safe_name}</span></a></li>'
-            )
+        href = internal_hrefs.get(key) or url
+        safe_href = html.escape(href, quote=True)
+        items.append(
+            f'<li class="parish-item" data-name="{name_key}">'
+            f'<a class="parish-link" href="{safe_href}" {blank}>{safe_name}</a></li>'
+        )
     return (
         '<div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div>'
         f'<ul id="parish-grid" class="parish-grid">{"".join(items)}</ul>'
@@ -912,7 +897,7 @@ def render_ocr_standalone_page(
   <div class="page">
     <div class="top" id="ocr-top">
       <div class="top-left">
-        <a class="back-link" href="{html.escape(viewer_href, quote=True)}">← Viewer</a>
+        <a class="back-link" href="{html.escape(viewer_href, quote=True)}" target="_blank" rel="noopener noreferrer">← Viewer</a>
         <span class="title-line">{html.escape(diocese_label)} Text Bulletin · {html.escape(uk_bulletin_date)}</span>
       </div>
     </div>
@@ -1101,6 +1086,176 @@ def _pdf_standalone_href(config: DioceseConfig, bulletin_date: str) -> str:
     return f"{config.key}-{bulletin_date}-pdf.html"
 
 
+def prefers_native_pdf_js() -> str:
+    """Detect phones/tablets where PDF-in-iframe usually shows a broken icon."""
+    return """
+      function prefersNativePdf() {
+        var ua = navigator.userAgent || '';
+        if (/Android/i.test(ua)) return true;
+        if (/iPhone|iPod/i.test(ua)) return true;
+        if (/iPad/i.test(ua)) return true;
+        // iPadOS 13+ may report as Macintosh with touch points.
+        if (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1) return true;
+        return false;
+      }
+"""
+
+
+PDF_INPAGE_VIEWER_SRC = "/assets/pdf-inpage-viewer.js"
+
+
+def pdf_inpage_viewer_css() -> str:
+    """Hide the raw-PDF iframe on every device; show stacked PDF.js pages.
+
+    Desktop wrap stays 850px. Tablet/phone use 450px. Users scroll pages
+    inside the viewer — no Page X of Y / prev-next chrome.
+    """
+    return f"""
+    .pdf-inpage-viewer,
+    .pdf-mobile-fallback {{
+      display: flex !important;
+      flex-direction: column;
+      min-height: 0;
+      flex: 1 1 auto;
+      background: #3a3f42;
+      color: #e8eeed;
+    }}
+    .pdf-inpage-toolbar {{
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 8px 10px;
+      background: {DEEP_TEAL};
+      color: #fff;
+      flex: 0 0 auto;
+    }}
+    .pdf-inpage-backup {{ display: flex; gap: 8px; flex-wrap: wrap; }}
+    .pdf-inpage-backup a {{ color: #fff; font-weight: 700; font-size: 0.85rem; }}
+    .pdf-inpage-status {{ padding: 10px 12px; background: #1f3d3c; color: #d8f0ee; font-size: 0.9rem; }}
+    .pdf-inpage-pages {{
+      flex: 1 1 auto;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      background: #525659;
+      padding: 8px 0 16px;
+    }}
+    .pdf-inpage-page-slot {{
+      margin: 0 auto 10px;
+      background: #3a3f42;
+      min-height: 180px;
+    }}
+    .pdf-inpage-page-slot canvas {{ display: block; width: 100%; height: auto; background: #fff; }}
+    .pdf-frame-wrap,
+    .pdf-standalone-shell {{
+      display: flex;
+      flex-direction: column;
+    }}
+    .pdf-frame-wrap iframe,
+    .pdf-standalone-shell iframe.pdf-frame,
+    body.is-native-pdf iframe.pdf-frame {{
+      display: none !important;
+    }}
+    .pdf-frame-wrap.is-native-pdf,
+    .pdf-standalone-shell.is-native-pdf,
+    body.is-native-pdf .pdf-standalone-shell {{
+      display: flex;
+      flex-direction: column;
+      height: 85vh !important;
+      min-height: 850px !important;
+      background: #3a3f42;
+    }}
+    @media (max-width: 1024px) {{
+      .pdf-frame-wrap,
+      .pdf-standalone-shell,
+      .pdf-frame-wrap.is-native-pdf,
+      .pdf-standalone-shell.is-native-pdf,
+      body.is-native-pdf .pdf-standalone-shell {{
+        height: 70vh !important;
+        min-height: 450px !important;
+        display: flex;
+        flex-direction: column;
+        background: #3a3f42;
+      }}
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {{
+        display: none !important;
+      }}
+    }}
+"""
+
+
+def pdf_inpage_viewer_html(pdf_href: str) -> str:
+    """In-page PDF.js host. Visible on desktop and phones.
+
+    Open PDF / Download stay as backup. No Page X of Y navigator.
+    Do not use the HTML ``hidden`` attribute — browsers apply
+    ``[hidden] {{ display: none !important }}`` which fights flex layout.
+    """
+    safe = html.escape(pdf_href, quote=True)
+    return f"""
+        <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="{safe}">
+          <div class="pdf-inpage-toolbar">
+            <div class="pdf-inpage-backup">
+              <a href="{safe}" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="{safe}" download>Download</a>
+            </div>
+          </div>
+          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
+        </div>"""
+
+
+def pdf_inpage_viewer_boot_js() -> str:
+    """Always load the stacked PDF.js viewer; hide the native iframe."""
+    return f"""
+    (function () {{
+      function activateWrap(wrap) {{
+        if (!wrap) return;
+        wrap.classList.add('is-native-pdf');
+        var iframe = wrap.querySelector('iframe');
+        if (iframe) {{
+          iframe.setAttribute('hidden', '');
+          try {{ iframe.removeAttribute('src'); }} catch (e) {{}}
+        }}
+      }}
+
+      document.querySelectorAll('.pdf-frame-wrap').forEach(activateWrap);
+
+      var standalone = document.querySelector('iframe.pdf-frame');
+      if (standalone && !standalone.closest('.pdf-frame-wrap')) {{
+        document.body.classList.add('is-native-pdf');
+        standalone.setAttribute('hidden', '');
+        try {{ standalone.removeAttribute('src'); }} catch (e) {{}}
+      }}
+
+      if (!document.querySelector('script[src="{PDF_INPAGE_VIEWER_SRC}"]')) {{
+        var s = document.createElement('script');
+        s.src = '{PDF_INPAGE_VIEWER_SRC}';
+        s.defer = true;
+        document.head.appendChild(s);
+      }}
+    }})();
+"""
+
+
+def pdf_mobile_fallback_css() -> str:
+    """Back-compat alias — mobile path is now the in-page PDF.js viewer."""
+    return pdf_inpage_viewer_css()
+
+
+def pdf_mobile_fallback_html(pdf_href: str) -> str:
+    """Back-compat alias — mobile path is now the in-page PDF.js viewer."""
+    return pdf_inpage_viewer_html(pdf_href)
+
+
+def pdf_mobile_fallback_boot_js() -> str:
+    """Back-compat alias — mobile path is now the in-page PDF.js viewer."""
+    return pdf_inpage_viewer_boot_js()
+
+
+
 def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: int, ocr_fragment: str, parish_links: list[tuple[str, str]]) -> str:
     """Dated bulletin-archive viewer page (docs/bulletins/{diocese}-{date}.html).
 
@@ -1132,6 +1287,7 @@ def render_pdf_standalone_page(config: DioceseConfig, bulletin_date: str, pdf_hr
     """Distraction-free, chrome-free full-page PDF view — mirrors render_ocr_standalone_page."""
     diocese_label = _diocese_label(config.display_name)
     uk_bulletin_date = format_uk_date(bulletin_date)
+    safe_pdf = html.escape(pdf_href, quote=True)
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1162,19 +1318,33 @@ def render_pdf_standalone_page(config: DioceseConfig, bulletin_date: str, pdf_hr
     .back-link {{ font-weight: 700; color: {TEAL}; text-decoration: none; font-size: 0.9rem; }}
     .title-line {{ font-weight: 700; font-size: 0.9rem; color: {TEXT}; }}
     .download-link {{ font-weight: 700; color: {TEAL}; text-decoration: none; font-size: 0.85rem; white-space: nowrap; }}
+    .pdf-standalone-shell {{
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      background: #525659;
+    }}
     .pdf-frame {{ flex: 1 1 auto; border: 0; width: 100%; height: 100%; background: #525659; }}
     body.embed-mode .top {{ display: none !important; }}
+    {pdf_inpage_viewer_css()}
+    body.is-native-pdf {{ background: #3a3f42; }}
+    body.is-native-pdf .pdf-standalone-shell {{ background: #3a3f42; }}
   </style>
+  <script src="{PDF_INPAGE_VIEWER_SRC}" defer></script>
 </head>
 <body>
   <div class="top" id="pdf-top">
     <div class="top-left">
-      <a class="back-link" href="{html.escape(viewer_href, quote=True)}">← Viewer</a>
+      <a class="back-link" href="{html.escape(viewer_href, quote=True)}" target="_blank" rel="noopener noreferrer">← Viewer</a>
       <span class="title-line">{html.escape(diocese_label)} · {html.escape(uk_bulletin_date)}</span>
     </div>
-    <a class="download-link" href="{html.escape(pdf_href, quote=True)}" download>⬇ Download PDF</a>
+    <a class="download-link" href="{safe_pdf}" target="_blank" rel="noopener noreferrer" download>⬇ Download PDF</a>
   </div>
-  <iframe class="pdf-frame" src="{html.escape(pdf_href, quote=True)}" title="{html.escape(config.display_name)} bulletin PDF"></iframe>
+  <div class="pdf-standalone-shell">
+    <iframe class="pdf-frame" src="{safe_pdf}" title="{html.escape(config.display_name)} bulletin PDF"></iframe>
+    {pdf_inpage_viewer_html(pdf_href)}
+  </div>
   <script>
     (function () {{
       try {{
@@ -1183,6 +1353,7 @@ def render_pdf_standalone_page(config: DioceseConfig, bulletin_date: str, pdf_hr
         }}
       }} catch (e) {{}}
     }})();
+    {pdf_inpage_viewer_boot_js()}
   </script>
 </body>
 </html>
@@ -1215,16 +1386,14 @@ def render_bulletin_viewer_shell(
     ``harvester.page_renderer.render_diocese_raphoe_page``) so Raphoe, Derry
     and Down & Connor always share one visual/structural design.
 
-    Matches the flat, single-column layout Frank's own reference page uses:
-    headline -> plain "Download PDF" link -> "Original PDF Version" heading
-    -> PDF viewer (always visible, not behind a tab) -> a find-text-instantly
-    callout -> "OCR Extracted Plain Text" heading -> one continuous,
-    page-ordered OCR panel (no per-parish accordion/dropdown) -> the A-Z
-    parish link grid, all on this one page. Includes a genuine
-    distraction-free full-page mode for both the PDF (``pdf_standalone_href``)
-    and the OCR text (``ocr_standalone_href``), each surfaced as an
-    "open in new tab" toolbar link.
+    Calm Parish Press teal/white layout shared by every diocese:
+    serif title -> (mobile-only: jump to OCR + Download PDF) -> Original PDF
+    and searchable OCR plain text (both min-height 850px desktop /
+    450px tablet+phone) -> simple teal bullet parish links. No pro-tip
+    callout; no separate Site links.
+    Outbound links open in a new tab; the mobile OCR jump is same-tab scroll.
     """
+    blank = 'target="_blank" rel="noopener noreferrer"'
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1233,22 +1402,43 @@ def render_bulletin_viewer_shell(
   <title>{html.escape(page_title)}</title>
   <style>
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
+    html {{ scroll-behavior: smooth; }}
     body {{
       font-family: "Segoe UI", system-ui, sans-serif;
-      background: #fafbfc;
+      background: #f4f6f6;
       color: {TEXT};
       line-height: 1.55;
     }}
     a {{ color: {TEAL}; text-decoration: none; }}
     a:hover {{ text-decoration: underline; }}
-    .page {{ max-width: 1100px; margin: 0 auto; padding: 16px 16px 40px; }}
-    .back-link {{ display: inline-block; margin-bottom: 14px; font-weight: 700; color: {TEAL}; }}
-    .header {{ text-align: center; margin-bottom: 24px; }}
-    .diocese-label {{ margin: 0 0 6px; color: {ACCENT}; font-size: 0.95rem; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 800; }}
-    h1 {{ margin: 0 0 8px; color: {TEAL}; font-size: clamp(1.8rem, 3vw, 2.5rem); }}
-    .meta {{ color: #6b7280; font-size: 0.95rem; }}
-    
-    /* Top download link — plain, prominent, right under the headline */
+    .page {{ max-width: 960px; margin: 0 auto; padding: 20px 18px 48px; }}
+    .back-link {{ display: inline-block; margin-bottom: 16px; font-weight: 600; color: {TEAL}; font-size: 0.95rem; }}
+    .header {{
+      text-align: center;
+      margin-bottom: 28px;
+      background: #fff;
+      border: 1px solid #dde5e4;
+      padding: 28px 20px 22px;
+    }}
+    .diocese-label {{
+      margin: 0 0 8px;
+      color: {DEEP_TEAL};
+      font-size: 0.8rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }}
+    h1 {{
+      margin: 0 0 8px;
+      color: {DEEP_TEAL};
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.55rem, 3.2vw, 2.15rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      line-height: 1.25;
+    }}
+    .meta {{ color: #6b7280; font-size: 0.92rem; margin-bottom: 10px; }}
     .download-link-top {{
       display: inline-block;
       margin-top: 4px;
@@ -1257,83 +1447,70 @@ def render_bulletin_viewer_shell(
       color: {TEAL};
     }}
 
-    /* Section headings — "BULLETIN — ORIGINAL PDF VERSION" style dividers
-       between the always-visible PDF and OCR panels below (no tabs). */
+    /* Mobile-only jump + download (hidden on desktop) */
+    .mobile-jump {{
+      display: none;
+      text-align: center;
+      margin: 0 0 22px;
+    }}
+    .mobile-jump-btn {{
+      display: block;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto 12px;
+      padding: 12px 16px;
+      border: 1px solid {TEAL};
+      background: #fff;
+      color: {TEAL};
+      font-weight: 700;
+      font-size: 0.98rem;
+      text-decoration: none;
+      border-radius: 2px;
+    }}
+    .mobile-jump-btn:hover {{ background: #f0f7f7; text-decoration: none; }}
+    .mobile-jump-download {{
+      display: inline-block;
+      font-weight: 700;
+      color: {TEAL};
+      font-size: 1rem;
+    }}
+
     .section-heading {{
-      margin: 30px 0 14px;
+      margin: 34px 0 14px;
       text-align: center;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
-      font-weight: 800;
-      font-size: 1.05rem;
-      color: {DEEP_TEAL};
+      letter-spacing: 0.07em;
+      font-weight: 700;
+      font-size: 0.98rem;
+      color: #4a5560;
+      font-family: Georgia, "Times New Roman", serif;
     }}
 
-    /* Pro-tip callout between the PDF and OCR sections */
-    .callout-tip {{
-      margin: 18px auto;
-      max-width: 720px;
-      text-align: center;
-      background: #fff4df;
-      border: 1px solid #f5c451;
-      border-radius: 999px;
-      padding: 10px 22px;
-      color: #7a4a00;
-      font-size: 0.92rem;
-      font-weight: 600;
-    }}
-    .callout-tip strong {{ font-weight: 800; }}
-
-    /* Viewer blocks — PDF and OCR are both always visible, stacked, no tabs */
     .viewer-block {{
-      background: white;
-      border: 1px solid #d6ecea;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(26, 107, 107, 0.08);
-      margin-bottom: 8px;
+      background: #fff;
+      border: 1px solid #dde5e4;
+      padding: 14px;
+      margin-bottom: 4px;
     }}
-    
-    /* Toolbar */
-    .panel-toolbar {{
+
+    .quiet-links {{
       display: flex;
       justify-content: flex-end;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
+      gap: 14px;
       flex-wrap: wrap;
-    }}
-    .toolbar-btn {{
-      padding: 8px 16px;
-      border: 2px solid {TEAL};
-      border-radius: 6px;
-      background: white;
-      color: {TEAL};
+      margin-bottom: 10px;
+      font-size: 0.88rem;
       font-weight: 600;
-      font-size: 0.9rem;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
     }}
-    .toolbar-btn:hover {{
-      background: {TEAL};
-      color: white;
-      text-decoration: none;
-    }}
-    
-    /* PDF View — the browser's own PDF viewer supplies page number, zoom
-       and print/download controls inside the iframe; we only add a small
-       fullscreen shortcut on top of it. */
+    .quiet-links a {{ color: {TEAL}; }}
+
     .pdf-frame-wrap {{
       position: relative;
-      height: 92vh;
-      min-height: 92vh;
+      height: 85vh;
+      min-height: 850px;
       overflow: hidden;
-      border: 1px solid #c7dcda;
-      border-radius: 10px;
-      background: #f2f5f5;
+      border: 1px solid #c9d4d3;
+      background: #3a3f42;
     }}
     .pdf-frame-wrap iframe {{
       width: 100%;
@@ -1346,31 +1523,30 @@ def render_bulletin_viewer_shell(
       top: 10px;
       right: 10px;
       z-index: 5;
-      width: 36px;
-      height: 36px;
+      width: 34px;
+      height: 34px;
       border: 1px solid {TEAL};
-      border-radius: 6px;
+      border-radius: 4px;
       background: rgba(255, 255, 255, 0.92);
       color: {TEAL};
-      font-size: 1.1rem;
+      font-size: 1rem;
       line-height: 1;
       cursor: pointer;
     }}
     .fullscreen-btn:hover {{ background: #fff; }}
-    .ocr-search-bar {{
-      position: relative;
-      margin-bottom: 12px;
-    }}
+    {pdf_inpage_viewer_css()}
+
+    .ocr-search-bar {{ position: relative; margin-bottom: 10px; }}
     .search-input {{
       width: 100%;
-      border: 1px solid #bdd7d5;
-      border-radius: 8px;
-      padding: 12px 44px 12px 16px;
+      border: 1px solid #c9d4d3;
+      border-radius: 4px;
+      padding: 11px 42px 11px 14px;
       font-size: 1rem;
     }}
     .search-clear {{
       position: absolute;
-      right: 12px;
+      right: 10px;
       top: 50%;
       transform: translateY(-50%);
       width: 32px;
@@ -1379,7 +1555,7 @@ def render_bulletin_viewer_shell(
       border-radius: 50%;
       background: transparent;
       color: #6b7280;
-      font-size: 1.3rem;
+      font-size: 1.25rem;
       cursor: pointer;
     }}
     .search-clear[hidden] {{ display: none; }}
@@ -1393,7 +1569,7 @@ def render_bulletin_viewer_shell(
     }}
     .ocr-search-tools button {{
       border: 0;
-      border-radius: 6px;
+      border-radius: 4px;
       background: {TEAL};
       color: white;
       font-weight: 600;
@@ -1402,21 +1578,17 @@ def render_bulletin_viewer_shell(
       font-size: 0.9rem;
     }}
     .ocr-search-tools button:disabled {{ background: #9bbfbd; cursor: not-allowed; }}
-    .match-count {{
-      color: #6b7280;
-      font-size: 0.9rem;
-      font-weight: 600;
-    }}
+    .match-count {{ color: #6b7280; font-size: 0.9rem; font-weight: 600; }}
     .font-size-controls {{ display: none; }}
     .ocr-zoom-bar {{
       position: sticky; top: 0; z-index: 6;
       display: flex; justify-content: center; align-items: center; gap: 10px;
       margin: 0 0 10px; padding: 6px 10px;
       background: rgba(255, 255, 255, 0.94);
-      border: 1px solid #d4ddd9; border-radius: 8px;
+      border: 1px solid #d4ddd9; border-radius: 4px;
     }}
     .ocr-zoom-bar button {{
-      min-width: 40px; min-height: 40px; border: 1px solid {TEAL}; border-radius: 6px;
+      min-width: 40px; min-height: 40px; border: 1px solid {TEAL}; border-radius: 4px;
       background: #fff; color: {TEAL}; font-weight: 700; font-size: 1.15rem; cursor: pointer;
     }}
     .ocr-zoom-pct {{
@@ -1426,22 +1598,17 @@ def render_bulletin_viewer_shell(
     @media (pointer: coarse) {{ .ocr-zoom-hint {{ display: inline; margin-left: 6px; }} }}
     {ocr_reading_css("#ocr-panel")}
     #ocr-panel {{
-      height: 92vh;
-      min-height: 92vh;
+      height: 85vh;
+      min-height: 850px;
       overflow-y: auto;
       border: 1px solid #d4ddd9;
-      border-radius: 10px;
-      padding: 22px 26px 32px;
+      padding: 22px 24px 32px;
     }}
     .note-box {{
-      margin-top: 14px;
-      padding: 6px 0;
-      border-radius: 0;
-      background: transparent;
-      border: 0;
-      color: #5a6a68;
+      margin-top: 12px;
+      color: #8a3b3b;
       font-weight: 400;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       line-height: 1.5;
     }}
     .ocr-failed-banner {{
@@ -1449,7 +1616,7 @@ def render_bulletin_viewer_shell(
       padding: 12px 14px;
       background: #fff4df;
       border: 1px solid #f5d08d;
-      border-radius: 8px;
+      border-radius: 4px;
       color: #713f12;
       font-weight: 600;
       font-size: 0.9rem;
@@ -1458,141 +1625,138 @@ def render_bulletin_viewer_shell(
     .empty-state[hidden],
     #parish-empty[hidden] {{ display: none !important; }}
     .parish-section {{
-      margin-top: 28px;
-      background: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 10px;
-      padding: 16px;
+      margin-top: 36px;
+      padding: 8px 0 0;
+      background: transparent;
+      border: 0;
     }}
     .parish-section h2.section-heading {{
-      color: #1e3a5f;
-      font-size: 1.2rem;
+      color: {DEEP_TEAL};
+      font-size: 1.15rem;
+      margin-bottom: 16px;
     }}
     .parish-filter {{
       width: 100%;
-      border: 1px solid #e5e7eb;
-      border-radius: 6px;
+      max-width: 420px;
+      display: block;
+      margin: 0 auto 18px;
+      border: 1px solid #d0d8d7;
+      border-radius: 4px;
       padding: 10px 12px;
       font-size: 0.95rem;
-      margin-bottom: 12px;
     }}
     ul.parish-grid {{
       list-style: none;
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
+      gap: 8px 28px;
       padding: 0;
       margin: 0;
     }}
-    .parish-item {{ margin: 0; display: flex; flex-direction: column; gap: 4px; }}
-    .parish-site-link {{
-      align-self: flex-start;
-      margin-left: 4px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: #6b7280;
-      text-decoration: none;
+    .parish-item {{
+      margin: 0;
+      padding: 2px 0 2px 1.1em;
+      position: relative;
     }}
-    .parish-site-link:hover {{ color: {TEAL}; text-decoration: underline; }}
-    .parish-link {{
-      min-height: 48px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      text-decoration: none;
+    .parish-item::before {{
+      content: "•";
+      position: absolute;
+      left: 0;
+      top: 2px;
       color: {TEAL};
-      font-size: 1rem;
       font-weight: 700;
-      background: #f9fcfc;
-      border: 1px solid #d9ecea;
-      border-radius: 8px;
-      padding: 10px 14px;
-      transition: all 0.15s;
     }}
-    .parish-link:hover {{
-      background: #e8f4f4;
+    .parish-link {{
+      color: {TEAL};
+      font-size: 0.98rem;
+      font-weight: 600;
       text-decoration: none;
-      transform: translateY(-1px);
+      background: transparent;
+      border: 0;
+      padding: 0;
+      min-height: 0;
+      display: inline;
     }}
-    .empty-state {{ margin: 0 0 12px; color: #6b7280; font-size: 0.95rem; }}
-    
-    /* Footer */
+    .parish-link:hover {{ text-decoration: underline; }}
+    .empty-state {{ margin: 0 0 12px; color: #6b7280; font-size: 0.95rem; text-align: center; }}
+
     footer {{
-      margin-top: 32px;
+      margin-top: 40px;
       background: {FOOTER};
       color: white;
       padding: 16px 20px;
     }}
     .footer-inner {{
-      max-width: 1100px;
+      max-width: 960px;
       margin: 0 auto;
       display: flex;
       justify-content: space-between;
       gap: 12px;
       flex-wrap: wrap;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
     }}
-    .footer-inner a {{ color: #d8f0ee; font-weight: 700; }}
-    .footer-inner a:hover {{ text-decoration: underline; }}
-    
-    /* Responsive */
+    .footer-inner a {{ color: #d8f0ee; font-weight: 600; }}
+
+    @media (max-width: 1024px) {{
+      /* PDF wrap: 450px in-page PDF.js viewer. OCR panel matches. */
+      #ocr-panel {{
+        height: 70vh;
+        min-height: 450px;
+      }}
+    }}
     @media (max-width: 900px) {{
       ul.parish-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
     }}
-    @media (max-width: 600px) {{
-      .page {{ padding: 16px 12px; }}
-      ul.parish-grid {{ grid-template-columns: 1fr; }}
-      .pdf-frame-wrap, #ocr-panel {{
-        height: 90vh;
-        min-height: 90vh;
-      }}
+    @media (max-width: 700px) {{
+      .page {{ padding: 14px 12px 36px; }}
+      .mobile-jump {{ display: block; }}
+      .download-link-top {{ display: none; }}
+      .quiet-links {{ justify-content: center; }}
+      ul.parish-grid {{ grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }}
       #ocr-panel {{
         padding: 16px 14px 28px;
       }}
       .ocr-search-tools {{ flex-direction: column; }}
       .ocr-search-tools button {{
-        min-height: 48px;
+        min-height: 44px;
         width: 100%;
       }}
-      .panel-toolbar {{ justify-content: stretch; }}
-      .toolbar-btn {{ flex: 1; justify-content: center; min-height: 48px; }}
-      .callout-tip {{ margin-left: 8px; margin-right: 8px; }}
     }}
   </style>
+  <script src="{PDF_INPAGE_VIEWER_SRC}" defer></script>
 </head>
 <body>
   <div class="page">
-    <a class="back-link" href="{html.escape(back_href, quote=True)}">{html.escape(back_label)}</a>
+    <a class="back-link" href="{html.escape(back_href, quote=True)}" {blank}>{html.escape(back_label)}</a>
     <header class="header">
       <p class="diocese-label">{html.escape(diocese_label)}</p>
       <h1>{html.escape(headline)}</h1>
       <p class="meta">{html.escape(meta_line)}</p>
-      <a class="download-link-top" href="{html.escape(pdf_download_href, quote=True)}" download>⬇ Download PDF</a>
+      <a class="download-link-top" href="{html.escape(pdf_download_href, quote=True)}" {blank} download>Download PDF</a>
     </header>
 
-    <!-- PDF section: always visible (no tab click needed), original PDF first -->
+    <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
+      <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
+      <a class="mobile-jump-download" href="{html.escape(pdf_download_href, quote=True)}" {blank} download>Download PDF</a>
+    </div>
+
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
-      <div class="panel-toolbar">
-        <a class="toolbar-btn" href="{html.escape(pdf_href, quote=True)}" target="_blank" rel="noopener noreferrer">↗ Open PDF in new tab</a>
-        <a class="toolbar-btn" href="{html.escape(pdf_standalone_href, quote=True)}" target="_blank" rel="noopener noreferrer">🖥 Distraction-free view</a>
-        <a class="toolbar-btn" href="{html.escape(pdf_download_href, quote=True)}" download>⬇ Download PDF</a>
+      <div class="quiet-links">
+        <a href="{html.escape(pdf_href, quote=True)}" {blank}>Open PDF</a>
+        <a href="{html.escape(pdf_standalone_href, quote=True)}" {blank}>Distraction-free view</a>
       </div>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
         <iframe src="{html.escape(pdf_href, quote=True)}" title="{html.escape(display_name)} bulletin PDF"></iframe>
+        {pdf_inpage_viewer_html(pdf_href)}
       </div>
     </div>
 
-    <p class="callout-tip">🔍 <strong>Pro tip: find text instantly.</strong> Use the search box below (or your browser's Ctrl/Cmd+F) to jump straight to a parish, name or notice in the text version underneath.</p>
-
-    <!-- OCR section: one continuous, page-ordered document — no per-parish
-         dropdown/accordion. Reads exactly like the PDF, just as searchable
-         text. -->
     <h2 class="section-heading">Bulletin — OCR Extracted Plain Text</h2>
     <div id="panel-ocr" class="viewer-block">
-      <div class="panel-toolbar">
-        <a class="toolbar-btn" href="{html.escape(ocr_standalone_href, quote=True)}" target="_blank" rel="noopener noreferrer">↗ Open bulletin text in new tab (distraction-free)</a>
+      <div class="quiet-links">
+        <a href="{html.escape(ocr_standalone_href, quote=True)}" {blank}>Open text in new tab</a>
       </div>
       <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
         <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
@@ -1601,7 +1765,7 @@ def render_bulletin_viewer_shell(
         <span class="ocr-zoom-hint">or pinch to zoom</span>
       </div>
       <div class="ocr-search-bar">
-        <input id="ocr-search" class="search-input" type="search" placeholder="🔍 Search OCR text..." aria-label="Search OCR text" />
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search OCR text..." aria-label="Search OCR text" />
         <button id="clear-search" class="search-clear" type="button" aria-label="Clear OCR search" hidden>×</button>
       </div>
       <div class="ocr-search-tools">
@@ -1612,32 +1776,21 @@ def render_bulletin_viewer_shell(
         </div>
       </div>
       <div id="ocr-panel">{ocr_fragment}</div>
-      <div class="note-box">The plain text OCR version is auto-generated and may contain errors so it is always best to double check with the original PDF. OCR (Optical Character Recognition) is technology that turns images of text into editable, searchable digital text.</div>
+      <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
-    <!-- Parish Links Section -->
     <section class="parish-section">
       <h2 class="section-heading">{html.escape(parish_section_heading)}</h2>
-      <input id="parish-filter" class="parish-filter" type="search" placeholder="🔍 Filter parishes..." aria-label="Filter parishes" />
+      <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
       {parish_links_html}
     </section>
   </div>
-  <!-- Support Banner -->
-  <div style="max-width:1100px;margin:24px auto 0;padding:0 16px;">
-    <div style="display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:12px;background:#fff;border:1px solid #d6ecea;border-radius:12px;padding:14px 18px;">
-      <span style="font-size:0.95rem;color:#4b5563;">📊 <span id="view-count">–</span> views this week</span>
-      <div style="display:flex;gap:10px;flex-wrap:wrap;">
-        <a href="https://github.com/Frankytyrone/parish_harvester" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#24292e;color:#fff;border-radius:8px;font-weight:600;font-size:0.9rem;text-decoration:none;">⭐ Star on GitHub</a>
-        <a href="https://buymeacoffee.com/frankytyrone" target="_blank" rel="noopener noreferrer" style="display:inline-flex;align-items:center;gap:6px;padding:8px 14px;background:#FFDD00;color:#000;border-radius:8px;font-weight:700;font-size:0.9rem;text-decoration:none;">☕ Buy Me a Coffee</a>
-      </div>
-    </div>
-  </div>
   <footer>
     <div class="footer-inner">
-      <span>© 2026 Parish Press — Free forever for all Irish parishes</span>
-      <div style="display:flex;gap:12px;flex-wrap:wrap;">
-        <a href="https://github.com/Frankytyrone/parish_harvester" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a href="https://buymeacoffee.com/frankytyrone" target="_blank" rel="noopener noreferrer">☕ Donate</a>
+      <span>© 2026 Parish Press</span>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;">
+        <a href="https://github.com/Frankytyrone/parish_harvester" {blank}>GitHub</a>
+        <a href="https://buymeacoffee.com/frankytyrone" {blank}>Donate</a>
       </div>
     </div>
   </footer>
@@ -1659,6 +1812,8 @@ def render_bulletin_viewer_shell(
         }} catch (e) {{}}
       }});
     }})();
+
+    {pdf_inpage_viewer_boot_js()}
 
     (function () {{
       var KEY = 'ph_ocr_scale';
@@ -2018,7 +2173,7 @@ def write_bulletins_index(entries: list[ViewerEntry]) -> None:
     for entry in entries:
         config = DIOCESES[entry.diocese]
         items.append(
-            f"<li><a href=\"{entry.path.name}\">{html.escape(config.display_name)} — {html.escape(format_uk_date(entry.date))}</a></li>"
+            f"<li><a href=\"{entry.path.name}\" target=\"_blank\" rel=\"noopener noreferrer\">{html.escape(config.display_name)} — {html.escape(format_uk_date(entry.date))}</a></li>"
         )
     if not items:
         items.append("<li>No OCR bulletin viewer pages have been generated yet.</li>")
@@ -2044,7 +2199,7 @@ def write_bulletins_index(entries: list[ViewerEntry]) -> None:
 </head>
 <body>
   <div class="page">
-    <a href="../index.html">← Back to dashboard</a>
+    <a href="../index.html" target="_blank" rel="noopener noreferrer">← Back to dashboard</a>
     <h1>OCR Bulletin Archive</h1>
     <p>Newest generated bulletin viewer pages appear first.</p>
     <div class="archive">
@@ -2075,9 +2230,9 @@ def write_root_index(entries: list[ViewerEntry]) -> None:
           <h2>{html.escape(diocese.display_name)}</h2>
           <p>Latest OCR viewer: <strong>{html.escape(ocr_label)}</strong></p>
           <div class="actions">
-            <a class="button secondary" href="mega_pdf/index.html#{diocese.key}">👁 View Online</a>
-            <a class="button primary" href="{ocr_href}">📖 Read OCR Text</a>
-            <a class="button secondary" href="mega_pdf/{diocese.pdf_filename}" download>⬇ Download PDF</a>
+            <a class="button secondary" href="mega_pdf/index.html#{diocese.key}" target="_blank" rel="noopener noreferrer">👁 View Online</a>
+            <a class="button primary" href="{ocr_href}" target="_blank" rel="noopener noreferrer">📖 Read OCR Text</a>
+            <a class="button secondary" href="mega_pdf/{diocese.pdf_filename}" target="_blank" rel="noopener noreferrer" download>⬇ Download PDF</a>
           </div>
         </article>
             """
@@ -2124,9 +2279,9 @@ def write_root_index(entries: list[ViewerEntry]) -> None:
     <h2 class="section-title">Mega PDF cards</h2>
     <div class="cards">{''.join(cards)}</div>
     <div class="archive-card">
-      <p><a href="bulletins/index.html">Browse the full OCR bulletin archive</a></p>
-      <p><a href="mega_pdf/index.html">Open the mega PDF tab viewer</a></p>
-      <p><a href="search/">Search all bulletins</a></p>
+      <p><a href="bulletins/index.html" target="_blank" rel="noopener noreferrer">Browse the full OCR bulletin archive</a></p>
+      <p><a href="mega_pdf/index.html" target="_blank" rel="noopener noreferrer">Open the mega PDF tab viewer</a></p>
+      <p><a href="search/" target="_blank" rel="noopener noreferrer">Search all bulletins</a></p>
     </div>
   </main>
 </body>

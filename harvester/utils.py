@@ -52,6 +52,11 @@ _WP_DATE_PATH_RE = re.compile(r"/(\d{4})/(\d{2})/(\d{2})/")
 # e.g. 5-4-26, 12-4-26, 15-3-26  (Limavady parish pattern)
 _D_M_YY_RE = re.compile(r"(?<!\d)(\d{1,2})-(\d{1,2})-(\d{2})(?!\d)")
 
+# Pattern B-dot: D.M.YY with optional unpadded month/day — Ballymena
+# 16.8.26-20th-Sunday.pdf / 9.8.26-19th-Sunday.pdf. The 2-digit-only
+# _YY_MM_DD_RE above does not match these.
+_D_M_YY_DOT_RE = re.compile(r"(?<!\d)(\d{1,2})\.(\d{1,2})\.(\d{2})(?!\d)")
+
 # Pattern E: [YYYY-M-D] bracketed ISO variant
 # e.g. [2026-4-12], [2026-12-25]  (Greenlough parish pattern)
 _BRACKETED_ISO_RE = re.compile(r"\[(\d{4})-(\d{1,2})-(\d{1,2})\]")
@@ -79,6 +84,23 @@ _MONTH_MAP: dict[str, int] = {
 # (?:st|nd|rd|th)? handles formats like "5th" or "12th".
 _SLUG_DATE_RE = re.compile(
     r"(\d{1,2})(?:st|nd|rd|th)?[_\-\s]([a-z]+)[_\-\s](\d{4})",
+    re.IGNORECASE,
+)
+
+# Yearless "9th-August" / "5th July" slugs (Milford & Rathmullan overwrite
+# Parish-Newsletter-Sunday-9th-August.pdf each week with no year in the
+# filename). Negative lookahead refuses a following 4-digit year so the
+# dated slug matcher above still owns "9th-August-2026".
+_MONTH_ALT = "|".join(sorted(_MONTH_MAP.keys(), key=len, reverse=True))
+_YEARLESS_SLUG_RE = re.compile(
+    rf"(?<!\d)(\d{{1,2}})(?:st|nd|rd|th)?[_\-\s]({_MONTH_ALT})"
+    rf"(?![a-z])(?![_\-\s](?:19|20)\d{{2}})",
+    re.IGNORECASE,
+)
+
+# Glenavy: 2026-August-16-Twentieth-Sunday-in-Ordinary-Time.pdf
+_YEAR_MONTHNAME_DAY_RE = re.compile(
+    rf"(20\d{{2}})[_\-\s]({_MONTH_ALT})[_\-\s](\d{{1,2}})(?:st|nd|rd|th)?(?!\d)",
     re.IGNORECASE,
 )
 
@@ -219,6 +241,20 @@ def extract_date_from_string(text: str) -> date | None:
         except ValueError:
             pass
 
+    # Pattern B: D-M-YY (1–2 digit day/month) — limavady 16-8-26.pdf,
+    # claudy NEWSLETTER 9-8-26.docx. Must come after the 6/8-digit compact
+    # forms so "160826" is not split into 16-08-26 by accident (those have
+    # no dashes).
+    m = _first_match_outside_hash(_D_M_YY_RE, text, spans)
+    if m:
+        try:
+            year = 2000 + int(m.group(3))
+            candidate = date(year, int(m.group(2)), int(m.group(1)))
+            if _is_plausible_bulletin_year(candidate.year):
+                return candidate
+        except ValueError:
+            pass
+
     # Dot-separated N.N.NN — ambiguous between YY.MM.DD (Google Drive folder
     # rows: 26.06.14 → 2026-06-14, 29.01.05 → 2029-01-05; locked by
     # tests/test_cloud_folders.py) and UK-convention DD.MM.YY filenames
@@ -244,12 +280,111 @@ def extract_date_from_string(text: str) -> date | None:
         if candidates:
             return max(candidates, key=lambda d: d.year)
 
+    # Pattern B-dot with unpadded day/month (16.8.26 / 9.8.26). Same dual
+    # year reading as the 2-digit dotted form above. Must run after that
+    # form so 26.06.14 still hits the locked Drive-folder tests first.
+    m = _first_match_outside_hash(_D_M_YY_DOT_RE, text, spans)
+    if m:
+        g1, g2, g3 = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        candidates = []
+        try:
+            candidates.append(date(2000 + g1, g2, g3))  # YY.MM.DD
+        except ValueError:
+            pass
+        try:
+            candidates.append(date(2000 + g3, g2, g1))  # DD.MM.YY
+        except ValueError:
+            pass
+        plausible = [c for c in candidates if _is_plausible_bulletin_year(c.year)]
+        if plausible:
+            return max(plausible, key=lambda d: d.year)
+
     # Ordinal month-name slugs: 26th-July-2026, 5_april_2026
     slug_date = extract_date_from_slug(text)
     if slug_date:
         return slug_date
 
+    # Year-first month-name: 2026-August-16 (Glenavy / Killead)
+    m = _first_match_outside_hash(_YEAR_MONTHNAME_DAY_RE, text, spans)
+    if m:
+        month = _MONTH_MAP.get(m.group(2).lower())
+        if month:
+            try:
+                candidate = date(int(m.group(1)), month, int(m.group(3)))
+                if _is_plausible_bulletin_year(candidate.year):
+                    return candidate
+            except ValueError:
+                pass
+
     return None
+
+
+def yearless_slug_date(
+    text: str,
+    assume_year: int,
+    *,
+    near: date | None = None,
+) -> date | None:
+    """Parse a yearless '9th-August' / '5th July' slug using *assume_year*.
+
+    If the resulting date is more than 14 days ahead of *near* (typically
+    the harvest Sunday), try the previous year — so a 04/01 harvest still
+    reads '28th-December' as last December, not next December.
+    """
+    m = _YEARLESS_SLUG_RE.search(unquote(text or ""))
+    if not m:
+        return None
+    month = _MONTH_MAP.get(m.group(2).lower())
+    if not month:
+        return None
+    try:
+        candidate = date(assume_year, month, int(m.group(1)))
+    except ValueError:
+        return None
+    if near is not None and (candidate - near).days > 14:
+        try:
+            return date(assume_year - 1, month, int(m.group(1)))
+        except ValueError:
+            return candidate
+    return candidate
+
+
+def predicted_dated_upload_urls(
+    example_url: str,
+    target: date,
+    *,
+    weeks_back: int = 8,
+) -> list[str]:
+    """Rewrite a dated upload URL for *target* and the previous *weeks_back* Sundays.
+
+    Also tries .docx/.jpg/.jpeg/.png siblings of each .pdf guess (uploader
+    fallback). First match in the returned list is the current Sunday.
+    """
+    seen: list[str] = []
+
+    def _add(url: str) -> None:
+        url = (url or "").strip()
+        if url and url not in seen:
+            seen.append(url)
+
+    for i in range(weeks_back + 1):
+        week = target - timedelta(days=7 * i)
+        rewritten = rewrite_date_url(example_url, week)
+        _add(rewritten)
+        if "onewebmedia" in rewritten.lower() and "newsletter" in rewritten.lower():
+            for extra in oneweb_newsletter_download_urls(example_url, week):
+                _add(extra)
+        lower = rewritten.lower()
+        if lower.endswith(".pdf"):
+            stem = rewritten[:-4]
+            for ext in (".docx", ".jpg", ".jpeg", ".png"):
+                _add(stem + ext)
+        elif lower.endswith(".docx"):
+            _add(rewritten[:-5] + ".pdf")
+            parsed = urlparse(rewritten)
+            quoted = parsed._replace(path=quote(unquote(parsed.path), safe="/")).geturl()
+            _add(quoted)
+    return seen
 
 
 def extract_date_from_slug(slug: str) -> date | None:
@@ -299,6 +434,138 @@ def rewrite_slug_url(url: str, target: date) -> str:
 
     new_slug = f"{target.day}{sep}{_MONTH_NAMES[target.month]}{sep}{target.year}"
     return url[: m.start()] + new_slug + url[m.end() :]
+
+
+_WIX_COPY_OF_PREFIX = "copy-of-"
+_DROPFILES_SEF_RE = re.compile(
+    r"(?P<origin>https?://[^/]+)/files/(?P<catid>\d+)/"
+    r"(?:Newsletters|Weekly-Bulletins|Bulletins)/(?P<fid>\d+)/",
+    re.IGNORECASE,
+)
+
+
+def _strip_wix_copy_of_prefix(url: str) -> str:
+    parsed = urlparse(url)
+    path = parsed.path
+    leaf = path.rstrip("/").rsplit("/", 1)[-1] if path else ""
+    if leaf.lower().startswith(_WIX_COPY_OF_PREFIX):
+        new_leaf = leaf[len(_WIX_COPY_OF_PREFIX) :]
+        new_path = path[: path.rstrip("/").rfind(leaf)] + new_leaf
+        if path.endswith("/"):
+            new_path += "/"
+        return parsed._replace(path=new_path).geturl()
+    return url
+
+
+def _with_wix_copy_of_prefix(url: str) -> str:
+    parsed = urlparse(url)
+    path = parsed.path
+    leaf = path.rstrip("/").rsplit("/", 1)[-1] if path else ""
+    if not leaf or leaf.lower().startswith(_WIX_COPY_OF_PREFIX):
+        return url
+    new_path = path[: path.rstrip("/").rfind(leaf)] + _WIX_COPY_OF_PREFIX + leaf
+    if path.endswith("/"):
+        new_path += "/"
+    return parsed._replace(path=new_path).geturl()
+
+
+def wix_dated_slug_candidates(
+    example_url: str,
+    target: date,
+    *,
+    weeks_back: int = 3,
+) -> list[str]:
+    """Rewrite a Wix dated page slug for *target* and prior Sundays.
+
+    Wix often publishes a duplicated bulletin as ``copy-of-<original-slug>``
+    when the editor copies last week's page (Ballinascreen 16/08/2026).
+    Each week tries the canonical slug first, then the copy-of- variant.
+    """
+    example_url = (example_url or "").strip()
+    if not example_url:
+        return []
+    seen: list[str] = []
+
+    def _add(url: str) -> None:
+        url = (url or "").strip()
+        if url and url not in seen:
+            seen.append(url)
+
+    for i in range(weeks_back + 1):
+        week = target - timedelta(days=7 * i)
+        rewritten = rewrite_date_url(example_url, week)
+        canonical = _strip_wix_copy_of_prefix(rewritten)
+        _add(canonical)
+        _add(_with_wix_copy_of_prefix(canonical))
+    return seen
+
+
+def predicted_wordpress_dated_post_urls(
+    example_url: str,
+    target: date,
+    *,
+    weeks_back: int = 3,
+    post_days_before: tuple[int, ...] = (3, 2, 4, 1, 5, 6),
+) -> list[str]:
+    """Guess WordPress permalinks where slug Sunday ≠ /YYYY/MM/DD/ post date.
+
+    St Teresa's (and similar) posts look like::
+
+        /2026/08/06/the-st-teresas-parish-bulletin-for-sunday-9th-august-2026/
+
+    The leaf date is the bulletin Sunday; the folder date is when they hit
+    Publish (usually 2–4 days earlier). ``rewrite_date_url`` would keep the
+    old folder day and invent a 404 such as ``/2026/08/06/…-16th-august-2026/``.
+    This helper rewrites the Sunday slug and tries a small range of post
+    dates for this Sunday, then previous Sundays.
+    """
+    example_url = (example_url or "").strip()
+    if not example_url:
+        return []
+    parsed = urlparse(example_url)
+    if not parsed.scheme or not parsed.netloc:
+        return []
+    leaf = parsed.path.rstrip("/").rsplit("/", 1)[-1]
+    slug_m = _SLUG_DATE_RE.search(leaf)
+    if not slug_m:
+        return []
+    prefix = leaf[: slug_m.start()]
+    suffix = leaf[slug_m.end() :]
+    origin = f"{parsed.scheme}://{parsed.netloc}"
+    seen: list[str] = []
+
+    def _add(url: str) -> None:
+        if url and url not in seen:
+            seen.append(url)
+
+    for i in range(weeks_back + 1):
+        week = target - timedelta(days=7 * i)
+        day_str = f"{week.day}{_ordinal_suffix(week.day)}"
+        month_str = _MONTH_NAMES[week.month]
+        slug = f"{prefix}{day_str}-{month_str}-{week.year}{suffix}"
+        for offset in post_days_before:
+            posted = week - timedelta(days=offset)
+            _add(
+                f"{origin}/{posted.year}/{posted.month:02d}/"
+                f"{posted.day:02d}/{slug}/"
+            )
+    return seen
+
+
+def dropfiles_task_download_url(example_url: str) -> str | None:
+    """Convert a Dropfiles SEF ``/files/{catid}/Newsletters/{id}/…`` href.
+
+    Some SiteGround hosts 403 the pretty URL but still serve
+    ``index.php?option=com_dropfiles&task=frontfile.download&catid=&id=``
+    (Banagher, confirmed 19/08/2026).
+    """
+    m = _DROPFILES_SEF_RE.search(example_url or "")
+    if not m:
+        return None
+    return (
+        f"{m.group('origin')}/index.php?option=com_dropfiles"
+        f"&task=frontfile.download&catid={m.group('catid')}&id={m.group('fid')}"
+    )
 
 
 def rewrite_wp_url(url: str, target: date) -> str:
@@ -604,6 +871,20 @@ def rewrite_date_url(url: str, target: date) -> str:
         return m.group(0)
 
     new_path = _D_M_YY_RE.sub(_replace_d_m_yy, path)
+    if new_path != path:
+        return parsed._replace(path=new_path).geturl()
+
+    def _replace_d_m_yy_dot(m: re.Match) -> str:
+        try:
+            year = 2000 + int(m.group(3))
+            orig = date(year, int(m.group(2)), int(m.group(1)))
+            if abs((orig - target).days) < 365:
+                return f"{target.day}.{target.month}.{target.year % 100:02d}"
+        except ValueError:
+            pass
+        return m.group(0)
+
+    new_path = _D_M_YY_DOT_RE.sub(_replace_d_m_yy_dot, path)
     if new_path != path:
         return parsed._replace(path=new_path).geturl()
 
@@ -1102,3 +1383,62 @@ def is_valid_pdf(path: Path) -> bool:
             return fh.read(4) == b"%PDF"
     except OSError:
         return False
+
+
+# ---------------------------------------------------------------------------
+# Permanent ParishPress bulletin paths + MCN.live newsletter JSON
+# ---------------------------------------------------------------------------
+
+_PERMANENT_BULLETIN_PATH_RE = re.compile(
+    r"^/bulletin/[a-z0-9_-]+/[a-z0-9._-]+/?$",
+    re.IGNORECASE,
+)
+_MCN_CHURCH_ID_RE = re.compile(
+    r'id=["\']hfChurchId["\'][^>]*value=["\'](\d+)["\']'
+    r'|value=["\'](\d+)["\'][^>]*id=["\']hfChurchId["\']',
+    re.IGNORECASE,
+)
+
+
+def looks_like_permanent_bulletin_url(url: str) -> bool:
+    """True for always-current ParishPress paths that redirect to this week's file.
+
+    Example: https://newtownkilleaparish.ie/bulletin/raphoe/newtown-killea/
+    Do not treat the listing page /bulletin/ as permanent — that 403s bots.
+    """
+    raw = unquote((url or "").strip())
+    if not raw.lower().startswith(("http://", "https://")):
+        return False
+    path = urlparse(raw).path.rstrip("/") + "/"
+    if _PERMANENT_BULLETIN_PATH_RE.match(path.rstrip("/") + "/" if not path.endswith("/") else path):
+        return True
+    lower_path = urlparse(raw.lower()).path
+    return "/parish-bulletins/" in lower_path and lower_path.endswith("bulletin.pdf")
+
+
+def extract_mcn_church_id(html: str) -> str | None:
+    """Read hidden ``hfChurchId`` from an MCN.live camera page."""
+    match = _MCN_CHURCH_ID_RE.search(html or "")
+    if not match:
+        return None
+    return match.group(1) or match.group(2) or None
+
+
+def mcn_profile_data_url(camera_page_url: str, church_id: str | int) -> str:
+    """Build POST URL for ``/Website/ProfileDataByJson/{churchId}``."""
+    parsed = urlparse((camera_page_url or "").strip())
+    origin = f"{parsed.scheme}://{parsed.netloc}" if parsed.scheme and parsed.netloc else "https://mcn.live"
+    return f"{origin}/Website/ProfileDataByJson/{int(church_id)}"
+
+
+def mcn_newsletter_url_from_profile(payload: dict | None) -> str | None:
+    """Return ``newsletter.newsLetterUrl`` from an MCN ProfileDataByJson body."""
+    if not isinstance(payload, dict):
+        return None
+    newsletter = payload.get("newsletter")
+    if not isinstance(newsletter, dict):
+        return None
+    url = str(newsletter.get("newsLetterUrl") or "").strip()
+    if url.lower().startswith(("http://", "https://")):
+        return url
+    return None

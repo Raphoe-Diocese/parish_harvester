@@ -1,31 +1,40 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "parishofballinascreen",
   "display_name": "Ballinascreen (& Desertmartin amalgamated)",
   "diocese": "derry",
   "url": "https://www.parishofballinascreen.com/",
   "start_url": "https://www.parishofballinascreen.com/",
-  "site_type": "html_text_bulletin",
+  "site_type": "wix_dated_slug_image",
   "playbook_type": "wix_dated_slug",
-  "recorded_date": "2026-08-09",
+  "recorded_date": "2026-08-19",
+  "weeks_back": 3,
   "max_bulletin_pages": 10,
+  "timeout_ms": 90000,
+  "total_timeout_s": 180,
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.parishofballinascreen.com/ballinascreen-desertmartin-parishes-21_june_2026",
+      "url": "https://www.parishofballinascreen.com/ballinascreen-desertmartin-parishes-16_august_2026",
       "use_target_url": true
     },
     {
-      "action": "print_to_pdf"
+      "action": "image_stack",
+      "count": 1,
+      "position": "first",
+      "selector": "img",
+      "min_long_side": 700,
+      "min_short_side": 500
     }
   ],
   "operator_notes": [
-    "Single shared HTML bulletin for Ballinascreen and Desertmartin (Wix site).",
-    "Weekly URL slug: ballinascreen-desertmartin-parishes-D_month_YYYY (e.g. 21_june_2026).",
-    "Harvester rewrites the goto URL each Sunday — do not hardcode the date in training.",
-    "End with print_to_pdf on the bulletin page; there is no PDF download."
+    "Homepage has a Parish Bulletin & Mass Times scroll image. The weekly page is a Wix IMAGE bulletin, not a PDF download.",
+    "URL predictor: ballinascreen-desertmartin-parishes-D_month_YYYY, then copy-of- if canonical 404s (playbook wix_dated_slug).",
+    "16/08/2026 is live at copy-of-ballinascreen-desertmartin-parishes-16_august_2026. The page's real bulletin is one large wixstatic scan (4962x3509). print_to_pdf of the Wix chrome is messy — image_stack converts that scan to PDF."
   ],
-  "operator_notes_2026_08_09": [
-    "2026-08-09 fix: this is a genuine multi-page bulletin for TWO amalgamated parishes (Ballinascreen & Desertmartin), with the bulk of the content published as a scanned-image gallery ('Click or Tap on image before zooming in') spanning 5-6 pages plus a header and footer page (7 pages observed on 9_august_2026). Raised max_bulletin_pages so this is no longer wrongly rejected as 'Too many pages' \u2014 verified page 0 header text correctly says '9_AUGUST_2026 ... NINETEENTH SUNDAY IN ORDINARY TIME', matching the harvest target week."
+  "do_not": [
+    "Do not hardcode copy-of- into the trained slug — Wix only uses that prefix some weeks.",
+    "Do not print_to_pdf the Wix page (header/footer/click-to-zoom chrome).",
+    "Do not treat a Wix 404 shell as this week's bulletin."
   ]
 }

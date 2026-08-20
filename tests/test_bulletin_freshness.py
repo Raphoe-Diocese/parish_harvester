@@ -124,8 +124,51 @@ class BulletinFreshnessTests(unittest.TestCase):
         )
         extracted = extract_bulletin_date(url)
         self.assertNotEqual(extracted, date(2026, 8, 19))
+        self.assertEqual(extracted, date(2026, 8, 9))
         verdict = check_bulletin_freshness(url, date(2026, 8, 9))
         self.assertEqual(verdict.status, "fresh")
+        self.assertEqual(verdict.reason, "in_bulletin_week")
+        # Same file must stay fresh against the following Sunday (8-day grace).
+        later = check_bulletin_freshness(url, date(2026, 8, 16))
+        self.assertEqual(later.status, "fresh")
+
+    def test_liturgical_only_filename_is_not_folder_day_one(self) -> None:
+        # Holy Family / Loughshore: Twentieth-Sunday-in-Ordinary-Time.pdf
+        # inside /uploads/2026/08/ used to date as 01/08/2026 and fail the
+        # 16/08/2026 harvest as 15 days stale.
+        url = (
+            "https://www.holy-familyparish.com/app/uploads/2026/08/"
+            "Twentieth-Sunday-in-Ordinary-Time.pdf"
+        )
+        self.assertEqual(extract_bulletin_date(url), date(2026, 8, 16))
+        verdict = check_bulletin_freshness(url, date(2026, 8, 16))
+        self.assertEqual(verdict.status, "fresh")
+        self.assertEqual(verdict.reason, "in_bulletin_week")
+
+    def test_ballymena_unpadded_dot_date_and_glenavy_year_month_day(self) -> None:
+        self.assertEqual(
+            extract_bulletin_date(
+                "https://ballymenaparish.org/wp-content/uploads/2026/08/"
+                "16.8.26-20th-Sunday.pdf"
+            ),
+            date(2026, 8, 16),
+        )
+        self.assertEqual(
+            extract_bulletin_date(
+                "https://www.glenavyandkilleadparish.com/app/uploads/2026/08/"
+                "2026-August-16-Twentieth-Sunday-in-Ordinary-Time.pdf"
+            ),
+            date(2026, 8, 16),
+        )
+
+    def test_hashed_upload_same_month_is_fresh(self) -> None:
+        url = (
+            "https://www.iskaheenparish.com/wp-content/uploads/2026/08/"
+            "240be8f2-b7ae-49f3-8748-f9290e30bcb2-rotated.jpg"
+        )
+        verdict = check_bulletin_freshness(url, date(2026, 8, 16))
+        self.assertEqual(verdict.status, "fresh")
+        self.assertEqual(verdict.reason, "upload_folder_matches_target_month")
 
     def test_ordinal_day_of_month_still_extracted_when_not_a_sunday_count(
         self,
@@ -263,6 +306,75 @@ class BulletinFreshnessTests(unittest.TestCase):
         start, end = week_window(target)
         self.assertEqual(start, target - timedelta(days=6))
         self.assertEqual(end, target)
+
+    def test_yearless_month_day_slug_uses_harvest_year(self) -> None:
+        # milfordrathmullanparishes.ie / rathmullan — filenames have no year.
+        # 09/08/2026 is 7 days behind 16/08/2026 so it is still inside the
+        # 8-day grace window. 05/07/2026 is 42 days behind and must be stale
+        # (previously these URLs were "unknown" and silently accepted).
+        target = date(2026, 8, 16)
+        august = (
+            "https://milfordrathmullanparishes.ie/wp-content/uploads/"
+            "Parish-Newsletter-Sunday-9th-August.pdf"
+        )
+        july = (
+            "https://milfordrathmullanparishes.ie/wp-content/uploads/"
+            "Parish-Newsletter-5th-July.pdf"
+        )
+        self.assertIsNone(extract_bulletin_date(august))
+        self.assertIsNone(extract_bulletin_date(july))
+        august_verdict = check_bulletin_freshness(august, target)
+        self.assertEqual(august_verdict.status, "fresh")
+        self.assertEqual(august_verdict.extracted_date, date(2026, 8, 9))
+        july_verdict = check_bulletin_freshness(july, target)
+        self.assertEqual(july_verdict.status, "stale")
+        self.assertEqual(july_verdict.extracted_date, date(2026, 7, 5))
+
+    def test_d_m_yy_oneweb_filenames_are_dated(self) -> None:
+        target = date(2026, 8, 16)
+        limavady = "https://www.limavadyparish.org/onewebmedia/16-8-26.pdf"
+        claudy = "http://parishofclaudy.com/onewebmedia/NEWSLETTER 9-8-26.docx"
+        self.assertEqual(extract_bulletin_date(limavady), date(2026, 8, 16))
+        self.assertEqual(
+            check_bulletin_freshness(limavady, target).status, "fresh"
+        )
+        self.assertEqual(extract_bulletin_date(claudy), date(2026, 8, 9))
+        self.assertEqual(
+            check_bulletin_freshness(claudy, target).reason, "within_grace_days"
+        )
+
+    def test_yearless_slug_does_not_override_full_year_filename(self) -> None:
+        url = (
+            "https://newtownkilleaparish.ie/wp-content/uploads/2026/07/"
+            "Newsletter-12th-July-2026.pdf"
+        )
+        self.assertEqual(extract_bulletin_date(url), date(2026, 7, 12))
+        verdict = check_bulletin_freshness(url, date(2026, 8, 16))
+        self.assertEqual(verdict.status, "stale")
+
+    def test_stteresas_post_url_is_9_aug_not_unknown(self) -> None:
+        post = (
+            "https://stteresasparish.church/2026/08/06/"
+            "the-st-teresas-parish-bulletin-for-sunday-9th-august-2026/"
+        )
+        image = (
+            "https://stteresasparish.church/wp-content/uploads/2026/08/"
+            "microsoft-word-9-august-2026.docx.jpg"
+        )
+        target = date(2026, 8, 16)
+        self.assertEqual(extract_bulletin_date(post), date(2026, 8, 9))
+        self.assertEqual(extract_bulletin_date(image), date(2026, 8, 9))
+        self.assertEqual(
+            check_bulletin_freshness(post, target).reason, "within_grace_days"
+        )
+        self.assertEqual(
+            check_bulletin_freshness(
+                "https://stteresasparish.church/2026/07/30/"
+                "the-st-teresas-parish-bulletin-for-sunday-2nd-august-2026/",
+                target,
+            ).status,
+            "stale",
+        )
 
 
 if __name__ == "__main__":

@@ -11,6 +11,13 @@ from ocr.generate_bulletin_pages import (
     extract_ocr_fragment,
     format_uk_date,
     parse_parish_links,
+    pdf_inpage_viewer_boot_js,
+    pdf_inpage_viewer_css,
+    pdf_inpage_viewer_html,
+    pdf_mobile_fallback_boot_js,
+    pdf_mobile_fallback_css,
+    pdf_mobile_fallback_html,
+    prefers_native_pdf_js,
     prepare_ocr_fragment,
     render_bulletin_viewer_shell,
     render_ocr_standalone_page,
@@ -91,17 +98,24 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertIn("id=\"ocr-prev\"", html_output)
             self.assertIn("id=\"ocr-next\"", html_output)
             self.assertNotIn("Jump to OCR Text", html_output)
+            self.assertIn("Tap to go to plain text bulletin", html_output)
+            self.assertIn("mobile-jump", html_output)
+            self.assertIn('href="#panel-ocr"', html_output)
             self.assertIn("test-2026-05-19-ocr.html", html_output)
             self.assertNotIn("Next page →", html_output)
             self.assertNotIn("pdf-controls", html_output)
             self.assertIn("pdf-frame-wrap", html_output)
             self.assertIn('target="_blank"', html_output)
-            # Both "open in new tab, no distractions" links must be visible
-            # from the main viewer page's toolbar (audit gap fix).
+            # Quiet new-tab links for PDF / distraction-free / OCR text.
             self.assertIn("test-2026-05-19-pdf.html", html_output)
             self.assertIn("Distraction-free view", html_output)
             self.assertIn("test-2026-05-19-ocr.html", html_output)
-            self.assertIn("distraction-free", html_output.lower())
+            self.assertIn("Open PDF", html_output)
+            self.assertIn("Open text in new tab", html_output)
+            # OCR search must remain available.
+            self.assertIn('id="ocr-search"', html_output)
+            self.assertIn('id="ocr-prev"', html_output)
+            self.assertIn('id="ocr-next"', html_output)
             # PDF is shown immediately (no tab click) — the PDF and OCR
             # panels are both always visible, stacked, matching Frank's
             # reference page layout (Frank feedback, round 2).
@@ -110,9 +124,41 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertNotIn('role="tablist"', html_output)
             self.assertIn("Bulletin — Original PDF Version", html_output)
             self.assertIn("Bulletin — OCR Extracted Plain Text", html_output)
-            self.assertIn("PRO TIP", html_output.upper())
+            self.assertNotIn("PRO TIP", html_output.upper())
+            self.assertNotIn("callout-tip", html_output)
+            self.assertNotIn("🔗 Site", html_output)
+            self.assertIn("min-height: 850px", html_output)
+            self.assertRegex(
+                html_output,
+                r"#ocr-panel\s*\{[^}]*min-height:\s*850px",
+            )
+            self.assertRegex(
+                html_output,
+                r"\.pdf-frame-wrap\s*\{[^}]*min-height:\s*850px",
+            )
+            # Tablet/phone: shorter balanced panels (not desktop 850px).
+            self.assertIn("@media (max-width: 1024px)", html_output)
+            self.assertIn("min-height: 450px", html_output)
+            self.assertIn("Georgia", html_output)
             self.assertIn("Download PDF", html_output)
             self.assertIn("pdf-fullscreen-btn", html_output)
+            # Desktop + mobile: hide the raw-PDF iframe and show stacked PDF.js pages.
+            self.assertIn("pdf-inpage-viewer", html_output)
+            self.assertIn("/assets/pdf-inpage-viewer.js", html_output)
+            self.assertIn("data-pdf-src", html_output)
+            self.assertIn("is-native-pdf", html_output)
+            self.assertIn("display: flex !important", html_output)
+            self.assertIn(".pdf-frame-wrap iframe", html_output)
+            self.assertIn("display: none !important", html_output)
+            self.assertNotIn("pdf-inpage-prev", html_output)
+            self.assertNotIn("pdf-inpage-next", html_output)
+            self.assertNotIn("pdf-inpage-page-label", html_output)
+            self.assertNotIn("pdf-inpage-nav", html_output)
+            media_idx = html_output.find("@media (max-width: 1024px)")
+            self.assertGreaterEqual(media_idx, 0)
+            media_chunk = html_output[media_idx : media_idx + 900]
+            self.assertIn("min-height: 450px", media_chunk)
+            self.assertNotIn('id="pdf-inpage-viewer" hidden', html_output)
             # PDF section must appear before the OCR section in document order.
             self.assertLess(
                 html_output.index("Bulletin — Original PDF Version"),
@@ -137,6 +183,55 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn('href="test-2026-05-19.html"', html_output)
         self.assertIn("<iframe", html_output)
         self.assertIn("embed-mode", html_output)
+        self.assertIn("pdf-inpage-viewer", html_output)
+        self.assertIn("/assets/pdf-inpage-viewer.js", html_output)
+        self.assertIn("data-pdf-src", html_output)
+        self.assertNotIn("pdf-inpage-prev", html_output)
+        self.assertNotIn("pdf-inpage-next", html_output)
+        self.assertNotIn("pdf-inpage-page-label", html_output)
+
+    def test_mobile_pdf_inpage_viewer_helpers(self) -> None:
+        """PDF.js in-page viewer stacks pages for scroll; Open PDF / Download stay."""
+        det = prefers_native_pdf_js()
+        self.assertIn("prefersNativePdf", det)
+        self.assertIn("Android", det)
+        self.assertIn("iPhone", det)
+        self.assertIn("maxTouchPoints", det)
+
+        panel = pdf_inpage_viewer_html("../mega_pdf/raphoe_mega_bulletin.pdf")
+        self.assertIn('id="pdf-inpage-viewer"', panel)
+        self.assertIn('data-pdf-src="../mega_pdf/raphoe_mega_bulletin.pdf"', panel)
+        self.assertIn("pdf-inpage-pages", panel)
+        self.assertIn("Open PDF", panel)
+        self.assertIn("Download", panel)
+        self.assertIn('target="_blank"', panel)
+        self.assertNotIn("pdf-inpage-prev", panel)
+        self.assertNotIn("pdf-inpage-next", panel)
+        self.assertNotIn("pdf-inpage-page-label", panel)
+        self.assertNotIn("Previous page", panel)
+        self.assertNotIn("Next page", panel)
+        self.assertEqual(panel, pdf_mobile_fallback_html("../mega_pdf/raphoe_mega_bulletin.pdf"))
+
+        boot = pdf_inpage_viewer_boot_js()
+        self.assertIn("is-native-pdf", boot)
+        self.assertIn("pdf-frame-wrap", boot)
+        self.assertIn("removeAttribute('src')", boot)
+        self.assertIn("/assets/pdf-inpage-viewer.js", boot)
+        self.assertNotIn("prefersNativePdf", boot)
+        self.assertNotIn("narrowViewport", boot)
+        self.assertEqual(boot, pdf_mobile_fallback_boot_js())
+
+        css = pdf_inpage_viewer_css()
+        self.assertIn("@media (max-width: 1024px)", css)
+        self.assertIn("display: flex !important", css)
+        self.assertIn(".pdf-frame-wrap iframe", css)
+        self.assertIn("min-height: 850px", css)
+        self.assertIn("height: 85vh", css)
+        self.assertIn("min-height: 450px", css)
+        self.assertIn("overflow: auto", css)
+        self.assertIn(".pdf-inpage-viewer", css)
+        self.assertNotIn("pdf-inpage-nav", css)
+        self.assertEqual(css, pdf_mobile_fallback_css())
 
     def test_render_bulletin_viewer_shell_is_shared_canonical_design(self) -> None:
         """harvester.page_renderer.render_diocese_raphoe_page also calls this —
@@ -163,6 +258,77 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("https://example.com/example-pdf.html", html_output)
         self.assertIn("https://example.com/example-ocr.html", html_output)
         self.assertIn("← Back to home", html_output)
+        self.assertNotIn("callout-tip", html_output)
+        self.assertNotIn("PRO TIP", html_output.upper())
+        self.assertIn("min-height: 850px", html_output)
+        self.assertRegex(
+            html_output,
+            r"#ocr-panel\s*\{[^}]*min-height:\s*850px",
+        )
+        self.assertRegex(
+            html_output,
+            r"\.pdf-frame-wrap\s*\{[^}]*min-height:\s*850px",
+        )
+        self.assertIn("@media (max-width: 1024px)", html_output)
+        self.assertIn("min-height: 450px", html_output)
+        self.assertNotIn("parish-site-link", html_output)
+        self.assertIn("mobile-jump", html_output)
+        self.assertIn("Tap to go to plain text bulletin", html_output)
+        self.assertIn('id="ocr-search"', html_output)
+        self.assertIn("Georgia", html_output)
+        self.assertIn("pdf-inpage-viewer", html_output)
+        self.assertIn("/assets/pdf-inpage-viewer.js", html_output)
+        self.assertIn("is-native-pdf", html_output)
+        self.assertNotIn("pdf-inpage-prev", html_output)
+        self.assertNotIn("pdf-inpage-next", html_output)
+        self.assertNotIn("pdf-inpage-page-label", html_output)
+        self.assertNotIn('id="pdf-inpage-viewer" hidden', html_output)
+
+    def test_pdf_inpage_viewer_asset_streams_first_page(self) -> None:
+        assets = Path(__file__).resolve().parent.parent / "docs" / "assets"
+        viewer = assets / "pdf-inpage-viewer.js"
+        self.assertTrue(viewer.is_file(), "docs/assets/pdf-inpage-viewer.js must exist for live pages")
+        text = viewer.read_text(encoding="utf-8")
+        self.assertIn("pdfjs", text.lower())
+        self.assertIn("disableAutoFetch", text)
+        self.assertIn("disableStream", text)
+        self.assertIn("disableRange", text)
+        self.assertIn("cdnjs.cloudflare.com/ajax/libs/pdf.js", text)
+        self.assertNotIn("docs.google.com", text)
+        self.assertIn("is-native-pdf", text)
+        self.assertIn("stackAllPages", text)
+        self.assertIn("numPages", text)
+        self.assertIn("Open PDF", text)
+        self.assertIn("Download", text)
+        self.assertNotIn("pdf-inpage-prev", text)
+        self.assertNotIn("pdf-inpage-next", text)
+        self.assertNotIn("pdf-inpage-page-label", text)
+        self.assertNotIn('Page " + currentPage + " of', text)
+        self.assertNotIn("narrowViewport", text)
+        self.assertNotIn("prefersNativePdf", text)
+        loader = assets / "pdf-mobile-fallback.js"
+        self.assertTrue(loader.is_file())
+        self.assertIn("pdf-inpage-viewer.js", loader.read_text(encoding="utf-8"))
+
+    def test_live_diocese_html_ships_inpage_viewer(self) -> None:
+        """Generator-only changes are invisible on parishpress.ie — live HTML must include PDF.js."""
+        docs = Path(__file__).resolve().parent.parent / "docs"
+        for rel in (
+            "dioceses/raphoe/index.html",
+            "dioceses/derry/index.html",
+            "dioceses/down-and-connor/index.html",
+        ):
+            html_live = (docs / rel).read_text(encoding="utf-8")
+            self.assertIn("pdf-inpage-viewer", html_live, rel)
+            self.assertIn("/assets/pdf-inpage-viewer.js", html_live, rel)
+            self.assertIn("data-pdf-src", html_live, rel)
+            self.assertIn('src="/mega_pdf/', html_live, rel)
+            self.assertNotIn("View this bulletin PDF", html_live, rel)
+            self.assertNotIn("pdf-inpage-prev", html_live, rel)
+            self.assertNotIn("pdf-inpage-next", html_live, rel)
+            self.assertNotIn('class="pdf-inpage-page-label"', html_live, rel)
+            self.assertNotIn('aria-label="Previous page"', html_live, rel)
+            self.assertNotIn('aria-label="Next page"', html_live, rel)
 
     def test_render_ocr_standalone_page(self) -> None:
         config = DioceseConfig(

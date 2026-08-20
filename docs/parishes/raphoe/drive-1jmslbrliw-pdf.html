@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Raphoe PDF — 16/08/2026</title>
+  <title>Raphoe PDF — 20/08/2026</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
@@ -28,19 +28,116 @@
     .back-link { font-weight: 700; color: #1a6b6b; text-decoration: none; font-size: 0.9rem; }
     .title-line { font-weight: 700; font-size: 0.9rem; color: #1a1a2e; }
     .download-link { font-weight: 700; color: #1a6b6b; text-decoration: none; font-size: 0.85rem; white-space: nowrap; }
+    .pdf-standalone-shell {
+      flex: 1 1 auto;
+      display: flex;
+      flex-direction: column;
+      min-height: 0;
+      background: #525659;
+    }
     .pdf-frame { flex: 1 1 auto; border: 0; width: 100%; height: 100%; background: #525659; }
     body.embed-mode .top { display: none !important; }
+    
+    .pdf-inpage-viewer,
+    .pdf-mobile-fallback {
+      display: flex !important;
+      flex-direction: column;
+      min-height: 0;
+      flex: 1 1 auto;
+      background: #3a3f42;
+      color: #e8eeed;
+    }
+    .pdf-inpage-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 8px 10px;
+      background: #14524f;
+      color: #fff;
+      flex: 0 0 auto;
+    }
+    .pdf-inpage-backup { display: flex; gap: 8px; flex-wrap: wrap; }
+    .pdf-inpage-backup a { color: #fff; font-weight: 700; font-size: 0.85rem; }
+    .pdf-inpage-status { padding: 10px 12px; background: #1f3d3c; color: #d8f0ee; font-size: 0.9rem; }
+    .pdf-inpage-pages {
+      flex: 1 1 auto;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      background: #525659;
+      padding: 8px 0 16px;
+    }
+    .pdf-inpage-page-slot {
+      margin: 0 auto 10px;
+      background: #3a3f42;
+      min-height: 180px;
+    }
+    .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-frame-wrap,
+    .pdf-standalone-shell {
+      display: flex;
+      flex-direction: column;
+    }
+    .pdf-frame-wrap iframe,
+    .pdf-standalone-shell iframe.pdf-frame,
+    body.is-native-pdf iframe.pdf-frame {
+      display: none !important;
+    }
+    .pdf-frame-wrap.is-native-pdf,
+    .pdf-standalone-shell.is-native-pdf,
+    body.is-native-pdf .pdf-standalone-shell {
+      display: flex;
+      flex-direction: column;
+      height: 85vh !important;
+      min-height: 850px !important;
+      background: #3a3f42;
+    }
+    @media (max-width: 1024px) {
+      .pdf-frame-wrap,
+      .pdf-standalone-shell,
+      .pdf-frame-wrap.is-native-pdf,
+      .pdf-standalone-shell.is-native-pdf,
+      body.is-native-pdf .pdf-standalone-shell {
+        height: 70vh !important;
+        min-height: 450px !important;
+        display: flex;
+        flex-direction: column;
+        background: #3a3f42;
+      }
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        display: none !important;
+      }
+    }
+
+    body.is-native-pdf { background: #3a3f42; }
+    body.is-native-pdf .pdf-standalone-shell { background: #3a3f42; }
   </style>
+  <script src="/assets/pdf-inpage-viewer.js" defer></script>
 </head>
 <body>
   <div class="top" id="pdf-top">
     <div class="top-left">
-      <a class="back-link" href="drive-1jmslbrliw.html">← Viewer</a>
-      <span class="title-line">RAPHOE · 16/08/2026</span>
+      <a class="back-link" href="drive-1jmslbrliw.html" target="_blank" rel="noopener noreferrer">← Viewer</a>
+      <span class="title-line">RAPHOE · 20/08/2026</span>
     </div>
-    <a class="download-link" href="../../mega_pdf/raphoe_mega_bulletin.pdf" download>⬇ Download PDF</a>
+    <a class="download-link" href="../../mega_pdf/raphoe_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer" download>⬇ Download PDF</a>
   </div>
-  <iframe class="pdf-frame" src="../../mega_pdf/raphoe_mega_bulletin.pdf" title="Raphoe bulletin PDF"></iframe>
+  <div class="pdf-standalone-shell">
+    <iframe class="pdf-frame" src="../../mega_pdf/raphoe_mega_bulletin.pdf" title="Raphoe bulletin PDF"></iframe>
+    
+        <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="../../mega_pdf/raphoe_mega_bulletin.pdf">
+          <div class="pdf-inpage-toolbar">
+            <div class="pdf-inpage-backup">
+              <a href="../../mega_pdf/raphoe_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="../../mega_pdf/raphoe_mega_bulletin.pdf" download>Download</a>
+            </div>
+          </div>
+          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
+        </div>
+  </div>
   <script>
     (function () {
       try {
@@ -49,6 +146,35 @@
         }
       } catch (e) {}
     })();
+    
+    (function () {
+      function activateWrap(wrap) {
+        if (!wrap) return;
+        wrap.classList.add('is-native-pdf');
+        var iframe = wrap.querySelector('iframe');
+        if (iframe) {
+          iframe.setAttribute('hidden', '');
+          try { iframe.removeAttribute('src'); } catch (e) {}
+        }
+      }
+
+      document.querySelectorAll('.pdf-frame-wrap').forEach(activateWrap);
+
+      var standalone = document.querySelector('iframe.pdf-frame');
+      if (standalone && !standalone.closest('.pdf-frame-wrap')) {
+        document.body.classList.add('is-native-pdf');
+        standalone.setAttribute('hidden', '');
+        try { standalone.removeAttribute('src'); } catch (e) {}
+      }
+
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js"]')) {
+        var s = document.createElement('script');
+        s.src = '/assets/pdf-inpage-viewer.js';
+        s.defer = true;
+        document.head.appendChild(s);
+      }
+    })();
+
   </script>
 </body>
 </html>

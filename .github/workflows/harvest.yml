@@ -1,4 +1,5 @@
 name: Harvest Parish Bulletins
+run-name: Harvest ${{ inputs.target_parish || 'full' }}
 
 on:
   schedule:
@@ -62,6 +63,12 @@ jobs:
           pip install -r requirements.txt
           pip install pytest
 
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-py312
+
       - name: Install Playwright browsers
         run: |
           set -euo pipefail
@@ -94,6 +101,7 @@ jobs:
           echo "::warning::Tests failed — harvest will still run. Fix tests soon; see test.yml on push."
 
       - name: Autofix recipes before harvest
+        if: github.event_name != 'workflow_dispatch' || github.event.inputs.target_parish == ''
         run: |
           set -euo pipefail
           python scripts/autofix_recipes.py || true

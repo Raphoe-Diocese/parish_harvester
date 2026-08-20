@@ -37,5 +37,16 @@
     "a false 'ok'. Leaving the oversized-page rejection in place is the",
     "safer failure mode until the site starts serving genuinely fresh PDFs",
     "again; re-check manually if this persists for many more weeks."
+  ],
+  "operator_notes_2026_08_18": [
+    "Recheck: parishnews.html no longer lists weekly newsletter links (only GiftAidForm.pdf). Direct files pdf/160826.pdf, pdf/090826.pdf and pdf/020826.pdf all exist (HTTP 200) but are byte-identical (md5 ac67defb…, 13 pages, body text still 'Bulletin 11th & 12th July 2026'). Do not switch to predicted_dated_pdf — the filename date would pass freshness and serve July content as a false ok. Leave the oversized-page rejection in place."
+  ],
+  "operator_notes_2026_08_19": [
+    "CASUALTY recheck: 160826/090826/020826 still byte-identical (md5 ac67defb3de0, 455913 bytes). 170826/180826/190826/230826 404. Do not predict-download — that would fake a 16/08 success with July content.",
+    "Trainer later pinned click/download of pdf/160826.pdf (site_type dated_pdf_path). Same July-file trap. No separate real 16 Aug card found on parishnews.html. Restored the listing recipe so harvest keeps failing oversized/stale instead of serving July as this week."
+  ],
+  "do_not": [
+    "Do not set site_type predicted_dated_pdf or hardcode /pdf/160826.pdf — those dated names are copies of the July bulletin (md5 ac67defb…).",
+    "Do not raise max_bulletin_pages to accept the 13-page July file."
   ]
 }

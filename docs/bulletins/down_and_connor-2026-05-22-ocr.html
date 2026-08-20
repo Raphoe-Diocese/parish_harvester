@@ -7,222 +7,228 @@
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
-      font-family: Georgia, "Times New Roman", Times, serif;
-      background: #fff;
-      color: #1a1a2e;
-      line-height: 1.35;
-      font-size: 1.05rem;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #eef1f0;
+      color: #1a1f1e;
+      line-height: 1.65;
+      font-size: 1.125rem;
       -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
     }
-    a { color: #1d4ed8; text-decoration: underline; font-weight: 600; }
-    .page { max-width: 100%; margin: 0; padding: 8px 10px 24px; }
+    a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
+    .page {
+      max-width: min(72ch, 100%);
+      margin: 0 auto;
+      padding: 14px 18px 40px;
+    }
     .top {
       display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
       gap: 8px 14px;
-      margin-bottom: 8px; font-family: Georgia, "Times New Roman", Times, serif;
+      margin-bottom: 12px;
     }
     .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
     .back-link {
-      font-family: system-ui, sans-serif; font-size: 0.85rem; font-weight: 700;
-      color: #1e3a5f; text-decoration: none;
+      font-size: 0.9rem; font-weight: 700;
+      color: #14524f; text-decoration: none;
     }
     .title-line {
-      font-size: 1.05rem; font-weight: 700; color: #1a1a2e;
+      font-size: 1rem; font-weight: 700; color: #1a1f1e;
     }
     .font-size-controls { display: none; }
     .ocr-zoom-bar {
       position: sticky; top: 0; z-index: 6;
-      display: flex; justify-content: center; align-items: center; gap: 6px;
-      margin: 0 0 6px; padding: 4px 8px;
-      background: #f8fafc;
-      border: 1px solid #e5e7eb; border-radius: 6px;
-      font-family: system-ui, sans-serif;
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
     }
     .ocr-zoom-bar button {
-      min-width: 32px; min-height: 32px; border: 1px solid #1e3a5f; border-radius: 4px;
-      background: #fff; color: #1e3a5f; font-weight: 700; font-size: 1rem; cursor: pointer;
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.1rem; cursor: pointer;
       line-height: 1;
     }
     .ocr-zoom-pct {
-      min-width: 3rem; text-align: center; font-weight: 700; font-size: 0.85rem; color: #1e3a5f;
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
     }
-    .ocr-zoom-hint { display: none; font-size: 0.7rem; color: #666666; }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
     @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 4px; } }
+    
     .ocr-body {
-      background: #fff;
-      padding: 0 2px;
-      max-width: 100%;
-      font-size: calc(1.05rem * var(--ocr-scale, 1));
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
       touch-action: pan-x pan-y pinch-zoom;
-      color: #222222;
     }
-    .ocr-body h1, .ocr-body h2 { color: #14524f; margin: 0.7em 0 0.2em; font-weight: 700; font-size: 1.15em; }
-    .ocr-body h3, .ocr-body h4 { color: #1a6b6b; margin: 0.6em 0 0.15em; font-weight: 700; }
-    .ocr-body h2.b-title, .ocr-body .b-title {
-      font-size: 1.2em; border-bottom: 1px solid #c8d6f0; padding-bottom: 0.1em;
-    }
-    .ocr-body h3.ocr-page-heading, .ocr-body .page-label {
-      font-size: 0.72rem;
-      letter-spacing: 0.05em;
-      text-transform: uppercase;
-      margin: 0.85em 0 0.25em;
-      font-family: system-ui, sans-serif;
-      color: #64748b;
-    }
-    .ocr-body p { margin: 0 0 0.35em; }
-    .ocr-body hr { border: 0; border-top: 1px solid #e2e8f0; margin: 0.7em 0; }
-    .ocr-body mark { background: #fff3cd; padding: 0 2px; border-radius: 2px; }
-    .ocr-body mark.search-active { background: #fde047; outline: 2px solid #0f5e5e; }
-    .parish-block {
-      margin: 0 0 0.5rem;
-      border: 1px solid #e5e7eb;
-      border-radius: 4px;
-      background: #fff;
-    }
-    .parish-block.parish-odd { background: #f7faf9; }
-    .parish-block > summary.parish-head {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: baseline;
-      justify-content: space-between;
-      gap: 6px 12px;
-      margin: 0;
-      padding: 0.4rem 0.55rem 0.4rem 0.6rem;
-      border-left: 3px solid #1a6b6b;
-      cursor: pointer;
-      list-style: none;
-    }
-    .parish-block > summary.parish-head::-webkit-details-marker { display: none; }
-    .parish-odd > summary.parish-head { border-left-color: #14524f; }
-    .parish-name {
-      margin: 0 !important;
-      font-size: 1.08rem !important;
-      font-family: Georgia, "Times New Roman", Times, serif;
-      color: #14524f !important;
-      border: 0 !important;
-      padding: 0 !important;
+    .ocr-body h1, .ocr-body h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
       font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
     }
-    .parish-name::before {
-      content: "▸ ";
+    .ocr-body h2.b-title, .ocr-body .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    .ocr-body h3.b-head, .ocr-body .b-head {
+      font-size: 1.12em;
+      color: #134e9c;
+      margin: 1.1em 0 0.35em;
+    }
+    .ocr-body h4.b-sub, .ocr-body .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    .ocr-body h3, .ocr-body h4 {
       color: #1a6b6b;
-      font-family: system-ui, sans-serif;
-      font-size: 0.85em;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
     }
-    .parish-block[open] .parish-name::before { content: "▾ "; }
-    .parish-source {
-      font-family: system-ui, sans-serif;
+    .ocr-body h3.ocr-page-heading,
+    .ocr-body .page-label {
       font-size: 0.78rem;
-      font-weight: 600;
-      white-space: nowrap;
-      text-decoration: none !important;
-      color: #1d4ed8;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
     }
-    .parish-source:hover { text-decoration: underline !important; }
-    .parish-source.muted { color: #94a3b8; font-weight: 500; }
-    .parish-body { padding: 0.2rem 0.6rem 0.65rem; }
-    .parish-empty {
-      font-family: system-ui, sans-serif;
-      font-size: 16px;
-      color: #666666;
-      font-style: normal;
-      font-weight: 400;
+    .ocr-body p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
     }
-    .parish-row-empty {
-      display: flex;
-      flex-wrap: nowrap;
-      align-items: center;
-      justify-content: space-between;
-      gap: 8px 12px;
-      min-height: 48px;
-      height: auto;
-      max-height: 64px;
-      padding: 8px 0;
-      margin: 0;
+    .ocr-body hr {
       border: 0;
-      border-bottom: 1px solid #e5e7eb;
-      background: transparent;
-      box-sizing: border-box;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
     }
-    .parish-row-empty .parish-name {
-      margin: 0 !important;
-      font-size: 16px !important;
-      font-family: system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif !important;
-      color: #1e3a5f !important;
+    .ocr-body strong { color: #0f2b5b; }
+    .ocr-body a {
+      color: #1a6b6b;
       font-weight: 600;
-      flex: 0 1 auto;
+      overflow-wrap: anywhere;
     }
-    .parish-row-empty .parish-name::before { content: none !important; }
-    .parish-row-empty .parish-empty {
-      flex: 1 1 auto;
-      margin: 0;
-      color: #666666;
-      font-size: 16px;
-      white-space: nowrap;
-      overflow: hidden;
-      text-overflow: ellipsis;
+    .ocr-body mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
     }
-    .parish-row-empty .parish-source {
-      color: #1e3a5f;
-      font-size: 16px;
-      flex: 0 0 auto;
+    .ocr-body mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    .ocr-body table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ocr-body table.b-table td, .ocr-body table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .ocr-body table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    .ocr-body table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    .ocr-body img, .ocr-body iframe, .ocr-body video {
+      max-width: 100%;
+      height: auto;
+    }
+    .ocr-body > :first-child {
+      margin-top: 0;
+    }
+
+    .ocr-body {
+      padding: 4px 2px 8px;
     }
     .search-panel {
-      margin: 0 0 8px;
-      font-family: system-ui, sans-serif;
-      border: 1px solid #e5e7eb;
-      border-radius: 6px;
-      padding: 6px 8px;
-      background: #f8fafc;
+      margin: 0 0 12px;
+      border: 1px solid #d4ddd9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
     }
-    .search-panel .ocr-search-bar { margin-bottom: 4px; }
-    .ocr-search-bar { position: relative; margin-bottom: 4px; }
+    .search-panel .ocr-search-bar { margin-bottom: 6px; }
+    .ocr-search-bar { position: relative; margin-bottom: 6px; }
     .search-input {
-      width: 100%; min-height: 34px; border: 1px solid #e5e7eb; border-radius: 5px;
-      padding: 5px 30px 5px 10px; font-size: 0.92rem;
-      font-family: system-ui, sans-serif; color: #222222; background: #fff;
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: #1a1f1e; background: #fff;
     }
-    .search-clear { position: absolute; right: 4px; top: 50%; transform: translateY(-50%); width: 26px; height: 26px; border: 0; background: transparent; color: #666666; font-size: 1rem; cursor: pointer; }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }
     .search-clear[hidden] { display: none; }
     .ocr-search-tools {
       display: flex; align-items: center; justify-content: space-between; gap: 8px;
       flex-wrap: wrap;
     }
     .ocr-search-tools button {
-      border: 1px solid #1e3a5f; border-radius: 4px; background: #fff; color: #1e3a5f;
-      font-weight: 600; min-height: 30px; padding: 3px 10px; cursor: pointer; font-size: 0.8rem;
+      border: 1px solid #1a6b6b; border-radius: 6px; background: #fff; color: #1a6b6b;
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
     }
-    .ocr-search-tools button:disabled { color: #999; border-color: #e5e7eb; cursor: not-allowed; }
-    .match-count { color: #666666; font-size: 0.78rem; font-weight: 600; }
+    .ocr-search-tools button:disabled { color: #999; border-color: #d4ddd9; cursor: not-allowed; }
+    .match-count { color: #5a6a68; font-size: 0.85rem; font-weight: 600; }
     .note-box {
-      margin-top: 10px;
-      color: #666666;
+      margin-top: 18px;
+      color: #5a6a68;
       font-weight: 400;
-      font-size: 13px;
-      line-height: 1.35;
-      font-family: system-ui, sans-serif;
-      font-style: normal;
+      font-size: 0.85rem;
+      line-height: 1.5;
       padding: 0;
     }
     .ocr-failed-banner {
-      margin: 10px 0;
-      padding: 10px 14px;
+      margin: 12px 0;
+      padding: 12px 14px;
       background: #fff4df;
       border: 1px solid #f5d08d;
-      border-radius: 6px;
+      border-radius: 8px;
       color: #713f12;
       font-weight: 600;
-      font-size: 13px;
+      font-size: 0.9rem;
+      line-height: 1.45;
     }
     body.embed-mode .top { display: none !important; }
-    body.embed-mode .page { padding-top: 4px; }
+    body.embed-mode .page { padding-top: 8px; }
+    @media (max-width: 600px) {
+      .page { padding: 12px 14px 32px; }
+      .ocr-search-tools button { min-height: 48px; }
+    }
   </style>
 </head>
 <body>
   <div class="page">
     <div class="top" id="ocr-top">
       <div class="top-left">
-        <a class="back-link" href="down_and_connor-2026-05-22.html">← Viewer</a>
+        <a class="back-link" href="down_and_connor-2026-05-22.html" target="_blank" rel="noopener noreferrer">← Viewer</a>
         <span class="title-line">DOWN &amp; CONNOR Text Bulletin · 22/05/2026</span>
       </div>
     </div>
@@ -366,7 +372,7 @@ CAUSEWAY FAMILY OF PARISHES
 17th May 2026
 Ascension of the Lord LEADS THE WAY
 At first glance, the Ascension seems like a sad day — Jesus rising above the clouds and leaving his apostles behind. Even they stood bewildered, unsure whether to grieve or rejoice. But the Ascension is actually a great feast, because Jesus didn't abandon us. He turned not his back on us, but his face toward heaven — inviting us to follow him in the same direction.
-Think of a great procession: everyone moving together, heading the same way, full of prayer and celebration. That's exactly what Jesus invites us into. He has gone ahead to open the doors of heaven and welcome us in. And wonderfully, being God, he can lead the way while also walking right beside each one of us — all the way home.<br>
+Think of a great procession: everyone moving together, heading the same way, full of prayer and celebration. That's exactly what Jesus invites us into. He has gone ahead to open the doors of heaven and welcome us in. And wonderfully, being God, he can lead the way while also walking right beside each one of us — all the way home.
 THIS WEEK
 Parish verham can be viewed on our YouTube channel (search for Ballymoney Parish)
 SUNDAY 17th 9.30am Mass
@@ -390,7 +396,7 @@ If you want to give by cheque please make payable to: Parish of Ballymoney &amp;
 WE PRAY FOR THE FAITHFUL DEPARTED
 Anniversaries
 Stuart Coyle, Eoin Henry, James John Kelly, May Kelly, Mary Loughery, Hannah McCloskey, Danny McKay
-REGUIESCAT IN PACE<br>
+REGUIESCAT IN PACE
 CONGRATULATIONS
 to all the children of our parish who received their First Holy Communion on Saturday. May God bless them and their families at this special time.
 Many thanks to all the teachers and staff at St Brigid's PS for the work they did to prepare the children for Communion and Confirmation. Thanks as well to those who prepared the children from Ballymoney Model Integrated PS, and the Causeway Family of Parishes who prepared children from other schools.
@@ -418,7 +424,7 @@ or email:
 <a href="mailto:pathwaystothefuture@downandconnor.org" target="_blank" rel="noopener noreferrer">pathwaystothefuture@downandconnor.org</a>
 SUMMER SINGING COURSE FOR YOUNG PEOPLE
 The music team at St Peter's Cathedral will be running their annual summer singing school for young people aged 8-16 in Belfast from 6th-10th July this year. The 5 day course is especially for young people who want to improve their voice and music skills.
-The course is £50 for the five days (£25 optional extra for advanced singers studying for GCSE and A-Levels). Click on this QR code to book at a reduced rate of £30 available up to 30th May.<br>
+The course is £50 for the five days (£25 optional extra for advanced singers studying for GCSE and A-Levels). Click on this QR code to book at a reduced rate of £30 available up to 30th May.
 LOURDES ASSOCIATE MEMBERSHIP
 The annual collection to support the ill pilgrims going on the Down &amp; Connor Pilgrimage to Lourdes will be held at all Masses on the weekend of 30th &amp; 31st May. Your generosity is much appreciated!
 POPE'S PRAYER INTENTION FOR MAY
@@ -441,7 +447,7 @@ Website:
 Facebook: @ballymoneycarbolic
 Youtube: Ballymoney Parish
 HYMNS FOR MASS
-My soul glorifies the Lord, my spirit rejoices in God, my Saviour. He looks on his servant in her loveliness; henceforth all ages will call me blessed. The Almighty works marvels for me. Holy his name! His mercy is from age to age, on those who fear him. He puts forth his arm in strength and scatters the proud-hearted. He casts the mighty from their thrones and raises the lowly. He fills the starving with good things, sends the rich away empty. He protects Israel, his servant, remembering his mercy, the mercy promised to our fathers, to Abraham and his sons for ever.<br>
+My soul glorifies the Lord, my spirit rejoices in God, my Saviour. He looks on his servant in her loveliness; henceforth all ages will call me blessed. The Almighty works marvels for me. Holy his name! His mercy is from age to age, on those who fear him. He puts forth his arm in strength and scatters the proud-hearted. He casts the mighty from their thrones and raises the lowly. He fills the starving with good things, sends the rich away empty. He protects Israel, his servant, remembering his mercy, the mercy promised to our fathers, to Abraham and his sons for ever.
 Hail the day that sees him rise, Alleluia! to his throne beyond the skies. Alleluia! Christ, the Lamb for sinners given, Alleluia! enters now the highest heaven. Alleluia!
 There for him high triumph waits; Alleluia! lift your heads, eternal gates. Alleluia! He has conquered death and sin; Alleluia! take the King of glory in. Alleluia!</p>
 <h2 class="b-title">Bangor</h2>
@@ -498,7 +504,7 @@ Open 5.30am – 4.30Pm Monday – Friday
 Please note you will be asked to provide your
 name, mobile and email details
 You will also be asked
-if you will be attending 9.00am mass<br>
+if you will be attending 9.00am mass
 Introduction
 A novena prepares us ever nine days to receive the graces of God special to a feast. In this Sacred Heart novena, the grace we ask is to know personally the love of God in the heart of Christ.
 The Novena to the Sacred Heart takes place from 4–12 June 2026. Many churches celebrate this novena, or at least pray the novena prayer. During the nine days, we renew our love of the heart of Jesus, who loved us first. Each day, this novena presents a short piece of Scripture followed by a meditation, a reflection and a prayer.
@@ -862,7 +868,7 @@ Summer Singing Course: 6th-10th July, 5-day singing course for young people who 
 . EARLY BIRD DISCOUNT: Book by 30th May £30 for 5-day course.</p>
 <h2 class="b-title">Glenariffe</h2>
 <p><a href="https://glenariffeparish.org" target="_blank" rel="noopener noreferrer">https://glenariffeparish.org</a>
-ST PATRICK'S AND ST BRIGID'S GLENARIFFE<br>
+ST PATRICK'S AND ST BRIGID'S GLENARIFFE
 17th May 2026
 “God goes up with shouts of joy
 The Lord goes up with trumpet blast”
@@ -886,7 +892,7 @@ Gospel Reflections for the Year of Matthew
 <a href="https://www.messenger.ie/bookshop/" target="_blank" rel="noopener noreferrer">www.messenger.ie/bookshop/</a>
 Fully Alive
 I asked a woman once if Johnny was in the house. She pointed at a chair and said, 'If he was here he would be there.' He never moved far! Jesus - he is here and there. The risen lord has moved on, but he has not fully left us. His Spirit dwells in us.
-The one who came to earth has now gone back to heaven, bringing with him all that is human. His body - the man of heaven and the God of earth - is now the church, and that's us.<br>
+The one who came to earth has now gone back to heaven, bringing with him all that is human. His body - the man of heaven and the God of earth - is now the church, and that's us.
 Before we are of any denomination or group, we are Christ's. We are baptised into the church of Christ; and yes, we live out our faith in different denominations. Today is the feast of the whole church - we begin in him and end in him, like the Alpha and Omega, the beginning and the end, on the paschal candle. Our faith is also renewed through living with Jesus - we are partners in our mission. Our faith is also renewed in reading and praying the gospel each day.
 On earth we are his body, with all our strengths and weaknesses, goodness and sin. Icons have Jesus smiling as he reaches heaven, smiling on us and living through us. We prepare for the way he is with us now next Sunday - in the Spirit. Where the qualities of the Spirit are alive, he is alive and well among us.
 A breathing prayer - as you breathe in notice you are breathing in the gift of life from God. Holy Spirit, living in the church, living in Mary, draw me more fully into your life.
@@ -910,8 +916,8 @@ or
 St Clare's Community Hall is a drop off point for the Hygiene Bank. You can now bring unopened toiletries to help people in our community who need them most. Donation box is in the front entrance of the hall, so items can be donated any time the hall is open. Sing into Summer with Lisburn Harmony plus special guests The Accidental Choir on Saturday 23 May 2026 @ 7.30pm in St Clare's Community Hall. Tickets £12.50 or benches available up to 2 adults and 2 children @ £25. Glencore Community Group AGM on Monday 27 April 2026 @ 7pm. Please join us for a review of last years work and to have your say on priorities going forward.
 Blessing of the Graves at Milltown Cemetery will take place on Sunday 10 May at 3pm
 Rwanda fundraising ball: Join us for an evening of food, music &amp; dancing in the Ballymac hotel on Saturday 13 June at 7pm to raise vital funds for the mission project of the Sisters of the Community of Mary, of the Heart of Jesus (Sisters of Comunidade Servos de Maria do Coração de Jesus) in Rwanda. For more information and tickets, please visit bit.ly/4aAsKIO
-Tobar Mhuire Retreat Centre, Crossgar 1-day retreat Saturday 6 June, 10am – 4pm, guided by Fr John Verghese.<br>
-OLENAVI + KILLEAD PARISH<br>
+Tobar Mhuire Retreat Centre, Crossgar 1-day retreat Saturday 6 June, 10am – 4pm, guided by Fr John Verghese.
+OLENAVI + KILLEAD PARISH
 Fourth Sunday of Easter 26 April 2026
 Very Rev Canon Colm McBride PP: St Joseph's
 Presbytery, 59 Chapel Road, Glenavy, BT29 4LY Tel: 94 422278
@@ -924,7 +930,7 @@ Parish Website: glenavyandkilleadparish.com
 A member of Lisburn Pastoral Community
 Follow in Love
 The first big moment of vocation is baptism. The anointing of chrism at baptism might be called the anointing for vocation.
-The baptismal vocation is for witness, love and service. This is expressed in ways in which people live out their baptism in married life, single life - and within the single life, maybe religious life or priesthood.<br>
+The baptismal vocation is for witness, love and service. This is expressed in ways in which people live out their baptism in married life, single life - and within the single life, maybe religious life or priesthood.
 Our active witness is to the life and the values of Jesus in our lives. Teaching is not itself a vocation, for example, but the way we teach is a way of living out our vocation. It is the same with many of the helping professions and employments. Being a good neighbour can be a living out of our vocation.
 We witness to love in marriage, in family, extended family, and in friendship. Any love is a sharing in the love of God. In the moments of unselfish love in any relationship, we are living out our vocation. When we love, we are doing God's will!
 We witness to service in the wider world in our care for the poor and in welcoming the stranger: the widow, the orphan, the immigrant- in fact anybody needy.
@@ -1040,7 +1046,7 @@ Please notify the charity if you:
 - no longer pay sufficient tax on your income and/or capital gains
 If you pay Income Tax at the higher or additional rate and want to receive the additional tax relief due to you, you must include all your Gift Aid donations on your Self-Assessment tax return or ask HM Revenue and Customs to adjust your tax code.</p>
 <h2 class="b-title">Holy Family</h2>
-<p><a href="https://www.holy-familyparish.com" target="_blank" rel="noopener noreferrer">https://www.holy-familyparish.com</a><br>
+<p><a href="https://www.holy-familyparish.com" target="_blank" rel="noopener noreferrer">https://www.holy-familyparish.com</a>
 A praying, caring community, centred in Christ
 Holy Family Parish is a member of a Family of Parishes, comprising the parishes of St Patrick's, Holy Family and St Gerard's.
 MASS SCHEDULE
@@ -1086,7 +1092,7 @@ Society of St Vincent de Paul (Helpline):
 Email:
 <a href="mailto:holyfamily@downandconnor.org" target="_blank" rel="noopener noreferrer">holyfamily@downandconnor.org</a>
 Website &amp; Webcam:
-<a href="https://www.holy-familyparish.com" target="_blank" rel="noopener noreferrer">www.holy-familyparish.com</a><br>
+<a href="https://www.holy-familyparish.com" target="_blank" rel="noopener noreferrer">www.holy-familyparish.com</a>
 THE SACRATION OF THE LONG
 17TH MAY 2016
 Readings: A (H)
@@ -1097,12 +1103,12 @@ MASS FOR THE SICK OF OUR PARISH &amp; CARERS
 Mass with the Sacrament of the Sick and blessing of carers will take place in
 Holy Family Church
 on Sunday 17th May at 3pm
-Everyone is most welcome<br>
-MEMO<br>
+Everyone is most welcome
+MEMO
 MEDICAL MISSIONARIES of MARY
 THE MEDICAL MISSIONARIES OF MARY. Sincere thanks from Sr Sheila Campbell for the warm welcome she received on her recent visit to the parish, as well as the generous financial support. Holy Family parish raised an amazing £2,569.09 for the Medical Missionaries of Mary, for which Sr Sheila and her community are very grateful and which, they have acknowledged, will make a real difference to their work. Thank you for your generosity.
 ANOTHER TRAVER BEFORE EXAMS
-Dear Lord, be with us as we begin our exams, may all the work we leave done bear fruit. Help us to be calm, to read the questions carefully, and keep an eye on the time. Grant us a dear wind, protect us from all anxiety. May we be considerate of others in the exam hall, and follow the instructions of those who are there to support us. Help us to remember that our exams are milestones on a longer journey, as we learn and grow into the kind of people you want us to be, who will make a difference in the world for the better, with our knowledge, our skills, and our generous hearts. Ammi<br>
+Dear Lord, be with us as we begin our exams, may all the work we leave done bear fruit. Help us to be calm, to read the questions carefully, and keep an eye on the time. Grant us a dear wind, protect us from all anxiety. May we be considerate of others in the exam hall, and follow the instructions of those who are there to support us. Help us to remember that our exams are milestones on a longer journey, as we learn and grow into the kind of people you want us to be, who will make a difference in the world for the better, with our knowledge, our skills, and our generous hearts. Ammi
 PARISH NEWS &amp; EVENTS
 WEEKLY OFFERING. The weekly collection on Sunday 10th May came to £2,437.96. Thank you for your continued generosity and support. For information on standing order and contactless methods of donation, please contact the parish office.
 PARISH 100 CLUB. Week 1 winners: S Gault, C McKeown, Mr &amp; Mrs Konrad, and Mary Shannon (Promoter). Congratulations to all the winners.
@@ -1125,7 +1131,7 @@ IGNITE IRELAND. Saturday 23rd May in the Convention Centre, Dublin. Guest speake
 for information, and to book.
 FR. MIKE SCHMITZ’S PARABLES TOUR. US priest Fr. Mike Schmitz’s Parables Tour will be coming to Dublin on 20 July. Fr Mike is the well-known digital evangeliser who uses his platform Ascension Presents to spread the Gospel. Book at ticketmaster.ie.
 ANNUAL PARISH CENSUS 2026. A count of attendance will take place at all parish Masses this weekend. The annual parish census captures valuable information about the numbers, ages, and gender of people attending Mass. This information helps the Diocese and parishes to identify pastoral priorities, make plans to address them, and provide support to our faith communities.
-When you arrive at Mass, you will be given a small counter for yourself and for each person in your family group and will be asked to place the counters in baskets labelled according to age. There will be red counters for females and blue counters for males. The baskets will be labelled with age bands and the number of counters for each age band will be recorded after each Mass. Thank you for your patience. and co-operation.<br>
+When you arrive at Mass, you will be given a small counter for yourself and for each person in your family group and will be asked to place the counters in baskets labelled according to age. There will be red counters for females and blue counters for males. The baskets will be labelled with age bands and the number of counters for each age band will be recorded after each Mass. Thank you for your patience. and co-operation.
 REST IN PEACE
 Recently deceased: Phyllis Lee, Oliver Agnew, Margaret Donnelly
 Month’s Mind: Daniel Callaghan, George McFarlane, Liam Butcher, Maureen Magee
@@ -1157,7 +1163,7 @@ Maureen Magee MM
 Fri 22:
 Paul Harding
 Sat 23 (10am):
-Simon O’Grady &amp; Gemma O’Grady Nohilly<br>
+Simon O’Grady &amp; Gemma O’Grady Nohilly
 Loughshore
 <a href="https://www.loughshoreparishes.org" target="_blank" rel="noopener noreferrer">https://www.loughshoreparishes.org</a>
 The Loughshore Parishes
@@ -1253,7 +1259,7 @@ For individuals who have previously completed the full Level 2 Child Safeguardin
 Duration: Approximately 1.5 hours (or until key learning outcomes are met).
 Link to book: Tues 19 May 2026- Child Level 2 Virtual Refresher Session – Fill in form
 SAINT PATRICK'S WAY PILGRIM WALK in the footsteps of our Patron Saint on Saint Patrick's Way Pilgrim Walk in Downpatrick with guides Martina Purdy and Elaine Kelly on Sat 6 June and 8 August, and Mairead Sweeney on Sat 4 July, begin at Saint Patricks Centre with the fabulous 180° IMAX film of St Patrick, price includes entrance fees, internal bus transfers, pilgrimage lunch at the famous Saul Barn, plus a stamped Camino passport and a 6 mile pilgrimage walk finishing at Saint Patrick's grave. Come and Be Amazed! (Duration 9am-approx 3pm, all for just £55) To book ring 02844 619000 or go to website
-<a href="https://www.saintpatrickcentre.com" target="_blank" rel="noopener noreferrer">www.saintpatrickcentre.com</a><br>
+<a href="https://www.saintpatrickcentre.com" target="_blank" rel="noopener noreferrer">www.saintpatrickcentre.com</a>
 ST GERARD'S ANNUAL NOVENA TO OUR MOTHER OF PERPETUAL HELP
 “Living our Baptism today” - St Gerard's
 Parish Church Monday 1th - Tuesday 19th May 2026
@@ -1320,7 +1326,7 @@ St Luke's
 St Anne's
 <a href="mailto:stannes@downandconnor.org" target="_blank" rel="noopener noreferrer">stannes@downandconnor.org</a>
 Pope Leo's prayer intentions for May: That everyone might have food.
-Let us pray that everyone, from large producers to small consumers, be committed to avoid wasting food and to ensure that everyone has access to quality food.<br>
+Let us pray that everyone, from large producers to small consumers, be committed to avoid wasting food and to ensure that everyone has access to quality food.
 CAMINO
 WALK TOGETHER IN FAITH: CAMINO CELTA
 Join us from 6th - 12th September 2026 to walk in the footsteps of our ancestors along the Celtic Camino from Ferrol to Santiago de Compostela in Northern Spain (120km).
@@ -1332,7 +1338,7 @@ Fr Martin O'Hagan is arranging an overnight Guided Retreat in Drumalis for paris
 Arrive Drumalis after lunch Tuesday 26th depart after lunch Wednesday 27th - Cost £100 per person- Accommodation, Evening meal, breakfast and lunch on second day included.
 Transport is not provided. There are a small number of funded places available. If you are interested, or would like further information please contact St Annes's Parish Office- 028 90 610112 or email:
 <a href="mailto:stannes@downandconnor.org" target="_blank" rel="noopener noreferrer">stannes@downandconnor.org</a>
-CITY CEMETERY Blessing of the Graves Sunday 17th May at 3pm<br>
+CITY CEMETERY Blessing of the Graves Sunday 17th May at 3pm
 Recently Deceased
 Months Mind
 Anniversaries
@@ -1342,7 +1348,7 @@ Patsy Cushman &amp; Ray McDonnell
 We pray for those whose anniversaries occur around this time
 Eternal rest grant unto them O Lord and may perpetual light shine upon them
 DIVINE MERCY DEVOTIONS WITH ADORATION &amp; CONFESSION 7-8PM
-Nativity Thursday 28th May. Everyone Welcome<br>
+Nativity Thursday 28th May. Everyone Welcome
 Weekly Offering Envelope Offering: £625.00
 Many thanks for your continued support
 Please consider using envelopes.
@@ -1405,10 +1411,10 @@ POPE FRANCIS</p>
   <a class="parish-source" href="http://portstewartparish.website/bulletins/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
 </div>
 <h2 class="b-title">Sacred Heart Belfast</h2>
-<p><a href="https://www.sacredheartparishbelfast.com" target="_blank" rel="noopener noreferrer">https://www.sacredheartparishbelfast.com</a><br>
+<p><a href="https://www.sacredheartparishbelfast.com" target="_blank" rel="noopener noreferrer">https://www.sacredheartparishbelfast.com</a>
 SACRED HEART PARISH
 Sunday 12th April 2026
-Divine Mercy Sunday<br>
+Divine Mercy Sunday
 Deacon: Joe Baxter</p>
 <hr>
 <hr>
@@ -1457,7 +1463,7 @@ May Your Divine Mercy renew the earth
 and lead all souls to the joy of Your eternal kingdom.
 We offer this prayer through Christ our Lord,
 in union with the Holy Spirit, forever and ever.
-Amen!<br>
+Amen!
 Pope Leo's Prayer Intentions for 2026
 April: For priests in crisis.
 Let us pray for priests going through moments of crisis in their vocation, that they may find the accompaniment they need and that communities may support them with understanding and care.
@@ -1612,14 +1618,14 @@ We ask you to keep the children in your prayers over the coming weeks as they pr
 Ordination to the Priesthood of Deacon Thomas Hampton will take place on Sunday 28th June.
 Please keep Deacon Thomas in your prayers as he makes his final preparations for his Ordination.
 Parish of Gaul &amp; Ballee 300 Club
-The first draw will take place on Monday 1st June. This will cover April, May and June. There will be prizes of £250 and £100 for each month. We thank those who have renewed their membership for another year and welcome all our new members.<br>
+The first draw will take place on Monday 1st June. This will cover April, May and June. There will be prizes of £250 and £100 for each month. We thank those who have renewed their membership for another year and welcome all our new members.
 We congratulate our P7 children from St Joseph's PG, Strangford and St Malachy's PG, Kilclief who received the Gacrament of Confirmation this week.
 Prayer for exams
 Over the next few weeks many of our young people will be sitting exams at various levels in schools and colleges. If you wish to submit a petition for prayer support during these stressful times, a form is available at the back of St Patrick's Church, Saul. Please complete this form and place it in the brown box. The petitions will be included in all our Parish Masses. A Blessed exam candle will burn in the sanctuary for these intentions. A special student Mass will be held in St Patrick's Church, Saul on Friday 2nd May at 7pm. All students and their families are welcome to attend this Mass. There is also an Exam Prayer leaflet in the Church, please take one home with you.
 Annual Parish Census 2026
 Parish of Kilclief – Census will take place this weekend
 Parish of Saul &amp; Ballee – Census will take place on the weekend of 16th and 17th May
-Parishioners are asked to take a counter (red for female, blue for male) and place it in the basket which corresponds to your age band. We thank you for your support.<br>
+Parishioners are asked to take a counter (red for female, blue for male) and place it in the basket which corresponds to your age band. We thank you for your support.
 Society of St Vincent de Paul
 Stella Maris St Vincent de Paul Strangford
 Do you need help? If you are a parishioner of the parish of Kilclief and Strangford, please contact Stella Maris Strangford St Vincent de Paul on the confidential helpline:
@@ -1628,7 +1634,7 @@ Saul St Vincent de Paul Conference – If you are a Parishioner of Saul &amp; Ba
 . All calls are confidential.
 St Vincent de Paul, Saul Conference Annual trip to Knock Shrine will take place on Thursday 28th May. Bus will leave the Church car park at 7am sharp. Cost will be £40 which includes breakfast on the way to Knock and dinner on the way home. Please note pre-booking is essential with priority given to those living in the Parish of Saul &amp; Ballee. If you live outside the Parish and would like to go you can still get your name to be added to the list should there still be places available. Please contact Caroline on 07928 346114 or Marie on
 with your name, address and phone number before 15th May.
-Legion of Mary 41st All Ireland Rosary Rally on Saturday 6th June at Knock Shrine. The bus will leave St Patrick's Church, Downpatrick at 6.45am with pick up at Crossgar Chapel at 7am and Saintfield Chapel at 7.10am. Costs £30, please bring a packed lunch. To book your place leave your money along with your name and phone number in a sealed envelope into the Parish office.<br>
+Legion of Mary 41st All Ireland Rosary Rally on Saturday 6th June at Knock Shrine. The bus will leave St Patrick's Church, Downpatrick at 6.45am with pick up at Crossgar Chapel at 7am and Saintfield Chapel at 7.10am. Costs £30, please bring a packed lunch. To book your place leave your money along with your name and phone number in a sealed envelope into the Parish office.
 Join us for our 1-day retreat at Tobar Mhuire Retreat Centre, Crossgar on Saturday 6th June from 10am to 4pm. Let go, let God, "surrender to Jesus". Further information will be available in the coming weeks.
 Bishop Alan McGuckian SJ and Jim Deeds will lead the Three-Day Pilgrimage to Lough Derg. Date: 19th – 21st June 2026. The bus will depart from St Patrick's Church Donegall Street. Cost £100. Places are limited early booking advised. To book contact Claire on
 <a href="tel:+442890690920" style="color:#1d4ed8;font-weight:600;">028 90690920</a>
@@ -1663,8 +1669,8 @@ Email:
   <a class="parish-source" href="https://www.stagnesbelfast.com/" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
 </div>
 <h2 class="b-title">St Bernadettes</h2>
-<p><a href="https://www.stbernadettesparish.org" target="_blank" rel="noopener noreferrer">https://www.stbernadettesparish.org</a><br>
-Parishes of Holy Rosary and St. Bernadette<br>
+<p><a href="https://www.stbernadettesparish.org" target="_blank" rel="noopener noreferrer">https://www.stbernadettesparish.org</a>
+Parishes of Holy Rosary and St. Bernadette
 MASS SCHEDULE
 SUNDAYS
 ST BERNADETTE'S PARISH
@@ -1702,7 +1708,7 @@ Philomena (Finance Officer)
 <a href="mailto:p.dawson@downandconnor.org" target="_blank" rel="noopener noreferrer">p.dawson@downandconnor.org</a>
 More Information and resources:
 holyrosaryparishbelfast.net and
-<a href="https://www.st.bernadettesparish.org" target="_blank" rel="noopener noreferrer">www.st.bernadettesparish.org</a><br>
+<a href="https://www.st.bernadettesparish.org" target="_blank" rel="noopener noreferrer">www.st.bernadettesparish.org</a>
 45th Anniversary of Medjugorie
 Direct flight to: Mostar
 Date: 24 June 2026
@@ -1710,15 +1716,15 @@ Depart: from Dublin
 Arrive: Mostar
 Duration: 7 nights
 Price: €855
-Contact: (028) 956 80005<br>
+Contact: (028) 956 80005
 PENTECOST SUNDAY
 24th MAY 2026
-Readings: A (6) ♦ Poster: Week 4<br>
+Readings: A (6) ♦ Poster: Week 4
 St Bernadette's:
 31st May, 14th during the 11.00am Mass.
 Holy Rosary Parish:
 24th May, 7th &amp; 21st June, during the 10.30am Mass.
-There will be no children's liturgy in St Bernadette's on 28th June.<br>
+There will be no children's liturgy in St Bernadette's on 28th June.
 PARISH NEWS &amp; EVENTS
 WEEKLY COLLECTION:
 Holy Rosary: £1940.00
@@ -1740,7 +1746,7 @@ for all bookings and enquiries please email:
 Holy Rosary Senior Citizens
 Meeting on Monday 8th June at 7pm
 Bingo
-Sunday 21st June 7pm<br>
+Sunday 21st June 7pm
 REST IN PEACE
 Recently Deceased:
 Mary Roberts
@@ -1768,7 +1774,7 @@ Monday: 7.00 pm Tuesday: 9.30 am Wednesday: 9.30 am Thursday: 9.30 am Friday: 7.
 Confession Monday: 7.30 pm – 8.00 pm Friday: 6.30 pm – 7.00 pm Saturday: 12.30 pm – 1.00 pm &amp; 5.30 pm – 6:00 pm Eucharistic Adoration Monday: 7.30 pm – 8.00 pm
 Baptisms 1st &amp; 3rd Sunday of the Month at 1.30pm Please contact the Parish Office to book (One month’s notice required) Marriages At least 6 months’ notice required prior to date of Marriage. Please contact Fr O’Donnell
 PARISH OFFERTORY COLLECTION (Total includes Basket Collections, Standing Orders and Dona Donations) Weekly Collection 10th May: £6026.50
-Mass Intentions for week ahead: Mon 18th May 7pm: Exam Mass Tues 19th May 9.30am: Charles Copeland (A) &amp; Requiem Mass for Terry Owens RIP Wed 20th May 9.30am: Mark Copeland (A) Thurs 21st May 9.30am: Anne Haughey (A) Fri 2nd May 7pm: Tony Curran (MM) Sat 23rd May 12noon: Rosarie Heatherington (A) Sat 23rd May 6pm: Joan McGeough (A)<br>
+Mass Intentions for week ahead: Mon 18th May 7pm: Exam Mass Tues 19th May 9.30am: Charles Copeland (A) &amp; Requiem Mass for Terry Owens RIP Wed 20th May 9.30am: Mark Copeland (A) Thurs 21st May 9.30am: Anne Haughey (A) Fri 2nd May 7pm: Tony Curran (MM) Sat 23rd May 12noon: Rosarie Heatherington (A) Sat 23rd May 6pm: Joan McGeough (A)
 Saint Brigid's Parish
 The Ascension of the Lord
 17th May 2026, Year A
@@ -1815,12 +1821,12 @@ The Men's Morning Prayer group recommences each Friday from 15th May at 7.30am i
 Lay Dominicans
 The next meeting of the Lay Dominicans will be on Monday 18th May at 7.35pm in the Parish Centre. All newcomers welcome, without any commitment.
 Laudato Si' week 2026 (May 17 - May 24) 'From Hope to Action' Join us.
-The theme for this year's Laudato Si week is 'From Hope to Action'. What action will we take in this week to show care for our planet, our common home?<br>
+The theme for this year's Laudato Si week is 'From Hope to Action'. What action will we take in this week to show care for our planet, our common home?
 Action an Eco - Tip
 - Plant butterfly and bee friendly plants in containers and gardens
 - Buy locally sourced food
 - Make one journey on foot or use public transport
-- Turn off all non-essential lights<br>
+- Turn off all non-essential lights
 Start the conversation with family and friends – what can we do to care for our common home? Involve young people in our conversations – their voice matters.
 Read and consider what others are saying
 David Attenborough who recently celebrated his 100th birthday urges us to take action:
@@ -1836,11 +1842,11 @@ PARISH OF ST COLMCILLE
 BALLYHACKAMORE
 Sixth Sunday of Easter
 Year A
-Missal Pg 314<br>
+Missal Pg 314
 To know the joy of God’s love and make the love of God known to all
 Thank you sincerely to everyone who supported and contributed towards our Belfast Marathon relay team in aid of Mary’s Meals, we raised the remarkable total of £6,429, which is a truly staggering amount and greatly appreciated. Thankfully, my legs have just about recovered!
 You will notice that work on the new lighting in the church is now well underway and we look forward to seeing everything fully illuminated in the weeks ahead. As with any major project, it will take a little bit of time for everything to settle fully into place, but already the difference is very encouraging.
-We also look forward to our First Holy Communion celebrations next Saturday. Please keep all of the children and their families in your prayers at this special time. Please also remember our young people preparing for Confirmation on the 23rd of May.<br>
+We also look forward to our First Holy Communion celebrations next Saturday. Please keep all of the children and their families in your prayers at this special time. Please also remember our young people preparing for Confirmation on the 23rd of May.
 The fruit of the Spirit is love, joy, peace, patience, kindness, generosity, faithfulness, gentleness, and self-control. GALATIANS 5:22-23
 St Colmcilles Parish, 101 Upper Newtownards Road, Belfast, BT4 3JB
 Parish Priest: Fr Conor McGrath PP,
@@ -1896,31 +1902,31 @@ Saint Patrick's Way Pilgrim Walk in the footsteps of our Patron Saint in Downpat
 begin at Saint Patrick's Centre with the fabulous 180° IMAX film of St Patrick, price includes entrance fees, internal bus transfers, pilgrimage lunch at the famous Saul Barn, plus a stamped Camino passport and a 6-mile pilgrimage walk finishing at Saint Patrick's grave. Duration 9 am-3 pm, all for just £55. To book, ring 02844 619000 or go to the website:
 <a href="https://www.saintpatrickcentre.com" target="_blank" rel="noopener noreferrer">www.saintpatrickcentre.com</a>
 ANNUAL PARISH CENSUS 2026
-An attendance count will take place at all Masses across the Diocese on 9th - 10th May 2026.<br>
+An attendance count will take place at all Masses across the Diocese on 9th - 10th May 2026.
 The annual parish census captures valuable information about the numbers, ages, and gender of people attending Mass. This information helps the Diocese and parishes to identify pastoral priorities, make plans to address them, and provide support to our faith communities.
 When you arrive at Mass, you will be given counters for yourself and each member of your household. Please place them in the baskets according to age group- red for females and blue for males. The number of counters for each age band will be recorded after each Mass.
-We look forward to seeing you at Mass this weekend, and thank you for your patience and cooperation.<br>
+We look forward to seeing you at Mass this weekend, and thank you for your patience and cooperation.
 PEG Listening Ear
 Members of the Parish Engagement Group will be at the back of the church after every Mass this weekend (9th - 10th May 2026) in red lanyards.
-Please feel free to stop by, share your feedback, and chat about parish activities.<br>
+Please feel free to stop by, share your feedback, and chat about parish activities.
 ALL IRELAND ROSARY RALLY
 On Saturday, May 16, 2026, you are invited to stand as a public witness for our faith. Simply gather your friends, family, and neighbours to pray the Rosary in a public square. YOU DON'T NEED A MASSIVE CROWD TO MAKE AN IMPACT.
 As Our Lord promised:
-“Where two or more are gathered in my name, I am there among them.”<br>
+“Where two or more are gathered in my name, I am there among them.”
 At St. Oliver Plunkett Church Carpark Glenveigh Drive, Lenadson, Belfast.
 At 4.00pm
 Please Join Us
-The Parish Engagement Group warmly invites you to:<br>
+The Parish Engagement Group warmly invites you to:
 The Parish Engagement Group (PEG) are also calling for volunteers to help marshal the Fun Day and to help out on the day. If you would like to volunteer some of your time, please contact the Parish Office.
 Contact details:
 Email:
 <a href="mailto:stcolmcilles@downandconnor.org" target="_blank" rel="noopener noreferrer">stcolmcilles@downandconnor.org</a>
 Text/ WhatsApp: 07879 498131
-Call:<br>
+Call:
 The Parish Fun Day coincides with our WALK TO MASS WEEKEND
 Pope Francis' encyclical Laudato St. On Care for Our Common Home urges us, as individuals &amp; communities of faith, to take action to address the multiple ecological crises in our world. We are called to choose a simpler lifestyle, reducing our consumption of the earth's resources.
 We invite parishioners to walk to Mass on the weekend of 6 &amp; 7 June. Let those of us who can, make this small act of care for our common home.
-"There is a nobility in the duty to care for creation through small actions." (L.S. 211)<br>
+"There is a nobility in the duty to care for creation through small actions." (L.S. 211)
 Diocese of Down and Connor
 Three Day Pilgrimage
 LED BY BISHOP ALAN MCGUCKIAN SJ AND JIM DEEDS
@@ -1932,20 +1938,20 @@ NAME: Claire
 Tel:
 <a href="tel:+442890690920" style="color:#1d4ed8;font-weight:600;">028 90690920</a>
 Email:
-<a href="mailto:pathwaystothefuture@downandconnor.org" target="_blank" rel="noopener noreferrer">pathwaystothefuture@downandconnor.org</a><br>
+<a href="mailto:pathwaystothefuture@downandconnor.org" target="_blank" rel="noopener noreferrer">pathwaystothefuture@downandconnor.org</a>
 National Pilgrimage to Knock
 Saturday May 16, 2026
-To give thanks to God for all the blessings he showers on us, Aid to the Church in Need is delighted to announce details of our national pilgrimage to our Eucharistic and Marian Shrine at Knock, Co. Mayo.<br>
+To give thanks to God for all the blessings he showers on us, Aid to the Church in Need is delighted to announce details of our national pilgrimage to our Eucharistic and Marian Shrine at Knock, Co. Mayo.
 Chief Celebrant
 Bishop William Shemall
 from Jerusalem will speak about
 the plight of the suffering Christians
-in the Holy Land.<br>
+in the Holy Land.
 If you would like to find out more information, or to organise a bus, please contact us by
 EMAIL:
 <a href="mailto:info@acnireland.org" target="_blank" rel="noopener noreferrer">info@acnireland.org</a>
 or
-TELEPHONE: 01 837 7516<br>
+TELEPHONE: 01 837 7516
 Useful Contacts
 Parish Secretary: Ciyana James -
 <a href="mailto:stcolmcilles@downandconnor.org" target="_blank" rel="noopener noreferrer">stcolmcilles@downandconnor.org</a>
@@ -2079,7 +2085,7 @@ St. Peter's Catholic Cathedral Belfast Music Summer Spring Course 6th-10th July 
 Five day singing course for young people who want to improve their singing voice and musical skills. For young people aged 8-16.
 For more information email:
 <a href="mailto:cathedralmusic@downandconnor.org" target="_blank" rel="noopener noreferrer">cathedralmusic@downandconnor.org</a>
-MONDAY - SPRED at 7.00pm in the Parish Centre Volunteers &amp; members welcome<br>
+MONDAY - SPRED at 7.00pm in the Parish Centre Volunteers &amp; members welcome
 Snowball £300.00
 8.00pm to 9:30pm
 Tuesday 19th May
@@ -2132,16 +2138,16 @@ Check the Parish Website</p>
   <a class="parish-source" href="https://www.stmatthewsparish.com/news" target="_blank" rel="noopener noreferrer" onclick="event.stopPropagation()">Newsletter</a>
 </div>
 <h2 class="b-title">St Michael the Archangel</h2>
-<p>Mass Times This Week<br>
+<p>Mass Times This Week
 Saturday 5.00pm Vigil Mass
 Sunday 11.00am Mass
 Monday - Friday 7.00am Mass &amp; 10.00am
 Mass
 Please note our usual 7.00pm Wednesday
-Novena Mass will be celebrated in St Matthias' Church on the Glen Road<br>
-This year our Family of Parishes will be offering evening Mass, Monday-Friday at 7.00pm in St Matthias' Church, Glen Road.<br>
-Adoration of the Blessed Sacrament takes place every Wednesday &amp; Friday following the 10 o'clock Mass<br>
-Sunday evenings from 6.00-7.30pm, a time of intercession for vocations, with a special Lenten Holy hour of prayer and reflection. Adoration of the Blessed Sacrament throughout. All are very welcome.<br>
+Novena Mass will be celebrated in St Matthias' Church on the Glen Road
+This year our Family of Parishes will be offering evening Mass, Monday-Friday at 7.00pm in St Matthias' Church, Glen Road.
+Adoration of the Blessed Sacrament takes place every Wednesday &amp; Friday following the 10 o'clock Mass
+Sunday evenings from 6.00-7.30pm, a time of intercession for vocations, with a special Lenten Holy hour of prayer and reflection. Adoration of the Blessed Sacrament throughout. All are very welcome.
 St Michael the Archangel Parish Bulletin
 1st March 2026
 Second Sunday of Lent
@@ -2159,23 +2165,23 @@ In the event of an emergency please call the Vicariate Mobile on
 Webcam: Churchmedia.tv or
 Facebook Saint Michael the Archangel Parish Twitter/X @St-MichaelArch
 Email:
-<a href="mailto:stmichaels@downandconnor.org" target="_blank" rel="noopener noreferrer">stmichaels@downandconnor.org</a><br>
+<a href="mailto:stmichaels@downandconnor.org" target="_blank" rel="noopener noreferrer">stmichaels@downandconnor.org</a>
 We pray for all our deceased relatives and friends and for those whose anniversaries occur at this time
 Anniversaries: Deirdre Gribbin, Jim Crossley, Joseph McCluskey, Phyllis McMurrough, Arthur McKenna, Billy McAlea, Lily Bradshaw, Eugene &amp; Francis Moyna, Susan &amp; Patrick Lee, Patrick McGaharan, John &amp; Mary Allison
 Months mind: Maura Rooney, Betty Hanna, Bob Murray
 You can book an anniversary Mass or give an anniversary intention for this section of the bulletin by calling or e-mailing the parish office 02895 904304 (Option 1)
 Email:
-<a href="mailto:stmichaels@downandconnor.org" target="_blank" rel="noopener noreferrer">stmichaels@downandconnor.org</a><br>
+<a href="mailto:stmichaels@downandconnor.org" target="_blank" rel="noopener noreferrer">stmichaels@downandconnor.org</a>
 The Offertory Collection for the 2nd February amounted to £2301.20. Thank you TO MAKE A DONATION TO THE PARISH PLEASE VISIT OUR WEBSITE
 stmichaelsbelfast.co.uk and click on the
 DONATE BUTTON
-Thank you for your continuous support and generosity<br>
+Thank you for your continuous support and generosity
 Lenten Challenge 2026
 Parishioners who wish to take a short-term pledge for Lent are invited to visit
 <a href="https://www.pioneers.ie" target="_blank" rel="noopener noreferrer">www.pioneers.ie</a>
 or to speak to a Pioneer in the parish.
 #
-This Lent the Black Mountain Family of Parishes is holding a series of presentations for those interested in learning more about the Catholic Faith. Wednesdays throughout Lent at 7pm. All are welcome to St Teresa's Parish Centre<br>
+This Lent the Black Mountain Family of Parishes is holding a series of presentations for those interested in learning more about the Catholic Faith. Wednesdays throughout Lent at 7pm. All are welcome to St Teresa's Parish Centre
 Congratulations to all our winners this month!
 Parish Draw for February 2026
 1st Prize £500.00 James McNally
@@ -2194,7 +2200,7 @@ For more details contact Fr Conor McGrath
 <a href="mailto:c.mcgrath@downandconnor.org" target="_blank" rel="noopener noreferrer">c.mcgrath@downandconnor.org</a>
 Don't miss a DIVINE invitation to come on St Patrick's Way Pilgrim Walk in Downpatrick with guides Martina Purdy and Elaine Kelly on Saturday March 14 in honour of Ireland's patron saint and the 25th Anniversary of The Saint Patrick Centre. Includes the fabulous 180° IMAX film of St Patrick, with internal bus transfers, pilgrimage lunch, an authentic Camino passport and a 6 mile pilgrimage walk finishing at St Patrick's grave. A special 25% discount price is on offer of £40 (normally £55) To
 book ring 02844 619000 or go to
-<a href="https://www.saintpatrickcentre.com" target="_blank" rel="noopener noreferrer">www.saintpatrickcentre.com</a><br>
+<a href="https://www.saintpatrickcentre.com" target="_blank" rel="noopener noreferrer">www.saintpatrickcentre.com</a>
 Sunday, March 1, 2026 at 3.00pm
 Clonard Monastery, Belfast.
 For All
@@ -2219,7 +2225,7 @@ for more information or call the Pilgrimage Office on (028) 9077 0162 or email
 <a href="mailto:lourdes@downandconnor.org" target="_blank" rel="noopener noreferrer">lourdes@downandconnor.org</a>
 Youth Team (10-17th July): applications now open (see website for details) Application for the Youth Team is online only: The link for application form is
 <a href="https://forms.office.com/e/OP2U1Ku3c8" target="_blank" rel="noopener noreferrer">https://forms.office.com/e/OP2U1Ku3c8</a>
-Celebrating St Michael's Parish<br>
+Celebrating St Michael's Parish
 This year 2026 marks fifty years since St Michael's became a parish in its own right.
 Among the plans to mark this special anniversary is a special edition commemorative magazine. Anyone who has any old photographs or information regarding the parish history is asked to contact the office and leave details with Catherine or email
 <a href="mailto:martinapurdy1@gmail.com" target="_blank" rel="noopener noreferrer">martinapurdy1@gmail.com</a>
@@ -2242,7 +2248,7 @@ Spiritual Director: FR TONY DEVLIN
 For further details contact:
 Jonene McCusker 07753 803414
 or email:
-<a href="mailto:jeanreynolds@hotmail.co.uk" target="_blank" rel="noopener noreferrer">jeanreynolds@hotmail.co.uk</a><br>
+<a href="mailto:jeanreynolds@hotmail.co.uk" target="_blank" rel="noopener noreferrer">jeanreynolds@hotmail.co.uk</a>
 The Sign of Peace remains an integral part of the celebration of the Eucharist and has been reintroduced as a normal practice across the Diocese. The customary expression of the Sign of Peace in Ireland is a handshake. However, other non-contact forms of the sign of peace such as a nod, a bow or a smile are also legitimate expressions of the Sign of Peace. No offence should be taken if someone prefers to express a non-contact Sign of Peace.
 Spiritual Exercises: 5 Day Silent Ignatian Retreat for Men
 Led by Benedictine monks from St. Josephs Abbey, in France. Starts Thursday 30th April Benburb Priory, Co. Tyrone (1.5 hrs from Dublin). €450 (all meals &amp; single room included).
@@ -2258,18 +2264,18 @@ Eileen Murphy
 Month’s Mind:
 Patrick Fegan, Roisin Lynn, Rose Shannon
 Anniversaries:
-Geraldine Gray, Kathleen White, Barney Gorman, Jack Brennan, Lily Smyth, Peggy, Paddy &amp; Patrick Hanna, Kay Jones, Vincent Ward, Danny &amp; Kathleen Nugent<br>
+Geraldine Gray, Kathleen White, Barney Gorman, Jack Brennan, Lily Smyth, Peggy, Paddy &amp; Patrick Hanna, Kay Jones, Vincent Ward, Danny &amp; Kathleen Nugent
 First Saturday Devotions
 St. Matthias’s Church, Glen Road
 Saturday 7th February 2026
 3.00 p.m. Adoration of the Blessed Sacrament, Confessions and Act of Consecration, Rosary and Divine Mercy Chaplet.
 4.00 p.m. Holy Sacrifice of the Mass.
-Everyone is welcome<br>
+Everyone is welcome
 Sunday Mass 11am
-Saturday Vigil Mass 6.30pm<br>
+Saturday Vigil Mass 6.30pm
 Mon - Wed at 10am / Friday at 7.30pm
 Confession is 5.45pm - 6.15pm on a Saturday and 6pm - 7pm on a Wednesday.
-On the first Friday of each month, our 7.30pm Mass includes the Anointing of the Sick. All welcome to attend.<br>
+On the first Friday of each month, our 7.30pm Mass includes the Anointing of the Sick. All welcome to attend.
 27b Glenveagh Drive, Belfast,
 BT11 9HX. T:
 <a href="tel:+442890618180" style="color:#1d4ed8;font-weight:600;">028 9061 8180</a>
@@ -2279,7 +2285,7 @@ E:
 <a href="mailto:stoliverplunkett@downandconnor.org" target="_blank" rel="noopener noreferrer">stoliverplunkett@downandconnor.org</a>
 <a href="https://www.stoliverplunkettparish.ie" target="_blank" rel="noopener noreferrer">www.stoliverplunkettparish.ie</a>
 Webcam: stoliverplunkettparish.ie/live-mass
-SUNDAY 25TH JANUARY 2026<br>
+SUNDAY 25TH JANUARY 2026
 Black Mountain Family of Parishes
 Fr McCullagh - St Agnes
 <a href="tel:+442890615" style="color:#1d4ed8;font-weight:600;">028 90615</a>
@@ -2307,13 +2313,13 @@ Faith &amp; Pastoral Development: £174.71
 Thank you to all our parishioners for your generosity
 and continued loyalty to St Oliver Plunkett parish.
 Parish Envelopes
-There are still several boxes of parish envelopes to be collected. You can call to the parish office to pick them up during office hours. Thank you.<br>
+There are still several boxes of parish envelopes to be collected. You can call to the parish office to pick them up during office hours. Thank you.
 Giving Sunday
 As a parish, we will continue to meet on the last Sunday of the month and if you wish, we will have a collection which will be donated to a different charity each church year.
 This year we are donating to NI Cancer.
 There will be tea/coffee and donuts in the parish hall after the 11am Mass this weekend. Everyone is welcome.
 Change of office hours
-Please note, for the foreseeable future, the office will be closed on a Wednesday. You can still email or ring and leave a message and we will get back to you the following day. Many thanks<br>
+Please note, for the foreseeable future, the office will be closed on a Wednesday. You can still email or ring and leave a message and we will get back to you the following day. Many thanks
 MARRIAGE ENRICHMENT WEEKEND
 Catholic Marriage Encounter in Ireland - Dates: 20-22 March 2026
 A WEEKEND LIKE NO OTHER. Venue: "St Marys" Knock, Co. Mayo
@@ -2345,7 +2351,7 @@ SYCAMORE What do you believe?
 This Lent the Black Mountain Family of Parishes is holding a series of presentations for those interested in learning more about the Catholic Faith.
 Wednesday 25 February 2026 at 7pm
 begins the six week programme and all are welcome
-to St Teresa's Parish Centre 135 Glen Road Belfast BT11 8BL<br>
+to St Teresa's Parish Centre 135 Glen Road Belfast BT11 8BL
 A Message from Trocaire would like to pass on their thanks for the generous donations raised through the sales of Trocaire's Gifts of Change and donations made at Christmas time by the parishioners of St Oliver Plunkett.
 Thanks to your kindness, Trocaire is able to work with communities all over the world to address the underlying causes of poverty and injustice.
 Missing &amp; Online-Only Bulletins

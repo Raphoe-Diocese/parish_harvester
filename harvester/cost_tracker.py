@@ -125,14 +125,14 @@ def _section_repo_size(repo_root: Path) -> str:
     if pct >= 85:
         lines += [
             "**⚠️ Action required:**",
-            "1. Go to `.github/workflows/retention.yml` and trigger it manually.",
-            "2. If that doesn't help, see the retention policy: `parishes/retention_policy.json`.",
-            "3. As a last resort, reduce `keep_months_archive` to 12.",
+            "1. Zip archives are disabled — do not turn them back on (they add copies to git).",
+            "2. Deleting files from the tree does **not** shrink GitHub quota until history is rewritten.",
+            "3. Do not force-push. If quota must drop, ask GitHub Support or agree a history rewrite first.",
             "",
         ]
     elif pct >= 60:
         lines += [
-            "**ℹ️ Approaching limit.** Retention workflow will compress old files automatically.",
+            "**ℹ️ Approaching limit.** Zip archives stay off. Current-week PDFs and mega PDFs stay.",
             "",
         ]
     else:
@@ -201,7 +201,7 @@ def _section_free_forever() -> str:
         "- **Gemini API** — 1,500 free requests/day (no credit card).",
         "- **Groq API** — 30 free requests/min (no credit card).",
         "- **Mistral free tier** — ~1 request/sec (no credit card).",
-        "- **Repository storage** — 5 GB hard cap (managed by retention workflow).",
+        "- **Repository storage** — 5 GB hard cap (zip archives disabled; current-week + mega PDFs stay).",
         "",
     ])
 
@@ -226,7 +226,7 @@ def _section_if_red() -> str:
     return "\n".join([
         "## 🚨 What to do if a 🔴 appears",
         "",
-        "1. **Storage 🔴**: Trigger the retention workflow manually in GitHub Actions.",
+        "1. **Storage 🔴**: Do not create zip archives. Tree deletes do not free GitHub quota until a history rewrite (ask first).",
         "2. **Actions minutes 🔴**: Only a risk for private repos. Make the repo public.",
         "3. **AI calls failing**: Check `.env` / GitHub Secrets for your API keys.",
         "   The ai_router falls back automatically — summaries may be missing but harvest continues.",

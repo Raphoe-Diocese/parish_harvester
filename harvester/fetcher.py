@@ -1790,6 +1790,8 @@ def _is_placeholder_recipe(recipe_meta: dict | None) -> bool:
     #   - naomhfionan_numbered_pdf: predicted-URL fetch of an unchallenged
     #     asset path past a Cloudflare-challenged listing page
     #     (_try_naomhfionan_predicted_pdf).
+    #   - wp_json_newest_post_images: WP.com public-api / RSS / predicted
+    #     Sunday post, then stack page images (St Teresa's Glen Road).
     # Without this exemption a transient failure on either path would
     # incorrectly fall through to legacy scrape/URL-guess fallbacks (which
     # face the exact same block, just less reliably) instead of surfacing a
@@ -1797,6 +1799,11 @@ def _is_placeholder_recipe(recipe_meta: dict | None) -> bool:
     if str(recipe_meta.get("site_type") or "").strip().lower() in {
         "waf_retry_wordpress",
         "naomhfionan_numbered_pdf",
+        "http_scrape_newest_pdf",
+        "predicted_dated_pdf",
+        "wp_json_newest_media",
+        "wp_json_newest_post_images",
+        "http_scrape_newest_images",
     }:
         return False
     steps = recipe_meta.get("steps")
