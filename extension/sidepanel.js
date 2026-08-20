@@ -376,7 +376,7 @@ let _pdHarvestReport = null;
 let _pdParishStatusDoc = null;
 let _problemsAllRows = [];
 let _problemsAutoRefreshTimer = null;
-const PROBLEMS_AUTO_REFRESH_MS = 20 * 60 * 1000;
+const PROBLEMS_AUTO_REFRESH_MS = 2 * 60 * 1000;
 
 async function _pdLoadParishStatusDoc(force = false) {
   if (_pdParishStatusDoc && !force) return _pdParishStatusDoc;
@@ -386,18 +386,6 @@ async function _pdLoadParishStatusDoc(force = false) {
     const status = await _problemsFetchParishStatus(cfg.ghRepo, cfg.ghPat);
     if (status?.schema_version >= 1) {
       _pdParishStatusDoc = status;
-      try {
-        await chrome.storage.local.set({
-          ph_parish_status_cache: {
-            fetched_at: Date.now(),
-            target_date: status.target_date || "",
-            actionable_count: Array.isArray(status.actionable_keys) ? status.actionable_keys.length : 0,
-            summary: status.summary || {},
-          },
-        });
-      } catch (_e) {
-        // storage optional
-      }
       return _pdParishStatusDoc;
     }
   } catch (_e) {
@@ -489,11 +477,13 @@ async function _pdGhFetch(path) {
   try {
     const apiUrl = `https://api.github.com/repos/${cfg.ghRepo}/contents/${path}`;
     const resp = await fetch(apiUrl, {
+      cache: "no-store",
       signal: controller.signal,
       headers: {
         Authorization: _pdAuthHeader(cfg.ghPat),
         Accept: "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
+        "Cache-Control": "no-cache",
       },
     });
     if (resp.status === 404) throw new Error(`File not found: ${path}`);
@@ -912,16 +902,50 @@ function formatUkDate(isoDate) {
   return value;
 }
 
+function formatUkDateTime(isoDate) {
+  const value = String(isoDate || "").trim();
+  if (!value) return "";
+  const d = new Date(value);
+  if (Number.isNaN(d.getTime())) return formatUkDate(value);
+  const dd = String(d.getDate()).padStart(2, "0");
+  const mm = String(d.getMonth() + 1).padStart(2, "0");
+  const yyyy = d.getFullYear();
+  const hh = String(d.getHours()).padStart(2, "0");
+  const min = String(d.getMinutes()).padStart(2, "0");
+  return `${dd}/${mm}/${yyyy} ${hh}:${min}`;
+}
+
+function _problemsSetRefreshedLine(statusDoc, errorText) {
+  const el = document.getElementById("problems-refreshed");
+  if (!el) return;
+  if (errorText) {
+    el.textContent = errorText;
+    return;
+  }
+  const fetched = formatUkDateTime(statusDoc?._ext_fetched_at || new Date().toISOString());
+  const repoUpdated = formatUkDateTime(
+    statusDoc?._ext_repo_updated_at || statusDoc?.last_patched_at || statusDoc?.generated_at || ""
+  );
+  const week = formatUkDate(String(statusDoc?.target_date || ""));
+  const bits = [];
+  if (fetched) bits.push(`Refreshed from GitHub ${fetched}`);
+  if (repoUpdated) bits.push(`repo file ${repoUpdated}`);
+  if (week && week !== "—") bits.push(`harvest week ${week}`);
+  el.textContent = bits.join(" · ") || "Refreshed from GitHub.";
+}
+
 async function _pdFetchLatestCommitTime(path) {
   const cfg = await _pdGetGithubConfig();
   if (!cfg) return "";
   const endpoint = `https://api.github.com/repos/${cfg.ghRepo}/commits?path=${encodeURIComponent(path)}&per_page=1`;
   try {
     const resp = await fetch(endpoint, {
+      cache: "no-store",
       headers: {
         Authorization: _pdAuthHeader(cfg.ghPat),
         Accept: "application/vnd.github+json",
         "X-GitHub-Api-Version": "2022-11-28",
+        "Cache-Control": "no-cache",
       },
     });
     if (!resp.ok) return "";
@@ -2406,10 +2430,12 @@ async function loadProblemsDashboard() {
       parts.push("fixed parishes leave this list after harvest + Refresh");
       hint.textContent = parts.join(" · ") + ".";
     }
+    _problemsSetRefreshedLine(parishStatus);
     await _problemsRenderRows(visible);
   } catch (_e) {
     if (warning) warning.style.display = "block";
     _problemsAllRows = [];
+    _problemsSetRefreshedLine(null, "Could not refresh from GitHub — check PAT / internet, then tap Refresh.");
     await _problemsRenderRows([]);
   } finally {
     if (empty && !empty.textContent) {
@@ -3364,7 +3390,7 @@ chrome.runtime.onMessage.addListener((message) => {
   if (message?.type === "problems_refresh") {
     _spShowPanel("problems");
     void loadProblemsDashboard().then(() => {
-      if (message.parish_key) {
+      if (message.parish_key && message.dispatch_at) {
         void _problemsWatchParishHarvest(
           message.parish_key,
           message.display_name || message.parish_key,

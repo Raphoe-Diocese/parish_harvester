@@ -45,7 +45,30 @@ class SendTestCommsTests(unittest.TestCase):
 
     def test_manifest_bumped_for_extension_js(self) -> None:
         text = MANIFEST.read_text(encoding="utf-8")
-        self.assertIn('"version": "1.61.7"', text)
+        self.assertIn('"version": "1.61.8"', text)
+
+    def test_back_room_fetches_fresh_parish_status(self) -> None:
+        push = PUSH_JS.read_text(encoding="utf-8")
+        sidepanel = (REPO / "extension" / "sidepanel.js").read_text(encoding="utf-8")
+        html = (REPO / "extension" / "sidepanel.html").read_text(encoding="utf-8")
+        self.assertIn("const fetchLatestFileCommit", push)
+        self.assertIn("parishes/parish_status.json", push)
+        self.assertIn("cache: \"no-store\"", push)
+        self.assertIn("attachStatusFetchMeta", push)
+        self.assertNotIn("ph_parish_status_cache", sidepanel)
+        self.assertIn("function formatUkDateTime", sidepanel)
+        self.assertIn("function _problemsSetRefreshedLine", sidepanel)
+        self.assertIn("message.dispatch_at", sidepanel)
+        self.assertIn("2 * 60 * 1000", sidepanel)
+        self.assertIn("id=\"problems-refreshed\"", html)
+        self.assertIn("id=\"problems-refresh-btn\"", html)
+
+    def test_harvest_commits_parish_status_after_single_parish(self) -> None:
+        yml = HARVEST_YML.read_text(encoding="utf-8")
+        self.assertIn("if: steps.harvest_run.outcome == 'success'", yml)
+        self.assertIn("parishes/parish_status.json", yml)
+        self.assertIn("Partial harvests are normal", yml)
+        self.assertIn("git commit -m", yml)
 
     def test_ballinascreen_uses_wix_predictor_then_image_stack(self) -> None:
         recipe = (
