@@ -1,39 +1,44 @@
 {
+  "version": 1,
   "parish_key": "parishoflisburn",
   "display_name": "Lisburn",
-  "recorded_date": "2026-04-30",
-  "start_url": "https://parishoflisburn.org/about/",
-  "max_bulletin_pages": 10,
-  "operator_notes_2026_08_10": "The real weekly Blaris/Christ the Redeemer bulletin PDF (e.g. 09-08-26-Blaris-Bulletin_Small.pdf) is a genuine 8-page document: cover + full Mass order/readings (pages 2-5) + recently deceased/anniversaries (page 6) + offertory envelope info (page 7) + small advertise footer (page 8). The default MAX_BULLETIN_PAGES=4 guard was discarding it as 'oversized' every week, even though the recipe itself (NEWS -> Download -> *.pdf) was working correctly and pulling the right dated file. Verified page 1 reads 'Nineteenth Sunday in Ordinary Time' / '9th August', matching the 2026-08-09 target. Raised the limit to 10 to match Ballinascreen's precedent for a genuinely long amalgamated-parish bulletin.",
+  "diocese": "down_and_connor",
+  "start_url": "https://parishoflisburn.org/category/news/",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://parishoflisburn.org/about/"
-    },
-    {
       "action": "click",
-      "selector": "a:has-text('NEWS')",
+      "selector": "a[href*=\"16-08-26-Blaris-Bulletin_Small.pdf\"]",
+      "href": "https://parishoflisburn.org/wp-content/uploads/2026/08/16-08-26-Blaris-Bulletin_Small.pdf",
+      "text": "News DONATE TO THE PARISH CLICK HERE Parish of Blaris – Onli",
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "top",
       "fallback_selectors": [
-        "a[href*='news'][href$='.pdf']",
         "a[href$='.pdf']",
-        "a[href*='.pdf']",
-        "ul#topnav > li:nth-of-type(3) > a"
-      ]
-    },
-    {
-      "action": "click",
-      "selector": "a:has-text('Download')",
-      "fallback_selectors": [
-        "a[href*='bulletin'][href$='.pdf']",
-        "a[href$='.pdf']",
-        "a[href*='.pdf']",
-        "div#news_block > div:nth-of-type(6) > p > a"
+        "a[href*='.pdf']"
       ]
     },
     {
       "action": "download",
-      "url_pattern": "*.pdf"
+      "url": "https://parishoflisburn.org/wp-content/uploads/2026/08/16-08-26-Blaris-Bulletin_Small.pdf"
     }
   ],
-  "diocese": "down_and_connor"
+  "observed_load_ms": 41686,
+  "timeout_ms": 93372,
+  "total_timeout_s": 250,
+  "playbook_type": "pdf_download_list",
+  "site_type": "pdf_link_list",
+  "operator_notes": [
+    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
+    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+    "Do not worry if the filename or date in the link text changes every week."
+  ],
+  "do_not": [
+    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
+    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  },
+  "recorded_date": "2026-08-20"
 }
