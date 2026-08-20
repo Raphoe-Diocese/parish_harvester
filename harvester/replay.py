@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import asyncio
+import base64
 import fnmatch
 import io
 import json
@@ -1386,15 +1387,28 @@ async def _try_predicted_dated_pdf(
         if not file_result:
             continue
         file_body, file_headers = file_result
-        if not _dropfiles_body_looks_like_file(file_headers, file_body):
+        if _dropfiles_body_looks_like_file(file_headers, file_body):
+            if _is_pdf_content(file_body):
+                dest.write_bytes(file_body)
+                return url, "pdf"
+            if file_body[:2] == b"PK":
+                pdf_bytes = await _convert_docx_to_pdf_bytes(file_body)
+                dest.write_bytes(pdf_bytes)
+                return url, "docx_to_pdf"
             continue
-        if _is_pdf_content(file_body):
-            dest.write_bytes(file_body)
-            return url, "pdf"
-        if file_body[:2] == b"PK":
-            pdf_bytes = await _convert_docx_to_pdf_bytes(file_body)
-            dest.write_bytes(pdf_bytes)
-            return url, "docx_to_pdf"
+        # Dated notice pages (Holywood): HTML with a PDF Embedder iframe,
+        # not a direct upload. 404s are already a hard miss above.
+        if _body_looks_like_html(file_headers, file_body):
+            found = await _download_pdfembed_from_html(
+                file_body.decode("utf-8", errors="ignore"),
+                url,
+                dest,
+                max_attempts=3,
+                per_attempt_timeout_s=8.0,
+                total_budget_s=12.0,
+            )
+            if found:
+                return found
     return None
 
 
@@ -1879,19 +1893,93 @@ async def _try_http_scrape_newest_images(
     return source_url, "image_to_pdf"
 
 
+def _body_looks_like_html(headers: dict[str, str], body: bytes) -> bool:
+    """True when a 200 response is an HTML page rather than a file download."""
+    if not body:
+        return False
+    content_type = (headers.get("content-type") or "").lower()
+    if "html" in content_type:
+        return True
+    head = body.lstrip()[:64].lower()
+    return head.startswith(b"<!doctype html") or head.startswith(b"<html")
+
+
+def _decode_pdfemb_data_url(raw: str) -> str | None:
+    """Decode PDF Embedder Premium ``pdfemb-data`` (base64 JSON ``{url:...}``)."""
+    text = unquote((raw or "").strip()).replace(" ", "+")
+    if not text:
+        return None
+    pad = "=" * ((4 - len(text) % 4) % 4)
+    payload = None
+    for decoder in (base64.b64decode, base64.urlsafe_b64decode):
+        try:
+            payload = json.loads(decoder(text + pad))
+            break
+        except Exception:
+            continue
+    if not isinstance(payload, dict):
+        return None
+    url = payload.get("url")
+    if isinstance(url, str) and url.strip():
+        return url.strip()
+    return None
+
+
 def _extract_pdfembed_target_url(html: str) -> str | None:
-    """PDF Embedder plugin iframe: src="...?url=<urlencoded pdf url>&title=...".
+    """PDF Embedder plugin iframe target PDF.
+
+    Older builds: ``src="...?url=<urlencoded pdf url>&title=..."``.
+    Premium builds (Holywood): ``src="...?pdfemb-data=<base64 json {url:...}>"``.
     Same plugin/markup as PDFEMB_SELECTOR (a.pdfemb-viewer) used elsewhere,
-    just accessed via raw HTML regex instead of a Playwright locator."""
-    m = _PDFEMB_IFRAME_SRC_RE.search(html)
+    just accessed via raw HTML regex instead of a Playwright locator.
+    """
+    m = _PDFEMB_IFRAME_SRC_RE.search(html or "")
     if not m:
         return None
-    src = m.group(1) or m.group(2)
+    src = (m.group(1) or m.group(2) or "").replace("&amp;", "&").strip()
     if not src:
         return None
     query = parse_qs(urlparse(unquote(src)).query)
     urls = query.get("url")
-    return urls[0] if urls else None
+    if urls and urls[0]:
+        return urls[0]
+    for raw in query.get("pdfemb-data") or []:
+        decoded = _decode_pdfemb_data_url(raw)
+        if decoded:
+            return decoded
+    return None
+
+
+async def _download_pdfembed_from_html(
+    html: str,
+    page_url: str,
+    dest: Path,
+    *,
+    max_attempts: int,
+    per_attempt_timeout_s: float,
+    total_budget_s: float,
+) -> tuple[str, str] | None:
+    """Download the PDF Embedder iframe target from an already-fetched post."""
+    pdf_url = _extract_pdfembed_target_url(html)
+    if not pdf_url:
+        return None
+    pdf_url = urljoin(page_url, pdf_url)
+    file_result = await asyncio.to_thread(
+        _fetch_bytes_with_retries,
+        pdf_url,
+        max_attempts=max_attempts,
+        per_attempt_timeout_s=per_attempt_timeout_s,
+        total_budget_s=total_budget_s,
+    )
+    if not file_result:
+        return None
+    file_body, file_headers = file_result
+    if _dropfiles_body_looks_like_file(file_headers, file_body) and _is_pdf_content(
+        file_body
+    ):
+        dest.write_bytes(file_body)
+        return pdf_url, "pdf"
+    return None
 
 
 def _extract_wp_upload_images(html: str, year: int, month: int, base_url: str) -> list[str]:
@@ -1928,6 +2016,8 @@ async def _try_waf_retry_wordpress_bulletin(
     *,
     post_slug_patterns: list[str],
     target_date: date,
+    example_post_url: str | None = None,
+    weeks_back: int = 8,
 ) -> tuple[str, str] | None:
     """Discover + download a WordPress bulletin post on a WAF-flaky host by
     scraping raw HTML fetched via plain-HTTP retries — never via Playwright
@@ -1944,9 +2034,13 @@ async def _try_waf_retry_wordpress_bulletin(
        site's real current post, not a guess — some of these parishes don't
        post every single week, so guessing a slug/number would be wrong as
        often as it's right).
-    3. Fetch that post page and pull out either a PDF Embedder iframe's
+    3. If the listing is empty or WAF-blocked, optionally predict dated post
+       URLs from *example_post_url* (Holywood
+       ``/bulletins/bulletin-notice-sunday-{Dth}-{month}-{YYYY}/``). 404s
+       are a hard miss — never invent a Sunday that does not exist.
+    4. Fetch that post page and pull out either a PDF Embedder iframe's
        target PDF, or the post's own (non-thumbnail) uploaded page image(s).
-    4. Fetch the actual file(s) and save/convert to *dest* as a PDF.
+    5. Fetch the actual file(s) and save/convert to *dest* as a PDF.
 
     Every stage runs off a single shared time budget (_WAF_RETRY_OVERALL_BUDGET_S)
     rather than a fixed budget per stage — a multi-page image bulletin can need
@@ -1962,73 +2056,89 @@ async def _try_waf_retry_wordpress_bulletin(
     def _stage_budget(preferred_s: float) -> float:
         return max(1.0, min(preferred_s, _remaining_budget()))
 
-    if _remaining_budget() <= 0:
-        return None
-    listing_result = await asyncio.to_thread(
-        _fetch_bytes_with_retries,
-        listing_url,
-        max_attempts=_DROPFILES_HTTP_ATTEMPTS,
-        per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
-        total_budget_s=_stage_budget(_DROPFILES_HTTP_LISTING_BUDGET_S),
-    )
-    if not listing_result:
-        return None
-    listing_body, listing_headers = listing_result
-    if "text/html" not in (listing_headers.get("content-type") or "").lower():
-        return None
-    listing_html = listing_body.decode("utf-8", errors="ignore")
+    listing_html = ""
+    if _remaining_budget() > 0:
+        listing_result = await asyncio.to_thread(
+            _fetch_bytes_with_retries,
+            listing_url,
+            max_attempts=_DROPFILES_HTTP_ATTEMPTS,
+            per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
+            total_budget_s=_stage_budget(_DROPFILES_HTTP_LISTING_BUDGET_S),
+        )
+        if listing_result:
+            listing_body, listing_headers = listing_result
+            if "text/html" in (listing_headers.get("content-type") or "").lower():
+                listing_html = listing_body.decode("utf-8", errors="ignore")
+
+    post_urls: list[str] = []
+
+    def _remember_post(url: str) -> None:
+        url = (url or "").strip()
+        if url and url not in post_urls:
+            post_urls.append(url)
 
     candidates = _extract_matching_hrefs(listing_html, listing_url, post_slug_patterns)
     scored = _score_wordpress_post_hrefs(candidates, target_date)
-    if not scored:
+    if scored:
+        _remember_post(max(scored)[1])
+    # Holywood (and similar): listing can be stale or WAF-empty. Predict
+    # /bulletin-notice-sunday-{Dth}-{month}-{YYYY}/ and skip 404s — never
+    # invent a Sunday that does not exist.
+    if example_post_url:
+        for url in predicted_dated_upload_urls(
+            example_post_url, target_date, weeks_back=weeks_back
+        ):
+            _remember_post(url)
+    if not post_urls:
         return None
-    _best_date, post_url = max(scored)
 
-    if _remaining_budget() <= 0:
-        return None
-    post_result = await asyncio.to_thread(
-        _fetch_bytes_with_retries,
-        post_url,
-        max_attempts=_DROPFILES_HTTP_ATTEMPTS,
-        per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
-        total_budget_s=_stage_budget(_DROPFILES_HTTP_FILE_BUDGET_S),
-    )
-    if not post_result:
-        return None
-    post_body, post_headers = post_result
-    post_ct = (post_headers.get("content-type") or "").lower()
-    # Loughshore (and similar) 302 the Sunday post straight to the PDF.
-    if _is_pdf_content(post_body) or (
-        _dropfiles_body_looks_like_file(post_headers, post_body) and _is_pdf_content(post_body)
-    ):
-        dest.write_bytes(post_body)
-        return post_url, "pdf"
-    if "text/html" not in post_ct:
-        return None
-    post_html = post_body.decode("utf-8", errors="ignore")
-
-    pdf_url = _extract_pdfembed_target_url(post_html)
-    if pdf_url and _remaining_budget() > 0:
-        pdf_url = urljoin(post_url, pdf_url)
-        file_result = await asyncio.to_thread(
+    for post_url in post_urls:
+        if _remaining_budget() <= 0:
+            break
+        post_result = await asyncio.to_thread(
             _fetch_bytes_with_retries,
-            pdf_url,
+            post_url,
             max_attempts=_DROPFILES_HTTP_ATTEMPTS,
             per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
             total_budget_s=_stage_budget(_DROPFILES_HTTP_FILE_BUDGET_S),
         )
-        if file_result:
-            file_body, file_headers = file_result
-            if _dropfiles_body_looks_like_file(file_headers, file_body) and _is_pdf_content(
-                file_body
-            ):
-                dest.write_bytes(file_body)
-                return pdf_url, "pdf"
+        if not post_result:
+            continue
+        post_body, post_headers = post_result
+        post_ct = (post_headers.get("content-type") or "").lower()
+        # Loughshore (and similar) 302 the Sunday post straight to the PDF.
+        if _is_pdf_content(post_body) or (
+            _dropfiles_body_looks_like_file(post_headers, post_body)
+            and _is_pdf_content(post_body)
+        ):
+            dest.write_bytes(post_body)
+            return post_url, "pdf"
+        if "text/html" not in post_ct:
+            continue
+        post_html = post_body.decode("utf-8", errors="ignore")
 
-    image_urls = _extract_wp_upload_images(
-        post_html, _best_date.year, _best_date.month, post_url
-    )
-    if image_urls:
+        if _remaining_budget() > 0:
+            found = await _download_pdfembed_from_html(
+                post_html,
+                post_url,
+                dest,
+                max_attempts=_DROPFILES_HTTP_ATTEMPTS,
+                per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
+                total_budget_s=_stage_budget(_DROPFILES_HTTP_FILE_BUDGET_S),
+            )
+            if found:
+                return found
+
+        post_date = extract_date_from_slug(post_url) or extract_date_from_string(post_url)
+        if post_date is None and scored:
+            post_date = max(scored)[0]
+        if post_date is None:
+            continue
+        image_urls = _extract_wp_upload_images(
+            post_html, post_date.year, post_date.month, post_url
+        )
+        if not image_urls:
+            continue
         image_bytes: list[bytes] = []
         for image_url in image_urls[:6]:
             if _remaining_budget() <= 0:
@@ -3163,11 +3273,22 @@ async def replay_recipe(
             for p in (recipe.get("post_slug_patterns") or [])
             if str(p).strip()
         ] or ["bulletin"]
+        example_post_url = str(recipe.get("example_post_url") or "").strip()
+        if not example_post_url:
+            for step in steps:
+                if not isinstance(step, dict):
+                    continue
+                step_url = str(step.get("url") or "").strip()
+                if step_url and not _looks_like_direct_document_url(step_url):
+                    example_post_url = step_url
+                    break
         found = await _try_waf_retry_wordpress_bulletin(
             start_url,
             dest,
             post_slug_patterns=post_slug_patterns,
             target_date=target_date,
+            example_post_url=example_post_url or None,
+            weeks_back=int(recipe.get("weeks_back") or 8),
         )
         if found:
             return dest, found[1], found[0]
