@@ -195,6 +195,21 @@ def rewrite_cloud_folder_click_step(step: dict, target: date) -> dict:
     return rewritten
 
 
+def newest_yy_mm_dd_label(texts: list[str]) -> str | None:
+    """Return the newest ``YY.MM.DD.pdf`` label among Drive row texts."""
+    best_date: date | None = None
+    best_label: str | None = None
+    for text in texts:
+        parsed = parse_yy_mm_dd(text or "")
+        if parsed is None:
+            continue
+        label = format_cloud_folder_label(parsed, with_pdf=True)
+        if best_date is None or parsed > best_date:
+            best_date = parsed
+            best_label = label
+    return best_label
+
+
 def recipe_uses_cloud_folder(steps: list) -> bool:
     """True when recipe navigates a dated cloud folder listing."""
     for step in steps:
