@@ -451,6 +451,59 @@ class ClaudyBulletinFilterTests(unittest.TestCase):
             ],
         )
 
+    def test_find_stacked_bulletin_image_urls_keeps_wix_1x_page_scans(self) -> None:
+        """Parish of Maghera Wix 1x fills are ~423x600. Default min_short_side=500
+        would drop them; the recipe uses 400 so the pair is kept and the logo is not.
+        """
+        import asyncio
+
+        from harvester.replay import _find_stacked_bulletin_image_urls
+
+        class _Page:
+            url = "https://www.parishofmaghera.com/copy-of-contact-us-2"
+
+            async def eval_on_selector_all(self, selector: str, _script: str):
+                return [
+                    {
+                        "index": 0,
+                        "src": "/logo.png",
+                        "naturalWidth": 357,
+                        "naturalHeight": 179,
+                    },
+                    {
+                        "index": 1,
+                        "src": "/160826B-0.jpg",
+                        "naturalWidth": 423,
+                        "naturalHeight": 600,
+                    },
+                    {
+                        "index": 2,
+                        "src": "/160826B-1.jpg",
+                        "naturalWidth": 422,
+                        "naturalHeight": 622,
+                    },
+                ]
+
+        page = _Page()
+        dropped = asyncio.run(
+            _find_stacked_bulletin_image_urls(
+                page, 2, min_long_side=550, min_short_side=500
+            )
+        )
+        self.assertEqual(dropped, [])
+        kept = asyncio.run(
+            _find_stacked_bulletin_image_urls(
+                page, 2, min_long_side=550, min_short_side=400
+            )
+        )
+        self.assertEqual(
+            kept,
+            [
+                "https://www.parishofmaghera.com/160826B-0.jpg",
+                "https://www.parishofmaghera.com/160826B-1.jpg",
+            ],
+        )
+
     def test_replay_recipe_supports_print_to_pdf_step(self) -> None:
         import asyncio
 

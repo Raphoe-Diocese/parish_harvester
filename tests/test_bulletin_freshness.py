@@ -376,6 +376,24 @@ class BulletinFreshnessTests(unittest.TestCase):
             "stale",
         )
 
+    def test_maghera_wix_ddmmyy_b_filename_is_16_aug(self) -> None:
+        current = (
+            "https://static.wixstatic.com/media/"
+            "596648_b0abf059f78b4dddbb521f0aeec0b508~mv2.jpg/v1/fill/"
+            "w_423,h_600,al_c,q_80/160826B-0.jpg"
+        )
+        archived = (
+            "https://static.wixstatic.com/media/"
+            "596648_oldjuly~mv2.jpg/v1/fill/w_423,h_600/120726-0.jpg"
+        )
+        target = date(2026, 8, 16)
+        self.assertEqual(extract_bulletin_date(current), date(2026, 8, 16))
+        self.assertEqual(extract_bulletin_date(current.replace("-0.jpg", "-1.jpg")), date(2026, 8, 16))
+        self.assertEqual(check_bulletin_freshness(current, target).status, "fresh")
+        self.assertEqual(check_bulletin_freshness(current, target).reason, "in_bulletin_week")
+        self.assertEqual(extract_bulletin_date(archived), date(2026, 7, 12))
+        self.assertEqual(check_bulletin_freshness(archived, target).status, "stale")
+
 
 if __name__ == "__main__":
     unittest.main()
