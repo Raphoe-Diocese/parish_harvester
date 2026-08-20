@@ -109,6 +109,7 @@ jobs:
       # Pages replaces the whole site and /mega_pdf/*.pdf 404s. Always recover
       # the latest harvest that actually uploaded *_mega_bulletin.pdf.
       - name: Download mega PDFs from latest harvest (OCR/docs-only deploys)
+        continue-on-error: true
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
@@ -121,7 +122,7 @@ jobs:
           FOUND=""
           while IFS= read -r run_id; do
             [ -n "${run_id}" ] || continue
-            count="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/artifacts" --jq '[.artifacts[] | select(.name | test("mega-bulletin-pdf"; "i") and .expired == false)] | length')"
+            count="$(gh api "repos/${GITHUB_REPOSITORY}/actions/runs/${run_id}/artifacts" --jq '[.artifacts[] | select((.name | test("mega-bulletin-pdf"; "i")) and (.expired == false))] | length')"
             if [ "${count:-0}" -gt 0 ]; then
               echo "Downloading mega PDF artifact from harvest run ${run_id}"
               gh run download "${run_id}" --repo "${GITHUB_REPOSITORY}" --name all-mega-bulletin-pdf --dir _harvest_artifacts || \
