@@ -666,5 +666,49 @@ class ErrigalAndMalinRecipeTests(unittest.TestCase):
         )
 
 
+class BallymenaRecipeTests(unittest.TestCase):
+    THIS_WEEK = (
+        "https://ballymenaparish.org/wp-content/uploads/2026/08/"
+        "23.8.26-A4-21st-Sunday.pdf"
+    )
+    LAST_WEEK = (
+        "https://ballymenaparish.org/wp-content/uploads/2026/08/"
+        "16.8.26-20th-Sunday.pdf"
+    )
+    WEDDING = (
+        "https://ballymenaparish.org/wp-content/uploads/2025/01/Wedding-Parish.pdf"
+    )
+
+    def test_recipe_uses_wp_json_not_wedding_download(self) -> None:
+        data = json.loads(
+            Path("parishes/recipes/down_and_connor/ballymenaparish.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(data["site_type"], "wp_json_newest_media")
+        self.assertIn("sunday", data.get("href_patterns") or [])
+        steps = data.get("steps") or []
+        self.assertFalse(
+            any(
+                "wedding-parish" in str(step.get("url") or "").lower()
+                or str(step.get("url") or "").lower().endswith(".pdf")
+                for step in steps
+                if isinstance(step, dict)
+            ),
+            "pinned Wedding-Parish.pdf / dated download would miss this week's Sunday file",
+        )
+
+    def test_dot_date_sunday_beats_wedding(self) -> None:
+        scored = _score_http_scrape_pdf_hrefs(
+            [self.THIS_WEEK, self.LAST_WEEK, self.WEDDING],
+            date(2026, 8, 16),
+        )
+        best_date, best_url = max(scored)
+        self.assertEqual(best_date, date(2026, 8, 23))
+        self.assertEqual(best_url, self.THIS_WEEK)
+        self.assertTrue(all("Wedding-Parish" not in url for _, url in scored))
+        self.assertTrue(_is_non_bulletin_url(self.WEDDING))
+
+
 if __name__ == "__main__":
     unittest.main()

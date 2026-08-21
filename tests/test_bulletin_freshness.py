@@ -175,6 +175,13 @@ class BulletinFreshnessTests(unittest.TestCase):
         )
         self.assertEqual(
             extract_bulletin_date(
+                "https://ballymenaparish.org/wp-content/uploads/2026/08/"
+                "23.8.26-A4-21st-Sunday.pdf"
+            ),
+            date(2026, 8, 23),
+        )
+        self.assertEqual(
+            extract_bulletin_date(
                 "https://www.glenavyandkilleadparish.com/app/uploads/2026/08/"
                 "2026-August-16-Twentieth-Sunday-in-Ordinary-Time.pdf"
             ),
