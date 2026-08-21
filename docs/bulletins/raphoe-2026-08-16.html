@@ -110,7 +110,7 @@
 
     .pdf-frame-wrap {
       position: relative;
-      height: 85vh;
+      height: auto;
       min-height: 850px;
       overflow: hidden;
       border: 1px solid #c9d4d3;
@@ -141,9 +141,9 @@
     
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {
-      display: none;
+      display: flex !important;
       flex-direction: column;
-      min-height: 0;
+      min-height: 850px;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
@@ -152,81 +152,85 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: space-between;
+      justify-content: flex-end;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
       color: #fff;
       flex: 0 0 auto;
     }
-    .pdf-inpage-nav { display: flex; align-items: center; gap: 8px; }
-    .pdf-inpage-nav button {
-      min-width: 44px;
-      min-height: 40px;
-      border: 1px solid rgba(255,255,255,0.35);
-      border-radius: 6px;
-      background: #1a6b6b;
-      color: #fff;
-      font-size: 1.25rem;
-      font-weight: 700;
-    }
-    .pdf-inpage-page-label { font-size: 0.9rem; font-weight: 700; min-width: 7rem; text-align: center; }
     .pdf-inpage-backup { display: flex; gap: 8px; flex-wrap: wrap; }
     .pdf-inpage-backup a { color: #fff; font-weight: 700; font-size: 0.85rem; }
     .pdf-inpage-status { padding: 10px 12px; background: #1f3d3c; color: #d8f0ee; font-size: 0.9rem; }
     .pdf-inpage-pages {
-      flex: 1 1 auto;
+      box-sizing: border-box;
+      flex: 0 0 auto;
+      height: 850px;
+      min-height: 850px;
       overflow: auto;
       -webkit-overflow-scrolling: touch;
       background: #525659;
       padding: 8px 0 16px;
     }
-    .pdf-frame-wrap.is-native-pdf,
-    body.is-native-pdf .pdf-standalone-shell {
-      height: 70vh;
-      min-height: 450px;
+    .pdf-inpage-page-slot {
+      margin: 0 auto 10px;
+      background: #3a3f42;
+      min-height: 180px;
+      position: relative;
+    }
+    .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-link-layer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
+    .pdf-annot-link {
+      position: absolute; z-index: 2; pointer-events: auto;
+      background: rgba(26, 107, 107, 0.08); border-radius: 2px;
+    }
+    .pdf-frame-wrap,
+    .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
-      background: #3a3f42;
+      height: auto;
     }
-    .pdf-frame-wrap.is-native-pdf iframe,
-    .pdf-frame-wrap.is-native-pdf .fullscreen-btn,
+    .pdf-frame-wrap iframe,
+    .pdf-standalone-shell iframe.pdf-frame,
     body.is-native-pdf iframe.pdf-frame {
       display: none !important;
+      height: 850px;
+      min-height: 850px;
     }
-    .pdf-frame-wrap.is-native-pdf .pdf-inpage-viewer,
-    .pdf-frame-wrap.is-native-pdf .pdf-mobile-fallback,
-    body.is-native-pdf .pdf-inpage-viewer,
-    body.is-native-pdf .pdf-mobile-fallback {
-      display: flex !important;
-      flex: 1 1 auto;
-      min-height: 0;
+    .pdf-frame-wrap.is-native-pdf,
+    .pdf-standalone-shell.is-native-pdf,
+    body.is-native-pdf .pdf-standalone-shell {
+      display: flex;
+      flex-direction: column;
+      height: auto !important;
+      min-height: 850px !important;
+      background: #3a3f42;
     }
     @media (max-width: 1024px) {
-      .pdf-frame-wrap {
-        height: 70vh !important;
+      .pdf-frame-wrap,
+      .pdf-standalone-shell,
+      .pdf-frame-wrap.is-native-pdf,
+      .pdf-standalone-shell.is-native-pdf,
+      body.is-native-pdf .pdf-standalone-shell {
+        height: auto !important;
         min-height: 450px !important;
-        display: flex;
-        flex-direction: column;
-        background: #3a3f42;
-      }
-      .pdf-frame-wrap iframe,
-      .pdf-frame-wrap .fullscreen-btn,
-      .pdf-standalone-shell iframe.pdf-frame {
-        display: none !important;
-      }
-      .pdf-standalone-shell {
-        height: 70vh;
-        min-height: 450px;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
-        display: flex !important;
-        flex: 1 1 auto;
-        min-height: 0;
+        min-height: 450px !important;
+      }
+      .pdf-inpage-pages,
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        height: 450px !important;
+        min-height: 450px !important;
+      }
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        display: none !important;
       }
     }
 
@@ -405,13 +409,60 @@
     #ocr-panel > :first-child {
       margin-top: 0;
     }
+    
+    #ocr-panel .ocr-parish-masthead {
+      margin: 2.1em 0 1.15em;
+      padding: 0.85em 0 0.7em;
+      border-top: 3px solid #14524f;
+      border-bottom: 1px solid #c5d0c9;
+    }
+    #ocr-panel .ocr-parish-masthead:first-child {
+      margin-top: 0;
+    }
+    #ocr-panel h2.ocr-parish-name,
+    #ocr-panel .ocr-parish-name {
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #14524f;
+      margin: 0 0 0.2em;
+      line-height: 1.25;
+      border: 0;
+      padding: 0;
+      text-transform: none;
+    }
+    #ocr-panel .ocr-parish-date {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    #ocr-panel .ocr-parish-link {
+      margin: 0.25em 0 0;
+      font-size: 0.88rem;
+    }
+    #ocr-panel h3.b-head {
+      margin-top: 1.45em;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.12em;
+      border-bottom: 1px solid #d4ddd9;
+    }
+
 
     #ocr-panel {
-      height: 85vh;
+      box-sizing: border-box;
+      height: 850px;
       min-height: 850px;
       overflow-y: auto;
       border: 1px solid #d4ddd9;
       padding: 22px 24px 32px;
+    }
+    .pdf-frame-wrap iframe {
+      height: 850px;
+      min-height: 850px;
     }
     .note-box {
       margin-top: 12px;
@@ -507,9 +558,17 @@
     .footer-inner a { color: #d8f0ee; font-weight: 600; }
 
     @media (max-width: 1024px) {
-      /* PDF wrap: 450px in-page PDF.js viewer. OCR panel matches. */
+      /* Harvest + OCR both call this generator — keep both panels here.
+         Desktop: 850px on the VISIBLE boxes. Tablet/phone (max-width 1024px): ~450px. */
+      .pdf-frame-wrap,
+      .pdf-inpage-viewer {
+        height: auto;
+        min-height: 450px;
+      }
+      .pdf-frame-wrap iframe,
+      .pdf-inpage-pages,
       #ocr-panel {
-        height: 70vh;
+        height: 450px;
         min-height: 450px;
       }
     }

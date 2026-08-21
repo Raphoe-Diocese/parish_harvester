@@ -1136,8 +1136,9 @@ PDF_INPAGE_VIEWER_SRC = "/assets/pdf-inpage-viewer.js"
 def pdf_inpage_viewer_css() -> str:
     """Hide the raw-PDF iframe on every device; show stacked PDF.js pages.
 
-    Desktop wrap stays 850px. Tablet/phone use 450px. Users scroll pages
-    inside the viewer — no Page X of Y / prev-next chrome.
+    The VISIBLE gray box is ``.pdf-inpage-pages`` (iframe is display:none).
+    Desktop that box is 850px tall. Tablet/phone (max-width 1024px): 450px.
+    The wrap must grow around the toolbar + 850px pages — do not clip with 85vh.
     """
     return f"""
     .pdf-inpage-viewer,
@@ -1164,7 +1165,9 @@ def pdf_inpage_viewer_css() -> str:
     .pdf-inpage-backup a {{ color: #fff; font-weight: 700; font-size: 0.85rem; }}
     .pdf-inpage-status {{ padding: 10px 12px; background: #1f3d3c; color: #d8f0ee; font-size: 0.9rem; }}
     .pdf-inpage-pages {{
-      flex: 1 1 auto;
+      box-sizing: border-box;
+      flex: 0 0 auto;
+      height: 850px;
       min-height: 850px;
       overflow: auto;
       -webkit-overflow-scrolling: touch;
@@ -1187,11 +1190,13 @@ def pdf_inpage_viewer_css() -> str:
     .pdf-standalone-shell {{
       display: flex;
       flex-direction: column;
+      height: auto;
     }}
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
     body.is-native-pdf iframe.pdf-frame {{
       display: none !important;
+      height: 850px;
       min-height: 850px;
     }}
     .pdf-frame-wrap.is-native-pdf,
@@ -1199,7 +1204,7 @@ def pdf_inpage_viewer_css() -> str:
     body.is-native-pdf .pdf-standalone-shell {{
       display: flex;
       flex-direction: column;
-      height: 85vh !important;
+      height: auto !important;
       min-height: 850px !important;
       background: #3a3f42;
     }}
@@ -1209,17 +1214,20 @@ def pdf_inpage_viewer_css() -> str:
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {{
-        height: 70vh !important;
+        height: auto !important;
         min-height: 450px !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }}
       .pdf-inpage-viewer,
-      .pdf-mobile-fallback,
+      .pdf-mobile-fallback {{
+        min-height: 450px !important;
+      }}
       .pdf-inpage-pages,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {{
+        height: 450px !important;
         min-height: 450px !important;
       }}
       .pdf-frame-wrap iframe,
@@ -1550,7 +1558,7 @@ def render_bulletin_viewer_shell(
 
     .pdf-frame-wrap {{
       position: relative;
-      height: 85vh;
+      height: auto;
       min-height: 850px;
       overflow: hidden;
       border: 1px solid #c9d4d3;
@@ -1642,13 +1650,15 @@ def render_bulletin_viewer_shell(
     @media (pointer: coarse) {{ .ocr-zoom-hint {{ display: inline; margin-left: 6px; }} }}
     {ocr_reading_css("#ocr-panel")}
     #ocr-panel {{
-      height: 85vh;
+      box-sizing: border-box;
+      height: 850px;
       min-height: 850px;
       overflow-y: auto;
       border: 1px solid #d4ddd9;
       padding: 22px 24px 32px;
     }}
     .pdf-frame-wrap iframe {{
+      height: 850px;
       min-height: 850px;
     }}
     .note-box {{
@@ -1748,11 +1758,14 @@ def render_bulletin_viewer_shell(
       /* Harvest + OCR both call this generator — keep both panels here.
          Desktop: 850px on the VISIBLE boxes. Tablet/phone (max-width 1024px): ~450px. */
       .pdf-frame-wrap,
+      .pdf-inpage-viewer {{
+        height: auto;
+        min-height: 450px;
+      }}
       .pdf-frame-wrap iframe,
-      .pdf-inpage-viewer,
       .pdf-inpage-pages,
       #ocr-panel {{
-        height: 70vh;
+        height: 450px;
         min-height: 450px;
       }}
     }}

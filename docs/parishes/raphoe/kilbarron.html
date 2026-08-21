@@ -6,22 +6,43 @@
   <title>Kilbarron Bulletin — 14/08/2026</title>
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
     body {
       font-family: "Segoe UI", system-ui, sans-serif;
-      background: #fafbfc;
+      background: #f4f6f6;
       color: #1a1a2e;
       line-height: 1.55;
     }
     a { color: #1a6b6b; text-decoration: none; }
     a:hover { text-decoration: underline; }
-    .page { max-width: 1100px; margin: 0 auto; padding: 16px 16px 40px; }
-    .back-link { display: inline-block; margin-bottom: 14px; font-weight: 700; color: #1a6b6b; }
-    .header { text-align: center; margin-bottom: 24px; }
-    .diocese-label { margin: 0 0 6px; color: #c0392b; font-size: 0.95rem; letter-spacing: 0.15em; text-transform: uppercase; font-weight: 800; }
-    h1 { margin: 0 0 8px; color: #1a6b6b; font-size: clamp(1.8rem, 3vw, 2.5rem); }
-    .meta { color: #6b7280; font-size: 0.95rem; }
-    
-    /* Top download link — plain, prominent, right under the headline */
+    .page { max-width: 960px; margin: 0 auto; padding: 20px 18px 48px; }
+    .back-link { display: inline-block; margin-bottom: 16px; font-weight: 600; color: #1a6b6b; font-size: 0.95rem; }
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+      background: #fff;
+      border: 1px solid #dde5e4;
+      padding: 28px 20px 22px;
+    }
+    .diocese-label {
+      margin: 0 0 8px;
+      color: #14524f;
+      font-size: 0.8rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    h1 {
+      margin: 0 0 8px;
+      color: #14524f;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.55rem, 3.2vw, 2.15rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      line-height: 1.25;
+    }
+    .meta { color: #6b7280; font-size: 0.92rem; margin-bottom: 10px; }
     .download-link-top {
       display: inline-block;
       margin-top: 4px;
@@ -30,83 +51,70 @@
       color: #1a6b6b;
     }
 
-    /* Section headings — "BULLETIN — ORIGINAL PDF VERSION" style dividers
-       between the always-visible PDF and OCR panels below (no tabs). */
+    /* Mobile-only jump + download (hidden on desktop) */
+    .mobile-jump {
+      display: none;
+      text-align: center;
+      margin: 0 0 22px;
+    }
+    .mobile-jump-btn {
+      display: block;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto 12px;
+      padding: 12px 16px;
+      border: 1px solid #1a6b6b;
+      background: #fff;
+      color: #1a6b6b;
+      font-weight: 700;
+      font-size: 0.98rem;
+      text-decoration: none;
+      border-radius: 2px;
+    }
+    .mobile-jump-btn:hover { background: #f0f7f7; text-decoration: none; }
+    .mobile-jump-download {
+      display: inline-block;
+      font-weight: 700;
+      color: #1a6b6b;
+      font-size: 1rem;
+    }
+
     .section-heading {
-      margin: 30px 0 14px;
+      margin: 34px 0 14px;
       text-align: center;
       text-transform: uppercase;
-      letter-spacing: 0.06em;
-      font-weight: 800;
-      font-size: 1.05rem;
-      color: #14524f;
+      letter-spacing: 0.07em;
+      font-weight: 700;
+      font-size: 0.98rem;
+      color: #4a5560;
+      font-family: Georgia, "Times New Roman", serif;
     }
 
-    /* Pro-tip callout between the PDF and OCR sections */
-    .callout-tip {
-      margin: 18px auto;
-      max-width: 720px;
-      text-align: center;
-      background: #fff4df;
-      border: 1px solid #f5c451;
-      border-radius: 999px;
-      padding: 10px 22px;
-      color: #7a4a00;
-      font-size: 0.92rem;
-      font-weight: 600;
-    }
-    .callout-tip strong { font-weight: 800; }
-
-    /* Viewer blocks — PDF and OCR are both always visible, stacked, no tabs */
     .viewer-block {
-      background: white;
-      border: 1px solid #d6ecea;
-      border-radius: 16px;
-      padding: 20px;
-      box-shadow: 0 4px 12px rgba(26, 107, 107, 0.08);
-      margin-bottom: 8px;
+      background: #fff;
+      border: 1px solid #dde5e4;
+      padding: 14px;
+      margin-bottom: 4px;
     }
-    
-    /* Toolbar */
-    .panel-toolbar {
+
+    .quiet-links {
       display: flex;
       justify-content: flex-end;
-      align-items: center;
-      gap: 10px;
-      margin-bottom: 12px;
+      gap: 14px;
       flex-wrap: wrap;
-    }
-    .toolbar-btn {
-      padding: 8px 16px;
-      border: 2px solid #1a6b6b;
-      border-radius: 6px;
-      background: white;
-      color: #1a6b6b;
+      margin-bottom: 10px;
+      font-size: 0.88rem;
       font-weight: 600;
-      font-size: 0.9rem;
-      cursor: pointer;
-      text-decoration: none;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
     }
-    .toolbar-btn:hover {
-      background: #1a6b6b;
-      color: white;
-      text-decoration: none;
-    }
-    
-    /* PDF View — the browser's own PDF viewer supplies page number, zoom
-       and print/download controls inside the iframe; we only add a small
-       fullscreen shortcut on top of it. */
+    .quiet-links a { color: #1a6b6b; }
+
     .pdf-frame-wrap {
       position: relative;
-      height: 92vh;
-      min-height: 92vh;
+      height: auto;
+      min-height: 850px;
       overflow: hidden;
-      border: 1px solid #c7dcda;
-      border-radius: 10px;
-      background: #f2f5f5;
+      border: 1px solid #c9d4d3;
+      background: #3a3f42;
     }
     .pdf-frame-wrap iframe {
       width: 100%;
@@ -119,31 +127,125 @@
       top: 10px;
       right: 10px;
       z-index: 5;
-      width: 36px;
-      height: 36px;
+      width: 34px;
+      height: 34px;
       border: 1px solid #1a6b6b;
-      border-radius: 6px;
+      border-radius: 4px;
       background: rgba(255, 255, 255, 0.92);
       color: #1a6b6b;
-      font-size: 1.1rem;
+      font-size: 1rem;
       line-height: 1;
       cursor: pointer;
     }
     .fullscreen-btn:hover { background: #fff; }
-    .ocr-search-bar {
-      position: relative;
-      margin-bottom: 12px;
+    
+    .pdf-inpage-viewer,
+    .pdf-mobile-fallback {
+      display: flex !important;
+      flex-direction: column;
+      min-height: 850px;
+      flex: 1 1 auto;
+      background: #3a3f42;
+      color: #e8eeed;
     }
+    .pdf-inpage-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 8px;
+      padding: 8px 10px;
+      background: #14524f;
+      color: #fff;
+      flex: 0 0 auto;
+    }
+    .pdf-inpage-backup { display: flex; gap: 8px; flex-wrap: wrap; }
+    .pdf-inpage-backup a { color: #fff; font-weight: 700; font-size: 0.85rem; }
+    .pdf-inpage-status { padding: 10px 12px; background: #1f3d3c; color: #d8f0ee; font-size: 0.9rem; }
+    .pdf-inpage-pages {
+      box-sizing: border-box;
+      flex: 0 0 auto;
+      height: 850px;
+      min-height: 850px;
+      overflow: auto;
+      -webkit-overflow-scrolling: touch;
+      background: #525659;
+      padding: 8px 0 16px;
+    }
+    .pdf-inpage-page-slot {
+      margin: 0 auto 10px;
+      background: #3a3f42;
+      min-height: 180px;
+      position: relative;
+    }
+    .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-link-layer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
+    .pdf-annot-link {
+      position: absolute; z-index: 2; pointer-events: auto;
+      background: rgba(26, 107, 107, 0.08); border-radius: 2px;
+    }
+    .pdf-frame-wrap,
+    .pdf-standalone-shell {
+      display: flex;
+      flex-direction: column;
+      height: auto;
+    }
+    .pdf-frame-wrap iframe,
+    .pdf-standalone-shell iframe.pdf-frame,
+    body.is-native-pdf iframe.pdf-frame {
+      display: none !important;
+      height: 850px;
+      min-height: 850px;
+    }
+    .pdf-frame-wrap.is-native-pdf,
+    .pdf-standalone-shell.is-native-pdf,
+    body.is-native-pdf .pdf-standalone-shell {
+      display: flex;
+      flex-direction: column;
+      height: auto !important;
+      min-height: 850px !important;
+      background: #3a3f42;
+    }
+    @media (max-width: 1024px) {
+      .pdf-frame-wrap,
+      .pdf-standalone-shell,
+      .pdf-frame-wrap.is-native-pdf,
+      .pdf-standalone-shell.is-native-pdf,
+      body.is-native-pdf .pdf-standalone-shell {
+        height: auto !important;
+        min-height: 450px !important;
+        display: flex;
+        flex-direction: column;
+        background: #3a3f42;
+      }
+      .pdf-inpage-viewer,
+      .pdf-mobile-fallback {
+        min-height: 450px !important;
+      }
+      .pdf-inpage-pages,
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        height: 450px !important;
+        min-height: 450px !important;
+      }
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        display: none !important;
+      }
+    }
+
+
+    .ocr-search-bar { position: relative; margin-bottom: 10px; }
     .search-input {
       width: 100%;
-      border: 1px solid #bdd7d5;
-      border-radius: 8px;
-      padding: 12px 44px 12px 16px;
+      border: 1px solid #c9d4d3;
+      border-radius: 4px;
+      padding: 11px 42px 11px 14px;
       font-size: 1rem;
     }
     .search-clear {
       position: absolute;
-      right: 12px;
+      right: 10px;
       top: 50%;
       transform: translateY(-50%);
       width: 32px;
@@ -152,7 +254,7 @@
       border-radius: 50%;
       background: transparent;
       color: #6b7280;
-      font-size: 1.3rem;
+      font-size: 1.25rem;
       cursor: pointer;
     }
     .search-clear[hidden] { display: none; }
@@ -166,7 +268,7 @@
     }
     .ocr-search-tools button {
       border: 0;
-      border-radius: 6px;
+      border-radius: 4px;
       background: #1a6b6b;
       color: white;
       font-weight: 600;
@@ -175,21 +277,17 @@
       font-size: 0.9rem;
     }
     .ocr-search-tools button:disabled { background: #9bbfbd; cursor: not-allowed; }
-    .match-count {
-      color: #6b7280;
-      font-size: 0.9rem;
-      font-weight: 600;
-    }
+    .match-count { color: #6b7280; font-size: 0.9rem; font-weight: 600; }
     .font-size-controls { display: none; }
     .ocr-zoom-bar {
       position: sticky; top: 0; z-index: 6;
       display: flex; justify-content: center; align-items: center; gap: 10px;
       margin: 0 0 10px; padding: 6px 10px;
       background: rgba(255, 255, 255, 0.94);
-      border: 1px solid #d4ddd9; border-radius: 8px;
+      border: 1px solid #d4ddd9; border-radius: 4px;
     }
     .ocr-zoom-bar button {
-      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 4px;
       background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.15rem; cursor: pointer;
     }
     .ocr-zoom-pct {
@@ -311,24 +409,66 @@
     #ocr-panel > :first-child {
       margin-top: 0;
     }
+    
+    #ocr-panel .ocr-parish-masthead {
+      margin: 2.1em 0 1.15em;
+      padding: 0.85em 0 0.7em;
+      border-top: 3px solid #14524f;
+      border-bottom: 1px solid #c5d0c9;
+    }
+    #ocr-panel .ocr-parish-masthead:first-child {
+      margin-top: 0;
+    }
+    #ocr-panel h2.ocr-parish-name,
+    #ocr-panel .ocr-parish-name {
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #14524f;
+      margin: 0 0 0.2em;
+      line-height: 1.25;
+      border: 0;
+      padding: 0;
+      text-transform: none;
+    }
+    #ocr-panel .ocr-parish-date {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    #ocr-panel .ocr-parish-link {
+      margin: 0.25em 0 0;
+      font-size: 0.88rem;
+    }
+    #ocr-panel h3.b-head {
+      margin-top: 1.45em;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.12em;
+      border-bottom: 1px solid #d4ddd9;
+    }
+
 
     #ocr-panel {
-      height: 92vh;
-      min-height: 92vh;
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
       overflow-y: auto;
       border: 1px solid #d4ddd9;
-      border-radius: 10px;
-      padding: 22px 26px 32px;
+      padding: 22px 24px 32px;
+    }
+    .pdf-frame-wrap iframe {
+      height: 850px;
+      min-height: 850px;
     }
     .note-box {
-      margin-top: 14px;
-      padding: 6px 0;
-      border-radius: 0;
-      background: transparent;
-      border: 0;
-      color: #5a6a68;
+      margin-top: 12px;
+      color: #8a3b3b;
       font-weight: 400;
-      font-size: 0.85rem;
+      font-size: 0.82rem;
       line-height: 1.5;
     }
     .ocr-failed-banner {
@@ -336,7 +476,7 @@
       padding: 12px 14px;
       background: #fff4df;
       border: 1px solid #f5d08d;
-      border-radius: 8px;
+      border-radius: 4px;
       color: #713f12;
       font-weight: 600;
       font-size: 0.9rem;
@@ -345,105 +485,110 @@
     .empty-state[hidden],
     #parish-empty[hidden] { display: none !important; }
     .parish-section {
-      margin-top: 28px;
-      background: #fff;
-      border: 1px solid #e5e7eb;
-      border-radius: 10px;
-      padding: 16px;
+      margin-top: 36px;
+      padding: 8px 0 0;
+      background: transparent;
+      border: 0;
     }
     .parish-section h2.section-heading {
-      color: #1e3a5f;
-      font-size: 1.2rem;
+      color: #14524f;
+      font-size: 1.15rem;
+      margin-bottom: 16px;
     }
     .parish-filter {
       width: 100%;
-      border: 1px solid #e5e7eb;
-      border-radius: 6px;
+      max-width: 420px;
+      display: block;
+      margin: 0 auto 18px;
+      border: 1px solid #d0d8d7;
+      border-radius: 4px;
       padding: 10px 12px;
       font-size: 0.95rem;
-      margin-bottom: 12px;
     }
     ul.parish-grid {
       list-style: none;
       display: grid;
       grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 12px;
+      gap: 8px 28px;
       padding: 0;
       margin: 0;
     }
-    .parish-item { margin: 0; display: flex; flex-direction: column; gap: 4px; }
-    .parish-site-link {
-      align-self: flex-start;
-      margin-left: 4px;
-      font-size: 0.78rem;
-      font-weight: 600;
-      color: #6b7280;
-      text-decoration: none;
+    .parish-item {
+      margin: 0;
+      padding: 2px 0 2px 1.1em;
+      position: relative;
     }
-    .parish-site-link:hover { color: #1a6b6b; text-decoration: underline; }
-    .parish-link {
-      min-height: 48px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-      text-decoration: none;
+    .parish-item::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      top: 2px;
       color: #1a6b6b;
-      font-size: 1rem;
       font-weight: 700;
-      background: #f9fcfc;
-      border: 1px solid #d9ecea;
-      border-radius: 8px;
-      padding: 10px 14px;
-      transition: all 0.15s;
     }
-    .parish-link:hover {
-      background: #e8f4f4;
+    .parish-link {
+      color: #1a6b6b;
+      font-size: 0.98rem;
+      font-weight: 600;
       text-decoration: none;
-      transform: translateY(-1px);
+      background: transparent;
+      border: 0;
+      padding: 0;
+      min-height: 0;
+      display: inline;
     }
-    .empty-state { margin: 0 0 12px; color: #6b7280; font-size: 0.95rem; }
-    
-    /* Footer */
+    .parish-link:hover { text-decoration: underline; }
+    .empty-state { margin: 0 0 12px; color: #6b7280; font-size: 0.95rem; text-align: center; }
+
     footer {
-      margin-top: 32px;
+      margin-top: 40px;
       background: #114b4b;
       color: white;
       padding: 16px 20px;
     }
     .footer-inner {
-      max-width: 1100px;
+      max-width: 960px;
       margin: 0 auto;
       display: flex;
       justify-content: space-between;
       gap: 12px;
       flex-wrap: wrap;
-      font-size: 0.9rem;
+      font-size: 0.88rem;
     }
-    .footer-inner a { color: #d8f0ee; font-weight: 700; }
-    .footer-inner a:hover { text-decoration: underline; }
-    
-    /* Responsive */
+    .footer-inner a { color: #d8f0ee; font-weight: 600; }
+
+    @media (max-width: 1024px) {
+      /* Harvest + OCR both call this generator — keep both panels here.
+         Desktop: 850px on the VISIBLE boxes. Tablet/phone (max-width 1024px): ~450px. */
+      .pdf-frame-wrap,
+      .pdf-inpage-viewer {
+        height: auto;
+        min-height: 450px;
+      }
+      .pdf-frame-wrap iframe,
+      .pdf-inpage-pages,
+      #ocr-panel {
+        height: 450px;
+        min-height: 450px;
+      }
+    }
     @media (max-width: 900px) {
       ul.parish-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
     }
-    @media (max-width: 600px) {
-      .page { padding: 16px 12px; }
-      ul.parish-grid { grid-template-columns: 1fr; }
-      .pdf-frame-wrap, #ocr-panel {
-        height: 90vh;
-        min-height: 90vh;
-      }
+    @media (max-width: 700px) {
+      .page { padding: 14px 12px 36px; }
+      .mobile-jump { display: block; }
+      .download-link-top { display: none; }
+      .quiet-links { justify-content: center; }
+      ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
       #ocr-panel {
         padding: 16px 14px 28px;
       }
       .ocr-search-tools { flex-direction: column; }
       .ocr-search-tools button {
-        min-height: 48px;
+        min-height: 44px;
         width: 100%;
       }
-      .panel-toolbar { justify-content: stretch; }
-      .toolbar-btn { flex: 1; justify-content: center; min-height: 48px; }
-      .callout-tip { margin-left: 8px; margin-right: 8px; }
     }
   </style>
 </head>
