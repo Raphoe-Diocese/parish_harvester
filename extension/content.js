@@ -4137,7 +4137,7 @@
       "padding:4px 6px",
     ].join(";");
     const moreOptionsSummary = document.createElement("summary");
-    moreOptionsSummary.textContent = "Other options (auto-guess link, image, frame…)";
+    moreOptionsSummary.textContent = "Other options (image, frame…)";
     moreOptionsSummary.style.cssText = [
       "cursor:pointer",
       "font-size:10px",
@@ -4610,7 +4610,9 @@
         }
       }
       if (pinLinkBtn) {
-        pinLinkBtn.style.display = "none";
+        // Always offer Guess on listing/HTML pages. It used to be forced
+        // hidden after every refresh, so the control only flashed briefly.
+        pinLinkBtn.style.display = onDirectPdf ? "none" : "block";
       }
       } catch (guidedErr) {
         console.error("[Parish Trainer] guided context refresh failed:", guidedErr);
@@ -5428,7 +5430,7 @@
     );
 
     pinLinkBtn = makeSmallBtn(
-      "🤖 Auto-guess bulletin link",
+      "Guess the bulletin link",
       "#6d28d9",
       async () => {
         showStatus("⏳ Finding best bulletin link on this page…", "info");
@@ -5548,6 +5550,7 @@
     contextPrimaryBtn.style.display = "none";
 
     wizardBtns.appendChild(clickFirstBtn);
+    wizardBtns.appendChild(pinLinkBtn);
     wizardBtns.appendChild(contextPrimaryBtn);
 
     savePagePdfBtn = makeSmallBtn(
@@ -5581,8 +5584,6 @@
     wizardBtns.appendChild(savePagePdfBtn);
     wizardBtns.appendChild(pickImageBtn);
     wizardBtns.appendChild(imageCropBtn);
-
-    moreOptionsBody.appendChild(pinLinkBtn);
 
       const manualPickLinkBtn = makeSmallBtn(
       "🔗 Point at a specific link manually",
@@ -6699,6 +6700,7 @@
               autoDetectNote.style.color = "#86efac";
               autoDetectNote.textContent = `✓ You picked: ${item.name || key} (${key})`;
               parishMismatchBanner.style.display = "none";
+              void _refreshHarvestStatusLine(key);
             },
           })
         : null;
@@ -6713,6 +6715,34 @@
       const harvestStatusLine = document.createElement("div");
       harvestStatusLine.style.cssText = "font-size:9px;color:#93c5fd;margin-bottom:4px;display:none;";
       pushSection.appendChild(harvestStatusLine);
+      const alreadyWorkingBanner = document.createElement("div");
+      alreadyWorkingBanner.style.cssText =
+        "display:none;font-size:10px;line-height:1.4;color:#86efac;background:#14532d;border:1px solid #166534;border-radius:6px;padding:6px 8px;margin-bottom:6px;";
+      pushSection.appendChild(alreadyWorkingBanner);
+      let _pendingPreviousTestedAt = "";
+      let _parishStatusDoc = null;
+      const _formatUkDateLocal = (iso) => {
+        const match = String(iso || "").match(/(\d{4})-(\d{2})-(\d{2})/);
+        return match ? `${match[3]}/${match[2]}/${match[1]}` : "";
+      };
+      const _loadParishStatusDoc = async () => {
+        const settings = await _storageGet(["gh_pat", "gh_repo"]);
+        const mod = globalThis.phGithubRecipePush;
+        if (!mod?.fetchParishStatusJson) return null;
+        try {
+          _parishStatusDoc = await mod.fetchParishStatusJson({
+            gh_pat: settings.gh_pat || "",
+            gh_repo: settings.gh_repo,
+          });
+          return _parishStatusDoc;
+        } catch (_e) {
+          return null;
+        }
+      };
+      const _statusRowForKey = (parishKey) => {
+        const key = String(parishKey || "").trim().toLowerCase();
+        return _parishStatusDoc?.parishes?.[key] || null;
+      };
       keyInput.addEventListener("input", () => {
         parishPickerTouched = true;
       });
@@ -6724,94 +6754,58 @@
         const key = String(parishKey || "").trim().toLowerCase();
         if (!key) {
           harvestStatusLine.style.display = "none";
+          alreadyWorkingBanner.style.display = "none";
           return;
         }
-        const settings = await _storageGet(["gh_repo"]);
-        const ghRepo = String(settings.gh_repo || "Raphoe-Diocese/parish_harvester").trim();
         try {
-          const [reportResp, failResp] = await Promise.all([
-            fetch(`https://raw.githubusercontent.com/${ghRepo}/main/Bulletins/report.json`),
-            fetch(`https://raw.githubusercontent.com/${ghRepo}/main/parishes/consecutive_failures.json`),
-          ]);
-          let line = "";
-          if (reportResp.ok) {
-            const report = await reportResp.json();
-            const downloaded = (report.downloaded || []).some((r) => r.parish === key);
-            const failed = (report.failed || []).find((r) => r.parish === key);
-            if (downloaded) {
-              const ukDate = (() => {
-                const raw = String(report.target_date || "");
-                const m = raw.match(/(\d{4})-(\d{2})-(\d{2})/);
-                return m ? `${m[3]}/${m[2]}/${m[1]}` : (raw || "recent");
-              })();
-              line = `✅ Last harvest (${ukDate}): downloaded OK`;
-              harvestStatusLine.style.color = "#86efac";
-            } else if (failed) {
-              const reason = String(failed.reason || failed.error || "failed").slice(0, 90);
-              // Stale-failure guard: if the recipe was re-saved AFTER this
-              // harvest ran, the failure predates the fix — don't scare the user
-              // with an error that no longer applies.
-              let fixedSince = false;
-              try {
-                const reportDate = String(report.target_date || "").slice(0, 10);
-                const loadedRec = await loadRecipeFromRawGithub(key);
-                const recDate = String(loadedRec?.recipe?.recorded_date || "").slice(0, 10);
-                if (recDate && reportDate && recDate > reportDate) fixedSince = true;
-              } catch (_e) {}
-              if (fixedSince) {
-                _lastHarvestIssue = "";
-                _needsRetrain = false;
-                line = "✅ Fix saved since the last run — press Send & test (or wait for Sunday) to confirm.";
-                harvestStatusLine.style.color = "#86efac";
-                _refreshGuidedContext();
-              } else {
-                const training = _standaloneRecipeSteps().length > 0;
-                const onPdf = detectPageType().type === "direct_pdf";
-                _lastHarvestIssue = reason;
-                _needsRetrain = false;
-                const cloudFail =
-                  /cloud folder|yy\.mm\.dd|html_render|folder listing|re-train/i.test(reason) ||
-                  (failed.file_type === "html_render" && _isCloudFolderUrl(pageUrl));
-                if (cloudFail || reason.includes("outdated")) {
-                  _needsRetrain = true;
-                }
-                if (training || onPdf) {
-                  line = _needsRetrain
-                    ? `⚠️ Retrain needed — last harvest: ${reason}`
-                    : `ℹ️ Last Sunday's run failed (${reason}) — push this recipe to fix it`;
-                  harvestStatusLine.style.color = _needsRetrain ? "#fca5a5" : "#fde68a";
-                } else {
-                  line = _needsRetrain
-                    ? `⚠️ Retrain this recipe — last harvest: ${reason}`
-                    : `❌ Last harvest: ${reason}`;
-                  harvestStatusLine.style.color = "#fca5a5";
-                }
-                if (window.ph_copilot?.rememberIssue) {
-                  window.ph_copilot.rememberIssue(key, { lastIssue: reason, needsRetrain: _needsRetrain });
-                }
-                _refreshGuidedContext();
-              }
-            }
-          }
-          if (!line && failResp.ok) {
-            const fails = await failResp.json();
-            const count = Number(fails[key] || 0);
-            if (count >= 2) {
-              _needsRetrain = true;
-              _lastHarvestIssue = `${count} consecutive harvest failures`;
-              line = `⚠️ ${count} consecutive harvest failures — retrain this recipe`;
-              harvestStatusLine.style.color = "#fde68a";
-              _refreshGuidedContext();
-            }
-          }
-          if (line) {
-            harvestStatusLine.textContent = line;
-            harvestStatusLine.style.display = "block";
-          } else {
+          if (!_parishStatusDoc) await _loadParishStatusDoc();
+          const row = _statusRowForKey(key);
+          if (!row?.outcome) {
             harvestStatusLine.style.display = "none";
+            alreadyWorkingBanner.style.display = "none";
+            return;
           }
+          const when = _formatUkDateLocal(row.last_tested_at);
+          if (row.outcome === "ok") {
+            _lastHarvestIssue = "";
+            _needsRetrain = false;
+            harvestStatusLine.textContent = `✅ Last harvest (${when || "—"}): ok`;
+            harvestStatusLine.style.color = "#86efac";
+            harvestStatusLine.style.display = "block";
+            alreadyWorkingBanner.textContent = `Already working on GitHub as of ${when || "—"}. Autoguess is optional — you do not need a full retrain.`;
+            alreadyWorkingBanner.style.display = "block";
+            if (pinLinkBtn) {
+              pinLinkBtn.title = `Already working on GitHub as of ${when || "—"}. Only use Auto-guess if you need a new recipe.`;
+            }
+            _refreshGuidedContext();
+            return;
+          }
+          alreadyWorkingBanner.style.display = "none";
+          const reason = String(row.error || row.category || row.outcome).slice(0, 90);
+          if (row.outcome === "stale") {
+            _lastHarvestIssue = reason;
+            _needsRetrain = false;
+            harvestStatusLine.textContent = `🕐 Stale (${when || "—"}): ${reason}`;
+            harvestStatusLine.style.color = "#fde68a";
+            harvestStatusLine.style.display = "block";
+            _refreshGuidedContext();
+            return;
+          }
+          const training = _standaloneRecipeSteps().length > 0;
+          _lastHarvestIssue = reason;
+          _needsRetrain = /outdated|re-train|cloud folder/i.test(reason);
+          harvestStatusLine.textContent = _needsRetrain
+            ? `⚠️ Retrain needed — last harvest (${when || "—"}): ${reason}`
+            : `${training ? "ℹ️" : "❌"} Last harvest (${when || "—"}): ${reason}`;
+          harvestStatusLine.style.color = _needsRetrain || !training ? "#fca5a5" : "#fde68a";
+          harvestStatusLine.style.display = "block";
+          if (window.ph_copilot?.rememberIssue) {
+            window.ph_copilot.rememberIssue(key, { lastIssue: reason, needsRetrain: _needsRetrain });
+          }
+          _refreshGuidedContext();
         } catch (_e) {
           harvestStatusLine.style.display = "none";
+          alreadyWorkingBanner.style.display = "none";
         }
       };
 
@@ -6882,13 +6876,23 @@
         if (!parishSearchCombo) return;
         const settings = await _storageGet(["gh_repo"]);
         const reg = await window.ph_parish_pickers.loadRegistry(settings.gh_repo);
+        if (!_parishStatusDoc) await _loadParishStatusDoc();
+        const harvestSuffix = (parishKey) => {
+          const row = _statusRowForKey(parishKey);
+          if (!row?.outcome) return "";
+          const when = _formatUkDateLocal(row.last_tested_at);
+          if (row.outcome === "ok") return ` — ok ${when}`;
+          if (row.outcome === "stale") return ` — stale ${when}`;
+          if (row.outcome === "failed") return ` — failed ${when}`;
+          return ` — ${row.outcome}`;
+        };
         let items = [];
         if (resolvedDiocese && resolvedDiocese !== NEW_DIOCESE_VALUE && reg.parishesByDiocese[resolvedDiocese]) {
           items = reg.parishesByDiocese[resolvedDiocese].map((p) => ({
             value: p.key,
             key: p.key,
             name: p.name,
-            label: `${p.name} (${p.key})`,
+            label: `${p.name} (${p.key})${harvestSuffix(p.key)}`,
             diocese: resolvedDiocese,
           }));
         } else {
@@ -6896,7 +6900,7 @@
             value: p.key,
             key: p.key,
             name: p.name,
-            label: `${p.name} (${p.key})`,
+            label: `${p.name} (${p.key})${harvestSuffix(p.key)}`,
             diocese: p.diocese,
           }));
         }
@@ -7313,7 +7317,7 @@
         postPushBanner.appendChild(btnRow);
       };
 
-      const _startPostPushHarvestWatch = (parishKey, displayName, pushResponse, dispatchAt) => {
+      const _startPostPushHarvestWatch = (parishKey, displayName, pushResponse, dispatchAt, previousTestedAt = "") => {
         const token = ++_postPushWatchToken;
         void (async () => {
           const settings = await _storageGet(["gh_pat", "gh_repo"]);
@@ -7326,6 +7330,7 @@
             gh_repo: settings.gh_repo,
             parish_key: parishKey,
             startedAt,
+            previousTestedAt,
             onProgress: ({ elapsed, runStatus, queued }) => {
               if (token !== _postPushWatchToken) return;
               let statusLabel = "checking result";
@@ -7347,6 +7352,20 @@
             },
           });
           if (token !== _postPushWatchToken) return;
+          if (result.timedOut) {
+            const reason = String(result.reason || "Timed out waiting for last_tested_at to change.").slice(0, 240);
+            showPostPushBanner(
+              pushResponse,
+              `⚠️ <strong>${displayName}</strong> — ${reason} ` +
+              `<a href="${result.runUrl}" target="_blank" rel="noopener noreferrer">Actions</a> · Problems tab.`,
+              "warn"
+            );
+            showStatus(`⚠️ ${displayName} — ${reason}`, "warn");
+            try {
+              chrome.runtime.sendMessage({ type: "problems_refresh", parish_key: parishKey, display_name: displayName });
+            } catch (_e) {}
+            return;
+          }
           if (result.ok) {
             const pdfUrl =
               result.item?.url ||
@@ -7829,7 +7848,7 @@
               response,
               `⏳ <strong>${name || key}</strong> — single-parish test running (${0}s)…`
             );
-            _startPostPushHarvestWatch(key, name || key, response, dispatchAt);
+            _startPostPushHarvestWatch(key, name || key, response, dispatchAt, _pendingPreviousTestedAt);
             try {
               chrome.runtime.sendMessage({
                 type: "problems_refresh",
@@ -7846,7 +7865,7 @@
               response,
               `⏳ <strong>${name || key}</strong> — starting single-parish test…`
             );
-            _startPostPushHarvestWatch(key, name || key, response, dispatchAt);
+            _startPostPushHarvestWatch(key, name || key, response, dispatchAt, _pendingPreviousTestedAt);
           } else if (response.dispatchError) {
             showDispatchErrorBanner(response.dispatchError);
             showStatus(
@@ -7991,6 +8010,33 @@
             );
 
             const dispatchAt = Date.now();
+            _pendingPreviousTestedAt = "";
+            try {
+              const statusDoc = await pushMod.fetchParishStatusJson({
+                gh_pat: settings.gh_pat,
+                gh_repo: settings.gh_repo,
+              });
+              _pendingPreviousTestedAt = String(statusDoc?.parishes?.[key]?.last_tested_at || "").trim();
+            } catch (_e) {
+              _pendingPreviousTestedAt = "";
+            }
+            try {
+              const stored = await _storageGet(["ph_last_parish_dispatch"]);
+              const map =
+                stored.ph_last_parish_dispatch && typeof stored.ph_last_parish_dispatch === "object"
+                  ? { ...stored.ph_last_parish_dispatch }
+                  : {};
+              map[key] = {
+                at: dispatchAt,
+                displayName: name || key,
+                previousTestedAt: _pendingPreviousTestedAt,
+              };
+              await new Promise((resolve) => {
+                chrome.storage.local.set({ ph_last_parish_dispatch: map }, () => resolve());
+              });
+            } catch (_e) {
+              // UX timestamp only — harvest still runs.
+            }
             const dispatchResult = await pushMod.dispatchHarvestTest({
               gh_pat: settings.gh_pat,
               gh_repo: settings.gh_repo,

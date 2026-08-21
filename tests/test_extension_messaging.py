@@ -119,6 +119,30 @@ class ExtensionMessagingTests(unittest.TestCase):
         self.assertIn("GitHub repo configured:", popup_js)
         self.assertIn("Paste this whole block to your AI assistant.", popup_js)
 
+    def test_trainer_matches_github_parish_status(self) -> None:
+        push = (REPO_ROOT / "extension" / "github_recipe_push.js").read_text(encoding="utf-8")
+        sidepanel = SIDEPANEL_JS.read_text(encoding="utf-8")
+        content = CONTENT_JS.read_text(encoding="utf-8")
+        html = SIDEPANEL_HTML.read_text(encoding="utf-8")
+        manifest = json.loads(MANIFEST_JSON.read_text(encoding="utf-8"))
+        self.assertEqual(manifest.get("version"), "1.61.10")
+        self.assertIn("previousTestedAt", push)
+        self.assertIn("commits?path=", push)
+        self.assertIn("if (!ref) return null", push)
+        self.assertIn("timedOut: true", push)
+        self.assertIn("formatUkDateFromIso", push)
+        self.assertNotIn("_problemsDeadPollRemoved", sidepanel)
+        self.assertNotIn("if (pdfOk) return { ok: true", push)
+        self.assertNotIn(
+            "https://raw.githubusercontent.com/${repo}/main/parishes/parish_status.json?t=${Date.now()}",
+            sidepanel,
+        )
+        self.assertIn("_pdHarvestLabel", sidepanel)
+        self.assertIn("Already working on GitHub as of", sidepanel)
+        self.assertIn("trainer-version-footer", html)
+        self.assertIn("Already working on GitHub as of", content)
+        self.assertNotIn("parish_health", sidepanel)
+
     def test_content_scripts_use_isolated_world_only(self) -> None:
         manifest = json.loads(MANIFEST_JSON.read_text(encoding="utf-8"))
         content_scripts = manifest.get("content_scripts", [])

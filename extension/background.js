@@ -1466,6 +1466,7 @@ async function _pushRecipeFollowupWork(message, gh_pat, gh_repo) {
       dispatchMap[key] = {
         at: Date.now(),
         displayName: normalizedRecipe.display_name || key,
+        previousTestedAt: String(dispatchMap[key]?.previousTestedAt || "").trim(),
       };
       await chrome.storage.local.set({ [PH_LAST_DISPATCH_KEY]: dispatchMap });
     }
@@ -1918,6 +1919,7 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
           dispatchMap[key] = {
             at: Date.now(),
             displayName: normalizedRecipe.display_name || key,
+            previousTestedAt: String(dispatchMap[key]?.previousTestedAt || "").trim(),
           };
           await chrome.storage.local.set({ [PH_LAST_DISPATCH_KEY]: dispatchMap });
         }
