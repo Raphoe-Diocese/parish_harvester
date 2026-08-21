@@ -2,15 +2,15 @@
   "generated_at": "2026-08-21",
   "target_date": "2026-08-16",
   "summary": {
-    "downloaded": 85,
+    "downloaded": 86,
     "html_links": 0,
     "skipped": 17,
-    "failed": 21,
+    "failed": 20,
     "stale_rejected": 1
   },
   "action_counts": {
-    "ok": 88,
-    "investigate": 18,
+    "ok": 89,
+    "investigate": 17,
     "skip": 17,
     "retrain": 1
   },
@@ -1598,28 +1598,28 @@
     {
       "parish_key": "errigalparish",
       "display_name": "Errigal",
-      "diocese": "unknown",
+      "diocese": "derry",
       "recipe_file": "parishes/recipes/unknown/errigalparish.json",
       "recipe": {
-        "start_url": "https://www.errigalparish.com/news.html",
-        "site_type": "dated_pdf_path",
+        "start_url": "https://www.errigalparish.com/pdf/160826.pdf",
+        "site_type": "predicted_dated_pdf",
         "playbook_type": "dated_pdf_bulletin",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 2,
-        "click_count": 1,
+        "step_count": 1,
+        "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "Bulletin is a real PDF (often made in Microsoft Word \u2192 Print to PDF).",
-          "Tab title may say .docx or .jpg \u2014 ignore that; check the address bar ends in .pdf.",
-          "On the PDF page: tap Save this PDF \u2014 saves the full https://\u2026 address for Sunday harvest.",
-          "Or start on parishnews.html \u2192 point at this week's link \u2192 Yes \u2192 Save this PDF.",
-          "Harvester rewrites DDMMYY in the URL each Sunday (e.g. 140626 \u2192 210626)."
+          "Errigal (Derry). Weekly PDF at /pdf/DDMMYY.pdf. news.html now lists 'Sunday, DDth Month YYYY - Click Here to View' plus GDPR / Privacy / pastoral-letter PDFs.",
+          "2026-08-21: 160826.pdf is HTTP 200, 295551 bytes, 8 pages, text 'Errigal Parish News - 16th August 2026' / Twentieth Sunday / St Mary's + St Joseph's. 230826.pdf is 404 (next Sunday not posted). 090826.pdf is a different shorter file.",
+          "Send & test 21/08/2026 downloaded that real 8-page file, then failed 'Too many pages: 8 pages (max 4)'. Default cap is 4. max_bulletin_pages=12 allows the weekly newsletter.",
+          "site_type:predicted_dated_pdf fetches the rewritten /pdf/DDMMYY.pdf over HTTP and never clicks news.html."
         ],
         "do_not": [
-          "Do not use use_page_url only \u2014 GitHub cannot read Chrome's internal PDF viewer address.",
-          "Do not worry if Document Properties title mentions Microsoft Word."
+          "Do not click news.html \u2014 GDPR, Privacy Notice, and pastoralletter2025.pdf sit beside the weekly link.",
+          "Do not leave the default 4-page cap \u2014 this parish's weekly file is ~8 pages.",
+          "Do not pin use_captured_url to one week's filename."
         ],
         "recorded_date": "2026-08-21"
       },
@@ -1627,10 +1627,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Too many pages: 8 pages (max 4)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Too many pages: 8 pages (max 4)"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "fahanparish",
@@ -2830,26 +2830,28 @@
       "recipe_file": "parishes/recipes/derry/malinparish.json",
       "recipe": {
         "start_url": "https://malinparish.ie/index.php/bulletin/",
-        "site_type": "pdf_link_list",
+        "site_type": "http_scrape_newest_pdf",
         "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
-          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-          "Do not worry if the filename or date in the link text changes every week."
+          "Listing https://malinparish.ie/index.php/bulletin/ has dated Bulletin-Dth-Month-YYYY.pdf links. Newest on 21/08/2026 is Bulletin-5th-April-2026.pdf (HTTP 200). August files 404.",
+          "The old download step rewrote 5th-April-2026 \u2192 Bulletin-16th-August-2026.pdf and failed HTTP 404. That is a content gap, not a missing file to invent.",
+          "site_type:http_scrape_newest_pdf picks the newest real Bulletin-*.pdf from the listing. Harvest week 16/08/2026 vs 05/04/2026 must be stale, not failed.",
+          "March files sit in /uploads/2026/04/ \u2014 scoring must use the filename date, not the folder month."
         ],
         "do_not": [
-          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
-          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+          "Do not pin or rewrite a dated download URL \u2014 harvest will guess Bulletin-16th-August-2026.pdf and 404.",
+          "Do not download Synod-2023.pdf or SHARING-THE-GOOD-NEWS-MAY-2021.pdf from the same page.",
+          "Do not mark this failed while the April file is still on the listing."
         ],
         "recorded_date": "2026-08-21"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
