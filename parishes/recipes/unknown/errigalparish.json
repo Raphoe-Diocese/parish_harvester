@@ -1,26 +1,46 @@
 {
-  "version": 2,
+  "version": 1,
   "parish_key": "errigalparish",
-  "display_name": "Errigalparish",
-  "diocese": "derry",
-  "start_url": "https://www.errigalparish.com/pdf/160826.pdf",
+  "display_name": "Errigal",
+  "diocese": "unknown",
+  "start_url": "https://www.errigalparish.com/news.html",
   "steps": [
     {
+      "action": "click",
+      "selector": "a[href$='.pdf']",
+      "href": "https://www.errigalparish.com/pdf/160826.pdf",
+      "text": "Sunday, 16th August 2026 - Click Here to View | Sunday, 16th",
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "middle",
+      "fallback_selectors": [
+        "a[href$='.pdf']",
+        "a[href*='.pdf']"
+      ]
+    },
+    {
       "action": "download",
-      "url": "https://www.errigalparish.com/pdf/090826.pdf"
+      "url": "https://www.errigalparish.com/pdf/160826.pdf"
     }
   ],
-  "site_type": "predicted_dated_pdf",
-  "weeks_back": 8,
-  "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-08-18",
+  "observed_load_ms": 12855.199951171875,
+  "timeout_ms": 55000,
+  "total_timeout_s": 250,
+  "playbook_type": "dated_pdf_bulletin",
+  "site_type": "dated_pdf_path",
   "operator_notes": [
-    "Weekly PDF at /pdf/DDMMYY.pdf (e.g. 160826.pdf = 16/08/2026).",
-    "2026-08-18 FIX: click on news.html failed ('No valid content found') even though this week's file is a direct unchallenged asset. Confirmed 16/08/2026 via curl: HTTP 200, 295,551 bytes, text 'Errigal Parish News - 16th August 2026'. site_type:predicted_dated_pdf fetches the rewritten /pdf/DDMMYY.pdf and never clicks the listing (which also links GDPR/pastoral-letter PDFs)."
+    "Bulletin is a real PDF (often made in Microsoft Word → Print to PDF).",
+    "Tab title may say .docx or .jpg — ignore that; check the address bar ends in .pdf.",
+    "On the PDF page: tap Save this PDF — saves the full https://… address for Sunday harvest.",
+    "Or start on parishnews.html → point at this week's link → Yes → Save this PDF.",
+    "Harvester rewrites DDMMYY in the URL each Sunday (e.g. 140626 → 210626)."
   ],
   "do_not": [
-    "Do not click a[href*=\"pdf\"] on news.html — it can pick drumraghparish.com GDPR/Privacy/Bishops-Letter links.",
-    "Do not set use_captured_url."
-  ]
+    "Do not use use_page_url only — GitHub cannot read Chrome's internal PDF viewer address.",
+    "Do not worry if Document Properties title mentions Microsoft Word."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "middle"
+  },
+  "recorded_date": "2026-08-21"
 }
