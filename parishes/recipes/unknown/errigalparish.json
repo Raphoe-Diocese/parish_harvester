@@ -1,46 +1,31 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "errigalparish",
   "display_name": "Errigal",
-  "diocese": "unknown",
-  "start_url": "https://www.errigalparish.com/news.html",
+  "diocese": "derry",
+  "start_url": "https://www.errigalparish.com/pdf/160826.pdf",
   "steps": [
-    {
-      "action": "click",
-      "selector": "a[href$='.pdf']",
-      "href": "https://www.errigalparish.com/pdf/160826.pdf",
-      "text": "Sunday, 16th August 2026 - Click Here to View | Sunday, 16th",
-      "pick_strategy": "newest_dated",
-      "bulletin_position": "middle",
-      "fallback_selectors": [
-        "a[href$='.pdf']",
-        "a[href*='.pdf']"
-      ]
-    },
     {
       "action": "download",
       "url": "https://www.errigalparish.com/pdf/160826.pdf"
     }
   ],
-  "observed_load_ms": 12855.199951171875,
-  "timeout_ms": 55000,
-  "total_timeout_s": 250,
+  "site_type": "predicted_dated_pdf",
+  "weeks_back": 8,
+  "max_bulletin_pages": 12,
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
   "playbook_type": "dated_pdf_bulletin",
-  "site_type": "dated_pdf_path",
+  "recorded_date": "2026-08-21",
   "operator_notes": [
-    "Bulletin is a real PDF (often made in Microsoft Word → Print to PDF).",
-    "Tab title may say .docx or .jpg — ignore that; check the address bar ends in .pdf.",
-    "On the PDF page: tap Save this PDF — saves the full https://… address for Sunday harvest.",
-    "Or start on parishnews.html → point at this week's link → Yes → Save this PDF.",
-    "Harvester rewrites DDMMYY in the URL each Sunday (e.g. 140626 → 210626)."
+    "Errigal (Derry). Weekly PDF at /pdf/DDMMYY.pdf. news.html now lists 'Sunday, DDth Month YYYY - Click Here to View' plus GDPR / Privacy / pastoral-letter PDFs.",
+    "2026-08-21: 160826.pdf is HTTP 200, 295551 bytes, 8 pages, text 'Errigal Parish News - 16th August 2026' / Twentieth Sunday / St Mary's + St Joseph's. 230826.pdf is 404 (next Sunday not posted). 090826.pdf is a different shorter file.",
+    "Send & test 21/08/2026 downloaded that real 8-page file, then failed 'Too many pages: 8 pages (max 4)'. Default cap is 4. max_bulletin_pages=12 allows the weekly newsletter.",
+    "site_type:predicted_dated_pdf fetches the rewritten /pdf/DDMMYY.pdf over HTTP and never clicks news.html."
   ],
   "do_not": [
-    "Do not use use_page_url only — GitHub cannot read Chrome's internal PDF viewer address.",
-    "Do not worry if Document Properties title mentions Microsoft Word."
-  ],
-  "bulletin_layout": {
-    "strategy": "newest_dated",
-    "position": "middle"
-  },
-  "recorded_date": "2026-08-21"
+    "Do not click news.html — GDPR, Privacy Notice, and pastoralletter2025.pdf sit beside the weekly link.",
+    "Do not leave the default 4-page cap — this parish's weekly file is ~8 pages.",
+    "Do not pin use_captured_url to one week's filename."
+  ]
 }

@@ -1,28 +1,30 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "malinparish",
   "display_name": "Malin",
   "diocese": "derry",
   "start_url": "https://malinparish.ie/index.php/bulletin/",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": ["bulletin-"],
+  "playbook_type": "pdf_download_list",
   "steps": [
     {
-      "action": "download",
-      "url": "http://malinparish.ie/wp-content/uploads/2026/04/Bulletin-5th-April-2026.pdf"
+      "action": "goto",
+      "url": "https://malinparish.ie/index.php/bulletin/"
     }
   ],
-  "observed_load_ms": 16309,
-  "timeout_ms": 55000,
-  "total_timeout_s": 190,
-  "playbook_type": "pdf_download_list",
-  "site_type": "pdf_link_list",
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-08-21",
   "operator_notes": [
-    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
-    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-    "Do not worry if the filename or date in the link text changes every week."
+    "Listing https://malinparish.ie/index.php/bulletin/ has dated Bulletin-Dth-Month-YYYY.pdf links. Newest on 21/08/2026 is Bulletin-5th-April-2026.pdf (HTTP 200). August files 404.",
+    "The old download step rewrote 5th-April-2026 → Bulletin-16th-August-2026.pdf and failed HTTP 404. That is a content gap, not a missing file to invent.",
+    "site_type:http_scrape_newest_pdf picks the newest real Bulletin-*.pdf from the listing. Harvest week 16/08/2026 vs 05/04/2026 must be stale, not failed.",
+    "March files sit in /uploads/2026/04/ — scoring must use the filename date, not the folder month."
   ],
   "do_not": [
-    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
-    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
-  ],
-  "recorded_date": "2026-08-21"
+    "Do not pin or rewrite a dated download URL — harvest will guess Bulletin-16th-August-2026.pdf and 404.",
+    "Do not download Synod-2023.pdf or SHARING-THE-GOOD-NEWS-MAY-2021.pdf from the same page.",
+    "Do not mark this failed while the April file is still on the listing."
+  ]
 }
