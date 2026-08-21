@@ -46,6 +46,22 @@ def _pdf_error_page_reason(path: Path) -> str | None:
     return None
 
 
+def _stale_dir_for_current(current_dir: Path) -> Path:
+    """Saved copies of too-old bulletins for the Back room View bulletin button."""
+    return current_dir.parent / "stale"
+
+
+def _copy_harvested_pdf(result: "FetchResult", dest_dir: Path) -> Path | None:
+    if not result.file_path or not Path(result.file_path).exists():
+        return None
+    dest_dir.mkdir(parents=True, exist_ok=True)
+    dest = dest_dir / f"{result.key}.pdf"
+    src = Path(result.file_path)
+    if src.resolve() != dest.resolve():
+        shutil.copy2(src, dest)
+    return dest
+
+
 def _recipe_is_inactive(meta: dict | None) -> bool:
     if not isinstance(meta, dict):
         return False
@@ -167,6 +183,13 @@ def generate_report(
             stale.unlink()
         except OSError:
             pass
+    stale_dir = _stale_dir_for_current(current_dir)
+    stale_dir.mkdir(parents=True, exist_ok=True)
+    for old_stale in stale_dir.glob("*.pdf"):
+        try:
+            old_stale.unlink()
+        except OSError:
+            pass
 
     downloaded: list[dict] = []
     html_links: list[dict] = []
@@ -176,6 +199,7 @@ def generate_report(
 
     for r in results:
         if r.is_stale:
+            kept = _copy_harvested_pdf(r, stale_dir)
             stale_rejected.append({
                 "parish": r.key,
                 "display_name": r.display_name,
@@ -183,6 +207,7 @@ def generate_report(
                 "reason": r.stale_reason,
                 "retry_strategy": r.retry_strategy,
                 "error": r.error,
+                **({"file": kept.name} if kept else {}),
             })
             continue
         error_reason = (
@@ -298,6 +323,7 @@ def generate_report(
 def _result_to_report_entry(r: "FetchResult", current_dir: Path) -> tuple[str, dict | None]:
     """Map one FetchResult to (bucket, entry) where bucket is a report section key."""
     if r.is_stale:
+        kept = _copy_harvested_pdf(r, _stale_dir_for_current(current_dir))
         return "stale_rejected", {
             "parish": r.key,
             "display_name": r.display_name,
@@ -305,6 +331,7 @@ def _result_to_report_entry(r: "FetchResult", current_dir: Path) -> tuple[str, d
             "reason": r.stale_reason,
             "retry_strategy": r.retry_strategy,
             "error": r.error,
+            **({"file": kept.name} if kept else {}),
         }
     if r.status == "ok" and r.file_path and r.file_path.exists():
         error_reason = _pdf_error_page_reason(r.file_path)

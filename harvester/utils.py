@@ -982,6 +982,32 @@ def rewrite_date_url(url: str, target: date) -> str:
             pass
 
     # ------------------------------------------------------------------
+    # Pattern H: yearless "28th-June" / "16th-Aug" (Tawnawilly, Milford)
+    # ------------------------------------------------------------------
+    yearless_m = _YEARLESS_SLUG_RE.search(path)
+    if yearless_m:
+        old_month = _MONTH_MAP.get(yearless_m.group(2).lower())
+        if old_month:
+            month_raw = yearless_m.group(2)
+            had_ordinal = bool(re.search(r"(?:st|nd|rd|th)", yearless_m.group(0), re.I))
+            sep_m = re.search(r"(?:st|nd|rd|th)?([_\-\s])", yearless_m.group(0), re.I)
+            sep = sep_m.group(1) if sep_m else "-"
+            month_full = _MONTH_NAMES[target.month]
+            month_str = month_full[:3] if len(month_raw) <= 3 else month_full
+            if month_raw.isupper():
+                month_str = month_str.upper()
+            elif month_raw[0].isupper():
+                month_str = month_str.capitalize()
+            day_str = (
+                f"{target.day}{_ordinal_suffix(target.day)}"
+                if had_ordinal
+                else str(target.day)
+            )
+            new_frag = f"{day_str}{sep}{month_str}"
+            new_path = path[: yearless_m.start()] + new_frag + path[yearless_m.end() :]
+            return parsed._replace(path=new_path).geturl()
+
+    # ------------------------------------------------------------------
     # Pattern F: No date found - return URL unchanged (static files).
     # However, if the URL has a /YYYY/MM/ directory segment, update that
     # even when the filename itself has no recognisable date.  This handles

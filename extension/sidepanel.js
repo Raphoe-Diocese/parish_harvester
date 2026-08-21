@@ -1757,8 +1757,38 @@ async function _problemsClearRetrained(parishKey) {
   await _spStorageSet({ [PROBLEMS_RECIPE_RETRAINED_KEY]: retrained });
 }
 
-function _problemsParishBulletinPdf(repo, parishKey) {
-  return `https://raw.githubusercontent.com/${repo}/main/Bulletins/current/${parishKey}.pdf`;
+function _problemsParishBulletinPdf(repo, parishKey, folder) {
+  const dir = folder === "stale" ? "stale" : "current";
+  return `https://raw.githubusercontent.com/${repo}/main/Bulletins/${dir}/${parishKey}.pdf`;
+}
+
+async function _problemsOpenHarvestedPdf(row, repo) {
+  const key = String(row?.parish || "").trim();
+  if (!key) {
+    setStatus("No parish key — cannot open a harvest PDF.", "err");
+    return;
+  }
+  const first = row?.outcome === "stale" ? "stale" : "current";
+  const second = first === "stale" ? "current" : "stale";
+  const urls = [
+    _problemsParishBulletinPdf(repo, key, first),
+    _problemsParishBulletinPdf(repo, key, second),
+  ];
+  for (const url of urls) {
+    try {
+      const resp = await fetch(url, { method: "HEAD", cache: "no-store" });
+      if (resp.ok) {
+        chrome.tabs.create({ url, active: true });
+        return;
+      }
+    } catch (_e) {
+      // try the other folder
+    }
+  }
+  setStatus(
+    `No saved harvest PDF on GitHub for ${row.display_name || key} this week. Harvest throws away a too-old file unless this week’s run kept it.`,
+    "warn"
+  );
 }
 
 function _problemsShowVerifyResult(payload) {
@@ -2280,6 +2310,16 @@ async function _problemsRenderRows(rows) {
       void _problemsOpenSite(row, openBtn);
     });
     actions.appendChild(openBtn);
+
+    const viewBtn = document.createElement("button");
+    viewBtn.type = "button";
+    viewBtn.className = "problems-view-btn";
+    viewBtn.textContent = "View bulletin";
+    viewBtn.title = "Open the PDF harvest actually saved on GitHub";
+    viewBtn.addEventListener("click", () => {
+      void _problemsOpenHarvestedPdf(row, ghRepo);
+    });
+    actions.appendChild(viewBtn);
 
     const sendBtn = document.createElement("button");
     sendBtn.type = "button";

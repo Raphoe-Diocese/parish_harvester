@@ -86,12 +86,15 @@ class PatchReportTests(unittest.TestCase):
             current_dir = tmp_path / "current"
             current_dir.mkdir()
 
+            pdf = tmp_path / "bangorparish-raw.pdf"
+            pdf.write_bytes(b"%PDF-1.4\n%\xe2\xe3\xcf\xd3\n")
             result = FetchResult(
                 key="bangorparish",
                 display_name="Bangor",
                 status="error",
                 url="https://example.com/bulletin",
                 error="Stale bulletin rejected for mega PDF (bulletin date 2026-06-07, too_old)",
+                file_path=pdf,
             )
             result.is_stale = True
             result.stale_reason = "too_old"
@@ -109,6 +112,9 @@ class PatchReportTests(unittest.TestCase):
             self.assertEqual(patched["summary"]["stale_rejected"], 1)
             self.assertEqual(patched["stale_rejected"][0]["parish"], "bangorparish")
             self.assertIn("last_tested_at", patched["stale_rejected"][0])
+            stale_copy = tmp_path / "stale" / "bangorparish.pdf"
+            self.assertTrue(stale_copy.is_file())
+            self.assertEqual(patched["stale_rejected"][0].get("file"), "bangorparish.pdf")
 
     def test_creates_report_when_missing(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

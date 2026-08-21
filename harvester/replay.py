@@ -124,6 +124,11 @@ _WAF_RETRY_OVERALL_BUDGET_S = 160.0
 PDFEMB_SELECTOR = "a.pdfemb-viewer[href]"
 PDFEMB_HREF_EXTRACT_JS = "(els) => els.map(el => el.getAttribute('href')).filter(Boolean)"
 
+_ALWAYS_NON_BULLETIN_RE = re.compile(
+    r"gdpr|privacy[-_\s]?policy|wedding[-_\s]?parish|\bwedding\b|"
+    r"order[-_\s]?of[-_\s]?mass|giftaid|gift[-_\s]?aid",
+    re.IGNORECASE,
+)
 _NON_BULLETIN_RE = re.compile(
     r"dataentry|giftaid|standingorder|donation|prayer|safeguarding|privacy|gdpr|diocese|"
     r"sitemap|application|registration|volunteer|finances|financial|parishdraw|mcn\s*media|"
@@ -153,6 +158,8 @@ _WP_UPLOADS_YEAR_MONTH_RE = re.compile(r"/wp-content/uploads/(20\d{2})/(0?[1-9]|
 
 def _is_non_bulletin_url(url: str) -> bool:
     text = unquote(url or "")
+    if _ALWAYS_NON_BULLETIN_RE.search(text):
+        return True
     if _BULLETIN_KEYWORD_RE.search(text):
         return False
     return bool(_NON_BULLETIN_RE.search(text))

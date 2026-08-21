@@ -101,6 +101,11 @@ class ClaudyBulletinFilterTests(unittest.TestCase):
     def test_gdpr_pdf_is_non_bulletin(self) -> None:
         url = "http://parishofclaudy.com/onewebmedia/Diocese%20of%20Derry%20-%20GDPR%20Guide.pdf"
         self.assertTrue(_is_non_bulletin_url(url))
+        self.assertTrue(
+            _is_non_bulletin_url(
+                "https://tawnawillyparish.ie/wp-content/uploads/GDPR-Parish-Bulletin.pdf"
+            )
+        )
 
     def test_newsletter_docx_is_bulletin(self) -> None:
         url = "http://parishofclaudy.com/onewebmedia/NEWSLETTER%207-6-26.docx"

@@ -407,6 +407,7 @@ jobs:
           # Partial harvests are normal — always commit OK parishes + parish_status for the extension.
           git add -f Bulletins/report.json Bulletins/report.txt Bulletins/dashboard.html docs/manifest.json docs/index.html docs/dioceses/ 2>/dev/null || true
           git add -f Bulletins/current/*.pdf 2>/dev/null || true
+          git add -f Bulletins/stale/*.pdf 2>/dev/null || true
           git add -f mega_pdf/*_mega_bulletin.pdf 2>/dev/null || true
           git add -f docs/mega_pdf/*_mega_bulletin.pdf docs/mega_pdf/*.pages.json 2>/dev/null || true
           git add -f parishes/consecutive_failures.json parishes/stale_bulletins.json parishes/retry_queue.json parishes/parish_status.json parishes/training_backlog.json 2>/dev/null || true
@@ -414,6 +415,10 @@ jobs:
           if [ -n "${TARGET_PARISH}" ] && [ -f "Bulletins/current/${TARGET_PARISH}.pdf" ]; then
             git add -f "Bulletins/current/${TARGET_PARISH}.pdf"
             echo "Including test PDF: Bulletins/current/${TARGET_PARISH}.pdf"
+          fi
+          if [ -n "${TARGET_PARISH}" ] && [ -f "Bulletins/stale/${TARGET_PARISH}.pdf" ]; then
+            git add -f "Bulletins/stale/${TARGET_PARISH}.pdf"
+            echo "Including stale PDF: Bulletins/stale/${TARGET_PARISH}.pdf"
           fi
           if git diff --cached --quiet; then
             echo "ℹ️  No staged changes — skipping commit."
