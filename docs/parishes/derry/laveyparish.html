@@ -143,7 +143,7 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
-      min-height: 0;
+      min-height: 850px;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
@@ -164,6 +164,7 @@
     .pdf-inpage-status { padding: 10px 12px; background: #1f3d3c; color: #d8f0ee; font-size: 0.9rem; }
     .pdf-inpage-pages {
       flex: 1 1 auto;
+      min-height: 850px;
       overflow: auto;
       -webkit-overflow-scrolling: touch;
       background: #525659;
@@ -190,6 +191,7 @@
     .pdf-standalone-shell iframe.pdf-frame,
     body.is-native-pdf iframe.pdf-frame {
       display: none !important;
+      min-height: 850px;
     }
     .pdf-frame-wrap.is-native-pdf,
     .pdf-standalone-shell.is-native-pdf,
@@ -211,6 +213,13 @@
         display: flex;
         flex-direction: column;
         background: #3a3f42;
+      }
+      .pdf-inpage-viewer,
+      .pdf-mobile-fallback,
+      .pdf-inpage-pages,
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        min-height: 450px !important;
       }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
@@ -443,6 +452,9 @@
       border: 1px solid #d4ddd9;
       padding: 22px 24px 32px;
     }
+    .pdf-frame-wrap iframe {
+      min-height: 850px;
+    }
     .note-box {
       margin-top: 12px;
       color: #8a3b3b;
@@ -538,8 +550,11 @@
 
     @media (max-width: 1024px) {
       /* Harvest + OCR both call this generator — keep both panels here.
-         Desktop: 850px. Tablet/phone (max-width 1024px): ~450px. */
+         Desktop: 850px on the VISIBLE boxes. Tablet/phone (max-width 1024px): ~450px. */
       .pdf-frame-wrap,
+      .pdf-frame-wrap iframe,
+      .pdf-inpage-viewer,
+      .pdf-inpage-pages,
       #ocr-panel {
         height: 70vh;
         min-height: 450px;
@@ -626,9 +641,7 @@
           <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
         </div>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Lavey</h2><p class="ocr-parish-date">21/08/2026</p></header>
-<hr>
-<p>Page 55</p>
+      <div id="ocr-panel"><p class="page-label">Page 55</p>
 <h3 class="b-head">Mass Times</h3>
 <p>Sundays:<br>
 Vigil: 6.00pm<br>
@@ -652,11 +665,11 @@ Lavey Early<br>
 Years<br>
 <a href="tel:+442879645464" style="color:#1d4ed8;font-weight:600;">028 7964 5464</a><br>
 Neighbouring<br>
-Parishes<br>
-Maghera<br>
-Fr. Doherty<br>
+Parishes</p>
+<h2 class="ocr-parish-name">Maghera (Derry)</h2>
+<p>21/08/2026</p>
+<p>Fr. Doherty<br>
 <a href="tel:+442879642496" style="color:#1d4ed8;font-weight:600;">028 7964 2496</a><br>
-Kilrea<br>
 Fr. McDermott<br>
 028 2954 0343Mercy to every person “Lord” , the woman said, “help me. ” Human<br>
 life is too big and too complex for any of us to live it on our own. We<br>
@@ -700,10 +713,11 @@ celebrated in<br>
 Lavey/Termoneeny Centre.<br>
 All Proceeds in aid of<br>
 Parish Funds.<br>
-All Welcome!<br>
-Lavey</p>
+All Welcome!</p>
+<h2 class="ocr-parish-name">Lavey</h2>
+<p>21/08/2026</p>
 <hr>
-<p>Page 56</p>
+<p class="page-label">Page 56</p>
 <p>Sunday 16th August - 20th Sunday in Ordinary Time<br>
 Monday 17th August 9.15 am Mass<br>
 Wednesday 19th August 9.15 am Mass<br>
@@ -757,7 +771,8 @@ That the men called to priesthood will &quot;.have a<br>
 care for justice [and] act with integrity.&quot;<br>
 as they preach the message of God&#x27;s salvation<br>
 for everyone, the Good News that the Church is<br>
-&quot;.a house of prayer for all the peoples.&quot;</p></div>
+&quot;.a house of prayer for all the peoples.&quot;</p>
+<hr></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 

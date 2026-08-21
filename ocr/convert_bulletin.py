@@ -776,6 +776,11 @@ def main():
         print(f"Stub output saved to: {output_filename}")
         return
 
+    from ocr.sparse_page_ocr import fill_sparse_ocr_pages
+
+    print("Filling sparse / banner-only mega pages from page images ...")
+    pages_text = fill_sparse_ocr_pages(pdf_file, pages_text)
+
     print("Building HTML ...")
     content = build_html_content(pages_text)
 

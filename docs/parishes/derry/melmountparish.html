@@ -143,7 +143,7 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
-      min-height: 0;
+      min-height: 850px;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
@@ -164,6 +164,7 @@
     .pdf-inpage-status { padding: 10px 12px; background: #1f3d3c; color: #d8f0ee; font-size: 0.9rem; }
     .pdf-inpage-pages {
       flex: 1 1 auto;
+      min-height: 850px;
       overflow: auto;
       -webkit-overflow-scrolling: touch;
       background: #525659;
@@ -190,6 +191,7 @@
     .pdf-standalone-shell iframe.pdf-frame,
     body.is-native-pdf iframe.pdf-frame {
       display: none !important;
+      min-height: 850px;
     }
     .pdf-frame-wrap.is-native-pdf,
     .pdf-standalone-shell.is-native-pdf,
@@ -211,6 +213,13 @@
         display: flex;
         flex-direction: column;
         background: #3a3f42;
+      }
+      .pdf-inpage-viewer,
+      .pdf-mobile-fallback,
+      .pdf-inpage-pages,
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        min-height: 450px !important;
       }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
@@ -443,6 +452,9 @@
       border: 1px solid #d4ddd9;
       padding: 22px 24px 32px;
     }
+    .pdf-frame-wrap iframe {
+      min-height: 850px;
+    }
     .note-box {
       margin-top: 12px;
       color: #8a3b3b;
@@ -538,8 +550,11 @@
 
     @media (max-width: 1024px) {
       /* Harvest + OCR both call this generator — keep both panels here.
-         Desktop: 850px. Tablet/phone (max-width 1024px): ~450px. */
+         Desktop: 850px on the VISIBLE boxes. Tablet/phone (max-width 1024px): ~450px. */
       .pdf-frame-wrap,
+      .pdf-frame-wrap iframe,
+      .pdf-inpage-viewer,
+      .pdf-inpage-pages,
       #ocr-panel {
         height: 70vh;
         min-height: 450px;
@@ -626,9 +641,7 @@
           <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
         </div>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Melmount (&amp; Camus)</h2><p class="ocr-parish-date">21/08/2026</p></header>
-<hr>
-<p>Page 65</p>
+      <div id="ocr-panel"><p class="page-label">Page 65</p>
 <p>15 Sunday in Ordinary Time (Year A)<br>
 12 July 2026<br>
 The Soil of Our Lives<br>
@@ -652,10 +665,11 @@ our lives has become hardened, or crowded, or shallow. The worries of<br>
 the week, the busyness, the old hurts we haven&#x27;t let go of — these are<br>
 the thorns and the stones. They don&#x27;t destroy the seed. They just stop it<br>
 The good news is that soil can always be worked: A little time in prayer<br>
-each day. An honest look at what is choking the Word in us. A return to<br>
-the Sacraments. Small, quiet acts of clearing the ground! When we dothMelmount (&amp; Camus)</p>
+each day. An honest look at what is choking the Word in us. A return to</p>
+<h2 class="ocr-parish-name">Melmount (&amp; Camus)</h2>
+<p>21/08/2026</p>
 <hr>
-<p>Page 66</p>
+<p class="page-label">Page 66</p>
 <p>that, our roots go down deeper into God, and we find a steadiness that<br>
 the heat of life cannot wither.<br>
 St Paul tells us the whole of creation is groaning, waiting to be set free.<br>
@@ -683,7 +697,7 @@ Jim Harley, 1 Melmount Park<br>
 Thomas Martin Roulston, 89 Carlton Drive</p>
 <h3 class="b-head">Anniversaries</h3>
 <hr>
-<p>Page 67</p>
+<p class="page-label">Page 67</p>
 <p>Sr. Monica O’Kane, Mary Kate Mullen, William Robinson<br>
 Conor McCarron, Tony McAleer, Susan Logue<br>
 Vincent Gormley, Betty McColgan, Ellen Jane McCormick<br>
@@ -710,7 +724,7 @@ Parishioners can still leave their contributions in the Parish Office. If the<br
 Office is closed, please use the letterbox.<br>
 Parish Bulletin This is the last bulletin until September.</p>
 <hr>
-<p>Page 68</p>
+<p class="page-label">Page 68</p>
 <p>Exposition of the Blessed Sacrament will take place in St. Mary’s,<br>
 Melmount tomorrow, Monday 13 July after 10.00am Mass until 6.30pm.<br>
 Vocations We pray for the men called to serve the Church as priests of<br>
@@ -733,7 +747,7 @@ online for booking at<br>
 Please Note: These courses are in person and not online courses.<br>
 Accord Derry will NOT be facilitating courses during October or</p>
 <hr>
-<p>Page 69</p>
+<p class="page-label">Page 69</p>
 <p>Safeguarding Notice If you have any concerns with regard to the<br>
 Safeguarding of children within the church please contact Marie O’Kane,<br>
 the Diocesan Designated Liaison Person (DLP) on <a href="tel:+447596500793" style="color:#1d4ed8;font-weight:600;">+447596500793</a> or<br>
@@ -760,7 +774,7 @@ August Draw<br>
 £250: 1626 Anne Neeson – Madeleine McColgan<br>
 £250: 1379 Gary McNicholl – Sheelagh McKelvey</p>
 <hr>
-<p>Page 70</p>
+<p class="page-label">Page 70</p>
 <p>£250: 1862 Emma Lynch – Elizabeth O’Hare<br>
 £150: 1825 Susan McGuinness – John Donohoe<br>
 £150: 1684 Teresa Boggs – Katrina Houston<br>
@@ -771,7 +785,6 @@ August Draw<br>
 Forty Hours<br>
 Adoration – St<br>
 Mary’s<br>
-Melmount<br>
 Join us for Forty Hours<br>
 Adoration in St Mary’s<br>
 Melmount between 26th and<br>
@@ -787,7 +800,8 @@ and click.<br>
 View Forty Hours Adoration<br>
 PDF<br>
 ✍<br>
-Sign-Up Sheet (PDF)</p></div>
+Sign-Up Sheet (PDF)</p>
+<hr></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 

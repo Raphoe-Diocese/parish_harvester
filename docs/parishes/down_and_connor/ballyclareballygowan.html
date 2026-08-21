@@ -143,7 +143,7 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
-      min-height: 0;
+      min-height: 850px;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
@@ -164,6 +164,7 @@
     .pdf-inpage-status { padding: 10px 12px; background: #1f3d3c; color: #d8f0ee; font-size: 0.9rem; }
     .pdf-inpage-pages {
       flex: 1 1 auto;
+      min-height: 850px;
       overflow: auto;
       -webkit-overflow-scrolling: touch;
       background: #525659;
@@ -190,6 +191,7 @@
     .pdf-standalone-shell iframe.pdf-frame,
     body.is-native-pdf iframe.pdf-frame {
       display: none !important;
+      min-height: 850px;
     }
     .pdf-frame-wrap.is-native-pdf,
     .pdf-standalone-shell.is-native-pdf,
@@ -211,6 +213,13 @@
         display: flex;
         flex-direction: column;
         background: #3a3f42;
+      }
+      .pdf-inpage-viewer,
+      .pdf-mobile-fallback,
+      .pdf-inpage-pages,
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        min-height: 450px !important;
       }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
@@ -443,6 +452,9 @@
       border: 1px solid #d4ddd9;
       padding: 22px 24px 32px;
     }
+    .pdf-frame-wrap iframe {
+      min-height: 850px;
+    }
     .note-box {
       margin-top: 12px;
       color: #8a3b3b;
@@ -538,8 +550,11 @@
 
     @media (max-width: 1024px) {
       /* Harvest + OCR both call this generator — keep both panels here.
-         Desktop: 850px. Tablet/phone (max-width 1024px): ~450px. */
+         Desktop: 850px on the VISIBLE boxes. Tablet/phone (max-width 1024px): ~450px. */
       .pdf-frame-wrap,
+      .pdf-frame-wrap iframe,
+      .pdf-inpage-viewer,
+      .pdf-inpage-pages,
       #ocr-panel {
         height: 70vh;
         min-height: 450px;
@@ -626,18 +641,17 @@
           <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
         </div>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Ballyclare and Ballygowan</h2><p class="ocr-parish-date">21/08/2026</p></header>
-<hr>
-<p>Page 7</p>
+      <div id="ocr-panel"><p class="page-label">Page 7</p>
 <p>Notice Board<br>
 (028) 9334 2226 ballyclar e@downandconnor .org<br>
 @ballyclar eballygowanparish16 August 2026The Parish of Ballyclare &amp; Ballygowan<br>
 Offerings: Thank you for your recent offerings.<br>
 9 August – Weekly Offering £345.40<br>
-Masses this week: Monday - Thursday 9.00am<br>
-Ballyclare and Ballygowan</p>
+Masses this week: Monday - Thursday 9.00am</p>
+<h2 class="ocr-parish-name">Ballyclare and Ballygowan</h2>
+<p>21/08/2026</p>
 <hr>
-<p>Page 8</p>
+<p class="page-label">Page 8</p>
 <p>Please click on the button if you wish to make an online donatation to<br>
 the Parish of Ballyclare and Ballygowan. Thank you.This Week’s Hymns<br>
 Entrance<br>
@@ -645,7 +659,8 @@ OffertoryCommunion<br>
 Recessional395<br>
 687260<br>
 442<br>
-Copyright   2025 Ballyclare and Ballygowan Parish</p></div>
+Copyright   2025 Ballyclare and Ballygowan Parish</p>
+<hr></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 

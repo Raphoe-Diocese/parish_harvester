@@ -108,6 +108,47 @@ class SplitOcrHtmlByPageRangesTests(unittest.TestCase):
         self.assertIn("Second page for annagry", chunks["annagryparish"].html)
         self.assertNotIn("Recently deceased", chunks["annagryparish"].html)
 
+    def test_page_ranges_match_plain_page_markers(self) -> None:
+        """Live structured HTML often has <p>Page 14</p> without page-label class."""
+        from ocr.parish_splitter import split_ocr_html_by_page_ranges
+
+        fragment = """
+<p>Page 13</p>
+<p>Glenties notices.</p>
+<hr>
+<p>Page 14</p>
+<p>Gortahork</p>
+<p>Aifrinn na seachtaine 16ú Lúnasa 2026.</p>
+<hr>
+<p>Page 15</p>
+<p>Inver parish mass times.</p>
+"""
+        chunks = split_ocr_html_by_page_ranges(
+            fragment, {"gort-a-choirce": (14, 14), "inverparish": (15, 15)}
+        )
+        self.assertEqual(chunks["gort-a-choirce"].start_page, 14)
+        self.assertIn("Aifrinn na seachtaine", chunks["gort-a-choirce"].html)
+        self.assertNotIn("Inver parish", chunks["gort-a-choirce"].html)
+        self.assertIn("Inver parish", chunks["inverparish"].html)
+
+    def test_irish_alias_matches_gort_a_choirce_banner(self) -> None:
+        from ocr.parish_splitter import split_ocr_html_by_parish
+
+        fragment = """
+<p class="page-label">Page 14</p>
+<p>Gort a' Choirce</p>
+<p>Aifrinn na seachtaine. POBAL CHRÍOST RÍ.</p>
+<hr>
+<p class="page-label">Page 15</p>
+<p>Inver Parish</p>
+<p>Mass at Frosses.</p>
+"""
+        chunks = split_ocr_html_by_parish(
+            fragment, [("gort-a-choirce", "Gortahork"), ("inverparish", "Inver")]
+        )
+        self.assertEqual(chunks["gort-a-choirce"].start_page, 14)
+        self.assertIn("Aifrinn na seachtaine", chunks["gort-a-choirce"].html)
+
 
 if __name__ == "__main__":
     unittest.main()

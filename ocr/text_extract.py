@@ -6,13 +6,41 @@ Returns None when the PDF looks scanned or image-only so callers can fall back
 to Mistral / Gemini / OpenAI.
 """
 
+import re
 from pathlib import Path
 
 from PyPDF2 import PdfReader
 
+_URL_RE = re.compile(r"(?:https?://|www\.)\S+", re.IGNORECASE)
+
 # Heuristic thresholds — tuned for parish newsletter PDFs (Word/InDesign exports).
 MIN_CHARS_PER_PAGE = 80
 MIN_TOTAL_CHARS = 200
+# A real bulletin page is thousands of characters. Stitcher banners are a
+# short name + URL (often 40–150 chars) sitting on an image-only page.
+SPARSE_PAGE_CHARS = 200
+BANNER_ONLY_CHARS = 400
+
+
+def page_text_char_count(lines: list[str] | None) -> int:
+    return len("\n".join(lines or []).strip())
+
+
+def page_is_sparse(lines: list[str] | None) -> bool:
+    """True when a page looks like a stitcher banner, not a real bulletin body."""
+    text = "\n".join(ln.strip() for ln in (lines or []) if str(ln).strip()).strip()
+    if not text:
+        return True
+    if len(text) < SPARSE_PAGE_CHARS:
+        return True
+    nonempty = [ln for ln in text.splitlines() if ln.strip()]
+    if (
+        len(text) < BANNER_ONLY_CHARS
+        and len(nonempty) <= 4
+        and _URL_RE.search(text)
+    ):
+        return True
+    return False
 
 
 def extract_text_pages(pdf_path: str | Path) -> list[list[str]] | None:

@@ -47,6 +47,8 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 
 ## Still open (do not pretend these are finished)
 
+- [ ] **doing** · 2026-08-21 · Gortahork (`gort-a-choirce`) OCR empty — mega page 14 was banner-only (Irish image body never OCR'd). Fill sparse mega pages from the mega PDF image and slice by `pages.json` / `Page N`. Keep Irish as Irish. **Leave open until verified on live** https://www.parishpress.ie/parishes/raphoe/gort-a-choirce.html · `ocr/sparse_page_ocr.py`, `ocr/parish_splitter.py`, `ocr/parish_pages.py`
+- [ ] **doing** · 2026-08-21 · Desktop 850px must be the **visible** PDF.js / `#ocr-panel` height (not only an outer wrap). Diocese **and** parish pages. Mobile/tablet `max-width: 1024px` stay ~450px. **Leave open until verified on live Gortahork + Raphoe.** · `render_bulletin_viewer_shell`, `docs/assets/pdf-inpage-viewer.js`
 - [ ] **todo** · 2026-08-20 · Problems console — full work-queue polish · `extension/sidepanel.js`, `harvester/parish_status.py`
 - [ ] **doing** · 2026-08-21 · Trainer ↔ GitHub sync: Problems/Directory load latest `parishes/parish_status.json` via commit SHA; Directory shows ok + UK date; Send & test waits for `last_tested_at` change · `extension/*`
 - [ ] **todo** · 2026-08-20 · Recipe success — one parish at a time (A–Z repair with proof packs) · `parishes/recipes/`, Problems tab

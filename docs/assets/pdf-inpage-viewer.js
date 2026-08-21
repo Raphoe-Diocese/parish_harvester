@@ -27,12 +27,12 @@
     var style = document.createElement("style");
     style.id = "pdf-inpage-viewer-style";
     style.textContent =
-      ".pdf-inpage-viewer{display:flex!important;flex-direction:column;min-height:0;flex:1 1 auto;background:#3a3f42;color:#e8eeed}" +
+      ".pdf-inpage-viewer{display:flex!important;flex-direction:column;min-height:850px;flex:1 1 auto;background:#3a3f42;color:#e8eeed}" +
       ".pdf-inpage-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:8px;padding:8px 10px;background:#14524f;color:#fff;flex:0 0 auto}" +
       ".pdf-inpage-backup{display:flex;gap:8px;flex-wrap:wrap}" +
       ".pdf-inpage-backup a{color:#fff;font-weight:700;font-size:.85rem}" +
       ".pdf-inpage-status{padding:10px 12px;background:#1f3d3c;color:#d8f0ee;font-size:.9rem}" +
-      ".pdf-inpage-pages{flex:1 1 auto;overflow:auto;-webkit-overflow-scrolling:touch;background:#525659;padding:8px 0 16px}" +
+      ".pdf-inpage-pages{flex:1 1 auto;min-height:850px;overflow:auto;-webkit-overflow-scrolling:touch;background:#525659;padding:8px 0 16px}" +
       ".pdf-inpage-page-slot{margin:0 auto 10px;background:#3a3f42;min-height:180px;position:relative}" +
       ".pdf-inpage-page-slot canvas{display:block;width:100%;height:auto;background:#fff}" +
       ".pdf-link-layer{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}" +
@@ -40,7 +40,7 @@
       ".pdf-annot-link:focus{outline:2px solid #1a6b6b;outline-offset:1px}" +
       ".pdf-frame-wrap,.pdf-standalone-shell{display:flex;flex-direction:column}" +
       ".pdf-frame-wrap iframe,.pdf-standalone-shell iframe.pdf-frame," +
-      "body.is-native-pdf iframe.pdf-frame{display:none!important}" +
+      "body.is-native-pdf iframe.pdf-frame{display:none!important;min-height:850px}" +
       ".pdf-frame-wrap.is-native-pdf,.pdf-standalone-shell.is-native-pdf," +
       "body.is-native-pdf .pdf-standalone-shell{" +
       "display:flex;flex-direction:column;height:85vh!important;min-height:850px!important;background:#3a3f42}" +
@@ -49,6 +49,8 @@
       ".pdf-frame-wrap.is-native-pdf,.pdf-standalone-shell.is-native-pdf," +
       "body.is-native-pdf .pdf-standalone-shell{" +
       "height:70vh!important;min-height:450px!important}" +
+      ".pdf-inpage-viewer,.pdf-inpage-pages,.pdf-frame-wrap iframe," +
+      ".pdf-standalone-shell iframe.pdf-frame{min-height:450px!important}" +
       "}";
     document.head.appendChild(style);
   }

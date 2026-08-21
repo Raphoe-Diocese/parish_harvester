@@ -7,6 +7,18 @@ import re
 from typing import Iterable, NamedTuple
 
 
+# Irish / English names that the stitcher English label does not include.
+# Used so Gortahork still matches “Gort a' Choirce” on the page.
+PARISH_NAME_ALIASES: dict[str, tuple[str, ...]] = {
+    "gortahork": (
+        "Gort a' Choirce",
+        "Gort a’ Choirce",
+        "Gort a Choirce",
+        "Pobal Chríost Rí",
+    ),
+}
+
+
 def _name_patterns(display_name: str) -> tuple[list[str], list[str]]:
     """Return (strong_patterns, weak_patterns) for a parish display name.
 
@@ -38,6 +50,10 @@ def _name_patterns(display_name: str) -> tuple[list[str], list[str]]:
         else:
             weak.append(short)
             strong.append(f"{short} Parish")
+    for alias in PARISH_NAME_ALIASES.get(name.lower(), ()):
+        alias = (alias or "").strip()
+        if len(alias) >= 3:
+            strong.append(alias)
     strong = sorted({p for p in strong if len(p) >= 3}, key=len, reverse=True)
     weak = sorted(
         {p for p in weak if len(p) >= 3 and p.lower() not in {s.lower() for s in strong}},
@@ -212,8 +228,11 @@ class ParishPageChunk(NamedTuple):
 
 
 _PAGE_LABEL_RE = re.compile(
-    r'<p\s+class="page-label"[^>]*>\s*Page\s+(\d+)\s*</p>', re.IGNORECASE
+    r'(?:<p\s+class="page-label"[^>]*>|<p\b[^>]*>|<h[1-6]\b[^>]*>)'
+    r'\s*Page\s+(\d+)\s*</(?:p|h[1-6])>',
+    re.IGNORECASE,
 )
+_PAGE_PLAIN_RE = re.compile(r"^Page\s+(\d+)\s*$", re.IGNORECASE)
 _HTML_BLOCK_RE = re.compile(
     r'(?P<heading><h[1-6]\b[^>]*>.*?</h[1-6]>)'
     r'|(?P<hr><hr\s*/?>)'
@@ -278,9 +297,16 @@ def _tokenize_ocr_units(fragment: str) -> list[tuple[str, str]]:
             else:
                 units.append(("block", whole))
         elif match.group("plain_p"):
-            inner = _STRIP_P_WRAPPER_RE.sub("", match.group("plain_p")).strip()
-            for line in _split_br_lines(inner):
-                units.append(("line", line))
+            whole = match.group("plain_p")
+            if _PAGE_LABEL_RE.match(whole.strip()):
+                units.append(("page", whole))
+            else:
+                inner = _STRIP_P_WRAPPER_RE.sub("", whole).strip()
+                for line in _split_br_lines(inner):
+                    if _PAGE_PLAIN_RE.match(_block_plain_text(line)):
+                        units.append(("page", f'<p class="page-label">{_block_plain_text(line)}</p>'))
+                    else:
+                        units.append(("line", line))
         pos = match.end()
     tail = fragment[pos:].strip()
     if tail:
