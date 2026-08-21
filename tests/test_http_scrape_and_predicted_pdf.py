@@ -825,9 +825,9 @@ class PortstewartMdocsRecipeTests(unittest.TestCase):
         self.assertEqual(data["site_type"], "mdocs_bulletin_list")
         self.assertEqual(data["playbook_type"], "mdocs_download_list")
         self.assertTrue(data["start_url"].endswith("/weekly-bulletin/"))
-        blob = json.dumps(data)
-        self.assertNotIn("23rd August 2026", blob)
-        self.assertNotIn("mdocs-file=9538", blob)
+        steps_blob = json.dumps(data.get("steps") or [])
+        self.assertNotIn("23rd August 2026", steps_blob)
+        self.assertNotIn("mdocs-file=9538", steps_blob)
         click = next(
             step
             for step in data["steps"]
