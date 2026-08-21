@@ -1,8 +1,19 @@
-"""Keep newly generated mega PDFs when harvest git rebase/merge hits conflicts.
+"""Keep newly generated harvest outputs when git rebase/merge hits conflicts.
 
-Binary ``*_mega_bulletin.pdf`` files cannot be auto-merged. Tonight's full
-harvest failed on push with ``CONFLICT (add/add)`` for each diocese mega.
-This helper prefers the files this harvest just produced, then continues.
+Binary mega PDFs cannot be auto-merged. Generated diocese HTML and harvest
+JSON often cannot either (content or add/add). This helper prefers the files
+this harvest just produced, then continues.
+
+Covered paths (this harvest wins):
+
+* ``mega_pdf/*.pdf`` and ``docs/mega_pdf/*.pdf``
+* ``docs/dioceses/**`` (and ``docs/parishes/**`` if harvest wrote them)
+* ``docs/index.html``, ``docs/manifest.json``, ``docs/mega_pdf/*.pages.json``
+* ``Bulletins/report.json`` (plus report.txt / dashboard / current PDFs)
+* ``parishes/parish_status.json`` and the other harvest status JSON files
+
+Source files such as ``parishes/recipes/**`` and ``harvester/*.py`` are never
+auto-overwritten.
 
 Rebase vs merge (git's ours/theirs is reversed):
 
@@ -16,18 +27,76 @@ import os
 import shutil
 import subprocess
 import tempfile
+from collections.abc import Callable
 from pathlib import Path
 
 MEGA_PDF_DIR_NAMES = ("mega_pdf", "docs/mega_pdf")
 MEGA_PDF_PREFIXES = tuple(f"{name}/" for name in MEGA_PDF_DIR_NAMES)
 
+# Exact generated files harvest.yml / main.py write and commit.
+GENERATED_HARVEST_FILES = frozenset(
+    {
+        "Bulletins/report.json",
+        "Bulletins/report.txt",
+        "Bulletins/dashboard.html",
+        "docs/manifest.json",
+        "docs/index.html",
+        "parish_status.json",
+        "parishes/parish_status.json",
+        "parishes/consecutive_failures.json",
+        "parishes/stale_bulletins.json",
+        "parishes/retry_queue.json",
+        "parishes/training_backlog.json",
+    }
+)
+
+# Directory trees harvest (or harvest+OCR site build) regenerates.
+GENERATED_HARVEST_PREFIXES = (
+    "mega_pdf/",
+    "docs/mega_pdf/",
+    "docs/dioceses/",
+    "docs/parishes/",
+    "Bulletins/current/",
+)
+
+# Never take harvest's side for these, even if a prefix accidentally matches.
+PROTECTED_SOURCE_PREFIXES = (
+    "parishes/recipes/",
+    "harvester/",
+    "tests/",
+    "extension/",
+    ".github/",
+)
+
+
+def _normalize_repo_path(path: str) -> str:
+    return path.replace("\\", "/").lstrip("./")
+
 
 def is_generated_mega_pdf(path: str) -> bool:
     """True for generated binaries under mega_pdf/ or docs/mega_pdf/."""
-    normalized = path.replace("\\", "/").lstrip("./")
+    normalized = _normalize_repo_path(path)
     if not normalized.endswith(".pdf"):
         return False
     return any(normalized.startswith(prefix) for prefix in MEGA_PDF_PREFIXES)
+
+
+def is_protected_source_path(path: str) -> bool:
+    """True for recipes, harvester code, tests, extension, and workflows."""
+    normalized = _normalize_repo_path(path)
+    return any(normalized.startswith(prefix) for prefix in PROTECTED_SOURCE_PREFIXES)
+
+
+def is_generated_harvest_output(path: str) -> bool:
+    """True for files this harvest generated and may safely keep on conflict."""
+    normalized = _normalize_repo_path(path)
+    if is_protected_source_path(normalized):
+        return False
+    if normalized in GENERATED_HARVEST_FILES:
+        return True
+    if is_generated_mega_pdf(normalized):
+        return True
+    return any(normalized.startswith(prefix) for prefix in GENERATED_HARVEST_PREFIXES)
 
 
 def _run_git(
@@ -78,6 +147,16 @@ def unmerged_paths(repo: Path) -> list[str]:
     return [line.strip().replace("\\", "/") for line in out.splitlines() if line.strip()]
 
 
+def _copy_repo_file(src_root: Path, dest_root: Path, rel: str) -> bool:
+    src = src_root / rel
+    if not src.is_file():
+        return False
+    target = dest_root / rel
+    target.parent.mkdir(parents=True, exist_ok=True)
+    shutil.copy2(src, target)
+    return True
+
+
 def snapshot_mega_pdfs(repo: Path, dest: Path) -> list[str]:
     """Copy current mega PDFs so a later rebase can restore this harvest's files."""
     dest.mkdir(parents=True, exist_ok=True)
@@ -87,10 +166,9 @@ def snapshot_mega_pdfs(repo: Path, dest: Path) -> list[str]:
         if not src_dir.is_dir():
             continue
         for pdf in sorted(src_dir.glob("*.pdf")):
-            target = dest / prefix / pdf.name
-            target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(pdf, target)
-            copied.append(f"{prefix}/{pdf.name}")
+            rel = f"{prefix}/{pdf.name}"
+            if _copy_repo_file(repo, dest, rel):
+                copied.append(rel)
     return copied
 
 
@@ -102,11 +180,74 @@ def restore_mega_pdfs(repo: Path, snapshot: Path) -> list[str]:
         if not src_dir.is_dir():
             continue
         for pdf in sorted(src_dir.glob("*.pdf")):
-            target = repo / prefix / pdf.name
-            target.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(pdf, target)
-            restored.append(f"{prefix}/{pdf.name}")
+            rel = f"{prefix}/{pdf.name}"
+            if _copy_repo_file(snapshot, repo, rel):
+                restored.append(rel)
     return restored
+
+
+def snapshot_harvest_outputs(repo: Path, dest: Path) -> list[str]:
+    """Copy generated harvest files so rebase can restore this job's versions."""
+    dest.mkdir(parents=True, exist_ok=True)
+    copied: list[str] = []
+    seen: set[str] = set()
+
+    def _take(rel: str) -> None:
+        if rel in seen:
+            return
+        if _copy_repo_file(repo, dest, rel):
+            seen.add(rel)
+            copied.append(rel)
+
+    for rel in sorted(GENERATED_HARVEST_FILES):
+        _take(rel)
+    for rel in snapshot_mega_pdfs(repo, dest):
+        if rel not in seen:
+            seen.add(rel)
+            copied.append(rel)
+
+    extra_dirs = (
+        "docs/mega_pdf",
+        "docs/dioceses",
+        "docs/parishes",
+        "Bulletins/current",
+    )
+    for prefix in extra_dirs:
+        src_dir = repo / prefix
+        if not src_dir.is_dir():
+            continue
+        for src in sorted(src_dir.rglob("*")):
+            if not src.is_file():
+                continue
+            rel = src.relative_to(repo).as_posix()
+            if is_generated_harvest_output(rel):
+                _take(rel)
+    return copied
+
+
+def _resolve_conflicts_for(
+    repo: Path,
+    *,
+    snapshot: Path | None,
+    keep: Callable[[str], bool],
+) -> tuple[list[str], list[str]]:
+    unresolved = unmerged_paths(repo)
+    matched = [path for path in unresolved if keep(path)]
+    leftover = [path for path in unresolved if path not in matched]
+    if not matched:
+        return [], leftover
+
+    flag = harvest_side_flag(repo)
+    for path in matched:
+        dest = repo / path
+        snap_file = (snapshot / path) if snapshot is not None else None
+        if snap_file is not None and snap_file.is_file():
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            shutil.copy2(snap_file, dest)
+        else:
+            _run_git(repo, ["checkout", flag, "--", path])
+        _run_git(repo, ["add", "--", path])
+    return matched, leftover
 
 
 def resolve_mega_pdf_conflicts(
@@ -117,23 +258,20 @@ def resolve_mega_pdf_conflicts(
 
     Returns ``(resolved_paths, leftover_unmerged_paths)``.
     """
-    unresolved = unmerged_paths(repo)
-    mega_conflicts = [path for path in unresolved if is_generated_mega_pdf(path)]
-    leftover = [path for path in unresolved if path not in mega_conflicts]
-    if not mega_conflicts:
-        return [], leftover
+    return _resolve_conflicts_for(repo, snapshot=snapshot, keep=is_generated_mega_pdf)
 
-    flag = harvest_side_flag(repo)
-    for path in mega_conflicts:
-        dest = repo / path
-        snap_file = (snapshot / path) if snapshot is not None else None
-        if snap_file is not None and snap_file.is_file():
-            dest.parent.mkdir(parents=True, exist_ok=True)
-            shutil.copy2(snap_file, dest)
-        else:
-            _run_git(repo, ["checkout", flag, "--", path])
-        _run_git(repo, ["add", "--", path])
-    return mega_conflicts, leftover
+
+def resolve_harvest_output_conflicts(
+    repo: Path,
+    snapshot: Path | None = None,
+) -> tuple[list[str], list[str]]:
+    """Resolve generated harvest-output conflicts so this job's files win.
+
+    Recipes, harvester code, and other source files stay in leftover.
+    """
+    return _resolve_conflicts_for(
+        repo, snapshot=snapshot, keep=is_generated_harvest_output
+    )
 
 
 def continue_git_integration(repo: Path) -> None:
@@ -162,10 +300,10 @@ def abort_git_integration(repo: Path) -> None:
 
 
 def rebase_keeping_harvest_megas(repo: Path, remote_ref: str = "origin/main") -> None:
-    """Rebase onto ``remote_ref``, keeping this harvest's mega PDFs on conflict."""
-    snapshot_dir = Path(tempfile.mkdtemp(prefix="harvest-megas-"))
+    """Rebase onto ``remote_ref``, keeping this harvest's generated outputs."""
+    snapshot_dir = Path(tempfile.mkdtemp(prefix="harvest-outputs-"))
     try:
-        snapshot_mega_pdfs(repo, snapshot_dir)
+        snapshot_harvest_outputs(repo, snapshot_dir)
         result = _run_git(
             repo,
             ["rebase", "--autostash", remote_ref],
@@ -177,18 +315,20 @@ def rebase_keeping_harvest_megas(repo: Path, remote_ref: str = "origin/main") ->
             print(result.stdout, end="")
         if result.stderr:
             print(result.stderr, end="")
-        resolved, leftover = resolve_mega_pdf_conflicts(repo, snapshot_dir)
+        resolved, leftover = resolve_harvest_output_conflicts(repo, snapshot_dir)
         if leftover:
             abort_git_integration(repo)
             raise RuntimeError(
-                "Rebase conflicted on non-mega files that cannot be auto-resolved: "
+                "Rebase conflicted on source files that cannot be auto-resolved: "
                 + ", ".join(leftover)
             )
         if not resolved:
             abort_git_integration(repo)
-            raise RuntimeError("Rebase failed without mega PDF conflicts to resolve")
+            raise RuntimeError(
+                "Rebase failed without generated harvest-output conflicts to resolve"
+            )
         print(
-            "Resolved mega PDF conflicts in favor of this harvest: "
+            "Resolved harvest output conflicts in favor of this harvest: "
             + ", ".join(resolved)
         )
         continue_git_integration(repo)
@@ -203,7 +343,7 @@ def push_with_mega_conflict_retry(
     branch: str = "main",
     attempts: int = 5,
 ) -> None:
-    """Push HEAD to ``remote/branch``, rebasing and keeping new megas on conflict."""
+    """Push HEAD to ``remote/branch``, rebasing and keeping this harvest's files."""
     for attempt in range(1, attempts + 1):
         push = _run_git(repo, ["push", remote, f"HEAD:{branch}"], check=False)
         if push.returncode == 0:

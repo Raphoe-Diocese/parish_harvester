@@ -10,10 +10,14 @@ from pathlib import Path
 from harvester.mega_pdf_git import (
     continue_git_integration,
     harvest_side_flag,
+    is_generated_harvest_output,
     is_generated_mega_pdf,
+    is_protected_source_path,
     push_with_mega_conflict_retry,
     rebase_keeping_harvest_megas,
+    resolve_harvest_output_conflicts,
     resolve_mega_pdf_conflicts,
+    snapshot_harvest_outputs,
     snapshot_mega_pdfs,
 )
 
@@ -51,6 +55,34 @@ class GeneratedMegaPdfPathTests(unittest.TestCase):
         self.assertFalse(is_generated_mega_pdf("docs/mega_pdf/derry_mega_bulletin.pages.json"))
         self.assertFalse(is_generated_mega_pdf("mega_pdf/readme.txt"))
         self.assertFalse(is_generated_mega_pdf("other/mega_pdf/derry_mega_bulletin.pdf"))
+
+
+class GeneratedHarvestOutputPathTests(unittest.TestCase):
+    def test_accepts_generated_harvest_outputs(self) -> None:
+        self.assertTrue(is_generated_harvest_output("mega_pdf/derry_mega_bulletin.pdf"))
+        self.assertTrue(is_generated_harvest_output("docs/mega_pdf/raphoe_mega_bulletin.pdf"))
+        self.assertTrue(is_generated_harvest_output("docs/mega_pdf/derry.pages.json"))
+        self.assertTrue(is_generated_harvest_output("docs/dioceses/derry/index.html"))
+        self.assertTrue(
+            is_generated_harvest_output("docs/dioceses/down-and-connor/index.html")
+        )
+        self.assertTrue(is_generated_harvest_output("docs/parishes/bangorparish/index.html"))
+        self.assertTrue(is_generated_harvest_output("docs/index.html"))
+        self.assertTrue(is_generated_harvest_output("docs/manifest.json"))
+        self.assertTrue(is_generated_harvest_output("Bulletins/report.json"))
+        self.assertTrue(is_generated_harvest_output("parishes/parish_status.json"))
+        self.assertTrue(is_generated_harvest_output("parish_status.json"))
+        self.assertTrue(is_generated_harvest_output("Bulletins/current/bangorparish.pdf"))
+
+    def test_rejects_recipes_and_harvester_source(self) -> None:
+        self.assertTrue(is_protected_source_path("parishes/recipes/raphoe/bangorparish.json"))
+        self.assertTrue(is_protected_source_path("harvester/fetcher.py"))
+        self.assertFalse(is_generated_harvest_output("parishes/recipes/raphoe/foo.json"))
+        self.assertFalse(is_generated_harvest_output("harvester/mega_pdf_git.py"))
+        self.assertFalse(is_generated_harvest_output("tests/test_mega_pdf_git.py"))
+        self.assertFalse(is_generated_harvest_output("extension/sidepanel.js"))
+        self.assertFalse(is_generated_harvest_output(".github/workflows/harvest.yml"))
+        self.assertFalse(is_generated_harvest_output("notes.txt"))
 
 
 class MegaPdfGitConflictTests(unittest.TestCase):
@@ -180,6 +212,105 @@ class MegaPdfGitConflictTests(unittest.TestCase):
         self.assertIn(b"A", (dest / "mega_pdf" / "derry_mega_bulletin.pdf").read_bytes())
         self.assertIn(b"B", (dest / "docs" / "mega_pdf" / "derry_mega_bulletin.pdf").read_bytes())
 
+    def _commit_diocese_pages(self, marker: str, message: str) -> None:
+        for diocese in ("derry", "down-and-connor"):
+            path = self.root / "docs" / "dioceses" / diocese / "index.html"
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_text(f"<html>{marker}</html>\n", encoding="utf-8")
+        report = self.root / "Bulletins" / "report.json"
+        report.parent.mkdir(parents=True, exist_ok=True)
+        report.write_text(f'{{"marker": "{marker}"}}\n', encoding="utf-8")
+        status = self.root / "parishes" / "parish_status.json"
+        status.parent.mkdir(parents=True, exist_ok=True)
+        status.write_text(f'{{"marker": "{marker}"}}\n', encoding="utf-8")
+        _git(self.root, "add", "-A")
+        _git(self.root, "commit", "-m", message)
+
+    def test_rebase_content_conflict_keeps_harvest_diocese_pages(self) -> None:
+        # Same failure as run 32384891762: both sides edited diocese HTML.
+        self._commit_diocese_pages("SHARED", "shared pages")
+        _git(self.root, "checkout", "-b", "harvest")
+        self._commit_diocese_pages("HARVEST-NEW", "harvest pages")
+
+        _git(self.root, "checkout", "main")
+        self._commit_diocese_pages("MAIN-OLD", "main pages")
+
+        _git(self.root, "checkout", "harvest")
+        rebase = _git(self.root, "rebase", "main", check=False)
+        self.assertNotEqual(rebase.returncode, 0, rebase.stderr)
+        combined = rebase.stdout + rebase.stderr
+        self.assertIn("docs/dioceses/derry/index.html", combined)
+        self.assertIn("docs/dioceses/down-and-connor/index.html", combined)
+
+        resolved, leftover = resolve_harvest_output_conflicts(self.root)
+        self.assertEqual(leftover, [])
+        self.assertIn("docs/dioceses/derry/index.html", resolved)
+        self.assertIn("docs/dioceses/down-and-connor/index.html", resolved)
+        self.assertIn("Bulletins/report.json", resolved)
+        self.assertIn("parishes/parish_status.json", resolved)
+
+        continue_git_integration(self.root)
+        derry = (self.root / "docs" / "dioceses" / "derry" / "index.html").read_text(
+            encoding="utf-8"
+        )
+        self.assertIn("HARVEST-NEW", derry)
+        self.assertNotIn("MAIN-OLD", derry)
+
+    def test_rebase_helper_keeps_diocese_pages_from_snapshot(self) -> None:
+        self._commit_diocese_pages("SHARED", "shared pages")
+        _git(self.root, "checkout", "-b", "harvest")
+        self._commit_diocese_pages("HARVEST-NEW", "harvest pages")
+
+        _git(self.root, "checkout", "main")
+        self._commit_diocese_pages("MAIN-OLD", "main pages")
+
+        _git(self.root, "checkout", "harvest")
+        rebase_keeping_harvest_megas(self.root, "main")
+
+        derry = (self.root / "docs" / "dioceses" / "derry" / "index.html").read_text(
+            encoding="utf-8"
+        )
+        report = (self.root / "Bulletins" / "report.json").read_text(encoding="utf-8")
+        self.assertIn("HARVEST-NEW", derry)
+        self.assertIn("HARVEST-NEW", report)
+        self.assertNotIn("MAIN-OLD", derry)
+
+    def test_recipe_conflicts_are_not_auto_resolved(self) -> None:
+        _git(self.root, "checkout", "-b", "harvest")
+        recipe = self.root / "parishes" / "recipes" / "raphoe" / "bangorparish.json"
+        recipe.parent.mkdir(parents=True, exist_ok=True)
+        recipe.write_text('{"from": "harvest"}\n', encoding="utf-8")
+        self._commit_diocese_pages("HARVEST-NEW", "harvest recipe+pages")
+
+        _git(self.root, "checkout", "main")
+        recipe = self.root / "parishes" / "recipes" / "raphoe" / "bangorparish.json"
+        recipe.parent.mkdir(parents=True, exist_ok=True)
+        recipe.write_text('{"from": "main"}\n', encoding="utf-8")
+        self._commit_diocese_pages("MAIN-OLD", "main recipe+pages")
+
+        _git(self.root, "checkout", "harvest")
+        with self.assertRaises(RuntimeError) as ctx:
+            rebase_keeping_harvest_megas(self.root, "main")
+        self.assertIn("parishes/recipes/raphoe/bangorparish.json", str(ctx.exception))
+
+    def test_snapshot_includes_diocese_pages_and_status(self) -> None:
+        path = self.root / "docs" / "dioceses" / "derry" / "index.html"
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text("<html>HARVEST</html>\n", encoding="utf-8")
+        report = self.root / "Bulletins" / "report.json"
+        report.parent.mkdir(parents=True, exist_ok=True)
+        report.write_text('{"ok": true}\n', encoding="utf-8")
+        dest = self.root / "snap"
+        copied = snapshot_harvest_outputs(self.root, dest)
+        self.assertIn("docs/dioceses/derry/index.html", copied)
+        self.assertIn("Bulletins/report.json", copied)
+        self.assertIn(
+            "HARVEST",
+            (dest / "docs" / "dioceses" / "derry" / "index.html").read_text(
+                encoding="utf-8"
+            ),
+        )
+
 
 class MegaPdfPushRetryTests(unittest.TestCase):
     def test_push_rebases_over_remote_add_add_and_keeps_harvest(self) -> None:
@@ -238,4 +369,6 @@ class HarvestWorkflowMegaPushTests(unittest.TestCase):
         self.assertIn('HARVEST_MEGA_PDF: "1"', workflow)
         self.assertIn("git add -f mega_pdf/*_mega_bulletin.pdf", workflow)
         self.assertIn("git add -f docs/mega_pdf/*_mega_bulletin.pdf", workflow)
+        self.assertIn("docs/dioceses/", workflow)
+        self.assertIn("cron: '0 9 * * 0'", workflow)
         self.assertNotIn("HARVEST_MEGA_PDF: \"0\"", workflow)

@@ -1,9 +1,10 @@
 #!/usr/bin/env python3
-"""Push a harvest commit to main, keeping newly generated mega PDFs on conflict.
+"""Push a harvest commit to main, keeping newly generated harvest files.
 
-Used by ``.github/workflows/harvest.yml`` after the harvest commit. Binary
-mega PDFs cannot merge; add/add or modify/modify conflicts on those paths
-take this harvest's files and continue.
+Used by ``.github/workflows/harvest.yml`` after the harvest commit. Mega PDFs,
+diocese HTML pages, and harvest JSON cannot always merge; add/add or content
+conflicts on those generated paths take this harvest's files and continue.
+Recipes and harvester source are not auto-overwritten.
 
 Usage:
   python scripts/push_harvest_results.py
