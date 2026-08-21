@@ -7,7 +7,7 @@ import re
 import time
 from datetime import date, datetime, timedelta
 from pathlib import Path
-from urllib.parse import quote, unquote, urlparse
+from urllib.parse import quote, unquote, urlparse, urlunparse
 
 
 def format_uk_date(iso_date: str | date | None) -> str:
@@ -1468,3 +1468,69 @@ def mcn_newsletter_url_from_profile(payload: dict | None) -> str | None:
     if url.lower().startswith(("http://", "https://")):
         return url
     return None
+
+
+_CHURCHMEDIA_RESERVED_PATHS = {
+    "api",
+    "newsletter",
+    "assets",
+    "embed",
+    "video",
+    "videos",
+    "login",
+    "auth",
+    "admin",
+    "dashboard",
+}
+_CHURCHMEDIA_SLUG_RE = re.compile(r"^[A-Za-z0-9][A-Za-z0-9-]{0,80}$")
+
+
+def churchmedia_slug_from_url(url: str) -> str | None:
+    """Return the public channel slug from a churchmedia.tv listing URL.
+
+    ``https://churchmedia.tv/st-patricks-church-2`` → ``st-patricks-church-2``.
+    Newsletter PDF paths and ``/api/`` URLs are not slugs.
+    """
+    parsed = urlparse((url or "").strip())
+    host = (parsed.netloc or "").lower()
+    if host.startswith("www."):
+        host = host[4:]
+    if host != "churchmedia.tv":
+        return None
+    parts = [p for p in parsed.path.split("/") if p]
+    if not parts:
+        return None
+    slug = parts[0]
+    if slug.lower() in _CHURCHMEDIA_RESERVED_PATHS:
+        return None
+    if not _CHURCHMEDIA_SLUG_RE.fullmatch(slug):
+        return None
+    return slug
+
+
+def churchmedia_channel_about_url(slug: str) -> str:
+    """Build GET URL for ``/api/getChannelAbout?slug=…``."""
+    token = (slug or "").strip()
+    return f"https://churchmedia.tv/api/getChannelAbout?slug={token}"
+
+
+def churchmedia_newsletter_url_from_about(payload: dict | None) -> str | None:
+    """Return the current newsletter PDF from a churchmedia getChannelAbout body.
+
+    Strips ``?cb=`` cache-busters so callers never persist a dead token. The
+    path token (``/newsletter/<id>.<slug>.pdf``) still changes on each upload
+    and must be read live from the API.
+    """
+    if not isinstance(payload, dict):
+        return None
+    data = payload.get("data")
+    if not isinstance(data, dict):
+        data = payload
+    url = str(data.get("newsletter_url") or "").strip()
+    if not url.lower().startswith(("http://", "https://")):
+        return None
+    parsed = urlparse(url)
+    path = unquote(parsed.path or "")
+    if "/newsletter/" not in path.lower() or not path.lower().endswith(".pdf"):
+        return None
+    return urlunparse((parsed.scheme, parsed.netloc, parsed.path, "", "", ""))
