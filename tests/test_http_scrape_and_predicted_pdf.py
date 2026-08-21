@@ -55,6 +55,13 @@ class YearlessSlugTests(unittest.TestCase):
         url = "Newsletter-12th-July-2026.pdf"
         self.assertIsNone(yearless_slug_date(url, 2026, near=date(2026, 8, 16)))
 
+    def test_tawnawilly_aug_abbreviation_is_yearless(self) -> None:
+        url = "https://tawnawillyparish.ie/wp-content/uploads/Sunday-23rd-Aug.pdf"
+        self.assertEqual(
+            yearless_slug_date(url, 2026, near=date(2026, 8, 16)),
+            date(2026, 8, 23),
+        )
+
 
 class PredictedDatedUploadTests(unittest.TestCase):
     def test_newtown_pattern_rewrites_sunday_and_month_folder(self) -> None:
@@ -88,6 +95,29 @@ class PredictedDatedUploadTests(unittest.TestCase):
         self.assertTrue(
             all("holy-familyparish.com" not in u for u in urls),
             urls[:6],
+        )
+
+    def test_yearless_sunday_june_rewrites_to_august(self) -> None:
+        example = "https://tawnawillyparish.ie/wp-content/uploads/Sunday-28th-June.pdf"
+        self.assertEqual(
+            rewrite_date_url(example, date(2026, 8, 16)),
+            "https://tawnawillyparish.ie/wp-content/uploads/Sunday-16th-August.pdf",
+        )
+        self.assertEqual(
+            rewrite_date_url(
+                "https://tawnawillyparish.ie/wp-content/uploads/Sunday-16th-Aug.pdf",
+                date(2026, 8, 23),
+            ),
+            "https://tawnawillyparish.ie/wp-content/uploads/Sunday-23rd-Aug.pdf",
+        )
+        urls = predicted_dated_upload_urls(example, date(2026, 8, 16), weeks_back=1)
+        self.assertEqual(
+            urls[0],
+            "https://tawnawillyparish.ie/wp-content/uploads/Sunday-16th-August.pdf",
+        )
+        self.assertIn(
+            "https://tawnawillyparish.ie/wp-content/uploads/Sunday-9th-August.pdf",
+            urls,
         )
 
     def test_claudy_oneweb_space_variants_are_quoted(self) -> None:
@@ -128,6 +158,21 @@ class HttpScrapeScoreTests(unittest.TestCase):
         self.assertEqual(best_date, date(2026, 8, 23))
         self.assertIn("Sunday-23rd-August", best_url)
         self.assertTrue(all("Order-of-Mass" not in url for _, url in scored))
+
+    def test_tawnawilly_yearless_aug_beats_july_2026_and_skips_gdpr(self) -> None:
+        hrefs = [
+            "https://tawnawillyparish.ie/wp-content/uploads/GDPR-Parish-Bulletin.pdf",
+            "https://tawnawillyparish.ie/wp-content/uploads/Sunday-26-July-2026.pdf",
+            "https://tawnawillyparish.ie/wp-content/uploads/Sunday-16th-Aug.pdf",
+            "https://tawnawillyparish.ie/wp-content/uploads/Sunday-23rd-Aug.pdf",
+            "https://tawnawillyparish.ie/wp-content/uploads/ChristMass-Newsletter-2025.pdf",
+        ]
+        scored = _score_http_scrape_pdf_hrefs(hrefs, date(2026, 8, 16))
+        best_date, best_url = max(scored)
+        self.assertEqual(best_date, date(2026, 8, 23))
+        self.assertIn("Sunday-23rd-Aug", best_url)
+        self.assertTrue(_is_non_bulletin_url(hrefs[0]))
+        self.assertTrue(all("GDPR" not in url for _, url in scored))
 
     def test_filename_date_beats_wordpress_upload_folder(self) -> None:
         # Malin uploaded March files into /2026/04/. Folder-first dating

@@ -1508,6 +1508,41 @@
       if (mo) return { year: +m[2], month: mo, day: 0 };
     }
 
+    const _MONTH_NAME_ALT =
+      "january|february|march|april|june|july|august|september|october|november|december|sept|jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec";
+
+    // 2-Aug-26 / Sunday-26th-Oct-25.pdf (2-digit year). Must beat yearless.
+    m = s.match(
+      new RegExp(
+        String.raw`(?<!\d)(\d{1,2})(?:st|nd|rd|th)?[-_\s]+(${_MONTH_NAME_ALT})[-_\s]+(\d{2})(?!\d)`,
+        "i"
+      )
+    );
+    if (m) {
+      const mo = _MONTH_ABBR_MAP[m[2].slice(0, 3)];
+      const yy = +m[3];
+      if (mo && yy <= 39) return { year: 2000 + yy, month: mo, day: +m[1] };
+    }
+
+    // Yearless Sunday-16th-Aug.pdf / "Sunday 23rd August" — assume this year
+    // unless that date is more than 14 days in the future (then last year).
+    m = s.match(
+      new RegExp(
+        String.raw`(?<!\d)(\d{1,2})(?:st|nd|rd|th)?[-_\s]+(${_MONTH_NAME_ALT})(?![a-z])(?![-_\s](?:19|20)\d{2})`,
+        "i"
+      )
+    );
+    if (m) {
+      const mo = _MONTH_ABBR_MAP[m[2].slice(0, 3)];
+      if (mo) {
+        const now = new Date();
+        let year = now.getFullYear();
+        const candidate = new Date(year, mo - 1, +m[1]);
+        if ((candidate.getTime() - now.getTime()) / 86400000 > 14) year -= 1;
+        return { year, month: mo, day: +m[1] };
+      }
+    }
+
     // Bare year only (fallback — match any 20xx year)
     m = s.match(/\b(20\d{2})\b/);
     if (m) return { year: +m[1], month: 0, day: 0 };
@@ -1516,8 +1551,11 @@
   };
 
   // Admin / non-bulletin PDFs (Gift Aid forms, GDPR guides, etc.) — never treat as weekly bulletin.
+  const _ALWAYS_SKIP_BULLETIN_RE =
+    /gdpr|privacy[-_\s]?policy|wedding[-_\s]?parish|\bwedding\b|order[-_\s]?of[-_\s]?mass|gift\s*aid|safeguarding/i;
   const _isNonBulletinPdf = (url, label) => {
     const text = `${url || ""} ${label || ""}`.toLowerCase();
+    if (_ALWAYS_SKIP_BULLETIN_RE.test(text)) return true;
     if (/\b(bulletin|newsletter)\b/i.test(text)) return false;
     return (
       /dataentry|giftaid|standingorder|donation|prayer|safeguarding|privacy|gdpr|diocese|sitemap|application|registration|volunteer|finances|financial|parishdraw|mcn\s*media/i.test(
@@ -1705,6 +1743,7 @@
     catch (_e) { decoded = ((url || "") + " " + (label || "")).toLowerCase(); }
     let d = extractDateFromUrl(decoded);
     const keywordBonus = /\b(bulletin|newsletter|notice)\b/.test(decoded) ? 5 : 0;
+    const sundayBonus = /\bsunday\b/.test(decoded) ? 4 : 0;
     const pdfBonus = /\.pdf(\?|$)/.test(decoded) ? 3 : 0;
     const docxBonus = /\.docx(\?|$)/.test(decoded) ? 1 : 0;
     const uploadsBonus = decoded.includes("/uploads/") || decoded.includes("/wp-content/") ? 2 : 0;
@@ -1714,7 +1753,7 @@
         if (decoded.includes(name)) {
           const approxYear = new Date().getFullYear();
           const dateScore = approxYear * 10000 + approx.month * 100 + approx.day;
-          const tieBreaker = keywordBonus + pdfBonus + docxBonus + uploadsBonus;
+          const tieBreaker = keywordBonus + sundayBonus + pdfBonus + docxBonus + uploadsBonus;
           return {
             dateScore,
             tieBreaker,
@@ -1729,7 +1768,7 @@
     const hasFullDate = d !== null && d.month > 0 && d.day > 0;
     const hasDate = d !== null && d.year > 0;
     // tieBreaker does NOT include domIdx — position is handled by the sort comparator
-    let tieBreaker = keywordBonus + pdfBonus + docxBonus + uploadsBonus;
+    let tieBreaker = keywordBonus + sundayBonus + pdfBonus + docxBonus + uploadsBonus;
     const phrase = window.ph_copilot?.scorePhrase?.(url, label);
     if (phrase) {
       tieBreaker += phrase.bonus - phrase.penalty;
@@ -4638,7 +4677,9 @@
         const label = _getEnrichedLinkLabel(el);
         const s = scoreUrlCandidateStr(url, label, idx);
         const phrase = window.ph_copilot?.scorePhrase?.(url, label);
-        const adminSkip = phrase && phrase.penalty >= 120 && phrase.bonus < 40;
+        const adminSkip =
+          _isNonBulletinPdf(url, label) ||
+          Boolean(phrase && phrase.penalty >= 120);
         return { el, url, label, domIdx: idx, ...s, adminSkip };
       });
       const viable = scored.filter((c) => !c.adminSkip);
@@ -5183,6 +5224,151 @@
       guidedPanel.appendChild(cancelBtn);
     };
 
+    const _absGuessUrl = (raw) => {
+      const href = String(raw || "").trim();
+      if (!href) return "";
+      try {
+        return new URL(href, window.location.href).href;
+      } catch (_e) {
+        return href;
+      }
+    };
+
+    const _saveGuessedBulletinLink = (candidate) => {
+      const url = _absGuessUrl(candidate?.url || candidate?.el?.getAttribute?.("href") || "");
+      const label = String(candidate?.label || "").slice(0, 60);
+      if (!url) {
+        showStatus("❌ That guess has no URL — use Step 1 and pick the link yourself.", "error");
+        return false;
+      }
+      const isFile =
+        _looksLikeBulletinDownloadUrl(url, label) || /\.pdf(\?|$)/i.test(url);
+      if (isFile) {
+        if (_inStandaloneMode()) {
+          standaloneAddStep(
+            { action: "download", url },
+            "mark_file",
+            `📄 Guessed bulletin: ${label || url.slice(-50)}`
+          );
+          void _persistRecordingSession();
+          _notifyRecordingTabActive();
+        } else {
+          markDownloadUrlSafe(url, showStatus, true);
+        }
+        void _copilotSavePin({
+          text: label,
+          href: url,
+          selector: candidate.selector || "",
+        });
+        showStatus(
+          "✅ Guessed link saved — harvest downloads that bulletin. Tap Send & test.",
+          "ok"
+        );
+        resetGuidedPanel();
+        return true;
+      }
+      if (_inStandaloneMode()) {
+        standaloneAddStep({ action: "goto", url }, "goto", `Open: ${label || url}`);
+        void _persistRecordingSession();
+        _notifyRecordingTabActive();
+      }
+      showStatus("✅ Saved that page as the start link. Use Step 1 if you still need to pick a file.", "ok");
+      resetGuidedPanel();
+      return true;
+    };
+
+    const showGuessedLinkPanel = (candidates) => {
+      const top = (candidates || []).filter((c) => c && (c.url || c.el)).slice(0, 3);
+      if (!top.length) {
+        showStatus("❌ Could not find a bulletin link — use Step 1 and pick it yourself.", "error");
+        return;
+      }
+      _clearElement(guidedPanel);
+      if (patternHintWrap) guidedPanel.appendChild(patternHintWrap);
+      if (parishRecordingLine) guidedPanel.appendChild(parishRecordingLine);
+      if (pageLoadTimerLine) guidedPanel.appendChild(pageLoadTimerLine);
+
+      const heading = document.createElement("div");
+      heading.style.cssText = "font-weight:700;color:#c4b5fd;margin-bottom:6px;font-size:12px;";
+      heading.textContent = "Guessed bulletin link";
+      guidedPanel.appendChild(heading);
+
+      const hint = document.createElement("div");
+      hint.style.cssText = "font-size:10px;color:#cbd5e1;line-height:1.4;margin-bottom:8px;";
+      hint.textContent =
+        "Check the title and URL. Tap Save guessed link if it is this week's Sunday bulletin. If it is wrong, use Step 1 or pick newest — Guess stays on the toolbar.";
+      guidedPanel.appendChild(hint);
+
+      const renderGuessRow = (candidate, isBest) => {
+        const url = _absGuessUrl(candidate.url || candidate.el?.getAttribute?.("href") || "");
+        const label = String(candidate.label || "").trim() || "(no title)";
+        const displayDate = getDisplayDate(url, label);
+        const box = document.createElement("div");
+        box.style.cssText =
+          "background:#0f172a;border:1px solid " +
+          (isBest ? "#7c3aed" : "#334155") +
+          ";border-radius:6px;padding:8px;margin-bottom:8px;";
+
+        if (displayDate) {
+          const dateEl = document.createElement("div");
+          dateEl.style.cssText = "color:#fbbf24;font-weight:600;font-size:10px;margin-bottom:3px;";
+          dateEl.textContent = `📅 ${displayDate}`;
+          box.appendChild(dateEl);
+        }
+
+        const titleEl = document.createElement("div");
+        titleEl.style.cssText = "font-weight:700;color:#f8fafc;font-size:12px;margin-bottom:4px;";
+        titleEl.textContent = isBest ? `Best guess: ${label}` : label;
+        box.appendChild(titleEl);
+
+        const urlEl = document.createElement("div");
+        urlEl.style.cssText = "color:#93c5fd;font-size:10px;word-break:break-all;line-height:1.35;margin-bottom:8px;";
+        urlEl.textContent = url || "(no URL)";
+        box.appendChild(urlEl);
+
+        const saveBtn = makeSmallBtn(
+          isBest ? "Save guessed link" : "Use this link",
+          isBest ? "#16a34a" : "#2563eb",
+          () => {
+            _saveGuessedBulletinLink({ ...candidate, url, label });
+          },
+          isBest
+            ? "Write this URL into the recipe (newest Sunday each week if this is a listing)"
+            : "Save this candidate instead of the best guess"
+        );
+        saveBtn.style.width = "100%";
+        saveBtn.style.padding = "8px 10px";
+        saveBtn.style.fontSize = "11px";
+        box.appendChild(saveBtn);
+        guidedPanel.appendChild(box);
+
+        if (isBest && candidate.el instanceof Element) {
+          const prevOutline = candidate.el.style.outline;
+          candidate.el.style.outline = "3px solid #a78bfa";
+          candidate.el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+          setTimeout(() => {
+            if (candidate.el.style.outline === "3px solid #a78bfa") {
+              candidate.el.style.outline = prevOutline;
+            }
+          }, 4000);
+        }
+      };
+
+      renderGuessRow(top[0], true);
+      if (top.length > 1) {
+        const more = document.createElement("div");
+        more.style.cssText = "font-size:10px;color:#fbbf24;margin:4px 0 6px;";
+        more.textContent = "Other possible links — tap Use this link if the guess is wrong:";
+        guidedPanel.appendChild(more);
+        top.slice(1).forEach((c) => renderGuessRow(c, false));
+      }
+
+      const backBtn = makeSmallBtn("↩ Keep Guess — I'll use Step 1 instead", "#374151", resetGuidedPanel);
+      backBtn.style.width = "100%";
+      backBtn.style.fontSize = "10px";
+      guidedPanel.appendChild(backBtn);
+    };
+
     // Show confirmation after an image is picked
     const showPickImageConfirmation = (imgEl) => {
       const src = imgEl.getAttribute("src") || "";
@@ -5434,32 +5620,33 @@
       "#6d28d9",
       async () => {
         showStatus("⏳ Finding best bulletin link on this page…", "info");
-        const scan = await _handleCopilotMessage({ type: "copilot_scan" });
-        if (!scan?.ok || !scan.context?.best) {
-          showStatus("❌ Could not find a bulletin link — use Follow a link and pick it yourself.", "error");
+        const pageCtx = detectPageType();
+        const pickableLinks = pageCtx.links || pageCtx.bulletinLinks || [];
+        const elements = pickableLinks.length
+          ? Array.from(pickableLinks)
+          : _filterBulletinCandidates(document.querySelectorAll("a[href]"));
+        const { pool } = _scoreBulletinLinkElements(elements);
+        if (pool.length) {
+          showGuessedLinkPanel(pool);
+          showStatus(
+            pool.length > 1
+              ? `Guessed ${pool.length} possible bulletin links — check the URL, then Save guessed link or Use this link.`
+              : "Guessed a bulletin link — check the URL, then tap Save guessed link.",
+            "info"
+          );
           return;
         }
-        const pick = scan.context?.best;
-        const pin = await _handleCopilotMessage({ type: "copilot_pin" });
-        if (pin?.ok) {
-          const recorded = pick ? _copilotRecordPick(pick) : { ok: false };
-          if (recorded.ok) {
-            showStatus(
-              `✅ Click step recorded: "${pick.label || pick.selector}". Now open that link and finish with Save PDF / Save page.`,
-              "ok"
-            );
-            _refreshGuidedContext?.();
-          } else {
-            showStatus(
-              "📌 Pinned for this website. Use Follow a link to record the click step, then finish with Save PDF / Save page.",
-              "ok"
-            );
-          }
-        } else {
-          showStatus(`❌ ${pin?.reason || "Could not pin."}`, "error");
+        const scan = await _handleCopilotMessage({ type: "copilot_scan" });
+        const best = scan?.context?.best;
+        if (!scan?.ok || !best) {
+          showStatus("❌ Could not find a bulletin link — use Step 1 and pick it yourself.", "error");
+          return;
         }
+        const alts = scan.context?.alternatives || [];
+        showGuessedLinkPanel([best, ...alts]);
+        showStatus("Guessed a bulletin link — check the URL, then tap Save guessed link.", "info");
       },
-      "Extension guesses the bulletin link and records a click step. You still open it and save the capture step."
+      "Shows the guessed bulletin title and URL. Save guessed link writes it into the recipe."
     );
 
     contextPrimaryBtn = makeSmallBtn(
@@ -8697,10 +8884,27 @@
         const match = links.find((l) => l.domIdx === ranked.best.domIdx) || links[0];
         _copilotPick = match || null;
         if (_copilotPick?.el) _copilotRingElement(_copilotPick.el);
+        ranked.best = {
+          ...ranked.best,
+          el: match?.el || ranked.best.el,
+          selector: match?.selector || ranked.best.selector,
+          url: match?.url || ranked.best.url,
+          label: match?.label || ranked.best.label,
+        };
       } else {
         _copilotPick = null;
         _copilotClearRing();
       }
+      ranked.alternatives = (ranked.alternatives || []).map((alt) => {
+        const found = links.find((l) => l.domIdx === alt.domIdx);
+        return {
+          ...alt,
+          el: found?.el || alt.el,
+          selector: found?.selector || alt.selector,
+          url: found?.url || alt.url,
+          label: found?.label || alt.label,
+        };
+      });
       const advice = window.ph_copilot?.advise?.({
         pageType: detected.type,
         best: ranked.best,

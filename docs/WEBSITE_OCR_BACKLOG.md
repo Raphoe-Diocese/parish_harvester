@@ -47,9 +47,10 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 
 ## Still open (do not pretend these are finished)
 
-- [ ] **doing** · 2026-08-21 · Gortahork (`gort-a-choirce`) OCR empty — mega page 14 was banner-only (Irish image body never OCR'd). Fill sparse mega pages from the mega PDF image and slice by `pages.json` / `Page N`. Keep Irish as Irish. **Leave open until verified on live** https://www.parishpress.ie/parishes/raphoe/gort-a-choirce.html · `ocr/sparse_page_ocr.py`, `ocr/parish_splitter.py`, `ocr/parish_pages.py`
-- [ ] **doing** · 2026-08-21 · Desktop 850px must be the **visible** `.pdf-inpage-pages` / `#ocr-panel` height (not the hidden iframe, not an 85vh-clipped wrap). Diocese **and** parish pages. Mobile/tablet `max-width: 1024px` stay ~450px. **Leave open until verified on live Gortahork + Raphoe after deploy.** · `render_bulletin_viewer_shell`, `docs/assets/pdf-inpage-viewer.js`
+- [x] **done** · 2026-08-21 · Gortahork (`gort-a-choirce`) OCR empty — live fetch 21/08/2026 after #61/#64: Irish body present (`POBAL CHRIOST RI`, `AIFRINN NA SEACHTAINE`). · `ocr/sparse_page_ocr.py`, `ocr/parish_splitter.py`, `ocr/parish_pages.py`
+- [x] **done** · 2026-08-21 · Desktop 850px visible boxes — live fetch after #64 deploy: Gortahork + Raphoe diocese have `height`/`min-height: 850px` on `.pdf-inpage-pages` and `#ocr-panel`; `.pdf-frame-wrap` is `height: auto` (no `85vh`); `@media (max-width: 1024px)` is 450px. · `render_bulletin_viewer_shell`
 - [ ] **todo** · 2026-08-20 · Problems console — full work-queue polish · `extension/sidepanel.js`, `harvester/parish_status.py`
+- [ ] **doing** · 2026-08-21 · Trainer Guess must show the guessed URL + title and a **Save guessed link** / **Use this link** control that writes a real recipe step (download / goto / newest-picker). Top 3 candidates. Prefer newest Sunday; skip GDPR / privacy / wedding / Order of Mass. Do not hide Guess after refresh. Manifest footer must match. · `extension/content.js`, `extension/copilot.js`, `extension/manifest.json`
 - [ ] **doing** · 2026-08-21 · Trainer ↔ GitHub sync: Problems/Directory load latest `parishes/parish_status.json` via commit SHA; Directory shows ok + UK date; Send & test waits for `last_tested_at` change · `extension/*`
 - [ ] **todo** · 2026-08-20 · Recipe success — one parish at a time (A–Z repair with proof packs) · `parishes/recipes/`, Problems tab
 - [ ] **todo** · 2026-08-20 · parishpress.ie — live DNS / Pages cutover when Frank is ready · `docs/PARISHPRESS_IE_MIGRATION.md`, `docs/DOMAIN_SETUP.md`
