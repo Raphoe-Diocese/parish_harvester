@@ -2,15 +2,15 @@
   "generated_at": "2026-08-21",
   "target_date": "2026-08-16",
   "summary": {
-    "downloaded": 88,
+    "downloaded": 89,
     "html_links": 0,
     "skipped": 17,
-    "failed": 18,
+    "failed": 17,
     "stale_rejected": 1
   },
   "action_counts": {
-    "ok": 91,
-    "investigate": 15,
+    "ok": 92,
+    "investigate": 14,
     "skip": 17,
     "retrain": 1
   },
@@ -3167,24 +3167,25 @@
       "diocese": "down_and_connor",
       "recipe_file": "parishes/recipes/down_and_connor/portstewartparish.json",
       "recipe": {
-        "start_url": "http://portstewartparish.website/weekly-bulletin/",
+        "start_url": "https://portstewartparish.website/weekly-bulletin/",
         "site_type": "mdocs_bulletin_list",
         "playbook_type": "mdocs_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 2,
+        "step_count": 3,
         "click_count": 1,
         "has_terminal": true,
         "operator_notes": [
-          "mDocs WordPress plugin lists dated PDFs \u2014 newest row is usually at the top.",
-          "Click Download on this week's row, then capture PDF download (not Save page as PDF).",
-          "Slow sites: use http:// if HTTPS certificate is expired (portstewartparish.website).",
-          "Harvester waits up to 7 minutes for the table on very slow hosts."
+          "mDocs table on /weekly-bulletin/ \u2014 newest bulletin is the first row (modified desc).",
+          "Harvest HTTP-scrapes the newest dated ?mdocs-file= row from the listing HTML, then downloads that PDF. Playwright clicks the Download column only if the scrape misses.",
+          "Frank highlighted 23 August 2026.pdf as this week's file \u2014 do not pin that title or id; pick the newest row every Sunday.",
+          "HTTPS listing works (Let's Encrypt valid through 22/10/2026). HTTP 301s to HTTPS. Host profile ignores TLS errors if the cert lapses."
         ],
         "do_not": [
-          "Do not use Save page as PDF \u2014 bulletins are real PDF files in the mDocs table.",
-          "Do not use https://portstewartparish.website \u2014 certificate expired; use http://."
+          "Do not pin a dated title, filename, or mdocs-file id (e.g. 23rd August 2026 / ?mdocs-file=9538) \u2014 it breaks next week.",
+          "Do not click the title dropdown (href='#') \u2014 that is not the PDF. Use the Download column / ?mdocs-file= link.",
+          "Do not use Save page as PDF \u2014 bulletins are real PDF files behind mDocs download links."
         ],
         "recorded_date": "2026-08-21"
       },
@@ -3198,13 +3199,13 @@
         "prefer_headful": true,
         "navigation_wait_until": "commit",
         "ignore_https_errors": true,
-        "notes": "Use HTTP \u2014 HTTPS cert expired. mdocs bulletin table can take 3\u20135 min to appear; PDF is row 1 Download link."
+        "notes": "Listing HTML is server-rendered. HTTP-scrape newest ?mdocs-file= row; Playwright Download-column click is fallback. HTTPS works; ignore TLS errors if the cert lapses. HTTP 301s to HTTPS."
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: Recipe download step did not find a matching document URL; headful fallback: Recipe replay failed: Recipe download step did not find a matching document URL",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: Recipe download step did not find a matching document URL; headful fallback: Recipe replay failed: Recipe download step did not find a mat"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "drive-1jmslbrliw",
