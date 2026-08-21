@@ -2,15 +2,15 @@
   "generated_at": "2026-08-21",
   "target_date": "2026-08-16",
   "summary": {
-    "downloaded": 84,
+    "downloaded": 85,
     "html_links": 0,
     "skipped": 17,
-    "failed": 23,
+    "failed": 22,
     "stale_rejected": 0
   },
   "action_counts": {
-    "ok": 86,
-    "investigate": 20,
+    "ok": 87,
+    "investigate": 19,
     "skip": 17,
     "retrain": 1
   },
@@ -2932,23 +2932,25 @@
         "has_terminal": false,
         "operator_notes": [
           "This week's bulletin is under the Extra/Divi 'This week's bulletin' toggle \u2014 Parish-Newsletter-*.pdf.",
-          "Rathmullan shares this bulletin page.",
-          "2026-08-18 FIX: download step had use_captured_url pinned to Parish-Newsletter-5th-July.pdf. The filename has no year, so freshness reported unknown and the harvest was marked ok while serving a June/July file. Same HTTP-scrape helper as rathmullan.json \u2014 picks the newest Parish-Newsletter PDF from the listing HTML each Sunday."
+          "Rathmullan shares this bulletin page \u2014 same Parish-Newsletter file for both.",
+          "2026-08-18 FIX: download step had use_captured_url pinned to Parish-Newsletter-5th-July.pdf. The filename has no year, so freshness reported unknown and the harvest was marked ok while serving a June/July file. Same HTTP-scrape helper as rathmullan.json \u2014 picks the newest Parish-Newsletter PDF from the listing HTML each Sunday.",
+          "2026-08-21: listing only had Parish-Newsletter-Sunday-23rd-August.pdf (next Sunday, posted Friday). HTTP-scrape +3-day window rejected it as too new. Ahead window is now 7 days."
         ],
         "do_not": [
           "Do not use generic a[href$='.pdf'] \u2014 it grabs Order-of-Mass.pdf from the site menu.",
-          "Do not set use_captured_url on a dated Parish-Newsletter filename \u2014 it freezes the recipe and freshness cannot see a year."
+          "Do not set use_captured_url on a dated Parish-Newsletter filename \u2014 it freezes the recipe and freshness cannot see a year.",
+          "Do not download GDPR, privacy, or Order of Mass PDFs."
         ],
-        "recorded_date": "2026-08-18"
+        "recorded_date": "2026-08-21"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP-scrape listing https://milfordrathmullanparishes.ie/bulletins/ \u2014 no dated bulletin PDF matching ['parish-newsletter'] (not a selector problem; parish may not have posted)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP-scrape listing https://milfordrathmullanparishes.ie/bulletins/ \u2014 no dated bulletin PDF matching ['parish-newsletter'] (not a selector"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "nativityparish",
@@ -3231,26 +3233,30 @@
       "recipe_file": "parishes/recipes/raphoe/rathmullan.json",
       "recipe": {
         "start_url": "https://milfordrathmullanparishes.ie/bulletins/",
-        "site_type": "pdf_link_list",
+        "site_type": "http_scrape_newest_pdf",
         "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 2,
-        "click_count": 1,
-        "has_terminal": true,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
         "operator_notes": [
-          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
-          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-          "Do not worry if the filename or date in the link text changes every week."
+          "Shares https://milfordrathmullanparishes.ie/bulletins/ with Milford (milfordrathmullanparishes).",
+          "This week's PDF is under the Extra/Divi 'This week's bulletin' toggle \u2014 Parish-Newsletter-*.pdf.",
+          "Filenames are yearless (Parish-Newsletter-Sunday-23rd-August.pdf). HTTP-scrape picks the newest Parish-Newsletter and skips Order-of-Mass.pdf.",
+          "2026-08-21: Send & test had pinned 23rd-August plus a catholicbishops.ie Order-of-Mass download. Restored http_scrape. Harvest Sunday is last Sunday; they often post next Sunday's file on Friday."
         ],
         "do_not": [
-          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
-          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+          "Do not use generic a[href$='.pdf'] \u2014 it grabs Order-of-Mass.pdf from the site menu.",
+          "Do not pin a dated filename in the selector \u2014 the parish changes the shape week to week.",
+          "Do not set use_captured_url on a July/August filename \u2014 it freezes the recipe.",
+          "Do not click the Extra toggle \u2014 the PDF href is already in the raw HTML.",
+          "Do not download GDPR, privacy, or Order of Mass PDFs."
         ],
         "recorded_date": "2026-08-21"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
