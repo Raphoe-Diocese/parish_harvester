@@ -5,12 +5,12 @@
     "downloaded": 88,
     "html_links": 0,
     "skipped": 17,
-    "failed": 17,
-    "stale_rejected": 2
+    "failed": 18,
+    "stale_rejected": 1
   },
   "action_counts": {
-    "ok": 92,
-    "investigate": 14,
+    "ok": 91,
+    "investigate": 15,
     "skip": 17,
     "retrain": 1
   },
@@ -1755,10 +1755,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Stale bulletin rejected for mega PDF (bulletin date 2026-07-19, date_behind_of_target)",
+      "suggested_action": "investigate",
+      "suggested_reason": "Stale bulletin rejected for mega PDF (bulletin date 2026-07-19, date_behind_of_target)"
     },
     {
       "parish_key": "glenavyandkilleadparish",
@@ -2684,9 +2684,9 @@
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP 404 for https://parishoflisburn.org/wp-content/uploads/2026/08/16-8-26-Blaris-Bulletin_Small.pdf",
+      "last_error": "No valid content found",
       "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP 404 for https://parishoflisburn.org/wp-content/uploads/2026/08/16-8-26-Blaris-Bulletin_Small.pdf"
+      "suggested_reason": "No valid content found"
     },
     {
       "parish_key": "loughshoreparishes",
@@ -3129,33 +3129,37 @@
       "recipe_file": "parishes/recipes/down_and_connor/portaferryparish.json",
       "recipe": {
         "start_url": "https://churchmedia.tv/st-patricks-church-2",
-        "site_type": "pdf_link_list",
-        "playbook_type": "pdf_download_list",
+        "site_type": "churchmedia_newsletter",
+        "playbook_type": "churchmedia_latest_newsletter",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
-        "click_count": 0,
+        "step_count": 2,
+        "click_count": 1,
         "has_terminal": true,
         "operator_notes": [
-          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
-          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-          "Do not worry if the filename or date in the link text changes every week."
+          "Weekly bulletin is the churchmedia.tv 'View Our Latest Newsletter' button on St Patrick's Ballyphilip (st-patricks-church-2).",
+          "GET /api/getChannelAbout?slug=st-patricks-church-2 \u2192 data.newsletter_url. The path token and ?cb= cache-buster change every upload \u2014 never pin them.",
+          "Harvester HTTP-fetches that JSON first (no browser). Playwright click of the newsletter button is the fallback.",
+          "Same week's file is also overwritten at portaferryparish.com/images/downloads/Bulletin2019A.pdf (Joomla pdf.js viewer) \u2014 last-resort HTTP fallback only when the churchmedia API/PDF fails.",
+          "Probed 21/08/2026: current file Sunday 23rd August 2026 (Twenty-First Sunday in Ordinary Time), 5 pages, Last-Modified 20/08/2026. Dead pinned token was ovt7qm?cb=1786005944 (returned HTML)."
         ],
         "do_not": [
-          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
-          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+          "Do not pin churchmedia /newsletter/<token>.st-patricks-church-2.pdf?cb=... \u2014 the token dies on the next upload.",
+          "Do not use st-patricks-ballygalget \u2014 that is a different church livestream in the same parish.",
+          "Do not download the Angular SPA HTML for a dead /newsletter/<token>.pdf (returns text/html).",
+          "Do not treat Bulletin2019A.pdf's 2019 as a year \u2014 it is a static overwrite filename."
         ],
-        "recorded_date": "2026-08-20"
+        "recorded_date": "2026-08-21"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Recipe replay failed: Recipe download step did not find a matching document URL",
+      "last_error": "Too many pages: 5 pages (max 4)",
       "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: Recipe download step did not find a matching document URL"
+      "suggested_reason": "Too many pages: 5 pages (max 4)"
     },
     {
       "parish_key": "portstewartparish",
