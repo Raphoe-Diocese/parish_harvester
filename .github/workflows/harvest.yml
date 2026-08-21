@@ -405,7 +405,7 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           # Partial harvests are normal — always commit OK parishes + parish_status for the extension.
-          git add -f Bulletins/report.json Bulletins/report.txt Bulletins/dashboard.html docs/manifest.json docs/dioceses/ 2>/dev/null || true
+          git add -f Bulletins/report.json Bulletins/report.txt Bulletins/dashboard.html docs/manifest.json docs/index.html docs/dioceses/ 2>/dev/null || true
           git add -f Bulletins/current/*.pdf 2>/dev/null || true
           git add -f mega_pdf/*_mega_bulletin.pdf 2>/dev/null || true
           git add -f docs/mega_pdf/*_mega_bulletin.pdf docs/mega_pdf/*.pages.json 2>/dev/null || true
@@ -420,8 +420,9 @@ jobs:
             exit 0
           fi
           git commit -m "chore: add harvested bulletins for $(date +%Y-%m-%d) [skip ci]"
-          # Binary mega PDFs cannot merge. On add/add or modify/modify during
-          # rebase, keep the files this harvest just generated and continue.
+          # Generated harvest outputs (mega PDFs, diocese pages, report/status)
+          # cannot always merge. On add/add or content conflict during rebase,
+          # keep the files this harvest just generated and continue.
           python scripts/push_harvest_results.py --remote origin --branch main
 
       - name: Warn if git commit failed
