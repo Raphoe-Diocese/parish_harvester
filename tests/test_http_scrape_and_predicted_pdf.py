@@ -114,6 +114,21 @@ class HttpScrapeScoreTests(unittest.TestCase):
         self.assertTrue(_is_non_bulletin_url(hrefs[0]))
         self.assertTrue(all("Order-of-Mass" not in url for _, url in scored))
 
+    def test_friday_next_sunday_newsletter_is_accepted(self) -> None:
+        # Friday 21/08/2026 harvest Sunday is 16/08. The listing only had
+        # next Sunday's Parish-Newsletter. +3 days used to reject it.
+        hrefs = [
+            "https://www.catholicbishops.ie/wp-content/uploads/2011/02/Order-of-Mass.pdf",
+            "https://milfordrathmullanparishes.ie/wp-content/uploads/"
+            "Parish-Newsletter-Sunday-23rd-August.pdf",
+        ]
+        scored = _score_http_scrape_pdf_hrefs(hrefs, date(2026, 8, 16))
+        self.assertEqual(len(scored), 1)
+        best_date, best_url = max(scored)
+        self.assertEqual(best_date, date(2026, 8, 23))
+        self.assertIn("Sunday-23rd-August", best_url)
+        self.assertTrue(all("Order-of-Mass" not in url for _, url in scored))
+
     def test_filename_date_beats_wordpress_upload_folder(self) -> None:
         # Malin uploaded March files into /2026/04/. Folder-first dating
         # would treat 29th-March as 29/04 and beat 5th-April.

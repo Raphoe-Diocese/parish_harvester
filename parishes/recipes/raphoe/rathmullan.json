@@ -1,44 +1,32 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "rathmullan",
   "display_name": "Rathmullan",
   "diocese": "raphoe",
   "start_url": "https://milfordrathmullanparishes.ie/bulletins/",
   "steps": [
     {
-      "action": "click",
-      "selector": "a[href*=\"Parish-Newsletter-Sunday-23rd-August.pdf\"]",
-      "href": "https://milfordrathmullanparishes.ie/wp-content/uploads/Parish-Newsletter-Sunday-23rd-August.pdf",
-      "text": "Parish Newsletter Sunday 23rd August",
-      "pick_strategy": "newest_dated",
-      "bulletin_position": "bottom",
-      "fallback_selectors": [
-        "a[href$='.pdf']",
-        "a[href*='.pdf']"
-      ]
-    },
-    {
-      "action": "download",
-      "url": "https://www.catholicbishops.ie/wp-content/uploads/2011/02/Order-of-Mass.pdf"
+      "action": "goto",
+      "url": "https://milfordrathmullanparishes.ie/bulletins/"
     }
   ],
-  "observed_load_ms": 1464,
-  "timeout_ms": 55000,
-  "total_timeout_s": 250,
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": ["parish-newsletter"],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
   "playbook_type": "pdf_download_list",
-  "site_type": "pdf_link_list",
+  "recorded_date": "2026-08-21",
   "operator_notes": [
-    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
-    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-    "Do not worry if the filename or date in the link text changes every week."
+    "Shares https://milfordrathmullanparishes.ie/bulletins/ with Milford (milfordrathmullanparishes).",
+    "This week's PDF is under the Extra/Divi 'This week's bulletin' toggle — Parish-Newsletter-*.pdf.",
+    "Filenames are yearless (Parish-Newsletter-Sunday-23rd-August.pdf). HTTP-scrape picks the newest Parish-Newsletter and skips Order-of-Mass.pdf.",
+    "2026-08-21: Send & test had pinned 23rd-August plus a catholicbishops.ie Order-of-Mass download. Restored http_scrape. Harvest Sunday is last Sunday; they often post next Sunday's file on Friday."
   ],
   "do_not": [
-    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
-    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
-  ],
-  "bulletin_layout": {
-    "strategy": "newest_dated",
-    "position": "bottom"
-  },
-  "recorded_date": "2026-08-21"
+    "Do not use generic a[href$='.pdf'] — it grabs Order-of-Mass.pdf from the site menu.",
+    "Do not pin a dated filename in the selector — the parish changes the shape week to week.",
+    "Do not set use_captured_url on a July/August filename — it freezes the recipe.",
+    "Do not click the Extra toggle — the PDF href is already in the raw HTML.",
+    "Do not download GDPR, privacy, or Order of Mass PDFs."
+  ]
 }
