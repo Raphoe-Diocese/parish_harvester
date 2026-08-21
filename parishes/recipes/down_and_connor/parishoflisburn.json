@@ -1,28 +1,29 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "parishoflisburn",
   "display_name": "Lisburn",
   "diocese": "down_and_connor",
   "start_url": "https://parishoflisburn.org/category/news/",
+  "site_type": "pdf_link_list",
+  "max_bulletin_pages": 16,
+  "playbook_type": "pdf_download_list",
   "steps": [
     {
       "action": "download",
       "url": "https://parishoflisburn.org/wp-content/uploads/2026/08/16-08-26-Blaris-Bulletin_Small.pdf"
     }
   ],
-  "observed_load_ms": 1352,
   "timeout_ms": 55000,
   "total_timeout_s": 190,
-  "playbook_type": "pdf_download_list",
-  "site_type": "pdf_link_list",
+  "recorded_date": "2026-08-21",
   "operator_notes": [
-    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
-    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-    "Do not worry if the filename or date in the link text changes every week."
+    "Parish of Blaris (Lisburn). This week's file is https://parishoflisburn.org/wp-content/uploads/2026/08/16-08-26-Blaris-Bulletin_Small.pdf",
+    "2026-08-21: HTTP 200, 739527 bytes, 8 pages, date 16/08/2026 (Twentieth Sunday). Send & test downloaded it then failed 'Too many pages: 8 pages (max 4)'. max_bulletin_pages=16 allows this long weekly file.",
+    "Do not use predicted_dated_pdf rewrite on this name — it drops zero-padding (16-08-26 → 16-8-26) and 404s."
   ],
   "do_not": [
-    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
-    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
-  ],
-  "recorded_date": "2026-08-21"
+    "Do not leave the default 4-page cap — Blaris Small bulletins are ~8 pages.",
+    "Do not download wedding / GDPR / Order of Mass.",
+    "Do not raise the cap to accept an old magazine if the filename date is stale."
+  ]
 }

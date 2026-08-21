@@ -17,6 +17,15 @@
   const TOOLBAR_ID = "ph-floating-toolbar";
   let toolbarReadyLogged = false;
   let recipeSteps = []; // single source of truth for both UI preview and standalone recipe push
+  const LONG_BULLETIN_MAX_PAGES = 16;
+  let allowLongBulletin = false;
+
+  const _setAllowLongBulletin = (on) => {
+    allowLongBulletin = Boolean(on);
+    const cb = document.getElementById("ph-long-bulletin-cb");
+    if (cb) cb.checked = allowLongBulletin;
+    void _persistRecordingSession({ allowLongBulletin });
+  };
   let lastPushedRecipeNote = "";
   let pickLinkActive = false;
   let pickLinkHighlightEl = null;
@@ -191,6 +200,7 @@
       startUrl,
       steps: _serializeRecipeSteps(),
       updatedAt: Date.now(),
+      allowLongBulletin: Boolean(allowLongBulletin),
       ...extra,
     };
     await _storageSet({
@@ -591,6 +601,7 @@
     }));
     standaloneStartUrl =
       session.startUrl && _hostsMatch(session.startUrl, pageUrl) ? session.startUrl : pageUrl;
+    allowLongBulletin = Boolean(session.allowLongBulletin);
 
     if (session.fixNow) {
       await _applyFixNowToolbar({
@@ -1038,6 +1049,9 @@
         position: clickStep.bulletin_position || "top",
       };
     }
+    if (allowLongBulletin) {
+      recipe.max_bulletin_pages = LONG_BULLETIN_MAX_PAGES;
+    }
     return recipe;
   };
 
@@ -1096,7 +1110,10 @@
     if (showLoadedMessage && imported > 0) {
       // Caller should show status when toolbar is ready.
     }
-    void _persistRecordingSession();
+    if (Number(recipe.max_bulletin_pages) >= 8) {
+      allowLongBulletin = true;
+    }
+    void _persistRecordingSession({ allowLongBulletin });
     return imported;
   };
 
@@ -8293,6 +8310,29 @@
         };
         void _runFastPush();
       });
+      const longBulletinRow = document.createElement("label");
+      longBulletinRow.style.cssText =
+        "display:flex;align-items:flex-start;gap:6px;margin-bottom:8px;font-size:10px;color:#e5e7eb;line-height:1.35;cursor:pointer;";
+      const longBulletinCb = document.createElement("input");
+      longBulletinCb.type = "checkbox";
+      longBulletinCb.id = "ph-long-bulletin-cb";
+      longBulletinCb.checked = allowLongBulletin;
+      longBulletinCb.style.marginTop = "2px";
+      longBulletinCb.addEventListener("change", () => {
+        _setAllowLongBulletin(longBulletinCb.checked);
+        showStatus(
+          longBulletinCb.checked
+            ? "✅ Long bulletin — harvest will allow up to 16 pages."
+            : "Default 4-page cap is back on.",
+          "info"
+        );
+      });
+      const longBulletinText = document.createElement("span");
+      longBulletinText.textContent =
+        "Long bulletin — allow extra pages (tick this for odd 8+ page PDFs like Lisburn / Errigal)";
+      longBulletinRow.appendChild(longBulletinCb);
+      longBulletinRow.appendChild(longBulletinText);
+      pushSection.appendChild(longBulletinRow);
       pushSection.appendChild(pushBtn);
 
       const clearBtn = document.createElement("button");

@@ -666,6 +666,24 @@ class ErrigalAndMalinRecipeTests(unittest.TestCase):
         )
 
 
+class LisburnRecipeTests(unittest.TestCase):
+    def test_recipe_allows_eight_page_blaris_small(self) -> None:
+        data = json.loads(
+            Path("parishes/recipes/down_and_connor/parishoflisburn.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertGreaterEqual(int(data["max_bulletin_pages"]), 8)
+        steps = data.get("steps") or []
+        self.assertTrue(
+            any(
+                "16-08-26-Blaris-Bulletin_Small.pdf" in str(step.get("url") or "")
+                for step in steps
+                if isinstance(step, dict)
+            )
+        )
+
+
 class BallymenaRecipeTests(unittest.TestCase):
     THIS_WEEK = (
         "https://ballymenaparish.org/wp-content/uploads/2026/08/"
