@@ -1597,37 +1597,40 @@
     },
     {
       "parish_key": "errigalparish",
-      "display_name": "Errigalparish",
-      "diocese": "derry",
+      "display_name": "Errigal",
+      "diocese": "unknown",
       "recipe_file": "parishes/recipes/unknown/errigalparish.json",
       "recipe": {
-        "start_url": "https://www.errigalparish.com/pdf/160826.pdf",
-        "site_type": "predicted_dated_pdf",
-        "playbook_type": "",
+        "start_url": "https://www.errigalparish.com/news.html",
+        "site_type": "dated_pdf_path",
+        "playbook_type": "dated_pdf_bulletin",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
-        "click_count": 0,
+        "step_count": 2,
+        "click_count": 1,
         "has_terminal": true,
         "operator_notes": [
-          "Weekly PDF at /pdf/DDMMYY.pdf (e.g. 160826.pdf = 16/08/2026).",
-          "2026-08-18 FIX: click on news.html failed ('No valid content found') even though this week's file is a direct unchallenged asset. Confirmed 16/08/2026 via curl: HTTP 200, 295,551 bytes, text 'Errigal Parish News - 16th August 2026'. site_type:predicted_dated_pdf fetches the rewritten /pdf/DDMMYY.pdf and never clicks the listing (which also links GDPR/pastoral-letter PDFs)."
+          "Bulletin is a real PDF (often made in Microsoft Word \u2192 Print to PDF).",
+          "Tab title may say .docx or .jpg \u2014 ignore that; check the address bar ends in .pdf.",
+          "On the PDF page: tap Save this PDF \u2014 saves the full https://\u2026 address for Sunday harvest.",
+          "Or start on parishnews.html \u2192 point at this week's link \u2192 Yes \u2192 Save this PDF.",
+          "Harvester rewrites DDMMYY in the URL each Sunday (e.g. 140626 \u2192 210626)."
         ],
         "do_not": [
-          "Do not click a[href*=\"pdf\"] on news.html \u2014 it can pick drumraghparish.com GDPR/Privacy/Bishops-Letter links.",
-          "Do not set use_captured_url."
+          "Do not use use_page_url only \u2014 GitHub cannot read Chrome's internal PDF viewer address.",
+          "Do not worry if Document Properties title mentions Microsoft Word."
         ],
-        "recorded_date": "2026-08-18"
+        "recorded_date": "2026-08-21"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "No valid content found",
+      "last_error": "Too many pages: 8 pages (max 4)",
       "suggested_action": "investigate",
-      "suggested_reason": "No valid content found"
+      "suggested_reason": "Too many pages: 8 pages (max 4)"
     },
     {
       "parish_key": "fahanparish",
