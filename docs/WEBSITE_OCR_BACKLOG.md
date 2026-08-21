@@ -38,6 +38,8 @@ Date format for new rows: `YYYY-MM-DD`. User-facing dates on the site stay **DD/
 | done | 2026-08-20 | Readable OCR measure: larger body type, line-height ~1.65, space after headings, max-width ~72ch, soft stone paper (not harsh black-on-white), mobile wrap | `ocr_reading_css()` in `ocr/generate_bulletin_pages.py`; mirrored in `ocr/convert_bulletin.py` `CSS` |
 | done | 2026-08-20 | Mega PDF parish URL links at the top of each parish must **work** and open in a **new tab** (PDF.js was painting canvases only, so annotations were dead) | `harvester/stitcher.py` (`_build_parish_header_pdf` `linkURL` + `newWindow=True`); `docs/assets/pdf-inpage-viewer.js` annotation overlay |
 | done | 2026-08-20 | Desktop 850px min-height for PDF **and** OCR in the canonical generator; tablet/phone ~450px. Regenerated live diocese HTML so harvest cannot drop it. | `render_bulletin_viewer_shell`; tests in `tests/test_ocr_bulletin_pages.py`, `tests/test_page_renderer.py`, `tests/test_site_builder.py` |
+| done | 2026-08-21 | Gortahork (`gort-a-choirce`) OCR: mega page 14 was banner-only; sparse-page fill from mega image + `pages.json` / `Page N` slice. Live verified 2026-08-21: Irish body (`AIFRINN NA SEACHTAINE`, An tAth. Donnchadh Ó Baoill, 16ú Lúnasa) on https://www.parishpress.ie/parishes/raphoe/gort-a-choirce.html after #61 deploy | `ocr/sparse_page_ocr.py`, `ocr/parish_splitter.py`, `ocr/parish_pages.py` |
+| done | 2026-08-21 | Desktop 850px on **visible** `.pdf-inpage-pages` / `.pdf-inpage-viewer` / `#ocr-panel` (not only outer wrap). Live verified 2026-08-21 on Gortahork: those selectors have `min-height: 850px`; `@media (max-width: 1024px)` stays 450px | `render_bulletin_viewer_shell`, `docs/assets/pdf-inpage-viewer.js` |
 | done | 2026-08-20 | Parish / diocese HTML links already use `target="_blank"` `rel="noopener noreferrer"` | `render_bulletin_viewer_shell`, `render_parish_link_grid`, `ocr/parish_pages.py` |
 | locked | 2026-08-20 | Mega PDF generation stays on — do not disable `HARVEST_MEGA_PDF` | `.github/workflows/harvest.yml`, `main.py` (single-parish skip is intentional) |
 
@@ -47,8 +49,6 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 
 ## Still open (do not pretend these are finished)
 
-- [ ] **doing** · 2026-08-21 · Gortahork (`gort-a-choirce`) OCR empty — mega page 14 was banner-only (Irish image body never OCR'd). Fill sparse mega pages from the mega PDF image and slice by `pages.json` / `Page N`. Keep Irish as Irish. **Leave open until verified on live** https://www.parishpress.ie/parishes/raphoe/gort-a-choirce.html · `ocr/sparse_page_ocr.py`, `ocr/parish_splitter.py`, `ocr/parish_pages.py`
-- [ ] **doing** · 2026-08-21 · Desktop 850px must be the **visible** PDF.js / `#ocr-panel` height (not only an outer wrap). Diocese **and** parish pages. Mobile/tablet `max-width: 1024px` stay ~450px. **Leave open until verified on live Gortahork + Raphoe.** · `render_bulletin_viewer_shell`, `docs/assets/pdf-inpage-viewer.js`
 - [ ] **todo** · 2026-08-20 · Problems console — full work-queue polish · `extension/sidepanel.js`, `harvester/parish_status.py`
 - [ ] **doing** · 2026-08-21 · Trainer ↔ GitHub sync: Problems/Directory load latest `parishes/parish_status.json` via commit SHA; Directory shows ok + UK date; Send & test waits for `last_tested_at` change · `extension/*`
 - [ ] **todo** · 2026-08-20 · Recipe success — one parish at a time (A–Z repair with proof packs) · `parishes/recipes/`, Problems tab
@@ -78,7 +78,7 @@ python -m pytest tests/test_ocr_bulletin_pages.py tests/test_bulletin_layout.py 
 
 Spot-check generated CSS for:
 
-- `min-height: 850px` on `.pdf-frame-wrap` and `#ocr-panel`
+- `min-height: 850px` on the **visible** boxes: `.pdf-inpage-pages`, `.pdf-inpage-viewer`, and `#ocr-panel` (also `.pdf-frame-wrap`)
 - `@media (max-width: 1024px)` with `min-height: 450px`
 - `ocr-parish-masthead` / `ocr-parish-name` in the OCR panel
 - `getAnnotations` + `target="_blank"` in `docs/assets/pdf-inpage-viewer.js`
