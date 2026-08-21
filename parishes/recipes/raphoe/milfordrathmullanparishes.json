@@ -6,7 +6,7 @@
   "site_type": "http_scrape_newest_pdf",
   "href_patterns": ["parish-newsletter"],
   "playbook_type": "pdf_download_list",
-  "recorded_date": "2026-08-18",
+  "recorded_date": "2026-08-21",
   "start_url": "https://milfordrathmullanparishes.ie/bulletins/",
   "steps": [
     {
@@ -18,11 +18,13 @@
   "total_timeout_s": 180,
   "operator_notes": [
     "This week's bulletin is under the Extra/Divi 'This week's bulletin' toggle — Parish-Newsletter-*.pdf.",
-    "Rathmullan shares this bulletin page.",
-    "2026-08-18 FIX: download step had use_captured_url pinned to Parish-Newsletter-5th-July.pdf. The filename has no year, so freshness reported unknown and the harvest was marked ok while serving a June/July file. Same HTTP-scrape helper as rathmullan.json — picks the newest Parish-Newsletter PDF from the listing HTML each Sunday."
+    "Rathmullan shares this bulletin page — same Parish-Newsletter file for both.",
+    "2026-08-18 FIX: download step had use_captured_url pinned to Parish-Newsletter-5th-July.pdf. The filename has no year, so freshness reported unknown and the harvest was marked ok while serving a June/July file. Same HTTP-scrape helper as rathmullan.json — picks the newest Parish-Newsletter PDF from the listing HTML each Sunday.",
+    "2026-08-21: listing only had Parish-Newsletter-Sunday-23rd-August.pdf (next Sunday, posted Friday). HTTP-scrape +3-day window rejected it as too new. Ahead window is now 7 days."
   ],
   "do_not": [
     "Do not use generic a[href$='.pdf'] — it grabs Order-of-Mass.pdf from the site menu.",
-    "Do not set use_captured_url on a dated Parish-Newsletter filename — it freezes the recipe and freshness cannot see a year."
+    "Do not set use_captured_url on a dated Parish-Newsletter filename — it freezes the recipe and freshness cannot see a year.",
+    "Do not download GDPR, privacy, or Order of Mass PDFs."
   ]
 }

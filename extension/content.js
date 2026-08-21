@@ -4137,7 +4137,7 @@
       "padding:4px 6px",
     ].join(";");
     const moreOptionsSummary = document.createElement("summary");
-    moreOptionsSummary.textContent = "Other options (auto-guess link, image, frame…)";
+    moreOptionsSummary.textContent = "Other options (image, frame…)";
     moreOptionsSummary.style.cssText = [
       "cursor:pointer",
       "font-size:10px",
@@ -4610,7 +4610,9 @@
         }
       }
       if (pinLinkBtn) {
-        pinLinkBtn.style.display = "none";
+        // Always offer Guess on listing/HTML pages. It used to be forced
+        // hidden after every refresh, so the control only flashed briefly.
+        pinLinkBtn.style.display = onDirectPdf ? "none" : "block";
       }
       } catch (guidedErr) {
         console.error("[Parish Trainer] guided context refresh failed:", guidedErr);
@@ -5428,7 +5430,7 @@
     );
 
     pinLinkBtn = makeSmallBtn(
-      "🤖 Auto-guess bulletin link",
+      "Guess the bulletin link",
       "#6d28d9",
       async () => {
         showStatus("⏳ Finding best bulletin link on this page…", "info");
@@ -5548,6 +5550,7 @@
     contextPrimaryBtn.style.display = "none";
 
     wizardBtns.appendChild(clickFirstBtn);
+    wizardBtns.appendChild(pinLinkBtn);
     wizardBtns.appendChild(contextPrimaryBtn);
 
     savePagePdfBtn = makeSmallBtn(
@@ -5581,8 +5584,6 @@
     wizardBtns.appendChild(savePagePdfBtn);
     wizardBtns.appendChild(pickImageBtn);
     wizardBtns.appendChild(imageCropBtn);
-
-    moreOptionsBody.appendChild(pinLinkBtn);
 
       const manualPickLinkBtn = makeSmallBtn(
       "🔗 Point at a specific link manually",
