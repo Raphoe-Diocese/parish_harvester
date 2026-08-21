@@ -1,8 +1,10 @@
 """Helpers for HTTP-scrape newest PDF and predicted dated uploads."""
 from __future__ import annotations
 
+import json
 import unittest
 from datetime import date
+from pathlib import Path
 
 from harvester.replay import (
     _decode_pdfemb_data_url,
@@ -97,6 +99,16 @@ class PredictedDatedUploadTests(unittest.TestCase):
             urls[:6],
         )
 
+    def test_errigal_derry_ddmmyy_path(self) -> None:
+        example = "https://www.errigalparish.com/pdf/160826.pdf"
+        urls = predicted_dated_upload_urls(example, date(2026, 8, 16), weeks_back=2)
+        self.assertEqual(urls[0], "https://www.errigalparish.com/pdf/160826.pdf")
+        self.assertIn("https://www.errigalparish.com/pdf/090826.pdf", urls)
+        self.assertEqual(
+            rewrite_date_url(example, date(2026, 8, 23)),
+            "https://www.errigalparish.com/pdf/230826.pdf",
+        )
+
     def test_yearless_sunday_june_rewrites_to_august(self) -> None:
         example = "https://tawnawillyparish.ie/wp-content/uploads/Sunday-28th-June.pdf"
         self.assertEqual(
@@ -186,6 +198,18 @@ class HttpScrapeScoreTests(unittest.TestCase):
         best_date, best_url = max(scored)
         self.assertEqual(best_date, date(2026, 4, 5))
         self.assertIn("5th-April", best_url)
+
+    def test_malin_dated_download_rewrites_to_missing_august_file(self) -> None:
+        # This is why Malin must scrape the listing, not rewrite the download URL.
+        example = (
+            "http://malinparish.ie/wp-content/uploads/2026/04/"
+            "Bulletin-5th-April-2026.pdf"
+        )
+        self.assertEqual(
+            rewrite_date_url(example, date(2026, 8, 16)),
+            "http://malinparish.ie/wp-content/uploads/2026/08/"
+            "Bulletin-16th-August-2026.pdf",
+        )
 
     def test_liturgical_and_glenavy_filenames_score_current_week(self) -> None:
         hrefs = [
@@ -613,6 +637,33 @@ class HolywoodNoticePageTests(unittest.TestCase):
         scored = _score_wordpress_post_hrefs(hrefs, date(2026, 8, 16))
         self.assertEqual(max(scored)[1], self.POST_16)
         self.assertEqual(max(scored)[0], date(2026, 8, 16))
+
+
+class ErrigalAndMalinRecipeTests(unittest.TestCase):
+    def test_errigal_allows_eight_page_weekly(self) -> None:
+        data = json.loads(
+            Path("parishes/recipes/unknown/errigalparish.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(data["site_type"], "predicted_dated_pdf")
+        self.assertGreaterEqual(int(data["max_bulletin_pages"]), 8)
+
+    def test_malin_scrapes_listing_instead_of_rewriting_date(self) -> None:
+        data = json.loads(
+            Path("parishes/recipes/derry/malinparish.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(data["site_type"], "http_scrape_newest_pdf")
+        self.assertIn("bulletin-", data.get("href_patterns") or [])
+        steps = data.get("steps") or []
+        self.assertFalse(
+            any(
+                str(step.get("url") or "").lower().endswith(".pdf")
+                for step in steps
+                if isinstance(step, dict)
+            ),
+            "dated PDF download URL would be rewritten to a missing August file",
+        )
 
 
 if __name__ == "__main__":
