@@ -2029,34 +2029,26 @@
       "recipe_file": "parishes/recipes/down_and_connor/holycrossparishbelfast.json",
       "recipe": {
         "start_url": "http://www.holycrossparishbelfast.com/parishnews.html",
-        "site_type": "",
-        "playbook_type": "",
+        "site_type": "dated_pdf_path",
+        "playbook_type": "dated_pdf_bulletin",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 3,
-        "click_count": 1,
+        "step_count": 1,
+        "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "DO NOT raise max_bulletin_pages here despite the 'Too many pages: 13'",
-          "rejection looking like the usual oversized-bulletin fix pattern.",
-          "Investigated 2026-08-10: the site's own newest-dated link (090826.pdf,",
-          "labelled 'Sunday, 9th August 2026 - 19th Sunday Ord. Time') and last",
-          "week's (020826.pdf) are byte-identical \u2014 same stale content headed",
-          "'Bulletin 11th & 12th July 2026', padded out to 13 pages with blank/",
-          "dotted-line filler pages (an unrelated form template), served under a",
-          "fresh-looking weekly filename each week. This is a site-side content",
-          "problem (parish secretary not updating the real file), not a scraper",
-          "bug \u2014 raising the page cap would just serve 2+ month stale content as",
-          "a false 'ok'. Leaving the oversized-page rejection in place is the",
-          "safer failure mode until the site starts serving genuinely fresh PDFs",
-          "again; re-check manually if this persists for many more weeks."
+          "Bulletin is a real PDF (often made in Microsoft Word \u2192 Print to PDF).",
+          "Tab title may say .docx or .jpg \u2014 ignore that; check the address bar ends in .pdf.",
+          "On the PDF page: tap Save this PDF \u2014 saves the full https://\u2026 address for Sunday harvest.",
+          "Or start on parishnews.html \u2192 point at this week's link \u2192 Yes \u2192 Save this PDF.",
+          "Harvester rewrites DDMMYY in the URL each Sunday (e.g. 140626 \u2192 210626)."
         ],
         "do_not": [
-          "Do not set site_type predicted_dated_pdf or hardcode /pdf/160826.pdf \u2014 those dated names are copies of the July bulletin (md5 ac67defb\u2026).",
-          "Do not raise max_bulletin_pages to accept the 13-page July file."
+          "Do not use use_page_url only \u2014 GitHub cannot read Chrome's internal PDF viewer address.",
+          "Do not worry if Document Properties title mentions Microsoft Word."
         ],
-        "recorded_date": "2026-04-30"
+        "recorded_date": "2026-08-21"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
