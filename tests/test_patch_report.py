@@ -114,6 +114,7 @@ class PatchReportTests(unittest.TestCase):
             self.assertIn("last_tested_at", patched["stale_rejected"][0])
             stale_copy = tmp_path / "stale" / "bangorparish.pdf"
             self.assertTrue(stale_copy.is_file())
+            self.assertTrue((tmp_path / "bangorparish.pdf").is_file())
             self.assertEqual(patched["stale_rejected"][0].get("file"), "bangorparish.pdf")
 
     def test_creates_report_when_missing(self) -> None:

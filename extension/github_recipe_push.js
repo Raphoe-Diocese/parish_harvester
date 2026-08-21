@@ -417,16 +417,24 @@
     const key = String(parish_key || "").trim();
     const pat = String(gh_pat || "").trim();
     if (!pat || !key) return false;
-    try {
-      const resp = await fetchGithub(
-        `https://api.github.com/repos/${gh_repo}/contents/Bulletins/current/${key}.pdf`,
-        authHeaders(pat),
-        12000
-      );
-      return resp.ok;
-    } catch (_e) {
-      return false;
+    const paths = [
+      `Bulletins/${key}.pdf`,
+      `Bulletins/current/${key}.pdf`,
+      `Bulletins/stale/${key}.pdf`,
+    ];
+    for (const filePath of paths) {
+      try {
+        const resp = await fetchGithub(
+          `https://api.github.com/repos/${gh_repo}/contents/${filePath}`,
+          authHeaders(pat),
+          12000
+        );
+        if (resp.ok) return true;
+      } catch (_e) {
+        // try the next harvest proof path
+      }
     }
+    return false;
   };
 
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));

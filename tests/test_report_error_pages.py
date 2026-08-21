@@ -108,6 +108,32 @@ class PdfErrorPageTests(unittest.TestCase):
             self.assertEqual(report["summary"]["failed"], 1)
             self.assertFalse((current_dir / "someparish.pdf").exists())
 
+    def test_ok_download_writes_proof_pdf_not_zip(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            raw_dir = tmp_path / "raw"
+            raw_dir.mkdir()
+            current_dir = tmp_path / "current"
+            pdf = raw_dir / "bangorparish.pdf"
+            _make_blank_pdf(pdf)
+            result = _fake_result("bangorparish", pdf)
+
+            report = generate_report(
+                [result],
+                raw_dir,
+                current_dir,
+                tmp_path / "report.json",
+                tmp_path / "report.txt",
+                date(2026, 8, 16),
+            )
+
+            self.assertEqual(report["summary"]["downloaded"], 1)
+            self.assertTrue((current_dir / "bangorparish.pdf").is_file())
+            proof = tmp_path / "bangorparish.pdf"
+            self.assertTrue(proof.is_file(), "View bulletin needs Bulletins/<key>.pdf")
+            self.assertFalse(any(tmp_path.glob("*.zip")))
+            self.assertFalse((tmp_path / "archive").exists())
+
 
 if __name__ == "__main__":
     unittest.main()

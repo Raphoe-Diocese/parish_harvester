@@ -1758,8 +1758,101 @@ async function _problemsClearRetrained(parishKey) {
 }
 
 function _problemsParishBulletinPdf(repo, parishKey, folder) {
-  const dir = folder === "stale" ? "stale" : "current";
-  return `https://raw.githubusercontent.com/${repo}/main/Bulletins/${dir}/${parishKey}.pdf`;
+  const key = String(parishKey || "").trim();
+  if (folder === "stale") {
+    return `https://raw.githubusercontent.com/${repo}/main/Bulletins/stale/${key}.pdf`;
+  }
+  if (folder === "current") {
+    return `https://raw.githubusercontent.com/${repo}/main/Bulletins/current/${key}.pdf`;
+  }
+  return `https://raw.githubusercontent.com/${repo}/main/Bulletins/${key}.pdf`;
+}
+
+function _problemsHarvestPdfCandidates(repo, row) {
+  const key = String(row?.parish || "").trim();
+  const slug = _pdDioceseSlug(row?.diocese || "");
+  const firstDir = row?.outcome === "stale" ? "stale" : "current";
+  const secondDir = firstDir === "stale" ? "current" : "stale";
+  const urls = [
+    { url: _problemsParishBulletinPdf(repo, key), minBytes: 512 },
+    { url: _problemsParishBulletinPdf(repo, key, firstDir), minBytes: 512 },
+    { url: _problemsParishBulletinPdf(repo, key, secondDir), minBytes: 512 },
+  ];
+  if (slug) {
+    urls.push({ url: `https://www.parishpress.ie/parishes/${slug}/${key}.pdf`, minBytes: 8192 });
+    urls.push({
+      url: `https://raphoe-diocese.github.io/parish_harvester/parishes/${slug}/${key}.pdf`,
+      minBytes: 8192,
+    });
+  }
+  return urls;
+}
+
+function _problemsPdfMagicOk(bytes) {
+  return Boolean(
+    bytes
+    && bytes.length >= 4
+    && bytes[0] === 0x25
+    && bytes[1] === 0x50
+    && bytes[2] === 0x44
+    && bytes[3] === 0x46
+  );
+}
+
+function _problemsUrlLooksLikeZip(url) {
+  const lower = String(url || "").toLowerCase();
+  return lower.endsWith(".zip") || lower.includes(".zip?") || lower.includes("/archive/");
+}
+
+async function _problemsUrlIsOpenablePdf(url, minBytes) {
+  if (_problemsUrlLooksLikeZip(url)) return false;
+  try {
+    const resp = await fetch(url, {
+      cache: "no-store",
+      headers: { Range: "bytes=0-7" },
+    });
+    if (!resp.ok && resp.status !== 206) return false;
+    const type = String(resp.headers.get("content-type") || "").toLowerCase();
+    if (type.includes("zip") || type.includes("html") || type.includes("json")) return false;
+    const range = String(resp.headers.get("content-range") || "");
+    const totalMatch = range.match(/\/(\d+)\s*$/);
+    const declared = totalMatch
+      ? Number(totalMatch[1])
+      : Number(resp.headers.get("content-length") || 0);
+    if (declared && declared < Number(minBytes || 0)) return false;
+    const buf = new Uint8Array(await resp.arrayBuffer());
+    if (_problemsPdfMagicOk(buf)) return true;
+    return type.includes("pdf") && (!declared || declared >= Number(minBytes || 0));
+  } catch (_e) {
+    return false;
+  }
+}
+
+async function _problemsGithubProofDownloadUrl(repo, path, ghPat) {
+  const pat = String(ghPat || "").trim();
+  if (!pat || !path || String(path).toLowerCase().endsWith(".zip")) return "";
+  try {
+    const resp = await fetch(
+      `https://api.github.com/repos/${repo}/contents/${path}?ref=main`,
+      {
+        cache: "no-store",
+        headers: {
+          Authorization: (globalThis.phGithubRecipePush?.authHeaderValue
+            ? globalThis.phGithubRecipePush.authHeaderValue(pat)
+            : (pat.startsWith("github_pat_") ? `Bearer ${pat}` : `token ${pat}`)),
+          Accept: "application/vnd.github+json",
+          "X-GitHub-Api-Version": "2022-11-28",
+        },
+      }
+    );
+    if (!resp.ok) return "";
+    const data = await resp.json();
+    if (Number(data?.size || 0) < 512) return "";
+    if (String(data?.name || "").toLowerCase().endsWith(".zip")) return "";
+    return String(data?.download_url || "").trim();
+  } catch (_e) {
+    return "";
+  }
 }
 
 async function _problemsOpenHarvestedPdf(row, repo) {
@@ -1768,25 +1861,33 @@ async function _problemsOpenHarvestedPdf(row, repo) {
     setStatus("No parish key — cannot open a harvest PDF.", "err");
     return;
   }
-  const first = row?.outcome === "stale" ? "stale" : "current";
-  const second = first === "stale" ? "current" : "stale";
-  const urls = [
-    _problemsParishBulletinPdf(repo, key, first),
-    _problemsParishBulletinPdf(repo, key, second),
+  setStatus(`Opening harvested PDF for ${row.display_name || key}…`, "warn");
+  const cfg = await _pdGetGithubConfig();
+  const pat = cfg?.ghPat || "";
+  const firstDir = row?.outcome === "stale" ? "stale" : "current";
+  const secondDir = firstDir === "stale" ? "current" : "stale";
+  const apiPaths = [
+    `Bulletins/${key}.pdf`,
+    `Bulletins/${firstDir}/${key}.pdf`,
+    `Bulletins/${secondDir}/${key}.pdf`,
   ];
-  for (const url of urls) {
-    try {
-      const resp = await fetch(url, { method: "HEAD", cache: "no-store" });
-      if (resp.ok) {
-        chrome.tabs.create({ url, active: true });
-        return;
-      }
-    } catch (_e) {
-      // try the other folder
+  for (const path of apiPaths) {
+    const download = await _problemsGithubProofDownloadUrl(repo, path, pat);
+    if (download) {
+      chrome.tabs.create({ url: download, active: true });
+      setStatus(`Opened harvest PDF: ${path}`, "ok");
+      return;
+    }
+  }
+  for (const item of _problemsHarvestPdfCandidates(repo, row)) {
+    if (await _problemsUrlIsOpenablePdf(item.url, item.minBytes)) {
+      chrome.tabs.create({ url: item.url, active: true });
+      setStatus(`Opened harvest PDF for ${row.display_name || key}.`, "ok");
+      return;
     }
   }
   setStatus(
-    `No saved harvest PDF on GitHub for ${row.display_name || key} this week. Harvest throws away a too-old file unless this week’s run kept it.`,
+    `No saved harvest PDF for ${row.display_name || key} this week. After the next scrape, look for Bulletins/${key}.pdf — not a zip.`,
     "warn"
   );
 }
@@ -1818,7 +1919,7 @@ function _problemsShowVerifyResult(payload) {
       );
     }
     lines.push(
-      `Saved copy: <a href="${parishPdf}" target="_blank" rel="noopener noreferrer">Bulletins/current/${payload.parishKey}.pdf</a>`
+      `Saved copy: <a href="${parishPdf}" target="_blank" rel="noopener noreferrer">Bulletins/${payload.parishKey}.pdf</a>`
     );
   } else if (payload.stale === true) {
     box.className = "warn";
@@ -2315,7 +2416,7 @@ async function _problemsRenderRows(rows) {
     viewBtn.type = "button";
     viewBtn.className = "problems-view-btn";
     viewBtn.textContent = "View bulletin";
-    viewBtn.title = "Open the PDF harvest actually saved on GitHub";
+    viewBtn.title = "Open the PDF harvest scraped this week (Bulletins/<key>.pdf, parishpress slice, or harvest proof)";
     viewBtn.addEventListener("click", () => {
       void _problemsOpenHarvestedPdf(row, ghRepo);
     });
