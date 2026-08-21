@@ -5235,7 +5235,8 @@
     };
 
     const _saveGuessedBulletinLink = (candidate) => {
-      const url = _absGuessUrl(candidate?.url || candidate?.el?.getAttribute?.("href") || "");
+      const el = candidate?.el;
+      const url = _absGuessUrl(candidate?.url || el?.getAttribute?.("href") || "");
       const label = String(candidate?.label || "").slice(0, 60);
       if (!url) {
         showStatus("❌ That guess has no URL — use Step 1 and pick the link yourself.", "error");
@@ -5243,6 +5244,31 @@
       }
       const isFile =
         _looksLikeBulletinDownloadUrl(url, label) || /\.pdf(\?|$)/i.test(url);
+      const pageCtx = detectPageType();
+      const isListing =
+        Boolean(el) &&
+        (pageCtx.type === "pdf_links" ||
+          pageCtx.type === "parish_messenger" ||
+          pageCtx.type === "mdocs_bulletin_list" ||
+          (pageCtx.links && pageCtx.links.length > 1));
+
+      if (_inStandaloneMode() && isListing) {
+        const clickStep = _enrichClickStepForWeeklyReplay(
+          {
+            action: "click",
+            selector: buildStableLinkSelector(el),
+            href: url,
+            text: label,
+          },
+          el
+        );
+        standaloneAddStep(
+          clickStep,
+          "click",
+          `🔗 Newest bulletin: "${label || clickStep.selector}"`
+        );
+      }
+
       if (isFile) {
         if (_inStandaloneMode()) {
           standaloneAddStep(
@@ -5255,24 +5281,21 @@
         } else {
           markDownloadUrlSafe(url, showStatus, true);
         }
-        void _copilotSavePin({
-          text: label,
-          href: url,
-          selector: candidate.selector || "",
-        });
-        showStatus(
-          "✅ Guessed link saved — harvest downloads that bulletin. Tap Send & test.",
-          "ok"
-        );
-        resetGuidedPanel();
-        return true;
-      }
-      if (_inStandaloneMode()) {
+      } else if (_inStandaloneMode() && !isListing) {
         standaloneAddStep({ action: "goto", url }, "goto", `Open: ${label || url}`);
         void _persistRecordingSession();
         _notifyRecordingTabActive();
       }
-      showStatus("✅ Saved that page as the start link. Use Step 1 if you still need to pick a file.", "ok");
+
+      void _copilotSavePin({
+        text: label,
+        href: url,
+        selector: candidate.selector || (el ? buildStableLinkSelector(el) : ""),
+      });
+      showStatus(
+        "✅ Guessed link saved — harvest picks the newest matching bulletin each Sunday. Tap Send & test.",
+        "ok"
+      );
       resetGuidedPanel();
       return true;
     };
