@@ -2,15 +2,15 @@
   "generated_at": "2026-08-21",
   "target_date": "2026-08-16",
   "summary": {
-    "downloaded": 83,
+    "downloaded": 84,
     "html_links": 0,
     "skipped": 17,
-    "failed": 24,
+    "failed": 23,
     "stale_rejected": 0
   },
   "action_counts": {
-    "ok": 85,
-    "investigate": 21,
+    "ok": 86,
+    "investigate": 20,
     "skip": 17,
     "retrain": 1
   },
@@ -343,7 +343,7 @@
         "playbook_type": "link_only",
         "status": "inactive",
         "skip": true,
-        "placeholder": true,
+        "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
@@ -358,7 +358,7 @@
       "harvest_status": "skipped",
       "last_error": "",
       "suggested_action": "skip",
-      "suggested_reason": "Facebook bulletin \u2014 cannot automate weekly harvest"
+      "suggested_reason": "Facebook page \u2014 website link only, cannot auto-harvest"
     },
     {
       "parish_key": "ballycastleparish",
@@ -2304,7 +2304,7 @@
         "playbook_type": "link_only",
         "status": "inactive",
         "skip": true,
-        "placeholder": true,
+        "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
@@ -2898,7 +2898,7 @@
         "playbook_type": "link_only",
         "status": "inactive",
         "skip": true,
-        "placeholder": true,
+        "placeholder": false,
         "step_count": 1,
         "click_count": 0,
         "has_terminal": false,
@@ -2913,7 +2913,7 @@
       "harvest_status": "skipped",
       "last_error": "",
       "suggested_action": "skip",
-      "suggested_reason": "Facebook bulletin \u2014 cannot automate weekly harvest"
+      "suggested_reason": "Facebook page \u2014 website link only, cannot auto-harvest"
     },
     {
       "parish_key": "milfordrathmullanparishes",
@@ -2967,7 +2967,7 @@
         "has_terminal": false,
         "operator_notes": [],
         "do_not": [],
-        "recorded_date": "2026-08-21"
+        "recorded_date": "2026-06-26"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -3231,36 +3231,33 @@
       "recipe_file": "parishes/recipes/raphoe/rathmullan.json",
       "recipe": {
         "start_url": "https://milfordrathmullanparishes.ie/bulletins/",
-        "site_type": "http_scrape_newest_pdf",
+        "site_type": "pdf_link_list",
         "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
-        "click_count": 0,
-        "has_terminal": false,
+        "step_count": 2,
+        "click_count": 1,
+        "has_terminal": true,
         "operator_notes": [
-          "Shares https://milfordrathmullanparishes.ie/bulletins/ with Milford.",
-          "This week's PDF is under the Extra/Divi 'This week's bulletin' toggle \u2014 Parish-Newsletter-*.pdf.",
-          "Filenames are yearless and inconsistent (Parish-Newsletter-5th-July.pdf vs Parish-Newsletter-Sunday-9th-August.pdf).",
-          "2026-08-18 FIX: previous recipe had no goto, a pinned Sunday-9th-August selector that Playwright could not see (closed toggle), and a download URL pointing at catholicbishops.ie Order-of-Mass.pdf. site_type:http_scrape_newest_pdf fetches the listing via plain HTTP, keeps only Parish-Newsletter PDFs, and downloads the newest dated file. Never click; never grab Order of Mass."
+          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
+          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+          "Do not worry if the filename or date in the link text changes every week."
         ],
         "do_not": [
-          "Do not use generic a[href$='.pdf'] \u2014 it grabs Order-of-Mass.pdf from the site menu.",
-          "Do not pin a dated filename in the selector \u2014 the parish changes the shape week to week.",
-          "Do not set use_captured_url on a July/August filename \u2014 it freezes the recipe.",
-          "Do not click the Extra toggle \u2014 the PDF href is already in the raw HTML."
+          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
+          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
         ],
-        "recorded_date": "2026-08-18"
+        "recorded_date": "2026-08-21"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP-scrape listing https://milfordrathmullanparishes.ie/bulletins/ \u2014 no dated bulletin PDF matching ['parish-newsletter'] (not a selector problem; parish may not have posted)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP-scrape listing https://milfordrathmullanparishes.ie/bulletins/ \u2014 no dated bulletin PDF matching ['parish-newsletter'] (not a selector"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "saintannesparish",
@@ -3457,7 +3454,7 @@
         "has_terminal": false,
         "operator_notes": [],
         "do_not": [],
-        "recorded_date": "2026-08-21"
+        "recorded_date": "2026-06-26"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
