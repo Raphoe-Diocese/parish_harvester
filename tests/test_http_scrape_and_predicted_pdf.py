@@ -22,6 +22,9 @@ from harvester.replay import (
     _wordpress_posts_api_urls,
 )
 from harvester.utils import (
+    churchmedia_channel_about_url,
+    churchmedia_newsletter_url_from_about,
+    churchmedia_slug_from_url,
     dropfiles_task_download_url,
     extract_mcn_church_id,
     looks_like_permanent_bulletin_url,
@@ -356,6 +359,75 @@ class McnNewsletterHelperTests(unittest.TestCase):
             str(mcn_newsletter_url_from_profile(payload)).endswith(".pdf")
         )
         self.assertIsNone(mcn_newsletter_url_from_profile({"newsletter": {}}))
+
+
+class ChurchmediaNewsletterHelperTests(unittest.TestCase):
+    LISTING = "https://churchmedia.tv/st-patricks-church-2"
+
+    def test_slug_from_listing_not_newsletter_path(self) -> None:
+        self.assertEqual(
+            churchmedia_slug_from_url(self.LISTING),
+            "st-patricks-church-2",
+        )
+        self.assertIsNone(
+            churchmedia_slug_from_url(
+                "https://churchmedia.tv/newsletter/s22osz.st-patricks-church-2.pdf?cb=1787226064"
+            )
+        )
+        self.assertIsNone(
+            churchmedia_slug_from_url(
+                "https://churchmedia.tv/api/getChannelAbout?slug=st-patricks-church-2"
+            )
+        )
+
+    def test_about_url_and_strips_cache_buster(self) -> None:
+        self.assertEqual(
+            churchmedia_channel_about_url("st-patricks-church-2"),
+            "https://churchmedia.tv/api/getChannelAbout?slug=st-patricks-church-2",
+        )
+        payload = {
+            "status": "Success",
+            "data": {
+                "newsletter_enable": 1,
+                "newsletter_url": (
+                    "https://churchmedia.tv/newsletter/"
+                    "s22osz.st-patricks-church-2.pdf?cb=1787226064"
+                ),
+            },
+        }
+        out = churchmedia_newsletter_url_from_about(payload)
+        self.assertEqual(
+            out,
+            "https://churchmedia.tv/newsletter/s22osz.st-patricks-church-2.pdf",
+        )
+        self.assertNotIn("cb=", out or "")
+        self.assertIsNone(churchmedia_newsletter_url_from_about({"data": {}}))
+        self.assertIsNone(
+            churchmedia_newsletter_url_from_about(
+                {"data": {"newsletter_url": "https://churchmedia.tv/st-patricks-church-2"}}
+            )
+        )
+
+    def test_portaferry_recipe_does_not_pin_cache_token(self) -> None:
+        recipe_path = (
+            Path(__file__).resolve().parent.parent
+            / "parishes"
+            / "recipes"
+            / "down_and_connor"
+            / "portaferryparish.json"
+        )
+        raw = recipe_path.read_text(encoding="utf-8")
+        recipe = json.loads(raw)
+        self.assertEqual(recipe["site_type"], "churchmedia_newsletter")
+        self.assertEqual(recipe["churchmedia_slug"], "st-patricks-church-2")
+        self.assertEqual(recipe["start_url"], self.LISTING)
+        self.assertNotIn("cb=", raw)
+        self.assertNotIn("ovt7qm", raw)
+        self.assertNotRegex(raw, r"/newsletter/[A-Za-z0-9]+\.st-patricks")
+        click = recipe["steps"][0]
+        self.assertEqual(click["text"], "View Our Latest Newsletter")
+        self.assertIn("st-patricks-church-2.pdf", click["selector"])
+        self.assertNotIn("cb=", click["selector"])
 
 
 class StTeresasPredictedPostTests(unittest.TestCase):

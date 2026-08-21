@@ -46,6 +46,9 @@ from .utils import (
     dropfiles_task_download_url,
     extract_date_from_slug,
     extract_date_from_string,
+    churchmedia_channel_about_url,
+    churchmedia_newsletter_url_from_about,
+    churchmedia_slug_from_url,
     extract_mcn_church_id,
     extract_newsletter_number,
     looks_like_permanent_bulletin_url,
@@ -537,6 +540,13 @@ async def _wait_for_bulletin_content(page: Page, recipe: dict, timeout_ms: int) 
                 "a[href*='.pdf']",
                 "a[href*='bulletin']",
                 "a[href*='download']",
+            ]
+        )
+    if "churchmedia" in playbook:
+        probes.extend(
+            [
+                "a[href*='/newsletter/'][href*='.pdf']",
+                "a[href*='churchmedia.tv/newsletter/']",
             ]
         )
     if not probes:
@@ -1032,6 +1042,63 @@ async def _try_mcn_live_newsletter(start_url: str, dest: Path) -> tuple[str, str
     if not newsletter_url:
         return None
     return await _try_http_document_url(newsletter_url, dest)
+
+
+def _churchmedia_fetch_newsletter_url(listing_url: str, slug: str = "") -> str | None:
+    """Plain-HTTP: listing slug → getChannelAbout → newsletter_url (no ?cb=)."""
+    token = (slug or "").strip() or (churchmedia_slug_from_url(listing_url) or "")
+    if not token:
+        return None
+    api = churchmedia_channel_about_url(token)
+    headers = {
+        "User-Agent": (
+            "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
+            "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
+        ),
+        "Accept": "application/json",
+    }
+    try:
+        request = Request(api, headers=headers)
+        with urlopen(request, timeout=20) as response:
+            payload = json.loads(response.read().decode("utf-8", "ignore") or "{}")
+    except Exception:
+        return None
+    return churchmedia_newsletter_url_from_about(
+        payload if isinstance(payload, dict) else None
+    )
+
+
+async def _try_churchmedia_newsletter(
+    start_url: str,
+    dest: Path,
+    recipe: dict | None = None,
+) -> tuple[str, str] | None:
+    """HTTP-first: current churchmedia newsletter, then optional fallback PDFs."""
+    slug = ""
+    fallbacks: list[str] = []
+    if isinstance(recipe, dict):
+        slug = str(recipe.get("churchmedia_slug") or "").strip()
+        raw_fallbacks = recipe.get("fallback_document_urls") or []
+        if isinstance(raw_fallbacks, list):
+            fallbacks = [
+                str(item).strip()
+                for item in raw_fallbacks
+                if isinstance(item, str) and str(item).strip()
+            ]
+    newsletter_url = await asyncio.to_thread(
+        _churchmedia_fetch_newsletter_url, start_url, slug
+    )
+    candidates: list[str] = []
+    if newsletter_url:
+        candidates.append(newsletter_url)
+    for extra in fallbacks:
+        if extra not in candidates:
+            candidates.append(extra)
+    for url in candidates:
+        found = await _try_http_document_url(url, dest)
+        if found:
+            return found
+    return None
 
 
 def _extract_dropfiles_candidates_from_html(html: str, base_url: str) -> list[tuple[int, str]]:
@@ -2857,7 +2924,7 @@ def _next_step_skips_pdf_probe(steps: list, index: int, recipe: dict | None = No
             if is_cloud_folder_click_step(step):
                 return True
             playbook = str((recipe or {}).get("playbook_type") or (recipe or {}).get("site_type") or "")
-            if any(tag in playbook.lower() for tag in ("pdfemb", "mdocs", "wp_block", "permanent_bulletin", "mcn_live", "mcn_pdf")):
+            if any(tag in playbook.lower() for tag in ("pdfemb", "mdocs", "wp_block", "permanent_bulletin", "mcn_live", "mcn_pdf", "churchmedia")):
                 return False
             selector = str(step.get("selector") or "")
             return not _PDF_LIKE_SELECTOR_RE.search(selector)
@@ -3273,6 +3340,17 @@ async def replay_recipe(
         "/camera/" in start_url.lower() and "mcn.live" in start_url.lower()
     ):
         found = await _try_mcn_live_newsletter(start_url, dest)
+        if found:
+            return dest, found[1], found[0]
+
+    # churchmedia.tv livestream pages expose "View Our Latest Newsletter"
+    # only after Angular hydrates. GET /api/getChannelAbout?slug=… returns
+    # the current PDF; the path token and ?cb= change every upload.
+    if site_type == "churchmedia_newsletter" or (
+        "churchmedia.tv" in start_url.lower()
+        and "/newsletter/" not in start_url.lower()
+    ):
+        found = await _try_churchmedia_newsletter(start_url, dest, recipe)
         if found:
             return dest, found[1], found[0]
 
