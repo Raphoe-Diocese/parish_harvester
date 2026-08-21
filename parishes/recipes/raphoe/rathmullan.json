@@ -1,31 +1,28 @@
 {
-  "version": 2,
+  "version": 1,
   "parish_key": "rathmullan",
   "display_name": "Rathmullan",
   "diocese": "raphoe",
   "start_url": "https://milfordrathmullanparishes.ie/bulletins/",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://milfordrathmullanparishes.ie/bulletins/"
+      "action": "download",
+      "url": "https://www.catholicbishops.ie/wp-content/uploads/2011/02/Order-of-Mass.pdf"
     }
   ],
-  "site_type": "http_scrape_newest_pdf",
-  "href_patterns": ["parish-newsletter"],
-  "timeout_ms": 45000,
-  "total_timeout_s": 180,
+  "observed_load_ms": 1464,
+  "timeout_ms": 55000,
+  "total_timeout_s": 190,
   "playbook_type": "pdf_download_list",
-  "recorded_date": "2026-08-18",
+  "site_type": "pdf_link_list",
   "operator_notes": [
-    "Shares https://milfordrathmullanparishes.ie/bulletins/ with Milford.",
-    "This week's PDF is under the Extra/Divi 'This week's bulletin' toggle — Parish-Newsletter-*.pdf.",
-    "Filenames are yearless and inconsistent (Parish-Newsletter-5th-July.pdf vs Parish-Newsletter-Sunday-9th-August.pdf).",
-    "2026-08-18 FIX: previous recipe had no goto, a pinned Sunday-9th-August selector that Playwright could not see (closed toggle), and a download URL pointing at catholicbishops.ie Order-of-Mass.pdf. site_type:http_scrape_newest_pdf fetches the listing via plain HTTP, keeps only Parish-Newsletter PDFs, and downloads the newest dated file. Never click; never grab Order of Mass."
+    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
+    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+    "Do not worry if the filename or date in the link text changes every week."
   ],
   "do_not": [
-    "Do not use generic a[href$='.pdf'] — it grabs Order-of-Mass.pdf from the site menu.",
-    "Do not pin a dated filename in the selector — the parish changes the shape week to week.",
-    "Do not set use_captured_url on a July/August filename — it freezes the recipe.",
-    "Do not click the Extra toggle — the PDF href is already in the raw HTML."
-  ]
+    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
+    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+  ],
+  "recorded_date": "2026-08-21"
 }
