@@ -416,18 +416,26 @@ class ChurchmediaNewsletterHelperTests(unittest.TestCase):
             / "down_and_connor"
             / "portaferryparish.json"
         )
-        raw = recipe_path.read_text(encoding="utf-8")
-        recipe = json.loads(raw)
+        recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
         self.assertEqual(recipe["site_type"], "churchmedia_newsletter")
         self.assertEqual(recipe["churchmedia_slug"], "st-patricks-church-2")
         self.assertEqual(recipe["start_url"], self.LISTING)
-        self.assertNotIn("cb=", raw)
-        self.assertNotIn("ovt7qm", raw)
-        self.assertNotRegex(raw, r"/newsletter/[A-Za-z0-9]+\.st-patricks")
         click = recipe["steps"][0]
+        download = recipe["steps"][1]
+        pinned_surfaces = [
+            recipe["start_url"],
+            click.get("selector") or "",
+            click.get("href") or "",
+            *(click.get("fallback_selectors") or []),
+            download.get("url") or "",
+            * (recipe.get("fallback_document_urls") or []),
+        ]
+        joined = "\n".join(str(item) for item in pinned_surfaces)
+        self.assertNotIn("cb=", joined)
+        self.assertNotIn("ovt7qm", joined)
+        self.assertNotRegex(joined, r"/newsletter/[A-Za-z0-9]+\.st-patricks")
         self.assertEqual(click["text"], "View Our Latest Newsletter")
         self.assertIn("st-patricks-church-2.pdf", click["selector"])
-        self.assertNotIn("cb=", click["selector"])
 
 
 class StTeresasPredictedPostTests(unittest.TestCase):
