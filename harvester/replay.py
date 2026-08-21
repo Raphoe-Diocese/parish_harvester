@@ -355,7 +355,7 @@ def _url_matches_pattern(url: str, pattern: str) -> bool:
     if fnmatch.fnmatch(lower, pat):
         return True
     if pat == "*.pdf":
-        return ".pdf" in lower
+        return ".pdf" in lower or "mdocs-file=" in lower
     if pat == "*.docx":
         return ".docx" in lower
     return False
@@ -485,10 +485,25 @@ def _recipe_navigation_wait_until(recipe: dict) -> str:
     return "domcontentloaded"
 
 
+_MDOCS_FILE_ID_RE = re.compile(r"[?&]mdocs-file=(\d+)", re.I)
+_MDOCS_TABLE_ROW_RE = re.compile(r"<tr\b[^>]*>.*?</tr>", re.I | re.S)
+_MDOCS_DOWNLOAD_HREF_RE = re.compile(
+    r"""(?:href|data-download)=["']([^"']*mdocs-file=\d+[^"']*)["']""",
+    re.I,
+)
+
+
+def _mdocs_file_id(url: str) -> int:
+    match = _MDOCS_FILE_ID_RE.search(url or "")
+    return int(match.group(1)) if match else 0
+
+
 async def _find_mdocs_pdf_urls(page: Page) -> list[str]:
     """mDocs plugin lists — latest bulletin is first row (site copy)."""
     raw_links = await page.eval_on_selector_all(
-        "table.mdocs a[href], a.mdocs-download[href], .mdocs a[href], .mdocs-file a[href]",
+        "table.mdocs a[href], table#mdocs-list-table a[href], "
+        "a.mdocs-download[href], a[href*='mdocs-file'], "
+        ".mdocs a[href], .mdocs-file a[href]",
         "(els) => els.map(el => el.getAttribute('href') || '').filter(Boolean)",
     )
     seen: set[str] = set()
@@ -498,7 +513,7 @@ async def _find_mdocs_pdf_urls(page: Page) -> list[str]:
             continue
         resolved = urljoin(page.url, raw.strip())
         lower = resolved.lower()
-        if ".pdf" not in lower:
+        if ".pdf" not in lower and "mdocs-file=" not in lower:
             continue
         if _is_non_bulletin_url(resolved):
             continue
@@ -507,7 +522,11 @@ async def _find_mdocs_pdf_urls(page: Page) -> list[str]:
         seen.add(resolved)
         candidates.append(resolved)
     candidates.sort(
-        key=lambda u: (_score_bulletin_url(u)[0], _score_bulletin_url(u)[1]),
+        key=lambda u: (
+            _score_bulletin_url(u)[0],
+            _score_bulletin_url(u)[1],
+            _mdocs_file_id(u),
+        ),
         reverse=True,
     )
     return candidates
@@ -530,7 +549,15 @@ async def _wait_for_bulletin_content(page: Page, recipe: dict, timeout_ms: int) 
             ]
         )
     if "mdocs" in playbook:
-        probes.extend(["table.mdocs", "a.mdocs-download", ".mdocs a[href]"])
+        probes.extend(
+            [
+                "table.mdocs",
+                "table#mdocs-list-table",
+                "a.mdocs-download",
+                "a[href*='mdocs-file']",
+                ".mdocs a[href]",
+            ]
+        )
     if "wp_block" in playbook or "permanent_bulletin" in playbook:
         probes.extend(["object.wp-block-file__embed", ".wp-block-file a[href$='.pdf']"])
     if "mcn_live" in playbook or "mcn_pdf" in playbook:
@@ -1096,6 +1123,108 @@ async def _try_churchmedia_newsletter(
             candidates.append(extra)
     for url in candidates:
         found = await _try_http_document_url(url, dest)
+        if found:
+            return found
+    return None
+
+
+def _extract_mdocs_dated_downloads(
+    html: str,
+    base_url: str,
+    *,
+    year_hint: int,
+) -> list[tuple[date, str]]:
+    """Pair each mDocs ?mdocs-file= download with the date on its table row."""
+    from .bulletin_freshness import extract_bulletin_date
+
+    scored: list[tuple[date, str]] = []
+    seen: set[str] = set()
+    for row in _MDOCS_TABLE_ROW_RE.findall(html or ""):
+        href_match = _MDOCS_DOWNLOAD_HREF_RE.search(row)
+        if not href_match:
+            continue
+        url = urljoin(base_url, href_match.group(1).strip())
+        if not url or url in seen or _is_non_bulletin_url(url):
+            continue
+        text = unquote(re.sub(r"<[^>]+>", " ", row))
+        found = (
+            extract_date_from_string(text)
+            or extract_bulletin_date(text)
+            or yearless_slug_date(text, year_hint)
+        )
+        if found is None:
+            continue
+        seen.add(url)
+        scored.append((found, url))
+    return scored
+
+
+def _pick_newest_mdocs_download(
+    scored: list[tuple[date, str]],
+    target_date: date,
+) -> str | None:
+    """Newest dated mDocs file, allowing next-Sunday posts within the scrape window."""
+    ahead = target_date + timedelta(days=_HTTP_SCRAPE_AHEAD_DAYS)
+    eligible = [(found, url) for found, url in scored if found <= ahead]
+    if not eligible:
+        return None
+    found, url = max(eligible, key=lambda item: (item[0], _mdocs_file_id(item[1])))
+    return url
+
+
+def _mdocs_listing_url_candidates(listing_url: str) -> list[str]:
+    """Try the recorded listing, then the opposite HTTP/HTTPS scheme."""
+    url = (listing_url or "").strip()
+    if not url:
+        return []
+    out = [url]
+    parsed = urlparse(url)
+    if parsed.scheme == "https":
+        out.append("http://" + url[len("https://") :])
+    elif parsed.scheme == "http":
+        out.append("https://" + url[len("http://") :])
+    seen: set[str] = set()
+    unique: list[str] = []
+    for item in out:
+        if item not in seen:
+            seen.add(item)
+            unique.append(item)
+    return unique
+
+
+async def _try_http_scrape_mdocs(
+    listing_url: str,
+    dest: Path,
+    target_date: date,
+) -> tuple[str, str] | None:
+    """Fetch the mDocs listing via plain HTTP and download the newest dated PDF.
+
+    Portstewart (and other Memphis Documents tables) server-render
+    ``?mdocs-file=NNNN`` download links. Those URLs have no ``.pdf`` suffix, so
+    the generic HTTP-scrape helper misses them, and a Playwright click on the
+    title dropdown (``href="#"``) never captures a file.
+    """
+    for url in _mdocs_listing_url_candidates(listing_url):
+        listing_result = await asyncio.to_thread(
+            _fetch_bytes_with_retries,
+            url,
+            max_attempts=_DROPFILES_HTTP_ATTEMPTS,
+            per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
+            total_budget_s=_DROPFILES_HTTP_LISTING_BUDGET_S,
+        )
+        if not listing_result:
+            continue
+        listing_body, listing_headers = listing_result
+        if "text/html" not in (listing_headers.get("content-type") or "").lower():
+            continue
+        listing_html = listing_body.decode("utf-8", errors="ignore")
+        scored = _extract_mdocs_dated_downloads(
+            listing_html, url, year_hint=target_date.year
+        )
+        pdf_url = _pick_newest_mdocs_download(scored, target_date)
+        if not pdf_url:
+            continue
+        found = await _try_http_document_url(pdf_url, dest)
         if found:
             return found
     return None
@@ -3351,6 +3480,15 @@ async def replay_recipe(
         and "/newsletter/" not in start_url.lower()
     ):
         found = await _try_churchmedia_newsletter(start_url, dest, recipe)
+        if found:
+            return dest, found[1], found[0]
+
+    # mDocs tables (Portstewart): listing HTML is server-rendered with
+    # ?mdocs-file=NNNN download links. HTTP-scrape the newest dated row so
+    # we never pin "23rd August 2026" or click the title dropdown (href="#").
+    playbook = str(recipe.get("playbook_type") or "").strip().lower()
+    if target_date is not None and ("mdocs" in site_type or "mdocs" in playbook):
+        found = await _try_http_scrape_mdocs(start_url, dest, target_date)
         if found:
             return dest, found[1], found[0]
 
