@@ -56,7 +56,13 @@ from .browser_launch import (
     looks_like_bot_block,
     new_harvester_context,
 )
-from .bulletin_freshness import check_bulletin_freshness, mark_result_stale, suggest_retry_strategy
+from .bulletin_freshness import (
+    check_bulletin_freshness,
+    extract_bulletin_date_from_text,
+    mark_result_stale,
+    suggest_retry_strategy,
+    verdict_for_extracted_date,
+)
 from .cloud_urls import normalize_document_url
 from .cloud_folders import (
     cloud_folder_date_tokens,
@@ -436,6 +442,78 @@ def _is_real_pdf(
         )
         return False
     return True
+
+
+def extract_pdf_bulletin_date(path: Path) -> date | None:
+    """Read a bulletin heading date from the first pages of a PDF."""
+    try:
+        reader = PdfReader(str(path))
+    except Exception:
+        return None
+    chunks: list[str] = []
+    for page in reader.pages[:4]:
+        chunks.append(page.extract_text() or "")
+    return extract_bulletin_date_from_text("\n".join(chunks))
+
+
+def classify_page_capped_pdf(
+    dest: Path,
+    *,
+    key: str,
+    display_name: str,
+    url: str,
+    target: date,
+    entry: ParishEntry,
+    max_pages: int,
+) -> FetchResult | None:
+    """If *dest* is a real PDF rejected only for page count, return stale or an honest fail.
+
+    Holy Cross Belfast (and similar) serve a genuine PDF that is still last
+    month's bulletin padded to 13 pages. ``_is_real_pdf`` then returns False
+    and harvest used to report the default "No valid content found" — which
+    looks like an empty download. A dated filename such as ``160826.pdf``
+    would also pass URL freshness, so we must not raise the page cap.
+    """
+    if not dest.exists() or not is_valid_pdf(dest):
+        return None
+    try:
+        size = dest.stat().st_size
+    except OSError:
+        return None
+    if size < MIN_PDF_BYTES:
+        return None
+    try:
+        page_count = len(PdfReader(str(dest)).pages)
+    except Exception:
+        return None
+    if page_count <= max_pages:
+        return None
+
+    body_date = extract_pdf_bulletin_date(dest)
+    if body_date is not None:
+        verdict = verdict_for_extracted_date(body_date, target)
+        if verdict.status == "stale":
+            print(
+                f"  {key}: downloaded PDF body date is still "
+                f"{body_date.isoformat()}, not this week"
+            )
+            result = FetchResult(
+                key=key,
+                display_name=display_name,
+                status="ok",
+                url=url,
+                file_path=dest,
+                file_type="pdf",
+            )
+            return mark_result_stale(result, verdict, entry=entry)
+
+    return FetchResult(
+        key=key,
+        display_name=display_name,
+        status="error",
+        url=url,
+        error=f"Too many pages: {page_count} pages (max {max_pages})",
+    )
 
 
 def _rewrite_gdrive_url(url: str) -> str:
@@ -2094,6 +2172,18 @@ async def _fetch_entry(
                         file_path=replayed_path,
                         file_type=replay_file_type,
                     )
+            else:
+                classified = classify_page_capped_pdf(
+                    dest if dest.exists() else replayed_path,
+                    key=key,
+                    display_name=entry.display_name,
+                    url=replay_url or _failure_report_url(entry, recipe_meta, target),
+                    target=target,
+                    entry=entry,
+                    max_pages=recipe_page_limit,
+                )
+                if classified is not None:
+                    return classified
         except RecipeReplayError as exc:
             msg = str(exc)
             if "Recipe outdated" in msg:
@@ -2433,7 +2523,7 @@ async def fetch_parish(
                         url=result.url,
                         error="HTML page could not be captured as PDF",
                     )
-            if result.status in ("ok", "html_link"):
+            if result.status in ("ok", "html_link") or result.is_stale:
                 return result
             last_error = result.error
         except TimeoutError:

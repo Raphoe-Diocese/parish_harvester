@@ -13,8 +13,12 @@ from pathlib import Path
 
 from reportlab.pdfgen import canvas
 
+from datetime import date
+
 from harvester.fetcher import (
     HTML_RENDER_MIN_BYTES,
+    ParishEntry,
+    classify_page_capped_pdf,
     _is_real_pdf,
     _reject_if_oversized,
     recipe_max_bulletin_pages,
@@ -80,6 +84,88 @@ class IsRealPdfTests(unittest.TestCase):
             self.assertEqual(MAX_BULLETIN_PAGES, 4)
             self.assertFalse(_is_real_pdf(pdf))  # global default still rejects
             self.assertTrue(_is_real_pdf(pdf, max_pages=12))  # Ardmore-style override
+
+
+class ClassifyPageCappedPdfTests(unittest.TestCase):
+    def _entry(self) -> ParishEntry:
+        return ParishEntry(
+            key="holycrossparishbelfast",
+            display_name="Holy Cross Belfast",
+            pattern="learned",
+            content_type="pdf",
+            example_url="http://www.holycrossparishbelfast.com/pdf/160826.pdf",
+            bulletin_page="http://www.holycrossparishbelfast.com/parishnews.html",
+        )
+
+    def _long_pdf(self, path: Path, heading: str, pages: int = 6) -> None:
+        c = canvas.Canvas(str(path))
+        c.drawString(72, 700, "Recent Anniversaries : Marie Lavery")
+        c.showPage()
+        c.drawString(72, 700, heading)
+        c.drawString(72, 680, "Caoimhin died on 9th July 2023.")
+        c.showPage()
+        for _ in range(pages - 2):
+            c.drawString(72, 700, "filler page")
+            c.showPage()
+        c.save()
+        with path.open("ab") as fh:
+            fh.write(b"\n% " + b"0" * MIN_PDF_BYTES)
+
+    def test_july_body_under_august_filename_is_stale_not_empty(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "160826.pdf"
+            self._long_pdf(pdf, "Bulletin 11th & 12th July 2026")
+            self.assertFalse(_is_real_pdf(pdf))
+            result = classify_page_capped_pdf(
+                pdf,
+                key="holycrossparishbelfast",
+                display_name="Holy Cross Belfast",
+                url="http://www.holycrossparishbelfast.com/pdf/160826.pdf",
+                target=date(2026, 8, 16),
+                entry=self._entry(),
+                max_pages=4,
+            )
+            self.assertIsNotNone(result)
+            assert result is not None
+            self.assertTrue(result.is_stale)
+            self.assertIn("Stale bulletin rejected", result.error)
+            self.assertIn("2026-07-12", result.error)
+            self.assertNotIn("No valid content found", result.error)
+            self.assertNotEqual(result.status, "ok")
+
+    def test_current_week_oversized_pdf_is_honest_fail_not_ok(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "160826.pdf"
+            self._long_pdf(pdf, "Bulletin 16th August 2026")
+            result = classify_page_capped_pdf(
+                pdf,
+                key="holycrossparishbelfast",
+                display_name="Holy Cross Belfast",
+                url="http://www.holycrossparishbelfast.com/pdf/160826.pdf",
+                target=date(2026, 8, 16),
+                entry=self._entry(),
+                max_pages=4,
+            )
+            self.assertIsNotNone(result)
+            assert result is not None
+            self.assertFalse(result.is_stale)
+            self.assertIn("Too many pages", result.error)
+            self.assertNotEqual(result.status, "ok")
+
+    def test_missing_file_returns_none(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            missing = Path(tmp) / "gone.pdf"
+            self.assertIsNone(
+                classify_page_capped_pdf(
+                    missing,
+                    key="holycrossparishbelfast",
+                    display_name="Holy Cross Belfast",
+                    url="http://www.holycrossparishbelfast.com/pdf/160826.pdf",
+                    target=date(2026, 8, 16),
+                    entry=self._entry(),
+                    max_pages=4,
+                )
+            )
 
 
 class RecipeMaxBulletinPagesTests(unittest.TestCase):

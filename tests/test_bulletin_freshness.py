@@ -11,8 +11,10 @@ from harvester.bulletin_freshness import (
     apply_freshness_safety_net,
     check_bulletin_freshness,
     extract_bulletin_date,
+    extract_bulletin_date_from_text,
     mark_result_stale,
     suggest_retry_strategy,
+    verdict_for_extracted_date,
     week_window,
 )
 from harvester.fetcher import FetchResult, ParishEntry
@@ -53,6 +55,24 @@ class BulletinFreshnessTests(unittest.TestCase):
         old = (target - timedelta(days=20)).strftime("%d%m%y")
         verdict = check_bulletin_freshness(f"https://example.com/bulletin_{old}.pdf", target)
         self.assertEqual(verdict.status, "stale")
+
+    def test_pdf_heading_date_ignores_memorial_dates(self) -> None:
+        text = (
+            "Recent Anniversaries : Marie Lavery\n"
+            "Bulletin 11th & 12th July 2026\n"
+            "Caoimhin was just eight years old when he died on 9th July 2023.\n"
+        )
+        self.assertEqual(extract_bulletin_date_from_text(text), date(2026, 7, 12))
+        self.assertIsNone(
+            extract_bulletin_date_from_text(
+                "Caoimhin was just eight years old when he died on 9th July 2023."
+            )
+        )
+
+    def test_body_july_date_is_stale_against_august_sunday(self) -> None:
+        verdict = verdict_for_extracted_date(date(2026, 7, 12), date(2026, 8, 16))
+        self.assertEqual(verdict.status, "stale")
+        self.assertEqual(verdict.extracted_date, date(2026, 7, 12))
 
     def test_unknown_date_is_not_auto_rejected(self) -> None:
         target = date(2026, 6, 14)

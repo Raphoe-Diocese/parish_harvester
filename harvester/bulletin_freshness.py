@@ -253,6 +253,56 @@ def _safe_parse_ddmmyy(day_s: str, month_s: str, year_s: str) -> date | None:
         return None
 
 
+_BULLETIN_HEADING_RE = re.compile(
+    r"(?i)\b(?:parish\s+)?(?:bulletin|newsletter|parish\s+news)\b"
+)
+
+
+def extract_bulletin_date_from_text(text: str) -> date | None:
+    """Parse a date from bulletin/newsletter heading lines in PDF text.
+
+    Ignores incidental dates in body copy (memorials, anniversary lists).
+    Used when a parish republishes an old file under a fresh-looking filename
+    (Holy Cross Belfast: ``160826.pdf`` still headed 11th & 12th July 2026).
+    """
+    for line in (text or "").splitlines():
+        if not _BULLETIN_HEADING_RE.search(line):
+            continue
+        parsed = extract_date_from_string(line)
+        if parsed:
+            return parsed
+    return None
+
+
+def verdict_for_extracted_date(extracted: date, target: date) -> FreshnessVerdict:
+    """Compare an already-parsed bulletin date with the harvest Sunday."""
+    week_start, week_end = week_window(target)
+    if week_start <= extracted <= week_end:
+        return FreshnessVerdict(
+            status="fresh",
+            extracted_date=extracted,
+            reason="in_bulletin_week",
+            days_from_target=(extracted - target).days,
+        )
+
+    days_from_target = (extracted - target).days
+    if abs(days_from_target) <= MAX_STALE_DAYS_FROM_TARGET:
+        return FreshnessVerdict(
+            status="fresh",
+            extracted_date=extracted,
+            reason="within_grace_days",
+            days_from_target=days_from_target,
+        )
+
+    direction = "ahead" if days_from_target > 0 else "behind"
+    return FreshnessVerdict(
+        status="stale",
+        extracted_date=extracted,
+        reason=f"date_{direction}_of_target",
+        days_from_target=days_from_target,
+    )
+
+
 def check_bulletin_freshness(url: str, target: date) -> FreshnessVerdict:
     """
     Decide whether *url* points at the current harvest week's bulletin.
@@ -291,32 +341,7 @@ def check_bulletin_freshness(url: str, target: date) -> FreshnessVerdict:
             days_from_target=0,
         )
 
-    week_start, week_end = week_window(target)
-    if week_start <= extracted <= week_end:
-        return FreshnessVerdict(
-            status="fresh",
-            extracted_date=extracted,
-            reason="in_bulletin_week",
-            days_from_target=(extracted - target).days,
-        )
-
-    days_from_target = (extracted - target).days
-    days_old = abs(days_from_target)
-    if days_old <= MAX_STALE_DAYS_FROM_TARGET:
-        return FreshnessVerdict(
-            status="fresh",
-            extracted_date=extracted,
-            reason="within_grace_days",
-            days_from_target=days_from_target,
-        )
-
-    direction = "ahead" if days_from_target > 0 else "behind"
-    return FreshnessVerdict(
-        status="stale",
-        extracted_date=extracted,
-        reason=f"date_{direction}_of_target",
-        days_from_target=days_from_target,
-    )
+    return verdict_for_extracted_date(extracted, target)
 
 
 def suggest_retry_strategy(
