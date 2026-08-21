@@ -1271,6 +1271,13 @@ def _extract_matching_hrefs(html: str, base_url: str, keyword_patterns: list[str
     return out
 
 
+# Harvest Sunday is last Sunday Mon–Sat. Parishes sometimes post next
+# Sunday's file on Thursday/Friday (milfordrathmullanparishes 2026-08-21:
+# the listing only had Parish-Newsletter-Sunday-23rd-August.pdf). A +3
+# cutoff rejected that as "too new" and reported a false miss.
+_HTTP_SCRAPE_AHEAD_DAYS = 7
+
+
 def _score_http_scrape_pdf_hrefs(
     hrefs: list[str],
     target_date: date,
@@ -1278,12 +1285,13 @@ def _score_http_scrape_pdf_hrefs(
     """Rank listing-page PDF hrefs by extracted bulletin date.
 
     Drops non-bulletin URLs (Order of Mass, GDPR, …) and anything dated
-    more than 3 days after the harvest Sunday. Yearless slugs such as
+    more than a week after the harvest Sunday. Yearless slugs such as
     Parish-Newsletter-Sunday-9th-August.pdf are dated with the harvest year.
     """
     from .bulletin_freshness import extract_bulletin_date
 
     scored: list[tuple[date, str]] = []
+    ahead = target_date + timedelta(days=_HTTP_SCRAPE_AHEAD_DAYS)
     for href in hrefs:
         if _is_non_bulletin_url(href):
             continue
@@ -1301,7 +1309,7 @@ def _score_http_scrape_pdf_hrefs(
             or extract_bulletin_date(href)
             or yearless_slug_date(href, target_date.year, near=target_date)
         )
-        if found and found <= target_date + timedelta(days=3):
+        if found and found <= ahead:
             scored.append((found, href))
     return scored
 
