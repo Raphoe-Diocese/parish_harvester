@@ -1,15 +1,30 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "portstewartparish",
   "display_name": "Portstewart",
   "diocese": "down_and_connor",
-  "start_url": "http://portstewartparish.website/weekly-bulletin/",
+  "start_url": "https://portstewartparish.website/weekly-bulletin/",
+  "site_type": "mdocs_bulletin_list",
+  "playbook_type": "mdocs_download_list",
+  "recorded_date": "2026-08-21",
+  "timeout_ms": 180000,
+  "total_timeout_s": 600,
+  "navigation_wait_until": "commit",
   "steps": [
     {
+      "action": "goto",
+      "url": "https://portstewartparish.website/weekly-bulletin/"
+    },
+    {
       "action": "click",
-      "selector": "table#mdocs-list-table > tbody > tr:nth-of-type(1) > td:nth-of-type(1) > div > a",
-      "href": "#",
-      "text": "23rd August 2026 - 23 August 2026.pdf | 23rd August 2026 - 2"
+      "selector": "table#mdocs-list-table tbody tr:first-child td.mdocs-download a[href*='mdocs-file']",
+      "pick_strategy": "first_match",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "a[href*='mdocs-file']",
+        "td.mdocs-download a[href*='mdocs-file']",
+        ".mdocs a[href*='mdocs-file']"
+      ]
     },
     {
       "action": "download",
@@ -17,21 +32,15 @@
       "url_pattern": "*.pdf"
     }
   ],
-  "observed_load_ms": 10345,
-  "timeout_ms": 300000,
-  "total_timeout_s": 900,
-  "navigation_wait_until": "commit",
-  "playbook_type": "mdocs_download_list",
-  "site_type": "mdocs_bulletin_list",
   "operator_notes": [
-    "mDocs WordPress plugin lists dated PDFs — newest row is usually at the top.",
-    "Click Download on this week's row, then capture PDF download (not Save page as PDF).",
-    "Slow sites: use http:// if HTTPS certificate is expired (portstewartparish.website).",
-    "Harvester waits up to 7 minutes for the table on very slow hosts."
+    "mDocs table on /weekly-bulletin/ — newest bulletin is the first row (modified desc).",
+    "Harvest HTTP-scrapes the newest dated ?mdocs-file= row from the listing HTML, then downloads that PDF. Playwright clicks the Download column only if the scrape misses.",
+    "Frank highlighted 23 August 2026.pdf as this week's file — do not pin that title or id; pick the newest row every Sunday.",
+    "HTTPS listing works (Let's Encrypt valid through 22/10/2026). HTTP 301s to HTTPS. Host profile ignores TLS errors if the cert lapses."
   ],
   "do_not": [
-    "Do not use Save page as PDF — bulletins are real PDF files in the mDocs table.",
-    "Do not use https://portstewartparish.website — certificate expired; use http://."
-  ],
-  "recorded_date": "2026-08-21"
+    "Do not pin a dated title, filename, or mdocs-file id (e.g. 23rd August 2026 / ?mdocs-file=9538) — it breaks next week.",
+    "Do not click the title dropdown (href='#') — that is not the PDF. Use the Download column / ?mdocs-file= link.",
+    "Do not use Save page as PDF — bulletins are real PDF files behind mDocs download links."
+  ]
 }
