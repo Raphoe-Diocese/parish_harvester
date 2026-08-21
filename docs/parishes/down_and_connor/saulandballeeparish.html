@@ -143,7 +143,7 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
-      min-height: 0;
+      min-height: 850px;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
@@ -164,6 +164,7 @@
     .pdf-inpage-status { padding: 10px 12px; background: #1f3d3c; color: #d8f0ee; font-size: 0.9rem; }
     .pdf-inpage-pages {
       flex: 1 1 auto;
+      min-height: 850px;
       overflow: auto;
       -webkit-overflow-scrolling: touch;
       background: #525659;
@@ -190,6 +191,7 @@
     .pdf-standalone-shell iframe.pdf-frame,
     body.is-native-pdf iframe.pdf-frame {
       display: none !important;
+      min-height: 850px;
     }
     .pdf-frame-wrap.is-native-pdf,
     .pdf-standalone-shell.is-native-pdf,
@@ -211,6 +213,13 @@
         display: flex;
         flex-direction: column;
         background: #3a3f42;
+      }
+      .pdf-inpage-viewer,
+      .pdf-mobile-fallback,
+      .pdf-inpage-pages,
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        min-height: 450px !important;
       }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
@@ -443,6 +452,9 @@
       border: 1px solid #d4ddd9;
       padding: 22px 24px 32px;
     }
+    .pdf-frame-wrap iframe {
+      min-height: 850px;
+    }
     .note-box {
       margin-top: 12px;
       color: #8a3b3b;
@@ -538,8 +550,11 @@
 
     @media (max-width: 1024px) {
       /* Harvest + OCR both call this generator — keep both panels here.
-         Desktop: 850px. Tablet/phone (max-width 1024px): ~450px. */
+         Desktop: 850px on the VISIBLE boxes. Tablet/phone (max-width 1024px): ~450px. */
       .pdf-frame-wrap,
+      .pdf-frame-wrap iframe,
+      .pdf-inpage-viewer,
+      .pdf-inpage-pages,
       #ocr-panel {
         height: 70vh;
         min-height: 450px;
@@ -626,9 +641,7 @@
           <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
         </div>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Saul and Ballee</h2><p class="ocr-parish-date">21/08/2026</p></header>
-<hr>
-<p>Page 30</p>
+      <div id="ocr-panel"><p class="page-label">Page 30</p>
 <p>Downpatrick Family of Parishes of Saul &amp; Ballee and Kilclief<br>
 Ninet eenth Sunday of Ordinary Time<br>
 Sunday 15th August 2026</p>
@@ -664,10 +677,11 @@ Parish Finance Officer – 8hrs per week, Thurs &amp; Fri 10am to 2pm<br>
 Further details on these jobs are available on the posters displayed in the Churches or from<br>
 <a href="https://www.downandconnor.org" target="_blank" rel="noopener noreferrer">www.downandconnor.org</a> and click on job vacancies<br>
 Closing date for applications for both jobs is 12noon on Thursday 20th August 2026<br>
-All bulletin notices should be with the Parish office by 12noon on Wednesday<br>
-Saul and Ballee</p>
+All bulletin notices should be with the Parish office by 12noon on Wednesday</p>
+<h2 class="ocr-parish-name">Saul and Ballee</h2>
+<p>21/08/2026</p>
 <hr>
-<p>Page 31</p>
+<p class="page-label">Page 31</p>
 <p>Parish of Saul &amp; Ballee<br>
 Months Mind Mass: Gerry McCashin on Saturday 2nd August at 5pm in St Patrick’s, Saul</p>
 <h3 class="b-head">Anniversary Masses</h3>
@@ -704,7 +718,7 @@ St Vincent de Paul Helplines - Are you struggling with the cost of school un ifo
 for help. Strangford Conference helpline number is displayed in the Church or phone Saul<br>
 Conference on <a href="tel:+3537928346114" style="color:#1d4ed8;font-weight:600;">07928346114</a> or <a href="tel:+3537801896229" style="color:#1d4ed8;font-weight:600;">07801896229</a></p>
 <hr>
-<p>Page 32</p>
+<p class="page-label">Page 32</p>
 <p>MATT TALBOT – URBAN MYSTIC<br>
 The Knights of St Columbanus, CK12 Downpatrick , invite you to a special screening of Matt Talbot<br>
 – Urban Mystic at Newcastle Community Cinema, St Mary&#x27;s Hall, Main Street, Newcastle , on Friday<br>
@@ -743,7 +757,7 @@ SAFEGUARDING - If you have a concern, suspicion, or wish to make an allegation o
 adult at risk, please contact the Diocesan Safeguarding Office: Philip O&#x27;Hara, Designated Liaison Person, 120, Cliftonville R oad,<br>
 Belfast BT14 6LA. Mobile: 07534 992124 or Telephone: 028 90 492798. Email: <a href="mailto:philip.ohara@soddc.org" target="_blank" rel="noopener noreferrer">philip.ohara@soddc.org</a> or visit</p>
 <hr>
-<p>Page 33</p>
+<p class="page-label">Page 33</p>
 <p>A Brief history of St Malachy’s Church, Kilclief<br>
 The first Church dedicated to St Malachy was erected<br>
 in 1785 when the Parish Priest was Fr John<br>
@@ -776,7 +790,8 @@ Very Rev Fr Aidan Brankin, Parish Priest 02844 612525 (Saul) or 02844 260101 (St
 Saul Office: 02844 612525 , Office Hours: Mon to Fri 9 .30am to 12noon 10 St Patrick’s Rd, Downpatrick, BT30 7JG<br>
 Kilclief Office: 02844 260101 Office Hours: Monday 1pm to 3pm 8 Shore Rd, Strangford, BT30 7NL<br>
 Website: <a href="https://www.saulandballeeparish.com" target="_blank" rel="noopener noreferrer">www.saulandballeeparish.com</a><br>
-Email: <a href="mailto:saul@downandconnor.org" target="_blank" rel="noopener noreferrer">saul@downandconnor.org</a> <a href="mailto:strangfordandkilclief@downandconnor.org" target="_blank" rel="noopener noreferrer">strangfordandkilclief@downandconnor.org</a></p></div>
+Email: <a href="mailto:saul@downandconnor.org" target="_blank" rel="noopener noreferrer">saul@downandconnor.org</a> <a href="mailto:strangfordandkilclief@downandconnor.org" target="_blank" rel="noopener noreferrer">strangfordandkilclief@downandconnor.org</a></p>
+<hr></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 

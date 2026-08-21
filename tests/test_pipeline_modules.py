@@ -13,7 +13,7 @@ from harvester.site_health import (
     should_mark_inactive,
 )
 from ocr.parish_splitter import split_ocr_by_parish
-from ocr.text_extract import extract_text_pages
+from ocr.text_extract import extract_text_pages, page_is_sparse
 
 
 class TextExtractTests(unittest.TestCase):
@@ -31,6 +31,27 @@ class TextExtractTests(unittest.TestCase):
                 writer.write(fh)
             # Blank page has no text — should return None
             self.assertIsNone(extract_text_pages(path))
+
+    def test_banner_only_page_is_sparse(self) -> None:
+        banner = [
+            "Gortahork",
+            "https://www.parishpress.net/wp-content/uploads/parish-bulletins/donegal/raphoe/gort-a-choirce/bulletin.pdf",
+        ]
+        self.assertTrue(page_is_sparse(banner))
+        self.assertTrue(page_is_sparse([]))
+        self.assertFalse(
+            page_is_sparse(
+                [
+                    "AIFRINN NA SEACHTAINE",
+                    "16ú Lúnasa 2026 Pobal Chríost Rí Gort a' Choirce",
+                    "An tAth. Donnchadh Ó Baoill (086) 603 1749",
+                    "Nora O'Donnell, An Bhealtaine / An Chlochán Liath",
+                    "Eamon Mc Ginley, Inis Bó Finne / An Fál Carrach",
+                    "Sarah Mc Gee, Gaoth Dobhair agus Harry Thompson",
+                    "Tógadh €1,530 an tseachtain s'chuaigh thart. Buíochas don phobal.",
+                ]
+            )
+        )
 
 
 class ParishSplitterTests(unittest.TestCase):

@@ -136,6 +136,10 @@ class OcrBulletinPageTests(unittest.TestCase):
                 html_output,
                 r"\.pdf-frame-wrap\s*\{[^}]*min-height:\s*850px",
             )
+            self.assertRegex(
+                html_output,
+                r"\.pdf-inpage-pages\s*\{[^}]*min-height:\s*850px",
+            )
             # Tablet/phone: shorter balanced panels (not desktop 850px).
             self.assertIn("@media (max-width: 1024px)", html_output)
             self.assertIn("min-height: 450px", html_output)
@@ -230,6 +234,9 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("min-height: 450px", css)
         self.assertIn("overflow: auto", css)
         self.assertIn(".pdf-inpage-viewer", css)
+        self.assertRegex(css, r"\.pdf-inpage-pages\s*\{[^}]*min-height:\s*850px")
+        self.assertIn(".pdf-inpage-viewer", css)
+        self.assertIn(".pdf-inpage-pages", css)
         self.assertNotIn("pdf-inpage-nav", css)
         self.assertEqual(css, pdf_mobile_fallback_css())
 
@@ -269,6 +276,14 @@ class OcrBulletinPageTests(unittest.TestCase):
             html_output,
             r"\.pdf-frame-wrap\s*\{[^}]*min-height:\s*850px",
         )
+        self.assertRegex(
+            html_output,
+            r"\.pdf-inpage-pages\s*\{[^}]*min-height:\s*850px",
+        )
+        self.assertRegex(
+            html_output,
+            r"\.pdf-inpage-viewer,\s*\n\s*\.pdf-mobile-fallback\s*\{[^}]*min-height:\s*850px",
+        )
         self.assertIn("@media (max-width: 1024px)", html_output)
         self.assertIn("min-height: 450px", html_output)
         self.assertNotIn("parish-site-link", html_output)
@@ -302,6 +317,8 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("pdf-annot-link", text)
         self.assertIn('target = "_blank"', text)
         self.assertIn("noopener noreferrer", text)
+        self.assertIn("min-height:850px", text.replace(" ", ""))
+        self.assertIn(".pdf-inpage-pages", text)
         self.assertIn("Open PDF", text)
         self.assertIn("Download", text)
         self.assertNotIn("pdf-inpage-prev", text)
@@ -313,6 +330,21 @@ class OcrBulletinPageTests(unittest.TestCase):
         loader = assets / "pdf-mobile-fallback.js"
         self.assertTrue(loader.is_file())
         self.assertIn("pdf-inpage-viewer.js", loader.read_text(encoding="utf-8"))
+
+    def test_live_gortahork_ocr_has_mega_body_and_visible_850(self) -> None:
+        """Frank 2026-08-21: parish slice must reuse mega OCR sentences; 850px on visible boxes."""
+        docs = Path(__file__).resolve().parent.parent / "docs"
+        html_live = (docs / "parishes" / "raphoe" / "gort-a-choirce.html").read_text(encoding="utf-8")
+        self.assertIn("AIFRINN NA SEACHTAINE", html_live)
+        self.assertIn("GORT A", html_live)
+        self.assertIn("16ú Lúnasa 2026", html_live)
+        self.assertIn("Donnchadh", html_live)
+        self.assertRegex(html_live, r"\.pdf-inpage-pages\s*\{[^}]*min-height:\s*850px")
+        self.assertRegex(html_live, r"#ocr-panel\s*\{[^}]*min-height:\s*850px")
+        self.assertIn("min-height: 450px", html_live)
+        diocese = (docs / "dioceses" / "raphoe" / "index.html").read_text(encoding="utf-8")
+        self.assertIn("AIFRINN NA SEACHTAINE", diocese)
+        self.assertRegex(diocese, r"\.pdf-inpage-pages\s*\{[^}]*min-height:\s*850px")
 
     def test_live_diocese_html_ships_inpage_viewer(self) -> None:
         """Generator-only changes are invisible on parishpress.ie — live HTML must include PDF.js."""

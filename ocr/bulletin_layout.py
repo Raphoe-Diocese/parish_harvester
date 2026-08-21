@@ -30,6 +30,14 @@ _HEADING_START = re.compile(
     r"|mass\s+(?:and\s+confessions?\s+)?schedule"
     r"|upcoming\s+mass\s+schedule"
     r"|amanna\s+(?:an\s+)?aifrinn"
+    r"|aifrinn\s+na\s+seachtaine"
+    r"|b[aá]s\s+le\s+gairid"
+    r"|cuimhneach[aá]in\s+b[aá]is"
+    r"|cruinni[uú]\s+airgid"
+    r"|an\s+ch[eé]ad\s+l[eé]acht"
+    r"|an\s+dara\s+l[eé]acht"
+    r"|an\s+soisc[eé]al"
+    r"|freagra\s+an\s+tsailm"
     r"|anniversar(?:y|ies)(?:\s*/\s*intentions?)?"
     r"|recent(?:ly)?\s+(?:deceased|dead|deaths?)"
     r"|rest\s+in\s+peace"
@@ -292,6 +300,10 @@ def structure_ocr_html(
             plain = _plain(raw)
             if not plain:
                 flush()
+                continue
+            if re.fullmatch(r"Page\s+\d+", plain, re.IGNORECASE):
+                flush()
+                out.append(f'<p class="page-label">{html.escape(plain)}</p>')
                 continue
             nxt = _plain(raw_lines[idx + 1]) if idx + 1 < len(raw_lines) else ""
             if allow_parish and packed:

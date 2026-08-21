@@ -150,6 +150,21 @@ class BulletinLayoutTests(unittest.TestCase):
         self.assertIn("Mass times this week", result)
         self.assertLess(result.index("Mass times this week"), result.index("Confessions"))
 
+    def test_preserves_page_label_class(self) -> None:
+        html_out = structure_ocr_html(
+            "<p>Page 14</p><p>Aifrinn na seachtaine</p><p>16ú Lúnasa 2026</p>",
+            single_parish_name="Gortahork",
+            bulletin_date="2026-08-21",
+        )
+        self.assertIn('class="page-label"', html_out)
+        self.assertIn("Page 14", html_out)
+        self.assertIn("Aifrinn na seachtaine", html_out)
+
+    def test_promotes_irish_section_headings(self) -> None:
+        self.assertEqual(classify_heading_line("AIFRINN NA SEACHTAINE"), "AIFRINN NA SEACHTAINE")
+        self.assertEqual(classify_heading_line("BÁS LE GAIRID"), "BÁS LE GAIRID")
+        self.assertEqual(classify_heading_line("AN CHÉAD LÉACHT"), "AN CHÉAD LÉACHT")
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -143,7 +143,7 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
-      min-height: 0;
+      min-height: 850px;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
@@ -164,6 +164,7 @@
     .pdf-inpage-status { padding: 10px 12px; background: #1f3d3c; color: #d8f0ee; font-size: 0.9rem; }
     .pdf-inpage-pages {
       flex: 1 1 auto;
+      min-height: 850px;
       overflow: auto;
       -webkit-overflow-scrolling: touch;
       background: #525659;
@@ -190,6 +191,7 @@
     .pdf-standalone-shell iframe.pdf-frame,
     body.is-native-pdf iframe.pdf-frame {
       display: none !important;
+      min-height: 850px;
     }
     .pdf-frame-wrap.is-native-pdf,
     .pdf-standalone-shell.is-native-pdf,
@@ -211,6 +213,13 @@
         display: flex;
         flex-direction: column;
         background: #3a3f42;
+      }
+      .pdf-inpage-viewer,
+      .pdf-mobile-fallback,
+      .pdf-inpage-pages,
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        min-height: 450px !important;
       }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
@@ -443,6 +452,9 @@
       border: 1px solid #d4ddd9;
       padding: 22px 24px 32px;
     }
+    .pdf-frame-wrap iframe {
+      min-height: 850px;
+    }
     .note-box {
       margin-top: 12px;
       color: #8a3b3b;
@@ -538,8 +550,11 @@
 
     @media (max-width: 1024px) {
       /* Harvest + OCR both call this generator — keep both panels here.
-         Desktop: 850px. Tablet/phone (max-width 1024px): ~450px. */
+         Desktop: 850px on the VISIBLE boxes. Tablet/phone (max-width 1024px): ~450px. */
       .pdf-frame-wrap,
+      .pdf-frame-wrap iframe,
+      .pdf-inpage-viewer,
+      .pdf-inpage-pages,
       #ocr-panel {
         height: 70vh;
         min-height: 450px;
@@ -626,11 +641,10 @@
           <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
         </div>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Ardmore</h2><p class="ocr-parish-date">21/08/2026</p></header>
-<hr>
-<p>Page 2</p>
-<p>Ardmore Parish Newsletter<br>
-Eighteenth Sunday in Ordinary Time<br>
+      <div id="ocr-panel"><p class="page-label">Page 2</p>
+<h2 class="ocr-parish-name">Ardmore</h2>
+<p>21/08/2026</p>
+<p>Eighteenth Sunday in Ordinary Time<br>
 Sunday 2nd August 2026<br>
 Thoughts on the Gospel<br>
 Matthew 14:13 –21 – The Feeding of the Five Thousand<br>
@@ -658,10 +672,9 @@ Prayer<br>
 Lord, fill our hearts with compassion. Use the little we have to accomplish great<br>
 things for Your Kingdom. Teach us to trust You completely, to surrender our<br>
 limitations into Your hands, and to share Your blessings generously with all whom<br>
-we meet. Amen.<br>
-Readings for Next Sunday Ardmore</p>
+we meet. Amen.</p>
 <hr>
-<p>Page 3</p>
+<p class="page-label">Page 3</p>
 <p>Sunday 9th August 2026<br>
 First Reading: 1 Kings 19:9a, 11 –13a<br>
 Psalm: Psalm 85:9 –14<br>
@@ -687,7 +700,7 @@ Christian communities.<br>
 Prayer for Vocations<br>
 We pray for men whom God is calling to the priesthood.</p>
 <hr>
-<p>Page 4</p>
+<p class="page-label">Page 4</p>
 <p>Like Jesus in today&#x27;s Gospel, may they never turn away from the poor, the hungry, the<br>
 vulnerable or those most in need, but always reflect the compassionate love of Christ<br>
 as they nourish His people through the Word of God and the Eucharist.<br>
@@ -714,7 +727,7 @@ Today (Sunday)<br>
 • Confessions – 2.00 pm – 5.00 pm<br>
 ACCORD Marriage Preparation</p>
 <hr>
-<p>Page 5</p>
+<p class="page-label">Page 5</p>
 <p>Marriage preparation courses are available throughout the year.<br>
 Please visit <a href="https://www.accordni.com" target="_blank" rel="noopener noreferrer">www.accordni.com</a> for dates and booking information.<br>
 Monthly Mass for Sr Clare Crockett<br>
@@ -741,7 +754,7 @@ Cost: £55<br>
 <a href="tel:+442844619000" style="color:#1d4ed8;font-weight:600;">028 4461 9000</a><br>
 Visit <a href="https://www.saintpatrickcentre.com" target="_blank" rel="noopener noreferrer">www.saintpatrickcentre.com</a></p>
 <hr>
-<p>Page 6</p>
+<p class="page-label">Page 6</p>
 <p>Youth &amp; Young Adults<br>
 Embrace the Grace<br>
 Legion of Mary Young Adult Catholic Conference<br>
@@ -770,7 +783,7 @@ Anam Óg Summer Scheme<br>
 Termonbacca, Derry<br>
 For children aged 8–14</p>
 <hr>
-<p>Page 7</p>
+<p class="page-label">Page 7</p>
 <p>Faith, friendship, games, arts &amp; crafts, adventure and prayer.<br>
 Email:<br>
 Community &amp; Charity<br>
@@ -796,7 +809,7 @@ Saturday 15th &amp; Sunday 16th August<br>
 Countywide Collection<br>
 Volunteers are greatly appreciated.</p>
 <hr>
-<p>Page 8</p>
+<p class="page-label">Page 8</p>
 <p>Margaret:<br>
 00353 89 246 9599<br>
 Míle buíochas.<br>
@@ -820,7 +833,51 @@ Prizes<br>
 €2,000<br>
 4th – €1,500<br>
 5th – €1,000<br>
-6th – €500</p></div>
+6th – €500</p>
+<hr>
+<p class="page-label">Page 9</p>
+<p>Lough Derg Day Retreats<br>
+As the Three -Day Pilgrimage season concludes (final day to begin is 13th August ), Day<br>
+Retreats resume on:<br>
+• August: 18, 22, 23, 29 &amp; 31<br>
+• September: 5, 6, 9, 12, 15, 19 &amp; 20<br>
+Take time away from the busyness of everyday life for guided prayer, quiet reflection and<br>
+spiritual renewal.<br>
+Advance booking is essential.<br>
+Employment Opportunity<br>
+Administrative &amp; Financial Officer</p>
+<h2 class="ocr-parish-name">Clonmany</h2>
+<p>21/08/2026</p>
+<p>The Derry Diocesan Trust invites applications for the position of:<br>
+Administrative &amp; Financial Officer<br>
+Hours: 9 per week<br>
+Application packs are available from:<br>
+Bishop&#x27;s House</p>
+<h2 class="ocr-parish-name">St Eugene&#x27;s Cathedral (Templemore)</h2>
+<p>21/08/2026</p>
+<p>Derry BT48 9AP<br>
+<a href="tel:+442871262302" style="color:#1d4ed8;font-weight:600;">028 7126 2302</a><br>
+Closing Date: Tuesday 1th August 2026<br>
+Publications<br>
+Reflections Through Poetry<br>
+A beautiful collection by Fr John P. Forbes<br>
+Available from the Pastoral Office<br>
+Price: £10</p>
+<hr>
+<p class="page-label">Page 10</p>
+<p>All proceeds support Children in Crossfire and the Cause for the Canonisation of Sr<br>
+Clare Crockett.<br>
+Sharing the Good News<br>
+Read the latest weekly Catholic e -zine featuring news, reflections and resources from<br>
+across Ireland.<br>
+Visit theway.ie/ezine -2/.<br>
+Closing Prayer<br>
+May the Lord bless us with compassionate hearts, generous spirits, and unwavering<br>
+trust in His providence. May we recognise Christ in those around us, offer Him the little<br>
+we possess, and witness His abundant blessings multiplying in our families, our pari sh,<br>
+and our community.<br>
+May Almighty God bless you, the Father, ✠ the Son, and the Holy Spirit. Amen.</p>
+<hr></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
