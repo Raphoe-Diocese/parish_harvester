@@ -48,6 +48,7 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 ## Still open (do not pretend these are finished)
 
 - [ ] **todo** · 2026-08-20 · Problems console — full work-queue polish · `extension/sidepanel.js`, `harvester/parish_status.py`
+- [ ] **doing** · 2026-08-21 · Trainer ↔ GitHub sync: Problems/Directory load latest `parishes/parish_status.json` via commit SHA; Directory shows ok + UK date; Send & test waits for `last_tested_at` change · `extension/*`
 - [ ] **todo** · 2026-08-20 · Recipe success — one parish at a time (A–Z repair with proof packs) · `parishes/recipes/`, Problems tab
 - [ ] **todo** · 2026-08-20 · parishpress.ie — live DNS / Pages cutover when Frank is ready · `docs/PARISHPRESS_IE_MIGRATION.md`, `docs/DOMAIN_SETUP.md`
 - [ ] **todo** · 2026-08-20 · Site look — modern pages **after** OCR/capture/recipes are reliable · `harvester/site_builder.py`, `docs/`

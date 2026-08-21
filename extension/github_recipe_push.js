@@ -318,11 +318,16 @@
   const fetchLatestFileCommit = async ({ gh_pat, gh_repo, path }) => {
     const repo = resolveGhRepo(gh_repo);
     const pat = String(gh_pat || "").trim();
-    if (!pat || !path) return null;
+    if (!path) return null;
     try {
       const resp = await fetchGithub(
         `https://api.github.com/repos/${repo}/commits?path=${encodeURIComponent(path)}&sha=main&per_page=1`,
-        { ...authHeaders(pat), "Cache-Control": "no-cache" },
+        {
+          Accept: "application/vnd.github+json",
+          "X-GitHub-Api-Version": "2022-11-28",
+          "Cache-Control": "no-cache",
+          ...(pat ? { Authorization: authHeaderValue(pat) } : {}),
+        },
         12000,
         { cache: "no-store" }
       );
@@ -355,7 +360,8 @@
       gh_repo,
       path: "parishes/parish_status.json",
     });
-    const ref = commit?.sha || "main";
+    const ref = commit?.sha;
+    if (!ref) return null;
     if (pat) {
       try {
         const resp = await fetchGithub(
@@ -400,6 +406,9 @@
     }
     if (row.outcome === "failed") return { status: "failed", item };
     if (row.outcome === "html_only") return { status: "html_link", item };
+    if (row.outcome === "skipped" || row.outcome === "disabled") {
+      return { status: row.outcome, item };
+    }
     return { status: "unknown", item };
   }
 
@@ -423,6 +432,11 @@
   const sleep = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   const SEND_TEST_MAX_WAIT_MS = 15 * 60 * 1000;
 
+  function formatUkDateFromIso(iso) {
+    const match = String(iso || "").match(/(\d{4})-(\d{2})-(\d{2})/);
+    return match ? `${match[3]}/${match[2]}/${match[1]}` : "";
+  }
+
   function isFreshHarvestTimestamp(iso, startedAt, skewMs = 120000) {
     const ms = iso ? new Date(iso).getTime() : NaN;
     return Number.isFinite(ms) && ms >= Number(startedAt) - skewMs;
@@ -433,10 +447,9 @@
     const created = new Date(run.created_at).getTime();
     if (!Number.isFinite(created) || created < afterMs - 30_000) return false;
     const key = String(parishKey || "").trim().toLowerCase();
-    if (!key) return true;
+    if (!key) return false;
     const title = `${run.display_title || ""} ${run.name || ""}`.toLowerCase();
-    if (title.includes(key)) return true;
-    return created >= afterMs - 30_000;
+    return title.includes(key);
   }
 
   async function findLatestHarvestRun(gh_pat, gh_repo, afterMs, parishKey) {
@@ -527,6 +540,7 @@
     gh_repo: storedRepo,
     parish_key,
     startedAt,
+    previousTestedAt = "",
     onProgress,
     maxWaitMs = SEND_TEST_MAX_WAIT_MS,
   }) {
@@ -564,8 +578,12 @@
 
       const statusDoc = await fetchParishStatusJson({ gh_pat, gh_repo: storedRepo });
       const fromStatus = statusDoc ? parishStatusFromDoc(statusDoc, key) : null;
-      const testedAt = fromStatus?.item?.last_tested_at || statusDoc?.last_patched_at || "";
-      const freshResult = isFreshHarvestTimestamp(testedAt, started);
+      const testedAt = String(fromStatus?.item?.last_tested_at || "").trim();
+      const prevTested = String(previousTestedAt || "").trim();
+      const freshResult = Boolean(testedAt) && (
+        (prevTested && testedAt !== prevTested) ||
+        isFreshHarvestTimestamp(testedAt, started, 5000)
+      );
       let parishStatus = { status: "unknown", item: null };
       if (freshResult && fromStatus) {
         parishStatus = fromStatus;
@@ -590,8 +608,7 @@
       if (freshOutcome) return freshOutcome;
 
       if (workflowSucceeded) {
-        const pdfOk = await parishPdfExists({ gh_pat, gh_repo: storedRepo, parish_key: key });
-        if (pdfOk) return { ok: true, runUrl, item: parishStatus.item, elapsed };
+        // Do not treat a leftover Bulletins/current PDF as this test passing.
       }
       if (workflowCancelled) {
         return {
@@ -634,14 +651,29 @@
       attempt += 1;
     }
 
+    const elapsed = Math.round((Date.now() - started) / 1000);
+    const statusDoc = await fetchParishStatusJson({ gh_pat, gh_repo: storedRepo });
+    const fromStatus = statusDoc ? parishStatusFromDoc(statusDoc, key) : null;
+    const testedAt = String(fromStatus?.item?.last_tested_at || "").trim();
+    const when = formatUkDateFromIso(testedAt);
+    const fileOutcome = fromStatus && fromStatus.status !== "unknown"
+      ? outcomeFromFreshStatus(fromStatus, runUrl, elapsed)
+      : null;
+    const timeoutNote = fromStatus && fromStatus.status !== "unknown"
+      ? `Timed out after 15 min. GitHub currently says ${fromStatus.status}${when ? ` as of ${when}` : ""}.`
+      : (listError
+        ? `${listError}. PAT needs Actions: Read so the extension can watch the run — or wait and refresh Problems from parish_status.json.`
+        : "Timed out waiting for last_tested_at to change. Open Actions, then refresh Problems.");
+    if (fileOutcome) {
+      return { ...fileOutcome, timedOut: true, reason: timeoutNote };
+    }
     return {
       ok: false,
+      timedOut: true,
       runUrl,
-      elapsed: Math.round((Date.now() - started) / 1000),
-      reason:
-        listError
-          ? `${listError}. PAT needs Actions: Read so the extension can watch the run — or wait and refresh Problems from parish_status.json.`
-          : "Timed out waiting for parish_status.json (GitHub setup can take 6–10 min). Open Actions.",
+      item: fromStatus?.item || null,
+      elapsed,
+      reason: timeoutNote,
     };
   }
 

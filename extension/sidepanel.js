@@ -381,9 +381,16 @@ const PROBLEMS_AUTO_REFRESH_MS = 2 * 60 * 1000;
 async function _pdLoadParishStatusDoc(force = false) {
   if (_pdParishStatusDoc && !force) return _pdParishStatusDoc;
   try {
-    const cfg = await _pdGetGithubConfig();
-    if (!cfg) return null;
-    const status = await _problemsFetchParishStatus(cfg.ghRepo, cfg.ghPat);
+    let ghRepo = phResolveGhRepo("");
+    let ghPat = "";
+    try {
+      const cfg = await chrome.storage.local.get(["gh_pat", "gh_repo"]);
+      ghPat = String(cfg?.gh_pat || "").trim();
+      ghRepo = phResolveGhRepo(cfg?.gh_repo);
+    } catch (_e) {
+      // Public GitHub fetch still works without storage.
+    }
+    const status = await _problemsFetchParishStatus(ghRepo, ghPat);
     if (status?.schema_version >= 1) {
       _pdParishStatusDoc = status;
       return _pdParishStatusDoc;
@@ -1358,24 +1365,15 @@ async function _problemsSaveUiPrefs() {
 
 async function _problemsFetchParishStatus(repo, ghPat) {
   const mod = globalThis.phGithubRecipePush;
-  if (mod?.fetchParishStatusJson && ghPat) {
+  if (mod?.fetchParishStatusJson) {
     try {
-      const status = await mod.fetchParishStatusJson({ gh_pat: ghPat, gh_repo: repo });
+      const status = await mod.fetchParishStatusJson({ gh_pat: ghPat || "", gh_repo: repo });
       if (status && status.schema_version >= 1) return status;
     } catch (_e) {
-      // Fall through to raw CDN.
+      // Honest miss — do not fall back to a cached raw /main/ URL.
     }
   }
-  try {
-    const resp = await fetch(
-      `https://raw.githubusercontent.com/${repo}/main/parishes/parish_status.json?t=${Date.now()}`,
-      { cache: "no-store" }
-    );
-    if (!resp.ok) return null;
-    return resp.json();
-  } catch (_e) {
-    return null;
-  }
+  return null;
 }
 
 function _problemsRowsFromStatus(status, retrainedMap) {
@@ -1522,8 +1520,35 @@ async function _problemsFilterActionableRows(report, consecutiveFailures, retrai
 let _pdAllParishes  = [];
 let _pdDioceseTexts = {}; // dioceseName → { text, path }
 
+function _pdParishStatusItem(parishKey) {
+  const key = String(parishKey || "").trim().toLowerCase();
+  return _pdParishStatusDoc?.parishes?.[key] || null;
+}
+
+function _pdHarvestLabel(parishKey) {
+  const item = _pdParishStatusItem(parishKey);
+  if (!item?.outcome) return "";
+  const when = formatUkDate(String(item.last_tested_at || _pdParishStatusDoc?.target_date || ""));
+  const outcome = String(item.outcome);
+  if (outcome === "ok") return `ok ${when}`;
+  if (outcome === "stale") return `stale ${when}`;
+  if (outcome === "failed") return `failed ${when}`;
+  if (outcome === "skipped") return "skipped";
+  if (outcome === "disabled") return "disabled";
+  if (outcome === "html_only") return `html-only ${when}`;
+  return when && when !== "—" ? `${outcome} ${when}` : outcome;
+}
+
 function _pdStatusDot(parish) {
   if (parish.disabled) return "⚫";
+  const item = _pdParishStatusItem(parish.key);
+  const outcome = String(item?.outcome || "");
+  if (outcome === "ok") return "✅";
+  if (outcome === "stale") return "🕐";
+  if (outcome === "failed") return "❌";
+  if (outcome === "skipped") return "⏭";
+  if (outcome === "disabled") return "⚫";
+  if (outcome === "html_only") return "📄";
   if (_pdGetOverride(parish.key)) return "📌";
   const rs = _pdRecipeCache[parish.key];
   if (rs === "dead") return "🔴";
@@ -1743,7 +1768,18 @@ function _problemsShowVerifyResult(payload) {
   const parishPdf = _problemsParishBulletinPdf(payload.repo, payload.parishKey);
   const runLink = payload.runUrl || links.actions;
   const lines = [];
-  if (payload.ok === true) {
+  if (payload.timedOut) {
+    box.className = payload.ok === true || payload.stale === true ? "warn" : "err";
+    lines.push(`⚠️ <strong>${payload.displayName}</strong> — ${payload.reason || "Timed out waiting for last_tested_at to change."}`);
+    if (payload.ok === true) {
+      lines.push("GitHub file currently says ok — this is not a new Send & test pass.");
+    } else if (payload.stale === true) {
+      lines.push("GitHub file currently says stale (recipe worked, bulletin too old).");
+    } else if (payload.ok === false) {
+      const reason = String(payload.item?.error || payload.item?.reason || "still failed").slice(0, 220);
+      lines.push(`GitHub file currently says failed: ${reason}`);
+    }
+  } else if (payload.ok === true) {
     box.className = "ok";
     lines.push(`✅ <strong>${payload.displayName}</strong> — single-parish test passed.`);
     if (payload.item?.url) {
@@ -1825,183 +1861,129 @@ async function _problemsPollHarvestResult({
     parishKey,
     repo: ghRepo,
     runUrl,
-    message: "Checking GitHub now — slow sites can take 2–5 minutes…",
+    message: "Checking GitHub now — waiting for last_tested_at to change (up to 15 min)…",
   });
   setStatus(`⏳ Testing ${displayName} on GitHub…`, "warn");
 
+  const stored = await _problemsGetLastDispatch(parishKey);
+  const previousTestedAt = String(stored?.previousTestedAt || "").trim();
   const pushMod = globalThis.phGithubRecipePush;
-  const maxAttempts = 55;
-
-  for (let attempt = 0; attempt < maxAttempts; attempt += 1) {
-    if (attempt > 0) {
-      const delay = attempt < 8 ? 3000 : attempt < 20 ? 8000 : 12000;
-      await new Promise((resolve) => setTimeout(resolve, delay));
+  if (!pushMod?.pollHarvestUntilDone) {
+    _problemsShowVerifyResult({
+      ok: false,
+      displayName,
+      parishKey,
+      repo: ghRepo,
+      runUrl,
+      message: "Reload Parish Trainer once — harvest watcher is missing from this version.",
+    });
+    setStatus("❌ Reload Parish Trainer once, then tap Test again.", "err");
+    if (verifyBtn) {
+      verifyBtn.disabled = false;
+      verifyBtn.textContent = "▶ Test again";
     }
-    if (verifyBtn) verifyBtn.textContent = `⏳ ${Math.round((Date.now() - started) / 1000)}s…`;
-
-    const run = await _problemsFindLatestWorkflowRun(ghPat, ghRepo, started);
-    if (run?.html_url) runUrl = run.html_url;
-    const workflowDone = run && run.status === "completed";
-    const workflowRunning = run && (run.status === "in_progress" || run.status === "queued" || run.status === "pending");
-    const workflowFailed = workflowDone && run.conclusion === "failure";
-    const workflowSucceeded = workflowDone && run.conclusion === "success";
-
-    const report = await _problemsFetchLiveReport(ghRepo, ghPat);
-    const statusDoc = pushMod?.fetchParishStatusJson
-      ? await pushMod.fetchParishStatusJson({ gh_pat: ghPat, gh_repo: ghRepo })
-      : null;
-    let parishStatus = statusDoc && pushMod?.parishStatusFromDoc
-      ? pushMod.parishStatusFromDoc(statusDoc, parishKey)
-      : null;
-    const testedAt = parishStatus?.item?.last_tested_at || statusDoc?.last_patched_at || "";
-    const testedMs = testedAt ? new Date(testedAt).getTime() : 0;
-    const freshStatus = Number.isFinite(testedMs) && testedMs >= started - 120_000;
-    if (!freshStatus || !parishStatus) {
-      parishStatus = report ? _problemsParishHarvestStatus(report, parishKey) : { status: "unknown", item: null };
-    }
-
-    let pdfExists = false;
-    if (pushMod?.parishPdfExists) {
-      try {
-        pdfExists = await pushMod.parishPdfExists({
-          gh_pat: ghPat,
-          gh_repo: ghRepo,
-          parish_key: parishKey,
-        });
-      } catch (_e) {
-        pdfExists = false;
-      }
-    }
-
-    if (parishStatus.status === "ok" || (pdfExists && workflowSucceeded)) {
-      await _problemsClearRetrained(parishKey);
-      _pdHarvestReport = null;
-      const item = parishStatus.item || {
-        parish: parishKey,
-        url: _problemsParishBulletinPdf(ghRepo, parishKey),
-      };
-      _problemsShowVerifyResult({
-        ok: true,
-        displayName,
-        parishKey,
-        repo: ghRepo,
-        runUrl,
-        item,
-      });
-      setStatus(`✅ ${displayName} verified — bulletin link below.`, "ok");
-      if (verifyBtn) verifyBtn.textContent = "✅ Done";
-      void loadProblemsDashboard();
-      return;
-    }
-
-    if (workflowDone && parishStatus.status === "stale") {
-      _problemsShowVerifyResult({
-        stale: true,
-        displayName,
-        parishKey,
-        repo: ghRepo,
-        runUrl,
-        item: parishStatus.item,
-      });
-      setStatus(`🕐 ${displayName} — recipe OK, bulletin too old (recorded on GitHub).`, "warn");
-      if (verifyBtn) {
-        verifyBtn.disabled = false;
-        verifyBtn.textContent = "▶ Test again";
-      }
-      void loadProblemsDashboard();
-      return;
-    }
-
-    if (workflowRunning) {
-      const runStatus = run.status === "queued" || run.status === "pending"
-        ? "queued (another harvest may be ahead — please wait)"
-        : "running on GitHub";
-      _problemsShowVerifyResult({
-        ok: null,
-        displayName,
-        parishKey,
-        repo: ghRepo,
-        runUrl,
-        message: `${runStatus} — ${Math.round((Date.now() - started) / 1000)}s elapsed. Result appears here when done.`,
-      });
-      continue;
-    }
-
-    if (workflowFailed) {
-      if (parishStatus.status === "failed" || parishStatus.status === "stale") {
-        _problemsShowVerifyResult({
-          ok: parishStatus.status === "failed" ? false : undefined,
-          stale: parishStatus.status === "stale",
-          displayName,
-          parishKey,
-          repo: ghRepo,
-          runUrl,
-          item: parishStatus.item,
-        });
-      } else {
-        _problemsShowVerifyResult({
-          ok: false,
-          displayName,
-          parishKey,
-          repo: ghRepo,
-          runUrl,
-          message: "GitHub Actions run failed — open the run link below for the error log.",
-        });
-      }
-      setStatus(`❌ ${displayName} still failing — see links below.`, "err");
-      if (verifyBtn) {
-        verifyBtn.disabled = false;
-        verifyBtn.textContent = "▶ Test again";
-      }
-      void loadProblemsDashboard();
-      return;
-    }
-
-    if (workflowDone && parishStatus.status === "failed") {
-      _problemsShowVerifyResult({
-        ok: false,
-        displayName,
-        parishKey,
-        repo: ghRepo,
-        runUrl,
-        item: parishStatus.item,
-      });
-      setStatus(`❌ ${displayName} still failing — see links below.`, "err");
-      if (verifyBtn) {
-        verifyBtn.disabled = false;
-        verifyBtn.textContent = "▶ Test again";
-      }
-      void loadProblemsDashboard();
-      return;
-    }
-
-    if (workflowDone && parishStatus.status === "unknown") {
-      _problemsShowVerifyResult({
-        ok: null,
-        displayName,
-        parishKey,
-        repo: ghRepo,
-        runUrl,
-        message: pdfExists
-          ? "PDF found on GitHub — refreshing report…"
-          : "GitHub finished but report not updated yet — still checking…",
-      });
-    }
+    return;
   }
 
+  const result = await pushMod.pollHarvestUntilDone({
+    gh_pat: ghPat,
+    gh_repo: ghRepo,
+    parish_key: parishKey,
+    startedAt: started,
+    previousTestedAt,
+    onProgress: ({ elapsed, runStatus, queued, runUrl: liveUrl }) => {
+      if (liveUrl) runUrl = liveUrl;
+      if (verifyBtn) verifyBtn.textContent = `⏳ ${elapsed}s…`;
+      let statusLabel = "checking parish_status.json";
+      if (runStatus === "no_actions_read") {
+        statusLabel = "waiting for parish_status (PAT needs Actions: Read)";
+      } else if (queued || runStatus === "queued") {
+        statusLabel = "queued on GitHub";
+      } else if (runStatus === "in_progress") {
+        statusLabel = "running on GitHub";
+      } else if (runStatus === "starting" || runStatus === "waiting") {
+        statusLabel = "waiting for GitHub Actions";
+      }
+      _problemsShowVerifyResult({
+        ok: null,
+        displayName,
+        parishKey,
+        repo: ghRepo,
+        runUrl,
+        message: `${statusLabel} — ${elapsed}s. Result appears here when last_tested_at changes.`,
+      });
+    },
+  });
+  if (result?.runUrl) runUrl = result.runUrl;
+  _pdParishStatusDoc = null;
+  _pdHarvestReport = null;
+  if (result?.timedOut) {
+    _problemsShowVerifyResult({
+      timedOut: true,
+      ok: result.ok === true,
+      stale: result.stale === true,
+      displayName,
+      parishKey,
+      repo: ghRepo,
+      runUrl,
+      item: result.item,
+      reason: result.reason,
+    });
+    setStatus(`⚠️ ${displayName} — ${result.reason}`, "warn");
+    if (verifyBtn) {
+      verifyBtn.disabled = false;
+      verifyBtn.textContent = "▶ Test again";
+    }
+    void loadProblemsDashboard();
+    return;
+  }
+  if (result?.ok) {
+    await _problemsClearRetrained(parishKey);
+    _problemsShowVerifyResult({
+      ok: true,
+      displayName,
+      parishKey,
+      repo: ghRepo,
+      runUrl,
+      item: result.item || { parish: parishKey, url: _problemsParishBulletinPdf(ghRepo, parishKey) },
+    });
+    setStatus(`✅ ${displayName} verified — bulletin link below.`, "ok");
+    if (verifyBtn) verifyBtn.textContent = "✅ Done";
+    void loadProblemsDashboard();
+    return;
+  }
+  if (result?.stale) {
+    _problemsShowVerifyResult({
+      stale: true,
+      displayName,
+      parishKey,
+      repo: ghRepo,
+      runUrl,
+      item: result.item,
+    });
+    setStatus(`🕐 ${displayName} — recipe OK, bulletin too old (recorded on GitHub).`, "warn");
+    if (verifyBtn) {
+      verifyBtn.disabled = false;
+      verifyBtn.textContent = "▶ Test again";
+    }
+    void loadProblemsDashboard();
+    return;
+  }
   _problemsShowVerifyResult({
-    ok: null,
+    ok: false,
     displayName,
     parishKey,
     repo: ghRepo,
     runUrl,
-    message: "Timed out waiting — open the Actions run link below to see progress.",
+    item: result?.item,
+    message: result?.reason,
   });
-  setStatus(`⚠️ Still waiting for ${displayName} — open Actions link below.`, "warn");
+  setStatus(`❌ ${displayName} still failing — see links below.`, "err");
   if (verifyBtn) {
     verifyBtn.disabled = false;
     verifyBtn.textContent = "▶ Test again";
   }
+  void loadProblemsDashboard();
 }
 
 async function _problemsWatchParishHarvest(parishKey, displayName, dispatchAt) {
@@ -2054,6 +2036,8 @@ async function _problemsVerifyHarvest(row, verifyBtn, { forceDispatch = false } 
 
   setStatus(`⏳ Starting new test for ${displayName}…`, "warn");
   const dispatchStarted = Date.now();
+  const statusBefore = await _pdLoadParishStatusDoc(true);
+  const previousTestedAt = String(statusBefore?.parishes?.[String(parishKey).toLowerCase()]?.last_tested_at || "").trim();
   const dispatch = await _pdDispatchHarvest(parishKey, _pdDioceseForKey(parishKey));
   if (!dispatch.ok) {
     setStatus(`❌ Harvest trigger failed: ${dispatch.error}`, "err");
@@ -2065,7 +2049,7 @@ async function _problemsVerifyHarvest(row, verifyBtn, { forceDispatch = false } 
   }
 
   const dispatchMap = (await _spStorageGet([PH_LAST_DISPATCH_KEY]))[PH_LAST_DISPATCH_KEY] || {};
-  dispatchMap[parishKey] = { at: dispatchStarted, displayName };
+  dispatchMap[String(parishKey).toLowerCase()] = { at: dispatchStarted, displayName, previousTestedAt };
   await _spStorageSet({ [PH_LAST_DISPATCH_KEY]: dispatchMap });
 
   await _problemsPollHarvestResult({
@@ -2392,25 +2376,7 @@ async function loadProblemsDashboard() {
       rows = _problemsRowsFromStatus(parishStatus, retrainedMap);
       lastSeen = formatUkDate(String(parishStatus.target_date || "")) || lastSeen;
     } else {
-      statusSource = "report.json (legacy)";
-      let report = cfg ? await _problemsFetchLiveReport(urls.repo, cfg.ghPat) : null;
-      const failuresResp = await fetch(urls.failuresUrl, { cache: "no-store" });
-      if (!report) {
-        const reportResp = await fetch(urls.reportUrl, { cache: "no-store" });
-        if (!reportResp.ok || !failuresResp.ok) {
-          throw new Error("Could not fetch live report data");
-        }
-        report = await reportResp.json();
-      } else if (!failuresResp.ok) {
-        throw new Error("Could not fetch live report data");
-      }
-      const consecutive = await failuresResp.json();
-      const consecutiveFailures = (consecutive && typeof consecutive === "object") ? consecutive : {};
-      const legacy = await _problemsFilterActionableRows(report, consecutiveFailures, retrainedMap);
-      rows = legacy.rows;
-      hiddenDead = legacy.hiddenDead;
-      hiddenFixed = legacy.hiddenFixed;
-      lastSeen = legacy.lastSeen;
+      throw new Error("Could not load latest parish_status.json from GitHub (commit SHA). Tap Refresh.");
     }
 
     _problemsAllRows = rows;
@@ -2444,7 +2410,19 @@ async function loadProblemsDashboard() {
   }
 }
 
-const _PD_DOT_TITLES = { "🟢": "Recipe trained", "🟡": "Needs training", "🔴": "Dead website", "⚫": "Disabled", "📌": "Manual override URL set", "⬜": "Checking…" };
+const _PD_DOT_TITLES = {
+  "✅": "Harvest ok on GitHub",
+  "🕐": "Harvest stale on GitHub",
+  "❌": "Harvest failed on GitHub",
+  "⏭": "Skipped on GitHub",
+  "📄": "HTML-only on GitHub",
+  "🟢": "Recipe trained",
+  "🟡": "Needs training",
+  "🔴": "Dead website",
+  "⚫": "Disabled",
+  "📌": "Manual override URL set",
+  "⬜": "Checking…",
+};
 
 function _pdShowAddParishDialog(dioceseDisplayName, anchorEl) {
   const existing = document.querySelector(".pd-add-parish-row");
@@ -2756,6 +2734,20 @@ function _pdBuildRow(parish, excludes) {
     });
   }
   row.appendChild(nameEl);
+
+  const harvestLabel = _pdHarvestLabel(parish.key);
+  if (harvestLabel) {
+    const harvestEl = document.createElement("span");
+    harvestEl.className = "pd-harvest";
+    const outcome = String(_pdParishStatusItem(parish.key)?.outcome || "");
+    if (outcome === "failed") harvestEl.classList.add("failed");
+    else if (outcome === "stale") harvestEl.classList.add("stale");
+    harvestEl.textContent = harvestLabel;
+    harvestEl.title = outcome === "ok"
+      ? `Already working on GitHub as of ${formatUkDate(_pdParishStatusItem(parish.key)?.last_tested_at)}`
+      : `GitHub harvest: ${harvestLabel}`;
+    row.appendChild(harvestEl);
+  }
 
   const editBtn = document.createElement("button");
   editBtn.className = "pd-btn";
@@ -3440,3 +3432,15 @@ chrome.runtime.onMessage.addListener((message) => {
     });
   });
 });
+
+(function _spShowTrainerVersion() {
+  const el = document.getElementById("trainer-version-footer");
+  if (!el) return;
+  let ver = "";
+  try {
+    ver = chrome.runtime.getManifest().version;
+  } catch (_e) {
+    ver = "";
+  }
+  el.textContent = ver ? `Parish Trainer v${ver}` : "Parish Trainer";
+})();
