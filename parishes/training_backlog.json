@@ -2847,7 +2847,7 @@
           "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
           "Do not pick GDPR, Gift Aid, or financial statement PDFs."
         ],
-        "recorded_date": "2026-08-19"
+        "recorded_date": "2026-08-21"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
@@ -4130,9 +4130,9 @@
       "diocese": "raphoe",
       "recipe_file": "parishes/recipes/raphoe/tawnawillyparish.json",
       "recipe": {
-        "start_url": "https://tawnawillyparish.ie/bulletin/",
-        "site_type": "pdf_link_list",
-        "playbook_type": "pdf_download_list",
+        "start_url": "https://tawnawillyparish.ie/",
+        "site_type": "wp_json_newest_media",
+        "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
@@ -4140,15 +4140,18 @@
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
-          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-          "Do not worry if the filename or date in the link text changes every week."
+          "2026-08-21 FIX: GitHub harvest got HTTP 403 on https://tawnawillyparish.ie/bulletin/. wp-json/wp/v2/media is unchallenged (HTTP 200). Newest Sunday 23 Aug 2026 is /wp-content/uploads/Sunday-23rd-Aug.pdf (HTTP 200, application/pdf). Sunday-16th-Aug.pdf is also live.",
+          "August files use Aug not August \u2014 Sunday-16th-August.pdf and Sunday-23rd-August.pdf 404. Do not predict full-month names from the old Sunday-28th-June.pdf pin.",
+          "Trainer Guess was highlighting Sunday-26-July-2026.pdf (Sunday 26th) because yearless Sunday-16th-Aug.pdf had no parsed date. Listing also has a huge PARISH BULLETIN 2025 archive.",
+          "site_type:wp_json_newest_media with href_patterns [sunday]. Never open /bulletin/. Never pin use_captured_url. Do not download GDPR."
         ],
         "do_not": [
-          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
-          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+          "Do not set start_url to https://tawnawillyparish.ie/bulletin/ \u2014 CI 403s that listing.",
+          "Do not set use_captured_url on a dated Sunday-*.pdf.",
+          "Do not guess Sunday-Nth-August.pdf (full month) \u2014 live files are Sunday-Nth-Aug.pdf.",
+          "Do not download GDPR, privacy, wedding, or Order of Mass."
         ],
-        "recorded_date": "2026-08-16"
+        "recorded_date": "2026-08-21"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
