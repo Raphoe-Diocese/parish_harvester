@@ -1,40 +1,28 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "ballymenaparish",
   "display_name": "Ballymena",
   "diocese": "down_and_connor",
-  "start_url": "https://ballymenaparish.org/bulletin-and-parish-documents/",
+  "start_url": "https://ballymenaparish.org/",
+  "site_type": "wp_json_newest_media",
+  "href_patterns": ["sunday"],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-08-21",
   "steps": [
     {
-      "action": "click",
-      "selector": "a:has-text(\"Bulletin\")",
-      "href": "http://Ladies%20Activity%20class%20continues%20–%2011%2000am%20-%2012noon%20",
-      "text": "Bulletin"
-    },
-    {
-      "action": "click",
-      "selector": "div:nth-of-type(3) > div:nth-of-type(1) > div:nth-of-type(1) > div > div:nth-of-type(1) > a",
-      "href": "http://Ladies%20Activity%20class%20continues%20–%2011%2000am%20-%2012noon%20",
-      "text": ""
-    },
-    {
-      "action": "download",
-      "url": "https://ballymenaparish.org/wp-content/uploads/2025/01/Wedding-Parish.pdf"
+      "action": "goto",
+      "url": "https://ballymenaparish.org/"
     }
   ],
-  "observed_load_ms": 2944.89990234375,
-  "timeout_ms": 55000,
-  "total_timeout_s": 370,
-  "playbook_type": "wix_html",
-  "site_type": "html_text_bulletin",
   "operator_notes": [
-    "Bulletin text is on the web page — not a downloadable PDF file.",
-    "Use Save page as PDF on the newsletter article page.",
-    "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
+    "All Saints Ballymena. The public /bulletin-and-parish-documents/ FileBird listing still highlights Wedding-Parish.pdf (2025). Weekly files live in wp-json/wp/v2/media as D.M.YY-Nth-Sunday.pdf.",
+    "2026-08-21: newest is https://ballymenaparish.org/wp-content/uploads/2026/08/23.8.26-A4-21st-Sunday.pdf (HTTP 200, 235748 bytes, 2 pages, text 'Parish Website www.ballymenaparish.org', 21st Sunday, baptisms, recently deceased Maura Hegarty). 16.8.26-20th-Sunday.pdf is also live.",
+    "Harvest week 16/08/2026 accepts 23/08 via the +7 day window. site_type:wp_json_newest_media never opens the listing and never clicks Wedding-Parish.pdf. Old recipe failed 'APIRequestContext.get: Invalid URL' on a junk click href."
   ],
   "do_not": [
-    "Do not use Pick bulletin image when the page is mostly text paragraphs.",
-    "Do not stop at click-only — need print_to_pdf as the final step."
-  ],
-  "recorded_date": "2026-08-21"
+    "Do not download Wedding-Parish.pdf.",
+    "Do not pin a dated D.M.YY filename or use_captured_url.",
+    "Do not click the FileBird listing — GitHub harvest cannot use those junk hrefs."
+  ]
 }
