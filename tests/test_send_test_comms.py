@@ -45,7 +45,7 @@ class SendTestCommsTests(unittest.TestCase):
 
     def test_manifest_bumped_for_extension_js(self) -> None:
         text = MANIFEST.read_text(encoding="utf-8")
-        self.assertIn('"version": "1.61.11"', text)
+        self.assertIn('"version": "1.61.12"', text)
 
     def test_back_room_fetches_fresh_parish_status(self) -> None:
         push = PUSH_JS.read_text(encoding="utf-8")
@@ -69,6 +69,9 @@ class SendTestCommsTests(unittest.TestCase):
         self.assertIn("parishes/parish_status.json", yml)
         self.assertIn("Partial harvests are normal", yml)
         self.assertIn("git commit -m", yml)
+        self.assertIn('Including proof PDF: Bulletins/${TARGET_PARISH}.pdf', yml)
+        self.assertIn("all_bulletins_*)", yml)
+        self.assertNotIn("zip old", yml.lower())
 
     def test_ballinascreen_uses_wix_predictor_then_image_stack(self) -> None:
         recipe = (

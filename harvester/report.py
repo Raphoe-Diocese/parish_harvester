@@ -51,6 +51,11 @@ def _stale_dir_for_current(current_dir: Path) -> Path:
     return current_dir.parent / "stale"
 
 
+def _proof_pdf_path(dest_dir: Path, parish_key: str) -> Path:
+    """Current-week proof copy at ``Bulletins/<key>.pdf`` (never a zip archive)."""
+    return dest_dir.parent / f"{parish_key}.pdf"
+
+
 def _copy_harvested_pdf(result: "FetchResult", dest_dir: Path) -> Path | None:
     if not result.file_path or not Path(result.file_path).exists():
         return None
@@ -59,6 +64,9 @@ def _copy_harvested_pdf(result: "FetchResult", dest_dir: Path) -> Path | None:
     src = Path(result.file_path)
     if src.resolve() != dest.resolve():
         shutil.copy2(src, dest)
+    proof = _proof_pdf_path(dest_dir, result.key)
+    if dest.resolve() != proof.resolve():
+        shutil.copy2(dest, proof)
     return dest
 
 
@@ -223,13 +231,12 @@ def generate_report(
                 "error": error_reason,
             })
         elif r.status == "ok" and r.file_path and r.file_path.exists():
-            dest = current_dir / r.file_path.name
-            shutil.copy2(r.file_path, dest)
+            dest = _copy_harvested_pdf(r, current_dir)
             entry = {
                 "parish": r.key,
                 "display_name": r.display_name,
                 "url": r.url,
-                "file": dest.name,
+                "file": dest.name if dest else f"{r.key}.pdf",
                 "file_type": r.file_type,
             }
             downloaded.append(entry)
@@ -342,15 +349,12 @@ def _result_to_report_entry(r: "FetchResult", current_dir: Path) -> tuple[str, d
                 "url": r.url,
                 "error": error_reason,
             }
-        dest = current_dir / r.file_path.name
-        current_dir.mkdir(parents=True, exist_ok=True)
-        if r.file_path.resolve() != dest.resolve():
-            shutil.copy2(r.file_path, dest)
+        dest = _copy_harvested_pdf(r, current_dir)
         return "downloaded", {
             "parish": r.key,
             "display_name": r.display_name,
             "url": r.url,
-            "file": dest.name,
+            "file": dest.name if dest else f"{r.key}.pdf",
             "file_type": r.file_type,
         }
     if r.status == "html_link":

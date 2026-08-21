@@ -420,6 +420,18 @@ jobs:
             git add -f "Bulletins/stale/${TARGET_PARISH}.pdf"
             echo "Including stale PDF: Bulletins/stale/${TARGET_PARISH}.pdf"
           fi
+          # Current-week proof copies at Bulletins/<key>.pdf — never zip archives.
+          if [ -n "${TARGET_PARISH}" ] && [ -f "Bulletins/${TARGET_PARISH}.pdf" ]; then
+            git add -f "Bulletins/${TARGET_PARISH}.pdf"
+            echo "Including proof PDF: Bulletins/${TARGET_PARISH}.pdf"
+          fi
+          shopt -s nullglob
+          for proof in Bulletins/*.pdf; do
+            case "$(basename "$proof")" in
+              all_bulletins_*) ;;
+              *) git add -f "$proof" ;;
+            esac
+          done
           if git diff --cached --quiet; then
             echo "ℹ️  No staged changes — skipping commit."
             exit 0
