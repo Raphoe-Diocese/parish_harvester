@@ -422,6 +422,7 @@ class ChurchmediaNewsletterHelperTests(unittest.TestCase):
         recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
         self.assertEqual(recipe["site_type"], "churchmedia_newsletter")
         self.assertEqual(recipe["churchmedia_slug"], "st-patricks-church-2")
+        self.assertEqual(recipe["max_bulletin_pages"], 8)
         self.assertEqual(recipe["start_url"], self.LISTING)
         click = recipe["steps"][0]
         download = recipe["steps"][1]

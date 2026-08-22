@@ -11,6 +11,7 @@
     "https://portaferryparish.com/images/downloads/Bulletin2019A.pdf"
   ],
   "recorded_date": "2026-08-21",
+  "max_bulletin_pages": 8,
   "timeout_ms": 90000,
   "total_timeout_s": 180,
   "navigation_wait_until": "domcontentloaded",
@@ -35,10 +36,12 @@
     "GET /api/getChannelAbout?slug=st-patricks-church-2 → data.newsletter_url. The path token and ?cb= cache-buster change every upload — never pin them.",
     "Harvester HTTP-fetches that JSON first (no browser). Playwright click of the newsletter button is the fallback.",
     "Same week's file is also overwritten at portaferryparish.com/images/downloads/Bulletin2019A.pdf (Joomla pdf.js viewer) — last-resort HTTP fallback only when the churchmedia API/PDF fails.",
-    "Probed 21/08/2026: current file Sunday 23rd August 2026 (Twenty-First Sunday in Ordinary Time), 5 pages, Last-Modified 20/08/2026. Dead pinned token was ovt7qm?cb=1786005944 (returned HTML)."
+    "Probed 21/08/2026: current file Sunday 23rd August 2026 (Twenty-First Sunday in Ordinary Time), 5 pages, Last-Modified 20/08/2026. Dead pinned token was ovt7qm?cb=1786005944 (returned HTML).",
+    "Harvest after #70 found that 5-page churchmedia file, then failed 'Too many pages: 5 pages (max 4)'. Default cap is 4. max_bulletin_pages=8 allows the weekly newsletter only on this recipe."
   ],
   "do_not": [
     "Do not pin churchmedia /newsletter/<token>.st-patricks-church-2.pdf?cb=... — the token dies on the next upload.",
+    "Do not leave the default 4-page cap — this parish's weekly file is 5 pages.",
     "Do not use st-patricks-ballygalget — that is a different church livestream in the same parish.",
     "Do not download the Angular SPA HTML for a dead /newsletter/<token>.pdf (returns text/html).",
     "Do not treat Bulletin2019A.pdf's 2019 as a year — it is a static overwrite filename."
