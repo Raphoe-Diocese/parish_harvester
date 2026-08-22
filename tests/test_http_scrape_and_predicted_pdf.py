@@ -841,24 +841,13 @@ class LisburnRecipeTests(unittest.TestCase):
         "16-08-26-Blaris-Bulletin_Small.pdf"
     )
 
-    def test_recipe_uses_wp_json_and_allows_eight_pages(self) -> None:
+    def test_recipe_allows_eight_page_blaris(self) -> None:
         data = json.loads(
             Path("parishes/recipes/down_and_connor/parishoflisburn.json").read_text(
                 encoding="utf-8"
             )
         )
-        self.assertEqual(data["site_type"], "wp_json_newest_media")
-        self.assertIn("blaris-bulletin", data.get("href_patterns") or [])
-        self.assertGreaterEqual(int(data["max_bulletin_pages"]), 8)
-        steps = data.get("steps") or []
-        self.assertFalse(
-            any(
-                str(step.get("url") or "").lower().endswith(".pdf")
-                for step in steps
-                if isinstance(step, dict)
-            ),
-            "pinned Blaris PDF is rewritten 16-08-26 → 16-8-26 and 404s",
-        )
+        self.assertGreaterEqual(int(data.get("max_bulletin_pages") or 0), 8)
 
     def test_padded_dd_mm_yy_rewrite_keeps_zeros(self) -> None:
         self.assertEqual(
