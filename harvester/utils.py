@@ -856,16 +856,23 @@ def rewrite_date_url(url: str, target: date) -> str:
 
     # ------------------------------------------------------------------
     # Pattern B: D-M-YY (dashed, 1-2 digit day/month, 2-digit year)
-    # e.g. 5-4-26  ->  12-4-26  (Limavady parish)
-    # Day and month intentionally omit leading zeros (matching the input pattern).
-    # Year uses :02d so that e.g. year 2005 produces "05" not "5".
+    # e.g. 5-4-26  ->  12-4-26  (Limavady / Claudy, unpadded)
+    #      16-08-26 -> 23-08-26 (Lisburn Blaris, keep zero-padding)
+    # Day and month keep the source width so 16-08-26 is not rewritten
+    # to 16-8-26 (that 404s). Year uses :02d so 2005 stays "05".
     # ------------------------------------------------------------------
     def _replace_d_m_yy(m: re.Match) -> str:
         try:
             year = 2000 + int(m.group(3))
             orig = date(year, int(m.group(2)), int(m.group(1)))
             if abs((orig - target).days) < 365:
-                return f"{target.day}-{target.month}-{target.year % 100:02d}"
+                day_s, month_s = m.group(1), m.group(2)
+                # 16-08-26 (both parts 2 digits) keeps zeros. 12-4-26 / 21-6-26
+                # is the unpadded OneWeb style even when the day is already 10+.
+                padded = len(day_s) == 2 and len(month_s) == 2
+                day_fmt = f"{target.day:02d}" if padded else str(target.day)
+                month_fmt = f"{target.month:02d}" if padded else str(target.month)
+                return f"{day_fmt}-{month_fmt}-{target.year % 100:02d}"
         except ValueError:
             pass
         return m.group(0)
