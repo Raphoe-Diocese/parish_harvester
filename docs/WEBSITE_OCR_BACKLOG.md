@@ -4,6 +4,8 @@
 
 This is the single list. Do not create a second competing plan. Do not mark an item **done** unless you have verified it on **generated** HTML/CSS (the files under `docs/dioceses/`, `docs/parishes/`, `docs/bulletins/`, or a fresh `render_bulletin_viewer_shell` output) — changing Python alone is not enough. Harvest regenerate overwrites live HTML from the canonical generator.
 
+**Do not lie about done.** Never tell Frank a website/OCR/viewer job is finished unless you have checked the **generated files that GitHub Pages deploys** (`docs/index.html`, `docs/dioceses/`, `docs/parishes/`) AND, after merge+Pages, the **live URL** (e.g. https://www.parishpress.ie/). Tests or Python-only edits are not enough. If it is not on the live page, say “not live yet”. Do not tick backlog items done without the live check.
+
 Date format for new rows: `YYYY-MM-DD`. User-facing dates on the site stay **DD/MM/YYYY**.
 
 ## Locked product rules (do not “helpfully” undo)
@@ -18,12 +20,15 @@ Date format for new rows: `YYYY-MM-DD`. User-facing dates on the site stay **DD/
 | OCR shows a **parish name header**, real **section headings**, professional spacing | `ocr/bulletin_layout.py`, `ocr_reading_css()` |
 | Do not invent events or translate Irish/Gaeilge | `ocr/bulletin_layout.py`, `ocr/convert_bulletin.py` prompt |
 | Keep real parish PDF slices (do not revert parish pages to fake mega-only PDFs) | `ocr/parish_pages.py` |
+| **Do not lie about done.** Generated Pages files + live URL after merge+Pages. If it is not on the live page, say “not live yet”. | `AGENTS.md`, this file, `.cursor/rules/website-ocr-backlog.mdc` |
 
 ## How to close an item
 
 1. Change the **canonical generator** (not only a one-off HTML file).
 2. Regenerate the live diocese pages (Raphoe, Derry, Down & Connor) so parishpress.ie gets the fix after deploy.
-3. Tick the box, set status to `done`, and note the PR / date verified.
+3. Check the **generated files GitHub Pages deploys** (`docs/index.html`, `docs/dioceses/`, `docs/parishes/`).
+4. After merge+Pages, check the **live URL**. If it is not on the live page, say “not live yet”. Do not tick done without that live check.
+5. Tick the box, set status to `done`, and note the PR / date verified.
 
 ---
 
@@ -56,6 +61,8 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 - [ ] **doing** · 2026-08-22 · Add Clogher Diocese from official Expand-all directory (37 parishes; 21 harvestable after kitchen-sink + snapshot). Facebook stays clickable. Hunt command is `docs/DIOCESE_HUNT.md`. Do not mark the public Clogher page done until a harvest writes `docs/dioceses/clogher/` · `parishes/clogher_diocese_*`, `parishes/recipes/clogher/`, `parishes/dioceses.json`
 - [x] **done** · 2026-08-22 · Sticky OCR search (`.ocr-sticky-chrome { position: sticky; top: 0 }`) and `#scroll-top-btn` / `.scroll-top-btn` page-top jump. Search highlight uses `scrollIntoView({ block: 'start' })` so it sits below the sticky bar. If a parish page is missing the wrapper, `pdf-inpage-viewer.js` wraps zoom + search + tools. Verified on generated Raphoe diocese + Gortahork parish HTML. · `harvester/site_chrome.py`, `ocr/generate_bulletin_pages.py`, `docs/assets/pdf-inpage-viewer.js`
 - [ ] **doing** · 2026-08-22 · Homepage: one compact row of live dioceses with cathedral photos, short welcome, no junk footer. Verified on generated `docs/index.html` 22/08/2026. Leave open until verified on live parishpress.ie · `harvester/site_builder.py` `_landing_page`
+- [ ] **doing** · 2026-08-22 · Favicon on generated heads (`href="/favicon.png"` + apple-touch). Leave open until live https://www.parishpress.ie/favicon.png is HTTP 200 image/png and homepage HTML has the tag. · `harvester/site_chrome.py` `favicon_link_tags`, `harvester/site_builder.py`, `ocr/generate_bulletin_pages.py`
+- [ ] **doing** · 2026-08-22 · Live diocese cards: one-line names (`Down & Connor Diocese`, `white-space: nowrap`, shrink `is-long` / `is-very-long`). Leave open until verified on live https://www.parishpress.ie/ · `harvester/site_builder.py` `_live_card_heading_html`
 - [ ] **todo** · 2026-08-20 · Recipe success — one parish at a time (A–Z repair with proof packs) · `parishes/recipes/`, Problems tab
 - [ ] **todo** · 2026-08-20 · parishpress.ie — live DNS / Pages cutover when Frank is ready · `docs/PARISHPRESS_IE_MIGRATION.md`, `docs/DOMAIN_SETUP.md`
 - [ ] **todo** · 2026-08-20 · Site look — modern pages **after** OCR/capture/recipes are reliable · `harvester/site_builder.py`, `docs/`

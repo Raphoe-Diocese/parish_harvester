@@ -11,7 +11,7 @@ from harvester.fetcher import parse_evidence_file
 from harvester.page_renderer import (
     render_diocese_raphoe_page,
 )
-from harvester.site_chrome import scroll_top_css, scroll_top_html, scroll_top_js
+from harvester.site_chrome import favicon_link_tags, scroll_top_css, scroll_top_html, scroll_top_js
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DOCS_DIR = REPO_ROOT / "docs"
@@ -556,6 +556,7 @@ def _placeholder_page(diocese: DioceseCard, out_path: Path) -> None:
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{html.escape(diocese.name)} Collated Bulletin — Parish Press</title>
+  {favicon_link_tags()}
   <style>
     * {{ box-sizing: border-box; }}
     body {{
@@ -622,6 +623,47 @@ def _status_dot(avg_success_rate: float | None) -> str:
     return "🔴"
 
 
+_LONG_NAME_CHARS = 20
+_VERY_LONG_NAME_CHARS = 28
+
+
+def _short_diocese_name(name: str) -> str:
+    short = name.removesuffix(" Diocese").strip()
+    short = short.replace("-and-", " & ").replace(" and ", " & ")
+    return re.sub(r"\s+", " ", short).strip()
+
+
+def _length_class(label: str) -> str:
+    n = len(label)
+    if n >= _VERY_LONG_NAME_CHARS:
+        return "is-very-long"
+    if n >= _LONG_NAME_CHARS:
+        return "is-long"
+    return ""
+
+
+def _live_card_heading(name: str) -> str:
+    return f"{_short_diocese_name(name)} Diocese"
+
+
+def _live_card_heading_html(name: str) -> str:
+    heading = _live_card_heading(name)
+    css = _length_class(heading)
+    attr = f' class="{css}"' if css else ""
+    return f"<h2{attr}>{html.escape(heading)}</h2>"
+
+
+def _coming_soon_item_html(row: dict[str, str]) -> str:
+    label = _short_diocese_name(row["name"])
+    css = _length_class(label)
+    attr = f' class="{css}"' if css else ""
+    return (
+        f"<li{attr}>{row['dot']} "
+        f"<a href=\"dioceses/{row['key']}/\" target=\"_blank\" rel=\"noopener noreferrer\">"
+        f"{html.escape(label)}</a></li>"
+    )
+
+
 def _landing_page(rows: list[dict[str, str]]) -> str:
     """Homepage: live dioceses prominent up top, the rest collapsed.
 
@@ -654,7 +696,7 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
             f"{photo}"
             "<div class=\"live-card-body\">"
             f"<p class=\"live-card-eyebrow\">{row['dot']} {html.escape(row['status_label'])}</p>"
-            f"<h2>{html.escape(row['name'])} Diocese</h2>"
+            f"{_live_card_heading_html(row['name'])}"
             f"<p class=\"live-card-updated\">Updated {html.escape(row['updated'])}</p>"
             "<div class=\"live-card-actions\">"
             f"<a class=\"live-btn primary\" href=\"dioceses/{row['key']}/\" target=\"_blank\" rel=\"noopener noreferrer\">Open bulletin</a>"
@@ -667,10 +709,7 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
 
     live_cards_html = "".join(_live_card(row) for row in live_rows)
 
-    other_rows_html = "".join(
-        f"<li>{row['dot']} <a href=\"dioceses/{row['key']}/\" target=\"_blank\" rel=\"noopener noreferrer\">{html.escape(row['name'])}</a></li>"
-        for row in other_rows
-    )
+    other_rows_html = "".join(_coming_soon_item_html(row) for row in other_rows)
 
     return f"""<!DOCTYPE html>
 <html lang=\"en\">
@@ -678,6 +717,7 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
   <meta charset=\"utf-8\" />
   <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
   <title>Parish Press — Irish Catholic Bulletins</title>
+  {favicon_link_tags()}
   <link rel=\"stylesheet\" href=\"assets/site.css\" />
   <style>
     * {{ box-sizing: border-box; }}
@@ -752,7 +792,9 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     .live-card-photo-empty {{ background: linear-gradient(135deg, #1a6b6b, #3fae9a); }}
     .live-card-body {{ padding: 10px 12px 12px; }}
     .live-card-eyebrow {{ margin: 0 0 4px; font-size: 0.7rem; font-weight: 700; color: #4b5563; text-transform: uppercase; letter-spacing: 0.04em; }}
-    .live-card h2 {{ margin: 0 0 2px; font-size: 1.02rem; color: #114b4b; }}
+    .live-card h2 {{ margin: 0 0 2px; font-size: 1.02rem; color: #114b4b; white-space: nowrap; }}
+    .live-card h2.is-long {{ font-size: 0.82rem; }}
+    .live-card h2.is-very-long {{ font-size: 0.7rem; }}
     .live-card-updated {{ margin: 0 0 8px; color: #6b7686; font-size: 0.78rem; }}
     .live-card-actions {{ display: flex; flex-direction: column; gap: 6px; }}
     .live-btn {{ display: inline-flex; align-items: center; justify-content: center; padding: 7px 10px; border-radius: 8px; font-weight: 700; font-size: 0.8rem; text-decoration: none; }}
@@ -772,7 +814,9 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     .more-dioceses[open] summary::before {{ content: "▾ "; }}
     .more-dioceses-note {{ margin: 10px 0 12px; color: #6b7280; font-size: 0.88rem; }}
     .more-dioceses-grid {{ list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px 16px; }}
-    .more-dioceses-grid li {{ margin: 0; font-size: 0.92rem; }}
+    .more-dioceses-grid li {{ margin: 0; font-size: 0.92rem; white-space: nowrap; }}
+    .more-dioceses-grid li.is-long {{ font-size: 0.82rem; }}
+    .more-dioceses-grid li.is-very-long {{ font-size: 0.7rem; }}
     .more-dioceses-grid a {{ color: #375569; text-decoration: none; }}
     .more-dioceses-grid a:hover {{ text-decoration: underline; color: #1a6b6b; }}
     .footer {{ border-top: 1px solid #d6ecea; margin-top: 28px; padding: 16px 16px 28px; color: #16202a; font-size: 0.92rem; line-height: 1.6; }}
@@ -881,6 +925,7 @@ def _subscribe_page(dioceses: list[DioceseCard]) -> str:
   <meta charset=\"utf-8\" />
   <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
   <title>Subscribe — Parish Press</title>
+  {favicon_link_tags()}
   <link rel=\"stylesheet\" href=\"../assets/site.css\" />
 </head>
 <body>

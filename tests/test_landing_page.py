@@ -86,8 +86,14 @@ class LandingPageTests(unittest.TestCase):
             self.assertEqual(index_html.count("live-card\""), 4)
             self.assertIn("Clogher Diocese", index_html)
             self.assertIn("Derry Diocese", index_html)
-            self.assertIn("Down and Connor Diocese", index_html)
+            self.assertIn("Down &amp; Connor Diocese", index_html)
+            self.assertNotIn("Down and Connor Diocese", index_html)
             self.assertIn("Raphoe Diocese", index_html)
+            self.assertIn('class="is-long"', index_html)
+            self.assertIn("white-space: nowrap", index_html)
+            self.assertIn("<h2>Raphoe Diocese</h2>", index_html)
+            self.assertNotIn('<h2 class="is-long">Raphoe Diocese</h2>', index_html)
+            self.assertIn('href="/favicon.png"', index_html)
             self.assertIn("Open bulletin", index_html)
             self.assertIn("Mega PDF", index_html)
             self.assertIn(">Text<", index_html)
@@ -130,6 +136,25 @@ class LandingPageTests(unittest.TestCase):
             self.assertIn('photo-credit', index_html)
             self.assertIn('font-size: 0.65rem', index_html)
             self.assertNotIn('hero-slide-credit', index_html)
+
+
+class FaviconAssetTests(unittest.TestCase):
+    def test_docs_favicon_png_exists_and_is_real(self) -> None:
+        favicon = Path(__file__).resolve().parent.parent / "docs" / "favicon.png"
+        self.assertTrue(favicon.exists(), "docs/favicon.png must ship with Pages")
+        self.assertGreater(favicon.stat().st_size, 1000)
+
+
+class LiveCardHeadingTests(unittest.TestCase):
+    def test_down_and_connor_uses_ampersand_and_is_long(self) -> None:
+        html_out = site_builder._live_card_heading_html("Down and Connor")
+        self.assertIn("Down &amp; Connor Diocese", html_out)
+        self.assertIn('class="is-long"', html_out)
+        self.assertNotIn("Down and Connor Diocese", html_out)
+
+    def test_raphoe_is_not_long(self) -> None:
+        html_out = site_builder._live_card_heading_html("Raphoe")
+        self.assertEqual(html_out, "<h2>Raphoe Diocese</h2>")
 
 
 class HeroSliderRenderTests(unittest.TestCase):
