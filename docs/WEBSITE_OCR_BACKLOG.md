@@ -11,8 +11,9 @@ Date format for new rows: `YYYY-MM-DD`. User-facing dates on the site stay **DD/
 | Rule | Where it lives |
 |------|----------------|
 | Mega PDF generation stays **on** (`HARVEST_MEGA_PDF=1`) | `.github/workflows/harvest.yml`, `AGENTS.md`, `DECISIONS_LOG.md` |
-| Desktop PDF **and** OCR panels: `min-height: 850px` | `ocr/generate_bulletin_pages.py` → `render_bulletin_viewer_shell` |
-| Mobile/tablet (max-width 1024px): `min-height: ~450px` | same function, `@media (max-width: 1024px)` |
+| Desktop PDF **and** OCR panels: **locked** `height` / `min-height` / `max-height` **850px**; extra content scrolls **inside** the box (`overflow: auto`). Not `height: auto`. Not `85vh`. | `ocr/generate_bulletin_pages.py` → `render_bulletin_viewer_shell`, `pdf_inpage_viewer_css()`; `docs/assets/pdf-inpage-viewer.js` `ensureStyles()` |
+| Mobile/tablet (max-width 1024px): **locked 450px** (height + min + max), inner scroll | same function + JS, `@media (max-width: 1024px)` |
+| Sticky OCR search stays **outside** `#ocr-panel`; page **↑** `#scroll-top-btn` jumps to the top of the page | `harvester/site_chrome.py`, viewer shell |
 | Parish / diocese outbound links open in a **new tab** (`target="_blank"` `rel="noopener noreferrer"`) | viewer shell, parish grids, `docs/assets/pdf-inpage-viewer.js` |
 | OCR shows a **parish name header**, real **section headings**, professional spacing | `ocr/bulletin_layout.py`, `ocr_reading_css()` |
 | Do not invent events or translate Irish/Gaeilge | `ocr/bulletin_layout.py`, `ocr/convert_bulletin.py` prompt |
@@ -37,7 +38,7 @@ Date format for new rows: `YYYY-MM-DD`. User-facing dates on the site stay **DD/
 | done | 2026-08-20 | Promote existing bulletin topic lines to real `h2`/`h3` (Mass times, Anniversaries / RIP / deceased, Community / notices, Fundraising / bingo / events, Contact). Do not invent text. Keep Irish as Irish. | `ocr/bulletin_layout.py`; applied from `ocr/convert_bulletin.py` (`render_markdown_lines`) and `prepare_ocr_fragment` |
 | done | 2026-08-20 | Readable OCR measure: larger body type, line-height ~1.65, space after headings, max-width ~72ch, soft stone paper (not harsh black-on-white), mobile wrap | `ocr_reading_css()` in `ocr/generate_bulletin_pages.py`; mirrored in `ocr/convert_bulletin.py` `CSS` |
 | done | 2026-08-20 | Mega PDF parish URL links at the top of each parish must **work** and open in a **new tab** (PDF.js was painting canvases only, so annotations were dead) | `harvester/stitcher.py` (`_build_parish_header_pdf` `linkURL` + `newWindow=True`); `docs/assets/pdf-inpage-viewer.js` annotation overlay |
-| done | 2026-08-20 | Desktop 850px min-height for PDF **and** OCR in the canonical generator; tablet/phone ~450px. Regenerated live diocese HTML so harvest cannot drop it. | `render_bulletin_viewer_shell`; tests in `tests/test_ocr_bulletin_pages.py`, `tests/test_page_renderer.py`, `tests/test_site_builder.py` |
+| done | 2026-08-20 | Desktop 850px / mobile 450px for PDF **and** OCR in the canonical generator. Regenerated live diocese HTML so harvest cannot drop it. Later locked as **fixed** visible boxes (not min-height-only growth) — see 2026-08-22 item. | `render_bulletin_viewer_shell`; tests in `tests/test_ocr_bulletin_pages.py`, `tests/test_page_renderer.py`, `tests/test_site_builder.py` |
 | done | 2026-08-20 | Parish / diocese HTML links already use `target="_blank"` `rel="noopener noreferrer"` | `render_bulletin_viewer_shell`, `render_parish_link_grid`, `ocr/parish_pages.py` |
 | locked | 2026-08-20 | Mega PDF generation stays on — do not disable `HARVEST_MEGA_PDF` | `.github/workflows/harvest.yml`, `main.py` (single-parish skip is intentional) |
 
@@ -48,7 +49,7 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 ## Still open (do not pretend these are finished)
 
 - [ ] **doing** · 2026-08-21 · Gortahork (`gort-a-choirce`) OCR empty — mega page 14 was banner-only (Irish image body never OCR'd). Fill sparse mega pages from the mega PDF image and slice by `pages.json` / `Page N`. Keep Irish as Irish. **Leave open until verified on live** https://www.parishpress.ie/parishes/raphoe/gort-a-choirce.html · `ocr/sparse_page_ocr.py`, `ocr/parish_splitter.py`, `ocr/parish_pages.py`
-- [x] **done** · 2026-08-22 · Desktop 850px is the **visible** `.pdf-inpage-pages` / `#ocr-panel` **min-height** (`height: auto`, `overflow: visible` — page scrolls, no inner scrollbar). Not 85vh, not a locked `height: 850px`. Diocese **and** parish pages. Mobile/tablet `max-width: 1024px` stay ~450px min-height. Verified on generated `docs/dioceses/raphoe/index.html`, `docs/dioceses/down-and-connor/index.html`, `docs/parishes/raphoe/gort-a-choirce.html`. Runtime `ensureStyles()` uses `!important` + cache-bust `?v=20260822`. · `render_bulletin_viewer_shell`, `pdf_inpage_viewer_css`, `docs/assets/pdf-inpage-viewer.js`
+- [x] **done** · 2026-08-22 · Desktop 850px is a **fixed** visible box: `.pdf-inpage-pages` and `#ocr-panel` use `height: 850px; min-height: 850px; max-height: 850px; overflow: auto`. Extra PDF pages / OCR text scroll **inside** the box. Mobile/tablet `max-width: 1024px`: locked 450px the same way. Not `height: auto`, not `overflow: visible`, not `85vh`. Sticky search stays **outside** `#ocr-panel` (`.ocr-sticky-chrome`). Page **↑** `#scroll-top-btn` still jumps to the top of the page. Runtime `ensureStyles()` locks the same sizes with `!important` + cache-bust `?v=20260822c`. Verified on generated `docs/dioceses/raphoe/index.html`, `docs/dioceses/down-and-connor/index.html`, `docs/parishes/raphoe/gort-a-choirce.html`. · `render_bulletin_viewer_shell`, `pdf_inpage_viewer_css`, `docs/assets/pdf-inpage-viewer.js`
 - [ ] **doing** · 2026-08-21 · Back room **View bulletin** opens this week’s scraped PDF: `Bulletins/<key>.pdf`, then `current/`/`stale/`, then the parishpress parish slice. No zip archives. Ship as Parish Trainer v1.61.12. · `extension/sidepanel.js`, `harvester/report.py`
 - [ ] **doing** · 2026-08-21 · Trainer Guess must show the guessed URL + title and a **Save guessed link** / **Use this link** control that writes a real recipe step (download / goto / newest-picker). Top 3 candidates. Prefer newest Sunday; skip GDPR / privacy / wedding / Order of Mass. Do not hide Guess after refresh. Manifest footer must match. · `extension/content.js`, `extension/copilot.js`, `extension/manifest.json`
 - [ ] **doing** · 2026-08-21 · Trainer ↔ GitHub sync: Problems/Directory load latest `parishes/parish_status.json` via commit SHA; Directory shows ok + UK date; Send & test waits for `last_tested_at` change · `extension/*`
@@ -82,11 +83,12 @@ python -m pytest tests/test_ocr_bulletin_pages.py tests/test_bulletin_layout.py 
 
 Spot-check generated CSS for:
 
-- `height: auto`, `min-height: 850px`, and `overflow: visible` on the visible `.pdf-inpage-pages` and `#ocr-panel` (not only the wrap)
-- no `overflow-y: auto` on `#ocr-panel` (no second scrollbar — the PAGE scrolls)
+- `height: 850px`, `min-height: 850px`, and `max-height: 850px` on the visible `.pdf-inpage-pages` and `#ocr-panel` (not only the wrap)
+- `overflow: auto` / `overflow-y: auto` on those boxes (content scrolls **inside** the 850px box)
+- no `height: auto` and no `overflow: visible` on those visible boxes
 - no `height: 85vh` clip on `.pdf-frame-wrap`
-- `@media (max-width: 1024px)` with `height: auto` / `min-height: 450px` on those same visible boxes
-- `.ocr-sticky-chrome { position: sticky; top: 0 }` and `#scroll-top-btn`
-- `/assets/pdf-inpage-viewer.js?v=20260822` (cache-bust)
+- `@media (max-width: 1024px)` with locked `height` / `min-height` / `max-height: 450px` and inner scroll on those same visible boxes
+- `.ocr-sticky-chrome { position: sticky; top: 0 }` **outside** `#ocr-panel`, and `#scroll-top-btn` (page top)
+- `/assets/pdf-inpage-viewer.js?v=20260822c` (cache-bust)
 - `ocr-parish-masthead` / `ocr-parish-name` in the OCR panel
 - `getAnnotations` + `target="_blank"` in `docs/assets/pdf-inpage-viewer.js`
