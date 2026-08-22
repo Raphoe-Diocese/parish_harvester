@@ -667,20 +667,44 @@ class ErrigalAndMalinRecipeTests(unittest.TestCase):
 
 
 class LisburnRecipeTests(unittest.TestCase):
-    def test_recipe_allows_eight_page_blaris_small(self) -> None:
+    THIS_WEEK = (
+        "https://parishoflisburn.org/wp-content/uploads/2026/08/"
+        "16-08-26-Blaris-Bulletin_Small.pdf"
+    )
+
+    def test_recipe_uses_wp_json_and_allows_eight_pages(self) -> None:
         data = json.loads(
             Path("parishes/recipes/down_and_connor/parishoflisburn.json").read_text(
                 encoding="utf-8"
             )
         )
+        self.assertEqual(data["site_type"], "wp_json_newest_media")
+        self.assertIn("blaris-bulletin", data.get("href_patterns") or [])
         self.assertGreaterEqual(int(data["max_bulletin_pages"]), 8)
         steps = data.get("steps") or []
-        self.assertTrue(
+        self.assertFalse(
             any(
-                "16-08-26-Blaris-Bulletin_Small.pdf" in str(step.get("url") or "")
+                str(step.get("url") or "").lower().endswith(".pdf")
                 for step in steps
                 if isinstance(step, dict)
-            )
+            ),
+            "pinned Blaris PDF is rewritten 16-08-26 → 16-8-26 and 404s",
+        )
+
+    def test_padded_dd_mm_yy_rewrite_keeps_zeros(self) -> None:
+        self.assertEqual(
+            rewrite_date_url(self.THIS_WEEK, date(2026, 8, 16)),
+            self.THIS_WEEK,
+        )
+        self.assertEqual(
+            rewrite_date_url(self.THIS_WEEK, date(2026, 8, 23)),
+            "https://parishoflisburn.org/wp-content/uploads/2026/08/"
+            "23-08-26-Blaris-Bulletin_Small.pdf",
+        )
+        unpadded = "https://www.limavadyparish.org/onewebmedia/16-8-26.pdf"
+        self.assertEqual(
+            rewrite_date_url(unpadded, date(2026, 8, 23)),
+            "https://www.limavadyparish.org/onewebmedia/23-8-26.pdf",
         )
 
 

@@ -3,27 +3,28 @@
   "parish_key": "parishoflisburn",
   "display_name": "Lisburn",
   "diocese": "down_and_connor",
-  "start_url": "https://parishoflisburn.org/category/news/",
-  "site_type": "pdf_link_list",
+  "start_url": "https://parishoflisburn.org/",
+  "site_type": "wp_json_newest_media",
+  "href_patterns": ["blaris-bulletin"],
   "max_bulletin_pages": 16,
   "playbook_type": "pdf_download_list",
   "steps": [
     {
-      "action": "download",
-      "url": "https://parishoflisburn.org/wp-content/uploads/2026/08/16-08-26-Blaris-Bulletin_Small.pdf"
+      "action": "goto",
+      "url": "https://parishoflisburn.org/"
     }
   ],
   "timeout_ms": 55000,
   "total_timeout_s": 190,
-  "recorded_date": "2026-08-21",
+  "recorded_date": "2026-08-22",
   "operator_notes": [
-    "Parish of Blaris (Lisburn). This week's file is https://parishoflisburn.org/wp-content/uploads/2026/08/16-08-26-Blaris-Bulletin_Small.pdf",
-    "2026-08-21: HTTP 200, 739527 bytes, 8 pages, date 16/08/2026 (Twentieth Sunday). Send & test downloaded it then failed 'Too many pages: 8 pages (max 4)'. max_bulletin_pages=16 allows this long weekly file.",
-    "Do not use predicted_dated_pdf rewrite on this name — it drops zero-padding (16-08-26 → 16-8-26) and 404s."
+    "Parish of Blaris (Lisburn). Weekly files are DD-MM-YY-Blaris-Bulletin_Small.pdf in wp-json media. Newest on 22/08/2026 is 16-08-26-Blaris-Bulletin_Small.pdf (HTTP 200, 739527 bytes, 8 pages, Twentieth Sunday).",
+    "Send & test download of that URL was rewritten 16-08-26 → 16-8-26 and failed HTTP 404. site_type:wp_json_newest_media never rewrites the filename.",
+    "max_bulletin_pages=16 — default 4-page cap rejected the real 8-page Small bulletin."
   ],
   "do_not": [
-    "Do not leave the default 4-page cap — Blaris Small bulletins are ~8 pages.",
-    "Do not download wedding / GDPR / Order of Mass.",
-    "Do not raise the cap to accept an old magazine if the filename date is stale."
+    "Do not pin or rewrite 16-08-26-Blaris-Bulletin_Small.pdf — harvest turns it into 16-8-26 and 404s.",
+    "Do not leave the default 4-page cap.",
+    "Do not download wedding / GDPR / Order of Mass."
   ]
 }
