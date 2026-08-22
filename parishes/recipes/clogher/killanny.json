@@ -1,19 +1,34 @@
 {
+  "version": 2,
   "parish_key": "killanny",
   "display_name": "Killanny",
   "diocese": "clogher",
+  "start_url": "https://www.killannyparish.ie/parish-bulletin",
+  "site_type": "html_text_bulletin",
+  "playbook_type": "html_text_bulletin",
+  "timeout_ms": 60000,
+  "total_timeout_s": 120,
+  "max_bulletin_pages": 8,
   "recorded_date": "2026-08-22",
-  "start_url": "http://www.killannyparish.ie/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No current weekly bulletin PDF on the official website \u2014 keep the reader link",
   "steps": [
     {
       "action": "goto",
-      "url": "http://www.killannyparish.ie/"
+      "url": "https://www.killannyparish.ie/parish-bulletin"
+    },
+    {
+      "action": "print_to_pdf",
+      "skip_listing_nav": true
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "HTML parish bulletin overwritten in place at /parish-bulletin. No weekly PDF.",
+    "Live on 22/08/2026 is still Sunday 16th May / 23rd May (Ascension / Pentecost) with 2021 membership and lockdown text — stale, not missing.",
+    "print_to_pdf this same URL every harvest so an overwrite is picked up. skip_listing_nav=true."
+  ],
+  "do_not": [
+    "Do not skip this parish because the HTML is old — harvest it as stale until they overwrite.",
+    "Do not invent an August 2026 PDF.",
+    "Do not pin a dated URL — the page is overwritten in place.",
+    "Do not remove skip_listing_nav."
+  ]
 }
