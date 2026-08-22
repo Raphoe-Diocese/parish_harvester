@@ -45,7 +45,7 @@ class SendTestCommsTests(unittest.TestCase):
 
     def test_manifest_bumped_for_extension_js(self) -> None:
         text = MANIFEST.read_text(encoding="utf-8")
-        self.assertIn('"version": "1.61.14"', text)
+        self.assertIn('"version": "1.61.15"', text)
 
     def test_back_room_fetches_fresh_parish_status(self) -> None:
         push = PUSH_JS.read_text(encoding="utf-8")

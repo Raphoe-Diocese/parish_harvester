@@ -132,7 +132,7 @@ class ExtensionMessagingTests(unittest.TestCase):
         content = CONTENT_JS.read_text(encoding="utf-8")
         html = SIDEPANEL_HTML.read_text(encoding="utf-8")
         manifest = json.loads(MANIFEST_JSON.read_text(encoding="utf-8"))
-        self.assertEqual(manifest.get("version"), "1.61.14")
+        self.assertEqual(manifest.get("version"), "1.61.15")
         self.assertIn("ph-long-bulletin-cb", content)
         self.assertIn("max_bulletin_pages", content)
         self.assertIn("Long bulletin — allow extra pages", content)

@@ -39,6 +39,12 @@ class ClogherDioceseTests(unittest.TestCase):
         self.assertIn("donaghparish.com/parish-news", by_key["donagh"].example_url)
         self.assertIn("_files/ugd/", by_key["irvinestown"].example_url)
         self.assertIn("onewebmedia/S25C", by_key["newtownbutler"].example_url)
+        self.assertIn("Newsletter-23.08.2026.pdf", by_key["corcaghanthreemilehouse"].example_url)
+        self.assertIn("23rd-August-2026-.rtf", by_key["magheracloone"].example_url)
+        self.assertIn("truaghparish.com", by_key["errigaltruagh"].example_url)
+        self.assertIn("14th-June.jpg", by_key["dromore"].example_url)
+        self.assertIn("pdf/230826.pdf", by_key["tempo"].example_url)
+        self.assertIn("parishnews.htm", by_key["ballybay"].example_url)
 
     def test_facebook_and_link_only_recipes_are_skipped(self) -> None:
         facebook = load_recipe(recipe_path_for("aughnamulleneast", PARISHES))

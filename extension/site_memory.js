@@ -99,6 +99,39 @@
       do_not: [
         "Do not use use_page_url only — GitHub cannot read Chrome's internal PDF viewer address.",
         "Do not worry if Document Properties title mentions Microsoft Word.",
+        "Do not skip a news.html page because view-source is empty — the /pdf/DDMMYY.pdf links are often JavaScript.",
+      ],
+    },
+    js_dated_pdf_list: {
+      playbook_type: "dated_pdf_bulletin",
+      site_type: "predicted_dated_pdf",
+      page_type: "direct_pdf",
+      recipe_flow: "direct_download",
+      label: "JS-rendered /pdf/DDMMYY.pdf list",
+      operator_notes: [
+        "Listing HTML scrape looks empty. Live DOM has Sunday, Dth Month YYYY → /pdf/DDMMYY.pdf.",
+        "Save this PDF. Harvester rewrites DDMMYY each Sunday (predicted_dated_pdf).",
+        "Prefer HTTP if HTTPS TLS fails (Tempo / Pobal).",
+      ],
+      do_not: [
+        "Do not skip because news.html looks empty.",
+        "Do not pin one week's filename.",
+      ],
+    },
+    js_overwritten_html_newsletter: {
+      playbook_type: "html_text_bulletin",
+      site_type: "html_text_bulletin",
+      page_type: "html_text_bulletin",
+      recipe_flow: "html_capture",
+      label: "JS-injected HTML newsletter (overwritten weekly)",
+      operator_notes: [
+        "parishnews.htm view-source is blank. After JS, this week's newsletter is on the page.",
+        "Save page as PDF with skip_listing_nav. Wait for the embed to load.",
+        "109.228.27.39/templates/?a= is a print view — do not pin that article id.",
+      ],
+      do_not: [
+        "Do not skip because HTTP scrape is blank.",
+        "Do not use the 109.228 IP as the start URL.",
       ],
     },
     mdocs_download_list: {
@@ -184,6 +217,50 @@
         "Do not Save page as PDF — that captures every old bulletin on the page.",
       ],
     },
+    onewebmedia_pdf_list: {
+      playbook_type: "pdf_download_list",
+      site_type: "pdf_link_list",
+      page_type: "pdf_link_list",
+      recipe_flow: "click_then_pdf",
+      label: "One.com weekly PDF list (onewebmedia)",
+      operator_notes: [
+        "onewebmedia/*.pdf — newest row is usually a DDMMYYYY name or hashed S25C with dated link text.",
+        "If the HTTPS certificate is expired, harvest must ignore TLS errors (Playwright).",
+        "Do not pin a dated or hashed filename.",
+      ],
+      do_not: [
+        "Do not pin a dated or hashed onewebmedia filename.",
+        "Do not use plain HTTP scrape when the certificate is expired.",
+      ],
+    },
+    wix_ugd_dated_pdf: {
+      playbook_type: "wix_html",
+      site_type: "html_text_bulletin",
+      page_type: "pdf_link_list",
+      recipe_flow: "click_then_pdf",
+      label: "Wix hashed PDF with dated link text",
+      operator_notes: [
+        "Wix /_files/ugd/ hashes have no date — the date is in the link text.",
+        "Click newest_dated, then download. Never pin the hash.",
+      ],
+      do_not: [
+        "Do not pin a hashed /_files/ugd/ URL.",
+        "Do not use http_scrape_newest_pdf on hashed Wix files.",
+        "Do not download rota or vocations PDFs.",
+      ],
+    },
+    office_rtf_newsletter: {
+      playbook_type: "pdf_download_list",
+      site_type: "http_scrape_newest_pdf",
+      page_type: "pdf_link_list",
+      recipe_flow: "direct_download",
+      label: "Weekly RTF newsletter",
+      operator_notes: [
+        "Weekly file is .rtf (Word). Harvester converts it with LibreOffice.",
+        "Pick the newest dated .rtf — do not invent a PDF name.",
+      ],
+      do_not: ["Do not pin a dated .rtf.", "Do not invent a PDF filename."],
+    },
     pdf_download_list: {
       playbook_type: "pdf_download_list",
       site_type: "pdf_link_list",
@@ -255,6 +332,21 @@
     }
     if (fpId === "stacked_image_bulletin" || _recipeUsesImageStack(safeRecipe)) {
       return CATALOG.stacked_image_bulletin;
+    }
+    if (fpId === "onewebmedia_pdf_list") {
+      return CATALOG.onewebmedia_pdf_list;
+    }
+    if (fpId === "wix_ugd_dated_pdf") {
+      return CATALOG.wix_ugd_dated_pdf;
+    }
+    if (fpId === "office_rtf_newsletter") {
+      return CATALOG.office_rtf_newsletter;
+    }
+    if (fpId === "js_dated_pdf_list") {
+      return CATALOG.js_dated_pdf_list;
+    }
+    if (fpId === "js_overwritten_html_newsletter") {
+      return CATALOG.js_overwritten_html_newsletter;
     }
     if (_recipeUsesDatedPdfPath(safeRecipe)) {
       return CATALOG.dated_pdf_bulletin;

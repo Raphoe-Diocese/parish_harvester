@@ -169,6 +169,107 @@
       doNot: ["Do not pick the first iframe PDF — often GDPR. Do not use image capture."],
     },
     {
+      id: "onewebmedia_pdf_list",
+      label: "One.com weekly PDF list (onewebmedia)",
+      pageType: "pdf_link_list",
+      captureMethod: "click_then_pdf",
+      playbookType: "pdf_download_list",
+      minScore: 28,
+      markers: [
+        { re: /onewebmedia\/[^"' ]+\.pdf/i, weight: 22, label: "onewebmedia PDF" },
+        { re: /bulletin\.html|bulletin-1\.html/i, weight: 10, label: "bulletin.html listing" },
+      ],
+      advice:
+        "One.com PDF list — click the newest dated row (link text). If the HTTPS cert is expired, harvest must ignore TLS errors. Do not pin hashed S25C names.",
+      doNot: [
+        "Do not pin a dated or hashed onewebmedia filename.",
+        "Do not use plain HTTP scrape when the certificate is expired.",
+      ],
+    },
+    {
+      id: "wix_ugd_dated_pdf",
+      label: "Wix hashed /_files/ugd/ PDF with dated link text",
+      pageType: "pdf_link_list",
+      captureMethod: "click_then_pdf",
+      playbookType: "wix_html",
+      minScore: 26,
+      markers: [
+        { re: /_files\/ugd\/[a-f0-9]+_[a-f0-9]+\.pdf/i, weight: 20, label: "Wix ugd hashed PDF" },
+        { re: /wixstatic|wix\.com|parastorage/i, weight: 8, label: "Wix host" },
+      ],
+      advice:
+        "Wix hashed PDFs — the date is in the link text (23rd August 2026), not the URL. Follow a link → newest dated → Get a PDF. Never pin the hash.",
+      doNot: [
+        "Do not pin a hashed /_files/ugd/ URL.",
+        "Do not use http_scrape_newest_pdf — hashes have no date.",
+        "Do not download rota / vocations PDFs.",
+      ],
+    },
+    {
+      id: "office_rtf_newsletter",
+      label: "Weekly RTF newsletter",
+      pageType: "pdf_link_list",
+      captureMethod: "click_then_pdf",
+      playbookType: "pdf_download_list",
+      minScore: 24,
+      markers: [
+        { re: /parish newsletter[^<]{0,40}\.rtf|\.rtf/i, weight: 16, label: "RTF newsletter" },
+        { re: /app\/uploads\/.*\.rtf|wp-content\/uploads\/.*\.rtf/i, weight: 14, label: "uploads RTF" },
+      ],
+      advice:
+        "Weekly file is Word RTF, not PDF. Save the newest dated .rtf — harvester converts it with LibreOffice.",
+      doNot: ["Do not invent a PDF filename. Do not pin a dated .rtf."],
+    },
+    {
+      id: "js_dated_pdf_list",
+      label: "JS-rendered /pdf/DDMMYY.pdf list",
+      pageType: "direct_pdf",
+      captureMethod: "direct_download",
+      playbookType: "dated_pdf_bulletin",
+      minScore: 26,
+      markers: [
+        { re: /\/pdf\/\d{6}\.pdf/i, weight: 22, label: "dated /pdf/DDMMYY.pdf" },
+        { re: /sunday,\s+\d{1,2}(?:st|nd|rd|th)\s+\w+\s+20\d{2}/i, weight: 8, label: "Sunday dated row" },
+      ],
+      pickDownloadUrl: (doc) => {
+        const hrefs = Array.from(doc.querySelectorAll("a[href]"))
+          .map((a) => {
+            try {
+              return new URL(a.getAttribute("href") || "", doc.location?.href || "").href;
+            } catch (_e) {
+              return "";
+            }
+          })
+          .filter((href) => /\/pdf\/\d{6}\.pdf/i.test(href));
+        const ranked = hrefs.sort().reverse();
+        return ranked[0] || "";
+      },
+      advice:
+        "news.html often looks empty in view-source. The weekly file is /pdf/DDMMYY.pdf in the live page. Save this PDF — harvester rewrites the date.",
+      doNot: [
+        "Do not skip because HTTP scrape of news.html is blank.",
+        "Do not pin one week's DDMMYY filename.",
+      ],
+    },
+    {
+      id: "js_overwritten_html_newsletter",
+      label: "JS-injected HTML newsletter (overwritten weekly)",
+      pageType: "html_text_bulletin",
+      captureMethod: "html_capture",
+      playbookType: "html_text_bulletin",
+      minScore: 24,
+      markers: [
+        { re: /109\.228\.27\.39\/templates\/\?a=/i, weight: 18, label: "legacy newsletter IP embed" },
+        { re: /parish newsletter/i, weight: 8, label: "parish newsletter heading" },
+      ],
+      advice:
+        "View-source looks empty. The live page already has this week's newsletter. Save page as PDF. Do not pin a 109.228 article id.",
+      doNot: [
+        "Do not skip because HTTP scrape is blank.",
+        "Do not harvest the 109.228.27.39 archive host as the start URL.",
+      ],
+    },
+    {
       id: "wordpress_pdfemb",
       label: "WordPress PDF Embedder list",
       pageType: "wp_pdfemb_list",

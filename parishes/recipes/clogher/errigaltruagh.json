@@ -1,19 +1,41 @@
 {
+  "version": 2,
   "parish_key": "errigaltruagh",
   "display_name": "Errigal Truagh",
   "diocese": "clogher",
+  "start_url": "https://www.truaghparish.com/",
+  "playbook_type": "wix_html",
+  "timeout_ms": 55000,
+  "total_timeout_s": 250,
   "recorded_date": "2026-08-22",
-  "start_url": "http://www.errigaltruparish.com/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No current weekly bulletin PDF on the official website \u2014 keep the reader link",
   "steps": [
     {
       "action": "goto",
-      "url": "http://www.errigaltruparish.com/"
+      "url": "https://www.truaghparish.com/"
+    },
+    {
+      "action": "click",
+      "selector": "a:has-text('Parish Bulletin')",
+      "pick_strategy": "newest_dated",
+      "fallback_selectors": [
+        "a[href*='_files/ugd/'][href$='.pdf']"
+      ]
+    },
+    {
+      "action": "download",
+      "url_pattern": "*.pdf"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "errigaltruparish.com is dead DNS. Live site is truaghparish.com.",
+    "Homepage 'Click here for Errigal Truagh Parish Bulletin' is a Wix hashed PDF.",
+    "Proved 22/08/2026: HTTP 200, 319760 bytes, PDF text Sunday 23 August 2026.",
+    "Do not pin the hash. Do not harvest the Vocations or church-history PDFs."
+  ],
+  "do_not": [
+    "Do not use errigaltruparish.com.",
+    "Do not pin a hashed Wix PDF.",
+    "Do not download the Year of Vocations PDF or the church-history docx.",
+    "Do not use http_scrape_newest_pdf — hashed filenames have no date."
+  ]
 }

@@ -1,5 +1,7 @@
 # How to Add a New Diocese
 
+**Agents: follow [`docs/DIOCESE_HUNT.md`](../docs/DIOCESE_HUNT.md) first.** That file is the hunt command (kitchen sink + fingerprint + remember the trick). This file is only the evidence-file format.
+
 This guide explains how to add a new diocese to the Parish Bulletin Harvester.
 
 ## Overview

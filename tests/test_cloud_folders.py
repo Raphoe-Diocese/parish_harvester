@@ -54,6 +54,11 @@ class CloudFolderTests(unittest.TestCase):
             extract_date_from_string("9.8.26-19th-Sunday.pdf"),
             date(2026, 8, 9),
         )
+        # Kilmore Newsletter-DD.MM.YYYY.pdf — 4-digit year must win over 08.20.26
+        self.assertEqual(
+            extract_date_from_string("Newsletter-23.08.2026.pdf"),
+            date(2026, 8, 23),
+        )
 
     def test_detect_cloud_date_format(self) -> None:
         self.assertEqual(detect_cloud_date_format("26.06.14.pdf"), "YY.MM.DD")
