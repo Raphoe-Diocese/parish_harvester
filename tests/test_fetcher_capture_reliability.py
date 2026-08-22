@@ -7,6 +7,7 @@ discovery accepts A4-sized scans; evidence parsing recognises .webp/.gif.
 """
 from __future__ import annotations
 
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -182,6 +183,20 @@ class RecipeMaxBulletinPagesTests(unittest.TestCase):
     def test_invalid_or_too_small_falls_back_to_global(self) -> None:
         self.assertEqual(recipe_max_bulletin_pages({"max_bulletin_pages": 0}), MAX_BULLETIN_PAGES)
         self.assertEqual(recipe_max_bulletin_pages({"max_bulletin_pages": "nope"}), MAX_BULLETIN_PAGES)
+
+    def test_holycross_recipe_keeps_default_page_cap(self) -> None:
+        """Holy Cross 13-page July file must stay rejected (global default 4)."""
+        recipe_path = (
+            Path(__file__).resolve().parent.parent
+            / "parishes"
+            / "recipes"
+            / "down_and_connor"
+            / "holycrossparishbelfast.json"
+        )
+        recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
+        self.assertNotIn("max_bulletin_pages", recipe)
+        self.assertEqual(recipe_max_bulletin_pages(recipe), MAX_BULLETIN_PAGES)
+        self.assertEqual(MAX_BULLETIN_PAGES, 4)
 
 
 class RejectIfOversizedTests(unittest.TestCase):
