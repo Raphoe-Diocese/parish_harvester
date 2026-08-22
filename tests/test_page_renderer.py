@@ -59,6 +59,8 @@ class PageRendererTests(unittest.TestCase):
             self.assertNotIn("PRO TIP", html.upper())
             self.assertNotIn("callout-tip", html)
             self.assertIn("min-height: 850px", html)
+            self.assertIn("height: 850px", html)
+            self.assertIn("max-height: 850px", html)
             self.assertIn("Georgia", html)
 
     def test_render_diocese_raphoe_page_escapes_user_content(self) -> None:

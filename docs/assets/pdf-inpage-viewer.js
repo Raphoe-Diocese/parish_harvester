@@ -3,8 +3,9 @@
  *
  * Phones cannot embed a raw PDF in <iframe> (sad-document icon). Desktop
  * Chrome/Edge iframes show a "Page X of Y" toolbar Frank asked to remove.
- * This script paints every page on stacked canvases with Mozilla PDF.js so
- * the PAGE scrolls (no inner PDF/OCR scrollbar). Open PDF / Download stay.
+ * This script paints every page on stacked canvases with Mozilla PDF.js.
+ * The visible PDF/OCR boxes are locked at 850px (450px on phones); extra
+ * pages scroll INSIDE those boxes. Open PDF / Download stay.
  *
  * Progressive load: disableAutoFetch + streaming + HTTP Range. Mega PDFs are
  * 14–20 MB; we must not wait for the whole file before showing page 1.
@@ -29,27 +30,27 @@
       style.id = "pdf-inpage-viewer-style";
       document.head.appendChild(style);
     }
-    /* !important so old HTML (height:850px;overflow:auto) cannot restore
-       a second scrollport. Visible boxes grow; the PAGE scrolls. */
+    /* !important so old HTML cannot stretch the page. Visible boxes stay
+       locked 850/450; extra content scrolls inside. */
     style.textContent =
-      ".pdf-inpage-viewer{display:flex!important;flex-direction:column;min-height:850px!important;height:auto!important;flex:1 1 auto;background:#3a3f42;color:#e8eeed}" +
+      ".pdf-inpage-viewer{display:flex!important;flex-direction:column;min-height:850px!important;flex:1 1 auto;background:#3a3f42;color:#e8eeed}" +
       ".pdf-inpage-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:8px;padding:8px 10px;background:#14524f;color:#fff;flex:0 0 auto}" +
       ".pdf-inpage-backup{display:flex;gap:8px;flex-wrap:wrap}" +
       ".pdf-inpage-backup a{color:#fff;font-weight:700;font-size:.85rem}" +
       ".pdf-inpage-status{padding:10px 12px;background:#1f3d3c;color:#d8f0ee;font-size:.9rem}" +
-      ".pdf-inpage-pages{box-sizing:border-box;flex:0 0 auto;height:auto!important;min-height:850px!important;overflow:visible!important;background:#525659;padding:8px 0 16px}" +
-      "#ocr-panel{height:auto!important;min-height:850px!important;overflow:visible!important}" +
+      ".pdf-inpage-pages{box-sizing:border-box;flex:0 0 auto;height:850px!important;min-height:850px!important;max-height:850px!important;overflow:auto!important;overflow-y:auto!important;background:#525659;padding:8px 0 16px}" +
+      "#ocr-panel{height:850px!important;min-height:850px!important;max-height:850px!important;overflow:auto!important;overflow-y:auto!important}" +
       ".pdf-inpage-page-slot{margin:0 auto 10px;background:#3a3f42;min-height:180px;position:relative}" +
       ".pdf-inpage-page-slot canvas{display:block;width:100%;height:auto;background:#fff}" +
       ".pdf-link-layer{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}" +
       ".pdf-annot-link{position:absolute;z-index:2;pointer-events:auto;background:rgba(26,107,107,0.08);border-radius:2px}" +
       ".pdf-annot-link:focus{outline:2px solid #1a6b6b;outline-offset:1px}" +
-      ".pdf-frame-wrap,.pdf-standalone-shell{display:flex;flex-direction:column;height:auto!important;overflow:visible!important}" +
+      ".pdf-frame-wrap,.pdf-standalone-shell{display:flex;flex-direction:column}" +
       ".pdf-frame-wrap iframe,.pdf-standalone-shell iframe.pdf-frame," +
-      "body.is-native-pdf iframe.pdf-frame{display:none!important;height:auto!important;min-height:850px!important}" +
+      "body.is-native-pdf iframe.pdf-frame{display:none!important;height:850px!important;min-height:850px!important;max-height:850px!important}" +
       ".pdf-frame-wrap.is-native-pdf,.pdf-standalone-shell.is-native-pdf," +
       "body.is-native-pdf .pdf-standalone-shell{" +
-      "display:flex;flex-direction:column;height:auto!important;min-height:850px!important;overflow:visible!important;background:#3a3f42}" +
+      "display:flex;flex-direction:column;min-height:850px!important;background:#3a3f42}" +
       ".ocr-sticky-chrome{position:sticky;top:0;z-index:8;background:#fff;padding:8px 0 10px;margin:0 0 8px}" +
       "html{scroll-padding-top:10rem}" +
       "mark.search-active{scroll-margin-top:10rem}" +
@@ -59,10 +60,10 @@
       ".pdf-frame-wrap,.pdf-standalone-shell," +
       ".pdf-frame-wrap.is-native-pdf,.pdf-standalone-shell.is-native-pdf," +
       "body.is-native-pdf .pdf-standalone-shell{" +
-      "height:auto!important;min-height:450px!important;overflow:visible!important}" +
-      ".pdf-inpage-viewer{min-height:450px!important;height:auto!important}" +
+      "min-height:450px!important}" +
+      ".pdf-inpage-viewer{min-height:450px!important}" +
       ".pdf-inpage-pages,#ocr-panel,.pdf-frame-wrap iframe," +
-      ".pdf-standalone-shell iframe.pdf-frame{height:auto!important;min-height:450px!important;overflow:visible!important}" +
+      ".pdf-standalone-shell iframe.pdf-frame{height:450px!important;min-height:450px!important;max-height:450px!important;overflow:auto!important;overflow-y:auto!important}" +
       "}";
   }
 

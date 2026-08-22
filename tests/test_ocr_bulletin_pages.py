@@ -128,23 +128,31 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertNotIn("callout-tip", html_output)
             self.assertNotIn("🔗 Site", html_output)
             self.assertIn("min-height: 850px", html_output)
-            self.assertIn("height: auto", html_output)
-            self.assertIn("overflow: visible", html_output)
+            self.assertIn("height: 850px", html_output)
+            self.assertIn("max-height: 850px", html_output)
             self.assertRegex(
                 html_output,
                 r"#ocr-panel\s*\{[^}]*min-height:\s*850px",
             )
             self.assertRegex(
                 html_output,
-                r"#ocr-panel\s*\{[^}]*height:\s*auto",
+                r"#ocr-panel\s*\{[^}]*height:\s*850px",
             )
             self.assertRegex(
                 html_output,
-                r"#ocr-panel\s*\{[^}]*overflow:\s*visible",
+                r"#ocr-panel\s*\{[^}]*max-height:\s*850px",
+            )
+            self.assertRegex(
+                html_output,
+                r"#ocr-panel\s*\{[^}]*overflow:\s*auto",
+            )
+            self.assertRegex(
+                html_output,
+                r"#ocr-panel\s*\{[^}]*overflow-y:\s*auto",
             )
             self.assertNotRegex(
                 html_output,
-                r"#ocr-panel\s*\{[^}]*overflow-y:\s*auto",
+                r"#ocr-panel\s*\{[^}]*height:\s*auto",
             )
             self.assertRegex(
                 html_output,
@@ -152,7 +160,7 @@ class OcrBulletinPageTests(unittest.TestCase):
             )
             self.assertRegex(
                 html_output,
-                r"\.pdf-inpage-pages\s*\{[^}]*height:\s*auto",
+                r"\.pdf-inpage-pages\s*\{[^}]*height:\s*850px",
             )
             self.assertRegex(
                 html_output,
@@ -160,18 +168,28 @@ class OcrBulletinPageTests(unittest.TestCase):
             )
             self.assertRegex(
                 html_output,
-                r"\.pdf-inpage-pages\s*\{[^}]*overflow:\s*visible",
+                r"\.pdf-inpage-pages\s*\{[^}]*max-height:\s*850px",
+            )
+            self.assertRegex(
+                html_output,
+                r"\.pdf-inpage-pages\s*\{[^}]*overflow:\s*auto",
+            )
+            self.assertNotRegex(
+                html_output,
+                r"\.pdf-inpage-pages\s*\{[^}]*height:\s*auto",
             )
             self.assertNotIn("85vh", html_output)
-            # Tablet/phone: shorter balanced panels (not desktop 850px).
+            # Tablet/phone: locked 450px visible boxes (not desktop 850px).
             self.assertIn("@media (max-width: 1024px)", html_output)
             self.assertIn("min-height: 450px", html_output)
+            self.assertIn("height: 450px", html_output)
+            self.assertIn("max-height: 450px", html_output)
             self.assertIn("Georgia", html_output)
             self.assertIn("Download PDF", html_output)
             self.assertIn("pdf-fullscreen-btn", html_output)
             # Desktop + mobile: hide the raw-PDF iframe and show stacked PDF.js pages.
             self.assertIn("pdf-inpage-viewer", html_output)
-            self.assertIn("/assets/pdf-inpage-viewer.js?v=20260822", html_output)
+            self.assertIn("/assets/pdf-inpage-viewer.js?v=20260822c", html_output)
             self.assertIn("data-pdf-src", html_output)
             self.assertIn("is-native-pdf", html_output)
             self.assertIn("display: flex !important", html_output)
@@ -211,7 +229,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("<iframe", html_output)
         self.assertIn("embed-mode", html_output)
         self.assertIn("pdf-inpage-viewer", html_output)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260822", html_output)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260822c", html_output)
         self.assertIn("data-pdf-src", html_output)
         self.assertNotIn("pdf-inpage-prev", html_output)
         self.assertNotIn("pdf-inpage-next", html_output)
@@ -243,7 +261,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("is-native-pdf", boot)
         self.assertIn("pdf-frame-wrap", boot)
         self.assertIn("removeAttribute('src')", boot)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260822", boot)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260822c", boot)
         self.assertNotIn("prefersNativePdf", boot)
         self.assertNotIn("narrowViewport", boot)
         self.assertEqual(boot, pdf_mobile_fallback_boot_js())
@@ -253,15 +271,19 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("display: flex !important", css)
         self.assertIn(".pdf-frame-wrap iframe", css)
         self.assertIn("min-height: 850px", css)
-        self.assertIn("height: auto", css)
+        self.assertIn("height: 850px", css)
+        self.assertIn("max-height: 850px", css)
         self.assertNotIn("85vh", css)
         self.assertIn("min-height: 450px", css)
-        self.assertIn("overflow: visible", css)
-        self.assertNotIn("overflow: auto", css)
+        self.assertIn("height: 450px", css)
+        self.assertIn("max-height: 450px", css)
+        self.assertIn("overflow: auto", css)
         self.assertIn(".pdf-inpage-viewer", css)
-        self.assertRegex(css, r"\.pdf-inpage-pages\s*\{[^}]*height:\s*auto")
+        self.assertRegex(css, r"\.pdf-inpage-pages\s*\{[^}]*height:\s*850px")
         self.assertRegex(css, r"\.pdf-inpage-pages\s*\{[^}]*min-height:\s*850px")
-        self.assertRegex(css, r"\.pdf-inpage-pages\s*\{[^}]*overflow:\s*visible")
+        self.assertRegex(css, r"\.pdf-inpage-pages\s*\{[^}]*max-height:\s*850px")
+        self.assertRegex(css, r"\.pdf-inpage-pages\s*\{[^}]*overflow:\s*auto")
+        self.assertNotRegex(css, r"\.pdf-inpage-pages\s*\{[^}]*height:\s*auto")
         self.assertIn(".pdf-inpage-viewer", css)
         self.assertIn(".pdf-inpage-pages", css)
         self.assertNotIn("pdf-inpage-nav", css)
@@ -295,23 +317,31 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotIn("callout-tip", html_output)
         self.assertNotIn("PRO TIP", html_output.upper())
         self.assertIn("min-height: 850px", html_output)
-        self.assertIn("height: auto", html_output)
-        self.assertIn("overflow: visible", html_output)
+        self.assertIn("height: 850px", html_output)
+        self.assertIn("max-height: 850px", html_output)
         self.assertRegex(
             html_output,
             r"#ocr-panel\s*\{[^}]*min-height:\s*850px",
         )
         self.assertRegex(
             html_output,
-            r"#ocr-panel\s*\{[^}]*height:\s*auto",
+            r"#ocr-panel\s*\{[^}]*height:\s*850px",
         )
         self.assertRegex(
             html_output,
-            r"#ocr-panel\s*\{[^}]*overflow:\s*visible",
+            r"#ocr-panel\s*\{[^}]*max-height:\s*850px",
+        )
+        self.assertRegex(
+            html_output,
+            r"#ocr-panel\s*\{[^}]*overflow:\s*auto",
+        )
+        self.assertRegex(
+            html_output,
+            r"#ocr-panel\s*\{[^}]*overflow-y:\s*auto",
         )
         self.assertNotRegex(
             html_output,
-            r"#ocr-panel\s*\{[^}]*overflow-y:\s*auto",
+            r"#ocr-panel\s*\{[^}]*height:\s*auto",
         )
         self.assertRegex(
             html_output,
@@ -319,7 +349,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         )
         self.assertRegex(
             html_output,
-            r"\.pdf-inpage-pages\s*\{[^}]*height:\s*auto",
+            r"\.pdf-inpage-pages\s*\{[^}]*height:\s*850px",
         )
         self.assertRegex(
             html_output,
@@ -327,7 +357,15 @@ class OcrBulletinPageTests(unittest.TestCase):
         )
         self.assertRegex(
             html_output,
-            r"\.pdf-inpage-pages\s*\{[^}]*overflow:\s*visible",
+            r"\.pdf-inpage-pages\s*\{[^}]*max-height:\s*850px",
+        )
+        self.assertRegex(
+            html_output,
+            r"\.pdf-inpage-pages\s*\{[^}]*overflow:\s*auto",
+        )
+        self.assertNotRegex(
+            html_output,
+            r"\.pdf-inpage-pages\s*\{[^}]*height:\s*auto",
         )
         self.assertRegex(
             html_output,
@@ -336,6 +374,8 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotIn("85vh", html_output)
         self.assertIn("@media (max-width: 1024px)", html_output)
         self.assertIn("min-height: 450px", html_output)
+        self.assertIn("height: 450px", html_output)
+        self.assertIn("max-height: 450px", html_output)
         self.assertNotIn("parish-site-link", html_output)
         self.assertIn("mobile-jump", html_output)
         self.assertIn("Tap to go to plain text bulletin", html_output)
@@ -344,7 +384,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn('id="scroll-top-btn"', html_output)
         self.assertIn("Georgia", html_output)
         self.assertIn("pdf-inpage-viewer", html_output)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260822", html_output)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260822c", html_output)
         self.assertIn("block: 'start'", html_output)
         self.assertNotIn("block: 'center'", html_output)
         self.assertIn("is-native-pdf", html_output)
@@ -372,8 +412,13 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn('target = "_blank"', text)
         self.assertIn("noopener noreferrer", text)
         self.assertIn("min-height:850px", text.replace(" ", ""))
-        self.assertIn("height:auto", text.replace(" ", ""))
-        self.assertIn("overflow:visible", text.replace(" ", ""))
+        self.assertIn("height:850px!important", text.replace(" ", ""))
+        self.assertIn("max-height:850px!important", text.replace(" ", ""))
+        self.assertIn("overflow:auto!important", text.replace(" ", ""))
+        self.assertIn("overflow-y:auto!important", text.replace(" ", ""))
+        self.assertIn("height:450px!important", text.replace(" ", ""))
+        self.assertIn("max-height:450px!important", text.replace(" ", ""))
+        self.assertNotIn("overflow:visible", text.replace(" ", ""))
         self.assertIn("!important", text)
         self.assertIn("#ocr-panel", text)
         self.assertIn("ocr-sticky-chrome", text)
@@ -392,7 +437,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotIn("prefersNativePdf", text)
         loader = assets / "pdf-mobile-fallback.js"
         self.assertTrue(loader.is_file())
-        self.assertIn("pdf-inpage-viewer.js?v=20260822", loader.read_text(encoding="utf-8"))
+        self.assertIn("pdf-inpage-viewer.js?v=20260822c", loader.read_text(encoding="utf-8"))
 
     def test_live_gortahork_ocr_has_mega_body_and_visible_850(self) -> None:
         """Frank 2026-08-21: parish slice must reuse mega OCR sentences; 850px on visible boxes."""
@@ -402,23 +447,31 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("GORT A", html_live)
         self.assertIn("16ú Lúnasa 2026", html_live)
         self.assertIn("Donnchadh", html_live)
-        self.assertRegex(html_live, r"\.pdf-inpage-pages\s*\{[^}]*height:\s*auto")
+        self.assertRegex(html_live, r"\.pdf-inpage-pages\s*\{[^}]*height:\s*850px")
         self.assertRegex(html_live, r"\.pdf-inpage-pages\s*\{[^}]*min-height:\s*850px")
-        self.assertRegex(html_live, r"\.pdf-inpage-pages\s*\{[^}]*overflow:\s*visible")
-        self.assertRegex(html_live, r"#ocr-panel\s*\{[^}]*height:\s*auto")
+        self.assertRegex(html_live, r"\.pdf-inpage-pages\s*\{[^}]*max-height:\s*850px")
+        self.assertRegex(html_live, r"\.pdf-inpage-pages\s*\{[^}]*overflow:\s*auto")
+        self.assertNotRegex(html_live, r"\.pdf-inpage-pages\s*\{[^}]*height:\s*auto")
+        self.assertRegex(html_live, r"#ocr-panel\s*\{[^}]*height:\s*850px")
         self.assertRegex(html_live, r"#ocr-panel\s*\{[^}]*min-height:\s*850px")
-        self.assertRegex(html_live, r"#ocr-panel\s*\{[^}]*overflow:\s*visible")
-        self.assertNotRegex(html_live, r"#ocr-panel\s*\{[^}]*overflow-y:\s*auto")
+        self.assertRegex(html_live, r"#ocr-panel\s*\{[^}]*max-height:\s*850px")
+        self.assertRegex(html_live, r"#ocr-panel\s*\{[^}]*overflow:\s*auto")
+        self.assertRegex(html_live, r"#ocr-panel\s*\{[^}]*overflow-y:\s*auto")
+        self.assertNotRegex(html_live, r"#ocr-panel\s*\{[^}]*height:\s*auto")
         self.assertIn("ocr-sticky-chrome", html_live)
         self.assertIn('id="scroll-top-btn"', html_live)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260822", html_live)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260822c", html_live)
         self.assertNotIn("85vh", html_live)
         self.assertIn("min-height: 450px", html_live)
+        self.assertIn("height: 450px", html_live)
+        self.assertIn("max-height: 450px", html_live)
         diocese = (docs / "dioceses" / "raphoe" / "index.html").read_text(encoding="utf-8")
         self.assertIn("AIFRINN NA SEACHTAINE", diocese)
-        self.assertRegex(diocese, r"\.pdf-inpage-pages\s*\{[^}]*height:\s*auto")
-        self.assertRegex(diocese, r"#ocr-panel\s*\{[^}]*overflow:\s*visible")
-        self.assertNotRegex(diocese, r"#ocr-panel\s*\{[^}]*overflow-y:\s*auto")
+        self.assertRegex(diocese, r"\.pdf-inpage-pages\s*\{[^}]*height:\s*850px")
+        self.assertRegex(diocese, r"\.pdf-inpage-pages\s*\{[^}]*max-height:\s*850px")
+        self.assertRegex(diocese, r"#ocr-panel\s*\{[^}]*overflow:\s*auto")
+        self.assertRegex(diocese, r"#ocr-panel\s*\{[^}]*overflow-y:\s*auto")
+        self.assertNotRegex(diocese, r"#ocr-panel\s*\{[^}]*height:\s*auto")
         self.assertIn("ocr-sticky-chrome", diocese)
         self.assertIn('id="scroll-top-btn"', diocese)
         self.assertNotIn("85vh", diocese)
@@ -433,7 +486,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         ):
             html_live = (docs / rel).read_text(encoding="utf-8")
             self.assertIn("pdf-inpage-viewer", html_live, rel)
-            self.assertIn("/assets/pdf-inpage-viewer.js?v=20260822", html_live, rel)
+            self.assertIn("/assets/pdf-inpage-viewer.js?v=20260822c", html_live, rel)
             self.assertIn("data-pdf-src", html_live, rel)
             self.assertIn('src="/mega_pdf/', html_live, rel)
             self.assertNotIn("View this bulletin PDF", html_live, rel)
@@ -444,8 +497,13 @@ class OcrBulletinPageTests(unittest.TestCase):
             )
             self.assertRegex(
                 html_live,
-                r"\.pdf-inpage-pages\s*\{[^}]*height:\s*auto",
-                msg=f"{rel} PDF box must be height: auto (page scroll)",
+                r"\.pdf-inpage-pages\s*\{[^}]*height:\s*850px",
+                msg=f"{rel} PDF box must be locked height: 850px",
+            )
+            self.assertRegex(
+                html_live,
+                r"\.pdf-inpage-pages\s*\{[^}]*max-height:\s*850px",
+                msg=f"{rel} PDF box must be max-height: 850px",
             )
             self.assertRegex(
                 html_live,
@@ -454,14 +512,20 @@ class OcrBulletinPageTests(unittest.TestCase):
             )
             self.assertRegex(
                 html_live,
-                r"#ocr-panel\s*\{[^}]*height:\s*auto",
-                msg=f"{rel} OCR box must be height: auto (page scroll)",
+                r"#ocr-panel\s*\{[^}]*height:\s*850px",
+                msg=f"{rel} OCR box must be locked height: 850px",
             )
-            self.assertNotRegex(
+            self.assertRegex(
+                html_live,
+                r"#ocr-panel\s*\{[^}]*max-height:\s*850px",
+                msg=f"{rel} OCR box must be max-height: 850px",
+            )
+            self.assertRegex(
                 html_live,
                 r"#ocr-panel\s*\{[^}]*overflow-y:\s*auto",
-                msg=f"{rel} must not keep an inner OCR scrollbar",
+                msg=f"{rel} OCR box must scroll inside (overflow-y: auto)",
             )
+            self.assertNotIn("85vh", html_live, rel)
             self.assertIn("ocr-parish-masthead", html_live, rel)
             self.assertIn("pdf-annot-link", html_live, rel)
             self.assertNotIn("PRO TIP", html_live.upper(), rel)

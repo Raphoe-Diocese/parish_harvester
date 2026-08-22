@@ -1144,7 +1144,7 @@ def prefers_native_pdf_js() -> str:
 """
 
 
-PDF_INPAGE_VIEWER_VERSION = "20260822"
+PDF_INPAGE_VIEWER_VERSION = "20260822c"
 PDF_INPAGE_VIEWER_SRC = f"/assets/pdf-inpage-viewer.js?v={PDF_INPAGE_VIEWER_VERSION}"
 
 
@@ -1152,9 +1152,10 @@ def pdf_inpage_viewer_css() -> str:
     """Hide the raw-PDF iframe on every device; show stacked PDF.js pages.
 
     The VISIBLE gray box is ``.pdf-inpage-pages`` (iframe is display:none).
-    Desktop: min-height 850px, height auto, overflow visible — the PAGE
-    scrolls. Do not lock height or create a second scrollport.
-    Tablet/phone (max-width 1024px): min-height 450px. Never 85vh.
+    Desktop: locked 850px tall (height + min-height + max-height). Extra
+    pages scroll INSIDE the box (overflow: auto). Never grow with the document.
+    Never use viewport-height clipping.
+    Tablet/phone (max-width 1024px): locked 450px, same inner scroll.
     """
     return f"""
     .pdf-inpage-viewer,
@@ -1183,9 +1184,11 @@ def pdf_inpage_viewer_css() -> str:
     .pdf-inpage-pages {{
       box-sizing: border-box;
       flex: 0 0 auto;
-      height: auto;
+      height: 850px;
       min-height: 850px;
-      overflow: visible;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
       background: #525659;
       padding: 8px 0 16px;
     }}
@@ -1205,24 +1208,21 @@ def pdf_inpage_viewer_css() -> str:
     .pdf-standalone-shell {{
       display: flex;
       flex-direction: column;
-      height: auto;
-      overflow: visible;
     }}
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
     body.is-native-pdf iframe.pdf-frame {{
       display: none !important;
-      height: auto;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
     }}
     .pdf-frame-wrap.is-native-pdf,
     .pdf-standalone-shell.is-native-pdf,
     body.is-native-pdf .pdf-standalone-shell {{
       display: flex;
       flex-direction: column;
-      height: auto !important;
       min-height: 850px !important;
-      overflow: visible !important;
       background: #3a3f42;
     }}
     @media (max-width: 1024px) {{
@@ -1231,9 +1231,7 @@ def pdf_inpage_viewer_css() -> str:
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {{
-        height: auto !important;
         min-height: 450px !important;
-        overflow: visible !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
@@ -1245,9 +1243,11 @@ def pdf_inpage_viewer_css() -> str:
       .pdf-inpage-pages,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {{
-        height: auto !important;
+        height: 450px !important;
         min-height: 450px !important;
-        overflow: visible !important;
+        max-height: 450px !important;
+        overflow: auto !important;
+        overflow-y: auto !important;
       }}
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {{
@@ -1577,9 +1577,7 @@ def render_bulletin_viewer_shell(
 
     .pdf-frame-wrap {{
       position: relative;
-      height: auto;
       min-height: 850px;
-      overflow: visible;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }}
@@ -1671,15 +1669,18 @@ def render_bulletin_viewer_shell(
     {ocr_reading_css("#ocr-panel")}
     #ocr-panel {{
       box-sizing: border-box;
-      height: auto;
+      height: 850px;
       min-height: 850px;
-      overflow: visible;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
       border: 1px solid #d4ddd9;
       padding: 22px 24px 32px;
     }}
     .pdf-frame-wrap iframe {{
-      height: auto;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
     }}
     .note-box {{
       margin-top: 12px;
@@ -1776,20 +1777,20 @@ def render_bulletin_viewer_shell(
 
     @media (max-width: 1024px) {{
       /* Harvest + OCR both call this generator — keep both panels here.
-         Desktop: min-height 850px, height auto, page scroll.
-         Tablet/phone (max-width 1024px): min-height ~450px. Never lock height. */
+         Desktop: locked 850px visible boxes, inner scroll.
+         Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {{
-        height: auto;
         min-height: 450px;
-        overflow: visible;
       }}
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
       #ocr-panel {{
-        height: auto;
+        height: 450px;
         min-height: 450px;
-        overflow: visible;
+        max-height: 450px;
+        overflow: auto;
+        overflow-y: auto;
       }}
     }}
     @media (max-width: 900px) {{
