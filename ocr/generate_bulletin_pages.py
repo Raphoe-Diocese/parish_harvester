@@ -16,6 +16,7 @@ from PyPDF2 import PdfReader
 from harvester.ai_summaries import summarise_bulletin
 from harvester.events_extractor import extract_events, write_events_json
 from harvester.weekly_diff import diff_bulletins
+from harvester.site_chrome import scroll_top_css, scroll_top_html, scroll_top_js, sticky_search_css
 from ocr.bulletin_layout import ocr_masthead_css, structure_ocr_html
 from ocr.parish_splitter import split_ocr_by_parish
 
@@ -856,8 +857,9 @@ def render_ocr_standalone_page(
       font-size: 1rem; font-weight: 700; color: {OCR_INK};
     }}
     .font-size-controls {{ display: none; }}
+    {sticky_search_css(OCR_PAPER)}
+    {scroll_top_css()}
     .ocr-zoom-bar {{
-      position: sticky; top: 0; z-index: 6;
       display: flex; justify-content: center; align-items: center; gap: 8px;
       margin: 0 0 10px; padding: 6px 10px;
       background: rgba(255, 255, 255, 0.92);
@@ -938,6 +940,7 @@ def render_ocr_standalone_page(
         <span class="title-line">{html.escape(diocese_label)} Text Bulletin · {html.escape(uk_bulletin_date)}</span>
       </div>
     </div>
+    <div class="ocr-sticky-chrome">
     <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
       <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
       <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
@@ -956,6 +959,7 @@ def render_ocr_standalone_page(
           <button id="ocr-next" type="button" disabled>Next →</button>
         </div>
       </div>
+    </div>
     </div>
     <div class="ocr-body" id="ocr-text">{ocr_fragment}</div>
     <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
@@ -1105,7 +1109,9 @@ def render_ocr_standalone_page(
         }}
       }});
     }})();
+    {scroll_top_js()}
   </script>
+  {scroll_top_html()}
 </body>
 </html>
 """
@@ -1640,8 +1646,9 @@ def render_bulletin_viewer_shell(
     .ocr-search-tools button:disabled {{ background: #9bbfbd; cursor: not-allowed; }}
     .match-count {{ color: #6b7280; font-size: 0.9rem; font-weight: 600; }}
     .font-size-controls {{ display: none; }}
+    {sticky_search_css("#fff")}
+    {scroll_top_css()}
     .ocr-zoom-bar {{
-      position: sticky; top: 0; z-index: 6;
       display: flex; justify-content: center; align-items: center; gap: 10px;
       margin: 0 0 10px; padding: 6px 10px;
       background: rgba(255, 255, 255, 0.94);
@@ -1831,6 +1838,7 @@ def render_bulletin_viewer_shell(
       <div class="quiet-links">
         <a href="{html.escape(ocr_standalone_href, quote=True)}" {blank}>Open text in new tab</a>
       </div>
+      <div class="ocr-sticky-chrome">
       <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
         <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
         <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
@@ -1847,6 +1855,7 @@ def render_bulletin_viewer_shell(
           <button id="ocr-prev" type="button" disabled aria-label="Previous search match">← Prev match</button>
           <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
         </div>
+      </div>
       </div>
       <div id="ocr-panel">{ocr_fragment}</div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
@@ -2120,7 +2129,9 @@ def render_bulletin_viewer_shell(
         if (page) page.insertBefore(banner, page.firstChild);
       }}
     }})();
+    {scroll_top_js()}
   </script>
+  {scroll_top_html()}
 </body>
 </html>
 """

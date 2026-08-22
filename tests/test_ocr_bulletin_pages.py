@@ -310,6 +310,8 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("mobile-jump", html_output)
         self.assertIn("Tap to go to plain text bulletin", html_output)
         self.assertIn('id="ocr-search"', html_output)
+        self.assertIn("ocr-sticky-chrome", html_output)
+        self.assertIn('id="scroll-top-btn"', html_output)
         self.assertIn("Georgia", html_output)
         self.assertIn("pdf-inpage-viewer", html_output)
         self.assertIn("/assets/pdf-inpage-viewer.js", html_output)
@@ -424,6 +426,10 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("Ar dheis Dé go raibh a anam", html_output)
         self.assertIn("Gaeilge", html_output)
         self.assertIn("19/05/2026", html_output)
+        self.assertIn("ocr-sticky-chrome", html_output)
+        self.assertIn("position: sticky", html_output)
+        self.assertIn('id="scroll-top-btn"', html_output)
+        self.assertIn("Back to top", html_output)
 
     def test_ocr_reading_styles_are_legible(self) -> None:
         """OCR pane must stay easy to read: soft paper, generous measure/line-height,

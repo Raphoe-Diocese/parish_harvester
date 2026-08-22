@@ -11,6 +11,7 @@ from harvester.fetcher import parse_evidence_file
 from harvester.page_renderer import (
     render_diocese_raphoe_page,
 )
+from harvester.site_chrome import scroll_top_css, scroll_top_html, scroll_top_js
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DOCS_DIR = REPO_ROOT / "docs"
@@ -56,19 +57,18 @@ class HeroSlide:
     eyebrow: str
     title: str
     subtitle: str
+    diocese_key: str = ""
     image: str | None = None
     credit: str | None = None
     position: str = "center"
 
 
-# Cathedral photos for the 3 live dioceses, sourced from Wikimedia Commons
-# (all confirmed Creative Commons licensed on their individual file pages —
-# see the "Photo credits" section of docs/assets/hero/README.md for the
-# full license/author/source details for each). Falls back to a CSS
-# gradient automatically if `image` is ever cleared — see HeroSlide above
-# and docs/assets/hero/README.md for how to swap any of these out.
+# Cathedral photos for the live dioceses, sourced from Wikimedia Commons.
+# On-image credits stay off the hero (they clutter the photo). Attribution
+# is kept on each slide record and shown once in a tiny homepage footer.
 HERO_SLIDES: list[HeroSlide] = [
     HeroSlide(
+        diocese_key="raphoe",
         image=(
             "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/"
             "Letterkenny_-_Cathedral_of_St._Eunan_and_St._Columba_-_20190421142600.jpg/"
@@ -78,9 +78,10 @@ HERO_SLIDES: list[HeroSlide] = [
         gradient="linear-gradient(135deg, #0f3d3d 0%, #1a6b6b 55%, #3fae9a 100%)",
         eyebrow="Raphoe Diocese",
         title="Cathedral of St. Eunan and St. Columba, Letterkenny",
-        subtitle="Auto-collected every Sunday, free forever.",
+        subtitle="This week's parish bulletins, in one place.",
     ),
     HeroSlide(
+        diocese_key="derry",
         image=(
             "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e1/"
             "Derry_St._Eugene%27s_Cathedral_2019_09_29.jpg/"
@@ -90,9 +91,10 @@ HERO_SLIDES: list[HeroSlide] = [
         gradient="linear-gradient(135deg, #1f2f52 0%, #35508f 55%, #6f8fd4 100%)",
         eyebrow="Derry Diocese",
         title="St Eugene's Cathedral, Derry",
-        subtitle="Full PDF viewer and searchable OCR text for every bulletin we collect.",
+        subtitle="Read the PDF or the searchable text.",
     ),
     HeroSlide(
+        diocese_key="down-and-connor",
         image=(
             "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c0/"
             "BELFAST%2C_St_Peter%27s_Cathedral_Ext_%2851103078079%29.jpg/"
@@ -103,9 +105,37 @@ HERO_SLIDES: list[HeroSlide] = [
         gradient="linear-gradient(135deg, #4a2545 0%, #7a3b66 55%, #c47a9a 100%)",
         eyebrow="Down & Connor Diocese",
         title="St Peter's Cathedral, Belfast",
-        subtitle="Works on any phone, tablet or computer. Subscribe by RSS or calendar if you'd like a nudge.",
+        subtitle="Works on any phone, tablet or computer.",
+    ),
+    HeroSlide(
+        diocese_key="clogher",
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/"
+            "St_Macartans_Cathedral_Monaghan_Ireland.jpg/"
+            "1280px-St_Macartans_Cathedral_Monaghan_Ireland.jpg"
+        ),
+        credit="Photo: Whoisjohngalt / Wikimedia Commons / CC BY-SA 4.0",
+        position="center 30%",
+        gradient="linear-gradient(135deg, #2c2416 0%, #6b5428 55%, #c4a15a 100%)",
+        eyebrow="Clogher Diocese",
+        title="St Macartan's Cathedral, Monaghan",
+        subtitle="The mother church of Clogher.",
     ),
 ]
+
+
+def _slide_for_diocese(diocese_key: str) -> HeroSlide | None:
+    for slide in HERO_SLIDES:
+        if slide.diocese_key == diocese_key:
+            return slide
+    return None
+
+
+def _photo_credit_line() -> str:
+    credits = [slide.credit for slide in HERO_SLIDES if slide.credit]
+    if not credits:
+        return ""
+    return "Cathedral photos: Wikimedia Commons (CC BY / CC BY-SA)."
 
 
 def _hero_slider_html() -> str:
@@ -121,9 +151,6 @@ def _hero_slider_html() -> str:
             else slide.gradient
         )
         active = " is-active" if i == 0 else ""
-        credit_html = (
-            f'<p class="hero-slide-credit">{html.escape(slide.credit)}</p>' if slide.credit else ""
-        )
         slides_html.append(
             f'<div class="hero-slide{active}" style="background:{bg};" '
             f'role="group" aria-roledescription="slide" aria-label="{i + 1} of {len(HERO_SLIDES)}" '
@@ -131,7 +158,6 @@ def _hero_slider_html() -> str:
             f'<p class="hero-slide-eyebrow">{html.escape(slide.eyebrow)}</p>'
             f'<h1 class="hero-slide-title">{html.escape(slide.title)}</h1>'
             f'<p class="hero-slide-subtitle">{html.escape(slide.subtitle)}</p>'
-            f"{credit_html}"
             "</div>"
         )
         dots_html.append(
@@ -612,21 +638,34 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
         key=lambda row: row["name"],
     )
 
-    live_cards_html = "".join(
-        (
+    def _live_card(row: dict[str, str]) -> str:
+        slide = _slide_for_diocese(row["key"])
+        if slide and slide.image:
+            photo = (
+                f"<div class=\"live-card-photo\" role=\"img\" "
+                f"aria-label=\"{html.escape(slide.title, quote=True)}\" "
+                f"style=\"background:url('{html.escape(slide.image, quote=True)}') "
+                f"{html.escape(slide.position, quote=True)}/cover no-repeat;\"></div>"
+            )
+        else:
+            photo = "<div class=\"live-card-photo live-card-photo-empty\" aria-hidden=\"true\"></div>"
+        return (
             "<article class=\"live-card\">"
+            f"{photo}"
+            "<div class=\"live-card-body\">"
             f"<p class=\"live-card-eyebrow\">{row['dot']} {html.escape(row['status_label'])}</p>"
             f"<h2>{html.escape(row['name'])} Diocese</h2>"
-            f"<p class=\"live-card-updated\">Last updated: {html.escape(row['updated'])}</p>"
+            f"<p class=\"live-card-updated\">Updated {html.escape(row['updated'])}</p>"
             "<div class=\"live-card-actions\">"
-            f"<a class=\"live-btn primary\" href=\"dioceses/{row['key']}/\" target=\"_blank\" rel=\"noopener noreferrer\">Open Collated Bulletin →</a>"
-            f"<a class=\"live-btn secondary\" href=\"{html.escape(_mega_pdf_url(row['key'], same_origin=True), quote=True)}\" target=\"_blank\" rel=\"noopener noreferrer\">📄 Mega PDF</a>"
-            f"<a class=\"live-btn secondary\" href=\"{html.escape(_ocr_standalone_url(row['key']), quote=True)}\" target=\"_blank\" rel=\"noopener noreferrer\">📝 Text Bulletin</a>"
+            f"<a class=\"live-btn primary\" href=\"dioceses/{row['key']}/\" target=\"_blank\" rel=\"noopener noreferrer\">Open bulletin</a>"
+            f"<a class=\"live-btn secondary\" href=\"{html.escape(_mega_pdf_url(row['key'], same_origin=True), quote=True)}\" target=\"_blank\" rel=\"noopener noreferrer\">Mega PDF</a>"
+            f"<a class=\"live-btn secondary\" href=\"{html.escape(_ocr_standalone_url(row['key']), quote=True)}\" target=\"_blank\" rel=\"noopener noreferrer\">Text</a>"
+            "</div>"
             "</div>"
             "</article>"
         )
-        for row in live_rows
-    )
+
+    live_cards_html = "".join(_live_card(row) for row in live_rows)
 
     other_rows_html = "".join(
         f"<li>{row['dot']} <a href=\"dioceses/{row['key']}/\" target=\"_blank\" rel=\"noopener noreferrer\">{html.escape(row['name'])}</a></li>"
@@ -682,7 +721,6 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     .hero-slide-eyebrow {{ margin: 0; font-size: 0.78rem; font-weight: 700; text-transform: uppercase; letter-spacing: 0.08em; color: #d8f3ee; text-shadow: 0 1px 3px rgba(0,0,0,0.35); }}
     .hero-slide-title {{ margin: 0; font-size: clamp(1.4rem, 4vw, 2.35rem); line-height: 1.15; font-weight: 800; max-width: 46rem; text-shadow: 0 2px 8px rgba(0,0,0,0.35); }}
     .hero-slide-subtitle {{ margin: 0; font-size: clamp(0.9rem, 1.6vw, 1.05rem); color: #eef7f5; max-width: 40rem; text-shadow: 0 1px 4px rgba(0,0,0,0.35); }}
-    .hero-slide-credit {{ position: absolute; right: 10px; bottom: 8px; margin: 0; font-size: 0.7rem; color: rgba(255,255,255,0.85); text-shadow: 0 1px 3px rgba(0,0,0,0.6); }}
     .hero-nav {{
       position: absolute; top: 50%; transform: translateY(-50%);
       width: 38px; height: 38px; border-radius: 999px; border: none;
@@ -702,23 +740,31 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
       .hero-dot {{ transition: none; }}
     }}
 
-    .intro {{ padding: 22px 16px 4px; text-align: center; }}
-    .intro p {{ margin: 0 auto; max-width: 46rem; color: #45565f; font-size: 1.02rem; line-height: 1.5; }}
-    .banner {{ background: #fff4df; border: 1px solid #f5d08d; color: #704d0f; border-radius: 10px; padding: 10px 14px; margin: 14px auto 0; max-width: 46rem; font-size: 0.9rem; }}
+    .intro {{ padding: 18px 16px 2px; text-align: center; }}
+    .intro h1 {{ margin: 0 auto 6px; max-width: 40rem; font-size: clamp(1.25rem, 3vw, 1.7rem); color: #114b4b; }}
+    .intro p {{ margin: 0 auto; max-width: 38rem; color: #45565f; font-size: 1rem; line-height: 1.45; }}
 
-    .content {{ padding: 22px 16px 10px; }}
-    .section-title {{ margin: 8px 0 14px; font-size: 0.92rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #4b5563; }}
-    .live-grid {{ display: grid; grid-template-columns: repeat(auto-fit, minmax(270px, 1fr)); gap: 18px; }}
-    .live-card {{ background: #fff; border: 1px solid #d6ecea; border-radius: 16px; padding: 20px; box-shadow: 0 8px 22px rgba(15, 47, 47, 0.07); transition: transform 150ms ease, box-shadow 150ms ease; }}
-    .live-card:hover {{ transform: translateY(-2px); box-shadow: 0 12px 28px rgba(15, 47, 47, 0.11); }}
-    .live-card-eyebrow {{ margin: 0 0 8px; font-size: 0.8rem; font-weight: 700; color: #4b5563; text-transform: uppercase; letter-spacing: 0.04em; }}
-    .live-card h2 {{ margin: 0 0 6px; font-size: 1.35rem; color: #114b4b; }}
-    .live-card-updated {{ margin: 0 0 16px; color: #6b7686; font-size: 0.88rem; }}
-    .live-card-actions {{ display: flex; flex-wrap: wrap; gap: 8px; }}
-    .live-btn {{ display: inline-flex; align-items: center; padding: 9px 14px; border-radius: 8px; font-weight: 700; font-size: 0.9rem; text-decoration: none; }}
+    .content {{ padding: 16px 16px 10px; }}
+    .section-title {{ margin: 8px 0 12px; font-size: 0.85rem; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em; color: #4b5563; }}
+    .live-grid {{ display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 12px; }}
+    .live-card {{ background: #fff; border: 1px solid #d6ecea; border-radius: 14px; overflow: hidden; box-shadow: 0 6px 16px rgba(15, 47, 47, 0.06); }}
+    .live-card-photo {{ height: 118px; background: #0f2f2f; }}
+    .live-card-photo-empty {{ background: linear-gradient(135deg, #1a6b6b, #3fae9a); }}
+    .live-card-body {{ padding: 10px 12px 12px; }}
+    .live-card-eyebrow {{ margin: 0 0 4px; font-size: 0.7rem; font-weight: 700; color: #4b5563; text-transform: uppercase; letter-spacing: 0.04em; }}
+    .live-card h2 {{ margin: 0 0 2px; font-size: 1.02rem; color: #114b4b; }}
+    .live-card-updated {{ margin: 0 0 8px; color: #6b7686; font-size: 0.78rem; }}
+    .live-card-actions {{ display: flex; flex-direction: column; gap: 6px; }}
+    .live-btn {{ display: inline-flex; align-items: center; justify-content: center; padding: 7px 10px; border-radius: 8px; font-weight: 700; font-size: 0.8rem; text-decoration: none; }}
     .live-btn.primary {{ background: #1a6b6b; color: #fff; }}
     .live-btn.secondary {{ background: #eef8f7; color: #1a6b6b; border: 1px solid #cfe8e6; }}
     .live-btn:hover {{ opacity: 0.92; text-decoration: none; }}
+    @media (max-width: 900px) {{
+      .live-grid {{ grid-template-columns: repeat(2, minmax(0, 1fr)); }}
+    }}
+    @media (max-width: 520px) {{
+      .live-grid {{ grid-template-columns: 1fr; }}
+    }}
     .more-dioceses {{ margin-top: 28px; background: #fff; border: 1px solid #d6ecea; border-radius: 14px; padding: 16px 20px; }}
     .more-dioceses summary {{ cursor: pointer; font-weight: 700; color: #1a6b6b; list-style: none; }}
     .more-dioceses summary::-webkit-details-marker {{ display: none; }}
@@ -736,20 +782,21 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
       .live-btn {{ flex: 1 1 auto; justify-content: center; }}
       .hero-nav {{ width: 32px; height: 32px; font-size: 1.2rem; }}
     }}
+    {scroll_top_css()}
   </style>
 </head>
 <body>
   <div class=\"topbar\">
     <div class=\"topbar-inner\">
       <div class=\"brand\">Parish Press <span>· Irish Catholic Bulletins</span></div>
-      <p class=\"topbar-tagline\">Auto-collected every Sunday. Free forever.</p>
+      <p class=\"topbar-tagline\">Weekly parish bulletins, free to read.</p>
     </div>
   </div>
   {_hero_slider_html()}
   <main class=\"content\">
     <div class=\"intro\">
-      <p>Every week we automatically fetch each parish's bulletin, stitch them into one collated PDF per diocese, and make the text searchable — so you can read your parish notices without hunting through a website.</p>
-      <p class=\"banner\">🤖 Bulletins are auto-collected from parish websites. OCR may contain errors. Always check the original PDF.</p>
+      <h1>Welcome to Parish Press</h1>
+      <p>Weekly Catholic parish bulletins from across Ireland, in one place. Always check Mass times and names against the original PDF.</p>
     </div>
     <p class=\"section-title\">Live dioceses</p>
     <section class=\"live-grid\">{live_cards_html}</section>
@@ -760,15 +807,7 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     </details>
   </main>
   <footer class=\"footer\">
-    <p><a href=\"bulletins/index.html\" target=\"_blank\" rel=\"noopener noreferrer\">Browse the full OCR bulletin archive</a></p>
-    <p><a href=\"mega_pdf/index.html\" target=\"_blank\" rel=\"noopener noreferrer\">Open the Collated Bulletin PDF viewer</a></p>
-    <p><a href=\"EMBEDDING.md\" target=\"_blank\" rel=\"noopener noreferrer\">Read the embedding guide</a> · <a href=\"embed-examples.html\" target=\"_blank\" rel=\"noopener noreferrer\">Open copy/paste embed examples</a></p>
-    <p><a href=\"badges/\" target=\"_blank\" rel=\"noopener noreferrer\">Parish reliability scores</a></p>
-    <p>Subscribe (RSS): <a href=\"feeds/derry_diocese.xml\" target=\"_blank\" rel=\"noopener noreferrer\">Derry Diocese</a> · <a href=\"feeds/down_and_connor.xml\" target=\"_blank\" rel=\"noopener noreferrer\">Down &amp; Connor</a> · <a href=\"feeds/clogher_diocese.xml\" target=\"_blank\" rel=\"noopener noreferrer\">Clogher Diocese</a></p>
-    <p><a href=\"search/\" target=\"_blank\" rel=\"noopener noreferrer\">Search all bulletins</a></p>
-    <p>📅 Subscribe in Google/Apple Calendar: <a href=\"calendars/derry.ics\" target=\"_blank\" rel=\"noopener noreferrer\">Derry Diocese</a> · <a href=\"calendars/down_and_connor.ics\" target=\"_blank\" rel=\"noopener noreferrer\">Down &amp; Connor</a> · <a href=\"calendars/all.ics\" target=\"_blank\" rel=\"noopener noreferrer\">All parishes</a></p>
-    <p><a href=\"sitemap.html\" target=\"_blank\" rel=\"noopener noreferrer\">🗺️ Site map — every public URL</a> · <a href=\"COST_DASHBOARD.md\" target=\"_blank\" rel=\"noopener noreferrer\">💷 Cost dashboard</a></p>
-    <p><a href=\"subscribe/\" target=\"_blank\" rel=\"noopener noreferrer\">📬 Subscribe for reminders</a></p>
+    <p>{html.escape(_photo_credit_line())}</p>
     <p>© 2026 Parish Press</p>
   </footer>
   <script>
@@ -823,7 +862,9 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
 
     startAuto();
   }})();
+  {scroll_top_js()}
   </script>
+  {scroll_top_html()}
 </body>
 </html>
 """
