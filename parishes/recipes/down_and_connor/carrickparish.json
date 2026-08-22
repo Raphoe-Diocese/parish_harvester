@@ -1,33 +1,42 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "carrickparish",
   "display_name": "Carrickfergus",
   "diocese": "down_and_connor",
-  "start_url": "https://www.carrickparish.org/info",
+  "start_url": "https://www.carrickparish.org/registration",
+  "site_type": "dated_pdf_path",
+  "playbook_type": "newest_dated_pdf",
+  "timeout_ms": 55000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-08-22",
   "steps": [
     {
-      "action": "click",
-      "selector": "a:has-text('Mass Times up to')",
-      "operator_notes": "Wix page lists many unrelated PDFs (Pastoral Plan, Directory, Supreme Court ruling, Gaza statement, magazine) under opaque hashed /_files/ugd/ URLs with no date info, so the generic *.pdf fallback used to grab whichever link happened to score highest (or, before the hash-date bug fix, a coincidentally date-like hash). The 'Weekly bulletin' section always has a currently-valid sheet literally titled 'Mass Times up to <date>' (a second, future-dated 'Mass Times from <date> onwards' sheet is often listed too — do not just take the newest/last match). If this selector ever stops matching, fail loud and retrain rather than falling back to *.pdf."
+      "action": "goto",
+      "url": "https://www.carrickparish.org/registration"
     },
     {
-      "action": "download",
-      "url": "https://www.carrickparish.org/_files/ugd/18d125_e29380ad624948a7b3dfdebf8a26fb4f.pdf"
+      "action": "click",
+      "selector": "a[href$='.pdf']",
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "a[href*='_files/ugd'][href$='.pdf']"
+      ]
+    },
+    {
+      "action": "download"
     }
   ],
-  "observed_load_ms": 20860,
-  "timeout_ms": 55000,
-  "total_timeout_s": 250,
-  "playbook_type": "wix_html",
-  "site_type": "html_text_bulletin",
   "operator_notes": [
-    "Bulletin text is on the web page — not a downloadable PDF file.",
-    "Use Save page as PDF on the newsletter article page.",
-    "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
+    "Carrickfergus weekly files live on the Bulletin Back Issues catalogue at /registration, labelled as dates (28th June 2026, 21st June 2026, …).",
+    "2026-08-22: newest catalogue file is still 28th June 2026 (same PDF as /info 'Final Summer edition'). HTTP 200, 373141 bytes, 2 pages, 13th Sunday / 28/06/2026. No July or August bulletin exists.",
+    "The /info 'Weekly bulletin' block now leads with 'Mass Times from 17th August 2026 onwards' — a 1-page standing schedule, not a weekly newsletter. Harvesting that would fake a current week. Old selector a:has-text('Mass Times up to') is gone.",
+    "Wix hashed /_files/ugd/ URLs change when they replace a file. pick_strategy:newest_dated reads the date from the link label, not the hash."
   ],
   "do_not": [
-    "Do not use Pick bulletin image when the page is mostly text paragraphs.",
-    "Do not stop at click-only — need print_to_pdf as the final step."
-  ],
-  "recorded_date": "2026-08-21"
+    "Do not start on /info — Mass Times from <date> onwards would score as this week.",
+    "Do not pin a /_files/ugd/ hash URL or use_captured_url.",
+    "Do not click Mass Times, Pastoral Plan, Directory, The Connection magazine, or Fr Davis letter.",
+    "Do not invent an August bulletin. Keep stale until the catalogue adds a newer dated file."
+  ]
 }
