@@ -279,8 +279,57 @@
     .ocr-search-tools button:disabled { background: #9bbfbd; cursor: not-allowed; }
     .match-count { color: #6b7280; font-size: 0.9rem; font-weight: 600; }
     .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: sticky;
+      top: 0;
+      z-index: 8;
+      background: #fff;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 30;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
     .ocr-zoom-bar {
-      position: sticky; top: 0; z-index: 6;
       display: flex; justify-content: center; align-items: center; gap: 10px;
       margin: 0 0 10px; padding: 6px 10px;
       background: rgba(255, 255, 255, 0.94);
@@ -636,6 +685,7 @@
       <div class="quiet-links">
         <a href="https://raphoe-diocese.github.io/parish_harvester/bulletins/raphoe-2026-08-21-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
+      <div class="ocr-sticky-chrome">
       <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
         <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
         <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
@@ -652,6 +702,7 @@
           <button id="ocr-prev" type="button" disabled aria-label="Previous search match">← Prev match</button>
           <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
         </div>
+      </div>
       </div>
       <div id="ocr-panel"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Annagry</h2><p class="ocr-parish-date">21/08/2026</p></header>
 <hr>
@@ -2527,7 +2578,7 @@ The following parishes do not have a downloadable PDF bulletin. Click a link to 
     <section class="parish-section">
       <h2 class="section-heading">RAPHOE Parishes with Working Bulletin Links</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="https://annagryparish.ie/newsletter-2/" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="http://ardara.ie/news/" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="ballintra parish"><a class="parish-link" href="https://www.facebook.com/donalquinn1959" target="_blank" rel="noopener noreferrer">Ballintra Parish</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="https://drive.google.com/drive/folders/1jPOi4GRU22vAxeKNe5Y_doBJ3riPh7ZK" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="https://www.steunanscathedral.ie/newsletter/" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm"><a class="parish-link" href="https://www.parishpress.net/wp-content/uploads/parish-bulletins/donegal/raphoe/drumholm-parish/bulletin.pdf?t=1782303743" target="_blank" rel="noopener noreferrer">Drumholm</a></li><li class="parish-item" data-name="dunfanaghy"><a class="parish-link" href="https://mcn.live/Camera/holy-cross-church" target="_blank" rel="noopener noreferrer">Dunfanaghy</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="https://naomhfionan.com/nuachtlitir/" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon"><a class="parish-link" href="https://drive.google.com/file/d/1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa/view" target="_blank" rel="noopener noreferrer">Gartan/Termon</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="https://mcn.live/Camera/our-lady-of-perpetual-succour-glenfinn" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="https://drive.google.com/file/d/14aLAxt4mv7eYBvYx2GGthpsQnLrsysmK/view" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="https://www.parishpress.net/wp-content/uploads/parish-bulletins/donegal/raphoe/gort-a-choirce/bulletin.pdf?t=1771000171" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="https://www.inverparish.com/parish-newsletter.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="https://drive.google.com/file/d/1m6sOGz3dECWvbbpXCnRGdHG77yWiLXxR/view" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilbarron"><a class="parish-link" href="https://www.kilbarron.org/bulletin" target="_blank" rel="noopener noreferrer">Kilbarron</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="https://www.mcn.live/Camera/st-carthas-church-kilcar,-f94-h2y5" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="https://mcn.live/Camera/st-mary-of-the-visitation-church-killybegs" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="kilmacrenan"><a class="parish-link" href="https://drive.google.com/file/d/1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa/view" target="_blank" rel="noopener noreferrer">Kilmacrenan</a></li><li class="parish-item" data-name="kincasslagh"><a class="parish-link" href="https://www.kincasslagh.ie/?post_type=kbp_bulletins" target="_blank" rel="noopener noreferrer">Kincasslagh</a></li><li class="parish-item" data-name="mevagh"><a class="parish-link" href="https://www.facebook.com/profile.php?id=100079250566866" target="_blank" rel="noopener noreferrer">Mevagh</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="https://milfordrathmullanparishes.ie/bulletins/" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="https://newtownkilleaparish.ie/bulletin/raphoe/newtown-killea/" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="raphoe"><a class="parish-link" href="https://drive.google.com/file/d/1jmslbrliw1BTtdrxHbqpUbhQEf6wXHy5/view" target="_blank" rel="noopener noreferrer">Raphoe</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="https://milfordrathmullanparishes.ie/bulletins/" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="stranolar"><a class="parish-link" href="https://www.stranorlarparish.ie/newsletter/" target="_blank" rel="noopener noreferrer">Stranolar</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="https://tawnawillyparish.ie/bulletin/" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="https://drive.google.com/file/d/1Hh7w-Ew0vLJUFMihFiVzVJGhjeYposIH/view" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="../../parishes/raphoe/annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="../../parishes/raphoe/ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="ballintra parish"><a class="parish-link" href="https://www.facebook.com/donalquinn1959" target="_blank" rel="noopener noreferrer">Ballintra Parish</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="../../parishes/raphoe/drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="../../parishes/raphoe/steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm"><a class="parish-link" href="../../parishes/raphoe/drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm</a></li><li class="parish-item" data-name="dunfanaghy"><a class="parish-link" href="https://mcn.live/Camera/holy-cross-church" target="_blank" rel="noopener noreferrer">Dunfanaghy</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="../../parishes/raphoe/naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon"><a class="parish-link" href="../../parishes/raphoe/drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="../../parishes/raphoe/glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="../../parishes/raphoe/drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="../../parishes/raphoe/gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="../../parishes/raphoe/inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="../../parishes/raphoe/drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilbarron"><a class="parish-link" href="https://www.kilbarron.org/bulletin" target="_blank" rel="noopener noreferrer">Kilbarron</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="../../parishes/raphoe/st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="../../parishes/raphoe/st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="kilmacrenan"><a class="parish-link" href="https://drive.google.com/file/d/1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa/view" target="_blank" rel="noopener noreferrer">Kilmacrenan</a></li><li class="parish-item" data-name="kincasslagh"><a class="parish-link" href="https://www.kincasslagh.ie/?post_type=kbp_bulletins" target="_blank" rel="noopener noreferrer">Kincasslagh</a></li><li class="parish-item" data-name="mevagh"><a class="parish-link" href="https://www.facebook.com/profile.php?id=100079250566866" target="_blank" rel="noopener noreferrer">Mevagh</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="../../parishes/raphoe/milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="../../parishes/raphoe/newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="raphoe"><a class="parish-link" href="../../parishes/raphoe/drive-1jmslbrliw.html" target="_blank" rel="noopener noreferrer">Raphoe</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="../../parishes/raphoe/rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="stranolar"><a class="parish-link" href="https://www.stranorlarparish.ie/newsletter/" target="_blank" rel="noopener noreferrer">Stranolar</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="../../parishes/raphoe/tawnawillyparish.html" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="../../parishes/raphoe/drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
     </section>
   </div>
   <footer>
@@ -2820,6 +2871,23 @@ The following parishes do not have a downloadable PDF bulletin. Click a link to 
         if (page) page.insertBefore(banner, page.firstChild);
       }
     })();
+    
+    (function () {
+      var btn = document.getElementById('scroll-top-btn');
+      if (!btn) return;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function shown() {
+        var y = window.scrollY || document.documentElement.scrollTop || 0;
+        btn.classList.toggle('is-visible', y > 240);
+      }
+      window.addEventListener('scroll', shown, { passive: true });
+      shown();
+      btn.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      });
+    })();
+    
   </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
 </body>
 </html>
