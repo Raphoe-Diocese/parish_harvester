@@ -309,6 +309,7 @@ class OcrBulletinPageTests(unittest.TestCase):
             parish_links_html='<ul class="parish-grid"><li>Example Parish</li></ul>',
         )
         self.assertIn("Sunday mass at 10am", html_output)
+        self.assertIn('href="/favicon.png"', html_output)
         self.assertIn('id="panel-pdf"', html_output)
         self.assertIn('id="panel-ocr"', html_output)
         self.assertIn("https://example.com/example-pdf.html", html_output)

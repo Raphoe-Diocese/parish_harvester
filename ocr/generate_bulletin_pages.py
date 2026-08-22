@@ -16,7 +16,7 @@ from PyPDF2 import PdfReader
 from harvester.ai_summaries import summarise_bulletin
 from harvester.events_extractor import extract_events, write_events_json
 from harvester.weekly_diff import diff_bulletins
-from harvester.site_chrome import scroll_top_css, scroll_top_html, scroll_top_js, sticky_search_css
+from harvester.site_chrome import favicon_link_tags, scroll_top_css, scroll_top_html, scroll_top_js, sticky_search_css
 from ocr.bulletin_layout import ocr_masthead_css, structure_ocr_html
 from ocr.parish_splitter import split_ocr_by_parish
 
@@ -825,6 +825,7 @@ def render_ocr_standalone_page(
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
   <title>{html.escape(config.display_name)} Text Bulletin — {html.escape(uk_bulletin_date)}</title>
+  {favicon_link_tags()}
   <style>
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
     body {{
@@ -1365,6 +1366,7 @@ def render_pdf_standalone_page(config: DioceseConfig, bulletin_date: str, pdf_hr
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{html.escape(config.display_name)} PDF — {html.escape(uk_bulletin_date)}</title>
+  {favicon_link_tags()}
   <style>
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
     html, body {{ height: 100%; }}
@@ -1471,6 +1473,7 @@ def render_bulletin_viewer_shell(
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
   <title>{html.escape(page_title)}</title>
+  {favicon_link_tags()}
   <style>
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
     html {{ scroll-behavior: smooth; }}

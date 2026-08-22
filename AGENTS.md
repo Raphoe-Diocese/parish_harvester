@@ -13,6 +13,8 @@ Collated Bulletin (mega PDF) stitching is **core production behaviour, not optio
 
 **Website / OCR backlog:** before any viewer, OCR, or `docs/` page work, read and update [`docs/WEBSITE_OCR_BACKLOG.md`](docs/WEBSITE_OCR_BACKLOG.md). That file is the living checklist (850px desktop / 450px mobile, parish OCR headers, new-tab links, mega PDF stays on). Do not start a second competing list.
 
+**Do not lie about done.** Never tell Frank a website/OCR/viewer job is finished unless you have checked the **generated files that GitHub Pages deploys** (`docs/index.html`, `docs/dioceses/`, `docs/parishes/`) AND, after merge+Pages, the **live URL** (e.g. https://www.parishpress.ie/). Tests or Python-only edits are not enough. If it is not on the live page, say “not live yet”. Do not tick backlog items done without the live check.
+
 ## PHASE PLAN
 
 ### Phase 1: Core capture reliability

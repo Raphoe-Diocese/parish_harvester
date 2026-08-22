@@ -68,6 +68,13 @@ def scroll_top_html() -> str:
     )
 
 
+def favicon_link_tags() -> str:
+    return (
+        '<link rel="icon" type="image/png" href="/favicon.png" />\n'
+        '  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />'
+    )
+
+
 def scroll_top_js() -> str:
     return """
     (function () {
