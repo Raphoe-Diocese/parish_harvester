@@ -2,57 +2,18 @@
   "generated_at": "2026-08-22",
   "target_date": "2026-08-16",
   "summary": {
-    "downloaded": 93,
+    "downloaded": 94,
     "html_links": 0,
     "skipped": 17,
-    "failed": 15,
+    "failed": 14,
     "stale_rejected": 1
   },
   "action_counts": {
     "skip": 31,
-    "ok": 117,
-    "investigate": 12,
-    "retrain": 1
+    "ok": 118,
+    "investigate": 12
   },
   "parishes": [
-    {
-      "parish_key": "carrickparish",
-      "display_name": "Carrickfergus",
-      "diocese": "down_and_connor",
-      "recipe_file": "parishes/recipes/down_and_connor/carrickparish.json",
-      "recipe": {
-        "start_url": "https://www.carrickparish.org/registration",
-        "site_type": "dated_pdf_path",
-        "playbook_type": "newest_dated_pdf",
-        "status": "",
-        "skip": false,
-        "placeholder": false,
-        "step_count": 3,
-        "click_count": 1,
-        "has_terminal": true,
-        "operator_notes": [
-          "Carrickfergus weekly files live on the Bulletin Back Issues catalogue at /registration, labelled as dates (28th June 2026, 21st June 2026, \u2026).",
-          "2026-08-22: newest catalogue file is still 28th June 2026 (same PDF as /info 'Final Summer edition'). HTTP 200, 373141 bytes, 2 pages, 13th Sunday / 28/06/2026. No July or August bulletin exists.",
-          "The /info 'Weekly bulletin' block now leads with 'Mass Times from 17th August 2026 onwards' \u2014 a 1-page standing schedule, not a weekly newsletter. Harvesting that would fake a current week. Old selector a:has-text('Mass Times up to') is gone.",
-          "Wix hashed /_files/ugd/ URLs change when they replace a file. pick_strategy:newest_dated reads the date from the link label, not the hash."
-        ],
-        "do_not": [
-          "Do not start on /info \u2014 Mass Times from <date> onwards would score as this week.",
-          "Do not pin a /_files/ugd/ hash URL or use_captured_url.",
-          "Do not click Mass Times, Pastoral Plan, Directory, The Connection magazine, or Fr Davis letter.",
-          "Do not invent an August bulletin. Keep stale until the catalogue adds a newer dated file."
-        ],
-        "recorded_date": "2026-08-22"
-      },
-      "bulletin_format": "download",
-      "learned_pattern": "",
-      "host_profile": null,
-      "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe for Carrickfergus is outdated \u2014 the website may have changed. Re-train with: python main.py --train \"Carrickfergus\" (detail: Recipe outdated \u2014 re-train with --train (all selectors failed: a:has-text('Mass Times up to'): Locator.get_a",
-      "suggested_action": "retrain",
-      "suggested_reason": "outdated selectors"
-    },
     {
       "parish_key": "aghagallonandballinderryparish",
       "display_name": "Aghagallon and Ballinderry",
@@ -993,6 +954,41 @@
       },
       "bulletin_format": "download",
       "learned_pattern": "Parish Services / Parish Messenger widget",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "carrickparish",
+      "display_name": "Carrickfergus",
+      "diocese": "down_and_connor",
+      "recipe_file": "parishes/recipes/down_and_connor/carrickparish.json",
+      "recipe": {
+        "start_url": "https://www.carrickparish.org/info",
+        "site_type": "html_text_bulletin",
+        "playbook_type": "wix_html",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 2,
+        "click_count": 1,
+        "has_terminal": true,
+        "operator_notes": [
+          "Bulletin text is on the web page \u2014 not a downloadable PDF file.",
+          "Use Save page as PDF on the newsletter article page.",
+          "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
+        ],
+        "do_not": [
+          "Do not use Pick bulletin image when the page is mostly text paragraphs.",
+          "Do not stop at click-only \u2014 need print_to_pdf as the final step."
+        ],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "html",
+      "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
