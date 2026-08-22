@@ -9,11 +9,14 @@ from pathlib import Path
 from harvester.replay import (
     _decode_pdfemb_data_url,
     _extract_matching_hrefs,
+    _extract_mdocs_dated_downloads,
     _extract_pdfembed_target_url,
     _extract_post_page_images,
     _extract_wp_upload_images,
     _is_non_bulletin_url,
+    _mdocs_listing_url_candidates,
     _pick_newest_dated_post_url,
+    _pick_newest_mdocs_download,
     _resolve_download_candidates,
     _score_http_scrape_pdf_hrefs,
     _score_wordpress_post_hrefs,
@@ -22,6 +25,9 @@ from harvester.replay import (
     _wordpress_posts_api_urls,
 )
 from harvester.utils import (
+    churchmedia_channel_about_url,
+    churchmedia_newsletter_url_from_about,
+    churchmedia_slug_from_url,
     dropfiles_task_download_url,
     extract_mcn_church_id,
     looks_like_permanent_bulletin_url,
@@ -356,6 +362,83 @@ class McnNewsletterHelperTests(unittest.TestCase):
             str(mcn_newsletter_url_from_profile(payload)).endswith(".pdf")
         )
         self.assertIsNone(mcn_newsletter_url_from_profile({"newsletter": {}}))
+
+
+class ChurchmediaNewsletterHelperTests(unittest.TestCase):
+    LISTING = "https://churchmedia.tv/st-patricks-church-2"
+
+    def test_slug_from_listing_not_newsletter_path(self) -> None:
+        self.assertEqual(
+            churchmedia_slug_from_url(self.LISTING),
+            "st-patricks-church-2",
+        )
+        self.assertIsNone(
+            churchmedia_slug_from_url(
+                "https://churchmedia.tv/newsletter/s22osz.st-patricks-church-2.pdf?cb=1787226064"
+            )
+        )
+        self.assertIsNone(
+            churchmedia_slug_from_url(
+                "https://churchmedia.tv/api/getChannelAbout?slug=st-patricks-church-2"
+            )
+        )
+
+    def test_about_url_and_strips_cache_buster(self) -> None:
+        self.assertEqual(
+            churchmedia_channel_about_url("st-patricks-church-2"),
+            "https://churchmedia.tv/api/getChannelAbout?slug=st-patricks-church-2",
+        )
+        payload = {
+            "status": "Success",
+            "data": {
+                "newsletter_enable": 1,
+                "newsletter_url": (
+                    "https://churchmedia.tv/newsletter/"
+                    "s22osz.st-patricks-church-2.pdf?cb=1787226064"
+                ),
+            },
+        }
+        out = churchmedia_newsletter_url_from_about(payload)
+        self.assertEqual(
+            out,
+            "https://churchmedia.tv/newsletter/s22osz.st-patricks-church-2.pdf",
+        )
+        self.assertNotIn("cb=", out or "")
+        self.assertIsNone(churchmedia_newsletter_url_from_about({"data": {}}))
+        self.assertIsNone(
+            churchmedia_newsletter_url_from_about(
+                {"data": {"newsletter_url": "https://churchmedia.tv/st-patricks-church-2"}}
+            )
+        )
+
+    def test_portaferry_recipe_does_not_pin_cache_token(self) -> None:
+        recipe_path = (
+            Path(__file__).resolve().parent.parent
+            / "parishes"
+            / "recipes"
+            / "down_and_connor"
+            / "portaferryparish.json"
+        )
+        recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
+        self.assertEqual(recipe["site_type"], "churchmedia_newsletter")
+        self.assertEqual(recipe["churchmedia_slug"], "st-patricks-church-2")
+        self.assertEqual(recipe["start_url"], self.LISTING)
+        click = recipe["steps"][0]
+        download = recipe["steps"][1]
+        pinned_surfaces = [
+            recipe["start_url"],
+            click.get("selector") or "",
+            click.get("href") or "",
+            *(click.get("fallback_selectors") or []),
+            download.get("url") or "",
+            * (recipe.get("fallback_document_urls") or []),
+        ]
+        joined = "\n".join(str(item) for item in pinned_surfaces)
+        self.assertNotIn("cb=", joined)
+        self.assertNotIn("ovt7qm", joined)
+        self.assertNotRegex(joined, r"/newsletter/[A-Za-z0-9]+\.st-patricks")
+        self.assertEqual(click["text"], "View Our Latest Newsletter")
+        self.assertIn("st-patricks-church-2.pdf", click["selector"])
 
 
 class StTeresasPredictedPostTests(unittest.TestCase):
@@ -750,6 +833,66 @@ class BallymenaRecipeTests(unittest.TestCase):
         self.assertEqual(best_url, self.THIS_WEEK)
         self.assertTrue(all("Wedding-Parish" not in url for _, url in scored))
         self.assertTrue(_is_non_bulletin_url(self.WEDDING))
+
+
+class PortstewartMdocsRecipeTests(unittest.TestCase):
+    LISTING = "https://portstewartparish.website/weekly-bulletin/"
+    NEWEST = "https://portstewartparish.website/?mdocs-file=9538"
+    LAST_WEEK = "https://portstewartparish.website/?mdocs-file=9520"
+    HTML = """
+    <div class="mdocs"><table class="table table-hover" id="mdocs-list-table"><tbody>
+    <tr>
+      <td><a class="mdocs-title-href" href="#">23rd August 2026 -
+        <small>23 August 2026.pdf</small></a></td>
+      <td class="mdocs-download">
+        <a href="https://portstewartparish.website/?mdocs-file=9538">Download</a>
+      </td>
+    </tr>
+    <tr>
+      <td><a class="mdocs-title-href" href="#">16th August 2026 Parish Bulletin -
+        <small>16 August 2026.pdf</small></a></td>
+      <td class="mdocs-download">
+        <a href="https://portstewartparish.website/?mdocs-file=9520">Download</a>
+      </td>
+    </tr>
+    </tbody></table></div>
+    """
+
+    def test_recipe_picks_newest_row_not_pinned_august_title(self) -> None:
+        data = json.loads(
+            Path("parishes/recipes/down_and_connor/portstewartparish.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(data["site_type"], "mdocs_bulletin_list")
+        self.assertEqual(data["playbook_type"], "mdocs_download_list")
+        self.assertTrue(data["start_url"].endswith("/weekly-bulletin/"))
+        steps_blob = json.dumps(data.get("steps") or [])
+        self.assertNotIn("23rd August 2026", steps_blob)
+        self.assertNotIn("mdocs-file=9538", steps_blob)
+        click = next(
+            step
+            for step in data["steps"]
+            if isinstance(step, dict) and step.get("action") == "click"
+        )
+        self.assertEqual(click.get("pick_strategy"), "first_match")
+        self.assertIn("mdocs-file", click.get("selector") or "")
+        self.assertNotEqual(click.get("href"), "#")
+
+    def test_row_dates_pick_23_august_over_16_august(self) -> None:
+        scored = _extract_mdocs_dated_downloads(
+            self.HTML, self.LISTING, year_hint=2026
+        )
+        urls = {url for _found, url in scored}
+        self.assertIn(self.NEWEST, urls)
+        self.assertIn(self.LAST_WEEK, urls)
+        picked = _pick_newest_mdocs_download(scored, date(2026, 8, 16))
+        self.assertEqual(picked, self.NEWEST)
+
+    def test_listing_url_tries_http_when_https_given(self) -> None:
+        urls = _mdocs_listing_url_candidates(self.LISTING)
+        self.assertEqual(urls[0], self.LISTING)
+        self.assertIn("http://portstewartparish.website/weekly-bulletin/", urls)
 
 
 if __name__ == "__main__":

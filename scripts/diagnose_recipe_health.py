@@ -115,17 +115,8 @@ def _analyze_recipe(key: str, path: Path, recipe: dict) -> list[dict]:
             }
         )
 
-    if "portstewartparish.website" in start_url and start_url.startswith("https://"):
-        issues.append(
-            {
-                "severity": "warn",
-                "code": "portstewart_https",
-                "parish": key,
-                "file": str(path.relative_to(REPO)),
-                "message": "Portstewart start_url uses HTTPS — certificate expired",
-                "fix": "Use http://portstewartparish.website",
-            }
-        )
+    # Portstewart HTTPS is valid again (Let's Encrypt through 2026-10-22) and
+    # HTTP 301s to HTTPS. Do not warn operators back onto HTTP.
 
     for i, step in enumerate(steps):
         if not isinstance(step, dict):
@@ -146,15 +137,16 @@ def _analyze_recipe(key: str, path: Path, recipe: dict) -> list[dict]:
                 }
             )
 
-        if action == "click" and DATED_SELECTOR.search(selector):
+        click_blob = f"{selector} {step.get('text') or ''} {step.get('href') or ''}"
+        if action == "click" and DATED_SELECTOR.search(click_blob):
             issues.append(
                 {
                     "severity": "warn",
                     "code": "dated_selector",
                     "parish": key,
                     "file": str(path.relative_to(REPO)),
-                    "message": f"Click selector may pin a dated filename: {selector[:80]}",
-                    "fix": "Use newest-dated link pick, not a hardcoded June-2026 filename.",
+                    "message": f"Click step may pin a dated filename: {click_blob.strip()[:80]}",
+                    "fix": "Use newest-row / newest-dated pick, not a hardcoded August-2026 title.",
                 }
             )
 

@@ -1,28 +1,46 @@
 {
-  "version": 1,
+  "version": 3,
   "parish_key": "portaferryparish",
   "display_name": "Portaferry",
   "diocese": "down_and_connor",
   "start_url": "https://churchmedia.tv/st-patricks-church-2",
+  "site_type": "churchmedia_newsletter",
+  "playbook_type": "churchmedia_latest_newsletter",
+  "churchmedia_slug": "st-patricks-church-2",
+  "fallback_document_urls": [
+    "https://portaferryparish.com/images/downloads/Bulletin2019A.pdf"
+  ],
+  "recorded_date": "2026-08-21",
+  "timeout_ms": 90000,
+  "total_timeout_s": 180,
+  "navigation_wait_until": "domcontentloaded",
   "steps": [
     {
+      "action": "click",
+      "selector": "a[href*='/newsletter/'][href*='st-patricks-church-2.pdf']",
+      "text": "View Our Latest Newsletter",
+      "pick_strategy": "first_match",
+      "fallback_selectors": [
+        "a[href*='churchmedia.tv/newsletter/'][href*='.pdf']",
+        "a[href*='newsletter'][href*='.pdf']"
+      ]
+    },
+    {
       "action": "download",
-      "url": "https://churchmedia.tv/newsletter/ovt7qm.st-patricks-church-2.pdf?cb=1786005944"
+      "url_pattern": "*.pdf"
     }
   ],
-  "observed_load_ms": 34344.5,
-  "timeout_ms": 78689,
-  "total_timeout_s": 190,
-  "playbook_type": "pdf_download_list",
-  "site_type": "pdf_link_list",
   "operator_notes": [
-    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
-    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-    "Do not worry if the filename or date in the link text changes every week."
+    "Weekly bulletin is the churchmedia.tv 'View Our Latest Newsletter' button on St Patrick's Ballyphilip (st-patricks-church-2).",
+    "GET /api/getChannelAbout?slug=st-patricks-church-2 → data.newsletter_url. The path token and ?cb= cache-buster change every upload — never pin them.",
+    "Harvester HTTP-fetches that JSON first (no browser). Playwright click of the newsletter button is the fallback.",
+    "Same week's file is also overwritten at portaferryparish.com/images/downloads/Bulletin2019A.pdf (Joomla pdf.js viewer) — last-resort HTTP fallback only when the churchmedia API/PDF fails.",
+    "Probed 21/08/2026: current file Sunday 23rd August 2026 (Twenty-First Sunday in Ordinary Time), 5 pages, Last-Modified 20/08/2026. Dead pinned token was ovt7qm?cb=1786005944 (returned HTML)."
   ],
   "do_not": [
-    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
-    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
-  ],
-  "recorded_date": "2026-08-20"
+    "Do not pin churchmedia /newsletter/<token>.st-patricks-church-2.pdf?cb=... — the token dies on the next upload.",
+    "Do not use st-patricks-ballygalget — that is a different church livestream in the same parish.",
+    "Do not download the Angular SPA HTML for a dead /newsletter/<token>.pdf (returns text/html).",
+    "Do not treat Bulletin2019A.pdf's 2019 as a year — it is a static overwrite filename."
+  ]
 }

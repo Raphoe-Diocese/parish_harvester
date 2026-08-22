@@ -731,6 +731,24 @@ class TestNavigationWaitUntil(unittest.TestCase):
         self.assertTrue(found)
         self.assertIn("21st-june-2026", found[0])
 
+    def test_find_mdocs_pdf_urls_includes_mdocs_file_query(self) -> None:
+        import asyncio
+
+        class _MdocsPage:
+            url = "https://portstewartparish.website/weekly-bulletin/"
+
+            async def eval_on_selector_all(self, _selector: str, _js: str):
+                return [
+                    "#",
+                    "https://portstewartparish.website/?mdocs-file=9520",
+                    "https://portstewartparish.website/?mdocs-file=9538",
+                ]
+
+        found = asyncio.run(_find_mdocs_pdf_urls(_MdocsPage()))
+        self.assertTrue(found)
+        self.assertIn("mdocs-file=9538", found[0])
+        self.assertTrue(all("mdocs-file=" in url for url in found))
+
 
 class _FakePageContext:
     def __init__(self) -> None:
