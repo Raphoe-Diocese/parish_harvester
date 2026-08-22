@@ -112,7 +112,7 @@
       position: relative;
       height: auto;
       min-height: 850px;
-      overflow: hidden;
+      overflow: visible;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -165,10 +165,9 @@
     .pdf-inpage-pages {
       box-sizing: border-box;
       flex: 0 0 auto;
-      height: 850px;
+      height: auto;
       min-height: 850px;
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
+      overflow: visible;
       background: #525659;
       padding: 8px 0 16px;
     }
@@ -189,12 +188,13 @@
       display: flex;
       flex-direction: column;
       height: auto;
+      overflow: visible;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
     body.is-native-pdf iframe.pdf-frame {
       display: none !important;
-      height: 850px;
+      height: auto;
       min-height: 850px;
     }
     .pdf-frame-wrap.is-native-pdf,
@@ -204,6 +204,7 @@
       flex-direction: column;
       height: auto !important;
       min-height: 850px !important;
+      overflow: visible !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -225,8 +226,9 @@
       .pdf-inpage-pages,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
-        height: 450px !important;
+        height: auto !important;
         min-height: 450px !important;
+        overflow: visible !important;
       }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
@@ -503,14 +505,14 @@
 
     #ocr-panel {
       box-sizing: border-box;
-      height: 850px;
+      height: auto;
       min-height: 850px;
-      overflow-y: auto;
+      overflow: visible;
       border: 1px solid #d4ddd9;
       padding: 22px 24px 32px;
     }
     .pdf-frame-wrap iframe {
-      height: 850px;
+      height: auto;
       min-height: 850px;
     }
     .note-box {
@@ -613,12 +615,14 @@
       .pdf-inpage-viewer {
         height: auto;
         min-height: 450px;
+        overflow: visible;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
       #ocr-panel {
-        height: 450px;
+        height: auto;
         min-height: 450px;
+        overflow: visible;
       }
     }
     @media (max-width: 900px) {
@@ -640,7 +644,7 @@
       }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260822" defer></script>
 </head>
 <body>
   <div class="page">
@@ -2630,9 +2634,9 @@ The following parishes do not have a downloadable PDF bulletin. Click a link to 
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260822"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260822';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -2704,7 +2708,7 @@ The following parishes do not have a downloadable PDF bulletin. Click a link to 
         target.classList.add('search-active');
         const details = target.closest('details.parish-block');
         if (details) details.open = true;
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
 
       function updateMatchUi() {

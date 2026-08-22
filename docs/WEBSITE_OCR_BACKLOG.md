@@ -48,12 +48,12 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 ## Still open (do not pretend these are finished)
 
 - [ ] **doing** · 2026-08-21 · Gortahork (`gort-a-choirce`) OCR empty — mega page 14 was banner-only (Irish image body never OCR'd). Fill sparse mega pages from the mega PDF image and slice by `pages.json` / `Page N`. Keep Irish as Irish. **Leave open until verified on live** https://www.parishpress.ie/parishes/raphoe/gort-a-choirce.html · `ocr/sparse_page_ocr.py`, `ocr/parish_splitter.py`, `ocr/parish_pages.py`
-- [ ] **doing** · 2026-08-21 · Desktop 850px must be the **visible** `.pdf-inpage-pages` / `#ocr-panel` height (not the hidden iframe, not an 85vh-clipped wrap). Diocese **and** parish pages. Mobile/tablet `max-width: 1024px` stay ~450px. **Leave open until verified on live Gortahork + Raphoe after deploy.** · `render_bulletin_viewer_shell`, `docs/assets/pdf-inpage-viewer.js`
+- [x] **done** · 2026-08-22 · Desktop 850px is the **visible** `.pdf-inpage-pages` / `#ocr-panel` **min-height** (`height: auto`, `overflow: visible` — page scrolls, no inner scrollbar). Not 85vh, not a locked `height: 850px`. Diocese **and** parish pages. Mobile/tablet `max-width: 1024px` stay ~450px min-height. Verified on generated `docs/dioceses/raphoe/index.html`, `docs/dioceses/down-and-connor/index.html`, `docs/parishes/raphoe/gort-a-choirce.html`. Runtime `ensureStyles()` uses `!important` + cache-bust `?v=20260822`. · `render_bulletin_viewer_shell`, `pdf_inpage_viewer_css`, `docs/assets/pdf-inpage-viewer.js`
 - [ ] **doing** · 2026-08-21 · Back room **View bulletin** opens this week’s scraped PDF: `Bulletins/<key>.pdf`, then `current/`/`stale/`, then the parishpress parish slice. No zip archives. Ship as Parish Trainer v1.61.12. · `extension/sidepanel.js`, `harvester/report.py`
 - [ ] **doing** · 2026-08-21 · Trainer Guess must show the guessed URL + title and a **Save guessed link** / **Use this link** control that writes a real recipe step (download / goto / newest-picker). Top 3 candidates. Prefer newest Sunday; skip GDPR / privacy / wedding / Order of Mass. Do not hide Guess after refresh. Manifest footer must match. · `extension/content.js`, `extension/copilot.js`, `extension/manifest.json`
 - [ ] **doing** · 2026-08-21 · Trainer ↔ GitHub sync: Problems/Directory load latest `parishes/parish_status.json` via commit SHA; Directory shows ok + UK date; Send & test waits for `last_tested_at` change · `extension/*`
 - [ ] **doing** · 2026-08-22 · Add Clogher Diocese from official Expand-all directory (37 parishes; 21 harvestable after kitchen-sink + snapshot). Facebook stays clickable. Hunt command is `docs/DIOCESE_HUNT.md`. Do not mark the public Clogher page done until a harvest writes `docs/dioceses/clogher/` · `parishes/clogher_diocese_*`, `parishes/recipes/clogher/`, `parishes/dioceses.json`
-- [ ] **doing** · 2026-08-22 · Sticky OCR search (zoom + find stay on screen) and a sitewide back-to-top arrow. Leave open until verified on generated Raphoe text bulletin + diocese pages · `harvester/site_chrome.py`, `ocr/generate_bulletin_pages.py`
+- [x] **done** · 2026-08-22 · Sticky OCR search (`.ocr-sticky-chrome { position: sticky; top: 0 }`) and `#scroll-top-btn` / `.scroll-top-btn` page-top jump. Search highlight uses `scrollIntoView({ block: 'start' })` so it sits below the sticky bar. If a parish page is missing the wrapper, `pdf-inpage-viewer.js` wraps zoom + search + tools. Verified on generated Raphoe diocese + Gortahork parish HTML. · `harvester/site_chrome.py`, `ocr/generate_bulletin_pages.py`, `docs/assets/pdf-inpage-viewer.js`
 - [ ] **doing** · 2026-08-22 · Homepage: one compact row of live dioceses with cathedral photos, short welcome, no junk footer. Verified on generated `docs/index.html` 22/08/2026. Leave open until verified on live parishpress.ie · `harvester/site_builder.py` `_landing_page`
 - [ ] **todo** · 2026-08-20 · Recipe success — one parish at a time (A–Z repair with proof packs) · `parishes/recipes/`, Problems tab
 - [ ] **todo** · 2026-08-20 · parishpress.ie — live DNS / Pages cutover when Frank is ready · `docs/PARISHPRESS_IE_MIGRATION.md`, `docs/DOMAIN_SETUP.md`
@@ -82,8 +82,11 @@ python -m pytest tests/test_ocr_bulletin_pages.py tests/test_bulletin_layout.py 
 
 Spot-check generated CSS for:
 
-- `height: 850px` and `min-height: 850px` on the visible `.pdf-inpage-pages` and `#ocr-panel` (not only the wrap)
-- no `height: 85vh` clip on `.pdf-frame-wrap.is-native-pdf`
-- `@media (max-width: 1024px)` with `height` / `min-height: 450px` on those same visible boxes
+- `height: auto`, `min-height: 850px`, and `overflow: visible` on the visible `.pdf-inpage-pages` and `#ocr-panel` (not only the wrap)
+- no `overflow-y: auto` on `#ocr-panel` (no second scrollbar — the PAGE scrolls)
+- no `height: 85vh` clip on `.pdf-frame-wrap`
+- `@media (max-width: 1024px)` with `height: auto` / `min-height: 450px` on those same visible boxes
+- `.ocr-sticky-chrome { position: sticky; top: 0 }` and `#scroll-top-btn`
+- `/assets/pdf-inpage-viewer.js?v=20260822` (cache-bust)
 - `ocr-parish-masthead` / `ocr-parish-name` in the OCR panel
 - `getAnnotations` + `target="_blank"` in `docs/assets/pdf-inpage-viewer.js`
