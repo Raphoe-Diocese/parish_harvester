@@ -2045,8 +2045,8 @@
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
-        "click_count": 0,
+        "step_count": 2,
+        "click_count": 1,
         "has_terminal": true,
         "operator_notes": [
           "Bulletin is a real PDF (often made in Microsoft Word \u2192 Print to PDF).",
@@ -2057,11 +2057,9 @@
         ],
         "do_not": [
           "Do not use use_page_url only \u2014 GitHub cannot read Chrome's internal PDF viewer address.",
-          "Do not worry if Document Properties title mentions Microsoft Word.",
-          "Do not raise max_bulletin_pages to accept the 13-page July file \u2014 the filename date is this week but the body is 12/07/2026.",
-          "Do not treat the Parish Messenger news cards as a new bulletin. Download the PDF and read the body date."
+          "Do not worry if Document Properties title mentions Microsoft Word."
         ],
-        "recorded_date": "2026-08-21"
+        "recorded_date": "2026-08-22"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
@@ -2659,27 +2657,28 @@
       "diocese": "down_and_connor",
       "recipe_file": "parishes/recipes/down_and_connor/parishoflisburn.json",
       "recipe": {
-        "start_url": "https://parishoflisburn.org/category/news/",
-        "site_type": "pdf_link_list",
+        "start_url": "https://parishoflisburn.org/",
+        "site_type": "wp_json_newest_media",
         "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
+        "has_terminal": false,
         "operator_notes": [
-          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
-          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-          "Do not worry if the filename or date in the link text changes every week."
+          "Parish of Blaris (Lisburn). Weekly files are DD-MM-YY-Blaris-Bulletin_Small.pdf in wp-json media. Newest on 22/08/2026 is 16-08-26-Blaris-Bulletin_Small.pdf (HTTP 200, 739527 bytes, 8 pages, Twentieth Sunday).",
+          "Send & test download of that URL was rewritten 16-08-26 \u2192 16-8-26 and failed HTTP 404. site_type:wp_json_newest_media never rewrites the filename.",
+          "max_bulletin_pages=16 \u2014 default 4-page cap rejected the real 8-page Small bulletin."
         ],
         "do_not": [
-          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
-          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+          "Do not pin or rewrite 16-08-26-Blaris-Bulletin_Small.pdf \u2014 harvest turns it into 16-8-26 and 404s.",
+          "Do not leave the default 4-page cap.",
+          "Do not download wedding / GDPR / Order of Mass."
         ],
         "recorded_date": "2026-08-22"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
