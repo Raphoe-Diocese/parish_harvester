@@ -1,19 +1,34 @@
 {
+  "version": 2,
   "parish_key": "ederney",
-  "display_name": "Ederney (C\u00fal M\u00e1ine)",
+  "display_name": "Ederney (Cúl Máine)",
   "diocese": "clogher",
+  "start_url": "https://culmaine.co.uk/newsletter",
+  "site_type": "html_text_bulletin",
+  "playbook_type": "html_text_bulletin",
+  "timeout_ms": 60000,
+  "total_timeout_s": 120,
+  "max_bulletin_pages": 16,
   "recorded_date": "2026-08-22",
-  "start_url": "http://www.culmaine.co.uk/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No current weekly bulletin PDF on the official website \u2014 keep the reader link",
   "steps": [
     {
       "action": "goto",
-      "url": "http://www.culmaine.co.uk/"
+      "url": "https://culmaine.co.uk/newsletter"
+    },
+    {
+      "action": "print_to_pdf",
+      "skip_listing_nav": true
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "Adobe Portfolio HTML newsletter overwritten in place. Masthead on 22/08/2026 is Sunday 23rd August 2026, 21st Sunday in Ordinary Time.",
+    "print_to_pdf the newsletter page. skip_listing_nav=true so html_capture does not leave the page.",
+    "Keep Irish Cúl Máine in the parish name."
+  ],
+  "do_not": [
+    "Do not invent a PDF download — there is no weekly PDF file.",
+    "Do not pin a dated URL — the page is overwritten each week.",
+    "Do not remove skip_listing_nav.",
+    "Do not scrape the Facebook plugin."
+  ]
 }

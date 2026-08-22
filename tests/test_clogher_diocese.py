@@ -30,6 +30,15 @@ class ClogherDioceseTests(unittest.TestCase):
         self.assertIn("Sunday-23rd-August-2026", by_key["donaghmoyne"].example_url)
         self.assertIn("Bulletin-Sunday-23rd-August-2026", by_key["roslea"].example_url)
         self.assertIn("09.02.2025", by_key["bundoran"].example_url)
+        self.assertIn("Sunday 23rd August 2026.pdf", by_key["clones"].example_url)
+        self.assertIn("230826.pdf", by_key["enniskillen"].example_url)
+        self.assertIn("Sunday-23rd-August-2026.jpg", by_key["fintona"].example_url)
+        self.assertIn("23082026.pdf", by_key["lisnaskeamaguiresbridge"].example_url)
+        self.assertIn("23082026.pdf", by_key["monaghanrackwallace"].example_url)
+        self.assertIn("culmaine.co.uk/newsletter", by_key["ederney"].example_url)
+        self.assertIn("donaghparish.com/parish-news", by_key["donagh"].example_url)
+        self.assertIn("_files/ugd/", by_key["irvinestown"].example_url)
+        self.assertIn("onewebmedia/S25C", by_key["newtownbutler"].example_url)
 
     def test_facebook_and_link_only_recipes_are_skipped(self) -> None:
         facebook = load_recipe(recipe_path_for("aughnamulleneast", PARISHES))
@@ -38,6 +47,10 @@ class ClogherDioceseTests(unittest.TestCase):
         clontibret = load_recipe(recipe_path_for("clontibret", PARISHES))
         self.assertTrue(_recipe_is_inactive(clontibret))
         self.assertIn("mucknoparish.ie", clontibret["start_url"])
+        clones = load_recipe(recipe_path_for("clones", PARISHES))
+        self.assertFalse(_recipe_is_inactive(clones))
+        self.assertIn("clonesparish.com", clones["start_url"])
+        self.assertNotIn("clonesparish.ie", clones["start_url"])
 
     def test_contacts_and_diocese_label(self) -> None:
         contacts = json.loads((PARISHES / "clogher_diocese_contacts.json").read_text(encoding="utf-8"))

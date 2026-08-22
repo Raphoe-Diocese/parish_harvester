@@ -1,19 +1,36 @@
 {
+  "version": 2,
   "parish_key": "lisnaskeamaguiresbridge",
   "display_name": "Lisnaskea-Maguiresbridge (Aghalurcher)",
   "diocese": "clogher",
+  "start_url": "https://www.lisnaskeamaguiresbridgeparish.com/bulletin.html",
+  "playbook_type": "pdf_download_list",
+  "timeout_ms": 55000,
+  "total_timeout_s": 250,
   "recorded_date": "2026-08-22",
-  "start_url": "http://www.lisnaskeamaguiresbridgeparish.com/",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No current weekly bulletin PDF on the official website \u2014 keep the reader link",
   "steps": [
     {
       "action": "goto",
-      "url": "http://www.lisnaskeamaguiresbridgeparish.com/"
+      "url": "https://www.lisnaskeamaguiresbridgeparish.com/bulletin.html"
+    },
+    {
+      "action": "click",
+      "selector": "a[href*='onewebmedia'][href$='.pdf']",
+      "pick_strategy": "newest_dated"
+    },
+    {
+      "action": "download",
+      "url_pattern": "*.pdf"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "Listing /bulletin.html newest on 22/08/2026 is onewebmedia/23082026.pdf (HTTP 200, 596595 bytes).",
+    "HTTPS certificate is expired — Playwright ignore_https_errors. Do not use http_scrape_newest_pdf (urllib verifies TLS).",
+    "Pattern A DDMMYYYY in the filename and the link text."
+  ],
+  "do_not": [
+    "Do not pin a dated filename.",
+    "Do not use http_scrape_newest_pdf — the site cert is expired.",
+    "Do not harvest the homepage — bulletins live on /bulletin.html."
+  ]
 }
