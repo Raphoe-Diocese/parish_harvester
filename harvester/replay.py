@@ -727,10 +727,15 @@ def _normalize_doc_url(url: str) -> str:
     return normalize_document_url(url)
 
 
+def _office_bytes_look_like_rtf(body: bytes) -> bool:
+    return body.lstrip()[:5].startswith(b"{\\rtf")
+
+
 async def _convert_docx_to_pdf_bytes(docx_bytes: bytes) -> bytes:
     with tempfile.TemporaryDirectory() as tmpdir:
         tmp_path = Path(tmpdir)
-        docx_path = tmp_path / "bulletin.docx"
+        suffix = ".rtf" if _office_bytes_look_like_rtf(docx_bytes) else ".docx"
+        docx_path = tmp_path / f"bulletin{suffix}"
         out_pdf = tmp_path / "bulletin.pdf"
         docx_path.write_bytes(docx_bytes)
         libreoffice_error = ""
@@ -754,6 +759,12 @@ async def _convert_docx_to_pdf_bytes(docx_bytes: bytes) -> bytes:
             libreoffice_error = (result.stderr or b"").decode("utf-8", errors="ignore").strip()
         except (FileNotFoundError, subprocess.TimeoutExpired):
             pass
+
+        if suffix == ".rtf":
+            extra = f" LibreOffice error: {libreoffice_error}" if libreoffice_error else ""
+            raise RecipeReplayError(
+                f"Could not convert RTF newsletter to PDF (needs LibreOffice).{extra}"
+            )
 
         try:
             import docx as _docx  # type: ignore[import]
@@ -977,7 +988,7 @@ def _dropfiles_body_looks_like_file(headers: dict[str, str], body: bytes) -> boo
     content_disposition = (headers.get("content-disposition") or "").lower()
     if "attachment" in content_disposition:
         return True
-    if _is_pdf_content(body) or body[:2] == b"PK":  # PK = docx/zip signature
+    if _is_pdf_content(body) or body[:2] == b"PK" or _office_bytes_look_like_rtf(body):
         return True
     if body[:3] == b"\xff\xd8\xff" or body[:8] == b"\x89PNG\r\n\x1a\n":  # JPEG / PNG
         return True
@@ -1499,7 +1510,7 @@ def _score_http_scrape_pdf_hrefs(
         if _is_non_bulletin_url(href):
             continue
         path = urlparse(href).path.lower()
-        if not path.endswith((".pdf", ".docx", ".doc")):
+        if not path.endswith((".pdf", ".docx", ".doc", ".rtf")):
             continue
         # Prefer the filename's own date over WordPress /uploads/YYYY/MM/
         # folder dates — Malin uploads March bulletins into /2026/04/, and
@@ -1559,12 +1570,13 @@ async def _try_http_scrape_newest_pdf(
     if not file_result:
         return None
     file_body, file_headers = file_result
+    is_rtf = _office_bytes_look_like_rtf(file_body) or urlparse(pdf_url).path.lower().endswith(".rtf")
     if not (
         _dropfiles_body_looks_like_file(file_headers, file_body)
-        and (_is_pdf_content(file_body) or file_body[:2] == b"PK")
+        and (_is_pdf_content(file_body) or file_body[:2] == b"PK" or is_rtf)
     ):
         return None
-    if file_body[:2] == b"PK" and not _is_pdf_content(file_body):
+    if is_rtf or (file_body[:2] == b"PK" and not _is_pdf_content(file_body)):
         pdf_bytes = await _convert_docx_to_pdf_bytes(file_body)
         dest.write_bytes(pdf_bytes)
         return pdf_url, "docx_to_pdf"

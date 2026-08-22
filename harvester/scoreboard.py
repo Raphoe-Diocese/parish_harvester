@@ -26,6 +26,7 @@ _DIOCESE_ORDER: tuple[str, ...] = (
     "Raphoe Diocese",
     "Derry Diocese",
     "Down & Connor Diocese",
+    "Clogher Diocese",
 )
 
 

@@ -246,6 +246,7 @@ document.getElementById("gh-save").addEventListener("click", () => {
 //   • exclude ☑   → add / remove the parish key from parishes/mega_excludes.json
 
 const PD_EVIDENCE_FILES_FALLBACK = {
+  "Clogher Diocese":       "parishes/clogher_diocese_bulletin_urls.txt",
   "Derry Diocese":         "parishes/derry_diocese_bulletin_urls.txt",
   "Down & Connor Diocese": "parishes/down_and_connor_bulletin_urls.txt",
   "Raphoe Diocese":        "parishes/raphoe_diocese_bulletin_urls.txt",
@@ -626,7 +627,9 @@ async function _pdDispatchHarvest(parishKey, dioceseName) {
     const mod = globalThis.phGithubRecipePush;
     dioceseInput = mod?.harvestWorkflowDiocese
       ? mod.harvestWorkflowDiocese(slug)
-      : slug === "derry"
+      : slug === "clogher"
+        ? "clogher_diocese"
+        : slug === "derry"
         ? "derry_diocese"
         : slug === "raphoe"
           ? "raphoe_diocese"
@@ -1196,6 +1199,7 @@ function _pdRecipeIsInactive(data) {
 async function _pdLoadRecipe(key) {
   if (!key) return null;
   const candidates = [
+    `parishes/recipes/clogher/${key}.json`,
     `parishes/recipes/derry/${key}.json`,
     `parishes/recipes/down_and_connor/${key}.json`,
     `parishes/recipes/raphoe/${key}.json`,
@@ -1244,6 +1248,7 @@ async function _problemsResolveFixUrl(row) {
 async function _pdCheckRecipe(key) {
   if (_pdRecipeCache[key]) return _pdRecipeCache[key];
   const candidates = [
+    `parishes/recipes/clogher/${key}.json`,
     `parishes/recipes/derry/${key}.json`,
     `parishes/recipes/down_and_connor/${key}.json`,
     `parishes/recipes/raphoe/${key}.json`,

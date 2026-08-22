@@ -1,0 +1,33 @@
+{
+  "version": 2,
+  "parish_key": "fintona",
+  "display_name": "Fintona (Donacavey)",
+  "diocese": "clogher",
+  "start_url": "https://fintonaparish.com/services/latest-bulletin/",
+  "playbook_type": "stacked_image_bulletin",
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-08-22",
+  "steps": [
+    {
+      "action": "goto",
+      "url": "https://fintonaparish.com/services/latest-bulletin/"
+    },
+    {
+      "action": "image_stack",
+      "count": 1,
+      "position": "first",
+      "selector": "img[src*='Sunday-']"
+    }
+  ],
+  "operator_notes": [
+    "Latest Bulletin page shows one Sunday-Dth-Month-YYYY scan. Files live under /uploads/2026/01/ — score the filename, not the folder.",
+    "Newest on 22/08/2026 is Sunday-23rd-August-2026.jpg (HTTP 200, 1362245 bytes).",
+    "image_stack the visible Sunday- image. Do not pin a dated filename."
+  ],
+  "do_not": [
+    "Do not pin a dated Sunday- image URL.",
+    "Do not harvest /newsletter-popups/ — that is a theme demo, not the bulletin.",
+    "Do not Save page as PDF — that captures chrome around the scan."
+  ]
+}

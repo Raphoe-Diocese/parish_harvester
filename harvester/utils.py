@@ -36,6 +36,9 @@ def format_uk_date(iso_date: str | date | None) -> str:
 _DDMMYY_RE = re.compile(r"(?<!\d)(\d{2})(\d{2})(\d{2})(?!\d)")      # 310825
 _DDMMYYYY_RE = re.compile(r"(?<!\d)(\d{2})(\d{2})(\d{4})(?!\d)")    # 31082025
 _YY_MM_DD_RE = re.compile(r"(?<!\d)(\d{2})\.(\d{2})\.(\d{2})(?!\d)")  # 26.06.14
+# DD.MM.YYYY — Kilmore Newsletter-23.08.2026.pdf. Must be tried before the
+# 2-digit-year dotted forms so "23.08.2026" is not read as 08.20.26.
+_D_M_YYYY_DOT_RE = re.compile(r"(?<!\d)(\d{1,2})\.(\d{1,2})\.(20\d{2})(?!\d)")
 _ISO_RE = re.compile(r"(\d{4})-(\d{2})-(\d{2})")                     # 2025-08-31
 _ISO_NODASH_RE = re.compile(r"(?<!\d)(\d{4})(\d{2})(\d{2})(?!\d)")  # 20250831
 _WP_YEAR_MONTH_RE = re.compile(r"/(\d{4})/(\d{2})/")                 # /2026/04/
@@ -238,6 +241,16 @@ def extract_date_from_string(text: str) -> date | None:
         try:
             year = 2000 + int(m.group(3))
             return date(year, int(m.group(2)), int(m.group(1)))
+        except ValueError:
+            pass
+
+    # DD.MM.YYYY (4-digit year is unambiguous UK dots).
+    m = _first_match_outside_hash(_D_M_YYYY_DOT_RE, text, spans)
+    if m:
+        try:
+            candidate = date(int(m.group(3)), int(m.group(2)), int(m.group(1)))
+            if _is_plausible_bulletin_year(candidate.year):
+                return candidate
         except ValueError:
             pass
 

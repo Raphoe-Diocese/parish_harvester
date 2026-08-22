@@ -41,6 +41,7 @@ Collated Bulletin (mega PDF) stitching is **core production behaviour, not optio
 - remember successful patterns
 - use confidence scores
 - flag human review cases
+- **Diocese hunt command (all ~24 remaining dioceses):** follow [`docs/DIOCESE_HUNT.md`](docs/DIOCESE_HUNT.md). Kitchen-sink search + fingerprint/snapshot. When a new trick works, write it into `extension/html_fingerprint.js`, `extension/site_memory.js`, and `parishes/site_patterns.json`.
 
 ### Phase 5: Chrome extension
 - simplify recipe maker
@@ -87,6 +88,7 @@ Extension Send & test
 | Extension push/poll | `extension/github_recipe_push.js` |
 | Problems UI | `extension/sidepanel.js` |
 | Training toolbar | `extension/content.js` |
+| **Diocese hunt command** | [`docs/DIOCESE_HUNT.md`](docs/DIOCESE_HUNT.md) |
 
 ## Outcome categories (parish_status)
 

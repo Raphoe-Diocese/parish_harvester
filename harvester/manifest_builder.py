@@ -14,7 +14,7 @@ from ocr.generate_bulletin_pages import DIOCESES
 
 PAGES_BASE_URL = "https://raphoe-diocese.github.io/parish_harvester"
 CDN_BASE_URL = "https://cdn.jsdelivr.net/gh/Raphoe-Diocese/parish_harvester@main"
-VIEWER_FILE_PATTERN = re.compile(r"^(derry|down_and_connor)-(\d{4}-\d{2}-\d{2})\.html$")
+VIEWER_FILE_PATTERN = re.compile(r"^(derry|down_and_connor|clogher)-(\d{4}-\d{2}-\d{2})\.html$")
 OCR_PANEL_PATTERN = re.compile(
     r'<div id="ocr-panel">\s*(.*?)\s*</div>\s*<div class="note-box">',
     re.DOTALL | re.IGNORECASE,
@@ -202,7 +202,12 @@ def _write_search_index(repo_root: Path, docs_dir: Path, generated_at: str) -> N
         if not match:
             continue
         ocr_slug, bulletin_date = match.groups()
-        diocese = "derry_diocese" if ocr_slug == "derry" else "down_and_connor"
+        if ocr_slug == "derry":
+            diocese = "derry_diocese"
+        elif ocr_slug == "clogher":
+            diocese = "clogher_diocese"
+        else:
+            diocese = "down_and_connor"
         viewer_html = viewer_path.read_text(encoding="utf-8")
         ocr_text = _extract_ocr_text(viewer_html)
         if not ocr_text:

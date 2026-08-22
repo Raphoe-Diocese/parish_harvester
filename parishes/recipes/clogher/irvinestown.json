@@ -1,0 +1,39 @@
+{
+  "version": 2,
+  "parish_key": "irvinestown",
+  "display_name": "Irvinestown (Devenish)",
+  "diocese": "clogher",
+  "start_url": "https://www.devenishparishirvinestown.com/weekly-bulletin",
+  "playbook_type": "wix_html",
+  "timeout_ms": 55000,
+  "total_timeout_s": 250,
+  "recorded_date": "2026-08-22",
+  "steps": [
+    {
+      "action": "goto",
+      "url": "https://www.devenishparishirvinestown.com/weekly-bulletin"
+    },
+    {
+      "action": "click",
+      "selector": "a[href*='_files/ugd/'][href$='.pdf']",
+      "pick_strategy": "newest_dated",
+      "fallback_selectors": [
+        "a[href$='.pdf']"
+      ]
+    },
+    {
+      "action": "download",
+      "url_pattern": "*.pdf"
+    }
+  ],
+  "operator_notes": [
+    "Wix weekly-bulletin page. Hashed /_files/ugd/ PDFs — date is in the link text, not the URL.",
+    "Newest on 22/08/2026 is the 23rd August 2026 PDF (HTTP 200, 1175064 bytes).",
+    "pick_strategy:newest_dated on the dated link text. Do not pin a hashed URL."
+  ],
+  "do_not": [
+    "Do not pin a hashed Wix PDF — it changes every week.",
+    "Do not download the View Rota PDFs.",
+    "Do not use http_scrape_newest_pdf — hashed filenames have no date."
+  ]
+}

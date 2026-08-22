@@ -26,6 +26,7 @@ BULLETINS_DATA_DIR = REPO_ROOT / "Bulletins"
 SUMMARIES_DIR = BULLETINS_DATA_DIR / "summaries"
 DIFFS_DIR = BULLETINS_DATA_DIR / "diffs"
 CONTACTS_PATH_BY_DIOCESE = {
+    "clogher": REPO_ROOT / "parishes" / "clogher_diocese_contacts.json",
     "derry": REPO_ROOT / "parishes" / "derry_diocese_contacts.json",
     "down_and_connor": REPO_ROOT / "parishes" / "down_and_connor_contacts.json",
     "raphoe": REPO_ROOT / "parishes" / "raphoe_diocese_contacts.json",
@@ -197,6 +198,13 @@ class ViewerEntry:
 
 
 _FALLBACK_DIOCESES = [
+    {
+        "key": "clogher",
+        "display_name": "Clogher Diocese",
+        "headline": "CLOGHER DIOCESE COLLATED BULLETIN",
+        "evidence_file": "parishes/clogher_diocese_bulletin_urls.txt",
+        "pdf_filename": "clogher_mega_bulletin.pdf",
+    },
     {
         "key": "derry",
         "display_name": "Derry Diocese",
