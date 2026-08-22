@@ -2,16 +2,16 @@
   "generated_at": "2026-08-22",
   "target_date": "2026-08-16",
   "summary": {
-    "downloaded": 91,
+    "downloaded": 92,
     "html_links": 0,
     "skipped": 17,
     "failed": 15,
     "stale_rejected": 1
   },
   "action_counts": {
-    "ok": 94,
+    "skip": 32,
+    "ok": 116,
     "investigate": 12,
-    "skip": 17,
     "retrain": 1
   },
   "parishes": [
@@ -21,27 +21,30 @@
       "diocese": "down_and_connor",
       "recipe_file": "parishes/recipes/down_and_connor/carrickparish.json",
       "recipe": {
-        "start_url": "https://www.carrickparish.org/info",
-        "site_type": "html_text_bulletin",
-        "playbook_type": "wix_html",
+        "start_url": "https://www.carrickparish.org/registration",
+        "site_type": "dated_pdf_path",
+        "playbook_type": "newest_dated_pdf",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 2,
+        "step_count": 3,
         "click_count": 1,
         "has_terminal": true,
         "operator_notes": [
-          "Bulletin text is on the web page \u2014 not a downloadable PDF file.",
-          "Use Save page as PDF on the newsletter article page.",
-          "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
+          "Carrickfergus weekly files live on the Bulletin Back Issues catalogue at /registration, labelled as dates (28th June 2026, 21st June 2026, \u2026).",
+          "2026-08-22: newest catalogue file is still 28th June 2026 (same PDF as /info 'Final Summer edition'). HTTP 200, 373141 bytes, 2 pages, 13th Sunday / 28/06/2026. No July or August bulletin exists.",
+          "The /info 'Weekly bulletin' block now leads with 'Mass Times from 17th August 2026 onwards' \u2014 a 1-page standing schedule, not a weekly newsletter. Harvesting that would fake a current week. Old selector a:has-text('Mass Times up to') is gone.",
+          "Wix hashed /_files/ugd/ URLs change when they replace a file. pick_strategy:newest_dated reads the date from the link label, not the hash."
         ],
         "do_not": [
-          "Do not use Pick bulletin image when the page is mostly text paragraphs.",
-          "Do not stop at click-only \u2014 need print_to_pdf as the final step."
+          "Do not start on /info \u2014 Mass Times from <date> onwards would score as this week.",
+          "Do not pin a /_files/ugd/ hash URL or use_captured_url.",
+          "Do not click Mass Times, Pastoral Plan, Directory, The Connection magazine, or Fr Davis letter.",
+          "Do not invent an August bulletin. Keep stale until the catalogue adds a newer dated file."
         ],
-        "recorded_date": "2026-08-21"
+        "recorded_date": "2026-08-22"
       },
-      "bulletin_format": "html",
+      "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -300,6 +303,34 @@
       "suggested_reason": "downloaded or not in failure list"
     },
     {
+      "parish_key": "aughnamulleneast",
+      "display_name": "Aughnamullen East",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/aughnamulleneast.json",
+      "recipe": {
+        "start_url": "https://www.facebook.com/people/Aughnamullen-East-Parish/100012686988092",
+        "site_type": "facebook_page",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [],
+        "do_not": [],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "Facebook page \u2014 website link only, cannot auto-harvest"
+    },
+    {
       "parish_key": "parishofballinascreen",
       "display_name": "Ballinascreen (& Desertmartin amalgamated)",
       "diocese": "derry",
@@ -366,6 +397,48 @@
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Facebook page \u2014 website link only, cannot auto-harvest"
+    },
+    {
+      "parish_key": "ballybay",
+      "display_name": "Ballybay (Tullycorbet)",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/ballybay.json",
+      "recipe": {
+        "start_url": "http://www.tullycorbetparish.com/parishnews.htm",
+        "site_type": "html_text_bulletin",
+        "playbook_type": "html_text_bulletin",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 2,
+        "click_count": 0,
+        "has_terminal": true,
+        "operator_notes": [
+          "parishnews.htm view-source looks empty. After JS the page is this week's Tullycorbet newsletter.",
+          "Masthead on 22/08/2026 is Sunday 23rd August 2026. print_to_pdf with skip_listing_nav.",
+          "109.228.27.39/templates/?a=22852&z=11 is a print view \u2014 do not pin that article id.",
+          "Latton is a separate official parish \u2014 do not harvest this file twice."
+        ],
+        "do_not": [
+          "Do not skip because HTTP scrape is blank.",
+          "Do not pin a 109.228 article id.",
+          "Do not remove skip_listing_nav.",
+          "Do not harvest Latton from this page."
+        ],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "html",
+      "learned_pattern": "",
+      "host_profile": {
+        "navigation_timeout_ms": 45000,
+        "wait_after_load_ms": 4000,
+        "total_timeout_s": 120
+      },
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "ballycastleparish",
@@ -631,6 +704,34 @@
       "suggested_reason": "downloaded or not in failure list"
     },
     {
+      "parish_key": "belleekgarrison",
+      "display_name": "Belleek-Garrison (Inis Muighe Samh)",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/belleekgarrison.json",
+      "recipe": {
+        "start_url": "https://clogherdiocese.ie/parish-details/?page=ddb_parish_details&parishID=5",
+        "site_type": "link_only",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [],
+        "do_not": [],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "No parish website on the official Clogher directory \u2014 diocese card link only"
+    },
+    {
       "parish_key": "parishofbright",
       "display_name": "Bright",
       "diocese": "down_and_connor",
@@ -657,6 +758,34 @@
       "last_error": "",
       "suggested_action": "ok",
       "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "brookeborofivemiletown",
+      "display_name": "Brookeboro-Fivemiletown (Aghavea-Aughintaine)",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/brookeborofivemiletown.json",
+      "recipe": {
+        "start_url": "https://clogherdiocese.ie/parish-details/?page=ddb_parish_details&parishID=6",
+        "site_type": "link_only",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [],
+        "do_not": [],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "No parish website on the official Clogher directory \u2014 diocese card link only"
     },
     {
       "parish_key": "drive-1rjeey-ayy",
@@ -722,6 +851,41 @@
       },
       "bulletin_format": "download",
       "learned_pattern": "direct_pdf",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "bundoran",
+      "display_name": "Bundoran (Magh Ene)",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/bundoran.json",
+      "recipe": {
+        "start_url": "https://magheneparish.ie/newsletter/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "pdf_download_list",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "Listing https://magheneparish.ie/newsletter/ newest real file on 22/08/2026 is Parish_Newsletter_09.02.2025.pdf (HTTP 200, 1029778 bytes).",
+          "Do not invent an August 2026 filename. Harvest week vs 09/02/2025 must be stale, not failed."
+        ],
+        "do_not": [
+          "Do not pin a dated filename.",
+          "Do not download wedding / GDPR / Order of Mass / parish-draw posters.",
+          "Do not harvest the shared Clontibret-Muckno file twice under clontibret."
+        ],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
@@ -837,6 +1001,41 @@
       "suggested_reason": "downloaded or not in failure list"
     },
     {
+      "parish_key": "carrickmacross",
+      "display_name": "Carrickmacross (Machaire Rois)",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/carrickmacross.json",
+      "recipe": {
+        "start_url": "https://www.carrickmacrossparish.ie/newsletter/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "pdf_download_list",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "Listing https://www.carrickmacrossparish.ie/newsletter/ newest on 22/08/2026 is Sunday_23rd_August_2026[2026-8-23].pdf (HTTP 200, 471606 bytes).",
+          "site_type:http_scrape_newest_pdf. Do not pin or rewrite the bracketed date."
+        ],
+        "do_not": [
+          "Do not pin a dated filename.",
+          "Do not download wedding / GDPR / Order of Mass / parish-draw posters.",
+          "Do not harvest the shared Clontibret-Muckno file twice under clontibret."
+        ],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
       "parish_key": "carryduffsaintfield",
       "display_name": "Carryduffsaintfield",
       "diocese": "down_and_connor",
@@ -863,6 +1062,43 @@
         "recorded_date": "2026-08-19"
       },
       "bulletin_format": "download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "castleblayney",
+      "display_name": "Castleblayney (Muckno)",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/castleblayney.json",
+      "recipe": {
+        "start_url": "https://mucknoparish.ie/",
+        "site_type": "wp_json_newest_media",
+        "playbook_type": "pdf_download_list",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "Joint Castleblayney / Clontibret bulletin. Newest on 22/08/2026 is F-Clontibret-Muckno-Bulletin-23rd-AUG-2026.pdf (HTTP 200, 676682 bytes).",
+          "Files live under /uploads/2020/09/ \u2014 score the filename date, not the folder year.",
+          "href_patterns [clontibret-muckno-bulletin] skips parish-draw and graves-poster PDFs.",
+          "Harvest this once under castleblayney. Clontibret is a clickable link only."
+        ],
+        "do_not": [
+          "Do not pin a dated filename.",
+          "Do not download wedding / GDPR / Order of Mass / parish-draw posters.",
+          "Do not harvest the shared Clontibret-Muckno file twice under clontibret."
+        ],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -1017,6 +1253,98 @@
       "suggested_reason": "downloaded or not in failure list"
     },
     {
+      "parish_key": "cleenish",
+      "display_name": "Cleenish (Arney)",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/cleenish.json",
+      "recipe": {
+        "start_url": "https://www.facebook.com/cleenishparish/",
+        "site_type": "facebook_page",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [],
+        "do_not": [],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "Facebook page \u2014 website link only, cannot auto-harvest"
+    },
+    {
+      "parish_key": "clogherparish",
+      "display_name": "Clogher",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/clogherparish.json",
+      "recipe": {
+        "start_url": "https://clogherdiocese.ie/parish-details/?page=ddb_parish_details&parishID=10",
+        "site_type": "link_only",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [],
+        "do_not": [],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "No parish website on the official Clogher directory \u2014 diocese card link only"
+    },
+    {
+      "parish_key": "clones",
+      "display_name": "Clones",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/clones.json",
+      "recipe": {
+        "start_url": "https://www.clonesparish.com/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "pdf_download_list",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "Official clonesparish.ie is dead DNS. Live site is clonesparish.com.",
+          "Newest on 22/08/2026 is Sunday 23rd August 2026.pdf (HTTP 200, 417727 bytes).",
+          "site_type:http_scrape_newest_pdf. Do not pin a dated filename."
+        ],
+        "do_not": [
+          "Do not use clonesparish.ie \u2014 that hostname does not resolve.",
+          "Do not pin a dated filename.",
+          "Do not download gallery photos or standing-order forms."
+        ],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
       "parish_key": "clonleighparish",
       "display_name": "Clonleigh (Strabane Pastoral Area)",
       "diocese": "derry",
@@ -1099,6 +1427,41 @@
       "suggested_reason": "downloaded or not in failure list"
     },
     {
+      "parish_key": "clontibret",
+      "display_name": "Clontibret",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/clontibret.json",
+      "recipe": {
+        "start_url": "https://mucknoparish.ie/",
+        "site_type": "html_text_bulletin",
+        "playbook_type": "wix_html",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 2,
+        "click_count": 0,
+        "has_terminal": true,
+        "operator_notes": [
+          "Bulletin text is on the web page \u2014 not a downloadable PDF file.",
+          "Use Save page as PDF on the newsletter article page.",
+          "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
+        ],
+        "do_not": [
+          "Do not use Pick bulletin image when the page is mostly text paragraphs.",
+          "Do not stop at click-only \u2014 need print_to_pdf as the final step."
+        ],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "html",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
       "parish_key": "parishofstjohncoleraine",
       "display_name": "Coleraine (St John)",
       "diocese": "derry",
@@ -1125,6 +1488,42 @@
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Website DNS no longer resolves (parishofstjohncoleraine.com)."
+    },
+    {
+      "parish_key": "corcaghanthreemilehouse",
+      "display_name": "Corcaghan-Threemilehouse (Kilmore & Drumsnatt)",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/corcaghanthreemilehouse.json",
+      "recipe": {
+        "start_url": "https://kilmoredrumsnatt.com/past-newsletters/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "pdf_download_list",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "Official diocese card had no website. Live site is kilmoredrumsnatt.com.",
+          "Newest on 22/08/2026 is Newsletter-23.08.2026.pdf (HTTP 200, 552599 bytes).",
+          "Pattern Newsletter-DD.MM.YYYY.pdf. /parish-news/ is the same week as HTML if the PDF is late."
+        ],
+        "do_not": [
+          "Do not pin a dated filename.",
+          "Do not download Standing-Order forms.",
+          "Do not treat the diocese card as the parish site."
+        ],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "corpuschristiparishbelfast",
@@ -1255,6 +1654,41 @@
       "suggested_reason": "downloaded or not in failure list"
     },
     {
+      "parish_key": "derrygonnelly",
+      "display_name": "Derrygonnelly (Botha)",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/derrygonnelly.json",
+      "recipe": {
+        "start_url": "http://bothaparish.com/bulletin/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "pdf_download_list",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "Newest on 22/08/2026 is http://bothaparish.com/wp-content/uploads/2026/08/23.08.2026.pdf (HTTP 200, 965054 bytes).",
+          "site_type:http_scrape_newest_pdf. Do not pin 23.08.2026.pdf."
+        ],
+        "do_not": [
+          "Do not pin a dated filename.",
+          "Do not download wedding / GDPR / Order of Mass / parish-draw posters.",
+          "Do not harvest the shared Clontibret-Muckno file twice under clontibret."
+        ],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
       "parish_key": "desertmartinparish",
       "display_name": "Desertmartin",
       "diocese": "derry",
@@ -1320,6 +1754,112 @@
         "wait_after_load_ms": 4000,
         "max_retries": 3
       },
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "donagh",
+      "display_name": "Donagh",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/donagh.json",
+      "recipe": {
+        "start_url": "https://donaghparish.com/parish-news/",
+        "site_type": "html_text_bulletin",
+        "playbook_type": "html_text_bulletin",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 2,
+        "click_count": 0,
+        "has_terminal": true,
+        "operator_notes": [
+          "HTML parish news page overwritten in place. Masthead on 22/08/2026 is DONAGH PARISH 23rd August 2026.",
+          "print_to_pdf /parish-news/. skip_listing_nav=true so html_capture does not leave the page.",
+          "The only PDF on the page is Standing-Order-Form.pdf \u2014 not the bulletin."
+        ],
+        "do_not": [
+          "Do not download Standing-Order-Form.pdf.",
+          "Do not pin a dated URL \u2014 the page is overwritten each week.",
+          "Do not remove skip_listing_nav."
+        ],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "html",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "donaghmoyne",
+      "display_name": "Donaghmoyne",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/donaghmoyne.json",
+      "recipe": {
+        "start_url": "https://donaghmoyne.com/",
+        "site_type": "wp_json_newest_media",
+        "playbook_type": "pdf_download_list",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "wp-json newest on 22/08/2026 is 21st-of-Ordinary-Time-Sunday-23rd-August-2026.pdf (HTTP 200, 264145 bytes with a normal browser UA).",
+          "Some bare bots get HTTP 403 on the PDF. site_type:wp_json_newest_media uses the harvest UA."
+        ],
+        "do_not": [
+          "Do not pin a dated filename.",
+          "Do not download wedding / GDPR / Order of Mass / parish-draw posters.",
+          "Do not harvest the shared Clontibret-Muckno file twice under clontibret."
+        ],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "dromore",
+      "display_name": "Dromore",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/dromore.json",
+      "recipe": {
+        "start_url": "https://www.dromorecatholicparish.com/latest-bulletin/",
+        "site_type": "",
+        "playbook_type": "stacked_image_bulletin",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 2,
+        "click_count": 0,
+        "has_terminal": true,
+        "operator_notes": [
+          "Latest Bulletins is a NextGEN image gallery. Newest file on 22/08/2026 is 14th-June.jpg (14/06/2026) \u2014 stale, not missing.",
+          "Do not invent an August scan. Harvest week vs 14/06/2026 must be stale, not failed."
+        ],
+        "do_not": [
+          "Do not pin 14th-June.jpg.",
+          "Do not invent an August 2026 image.",
+          "Do not Save page as PDF \u2014 that captures every old letter."
+        ],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "image_stack",
+      "learned_pattern": "",
+      "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
       "last_error": "",
@@ -1597,6 +2137,78 @@
       "suggested_reason": "Stale bulletin rejected for mega PDF (bulletin date 2026-07-05, date_behind_of_target)"
     },
     {
+      "parish_key": "ederney",
+      "display_name": "Ederney (C\u00fal M\u00e1ine)",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/ederney.json",
+      "recipe": {
+        "start_url": "https://culmaine.co.uk/newsletter",
+        "site_type": "html_text_bulletin",
+        "playbook_type": "html_text_bulletin",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 2,
+        "click_count": 0,
+        "has_terminal": true,
+        "operator_notes": [
+          "Adobe Portfolio HTML newsletter overwritten in place. Masthead on 22/08/2026 is Sunday 23rd August 2026, 21st Sunday in Ordinary Time.",
+          "print_to_pdf the newsletter page. skip_listing_nav=true so html_capture does not leave the page.",
+          "Keep Irish C\u00fal M\u00e1ine in the parish name."
+        ],
+        "do_not": [
+          "Do not invent a PDF download \u2014 there is no weekly PDF file.",
+          "Do not pin a dated URL \u2014 the page is overwritten each week.",
+          "Do not remove skip_listing_nav.",
+          "Do not scrape the Facebook plugin."
+        ],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "html",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "enniskillen",
+      "display_name": "Enniskillen (St Michael's Parish)",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/enniskillen.json",
+      "recipe": {
+        "start_url": "https://www.saintmichaels-parish.com/news.asp",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "pdf_download_list",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "Weekly files are /pdf/DDMMYY.pdf on news.asp. Newest on 22/08/2026 is 230826.pdf (HTTP 200, 356830 bytes).",
+          "www2.st-michaels.net is empty. site_type:http_scrape_newest_pdf. Do not pin 230826.pdf."
+        ],
+        "do_not": [
+          "Do not pin a dated filename.",
+          "Do not download ParishMassTimes.pdf, StandingOrder.pdf, LoughDergOvernight.pdf, or CareForCreation.pdf.",
+          "Do not harvest the empty www2.st-michaels.net host."
+        ],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
       "parish_key": "errigalparish",
       "display_name": "Errigal",
       "diocese": "derry",
@@ -1632,6 +2244,72 @@
       "last_error": "",
       "suggested_action": "ok",
       "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "errigaltruagh",
+      "display_name": "Errigal Truagh",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/errigaltruagh.json",
+      "recipe": {
+        "start_url": "https://www.truaghparish.com/",
+        "site_type": "",
+        "playbook_type": "wix_html",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 3,
+        "click_count": 1,
+        "has_terminal": true,
+        "operator_notes": [
+          "errigaltruparish.com is dead DNS. Live site is truaghparish.com.",
+          "Homepage 'Click here for Errigal Truagh Parish Bulletin' is a Wix hashed PDF.",
+          "Proved 22/08/2026: HTTP 200, 319760 bytes, PDF text Sunday 23 August 2026.",
+          "Do not pin the hash. Do not harvest the Vocations or church-history PDFs."
+        ],
+        "do_not": [
+          "Do not use errigaltruparish.com.",
+          "Do not pin a hashed Wix PDF.",
+          "Do not download the Year of Vocations PDF or the church-history docx.",
+          "Do not use http_scrape_newest_pdf \u2014 hashed filenames have no date."
+        ],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "eskra",
+      "display_name": "Eskra",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/eskra.json",
+      "recipe": {
+        "start_url": "https://clogherdiocese.ie/parish-details/?page=ddb_parish_details&parishID=21",
+        "site_type": "link_only",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [],
+        "do_not": [],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "No parish website on the official Clogher directory \u2014 diocese card link only"
     },
     {
       "parish_key": "fahanparish",
@@ -1689,6 +2367,42 @@
         "recorded_date": "2026-08-10"
       },
       "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "fintona",
+      "display_name": "Fintona (Donacavey)",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/fintona.json",
+      "recipe": {
+        "start_url": "https://fintonaparish.com/services/latest-bulletin/",
+        "site_type": "",
+        "playbook_type": "stacked_image_bulletin",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 2,
+        "click_count": 0,
+        "has_terminal": true,
+        "operator_notes": [
+          "Latest Bulletin page shows one Sunday-Dth-Month-YYYY scan. Files live under /uploads/2026/01/ \u2014 score the filename, not the folder.",
+          "Newest on 22/08/2026 is Sunday-23rd-August-2026.jpg (HTTP 200, 1362245 bytes).",
+          "image_stack the visible Sunday- image. Do not pin a dated filename."
+        ],
+        "do_not": [
+          "Do not pin a dated Sunday- image URL.",
+          "Do not harvest /newsletter-popups/ \u2014 that is a theme demo, not the bulletin.",
+          "Do not Save page as PDF \u2014 that captures chrome around the scan."
+        ],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "image_stack",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -2198,6 +2912,34 @@
       "suggested_reason": "Website DNS no longer resolves (holytrinityparishbelfast.com)."
     },
     {
+      "parish_key": "inniskeen",
+      "display_name": "Inniskeen (Inis Caoin Deagha)",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/inniskeen.json",
+      "recipe": {
+        "start_url": "https://clogherdiocese.ie/parish-details/?page=ddb_parish_details&parishID=23",
+        "site_type": "link_only",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [],
+        "do_not": [],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "No parish website on the official Clogher directory \u2014 diocese card link only"
+    },
+    {
       "parish_key": "inverparish",
       "display_name": "Inver",
       "diocese": "raphoe",
@@ -2254,6 +2996,45 @@
       "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "irvinestown",
+      "display_name": "Irvinestown (Devenish)",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/irvinestown.json",
+      "recipe": {
+        "start_url": "https://www.devenishparishirvinestown.com/weekly-bulletin",
+        "site_type": "",
+        "playbook_type": "wix_html",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 3,
+        "click_count": 1,
+        "has_terminal": true,
+        "operator_notes": [
+          "Wix weekly-bulletin page. Hashed /_files/ugd/ PDFs \u2014 date is in the link text, not the URL.",
+          "Newest on 22/08/2026 is the 23rd August 2026 PDF (HTTP 200, 1175064 bytes).",
+          "pick_strategy:newest_dated on the dated link text. Do not pin a hashed URL."
+        ],
+        "do_not": [
+          "Do not pin a hashed Wix PDF \u2014 it changes every week.",
+          "Do not download the View Rota PDFs.",
+          "Do not use http_scrape_newest_pdf \u2014 hashed filenames have no date."
+        ],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "download",
+      "learned_pattern": "",
+      "host_profile": {
+        "navigation_timeout_ms": 55000,
+        "total_timeout_s": 250
+      },
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
       "last_error": "",
@@ -2367,6 +3148,62 @@
       "last_error": "",
       "suggested_action": "ok",
       "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "killanny",
+      "display_name": "Killanny",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/killanny.json",
+      "recipe": {
+        "start_url": "http://www.killannyparish.ie/",
+        "site_type": "link_only",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [],
+        "do_not": [],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "No current weekly bulletin PDF on the official website \u2014 keep the reader link"
+    },
+    {
+      "parish_key": "killeevan",
+      "display_name": "Killeevan (Currin Killeevan & Aghabog)",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/killeevan.json",
+      "recipe": {
+        "start_url": "https://clogherdiocese.ie/parish-details/?page=ddb_parish_details&parishID=26",
+        "site_type": "link_only",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [],
+        "do_not": [],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "No parish website on the official Clogher directory \u2014 diocese card link only"
     },
     {
       "parish_key": "st-mary-of-the-visitation-church-killybegs",
@@ -2543,6 +3380,34 @@
       "suggested_reason": "Stale bulletin rejected for mega PDF (bulletin date 2026-07-05, date_behind_of_target)"
     },
     {
+      "parish_key": "latton",
+      "display_name": "Latton (Aughnamullen West)",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/latton.json",
+      "recipe": {
+        "start_url": "https://clogherdiocese.ie/parish-details/?page=ddb_parish_details&parishID=27",
+        "site_type": "link_only",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [],
+        "do_not": [],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "No parish website on the official Clogher directory \u2014 diocese card link only"
+    },
+    {
       "parish_key": "laveyparish",
       "display_name": "Lavey Parish",
       "diocese": "unknown",
@@ -2657,29 +3522,70 @@
       "diocese": "down_and_connor",
       "recipe_file": "parishes/recipes/down_and_connor/parishoflisburn.json",
       "recipe": {
-        "start_url": "https://parishoflisburn.org/category/news/",
-        "site_type": "pdf_link_list",
+        "start_url": "https://parishoflisburn.org/",
+        "site_type": "wp_json_newest_media",
         "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 2,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "Parish of Blaris (Lisburn). Weekly files are DD-MM-YY-Blaris-Bulletin_Small.pdf in wp-json media. Newest on 22/08/2026 is 16-08-26-Blaris-Bulletin_Small.pdf (HTTP 200, 739527 bytes, 8 pages, Twentieth Sunday).",
+          "Send & test download of that URL was rewritten 16-08-26 \u2192 16-8-26 and failed HTTP 404. site_type:wp_json_newest_media never rewrites the filename.",
+          "max_bulletin_pages=16 \u2014 default 4-page cap rejected the real 8-page Small bulletin."
+        ],
+        "do_not": [
+          "Do not pin or rewrite 16-08-26-Blaris-Bulletin_Small.pdf \u2014 harvest turns it into 16-8-26 and 404s.",
+          "Do not leave the default 4-page cap.",
+          "Do not download wedding / GDPR / Order of Mass."
+        ],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "lisnaskeamaguiresbridge",
+      "display_name": "Lisnaskea-Maguiresbridge (Aghalurcher)",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/lisnaskeamaguiresbridge.json",
+      "recipe": {
+        "start_url": "https://www.lisnaskeamaguiresbridgeparish.com/bulletin.html",
+        "site_type": "",
+        "playbook_type": "pdf_download_list",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 3,
         "click_count": 1,
         "has_terminal": true,
         "operator_notes": [
-          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
-          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-          "Do not worry if the filename or date in the link text changes every week."
+          "Listing /bulletin.html newest on 22/08/2026 is onewebmedia/23082026.pdf (HTTP 200, 596595 bytes).",
+          "HTTPS certificate is expired \u2014 Playwright ignore_https_errors. Do not use http_scrape_newest_pdf (urllib verifies TLS).",
+          "Pattern A DDMMYYYY in the filename and the link text."
         ],
         "do_not": [
-          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
-          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+          "Do not pin a dated filename.",
+          "Do not use http_scrape_newest_pdf \u2014 the site cert is expired.",
+          "Do not harvest the homepage \u2014 bulletins live on /bulletin.html."
         ],
         "recorded_date": "2026-08-22"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
-      "host_profile": null,
+      "host_profile": {
+        "navigation_timeout_ms": 45000,
+        "ignore_https_errors": true,
+        "total_timeout_s": 180
+      },
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
       "last_error": "",
@@ -2786,6 +3692,42 @@
         "recorded_date": "2026-08-20"
       },
       "bulletin_format": "image_stack",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "magheracloone",
+      "display_name": "Magheracloone",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/magheracloone.json",
+      "recipe": {
+        "start_url": "https://magheraclooneparish.com/bulletins/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "pdf_download_list",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "Official diocese card had no website. Live site is magheraclooneparish.com/bulletins/.",
+          "Newest on 22/08/2026 is 23rd-August-2026-.rtf (HTTP 200, 569702 bytes, application/rtf).",
+          "Harvester converts RTF via LibreOffice. Do not pin a dated filename."
+        ],
+        "do_not": [
+          "Do not pin a dated RTF filename.",
+          "Do not treat the diocese card as the parish site.",
+          "Do not invent a PDF \u2014 the weekly file is RTF."
+        ],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -2958,6 +3900,42 @@
       "suggested_reason": "downloaded or not in failure list"
     },
     {
+      "parish_key": "monaghanrackwallace",
+      "display_name": "Monaghan & Rackwallace (Cathedral Parish)",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/monaghanrackwallace.json",
+      "recipe": {
+        "start_url": "https://monaghan-rackwallace.com/",
+        "site_type": "wp_json_newest_media",
+        "playbook_type": "pdf_download_list",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "Live site is monaghan-rackwallace.com (the .ie host returns 403).",
+          "wp-json newest on 22/08/2026 is 23082026.pdf (HTTP 200, 300479 bytes).",
+          "Pattern A DDMMYYYY. Do not pin a dated filename."
+        ],
+        "do_not": [
+          "Do not use monaghan-rackwallace.ie \u2014 it returns HTTP 403.",
+          "Do not pin a dated filename.",
+          "Do not download Standing-Order-Request.pdf or parish-draw results."
+        ],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
       "parish_key": "nativityparish",
       "display_name": "Nativity",
       "diocese": "down_and_connor",
@@ -3023,6 +4001,46 @@
       "suggested_reason": "downloaded or not in failure list"
     },
     {
+      "parish_key": "newtownbutler",
+      "display_name": "Newtownbutler (Galloon)",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/newtownbutler.json",
+      "recipe": {
+        "start_url": "https://www.galloonparish.com/bulletin-1.html",
+        "site_type": "",
+        "playbook_type": "pdf_download_list",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 3,
+        "click_count": 1,
+        "has_terminal": true,
+        "operator_notes": [
+          "Listing /bulletin-1.html. Newest on 22/08/2026 is the 23rd August 2026 file S25C-1i26082010590.pdf (HTTP 200, 205065 bytes).",
+          "Many weekly files are hashed S25C-1i* names with no usable date in the URL \u2014 date is in the link text.",
+          "pick_strategy:newest_dated. Do not use http_scrape_newest_pdf here."
+        ],
+        "do_not": [
+          "Do not pin a hashed S25C filename.",
+          "Do not use http_scrape_newest_pdf \u2014 hashed names have no date and Aug 16  2026.pdf does not parse.",
+          "Do not harvest the homepage \u2014 bulletins live on /bulletin-1.html."
+        ],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "download",
+      "learned_pattern": "",
+      "host_profile": {
+        "navigation_timeout_ms": 45000,
+        "ignore_https_errors": true,
+        "total_timeout_s": 180
+      },
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
       "parish_key": "ourladyqueenofpeacekilwee",
       "display_name": "Our Lady Queen of Peace",
       "diocese": "down_and_connor",
@@ -3077,6 +4095,34 @@
       "last_error": "",
       "suggested_action": "ok",
       "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "pettigo",
+      "display_name": "Pettigo",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/pettigo.json",
+      "recipe": {
+        "start_url": "https://clogherdiocese.ie/parish-details/?page=ddb_parish_details&parishID=31",
+        "site_type": "link_only",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [],
+        "do_not": [],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "No parish website on the official Clogher directory \u2014 diocese card link only"
     },
     {
       "parish_key": "stmarysportglenone",
@@ -3267,6 +4313,69 @@
           "Do not download GDPR, privacy, or Order of Mass PDFs."
         ],
         "recorded_date": "2026-08-21"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "rockcorry",
+      "display_name": "Rockcorry (Ematris)",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/rockcorry.json",
+      "recipe": {
+        "start_url": "https://clogherdiocese.ie/parish-details/?page=ddb_parish_details&parishID=32",
+        "site_type": "link_only",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [],
+        "do_not": [],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "No parish website on the official Clogher directory \u2014 diocese card link only"
+    },
+    {
+      "parish_key": "roslea",
+      "display_name": "Roslea",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/roslea.json",
+      "recipe": {
+        "start_url": "https://parishofroslea.com/",
+        "site_type": "wp_json_newest_media",
+        "playbook_type": "pdf_download_list",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "Newest on 22/08/2026 is Bulletin-Sunday-23rd-August-2026.pdf (HTTP 200, 148359 bytes).",
+          "site_type:wp_json_newest_media with href_patterns [bulletin-sunday]."
+        ],
+        "do_not": [
+          "Do not pin a dated filename.",
+          "Do not download wedding / GDPR / Order of Mass / parish-draw posters.",
+          "Do not harvest the shared Clontibret-Muckno file twice under clontibret."
+        ],
+        "recorded_date": "2026-08-22"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -4203,6 +5312,45 @@
       "suggested_reason": "downloaded or not in failure list"
     },
     {
+      "parish_key": "tempo",
+      "display_name": "Tempo (Pobal)",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/tempo.json",
+      "recipe": {
+        "start_url": "http://www.pobalparish.com/pdf/230826.pdf",
+        "site_type": "predicted_dated_pdf",
+        "playbook_type": "dated_pdf_bulletin",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": true,
+        "operator_notes": [
+          "Weekly file is /pdf/DDMMYY.pdf. news.html is JavaScript \u2014 HTTP scrape looks empty.",
+          "Proved 22/08/2026: 230826.pdf is Parish of Pobal, Twenty-First Sunday, 23rd August 2026.",
+          "Use HTTP. HTTPS TLS can fail. site_type:predicted_dated_pdf \u2014 do not click news.html."
+        ],
+        "do_not": [
+          "Do not skip because news.html looks empty in view-source.",
+          "Do not pin use_captured_url to one week's filename.",
+          "Do not use HTTPS if the certificate fails \u2014 stay on http://www.pobalparish.com."
+        ],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "download",
+      "learned_pattern": "",
+      "host_profile": {
+        "navigation_timeout_ms": 45000,
+        "total_timeout_s": 180
+      },
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
       "parish_key": "threepatrons",
       "display_name": "The Three Patrons Parish (Pennyburn / Carnhill / Galliagh)",
       "diocese": "derry",
@@ -4243,6 +5391,90 @@
       "last_error": "",
       "suggested_action": "ok",
       "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "trillick",
+      "display_name": "Trillick (Kilskeery)",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/trillick.json",
+      "recipe": {
+        "start_url": "http://www.kilskeeryparish.co.uk/",
+        "site_type": "link_only",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [],
+        "do_not": [],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "No current weekly bulletin PDF on the official website \u2014 keep the reader link"
+    },
+    {
+      "parish_key": "tydavnet",
+      "display_name": "Tydavnet",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/tydavnet.json",
+      "recipe": {
+        "start_url": "https://clogherdiocese.ie/parish-details/?page=ddb_parish_details&parishID=36",
+        "site_type": "link_only",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [],
+        "do_not": [],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "No parish website on the official Clogher directory \u2014 diocese card link only"
+    },
+    {
+      "parish_key": "tyholland",
+      "display_name": "Tyholland",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/tyholland.json",
+      "recipe": {
+        "start_url": "https://clogherdiocese.ie/parish-details/?page=ddb_parish_details&parishID=37",
+        "site_type": "link_only",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [],
+        "do_not": [],
+        "recorded_date": "2026-08-22"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "No parish website on the official Clogher directory \u2014 diocese card link only"
     },
     {
       "parish_key": "urneyandcastlefinparish",
