@@ -775,8 +775,9 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     .more-dioceses-grid li {{ margin: 0; font-size: 0.92rem; }}
     .more-dioceses-grid a {{ color: #375569; text-decoration: none; }}
     .more-dioceses-grid a:hover {{ text-decoration: underline; color: #1a6b6b; }}
-    .footer {{ border-top: 1px solid #d6ecea; margin-top: 28px; padding: 16px 16px 28px; color: #5a6672; font-size: 0.92rem; line-height: 1.8; }}
-    .footer a {{ color: #1a6b6b; text-decoration: none; }}
+    .footer {{ border-top: 1px solid #d6ecea; margin-top: 28px; padding: 16px 16px 28px; color: #111; font-size: 1rem; line-height: 1.6; }}
+    .footer .photo-credit {{ margin: 0 0 8px; color: #111; font-size: 1.05rem; font-weight: 700; }}
+    .footer a {{ color: #14524f; text-decoration: none; }}
     .footer a:hover {{ text-decoration: underline; }}
     @media (max-width: 640px) {{
       .live-btn {{ flex: 1 1 auto; justify-content: center; }}
@@ -807,7 +808,7 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     </details>
   </main>
   <footer class=\"footer\">
-    <p>{html.escape(_photo_credit_line())}</p>
+    <p class=\"photo-credit\">{html.escape(_photo_credit_line())}</p>
     <p>© 2026 Parish Press</p>
   </footer>
   <script>
