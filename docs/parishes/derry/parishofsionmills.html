@@ -112,7 +112,7 @@
       position: relative;
       height: auto;
       min-height: 850px;
-      overflow: hidden;
+      overflow: visible;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -165,10 +165,9 @@
     .pdf-inpage-pages {
       box-sizing: border-box;
       flex: 0 0 auto;
-      height: 850px;
+      height: auto;
       min-height: 850px;
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
+      overflow: visible;
       background: #525659;
       padding: 8px 0 16px;
     }
@@ -189,12 +188,13 @@
       display: flex;
       flex-direction: column;
       height: auto;
+      overflow: visible;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
     body.is-native-pdf iframe.pdf-frame {
       display: none !important;
-      height: 850px;
+      height: auto;
       min-height: 850px;
     }
     .pdf-frame-wrap.is-native-pdf,
@@ -204,6 +204,7 @@
       flex-direction: column;
       height: auto !important;
       min-height: 850px !important;
+      overflow: visible !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -225,8 +226,9 @@
       .pdf-inpage-pages,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
-        height: 450px !important;
+        height: auto !important;
         min-height: 450px !important;
+        overflow: visible !important;
       }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
@@ -454,14 +456,14 @@
 
     #ocr-panel {
       box-sizing: border-box;
-      height: 850px;
+      height: auto;
       min-height: 850px;
-      overflow-y: auto;
+      overflow: visible;
       border: 1px solid #d4ddd9;
       padding: 22px 24px 32px;
     }
     .pdf-frame-wrap iframe {
-      height: 850px;
+      height: auto;
       min-height: 850px;
     }
     .note-box {
@@ -564,12 +566,14 @@
       .pdf-inpage-viewer {
         height: auto;
         min-height: 450px;
+        overflow: visible;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
       #ocr-panel {
-        height: 450px;
+        height: auto;
         min-height: 450px;
+        overflow: visible;
       }
     }
     @media (max-width: 900px) {
@@ -590,8 +594,58 @@
         width: 100%;
       }
     }
+  
+    .ocr-sticky-chrome {
+      position: sticky;
+      top: 0;
+      z-index: 8;
+      background: #fff;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 30;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
   </style>
-  <script src="/assets/pdf-inpage-viewer.js" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260822" defer></script>
 </head>
 <body>
   <div class="page">
@@ -636,7 +690,8 @@
       <div class="quiet-links">
         <a href="parishofsionmills-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <div class="ocr-sticky-chrome">
+<div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
         <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
         <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
         <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
@@ -653,7 +708,8 @@
           <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
         </div>
       </div>
-      <div id="ocr-panel"><p class="page-label">Page 73</p>
+      </div>
+<div id="ocr-panel"><p class="page-label">Page 73</p>
 <p>15 Sunday in Ordinary Time (Year A)<br>
 12 July 2026<br>
 The Soil of Our Lives<br>
@@ -860,9 +916,9 @@ Click here to view Sunday Readings from CatholicIreland.net</p>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260822"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260822';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -934,7 +990,7 @@ Click here to view Sunday Readings from CatholicIreland.net</p>
         target.classList.add('search-active');
         const details = target.closest('details.parish-block');
         if (details) details.open = true;
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
 
       function updateMatchUi() {
@@ -1102,5 +1158,22 @@ Click here to view Sunday Readings from CatholicIreland.net</p>
       }
     })();
   </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
+  <script>
+    (function () {
+      var btn = document.getElementById('scroll-top-btn');
+      if (!btn) return;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function shown() {
+        var y = window.scrollY || document.documentElement.scrollTop || 0;
+        btn.classList.toggle('is-visible', y > 240);
+      }
+      window.addEventListener('scroll', shown, { passive: true });
+      shown();
+      btn.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      });
+    })();
+    </script>
 </body>
 </html>

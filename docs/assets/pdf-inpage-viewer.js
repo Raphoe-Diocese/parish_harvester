@@ -4,7 +4,7 @@
  * Phones cannot embed a raw PDF in <iframe> (sad-document icon). Desktop
  * Chrome/Edge iframes show a "Page X of Y" toolbar Frank asked to remove.
  * This script paints every page on stacked canvases with Mozilla PDF.js so
- * users scroll continuously inside the viewer. Open PDF / Download stay.
+ * the PAGE scrolls (no inner PDF/OCR scrollbar). Open PDF / Download stay.
  *
  * Progressive load: disableAutoFetch + streaming + HTTP Range. Mega PDFs are
  * 14–20 MB; we must not wait for the whole file before showing page 1.
@@ -23,37 +23,87 @@
   ];
 
   function ensureStyles() {
-    if (document.getElementById("pdf-inpage-viewer-style")) return;
-    var style = document.createElement("style");
-    style.id = "pdf-inpage-viewer-style";
+    var style = document.getElementById("pdf-inpage-viewer-style");
+    if (!style) {
+      style = document.createElement("style");
+      style.id = "pdf-inpage-viewer-style";
+      document.head.appendChild(style);
+    }
+    /* !important so old HTML (height:850px;overflow:auto) cannot restore
+       a second scrollport. Visible boxes grow; the PAGE scrolls. */
     style.textContent =
-      ".pdf-inpage-viewer{display:flex!important;flex-direction:column;min-height:850px;flex:1 1 auto;background:#3a3f42;color:#e8eeed}" +
+      ".pdf-inpage-viewer{display:flex!important;flex-direction:column;min-height:850px!important;height:auto!important;flex:1 1 auto;background:#3a3f42;color:#e8eeed}" +
       ".pdf-inpage-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:8px;padding:8px 10px;background:#14524f;color:#fff;flex:0 0 auto}" +
       ".pdf-inpage-backup{display:flex;gap:8px;flex-wrap:wrap}" +
       ".pdf-inpage-backup a{color:#fff;font-weight:700;font-size:.85rem}" +
       ".pdf-inpage-status{padding:10px 12px;background:#1f3d3c;color:#d8f0ee;font-size:.9rem}" +
-      ".pdf-inpage-pages{box-sizing:border-box;flex:0 0 auto;height:850px;min-height:850px;overflow:auto;-webkit-overflow-scrolling:touch;background:#525659;padding:8px 0 16px}" +
+      ".pdf-inpage-pages{box-sizing:border-box;flex:0 0 auto;height:auto!important;min-height:850px!important;overflow:visible!important;background:#525659;padding:8px 0 16px}" +
+      "#ocr-panel{height:auto!important;min-height:850px!important;overflow:visible!important}" +
       ".pdf-inpage-page-slot{margin:0 auto 10px;background:#3a3f42;min-height:180px;position:relative}" +
       ".pdf-inpage-page-slot canvas{display:block;width:100%;height:auto;background:#fff}" +
       ".pdf-link-layer{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}" +
       ".pdf-annot-link{position:absolute;z-index:2;pointer-events:auto;background:rgba(26,107,107,0.08);border-radius:2px}" +
       ".pdf-annot-link:focus{outline:2px solid #1a6b6b;outline-offset:1px}" +
-      ".pdf-frame-wrap,.pdf-standalone-shell{display:flex;flex-direction:column;height:auto}" +
+      ".pdf-frame-wrap,.pdf-standalone-shell{display:flex;flex-direction:column;height:auto!important;overflow:visible!important}" +
       ".pdf-frame-wrap iframe,.pdf-standalone-shell iframe.pdf-frame," +
-      "body.is-native-pdf iframe.pdf-frame{display:none!important;height:850px;min-height:850px}" +
+      "body.is-native-pdf iframe.pdf-frame{display:none!important;height:auto!important;min-height:850px!important}" +
       ".pdf-frame-wrap.is-native-pdf,.pdf-standalone-shell.is-native-pdf," +
       "body.is-native-pdf .pdf-standalone-shell{" +
-      "display:flex;flex-direction:column;height:auto!important;min-height:850px!important;background:#3a3f42}" +
+      "display:flex;flex-direction:column;height:auto!important;min-height:850px!important;overflow:visible!important;background:#3a3f42}" +
+      ".ocr-sticky-chrome{position:sticky;top:0;z-index:8;background:#fff;padding:8px 0 10px;margin:0 0 8px}" +
+      "html{scroll-padding-top:10rem}" +
+      "mark.search-active{scroll-margin-top:10rem}" +
+      ".scroll-top-btn{position:fixed;right:16px;bottom:20px;z-index:30;width:46px;height:46px;border:0;border-radius:999px;background:#1a6b6b;color:#fff;font-size:1.35rem;line-height:1;cursor:pointer;box-shadow:0 4px 14px rgba(17,75,75,0.28);opacity:0;pointer-events:none;transform:translateY(8px)}" +
+      ".scroll-top-btn.is-visible{opacity:1;pointer-events:auto;transform:none}" +
       "@media (max-width:1024px){" +
       ".pdf-frame-wrap,.pdf-standalone-shell," +
       ".pdf-frame-wrap.is-native-pdf,.pdf-standalone-shell.is-native-pdf," +
       "body.is-native-pdf .pdf-standalone-shell{" +
-      "height:auto!important;min-height:450px!important}" +
-      ".pdf-inpage-viewer{min-height:450px!important}" +
-      ".pdf-inpage-pages,.pdf-frame-wrap iframe," +
-      ".pdf-standalone-shell iframe.pdf-frame{height:450px!important;min-height:450px!important}" +
+      "height:auto!important;min-height:450px!important;overflow:visible!important}" +
+      ".pdf-inpage-viewer{min-height:450px!important;height:auto!important}" +
+      ".pdf-inpage-pages,#ocr-panel,.pdf-frame-wrap iframe," +
+      ".pdf-standalone-shell iframe.pdf-frame{height:auto!important;min-height:450px!important;overflow:visible!important}" +
       "}";
-    document.head.appendChild(style);
+  }
+
+  function ensureStickySearch() {
+    if (document.querySelector(".ocr-sticky-chrome")) return;
+    var zoom = document.querySelector(".ocr-zoom-bar");
+    var bar = document.querySelector(".ocr-search-bar");
+    var tools = document.querySelector(".ocr-search-tools");
+    var first = zoom || bar || tools;
+    if (!first || !first.parentNode) return;
+    var wrap = document.createElement("div");
+    wrap.className = "ocr-sticky-chrome";
+    first.parentNode.insertBefore(wrap, first);
+    if (zoom) wrap.appendChild(zoom);
+    if (bar) wrap.appendChild(bar);
+    if (tools) wrap.appendChild(tools);
+  }
+
+  function ensureScrollTop() {
+    var btn = document.getElementById("scroll-top-btn");
+    if (!btn) {
+      btn = document.createElement("button");
+      btn.type = "button";
+      btn.className = "scroll-top-btn";
+      btn.id = "scroll-top-btn";
+      btn.setAttribute("aria-label", "Back to top");
+      btn.textContent = "↑";
+      document.body.appendChild(btn);
+    }
+    if (btn.getAttribute("data-pp-bound") === "1") return;
+    btn.setAttribute("data-pp-bound", "1");
+    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function shown() {
+      var y = window.scrollY || document.documentElement.scrollTop || 0;
+      btn.classList.toggle("is-visible", y > 240);
+    }
+    window.addEventListener("scroll", shown, { passive: true });
+    shown();
+    btn.addEventListener("click", function () {
+      window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+    });
   }
 
   function loadScript(src) {
@@ -307,6 +357,8 @@
 
   function run() {
     ensureStyles();
+    ensureStickySearch();
+    ensureScrollTop();
 
     document.querySelectorAll(".pdf-frame-wrap").forEach(function (wrap) {
       activateWrap(wrap, resolvePdfUrl(wrap));

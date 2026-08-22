@@ -264,6 +264,56 @@
       .page { padding: 12px 14px 32px; }
       .ocr-search-tools button { min-height: 48px; }
     }
+  
+    .ocr-sticky-chrome {
+      position: sticky;
+      top: 0;
+      z-index: 8;
+      background: #fff;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 30;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
   </style>
 </head>
 <body>
@@ -274,7 +324,8 @@
         <span class="title-line">GLENFIN Text Bulletin · 21/08/2026</span>
       </div>
     </div>
-    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+    <div class="ocr-sticky-chrome">
+<div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
       <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
       <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
       <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
@@ -293,7 +344,8 @@
         </div>
       </div>
     </div>
-    <div class="ocr-body" id="ocr-text"><p class="page-label">Page 12</p>
+    </div>
+<div class="ocr-body" id="ocr-text"><p class="page-label">Page 12</p>
 <p>Paróiste Chill Taobhóige<br>
 Tithe Pobail Ghleann Fhinne agus<br>
 Leitir Bric<br>
@@ -484,7 +536,7 @@ plications is Wednesday</p>
         if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
         ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
         ocrMatches[idx].classList.add('search-active');
-        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
       function updateMatchUi() {
         const total = ocrMatches.length;
@@ -567,5 +619,22 @@ plications is Wednesday</p>
       });
     })();
   </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
+  <script>
+    (function () {
+      var btn = document.getElementById('scroll-top-btn');
+      if (!btn) return;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function shown() {
+        var y = window.scrollY || document.documentElement.scrollTop || 0;
+        btn.classList.toggle('is-visible', y > 240);
+      }
+      window.addEventListener('scroll', shown, { passive: true });
+      shown();
+      btn.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      });
+    })();
+    </script>
 </body>
 </html>
