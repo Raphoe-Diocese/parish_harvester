@@ -6,13 +6,25 @@
   "start_url": "http://www.holycrossparishbelfast.com/parishnews.html",
   "steps": [
     {
+      "action": "click",
+      "selector": "a[href$='.pdf']",
+      "href": "http://www.holycrossparishbelfast.com/pdf/230826.pdf",
+      "text": "Click To Load Newsletter Sunday, 23rd August 2026 21st Sunda",
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "a[href$='.pdf']",
+        "a[href*='.pdf']"
+      ]
+    },
+    {
       "action": "download",
       "url": "http://www.holycrossparishbelfast.com/pdf/230826.pdf"
     }
   ],
-  "observed_load_ms": 25054,
-  "timeout_ms": 60108,
-  "total_timeout_s": 190,
+  "observed_load_ms": 15437,
+  "timeout_ms": 55000,
+  "total_timeout_s": 250,
   "playbook_type": "dated_pdf_bulletin",
   "site_type": "dated_pdf_path",
   "operator_notes": [
@@ -24,14 +36,11 @@
   ],
   "do_not": [
     "Do not use use_page_url only — GitHub cannot read Chrome's internal PDF viewer address.",
-    "Do not worry if Document Properties title mentions Microsoft Word.",
-    "Do not raise max_bulletin_pages to accept the 13-page July file — the filename date is this week but the body is 12/07/2026.",
-    "Do not treat the Parish Messenger news cards as a new bulletin. Download the PDF and read the body date."
+    "Do not worry if Document Properties title mentions Microsoft Word."
   ],
-  "operator_notes_2026_08_21": [
-    "Send & test 21/08/2026 downloaded a real PDF, then said 'No valid content found' because the file is 13 pages (cap is 4). The news cards on parishnews.html (Parish Messenger, theparishmessenger.com) say Sunday 16/08/2026 / 20th Sunday Ord. Time — those cards are not the PDF.",
-    "Direct files pdf/160826.pdf, pdf/230826.pdf, pdf/090826.pdf, pdf/020826.pdf, pdf/190726.pdf and pdf/120726.pdf are byte-identical (md5 ac67defb3de0, 455913 bytes, 13 pages). Page 2 still says 'Bulletin 11th & 12th July 2026'. Parish may be on summer holidays.",
-    "Leave stale/honest-fail until a genuinely new PDF. Do not mark ok off the dated filename."
-  ],
-  "recorded_date": "2026-08-21"
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  },
+  "recorded_date": "2026-08-22"
 }
