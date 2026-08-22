@@ -6,7 +6,9 @@ import unittest
 from datetime import date
 from pathlib import Path
 
+from harvester.bulletin_freshness import check_bulletin_freshness
 from harvester.replay import (
+    _best_scored_link_index,
     _decode_pdfemb_data_url,
     _extract_matching_hrefs,
     _extract_mdocs_dated_downloads,
@@ -18,6 +20,7 @@ from harvester.replay import (
     _pick_newest_dated_post_url,
     _pick_newest_mdocs_download,
     _resolve_download_candidates,
+    _score_bulletin_link,
     _score_http_scrape_pdf_hrefs,
     _score_wordpress_post_hrefs,
     _wordpress_feed_post_links,
@@ -747,6 +750,89 @@ class ErrigalAndMalinRecipeTests(unittest.TestCase):
             ),
             "dated PDF download URL would be rewritten to a missing August file",
         )
+
+
+class CarrickfergusBackIssuesRecipeTests(unittest.TestCase):
+    CATALOGUE = "https://www.carrickparish.org/registration"
+    JUNE_28 = (
+        "https://www.carrickparish.org/_files/ugd/"
+        "18d125_02051fa18f7e40b2baca445517fe43dd.pdf"
+    )
+    JUNE_21 = (
+        "https://www.carrickparish.org/_files/ugd/"
+        "18d125_792c23015a664279abcda50c079903e7.pdf"
+    )
+    MASS_TIMES = (
+        "https://www.carrickparish.org/_files/ugd/"
+        "18d125_e29380ad624948a7b3dfdebf8a26fb4f.pdf"
+    )
+
+    def test_recipe_uses_back_issues_not_mass_times(self) -> None:
+        data = json.loads(
+            Path("parishes/recipes/down_and_connor/carrickparish.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(data["start_url"], self.CATALOGUE)
+        self.assertNotIn("/info", data["start_url"])
+        click = next(
+            step
+            for step in data["steps"]
+            if isinstance(step, dict) and step.get("action") == "click"
+        )
+        self.assertEqual(click.get("pick_strategy"), "newest_dated")
+        self.assertIn("href$='.pdf'", click.get("selector") or "")
+        self.assertNotIn("Mass Times", json.dumps(data.get("steps") or []))
+        steps = data.get("steps") or []
+        self.assertFalse(
+            any(
+                "/_files/ugd/" in str(step.get("url") or "")
+                or str(step.get("url") or "").lower().endswith(".pdf")
+                for step in steps
+                if isinstance(step, dict)
+            ),
+            "pinned Wix hash URL goes stale when they replace the file",
+        )
+
+    def test_catalogue_labels_pick_june_28_not_older_or_2024(self) -> None:
+        entries = [
+            {
+                "href": "https://www.carrickparish.org/_files/ugd/"
+                "15976c_922fc491b1bc433699770f839a9d790b.pdf",
+                "text": "20th Oct 2024",
+                "idx": 0,
+            },
+            {"href": self.JUNE_28, "text": "28th June 2026", "idx": 1},
+            {"href": self.JUNE_21, "text": "21st June 2026", "idx": 2},
+        ]
+        self.assertEqual(_best_scored_link_index(entries, self.CATALOGUE), 1)
+        self.assertGreater(
+            _score_bulletin_link(self.JUNE_28, "28th June 2026")[0],
+            _score_bulletin_link(self.JUNE_21, "21st June 2026")[0],
+        )
+
+    def test_info_mass_times_would_fake_current_week(self) -> None:
+        info_entries = [
+            {
+                "href": self.MASS_TIMES,
+                "text": "Mass Times from 17th August 2026 onwards",
+                "idx": 0,
+            },
+            {"href": self.JUNE_28, "text": "Final Summer edition", "idx": 1},
+        ]
+        self.assertEqual(
+            _best_scored_link_index(info_entries, "https://www.carrickparish.org/info"),
+            0,
+        )
+        mass_times = check_bulletin_freshness(
+            "Mass Timings (17th August onwards)", date(2026, 8, 16)
+        )
+        june_bulletin = check_bulletin_freshness(
+            "28th June 2026 Saint Nicholas 13th Sunday", date(2026, 8, 16)
+        )
+        self.assertEqual(mass_times.status, "fresh")
+        self.assertEqual(june_bulletin.status, "stale")
+        self.assertEqual(june_bulletin.extracted_date, date(2026, 6, 28))
 
 
 class LisburnRecipeTests(unittest.TestCase):
