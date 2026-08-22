@@ -213,19 +213,23 @@ class HeroSliderRenderTests(unittest.TestCase):
         # Frank asked for real cathedral photos (not gradient placeholders)
         # for the 3 live dioceses — each must be a verified CC-licensed
         # Wikimedia Commons photo with an on-image attribution credit.
-        self.assertEqual(len(site_builder.HERO_SLIDES), 3)
+        self.assertEqual(len(site_builder.HERO_SLIDES), 4)
         for slide in site_builder.HERO_SLIDES:
             self.assertTrue(slide.image and slide.image.startswith("https://upload.wikimedia.org/"))
             self.assertTrue(slide.credit and "Wikimedia Commons" in slide.credit)
             self.assertTrue(any(lic in slide.credit for lic in ("CC BY-SA", "CC BY")))
 
         titles = {slide.title for slide in site_builder.HERO_SLIDES}
+        self.assertIn("St Macartan's Cathedral, Monaghan", titles)
         self.assertIn("Cathedral of St. Eunan and St. Columba, Letterkenny", titles)
         self.assertIn("St Eugene's Cathedral, Derry", titles)
         self.assertIn("St Peter's Cathedral, Belfast", titles)
 
         eyebrows = {slide.eyebrow for slide in site_builder.HERO_SLIDES}
-        self.assertEqual(eyebrows, {"Raphoe Diocese", "Derry Diocese", "Down & Connor Diocese"})
+        self.assertEqual(
+            eyebrows,
+            {"Clogher Diocese", "Raphoe Diocese", "Derry Diocese", "Down & Connor Diocese"},
+        )
 
     def test_hero_slider_html_empty_when_no_slides(self) -> None:
         original = site_builder.HERO_SLIDES

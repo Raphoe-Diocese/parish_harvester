@@ -61,13 +61,26 @@ class HeroSlide:
     position: str = "center"
 
 
-# Cathedral photos for the 3 live dioceses, sourced from Wikimedia Commons
+# Cathedral photos for the live dioceses, sourced from Wikimedia Commons
 # (all confirmed Creative Commons licensed on their individual file pages —
 # see the "Photo credits" section of docs/assets/hero/README.md for the
 # full license/author/source details for each). Falls back to a CSS
 # gradient automatically if `image` is ever cleared — see HeroSlide above
 # and docs/assets/hero/README.md for how to swap any of these out.
 HERO_SLIDES: list[HeroSlide] = [
+    HeroSlide(
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/2/2b/"
+            "St_Macartans_Cathedral_Monaghan_Ireland.jpg/"
+            "1280px-St_Macartans_Cathedral_Monaghan_Ireland.jpg"
+        ),
+        credit="Photo: Whoisjohngalt / Wikimedia Commons / CC BY-SA 4.0",
+        position="center 30%",
+        gradient="linear-gradient(135deg, #2c2416 0%, #6b5428 55%, #c4a15a 100%)",
+        eyebrow="Clogher Diocese",
+        title="St Macartan's Cathedral, Monaghan",
+        subtitle="The mother church of Clogher — bulletins collected automatically every Sunday.",
+    ),
     HeroSlide(
         image=(
             "https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/"
