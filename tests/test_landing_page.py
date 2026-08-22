@@ -91,6 +91,9 @@ class LandingPageTests(unittest.TestCase):
             self.assertIn("Raphoe Diocese", index_html)
             self.assertIn('class="is-long"', index_html)
             self.assertIn("white-space: nowrap", index_html)
+            self.assertIn("No data yet", index_html)
+            self.assertNotIn("No reliability data yet", index_html)
+            self.assertIn(".live-card-eyebrow {", index_html)
             self.assertIn("<h2>Raphoe Diocese</h2>", index_html)
             self.assertNotIn('<h2 class="is-long">Raphoe Diocese</h2>', index_html)
             self.assertIn('href="/favicon.png"', index_html)
@@ -155,6 +158,32 @@ class LiveCardHeadingTests(unittest.TestCase):
     def test_raphoe_is_not_long(self) -> None:
         html_out = site_builder._live_card_heading_html("Raphoe")
         self.assertEqual(html_out, "<h2>Raphoe Diocese</h2>")
+
+    def test_missing_reliability_eyebrow_stays_on_one_line(self) -> None:
+        self.assertEqual(site_builder._status_label(None), "No data yet")
+        self.assertEqual(site_builder._status_label(0.8), "Reliability available")
+        html = site_builder._landing_page(
+            [
+                {
+                    "key": "clogher",
+                    "name": "Clogher",
+                    "dot": "⚪",
+                    "status_label": site_builder._status_label(None),
+                    "updated": "16/08/2026",
+                },
+                {
+                    "key": "derry",
+                    "name": "Derry",
+                    "dot": "🟡",
+                    "status_label": site_builder._status_label(0.5),
+                    "updated": "16/08/2026",
+                },
+            ]
+        )
+        self.assertIn("No data yet", html)
+        self.assertNotIn("No reliability data yet", html)
+        self.assertRegex(html, r"\.live-card-eyebrow\s*\{[^}]*white-space:\s*nowrap")
+        self.assertIn("Reliability available", html)
 
 
 class HeroSliderRenderTests(unittest.TestCase):
