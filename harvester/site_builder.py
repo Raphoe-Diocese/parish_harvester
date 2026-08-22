@@ -597,14 +597,14 @@ def _status_dot(avg_success_rate: float | None) -> str:
 
 
 def _landing_page(rows: list[dict[str, str]]) -> str:
-    """Homepage: the 3 live dioceses prominent up top, the other 23 collapsed.
+    """Homepage: live dioceses prominent up top, the rest collapsed.
 
-    Only Raphoe, Derry and Down & Connor have real reliability data today
-    (see ``LIVE_DIOCESES``), so they get full cards with one-click links to
-    their collated (mega) bulletin and text bulletin. Every other diocese —
-    still "coming soon" — collapses into one small expandable list instead of
-    23 near-empty placeholder cards, entirely driven by the same per-diocese
-    rows (dot/status/updated) computed in :func:`run`.
+    Raphoe, Derry, Down & Connor and Clogher are in ``LIVE_DIOCESES``, so they
+    get full cards with one-click links to their collated (mega) bulletin and
+    text bulletin. Every other diocese — still "coming soon" — collapses into
+    one small expandable list instead of near-empty placeholder cards,
+    entirely driven by the same per-diocese rows (dot/status/updated)
+    computed in :func:`run`.
     """
     live_rows = [row for row in rows if row["key"] in LIVE_DIOCESES]
     other_rows = sorted(
