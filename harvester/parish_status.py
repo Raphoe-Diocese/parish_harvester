@@ -21,6 +21,7 @@ SCHEMA_VERSION = 1
 PARISH_STATUS_PATH = PARISHES_DIR / "parish_status.json"
 
 _DIOCESE_LABELS: dict[str, str] = {
+    "clogher_diocese": "Clogher Diocese",
     "derry_diocese": "Derry Diocese",
     "down_and_connor": "Down & Connor Diocese",
     "raphoe_diocese": "Raphoe Diocese",

@@ -1146,6 +1146,7 @@
       const ghRepo = String(settings.gh_repo || "Raphoe-Diocese/parish_harvester").trim();
       if (!ghRepo) return "";
       const files = [
+        "parishes/clogher_diocese_contacts.json",
         "parishes/derry_diocese_contacts.json",
         "parishes/down_and_connor_contacts.json",
         "parishes/raphoe_diocese_contacts.json",
@@ -6409,7 +6410,7 @@
     (() => {
       const DIOCESE_CACHE_KEY = "ph_diocese_list_cache";
       const DIOCESE_CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
-      const FALLBACK_DIOCESES = ["derry", "down_and_connor", "raphoe"];
+      const FALLBACK_DIOCESES = ["clogher", "derry", "down_and_connor", "raphoe"];
 
       const _fetchDioceseList = async () => {
         // Try cache first.
@@ -7756,6 +7757,7 @@
           ) {
             return "down_and_connor";
           }
+          if (raw === "clogher" || raw === "clogher_diocese" || raw === "clogher diocese") return "clogher";
           return raw.replace(/&/g, "and").replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
         };
 
@@ -7763,7 +7765,7 @@
         const dioceseSubfolder = canonicalDioceseSlug(diocese) || "unknown";
         const pathsToTry = [
           `parishes/recipes/${dioceseSubfolder}/${key}.json`,
-          ...["derry", "down_and_connor", "raphoe", "unknown"]
+          ...["clogher", "derry", "down_and_connor", "raphoe", "unknown"]
             .filter((d) => d !== dioceseSubfolder)
             .map((d) => `parishes/recipes/${d}/${key}.json`),
           `parishes/recipes/${key}.json`,

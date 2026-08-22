@@ -3,12 +3,13 @@
  * Content calls this directly so pushes survive MV3 service-worker sleep.
  */
 (function initPhGithubRecipePush(global) {
-  const DIOCESE_FOLDERS = ["derry", "down_and_connor", "raphoe", "unknown"];
+  const DIOCESE_FOLDERS = ["clogher", "derry", "down_and_connor", "raphoe", "unknown"];
 
   /** Map recipe/slug names to harvest.yml workflow_dispatch diocese input. */
   const harvestWorkflowDiocese = (value) => {
     const slug = canonicalDioceseSlug(value);
     if (!slug) return "all";
+    if (slug === "clogher") return "clogher_diocese";
     if (slug === "derry") return "derry_diocese";
     if (slug === "raphoe") return "raphoe_diocese";
     if (slug === "down_and_connor") return "down_and_connor";
@@ -30,6 +31,7 @@
       return "down_and_connor";
     }
     if (raw === "raphoe" || raw === "raphoe_diocese" || raw === "raphoe diocese") return "raphoe";
+    if (raw === "clogher" || raw === "clogher_diocese" || raw === "clogher diocese") return "clogher";
     return raw.replace(/&/g, "and").replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
   };
 

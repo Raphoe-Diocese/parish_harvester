@@ -17,14 +17,15 @@ DOCS_DIR = REPO_ROOT / "docs"
 RECIPES_DIR = REPO_ROOT / "parishes" / "recipes"
 BULLETINS_DIR = DOCS_DIR / "bulletins"
 
-LIVE_DIOCESES = {"raphoe", "derry", "down-and-connor"}
+LIVE_DIOCESES = {"raphoe", "derry", "down-and-connor", "clogher"}
 # site_builder uses hyphenated diocese keys; ocr.generate_bulletin_pages /
 # ocr.parish_pages use the underscored keys from parishes/dioceses.json.
-OCR_DIOCESE_KEYS = {"raphoe": "raphoe", "derry": "derry", "down-and-connor": "down_and_connor"}
+OCR_DIOCESE_KEYS = {"raphoe": "raphoe", "derry": "derry", "down-and-connor": "down_and_connor", "clogher": "clogher"}
 RELIABILITY_PATH = DOCS_DIR / "reliability.json"
 REPORT_PATH = REPO_ROOT / "Bulletins" / "report.json"
 GITHUB_RAW_BASE = "https://raw.githubusercontent.com/Raphoe-Diocese/parish_harvester/main/Bulletins/current"
 EVIDENCE_DIOCESE_KEYS = {
+    "clogher": "clogher_diocese",
     "derry": "derry_diocese",
     "down-and-connor": "down_and_connor",
     "raphoe": "raphoe_diocese",
@@ -763,7 +764,7 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     <p><a href=\"mega_pdf/index.html\" target=\"_blank\" rel=\"noopener noreferrer\">Open the Collated Bulletin PDF viewer</a></p>
     <p><a href=\"EMBEDDING.md\" target=\"_blank\" rel=\"noopener noreferrer\">Read the embedding guide</a> · <a href=\"embed-examples.html\" target=\"_blank\" rel=\"noopener noreferrer\">Open copy/paste embed examples</a></p>
     <p><a href=\"badges/\" target=\"_blank\" rel=\"noopener noreferrer\">Parish reliability scores</a></p>
-    <p>Subscribe (RSS): <a href=\"feeds/derry_diocese.xml\" target=\"_blank\" rel=\"noopener noreferrer\">Derry Diocese</a> · <a href=\"feeds/down_and_connor.xml\" target=\"_blank\" rel=\"noopener noreferrer\">Down &amp; Connor</a></p>
+    <p>Subscribe (RSS): <a href=\"feeds/derry_diocese.xml\" target=\"_blank\" rel=\"noopener noreferrer\">Derry Diocese</a> · <a href=\"feeds/down_and_connor.xml\" target=\"_blank\" rel=\"noopener noreferrer\">Down &amp; Connor</a> · <a href=\"feeds/clogher_diocese.xml\" target=\"_blank\" rel=\"noopener noreferrer\">Clogher Diocese</a></p>
     <p><a href=\"search/\" target=\"_blank\" rel=\"noopener noreferrer\">Search all bulletins</a></p>
     <p>📅 Subscribe in Google/Apple Calendar: <a href=\"calendars/derry.ics\" target=\"_blank\" rel=\"noopener noreferrer\">Derry Diocese</a> · <a href=\"calendars/down_and_connor.ics\" target=\"_blank\" rel=\"noopener noreferrer\">Down &amp; Connor</a> · <a href=\"calendars/all.ics\" target=\"_blank\" rel=\"noopener noreferrer\">All parishes</a></p>
     <p><a href=\"sitemap.html\" target=\"_blank\" rel=\"noopener noreferrer\">🗺️ Site map — every public URL</a> · <a href=\"COST_DASHBOARD.md\" target=\"_blank\" rel=\"noopener noreferrer\">💷 Cost dashboard</a></p>

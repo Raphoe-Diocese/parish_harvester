@@ -47,6 +47,7 @@ DIOCESE_STATUS_NAMES = {
     "raphoe": "Raphoe Diocese",
     "derry": "Derry Diocese",
     "down_and_connor": "Down & Connor Diocese",
+    "clogher": "Clogher Diocese",
 }
 
 # Leave Holy Cross / Dunfanaghy failing — July fake dates (do not slice

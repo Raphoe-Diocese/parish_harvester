@@ -563,7 +563,7 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
       }
 
       if (parishKey) {
-        for (const dio of ["derry", "down_and_connor", "raphoe", "unknown"]) {
+        for (const dio of ["clogher", "derry", "down_and_connor", "raphoe", "unknown"]) {
           try {
             const recipeResp = await fetch(
               `${rawBase}/parishes/recipes/${dio}/${parishKey}.json`
@@ -1272,6 +1272,7 @@ function _canonicalDioceseSlug(value) {
     return "down_and_connor";
   }
   if (raw === "raphoe" || raw === "raphoe_diocese" || raw === "raphoe diocese") return "raphoe";
+  if (raw === "clogher" || raw === "clogher_diocese" || raw === "clogher diocese") return "clogher";
   const normalized = raw.replace(/&/g, "and").replace(/[^a-z0-9]+/g, "_").replace(/^_+|_+$/g, "");
   return normalized;
 }
@@ -1279,13 +1280,14 @@ function _canonicalDioceseSlug(value) {
 function _harvestWorkflowDiocese(value) {
   const slug = _canonicalDioceseSlug(value);
   if (!slug) return "all";
+  if (slug === "clogher") return "clogher_diocese";
   if (slug === "derry") return "derry_diocese";
   if (slug === "raphoe") return "raphoe_diocese";
   if (slug === "down_and_connor") return "down_and_connor";
   return slug;
 }
 
-const _RECIPE_DIOCESE_FOLDERS = ["derry", "down_and_connor", "raphoe", "unknown"];
+const _RECIPE_DIOCESE_FOLDERS = ["clogher", "derry", "down_and_connor", "raphoe", "unknown"];
 
 async function _fetchGithubJson(url, headers, timeoutMs = 45000, init = {}) {
   const controller = new AbortController();
