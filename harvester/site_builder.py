@@ -623,6 +623,13 @@ def _status_dot(avg_success_rate: float | None) -> str:
     return "🔴"
 
 
+def _status_label(avg_success_rate: float | None) -> str:
+    """Keep homepage card status on one line so the four cards stay level."""
+    if avg_success_rate is None:
+        return "No data yet"
+    return "Reliability available"
+
+
 _LONG_NAME_CHARS = 20
 _VERY_LONG_NAME_CHARS = 28
 
@@ -791,7 +798,7 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     .live-card-photo {{ height: 118px; background: #0f2f2f; }}
     .live-card-photo-empty {{ background: linear-gradient(135deg, #1a6b6b, #3fae9a); }}
     .live-card-body {{ padding: 10px 12px 12px; }}
-    .live-card-eyebrow {{ margin: 0 0 4px; font-size: 0.7rem; font-weight: 700; color: #4b5563; text-transform: uppercase; letter-spacing: 0.04em; }}
+    .live-card-eyebrow {{ margin: 0 0 4px; font-size: 0.7rem; font-weight: 700; color: #4b5563; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }}
     .live-card h2 {{ margin: 0 0 2px; font-size: 1.02rem; color: #114b4b; white-space: nowrap; }}
     .live-card h2.is-long {{ font-size: 0.82rem; }}
     .live-card h2.is-very-long {{ font-size: 0.7rem; }}
@@ -1052,7 +1059,7 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
                     rates.append(float(rate))
         avg = (sum(rates) / len(rates)) if rates else None
         dot = _status_dot(avg)
-        status_label = "Reliability available" if avg is not None else "No reliability data yet"
+        status_label = _status_label(avg)
         rows.append(
             {
                 "key": diocese.key,
