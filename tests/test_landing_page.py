@@ -128,7 +128,7 @@ class LandingPageTests(unittest.TestCase):
             self.assertIn('upload.wikimedia.org', index_html)
             self.assertIn('Wikimedia Commons', index_html)
             self.assertIn('photo-credit', index_html)
-            self.assertIn('color: #111', index_html)
+            self.assertIn('font-size: 0.65rem', index_html)
             self.assertNotIn('hero-slide-credit', index_html)
 
 

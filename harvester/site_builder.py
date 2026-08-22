@@ -775,8 +775,8 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     .more-dioceses-grid li {{ margin: 0; font-size: 0.92rem; }}
     .more-dioceses-grid a {{ color: #375569; text-decoration: none; }}
     .more-dioceses-grid a:hover {{ text-decoration: underline; color: #1a6b6b; }}
-    .footer {{ border-top: 1px solid #d6ecea; margin-top: 28px; padding: 16px 16px 28px; color: #111; font-size: 1rem; line-height: 1.6; }}
-    .footer .photo-credit {{ margin: 0 0 8px; color: #111; font-size: 1.05rem; font-weight: 700; }}
+    .footer {{ border-top: 1px solid #d6ecea; margin-top: 28px; padding: 16px 16px 28px; color: #16202a; font-size: 0.92rem; line-height: 1.6; }}
+    .footer .photo-credit {{ margin: 0 0 6px; color: #222; font-size: 0.65rem; font-weight: 400; line-height: 1.3; }}
     .footer a {{ color: #14524f; text-decoration: none; }}
     .footer a:hover {{ text-decoration: underline; }}
     @media (max-width: 640px) {{
