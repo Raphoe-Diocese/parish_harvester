@@ -867,8 +867,11 @@ def rewrite_date_url(url: str, target: date) -> str:
             orig = date(year, int(m.group(2)), int(m.group(1)))
             if abs((orig - target).days) < 365:
                 day_s, month_s = m.group(1), m.group(2)
-                day_fmt = f"{target.day:02d}" if len(day_s) == 2 else str(target.day)
-                month_fmt = f"{target.month:02d}" if len(month_s) == 2 else str(target.month)
+                # 16-08-26 (both parts 2 digits) keeps zeros. 12-4-26 / 21-6-26
+                # is the unpadded OneWeb style even when the day is already 10+.
+                padded = len(day_s) == 2 and len(month_s) == 2
+                day_fmt = f"{target.day:02d}" if padded else str(target.day)
+                month_fmt = f"{target.month:02d}" if padded else str(target.month)
                 return f"{day_fmt}-{month_fmt}-{target.year % 100:02d}"
         except ValueError:
             pass
