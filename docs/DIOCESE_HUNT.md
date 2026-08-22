@@ -36,12 +36,12 @@ Clogher 22/08/2026 proved why: Expand-all cards said “no website.” The Paris
 | HTML overwritten in place | Culmaine / Donagh / Kilmore parish-news / Tullycorbet | `print_to_pdf` + `skip_listing_nav` |
 | Image on Latest Bulletin | Fintona `Sunday-Dth-Month-YYYY.jpg` in an old `/2026/01/` folder | `image_stack` the visible Sunday image. NextGEN `/wp-content/gallery/` is **not** `/uploads/` |
 | Dead official hostname | `clonesparish.ie`, `errigaltruparish.com`, `monaghan-rackwallace.ie` | Search the live twin (`.com`, `truaghparish.com`) |
-| Shared bulletin | Clontibret + Muckno | Harvest once; other parish is link-only |
+| Shared bulletin | Clontibret + Muckno; Tyholland + Monaghan & Rackwallace | Harvest once under the host parish. The other parish stays on the A-Z list as a labelled link (`bulletin with …`). Do not pin this week's PDF. |
 | Expired HTTPS | Lisnaskea / Galloon | Playwright + `ignore_https_errors` — urllib scrape will fail |
 
 ## Clogher leftover after kitchen sink (do not re-hunt blindly)
 
-Facebook / no live weekly file on 22/08/2026: Aughnamullen East, Belleek-Garrison, Brookeboro-Fivemiletown, Cleenish (`parishofcleenish.com` is a COVID ticket page), Clogher town, Eskra, Inniskeen (Kavanagh bulletin **404**), Killanny (`/parish-bulletin` locked on May 2021), Killeevan, Latton, Pettigo, Rockcorry, Trillick, Tydavnet, Tyholland. Clontibret shares Muckno — leave skipped.
+Facebook / no live weekly file on 22/08/2026: Aughnamullen East, Belleek-Garrison, Brookeboro-Fivemiletown, Cleenish (`parishofcleenish.com` is a COVID ticket page), Clogher town, Eskra, Inniskeen (Kavanagh bulletin **404**), Killanny (`/parish-bulletin` locked on May 2021), Killeevan, Latton, Pettigo, Rockcorry, Trillick, Tydavnet. Shared (leave skipped): Clontibret → Castleblayney / Muckno; Tyholland → Monaghan & Rackwallace (`past-newsletters`).
 
 ## Do not
 

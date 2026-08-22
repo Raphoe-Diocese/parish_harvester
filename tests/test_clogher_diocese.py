@@ -21,6 +21,10 @@ class ClogherDioceseTests(unittest.TestCase):
         self.assertEqual(len(set(keys)), 37)
         self.assertIn("clogherparish", keys)
         self.assertNotIn("clogher", keys)
+        by_key = {entry.key: entry for entry in parse_evidence_file("clogher_diocese", PARISHES)}
+        self.assertIn("Monaghan", by_key["tyholland"].display_name)
+        self.assertIn("past-newsletters", by_key["tyholland"].bulletin_page)
+        self.assertIn("Clontibret", by_key["castleblayney"].display_name)
 
     def test_harvestable_parishes_keep_real_bulletin_urls(self) -> None:
         by_key = {entry.key: entry for entry in parse_evidence_file("clogher_diocese", PARISHES)}
@@ -53,6 +57,10 @@ class ClogherDioceseTests(unittest.TestCase):
         clontibret = load_recipe(recipe_path_for("clontibret", PARISHES))
         self.assertTrue(_recipe_is_inactive(clontibret))
         self.assertIn("mucknoparish.ie", clontibret["start_url"])
+        tyholland = load_recipe(recipe_path_for("tyholland", PARISHES))
+        self.assertTrue(_recipe_is_inactive(tyholland))
+        self.assertIn("past-newsletters", tyholland["start_url"])
+        self.assertNotIn("23082026.pdf", json.dumps(tyholland))
         clones = load_recipe(recipe_path_for("clones", PARISHES))
         self.assertFalse(_recipe_is_inactive(clones))
         self.assertIn("clonesparish.com", clones["start_url"])
@@ -62,6 +70,19 @@ class ClogherDioceseTests(unittest.TestCase):
         contacts = json.loads((PARISHES / "clogher_diocese_contacts.json").read_text(encoding="utf-8"))
         self.assertEqual(len(contacts), 37)
         self.assertEqual(contacts["ederney"]["display_name"], "Ederney (Cúl Máine)")
+        self.assertEqual(
+            contacts["tyholland"]["display_name"],
+            "Tyholland (bulletin with Monaghan & Rackwallace)",
+        )
+        self.assertIn("past-newsletters", contacts["tyholland"]["website"])
+        self.assertEqual(
+            contacts["monaghanrackwallace"]["display_name"],
+            "Monaghan & Rackwallace (includes Tyholland)",
+        )
+        self.assertEqual(
+            contacts["clontibret"]["display_name"],
+            "Clontibret (bulletin with Castleblayney / Muckno)",
+        )
         self.assertEqual(_diocese_label("clogher_diocese"), "Clogher Diocese")
 
 
