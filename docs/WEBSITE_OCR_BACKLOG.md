@@ -65,6 +65,7 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 - [x] **done** · 2026-08-22 · Live diocese cards: one-line names (`Down & Connor Diocese`, `white-space: nowrap`, shrink `is-long` / `is-very-long`). Live-checked 22/08/2026 on https://www.parishpress.ie/: HTML has `Down &amp; Connor Diocese`, `white-space: nowrap`, `is-long`; does **not** have wrapping `Down and Connor Diocese`. PR #83. · `harvester/site_builder.py` `_live_card_heading_html`
 - [x] **done** · 2026-08-22 · Homepage Clogher card: status eyebrow stays on one line (`No data yet` + `.live-card-eyebrow { white-space: nowrap }`). Verified live 23/08/2026 on https://www.parishpress.ie/ after PR #85 + Pages run 32606594172. Old wrapping text is gone; more-dioceses note unchanged · harvester/site_builder.py _status_label
 - [ ] **doing** · 2026-08-23 · Killanny HTML /parish-bulletin harvested as stale (May 2021 text still live 23/08/2026). Do not skip; do not invent an August PDF. Leave open until a harvest writes parish_status for killanny · parishes/recipes/clogher/killanny.json
+- [ ] **doing** · 2026-08-23 · OCR search sticks only after a term is typed. Leave open until verified on live Derry text bulletin · harvester/site_chrome.py, docs/assets/pdf-inpage-viewer.js
 - [ ] **todo** · 2026-08-20 · Recipe success — one parish at a time (A–Z repair with proof packs) · `parishes/recipes/`, Problems tab
 - [ ] **todo** · 2026-08-20 · parishpress.ie — live DNS / Pages cutover when Frank is ready · `docs/PARISHPRESS_IE_MIGRATION.md`, `docs/DOMAIN_SETUP.md`
 - [ ] **todo** · 2026-08-20 · Site look — modern pages **after** OCR/capture/recipes are reliable · `harvester/site_builder.py`, `docs/`
@@ -97,7 +98,7 @@ Spot-check generated CSS for:
 - no `height: auto` and no `overflow: visible` on those visible boxes
 - no `height: 85vh` clip on `.pdf-frame-wrap`
 - `@media (max-width: 1024px)` with locked `height` / `min-height` / `max-height: 450px` and inner scroll on those same visible boxes
-- `.ocr-sticky-chrome { position: sticky; top: 0 }` **outside** `#ocr-panel`, and `#scroll-top-btn` (page top)
-- `/assets/pdf-inpage-viewer.js?v=20260822c` (cache-bust)
+- `.ocr-sticky-chrome` **outside** `#ocr-panel` is `position: relative` until `.is-searching` (typed term), then `position: sticky; top: 0`. `#scroll-top-btn` (page top)
+- `/assets/pdf-inpage-viewer.js?v=20260823s` (cache-bust)
 - `ocr-parish-masthead` / `ocr-parish-name` in the OCR panel
 - `getAnnotations` + `target="_blank"` in `docs/assets/pdf-inpage-viewer.js`

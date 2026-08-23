@@ -16,7 +16,7 @@ from PyPDF2 import PdfReader
 from harvester.ai_summaries import summarise_bulletin
 from harvester.events_extractor import extract_events, write_events_json
 from harvester.weekly_diff import diff_bulletins
-from harvester.site_chrome import favicon_link_tags, scroll_top_css, scroll_top_html, scroll_top_js, sticky_search_css
+from harvester.site_chrome import favicon_link_tags, scroll_top_css, scroll_top_html, scroll_top_js, sticky_search_css, sticky_search_js
 from ocr.bulletin_layout import ocr_masthead_css, structure_ocr_html
 from ocr.parish_splitter import split_ocr_by_parish
 
@@ -1110,6 +1110,7 @@ def render_ocr_standalone_page(
         }}
       }});
     }})();
+    {sticky_search_js()}
     {scroll_top_js()}
   </script>
   {scroll_top_html()}
@@ -1145,7 +1146,7 @@ def prefers_native_pdf_js() -> str:
 """
 
 
-PDF_INPAGE_VIEWER_VERSION = "20260822c"
+PDF_INPAGE_VIEWER_VERSION = "20260823s"
 PDF_INPAGE_VIEWER_SRC = f"/assets/pdf-inpage-viewer.js?v={PDF_INPAGE_VIEWER_VERSION}"
 
 
@@ -2141,6 +2142,7 @@ def render_bulletin_viewer_shell(
         if (page) page.insertBefore(banner, page.firstChild);
       }}
     }})();
+    {sticky_search_js()}
     {scroll_top_js()}
   </script>
   {scroll_top_html()}

@@ -287,18 +287,22 @@
     .font-size-controls { display: none; }
     
     .ocr-sticky-chrome {
-      position: sticky;
-      top: 0;
+      position: relative;
+      top: auto;
       z-index: 8;
       background: #fff;
       padding: 8px 0 10px;
       margin: 0 0 8px;
     }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
     .ocr-sticky-chrome .ocr-zoom-bar {
       position: relative;
       top: auto;
     }
-    html { scroll-padding-top: 10rem; }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
     mark.search-active { scroll-margin-top: 10rem; }
     
     
@@ -652,7 +656,7 @@
       }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260822c" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260823s" defer></script>
 </head>
 <body>
   <div class="page">
@@ -5210,9 +5214,9 @@ The following parishes do not have a downloadable PDF bulletin. Click a link to 
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260822c"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260823s"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260822c';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260823s';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -5452,6 +5456,30 @@ The following parishes do not have a downloadable PDF bulletin. Click a link to 
       }
     })();
     
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+
     (function () {
       var btn = document.getElementById('scroll-top-btn');
       if (!btn) return;
