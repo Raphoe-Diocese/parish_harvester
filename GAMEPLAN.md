@@ -76,6 +76,7 @@ run. Everything below was read on `origin/main` at commit `78063f98`.
 ### NOW — small PRs Frank can say `go` to, one at a time
 
 **N1. Turn off the tap (stop making new old-week pages).** ~4 files.
+**Status 23/08/2026: doing — PR [#115](https://github.com/Raphoe-Diocese/parish_harvester/pull/115) open, not merged.**
 Add `prune_old_viewers()` to `ocr/generate_bulletin_pages.py` and call it from
 `rebuild_indexes()` (already runs at the end of every viewer write). Rule: for
 each diocese keep only the newest date's three files; never touch
@@ -83,6 +84,14 @@ each diocese keep only the newest date's three files; never touch
 regenerated yet does not lose its current page. Add one test. Update both lists.
 *Risk if wrong:* a diocese page loses its OCR link. Guard with a test that the
 newest trio survives.
+*Built in PR #115:* `prune_old_viewers()` + `rebuild_indexes()` call it first;
+`--regenerate-from` protects the date it just rewrote; `BULLETIN_PRUNE_DISABLE=1`
+switches it off; 7 tests in `tests/test_bulletin_archive_prune.py`, including
+`test_current_week_ocr_and_pdf_links_survive_prune` (site_builder still resolves
+every diocese's `-ocr` / `-pdf` page after a prune). Dry run on a **copy** of the
+real folder: 168 old pages removed, this week's 12 + `index.html` + the
+`raphoe/` subfolder kept. Nothing in `docs/` was regenerated or deleted by that PR.
+**Tick this done only after the PR is merged.**
 
 **N2. Remove the 168 old-week pages that are already published.** 0 code files.
 `git rm` every `docs/bulletins/*-<date>*.html` except the newest date per
@@ -93,6 +102,10 @@ back to it when a diocese has no viewer page. GitHub Pages drops the files on
 the next deploy because `deploy-pages.yml` builds `_site` from `cp -a docs/.`.
 *Risk if wrong:* old bookmarks 404. That is the intent.
 *Do N1 first,* or the next OCR run just starts refilling.
+**Still needed after N1.** N1's prune only fires when the OCR job regenerates a
+diocese, so the 168 already-published files stay live until then — next Sunday
+at the earliest, and only for dioceses that run. N2 is what takes them off
+parishpress.ie now. Waiting for `go`.
 
 **N3. Make the harvest test gate real.** 1 file, one word.
 `.github/workflows/harvest.yml` line 103: `pytest -v --tb=short` →
