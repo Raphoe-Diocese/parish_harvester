@@ -13,6 +13,8 @@ Collated Bulletin (mega PDF) stitching is **core production behaviour, not optio
 
 **Website / OCR backlog:** before any viewer, OCR, or `docs/` page work, read and update [`docs/WEBSITE_OCR_BACKLOG.md`](docs/WEBSITE_OCR_BACKLOG.md). That file is the living checklist (850px desktop / 450px mobile, parish OCR headers, new-tab links, mega PDF stays on). Do not start a second competing list.
 
+**Everything else** (repo cleanup, workflow fixes, dead code) goes in [`GAMEPLAN.md`](GAMEPLAN.md). Three lists only: this file for product order, the backlog for website/OCR, `GAMEPLAN.md` for the rest.
+
 **Do not lie about done.** Never tell Frank a website/OCR/viewer job is finished unless you have checked the **generated files that GitHub Pages deploys** (`docs/index.html`, `docs/dioceses/`, `docs/parishes/`) AND, after merge+Pages, the **live URL** (e.g. https://www.parishpress.ie/). Tests or Python-only edits are not enough. If it is not on the live page, say “not live yet”. Do not tick backlog items done without the live check.
 
 ## PHASE PLAN
@@ -120,7 +122,7 @@ Until this list is finished, do **not** start other work. Park new ideas for a l
 
 ## Parked (later list — do not start yet)
 
-- **Remove bulletin archive entirely** — delete all traces of `https://raphoe-diocese.github.io/parish_harvester/bulletins/` (page, links, nav, generators, sitemaps). User request 2026-07-30.
+- **Remove the bulletin archive page and nav entirely** — the wider "delete every trace of `…/parish_harvester/bulletins/`" request (2026-07-30) stays parked. What is **unparked** as of 23/08/2026 is the narrower, safe half: publish **this week only**. See the `todo (NOW)` row in [`docs/WEBSITE_OCR_BACKLOG.md`](docs/WEBSITE_OCR_BACKLOG.md) and items N1/N2 in [`GAMEPLAN.md`](GAMEPLAN.md). `docs/bulletins/index.html` must survive — `harvester/site_builder.py` (`_ocr_standalone_url`) falls back to it.
 
 ## Dates (user-facing)
 
