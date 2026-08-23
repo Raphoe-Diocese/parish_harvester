@@ -1,0 +1,761 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Monaghan &amp; Rackwallace (includes Tyholland) Text Bulletin — 23/08/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #eef1f0;
+      color: #1a1f1e;
+      line-height: 1.65;
+      font-size: 1.125rem;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
+    }
+    a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
+    .page {
+      max-width: min(72ch, 100%);
+      margin: 0 auto;
+      padding: 14px 18px 40px;
+    }
+    .top {
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+      gap: 8px 14px;
+      margin-bottom: 12px;
+    }
+    .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+    .back-link {
+      font-size: 0.9rem; font-weight: 700;
+      color: #14524f; text-decoration: none;
+    }
+    .title-line {
+      font-size: 1rem; font-weight: 700; color: #1a1f1e;
+    }
+    .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 30;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
+    .ocr-zoom-bar {
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
+    }
+    .ocr-zoom-bar button {
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+      line-height: 1;
+    }
+    .ocr-zoom-pct {
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 4px; } }
+    
+    .ocr-body {
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    .ocr-body h1, .ocr-body h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h2.b-title, .ocr-body .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    .ocr-body h3.b-head, .ocr-body .b-head {
+      font-size: 1.12em;
+      color: #134e9c;
+      margin: 1.1em 0 0.35em;
+    }
+    .ocr-body h4.b-sub, .ocr-body .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    .ocr-body h3, .ocr-body h4 {
+      color: #1a6b6b;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    .ocr-body h3.ocr-page-heading,
+    .ocr-body .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    .ocr-body hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    .ocr-body strong { color: #0f2b5b; }
+    .ocr-body a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .ocr-body mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    .ocr-body mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    .ocr-body table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ocr-body table.b-table td, .ocr-body table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .ocr-body table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    .ocr-body table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    .ocr-body img, .ocr-body iframe, .ocr-body video {
+      max-width: 100%;
+      height: auto;
+    }
+    .ocr-body > :first-child {
+      margin-top: 0;
+    }
+    
+    .ocr-body .ocr-parish-masthead {
+      margin: 2.1em 0 1.15em;
+      padding: 0.85em 0 0.7em;
+      border-top: 3px solid #14524f;
+      border-bottom: 1px solid #c5d0c9;
+    }
+    .ocr-body .ocr-parish-masthead:first-child {
+      margin-top: 0;
+    }
+    .ocr-body h2.ocr-parish-name,
+    .ocr-body .ocr-parish-name {
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #14524f;
+      margin: 0 0 0.2em;
+      line-height: 1.25;
+      border: 0;
+      padding: 0;
+      text-transform: none;
+    }
+    .ocr-body .ocr-parish-date {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body .ocr-parish-link {
+      margin: 0.25em 0 0;
+      font-size: 0.88rem;
+    }
+    .ocr-body h3.b-head {
+      margin-top: 1.45em;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.12em;
+      border-bottom: 1px solid #d4ddd9;
+    }
+
+
+    .ocr-body {
+      padding: 4px 2px 8px;
+    }
+    .search-panel {
+      margin: 0 0 12px;
+      border: 1px solid #d4ddd9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .search-panel .ocr-search-bar { margin-bottom: 6px; }
+    .ocr-search-bar { position: relative; margin-bottom: 6px; }
+    .search-input {
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: #1a1f1e; background: #fff;
+    }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 1px solid #1a6b6b; border-radius: 6px; background: #fff; color: #1a6b6b;
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { color: #999; border-color: #d4ddd9; cursor: not-allowed; }
+    .match-count { color: #5a6a68; font-size: 0.85rem; font-weight: 600; }
+    .note-box {
+      margin-top: 18px;
+      color: #5a6a68;
+      font-weight: 400;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      padding: 0;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 8px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    body.embed-mode .top { display: none !important; }
+    body.embed-mode .page { padding-top: 8px; }
+    @media (max-width: 600px) {
+      .page { padding: 12px 14px 32px; }
+      .ocr-search-tools button { min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top" id="ocr-top">
+      <div class="top-left">
+        <a class="back-link" href="monaghanrackwallace.html" target="_blank" rel="noopener noreferrer">← Viewer</a>
+        <span class="title-line">MONAGHAN &amp; RACKWALLACE (INCLUDES TYHOLLAND) Text Bulletin · 23/08/2026</span>
+      </div>
+    </div>
+    <div class="ocr-sticky-chrome">
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+      <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+      <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+      <span class="ocr-zoom-hint">or pinch to zoom</span>
+    </div>
+    <div class="search-panel" role="search">
+      <div class="ocr-search-bar">
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search text (mass, bingo, parish…)" aria-label="Search bulletin text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled>← Prev</button>
+          <button id="ocr-next" type="button" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Monaghan &amp; Rackwallace (includes Tyholland)</h2><p class="ocr-parish-date">23/08/2026</p></header>
+<hr>
+<p class="page-label">Page 28</p>
+<p>Check out our<br>
+Facebook page:<br>
+Monaghan Rackwallace Parish<br>
+St. Patrick’s Tyholland Contact Parish Office <a href="tel:+3534781220" style="color:#1d4ed8;font-weight:600;">047 81220</a><br>
+Sunday 23rd August<br>
+10.30a.m. (Month’s Mind) ● Francie Ward, Cavancreevy, Castleshane.<br>
+● Genie &amp; Katie Mullen, Killyneil, daughters Catherine McSkeane &amp; Theresa Keaveney &amp; sons Gerard &amp; Seamus &amp; his wife Mary.<br>
+● Brendan Hughes, Tiravray, Castleshane.<br>
+Sunday 30th August<br>
+10.30a.m. ● Christina McKenna, Shelvins, Tyholland.<br>
+● Thomas &amp; Josephine Crudden, Killyneill &amp; dec’d. of the Crudden &amp; O’Brien families. Monaghan &amp; Rackwallace Parish Bulletin<br>
+Sunday 23rd August 2026<br>
+Tel: <a href="tel:+3534781220" style="color:#1d4ed8;font-weight:600;">047 81220</a><br>
+Priests of the Parish<br>
+Fr. Leo Creelman, Adm.<br>
+Fr. Humphrey Ude, C.C. Fr. Peter Tambala, C.C. Fr. Stephen Sherry, assisting.<br>
+St. Joseph ’s - Daily Mass Monday to Saturday - 10a.m. Sunday Mass 8.30a.m. &amp; 11.30a.m.<br>
+St. Macartan ’s - Vigil Mass Saturday at 6pm, Sunday Mass - 12.30p.m.<br>
+St. Michael ’s Ardaghey - every other Sunday 9.30a.m.<br>
+Email: <a href="mailto:monaghan@clogherparishes.ie" target="_blank" rel="noopener noreferrer">monaghan@clogherparishes.ie</a><br>
+Parish website address: <a href="https://www.monaghan" target="_blank" rel="noopener noreferrer">www.monaghan</a> -rackwallace.com<br>
+Parish Pastoral Centre Manager: Enda Mc Skeane <a href="tel:+353873346435" style="color:#1d4ed8;font-weight:600;">087 3346435</a> Website: <a href="https://www.stjosephspastoralcentre.com" target="_blank" rel="noopener noreferrer">www.stjosephspastoralcentre.com</a> Check out our<br>
+Facebook page:<br>
+Monaghan Rackwallace Parish<br>
+You are asked to pray for our parishioner Dympna Corbett, Woodview, who died recently.<br>
+May she Rest in Peace. Praying the Stations of the Cross after 10a.m. Mass on this Tuesday 25th Aug. led by Vocations Society of St. Joseph.<br>
+Clogher don Óige will host the second series of – The Chosen – a groundbreaking drama for young adults about the life of Jesus<br>
+Christ, told through the eyes of those who knew Him. It will take place each Thursday, for 8 weeks, beginning 10th September,<br>
+from 7.30pm to 9.30pm in St. Joseph’s Pastoral Centre. An opportunity for young adults aged 18 -40 to watch the series, take part in<br>
+discussions, group sharing and prayer. To register or for more information contact <a href="mailto:info@clogherdonoige.org" target="_blank" rel="noopener noreferrer">info@clogherdonoige.org</a> or call <a href="tel:+3534772784" style="color:#1d4ed8;font-weight:600;">047 72784</a>.<br>
+St. Macartan’s Bowling restarts its short mat bowling on Thursday 3rd Sept. at 8p.m. New members welcome.<br>
+Radio Maria Ireland is an Irish -run Catholic Talk -Radio Station who enjoy commercial free broadcasting with Prayer, Catechesis,<br>
+Uplifting Music, Talks, Interviews and Testimonies. Visit <a href="https://www.radiomaria.ie" target="_blank" rel="noopener noreferrer">www.radiomaria.ie</a> for more info &amp; ways to listen. Anniversary Mass Intentions<br>
+Saturday 22nd August<br>
+6.00p.m. Vigil Mass (Month’s Mind) ● Cathal Murray, Tirkeenan.<br>
+Sunday 23rd August<br>
+● 8.30a.m. &amp; 11.30a.m. (St. Joseph’s)<br>
+● 12.30p.m. (Cathedral)<br>
+Monday 24th August<br>
+10.00a.m. (St. Joseph’s) ● Seamus McCleary, Glenview Heights &amp; dec’d. of the McCleary family, Glaslough St.<br>
+● Peter Comiskey, Crosses.<br>
+Tuesday 25th August<br>
+10.00a.m. (St. Joseph’s) ● Desmond &amp; Lana Hamill, North Road &amp; dec’d. family members.<br>
+Wednesday 26th August<br>
+10.00a.m. (St. Joseph’s) ● James, Mary Rose, Jim, Brigid &amp; Oliver McElvaney, Hill Street.<br>
+● Sofia &amp; Vaclouas Stanevicia, Lithuania.<br>
+Thursday 27th August<br>
+10.00a.m. (St. Joseph’s) ● Sheila &amp; James Fullerton, Fairview Crescent &amp; dec’d. of the Swift, Maguire &amp; Corrigan families.<br>
+● John Pat Murphy &amp; dec’d. of the Murphy &amp; Owens families, Old Cross Square.<br>
+Friday 28th August<br>
+10.00a.m. (St. Joseph’s) ● Vincent McEntee &amp; decd. of the McEntee &amp; Hanley families, Killyvane.<br>
+● Patricia &amp; Dermot Cassidy &amp; son Peter, Mall Road.<br>
+Saturday 29th August<br>
+10.00a.m. (St. Joseph’s) ● Kit &amp; Pat McCormick, Broad Rd. &amp; Killymarley; Felix &amp; Catherine McCormick &amp; Teresa Hooper.<br>
+● Sean Boyle, Drumhirk.<br>
+● Biney &amp; Tim O’Hanrahan, Killyconnigan; Jack &amp; Mary Treanor, Dr. McKenna Tce.; Win &amp; Peter O’Hanrahan<br>
+Killyconnigan &amp; Billy McDonald, Monaghan.<br>
+● Bridie &amp; Seamus Fanning, Liseraw &amp; dec’d. family members; Jimmy Fanning, Drumbear &amp; dec’d. family.<br>
+6.00p.m. (Cathedral) Vigil Mass (Month’s Mind) ● Mary McKenna, formerly Dublin Street.<br>
+● John McCoy, Clones Road.<br>
+● Pauline Ormrod, Ard Glas, Killygoan.<br>
+Sunday 30th August<br>
+● 8.30a.m. &amp; 11.30a.m. (St. Joseph’s)<br>
+● 9.30a.m. (Ardaghey) ● Shane &amp; Lizzie Deighan, Ardaghey<br>
+● Gerry Rooney, Greaghglass; Bernard, Bridget, Brian &amp; Nancy Rooney.<br>
+● Darren Allister, Dunraymond, Sam &amp; Mary Agnes Allister; Billy &amp; Jenny Allister;<br>
+Rose &amp; Gerry Clerkin, Crosshue &amp; dec’d. of the Clerkin &amp; McCourt families &amp; Billy Savage.<br>
+● 12.30p.m. (Cathedral) Parish One Day Pilgrimage to Lough Derg — Saturday 29th August<br>
+Bus: €25 per person, leaves back of Courthouse, the lower carpark, at 7.30am. To book a seat contact: Adrian on <a href="tel:+353877859582" style="color:#1d4ed8;font-weight:600;">087 7859582</a><br>
+Maura on <a href="tel:+353870547149" style="color:#1d4ed8;font-weight:600;">087 0547149</a> or Mary on <a href="tel:+353868358137" style="color:#1d4ed8;font-weight:600;">086 8358137</a>. Anyone going to Lough Derg can leave their name &amp; monies into the parish office ST. JOSEPH’S CHURCH: TEMPORARY CLOSING FOR REPAINTING<br>
+31st August to 12th September<br>
+We plan to repaint the interior of St Joseph’s Church, commencing on Mon 31st August, with work expected to be completed with in<br>
+two weeks. During this period, St Joseph’s will be closed from Monday to Saturday. As a result, all weekday Masses and Adora tion<br>
+will take place in St Macartan’s Cathedral for the duration of the works. The usual Sunday Mass schedule at St Joseph’s Churc h will<br>
+remain unchanged and will continue as normal. Please note that all Anniversary Masses scheduled during this time will be tra ns-<br>
+ferred to the Cathedral. We thank you for your understanding and cooperation as we carry out these improvements to our church .<br>
+Monaghan &amp; Rackwallace Cemetery Sunday 2026<br>
+Blessing of the Graves on Sunday 6th September at 3p.m.<br>
+There will be a collection taken up on the day and proceeds will go to the upkeep of the graveyards.<br>
+Please Note: Due to Health &amp; Safety and expected large crowds,<br>
+NO VEHICLES can be admitted into the Cemetery grounds on Cemetery Sunday .<br>
+We also ask parishioners to bring a bottle of water with them and it will be blessed on the day. Sacrament of Marriage : Congratulations to Mark Greenan &amp; Jocelyn Meyer, who were recently married. UPDATE ON ST. MACART AN’S CATHEDRAL:<br>
+As you are all aware the scaffolding has recently been removed and we can now see the transformation. It is heartsome to see our<br>
+beloved Cathedral in all her glory once more, shining in the summer sun. The stone work, the details, the windows, have all b een<br>
+brought back to former glory and we give thanks for the craftsmanship, both past and present. This immense project ensures th at<br>
+St. Macartan’s Cathedral is now protected for further generations. As mentioned, our attentions now turn to the finer comfort s, such<br>
+as heating and toilet facilities. We are working hard with both our consultants and building team to provide the best soluti on to meet<br>
+the needs of parishioners, whilst keeping in mind our responsibility to ensure that we provide a sustainable system which pro tects<br>
+our fragile environment. We thank you for your continued patience.<br>
+Fundraising : Our current figure stands at €2,313,000. This money has been raised thanks to the amazing generosity of parishion-<br>
+ers clergy, and diocesan -wide support.<br>
+What happens next : Charitable Donations Scheme (separate to Monaghan Parish) will be rolled out in the coming months and we<br>
+ask, if you receive a CHY3/Enduring Certificate from us, that you complete and return same.<br>
+Yearly Pledges : If you have pledged to pay yearly and have yet to make your 2026 payment, just a reminder if you are paying by<br>
+cheque, please make cheque payable to Diocese of Clogher. You can drop it in Parish Office, or post to Bishop’s House,<br>
+FAO Gail. If paying by Bank Transfer, please ensure you use your name as reference. If you have any questions, please call G ail<br>
+at Bishop’s Office - <a href="tel:+3534781019" style="color:#1d4ed8;font-weight:600;">047 81019</a>, or by email at <a href="mailto:gail@clogherdiocese.ie" target="_blank" rel="noopener noreferrer">gail@clogherdiocese.ie</a><br>
+A sincere thanks to everyone for their continued support in this momentous task.<br>
+MONAGHAN RACKWALLACE PARISH DRAW<br>
+The August Draw will be held on Thursday next 27th August . Draw secretaries will receive monies at the Parish Office<br>
+during office hours and on Thursday 27th August from 10a.m. - 7p.m. (Please note new hours)<br>
+The draw will take place in the parish office live via the parish Facebook page at 7.30p.m. on Thursday 30th July Monaghan &amp; Rackwallace (includes Tyholland)</p>
+<hr>
+<p class="page-label">Page 29</p>
+<p>oO<br>
+8<br>
+x=<br>
+= Mas THE PARISH OF GALLOON<br>
+&amp; tí<br>
+8 y ‘3 Parish Bulletin — Sunday 23 August 2026<br>
+oO<br>
+3 % A Twenty-First Sunday in Ordinary Time<br>
+©<br>
+E ane Rev Kevin Malcolmson <a href="tel:+442867738244" style="color:#1d4ed8;font-weight:600;">028 677 38244</a> Email: <a href="mailto:frkevinmalcolmson@clogherparishes.ie" target="_blank" rel="noopener noreferrer">frkevinmalcolmson@clogherparishes.ie</a><br>
+a<br>
+£ Rev Michael King P.E. <a href="tel:+442867738229" style="color:#1d4ed8;font-weight:600;">028 677 38229</a><br>
+Parish Office: <a href="tel:+442867737935" style="color:#1d4ed8;font-weight:600;">028 677 37935</a> (Monday 1pm - 4pm and Thursday 10am - 1pm)<br>
+Email: <a href="mailto:office.galloon@clogherparishes.ie" target="_blank" rel="noopener noreferrer">office.galloon@clogherparishes.ie</a><br>
+Parish Website: <a href="https://www.galloonparish.com" target="_blank" rel="noopener noreferrer">www.galloonparish.com</a> (follow link to live streaming)<br>
+Watch Mass Live: <a href="https://www.churchservices.tv/newtownbutler" target="_blank" rel="noopener noreferrer">www.churchservices.tv/newtownbutler</a> &amp; <a href="https://www.churchservices.tv/donagh" target="_blank" rel="noopener noreferrer">www.churchservices.tv/donagh</a><br>
+MASSES AND INTENTIONS FOR THE COMING WEEK<br>
+CHURCH OF THE IMMACULATE CONCEPTION<br>
+Sun 23&quot; Aug Twenty-First Sunday in Ordinary Time<br>
+11.30am First Anniversary for Nora Reilly, Bunn<br>
+Frankie and Patricia Reilly and deceased family members<br>
+Alice and Arthur Melarkey, Lurganboy Park<br>
+Eileen McKiernan, Kilready<br>
+Tues 25th Aug NO MASS<br>
+Wed 26th Aug 10am: Weekday Mass<br>
+Thurs 27% Aug 10am: Weekday Mass = Rua<br>
+i 28th .<br>
+Fri 28° Aug 10am: Weekday Mass WHO, do men<br>
+Sun 30th Aug Twenty-Second Sunday in Ordinary Time “soy that LAM:<br>
+11.30am The people of the parish ules et<br>
+ST PATRICK’S DONAGH<br>
+Sat 22&quot; Aug Vigil Mass for the Twenty-First Sunday in Ordinary Time<br>
+6.30pm First Anniversary for Paddy Gilroy, Drumgallan<br>
+Mon 24&quot; Aug 7pm: Mass and Novena to our Lady of the Miraculous Medal<br>
+Sat 29th Aug Vigil Mass for the Twenty-Second Sunday in Ordinary Time<br>
+6.30pm Gerry Mulligan, Ballyhullagh<br>
+i SUNDAY MASS TIMES EUCHARISTIC ADORATION:<br>
+Donagh: Vigil Mass: Saturday 6.30pm Newtownbutler: = Thursday 5pm — 9pm<br>
+Newtownbutler: Sunday: 11:30am Sunday 7pm- 9pm<br>
+Donagh: Monday, Tuesday, Wednesday and Thursday<br>
+CONFESSIONS from 7.30pm — 9.30pm<br>
+Saturdays: 11am — 11.30 am in Newtownbutler E hursd ae nies ner nee 9 |<br>
+(unless notice is placed on Confession Room door) very Thursday in NTB Adoration Room from 8 - 9pm<br>
+Baptisms: are celebrated once monthly in each church.<br>
+First Fridays in Donagh from 6.15 — 6.55pm Please contact the Parish Office for dates and booking.<br>
+Bookings must be made through the parish office.<br>
+Bishop Duffy has appointed Fr. Polycarp Okolie as the new curate for Galloon Parish. He will begin his new role on<br>
+Tuesday 1% September and will be resident in the parochial house bungalow and available at <a href="tel:+442867738244" style="color:#1d4ed8;font-weight:600;">028 677 38244</a>.<br>
+a Fr. Polycarp is a priest of the Awgu Dicoese in Enugu State in South-East Nigeria. He was ordained in 2019. He<br>
+$ completed a course of study in Canon Law in Rome earlier this year and has spent the summer months assisting in<br>
+ó | Roslea Parish. We look forward to welcoming Fr. Polycarp to Galloon Parish in September.<br>
+= THERE WILL BE TWO OPPORTUNITIES TO SAY FAREWELL TO FR. KEVIN I<br>
+2 ¢ St. Pat&#x27;s Clubhouse, Donagh on Saturday 29th August after the 6.30pm Vigil Mass.<br>
+3 e The Pastoral Centre, NTB on Sunday 30* August after 11.30am Morning Mass. Everyone Welcome.<br>
+=<br>
+oO ns — Bb bi.<br>
+£<br>
+— OF THE EUCHARIST: + RECENTLY DECEASED T<br>
+23/8 Genevieve Crudden Parl). May she nt hee (mother of Naomi McManus, Aghagay<br>
+29/8 Catriona McGovern : :<br>
+NTB Parish Contributions: (Previous Weekend)<br>
+23/8 Phil McGovern/Catherine Cadden Weekly Envelope: £1088.84<br>
+30/8 Martin Donegan/Marie Keenan Monthly Envelope: £147<br>
+MINISTERS OF THE WORD: Loose Collection: £385.87<br>
+NTB: 23/8 Belinda Corr Sincere thanks for your continued generosity<br>
+30/8 Roisin Crudden<br>
+Bowls will resume in the Community BAPTISM: &amp;%<br>
+Centre NTB on Tues 1“ September 8pm - || we welcome into our Christian community Féilim Patrick McManus and<br>
+10pm. New members always welcome! Roux Bridget McDermott who were baptized last weekend in NTB.<br>
+SVDP Thrift Shop, Lisnaskea will be cles ed Craic, Ceili Agus Ceol! Children’s Irish Dancing Classes. Build<br>
+next week as we re-locate to new premises . ae . .<br>
+h . confidence &amp; coordination, make new friends, have fun and get active.<br>
+at 87 Main Street Lisnaskea. (close to the E Saturd ing 5” September in St R &quot;5 Parish Cent<br>
+old Ortine Hotel). very atur lay starting eptember in onan’s aris entre,<br>
+Lisnaskea. Time: 9.30 — 10.30am. To book contact Lorraine Cullen (6<br>
+St Joseph Men&#x27;s Camino: Every Camino || times All-Ireland &amp; International Champion) at 07922 386693 or email<br>
+changes us in ways we don't expect; every || <a href="mailto:huestonlorraine131@gmail.com" target="_blank" rel="noopener noreferrer">huestonlorraine131@gmail.com</a><br>
+man needs one. Join men from across -<br>
+Ireland on Saturday 12th September for a August &amp; September 2026 at Lough Derg. One Day Retreats — Guided<br>
+25km pilgrimage through the Boyne Days of Prayer and Reflection - places available on: August 22nd, 23rd,<br>
+Valley, beginning in Drogheda. The day 29th and 31st, September 5th, 6th, 9th, 12th, 15th, 19th and 20th.<br>
+includes Mass, Adoration, Rosary, Admission €50. Group discounts available. Advance Booking Essential.<br>
+Confessions, fraternity, lunch and dinner, || Includes Special Themed Retreats:<br>
+with after dinner speaker Fr. Mark Quinn. || 23rd August - St Peregrine, 5th September — Pioneer Pilgrimage, 6th<br>
+Open to men aged 18+. Cost: €65 (student || September — St Carlos Acutis, 9th &amp; 12th September — Vocations<br>
+€ 55). Registration, accommodation and || Monstrance, 19th September — Divine Mercy Pilgrimage. Advance<br>
+details: <a href="https://www.dominicans.ie/events" target="_blank" rel="noopener noreferrer">www.dominicans.ie/events</a>. booking essential.<br>
+Marriage Enrichment Weekend — 2&quot;¢ — 4% || NEW FOR 2026 SEASON — Overnight accommodation available on<br>
+October 2026: Marriage Encounter Ireland || Station Island the night before beginning a Retreat. Contact: Tel.<br>
+invites married couples to a residential <a href="tel:+353719861518" style="color:#1d4ed8;font-weight:600;">0719861518</a><br>
+Weekend from Friday 2&quot; October to Sunday ——<br>
+4&quot; October 2026 at the Focolare Centre, Clogher don Óige are excited to invite you to their upcoming special<br>
+Curryhills, Prosperous Co Kildare. Step away young adult series event — The Chosen, a groundbreaking drama about<br>
+from daily distractions to deepen your i .<br>
+communication, renew your love, and the life of Jesus Christ, told through the eyes of those who knew<br>
+rediscover the joy of your marriage. Visit Him. Join us for evenings of reflection, discussion, and community as<br>
+<a href="https://www.marriageencounter.ie" target="_blank" rel="noopener noreferrer">www.marriageencounter.ie</a>. we journey together through this inspiring portrayal of Jesus’<br>
+“There is nothing more beautiful revolutionary life and teachings.<br>
+And powerful than a smile that “= When: Thursdays, 03&quot; September 2026 — 29th October 2026 |<br>
+Has struggled through the tears. O Time: 7:30pm — 9:30pm<br>
+poaiblie one at vere ted with hurt. © Where: St. Joseph&#x27;s Pastoral Centre, Monaghan |<br>
+Smile because you learned from it This is a wonderful opportunity for young adults aged 18-40 to:<br>
+And gained the strength to rise above it! s Watch the series together<br>
+In the end, it’s not what you have been “&gt; Take part in group discussions and sharing<br>
+through that defines who you ó i .<br>
+Are; it’s how you got through it that has * Experience prayer and fellowship<br>
+made you the person you are If you have any questions, feel free to email us at<br>
+Today, and the person you are capable of info @clogherdonoige.org. We look forward to seeing you there for<br>
+being tomorrow”. faith, friendship, and great conversation. No previous experience of<br>
+Mother Teresa watching needed.</p></div>
+    <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
+  </div>
+  <script>
+    (function () {
+      try {
+        if (new URLSearchParams(window.location.search).get('embed') === '1') {
+          document.body.classList.add('embed-mode');
+        }
+      } catch (e) {}
+    })();
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-text');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+    (function () {
+      const ocrRoot = document.getElementById('ocr-text');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      if (!ocrRoot || !ocrSearch) return;
+      const originalHtml = ocrRoot.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+      function escapeRegExp(text) {
+        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        ocrMatches[idx].classList.add('search-active');
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      function updateMatchUi() {
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} of ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+      function applySearch(query) {
+        ocrRoot.innerHTML = originalHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrRoot, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) nodes.push(node);
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) return;
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrRoot.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+      ocrSearch.addEventListener('input', (e) => applySearch(e.target.value.trim()));
+      clearSearch.addEventListener('click', () => { ocrSearch.value = ''; applySearch(''); ocrSearch.focus(); });
+      prevMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && ocrMatches.length) {
+          e.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+    })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      var btn = document.getElementById('scroll-top-btn');
+      if (!btn) return;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function shown() {
+        var y = window.scrollY || document.documentElement.scrollTop || 0;
+        btn.classList.toggle('is-visible', y > 240);
+      }
+      window.addEventListener('scroll', shown, { passive: true });
+      shown();
+      btn.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      });
+    })();
+    
+  </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
+</body>
+</html>
