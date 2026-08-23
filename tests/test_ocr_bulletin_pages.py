@@ -8,6 +8,7 @@ from ocr.generate_bulletin_pages import (
     DioceseConfig,
     _fragment_to_plain_text,
     build_az_parish_ocr_html,
+    desktop_viewer_height_lock_css,
     extract_ocr_fragment,
     format_uk_date,
     parse_parish_links,
@@ -209,7 +210,7 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertIn("pdf-fullscreen-btn", html_output)
             # Desktop + mobile: hide the raw-PDF iframe and show stacked PDF.js pages.
             self.assertIn("pdf-inpage-viewer", html_output)
-            self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823u", html_output)
+            self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823v", html_output)
             self.assertIn("data-pdf-src", html_output)
             self.assertIn("is-native-pdf", html_output)
             self.assertIn("display: flex !important", html_output)
@@ -249,7 +250,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("<iframe", html_output)
         self.assertIn("embed-mode", html_output)
         self.assertIn("pdf-inpage-viewer", html_output)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823u", html_output)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823v", html_output)
         self.assertIn("data-pdf-src", html_output)
         self.assertNotIn("pdf-inpage-prev", html_output)
         self.assertNotIn("pdf-inpage-next", html_output)
@@ -281,7 +282,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("is-native-pdf", boot)
         self.assertIn("pdf-frame-wrap", boot)
         self.assertIn("removeAttribute('src')", boot)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823u", boot)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823v", boot)
         self.assertNotIn("prefersNativePdf", boot)
         self.assertNotIn("narrowViewport", boot)
         self.assertEqual(boot, pdf_mobile_fallback_boot_js())
@@ -308,6 +309,43 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn(".pdf-inpage-pages", css)
         self.assertNotIn("pdf-inpage-nav", css)
         self.assertEqual(css, pdf_mobile_fallback_css())
+
+    def test_desktop_850_lock_covers_windows_narrower_than_1025px(self) -> None:
+        """A half-screen desktop window is not a phone.
+
+        The 450px lock is ``max-width: 1024px``, and Windows display scaling,
+        browser zoom and half-screen windows all report a CSS width under
+        1024px — that is how Frank's desktop kept getting 450px boxes. The
+        desktop lock must come after the 450px lock (last block wins) and must
+        use ``!important`` so old generated HTML cannot undercut it.
+        """
+        lock = desktop_viewer_height_lock_css()
+        self.assertIn("@media (min-width: 701px) and (min-height: 501px)", lock)
+        for selector in (".pdf-inpage-pages", "#ocr-panel"):
+            self.assertIn(selector, lock)
+        self.assertIn("height: 850px !important", lock)
+        self.assertIn("min-height: 850px !important", lock)
+        self.assertIn("max-height: 850px !important", lock)
+        self.assertIn("overflow: auto !important", lock)
+        self.assertNotIn("height: auto", lock)
+        self.assertNotIn("85vh", lock)
+        self.assertNotIn("450px", lock)
+
+        css = pdf_inpage_viewer_css()
+        self.assertIn(lock, css)
+        self.assertLess(
+            css.index("@media (max-width: 1024px)"),
+            css.index("@media (min-width: 701px)"),
+        )
+
+        # Every page built from the generator carries the lock, and the runtime
+        # stylesheet (which wins on already-published pages) matches it.
+        viewer_js = Path("docs/assets/pdf-inpage-viewer.js").read_text(encoding="utf-8")
+        self.assertIn("@media (min-width:701px) and (min-height:501px){", viewer_js)
+        self.assertLess(
+            viewer_js.index("@media (max-width:1024px){"),
+            viewer_js.index("@media (min-width:701px) and (min-height:501px){"),
+        )
 
     def test_render_bulletin_viewer_shell_is_shared_canonical_design(self) -> None:
         """harvester.page_renderer.render_diocese_raphoe_page also calls this —
@@ -408,7 +446,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn('id="scroll-top-btn"', html_output)
         self.assertIn("Georgia", html_output)
         self.assertIn("pdf-inpage-viewer", html_output)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823u", html_output)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823v", html_output)
         self.assertIn("block: 'start'", html_output)
         self.assertNotIn("block: 'center'", html_output)
         self.assertIn("is-native-pdf", html_output)
@@ -523,7 +561,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotIn("prefersNativePdf", text)
         loader = assets / "pdf-mobile-fallback.js"
         self.assertTrue(loader.is_file())
-        self.assertIn("pdf-inpage-viewer.js?v=20260823u", loader.read_text(encoding="utf-8"))
+        self.assertIn("pdf-inpage-viewer.js?v=20260823v", loader.read_text(encoding="utf-8"))
 
     def test_live_gortahork_ocr_has_mega_body_and_visible_850(self) -> None:
         """Frank 2026-08-21: parish slice must reuse mega OCR sentences; 850px on visible boxes."""
@@ -565,7 +603,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotIn("85vh", diocese)
         self.assertIn("inner-2", diocese)
         self.assertIn("data-pp-scroll-top", diocese)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823u", diocese)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823v", diocese)
 
     def test_live_diocese_html_ships_inpage_viewer(self) -> None:
         """Generator-only changes are invisible on parishpress.ie — live HTML must include PDF.js."""

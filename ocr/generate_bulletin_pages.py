@@ -1163,8 +1163,46 @@ def prefers_native_pdf_js() -> str:
 """
 
 
-PDF_INPAGE_VIEWER_VERSION = "20260823u"
+PDF_INPAGE_VIEWER_VERSION = "20260823v"
 PDF_INPAGE_VIEWER_SRC = f"/assets/pdf-inpage-viewer.js?v={PDF_INPAGE_VIEWER_VERSION}"
+
+
+def desktop_viewer_height_lock_css() -> str:
+    """Give every desktop-sized window the locked 850px boxes, not just ≥1025px.
+
+    The 450px tablet/phone lock is written as ``max-width: 1024px``, which
+    swallows real desktops: a half-screen browser window, Windows display
+    scaling and browser zoom all report a CSS width under 1024px, so a mouse
+    reader on a 960px-wide window was handed the 450px phone box. Anything
+    wider than the phone layout (700px) and taller than a phone in landscape
+    (500px) is a desktop reader and keeps 850px. Phones stay 450px in both
+    orientations. Comes last so it beats the ``max-width: 1024px`` lock.
+    """
+    return """
+    @media (min-width: 701px) and (min-height: 501px) {
+      .pdf-frame-wrap,
+      .pdf-standalone-shell,
+      .pdf-frame-wrap.is-native-pdf,
+      .pdf-standalone-shell.is-native-pdf,
+      body.is-native-pdf .pdf-standalone-shell,
+      .pdf-inpage-viewer,
+      .pdf-mobile-fallback {
+        min-height: 850px !important;
+      }
+      .pdf-inpage-pages,
+      #ocr-panel,
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        height: 850px !important;
+        min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: auto !important;
+        overflow-y: auto !important;
+      }
+      /* Nothing to enlarge — the box is already the locked 850px. */
+      .az-expand { display: none; }
+    }
+"""
 
 
 def pdf_inpage_viewer_css() -> str:
@@ -1174,7 +1212,9 @@ def pdf_inpage_viewer_css() -> str:
     Desktop: locked 850px tall (height + min-height + max-height). Extra
     pages scroll INSIDE the box (overflow: auto). Never grow with the document.
     Never use viewport-height clipping.
-    Tablet/phone (max-width 1024px): locked 450px, same inner scroll.
+    Tablet/phone (max-width 1024px): locked 450px, same inner scroll — then
+    :func:`desktop_viewer_height_lock_css` hands 850px back to any window that
+    is desktop-sized but narrower than 1025px.
     """
     return f"""
     .pdf-inpage-viewer,
@@ -1273,7 +1313,7 @@ def pdf_inpage_viewer_css() -> str:
         display: none !important;
       }}
     }}
-"""
+{desktop_viewer_height_lock_css()}"""
 
 
 def pdf_inpage_viewer_html(pdf_href: str) -> str:
