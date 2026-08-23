@@ -19,6 +19,7 @@ from ocr.generate_bulletin_pages import (
     pdf_mobile_fallback_html,
     prefers_native_pdf_js,
     prepare_ocr_fragment,
+    render_az_jump_html,
     render_bulletin_viewer_shell,
     render_ocr_standalone_page,
     render_pdf_standalone_page,
@@ -416,6 +417,58 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotIn("pdf-inpage-page-label", html_output)
         self.assertNotIn('id="pdf-inpage-viewer" hidden', html_output)
 
+    def test_az_row_is_one_compact_letter_row_per_viewer(self) -> None:
+        """One letter row, only letters that have a parish, jump inside the box."""
+        row = render_az_jump_html(
+            ["Tawnawilly", "Templecrone", "Mevagh", "Milford Kilkeel", "Annagry"],
+            target="pdf",
+        )
+        # Gone: the tall grouped list with a heading and <ul> per letter.
+        for dead in ("az-jump-group", "az-jump-link", "az-jump-letters", "<ul>", "<h3>"):
+            self.assertNotIn(dead, row)
+        self.assertIn('class="az-row"', row)
+        self.assertEqual(row.count('class="az-letter"'), 3)  # A, M, T only
+        for absent in ("B", "C", "D"):
+            self.assertNotIn(f'aria-label="Jump to {absent}', row)
+        # T jumps to the first T parish; M carries both so the jump still lands
+        # when Mevagh has no page in this viewer.
+        self.assertIn('data-az-names="Tawnawilly|Templecrone"', row)
+        self.assertIn('data-az-names="Mevagh|Milford Kilkeel"', row)
+        self.assertIn('data-az-target="pdf"', row)
+        self.assertIn('data-az-expand="pdf"', row)
+        self.assertEqual(render_az_jump_html([], target="ocr"), "")
+
+    def test_mobile_enlarges_only_the_tapped_panel(self) -> None:
+        """Desktop stays 850px; a phone taps one panel open, never both."""
+        html_output = render_bulletin_viewer_shell(
+            page_title="Raphoe Diocese Collated Bulletin",
+            diocese_label="RAPHOE",
+            display_name="Raphoe Diocese",
+            headline="Raphoe Collated Bulletin",
+            meta_line="This week's bulletin — 23/08/2026.",
+            back_href="../../index.html",
+            back_label="← Back to home",
+            pdf_href="/mega_pdf/raphoe_mega_bulletin.pdf",
+            pdf_download_href="/mega_pdf/raphoe_mega_bulletin.pdf",
+            pdf_standalone_href="/mega_pdf/raphoe_mega_bulletin.pdf",
+            ocr_standalone_href="../../bulletins/raphoe-2026-08-23-ocr.html",
+            ocr_fragment='<header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Tawnawilly</h2></header>',
+            parish_section_heading="RAPHOE Parishes with Working Bulletin Links",
+            parish_links_html='<ul class="parish-grid"><li class="parish-item">Tawnawilly</li></ul>',
+            az_names=["Tawnawilly", "Mevagh"],
+            parish_page_index={"Tawnawilly": 26},
+        )
+        self.assertEqual(html_output.count('class="az-row"'), 2)
+        self.assertIn('data-az-expand="pdf"', html_output)
+        self.assertIn('data-az-expand="ocr"', html_output)
+        # Scoped to one panel id each — no shared rule that opens both.
+        self.assertIn("#panel-pdf.az-expanded .pdf-inpage-pages", html_output)
+        self.assertIn("#panel-ocr.az-expanded #ocr-panel", html_output)
+        self.assertNotIn("#panel-ocr.az-expanded .pdf-inpage-pages", html_output)
+        # Desktop lock untouched; Back to Top still re-measures after a resize.
+        self.assertRegex(html_output, r"#ocr-panel \{[^}]*height: 850px")
+        self.assertIn("parishPressBindScrollTopBoxes", html_output)
+
     def test_pdf_inpage_viewer_asset_streams_first_page(self) -> None:
         assets = Path(__file__).resolve().parent.parent / "docs" / "assets"
         viewer = assets / "pdf-inpage-viewer.js"
@@ -521,9 +574,18 @@ class OcrBulletinPageTests(unittest.TestCase):
             "dioceses/raphoe/index.html",
             "dioceses/derry/index.html",
             "dioceses/down-and-connor/index.html",
+            "dioceses/clogher/index.html",
         ):
             html_live = (docs / rel).read_text(encoding="utf-8")
             self.assertIn("pdf-inpage-viewer", html_live, rel)
+            # The tall grouped A–Z list is gone; one compact letter row per
+            # viewer replaces it. Generator-only edits do not reach the live
+            # page, so assert on the HTML GitHub Pages actually deploys.
+            self.assertNotIn("az-jump-group", html_live, rel)
+            self.assertNotIn("az-jump-link", html_live, rel)
+            self.assertEqual(html_live.count('class="az-row"'), 2, rel)
+            self.assertIn('class="az-letter"', html_live, rel)
+            self.assertIn("#panel-ocr.az-expanded #ocr-panel", html_live, rel)
             self.assertIn("/assets/pdf-inpage-viewer.js?v=", html_live, rel)
             self.assertIn(".ocr-sticky-chrome.is-searching", html_live, rel)
             self.assertIn("syncOcrSearchSticky", html_live, rel)
