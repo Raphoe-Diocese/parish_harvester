@@ -43,6 +43,8 @@ OCR_STANDALONE_BODY_PATTERN = re.compile(
 )
 OCR_PAGE_HEADING_PATTERN = re.compile(r"<h2>\s*Page\s+(\d+)\s*</h2>", re.IGNORECASE)
 VIEWER_FILE_PATTERN = re.compile(r"^([a-z0-9_]+)-(\d{4}-\d{2}-\d{2})\.html$")
+# Every dated page a viewer write produces: the viewer plus its -ocr and -pdf twins.
+DATED_PAGE_PATTERN = re.compile(r"^([a-z0-9_]+)-(\d{4}-\d{2}-\d{2})(?:-ocr|-pdf)?\.html$")
 OCR_PANEL_PATTERN = re.compile(
     r'<div id="ocr-panel">\s*(.*?)\s*</div>\s*<div class="note-box">',
     re.DOTALL | re.IGNORECASE,
@@ -2644,7 +2646,59 @@ def write_root_index(entries: list[ViewerEntry]) -> None:
     )
 
 
-def rebuild_indexes() -> None:
+def prune_old_viewers(keep_dates: dict[str, str] | None = None) -> list[Path]:
+    """Delete dated diocese pages older than that diocese's newest date.
+
+    ``ocr-bulletin.yml`` writes ``{diocese}-{TODAY}.html`` plus its ``-ocr``
+    and ``-pdf`` twins on every run and commits the whole folder, so the
+    published site gains another dated trio every week. Pruning is done **per
+    diocese**: a diocese that was not regenerated on this run keeps its own
+    newest trio, so ``docs/index.html`` and the diocese pages never lose a
+    current-week link.
+
+    ``index.html``, subfolders, and any file that is not a dated diocese page
+    are never touched. Pass ``keep_dates`` ({diocese: date}) to spare a date
+    that was deliberately rewritten. Set ``BULLETIN_PRUNE_DISABLE=1`` to keep
+    every week.
+    """
+    if os.getenv("BULLETIN_PRUNE_DISABLE", "").strip().lower() in {"1", "true", "yes"}:
+        return []
+    if not BULLETINS_DIR.exists():
+        return []
+
+    pages: dict[str, dict[str, list[Path]]] = {}
+    for path in BULLETINS_DIR.glob("*.html"):
+        match = DATED_PAGE_PATTERN.match(path.name)
+        if not match or not path.is_file():
+            continue
+        diocese, page_date = match.group(1), match.group(2)
+        if diocese not in DIOCESES:
+            continue
+        pages.setdefault(diocese, {}).setdefault(page_date, []).append(path)
+
+    removed: list[Path] = []
+    for diocese, pages_by_date in sorted(pages.items()):
+        keep = {max(pages_by_date)}
+        protected = (keep_dates or {}).get(diocese)
+        if protected:
+            keep.add(protected)
+        for page_date, paths in sorted(pages_by_date.items()):
+            if page_date in keep:
+                continue
+            for path in sorted(paths):
+                try:
+                    path.unlink()
+                except OSError as exc:
+                    print(f"  ⚠️  Could not prune {path.name}: {exc}")
+                    continue
+                removed.append(path)
+    if removed:
+        print(f"  🧹 Pruned {len(removed)} old dated page(s) from docs/bulletins (newest kept per diocese)")
+    return removed
+
+
+def rebuild_indexes(keep_dates: dict[str, str] | None = None) -> None:
+    prune_old_viewers(keep_dates)
     entries = scan_viewer_entries()
     write_bulletins_index(entries)
 
@@ -2672,8 +2726,9 @@ def main() -> None:
         return
 
     if args.regenerate_from:
-        regenerate_viewer_from_existing(args.regenerate_from.resolve())
-        rebuild_indexes()
+        regenerated = regenerate_viewer_from_existing(args.regenerate_from.resolve())
+        rewritten = VIEWER_FILE_PATTERN.match(regenerated.name)
+        rebuild_indexes({rewritten.group(1): rewritten.group(2)} if rewritten else None)
         return
 
     if args.write_parish_pages:
@@ -2694,7 +2749,7 @@ def main() -> None:
         parser.error("--diocese, --date, --pdf, and --ocr-html are required unless --rebuild-indexes is used.")
 
     write_viewer_page(args.diocese, args.date, args.pdf, args.ocr_html)
-    rebuild_indexes()
+    rebuild_indexes({args.diocese: args.date})
 
 
 if __name__ == "__main__":
