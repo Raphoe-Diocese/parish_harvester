@@ -2,17 +2,16 @@
   "generated_at": "2026-08-23",
   "target_date": "2026-08-23",
   "summary": {
-    "downloaded": 109,
+    "downloaded": 111,
     "html_links": 0,
     "skipped": 32,
-    "failed": 11,
+    "failed": 9,
     "stale_rejected": 9
   },
   "action_counts": {
     "skip": 32,
-    "ok": 120,
-    "investigate": 8,
-    "retrain_image": 1
+    "ok": 122,
+    "investigate": 7
   },
   "parishes": [
     {
@@ -299,7 +298,7 @@
       "recipe_file": "parishes/recipes/derry/parishofballinascreen.json",
       "recipe": {
         "start_url": "https://www.parishofballinascreen.com/",
-        "site_type": "wix_dated_slug_image",
+        "site_type": "html_text_bulletin",
         "playbook_type": "wix_dated_slug",
         "status": "",
         "skip": false,
@@ -308,16 +307,19 @@
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "Homepage has a Parish Bulletin & Mass Times scroll image. The weekly page is a Wix IMAGE bulletin, not a PDF download.",
-          "URL predictor: ballinascreen-desertmartin-parishes-D_month_YYYY, then copy-of- if canonical 404s (playbook wix_dated_slug).",
-          "16/08/2026 is live at copy-of-ballinascreen-desertmartin-parishes-16_august_2026. The page's real bulletin is one large wixstatic scan (4962x3509). print_to_pdf of the Wix chrome is messy \u2014 image_stack converts that scan to PDF."
+          "Weekly bulletin is a Wix blog page. Slug pattern: ballinascreen-desertmartin-parishes-D_month_YYYY, then copy-of- if the canonical slug 404s (playbook wix_dated_slug). The goto URL is a rewrite template, not a pinned Sunday.",
+          "Listing https://www.parishofballinascreen.com/parish-bulletins showed 23/08/2026 as the newest post this turn.",
+          "Proved 23/08/2026 HTTP: https://www.parishofballinascreen.com/ballinascreen-desertmartin-parishes-23_august_2026 is HTTP 200 text/html, title BALLINASCREEN & DESERTMARTIN PARISHES 23_AUGUST_2026. Page body has this-week notices (Month's Mind Bernadette Regan / Joe Joe McGuigan Friday 28 August; Sunday 23 August at Scoil Mhuire Buncrana). copy-of-23_august_2026 is HTTP 404.",
+          "No this-week PDF and no large scan. Largest wixstatic files on the 23/08 page are ~27KB (logo/og/small photos). 16/08 still lives at copy-of-\u2026-16_august_2026 with a 4962x3509 scan \u2014 that is last week, not this week.",
+          "image_stack failed because it looks for a large scan. print_to_pdf the Wix post (article[data-hook=post]). skip_listing_nav=true so html_capture does not leave the dated page."
         ],
         "do_not": [
+          "Do not pin a Sunday slug \u2014 wix_dated_slug rewrites the template each harvest.",
           "Do not hardcode copy-of- into the trained slug \u2014 Wix only uses that prefix some weeks.",
-          "Do not print_to_pdf the Wix page (header/footer/click-to-zoom chrome).",
+          "Do not use image_stack unless a large bulletin scan is actually on the page.",
           "Do not treat a Wix 404 shell as this week's bulletin."
         ],
-        "recorded_date": "2026-08-19"
+        "recorded_date": "2026-08-23"
       },
       "bulletin_format": "html",
       "learned_pattern": "image_bulletin",
@@ -327,10 +329,10 @@
         "max_retries": 3
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: Recipe image_stack found 0 bulletin image(s) but expected 1",
-      "suggested_action": "retrain_image",
-      "suggested_reason": "image capture recipe"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "ballybay",
@@ -1298,7 +1300,7 @@
         "has_terminal": false,
         "operator_notes": [
           "Official clonesparish.ie is dead DNS. Live site is clonesparish.com.",
-          "Newest on 22/08/2026 is Sunday 23rd August 2026.pdf (HTTP 200, 417727 bytes).",
+          "Homepage lists /uploads/downloads/Sunday <day> <Month> <year>.pdf with a raw space. HTTP-scrape encodes spaces (%20) before urllib fetch.",
           "site_type:http_scrape_newest_pdf. Do not pin a dated filename."
         ],
         "do_not": [
@@ -1312,10 +1314,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP-scrape listing https://www.clonesparish.com/ \u2014 no dated bulletin PDF matching ['uploads/downloads'] (not a selector problem; parish may not have posted)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP-scrape listing https://www.clonesparish.com/ \u2014 no dated bulletin PDF matching ['uploads/downloads'] (not a selector problem; parish m"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "clonleighparish",
