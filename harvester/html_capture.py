@@ -32,6 +32,7 @@ CONTENT_SELECTORS: tuple[str, ...] = (
     # 8 pages because a prior week's full newsletter was bundled in too).
     ".entry-content",
     ".post-content",
+    '[data-hook="post"]',  # Wix blog post body (Ballinascreen HTML weeks)
     ".inside-article",
     "article",
     ".content-area",

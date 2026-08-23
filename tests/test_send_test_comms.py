@@ -1,6 +1,7 @@
 """Send & test must talk to GitHub and stop on a real result or a clear error."""
 from __future__ import annotations
 
+import json
 import unittest
 from pathlib import Path
 
@@ -73,13 +74,20 @@ class SendTestCommsTests(unittest.TestCase):
         self.assertIn("all_bulletins_*)", yml)
         self.assertNotIn("zip old", yml.lower())
 
-    def test_ballinascreen_uses_wix_predictor_then_image_stack(self) -> None:
-        recipe = (
-            REPO / "parishes" / "recipes" / "derry" / "parishofballinascreen.json"
-        ).read_text(encoding="utf-8")
-        self.assertIn("wix_dated_slug", recipe)
-        self.assertIn("image_stack", recipe)
-        self.assertNotIn('"action": "print_to_pdf"', recipe)
+    def test_ballinascreen_uses_wix_predictor_then_print_to_pdf(self) -> None:
+        recipe = json.loads(
+            (REPO / "parishes" / "recipes" / "derry" / "parishofballinascreen.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        actions = [step.get("action") for step in recipe.get("steps") or []]
+        self.assertEqual(recipe.get("playbook_type"), "wix_dated_slug")
+        self.assertIn("print_to_pdf", actions)
+        self.assertNotIn("image_stack", actions)
+        print_step = next(
+            step for step in recipe["steps"] if step.get("action") == "print_to_pdf"
+        )
+        self.assertTrue(print_step.get("skip_listing_nav"))
 
     def test_stteresas_uses_wp_json_post_images(self) -> None:
         recipe = (
