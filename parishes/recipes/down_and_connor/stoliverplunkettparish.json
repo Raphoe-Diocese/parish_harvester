@@ -6,8 +6,20 @@
   "start_url": "https://stoliverplunkettparish.ie/bulletins/",
   "steps": [
     {
-      "action": "download",
-      "url": "https://stoliverplunkettparish.ie/wp-content/uploads/2026/06/Sun-21st-June-26.pdf"
+      "action": "goto",
+      "url": "https://stoliverplunkettparish.ie/bulletins/"
+    },
+    {
+      "action": "click",
+      "selector": "a[href$='.pdf']",
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "a[href*='/wp-content/uploads/'][href$='.pdf']"
+      ]
+    },
+    {
+      "action": "download"
     }
   ],
   "observed_load_ms": 1950,
@@ -16,13 +28,17 @@
   "playbook_type": "pdf_download_list",
   "site_type": "pdf_link_list",
   "operator_notes": [
-    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
-    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-    "Do not worry if the filename or date in the link text changes every week."
+    "Bulletin list at /bulletins/. Newest dated Sun-Nth-Month-26.pdf.",
+    "Do not pin a June download URL — harvest rewrote the folder to /2026/08/ and 404'd."
   ],
   "do_not": [
-    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
-    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+    "Do not pin Sun-28th-June-26.pdf or any dated filename.",
+    "Do not pick Ministers-of-the-Word / Eucharist rota .docx files."
   ],
-  "recorded_date": "2026-08-22"
+  "recorded_date": "2026-08-23",
+  "operator_notes_2026_08_23": [
+    "Listing recheck: newest real PDF is still /2026/06/Sun-28th-June-26.pdf (HTTP 200).",
+    "Predicted Sun-23rd-August-26.pdf and July/early-August names 404.",
+    "Parish has not posted since 28/06/2026. Recipe should report stale, not HTTP 404."
+  ]
 }

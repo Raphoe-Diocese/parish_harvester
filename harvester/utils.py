@@ -254,19 +254,28 @@ def extract_date_from_string(text: str) -> date | None:
         except ValueError:
             pass
 
-    # Pattern B: D-M-YY (1–2 digit day/month) — limavady 16-8-26.pdf,
-    # claudy NEWSLETTER 9-8-26.docx. Must come after the 6/8-digit compact
-    # forms so "160826" is not split into 16-08-26 by accident (those have
-    # no dashes).
+    # Pattern B: D-M-YY (1–2 digit day/month). Ambiguous between UK
+    # DD-MM-YY (limavady 16-8-26.pdf, claudy NEWSLETTER 9-8-26.docx) and
+    # YY-MM-DD (ballymoneyparish 26-08-23pdf.pdf → 23/08/2026). Reading
+    # Ballymoney as DD-MM-YY made this week's file look like 2016/2023 and
+    # harvest rejected it (found 2026-08-23). Same later-year pick as the
+    # dotted form below. Must come after the 6/8-digit compact forms so
+    # "160826" is not split into 16-08-26 by accident (those have no dashes).
     m = _first_match_outside_hash(_D_M_YY_RE, text, spans)
     if m:
+        g1, g2, g3 = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        dashed: list[date] = []
         try:
-            year = 2000 + int(m.group(3))
-            candidate = date(year, int(m.group(2)), int(m.group(1)))
-            if _is_plausible_bulletin_year(candidate.year):
-                return candidate
+            dashed.append(date(2000 + g1, g2, g3))  # YY-MM-DD
         except ValueError:
             pass
+        try:
+            dashed.append(date(2000 + g3, g2, g1))  # DD-MM-YY
+        except ValueError:
+            pass
+        plausible_dashed = [c for c in dashed if _is_plausible_bulletin_year(c.year)]
+        if plausible_dashed:
+            return max(plausible_dashed, key=lambda d: (d.year, d.month, d.day))
 
     # Dot-separated N.N.NN — ambiguous between YY.MM.DD (Google Drive folder
     # rows: 26.06.14 → 2026-06-14, 29.01.05 → 2029-01-05; locked by
