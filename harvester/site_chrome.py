@@ -5,21 +5,25 @@ DEEP_TEAL = "#14524f"
 
 
 def sticky_search_css(paper: str) -> str:
-    """Keep zoom + search on screen while staff scroll a long text bulletin."""
+    """Search chrome scrolls away until a term is typed, then it sticks."""
     return f"""
     .ocr-sticky-chrome {{
-      position: sticky;
-      top: 0;
+      position: relative;
+      top: auto;
       z-index: 8;
       background: {paper};
       padding: 8px 0 10px;
       margin: 0 0 8px;
     }}
+    .ocr-sticky-chrome.is-searching {{
+      position: sticky;
+      top: 0;
+    }}
     .ocr-sticky-chrome .ocr-zoom-bar {{
       position: relative;
       top: auto;
     }}
-    html {{ scroll-padding-top: 10rem; }}
+    html.is-ocr-searching {{ scroll-padding-top: 10rem; }}
     mark.search-active {{ scroll-margin-top: 10rem; }}
     """
 
@@ -73,6 +77,35 @@ def favicon_link_tags() -> str:
         '<link rel="icon" type="image/png" href="/favicon.png" />\n'
         '  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />'
     )
+
+
+def sticky_search_js() -> str:
+    """Pin the search bar only while the box has a search term."""
+    return """
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    """
 
 
 def scroll_top_js() -> str:

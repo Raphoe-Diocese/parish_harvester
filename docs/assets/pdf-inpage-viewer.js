@@ -51,8 +51,9 @@
       ".pdf-frame-wrap.is-native-pdf,.pdf-standalone-shell.is-native-pdf," +
       "body.is-native-pdf .pdf-standalone-shell{" +
       "display:flex;flex-direction:column;min-height:850px!important;background:#3a3f42}" +
-      ".ocr-sticky-chrome{position:sticky;top:0;z-index:8;background:#fff;padding:8px 0 10px;margin:0 0 8px}" +
-      "html{scroll-padding-top:10rem}" +
+      ".ocr-sticky-chrome{position:relative!important;top:auto;z-index:8;background:#fff;padding:8px 0 10px;margin:0 0 8px}" +
+      ".ocr-sticky-chrome.is-searching{position:sticky!important;top:0!important}" +
+      "html.is-ocr-searching{scroll-padding-top:10rem}" +
       "mark.search-active{scroll-margin-top:10rem}" +
       ".scroll-top-btn{position:fixed;right:16px;bottom:20px;z-index:30;width:46px;height:46px;border:0;border-radius:999px;background:#1a6b6b;color:#fff;font-size:1.35rem;line-height:1;cursor:pointer;box-shadow:0 4px 14px rgba(17,75,75,0.28);opacity:0;pointer-events:none;transform:translateY(8px)}" +
       ".scroll-top-btn.is-visible{opacity:1;pointer-events:auto;transform:none}" +
@@ -67,20 +68,49 @@
       "}";
   }
 
-  function ensureStickySearch() {
-    if (document.querySelector(".ocr-sticky-chrome")) return;
-    var zoom = document.querySelector(".ocr-zoom-bar");
-    var bar = document.querySelector(".ocr-search-bar");
-    var tools = document.querySelector(".ocr-search-tools");
-    var first = zoom || bar || tools;
-    if (!first || !first.parentNode) return;
-    var wrap = document.createElement("div");
-    wrap.className = "ocr-sticky-chrome";
-    first.parentNode.insertBefore(wrap, first);
-    if (zoom) wrap.appendChild(zoom);
-    if (bar) wrap.appendChild(bar);
-    if (tools) wrap.appendChild(tools);
+  function syncOcrSearchSticky() {
+    var chrome = document.querySelector(".ocr-sticky-chrome");
+    var input = document.getElementById("ocr-search");
+    if (!chrome || !input) return;
+    var active = Boolean((input.value || "").trim());
+    chrome.classList.toggle("is-searching", active);
+    document.documentElement.classList.toggle("is-ocr-searching", active);
   }
+
+  function ensureStickySearch() {
+    if (!document.querySelector(".ocr-sticky-chrome")) {
+      var zoom = document.querySelector(".ocr-zoom-bar");
+      var bar = document.querySelector(".ocr-search-bar");
+      var tools = document.querySelector(".ocr-search-tools");
+      var first = zoom || bar || tools;
+      if (first && first.parentNode) {
+        var wrap = document.createElement("div");
+        wrap.className = "ocr-sticky-chrome";
+        first.parentNode.insertBefore(wrap, first);
+        if (zoom) wrap.appendChild(zoom);
+        if (bar) wrap.appendChild(bar);
+        if (tools) wrap.appendChild(tools);
+      }
+    }
+    syncOcrSearchSticky();
+  }
+
+  document.addEventListener(
+    "input",
+    function (event) {
+      if (event.target && event.target.id === "ocr-search") syncOcrSearchSticky();
+    },
+    true
+  );
+  document.addEventListener(
+    "click",
+    function (event) {
+      if (event.target && event.target.id === "clear-search") {
+        window.setTimeout(syncOcrSearchSticky, 0);
+      }
+    },
+    true
+  );
 
   function ensureScrollTop() {
     var btn = document.getElementById("scroll-top-btn");

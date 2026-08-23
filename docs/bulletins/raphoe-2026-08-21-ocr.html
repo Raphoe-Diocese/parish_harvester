@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
   <title>Raphoe Diocese Text Bulletin — 21/08/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -38,18 +40,22 @@
     .font-size-controls { display: none; }
     
     .ocr-sticky-chrome {
-      position: sticky;
-      top: 0;
+      position: relative;
+      top: auto;
       z-index: 8;
       background: #eef1f0;
       padding: 8px 0 10px;
       margin: 0 0 8px;
     }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
     .ocr-sticky-chrome .ocr-zoom-bar {
       position: relative;
       top: auto;
     }
-    html { scroll-padding-top: 10rem; }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
     mark.search-active { scroll-margin-top: 10rem; }
     
     
@@ -2363,6 +2369,31 @@ The following parishes do not have a downloadable PDF bulletin. Click a link to 
         }
       });
     })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
     
     (function () {
       var btn = document.getElementById('scroll-top-btn');
