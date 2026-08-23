@@ -515,7 +515,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         ):
             html_live = (docs / rel).read_text(encoding="utf-8")
             self.assertIn("pdf-inpage-viewer", html_live, rel)
-            self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823s", html_live, rel)
+            self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823t", html_live, rel)
             self.assertIn(".ocr-sticky-chrome.is-searching", html_live, rel)
             self.assertIn("syncOcrSearchSticky", html_live, rel)
             self.assertIn("data-pdf-src", html_live, rel)
