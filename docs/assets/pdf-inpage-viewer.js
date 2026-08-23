@@ -65,6 +65,12 @@
       ".pdf-inpage-viewer{min-height:450px!important}" +
       ".pdf-inpage-pages,#ocr-panel,.pdf-frame-wrap iframe," +
       ".pdf-standalone-shell iframe.pdf-frame{height:450px!important;min-height:450px!important;max-height:450px!important;overflow:auto!important;overflow-y:auto!important}" +
+      /* "Tap to enlarge" grows ONLY the panel the reader tapped (extra id
+         specificity beats the 450 lock above). The other panel stays 450 so a
+         phone never shows two 850px boxes at once. */
+      "#panel-pdf.az-expanded .pdf-frame-wrap,#panel-pdf.az-expanded .pdf-inpage-viewer{min-height:850px!important}" +
+      "#panel-pdf.az-expanded .pdf-frame-wrap iframe,#panel-pdf.az-expanded .pdf-inpage-pages," +
+      "#panel-ocr.az-expanded #ocr-panel{height:850px!important;min-height:850px!important;max-height:850px!important}" +
       "}";
   }
 
