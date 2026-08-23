@@ -49,6 +49,11 @@ class ClogherDioceseTests(unittest.TestCase):
         self.assertIn("14th-June.jpg", by_key["dromore"].example_url)
         self.assertIn("pdf/230826.pdf", by_key["tempo"].example_url)
         self.assertIn("parishnews.htm", by_key["ballybay"].example_url)
+        self.assertIn("killannyparish.ie/parish-bulletin", by_key["killanny"].example_url)
+        killanny = load_recipe(recipe_path_for("killanny", PARISHES))
+        self.assertFalse(_recipe_is_inactive(killanny))
+        self.assertIn("parish-bulletin", killanny["start_url"])
+        self.assertTrue(any(step.get("skip_listing_nav") for step in killanny.get("steps", [])))
 
     def test_facebook_and_link_only_recipes_are_skipped(self) -> None:
         facebook = load_recipe(recipe_path_for("aughnamulleneast", PARISHES))
