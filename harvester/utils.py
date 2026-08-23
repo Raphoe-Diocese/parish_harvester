@@ -97,7 +97,7 @@ _SLUG_DATE_RE = re.compile(
 _MONTH_ALT = "|".join(sorted(_MONTH_MAP.keys(), key=len, reverse=True))
 _YEARLESS_SLUG_RE = re.compile(
     rf"(?<!\d)(\d{{1,2}})(?:st|nd|rd|th)?[_\-\s]({_MONTH_ALT})"
-    rf"(?![a-z])(?![_\-\s](?:19|20)\d{{2}})",
+    rf"(?![a-z])(?![_\-\s]\d{{4}})",
     re.IGNORECASE,
 )
 

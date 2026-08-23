@@ -67,6 +67,10 @@ class YearlessSlugTests(unittest.TestCase):
     def test_full_year_slug_is_not_yearless(self) -> None:
         url = "Newsletter-12th-July-2026.pdf"
         self.assertIsNone(yearless_slug_date(url, 2026, near=date(2026, 8, 16)))
+        # Kincasslagh listing typo: do not read "13th August 2107" as 13/08/2026.
+        self.assertIsNone(
+            yearless_slug_date("13th August 2107", 2026, near=date(2026, 8, 23))
+        )
 
     def test_tawnawilly_aug_abbreviation_is_yearless(self) -> None:
         url = "https://tawnawillyparish.ie/wp-content/uploads/Sunday-23rd-Aug.pdf"
