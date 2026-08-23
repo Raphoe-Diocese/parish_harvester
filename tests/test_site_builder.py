@@ -100,6 +100,9 @@ class SiteBuilderTests(unittest.TestCase):
             self.assertIn("Line one", derry_page)
             self.assertIn("DERRY", derry_page)
             self.assertIn("Derry Collated Bulletin", derry_page)
+            self.assertIn("Welcome to the Diocese of Derry.", derry_page)
+            self.assertIn("1 of 1 parish bulletins were found", derry_page)
+            self.assertNotIn("Bishop", derry_page)
             self.assertIn("Parish of Raphoe", raphoe_page)
             self.assertIn("We're still collecting bulletins for this diocese", armagh_page)
 
