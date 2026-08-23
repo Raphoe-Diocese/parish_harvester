@@ -59,6 +59,7 @@ from .utils import (
     predict_dropfiles_bulletin_urls,
     predicted_dated_upload_urls,
     predicted_wordpress_dated_post_urls,
+    quote_http_url,
     rewrite_date_url,
     rewrite_newsletter_number_for_target,
     wix_dated_slug_candidates,
@@ -976,6 +977,9 @@ def _fetch_bytes_with_retries(
         "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 "
         "(KHTML, like Gecko) Chrome/128.0.0.0 Safari/537.36"
     )}
+    url = quote_http_url(url)
+    if not url:
+        return None
     while attempts < max_attempts and (time.monotonic() - started) < total_budget_s:
         attempts += 1
         try:
@@ -1630,6 +1634,7 @@ async def _try_http_scrape_newest_pdf(
     if not scored:
         return None
     _best_date, pdf_url = max(scored)
+    pdf_url = quote_http_url(pdf_url)
     file_result = await asyncio.to_thread(
         _fetch_bytes_with_retries,
         pdf_url,
@@ -1777,6 +1782,7 @@ async def _try_wp_json_newest_media(
     if not scored:
         return None
     _best_date, pdf_url = max(scored)
+    pdf_url = quote_http_url(pdf_url)
     file_result = await asyncio.to_thread(
         _fetch_bytes_with_retries,
         pdf_url,
