@@ -92,12 +92,13 @@ _SLUG_DATE_RE = re.compile(
 
 # Yearless "9th-August" / "5th July" slugs (Milford & Rathmullan overwrite
 # Parish-Newsletter-Sunday-9th-August.pdf each week with no year in the
-# filename). Negative lookahead refuses a following 4-digit year so the
-# dated slug matcher above still owns "9th-August-2026".
+# filename). Negative lookahead refuses a following 2–4 digit year so
+# "9th-August-2026" stays with the dated slug matcher and Kincasslagh
+# archive "org_6-sep-15.pdf" is not read as 06/09/2026.
 _MONTH_ALT = "|".join(sorted(_MONTH_MAP.keys(), key=len, reverse=True))
 _YEARLESS_SLUG_RE = re.compile(
     rf"(?<!\d)(\d{{1,2}})(?:st|nd|rd|th)?[_\-\s]({_MONTH_ALT})"
-    rf"(?![a-z])(?![_\-\s]\d{{4}})",
+    rf"(?![a-z])(?![_\-\s]\d{{2,4}})",
     re.IGNORECASE,
 )
 

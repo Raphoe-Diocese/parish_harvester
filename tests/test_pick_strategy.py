@@ -58,6 +58,22 @@ def test_best_scored_link_index_ignores_garbled_future_year_filename() -> None:
     assert _best_scored_link_index(entries, base, position="top") == 1
 
 
+def test_best_scored_link_index_ignores_two_digit_year_archive_slug() -> None:
+    # Harvest 32654415598 still picked org_6-sep-15.pdf because yearless
+    # "6-sep" became 06/09/2026 (exactly 14 days ahead of 23/08, so it
+    # was not rolled back) and beat Newsletter-21st-Aug.pdf.
+    base = "https://www.kincasslagh.ie/"
+    entries = [
+        _entry("/app/uploads/2017/05/org_6-sep-15.pdf", 0, "6 September 2015"),
+        _entry(
+            "/app/uploads/2026/08/Newsletter-21st-Aug.pdf",
+            1,
+            "22nd August 2026",
+        ),
+    ]
+    assert _best_scored_link_index(entries, base, position="top") == 1
+
+
 def test_best_scored_link_index_ignores_garbled_future_year_in_label_text() -> None:
     # Same site's listing also mislabels some rows with a nonsense far-future
     # year in the link *text* itself (e.g. "13th August 2107"), which the
