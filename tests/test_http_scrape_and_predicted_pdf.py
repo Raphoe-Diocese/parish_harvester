@@ -13,6 +13,7 @@ from harvester.replay import (
     _best_scored_link_index,
     _decode_pdfemb_data_url,
     _extract_matching_hrefs,
+    _newest_dated_post_url_from_listing,
     _extract_mdocs_dated_downloads,
     _extract_pdfembed_target_url,
     _extract_post_page_images,
@@ -990,6 +991,63 @@ class PortstewartMdocsRecipeTests(unittest.TestCase):
         urls = _mdocs_listing_url_candidates(self.LISTING)
         self.assertEqual(urls[0], self.LISTING)
         self.assertIn("http://portstewartparish.website/weekly-bulletin/", urls)
+
+
+class CastleblayneyListingTests(unittest.TestCase):
+    LISTING = "https://mucknoparish.ie/category/weekly-bulletin/"
+    POST_23 = "https://mucknoparish.ie/2026/08/22/23rd-august-2026/"
+    POST_16 = "https://mucknoparish.ie/2026/08/15/bulletin-16-aug-2026/"
+    PDF_23 = (
+        "http://mucknoparish.ie/wp-content/uploads/2020/09/"
+        "F-Clontibret-Muckno-Bulletin-23rd-AUG-2026.pdf"
+    )
+    DRAW = (
+        "https://mucknoparish.ie/wp-content/uploads/2026/06/"
+        "Muckno-Parish-Draw-winners-May-June-26.pdf"
+    )
+    GRAVES = (
+        "https://mucknoparish.ie/wp-content/uploads/2026/07/"
+        "blessing-of-the-graves-poster.2026.pdf"
+    )
+
+    def test_recipe_scrapes_weekly_bulletin_listing(self) -> None:
+        data = json.loads(
+            Path("parishes/recipes/clogher/castleblayney.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(data["site_type"], "http_scrape_newest_pdf")
+        self.assertEqual(data["start_url"], self.LISTING)
+        self.assertIn("clontibret-muckno-bulletin", data.get("href_patterns") or [])
+        self.assertTrue(any("/202" in p for p in data.get("post_slug_patterns") or []))
+        steps_blob = json.dumps(data.get("steps") or [])
+        self.assertNotIn("F-Clontibret-Muckno-Bulletin-23rd-AUG-2026.pdf", steps_blob)
+        self.assertNotIn("23rd-AUG-2026", steps_blob)
+
+    def test_listing_picks_this_week_post_not_older_bulletin_slug(self) -> None:
+        html = f"""
+        <h2 class="entry-title"><a href="{self.POST_23}">23rd August 2026</a></h2>
+        <h2 class="entry-title"><a href="{self.POST_16}">Bulletin 16 Aug 2026</a></h2>
+        <a href="https://mucknoparish.ie/2026/07/28/blessing-of-the-graves-in-muckno-clontibret-parishes/">Graves</a>
+        """
+        picked = _newest_dated_post_url_from_listing(
+            html, self.LISTING, ["/202"], date(2026, 8, 23)
+        )
+        self.assertEqual(picked, self.POST_23)
+
+    def test_post_pdf_skips_draw_and_graves(self) -> None:
+        html = f"""
+        <a href="{self.PDF_23}">F Clontibret Muckno Bulletin 23rd AUG 2026</a>
+        <a href="{self.DRAW}">Parish Draw</a>
+        <a href="{self.GRAVES}">Graves poster</a>
+        """
+        hrefs = _extract_matching_hrefs(
+            html, self.POST_23, ["clontibret-muckno-bulletin"]
+        )
+        self.assertEqual(hrefs, [self.PDF_23])
+        scored = _score_http_scrape_pdf_hrefs(hrefs + [self.DRAW, self.GRAVES], date(2026, 8, 23))
+        self.assertEqual(max(scored)[1], self.PDF_23)
+        self.assertEqual(max(scored)[0], date(2026, 8, 23))
 
 
 if __name__ == "__main__":
