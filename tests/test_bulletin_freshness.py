@@ -370,6 +370,21 @@ class BulletinFreshnessTests(unittest.TestCase):
             check_bulletin_freshness(claudy, target).reason, "within_grace_days"
         )
 
+    def test_ballymoney_yy_mm_dd_filename_is_this_week(self) -> None:
+        url = (
+            "https://www.ballymoneyparish.com/media/other/31871/26-08-23pdf.pdf"
+        )
+        target = date(2026, 8, 23)
+        self.assertEqual(extract_bulletin_date(url), date(2026, 8, 23))
+        self.assertEqual(check_bulletin_freshness(url, target).status, "fresh")
+        old = (
+            "https://www.ballymoneyparish.com/media/other/31871/26-08-16pdf.pdf"
+        )
+        self.assertEqual(extract_bulletin_date(old), date(2026, 8, 16))
+        self.assertEqual(
+            check_bulletin_freshness(old, target).reason, "within_grace_days"
+        )
+
     def test_yearless_slug_does_not_override_full_year_filename(self) -> None:
         url = (
             "https://newtownkilleaparish.ie/wp-content/uploads/2026/07/"

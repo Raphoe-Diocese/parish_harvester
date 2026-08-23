@@ -60,6 +60,24 @@ class CloudFolderTests(unittest.TestCase):
             date(2026, 8, 23),
         )
 
+    def test_extract_date_from_string_dashed_yy_mm_dd_ballymoney(self) -> None:
+        # ballymoneyparish.com names files YY-MM-DDpdf.pdf. Reading only as
+        # DD-MM-YY made 26-08-16 look like 2016-08-26 and 26-08-23 look like
+        # 2023-08-26, so this week's bulletin was rejected as stale.
+        self.assertEqual(
+            extract_date_from_string("26-08-16pdf.pdf"),
+            date(2026, 8, 16),
+        )
+        self.assertEqual(
+            extract_date_from_string(
+                "https://www.ballymoneyparish.com/media/other/31871/26-08-23pdf.pdf"
+            ),
+            date(2026, 8, 23),
+        )
+        # Limavady / Claudy UK DD-MM-YY must still win (later year).
+        self.assertEqual(extract_date_from_string("16-8-26.pdf"), date(2026, 8, 16))
+        self.assertEqual(extract_date_from_string("9-8-26.docx"), date(2026, 8, 9))
+
     def test_detect_cloud_date_format(self) -> None:
         self.assertEqual(detect_cloud_date_format("26.06.14.pdf"), "YY.MM.DD")
         self.assertIsNone(detect_cloud_date_format("bulletin.pdf"))

@@ -157,6 +157,39 @@ class ClaudyBulletinFilterTests(unittest.TestCase):
         )
         self.assertGreater(current[0], old_dated[0])
 
+    def test_glenariffe_august_feast_outscores_july(self) -> None:
+        august = _score_bulletin_url(
+            "https://glenariffeparish.org/wp-content/uploads/2026/08/"
+            "Twenty-First-Sunday-of-Ordinary-Time.pdf"
+        )
+        july = _score_bulletin_url(
+            "https://glenariffeparish.org/wp-content/uploads/2026/07/"
+            "Sixteenth-Sunday-of-Ordinary-Time.pdf"
+        )
+        self.assertGreater(august[0], july[0])
+
+    def test_kincasslagh_app_uploads_august_beats_july_yyyymmdd(self) -> None:
+        # kincasslagh.ie uses /app/uploads/ and a yearless Newsletter-21st-Aug.pdf.
+        # Sunday harvest 23/08/2026 still picked 20260705.pdf because the
+        # folder regex required /wp-content/uploads/.
+        august = _score_bulletin_url(
+            "https://kincasslagh.ie/app/uploads/2026/08/Newsletter-21st-Aug.pdf"
+        )
+        july = _score_bulletin_url(
+            "https://kincasslagh.ie/app/uploads/2026/07/20260705.pdf"
+        )
+        self.assertGreater(august[0], july[0])
+
+    def test_ballymoney_yy_mm_dd_filename_this_week_beats_last_week(self) -> None:
+        this_week = _score_bulletin_url(
+            "https://www.ballymoneyparish.com/media/other/31871/26-08-23pdf.pdf"
+        )
+        last_week = _score_bulletin_url(
+            "https://www.ballymoneyparish.com/media/other/31871/26-08-16pdf.pdf"
+        )
+        self.assertGreater(this_week[0], last_week[0])
+        self.assertEqual(this_week[0], 20260823)
+
     def test_opaque_hash_does_not_inflate_bulletin_score(self) -> None:
         # carrickparish.org 2026-08-09: a Wix hashed filename can contain a
         # coincidental 6-digit run that looks like a DDMMYY date.

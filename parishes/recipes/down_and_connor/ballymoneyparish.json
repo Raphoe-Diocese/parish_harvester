@@ -7,19 +7,15 @@
   "steps": [
     {
       "action": "click",
-      "selector": "a[href*=\"26-08-16pdf.pdf\"]",
-      "href": "/media/other/31871/26-08-16pdf.pdf",
-      "text": "",
+      "selector": "a[href$='.pdf']",
       "pick_strategy": "newest_dated",
       "bulletin_position": "top",
       "fallback_selectors": [
-        "a[href$='.pdf']",
         "a[href*='.pdf']"
       ]
     },
     {
-      "action": "download",
-      "url": "https://www.ballymoneyparish.com/media/other/31871/26-08-16pdf.pdf"
+      "action": "download"
     }
   ],
   "observed_load_ms": 2580.39990234375,
@@ -28,17 +24,22 @@
   "playbook_type": "pdf_download_list",
   "site_type": "pdf_link_list",
   "operator_notes": [
-    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
-    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-    "Do not worry if the filename or date in the link text changes every week."
+    "Homepage lists bulletin PDFs named YY-MM-DDpdf.pdf (26-08-23 = 23/08/2026).",
+    "Do not pin 26-08-16pdf.pdf — that froze harvest on last week and the date parser read it as 2016.",
+    "Harvester picks the newest dated PDF each Sunday."
   ],
   "do_not": [
-    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
+    "Do not pin a dated filename in the selector or download URL.",
     "Do not pick GDPR, Gift Aid, or financial statement PDFs."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
     "position": "top"
   },
-  "recorded_date": "2026-08-19"
+  "recorded_date": "2026-08-23",
+  "operator_notes_2026_08_23": [
+    "Live this week: https://www.ballymoneyparish.com/media/other/31871/26-08-23pdf.pdf",
+    "(HTTP 200, 1891423 bytes, Last-Modified Sat 22/08/2026). Body says THIS WEEK / SUNDAY 23rd.",
+    "Old recipe pinned 26-08-16pdf.pdf. extract_date_from_string read 26-08-16 as 2016-08-26."
+  ]
 }
