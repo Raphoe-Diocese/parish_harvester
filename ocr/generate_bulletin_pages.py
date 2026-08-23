@@ -1568,10 +1568,18 @@ def az_jump_css() -> str:
 def az_jump_js() -> str:
     return """
     (function () {
-      var index = {};
-      var node = document.getElementById('parish-page-index');
-      if (node) {
-        try { index = JSON.parse(node.textContent || '{}') || {}; } catch (e) {}
+      // Read the page index lazily: this script runs before the
+      // #parish-page-index JSON later in the body exists, so reading it now
+      // would leave every PDF jump with an empty index.
+      var index = null;
+      function pageIndex() {
+        if (index) return index;
+        index = {};
+        var node = document.getElementById('parish-page-index');
+        if (node) {
+          try { index = JSON.parse(node.textContent || '{}') || {}; } catch (e) {}
+        }
+        return index;
       }
       function reduceMotion() {
         return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
@@ -1607,12 +1615,13 @@ def az_jump_js() -> str:
         return null;
       }
       function pageFor(name) {
-        if (index[name]) return index[name];
+        var map = pageIndex();
+        if (map[name]) return map[name];
         var n = norm(name);
-        var keys = Object.keys(index);
+        var keys = Object.keys(map);
         for (var i = 0; i < keys.length; i++) {
           if (norm(keys[i]) === n || norm(coreName(keys[i])) === n || n === norm(coreName(keys[i]))) {
-            var val = index[keys[i]];
+            var val = map[keys[i]];
             if (typeof val === 'number') return val;
           }
         }
