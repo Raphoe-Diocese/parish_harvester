@@ -55,7 +55,7 @@
       ".ocr-sticky-chrome.is-searching{position:sticky!important;top:0!important}" +
       "html.is-ocr-searching{scroll-padding-top:10rem}" +
       "mark.search-active{scroll-margin-top:10rem}" +
-      ".scroll-top-btn{position:fixed;right:16px;bottom:20px;z-index:30;width:46px;height:46px;border:0;border-radius:999px;background:#1a6b6b;color:#fff;font-size:1.35rem;line-height:1;cursor:pointer;box-shadow:0 4px 14px rgba(17,75,75,0.28);opacity:0;pointer-events:none;transform:translateY(8px)}" +
+      ".scroll-top-btn{position:fixed;right:16px;bottom:20px;z-index:9999;width:46px;height:46px;border:0;border-radius:999px;background:#1a6b6b;color:#fff;font-size:1.35rem;line-height:1;cursor:pointer;box-shadow:0 4px 14px rgba(17,75,75,0.28);opacity:0;pointer-events:none;transform:translateY(8px)}" +
       ".scroll-top-btn.is-visible{opacity:1;pointer-events:auto;transform:none}" +
       "@media (max-width:1024px){" +
       ".pdf-frame-wrap,.pdf-standalone-shell," +
@@ -115,6 +115,7 @@
   function ensureScrollTop() {
     var btn = document.getElementById("scroll-top-btn");
     if (!btn) {
+      if (!document.body) return;
       btn = document.createElement("button");
       btn.type = "button";
       btn.className = "scroll-top-btn";
@@ -123,9 +124,6 @@
       btn.textContent = "↑";
       document.body.appendChild(btn);
     }
-    if (btn.getAttribute("data-pp-bound") === "1") return;
-    btn.setAttribute("data-pp-bound", "1");
-    var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     function innerBoxes() {
       return Array.prototype.slice.call(
         document.querySelectorAll(".pdf-inpage-pages, #ocr-panel")
@@ -138,19 +136,44 @@
     }
     function shown() {
       var y = window.scrollY || document.documentElement.scrollTop || 0;
-      btn.classList.toggle("is-visible", y > 240 || maxInnerScroll() > 80);
+      btn.classList.toggle("is-visible", y > 80 || maxInnerScroll() > 16);
     }
-    window.addEventListener("scroll", shown, { passive: true });
-    document.addEventListener("scroll", shown, { capture: true, passive: true });
-    shown();
-    btn.addEventListener("click", function () {
-      var behavior = reduce ? "auto" : "smooth";
-      window.scrollTo({ top: 0, behavior: behavior });
-      innerBoxes().forEach(function (el) {
-        if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
-        else el.scrollTop = 0;
+    function shownSoon() {
+      shown();
+      if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+      else window.setTimeout(shown, 16);
+    }
+    function bindBox(el) {
+      if (!el || el.getAttribute("data-pp-scroll-top") === "1") return;
+      el.setAttribute("data-pp-scroll-top", "1");
+      el.addEventListener("scroll", shownSoon, { passive: true });
+    }
+    function bindBoxes() {
+      innerBoxes().forEach(bindBox);
+      shown();
+    }
+    window.parishPressBindScrollTopBoxes = bindBoxes;
+    if (btn.getAttribute("data-pp-bound") !== "inner-2") {
+      btn.setAttribute("data-pp-bound", "inner-2");
+      var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.addEventListener("scroll", shownSoon, { passive: true });
+      document.addEventListener("scroll", shownSoon, { capture: true, passive: true });
+      document.addEventListener("wheel", shownSoon, { capture: true, passive: true });
+      document.addEventListener("touchmove", shownSoon, { capture: true, passive: true });
+      if (window.MutationObserver && document.body) {
+        new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+      }
+      btn.addEventListener("click", function () {
+        var behavior = reduce ? "auto" : "smooth";
+        window.scrollTo({ top: 0, behavior: behavior });
+        innerBoxes().forEach(function (el) {
+          el.scrollTop = 0;
+          if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+        });
+        window.setTimeout(shown, reduce ? 0 : 400);
       });
-    });
+    }
+    bindBoxes();
   }
 
   window.parishPressScrollPdfToPage = function (pageNum) {
@@ -242,6 +265,9 @@
       "</div></div>" +
       '<div class="pdf-inpage-status">Showing first page…</div>' +
       '<div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>';
+    if (typeof window.parishPressBindScrollTopBoxes === "function") {
+      window.parishPressBindScrollTopBoxes();
+    }
     return host;
   }
 

@@ -132,6 +132,9 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertIn("Jump to a parish", html_output)
             self.assertIn("maxInnerScroll", html_output)
             self.assertIn(".pdf-inpage-pages, #ocr-panel", html_output)
+            self.assertIn("data-pp-scroll-top", html_output)
+            self.assertIn("inner-2", html_output)
+            self.assertIn("parishPressBindScrollTopBoxes", html_output)
             # PDF is shown immediately (no tab click) — the PDF and OCR
             # panels are both always visible, stacked, matching Frank's
             # reference page layout (Frank feedback, round 2).
@@ -205,7 +208,7 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertIn("pdf-fullscreen-btn", html_output)
             # Desktop + mobile: hide the raw-PDF iframe and show stacked PDF.js pages.
             self.assertIn("pdf-inpage-viewer", html_output)
-            self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823t", html_output)
+            self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823u", html_output)
             self.assertIn("data-pdf-src", html_output)
             self.assertIn("is-native-pdf", html_output)
             self.assertIn("display: flex !important", html_output)
@@ -245,7 +248,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("<iframe", html_output)
         self.assertIn("embed-mode", html_output)
         self.assertIn("pdf-inpage-viewer", html_output)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823t", html_output)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823u", html_output)
         self.assertIn("data-pdf-src", html_output)
         self.assertNotIn("pdf-inpage-prev", html_output)
         self.assertNotIn("pdf-inpage-next", html_output)
@@ -277,7 +280,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("is-native-pdf", boot)
         self.assertIn("pdf-frame-wrap", boot)
         self.assertIn("removeAttribute('src')", boot)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823t", boot)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823u", boot)
         self.assertNotIn("prefersNativePdf", boot)
         self.assertNotIn("narrowViewport", boot)
         self.assertEqual(boot, pdf_mobile_fallback_boot_js())
@@ -404,7 +407,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn('id="scroll-top-btn"', html_output)
         self.assertIn("Georgia", html_output)
         self.assertIn("pdf-inpage-viewer", html_output)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823t", html_output)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823u", html_output)
         self.assertIn("block: 'start'", html_output)
         self.assertNotIn("block: 'center'", html_output)
         self.assertIn("is-native-pdf", html_output)
@@ -451,6 +454,9 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn(".pdf-inpage-pages, #ocr-panel", text)
         self.assertIn("maxInnerScroll", text)
         self.assertIn("capture: true", text)
+        self.assertIn("data-pp-scroll-top", text)
+        self.assertIn("inner-2", text)
+        self.assertIn("parishPressBindScrollTopBoxes", text)
         self.assertIn("parishPressScrollPdfToPage", text)
         self.assertNotIn("85vh", text)
         self.assertIn(".pdf-inpage-pages", text)
@@ -464,7 +470,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotIn("prefersNativePdf", text)
         loader = assets / "pdf-mobile-fallback.js"
         self.assertTrue(loader.is_file())
-        self.assertIn("pdf-inpage-viewer.js?v=20260823t", loader.read_text(encoding="utf-8"))
+        self.assertIn("pdf-inpage-viewer.js?v=20260823u", loader.read_text(encoding="utf-8"))
 
     def test_live_gortahork_ocr_has_mega_body_and_visible_850(self) -> None:
         """Frank 2026-08-21: parish slice must reuse mega OCR sentences; 850px on visible boxes."""
@@ -504,6 +510,9 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("syncOcrSearchSticky", diocese)
         self.assertIn('id="scroll-top-btn"', diocese)
         self.assertNotIn("85vh", diocese)
+        self.assertIn("inner-2", diocese)
+        self.assertIn("data-pp-scroll-top", diocese)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823u", diocese)
 
     def test_live_diocese_html_ships_inpage_viewer(self) -> None:
         """Generator-only changes are invisible on parishpress.ie — live HTML must include PDF.js."""
@@ -515,7 +524,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         ):
             html_live = (docs / rel).read_text(encoding="utf-8")
             self.assertIn("pdf-inpage-viewer", html_live, rel)
-            self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823t", html_live, rel)
+            self.assertIn("/assets/pdf-inpage-viewer.js?v=", html_live, rel)
             self.assertIn(".ocr-sticky-chrome.is-searching", html_live, rel)
             self.assertIn("syncOcrSearchSticky", html_live, rel)
             self.assertIn("data-pdf-src", html_live, rel)
