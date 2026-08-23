@@ -13,12 +13,21 @@ class ScrollTopInnerBoxTests(unittest.TestCase):
         self.assertIn("maxInnerScroll", js)
         self.assertIn("capture: true", js)
         self.assertIn("innerBoxes", js)
-        self.assertIn("scrollTop = 0", js)
+        self.assertIn("el.scrollTop = 0", js)
         self.assertIn("window.scrollTo", js)
         self.assertIn("data-pp-bound", js)
+        self.assertIn("data-pp-scroll-top", js)
+        self.assertIn("inner-2", js)
+        self.assertIn("DOMContentLoaded", js)
+        self.assertIn("MutationObserver", js)
+        self.assertIn("parishPressBindScrollTopBoxes", js)
+        self.assertIn("wheel", js)
         # Must not only watch the window — that is why Frank's Raphoe
         # screenshot had no arrow after scrolling the locked 850px box.
-        self.assertIn("y > 240 || maxInnerScroll() > 80", js)
+        # Live HTML also runs this script before #scroll-top-btn exists.
+        self.assertIn("y > 80 || maxInnerScroll() > 16", js)
+        self.assertIn("document.createElement('button')", js)
+        self.assertNotIn("if (!btn) return;", js)
 
 
 if __name__ == "__main__":
