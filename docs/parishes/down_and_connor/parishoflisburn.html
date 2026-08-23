@@ -3,7 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Lisburn Bulletin — 19/08/2026</title>
+  <title>Lisburn Bulletin — 23/08/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -110,9 +112,7 @@
 
     .pdf-frame-wrap {
       position: relative;
-      height: auto;
       min-height: 850px;
-      overflow: visible;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -189,24 +189,21 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
-      height: auto;
-      overflow: visible;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
     body.is-native-pdf iframe.pdf-frame {
       display: none !important;
-      height: auto;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
     }
     .pdf-frame-wrap.is-native-pdf,
     .pdf-standalone-shell.is-native-pdf,
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
-      height: auto !important;
       min-height: 850px !important;
-      overflow: visible !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -215,7 +212,6 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
-        height: auto !important;
         min-height: 450px !important;
         display: flex;
         flex-direction: column;
@@ -285,8 +281,61 @@
     .ocr-search-tools button:disabled { background: #9bbfbd; cursor: not-allowed; }
     .match-count { color: #6b7280; font-size: 0.9rem; font-weight: 600; }
     .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #fff;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 30;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
     .ocr-zoom-bar {
-      position: sticky; top: 0; z-index: 6;
       display: flex; justify-content: center; align-items: center; gap: 10px;
       margin: 0 0 10px; padding: 6px 10px;
       background: rgba(255, 255, 255, 0.94);
@@ -469,8 +518,9 @@
       padding: 22px 24px 32px;
     }
     .pdf-frame-wrap iframe {
-      height: auto;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
     }
     .note-box {
       margin-top: 12px;
@@ -567,12 +617,11 @@
 
     @media (max-width: 1024px) {
       /* Harvest + OCR both call this generator — keep both panels here.
-         Desktop: 850px on the VISIBLE boxes. Tablet/phone (max-width 1024px): ~450px. */
+         Desktop: locked 850px visible boxes, inner scroll.
+         Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
-        height: auto;
         min-height: 450px;
-        overflow: visible;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -602,58 +651,8 @@
         width: 100%;
       }
     }
-  
-    .ocr-sticky-chrome {
-      position: sticky;
-      top: 0;
-      z-index: 8;
-      background: #fff;
-      padding: 8px 0 10px;
-      margin: 0 0 8px;
-    }
-    .ocr-sticky-chrome .ocr-zoom-bar {
-      position: relative;
-      top: auto;
-    }
-    html { scroll-padding-top: 10rem; }
-    mark.search-active { scroll-margin-top: 10rem; }
-    
-
-    .scroll-top-btn {
-      position: fixed;
-      right: 16px;
-      bottom: 20px;
-      z-index: 30;
-      width: 46px;
-      height: 46px;
-      border: 0;
-      border-radius: 999px;
-      background: #1a6b6b;
-      color: #fff;
-      font-size: 1.35rem;
-      line-height: 1;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(8px);
-      transition: opacity 160ms ease, transform 160ms ease;
-    }
-    .scroll-top-btn.is-visible {
-      opacity: 1;
-      pointer-events: auto;
-      transform: none;
-    }
-    .scroll-top-btn:focus-visible {
-      outline: 3px solid #14524f;
-      outline-offset: 2px;
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .scroll-top-btn { transition: none; }
-    }
-    
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260822c" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260823s" defer></script>
 </head>
 <body>
   <div class="page">
@@ -661,30 +660,30 @@
     <header class="header">
       <p class="diocese-label">DOWN &amp; CONNOR</p>
       <h1>Lisburn Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Lisburn — 19/08/2026. Part of the Down &amp; Connor Diocese collated bulletin. (Exact PDF pages for this parish could not be auto-detected this week, so this links to the full diocese bulletin instead.)</p>
-      <a class="download-link-top" href="../../mega_pdf/down_and_connor_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Lisburn — 23/08/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
+      <a class="download-link-top" href="parishoflisburn.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
     </header>
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="../../mega_pdf/down_and_connor_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="parishoflisburn.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       <div class="quiet-links">
-        <a href="../../mega_pdf/down_and_connor_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+        <a href="parishoflisburn.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
         <a href="parishoflisburn-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
       </div>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="../../mega_pdf/down_and_connor_mega_bulletin.pdf" title="Lisburn bulletin PDF"></iframe>
+        <iframe src="parishoflisburn.pdf" title="Lisburn bulletin PDF"></iframe>
         
-        <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="../../mega_pdf/down_and_connor_mega_bulletin.pdf">
+        <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="parishoflisburn.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="../../mega_pdf/down_and_connor_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-              <a href="../../mega_pdf/down_and_connor_mega_bulletin.pdf" download>Download</a>
+              <a href="parishoflisburn.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="parishoflisburn.pdf" download>Download</a>
             </div>
           </div>
           <div class="pdf-inpage-status">Showing first page…</div>
@@ -699,7 +698,7 @@
         <a href="parishoflisburn-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
       <div class="ocr-sticky-chrome">
-<div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
         <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
         <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
         <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
@@ -717,14 +716,900 @@
         </div>
       </div>
       </div>
-<div id="ocr-panel"><div class="ocr-failed-banner" role="status">⚠️ No searchable text was found for this parish this week. Please use the PDF above.</div></div>
+      <div id="ocr-panel"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Lisburn</h2><p class="ocr-parish-date">23/08/2026</p></header>
+<hr>
+<p class="page-label">Page 18</p>
+<p>1BSJTIPG#MBSJT<br>
+4VOEBZSE&quot;VHVTU<br>
+5IF5XFOUZ&#x27;JSTU4VOEBZJO0SEJOBSZ5JNF<br>
+451&quot;53*$,`4$)63$)<br>
+.BTTFT.POEBZr&#x27;SJEBZBN4BUVSEBZ7JHJMQN4VOEBZBNOPPO<br>
+-*7&amp;8&amp;#453&amp;&quot;.*/(0&#x27;&quot;--.&quot;44&amp;4<br>
+1MFBTFOPUFNBOZQBSJTIFTJOUIF%JPDFTFIBWFXFCDBNTJOTUBMMFEXIJDIQSPWJEFMJWFDPWFSBHFPGWBSJPVT.BTTFTUBLJOHQMBDFEBJMZUISPVHIPVUUIF%JPDFTF5IFTFDBOCFBDDFTTFECZWJTJUJOHXXXEPXOBOEDPOOPSPSH-JOLTUP1BSJTI8FCDBNT-JWF$IVSDIXFCDBNMJOLT$)63$)4&amp;37*$&amp;457.$/.&amp;%*&quot;$)63$)8&amp;#$&quot;.4Jesus said: ‘You are Peter and<br>
+on this rock I will build my Church.’<br>
+Matthew 16:18<br>
+&#x27;S%FSNPU.D$BVHIBO<br>
+11<br>
+&#x27;S&amp;BNPO.BHPSSJBO<br>
+$$<br>
+1BSJTI0⒏DF0QFOJOH)PVST<br>
+.POEBZ&#x27;SJEBZBNQN<br>
+$MPTFEQNQN<br>
+1BSJTI0⒏DF&#x27;BY<br>
+&amp;NBJMMJTCVSO!EPXOBOEDPOOPSPSH<br>
+1BTUPSBM$FOUSFXXXQBSJTIPqJTCVSOPSHLisburn</p>
+<hr>
+<p class="page-label">Page 19</p>
+<p>Congregation stands<br>
+&amp;OUSBODF)ZNOPS<br>
+&amp;OUSBODF&quot;OUJQIPO  $G1T<br>
+&quot;MM 5VSOZPVSFBS<br>
+0-PSE<br>
+BOEBOTXFSNF<br>
+ TBWFUIFTFSWBOUXIPUSVTUTJOZPV<br>
+NZ(PE )BWFNFSDZPONF<br>
+0-PSE<br>
+<br>
+ GPS*DSZUPZPVBMMUIFEBZMPOH<br>
+1SJFTU *OUIFOBNFPGUIF&#x27;BUIFS<br>
+BOEPGUIF4PO<br>
+BOE <br>
+ PGUIF)PMZ4QJSJU<br>
+&quot;MM &quot;NFO<br>
+1SJFTU 5IF-PSECFXJUIZPV<br>
+&quot;MM &quot;OEXJUIZPVSTQJSJU<br>
+1SJFTU #SPUIFSTBOETJTUFST<br>
+MFUVTBDLOPXMFEHFPVSTJOT<br>
+<br>
+ BOETPQSFQBSFPVSTFMWFTUPDFMFCSBUFUIFTBDSFE<br>
+ NZTUFSJFT<br>
+1SJFTU-PSE+FTVT<br>
+ZPVIBWFTIPXOVTUIFXBZUP<br>
+ UIF&#x27;BUIFS<br>
+ -PSE<br>
+IBWFNFSDZ -PSE<br>
+IBWFNFSDZ<br>
+1SJFTU-PSE+FTVT<br>
+ZPVIBWFHJWFOVTUIFDPOTPMBUJPOPG UIFUSVUI<br>
+ $ISJTU<br>
+IBWFNFSDZ $ISJTU<br>
+IBWFNFSDZ1SJFTU -PSE+FTVT<br>
+ZPVBSFUIF(PPE4IFQIFSE<br>
+MFBEJOHVT<br>
+ JOUPFWFSMBTUJOHMJGF<br>
+ -PSE<br>
+IBWFNFSDZ -PSE<br>
+IBWFNFSDZ<br>
+1SJFTU .BZBMNJHIUZ(PEIBWFNFSDZPOVT<br>
+ GPSHJWFVTPVSTJOT<br>
+ BOECSJOHVTUPFWFSMBTUJOHMJGF<br>
+&quot;MM &quot;NFO<br>
+&quot;MM (MPSZUP(PEJOUIFIJHIFTU<br>
+ BOEPOFBSUIQFBDFUPQFPQMFPGHPPEXJMM<br>
+ 8FQSBJTFZPV<br>
+XFCMFTTZPV<br>
+ XFBEPSFZPV<br>
+XFHMPSJGZZPV<br>
+ XFHJWFZPVUIBOLTGPSZPVSHSFBUHMPSZ<br>
+ -PSE(PE<br>
+IFBWFOMZ,JOH<br>
+ 0(PE<br>
+BMNJHIUZ&#x27;BUIFS<br>
+ -PSE+FTVT$ISJTU<br>
+0OMZ#FHPUUFO4PO<br>
+ -PSE(PE<br>
+-BNCPG(PE<br>
+4POPGUIF&#x27;BUIFS<br>
+ ZPVUBLFBXBZUIFTJOTPGUIFXPSME<br>
+ IBWFNFSDZPOVT<br>
+ ZPVUBLFBXBZUIFTJOTPGUIFXPSME<br>
+ SFDFJWFPVSQSBZFS<br>
+ ZPVBSFTFBUFEBUUIFSJHIUIBOEPGUIF&#x27;BUIFS<br>
+ IBWFNFSDZPOVT<br>
+ &#x27;PSZPVBMPOFBSFUIF)PMZ0OF<br>
+ZPVBMPOFBSFUIF<br>
+ -PSE<br>
+ZPVBMPOFBSFUIF.PTU)JHI<br>
+ +FTVT$ISJTU<br>
+XJUIUIF)PMZ4QJSJU<br>
+JOUIFHMPSZPG <br>
+ (PEUIF&#x27;BUIFS<br>
+ &quot;NFO<br>
+1SJFTU -FUVTQSBZ<br>
+Pause for silent prayer1SJFTU &quot;MNJHIUZFWFSMJWJOH(PE<br>
+1SJFTU 0(PE<br>
+XIPDBVTFUIFNJOETPGUIFGBJUIGVM<br>
+ UPVOJUFJOBTJOHMFQVSQPTF<br>
+ HSBOUZPVSQFPQMFUPMPWFXIBUZPVDPNNBOE<br>
+ BOEUPEFTJSFXIBUZPVQSPNJTF<br>
+ UIBU<br>
+BNJEUIFVODFSUBJOUJFTPGUIJTXPSME<br>
+ PVSIFBSUTNBZCFpYFEPOUIBUQMBDF<br>
+ XIFSFUSVFHMBEOFTTJTGPVOE 5ISPVHIPVS-PSE+FTVT$ISJTU<br>
+ZPVS4PO<br>
+ XIPMJWFTBOESFJHOTXJUIZPVJOUIFVOJUZPGUIF <br>
+ )PMZ4QJSJU<br>
+POF(PE<br>
+GPSFWFSBOEFWFS )PMZ4QJSJU<br>
+POF(PE<br>
+GPSFWFSBOEFWFS&quot;MM &quot;NFO<br>
+Congregation Sits<br>
+&quot;SFBEJOHGSPNUIFQSPQIFU*TBJBI<br>
+5IVTTBZTUIF-PSEPGIPTUTUP4IFCOB<br>
+UIFNBTUFSPGUIF<br>
+QBMBDF<br>
+ *EJTNJTTZPVGSPNZPVSP⒏DF<br>
+ *SFNPWFZPVGSPNZPVSQPTU<br>
+ BOEUIFTBNFEBZ*DBMMPONZTFSWBOU<br>
+ &amp;MJBLJNTPOPG)JMLJBI *JOWFTUIJNXJUIZPVSSPCF<br>
+ HJSEIJNXJUIZPVSTBTI<br>
+ FOUSVTUIJNXJUIZPVSBVUIPSJUZ<br>
+ BOEIFTIBMMCFBGBUIFS<br>
+ UPUIFJOIBCJUBOUTPG+FSVTBMFN<br>
+ BOEUPUIF)PVTFPG+VEBI *QMBDFUIFLFZPGUIF)PVTFPG%BWJE<br>
+ POIJTTIPVMEFS<br>
+ TIPVMEIFPQFO<br>
+OPPOFTIBMMDMPTF<br>
+ TIPVMEIFDMPTF<br>
+OPPOFTIBMMPQFO<br>
+ *ESJWFIJNMJLFBQFH<br>
+ JOUPBpSNQMBDF<br>
+ IFXJMMCFDPNFBUISPOFPGHMPSZ GPSIJTGBUIFS`TIPVTF<br>
+ 5IFXPSEPGUIF-PSE<br>
+&quot;MM 5IBOLTCFUP(PE<br>
+3<br>
+ :PVSMPWF<br>
+0MPSE<br>
+JTFUFSOBM<br>
+ EJTDBSEOPUUIFXPSLPGZPVSIBOET<br>
+ *UIBOLZPV<br>
+-PSE<br>
+XJUIBMMNZIFBSU<br>
+ ZPVIBWFIFBSEUIFXPSETPGNZNPVUI #FGPSFUIFBOHFMT*XJMMCMFTTZPV<br>
+ *XJMMBEPSFCFGPSFZPVSIPMZUFNQMF 3<br>
+ *UIBOLZPVGPSZPVSGBJUIGVMOFTTBOEMPWF<br>
+ XIJDIFYDFMBMMXFFWFSLOFXPGZPV<br>
+ 0OUIFEBZ*DBMMFE<br>
+ZPVBOTXFSFE<br>
+ ZPVJODSFBTFEUIFTUSFOHUIPGNZTPVM 3<br>
+<br>
+ 5IF-PSEJTIJHIZFUIFMPPLTPOUIFMPXMZ BOEUIFIBVHIUZIFLOPXTGSPNBGBS<br>
+ :PVSMPWF<br>
+0-PSE<br>
+JTFUFSOBM<br>
+ EJTDBSEOPUUIFXPSLPGZPVSIBOET 3<br>
+&quot;SFBEJOHGSPNUIFMFUUFSPG4U1BVMUPUIF3PNBOT<br>
+)PXSJDIBSFUIFEFQUITPG(PErIPXEFFQIJTXJTEPN<br>
+BOELOPXMFEHFrBOEIPXJNQPTTJCMFUPQFOFUSBUFIJT<br>
+NPUJWFTPSVOEFSTUBOEIJTNFUIPET8IPDPVMEFWFSLOPX<br>
+UIFNJOEPGUIF-PSE 8IPDPVMEFWFSCFIJTDPVOTFMMPS <br>
+THE TWENTY FIRST SUNDAY OF ORDINARY TIME<br>
+*/530%6$503:3*5&amp;4<br>
+(3&amp;&amp;5*/(<br>
+1&amp;/*5&amp;/5*&quot;-&quot;$55)&amp;-*563(:0&#x27;5)&amp;803%<br>
+&#x27;*3453&amp;&quot;%*/(<br>
+3&amp;410/403*&quot;-14&quot;-. 1T3W<br>
+4&amp;$0/%3&amp;&quot;%*/(<br>
+5)&amp;$0--&amp;$5<br>
+(-03*&quot;</p>
+<hr>
+<p class="page-label">Page 20</p>
+<p>8IPDPVMEFWFSHJWFIJNBOZUIJOHPSMFOEIJNBOZUIJOH <br>
+&quot;MMUIBUFYJTUTDPNFTGSPNIJN<br>
+BMMJTCZIJNBOEGPSIJN5P<br>
+IJNCFHMPSZGPSFWFS&quot;NFO<br>
+ 5IFXPSEPGUIF-PSE<br>
+&quot;MM 5IBOLTCFUP(PE<br>
+Congregation stands<br>
+&quot;$$-&quot;.&quot;5*0/   $PS<br>
+<br>
+&quot;MM &quot;MMFMVJB<br>
+BMMFMVJB<br>
+ (PEJO$ISJTUXBTSFDPODJMJOHUIFXPSMEUP <br>
+ IJNTFMG<br>
+BOEIFIBTFOUSVTUFEUPVTUIFOFXTUIBU UIFZBSFSFDPODJMFE &quot;MMFMVJB<br>
+1SJFTU 5IF-PSECFXJUIZPV<br>
+&quot;MM &quot;OEXJUIZPVSTQJSJU<br>
+1SJFTU &quot;SFBEJOHGSPNUIFIPMZ<br>
+ (PTQFMBDDPSEJOHUP.BUUIFX<br>
+&quot;MM (MPSZUPZPV<br>
+0-PSE<br>
+<br>
+8IFO+FTVTDBNFUPUIFSFHJPOPG$BFTBSFB1IJMJQQJIFQVUUIJTRVFTUJPOUPIJTEJTDJQMFT<br>
+b8IPEPQFPQMFTBZUIF4POPG<br>
+.BOJT `&quot;OEUIFZTBJE<br>
+b4PNFTBZIFJT+PIOUIF#BQUJTU<br>
+<br>
+TPNF&amp;MJKBI<br>
+BOEPUIFST+FSFNJBIPSPOFPGUIFQSPQIFUT`b#VUZPV<br>
+`IFTBJE<br>
+bXIPEPZPVTBZ*BN `5IFO4JNPO1FUFS<br>
+TQPLFVQ<br>
+b:PVBSFUIF$ISJTU<br>
+`IFTBJE<br>
+bUIF4POPGUIFMJWJOH<br>
+(PE`+FTVTSFQMJFE<br>
+b4JNPOTPOPG+POBI<br>
+ZPVBSFBIBQQZNBO#FDBVTFJUXBTOPUqFTIBOECMPPEUIBUSFWFBMFEUIJT<br>
+UPZPVCVUNZ&#x27;BUIFSJOIFBWFO4P*OPXTBZUPZPV:PV<br>
+BSF1FUFSBOEPOUIJTSPDL*XJMMCVJMENZ$IVSDI&quot;OEUIFHBUFTPGUIFVOEFSXPSMEDBOOFWFSIPMEPVUBHBJOTUJU*XJMM<br>
+HJWFZPVUIFLFZTPGUIFLJOHEPNPGIFBWFO<br>
+XIBUFWFSZPV<br>
+CJOEPOFBSUITIBMMCFDPOTJEFSFECPVOEJOIFBWFO<br>
+XIBUFWFSZPVMPPTFPOFBSUITIBMMCFDPOTJEFSFEMPPTFEJO<br>
+IFBWFO`5IFOIFHBWFUIFEJTDJQMFTTUSJDUPSEFSTOPUUPUFMM<br>
+BOZPOFUIBUIFXBTUIF$ISJTU<br>
+ 5IF(PTQFMPGUIF-PSE<br>
+&quot;MM 1SBJTFUPZPV-PSE+FTVT$ISJTUCongregation sits<br>
+Congregation stand<br>
+&quot;MM *CFMJFWFJOPOF(PE<br>
+ UIF&#x27;BUIFSBMNJHIUZ<br>
+ NBLFSPGIFBWFOBOEFBSUI<br>
+ PGBMMUIJOHTWJTJCMFBOEJOWJTJCMF<br>
+ *CFMJFWFJOPOF-PSE+FTVT$ISJTU<br>
+ UIF0OMZ#FHPUUFO4POPG(PE<br>
+ CPSOPGUIF&#x27;BUIFSCFGPSFBMMBHFT (PEGSPN(PE<br>
+-JHIUGSPN-JHIU<br>
+ USVF(PEGSPNUSVF(PE<br>
+ CFHPUUFO<br>
+OPUNBEF<br>
+DPOTVCTUBOUJBMXJUIUIF<br>
+ &#x27;BUIFS<br>
+UISPVHIIJNBMMUIJOHTXFSFNBEF &#x27;PSVTBOEGPSPVSTBMWBUJPO<br>
+ IFDBNFEPXOGSPNIFBWFO<br>
+(bow your head up to the words ‘and became man’)<br>
+<br>
+ BOECZUIF)PMZ4QJSJUXBTJODBSOBUFPGUIF7JSHJO<br>
+ .BSZ<br>
+BOECFDBNFNBO1SJFTU 0(PE<br>
+XIPDBVTFUIFNJOETPGUIFGBJUIGVM UPVOJUFJOBTJOHMFQVSQPTF<br>
+ HSBOUZPVSQFPQMFUPMPWFXIBUZPVDPNNBOE<br>
+ BOEUPEFTJSFXIBUZPVQSPNJTF<br>
+ UIBU<br>
+BNJEUIFVODFSUBJOUJFTPGUIJTXPSME<br>
+ PVSIFBSUTNBZCFpYFEPOUIBUQMBDF<br>
+ XIFSFUSVFHMBEOFTTJTGPVOE 5ISPVHIPVS-PSE+FTVT$ISJTU<br>
+ZPVS4PO<br>
+ XIPMJWFTBOESFJHOTXJUIZPVJOUIFVOJUZPGUIF <br>
+ )PMZ4QJSJU<br>
+POF(PE<br>
+GPSFWFSBOEFWFS )PMZ4QJSJU<br>
+POF(PE<br>
+GPSFWFSBOEFWFS&quot;MM &quot;NFO<br>
+Congregation Sits<br>
+&quot;SFBEJOHGSPNUIFQSPQIFU*TBJBI<br>
+5IVTTBZTUIF-PSEPGIPTUTUP4IFCOB<br>
+UIFNBTUFSPGUIF<br>
+QBMBDF<br>
+ *EJTNJTTZPVGSPNZPVSP⒏DF<br>
+ *SFNPWFZPVGSPNZPVSQPTU<br>
+ BOEUIFTBNFEBZ*DBMMPONZTFSWBOU<br>
+ &amp;MJBLJNTPOPG)JMLJBI *JOWFTUIJNXJUIZPVSSPCF<br>
+ HJSEIJNXJUIZPVSTBTI<br>
+ FOUSVTUIJNXJUIZPVSBVUIPSJUZ<br>
+ BOEIFTIBMMCFBGBUIFS<br>
+ UPUIFJOIBCJUBOUTPG+FSVTBMFN<br>
+ BOEUPUIF)PVTFPG+VEBI *QMBDFUIFLFZPGUIF)PVTFPG%BWJE<br>
+ POIJTTIPVMEFS<br>
+ TIPVMEIFPQFO<br>
+OPPOFTIBMMDMPTF<br>
+ TIPVMEIFDMPTF<br>
+OPPOFTIBMMPQFO<br>
+ *ESJWFIJNMJLFBQFH<br>
+ JOUPBpSNQMBDF<br>
+ IFXJMMCFDPNFBUISPOFPGHMPSZ GPSIJTGBUIFS`TIPVTF<br>
+ 5IFXPSEPGUIF-PSE<br>
+&quot;MM 5IBOLTCFUP(PE<br>
+3<br>
+ :PVSMPWF<br>
+0MPSE<br>
+JTFUFSOBM<br>
+ EJTDBSEOPUUIFXPSLPGZPVSIBOET<br>
+ *UIBOLZPV<br>
+-PSE<br>
+XJUIBMMNZIFBSU<br>
+ ZPVIBWFIFBSEUIFXPSETPGNZNPVUI #FGPSFUIFBOHFMT*XJMMCMFTTZPV<br>
+ *XJMMBEPSFCFGPSFZPVSIPMZUFNQMF 3<br>
+ *UIBOLZPVGPSZPVSGBJUIGVMOFTTBOEMPWF<br>
+ XIJDIFYDFMBMMXFFWFSLOFXPGZPV<br>
+ 0OUIFEBZ*DBMMFE<br>
+ZPVBOTXFSFE<br>
+ ZPVJODSFBTFEUIFTUSFOHUIPGNZTPVM 3<br>
+<br>
+ 5IF-PSEJTIJHIZFUIFMPPLTPOUIFMPXMZ BOEUIFIBVHIUZIFLOPXTGSPNBGBS<br>
+ :PVSMPWF<br>
+0-PSE<br>
+JTFUFSOBM<br>
+ EJTDBSEOPUUIFXPSLPGZPVSIBOET 3<br>
+&quot;SFBEJOHGSPNUIFMFUUFSPG4U1BVMUPUIF3PNBOT<br>
+)PXSJDIBSFUIFEFQUITPG(PErIPXEFFQIJTXJTEPN<br>
+BOELOPXMFEHFrBOEIPXJNQPTTJCMFUPQFOFUSBUFIJT<br>
+NPUJWFTPSVOEFSTUBOEIJTNFUIPET8IPDPVMEFWFSLOPX<br>
+UIFNJOEPGUIF-PSE 8IPDPVMEFWFSCFIJTDPVOTFMMPS <br>
+<br>
+ &#x27;PSPVSTBLFIFXBTDSVDJpFEVOEFS1POUJVT <br>
+ 1JMBUF<br>
+IFTV⒎FSFEEFBUIBOEXBTCVSJFE<br>
+ BOESPTFBHBJOPOUIFUIJSEEBZ<br>
+ JOBDDPSEBODFXJUIUIF4DSJQUVSFT )FBTDFOEFEJOUPIFBWFO<br>
+ BOEJTTFBUFEBUUIFSJHIUIBOEPGUIF&#x27;BUIFS<br>
+ )FXJMMDPNFBHBJOJOHMPSZ<br>
+ UPKVEHFUIFMJWJOHBOEUIFEFBE<br>
+ BOEIJTLJOHEPNXJMMIBWFOPFOE<br>
+ *CFMJFWFJOUIF)PMZ4QJSJU<br>
+UIF-PSE<br>
+UIFHJWFSPG<br>
+ MJGF<br>
+XIPQSPDFFETGSPNUIF&#x27;BUIFSBOEUIF4PO<br>
+ XIPXJUIUIF&#x27;BUIFSBOEUIF4POJTBEPSFEBOE<br>
+ HMPSJpFE<br>
+XIPIBTTQPLFOUISPVHIUIFQSPQIFUT<br>
+ *CFMJFWFJOPOF<br>
+IPMZ<br>
+DBUIPMJDBOEBQPTUPMJD<br>
+ $IVSDI*DPOGFTTPOF#BQUJTNGPSUIFGPSHJWFOFTT<br>
+ PGTJOTBOE*MPPLGPSXBSEUPUIFSFTVSSFDUJPOPG UIFEFBEBOEUIFMJGFPGUIFXPSMEUPDPNF&quot;NFO<br>
+Congregation sits<br>
+0⒎FSUPSZ1SPDFTTJPO<br>
+The gifts of bread and wine which will become the Lord’s body<br>
+and blood are brought to the altar.<br>
+The celebrant raises the host on the paten saying:<br>
+1SJFTU #MFTTFEBSFZPV<br>
+-PSE(PEPGBMMDSFBUJPO<br>
+ GPSUISPVHIZPVSHPPEOFTTXFIBWFSFDFJWFE UIFCSFBEXFP⒎FSZPV<br>
+ GSVJUPGUIFFBSUIBOEXPSLPGIVNBOIBOET<br>
+ JUXJMMCFDPNFGPSVTUIFCSFBEPGMJGF<br>
+&quot;MM #MFTTFECF(PEGPSFWFS<br>
+The celebrant pours wine and a little water into the<br>
+chalice, saying quietly:<br>
+1SJFTU #ZUIFNZTUFSZPGUIJTXBUFSBOEXJOF<br>
+ NBZXFDPNFUPTIBSFJOUIFEJWJOJUZPG$ISJTU<br>
+ XIPIVNCMFEIJNTFMGUPTIBSFJOPVSIVNBOJUZ<br>
+The celebrant then raises the chalice above the<br>
+altar and says: #MFTTFEBSFZPV<br>
+-PSE(PEPGBMMDSFBUJPO<br>
+ GPSUISPVHIZPVSHPPEOFTTXFIBWFSFDFJWFE<br>
+ UIFXJOFXFP⒎FSZPV<br>
+ GSVJUPGUIFWJOFBOEXPSLPGIVNBOIBOET<br>
+ JUXJMMCFDPNFPVSTQJSJUVBMESJOL<br>
+&quot;MM #MFTTFECF(PEGPSFWFS<br>
+Bowing, the celebrant says quietly:<br>
+1SJFTU 8JUIIVNCMFTQJSJUBOEDPOUSJUFIFBSU<br>
+ NBZXFCFBDDFQUFECZZPV<br>
+0-PSE<br>
+ BOENBZPVSTBDSJpDFJOZPVSTJHIUUIJTEBZ CFQMFBTJOHUPZPV<br>
+-PSE(PE<br>
+Then the celebrant washes his hands, saying quietly:<br>
+ 8BTINF<br>
+0-PSE<br>
+GSPNNZJOJRVJUZ<br>
+ BOEDMFBOTFNFGSPNNZTJO<br>
+<br>
+)0.*-:<br>
+13&quot;:&amp;30&#x27;5)&amp;&#x27;&quot;*5)&#x27;6-<br>
+5)&amp;-*563(:0&#x27;5)&amp;&amp;6$)&quot;3*45<br>
+(041&amp;-THE TWENTY FIRST SUNDAY OF ORDINARY TIME<br>
+5)&amp;$3&amp;&amp;%</p>
+<hr>
+<p class="page-label">Page 21</p>
+<p> 1SBZ<br>
+CSPUIFSTBOETJTUFST<br>
+UIBUNZTBDSJpDFBOE <br>
+ ZPVSTNBZCFBDDFQUBCMFUP(PE<br>
+<br>
+ UIFBMNJHIUZ&#x27;BUIFS<br>
+&quot;MM .BZUIF-PSEBDDFQUUIFTBDSJpDFBUZPVSIBOET <br>
+ GPSUIFQSBJTFBOEHMPSZPGIJTOBNF<br>
+GPSPVS <br>
+ HPPEBOEUIFHPPEPGBMMIJTIPMZ$IVSDI<br>
+1SJFTU 0-PSE<br>
+XIPHBJOFEGPSZPVSTFMGBQFPQMFCZ <br>
+ BEPQUJPOUISPVHIUIFPOFTBDSJpDFP⒎FSFEPODFGPS<br>
+ BMM<br>
+CFTUPXHSBDJPVTMZPOVT<br>
+XFQSBZ<br>
+ UIFHJGUTPGVOJUZBOEQFBDFJOZPVS$IVSDI<br>
+ 5ISPVHI$ISJTUPVS-PSE&quot;MM &quot;NFO<br>
+Congregation stands<br>
+1SJFTU 5IF-PSECFXJUIZPV<br>
+&quot;MM &quot;OEXJUIZPVSTQJSJU<br>
+1SJFTU -JGUVQZPVSIFBSUT<br>
+&quot;MM 8FMJGUUIFNVQUPUIF-PSE<br>
+1SJFTU -FUVTHJWFUIBOLTUPUIF-PSEPVS(PE<br>
+&quot;MM *UJTSJHIUBOEKVTU<br>
+13&amp;&#x27;&quot;$&amp; *7JO0SEJOBSZ5JNF<br>
+1SJFTU *UJTUSVMZSJHIUBOEKVTU<br>
+PVSEVUZBOEPVSTBMWBUJPO<br>
+ BMXBZTBOEFWFSZXIFSFUPHJWFZPVUIBOLT<br>
+ -PSE<br>
+IPMZ&#x27;BUIFS<br>
+BMNJHIUZBOEFUFSOBM(PE<br>
+ UISPVHI$ISJTUPVS-PSE<br>
+ &#x27;PSCZIJTCJSUIIFCSPVHIUSFOFXBM<br>
+ UPIVNBOJUZ`TGBMMFOTUBUF<br>
+ BOECZIJTTV⒎FSJOH<br>
+DBODFMMFEPVUPVSTJOT<br>
+ CZIJTSJTJOHGSPNUIFEFBE IFIBTPQFOFEUIFXBZUPFUFSOBMMJGF<br>
+ BOECZBTDFOEJOHUPZPV<br>
+0&#x27;BUIFS<br>
+ IFIBTVOMPDLFEUIFHBUFTPGIFBWFO<br>
+ &quot;OETP<br>
+XJUIUIFDPNQBOZPG&quot;OHFMTBOE4BJOUT<br>
+ XFTJOHUIFIZNOPGZPVSQSBJTF<br>
+ BTXJUIPVUFOEXFBDDMBJN<br>
+&quot;$$-&quot;.&quot;5*0/<br>
+&quot;MM )PMZ<br>
+)PMZ<br>
+)PMZ-PSE(PEPGIPTUT<br>
+ )FBWFOBOEFBSUIBSFGVMMPGZPVSHMPSZ<br>
+ )PTBOOBJOUIFIJHIFTU<br>
+ #MFTTFEJTIFXIPDPNFTJOUIFOBNFPGUIF-PSE<br>
+ )PTBOOBJOUIFIJHIFTU<br>
+1SJFTU :PVBSFJOEFFE)PMZ<br>
+0-PSE<br>
+ BOEBMMZPVIBWFDSFBUFE<br>
+ SJHIUMZHJWFTZPVQSBJTF<br>
+ GPSUISPVHIZPVS4POPVS-PSE+FTVT$ISJTU<br>
+ CZUIFQPXFSBOEXPSLJOHPGUIF)PMZ4QJSJU<br>
+ ZPVHJWFMJGFUPBMMUIJOHTBOENBLFUIFNIPMZ<br>
+ BOEZPVOFWFSDFBTFUPHBUIFSBQFPQMFUPZPVSTFMG<br>
+ TPUIBUGSPNUIFSJTJOHPGUIFTVOUPJUTTFUUJOH<br>
+ BQVSFTBDSJpDFNBZCFP⒎FSFEUPZPVSOBNF<br>
+ 5IFSFGPSF<br>
+0-PSE<br>
+XFIVNCMZJNQMPSFZPV<br>
+ CZUIFTBNF4QJSJUHSBDJPVTMZNBLFIPMZUIFTFHJGUT XFIBWFCSPVHIUUPZPVGPSDPOTFDSBUJPO<br>
+ UIBUUIFZNBZCFDPNFUIF#PEZBOE<br>
+#MPPE<br>
+ PGZPVS4POPVS-PSE+FTVT$ISJTU<br>
+ BUXIPTFDPNNBOEXFDFMFCSBUFUIFTFNZTUFSJFT<br>
+ &#x27;PSPOUIFOJHIUIFXBTCFUSBZFE<br>
+ IFIJNTFMGUPPLCSFBE<br>
+ BOE<br>
+HJWJOHZPVUIBOLT<br>
+IFTBJEUIFCMFTTJOH<br>
+ CSPLFUIFCSFBEBOEHBWFJUUPIJTEJTDJQMFT<br>
+TBZJOH<br>
+ 5&quot;,&amp;5)*4<br>
+&quot;--0&#x27;:06<br>
+&quot;/%&amp;&quot;50&#x27;*5<br>
+ &#x27;035)*4*4.:#0%: 8)*$)8*--#&amp;(*7&amp;/61&#x27;03:06<br>
+ *OBTJNJMBSXBZ<br>
+XIFOTVQQFSXBTFOEFE<br>
+ IFUPPLUIFDIBMJDF BOE<br>
+HJWJOHZPVUIBOLT<br>
+IFTBJEUIFCMFTTJOH<br>
+ BOEHBWFUIFDIBMJDFUPIJTEJTDJQMFT<br>
+TBZJOH<br>
+ 5&quot;,&amp;5)*4<br>
+&quot;--0&#x27;:06<br>
+&quot;/%%3*/,&#x27;30.*5<br>
+ &#x27;035)*4*45)&amp;$)&quot;-*$&amp;0&#x27;.:#-00%<br>
+5)&amp; <br>
+ #-00%0&#x27;5)&amp;/&amp;8&quot;/%&amp;5&amp;3/&quot;-$07&amp;/&quot;/5<br>
+  8)*$)8*--#&amp;1063&amp;%065&#x27;03:06&quot;/%&#x27;03<br>
+ .&quot;/:&#x27;035)&amp;&#x27;03(*7&amp;/&amp;440&#x27;4*/4<br>
+ %05)*4*/.&amp;.03:0&#x27;.&amp;<br>
+1SJFTU5IFNZTUFSZPGGBJUI&quot;MM 8FQSPDMBJNZPVS%FBUI<br>
+0-PSE<br>
+<br>
+ BOEQSPGFTTZPVS3FTVSSFDUJPO<br>
+ VOUJMZPVDPNFBHBJO<br>
+1SJFTU 5IFSFGPSF<br>
+0-PSE<br>
+BTXFDFMFCSBUF<br>
+ UIFNFNPSJBMPGUIFTBWJOH1BTTJPOPGZPVS4PO<br>
+ IJTXPOESPVT3FTVSSFDUJPOBOE&quot;TDFOTJPOJOUP<br>
+ IFBWFO<br>
+BOEBTXFMPPLGPSXBSEUPIJTTFDPOE<br>
+ DPNJOH<br>
+XFP⒎FSZPVJOUIBOLTHJWJOHUIJTIPMZBOE MJWJOHTBDSJpDF<br>
+ -PPL<br>
+XFQSBZ<br>
+VQPOUIFPCMBUJPOPGZPVS$IVSDI <br>
+ BOE<br>
+SFDPHOJTJOHUIFTBDSJpDJBM7JDUJNCZXIPTF <br>
+ EFBUIZPVXJMMFEUPSFDPODJMFVTUPZPVSTFMG<br>
+HSBOU<br>
+ UIBUXF<br>
+XIPBSFOPVSJTIFECZUIF#PEZBOE#MPPE PGZPVS4POBOEpMMFEXJUIIJT)PMZ4QJSJU<br>
+NBZ <br>
+ CFDPNFPOFCPEZ<br>
+POFTQJSJUJO$ISJTU<br>
+ .BZIFNBLFPGVTBOFUFSOBMP⒎FSJOHUPZPV<br>
+ TPUIBUXFNBZPCUBJOBOJOIFSJUBODFXJUIZPVS <br>
+ FMFDU<br>
+FTQFDJBMMZXJUIUIFNPTU#MFTTFE7JSHJO.BSZ<br>
+ .PUIFSPG(PE<br>
+XJUICMFTTFE+PTFQI<br>
+IFSTQPVTF<br>
+ XJUIZPVSCMFTTFE&quot;QPTUMFTBOEHMPSJPVT<br>
+ .BSUZSTXJUI4BJOU1BUSJDLBOEXJUIBMMUIF4BJOUT<br>
+ POXIPTFDPOTUBOUJOUFSDFTTJPOJOZPVSQSFTFODF  XFSFMZGPSVOGBJMJOHIFMQ<br>
+ .BZUIJT4BDSJpDFPGPVSSFDPODJMJBUJPO<br>
+XFQSBZ<br>
+<br>
+ 0-PSE<br>
+BEWBODFUIFQFBDFBOETBMWBUJPOPGBMMUIF<br>
+ XPSME#FQMFBTFEUPDPOpSNJOGBJUIBOEDIBSJUZ <br>
+ ZPVSQJMHSJN$IVSDIPOFBSUI<br>
+XJUIZPVSTFSWBOU  -FPPVS1PQFBOE/ PVS#JTIPQ<br>
+UIF0SEFSPG <br>
+ #JTIPQT<br>
+BMMUIFDMFSHZ<br>
+BOEUIFFOUJSFQFPQMFZPV  IBWFHBJOFEGPSZPVSPXO<br>
+ -JTUFOHSBDJPVTMZUPUIFQSBZFSTPGUIJTGBNJMZ<br>
+ XIPNZPVIBWFTVNNPOFECFGPSFZPV<br>
+ JOZPVSDPNQBTTJPO<br>
+0NFSDJGVM&#x27;BUIFS<br>
+ HBUIFSUPZPVSTFMGBMMZPVSDIJMESFO<br>
+ TDBUUFSFEUISPVHIPVUUIFXPSME<br>
+ 5PPVSEFQBSUFECSPUIFSTBOETJTUFST BOEUPBMMXIPXFSFQMFBTJOHUPZPV<br>
+ BUUIFJSQBTTJOHGSPNUIJTMJGF<br>
+ HJWFLJOEBENJUUBODFUPZPVSLJOHEPN 5IFSFXFIPQFUPFOKPZGPSFWFSUIFGVMMOFTTPG <br>
+ ZPVSHMPSZUISPVHI$ISJTUPVS-PSE<br>
+UISPVHIXIPN<br>
+ ZPVCFTUPXPOUIFXPSMEBMMUIBUJTHPPE<br>
+<br>
+13&quot;:&amp;307&amp;35)&amp;0&#x27;&amp;3*/(4<br>
+&amp;6$)&quot;3*45*$13&quot;:&amp;3***THE TWENTY FIRST SUNDAY OF ORDINARY TIME<br>
+</p>
+<hr>
+<p class="page-label">Page 22</p>
+<p><br>
+1SJFTU #FIPMEUIF-BNCPG(PE<br>
+<br>
+ CFIPMEIJNXIPUBLFTBXBZUIFTJOTPGUIFXPSME <br>
+ #MFTTFEBSFUIPTFDBMMFEUPUIFTVQQFSPGUIF-BNC<br>
+&quot;MM -PSE<br>
+*BNOPUXPSUIZ<br>
+ UIBUZPVTIPVMEFOUFSVOEFSNZSPPG<br>
+ CVUPOMZTBZUIFXPSE<br>
+ BOENZTPVMTIBMMCFIFBMFE<br>
+1SJFTU .BZUIF#PEZPG$ISJTU<br>
+ LFFQNFTBGFGPSFUFSOBMMJGF<br>
+1SJFTU .BZUIF#MPPEPG$ISJTU<br>
+ LFFQNFTBGFGPSFUFSOBMMJGF<br>
+&quot;MM 5IFFBSUIJTSFQMFUFXJUIUIFGSVJUTPGZPVSXPSL<br>
+<br>
+ 0-PSE<br>
+ZPVCSJOHGPSUICSFBEGSPNUIFFBSUI<br>
+ BOEXJOFUPDIFFSUIFIFBSU<br>
+Purifying the chalice the celebrant says quietly:<br>
+8IBUIBTQBTTFEPVSMJQTBTGPPE<br>
+0-PSE<br>
+NBZXFQPTTFTTJOQVSJUZPGIFBSU<br>
+UIBUXIBUIBTCFFOHJWFOUPVTJOUJNF<br>
+NBZCFPVSIFBMJOHGPSFUFSOJUZ<br>
+Congregation kneels<br>
+1SJFTU -FUVTQSBZ<br>
+ $PNQMFUFXJUIJOVT<br>
+0-PSE<br>
+XFQSBZ<br>
+ UIFIFBMJOHXPSLPGZPVSNFSDZ<br>
+ BOEHSBDJPVTMZQFSGFDUBOETVTUBJOVT<br>
+ TPUIBUJOBMMUIJOHTXFNBZQMFBTFZPV<br>
+ 5ISPVHI$ISJTUPVS-PSE<br>
+&quot;MM&quot;NFO<br>
+1SJFTU 5IF-PSECFXJUIZPV<br>
+&quot;MM&quot;OEXJUIZPVSTQJSJU<br>
+1SJFTU .BZ(PECMFTTZPVXJUIFWFSZIFBWFOMZCMFTTJOH<br>
+ NBLFZPVBMXBZTIPMZBOEQVSFJOIJTTJHIU<br>
+ QPVSPVUJOBCVOEBODFVQPOZPVUIFSJDIFTPGIJT <br>
+ HMPSZ<br>
+BOEUFBDIZPVXJUIUIFXPSETPGUSVUI<br>
+ NBZIFJOTUSVDUZPVJOUIF(PTQFMPGTBMWBUJPO<br>
+ BOEFWFSFOEPXZPVXJUIGSBUFSOBMDIBSJUZ<br>
+ 5ISPVHI$ISJTUPVS-PSE<br>
+&quot;MM&quot;NFO<br>
+1SJFTU &quot;OENBZUIFCMFTTJOHPGBMNJHIUZ(PE<br>
+ UIF&#x27;BUIFS<br>
+BOEUIF4PO<br>
+<br>
+BOEUIF)PMZ4QJSJU<br>
+ DPNFEPXOPOZPVBOESFNBJOXJUIZPVGPSFWFS<br>
+&quot;MM&quot;NFO<br>
+Then the celebrant, with hands joined and facing the people, says:<br>
+1SJFTU (PBOEBOOPVODFUIF(PTQFMPGUIF-PSE<br>
+&quot;MM5IBOLTCFUP(PE<br>
+*NQSJNBUVSrOJIJMPCTUBU<br>
+.PTU3FW&quot;MBO.D(VDLJBO<br>
+4+<br>
+#JTIPQPG%PXOBOE$POOPS&amp;YDFSQUT<br>
+GSPNUIF&amp;OHMJTIUSBOTMBUJPOPG5IF3PNBO.JTTBM<br>
+*OUFSOBUJPOBM$PNNJUUFFPO&amp;OHMJTIJO<br>
+UIF-JUVSHZ$PSQPSBUJPO&quot;MMSJHIUTSFTFSWFE+FSVTBMFN#JCMFWFSTJPOPGUIFTDSJQUVSFTDPQZSJHIU<br>
+%BSUPO<br>
+-POHNBO5PEE-UEBOE%PVCMFEBZ$P*OD3FTQPOTPSJBM1TBMNTBSFDPQZSJHIU5IF<br>
+(SBJMBOEPS(FP⒎SFZ$IBQNBO-UE$SFBUFEBOEQVCMJTIFECZ5BSB-FFT<br>
+-JMMF1BSL<br>
+#FMGBTU<br>
+<br>
+#5-35&amp;UBSBCPPLMFU!HNBJMDPN1SJFTU 5ISPVHIIJN<br>
+BOEXJUIIJN<br>
+BOEJOIJN<br>
+ 0(PE<br>
+BMNJHIUZ&#x27;BUIFS<br>
+ JOUIFVOJUZPGUIF)PMZ4QJSJU<br>
+ BMMHMPSZBOEIPOPVSJTZPVST<br>
+ GPSFWFSBOEFWFS<br>
+&quot;MM &quot;NFO<br>
+Congregation stands<br>
+1SJFTU &quot;UUIF4BWJPVS`TDPNNBOE<br>
+ BOEGPSNFECZEJWJOFUFBDIJOH<br>
+<br>
+ XFEBSFUPTBZ<br>
+&quot;MM 0VS&#x27;BUIFS<br>
+XIPBSUJOIFBWFO<br>
+ IBMMPXFECFUIZOBNF<br>
+ UIZLJOHEPNDPNF<br>
+ UIZXJMMCFEPOFPOFBSUIBTJUJTJOIFBWFO<br>
+ (JWFVTUIJTEBZPVSEBJMZCSFBE<br>
+BOEGPSHJWFVTPVSUSFTQBTTFT<br>
+ BTXFGPSHJWFUIPTFXIPUSFTQBTTBHBJOTUVT<br>
+ BOEMFBEVTOPUJOUPUFNQUBUJPO<br>
+ CVUEFMJWFSVTGSPNFWJM<br>
+1SJFTU %FMJWFSVT<br>
+-PSE<br>
+XFQSBZ<br>
+GSPNFWFSZFWJM<br>
+ HSBDJPVTMZHSBOUQFBDFJOPVSEBZT<br>
+ UIBU<br>
+CZUIFIFMQPGZPVSNFSDZ<br>
+ XFNBZCFBMXBZTGSFFGSPNTJO<br>
+ BOETBGFGSPNBMMEJTUSFTT<br>
+ BTXFBXBJUUIFCMFTTFEIPQF BOEUIFDPNJOHPGPVS4BWJPVS<br>
++FTVT$ISJTU<br>
+&quot;MM &#x27;PSUIFLJOHEPN<br>
+UIFQPXFSBOEUIFHMPSZ<br>
+ BSFZPVSTOPXBOEGPSFWFS1SJFTU -PSE+FTVT$ISJTU<br>
+XIPTBJEUPZPVS&quot;QPTUMFT<br>
+ 1FBDF*MFBWFZPV<br>
+NZQFBDF*HJWFZPV<br>
+ MPPLOPUPOPVSTJOT<br>
+CVUPOUIFGBJUIPGZPVS$IVSDI<br>
+ BOEHSBDJPVTMZHSBOUIFSQFBDFBOEVOJUZ JOBDDPSEBODFXJUIZPVSXJMM<br>
+ 8IPMJWFBOESFJHOGPSFWFSBOEFWFS&quot;MM &quot;NFO<br>
+1SJFTU 5IFQFBDFPGUIF-PSECFXJUIZPVBMXBZT<br>
+&quot;MM &quot;OEXJUIZPVSTQJSJU<br>
+1SJFTU .BZUIJTNJOHMJOHPGUIF#PEZBOE#MPPEPGPVS-PSE<br>
+ +FTVT$ISJTUCSJOHFUFSOBMMJGFUPVTXIPSFDFJWFJU<br>
+&quot;MM -BNCPG(PE<br>
+ZPVUBLFBXBZUIFTJOTPGUIF<br>
+ XPSME<br>
+IBWFNFSDZPOVT<br>
+ -BNCPG(PE<br>
+ZPVUBLFBXBZUIFTJOTPGUIF <br>
+ XPSME<br>
+IBWFNFSDZPOVT -BNCPG(PE<br>
+ZPVUBLFBXBZUIFTJOTPGUIF<br>
+ XPSME<br>
+HSBOUVTQFBDF<br>
+Congregation kneels<br>
+The celebrant says quietly:<br>
+-PSE+FTVT$ISJTU<br>
+4POPGUIFMJWJOH(PE<br>
+XIP<br>
+CZUIFXJMMPGUIF&#x27;BUIFS<br>
+BOEUIFXPSLPGUIF)PMZ4QJSJU<br>
+UISPVHIZPVS%FBUIHBWFMJGFUPUIFXPSME<br>
+GSFFNFCZUIJT<br>
+ZPVSNPTUIPMZ#PEZBOE#MPPE<br>
+GSPNBMMNZTJOTBOEGSPNFWFSZFWJM<br>
+LFFQNFBMXBZTGBJUIGVMUPZPVSDPNNBOENFOUT<br>
+BOEOFWFSMFUNFCFQBSUFEGSPNZPV<br>
+THE TWENTY-NINTH SUNDAY IN ORDINARY TIME - WORLD MISSION SUNDAY &#x27;PSPOUIFOJHIUIFXBTCFUSBZFE<br>
+ IFIJNTFMGUPPLCSFBE<br>
+ BOE<br>
+HJWJOHZPVUIBOLT<br>
+IFTBJEUIFCMFTTJOH<br>
+ CSPLFUIFCSFBEBOEHBWFJUUPIJTEJTDJQMFT<br>
+TBZJOH<br>
+ 5&quot;,&amp;5)*4<br>
+&quot;--0&#x27;:06<br>
+&quot;/%&amp;&quot;50&#x27;*5<br>
+ &#x27;035)*4*4.:#0%: 8)*$)8*--#&amp;(*7&amp;/61&#x27;03:06<br>
+ *OBTJNJMBSXBZ<br>
+XIFOTVQQFSXBTFOEFE<br>
+ IFUPPLUIFDIBMJDF BOE<br>
+HJWJOHZPVUIBOLT<br>
+IFTBJEUIFCMFTTJOH<br>
+ BOEHBWFUIFDIBMJDFUPIJTEJTDJQMFT<br>
+TBZJOH<br>
+ 5&quot;,&amp;5)*4<br>
+&quot;--0&#x27;:06<br>
+&quot;/%%3*/,&#x27;30.*5<br>
+ &#x27;035)*4*45)&amp;$)&quot;-*$&amp;0&#x27;.:#-00%<br>
+5)&amp; <br>
+ #-00%0&#x27;5)&amp;/&amp;8&quot;/%&amp;5&amp;3/&quot;-$07&amp;/&quot;/5<br>
+  8)*$)8*--#&amp;1063&amp;%065&#x27;03:06&quot;/%&#x27;03<br>
+ .&quot;/:&#x27;035)&amp;&#x27;03(*7&amp;/&amp;440&#x27;4*/4<br>
+ %05)*4*/.&amp;.03:0&#x27;.&amp;<br>
+1SJFTU5IFNZTUFSZPGGBJUI&quot;MM 8FQSPDMBJNZPVS%FBUI<br>
+0-PSE<br>
+<br>
+ BOEQSPGFTTZPVS3FTVSSFDUJPO<br>
+ VOUJMZPVDPNFBHBJO<br>
+1SJFTU 5IFSFGPSF<br>
+0-PSE<br>
+BTXFDFMFCSBUF<br>
+ UIFNFNPSJBMPGUIFTBWJOH1BTTJPOPGZPVS4PO<br>
+ IJTXPOESPVT3FTVSSFDUJPOBOE&quot;TDFOTJPOJOUP<br>
+ IFBWFO<br>
+BOEBTXFMPPLGPSXBSEUPIJTTFDPOE<br>
+ DPNJOH<br>
+XFP⒎FSZPVJOUIBOLTHJWJOHUIJTIPMZBOE MJWJOHTBDSJpDF<br>
+ -PPL<br>
+XFQSBZ<br>
+VQPOUIFPCMBUJPOPGZPVS$IVSDI <br>
+ BOE<br>
+SFDPHOJTJOHUIFTBDSJpDJBM7JDUJNCZXIPTF <br>
+ EFBUIZPVXJMMFEUPSFDPODJMFVTUPZPVSTFMG<br>
+HSBOU<br>
+ UIBUXF<br>
+XIPBSFOPVSJTIFECZUIF#PEZBOE#MPPE PGZPVS4POBOEpMMFEXJUIIJT)PMZ4QJSJU<br>
+NBZ <br>
+ CFDPNFPOFCPEZ<br>
+POFTQJSJUJO$ISJTU<br>
+ .BZIFNBLFPGVTBOFUFSOBMP⒎FSJOHUPZPV<br>
+ TPUIBUXFNBZPCUBJOBOJOIFSJUBODFXJUIZPVS <br>
+ FMFDU<br>
+FTQFDJBMMZXJUIUIFNPTU#MFTTFE7JSHJO.BSZ<br>
+ .PUIFSPG(PE<br>
+XJUICMFTTFE+PTFQI<br>
+IFSTQPVTF<br>
+ XJUIZPVSCMFTTFE&quot;QPTUMFTBOEHMPSJPVT<br>
+ .BSUZSTXJUI4BJOU1BUSJDLBOEXJUIBMMUIF4BJOUT<br>
+ POXIPTFDPOTUBOUJOUFSDFTTJPOJOZPVSQSFTFODF  XFSFMZGPSVOGBJMJOHIFMQ<br>
+ .BZUIJT4BDSJpDFPGPVSSFDPODJMJBUJPO<br>
+XFQSBZ<br>
+<br>
+ 0-PSE<br>
+BEWBODFUIFQFBDFBOETBMWBUJPOPGBMMUIF<br>
+ XPSME#FQMFBTFEUPDPOpSNJOGBJUIBOEDIBSJUZ <br>
+ ZPVSQJMHSJN$IVSDIPOFBSUI<br>
+XJUIZPVSTFSWBOU  -FPPVS1PQFBOE/ PVS#JTIPQ<br>
+UIF0SEFSPG <br>
+ #JTIPQT<br>
+BMMUIFDMFSHZ<br>
+BOEUIFFOUJSFQFPQMFZPV  IBWFHBJOFEGPSZPVSPXO<br>
+ -JTUFOHSBDJPVTMZUPUIFQSBZFSTPGUIJTGBNJMZ<br>
+ XIPNZPVIBWFTVNNPOFECFGPSFZPV<br>
+ JOZPVSDPNQBTTJPO<br>
+0NFSDJGVM&#x27;BUIFS<br>
+ HBUIFSUPZPVSTFMGBMMZPVSDIJMESFO<br>
+ TDBUUFSFEUISPVHIPVUUIFXPSME<br>
+ 5PPVSEFQBSUFECSPUIFSTBOETJTUFST BOEUPBMMXIPXFSFQMFBTJOHUPZPV<br>
+ BUUIFJSQBTTJOHGSPNUIJTMJGF<br>
+ HJWFLJOEBENJUUBODFUPZPVSLJOHEPN 5IFSFXFIPQFUPFOKPZGPSFWFSUIFGVMMOFTTPG <br>
+ ZPVSHMPSZUISPVHI$ISJTUPVS-PSE<br>
+UISPVHIXIPN<br>
+ ZPVCFTUPXPOUIFXPSMEBMMUIBUJTHPPE<br>
+5)&amp;$0.6/*0/3*5&amp;<br>
+*/7*5&quot;5*0/50)0-:$0.6/*0/<br>
+$0.6/*0/&quot;/5*1)0/ $G1T<br>
+13&quot;:&amp;3&quot;&#x27;5&amp;3$0.6/*0/THE TWENTY FIRST SUNDAY OF ORDINARY TIME<br>
+5)&amp;$0/$-6%*/(3*5&amp;4</p>
+<hr>
+<p class="page-label">Page 23</p>
+<p>8FSFNFNCFSPVSCFMPWFEEFBE<br>
+&quot;//*7&amp;34&quot;3*&amp;4+JN$POOBHIBO3PCFSU&amp;OHMJTI#FSOJF.BMMPO.BSUJO8BUUFST3PCFSU 4OS<br>
+.BSUIB<br>
+.POB%BNJBO,FSS4FBNVT)VMM4S.BSZ%VOOF3PTFOB)VHI)VHIFT+JN%PXOFZ)VHI.BSZ.BYXFMM+BNFT.BSZ.D(SPHBO<br>
+5)*48&amp;&amp;,`4$&quot;-&amp;/%&quot;3<br>
+.POEBZUI&quot;VHVTUr4U#BSUIPMPNFX<br>
+5IVSTEBZUI&quot;VHVTUr4U.POJDB<br>
+&#x27;SJEBZUI&quot;VHVTUr4U&quot;VHVTUJOF<br>
+#JTIPQBOE%PDUPSPGUIF$IVSDI<br>
+4BUVSEBZUI&quot;VHVTUr4U+PIOUIF#BQUJTU<br>
+#6--&amp;5*//05*$&amp;4&quot;/%&quot;//*7&amp;34&quot;3*&amp;4<br>
+#VMMFUJO/PUJDFTTIPVMECFXJUIUIF1BSJTI0⒏DFCZOPPOPO.POEBZ<br>
+UPCFJODMVEFEJOUIFXFFLFOECVMMFUJO<br>
+1MFBTFOPUFBMMFNBJMTUP1BSJTI0⒏DFTIPVMECFBEESFTTFEUPr<br>
+MJTCVSO!EPXOBOEDPOOPSPSH451&quot;53*$,`41&quot;4503&quot;-$&amp;/53&amp;<br>
+0ME4DIPPM$BGÉXJMMSFPQFOPO.POEBZ&quot;VHVTUBGUFSBN.BTTBLARIS PARISH: Sunday 23rd August 2026 BLARIS PARISH: Sunday 23rd August 2026<br>
+4&quot;$3&quot;.&amp;/540&#x27;&#x27;*3453&amp;$0/$*-*&quot;5*0/&quot;/%&#x27;*345)0-:$0.6/*0/<br>
+1BSFOUTPGDIJMESFOBUUFOEJOHTDIPPMTJOUIF1BSJTI<br>
+PUIFSUIBO4U+PTFQI`T4U&quot;MPZTJVT1SJNBSZ4DIPPMTXIP<br>
+XJTIUPIBWFUIFJSDIJMEDIJMESFOFOSPMMFEGPS&#x27;JSTU3FDPODJMJBUJPOBOE&#x27;JSTU)PMZ$PNNVOJPOBSF<br>
+BTLFEUPDPOUBDUUIF1BSJTI0⒏DFUPSFHJTUFSr1IPOF&amp;NBJMMJTCVSO!EPXOBOEDPOOPSPSH<br>
+5IFMJNJUFEQMBDFTBWBJMBCMFXJMMCFBXBSEFEPOUIFpSTUDPNF<br>
+pSTUTFSWFECBTJT<br>
+4&quot;$3&quot;.&amp;/50&#x27;$0/&#x27;*3.&quot;5*0/<br>
+&amp;OSPMNFOUGPS4U1BUSJDL`T1BSJTI$POpSNBUJPO$MBTTFTJTOPXPQFOUP:FBSBOE:FBSQVQJMT<br>
+XIPBSFOPUBUUFOEJOHFJUIFS4U+PTFQI`TPS4U&quot;MPZTJVT1SJNBSZ4DIPPMT&amp;BDIQVQJMJOUFOEJOHUPFOSPMJOUIF<br>
+QSFQBSBUJPODMBTTNVTUIBWFSFDFJWFE&#x27;JSTU$PNNVOJPOBOECFBCMFUPBUUFOEBMMTFTTJPOT<br>
+1MFBTFDPOUBDUUIF1BSJTI0⒏DFUPSFHJTUFSr&amp;NBJMMJTCVSO!EPXOBOEDPOOPSPSH<br>
+*/%*&quot;/$&quot;5)0-*$$0.6/*5:<br>
+.BTTJO4ZSP.BMBCBS3JUFXJMMCFDFMFCSBUFEJO4U1BUSJDL`T$IVSDIBUQNOFYU4VOEBZUI&quot;VHVTU<br>
+$)*-%3&amp;/`4-*563(:XJMMDPNNFODFBHBJOPO4VOEBZUI4FQUFNCFSEVSJOHBN<br>
+.BTT5IJTHSPVQXFMDPNFTBMMDIJMESFOGSPNZFBSTPGBHF 1SJNBSZUP1SJNBSZ<br>
+<br>
+1MFBTFOPUFUIBUZPVNVTUSFHJTUFSZPVSDIJMEDIJMESFO#&amp;&#x27;03&amp;UIJTEBUF*GZPVXPVMEMJLF<br>
+ZPVSDIJMEUPCFSFHJTUFSFE<br>
+UIFSFXJMMCFBSFHJTUSBUJPOTFTTJPOPO4VOEBZUI4FQUFNCFS<br>
+CFGPSFBOEBGUFSBN.BTTJOUIF1BTUPSBM$FOUSF*GBDIJMEIBTOPUCFFOSFHJTUFSFEUIFZ<br>
+DBOOPUBUUFOE*GZPVBMSFBEZSFHJTUFSFEZPVSDIJMEMBTUZFBS<br>
+ZPVEPOPUOFFE<br>
+UPSFSFHJTUFS&quot;EEJUJPOBMMZ<br>
+JGZPVXPVMEMJLFUPCFQBSUPGPVS$IJMESFO`T-JUVSHZ5FBNPG<br>
+7PMVOUFFST<br>
+QMFBTFDPOUBDUUIF1BSJTI0⒏DF<br>
+8FMPPLGPSXBSEUPXFMDPNJOHUIFDIJMESFOCBDLJO4FQUFNCFS<br>
+451&quot;53*$,`4:065)$-6#<br>
+3FHJTUSBUJPOXJMMCFPO&#x27;SJEBZUI4FQUFNCFSGSPNrQNJOUIF1BTUPSBM$FOUSF<br>
+GPSBMMOFXBOEPME.FNCFST BHFZFBST<br>
+<br>
+&quot;MMDIJMESFONVTUCFBDDPNQBOJFECZUIFJSQBSFOUTPOUIBUFWFOJOH<br>
+$PTUPG.FNCFSTIJQgTJOHMF<br>
+g&#x27;BNJMZGPSUIFZFBS<br>
+gOJHIUMZGFF<br>
+5IF:PVUI$MVCXJMMUIFODPNNFODFPO&#x27;SJEBZUI4FQUFNCFSrQN<br>
+.&quot;33*&quot;(&amp;&amp;/$06/5&amp;38&amp;&amp;,&amp;/%/E5)0$50#&amp;3<br>
+.BSSJBHF&amp;ODPVOUFS*SFMBOEJOWJUFTNBSSJFEDPVQMFTUPBSFTJEFOUJBM8FFLFOEGSPN<br>
+&#x27;SJEBZOEUP4VOEBZUI0DUPCFSBUUIFl&#x27;PDPMBSF$FOUSFz$VSSZIJMMT<br>
+1SPTQFSPVT<br>
+$P,JMEBSF<br>
+4UFQBXBZGSPNEBJMZEJTUSBDUJPOTUPEFFQFOZPVSDPNNVOJDBUJPO<br>
+SFOFXZPVSMPWF<br>
+<br>
+BOESFEJTDPWFSUIFKPZPGZPVSNBSSJBHFXXXNBSSJBHFFODPVOUFSJF5</p>
+<hr>
+<p class="page-label">Page 24</p>
+<p>.&quot;555&quot;-#05r63#&quot;/.:45*$<br>
+5IF,OJHIUTPG4U$PMVNCBOVT<br>
+$,%PXOQBUSJDL<br>
+JOWJUFZPVUPBTQFDJBMTDSFFOJOHPG.BUU5BMCPUr6SCBO.ZTUJDBU<br>
+/FXDBTUMF$PNNVOJUZ$JOFNB<br>
+4U.BSZT)BMM<br>
+.BJO4USFFU<br>
+/FXDBTUMF<br>
+PO&#x27;SJEBZUI4FQUFNCFSBUQN.BUU<br>
+5BMCPUTSFNBSLBCMFUSVFTUPSZPGGBJUI<br>
+TUSVHHMF<br>
+BEEJDUJPOBOESFEFNQUJPODPOUJOVFTUPJOTQJSFQFPQMFUISPVHIPVUUIF<br>
+XPSMEBOEP⒎FSTBQPXFSGVMNFTTBHFPGIPQFUPUIPTFB⒎FDUFECZBEEJDUJPOBOEUIFJSGBNJMJFT5IFFWFOJOHXJMMBMTP<br>
+GFBUVSFHVFTUTQFBLFS.JDIBFM.VSQIZ&quot;ENJTTJPOJTGSFF<br>
+XJUIBTVHHFTUFEEPOBUJPOPGgUPXBSETDPTUT5FBBOE<br>
+DP⒎FFXJMMCFTFSWFEGPMMPXJOHUIFTDSFFOJOH&amp;WFSZPOFJTWFSZXFMDPNFrQMFBTFCSJOHGBNJMZBOEGSJFOET<br>
+451&quot;53*$,4(&quot;$<br>
+4FOJPS-BEJFTHFUTUBSUFEXJUIUIFJS$IBNQJPOTIJQDBNQBJHOPO5VFTEBZUI&quot;VHVTUBHBJOTU&quot;FSBDIB6MBEIXJUIB<br>
+UISPXJOBUQN5IJTNBUDIJTOPXPOBU,JSLXPPET3PBE8PVMECFHSFBUUPTFFBCJHDSPXEUPDIFFSUIFNPO<br>
+4FOJPS.FOIBWFBMPOHCSFBLJOUIF$IBNQJPOTIJQXJUIUIFOFYUHBNFBHBJOTU4U$PNHBMMTPO4BUVSEBZUI<br>
+4FQUFNCFSXJUIBQNUISPXJO&quot;HBJOJUXPVMECFHSFBUUPTFFBHPPEDSPXEEPXOUPTVQQPSUUIFUFBN<br>
+451&quot;53*$,44&amp;/*03$)0*3SFUVSOGPSSFIFBSTBMPO8FEOFTEBZOE4FQUFNCFSBUQN<br>
+5IFDIPJSIBWFIBEBCVTZTVNNFSXJUINFNCFSTSFQSFTFOUJOHUIFQBSJTIBOEEJPDFTFBUUIFTISJOFTPG,OPDL<br>
+<br>
+-PVSEFTBOE&#x27;BUJNB8FXFMDPNFOFXNBMFWPJDFTUFOPSBOECBTT<br>
+*GZPVBSFJOUFSFTUFEDPOUBDUUIFQBSJTIP⒏DFBOEDPNFKPJOJOPOBSFIFBSTBM<br>
+1TBMNr4JOHUP(PE<br>
+TJOHQSBJTFTUPIJTOBNF<br>
+MJGUVQBTPOHUPIJNXIPSJEFTUISPVHIUIFEFTFSUT<br>
+IJTOBNFJTUIF-03%<br>
+FYVMUCFGPSFIJNBLARIS PARISH: Sunday 23rd August 2026<br>
+-*4#63/$*5:-*#3&quot;3:QSFTFOUT&quot;OFYIJCJUJPOPO#FMGBTU#PUBOJDBM(BSEFOTTUUPUI4FQUFNCFS<br>
+&quot;(BSEFOFST1FSTQFDUJWF&quot;O&amp;YIJCJUJPOCZ)BZMFZ8ZMJF5IVSSBUPGQBJOUJOHT<br>
+ESBXJOHT<br>
+QSJOUNBLJOH<br>
+QSFTTFEQMBOUTBOE<br>
+GPVOEPCKFDUTUIBUNFSHFUIFCFBVUZBOETDJFODFPGCPUBOZ<br>
+IPSUJDVMUVSFBOEBSU<br>
+&amp;YUSFNF&amp;YJTUFODF5IF)VOU4BUVSEBZUI4FQUFNCFS+PJOTUB⒎GSPNBXBSEXJOOJOH4DJFODF%JTDPWFSZ$FOUSF<br>
+BTUIFZFYBNJOFIPXBOJNBMTTVSWJWFMJGFJOUIFXJMEBOEMFBSOTPNFPGUIFBTUPVOEJOHXBZTUIFZNBOBHFUPpOErPS<br>
+BWPJECFDPNJOHrUIFOFYUNFBM&quot;HFrZST#PPLJOHFTTFOUJBM4FFCFMPX<br>
+1MFEHFGPSUIF1MBOFU$SBGU8FEOFTEBZSE4FQUFNCFS+PJO+PBOOFBOE/PFMGSPN-JTCVSOBOE$BTUMFSFBHI$JUZ<br>
+$PVODJMGPSBGVOVQDZDMJOHDSBGUTFTTJPO#PUIFWFOUTTVJUBCMFGPSDIJMESFOBHFErZSTBDDPNQBOJFECZBOBEVMU<br>
+QNrQN#PPLJOHFTTFOUJBMUFMJTCVSODJUZMJCSBSZ!MJCSBSJFTOJPSHVL</p>
+<hr>
+<p class="page-label">Page 25</p>
+<p>5PBEWFSUJTFDPOUBDU5BSBPOPSCZFNBJMBUUBSBCPPLMFU!HNBJMDPN</p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other DOWN &amp; CONNOR Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="antrim"><a class="parish-link" href="antrimparish.html" target="_blank" rel="noopener noreferrer">Antrim</a></li><li class="parish-item" data-name="ballycastle"><a class="parish-link" href="ballycastleparish.html" target="_blank" rel="noopener noreferrer">Ballycastle</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="kilmore and killyleagh"><a class="parish-link" href="kilmoreandkillyleagh.html" target="_blank" rel="noopener noreferrer">Kilmore and Killyleagh</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="port glenone (st mary&#x27;s portglenone)"><a class="parish-link" href="stmarysportglenone.html" target="_blank" rel="noopener noreferrer">Port Glenone (St Mary&#x27;s Portglenone)</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="sacred heart belfast"><a class="parish-link" href="sacredheartparishbelfast.html" target="_blank" rel="noopener noreferrer">Sacred Heart Belfast</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st brigids belfast"><a class="parish-link" href="stbrigidsparishbelfast.html" target="_blank" rel="noopener noreferrer">St Brigids Belfast</a></li><li class="parish-item" data-name="st colmcilles"><a class="parish-link" href="st-colmcilles.html" target="_blank" rel="noopener noreferrer">St Colmcilles</a></li><li class="parish-item" data-name="st gerards"><a class="parish-link" href="stgerardsparish.html" target="_blank" rel="noopener noreferrer">St Gerards</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st mary&#x27;s on the hill"><a class="parish-link" href="stmarysonthehill.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s on the Hill</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li><li class="parish-item" data-name="st teresas"><a class="parish-link" href="stteresasparish.html" target="_blank" rel="noopener noreferrer">St Teresas</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="antrim"><a class="parish-link" href="antrimparish.html" target="_blank" rel="noopener noreferrer">Antrim</a></li><li class="parish-item" data-name="ballycastle"><a class="parish-link" href="ballycastleparish.html" target="_blank" rel="noopener noreferrer">Ballycastle</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="ballymenaparish.html" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="derriaghy"><a class="parish-link" href="derriaghycatholicparish.html" target="_blank" rel="noopener noreferrer">Derriaghy</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="kilmore and killyleagh"><a class="parish-link" href="kilmoreandkillyleagh.html" target="_blank" rel="noopener noreferrer">Kilmore and Killyleagh</a></li><li class="parish-item" data-name="loughshore"><a class="parish-link" href="loughshoreparishes.html" target="_blank" rel="noopener noreferrer">Loughshore</a></li><li class="parish-item" data-name="maghera"><a class="parish-link" href="parishofmaghera.html" target="_blank" rel="noopener noreferrer">Maghera</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="port glenone (st mary&#x27;s portglenone)"><a class="parish-link" href="stmarysportglenone.html" target="_blank" rel="noopener noreferrer">Port Glenone (St Mary&#x27;s Portglenone)</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="sacred heart belfast"><a class="parish-link" href="sacredheartparishbelfast.html" target="_blank" rel="noopener noreferrer">Sacred Heart Belfast</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="saint anthony"><a class="parish-link" href="saintanthony.html" target="_blank" rel="noopener noreferrer">Saint Anthony</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st brigids belfast"><a class="parish-link" href="stbrigidsparishbelfast.html" target="_blank" rel="noopener noreferrer">St Brigids Belfast</a></li><li class="parish-item" data-name="st colmcille&#x27;s holywood"><a class="parish-link" href="stcolmcillesholywood.html" target="_blank" rel="noopener noreferrer">St Colmcille&#x27;s Holywood</a></li><li class="parish-item" data-name="st colmcilles"><a class="parish-link" href="st-colmcilles.html" target="_blank" rel="noopener noreferrer">St Colmcilles</a></li><li class="parish-item" data-name="st gerards"><a class="parish-link" href="stgerardsparish.html" target="_blank" rel="noopener noreferrer">St Gerards</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st mary&#x27;s on the hill"><a class="parish-link" href="stmarysonthehill.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s on the Hill</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li><li class="parish-item" data-name="st teresas"><a class="parish-link" href="stteresasparish.html" target="_blank" rel="noopener noreferrer">St Teresas</a></li></ul>
     </section>
   </div>
   <footer>
@@ -776,9 +1661,9 @@
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260822c"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260823s"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260822c';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260823s';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1017,9 +1902,32 @@
         if (page) page.insertBefore(banner, page.firstChild);
       }
     })();
-  </script>
-  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
-  <script>
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
     (function () {
       var btn = document.getElementById('scroll-top-btn');
       if (!btn) return;
@@ -1034,6 +1942,8 @@
         window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
       });
     })();
-    </script>
+    
+  </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
 </body>
 </html>
