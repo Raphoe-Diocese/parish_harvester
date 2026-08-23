@@ -16,6 +16,8 @@ from PyPDF2 import PdfReader
 from harvester.ai_summaries import summarise_bulletin
 from harvester.events_extractor import extract_events, write_events_json
 from harvester.weekly_diff import diff_bulletins
+from harvester.diocese_intro import lookup_internal_href
+from harvester.parish_aliases import collapse_named_links
 from harvester.site_chrome import favicon_link_tags, scroll_top_css, scroll_top_html, scroll_top_js, sticky_search_css, sticky_search_js
 from ocr.bulletin_layout import ocr_masthead_css, structure_ocr_html
 from ocr.parish_splitter import split_ocr_by_parish
@@ -788,7 +790,7 @@ def render_parish_link_grid(
     """
     if not parish_links:
         return '<p class="empty-state">No parish bulletin links were found for this diocese yet.</p>'
-    sorted_links = sorted(parish_links, key=lambda pair: pair[0].lower())
+    sorted_links = collapse_named_links(list(parish_links))
     internal_hrefs = internal_hrefs or {}
     items = []
     seen: set[str] = set()
@@ -800,7 +802,7 @@ def render_parish_link_grid(
         seen.add(key)
         name_key = html.escape(name.lower(), quote=True)
         safe_name = html.escape(name)
-        href = internal_hrefs.get(key) or url
+        href = lookup_internal_href(name, internal_hrefs) or url
         safe_href = html.escape(href, quote=True)
         items.append(
             f'<li class="parish-item" data-name="{name_key}">'
@@ -1159,7 +1161,7 @@ def prefers_native_pdf_js() -> str:
 """
 
 
-PDF_INPAGE_VIEWER_VERSION = "20260823s"
+PDF_INPAGE_VIEWER_VERSION = "20260823t"
 PDF_INPAGE_VIEWER_SRC = f"/assets/pdf-inpage-viewer.js?v={PDF_INPAGE_VIEWER_VERSION}"
 
 
@@ -1366,6 +1368,7 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
         ocr_fragment=ocr_fragment,
         parish_section_heading=f"{diocese_label} Parishes with Working Bulletin Links",
         parish_links_html=render_parish_link_grid(parish_links),
+        az_names=[name for name, _url in collapse_named_links(list(parish_links))],
     )
 
 
@@ -1447,6 +1450,202 @@ def render_pdf_standalone_page(config: DioceseConfig, bulletin_date: str, pdf_hr
 """
 
 
+def render_az_jump_html(names: list[str], *, target: str) -> str:
+    """Compact A–Z jump list for one viewer (PDF or OCR). Same names as the grid."""
+    cleaned: list[str] = []
+    seen: set[str] = set()
+    for raw in names:
+        name = (raw or "").strip()
+        key = _normalise_name(name)
+        if not name or not key or key in seen:
+            continue
+        seen.add(key)
+        cleaned.append(name)
+    cleaned.sort(key=lambda item: item.lower())
+    if not cleaned:
+        return ""
+    groups: dict[str, list[str]] = {}
+    for name in cleaned:
+        letter = name[0].upper()
+        if not letter.isalpha():
+            letter = "#"
+        groups.setdefault(letter, []).append(name)
+    letter_links: list[str] = []
+    blocks: list[str] = []
+    for letter in sorted(groups, key=lambda item: ("Z" if item == "#" else item)):
+        letter_id = html.escape(f"az-{target}-{letter}", quote=True)
+        letter_links.append(f'<a href="#{letter_id}">{html.escape(letter)}</a>')
+        items = "".join(
+            f'<li><button type="button" class="az-jump-link" '
+            f'data-az-target="{html.escape(target, quote=True)}" '
+            f'data-parish-name="{html.escape(name, quote=True)}">'
+            f"{html.escape(name)}</button></li>"
+            for name in groups[letter]
+        )
+        blocks.append(
+            f'<div class="az-jump-group" id="{letter_id}">'
+            f"<h3>{html.escape(letter)}</h3><ul>{items}</ul></div>"
+        )
+    return (
+        f'<nav class="az-jump" aria-label="Jump to a parish in the {html.escape(target)} viewer">'
+        f'<p class="az-jump-label">Jump to a parish</p>'
+        f'<div class="az-jump-letters">{"".join(letter_links)}</div>'
+        f'<div class="az-jump-groups">{"".join(blocks)}</div>'
+        "</nav>"
+    )
+
+
+def az_jump_css() -> str:
+    return f"""
+    .az-jump {{
+      margin: 0 0 10px;
+      padding: 10px 12px 8px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }}
+    .az-jump-label {{
+      margin: 0 0 6px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: {DEEP_TEAL};
+    }}
+    .az-jump-letters {{
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 10px;
+      margin: 0 0 8px;
+      font-weight: 700;
+    }}
+    .az-jump-letters a {{ color: {TEAL}; }}
+    .az-jump-group h3 {{
+      margin: 8px 0 4px;
+      font-size: 0.75rem;
+      letter-spacing: 0.08em;
+      color: #4a5560;
+    }}
+    .az-jump-group ul {{
+      list-style: none;
+      display: flex;
+      flex-wrap: wrap;
+      gap: 4px 14px;
+      margin: 0;
+      padding: 0;
+    }}
+    .az-jump-link {{
+      background: none;
+      border: 0;
+      padding: 0;
+      color: {TEAL};
+      font-weight: 600;
+      font-size: 0.92rem;
+      cursor: pointer;
+    }}
+    .az-jump-link:hover {{ text-decoration: underline; }}
+    .diocese-intro {{
+      margin: 0 0 22px;
+      padding: 18px 18px 16px;
+      background: #fff;
+      border: 1px solid #dde5e4;
+    }}
+    .diocese-intro p {{ margin: 0 0 10px; color: {TEXT}; }}
+    .diocese-intro .intro-welcome {{ font-size: 1.05rem; }}
+    .diocese-intro .intro-count {{ font-weight: 600; color: {DEEP_TEAL}; }}
+    .diocese-intro h3 {{
+      margin: 14px 0 8px;
+      font-size: 0.92rem;
+      color: {DEEP_TEAL};
+    }}
+    .diocese-intro .intro-stale-note {{ color: #5a6a68; font-size: 0.9rem; }}
+    .diocese-intro .intro-names {{
+      margin: 0;
+      padding-left: 1.15em;
+    }}
+    .diocese-intro .intro-names li {{ margin: 0 0 4px; }}
+    """
+
+
+def az_jump_js() -> str:
+    return """
+    (function () {
+      var index = {};
+      var node = document.getElementById('parish-page-index');
+      if (node) {
+        try { index = JSON.parse(node.textContent || '{}') || {}; } catch (e) {}
+      }
+      function reduceMotion() {
+        return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      }
+      function norm(s) {
+        return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+      }
+      function coreName(s) {
+        return String(s || '').replace(/\\s*\\([^)]*\\)\\s*/g, ' ').trim();
+      }
+      function scrollBoxTo(box, el) {
+        if (!box || !el) return false;
+        var br = box.getBoundingClientRect();
+        var er = el.getBoundingClientRect();
+        var top = box.scrollTop + (er.top - br.top) - 8;
+        if (box.scrollTo) {
+          box.scrollTo({ top: Math.max(0, top), behavior: reduceMotion() ? 'auto' : 'smooth' });
+        } else {
+          box.scrollTop = Math.max(0, top);
+        }
+        return true;
+      }
+      function findOcr(box, name) {
+        if (!box) return null;
+        var wanted = [norm(name), norm(coreName(name))];
+        var nodes = box.querySelectorAll('.ocr-parish-masthead, [id^="ocr-parish-"]');
+        for (var i = 0; i < nodes.length; i++) {
+          var el = nodes[i];
+          var label = el.getAttribute('data-parish-name') || ((el.querySelector('.ocr-parish-name') || el).textContent || '');
+          var got = norm(label);
+          if (wanted.indexOf(got) >= 0 || wanted.indexOf(norm(coreName(label))) >= 0) return el;
+        }
+        return null;
+      }
+      function pageFor(name) {
+        if (index[name]) return index[name];
+        var n = norm(name);
+        var keys = Object.keys(index);
+        for (var i = 0; i < keys.length; i++) {
+          if (norm(keys[i]) === n || norm(coreName(keys[i])) === n || n === norm(coreName(keys[i]))) {
+            var val = index[keys[i]];
+            if (typeof val === 'number') return val;
+          }
+        }
+        return 0;
+      }
+      function jump(target, name) {
+        if (target === 'pdf') {
+          var page = pageFor(name);
+          if (page && window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return;
+          }
+          var pages = document.querySelector('.pdf-inpage-pages');
+          if (pages && page) {
+            var slot = pages.querySelector('[data-page="' + page + '"]');
+            if (slot) { scrollBoxTo(pages, slot); return; }
+          }
+        }
+        var ocr = document.getElementById('ocr-panel');
+        var hit = findOcr(ocr, name);
+        if (hit) scrollBoxTo(ocr, hit);
+      }
+      document.addEventListener('click', function (ev) {
+        var btn = ev.target && ev.target.closest ? ev.target.closest('.az-jump-link') : null;
+        if (!btn) return;
+        ev.preventDefault();
+        jump(btn.getAttribute('data-az-target') || 'ocr', btn.getAttribute('data-parish-name') || btn.textContent || '');
+      });
+    })();
+    """
+
+
 def render_bulletin_viewer_shell(
     *,
     page_title: str,
@@ -1463,6 +1662,9 @@ def render_bulletin_viewer_shell(
     ocr_fragment: str,
     parish_section_heading: str,
     parish_links_html: str,
+    intro_html: str = "",
+    az_names: list[str] | None = None,
+    parish_page_index: dict[str, int] | None = None,
 ) -> str:
     """The single canonical PDF + Text Bulletin viewer design for this project.
 
@@ -1481,6 +1683,13 @@ def render_bulletin_viewer_shell(
     Outbound links open in a new tab; the mobile OCR jump is same-tab scroll.
     """
     blank = 'target="_blank" rel="noopener noreferrer"'
+    names = list(az_names or [])
+    az_pdf_html = render_az_jump_html(names, target="pdf")
+    az_ocr_html = render_az_jump_html(names, target="ocr")
+    page_index_json = html.escape(
+        json.dumps(parish_page_index or {}, ensure_ascii=True, separators=(",", ":")),
+        quote=False,
+    )
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -1668,6 +1877,7 @@ def render_bulletin_viewer_shell(
     .font-size-controls {{ display: none; }}
     {sticky_search_css("#fff")}
     {scroll_top_css()}
+    {az_jump_css()}
     .ocr-zoom-bar {{
       display: flex; justify-content: center; align-items: center; gap: 10px;
       margin: 0 0 10px; padding: 6px 10px;
@@ -1840,6 +2050,7 @@ def render_bulletin_viewer_shell(
       <p class="meta">{html.escape(meta_line)}</p>
       <a class="download-link-top" href="{html.escape(pdf_download_href, quote=True)}" {blank} download>Download PDF</a>
     </header>
+    {intro_html}
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
@@ -1848,6 +2059,7 @@ def render_bulletin_viewer_shell(
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
+      {az_pdf_html}
       <div class="quiet-links">
         <a href="{html.escape(pdf_href, quote=True)}" {blank}>Open PDF</a>
         <a href="{html.escape(pdf_standalone_href, quote=True)}" {blank}>Distraction-free view</a>
@@ -1861,6 +2073,7 @@ def render_bulletin_viewer_shell(
 
     <h2 class="section-heading">Bulletin — OCR Extracted Plain Text</h2>
     <div id="panel-ocr" class="viewer-block">
+      {az_ocr_html}
       <div class="quiet-links">
         <a href="{html.escape(ocr_standalone_href, quote=True)}" {blank}>Open text in new tab</a>
       </div>
@@ -2157,7 +2370,9 @@ def render_bulletin_viewer_shell(
     }})();
     {sticky_search_js()}
     {scroll_top_js()}
+    {az_jump_js()}
   </script>
+  <script type="application/json" id="parish-page-index">{page_index_json}</script>
   {scroll_top_html()}
 </body>
 </html>

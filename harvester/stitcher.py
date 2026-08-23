@@ -2,7 +2,8 @@
 stitcher.py — Mega PDF stitcher for the Parish Bulletin Harvester.
 
 Merges all downloaded PDFs (A-Z) into one mega PDF.
-Appends a compact summary section for HTML-only and failed parishes.
+The “Missing & Online-Only” list lives on the diocese page intro,
+not as a last page of this PDF (Frank, 23/08/2026).
 """
 from __future__ import annotations
 
@@ -169,9 +170,11 @@ def stitch_mega_pdf(
     output_path: Path | None = None,
 ) -> None:
     """
-    Merge all downloaded PDFs (A-Z by display name) into one mega PDF, then
-    append a single compact summary page listing all HTML-only and unavailable
-    parishes.
+    Merge all downloaded PDFs (A-Z by display name) into one mega PDF.
+    Alias recipes (Ballintra → Drumholm, Kilmacrenan → Gartan/Termon) are
+    skipped so the same parish is not listed twice. HTML-only / unavailable
+    parishes are *not* appended as a last page — that list is on the
+    diocese page intro.
 
     *mega_excludes_path* points to an optional JSON array of parish keys to
     skip in the mega PDF (e.g. when a parish posted a stale bulletin).  The
@@ -184,16 +187,7 @@ def stitch_mega_pdf(
     try:
         import PyPDF2
         from reportlab.lib import colors
-        from reportlab.lib.pagesizes import A4
-        from reportlab.lib.styles import getSampleStyleSheet
-        from reportlab.lib.units import cm
         from reportlab.pdfgen import canvas
-        from reportlab.platypus import (
-            HRFlowable,
-            Paragraph,
-            SimpleDocTemplate,
-            Spacer,
-        )
     except ImportError as exc:
         print(f"  ⚠️  Skipping mega PDF — missing library: {exc}")
         return
@@ -218,10 +212,14 @@ def stitch_mega_pdf(
         except Exception as exc:
             print(f"  ⚠️  Could not load mega_excludes.json: {exc}")
 
+    from harvester.parish_aliases import combined_display_name, is_alias_key
+
     # Build map: key -> (pdf_path | None, url, display_name)
     parish_map: dict[str, tuple[Path | None, str, str]] = {}
     for r in results:
         key = r.key
+        if is_alias_key(key):
+            continue
         # Keep stale historical fallback results out of the mega PDF.
         if r.is_fallback:
             continue
@@ -252,16 +250,16 @@ def stitch_mega_pdf(
     output_path = output_path or (bulletins_dir / f"all_bulletins_{target}.pdf")
     merger = PyPDF2.PdfWriter()
     real_count = 0
-    styles = getSampleStyleSheet()
     page_ranges: dict[str, dict[str, str | int]] = {}
 
-    # Collect parishes without a PDF for the compact summary section
+    # Collect parishes without a PDF (logged only — listed on the diocese page)
     missing_entries: list[tuple[str, str, str | None]] = []
 
     for parish_key, (pdf_path, parish_url, display_name) in sorted_entries:
         info = contacts.get(parish_key, {})
         if not display_name:
             display_name = info.get("display_name") or parish_key.replace("_", " ").title()
+        display_name = combined_display_name(parish_key) or display_name
         website: str | None = info.get("website")
 
         if pdf_path and pdf_path.exists():
@@ -326,59 +324,15 @@ def stitch_mega_pdf(
         else:
             missing_entries.append((display_name, parish_url, website))
 
-    # Build a single compact summary page for all missing/HTML parishes
-    summary_page_count = 0
+    # Missing / online-only parishes are listed on the diocese page intro,
+    # not as a last sheet of this mega PDF.
     if missing_entries:
-        buf = io.BytesIO()
-        doc = SimpleDocTemplate(
-            buf, pagesize=A4,
-            topMargin=1.5 * cm, bottomMargin=1.5 * cm,
-            leftMargin=2 * cm, rightMargin=2 * cm,
+        print(
+            f"     Online-only    : {len(missing_entries)} "
+            "(shown on the diocese page, not in this PDF)"
         )
-        story: list = [
-            Paragraph("Missing &amp; Online-Only Bulletins", styles["Title"]),
-            Spacer(1, 0.25 * cm),
-            Paragraph(f"Generated {format_uk_date(target.isoformat())}", styles["Normal"]),
-            Spacer(1, 0.12 * cm),
-            HRFlowable(width="100%", thickness=1, color=colors.grey),
-            Spacer(1, 0.2 * cm),
-            Paragraph(
-                "The following parishes do not have a downloadable PDF bulletin. "
-                "Click a link to view the bulletin online.",
-                styles["Normal"],
-            ),
-            Spacer(1, 0.15 * cm),
-        ]
-        small_style = styles["Normal"].clone("Small")
-        small_style.fontSize = 9
-        small_style.leading = 11
-        # Sort missing entries A-Z by display name
-        missing_entries.sort(key=lambda x: x[0].lower())
-        for display_name, parish_url, website in missing_entries:
-            name_esc = _xml_escape(display_name)
-            link_url = _absolute_http_url(parish_url) or _absolute_http_url(website)
-            if link_url:
-                safe_link = _xml_escape(link_url)
-                line = (
-                    f'<b>{name_esc}</b>: '
-                    f'<link href="{link_url}" color="blue">{safe_link}</link>'
-                )
-            else:
-                line = f'<b>{name_esc}</b>: contact parish directly'
-            story.append(Paragraph(line, small_style))
-            story.append(Spacer(1, 0.05 * cm))
 
-        try:
-            doc.build(story)
-            buf.seek(0)
-            summary_reader = PyPDF2.PdfReader(buf)
-            for page in summary_reader.pages:
-                merger.add_page(page)
-            summary_page_count = len(summary_reader.pages)
-        except Exception as exc:
-            print(f"    ⚠️  Could not create summary page: {exc}")
-
-    if real_count + summary_page_count > 0:
+    if real_count > 0:
         bulletins_dir.mkdir(parents=True, exist_ok=True)
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with output_path.open("wb") as fh:
@@ -393,7 +347,6 @@ def stitch_mega_pdf(
         print(f"  📖 Mega PDF      : {output_path}")
         print(f"     Page index     : {index_path} ({len(page_ranges)} parish range(s))")
         print(f"     Real PDFs      : {real_count}")
-        print(f"     Online-only    : {len(missing_entries)} (condensed to {summary_page_count} summary page(s))")
         publish_mega_to_docs(output_path)
     else:
         print("  ⚠️  No pages to include in mega PDF — skipping.")

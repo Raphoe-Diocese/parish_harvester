@@ -7,9 +7,20 @@ import unicodedata
 from dataclasses import dataclass
 from pathlib import Path
 
+from harvester.diocese_intro import (
+    build_diocese_week_summary,
+    load_mega_page_index,
+    render_diocese_intro_html,
+)
 from harvester.fetcher import parse_evidence_file
 from harvester.page_renderer import (
     render_diocese_raphoe_page,
+)
+from harvester.parish_aliases import (
+    collapse_named_links,
+    combined_display_name,
+    is_alias_key,
+    name_lookup_keys,
 )
 from harvester.site_chrome import favicon_link_tags, scroll_top_css, scroll_top_html, scroll_top_js
 
@@ -249,14 +260,15 @@ def _parish_links(diocese_key: str) -> list[dict[str, str]]:
         except Exception:
             entries = []
         if entries:
-            return [
-                {
-                    "name": entry.display_name,
-                    "url": entry.bulletin_page or entry.example_url,
-                }
-                for entry in entries
-                if (entry.bulletin_page or entry.example_url)
-            ]
+            collapsed = collapse_named_links(
+                [
+                    (entry.display_name, entry.bulletin_page or entry.example_url)
+                    for entry in entries
+                    if (entry.bulletin_page or entry.example_url)
+                    and not is_alias_key(entry.key)
+                ]
+            )
+            return [{"name": name, "url": url} for name, url in collapsed]
 
     links: list[dict[str, str]] = []
     for path in _recipe_files(diocese_key):
@@ -266,8 +278,12 @@ def _parish_links(diocese_key: str) -> list[dict[str, str]]:
             payload = {}
         if not isinstance(payload, dict):
             continue
+        key = str(payload.get("parish_key") or path.stem).strip()
+        if is_alias_key(key):
+            continue
         name = (
-            str(payload.get("parish_name") or "").strip()
+            combined_display_name(key)
+            or str(payload.get("parish_name") or "").strip()
             or str(payload.get("display_name") or "").strip()
             or path.stem.replace("-", " ").replace("_", " ").title()
         )
@@ -275,7 +291,9 @@ def _parish_links(diocese_key: str) -> list[dict[str, str]]:
         if not url:
             continue
         links.append({"name": name, "url": url})
-    return links
+    return [{"name": name, "url": url} for name, url in collapse_named_links(
+        [(item["name"], item["url"]) for item in links]
+    )]
 
 
 def _recipe_keys(diocese_key: str) -> set[str]:
@@ -334,9 +352,10 @@ def _parish_links_with_harvest(diocese_key: str, report_path: Path) -> tuple[lis
     seen: set[str] = set()
 
     def _append(name: str, key: str, fallback_url: str) -> None:
-        if key in seen:
+        if is_alias_key(key) or key in seen:
             return
         seen.add(key)
+        name = combined_display_name(key) or name
         if key in downloaded:
             row = downloaded[key]
             url = f"{GITHUB_RAW_BASE}/{key}.pdf"
@@ -532,9 +551,11 @@ def _internal_parish_hrefs(diocese_key: str, docs_dir: Path) -> dict[str, str]:
     hrefs: dict[str, str] = {}
     for parish in load_ok_parishes(ocr_key, parish_status_path=parish_status_path):
         if (parish_pages_dir / f"{parish.key}.html").exists():
-            hrefs[_normalise_parish_name(parish.display_name)] = (
-                f"../../parishes/{ocr_key}/{parish.key}.html"
-            )
+            href = f"../../parishes/{ocr_key}/{parish.key}.html"
+            labels = [parish.display_name, combined_display_name(parish.key) or ""]
+            for label in labels:
+                for token in name_lookup_keys(label):
+                    hrefs[token] = href
     return hrefs
 
 
@@ -1076,6 +1097,14 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
             display_short = diocese.name.removesuffix(" Diocese").strip() or diocese.name
             if display_short == "Down and Connor":
                 display_short = "Down & Connor"
+            intro_html = render_diocese_intro_html(
+                build_diocese_week_summary(
+                    diocese.key,
+                    diocese_display_name=diocese.name,
+                    recipes_root=RECIPES_DIR,
+                    parish_status_path=REPO_ROOT / "parishes" / "parish_status.json",
+                )
+            )
             render_diocese_raphoe_page(
                 parish_links=parish_links,
                 out_path=out_path,
@@ -1088,6 +1117,8 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
                 diocese_display_name=diocese.name,
                 headline=f"{display_short} Collated Bulletin",
                 internal_parish_hrefs=_internal_parish_hrefs(diocese.key, docs_dir),
+                intro_html=intro_html,
+                parish_page_index=load_mega_page_index(docs_dir, diocese.key),
             )
             updated_label = format_uk_date(target_date) or target_date or "Coming soon"
         else:

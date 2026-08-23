@@ -534,10 +534,12 @@ https://www.antrimparish.com
             mega = bulletins_dir / "all_bulletins_2026-04-27.pdf"
             self.assertTrue(mega.exists())
             reader = PyPDF2.PdfReader(str(mega))
-            # Mega PDF should have pages from the ok bulletin only (≤ 4 pages)
-            # plus possibly a summary page for big_parish which was excluded
+            text = "\n".join((page.extract_text() or "") for page in reader.pages)
+            self.assertNotIn("Missing & Online-Only", text)
+            # Mega PDF should have pages from the ok bulletin only — no
+            # trailing missing/online-only sheet.
             ok_page_count = 2  # both pages have real text
-            self.assertLessEqual(len(reader.pages), ok_page_count + 2)
+            self.assertEqual(len(reader.pages), ok_page_count)
 
     def test_build_parish_header_pdf_sets_new_window_for_website_link(self) -> None:
         mock_canvas = MagicMock()

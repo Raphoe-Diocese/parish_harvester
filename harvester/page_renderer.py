@@ -147,6 +147,8 @@ def render_diocese_raphoe_page(
     ocr_standalone_url: str = "../../bulletins/index.html",
     pdf_standalone_url: str = "",
     internal_parish_hrefs: dict[str, str] | None = None,
+    intro_html: str = "",
+    parish_page_index: dict[str, int] | None = None,
 ) -> None:
     """Render a diocese's "current" landing page.
 
@@ -161,6 +163,7 @@ def render_diocese_raphoe_page(
     :mod:`ocr.parish_pages`) — the parish name then links to that bulletin
     page only (see :func:`ocr.generate_bulletin_pages.render_parish_link_grid`).
     """
+    from harvester.parish_aliases import collapse_named_links
     from ocr.generate_bulletin_pages import render_bulletin_viewer_shell, render_parish_link_grid
 
     week_suffix = f" — {week_label}" if week_label else ""
@@ -172,10 +175,12 @@ def render_diocese_raphoe_page(
     meta_line = f"This week's bulletin — {week_label}." if week_label else "Updated automatically every Sunday."
     pdf_url = str(mega_pdf_url or "").strip()
 
-    tuple_links = [
-        (str(link.get("name") or "Unnamed Parish"), str(link.get("url") or ""))
-        for link in parish_links
-    ]
+    tuple_links = collapse_named_links(
+        [
+            (str(link.get("name") or "Unnamed Parish"), str(link.get("url") or ""))
+            for link in parish_links
+        ]
+    )
 
     html_doc = render_bulletin_viewer_shell(
         page_title=f"{display} Collated Bulletin{week_suffix}",
@@ -197,6 +202,9 @@ def render_diocese_raphoe_page(
         ),
         parish_section_heading=f"{diocese_label} Parishes with Working Bulletin Links",
         parish_links_html=render_parish_link_grid(tuple_links, internal_hrefs=internal_parish_hrefs),
+        intro_html=intro_html,
+        az_names=[name for name, _url in tuple_links],
+        parish_page_index=parish_page_index,
     )
     out_path.parent.mkdir(parents=True, exist_ok=True)
     out_path.write_text(html_doc, encoding="utf-8")

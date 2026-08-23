@@ -15,7 +15,7 @@ Date format for new rows: `YYYY-MM-DD`. User-facing dates on the site stay **DD/
 | Mega PDF generation stays **on** (`HARVEST_MEGA_PDF=1`) | `.github/workflows/harvest.yml`, `AGENTS.md`, `DECISIONS_LOG.md` |
 | Desktop PDF **and** OCR panels: **locked** `height` / `min-height` / `max-height` **850px**; extra content scrolls **inside** the box (`overflow: auto`). Not `height: auto`. Not `85vh`. | `ocr/generate_bulletin_pages.py` → `render_bulletin_viewer_shell`, `pdf_inpage_viewer_css()`; `docs/assets/pdf-inpage-viewer.js` `ensureStyles()` |
 | Mobile/tablet (max-width 1024px): **locked 450px** (height + min + max), inner scroll | same function + JS, `@media (max-width: 1024px)` |
-| Sticky OCR search stays **outside** `#ocr-panel`; page **↑** `#scroll-top-btn` jumps to the top of the page | `harvester/site_chrome.py`, viewer shell |
+| Sticky OCR search stays **outside** `#ocr-panel`; page **↑** `#scroll-top-btn` shows when the **inner** PDF/OCR box or the page is scrolled, and jumps those boxes **and** the page to the top | `harvester/site_chrome.py` `scroll_top_js`, viewer shell, `docs/assets/pdf-inpage-viewer.js` `ensureScrollTop` |
 | Parish / diocese outbound links open in a **new tab** (`target="_blank"` `rel="noopener noreferrer"`) | viewer shell, parish grids, `docs/assets/pdf-inpage-viewer.js` |
 | OCR shows a **parish name header**, real **section headings**, professional spacing | `ocr/bulletin_layout.py`, `ocr_reading_css()` |
 | Do not invent events or translate Irish/Gaeilge | `ocr/bulletin_layout.py`, `ocr/convert_bulletin.py` prompt |
@@ -72,8 +72,13 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 - [ ] **doing** · 2026-08-23 · Welcome honesty: homepage says Parish Press is an ongoing project and searchable text may be incomplete — confirm Mass times, names, and notices against the original PDF. Leave open until live Pages check on https://www.parishpress.ie/ · `harvester/site_builder.py` `_landing_page`, `docs/index.html`
 - [ ] **doing** · 2026-08-23 · Put Ballycastle’s 23/08 bulletin (Enda / Edna Hill, printed spelling kept) on the public Parish Press pages. PR #92 opened, wait for live Pages check. Do not mark done until live https://www.parishpress.ie/parishes/down_and_connor/ballycastleparish-ocr.html search for Enda Hill. · `docs/parishes/down_and_connor/ballycastleparish.pdf`, `docs/mega_pdf/down_and_connor_mega_bulletin.pdf` pages 5–6, `docs/bulletins/down_and_connor-*.html`
 - [ ] **doing** · 2026-08-23 · Recipe success — 13 Problems-tab parishes. **Clonleigh live ok** after harvest 32640896674 (23 Aug newsletter). Fixes in this PR: Ballymoney YY-MM-DD dates, Glenariffe unpin, Kincasslagh `/app/uploads/` score, St Oliver listing scrape. Content gap: Bangor 14/06, Dunsford 05/07, Holy Cross (230826.pdf still 12/07 body), Malin April, Hannahstown 07/06, Saint Malachy’s Feb 2025, St Oliver 28/06, St Patrick’s 05/07, Stranorlar 28/06. Skip Carrick / Lisburn / Tyholland. · `parishes/recipes/`, `harvester/utils.py`, `harvester/replay.py`
+- [ ] **doing** · 2026-08-23 · Back to Top arrow (Divi-style ↑) must show when the reader scrolls the INNER PDF or OCR box, not only when the whole page scrolls. Frank’s 23/08/2026 screenshot at the bottom of Raphoe has no arrow. Click jumps that box (and the page) to the top. Leave open until visible on live https://www.parishpress.ie/dioceses/raphoe/ · `harvester/site_chrome.py` `scroll_top_js`, `docs/assets/pdf-inpage-viewer.js`
+- [ ] **doing** · 2026-08-23 · Ballintra IS Drumholm. Do not list Ballintra as missing/Facebook-only when Drumholm has this week’s PDF. One A–Z name: Drumholm (Ballintra). · `parishes/recipes/raphoe/ballintra.json`, stitcher missing page, parish grid
+- [ ] **doing** · 2026-08-23 · Diocese page intro (not the last mega-PDF page): welcome; honest count “this week we found N of M bulletins”; never-publish / stale named separately; late-publish links. Professional tone. Do NOT invent bishop or office contacts — only details already in the repo or on the official diocese site (raphoediocese.ie). Move “Missing & Online-Only” off the bottom of the stitched PDF. · `harvester/stitcher.py` (~line 339), `ocr/generate_bulletin_pages.py` `render_bulletin_viewer_shell`
+- [ ] **doing** · 2026-08-23 · A–Z jump list at the top of the PDF and OCR viewers so a reader can go straight to one parish. Same list as the working-parishes grid. Do not add a second competing menu.
 - [ ] **todo** · 2026-08-20 · parishpress.ie — live DNS / Pages cutover when Frank is ready · `docs/PARISHPRESS_IE_MIGRATION.md`, `docs/DOMAIN_SETUP.md`
 - [ ] **todo** · 2026-08-20 · Site look — modern pages **after** OCR/capture/recipes are reliable · `harvester/site_builder.py`, `docs/`
+- [ ] **parked** · 2026-08-23 · Longer diocese story — only if Frank asks again. No invented phones or emails.
 - [ ] **parked** · 2026-07-30 · Remove bulletin archive entirely (`…/parish_harvester/bulletins/`) — do not start · `AGENTS.md` parked list
 
 ---
@@ -103,7 +108,7 @@ Spot-check generated CSS for:
 - no `height: auto` and no `overflow: visible` on those visible boxes
 - no `height: 85vh` clip on `.pdf-frame-wrap`
 - `@media (max-width: 1024px)` with locked `height` / `min-height` / `max-height: 450px` and inner scroll on those same visible boxes
-- `.ocr-sticky-chrome` **outside** `#ocr-panel` is `position: relative` until `.is-searching` (typed term), then `position: sticky; top: 0`. `#scroll-top-btn` (page top)
-- `/assets/pdf-inpage-viewer.js?v=20260823s` (cache-bust)
+- `.ocr-sticky-chrome` **outside** `#ocr-panel` is `position: relative` until `.is-searching` (typed term), then `position: sticky; top: 0`. `#scroll-top-btn` listens to **inner** `.pdf-inpage-pages` / `#ocr-panel` scroll as well as the page
+- `/assets/pdf-inpage-viewer.js?v=20260823t` (cache-bust; live HTML stays older until harvest/OCR regenerates)
 - `ocr-parish-masthead` / `ocr-parish-name` in the OCR panel
 - `getAnnotations` + `target="_blank"` in `docs/assets/pdf-inpage-viewer.js`

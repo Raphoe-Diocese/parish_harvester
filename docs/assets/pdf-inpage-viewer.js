@@ -126,16 +126,47 @@
     if (btn.getAttribute("data-pp-bound") === "1") return;
     btn.setAttribute("data-pp-bound", "1");
     var reduce = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    function innerBoxes() {
+      return Array.prototype.slice.call(
+        document.querySelectorAll(".pdf-inpage-pages, #ocr-panel")
+      );
+    }
+    function maxInnerScroll() {
+      return innerBoxes().reduce(function (max, el) {
+        return Math.max(max, el.scrollTop || 0);
+      }, 0);
+    }
     function shown() {
       var y = window.scrollY || document.documentElement.scrollTop || 0;
-      btn.classList.toggle("is-visible", y > 240);
+      btn.classList.toggle("is-visible", y > 240 || maxInnerScroll() > 80);
     }
     window.addEventListener("scroll", shown, { passive: true });
+    document.addEventListener("scroll", shown, { capture: true, passive: true });
     shown();
     btn.addEventListener("click", function () {
-      window.scrollTo({ top: 0, behavior: reduce ? "auto" : "smooth" });
+      var behavior = reduce ? "auto" : "smooth";
+      window.scrollTo({ top: 0, behavior: behavior });
+      innerBoxes().forEach(function (el) {
+        if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+        else el.scrollTop = 0;
+      });
     });
   }
+
+  window.parishPressScrollPdfToPage = function (pageNum) {
+    var pagesEl = document.querySelector(".pdf-inpage-pages");
+    if (!pagesEl) return;
+    var slot = pagesEl.querySelector('[data-page="' + pageNum + '"]');
+    if (!slot) return;
+    var boxRect = pagesEl.getBoundingClientRect();
+    var elRect = slot.getBoundingClientRect();
+    var top = pagesEl.scrollTop + (elRect.top - boxRect.top) - 8;
+    if (pagesEl.scrollTo) {
+      pagesEl.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
+    } else {
+      pagesEl.scrollTop = Math.max(0, top);
+    }
+  };
 
   function loadScript(src) {
     return new Promise(function (resolve, reject) {
