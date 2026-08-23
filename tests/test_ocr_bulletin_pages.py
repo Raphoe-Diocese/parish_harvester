@@ -493,7 +493,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotRegex(html_live, r"#ocr-panel\s*\{[^}]*height:\s*auto")
         self.assertIn("ocr-sticky-chrome", html_live)
         self.assertIn('id="scroll-top-btn"', html_live)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823s", html_live)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823u", html_live)
         self.assertNotIn("85vh", html_live)
         self.assertIn("min-height: 450px", html_live)
         self.assertIn("height: 450px", html_live)
