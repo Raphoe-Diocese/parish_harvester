@@ -630,6 +630,39 @@ def _status_label(avg_success_rate: float | None) -> str:
     return "Reliability available"
 
 
+# Public ready-by time on diocese cards (Irish clock). Harvest cron is 10:00 IST;
+# Frank asked for 16:00 as the time readers should expect the week's set.
+BULLETINS_READY_AT = "16:00"
+
+
+def _ready_count_text(ready: int | None, total: int | None) -> str:
+    """Placeholder until harvest fills the real this-week count. Do not invent."""
+    if ready is None or total is None:
+        return "—/—"
+    return f"{ready}/{total}"
+
+
+def _count_dot(ready: int | None, total: int | None) -> str:
+    if ready is None or total is None or total <= 0:
+        return "⚪"
+    return _status_dot(ready / total)
+
+
+def _live_card_ready_html(row: dict) -> str:
+    raw_ready = row.get("ready_count")
+    raw_total = row.get("total_count")
+    ready = raw_ready if isinstance(raw_ready, int) else None
+    total = raw_total if isinstance(raw_total, int) else None
+    count = _ready_count_text(ready, total)
+    dot = _count_dot(ready, total)
+    return (
+        "<p class=\"live-card-eyebrow\">"
+        f"<span class=\"live-card-ready\">{dot} Bulletins ready @ {html.escape(BULLETINS_READY_AT)}</span>"
+        f"<span class=\"live-card-count\">{html.escape(count)} available</span>"
+        "</p>"
+    )
+
+
 _LONG_NAME_CHARS = 20
 _VERY_LONG_NAME_CHARS = 28
 
@@ -702,7 +735,7 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
             "<article class=\"live-card\">"
             f"{photo}"
             "<div class=\"live-card-body\">"
-            f"<p class=\"live-card-eyebrow\">{row['dot']} {html.escape(row['status_label'])}</p>"
+            f"{_live_card_ready_html(row)}"
             f"{_live_card_heading_html(row['name'])}"
             f"<p class=\"live-card-updated\">Updated {html.escape(row['updated'])}</p>"
             "<div class=\"live-card-actions\">"
@@ -798,7 +831,18 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     .live-card-photo {{ height: 118px; background: #0f2f2f; }}
     .live-card-photo-empty {{ background: linear-gradient(135deg, #1a6b6b, #3fae9a); }}
     .live-card-body {{ padding: 10px 12px 12px; }}
-    .live-card-eyebrow {{ margin: 0 0 4px; font-size: 0.7rem; font-weight: 700; color: #4b5563; text-transform: uppercase; letter-spacing: 0.04em; white-space: nowrap; }}
+    .live-card-eyebrow {{
+      margin: 0 0 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: #4b5563;
+      letter-spacing: 0.01em;
+      line-height: 1.25;
+      white-space: nowrap;
+    }}
     .live-card h2 {{ margin: 0 0 2px; font-size: 1.02rem; color: #114b4b; white-space: nowrap; }}
     .live-card h2.is-long {{ font-size: 0.82rem; }}
     .live-card h2.is-very-long {{ font-size: 0.7rem; }}
@@ -1067,6 +1111,8 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
                 "dot": dot,
                 "status_label": status_label,
                 "updated": updated_label,
+                "ready_count": None,
+                "total_count": None,
             }
         )
 
