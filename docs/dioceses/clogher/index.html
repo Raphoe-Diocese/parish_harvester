@@ -336,52 +336,46 @@
     }
     
     
-    .az-jump {
+    .az-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
       margin: 0 0 10px;
-      padding: 10px 12px 8px;
+      padding: 8px 10px;
       background: #f7fafa;
       border: 1px solid #dde5e4;
     }
-    .az-jump-label {
-      margin: 0 0 6px;
-      font-size: 0.78rem;
+    .az-row-label {
+      margin-right: 2px;
+      font-size: 0.72rem;
       font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
       color: #14524f;
     }
-    .az-jump-letters {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px 10px;
-      margin: 0 0 8px;
-      font-weight: 700;
-    }
-    .az-jump-letters a { color: #1a6b6b; }
-    .az-jump-group h3 {
-      margin: 8px 0 4px;
-      font-size: 0.75rem;
-      letter-spacing: 0.08em;
-      color: #4a5560;
-    }
-    .az-jump-group ul {
-      list-style: none;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px 14px;
-      margin: 0;
-      padding: 0;
-    }
-    .az-jump-link {
-      background: none;
-      border: 0;
-      padding: 0;
+    .az-letter {
+      min-width: 30px;
+      height: 30px;
+      padding: 0 6px;
+      background: #fff;
+      border: 1px solid #cfdedd;
+      border-radius: 4px;
       color: #1a6b6b;
-      font-weight: 600;
-      font-size: 0.92rem;
+      font-weight: 700;
+      font-size: 0.9rem;
+      line-height: 1;
       cursor: pointer;
     }
-    .az-jump-link:hover { text-decoration: underline; }
+    .az-letter:hover,
+    .az-letter:focus-visible {
+      background: #1a6b6b;
+      border-color: #1a6b6b;
+      color: #fff;
+    }
+    /* Desktop boxes are already the locked 850px, so there is nothing to
+       enlarge — the button only appears on tablet/phone. */
+    .az-expand { display: none; }
     .diocese-intro {
       margin: 0 0 22px;
       padding: 18px 18px 16px;
@@ -700,6 +694,37 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Tap targets big enough for a thumb. */
+      .az-expand { display: inline-block; }
+      .az-letter,
+      .az-expand {
+        min-width: 40px;
+        height: 40px;
+        font-size: 0.95rem;
+      }
+      .az-expand {
+        padding: 0 12px;
+        background: #fff;
+        border: 1px solid #1a6b6b;
+        border-radius: 4px;
+        color: #1a6b6b;
+        font-weight: 700;
+        cursor: pointer;
+      }
+      /* Only the panel the reader tapped grows — the other one stays 450px.
+         Scoped to that panel's id so a phone never ends up with two 850px
+         boxes stacked on one screen. */
+      #panel-pdf.az-expanded .pdf-frame-wrap,
+      #panel-pdf.az-expanded .pdf-inpage-viewer {
+        min-height: 850px !important;
+      }
+      #panel-pdf.az-expanded .pdf-frame-wrap iframe,
+      #panel-pdf.az-expanded .pdf-inpage-pages,
+      #panel-ocr.az-expanded #ocr-panel {
+        height: 850px !important;
+        min-height: 850px !important;
+        max-height: 850px !important;
+      }
     }
     @media (max-width: 900px) {
       ul.parish-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
@@ -745,7 +770,7 @@
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
-      <nav class="az-jump" aria-label="Jump to a parish in the pdf viewer"><p class="az-jump-label">Jump to a parish</p><div class="az-jump-letters"><a href="#az-pdf-A">A</a><a href="#az-pdf-B">B</a><a href="#az-pdf-C">C</a><a href="#az-pdf-D">D</a><a href="#az-pdf-E">E</a><a href="#az-pdf-F">F</a><a href="#az-pdf-I">I</a><a href="#az-pdf-K">K</a><a href="#az-pdf-L">L</a><a href="#az-pdf-M">M</a><a href="#az-pdf-N">N</a><a href="#az-pdf-P">P</a><a href="#az-pdf-R">R</a><a href="#az-pdf-T">T</a></div><div class="az-jump-groups"><div class="az-jump-group" id="az-pdf-A"><h3>A</h3><ul><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Aughnamullen East">Aughnamullen East</button></li></ul></div><div class="az-jump-group" id="az-pdf-B"><h3>B</h3><ul><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Ballybay (Tullycorbet)">Ballybay (Tullycorbet)</button></li><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Belleek-Garrison (Inis Muighe Samh)">Belleek-Garrison (Inis Muighe Samh)</button></li><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Brookeboro-Fivemiletown (Aghavea-Aughintaine)">Brookeboro-Fivemiletown (Aghavea-Aughintaine)</button></li><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Bundoran (Magh Ene)">Bundoran (Magh Ene)</button></li></ul></div><div class="az-jump-group" id="az-pdf-C"><h3>C</h3><ul><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Carrickmacross (Machaire Rois)">Carrickmacross (Machaire Rois)</button></li><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Castleblayney (Muckno, includes Clontibret)">Castleblayney (Muckno, includes Clontibret)</button></li><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Cleenish (Arney)">Cleenish (Arney)</button></li><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Clogher">Clogher</button></li><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Clones">Clones</button></li><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Clontibret (bulletin with Castleblayney / Muckno)">Clontibret (bulletin with Castleblayney / Muckno)</button></li><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</button></li></ul></div><div class="az-jump-group" id="az-pdf-D"><h3>D</h3><ul><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Derrygonnelly (Botha)">Derrygonnelly (Botha)</button></li><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Donagh">Donagh</button></li><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Donaghmoyne">Donaghmoyne</button></li><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Dromore">Dromore</button></li></ul></div><div class="az-jump-group" id="az-pdf-E"><h3>E</h3><ul><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Ederney (Cúl Máine)">Ederney (Cúl Máine)</button></li><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Enniskillen (St Michael&#x27;s Parish)">Enniskillen (St Michael&#x27;s Parish)</button></li><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Errigal Truagh">Errigal Truagh</button></li><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Eskra">Eskra</button></li></ul></div><div class="az-jump-group" id="az-pdf-F"><h3>F</h3><ul><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Fintona (Donacavey)">Fintona (Donacavey)</button></li></ul></div><div class="az-jump-group" id="az-pdf-I"><h3>I</h3><ul><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Inniskeen (Inis Caoin Deagha)">Inniskeen (Inis Caoin Deagha)</button></li><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Irvinestown (Devenish)">Irvinestown (Devenish)</button></li></ul></div><div class="az-jump-group" id="az-pdf-K"><h3>K</h3><ul><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Killanny">Killanny</button></li><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Killeevan (Currin Killeevan &amp; Aghabog)">Killeevan (Currin Killeevan &amp; Aghabog)</button></li></ul></div><div class="az-jump-group" id="az-pdf-L"><h3>L</h3><ul><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Latton (Aughnamullen West)">Latton (Aughnamullen West)</button></li><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Lisnaskea-Maguiresbridge (Aghalurcher)">Lisnaskea-Maguiresbridge (Aghalurcher)</button></li></ul></div><div class="az-jump-group" id="az-pdf-M"><h3>M</h3><ul><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Magheracloone">Magheracloone</button></li><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Monaghan &amp; Rackwallace (includes Tyholland)">Monaghan &amp; Rackwallace (includes Tyholland)</button></li></ul></div><div class="az-jump-group" id="az-pdf-N"><h3>N</h3><ul><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Newtownbutler (Galloon)">Newtownbutler (Galloon)</button></li></ul></div><div class="az-jump-group" id="az-pdf-P"><h3>P</h3><ul><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Pettigo">Pettigo</button></li></ul></div><div class="az-jump-group" id="az-pdf-R"><h3>R</h3><ul><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Rockcorry (Ematris)">Rockcorry (Ematris)</button></li><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Roslea">Roslea</button></li></ul></div><div class="az-jump-group" id="az-pdf-T"><h3>T</h3><ul><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Tempo (Pobal)">Tempo (Pobal)</button></li><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Trillick (Kilskeery)">Trillick (Kilskeery)</button></li><li><button type="button" class="az-jump-link" data-az-target="pdf" data-parish-name="Tydavnet">Tydavnet</button></li></ul></div></div></nav>
+      <nav class="az-row" aria-label="Jump to a parish in the pdf viewer"><span class="az-row-label">Jump to</span><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Aughnamullen East" title="Aughnamullen East" aria-label="Jump to Aughnamullen East">A</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Ballybay (Tullycorbet)|Belleek-Garrison (Inis Muighe Samh)|Brookeboro-Fivemiletown (Aghavea-Aughintaine)|Bundoran (Magh Ene)" title="Ballybay (Tullycorbet), Belleek-Garrison (Inis Muighe Samh), Brookeboro-Fivemiletown (Aghavea-Aughintaine), Bundoran (Magh Ene)" aria-label="Jump to Ballybay (Tullycorbet)">B</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Carrickmacross (Machaire Rois)|Castleblayney (Muckno, includes Clontibret)|Cleenish (Arney)|Clogher|Clones|Clontibret (bulletin with Castleblayney / Muckno)|Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)" title="Carrickmacross (Machaire Rois), Castleblayney (Muckno, includes Clontibret), Cleenish (Arney), Clogher, Clones, Clontibret (bulletin with Castleblayney / Muckno), Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)" aria-label="Jump to Carrickmacross (Machaire Rois)">C</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Derrygonnelly (Botha)|Donagh|Donaghmoyne|Dromore" title="Derrygonnelly (Botha), Donagh, Donaghmoyne, Dromore" aria-label="Jump to Derrygonnelly (Botha)">D</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Ederney (Cúl Máine)|Enniskillen (St Michael&#x27;s Parish)|Errigal Truagh|Eskra" title="Ederney (Cúl Máine), Enniskillen (St Michael&#x27;s Parish), Errigal Truagh, Eskra" aria-label="Jump to Ederney (Cúl Máine)">E</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Fintona (Donacavey)" title="Fintona (Donacavey)" aria-label="Jump to Fintona (Donacavey)">F</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Inniskeen (Inis Caoin Deagha)|Irvinestown (Devenish)" title="Inniskeen (Inis Caoin Deagha), Irvinestown (Devenish)" aria-label="Jump to Inniskeen (Inis Caoin Deagha)">I</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Killanny|Killeevan (Currin Killeevan &amp; Aghabog)" title="Killanny, Killeevan (Currin Killeevan &amp; Aghabog)" aria-label="Jump to Killanny">K</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Latton (Aughnamullen West)|Lisnaskea-Maguiresbridge (Aghalurcher)" title="Latton (Aughnamullen West), Lisnaskea-Maguiresbridge (Aghalurcher)" aria-label="Jump to Latton (Aughnamullen West)">L</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Magheracloone|Monaghan &amp; Rackwallace (includes Tyholland)" title="Magheracloone, Monaghan &amp; Rackwallace (includes Tyholland)" aria-label="Jump to Magheracloone">M</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Newtownbutler (Galloon)" title="Newtownbutler (Galloon)" aria-label="Jump to Newtownbutler (Galloon)">N</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Pettigo" title="Pettigo" aria-label="Jump to Pettigo">P</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Rockcorry (Ematris)|Roslea" title="Rockcorry (Ematris), Roslea" aria-label="Jump to Rockcorry (Ematris)">R</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Tempo (Pobal)|Trillick (Kilskeery)|Tydavnet" title="Tempo (Pobal), Trillick (Kilskeery), Tydavnet" aria-label="Jump to Tempo (Pobal)">T</button><button type="button" class="az-expand" data-az-expand="pdf" aria-expanded="false">Tap to enlarge</button></nav>
       <div class="quiet-links">
         <a href="/mega_pdf/clogher_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
         <a href="https://raphoe-diocese.github.io/parish_harvester/bulletins/clogher-2026-08-23-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
@@ -769,7 +794,7 @@
 
     <h2 class="section-heading">Bulletin — OCR Extracted Plain Text</h2>
     <div id="panel-ocr" class="viewer-block">
-      <nav class="az-jump" aria-label="Jump to a parish in the ocr viewer"><p class="az-jump-label">Jump to a parish</p><div class="az-jump-letters"><a href="#az-ocr-A">A</a><a href="#az-ocr-B">B</a><a href="#az-ocr-C">C</a><a href="#az-ocr-D">D</a><a href="#az-ocr-E">E</a><a href="#az-ocr-F">F</a><a href="#az-ocr-I">I</a><a href="#az-ocr-K">K</a><a href="#az-ocr-L">L</a><a href="#az-ocr-M">M</a><a href="#az-ocr-N">N</a><a href="#az-ocr-P">P</a><a href="#az-ocr-R">R</a><a href="#az-ocr-T">T</a></div><div class="az-jump-groups"><div class="az-jump-group" id="az-ocr-A"><h3>A</h3><ul><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Aughnamullen East">Aughnamullen East</button></li></ul></div><div class="az-jump-group" id="az-ocr-B"><h3>B</h3><ul><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Ballybay (Tullycorbet)">Ballybay (Tullycorbet)</button></li><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Belleek-Garrison (Inis Muighe Samh)">Belleek-Garrison (Inis Muighe Samh)</button></li><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Brookeboro-Fivemiletown (Aghavea-Aughintaine)">Brookeboro-Fivemiletown (Aghavea-Aughintaine)</button></li><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Bundoran (Magh Ene)">Bundoran (Magh Ene)</button></li></ul></div><div class="az-jump-group" id="az-ocr-C"><h3>C</h3><ul><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Carrickmacross (Machaire Rois)">Carrickmacross (Machaire Rois)</button></li><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Castleblayney (Muckno, includes Clontibret)">Castleblayney (Muckno, includes Clontibret)</button></li><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Cleenish (Arney)">Cleenish (Arney)</button></li><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Clogher">Clogher</button></li><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Clones">Clones</button></li><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Clontibret (bulletin with Castleblayney / Muckno)">Clontibret (bulletin with Castleblayney / Muckno)</button></li><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</button></li></ul></div><div class="az-jump-group" id="az-ocr-D"><h3>D</h3><ul><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Derrygonnelly (Botha)">Derrygonnelly (Botha)</button></li><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Donagh">Donagh</button></li><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Donaghmoyne">Donaghmoyne</button></li><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Dromore">Dromore</button></li></ul></div><div class="az-jump-group" id="az-ocr-E"><h3>E</h3><ul><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Ederney (Cúl Máine)">Ederney (Cúl Máine)</button></li><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Enniskillen (St Michael&#x27;s Parish)">Enniskillen (St Michael&#x27;s Parish)</button></li><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Errigal Truagh">Errigal Truagh</button></li><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Eskra">Eskra</button></li></ul></div><div class="az-jump-group" id="az-ocr-F"><h3>F</h3><ul><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Fintona (Donacavey)">Fintona (Donacavey)</button></li></ul></div><div class="az-jump-group" id="az-ocr-I"><h3>I</h3><ul><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Inniskeen (Inis Caoin Deagha)">Inniskeen (Inis Caoin Deagha)</button></li><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Irvinestown (Devenish)">Irvinestown (Devenish)</button></li></ul></div><div class="az-jump-group" id="az-ocr-K"><h3>K</h3><ul><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Killanny">Killanny</button></li><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Killeevan (Currin Killeevan &amp; Aghabog)">Killeevan (Currin Killeevan &amp; Aghabog)</button></li></ul></div><div class="az-jump-group" id="az-ocr-L"><h3>L</h3><ul><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Latton (Aughnamullen West)">Latton (Aughnamullen West)</button></li><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Lisnaskea-Maguiresbridge (Aghalurcher)">Lisnaskea-Maguiresbridge (Aghalurcher)</button></li></ul></div><div class="az-jump-group" id="az-ocr-M"><h3>M</h3><ul><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Magheracloone">Magheracloone</button></li><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Monaghan &amp; Rackwallace (includes Tyholland)">Monaghan &amp; Rackwallace (includes Tyholland)</button></li></ul></div><div class="az-jump-group" id="az-ocr-N"><h3>N</h3><ul><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Newtownbutler (Galloon)">Newtownbutler (Galloon)</button></li></ul></div><div class="az-jump-group" id="az-ocr-P"><h3>P</h3><ul><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Pettigo">Pettigo</button></li></ul></div><div class="az-jump-group" id="az-ocr-R"><h3>R</h3><ul><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Rockcorry (Ematris)">Rockcorry (Ematris)</button></li><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Roslea">Roslea</button></li></ul></div><div class="az-jump-group" id="az-ocr-T"><h3>T</h3><ul><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Tempo (Pobal)">Tempo (Pobal)</button></li><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Trillick (Kilskeery)">Trillick (Kilskeery)</button></li><li><button type="button" class="az-jump-link" data-az-target="ocr" data-parish-name="Tydavnet">Tydavnet</button></li></ul></div></div></nav>
+      <nav class="az-row" aria-label="Jump to a parish in the ocr viewer"><span class="az-row-label">Jump to</span><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Aughnamullen East" title="Aughnamullen East" aria-label="Jump to Aughnamullen East">A</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Ballybay (Tullycorbet)|Belleek-Garrison (Inis Muighe Samh)|Brookeboro-Fivemiletown (Aghavea-Aughintaine)|Bundoran (Magh Ene)" title="Ballybay (Tullycorbet), Belleek-Garrison (Inis Muighe Samh), Brookeboro-Fivemiletown (Aghavea-Aughintaine), Bundoran (Magh Ene)" aria-label="Jump to Ballybay (Tullycorbet)">B</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Carrickmacross (Machaire Rois)|Castleblayney (Muckno, includes Clontibret)|Cleenish (Arney)|Clogher|Clones|Clontibret (bulletin with Castleblayney / Muckno)|Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)" title="Carrickmacross (Machaire Rois), Castleblayney (Muckno, includes Clontibret), Cleenish (Arney), Clogher, Clones, Clontibret (bulletin with Castleblayney / Muckno), Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)" aria-label="Jump to Carrickmacross (Machaire Rois)">C</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Derrygonnelly (Botha)|Donagh|Donaghmoyne|Dromore" title="Derrygonnelly (Botha), Donagh, Donaghmoyne, Dromore" aria-label="Jump to Derrygonnelly (Botha)">D</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Ederney (Cúl Máine)|Enniskillen (St Michael&#x27;s Parish)|Errigal Truagh|Eskra" title="Ederney (Cúl Máine), Enniskillen (St Michael&#x27;s Parish), Errigal Truagh, Eskra" aria-label="Jump to Ederney (Cúl Máine)">E</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Fintona (Donacavey)" title="Fintona (Donacavey)" aria-label="Jump to Fintona (Donacavey)">F</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Inniskeen (Inis Caoin Deagha)|Irvinestown (Devenish)" title="Inniskeen (Inis Caoin Deagha), Irvinestown (Devenish)" aria-label="Jump to Inniskeen (Inis Caoin Deagha)">I</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Killanny|Killeevan (Currin Killeevan &amp; Aghabog)" title="Killanny, Killeevan (Currin Killeevan &amp; Aghabog)" aria-label="Jump to Killanny">K</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Latton (Aughnamullen West)|Lisnaskea-Maguiresbridge (Aghalurcher)" title="Latton (Aughnamullen West), Lisnaskea-Maguiresbridge (Aghalurcher)" aria-label="Jump to Latton (Aughnamullen West)">L</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Magheracloone|Monaghan &amp; Rackwallace (includes Tyholland)" title="Magheracloone, Monaghan &amp; Rackwallace (includes Tyholland)" aria-label="Jump to Magheracloone">M</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Newtownbutler (Galloon)" title="Newtownbutler (Galloon)" aria-label="Jump to Newtownbutler (Galloon)">N</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Pettigo" title="Pettigo" aria-label="Jump to Pettigo">P</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Rockcorry (Ematris)|Roslea" title="Rockcorry (Ematris), Roslea" aria-label="Jump to Rockcorry (Ematris)">R</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Tempo (Pobal)|Trillick (Kilskeery)|Tydavnet" title="Tempo (Pobal), Trillick (Kilskeery), Tydavnet" aria-label="Jump to Tempo (Pobal)">T</button><button type="button" class="az-expand" data-az-expand="ocr" aria-expanded="false">Tap to enlarge</button></nav>
       <div class="quiet-links">
         <a href="https://raphoe-diocese.github.io/parish_harvester/bulletins/clogher-2026-08-23-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
@@ -3121,28 +3146,83 @@ The following parishes do not have a downloadable PDF bulletin. Click a link to 
         }
         return 0;
       }
-      function jump(target, name) {
-        if (target === 'pdf') {
-          var page = pageFor(name);
-          if (page && window.parishPressScrollPdfToPage) {
-            window.parishPressScrollPdfToPage(page);
-            return;
-          }
-          var pages = document.querySelector('.pdf-inpage-pages');
-          if (pages && page) {
-            var slot = pages.querySelector('[data-page="' + page + '"]');
-            if (slot) { scrollBoxTo(pages, slot); return; }
+      function showBox(box) {
+        // The jump happens inside the locked box, so make sure the box itself
+        // is on screen first or a phone reader sees nothing move.
+        if (!box || !box.getBoundingClientRect) return;
+        var r = box.getBoundingClientRect();
+        var h = window.innerHeight || document.documentElement.clientHeight || 0;
+        if (r.top < 0 || r.top > h - 120) {
+          if (box.scrollIntoView) {
+            box.scrollIntoView({ block: 'start', behavior: reduceMotion() ? 'auto' : 'smooth' });
           }
         }
+      }
+      function jumpPdf(names) {
+        var pages = document.querySelector('.pdf-inpage-pages');
+        if (!pages) return false;
+        for (var i = 0; i < names.length; i++) {
+          var page = pageFor(names[i]);
+          if (!page) continue;
+          var slot = pages.querySelector('[data-page="' + page + '"]');
+          if (!slot) continue;
+          showBox(pages);
+          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
+          else scrollBoxTo(pages, slot);
+          return true;
+        }
+        return false;
+      }
+      function jumpOcr(names) {
         var ocr = document.getElementById('ocr-panel');
-        var hit = findOcr(ocr, name);
-        if (hit) scrollBoxTo(ocr, hit);
+        if (!ocr) return false;
+        for (var i = 0; i < names.length; i++) {
+          var hit = findOcr(ocr, names[i]);
+          if (!hit) continue;
+          showBox(ocr);
+          scrollBoxTo(ocr, hit);
+          return true;
+        }
+        return false;
+      }
+      function jump(target, names, tries) {
+        var done = target === 'pdf' ? jumpPdf(names) : jumpOcr(names);
+        // PDF.js paints page slots as it streams, so the slot may not exist
+        // for a second or two after load. Retry briefly instead of failing.
+        if (!done && target === 'pdf' && (tries || 0) < 12) {
+          window.setTimeout(function () { jump(target, names, (tries || 0) + 1); }, 400);
+        }
+      }
+      function namesOf(btn) {
+        var raw = btn.getAttribute('data-az-names') || btn.getAttribute('data-parish-name') || '';
+        var out = [];
+        raw.split('|').forEach(function (part) {
+          var name = String(part || '').trim();
+          if (name) out.push(name);
+        });
+        return out;
+      }
+      function toggleExpand(btn) {
+        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
+        if (!panel) return;
+        var open = panel.classList.toggle('az-expanded');
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
+        // Box heights changed, so re-measure for the Back to Top button.
+        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
       }
       document.addEventListener('click', function (ev) {
-        var btn = ev.target && ev.target.closest ? ev.target.closest('.az-jump-link') : null;
+        if (!ev.target || !ev.target.closest) return;
+        var expand = ev.target.closest('.az-expand');
+        if (expand) {
+          ev.preventDefault();
+          toggleExpand(expand);
+          return;
+        }
+        var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();
-        jump(btn.getAttribute('data-az-target') || 'ocr', btn.getAttribute('data-parish-name') || btn.textContent || '');
+        jump(btn.getAttribute('data-az-target') || 'ocr', namesOf(btn), 0);
       });
     })();
     

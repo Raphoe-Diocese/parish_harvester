@@ -1451,7 +1451,15 @@ def render_pdf_standalone_page(config: DioceseConfig, bulletin_date: str, pdf_hr
 
 
 def render_az_jump_html(names: list[str], *, target: str) -> str:
-    """Compact A–Z jump list for one viewer (PDF or OCR). Same names as the grid."""
+    """One compact letter row for a viewer (PDF or OCR).
+
+    Only letters that actually have a parish are shown, so the row stays a
+    single line instead of the tall grouped A–Z list it replaced. Clicking a
+    letter scrolls to that letter's first parish *inside* the locked viewer
+    box. Every parish under the letter is carried in ``data-az-names`` so the
+    click still lands when the first one is missing from this viewer (a parish
+    can be in the OCR text but absent from the collated PDF, or the reverse).
+    """
     cleaned: list[str] = []
     seen: set[str] = set()
     for raw in names:
@@ -1470,79 +1478,70 @@ def render_az_jump_html(names: list[str], *, target: str) -> str:
         if not letter.isalpha():
             letter = "#"
         groups.setdefault(letter, []).append(name)
-    letter_links: list[str] = []
-    blocks: list[str] = []
+    buttons: list[str] = []
     for letter in sorted(groups, key=lambda item: ("Z" if item == "#" else item)):
-        letter_id = html.escape(f"az-{target}-{letter}", quote=True)
-        letter_links.append(f'<a href="#{letter_id}">{html.escape(letter)}</a>')
-        items = "".join(
-            f'<li><button type="button" class="az-jump-link" '
+        parishes = groups[letter]
+        buttons.append(
+            f'<button type="button" class="az-letter" '
             f'data-az-target="{html.escape(target, quote=True)}" '
-            f'data-parish-name="{html.escape(name, quote=True)}">'
-            f"{html.escape(name)}</button></li>"
-            for name in groups[letter]
-        )
-        blocks.append(
-            f'<div class="az-jump-group" id="{letter_id}">'
-            f"<h3>{html.escape(letter)}</h3><ul>{items}</ul></div>"
+            f'data-az-names="{html.escape("|".join(parishes), quote=True)}" '
+            f'title="{html.escape(", ".join(parishes), quote=True)}" '
+            f'aria-label="Jump to {html.escape(parishes[0], quote=True)}">'
+            f"{html.escape(letter)}</button>"
         )
     return (
-        f'<nav class="az-jump" aria-label="Jump to a parish in the {html.escape(target)} viewer">'
-        f'<p class="az-jump-label">Jump to a parish</p>'
-        f'<div class="az-jump-letters">{"".join(letter_links)}</div>'
-        f'<div class="az-jump-groups">{"".join(blocks)}</div>'
+        f'<nav class="az-row" aria-label="Jump to a parish in the {html.escape(target)} viewer">'
+        f'<span class="az-row-label">Jump to</span>'
+        f'{"".join(buttons)}'
+        f'<button type="button" class="az-expand" '
+        f'data-az-expand="{html.escape(target, quote=True)}" aria-expanded="false">'
+        f"Tap to enlarge</button>"
         "</nav>"
     )
 
 
 def az_jump_css() -> str:
     return f"""
-    .az-jump {{
+    .az-row {{
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
       margin: 0 0 10px;
-      padding: 10px 12px 8px;
+      padding: 8px 10px;
       background: #f7fafa;
       border: 1px solid #dde5e4;
     }}
-    .az-jump-label {{
-      margin: 0 0 6px;
-      font-size: 0.78rem;
+    .az-row-label {{
+      margin-right: 2px;
+      font-size: 0.72rem;
       font-weight: 700;
       letter-spacing: 0.06em;
       text-transform: uppercase;
       color: {DEEP_TEAL};
     }}
-    .az-jump-letters {{
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px 10px;
-      margin: 0 0 8px;
-      font-weight: 700;
-    }}
-    .az-jump-letters a {{ color: {TEAL}; }}
-    .az-jump-group h3 {{
-      margin: 8px 0 4px;
-      font-size: 0.75rem;
-      letter-spacing: 0.08em;
-      color: #4a5560;
-    }}
-    .az-jump-group ul {{
-      list-style: none;
-      display: flex;
-      flex-wrap: wrap;
-      gap: 4px 14px;
-      margin: 0;
-      padding: 0;
-    }}
-    .az-jump-link {{
-      background: none;
-      border: 0;
-      padding: 0;
+    .az-letter {{
+      min-width: 30px;
+      height: 30px;
+      padding: 0 6px;
+      background: #fff;
+      border: 1px solid #cfdedd;
+      border-radius: 4px;
       color: {TEAL};
-      font-weight: 600;
-      font-size: 0.92rem;
+      font-weight: 700;
+      font-size: 0.9rem;
+      line-height: 1;
       cursor: pointer;
     }}
-    .az-jump-link:hover {{ text-decoration: underline; }}
+    .az-letter:hover,
+    .az-letter:focus-visible {{
+      background: {TEAL};
+      border-color: {TEAL};
+      color: #fff;
+    }}
+    /* Desktop boxes are already the locked 850px, so there is nothing to
+       enlarge — the button only appears on tablet/phone. */
+    .az-expand {{ display: none; }}
     .diocese-intro {{
       margin: 0 0 22px;
       padding: 18px 18px 16px;
@@ -1619,28 +1618,83 @@ def az_jump_js() -> str:
         }
         return 0;
       }
-      function jump(target, name) {
-        if (target === 'pdf') {
-          var page = pageFor(name);
-          if (page && window.parishPressScrollPdfToPage) {
-            window.parishPressScrollPdfToPage(page);
-            return;
-          }
-          var pages = document.querySelector('.pdf-inpage-pages');
-          if (pages && page) {
-            var slot = pages.querySelector('[data-page="' + page + '"]');
-            if (slot) { scrollBoxTo(pages, slot); return; }
+      function showBox(box) {
+        // The jump happens inside the locked box, so make sure the box itself
+        // is on screen first or a phone reader sees nothing move.
+        if (!box || !box.getBoundingClientRect) return;
+        var r = box.getBoundingClientRect();
+        var h = window.innerHeight || document.documentElement.clientHeight || 0;
+        if (r.top < 0 || r.top > h - 120) {
+          if (box.scrollIntoView) {
+            box.scrollIntoView({ block: 'start', behavior: reduceMotion() ? 'auto' : 'smooth' });
           }
         }
+      }
+      function jumpPdf(names) {
+        var pages = document.querySelector('.pdf-inpage-pages');
+        if (!pages) return false;
+        for (var i = 0; i < names.length; i++) {
+          var page = pageFor(names[i]);
+          if (!page) continue;
+          var slot = pages.querySelector('[data-page="' + page + '"]');
+          if (!slot) continue;
+          showBox(pages);
+          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
+          else scrollBoxTo(pages, slot);
+          return true;
+        }
+        return false;
+      }
+      function jumpOcr(names) {
         var ocr = document.getElementById('ocr-panel');
-        var hit = findOcr(ocr, name);
-        if (hit) scrollBoxTo(ocr, hit);
+        if (!ocr) return false;
+        for (var i = 0; i < names.length; i++) {
+          var hit = findOcr(ocr, names[i]);
+          if (!hit) continue;
+          showBox(ocr);
+          scrollBoxTo(ocr, hit);
+          return true;
+        }
+        return false;
+      }
+      function jump(target, names, tries) {
+        var done = target === 'pdf' ? jumpPdf(names) : jumpOcr(names);
+        // PDF.js paints page slots as it streams, so the slot may not exist
+        // for a second or two after load. Retry briefly instead of failing.
+        if (!done && target === 'pdf' && (tries || 0) < 12) {
+          window.setTimeout(function () { jump(target, names, (tries || 0) + 1); }, 400);
+        }
+      }
+      function namesOf(btn) {
+        var raw = btn.getAttribute('data-az-names') || btn.getAttribute('data-parish-name') || '';
+        var out = [];
+        raw.split('|').forEach(function (part) {
+          var name = String(part || '').trim();
+          if (name) out.push(name);
+        });
+        return out;
+      }
+      function toggleExpand(btn) {
+        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
+        if (!panel) return;
+        var open = panel.classList.toggle('az-expanded');
+        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
+        // Box heights changed, so re-measure for the Back to Top button.
+        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
       }
       document.addEventListener('click', function (ev) {
-        var btn = ev.target && ev.target.closest ? ev.target.closest('.az-jump-link') : null;
+        if (!ev.target || !ev.target.closest) return;
+        var expand = ev.target.closest('.az-expand');
+        if (expand) {
+          ev.preventDefault();
+          toggleExpand(expand);
+          return;
+        }
+        var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();
-        jump(btn.getAttribute('data-az-target') || 'ocr', btn.getAttribute('data-parish-name') || btn.textContent || '');
+        jump(btn.getAttribute('data-az-target') || 'ocr', namesOf(btn), 0);
       });
     })();
     """
@@ -2018,6 +2072,37 @@ def render_bulletin_viewer_shell(
         max-height: 450px;
         overflow: auto;
         overflow-y: auto;
+      }}
+      /* Tap targets big enough for a thumb. */
+      .az-expand {{ display: inline-block; }}
+      .az-letter,
+      .az-expand {{
+        min-width: 40px;
+        height: 40px;
+        font-size: 0.95rem;
+      }}
+      .az-expand {{
+        padding: 0 12px;
+        background: #fff;
+        border: 1px solid {TEAL};
+        border-radius: 4px;
+        color: {TEAL};
+        font-weight: 700;
+        cursor: pointer;
+      }}
+      /* Only the panel the reader tapped grows — the other one stays 450px.
+         Scoped to that panel's id so a phone never ends up with two 850px
+         boxes stacked on one screen. */
+      #panel-pdf.az-expanded .pdf-frame-wrap,
+      #panel-pdf.az-expanded .pdf-inpage-viewer {{
+        min-height: 850px !important;
+      }}
+      #panel-pdf.az-expanded .pdf-frame-wrap iframe,
+      #panel-pdf.az-expanded .pdf-inpage-pages,
+      #panel-ocr.az-expanded #ocr-panel {{
+        height: 850px !important;
+        min-height: 850px !important;
+        max-height: 850px !important;
       }}
     }}
     @media (max-width: 900px) {{
