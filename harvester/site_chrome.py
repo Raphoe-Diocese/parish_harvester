@@ -34,7 +34,7 @@ def scroll_top_css() -> str:
       position: fixed;
       right: 16px;
       bottom: 20px;
-      z-index: 30;
+      z-index: 9999;
       width: 46px;
       height: 46px;
       border: 0;
@@ -111,42 +111,86 @@ def sticky_search_js() -> str:
 def scroll_top_js() -> str:
     """Show ↑ when the page *or* the locked PDF/OCR box is scrolled.
 
-    Raphoe (and the other live diocese pages) keep `.pdf-inpage-pages` and
-    `#ocr-panel` at a locked 850px / 450px with ``overflow: auto``. Readers
-    scroll inside those boxes, so ``window.scrollY`` stays near 0. Listen
-    to those inner boxes as well. Click jumps the boxes and the window.
+    Raphoe keeps `.pdf-inpage-pages` and ``#ocr-panel`` at a locked 850px /
+    450px with ``overflow: auto``. Readers scroll *inside* those boxes, so
+    ``window.scrollY`` stays near 0.
+
+    Live Raphoe HTML puts this script *before* ``#scroll-top-btn``, so the
+    old ``if (!btn) return`` died on parse. Document-capture ``scroll`` also
+    misses inner ``overflow: auto`` boxes in Safari / some Chromium builds.
+    Bind the boxes themselves, wait until the button exists, and re-bind
+    after PDF.js replaces ``.pdf-inpage-pages``. Click jumps the boxes and
+    the window.
     """
     return """
     (function () {
-      var btn = document.getElementById('scroll-top-btn');
-      if (!btn) return;
-      if (btn.getAttribute('data-pp-bound') === '1') return;
-      btn.setAttribute('data-pp-bound', '1');
-      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      function innerBoxes() {
-        return Array.prototype.slice.call(
-          document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
-        );
+      function boot() {
+        var btn = document.getElementById('scroll-top-btn');
+        if (!btn) {
+          if (!document.body) return;
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scroll-top-btn';
+          btn.id = 'scroll-top-btn';
+          btn.setAttribute('aria-label', 'Back to top');
+          btn.textContent = '↑';
+          document.body.appendChild(btn);
+        }
+        function innerBoxes() {
+          return Array.prototype.slice.call(
+            document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+          );
+        }
+        function maxInnerScroll() {
+          return innerBoxes().reduce(function (max, el) {
+            return Math.max(max, el.scrollTop || 0);
+          }, 0);
+        }
+        function shown() {
+          var y = window.scrollY || document.documentElement.scrollTop || 0;
+          btn.classList.toggle('is-visible', y > 80 || maxInnerScroll() > 16);
+        }
+        function shownSoon() {
+          shown();
+          if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+          else window.setTimeout(shown, 16);
+        }
+        function bindBox(el) {
+          if (!el || el.getAttribute('data-pp-scroll-top') === '1') return;
+          el.setAttribute('data-pp-scroll-top', '1');
+          el.addEventListener('scroll', shownSoon, { passive: true });
+        }
+        function bindBoxes() {
+          innerBoxes().forEach(bindBox);
+          shown();
+        }
+        window.parishPressBindScrollTopBoxes = bindBoxes;
+        if (btn.getAttribute('data-pp-bound') !== 'inner-2') {
+          btn.setAttribute('data-pp-bound', 'inner-2');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.addEventListener('scroll', shownSoon, { passive: true });
+          document.addEventListener('scroll', shownSoon, { capture: true, passive: true });
+          document.addEventListener('wheel', shownSoon, { capture: true, passive: true });
+          document.addEventListener('touchmove', shownSoon, { capture: true, passive: true });
+          if (window.MutationObserver && document.body) {
+            new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+          }
+          btn.addEventListener('click', function () {
+            var behavior = reduce ? 'auto' : 'smooth';
+            window.scrollTo({ top: 0, behavior: behavior });
+            innerBoxes().forEach(function (el) {
+              el.scrollTop = 0;
+              if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+            });
+            window.setTimeout(shown, reduce ? 0 : 400);
+          });
+        }
+        bindBoxes();
       }
-      function maxInnerScroll() {
-        return innerBoxes().reduce(function (max, el) {
-          return Math.max(max, el.scrollTop || 0);
-        }, 0);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
       }
-      function shown() {
-        var y = window.scrollY || document.documentElement.scrollTop || 0;
-        btn.classList.toggle('is-visible', y > 240 || maxInnerScroll() > 80);
-      }
-      window.addEventListener('scroll', shown, { passive: true });
-      document.addEventListener('scroll', shown, { capture: true, passive: true });
-      shown();
-      btn.addEventListener('click', function () {
-        var behavior = reduce ? 'auto' : 'smooth';
-        window.scrollTo({ top: 0, behavior: behavior });
-        innerBoxes().forEach(function (el) {
-          if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
-          else el.scrollTop = 0;
-        });
-      });
     })();
     """

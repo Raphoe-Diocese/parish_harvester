@@ -1161,7 +1161,7 @@ def prefers_native_pdf_js() -> str:
 """
 
 
-PDF_INPAGE_VIEWER_VERSION = "20260823t"
+PDF_INPAGE_VIEWER_VERSION = "20260823u"
 PDF_INPAGE_VIEWER_SRC = f"/assets/pdf-inpage-viewer.js?v={PDF_INPAGE_VIEWER_VERSION}"
 
 
