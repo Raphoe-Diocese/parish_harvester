@@ -6,6 +6,7 @@ import fnmatch
 import io
 import json
 import re
+import ssl
 import subprocess
 import tempfile
 import time
@@ -980,10 +981,11 @@ def _fetch_bytes_with_retries(
     url = quote_http_url(url)
     if not url:
         return None
+    insecure_ctx: ssl.SSLContext | None = None
     while attempts < max_attempts and (time.monotonic() - started) < total_budget_s:
         attempts += 1
+        request = Request(url, headers=headers_out)
         try:
-            request = Request(url, headers=headers_out)
             with urlopen(request, timeout=per_attempt_timeout_s) as response:
                 body = response.read()
                 if response.status == 200 and body:
@@ -994,8 +996,29 @@ def _fetch_bytes_with_retries(
             # shared retry budget on 404/410 (newtownkillea dated uploads).
             if exc.code in {404, 410}:
                 return None
-        except Exception:
-            pass
+        except Exception as exc:
+            if not _is_certificate_verify_error(exc):
+                continue
+            # mucknoparish.ie leaf cert has no Sectigo intermediate in-chain.
+            # HTTP listing/post work; PDF http:// 302s to https://www and
+            # dies here unless we retry without verify (same as autofix).
+            if insecure_ctx is None:
+                insecure_ctx = _insecure_ssl_context()
+            try:
+                with urlopen(
+                    request,
+                    timeout=per_attempt_timeout_s,
+                    context=insecure_ctx,
+                ) as response:
+                    body = response.read()
+                    if response.status == 200 and body:
+                        headers = {k.lower(): v for k, v in response.headers.items()}
+                        return body, headers
+            except HTTPError as ssl_exc:
+                if ssl_exc.code in {404, 410}:
+                    return None
+            except Exception:
+                pass
     return None
 
 
@@ -1494,14 +1517,47 @@ _WP_UPLOAD_IMAGE_RE = re.compile(
 _RESIZED_IMAGE_SUFFIX_RE = re.compile(r"-\d+x\d+\.(?:png|jpe?g)$", re.IGNORECASE)
 
 
+def _href_match_blob(url: str) -> str:
+    """Lowercased href with %20/spaces folded to hyphens for pattern checks.
+
+    Muckno filenames are usually hyphenated (clontibret-muckno-bulletin) but
+    the same words can appear as ``F Clontibret Muckno Bulletin 23rd AUG.pdf``.
+    """
+    return unquote(url or "").lower().replace(" ", "-")
+
+
+def _is_certificate_verify_error(exc: BaseException) -> bool:
+    reason = getattr(exc, "reason", exc)
+    text = f"{type(reason).__name__} {reason} {exc}".lower()
+    return (
+        "certificate_verify" in text
+        or "certificate verify failed" in text
+        or "sslcertverificationerror" in text
+    )
+
+
+def _insecure_ssl_context() -> ssl.SSLContext:
+    """Last-resort context for parish hosts that omit the CA intermediate.
+
+    mucknoparish.ie (proved 23/08/2026) sends only the leaf cert signed by
+    Sectigo Public Server Authentication CA DV R36. urlopen then fails with
+    CERTIFICATE_VERIFY_FAILED and the scrape reports a false 'no PDF'.
+    """
+    ctx = ssl.create_default_context()
+    ctx.check_hostname = False
+    ctx.verify_mode = ssl.CERT_NONE
+    return ctx
+
+
 def _extract_matching_hrefs(html: str, base_url: str, keyword_patterns: list[str]) -> list[str]:
     """Plain-regex href extraction (no bs4 dependency) for WAF-flaky sites where
     we fetch raw HTML via plain HTTP retries instead of a Playwright DOM."""
     out: list[str] = []
     seen: set[str] = set()
+    patterns = [str(p).lower() for p in keyword_patterns if p]
     for href in re.findall(r"""href=["']([^"']+)["']""", html, re.IGNORECASE):
-        low = href.lower()
-        if not any(pat in low for pat in keyword_patterns):
+        blob = _href_match_blob(href)
+        if not any(pat in blob for pat in patterns):
             continue
         absolute = urljoin(base_url, href)
         if absolute not in seen:
@@ -1592,44 +1648,58 @@ async def _try_http_scrape_newest_pdf(
     (Castleblayney / Muckno), follow the newest dated post and scrape that
     page for the PDF instead of pinning a filename.
     """
-    listing_result = await asyncio.to_thread(
-        _fetch_bytes_with_retries,
-        listing_url,
-        max_attempts=_DROPFILES_HTTP_ATTEMPTS,
-        per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
-        total_budget_s=_DROPFILES_HTTP_LISTING_BUDGET_S,
-    )
-    if not listing_result:
+    listing_html = ""
+    listing_fetched_from = listing_url
+    for candidate in _mdocs_listing_url_candidates(listing_url):
+        listing_result = await asyncio.to_thread(
+            _fetch_bytes_with_retries,
+            candidate,
+            max_attempts=_DROPFILES_HTTP_ATTEMPTS,
+            per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
+            total_budget_s=_DROPFILES_HTTP_LISTING_BUDGET_S,
+        )
+        if not listing_result:
+            continue
+        listing_body, listing_headers = listing_result
+        if "text/html" not in (listing_headers.get("content-type") or "").lower():
+            continue
+        listing_html = listing_body.decode("utf-8", errors="ignore")
+        listing_fetched_from = candidate
+        break
+    if not listing_html:
         return None
-    listing_body, listing_headers = listing_result
-    if "text/html" not in (listing_headers.get("content-type") or "").lower():
-        return None
-    listing_html = listing_body.decode("utf-8", errors="ignore")
-    hrefs = _extract_matching_hrefs(listing_html, listing_url, href_patterns)
+    hrefs = _extract_matching_hrefs(listing_html, listing_fetched_from, href_patterns)
     scored = _score_http_scrape_pdf_hrefs(hrefs, target_date)
     if not scored:
         post_url = _newest_dated_post_url_from_listing(
             listing_html,
-            listing_url,
+            listing_fetched_from,
             [str(p).strip() for p in (post_slug_patterns or []) if str(p).strip()],
             target_date,
         )
         if not post_url:
             return None
-        post_result = await asyncio.to_thread(
-            _fetch_bytes_with_retries,
-            post_url,
-            max_attempts=_DROPFILES_HTTP_ATTEMPTS,
-            per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
-            total_budget_s=_DROPFILES_HTTP_FILE_BUDGET_S,
-        )
-        if not post_result:
+        post_html = ""
+        post_fetched_from = post_url
+        for post_candidate in _mdocs_listing_url_candidates(post_url):
+            post_result = await asyncio.to_thread(
+                _fetch_bytes_with_retries,
+                post_candidate,
+                max_attempts=_DROPFILES_HTTP_ATTEMPTS,
+                per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
+                total_budget_s=_DROPFILES_HTTP_FILE_BUDGET_S,
+            )
+            if not post_result:
+                continue
+            post_body, post_headers = post_result
+            if "text/html" not in (post_headers.get("content-type") or "").lower():
+                continue
+            post_html = post_body.decode("utf-8", errors="ignore")
+            post_fetched_from = post_candidate
+            break
+        if not post_html:
             return None
-        post_body, post_headers = post_result
-        if "text/html" not in (post_headers.get("content-type") or "").lower():
-            return None
-        post_html = post_body.decode("utf-8", errors="ignore")
-        hrefs = _extract_matching_hrefs(post_html, post_url, href_patterns)
+        hrefs = _extract_matching_hrefs(post_html, post_fetched_from, href_patterns)
         scored = _score_http_scrape_pdf_hrefs(hrefs, target_date)
     if not scored:
         return None
@@ -1719,8 +1789,8 @@ _SKIP_IMAGE_NAME_RE = re.compile(
 def _href_matches_patterns(url: str, patterns: list[str]) -> bool:
     if not patterns:
         return True
-    low = unquote(url or "").lower()
-    return any(pat.lower() in low for pat in patterns)
+    blob = _href_match_blob(url)
+    return any(pat.lower().replace(" ", "-") in blob for pat in patterns)
 
 
 async def _try_wp_json_newest_media(
