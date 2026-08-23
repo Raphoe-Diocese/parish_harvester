@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
   <title>Cathedral Bulletin — 21/08/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -110,9 +112,7 @@
 
     .pdf-frame-wrap {
       position: relative;
-      height: auto;
       min-height: 850px;
-      overflow: visible;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -189,24 +189,21 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
-      height: auto;
-      overflow: visible;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
     body.is-native-pdf iframe.pdf-frame {
       display: none !important;
-      height: auto;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
     }
     .pdf-frame-wrap.is-native-pdf,
     .pdf-standalone-shell.is-native-pdf,
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
-      height: auto !important;
       min-height: 850px !important;
-      overflow: visible !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -215,7 +212,6 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
-        height: auto !important;
         min-height: 450px !important;
         display: flex;
         flex-direction: column;
@@ -285,8 +281,61 @@
     .ocr-search-tools button:disabled { background: #9bbfbd; cursor: not-allowed; }
     .match-count { color: #6b7280; font-size: 0.9rem; font-weight: 600; }
     .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #fff;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 30;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
     .ocr-zoom-bar {
-      position: sticky; top: 0; z-index: 6;
       display: flex; justify-content: center; align-items: center; gap: 10px;
       margin: 0 0 10px; padding: 6px 10px;
       background: rgba(255, 255, 255, 0.94);
@@ -469,8 +518,9 @@
       padding: 22px 24px 32px;
     }
     .pdf-frame-wrap iframe {
-      height: auto;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
     }
     .note-box {
       margin-top: 12px;
@@ -567,12 +617,11 @@
 
     @media (max-width: 1024px) {
       /* Harvest + OCR both call this generator — keep both panels here.
-         Desktop: 850px on the VISIBLE boxes. Tablet/phone (max-width 1024px): ~450px. */
+         Desktop: locked 850px visible boxes, inner scroll.
+         Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
-        height: auto;
         min-height: 450px;
-        overflow: visible;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -602,58 +651,8 @@
         width: 100%;
       }
     }
-  
-    .ocr-sticky-chrome {
-      position: sticky;
-      top: 0;
-      z-index: 8;
-      background: #fff;
-      padding: 8px 0 10px;
-      margin: 0 0 8px;
-    }
-    .ocr-sticky-chrome .ocr-zoom-bar {
-      position: relative;
-      top: auto;
-    }
-    html { scroll-padding-top: 10rem; }
-    mark.search-active { scroll-margin-top: 10rem; }
-    
-
-    .scroll-top-btn {
-      position: fixed;
-      right: 16px;
-      bottom: 20px;
-      z-index: 30;
-      width: 46px;
-      height: 46px;
-      border: 0;
-      border-radius: 999px;
-      background: #1a6b6b;
-      color: #fff;
-      font-size: 1.35rem;
-      line-height: 1;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(8px);
-      transition: opacity 160ms ease, transform 160ms ease;
-    }
-    .scroll-top-btn.is-visible {
-      opacity: 1;
-      pointer-events: auto;
-      transform: none;
-    }
-    .scroll-top-btn:focus-visible {
-      outline: 3px solid #14524f;
-      outline-offset: 2px;
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .scroll-top-btn { transition: none; }
-    }
-    
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260822c" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260823s" defer></script>
 </head>
 <body>
   <div class="page">
@@ -699,7 +698,7 @@
         <a href="steunanscathedral-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
       <div class="ocr-sticky-chrome">
-<div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
         <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
         <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
         <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
@@ -717,7 +716,8 @@
         </div>
       </div>
       </div>
-<div id="ocr-panel"><p class="page-label">Page 5</p>
+      <div id="ocr-panel"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Cathedral</h2><p class="ocr-parish-date">21/08/2026</p></header>
+<p class="page-label">Page 1</p>
 <p>SUNDAY COLLECTION ~ 9th August - €6,373<br>
 BUILDING FUND: €1,850<br>
 PARISH EXPENDITURE ~ €5,872.14<br>
@@ -740,7 +740,7 @@ it’s food, farming, crafts or a service business, we want to hear from you. Ap
 <a href="https://empowerprogramme.ie/" target="_blank" rel="noopener noreferrer">https://empowerprogramme.ie/</a> Places are limited. The closing date for applications<br>
 is 5 pm on Friday 4th September. Phone: 091 -742851or email: <a href="mailto:michelle.lee@atu.ie" target="_blank" rel="noopener noreferrer">michelle.lee@atu.ie</a><br>
 LOUGH DERG One Day Retreats - Guided Days of Prayer and Reflection<br>
-August: 18th, 2nd, 23rd, 29th and 31st ~ September: 5th, 6th, 9th, 12th, 15th, 19th<br>
+August: 18th, 22nd, 23rd, 29th and 31st ~ September: 5th, 6th, 9th, 12th, 15th, 19th<br>
 and 20th. Admission €50. Group discounts available. Advance Booking Essential .<br>
 Special Themed Retreats: 23rd August - St. Peregrine; 5th September - Pioneer<br>
 Pilgrimage; 6th September - St. Carlos Acutis; 9th and 12th September - Vocations<br>
@@ -776,6 +776,7 @@ Eucharistic Adoration is a devotion whereby members of a parish unite in<br>
 making continuous adoration before the exposed Blessed Sacrament, for as<br>
 many hours as may be possible, based on the number of people who pledge to<br>
 do a weekly holy hour. Eucharistic Adoration is silent and contemplative in<br>
+nature.<br>
 We in this parish are very blessed that St. Pius X Adoration<br>
 Chapel (located in the grounds of Loreto Secondary School) is<br>
 open from Sunday 1 pm – Friday 8 pm and that we have<br>
@@ -791,11 +792,10 @@ an hour of your choice - please contact Mary on <a href="tel:+353860870446" styl
 “Devotion to the Eucharist is the most noble, because it has God as its object;<br>
 it is the most profitable for salvation, because it gives us the Author of Grace;<br>
 it is the sweetest, because the Lord is Sweetness itself. ” Pope Pius X<br>
-(Feast of St. Pius X - Friday 21st August)</p>
-<h2 class="ocr-parish-name">Cathedral</h2>
-<p>21/08/2026</p>
+(Feast of St. Pius X - Friday 21st August)<br>
+Cathedral</p>
 <hr>
-<p class="page-label">Page 6</p>
+<p class="page-label">Page 2</p>
 <p>The NATIONAL NOVENA TO OUR LADY OF KNOCK continues until<br>
 Friday 21st August. To participate in this Novena, please visit: https://<br>
 <a href="https://www.knockshrine.ie/watch" target="_blank" rel="noopener noreferrer">www.knockshrine.ie/watch</a> -live/<br>
@@ -867,22 +867,21 @@ Quigley, Deceased Members of the Quigley Family, Eileen O ’Doherty, Patrick<br
 Greene, Kathleen Doherty, Liam Doherty, Duncan Doherty, Brigid Friel, Mason<br>
 Anderson, John Sadler, Kathleen Sadler, Brendan Sadler, John Sadler, Kathleen<br>
 McCauley, Eddie McCauley, Kathleen Lally, Eileen Boyle and Grace Marley RIP<br>
-Saturday 2nd August ~ The Queenship of Mary<br>
+Saturday 22nd August ~ The Queenship of Mary<br>
 10 am Mass ~ Frank McManus RIP (Month ’s Mind Mass)<br>
 Confessions: 12 noon - 1 pm and 7 pm<br>
 Baptisms: 4 pm<br>
 Vigil Mass ~ 6 pm<br>
 Sunday 23rd August ~ Twenty -first Sunday in Ordinary Time<br>
 Masses: 8 am, 10 am, 12 noon and 6 pm<br>
-Baptisms: 2.30 pm</p>
-<hr></div>
+Baptisms: 2.30 pm</p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other RAPHOE Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="drumholm"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="raphoe"><a class="parish-link" href="drive-1jmslbrliw.html" target="_blank" rel="noopener noreferrer">Raphoe</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="drumholm"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="raphoe"><a class="parish-link" href="drive-1jmslbrliw.html" target="_blank" rel="noopener noreferrer">Raphoe</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="tawnawillyparish.html" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
     </section>
   </div>
   <footer>
@@ -934,9 +933,9 @@ Baptisms: 2.30 pm</p>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260822c"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260823s"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260822c';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260823s';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1175,9 +1174,32 @@ Baptisms: 2.30 pm</p>
         if (page) page.insertBefore(banner, page.firstChild);
       }
     })();
-  </script>
-  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
-  <script>
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
     (function () {
       var btn = document.getElementById('scroll-top-btn');
       if (!btn) return;
@@ -1192,6 +1214,8 @@ Baptisms: 2.30 pm</p>
         window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
       });
     })();
-    </script>
+    
+  </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
 </body>
 </html>

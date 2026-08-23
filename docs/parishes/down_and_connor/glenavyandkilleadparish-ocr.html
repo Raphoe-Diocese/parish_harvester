@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
   <title>Glenavy and Killead Text Bulletin — 21/08/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -36,8 +38,61 @@
       font-size: 1rem; font-weight: 700; color: #1a1f1e;
     }
     .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 30;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
     .ocr-zoom-bar {
-      position: sticky; top: 0; z-index: 6;
       display: flex; justify-content: center; align-items: center; gap: 8px;
       margin: 0 0 10px; padding: 6px 10px;
       background: rgba(255, 255, 255, 0.92);
@@ -264,56 +319,6 @@
       .page { padding: 12px 14px 32px; }
       .ocr-search-tools button { min-height: 48px; }
     }
-  
-    .ocr-sticky-chrome {
-      position: sticky;
-      top: 0;
-      z-index: 8;
-      background: #fff;
-      padding: 8px 0 10px;
-      margin: 0 0 8px;
-    }
-    .ocr-sticky-chrome .ocr-zoom-bar {
-      position: relative;
-      top: auto;
-    }
-    html { scroll-padding-top: 10rem; }
-    mark.search-active { scroll-margin-top: 10rem; }
-    
-
-    .scroll-top-btn {
-      position: fixed;
-      right: 16px;
-      bottom: 20px;
-      z-index: 30;
-      width: 46px;
-      height: 46px;
-      border: 0;
-      border-radius: 999px;
-      background: #1a6b6b;
-      color: #fff;
-      font-size: 1.35rem;
-      line-height: 1;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(8px);
-      transition: opacity 160ms ease, transform 160ms ease;
-    }
-    .scroll-top-btn.is-visible {
-      opacity: 1;
-      pointer-events: auto;
-      transform: none;
-    }
-    .scroll-top-btn:focus-visible {
-      outline: 3px solid #14524f;
-      outline-offset: 2px;
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .scroll-top-btn { transition: none; }
-    }
-    
   </style>
 </head>
 <body>
@@ -325,7 +330,7 @@
       </div>
     </div>
     <div class="ocr-sticky-chrome">
-<div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
       <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
       <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
       <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
@@ -345,7 +350,8 @@
       </div>
     </div>
     </div>
-<div class="ocr-body" id="ocr-text"><p class="page-label">Page 11</p>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Glenavy and Killead</h2><p class="ocr-parish-date">21/08/2026</p></header>
+<p class="page-label">Page 1</p>
 <p>Twentieth Sunday in Ordinary Time<br>
 16 August 2026<br>
 Very Rev. Rory Sheehan P.P.: St Joseph ’s<br>
@@ -361,6 +367,7 @@ Wheel Balancing, Wheel Alignment, Batteries, General Service and repairs Tel: 02
 4423 113.<br>
 ST CLARE’S HALL, WHAT’S ON?– MONDAY Bootcamp with CM Fitness 6am – 7.20am, Multi<br>
 Sensory baby class 10—11am, Flip Fusion 5.30pm —6.30pm, Pilates 7pm – 9pm, Bowls 8pm –<br>
+10pm.<br>
 TUESDAY Brazier School of Dance 4.45PM – 7.45PM, Pickle Ball 8pm – 10pm.<br>
 WEDNESDAY Bootcamp with CM Fitness 6am – 7.20am, Friendship Group 10.30am –<br>
 12.30pm, Yoga 7pm – 8pm, Bowls 8pm – 10pm (Matches ).<br>
@@ -419,11 +426,10 @@ Faith in a surprising God who, in Jesus, his Son, never says no to<br>
 goodness. Faith that keeps us energetic and alive, not tired, in soul as<br>
 well as body.<br>
 Remember your feeling of gratitude for the children of your family.<br>
-Lord, I believe. Strengthen my faith.</p>
-<h2 class="ocr-parish-name">Glenavy and Killead</h2>
-<p>21/08/2026</p>
+Lord, I believe. Strengthen my faith.<br>
+Glenavy and Killead</p>
 <hr>
-<p class="page-label">Page 12</p>
+<p class="page-label">Page 2</p>
 <p>17 —23 August 2026 Mass Intentions<br>
 ST JOSEPH ’S MATER DEI St James<br>
 Monday<br>
@@ -431,11 +437,13 @@ Adoration<br>
 7pm —8pm<br>
 Sun Adoration<br>
 6.30pm —<br>
+7.30pm<br>
 Divine Mercy<br>
 Chaplet, Chaplet<br>
 for Holy Souls &amp;<br>
 Rosary after-<br>
 wards starts at<br>
+6.15pm<br>
 Mon Adoration<br>
 11am —12pm Mon 9.30am Communion Service<br>
 Tue 10am Funeral<br>
@@ -470,6 +478,7 @@ McCann, Aodh Cormican, William McGarrell, Daniel Crossey, Kathleen Henry,<br>
 Fr Eamon O ’Brien, Jim Brazier, Maureen O ’Rourke.<br>
 Sanctuary lamp intentions: Liz Donnelly, G &amp; M<br>
 Adoration No Adoration in Mater Dei on Wednesday mornings in July &amp;<br>
+August.<br>
 Collection 9 August 2026<br>
 Weekly Offering: £3,356<br>
 Thank you for your generosity Feumore Mass<br>
@@ -494,6 +503,7 @@ conference bank account. Account number 41965035, sort code<br>
 <a href="tel:+3537784955647" style="color:#1d4ed8;font-weight:600;">07784955647</a>. Donation can be made to our bank account, Sort Code<br>
 98-04-60. Account Number 41966009. Your support is very much<br>
 appreciated as we support those most vulnerable in your local<br>
+community.<br>
 CATHOLIC MOTHERS IRELAND – FAMILY DAY Catholic Mothers Ireland will hold its<br>
 Annual National Mass on Sunday, 6 September at Termonbacca Retreat Centre,<br>
 Derry City. The day will begin with Mass at 2.00pm, celebrated by Bishop Donal<br>
@@ -522,9 +532,10 @@ Session 5: The Spirit -Empowered Life,<br>
 Session 6: The Heart of a Disciple<br>
 Session 7: Going On with the Lord.<br>
 Book your place before the 24 August as numbers are limited by leaving<br>
-your name and contact details in the parish office Tel. <a href="tel:+442894422278" style="color:#1d4ed8;font-weight:600;">02894422278</a> or email</p>
+your name and contact details in the parish office Tel. <a href="tel:+442894422278" style="color:#1d4ed8;font-weight:600;">02894422278</a> or email<br>
+<a href="mailto:glenavy@downandconnor.org" target="_blank" rel="noopener noreferrer">glenavy@downandconnor.org</a></p>
 <hr>
-<p class="page-label">Page 13</p>
+<p class="page-label">Page 3</p>
 <p>Liturgical ‘Sign of Peace ’ The Sign of Peace remains an integral part of<br>
 the celebration of the Eucharist and has been reintroduced as a normal<br>
 practice across the Diocese. The customary expression of the Sign of Peace<br>
@@ -571,8 +582,7 @@ Mary to any sick parishioner for one week. If you would like to avail of<br>
 the statue, please contact the parish office.<br>
 Sanctuary lamp intentions: A Sanctuary Lamp burns for a week in each of our<br>
 two churches. If you would like to dedicate a lamp for a loved one or a special<br>
-Intention please contact the Parish Office. There is a suggested offering of £5</p>
-<hr></div>
+Intention please contact the Parish Office. There is a suggested offering of £5</p></div>
     <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
   </div>
   <script>
@@ -720,9 +730,32 @@ Intention please contact the Parish Office. There is a suggested offering of £5
         }
       });
     })();
-  </script>
-  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
-  <script>
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
     (function () {
       var btn = document.getElementById('scroll-top-btn');
       if (!btn) return;
@@ -737,6 +770,8 @@ Intention please contact the Parish Office. There is a suggested offering of £5
         window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
       });
     })();
-    </script>
+    
+  </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
 </body>
 </html>

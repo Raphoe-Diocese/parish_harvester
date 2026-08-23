@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
   <title>Saul and Ballee Text Bulletin — 21/08/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -36,8 +38,61 @@
       font-size: 1rem; font-weight: 700; color: #1a1f1e;
     }
     .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 30;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
     .ocr-zoom-bar {
-      position: sticky; top: 0; z-index: 6;
       display: flex; justify-content: center; align-items: center; gap: 8px;
       margin: 0 0 10px; padding: 6px 10px;
       background: rgba(255, 255, 255, 0.92);
@@ -264,56 +319,6 @@
       .page { padding: 12px 14px 32px; }
       .ocr-search-tools button { min-height: 48px; }
     }
-  
-    .ocr-sticky-chrome {
-      position: sticky;
-      top: 0;
-      z-index: 8;
-      background: #fff;
-      padding: 8px 0 10px;
-      margin: 0 0 8px;
-    }
-    .ocr-sticky-chrome .ocr-zoom-bar {
-      position: relative;
-      top: auto;
-    }
-    html { scroll-padding-top: 10rem; }
-    mark.search-active { scroll-margin-top: 10rem; }
-    
-
-    .scroll-top-btn {
-      position: fixed;
-      right: 16px;
-      bottom: 20px;
-      z-index: 30;
-      width: 46px;
-      height: 46px;
-      border: 0;
-      border-radius: 999px;
-      background: #1a6b6b;
-      color: #fff;
-      font-size: 1.35rem;
-      line-height: 1;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(8px);
-      transition: opacity 160ms ease, transform 160ms ease;
-    }
-    .scroll-top-btn.is-visible {
-      opacity: 1;
-      pointer-events: auto;
-      transform: none;
-    }
-    .scroll-top-btn:focus-visible {
-      outline: 3px solid #14524f;
-      outline-offset: 2px;
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .scroll-top-btn { transition: none; }
-    }
-    
   </style>
 </head>
 <body>
@@ -325,7 +330,7 @@
       </div>
     </div>
     <div class="ocr-sticky-chrome">
-<div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
       <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
       <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
       <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
@@ -345,7 +350,8 @@
       </div>
     </div>
     </div>
-<div class="ocr-body" id="ocr-text"><p class="page-label">Page 30</p>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Saul and Ballee</h2><p class="ocr-parish-date">21/08/2026</p></header>
+<p class="page-label">Page 1</p>
 <p>Downpatrick Family of Parishes of Saul &amp; Ballee and Kilclief<br>
 Ninet eenth Sunday of Ordinary Time<br>
 Sunday 15th August 2026</p>
@@ -362,7 +368,7 @@ Tuesday 18th August NO MASS<br>
 Weds 19th August 10am<br>
 Thursday 20th August<br>
 Friday 21st August 7pm 9.30am<br>
-Saturday 2nd August 5pm 6.30pm<br>
+Saturday 22nd August 5pm 6.30pm<br>
 Sunday 23rd August 9.30am 11am 12noon<br>
 Masses are available to view online at <a href="https://www.saulandballeeparish.com" target="_blank" rel="noopener noreferrer">www.saulandballeeparish.com</a> and<br>
 Please note – there will be NO MASSES in the Parishes on Monday and Tuesday this<br>
@@ -381,19 +387,18 @@ Parish Finance Officer – 8hrs per week, Thurs &amp; Fri 10am to 2pm<br>
 Further details on these jobs are available on the posters displayed in the Churches or from<br>
 <a href="https://www.downandconnor.org" target="_blank" rel="noopener noreferrer">www.downandconnor.org</a> and click on job vacancies<br>
 Closing date for applications for both jobs is 12noon on Thursday 20th August 2026<br>
-All bulletin notices should be with the Parish office by 12noon on Wednesday</p>
-<h2 class="ocr-parish-name">Saul and Ballee</h2>
-<p>21/08/2026</p>
+All bulletin notices should be with the Parish office by 12noon on Wednesday<br>
+Saul and Ballee</p>
 <hr>
-<p class="page-label">Page 31</p>
+<p class="page-label">Page 2</p>
 <p>Parish of Saul &amp; Ballee<br>
-Months Mind Mass: Gerry McCashin on Saturday 2nd August at 5pm in St Patrick’s, Saul</p>
+Months Mind Mass: Gerry McCashin on Saturday 22nd August at 5pm in St Patrick’s, Saul</p>
 <h3 class="b-head">Anniversary Masses</h3>
 <p>Saturday 15th August – Joe Curran, Leonard Curran, Roseanne &amp; Patrick Sloan<br>
 Sunday 16th August – Margaret Curran, Lennie Curran (9.30am) Bill Kearney, John &amp; Oliver<br>
 O’Hare, Patrick Taggart, Allie Dobbin &amp; Siobhan Smyth<br>
 Friday 21st August – Marie Cully, Gareth Fitzsimons , Harry Hampton<br>
-Saturday 2nd August - Mary McGreevy , Eithne McMullan<br>
+Saturday 22nd August - Mary McGreevy , Eithne McMullan<br>
 Sunday 23rd August – Warren Rodgers, Tom McVeigh (9.30am) , Ann Brennan (12noon)<br>
 Friday 28th August – Philip Smith<br>
 Saturday 29th August – Frank, Norah and Michael Donnelly<br>
@@ -422,7 +427,7 @@ St Vincent de Paul Helplines - Are you struggling with the cost of school un ifo
 for help. Strangford Conference helpline number is displayed in the Church or phone Saul<br>
 Conference on <a href="tel:+3537928346114" style="color:#1d4ed8;font-weight:600;">07928346114</a> or <a href="tel:+3537801896229" style="color:#1d4ed8;font-weight:600;">07801896229</a></p>
 <hr>
-<p class="page-label">Page 32</p>
+<p class="page-label">Page 3</p>
 <p>MATT TALBOT – URBAN MYSTIC<br>
 The Knights of St Columbanus, CK12 Downpatrick , invite you to a special screening of Matt Talbot<br>
 – Urban Mystic at Newcastle Community Cinema, St Mary&#x27;s Hall, Main Street, Newcastle , on Friday<br>
@@ -444,6 +449,7 @@ Burren Outdoor Retreat , Friday 4th September to Sunday 6th September. Would you
 come with us on a journey through the Burren with its limestone pavements, rare flora and ancient<br>
 sacred sites? Let the beauty of this place renew you in body and soul. Residential (people within easy<br>
 reach may commute). Contact Mary at <a href="tel:+353879701130" style="color:#1d4ed8;font-weight:600;">087 970 1130</a> for information or Des at <a href="tel:+353851614951" style="color:#1d4ed8;font-weight:600;">085 161 4951</a> for<br>
+bookings.<br>
 Abide in His Love Women’s Conference . The Great Northern Hotel, Bundoran, 20 –22<br>
 November 2026. Join women from across Ireland for a faith -filled weekend with inspiring speakers<br>
 including Sarah Swafford, Danielle Noonan, Fr Mark Wharton, Fr Barry Braum, Fr Oisín Martin,<br>
@@ -461,7 +467,7 @@ SAFEGUARDING - If you have a concern, suspicion, or wish to make an allegation o
 adult at risk, please contact the Diocesan Safeguarding Office: Philip O&#x27;Hara, Designated Liaison Person, 120, Cliftonville R oad,<br>
 Belfast BT14 6LA. Mobile: 07534 992124 or Telephone: 028 90 492798. Email: <a href="mailto:philip.ohara@soddc.org" target="_blank" rel="noopener noreferrer">philip.ohara@soddc.org</a> or visit</p>
 <hr>
-<p class="page-label">Page 33</p>
+<p class="page-label">Page 4</p>
 <p>A Brief history of St Malachy’s Church, Kilclief<br>
 The first Church dedicated to St Malachy was erected<br>
 in 1785 when the Parish Priest was Fr John<br>
@@ -479,6 +485,7 @@ In 1925 a porch was built but was later replaced by a geometrical tower which<br
 housed the bell which was blessed by Fr Crossin on 15th August 1952 and was<br>
 rung for the first time. Fr Crossin christened the new bell “Joseph”.<br>
 Unfortunately the bell cracked and a new bell was fitted and blessed on 10th May<br>
+1956.<br>
 In 1968/69 as assessment was carried out on the Church which stated the roof<br>
 and walls were in an advanced state of decay and it was decided the Church<br>
 should be replaced. The site for the new Church was given to the Parish by Mrs<br>
@@ -494,8 +501,7 @@ Very Rev Fr Aidan Brankin, Parish Priest 02844 612525 (Saul) or 02844 260101 (St
 Saul Office: 02844 612525 , Office Hours: Mon to Fri 9 .30am to 12noon 10 St Patrick’s Rd, Downpatrick, BT30 7JG<br>
 Kilclief Office: 02844 260101 Office Hours: Monday 1pm to 3pm 8 Shore Rd, Strangford, BT30 7NL<br>
 Website: <a href="https://www.saulandballeeparish.com" target="_blank" rel="noopener noreferrer">www.saulandballeeparish.com</a><br>
-Email: <a href="mailto:saul@downandconnor.org" target="_blank" rel="noopener noreferrer">saul@downandconnor.org</a> <a href="mailto:strangfordandkilclief@downandconnor.org" target="_blank" rel="noopener noreferrer">strangfordandkilclief@downandconnor.org</a></p>
-<hr></div>
+Email: <a href="mailto:saul@downandconnor.org" target="_blank" rel="noopener noreferrer">saul@downandconnor.org</a> <a href="mailto:strangfordandkilclief@downandconnor.org" target="_blank" rel="noopener noreferrer">strangfordandkilclief@downandconnor.org</a></p></div>
     <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
   </div>
   <script>
@@ -643,9 +649,32 @@ Email: <a href="mailto:saul@downandconnor.org" target="_blank" rel="noopener nor
         }
       });
     })();
-  </script>
-  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
-  <script>
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
     (function () {
       var btn = document.getElementById('scroll-top-btn');
       if (!btn) return;
@@ -660,6 +689,8 @@ Email: <a href="mailto:saul@downandconnor.org" target="_blank" rel="noopener nor
         window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
       });
     })();
-    </script>
+    
+  </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
 </body>
 </html>

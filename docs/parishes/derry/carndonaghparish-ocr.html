@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
   <title>Carndonagh Text Bulletin — 21/08/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -36,8 +38,61 @@
       font-size: 1rem; font-weight: 700; color: #1a1f1e;
     }
     .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 30;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
     .ocr-zoom-bar {
-      position: sticky; top: 0; z-index: 6;
       display: flex; justify-content: center; align-items: center; gap: 8px;
       margin: 0 0 10px; padding: 6px 10px;
       background: rgba(255, 255, 255, 0.92);
@@ -264,56 +319,6 @@
       .page { padding: 12px 14px 32px; }
       .ocr-search-tools button { min-height: 48px; }
     }
-  
-    .ocr-sticky-chrome {
-      position: sticky;
-      top: 0;
-      z-index: 8;
-      background: #fff;
-      padding: 8px 0 10px;
-      margin: 0 0 8px;
-    }
-    .ocr-sticky-chrome .ocr-zoom-bar {
-      position: relative;
-      top: auto;
-    }
-    html { scroll-padding-top: 10rem; }
-    mark.search-active { scroll-margin-top: 10rem; }
-    
-
-    .scroll-top-btn {
-      position: fixed;
-      right: 16px;
-      bottom: 20px;
-      z-index: 30;
-      width: 46px;
-      height: 46px;
-      border: 0;
-      border-radius: 999px;
-      background: #1a6b6b;
-      color: #fff;
-      font-size: 1.35rem;
-      line-height: 1;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(8px);
-      transition: opacity 160ms ease, transform 160ms ease;
-    }
-    .scroll-top-btn.is-visible {
-      opacity: 1;
-      pointer-events: auto;
-      transform: none;
-    }
-    .scroll-top-btn:focus-visible {
-      outline: 3px solid #14524f;
-      outline-offset: 2px;
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .scroll-top-btn { transition: none; }
-    }
-    
   </style>
 </head>
 <body>
@@ -325,7 +330,7 @@
       </div>
     </div>
     <div class="ocr-sticky-chrome">
-<div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
       <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
       <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
       <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
@@ -345,11 +350,11 @@
       </div>
     </div>
     </div>
-<div class="ocr-body" id="ocr-text"><p class="page-label">Page 25</p>
-<p>Sacred Heart Church</p>
-<h2 class="ocr-parish-name">Carndonagh</h2>
-<p>21/08/2026</p>
-<p>15th &amp; 16th August 2026 (20th Sunday Ordinary Time)</p>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Carndonagh</h2><p class="ocr-parish-date">21/08/2026</p></header>
+<p class="page-label">Page 1</p>
+<p>Sacred Heart Church<br>
+Carndonagh<br>
+15th &amp; 16th August 2026 (20th Sunday Ordinary Time)</p>
 <h3 class="b-head">Mass Times</h3>
 <p>Friday 7.00 p m<br>
 Saturday Vigil 7.00 pm<br>
@@ -366,8 +371,8 @@ Thursday .</p>
 <p>Sat 15th Aug Kathleen Hirrell, Tul na Ri (1st Anniv) 7pm<br>
 Sun 16th Aug Coleman Doherty (Olly), Ard Colgan (3rd Anniv) 9am<br>
 Fri 21st Aug Barney McCloskey, Glentogher (Month’s Mind) 7pm<br>
-Sat 2nd Aug Anthony Paradiso (Internment of Ashes) 11am<br>
-Sat 2nd Aug Joseph Callaghan, The Buildings, (Month’s Mind) 7 pm<br>
+Sat 22nd Aug Anthony Paradiso (Internment of Ashes) 11am<br>
+Sat 22nd Aug Joseph Callaghan, The Buildings, (Month’s Mind) 7 pm<br>
 Sun 23rd Aug Mary Jo Lafferty, Malin Rd 9am<br>
 Sat 29th Aug Mary Browne, Hollymount (Month’s Mind) 7pm<br>
 Sun 30th Aug John Collins, Gortin (30th Anniv) 9am</p>
@@ -378,12 +383,14 @@ Weekly Collection amounted to € 2372.56 &amp; Stg £ 78.33<br>
 Thank you for your generosity .<br>
 SACRED HEART CHURCH – PARISH DRAW WINNERS<br>
 €1000 Anne McLaughlin, Churchtown (Noel Doherty)<br>
-€100 John McMenamin (Laura &amp; Emma Doherty)</p>
+€100 John McMenamin (Laura &amp; Emma Doherty)<br>
+€50 Charlie &amp; Leeanne Doherty (Bronagh Doherty) Carndonagh</p>
 <hr>
-<p class="page-label">Page 26</p>
+<p class="page-label">Page 2</p>
 <p>Vocations: That the men called to priesthood will &quot;.have a care for justice<br>
 [and] act with integrity.&quot; as they preach the message of God&#x27;s salvation for<br>
 everyone, the Good News that the Church is &quot;.a house of prayer for all the<br>
+peoples.&quot;<br>
 DONEGAL DOWN SYDROME ASSOCIATION Annual church -gate<br>
 collection will take place on the weekend of 29 /30 August. Anyone<br>
 interested in helping on the day can contact the Donegal Down Syndrome<br>
@@ -419,8 +426,7 @@ Tickets cost €20 and can be booked on the e ventbrite website by looking up<br
 <a href="mailto:deusetpatria@gmail.com" target="_blank" rel="noopener noreferrer">deusetpatria@gmail.com</a> .<br>
 Masses and Baptisms: If you wish to book Masses or Baptisms please call into the Sacristy<br>
 before or after any Masses or telephone <a href="tel:+353860577273" style="color:#1d4ed8;font-weight:600;">0860577273</a>. Parish Office, Macartan’s,<br>
-Carndonagh, Co. Donegal. Tel:(074)9374104 Email:<a href="mailto:sacredheartchurchcarn@gmail.com" target="_blank" rel="noopener noreferrer">sacredheartchurchcarn@gmail.com</a></p>
-<hr></div>
+Carndonagh, Co. Donegal. Tel:(074)9374104 Email:<a href="mailto:sacredheartchurchcarn@gmail.com" target="_blank" rel="noopener noreferrer">sacredheartchurchcarn@gmail.com</a></p></div>
     <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
   </div>
   <script>
@@ -568,9 +574,32 @@ Carndonagh, Co. Donegal. Tel:(074)9374104 Email:<a href="mailto:sacredheartchurc
         }
       });
     })();
-  </script>
-  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
-  <script>
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
     (function () {
       var btn = document.getElementById('scroll-top-btn');
       if (!btn) return;
@@ -585,6 +614,8 @@ Carndonagh, Co. Donegal. Tel:(074)9374104 Email:<a href="mailto:sacredheartchurc
         window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
       });
     })();
-    </script>
+    
+  </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
 </body>
 </html>

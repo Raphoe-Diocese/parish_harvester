@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Drumquin PDF — 21/08/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
@@ -88,24 +90,21 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
-      height: auto;
-      overflow: visible;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
     body.is-native-pdf iframe.pdf-frame {
       display: none !important;
-      height: auto;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
     }
     .pdf-frame-wrap.is-native-pdf,
     .pdf-standalone-shell.is-native-pdf,
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
-      height: auto !important;
       min-height: 850px !important;
-      overflow: visible !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -114,7 +113,6 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
-        height: auto !important;
         min-height: 450px !important;
         display: flex;
         flex-direction: column;
@@ -141,42 +139,8 @@
 
     body.is-native-pdf { background: #3a3f42; }
     body.is-native-pdf .pdf-standalone-shell { background: #3a3f42; }
-  
-    .scroll-top-btn {
-      position: fixed;
-      right: 16px;
-      bottom: 20px;
-      z-index: 30;
-      width: 46px;
-      height: 46px;
-      border: 0;
-      border-radius: 999px;
-      background: #1a6b6b;
-      color: #fff;
-      font-size: 1.35rem;
-      line-height: 1;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(8px);
-      transition: opacity 160ms ease, transform 160ms ease;
-    }
-    .scroll-top-btn.is-visible {
-      opacity: 1;
-      pointer-events: auto;
-      transform: none;
-    }
-    .scroll-top-btn:focus-visible {
-      outline: 3px solid #14524f;
-      outline-offset: 2px;
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .scroll-top-btn { transition: none; }
-    }
-    
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260822c" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260823s" defer></script>
 </head>
 <body>
   <div class="top" id="pdf-top">
@@ -229,31 +193,14 @@
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260822c"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260823s"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260822c';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260823s';
         s.defer = true;
         document.head.appendChild(s);
       }
     })();
 
   </script>
-  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
-  <script>
-    (function () {
-      var btn = document.getElementById('scroll-top-btn');
-      if (!btn) return;
-      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      function shown() {
-        var y = window.scrollY || document.documentElement.scrollTop || 0;
-        btn.classList.toggle('is-visible', y > 240);
-      }
-      window.addEventListener('scroll', shown, { passive: true });
-      shown();
-      btn.addEventListener('click', function () {
-        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
-      });
-    })();
-    </script>
 </body>
 </html>

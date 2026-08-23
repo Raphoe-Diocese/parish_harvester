@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
   <title>Buncrana Text Bulletin — 21/08/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -36,8 +38,61 @@
       font-size: 1rem; font-weight: 700; color: #1a1f1e;
     }
     .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 30;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
     .ocr-zoom-bar {
-      position: sticky; top: 0; z-index: 6;
       display: flex; justify-content: center; align-items: center; gap: 8px;
       margin: 0 0 10px; padding: 6px 10px;
       background: rgba(255, 255, 255, 0.92);
@@ -264,56 +319,6 @@
       .page { padding: 12px 14px 32px; }
       .ocr-search-tools button { min-height: 48px; }
     }
-  
-    .ocr-sticky-chrome {
-      position: sticky;
-      top: 0;
-      z-index: 8;
-      background: #fff;
-      padding: 8px 0 10px;
-      margin: 0 0 8px;
-    }
-    .ocr-sticky-chrome .ocr-zoom-bar {
-      position: relative;
-      top: auto;
-    }
-    html { scroll-padding-top: 10rem; }
-    mark.search-active { scroll-margin-top: 10rem; }
-    
-
-    .scroll-top-btn {
-      position: fixed;
-      right: 16px;
-      bottom: 20px;
-      z-index: 30;
-      width: 46px;
-      height: 46px;
-      border: 0;
-      border-radius: 999px;
-      background: #1a6b6b;
-      color: #fff;
-      font-size: 1.35rem;
-      line-height: 1;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(8px);
-      transition: opacity 160ms ease, transform 160ms ease;
-    }
-    .scroll-top-btn.is-visible {
-      opacity: 1;
-      pointer-events: auto;
-      transform: none;
-    }
-    .scroll-top-btn:focus-visible {
-      outline: 3px solid #14524f;
-      outline-offset: 2px;
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .scroll-top-btn { transition: none; }
-    }
-    
   </style>
 </head>
 <body>
@@ -325,7 +330,7 @@
       </div>
     </div>
     <div class="ocr-sticky-chrome">
-<div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
       <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
       <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
       <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
@@ -345,7 +350,8 @@
       </div>
     </div>
     </div>
-<div class="ocr-body" id="ocr-text"><p class="page-label">Page 18</p>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Buncrana</h2><p class="ocr-parish-date">21/08/2026</p></header>
+<p class="page-label">Page 1</p>
 <p>Last week’s collection totalled €5,315<br>
 Sincere thanks.<br>
 Email: <a href="mailto:buncranaparish@gmail.com" target="_blank" rel="noopener noreferrer">buncranaparish@gmail.com</a><br>
@@ -458,6 +464,7 @@ your hearing back today by calling Inishowen Medical to<br>
 make an appointment on <a href="tel:+353749361800" style="color:#1d4ed8;font-weight:600;">074 93 61800</a> or <a href="tel:+3537476173" style="color:#1d4ed8;font-weight:600;">074 76173</a>.<br>
 DANCE FITNESS CLASS Every Tues 7 -8pm in St Mary’s<br>
 Hall, Buncrana. All welcome to this full body workout to<br>
+music.<br>
 PIANO LESSONS Beginner piano lessons available in the<br>
 Buncrana area, contact Lauren on <a href="tel:+353864558483" style="color:#1d4ed8;font-weight:600;">0864558483</a> for<br>
 more details.<br>
@@ -519,6 +526,7 @@ volunteers every Sat at 9.15am by the shore<br>
 front play park. All welcome<br>
 GENTLE EXERCISE CLASS for people living<br>
 with Parkinson&#x27;s every Wed at 2pm in The Ex-<br>
+change.<br>
 COCKHILL CEILI CLUB Classes have now<br>
 stopped for the summer months.<br>
 CEILI in Cockhill School Hall Fri 4 Sept. Music<br>
@@ -534,6 +542,7 @@ COMMUNITY EMPLOYMENT PROGRAMME<br>
 VACANCIES for a grounds worker for the grave-<br>
 yard at St Mary’s Cockhill. Contact<br>
 <a href="mailto:buncrana@swillycep.ie" target="_blank" rel="noopener noreferrer">buncrana@swillycep.ie</a> for more info or<br>
+application.<br>
 DOG FREE ZONE A reminder that dogs are not<br>
 permitted in Cockhill or Desertegney grave-<br>
 yards. Thank you.<br>
@@ -581,6 +590,7 @@ Mary’s Oratory. All Welcome. Practical Magic<br>
 (1998)<br>
 Sat 15th &amp; Sun<br>
 16th August<br>
+8.15pm<br>
 ROSARY<br>
 The Rosary is said in the Oratory at 9.30am<br>
 before Mass Monday to Thursday.<br>
@@ -721,10 +731,8 @@ Thurs 20th - 1pm COMING SOON<br>
 Movies &amp; Tea<br>
 Holy Days - Tues 1st<br>
 Sept. Adm €10 incl<br>
-Afternoon Tea. Carers</p>
-<h2 class="ocr-parish-name">Buncrana</h2>
-<p>21/08/2026</p>
-<hr></div>
+Afternoon Tea. Carers<br>
+go free. Buncrana</p></div>
     <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
   </div>
   <script>
@@ -872,9 +880,32 @@ Afternoon Tea. Carers</p>
         }
       });
     })();
-  </script>
-  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
-  <script>
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
     (function () {
       var btn = document.getElementById('scroll-top-btn');
       if (!btn) return;
@@ -889,6 +920,8 @@ Afternoon Tea. Carers</p>
         window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
       });
     })();
-    </script>
+    
+  </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
 </body>
 </html>

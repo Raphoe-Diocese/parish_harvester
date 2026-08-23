@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
   <title>Camus Text Bulletin — 21/08/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -36,8 +38,61 @@
       font-size: 1rem; font-weight: 700; color: #1a1f1e;
     }
     .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 30;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
     .ocr-zoom-bar {
-      position: sticky; top: 0; z-index: 6;
       display: flex; justify-content: center; align-items: center; gap: 8px;
       margin: 0 0 10px; padding: 6px 10px;
       background: rgba(255, 255, 255, 0.92);
@@ -264,56 +319,6 @@
       .page { padding: 12px 14px 32px; }
       .ocr-search-tools button { min-height: 48px; }
     }
-  
-    .ocr-sticky-chrome {
-      position: sticky;
-      top: 0;
-      z-index: 8;
-      background: #fff;
-      padding: 8px 0 10px;
-      margin: 0 0 8px;
-    }
-    .ocr-sticky-chrome .ocr-zoom-bar {
-      position: relative;
-      top: auto;
-    }
-    html { scroll-padding-top: 10rem; }
-    mark.search-active { scroll-margin-top: 10rem; }
-    
-
-    .scroll-top-btn {
-      position: fixed;
-      right: 16px;
-      bottom: 20px;
-      z-index: 30;
-      width: 46px;
-      height: 46px;
-      border: 0;
-      border-radius: 999px;
-      background: #1a6b6b;
-      color: #fff;
-      font-size: 1.35rem;
-      line-height: 1;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(8px);
-      transition: opacity 160ms ease, transform 160ms ease;
-    }
-    .scroll-top-btn.is-visible {
-      opacity: 1;
-      pointer-events: auto;
-      transform: none;
-    }
-    .scroll-top-btn:focus-visible {
-      outline: 3px solid #14524f;
-      outline-offset: 2px;
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .scroll-top-btn { transition: none; }
-    }
-    
   </style>
 </head>
 <body>
@@ -325,7 +330,7 @@
       </div>
     </div>
     <div class="ocr-sticky-chrome">
-<div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
       <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
       <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
       <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
@@ -345,7 +350,8 @@
       </div>
     </div>
     </div>
-<div class="ocr-body" id="ocr-text"><p class="page-label">Page 19</p>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Camus</h2><p class="ocr-parish-date">21/08/2026</p></header>
+<p class="page-label">Page 1</p>
 <p>Parishes of Camus, Clonleigh and Leckpatrick<br>
 Eigh teenth Sunday in Ordinary Time – Year A – 2nd August 2026<br>
 Parish Clergy<br>
@@ -374,7 +380,7 @@ Monthly Mass in Honour of St Pio will be celebrated on Wednesday 5th August at<b
 7.00 pm in Immaculate Conception Church, Strabane. We ask God’s blessing on all<br>
 through the intercession of St Pio. Everyone welcome.<br>
 Due to the Current Holiday Perio d, we wish to notify parishioners that there will be<br>
-no newsletter until 2nd/23rd August. Apologies for any inconvenience. The office will<br>
+no newsletter until 22nd/23rd August. Apologies for any inconvenience. The office will<br>
 be open as follows for the following two weeks: 10 am - 2 pm, Monday - Friday. Normal<br>
 hours will resume on Monday 17t h August .<br>
 The Assumption of the Blessed Virgin Mary<br>
@@ -384,11 +390,10 @@ of Jesus and in salvation. Mass times for the holy day are as follows:<br>
 Vigil Mass on Friday 14th August at 6.30 pm in Immaculate Conception Church<br>
 Mass on Saturday 15th August at 8.30 am in Sacred Heart Church, Derry Road<br>
 Mass on Saturday 15th August at 10.00 am in St Patrick’s Church, Murlog.<br>
-Masses at the usual times on the evening of Saturday 15th &amp; Sunday 16th August .</p>
-<h2 class="ocr-parish-name">Camus</h2>
-<p>21/08/2026</p>
+Masses at the usual times on the evening of Saturday 15th &amp; Sunday 16th August .<br>
+Camus</p>
 <hr>
-<p class="page-label">Page 20</p>
+<p class="page-label">Page 2</p>
 <p>Prayer at Time of Exam Results<br>
 Dear Lord, in this moment of uncertainty, I seek Your peace and guidance.<br>
 Help me to accept the results of my efforts with grace, whether they meet<br>
@@ -428,7 +433,7 @@ Readings for Sunday 23rd August :<br>
 Psalm: 137:1 -3, 6, 82nd Reading: Romans 11:33 -36<br>
 Gospel: Matthew 16:13 -20</p>
 <hr>
-<p class="page-label">Page 21</p>
+<p class="page-label">Page 3</p>
 <p>Saints of The Coming Week:<br>
 Tues day: St John Vianney, priest;<br>
 Wed: The Dedication of the Basilica of St Mary Major in Rome;<br>
@@ -455,7 +460,7 @@ a sellers’ draw. Return a complete book for Early Bird draws on 28/8/26. Ti ck
 Job Opportunity Derry Diocesan Trust invites applications for the post of<br>
 Administrative &amp; Financial Officer at Clonmany Parish. 9 hours pw. For application<br>
 pack, please contact Bishop’s House, St Eugene’s Cathedral, Derry, BT48 9AP,<br>
-<a href="tel:+442871262302" style="color:#1d4ed8;font-weight:600;">02871262302</a> or recruitment@derrydioce se.org Closing date:1th August 2026.<br>
+<a href="tel:+442871262302" style="color:#1d4ed8;font-weight:600;">02871262302</a> or recruitment@derrydioce se.org Closing date:11th August 2026.<br>
 Franciscan Friary, Rossnowlagh Monthly Healing Service today (Sunday). Rosary at<br>
 2.45 pm followed by Mass / Healing Service at 3 pm. Confessions 2 - 5 pm .<br>
 ACCORD Derry Marriage Preparation Courses available at <a href="https://www.accordni.com" target="_blank" rel="noopener noreferrer">www.accordni.com</a><br>
@@ -466,7 +471,7 @@ may they never turn away from the poor, hungry, most vulnerable or those in need
 but always reflect the love of Christ as they nourish and strengthen them with the<br>
 Word of God. Visit http s://derryvocations.org</p>
 <hr>
-<p class="page-label">Page 22</p>
+<p class="page-label">Page 4</p>
 <p>A Day of Healing &amp; Prayer in the House of Prayer, Clonfert with Eddie Stone on Sat<br>
 15th August. A bus leaves Letterkenny, collecting people in Ballybofey and Donegal<br>
 Town. A priest will accompany the group. Please contact <a href="tel:+353863936547" style="color:#1d4ed8;font-weight:600;">0863936547</a>.<br>
@@ -503,7 +508,7 @@ Termonbacca Derry Anam Óg Summer Scheme for those aged 8 - 14 takes place from<
 3rd - 7th August from 12 - 4 pm daily. Faith, friendship, arts and crafts,<br>
 adventures, games and prayer. Please email <a href="mailto:termonbaccaderry@ocd.ie" target="_blank" rel="noopener noreferrer">termonbaccaderry@ocd.ie</a></p>
 <hr>
-<p class="page-label">Page 23</p>
+<p class="page-label">Page 5</p>
 <p>Walk in Our Patron Saint’s Footsteps St Patrick&#x27;s Way Pilgrim Walk, Downpatrick with<br>
 guides Martina Purdy &amp; Elaine Kelly on 8th August 9 am - 3 pm Cost (£55) . Tel <a href="tel:+442844619000" style="color:#1d4ed8;font-weight:600;">028<br>
 44619000</a>. Visit <a href="https://www.saintpatrickcentre.com" target="_blank" rel="noopener noreferrer">www.saintpatrickcentre.com</a><br>
@@ -542,7 +547,7 @@ Thursday: 10.00 am: Immaculate Conception Church, Strabane<br>
 Friday: 8.00 am: Sacred Heart Church, Derry Road<br>
 10.00 am: Immaculate Conception Church, Strabane</p>
 <hr>
-<p class="page-label">Page 24</p>
+<p class="page-label">Page 6</p>
 <p>Weddings Please contact the parish office. At least 6 months’ notice required.<br>
 Baptisms : Parent(s) are asked to contact the parish office.<br>
 The Parish Pastoral Area Office , 27 Butcher St, Strabane covers all 3 parishes .<br>
@@ -566,8 +571,7 @@ Gormley, the Diocesan Designated Liaison Person (DLP) on <a href="tel:+447596500
 knowledge or allegation directly to the statutory authorities please contact Garda<br>
 Síochána Buncrana on <a href="tel:+353749320540" style="color:#1d4ed8;font-weight:600;">074 93 20540</a>, Garda Síochána Letterkenny on <a href="tel:+353749167100" style="color:#1d4ed8;font-weight:600;">074 91 67100</a>,<br>
 TUSLA (ROI) Child and Family Agency on <a href="tel:+353749102233" style="color:#1d4ed8;font-weight:600;">074 91 02233</a> or HSC Adult S afeguarding,<br>
-Donegal on <a href="tel:+353719834660" style="color:#1d4ed8;font-weight:600;">071 983 4660</a>.</p>
-<hr></div>
+Donegal on <a href="tel:+353719834660" style="color:#1d4ed8;font-weight:600;">071 983 4660</a>.</p></div>
     <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
   </div>
   <script>
@@ -715,9 +719,32 @@ Donegal on <a href="tel:+353719834660" style="color:#1d4ed8;font-weight:600;">07
         }
       });
     })();
-  </script>
-  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
-  <script>
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
     (function () {
       var btn = document.getElementById('scroll-top-btn');
       if (!btn) return;
@@ -732,6 +759,8 @@ Donegal on <a href="tel:+353719834660" style="color:#1d4ed8;font-weight:600;">07
         window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
       });
     })();
-    </script>
+    
+  </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
 </body>
 </html>
