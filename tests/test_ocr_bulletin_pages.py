@@ -73,6 +73,19 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertIn("<h3>PAGE 1</h3>", fragment)
             self.assertIn("<h3>PAGE 2</h3>", fragment)
 
+            standalone = tmp / "standalone.html"
+            standalone.write_text(
+                "<html><body>"
+                '<div class="ocr-body" id="ocr-text">'
+                "<p>Standalone body from the parish OCR page.</p>"
+                "</div>"
+                '<p class="note-box">Auto-generated from the bulletin PDF.</p>'
+                "</body></html>",
+                encoding="utf-8",
+            )
+            standalone_fragment = extract_ocr_fragment(standalone)
+            self.assertIn("Standalone body from the parish OCR page.", standalone_fragment)
+
             config = DioceseConfig(
                 key="test",
                 display_name="Test Diocese",
@@ -451,7 +464,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         docs = Path(__file__).resolve().parent.parent / "docs"
         html_live = (docs / "parishes" / "raphoe" / "gort-a-choirce.html").read_text(encoding="utf-8")
         self.assertIn("AIFRINN NA SEACHTAINE", html_live)
-        self.assertIn("GORT A", html_live)
+        self.assertIn("Gortahork", html_live)
         self.assertIn("16ú Lúnasa 2026", html_live)
         self.assertIn("Donnchadh", html_live)
         self.assertRegex(html_live, r"\.pdf-inpage-pages\s*\{[^}]*height:\s*850px")

@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
   <title>Inver Text Bulletin — 21/08/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -36,8 +38,61 @@
       font-size: 1rem; font-weight: 700; color: #1a1f1e;
     }
     .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 30;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
     .ocr-zoom-bar {
-      position: sticky; top: 0; z-index: 6;
       display: flex; justify-content: center; align-items: center; gap: 8px;
       margin: 0 0 10px; padding: 6px 10px;
       background: rgba(255, 255, 255, 0.92);
@@ -264,56 +319,6 @@
       .page { padding: 12px 14px 32px; }
       .ocr-search-tools button { min-height: 48px; }
     }
-  
-    .ocr-sticky-chrome {
-      position: sticky;
-      top: 0;
-      z-index: 8;
-      background: #fff;
-      padding: 8px 0 10px;
-      margin: 0 0 8px;
-    }
-    .ocr-sticky-chrome .ocr-zoom-bar {
-      position: relative;
-      top: auto;
-    }
-    html { scroll-padding-top: 10rem; }
-    mark.search-active { scroll-margin-top: 10rem; }
-    
-
-    .scroll-top-btn {
-      position: fixed;
-      right: 16px;
-      bottom: 20px;
-      z-index: 30;
-      width: 46px;
-      height: 46px;
-      border: 0;
-      border-radius: 999px;
-      background: #1a6b6b;
-      color: #fff;
-      font-size: 1.35rem;
-      line-height: 1;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(8px);
-      transition: opacity 160ms ease, transform 160ms ease;
-    }
-    .scroll-top-btn.is-visible {
-      opacity: 1;
-      pointer-events: auto;
-      transform: none;
-    }
-    .scroll-top-btn:focus-visible {
-      outline: 3px solid #14524f;
-      outline-offset: 2px;
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .scroll-top-btn { transition: none; }
-    }
-    
   </style>
 </head>
 <body>
@@ -325,7 +330,7 @@
       </div>
     </div>
     <div class="ocr-sticky-chrome">
-<div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
       <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
       <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
       <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
@@ -345,7 +350,8 @@
       </div>
     </div>
     </div>
-<div class="ocr-body" id="ocr-text"><p class="page-label">Page 15</p>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Inver</h2><p class="ocr-parish-date">21/08/2026</p></header>
+<p class="page-label">Page 1</p>
 <p>Date Church Time Anniversaries/ Intention s<br>
 Saturday 15th August Frosses 10:00am Feast of the Assumption<br>
 Mountcharles 1:00pm Baptism<br>
@@ -361,7 +367,7 @@ Tuesday 18th August Frosses 10:00am Holy Mass<br>
 Wednesday 19th Aug Frosses 10:00am Holy Mass<br>
 Thursday 20th August Frosses 10:00am Holy Mass<br>
 Friday 21st August Mountcharles 7:00pm Caroline Murray Month’s Mind<br>
-Saturday 2nd August Drimarone 3:00pm Baptism<br>
+Saturday 22nd August Drimarone 3:00pm Baptism<br>
 Ardaghey 6:00pm Patrick and Dan F riel<br>
 Willie Rose<br>
 Drimarone 7:30pm Holy Mass<br>
@@ -430,6 +436,7 @@ Tel: 01 4045378 Email: <a href="mailto:i.wiessner@anamcara.ie" target="_blank" r
 MARRIAGE ENCOUNTER Ireland invites married couples to a residential Weekend from Friday 2nd to Sunday<br>
 4th October 2026 <a href="https://www.marriageencounter.ie" target="_blank" rel="noopener noreferrer">www.marriageencounter.ie</a> INVER HERITAGE GROUP invite you to come along on Tuesday 18th August at 7pm to St Nauls Church<br>
 ruins at Inver for a talk by archaeologist Kate Robb and a demonstration of conservation masonry by Brian<br>
+Kerrigan.<br>
 Low-Gluten Hosts are available at all the Masses in the Parish. If you would like to receive a low -gluten host,<br>
 please feel free to come forward to the priest and cross one arm across your chest indicating your preference.<br>
 They may or may not be suitable depending on the various intolerances. If you have any questions please do<br>
@@ -447,7 +454,7 @@ NATIONAL NOVENA to Our Lady of Knock 13–21 August 2026. Visit: <a href="https:
 board for details. August &amp; September 2026 @ Lough Derg<br>
 “A pilgrimage has a vital part to play in our life of faith, for it removes us from our daily routines, and gives us<br>
 time and space to encounter God more deeply .” Pope Leo XIV<br>
-One Day Retreats – Guided Days of Prayer and Reflection - places available on August 18th, 2nd, 23rd, 29th<br>
+One Day Retreats – Guided Days of Prayer and Reflection - places available on August 18th, 22nd, 23rd, 29th<br>
 and 31st September 5th, 6th, 9th, 12th, 15th, 19th and 20th Admission €50. Group discounts available. Advance<br>
 Booking Essential . Includes Special Themed Retreats : 23rd August - St Peregrine | 5th September – Pioneer<br>
 Pilgrimage | 6th September – St Carlos Acutis | 9th &amp; 12th September – Vocations Monstrance | 19th September<br>
@@ -469,10 +476,8 @@ provided<br>
 The Stables Motorsport Centre – Community Event Join us on Sunday 23rd August 11am – 3pm<br>
 Rally Cars &amp; Displays | Meet the Community | Motorsports Atmosphere. Open invitation , all welcome .<br>
 The Stables Motorsport Centre , Frosses F94 C82Y ANNIVERSARIES AT THIS TIME : Kathleen McCabe<br>
-PLEASE NOTE: There will be no newsletter for the weekend of Saturday 5th / Sunday 6th September . The Donegal Down Syndrome Annual Church Gate Collection will take place throughout County Donegal</p>
-<h2 class="ocr-parish-name">Inver</h2>
-<p>21/08/2026</p>
-<hr></div>
+PLEASE NOTE: There will be no newsletter for the weekend of Saturday 5th / Sunday 6th September . The Donegal Down Syndrome Annual Church Gate Collection will take place throughout County Donegal<br>
+on Saturday 29th and Sunday 30th August 2026 . Inver</p></div>
     <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
   </div>
   <script>
@@ -620,9 +625,32 @@ PLEASE NOTE: There will be no newsletter for the weekend of Saturday 5th / Sunda
         }
       });
     })();
-  </script>
-  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
-  <script>
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
     (function () {
       var btn = document.getElementById('scroll-top-btn');
       if (!btn) return;
@@ -637,6 +665,8 @@ PLEASE NOTE: There will be no newsletter for the weekend of Saturday 5th / Sunda
         window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
       });
     })();
-    </script>
+    
+  </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
 </body>
 </html>

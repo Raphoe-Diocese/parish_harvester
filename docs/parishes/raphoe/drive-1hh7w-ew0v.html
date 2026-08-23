@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
   <title>Templecrone Bulletin — 21/08/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -110,9 +112,7 @@
 
     .pdf-frame-wrap {
       position: relative;
-      height: auto;
       min-height: 850px;
-      overflow: visible;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -189,24 +189,21 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
-      height: auto;
-      overflow: visible;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
     body.is-native-pdf iframe.pdf-frame {
       display: none !important;
-      height: auto;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
     }
     .pdf-frame-wrap.is-native-pdf,
     .pdf-standalone-shell.is-native-pdf,
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
-      height: auto !important;
       min-height: 850px !important;
-      overflow: visible !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -215,7 +212,6 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
-        height: auto !important;
         min-height: 450px !important;
         display: flex;
         flex-direction: column;
@@ -285,8 +281,61 @@
     .ocr-search-tools button:disabled { background: #9bbfbd; cursor: not-allowed; }
     .match-count { color: #6b7280; font-size: 0.9rem; font-weight: 600; }
     .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #fff;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 30;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
     .ocr-zoom-bar {
-      position: sticky; top: 0; z-index: 6;
       display: flex; justify-content: center; align-items: center; gap: 10px;
       margin: 0 0 10px; padding: 6px 10px;
       background: rgba(255, 255, 255, 0.94);
@@ -469,8 +518,9 @@
       padding: 22px 24px 32px;
     }
     .pdf-frame-wrap iframe {
-      height: auto;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
     }
     .note-box {
       margin-top: 12px;
@@ -567,12 +617,11 @@
 
     @media (max-width: 1024px) {
       /* Harvest + OCR both call this generator — keep both panels here.
-         Desktop: 850px on the VISIBLE boxes. Tablet/phone (max-width 1024px): ~450px. */
+         Desktop: locked 850px visible boxes, inner scroll.
+         Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
-        height: auto;
         min-height: 450px;
-        overflow: visible;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -602,58 +651,8 @@
         width: 100%;
       }
     }
-  
-    .ocr-sticky-chrome {
-      position: sticky;
-      top: 0;
-      z-index: 8;
-      background: #fff;
-      padding: 8px 0 10px;
-      margin: 0 0 8px;
-    }
-    .ocr-sticky-chrome .ocr-zoom-bar {
-      position: relative;
-      top: auto;
-    }
-    html { scroll-padding-top: 10rem; }
-    mark.search-active { scroll-margin-top: 10rem; }
-    
-
-    .scroll-top-btn {
-      position: fixed;
-      right: 16px;
-      bottom: 20px;
-      z-index: 30;
-      width: 46px;
-      height: 46px;
-      border: 0;
-      border-radius: 999px;
-      background: #1a6b6b;
-      color: #fff;
-      font-size: 1.35rem;
-      line-height: 1;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(8px);
-      transition: opacity 160ms ease, transform 160ms ease;
-    }
-    .scroll-top-btn.is-visible {
-      opacity: 1;
-      pointer-events: auto;
-      transform: none;
-    }
-    .scroll-top-btn:focus-visible {
-      outline: 3px solid #14524f;
-      outline-offset: 2px;
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .scroll-top-btn { transition: none; }
-    }
-    
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260822c" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260823s" defer></script>
 </head>
 <body>
   <div class="page">
@@ -699,7 +698,7 @@
         <a href="drive-1hh7w-ew0v-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
       <div class="ocr-sticky-chrome">
-<div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
         <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
         <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
         <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
@@ -717,12 +716,14 @@
         </div>
       </div>
       </div>
-<div id="ocr-panel"><p class="page-label">Page 23</p>
+      <div id="ocr-panel"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Templecrone</h2><p class="ocr-parish-date">21/08/2026</p></header>
+<p class="page-label">Page 1</p>
 <p>A Thirty Third<br>
 Sunday in<br>
 Ordinary time<br>
 ST.CRONA’S DUNGLOE<br>
 SAT 15th AUG .<br>
+11.00AM<br>
 6.30PM Dom &amp; Ann T Bonner, Gweedore Rd<br>
 Margaret McDonagh 1st Anniversary<br>
 Patrick Gerard Sweeney, Chapel Road &amp;<br>
@@ -739,7 +740,7 @@ FRI 21st AUG . ST. PIUS X , POPE<br>
 10AM Patrick &amp; Gracie Stevenson, and their<br>
 daughter Ann Teresa Stevenson . Mary Teresa<br>
 Hanlon &amp; Matthew Hanlon, Leitir<br>
-SAT 2nd AUG .<br>
+SAT 22nd AUG .<br>
 6.30PM James Shovlin, Caravan Road . 1st Anniversary<br>
 Joey Forker, Meenmore . 1st Anniversary<br>
 Jamie Bonner, Dungloe<br>
@@ -779,6 +780,7 @@ Remembrance Service to remember and honour all friends<br>
 and family gone before us. On the 30th August at 4 pm with<br>
 our Rector Rev Janet Broderick. Afterwards we can share our<br>
 memories with family and friends with light refr eshments at<br>
+church.<br>
 SPEEDING THROUGH LETTERMACAWARD VILLAGE – A<br>
 demonstartion / protest which is been organised by<br>
 community groups will place on Wednesday 2nd September<br>
@@ -794,14 +796,14 @@ community last weekend, carefully watched by her big sister s.<br>
 Congrats to Shane and Dawn on her big day!<br>
 Administrator &amp; Director of Music: Lisa Philbin (087) 123 9354<br>
 Newsletter: Maureen Mc Cahill (087) 673 7821<br>
+…………………………………………………………………………………………………………………………………………………………….<br>
 ST. CRONA’S CHURCH, CHAPEL ROAD, DUNGLOE, CO.DONEGAL, F94 W2P2 …………………….……………………………………………………………………………………………………………………………………….<br>
 TWENT IETH<br>
 SUNDAY IN<br>
 ORDINARY<br>
-TIME</p>
-<h2 class="ocr-parish-name">Templecrone</h2>
-<p>21/08/2026</p>
-<p>DUNGLOE -MEENACROSS -LEITIR -DOOCHARY<br>
+TIME<br>
+TEMPLECRONE PARISH<br>
+DUNGLOE -MEENACROSS -LEITIR -DOOCHARY<br>
 Fr. Pat Ward P.P <a href="tel:+353749521008" style="color:#1d4ed8;font-weight:600;">074 95 21008</a><br>
 <a href="tel:+353862300620" style="color:#1d4ed8;font-weight:600;">086 230 0620</a><br>
 Email: <a href="mailto:office@templecroneparish.ie" target="_blank" rel="noopener noreferrer">office@templecroneparish.ie</a><br>
@@ -824,7 +826,7 @@ Masses or Parish contributions<br>
 ST.PATRICK’S MEENACROSS<br>
 SUN 16th AUG . 20th SUNDAY IN ORDINARY TIME<br>
 9AM<br>
-SAT 2nd AUG.<br>
+SAT 22nd AUG.<br>
 1PM Mass before inter ment for Moira Thomas<br>
 who died at the end of June<br>
 SUN 23rd AUG . 21st SUNDAY IN ORDINARY TIME<br>
@@ -836,28 +838,29 @@ SAT 15th AUG .<br>
 John Manus O’Donnell, Renny &amp; London<br>
 Margaret O’Donnell, Dooey<br>
 Donal Breslin, Corrpoint - Birthday<br>
-SAT 2nd AUG .<br>
+SAT 22nd AUG .<br>
 7PM Sean Mc Cready, Corr Point. 1st Anniversary<br>
 ST.CONAL’S DOOCHARY<br>
 SUN 16th AUG . 20th SUNDAY IN ORDINARY TIME<br>
 11.30 AM Peter Mc Dermott &amp; deceased members of<br>
 the Mc Dermott Family, Doochary<br>
 SUN 23rd AUG . 21st SUNDAY IN ORDINARY TIME<br>
+11.30AM<br>
 RECENTLY DE CEASED :<br>
 Margaret Boyle, Annagry , nee Breslin, Dirlaug ht,</p>
 <h3 class="b-head">ANNIVERSARIES</h3>
 <p>Dan Bonner, Derryhenny,<br>
 Annie Bonner, Derryhenny<br>
 Nellie Duddy, Dirlaught,<br>
-Connie Brennan, Meenacross</p>
-<hr></div>
+Connie Brennan, Meenacross<br>
+Templecrone</p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other RAPHOE Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="raphoe"><a class="parish-link" href="drive-1jmslbrliw.html" target="_blank" rel="noopener noreferrer">Raphoe</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="raphoe"><a class="parish-link" href="drive-1jmslbrliw.html" target="_blank" rel="noopener noreferrer">Raphoe</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="tawnawillyparish.html" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li></ul>
     </section>
   </div>
   <footer>
@@ -909,9 +912,9 @@ Connie Brennan, Meenacross</p>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260822c"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260823s"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260822c';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260823s';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1150,9 +1153,32 @@ Connie Brennan, Meenacross</p>
         if (page) page.insertBefore(banner, page.firstChild);
       }
     })();
-  </script>
-  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
-  <script>
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
     (function () {
       var btn = document.getElementById('scroll-top-btn');
       if (!btn) return;
@@ -1167,6 +1193,8 @@ Connie Brennan, Meenacross</p>
         window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
       });
     })();
-    </script>
+    
+  </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
 </body>
 </html>

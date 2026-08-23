@@ -3,7 +3,9 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Errigal Text Bulletin — 14/08/2026</title>
+  <title>Errigal Text Bulletin — 21/08/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -36,8 +38,61 @@
       font-size: 1rem; font-weight: 700; color: #1a1f1e;
     }
     .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 30;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
     .ocr-zoom-bar {
-      position: sticky; top: 0; z-index: 6;
       display: flex; justify-content: center; align-items: center; gap: 8px;
       margin: 0 0 10px; padding: 6px 10px;
       background: rgba(255, 255, 255, 0.92);
@@ -167,6 +222,48 @@
     .ocr-body > :first-child {
       margin-top: 0;
     }
+    
+    .ocr-body .ocr-parish-masthead {
+      margin: 2.1em 0 1.15em;
+      padding: 0.85em 0 0.7em;
+      border-top: 3px solid #14524f;
+      border-bottom: 1px solid #c5d0c9;
+    }
+    .ocr-body .ocr-parish-masthead:first-child {
+      margin-top: 0;
+    }
+    .ocr-body h2.ocr-parish-name,
+    .ocr-body .ocr-parish-name {
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #14524f;
+      margin: 0 0 0.2em;
+      line-height: 1.25;
+      border: 0;
+      padding: 0;
+      text-transform: none;
+    }
+    .ocr-body .ocr-parish-date {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body .ocr-parish-link {
+      margin: 0.25em 0 0;
+      font-size: 0.88rem;
+    }
+    .ocr-body h3.b-head {
+      margin-top: 1.45em;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.12em;
+      border-bottom: 1px solid #d4ddd9;
+    }
+
 
     .ocr-body {
       padding: 4px 2px 8px;
@@ -222,68 +319,18 @@
       .page { padding: 12px 14px 32px; }
       .ocr-search-tools button { min-height: 48px; }
     }
-  
-    .ocr-sticky-chrome {
-      position: sticky;
-      top: 0;
-      z-index: 8;
-      background: #fff;
-      padding: 8px 0 10px;
-      margin: 0 0 8px;
-    }
-    .ocr-sticky-chrome .ocr-zoom-bar {
-      position: relative;
-      top: auto;
-    }
-    html { scroll-padding-top: 10rem; }
-    mark.search-active { scroll-margin-top: 10rem; }
-    
-
-    .scroll-top-btn {
-      position: fixed;
-      right: 16px;
-      bottom: 20px;
-      z-index: 30;
-      width: 46px;
-      height: 46px;
-      border: 0;
-      border-radius: 999px;
-      background: #1a6b6b;
-      color: #fff;
-      font-size: 1.35rem;
-      line-height: 1;
-      cursor: pointer;
-      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
-      opacity: 0;
-      pointer-events: none;
-      transform: translateY(8px);
-      transition: opacity 160ms ease, transform 160ms ease;
-    }
-    .scroll-top-btn.is-visible {
-      opacity: 1;
-      pointer-events: auto;
-      transform: none;
-    }
-    .scroll-top-btn:focus-visible {
-      outline: 3px solid #14524f;
-      outline-offset: 2px;
-    }
-    @media (prefers-reduced-motion: reduce) {
-      .scroll-top-btn { transition: none; }
-    }
-    
   </style>
 </head>
 <body>
   <div class="page">
     <div class="top" id="ocr-top">
       <div class="top-left">
-        <a class="back-link" href="errigalparish.html">← Viewer</a>
-        <span class="title-line">ERRIGAL Text Bulletin · 14/08/2026</span>
+        <a class="back-link" href="errigalparish.html" target="_blank" rel="noopener noreferrer">← Viewer</a>
+        <span class="title-line">ERRIGAL Text Bulletin · 21/08/2026</span>
       </div>
     </div>
     <div class="ocr-sticky-chrome">
-<div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
       <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
       <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
       <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
@@ -303,7 +350,324 @@
       </div>
     </div>
     </div>
-<div class="ocr-body" id="ocr-text"><div class="ocr-failed-banner" role="status">⚠️ No searchable text was found for this parish this week. Please use the PDF above.</div></div>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Errigal</h2><p class="ocr-parish-date">21/08/2026</p></header>
+<p class="page-label">Page 1</p>
+<p>Twent y - First Sunday in Ordinary Time (Year A)<br>
+Errigal Parish News - 23rd August 2026<br>
+Weekday Masses: St. Mary’s Church: - Monday, Tuesday, and Thursday at 10am.<br>
+St. Joseph’s Church: - Wednesday at 10am.<br>
+St. Mary’s Church - (Vigil): Anniversary Mass -<br>
+Anniversary Mass: For Adrian Robinson on Sunday 30th August at 10am.<br>
+St. Joseph’s Church - (Vigil) - DDS Mass for deceased members on Saturday 22nd August at<br>
+6pm.</p>
+<h3 class="b-head">Anniversary Mass -</h3>
+<p>Saturday Vigil Mass 6pm - St. Joseph ’s Church in August.<br>
+Eucharistic Adoration: - Adoration on Monday after Mass until 2.30pm.<br>
+………………………………………………………….<br>
+Requiescant In Pace: We extend our sympathy to the family and relatives of Tommy<br>
+Johnson, formerly Lyttlesdale who died during the week.<br>
+Baptism: We welcome into the parish community Donnacha Robert O’Louglin, 16<br>
+Churchtown Road who w as baptised last weekend.<br>
+Parish Pastoral Group : Next meeting to prepare for the Parish Mission will take place on<br>
+Tuesday 1st September in the P arochial House at 8.30pm.<br>
+Parish Mission: Parishioners may have heard that the parish will hold a mission in September<br>
+of this year. It will be delivered by the Dominican Order. As you know it has been some time<br>
+since the last Mission in the parish. Whilst members of the Parish Pastoral Group con tinue to<br>
+organise it, it would be helpful to have a few interested individuals from each end of the parish<br>
+to help with the organisation. Time commitment should not be great - a few hours between<br>
+now and September and some input during the week itself. Thi s is a great opportunity to get<br>
+involved in a significant event for the parish, and if you are interested, please contact Fr.<br>
+Crowley.<br>
+Parish Mission - Sunday 27th September - Friday 2nd October.<br>
+Errigal SVP: School Uniform Support: As the new school year approaches, we know that<br>
+the cost of school uniforms can place a significant financial burden on many families. If you<br>
+or someone you know needs assistance with the cost of school uniforms, please don&#x27;t hesitate<br>
+to contact your local St Vincent de Paul (SVP Errigal) in confidence .<br>
+Errigal</p>
+<hr>
+<p class="page-label">Page 2</p>
+<p>Telephone: <a href="tel:+3537563595868" style="color:#1d4ed8;font-weight:600;">07563595868</a> All enquiries will be treated with sensitivity, respect and complete<br>
+confidentiality.<br>
+Errigal SVP: Could You Spare a Little Time to Help Others? As we prepare to celebrate<br>
+the Feast of St Vincent de Paul (27th September), the Errigal St Vincent de Paul (SVP)<br>
+Conference need a couple of volunteers to join our local team. This is a wonderful<br>
+opportunity to put your faith into action, give something back to our community, and make a<br>
+real difference to the lives of local individuals and families who are struggling.<br>
+No previous experience is necessary. You will be warmly welcomed and fully supported by<br>
+our local SVP Volunteers, with guidance and training provided.<br>
+If you would like to find out more, please contact us on <a href="tel:+3537563595868" style="color:#1d4ed8;font-weight:600;">07563595868</a>. We'd be delighted to<br>
+hear from you. For more details, please see <a href="https://www.svp.ie/northern" target="_blank" rel="noopener noreferrer">https://www.svp.ie/northern</a> -ireland/<br>
+Errigal: Through Our Eyes - Summer Youth Photography Project : Starting Monday 6th<br>
+July, all young people under 18 are invited to join Errigal: Through Our Eyes, a summer<br>
+photography project. The theme is “See what matters. See where God is.” This will celebrate<br>
+the beauty, faith, kindness, and everyday life of our parish.<br>
+Pick up an entry form, then send up to three photos taken with in the parish boundaries and a<br>
+short reflection to the parish email (with parent/guardian consent for under -16s). There are<br>
+1st, 2nd and 3rd place prizes in both Primary and Secondary categories, with certificates for<br>
+everyone. Update Deadline - Please note that the closing date for entries has been<br>
+postponed until the end of September. We warmly encourage all our young people to<br>
+take part and share their photographs and reflections. More details will follow soon.<br>
+Baptism Dates: The next Baptism dates are Saturday 5th September in St. Mary’s Church at<br>
+5pm and St. Joseph’s Church on Sunday 13th September at 12.30pm. The Baptismal<br>
+Programme for parents/guardians will take place in the Parochial House on Wednesday 2nd<br>
+September at 7pm. Please register to attend the Baptismal Programme by Saturday 28th August<br>
+using the parish email address, this will indicate to the Baptismal Team the numbers who will<br>
+attend the Baptismal Programme.<br>
+Diocesan Schools&#x27; Religious Education Conference 2026 - &#x27;Drawing New Maps of Hope&#x27;<br>
+The Derry Diocesan Catechetical Centre is delighted to be hosting its third Diocesan Schools&#x27;<br>
+Religious Education Conference - &#x27;Drawing New Maps of Hope&#x27;. The conference will take<br>
+place over two days in Saint Columb&#x27;s College, Derry, with over 1200 delegat es<br>
+attending. Tuesday 25th August is the day for Post-Primary Schools and Wednesday 26th<br>
+August is the day for Primary Schools. We are delighted to welcome Dr Melodie<br>
+Wyttenbach, Executive Director, Roche Centre for Catholic Education, Boston College as ou r<br>
+keynote speaker. Bishop Donal McKeown will celebrate the Eucharist at the beginning of the<br>
+conference each day. Alongside Dr Wyttenbach&#x27;s keynote address, there will be 20<br>
+workshops, a panel discussion and the opportunity for attendees to meet and share their<br>
+experiences and good practice.<br>
+Michael English Church Concert: An evening of Faith, Hope and Inspiration. The concert<br>
+takes place on Friday 2nd October at 7.15pm, in St Patrick&#x27;s Church, Keenaught,<br>
+Desertmartin. Tickets are £30, and available to buy at Herons Gift Shop, Draperstown,<br>
+Moneyneena Post Office, Ballinascreen and Desertmartin Parish offices, or online with<br>
+Eventbrite: <a href="https://www.eventbrite.co.uk/e/michael" target="_blank" rel="noopener noreferrer">https://www.eventbrite.co.uk/e/michael</a> -english -band -fundraising -concert -tickets -<br>
+1996641829460</p>
+<hr>
+<p class="page-label">Page 3</p>
+<p>Gift Aid/Census Cards: Can we please request the return of Gift Aid and Census cards<br>
+recently circulated so that parish records can be updated during the summer months.<br>
+Rosary and Exposition of the Blessed Sacrament: Will continue through the summer months<br>
+on the first Monday of each month. St. Joseph’s Church - 7pm.<br>
+Diocesan Schools&#x27; Religious Education Conference 2026 - &#x27;Drawing New Maps of Hope&#x27;<br>
+- The Derry Diocesan Catechetical Centre is delighted to be hosting its third Diocesan<br>
+Schools&#x27; Religious Education Conference - &#x27;Drawing New Maps of Hope&#x27;. The conference<br>
+will take place over two days in Saint Columb&#x27;s College, Derry. Tuesday 25th August is the<br>
+day for Post-Primary Schools and Wednesday 26th August is the day for Primary<br>
+Schools. We are delighted to welcome Dr Melodie Wyttenbach, Executive Director, Roche<br>
+Centre for Catholic Education, Boston College as our keynote speaker. Bishop Donal<br>
+McKe own will celebrate the Eucharist at the beginning of the conference each day.<br>
+Alongside Dr Wyttenbach&#x27;s keynote address, there will be 20 workshops, a panel discussion<br>
+and the opportunity for attendees to meet and share their experiences and good practice. If<br>
+you would like to register your intention to attend, please complete the form below. Once you<br>
+have registered, you will receive a list of workshops to choose from.<br>
+Monday Adoration Adorers: We request if you are available on Monday from after the<br>
+morning Mass to participate in the rota for Adoration of the Blessed Sacrament which takes<br>
+place until 2.30pm. If interested, please leave your name/contact number in the sacristy and<br>
+we will follow up.<br>
+Parish Collections - Thank you. 183 boxes of envelopes in circulation.<br>
+Returns (Pink/Yellow - 85 White - 65)<br>
+St. Mary&#x27;s - Parish: £ 400 Renovation: £110<br>
+St. Joseph&#x27;s - Parish: £ 450 Renovation: £ 450<br>
+Ballerin GAA Lotto: There was no winner of the lotto jackpot the numbers are 8, 25, 27, 28.<br>
+Jackpot is £ 2500. Lucky Dip Winner £50 - Knight Family .<br>
+Glenullin GAA Lotto: There was no winner of the lotto jackpot the numbers are 3, 15, 22,<br>
+29. Jackpot £10.000. £25 winners - Majella McCloskey, Peter Doherty, Joanne O’ Kane,<br>
+Gerard McAfee, and Edel Mullan.<br>
+Readers &amp; Eucharistic Ministers<br>
+St. Mary’s Church - Church Reader s - 29th/30thAugust<br>
+Saturday Vigil -<br>
+Sunday Morning - Seamus O’Kane.<br>
+If anyone is interested in becoming a Reader in St. Mary’s Church, please gave your name to<br>
+Fr. Crowley training will be provided.<br>
+Eucharistic Ministers - 29th/30th August<br>
+Saturday Vigil -<br>
+Sunday Morning - Martina Bradley &amp; Gillian O ’Neill.<br>
+.<br>
+Readers &amp; Eucharistic Ministers<br>
+St. Joseph’s Church - Church Readers - 29th/30th August<br>
+Saturday Vigil - Gerard O’Kane .<br>
+Sunday Morning - Michael Leadon.</p>
+<hr>
+<p class="page-label">Page 4</p>
+<p>If anyone is interested in becoming a Reader in St. Joseph’s Church, please gave your name<br>
+to Fr. Crowley or Mairead Mc Nicholl (Lector Co -Ordinator), training will be provided.<br>
+Eucharistic Ministers - 29th/30th August<br>
+Saturday Vigil - Rosellen O’Kane &amp; Mary Conway.<br>
+Sunday Morning - Ursula Mullan &amp; Nadine McNicholl.<br>
+Feasts during the Week: Monday - St. Bartholomew: Name occurs in the Synoptic<br>
+Gospels only in the list of the apostles. He is probably to be identified with Nathanael of<br>
+Cana, whom Philip brings to our Lord. Preached the Gospel in India. Tuesday - St. Louis<br>
+(1214 - 70): King of France, father of eleven children, Franciscan tertiary, man of integrity,<br>
+died in Tunisia on his second Crusade. He is the Parton of the French Monarchy. Thursday -<br>
+St. Monica (332 - 87): Converted her pagan husband, Patricius, to the faith, and by her<br>
+prayers and tears brought her son St. Augustine to Christianity and a moral life. Patron saint<br>
+of mothers. Friday - St. Augustine (354 - 430): Bishop of Hippo, where he lived with a<br>
+community until his death. His theological influence has been most significant in the Church,<br>
+especially on the understanding of God’s grace. Patron of theologians . Saturday - Passion of<br>
+John the Baptist: He is found worthy of a martyr’s death, his last and greatest act of witness<br>
+to Christ.<br>
+Diocesan Voc ations: In this Sunday&#x27;s gospel Peter acknowledges Jesus as the Christ, the Son<br>
+of the living God, and Jesus confers on Peter &quot;.the keys of the Kingdom.&quot; an image<br>
+reflected in the First Reading where the Lord says He will &quot;.place the key of David.&quot; on the<br>
+shoulder of those called to lead His people, those who will be called &quot;father.&quot;<br>
+For further information, please contact the Diocesan Vocations Director, Fr Pat O&#x27;Hagan,<br>
+at <a href="mailto:pgoh2111@gmail.com" target="_blank" rel="noopener noreferrer">pgoh2111@gmail.com</a><br>
+Anniversaries: It is advisable where possible to book well in advance in the case of<br>
+anniversaries. These are arranged with a sacristan as the anniversary book is kept in the<br>
+sacristy. Also, please indicate in the Anniversary book that the Mass is booked for the stated<br>
+intention - we would appreciate an acknowledgment of the booking by email if possible. In<br>
+the case of a booked Anniversary Mass please inquire of the sacristan before the Mass<br>
+begins that the Mass is offered for the intention you request. Names to be added to the<br>
+weekend anniversary list need to be added to the anniversary book by informing the sacristan<br>
+- this can be done in advance of the date requested.<br>
+Parish Readers/Eucharistic Ministers: If you are unable to attend the schedule allocated to<br>
+you, it would be much appreciated if you can get a replacement to step in for you. (It may be<br>
+possible to exchange a rotation with another group member - there is also the opportunity to<br>
+seek cover via the Whatsapp messaging facility if available to your group). I also ask Readers<br>
+please to conclude the readings with - &#x27;The Word of the Lord&#x27; as directed in the Missalette,<br>
+and not &#x27;This is the Word of the Lord&#x27; as stated in the Lectionary. We have previously<br>
+discussed this at our reader meetings.<br>
+Look out Leaflets .Are now available for children at the back of both churches in the parish<br>
+focusing on the liturgy of the word each week. Enjoy!<br>
+Teach us to Pray Booklet - It can be downloaded at:<br>
+<a href="https://www.derrydiocese.org/news/teach" target="_blank" rel="noopener noreferrer">https://www.derrydiocese.org/news/teach</a> -us-to-pray.</p>
+<hr>
+<p class="page-label">Page 5</p>
+<p>Why Sunday Matters! The Irish Catholic Bishops’ Conference have published a pastoral<br>
+message titled ‘ Why Sunday Matters’ - an invitation to reflect on Sunday Mass. To access this<br>
+resource and watch a four -part video series titles Sunday Mass - ‘Diggin g Deeper’, visit at<br>
+TheWay.ie: Is a new digital platform set up by the Irish Bishops Conference dedicated to<br>
+sharing the ‘Goo d News’ and the witness of the Catholic Church in Ireland. It is intended to<br>
+help people discover the faith, live the faith and pass on the faith. It is for both seekers and<br>
+followers. Follow us on Facebook, Instagram, X and YouTube.<br>
+St. Joseph’s Church - A YouTube camera link is now available for services from St.<br>
+Joseph&#x27;s Church, Glenullin. The link can be accessed -<br>
+<a href="https://youtube.com" target="_blank" rel="noopener noreferrer">https://youtube.com</a> @parishoferrigalderry .<br>
+The Net: As always, it features a wide variety of news, interesting and inspiring interviews,<br>
+articles, and photos from parishes across the diocese. You can read the Diocesan newspaper<br>
+on-line at: <a href="https://www.derrydiocese.org/news/categories/the" target="_blank" rel="noopener noreferrer">www.derrydiocese.org/news/categories/the</a> -net. or a paper copy is available at the<br>
+back of the church. Donations welcome.<br>
+Prayer for Peace in the Middle East: God of mercy and compassion of grace and<br>
+reconciliation, pour your presence upon all your children in the Middle East: Jews, Muslims,<br>
+Christians, Palestinians, and Israelis. Let hatred be turned into love, fear to trust, despair to<br>
+hope, oppression to free dom, occupation to liberation. That violent encounters may be replaced<br>
+by loving embraces, and peace and justice maybe experienced by all. Amen.<br>
+St. Joseph’s Church: We present a dual gauge to initiative funds in our parish for the on -<br>
+going costs associated with the renovation of St. Joseph’s Church. The gauge on the left<br>
+indicates the funds we require to complete the refurbishment. The gauge on the right reflects<br>
+the loans we have received from other parishes. (Gauge also available on website and<br>
+Facebook page). Thanks - Donations to date - Current figure £23 5,400.00.<br>
+Providing compassionate care at the end of life - To address the sensitive issue of<br>
+compassionate care at the end of life, and in response to the need to inform the faithful of<br>
+Catholic teaching on this important life issue that affects so many families, the Bishops of<br>
+Ireland have published the pastoral letter: Freedom to Live Fully, Until Death Comes. You<br>
+are invited to read this letter and view the accompanying video Through the Valley, which<br>
+offers personal testimonies by carers and people with terminal illness. The key message of<br>
+both letter and video asserts that every person possesses inherent, infinite dignity that remains<br>
+intact regardless of their circumstances. In this context, bishops strongly oppose the<br>
+Oireachtas Committee’s proposal to Government to legislate for assisted suicide and call on<br>
+support for healthcare workers who uphold the sanctity of life. To read Freedom to Live<br>
+Fully, Until Death Comes and to watch Through the Valley, visit the following lin k:<br>
+<a href="https://www.catholicbishops.ie/2024/06/24/bishops" target="_blank" rel="noopener noreferrer">https://www.catholicbishops.ie/2024/06/24/bishops</a> -statement -on-end-of-life-care freedom -<br>
+to-live-fully -until-death -comes/<br>
+The Catholic Communications Office of the Irish Bishops Conference: Produces a five-<br>
+story weekly ezine Sharing Good News that reports on stories associated with the Bishops&#x27;<br>
+Conference, activities in parishes and dioceses, and that celebrates Church life generally. If you</p>
+<hr>
+<p class="page-label">Page 6</p>
+<p>do not currently subscribe to receiving it and you wish to subscribe to receive Sharing Good<br>
+News, please register your email address on <a href="https://catholicnews.ie/newsletter/" target="_blank" rel="noopener noreferrer">https://catholicnews.ie/newsletter/</a><br>
+Errigal Hall Volunteers: For this hospitality to continue in the community, we need new<br>
+volunteers to come forward and help in this voluntary service to the parish. If you are<br>
+interested, please contact Melinda Robinson. If enough volunteers come forward a rota can<br>
+be put in place via a WhatsApp group, so that the same people are not required at each<br>
+function.<br>
+Errigal Hall: Parishioners who borrow items from the hall need to sign for their removal from<br>
+the hall and when they are returned. The signing book is in the kitchen of the hall.<br>
+St. Joseph’s Church: Choir Practice will take place each Tuesday at 7pm in the church. New<br>
+members from Primary 4 up are very welcome. Any queries contact Roisin McIlvar<br>
+<a href="tel:+3537841407154" style="color:#1d4ed8;font-weight:600;">07841407154</a> .<br>
+St. Mary’s Church Choir: If you are interested in joining the choir, you are welcome to attend<br>
+the practice in the church on a Wednesday evening at 7pm. Or contact any choir member.<br>
+Derry Diocesan Society (DDS): In each of the parishes of the diocese Mass is offered<br>
+alternating in each parish (list at the back of each church) for deceased and living members<br>
+who are registered in the society. The deceased members registered are remembered in the<br>
+anniversary list fo r three consecutive weekends each quarter (three months). Registration is<br>
+£20 and can be given to a sacristan or Fr. Crowley - please ensure name and address of the<br>
+person to be enrolled is included and whether it is for a living or deceased member.<br>
+Maternity Blessing: Expectant mothers are welcome to receive a blessing in any of the<br>
+sacristies following Mass - and a prayer card for their pregnancy.<br>
+Stamps: For the missions can be left at the back of each church.<br>
+Synodal Pathway: Find attached the final versions of the National Synthesis for the Church<br>
+in Ireland, which is the fruit of the recent process of listening and consultation; it is based on<br>
+the syntheses produced by the 26 dioceses in Ireland, as well as those submitted by religious<br>
+congregations and other interested groups. Also attach appendix document from survivors of<br>
+abuse and the Irish Bishops’ Conference Cover Letter, which have all been forwarded to the<br>
+General Secretariat of the Synod of Bishops. Press Release also attached. We are requested to<br>
+bring the Report to the attention o f your parishioners and to share it on your social media</p>
+<hr>
+<p class="page-label">Page 7</p>
+<p>outlets. It will be a useful tool as parishes move forward on the synodal journey in the<br>
+autumn. The Report is now available on the website of the Synodal Pathway of the Church<br>
+in Ireland website: <a href="https://www.synod.ie" target="_blank" rel="noopener noreferrer">www.synod.ie</a><br>
+Parish Envelopes: Following previous discussion with the Parish Finance Committee we<br>
+encourage consideration for those who use envelopes infrequently to consider the use of a<br>
+standing order, (through this medium you have full control), of the donation at your disposal.<br>
+Further information is available from the parish website.<br>
+If you advance the standing order, (it can be processed on -line with your bank), or alternatively<br>
+bring the completed mandate to your bank. We request that when you are issuing your<br>
+instruction to the bank, that you do so with your personal name, in doing so we can therefore<br>
+identify from whom the standing order has been authorised. It is with your authorisation that<br>
+the standing order is either processed weekly or monthly. Also, you can withdraw the mandate<br>
+at your own discretion. We would appreciate an ac knowledgement of this transaction (via the<br>
+parish email) when it is activated, so that we can have a copy for the parish records. In the<br>
+information forwarded we will require your address and telephone number.<br>
+Several parishioners recently have set up a standing order, however we do not know who<br>
+these parishioners are because they have not provided an address. We ask please that you<br>
+follow the instructions above and email the parish to inform us who has authoris ed the<br>
+standing order.<br>
+We request now that the boxes are delivered, if you have not previously returned or<br>
+updated a parish Census card, please complete the card in the back of the box and<br>
+return in the collection envelope. Also, the Gift Aid card needs to be signed and<br>
+returned if you are a taxpayer.<br>
+Those who avail of Standing Orders are also asked to complete a Census card and Gift<br>
+Aid card. These can be collected in each sacristy and returned at your convenience.<br>
+Details of Parish Accounts for Standing Orders:<br>
+(Errigal Ballerin: Sort Code - 950346 - Account No. 40067059 is the No 1 a/c) Errigal<br>
+Development: Sort Code - 950346 - (Account No. 90042358 is the Renovation a/c).<br>
+(Errigal Glenullin : Sort Code - 950346 Account No. 90062596 is the No 1 a/c) ( Errigal<br>
+Parish : Sort Code 950689 - Account No. 90083712 is the Renovation a/c).<br>
+Parish Finance: If you wish to contribute to the parish by standing order - forms can be<br>
+forwarded upon request by sending an email to - <a href="mailto:errigalparish@gmail.com" target="_blank" rel="noopener noreferrer">errigalparish@gmail.com</a> or they are<br>
+available on the parish website. At the end of each month, we shall include in the<br>
+collection figures the amounts relating to the increase in standing orders, these figures<br>
+are stated in brackets.</p>
+<hr>
+<p class="page-label">Page 8</p>
+<p>Parish Census: In the recent distribution of collection envelopes, we request that at your<br>
+earliest convenience you might return the census card with your family details for<br>
+parish registration. Also, the Gift Aid card needs to be updated and signed so that the<br>
+parish ca n claim Gift Aid if you are a taxpayer, this does not affect your personal details<br>
+or taxation. If your tax circumstances change, please inform us, if you are no longer a<br>
+taxpayer.<br>
+Census cards are available in each sacristy, once completed they can be returned in a<br>
+sealed envelope via the collection box at the back of each church. If you have previously<br>
+registered, you do not have to do so again, unless your household occupation has<br>
+changed.<br>
+Church Cleaners: Cleaners are required to join the existing monthly groups who clean each<br>
+church. The more that participate the less occasions that individuals will be required to cover.<br>
+If interested, please leave your name/contact phone number in each sacristy or alternatively<br>
+give details to a sacristan.<br>
+Mass Cards/Mass Bouquets: Are available for sale at the back of each church please put the<br>
+money in the candle box.<br>
+ACCORD - Counselling: If you need to speak, to an experienced couples and relationships<br>
+counsellor during this time of unprecedented stress and pressure on family life, please contact<br>
+95680151. This is a free helpline service available from 9am - 8pm. Monday to Friday. All<br>
+calls charged at local rate.<br>
+ACCORD DERRY: Virtual Interactive Marriage Preparation Programme (limited to 15<br>
+couples per course). Booking now online at <a href="https://www.accordni.com" target="_blank" rel="noopener noreferrer">www.accordni.com</a><br>
+Radio Maria Ireland: <a href="https://www.radiomaria.ie/radio" target="_blank" rel="noopener noreferrer">https://www.radiomaria.ie/radio</a> -maria -ireland/ is an Irish -run Catholic<br>
+Talk-Radio Station with commercial -free broadcasting of Prayer, Catechesis, Music, Talks,<br>
+Interviews and Testimonies.<br>
+Church Safeguarding: If you have any concerns with regard to Safeguarding children or<br>
+adults in need of protection within the Church please contact: Mrs Marie O’Kane (Designated<br>
+Liaison Person), Diocesan Pastoral Centre, 164 Bishop Street, Derry. Tel: 02871 -<br>
+362475/<a href="tel:+3537596500793" style="color:#1d4ed8;font-weight:600;">07596500793</a>. Email: <a href="mailto:dlp@derrydiocese.org" target="_blank" rel="noopener noreferrer">dlp@derrydiocese.org</a> - or PSNI (Police Service of Northern<br>
+Ireland) 101 or Social Services Tel: 02871 -314090.<br>
+Parish Representatives - Tracey McGilligan and Clare Mullan.<br>
+Errigal Privacy Notice: The Diocese of Derry complies with GDPR regulations. A privacy<br>
+notice is available on the Parish Website or alternatively it is available from the Parish Office.<br>
+Live stream of Mass and Services in St. Mary’s Church and a Utube streaming in St. Joseph’s<br>
+Church are available online. Parishioners should note that the first three rows of seats are<br>
+visible in St. Mary’s Church.</p></div>
     <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
   </div>
   <script>
@@ -451,9 +815,32 @@
         }
       });
     })();
-  </script>
-  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
-  <script>
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
     (function () {
       var btn = document.getElementById('scroll-top-btn');
       if (!btn) return;
@@ -468,6 +855,8 @@
         window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
       });
     })();
-    </script>
+    
+  </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
 </body>
 </html>
