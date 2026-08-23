@@ -80,6 +80,86 @@ def _http_url(value: str) -> str:
     return ""
 
 
+# Official diocese parish pages already stored on recipes. Do not invent hosts.
+_DIOCESE_PAGE_HOSTS = (
+    "raphoediocese.ie",
+    "clogherdiocese.ie",
+    "downandconnordiocese.com",
+    "derrydiocese.org",
+)
+
+NEVER_PUBLISH_HEADING = (
+    "Parishes that share news on Facebook or their website"
+)
+NEVER_PUBLISH_NOTE = (
+    "We just have no downloadable PDF to stitch this week."
+)
+STALE_HEADING = "Parishes whose bulletin is from last week or older"
+STALE_NOTE = (
+    "They share news on Facebook or their website — we just have no "
+    "downloadable PDF to stitch this week."
+)
+
+
+def _host(url: str) -> str:
+    text = (url or "").lower()
+    if "://" in text:
+        text = text.split("://", 1)[1]
+    return text.split("/", 1)[0].removeprefix("www.")
+
+
+def _candidate_urls(row: dict, recipe: dict, extra: list[str] | None = None) -> list[str]:
+    found: list[str] = []
+    for raw in list(extra or []) + [
+        recipe.get("start_url"),
+        (row or {}).get("url"),
+        recipe.get("facebook"),
+        (row or {}).get("facebook"),
+    ]:
+        href = _http_url(str(raw or ""))
+        if href and href not in found:
+            found.append(href)
+    for step in recipe.get("steps") or []:
+        if not isinstance(step, dict):
+            continue
+        href = _http_url(str(step.get("url") or step.get("href") or ""))
+        if href and href not in found:
+            found.append(href)
+    return found
+
+
+def share_url(
+    row: dict,
+    recipe: dict,
+    *,
+    contact_facebook: str = "",
+    contact_website: str = "",
+) -> str:
+    """Reader link: proven Facebook, else parish website, else official diocese page."""
+    candidates = _candidate_urls(
+        row,
+        recipe,
+        extra=[contact_facebook, contact_website],
+    )
+    for href in candidates:
+        if "facebook.com" in _host(href):
+            return href
+    for href in candidates:
+        if _host(href) and _host(href) not in _DIOCESE_PAGE_HOSTS:
+            return href
+    for href in candidates:
+        if _host(href) in _DIOCESE_PAGE_HOSTS:
+            return href
+    return candidates[0] if candidates else ""
+
+
+def _contacts_for_diocese(diocese_key: str) -> dict[str, dict]:
+    folder = recipe_folder_name(diocese_key)
+    path = REPO_ROOT / "parishes" / f"{folder}_diocese_contacts.json"
+    payload = _load_json(path)
+    return payload if isinstance(payload, dict) else {}
+
+
 def _recipe_display(payload: dict, key: str) -> str:
     return (
         combined_display_name(key)
@@ -121,11 +201,16 @@ def build_diocese_week_summary(
         diocese_key.replace("_", " ").replace("-", " ").title() + " Diocese"
     )
     summary = DioceseWeekSummary(diocese_display_name=display)
-    root = recipes_root or (REPO_ROOT / "parishes" / "recipes")
+    repo_recipes = REPO_ROOT / "parishes" / "recipes"
+    root = recipes_root or repo_recipes
+    using_repo_recipes = (
+        recipes_root is None or Path(root).resolve() == repo_recipes.resolve()
+    )
     recipe_dir = Path(root) / recipe_folder_name(diocese_key)
     status_map = parish_status if parish_status is not None else _parishes_map(
         _load_json(parish_status_path or (REPO_ROOT / "parishes" / "parish_status.json"))
     )
+    contacts = _contacts_for_diocese(diocese_key) if using_repo_recipes else {}
 
     for key, recipe in _iter_recipes(recipe_dir):
         if is_alias_key(key):
@@ -142,10 +227,33 @@ def build_diocese_week_summary(
             summary.found += 1
             continue
         if outcome == "stale":
-            summary.stale.append(NamedLink(name=name, url=url))
+            contact = contacts.get(key) if isinstance(contacts.get(key), dict) else {}
+            summary.stale.append(
+                NamedLink(
+                    name=name,
+                    url=share_url(
+                        row or {},
+                        recipe,
+                        contact_facebook=str((contact or {}).get("facebook") or ""),
+                        contact_website=str((contact or {}).get("website") or ""),
+                    )
+                    or url,
+                )
+            )
             continue
         if skipped:
-            summary.never_publish.append(NamedLink(name=name, url=url))
+            contact = contacts.get(key) if isinstance(contacts.get(key), dict) else {}
+            summary.never_publish.append(
+                NamedLink(
+                    name=name,
+                    url=share_url(
+                        row or {},
+                        recipe,
+                        contact_facebook=str((contact or {}).get("facebook") or ""),
+                        contact_website=str((contact or {}).get("website") or ""),
+                    ),
+                )
+            )
 
     summary.never_publish.sort(key=lambda item: item.name.lower())
     summary.stale.sort(key=lambda item: item.name.lower())
@@ -200,16 +308,17 @@ def render_diocese_intro_html(summary: DioceseWeekSummary) -> str:
     if summary.never_publish:
         parts.append(
             "<div class=\"intro-never\">"
-            "<h3>Parishes that do not publish a downloadable bulletin online</h3>"
+            f"<h3>{_esc(NEVER_PUBLISH_HEADING)}</h3>"
+            f"<p class=\"intro-never-note\">{_esc(NEVER_PUBLISH_NOTE)}</p>"
             f"{_name_list_html(summary.never_publish, with_late_link=False)}"
             "</div>"
         )
     if summary.stale:
         parts.append(
             "<div class=\"intro-stale\">"
-            "<h3>Parishes whose bulletin is from last week or older</h3>"
-            "<p class=\"intro-stale-note\">If they published late, try the last known link.</p>"
-            f"{_name_list_html(summary.stale, with_late_link=True)}"
+            f"<h3>{_esc(STALE_HEADING)}</h3>"
+            f"<p class=\"intro-stale-note\">{_esc(STALE_NOTE)}</p>"
+            f"{_name_list_html(summary.stale, with_late_link=False)}"
             "</div>"
         )
     parts.append("</section>")
