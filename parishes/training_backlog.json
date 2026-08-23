@@ -2,16 +2,16 @@
   "generated_at": "2026-08-23",
   "target_date": "2026-08-23",
   "summary": {
-    "downloaded": 111,
+    "downloaded": 112,
     "html_links": 0,
     "skipped": 32,
-    "failed": 9,
+    "failed": 8,
     "stale_rejected": 9
   },
   "action_counts": {
-    "skip": 32,
-    "ok": 122,
-    "investigate": 7
+    "skip": 33,
+    "ok": 123,
+    "investigate": 6
   },
   "parishes": [
     {
@@ -1057,8 +1057,9 @@
         "click_count": 0,
         "has_terminal": false,
         "operator_notes": [
-          "Joint Castleblayney / Clontibret bulletin. Proved 23/08/2026: https://mucknoparish.ie/wp-content/uploads/2020/09/F-Clontibret-Muckno-Bulletin-23rd-AUG-2026.pdf is HTTP 200, application/pdf, 676682 bytes (http:// 302 then 200). Filename date is 23rd AUG 2026.",
-          "Homepage and wp-json media do not open the listing. The weekly-bulletin category lists this week's post (23rd August 2026); the PDF is only on that post (wp-block-file). site_type:http_scrape_newest_pdf follows the newest dated /202 permalink, then scrapes clontibret-muckno-bulletin PDFs.",
+          "Joint Castleblayney / Clontibret bulletin. Re-proved 23/08/2026: https://mucknoparish.ie/wp-content/uploads/2020/09/F-Clontibret-Muckno-Bulletin-23rd-AUG-2026.pdf is HTTP 200, application/pdf, 676682 bytes. Filename date is 23rd AUG 2026.",
+          "Homepage and wp-json media do not open the listing. /category/weekly-bulletin/ HTML has no .pdf hrefs \u2014 only post permalinks. Follow the newest dated /202 post (23rd-august-2026 this week), then scrape the wp-block-file PDF.",
+          "Harvest 32667440113 after PR #99 failed because urlopen HTTPS dies on a missing Sectigo intermediate (leaf only). HTTP listing/post work; PDF http:// 302s to https://www.mucknoparish.ie/... and needs the same SSL fallback. Encode spaces in fetch URLs.",
           "Files live under /uploads/2020/09/ \u2014 score the filename date, not the folder year.",
           "href_patterns [clontibret-muckno-bulletin] skips parish-draw and graves-poster PDFs.",
           "This week's post slug can be 23rd-august-2026 with no 'bulletin' in the path \u2014 do not require bulletin- in post_slug_patterns.",
@@ -1077,10 +1078,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP-scrape listing https://mucknoparish.ie/category/weekly-bulletin/ \u2014 no dated bulletin PDF matching ['clontibret-muckno-bulletin'] (not a selector problem; parish may not have posted)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP-scrape listing https://mucknoparish.ie/category/weekly-bulletin/ \u2014 no dated bulletin PDF matching ['clontibret-muckno-bulletin'] (not"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "castledergparish",
@@ -2406,6 +2407,36 @@
       "last_error": "",
       "suggested_action": "ok",
       "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "gaoth-dobhair",
+      "display_name": "Gaoth Dobhair (Gweedore)",
+      "diocese": "raphoe",
+      "recipe_file": "parishes/recipes/raphoe/gaoth-dobhair.json",
+      "recipe": {
+        "start_url": "https://www.facebook.com/paroisteghaothdobhair",
+        "site_type": "facebook_page",
+        "playbook_type": "link_only",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "2026-08-23: Live fetch of https://www.raphoediocese.ie/parish/gaoth-dobhair/ contained href https://www.facebook.com/paroisteghaothdobhair. Do not invent another Facebook URL. No this-week PDF claimed."
+        ],
+        "do_not": [],
+        "recorded_date": "2026-08-23"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "Facebook page \u2014 cannot auto-harvest a downloadable PDF"
     },
     {
       "parish_key": "drive-1kna8f6t54",
