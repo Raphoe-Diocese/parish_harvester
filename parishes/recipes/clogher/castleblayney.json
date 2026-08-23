@@ -3,29 +3,36 @@
   "parish_key": "castleblayney",
   "display_name": "Castleblayney (Muckno, includes Clontibret)",
   "diocese": "clogher",
-  "start_url": "https://mucknoparish.ie/",
-  "site_type": "wp_json_newest_media",
+  "start_url": "https://mucknoparish.ie/category/weekly-bulletin/",
+  "site_type": "http_scrape_newest_pdf",
   "href_patterns": [
     "clontibret-muckno-bulletin"
+  ],
+  "post_slug_patterns": [
+    "/202"
   ],
   "playbook_type": "pdf_download_list",
   "timeout_ms": 45000,
   "total_timeout_s": 180,
-  "recorded_date": "2026-08-22",
+  "recorded_date": "2026-08-23",
   "steps": [
     {
       "action": "goto",
-      "url": "https://mucknoparish.ie/"
+      "url": "https://mucknoparish.ie/category/weekly-bulletin/"
     }
   ],
   "operator_notes": [
-    "Joint Castleblayney / Clontibret bulletin. Newest on 22/08/2026 is F-Clontibret-Muckno-Bulletin-23rd-AUG-2026.pdf (HTTP 200, 676682 bytes).",
-    "Files live under /uploads/2020/09/ \u2014 score the filename date, not the folder year.",
+    "Joint Castleblayney / Clontibret bulletin. Proved 23/08/2026: https://mucknoparish.ie/wp-content/uploads/2020/09/F-Clontibret-Muckno-Bulletin-23rd-AUG-2026.pdf is HTTP 200, application/pdf, 676682 bytes (http:// 302 then 200). Filename date is 23rd AUG 2026.",
+    "Homepage and wp-json media do not open the listing. The weekly-bulletin category lists this week's post (23rd August 2026); the PDF is only on that post (wp-block-file). site_type:http_scrape_newest_pdf follows the newest dated /202 permalink, then scrapes clontibret-muckno-bulletin PDFs.",
+    "Files live under /uploads/2020/09/ — score the filename date, not the folder year.",
     "href_patterns [clontibret-muckno-bulletin] skips parish-draw and graves-poster PDFs.",
+    "This week's post slug can be 23rd-august-2026 with no 'bulletin' in the path — do not require bulletin- in post_slug_patterns.",
     "Harvest this once under castleblayney. Clontibret is a clickable link only."
   ],
   "do_not": [
     "Do not pin a dated filename.",
+    "Do not scrape the homepage — the carousel can lag behind /category/weekly-bulletin/.",
+    "Do not use wp_json_newest_media — harvest 23/08/2026 failed without opening the listing.",
     "Do not download wedding / GDPR / Order of Mass / parish-draw posters.",
     "Do not harvest the shared Clontibret-Muckno file twice under clontibret."
   ]

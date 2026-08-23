@@ -1549,12 +1549,33 @@ def _score_http_scrape_pdf_hrefs(
     return scored
 
 
+def _newest_dated_post_url_from_listing(
+    html: str,
+    base_url: str,
+    post_slug_patterns: list[str],
+    target_date: date,
+) -> str | None:
+    """Pick the newest dated HTML post from a category/listing page.
+
+    Used when the listing itself has no PDF hrefs (Muckno weekly-bulletin
+    archive: this week's file is only on the post page).
+    """
+    if not html or not post_slug_patterns:
+        return None
+    hrefs = _extract_matching_hrefs(html, base_url, post_slug_patterns)
+    scored = _score_wordpress_post_hrefs(hrefs, target_date)
+    if not scored:
+        return None
+    return max(scored)[1]
+
+
 async def _try_http_scrape_newest_pdf(
     listing_url: str,
     dest: Path,
     *,
     href_patterns: list[str],
     target_date: date,
+    post_slug_patterns: list[str] | None = None,
 ) -> tuple[str, str] | None:
     """Fetch a listing page via plain HTTP and download the newest matching PDF.
 
@@ -1562,6 +1583,10 @@ async def _try_http_scrape_newest_pdf(
     Parish-Newsletter PDF is in the HTML but hidden inside a closed accordion,
     so Playwright ``visible`` waits time out. The listing itself is not WAF
     blocked — we just must not click.
+
+    If the listing has no matching PDF hrefs and *post_slug_patterns* is set
+    (Castleblayney / Muckno), follow the newest dated post and scrape that
+    page for the PDF instead of pinning a filename.
     """
     listing_result = await asyncio.to_thread(
         _fetch_bytes_with_retries,
@@ -1578,6 +1603,30 @@ async def _try_http_scrape_newest_pdf(
     listing_html = listing_body.decode("utf-8", errors="ignore")
     hrefs = _extract_matching_hrefs(listing_html, listing_url, href_patterns)
     scored = _score_http_scrape_pdf_hrefs(hrefs, target_date)
+    if not scored:
+        post_url = _newest_dated_post_url_from_listing(
+            listing_html,
+            listing_url,
+            [str(p).strip() for p in (post_slug_patterns or []) if str(p).strip()],
+            target_date,
+        )
+        if not post_url:
+            return None
+        post_result = await asyncio.to_thread(
+            _fetch_bytes_with_retries,
+            post_url,
+            max_attempts=_DROPFILES_HTTP_ATTEMPTS,
+            per_attempt_timeout_s=_DROPFILES_HTTP_PER_ATTEMPT_TIMEOUT_S,
+            total_budget_s=_DROPFILES_HTTP_FILE_BUDGET_S,
+        )
+        if not post_result:
+            return None
+        post_body, post_headers = post_result
+        if "text/html" not in (post_headers.get("content-type") or "").lower():
+            return None
+        post_html = post_body.decode("utf-8", errors="ignore")
+        hrefs = _extract_matching_hrefs(post_html, post_url, href_patterns)
+        scored = _score_http_scrape_pdf_hrefs(hrefs, target_date)
     if not scored:
         return None
     _best_date, pdf_url = max(scored)
@@ -3585,11 +3634,17 @@ async def replay_recipe(
             for p in (recipe.get("href_patterns") or [])
             if str(p).strip()
         ] or ["parish-newsletter", ".pdf"]
+        post_slug_patterns = [
+            str(p).strip().lower()
+            for p in (recipe.get("post_slug_patterns") or [])
+            if str(p).strip()
+        ]
         found = await _try_http_scrape_newest_pdf(
             start_url,
             dest,
             href_patterns=href_patterns,
             target_date=target_date,
+            post_slug_patterns=post_slug_patterns or None,
         )
         if found:
             return dest, found[1], found[0]
