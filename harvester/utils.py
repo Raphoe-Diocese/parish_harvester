@@ -372,6 +372,23 @@ def yearless_slug_date(
     return candidate
 
 
+def quote_http_url(url: str) -> str:
+    """Encode raw spaces in a URL path so urllib can fetch it.
+
+    Listing pages (Clones) often publish ``href="/uploads/downloads/Sunday
+    23rd August 2026.pdf"`` with a literal space. ``urljoin`` keeps that
+    space; ``urllib.request.Request`` then raises ``InvalidURL``. Already
+    encoded ``%20`` stays ``%20`` (unquote, then quote).
+    """
+    raw = (url or "").strip()
+    if not raw:
+        return raw
+    parsed = urlparse(raw)
+    if not parsed.scheme or not parsed.netloc:
+        return raw
+    return parsed._replace(path=quote(unquote(parsed.path), safe="/")).geturl()
+
+
 def predicted_dated_upload_urls(
     example_url: str,
     target: date,

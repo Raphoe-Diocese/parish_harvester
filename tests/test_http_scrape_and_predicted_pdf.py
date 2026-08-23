@@ -13,6 +13,7 @@ from harvester.replay import (
     _best_scored_link_index,
     _decode_pdfemb_data_url,
     _extract_matching_hrefs,
+    _fetch_bytes_with_retries,
     _newest_dated_post_url_from_listing,
     _extract_mdocs_dated_downloads,
     _extract_pdfembed_target_url,
@@ -41,6 +42,7 @@ from harvester.utils import (
     mcn_profile_data_url,
     predicted_dated_upload_urls,
     predicted_wordpress_dated_post_urls,
+    quote_http_url,
     rewrite_date_url,
     wix_dated_slug_candidates,
     yearless_slug_date,
@@ -1048,6 +1050,75 @@ class CastleblayneyListingTests(unittest.TestCase):
         scored = _score_http_scrape_pdf_hrefs(hrefs + [self.DRAW, self.GRAVES], date(2026, 8, 23))
         self.assertEqual(max(scored)[1], self.PDF_23)
         self.assertEqual(max(scored)[0], date(2026, 8, 23))
+
+
+class ClonesSpaceUrlTests(unittest.TestCase):
+    LISTING = "https://www.clonesparish.com/"
+    RAW = (
+        "https://www.clonesparish.com/uploads/downloads/"
+        "Sunday 23rd August 2026.pdf"
+    )
+    ENCODED = (
+        "https://www.clonesparish.com/uploads/downloads/"
+        "Sunday%2023rd%20August%202026.pdf"
+    )
+    OLDER = (
+        "/uploads/downloads/Sunday 16th August 2026-DESKTOP-681QU39.pdf"
+    )
+
+    def test_recipe_scrapes_homepage_and_does_not_pin_dated_file(self) -> None:
+        data = json.loads(
+            Path("parishes/recipes/clogher/clones.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(data["site_type"], "http_scrape_newest_pdf")
+        self.assertEqual(data["start_url"], self.LISTING)
+        self.assertIn("uploads/downloads", data.get("href_patterns") or [])
+        steps_blob = json.dumps(data.get("steps") or [])
+        self.assertNotIn("Sunday 23rd August 2026.pdf", steps_blob)
+        self.assertNotIn("Sunday%2023rd%20August%202026.pdf", steps_blob)
+
+    def test_listing_scores_spaced_sunday_filename(self) -> None:
+        html = f"""
+        <a href="/uploads/downloads/Sunday 23rd August 2026.pdf">Sunday 23rd August 2026</a>
+        <a href="{self.OLDER}">Sunday 16th August 2026</a>
+        """
+        hrefs = _extract_matching_hrefs(html, self.LISTING, ["uploads/downloads"])
+        self.assertTrue(any("Sunday 23rd August 2026.pdf" in href for href in hrefs))
+        scored = _score_http_scrape_pdf_hrefs(hrefs, date(2026, 8, 23))
+        best_date, best_url = max(scored)
+        self.assertEqual(best_date, date(2026, 8, 23))
+        self.assertEqual(quote_http_url(best_url), self.ENCODED)
+
+    def test_quote_http_url_encodes_raw_space(self) -> None:
+        self.assertEqual(quote_http_url(self.RAW), self.ENCODED)
+        self.assertEqual(quote_http_url(self.ENCODED), self.ENCODED)
+
+    def test_fetch_bytes_encodes_spaces_before_request(self) -> None:
+        from unittest.mock import MagicMock, patch
+
+        body = b"%PDF-1.7 fake-pdf"
+        resp = MagicMock()
+        resp.status = 200
+        resp.read.return_value = body
+        resp.headers.items.return_value = [("Content-Type", "application/pdf")]
+        resp.__enter__.return_value = resp
+        resp.__exit__.return_value = False
+        with (
+            patch("harvester.replay.urlopen", return_value=resp) as mock_urlopen,
+            patch("harvester.replay.Request") as mock_req,
+        ):
+            mock_req.return_value = "REQ"
+            result = _fetch_bytes_with_retries(
+                self.RAW,
+                max_attempts=1,
+                per_attempt_timeout_s=1.0,
+                total_budget_s=2.0,
+            )
+            mock_req.assert_called()
+            self.assertEqual(mock_req.call_args[0][0], self.ENCODED)
+            mock_urlopen.assert_called()
+            self.assertIsNotNone(result)
+            self.assertEqual(result[0], body)
 
 
 if __name__ == "__main__":
