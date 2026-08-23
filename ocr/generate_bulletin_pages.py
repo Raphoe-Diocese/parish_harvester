@@ -35,6 +35,10 @@ CONTACTS_PATH_BY_DIOCESE = {
 
 HEADER_PATTERN = re.compile(r"^#\s*---\s*(.*?)\s*---\s*$")
 OCR_BODY_PATTERN = re.compile(r'<div class="scrollable-viewer">\s*(.*?)\s*</div>\s*</body>', re.DOTALL | re.IGNORECASE)
+OCR_STANDALONE_BODY_PATTERN = re.compile(
+    r'<div class="ocr-body"[^>]*>\s*(.*?)\s*</div>\s*<p class="note-box">',
+    re.DOTALL | re.IGNORECASE,
+)
 OCR_PAGE_HEADING_PATTERN = re.compile(r"<h2>\s*Page\s+(\d+)\s*</h2>", re.IGNORECASE)
 VIEWER_FILE_PATTERN = re.compile(r"^([a-z0-9_]+)-(\d{4}-\d{2}-\d{2})\.html$")
 OCR_PANEL_PATTERN = re.compile(
@@ -280,9 +284,18 @@ def parse_parish_links(path: Path) -> list[tuple[str, str]]:
 def extract_ocr_fragment(path: Path, *, tighten: bool = True) -> str:
     raw_html = path.read_text(encoding="utf-8")
     match = OCR_BODY_PATTERN.search(raw_html)
-    if not match:
-        raise ValueError(f"Could not find OCR content wrapper in {path}")
-    fragment = OCR_PAGE_HEADING_PATTERN.sub(r"<h3>PAGE \1</h3>", match.group(1).strip())
+    if match:
+        fragment = match.group(1).strip()
+    else:
+        match = OCR_STANDALONE_BODY_PATTERN.search(raw_html)
+        if match:
+            fragment = match.group(1).strip()
+        else:
+            panel_match = OCR_PANEL_PATTERN.search(raw_html)
+            if not panel_match:
+                raise ValueError(f"Could not find OCR content wrapper in {path}")
+            fragment = panel_match.group(1).strip()
+    fragment = OCR_PAGE_HEADING_PATTERN.sub(r"<h3>PAGE \1</h3>", fragment)
     if tighten:
         return tighten_ocr_paragraphs(fragment)
     return fragment
@@ -2180,6 +2193,13 @@ def regenerate_viewer_from_existing(existing_path: Path) -> Path:
     if not panel_match:
         raise ValueError(f"Could not find OCR panel in {existing_path}")
     raw_ocr_fragment = panel_match.group(1).strip()
+    pdf_candidate = DOCS_DIR / "mega_pdf" / config.pdf_filename
+    if not pdf_candidate.exists():
+        pdf_candidate = REPO_ROOT / "mega_pdf" / config.pdf_filename
+    if pdf_candidate.exists():
+        from ocr.sparse_page_ocr import prefer_embedded_pages_in_ocr_html
+
+        raw_ocr_fragment = prefer_embedded_pages_in_ocr_html(raw_ocr_fragment, pdf_candidate)
     parish_links = parse_parish_links(config.evidence_path)
     ocr_fragment = prepare_ocr_fragment(diocese, raw_ocr_fragment, parish_links, bulletin_date=bulletin_date)
     output_path = BULLETINS_DIR / existing_path.name
@@ -2197,9 +2217,6 @@ def regenerate_viewer_from_existing(existing_path: Path) -> Path:
         render_pdf_standalone_page(config, bulletin_date, pdf_href=_pdf_href(config), viewer_href=output_path.name),
         encoding="utf-8",
     )
-    pdf_candidate = DOCS_DIR / "mega_pdf" / config.pdf_filename
-    if not pdf_candidate.exists():
-        pdf_candidate = REPO_ROOT / "mega_pdf" / config.pdf_filename
     if pdf_candidate.exists():
         _write_parish_bulletin_pages(
             diocese,
@@ -2215,6 +2232,10 @@ def write_viewer_page(diocese: str, bulletin_date: str, pdf_path: Path, ocr_html
     config = DIOCESES[diocese]
     page_count = count_pdf_pages(pdf_path)
     raw_ocr_fragment = extract_ocr_fragment(ocr_html_path, tighten=False)
+    if pdf_path and Path(pdf_path).exists():
+        from ocr.sparse_page_ocr import prefer_embedded_pages_in_ocr_html
+
+        raw_ocr_fragment = prefer_embedded_pages_in_ocr_html(raw_ocr_fragment, pdf_path)
     parish_links = parse_parish_links(config.evidence_path)
     ocr_plain_text = _fragment_to_plain_text(tighten_ocr_paragraphs(raw_ocr_fragment))
     ocr_fragment = prepare_ocr_fragment(diocese, raw_ocr_fragment, parish_links, bulletin_date=bulletin_date)

@@ -112,7 +112,7 @@ Extension Send & test
 
 Until this list is finished, do **not** start other work. Park new ideas for a later list.
 
-1. **OCR reader** — ~95% done (reader UI live; new OCR runs will use stronger layout prompt)
+1. **OCR reader** — prefer embedded PDF text on born-digital pages; vision only for image/banner pages; one pass per diocese (max ~26) then split. Reader UI live.
 2. **Problems console** — full work-queue polish
 3. **Recipe success** — one parish at a time
 4. **parishpress.ie** — live DNS/Pages when user is ready

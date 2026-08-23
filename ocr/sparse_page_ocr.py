@@ -251,7 +251,7 @@ def fill_sparse_ocr_pages(
             filled[idx] = replacement
             print(
                 f"  Filled sparse mega page {idx + 1} "
-                f"({page_text_char_count(lines)} → {page_text_char_count(replacement)} chars)."
+                f"({page_text_char_count(lines)} -> {page_text_char_count(replacement)} chars)."
             )
     return filled
 
@@ -286,4 +286,32 @@ def fill_sparse_pages_in_ocr_html(
         rendered = "\n".join(render_markdown_lines(lines))
         out.append((num, rendered))
         print(f"  Filled sparse mega-OCR HTML page {num}.")
+    return join_ocr_html_pages(out)
+
+
+def prefer_embedded_pages_in_ocr_html(fragment: str, pdf_path: str | Path) -> str:
+    """Replace OCR HTML page bodies with native PDF text when it is not sparse.
+
+    Image / banner-only pages are left untouched so vision or fill_sparse
+    can still cover them.
+    """
+    from ocr.convert_bulletin import render_markdown_lines
+    from ocr.text_extract import extract_all_page_lines
+
+    pages = split_ocr_html_pages(fragment)
+    if not pages:
+        return fragment or ""
+    native = extract_all_page_lines(pdf_path) or []
+    out: list[tuple[int, str]] = []
+    preferred = 0
+    for num, body in pages:
+        idx = num - 1
+        native_lines = native[idx] if 0 <= idx < len(native) else None
+        if native_lines and not page_is_sparse(native_lines):
+            rendered = "\n".join(render_markdown_lines(native_lines))
+            out.append((num, rendered))
+            preferred += 1
+        else:
+            out.append((num, body))
+    print(f"Preferred embedded PDF text on {preferred} page(s).")
     return join_ocr_html_pages(out)

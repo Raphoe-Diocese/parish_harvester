@@ -25,10 +25,13 @@ here is hardcoded to a fixed parish roster.
 import html
 import io
 import json
+import time
 from dataclasses import dataclass
 from pathlib import Path
 
 from PyPDF2 import PdfReader, PdfWriter
+
+from ocr.text_extract import all_pages_have_embedded_text, extract_all_page_lines
 
 from ocr.parish_splitter import (
     split_ocr_by_parish,
@@ -53,6 +56,41 @@ DIOCESE_STATUS_NAMES = {
 # Leave Holy Cross / Dunfanaghy failing — July fake dates (do not slice
 # a stale bulletin onto a "this week" parish page).
 SKIP_OK_PARISH_KEYS = frozenset({"holy-cross-church"})
+
+
+def _write_text(path: Path, text: str) -> None:
+    """Write UTF-8 HTML, stripping NULs, with an atomic replace and retries."""
+    cleaned = (text or "").replace("\x00", "")
+    dest = Path(path)
+    tmp = dest.with_name(dest.name + ".tmp")
+    last_err: OSError | None = None
+    try:
+        for _attempt in range(3):
+            try:
+                tmp.write_text(cleaned, encoding="utf-8")
+                tmp.replace(dest)
+                return
+            except OSError as exc:
+                last_err = exc
+                time.sleep(0.05 * (_attempt + 1))
+        if last_err is not None:
+            raise last_err
+    finally:
+        if tmp.exists():
+            try:
+                tmp.unlink()
+            except OSError:
+                pass
+
+
+def ocr_html_from_embedded_pdf(pdf_path: Path | str) -> str | None:
+    """Build OCR HTML from the PDF text layer when every page is born-digital."""
+    pages = extract_all_page_lines(pdf_path)
+    if not all_pages_have_embedded_text(pages):
+        return None
+    from ocr.convert_bulletin import build_html_content
+
+    return build_html_content(pages)
 
 
 def load_mega_page_index(pdf_path: Path | None) -> dict[str, tuple[int, int]]:
@@ -276,122 +314,137 @@ def write_parish_pages_for_diocese(
     written: list[str] = []
 
     for parish in parishes:
-        chunk = html_chunks.get(parish.key)
-        indexed = page_index.get(parish.key)
-        start_page = (indexed[0] if indexed else None) or (chunk.start_page if chunk else None)
-        end_page = (indexed[1] if indexed else None) or (chunk.end_page if chunk else None)
-        has_range = bool(start_page and end_page)
-        pdf_bytes = (
-            slice_pdf_pages(pdf_path, start_page, end_page)
-            if (has_range and mega_exists and total_pages)
-            else None
-        )
-        if pdf_bytes is not None and len(pdf_bytes) < 32:
-            pdf_bytes = None
-
-        base_meta = (
-            f"This week's bulletin for {parish.display_name} — {uk_date}. "
-            f"Part of the {config.display_name} collated bulletin."
-        )
-        if pdf_bytes:
-            pdf_out = out_root / f"{parish.key}.pdf"
-            existing_ok = (
-                preserve_existing_pdfs
-                and pdf_out.exists()
-                and pdf_out.stat().st_size > 2048
+        try:
+            chunk = html_chunks.get(parish.key)
+            indexed = page_index.get(parish.key)
+            start_page = (indexed[0] if indexed else None) or (chunk.start_page if chunk else None)
+            end_page = (indexed[1] if indexed else None) or (chunk.end_page if chunk else None)
+            has_range = bool(start_page and end_page)
+            pdf_bytes = (
+                slice_pdf_pages(pdf_path, start_page, end_page)
+                if (has_range and mega_exists and total_pages)
+                else None
             )
-            if not existing_ok:
-                pdf_out.write_bytes(pdf_bytes)
-            pdf_href = f"{parish.key}.pdf"
-            meta_line = base_meta
-            fail_reason = ""
-        else:
-            if not mega_exists:
-                fail_reason = (
-                    "The diocese mega PDF is missing from the repository, so this parish's "
-                    "pages could not be sliced."
-                )
-            elif not has_range:
-                fail_reason = (
-                    "This parish is marked OK, but its page range could not be found in this "
-                    "week's mega OCR (no stitcher page index and no name-banner match)."
-                )
-            else:
-                fail_reason = (
-                    "This parish is marked OK and a page range was found, but slicing those "
-                    "pages from the mega PDF failed."
-                )
-            (out_root / f"{parish.key}.pdf").write_bytes(
-                write_missing_slice_pdf(parish.display_name, fail_reason)
+            if pdf_bytes is not None and len(pdf_bytes) < 32:
+                pdf_bytes = None
+
+            base_meta = (
+                f"This week's bulletin for {parish.display_name} — {uk_date}. "
+                f"Part of the {config.display_name} collated bulletin."
             )
-            pdf_href = f"{parish.key}.pdf"
-            meta_line = f"{base_meta} {fail_reason}"
-
-        if chunk and chunk.html.strip():
-            ocr_fragment = chunk.html
-        else:
-            fallback_text = (text_chunks.get(parish.key) or "").strip()
-            if fallback_text:
-                lines = [html.escape(ln) for ln in fallback_text.splitlines() if ln.strip()]
-                ocr_fragment = (
-                    '<div class="ocr-failed-banner" role="status">'
-                    "ℹ️ Matched by parish name only (not exact PDF pages) this week — check the "
-                    "PDF above for the definitive version.</div>\n"
-                    "<p>" + "<br>\n".join(lines) + "</p>"
+            if pdf_bytes:
+                pdf_out = out_root / f"{parish.key}.pdf"
+                existing_ok = (
+                    preserve_existing_pdfs
+                    and pdf_out.exists()
+                    and pdf_out.stat().st_size > 2048
                 )
+                if not existing_ok:
+                    pdf_out.write_bytes(pdf_bytes)
+                pdf_href = f"{parish.key}.pdf"
+                meta_line = base_meta
+                fail_reason = ""
             else:
-                why = fail_reason or (
-                    "No searchable text was found for this parish in this week's mega OCR."
+                if not mega_exists:
+                    fail_reason = (
+                        "The diocese mega PDF is missing from the repository, so this parish's "
+                        "pages could not be sliced."
+                    )
+                elif not has_range:
+                    fail_reason = (
+                        "This parish is marked OK, but its page range could not be found in this "
+                        "week's mega OCR (no stitcher page index and no name-banner match)."
+                    )
+                else:
+                    fail_reason = (
+                        "This parish is marked OK and a page range was found, but slicing those "
+                        "pages from the mega PDF failed."
+                    )
+                (out_root / f"{parish.key}.pdf").write_bytes(
+                    write_missing_slice_pdf(parish.display_name, fail_reason)
                 )
-                ocr_fragment = (
-                    '<div class="ocr-failed-banner" role="status">'
-                    f"⚠️ {html.escape(why)}</div>"
-                )
+                pdf_href = f"{parish.key}.pdf"
+                meta_line = f"{base_meta} {fail_reason}"
 
-        from ocr.bulletin_layout import structure_ocr_html
+            slice_pdf = out_root / f"{parish.key}.pdf"
+            embedded_html = None
+            if slice_pdf.exists() and not fail_reason:
+                embedded_html = ocr_html_from_embedded_pdf(slice_pdf)
 
-        ocr_fragment = structure_ocr_html(
-            tighten_ocr_paragraphs(ocr_fragment),
-            bulletin_date=bulletin_date,
-            single_parish_name=parish.display_name,
-        )
+            if embedded_html:
+                ocr_fragment = embedded_html
+            elif chunk and chunk.html.strip():
+                ocr_fragment = chunk.html
+            else:
+                fallback_text = (text_chunks.get(parish.key) or "").strip()
+                if fallback_text:
+                    lines = [html.escape(ln) for ln in fallback_text.splitlines() if ln.strip()]
+                    ocr_fragment = (
+                        '<div class="ocr-failed-banner" role="status">'
+                        "ℹ️ Matched by parish name only (not exact PDF pages) this week — check the "
+                        "PDF above for the definitive version.</div>\n"
+                        "<p>" + "<br>\n".join(lines) + "</p>"
+                    )
+                else:
+                    why = fail_reason or (
+                        "No searchable text was found for this parish in this week's mega OCR."
+                    )
+                    ocr_fragment = (
+                        '<div class="ocr-failed-banner" role="status">'
+                        f"⚠️ {html.escape(why)}</div>"
+                    )
 
-        parish_config = DioceseConfig(
-            key=parish.key,
-            display_name=parish.display_name,
-            headline=f"{parish.display_name} Parish Bulletin",
-            evidence_path=config.evidence_path,
-            pdf_filename=f"{parish.key}.pdf",
-        )
-        pdf_standalone_href = f"{parish.key}-pdf.html"
-        ocr_standalone_href = f"{parish.key}-ocr.html"
-        viewer_filename = f"{parish.key}.html"
+            from ocr.bulletin_layout import structure_ocr_html
 
-        page_html = render_bulletin_viewer_shell(
-            page_title=f"{parish.display_name} Bulletin — {uk_date}",
-            diocese_label=diocese_label,
-            display_name=parish.display_name,
-            headline=f"{parish.display_name} Parish Bulletin",
-            meta_line=meta_line,
-            back_href=f"../../dioceses/{diocese_key}/index.html",
-            back_label=f"← Back to {config.display_name} bulletin",
-            pdf_href=pdf_href,
-            pdf_download_href=pdf_href,
-            pdf_standalone_href=pdf_standalone_href,
-            ocr_standalone_href=ocr_standalone_href,
-            ocr_fragment=ocr_fragment,
-            parish_section_heading=f"Other {diocese_label} Parishes",
-            parish_links_html=_render_other_parishes_grid(parishes, parish.key),
-        )
-        (out_root / viewer_filename).write_text(page_html, encoding="utf-8")
-        (out_root / f"{parish.key}-pdf.html").write_text(
-            render_pdf_standalone_page(parish_config, bulletin_date, pdf_href=pdf_href, viewer_href=viewer_filename),
-            encoding="utf-8",
-        )
-        (out_root / f"{parish.key}-ocr.html").write_text(
-            render_ocr_standalone_page(parish_config, bulletin_date, ocr_fragment, viewer_href=viewer_filename),
-            encoding="utf-8",
-        )
-        written.append(parish.key)
+            ocr_fragment = structure_ocr_html(
+                tighten_ocr_paragraphs(ocr_fragment),
+                bulletin_date=bulletin_date,
+                single_parish_name=parish.display_name,
+            )
+
+            parish_config = DioceseConfig(
+                key=parish.key,
+                display_name=parish.display_name,
+                headline=f"{parish.display_name} Parish Bulletin",
+                evidence_path=config.evidence_path,
+                pdf_filename=f"{parish.key}.pdf",
+            )
+            pdf_standalone_href = f"{parish.key}-pdf.html"
+            ocr_standalone_href = f"{parish.key}-ocr.html"
+            viewer_filename = f"{parish.key}.html"
+
+            page_html = render_bulletin_viewer_shell(
+                page_title=f"{parish.display_name} Bulletin — {uk_date}",
+                diocese_label=diocese_label,
+                display_name=parish.display_name,
+                headline=f"{parish.display_name} Parish Bulletin",
+                meta_line=meta_line,
+                back_href=f"../../dioceses/{diocese_key}/index.html",
+                back_label=f"← Back to {config.display_name} bulletin",
+                pdf_href=pdf_href,
+                pdf_download_href=pdf_href,
+                pdf_standalone_href=pdf_standalone_href,
+                ocr_standalone_href=ocr_standalone_href,
+                ocr_fragment=ocr_fragment,
+                parish_section_heading=f"Other {diocese_label} Parishes",
+                parish_links_html=_render_other_parishes_grid(parishes, parish.key),
+            )
+            _write_text(out_root / viewer_filename, page_html)
+            _write_text(
+                out_root / f"{parish.key}-pdf.html",
+                render_pdf_standalone_page(
+                    parish_config, bulletin_date, pdf_href=pdf_href, viewer_href=viewer_filename
+                ),
+            )
+            _write_text(
+                out_root / f"{parish.key}-ocr.html",
+                render_ocr_standalone_page(
+                    parish_config, bulletin_date, ocr_fragment, viewer_href=viewer_filename
+                ),
+            )
+            written.append(parish.key)
+        except Exception as exc:
+            print(f"Skipped {parish.key} ({type(exc).__name__}: {exc})")
+            continue
 
     return written

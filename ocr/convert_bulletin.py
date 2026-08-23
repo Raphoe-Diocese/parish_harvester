@@ -8,7 +8,13 @@ import html as html_utils
 import sys
 
 from ocr.bulletin_layout import split_heading_prefix
-from ocr.text_extract import extract_text_pages
+from ocr.text_extract import (
+    all_pages_have_embedded_text,
+    extract_all_page_lines,
+    extract_text_pages,
+    page_is_sparse,
+    prefer_embedded_page_text,
+)
 
 # Keep in sync with ocr.generate_bulletin_pages.ocr_reading_css (presentation only).
 CSS = """
@@ -203,7 +209,7 @@ HEADING_MD_PATTERN = re.compile(r"^(#{1,6})\s+(.*)$")
 HR_MD_PATTERN = re.compile(r"^\s*(?:-{3,}|\*{3,}|_{3,})\s*$")
 BOLD_MD_PATTERN = re.compile(r"\*\*(.+?)\*\*")
 _WORD_DUP_RE = re.compile(r"\b([A-Za-zÀ-ÿ0-9'’&./+-]{2,})\b(?:\s+\1\b)+", re.IGNORECASE)
-_ORDINAL_DUP_RE = re.compile(r"\b(\d+)\1(st|nd|rd|th)\b", re.IGNORECASE)
+_ORDINAL_DUP_RE = re.compile(r"\b(\d{2,})\1(st|nd|rd|th)\b", re.IGNORECASE)
 _SPACE_ORDINAL_RE = re.compile(r"\b(\d)\s+(\d)(st|nd|rd|th)\b", re.IGNORECASE)
 _WORD_TH_DUP_RE = re.compile(
     r"\b([A-Za-zÀ-ÿ]{3,})(st|nd|rd|th)\s+\1\b", re.IGNORECASE
@@ -662,6 +668,19 @@ def main():
     provider_used = None
     images = None
 
+    try:
+        native_all = extract_all_page_lines(pdf_file)
+        if all_pages_have_embedded_text(native_all) and not any(
+            page_is_sparse(p) for p in (native_all or [])
+        ):
+            pages_text = native_all
+            provider_used = "Tier0-text"
+            print(
+                f"  Embedded PDF text on all {len(native_all)} page(s) — skipping vision OCR."
+            )
+    except Exception as e:
+        print(f"  Embedded-text check failed ({type(e).__name__}: {e}).")
+
     mistral_api_key = os.environ.get("MISTRAL_API_KEY")
     gemini_api_key = os.environ.get("GEMINI_API_KEY")
     github_token = os.environ.get("GITHUB_TOKEN")
@@ -780,6 +799,7 @@ def main():
 
     print("Filling sparse / banner-only mega pages from page images ...")
     pages_text = fill_sparse_ocr_pages(pdf_file, pages_text)
+    pages_text = prefer_embedded_page_text(pdf_file, pages_text)
 
     print("Building HTML ...")
     content = build_html_content(pages_text)

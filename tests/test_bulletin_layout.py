@@ -3,6 +3,7 @@ from __future__ import annotations
 import unittest
 
 from ocr.bulletin_layout import (
+    _is_url_only_line,
     classify_heading_line,
     render_parish_masthead,
     split_heading_prefix,
@@ -164,6 +165,45 @@ class BulletinLayoutTests(unittest.TestCase):
         self.assertEqual(classify_heading_line("AIFRINN NA SEACHTAINE"), "AIFRINN NA SEACHTAINE")
         self.assertEqual(classify_heading_line("BÁS LE GAIRID"), "BÁS LE GAIRID")
         self.assertEqual(classify_heading_line("AN CHÉAD LÉACHT"), "AN CHÉAD LÉACHT")
+
+    def test_keeps_notice_when_parish_name_glued_on_the_end(self) -> None:
+        fragment = (
+            "<p>Please do not park in the Church Car Park Ballycastle</p>"
+            "<p>https://www.ballycastleparish.com</p>"
+            "<p>Mass times Saturday 6.30pm</p>"
+        )
+        html_out = structure_ocr_html(
+            fragment,
+            parish_entries=[("ballycastleparish", "Ballycastle")],
+            bulletin_date="2026-08-23",
+        )
+        self.assertIn("Church Car Park", html_out)
+        self.assertIn("Ballycastle", html_out)
+        self.assertIn("ocr-parish-masthead", html_out)
+
+    def test_keeps_wrapped_recently_and_music_lines(self) -> None:
+        fragment = (
+            "<p>Ballycastle</p>"
+            "<p>https://www.ballycastleparish.com</p>"
+            "<p>The choir sang beautifully</p>"
+            "<p>recently.</p>"
+            "<p>and there will be live</p>"
+            "<p>music.</p>"
+        )
+        html_out = structure_ocr_html(
+            fragment,
+            parish_entries=[("ballycastleparish", "Ballycastle")],
+            bulletin_date="2026-08-23",
+        )
+        self.assertIn("recently.", html_out)
+        self.assertIn("music.", html_out)
+
+    def test_is_url_only_line_requires_real_host(self) -> None:
+        self.assertTrue(_is_url_only_line("https://www.ballycastleparish.com"))
+        self.assertTrue(_is_url_only_line("parishoflisburn.org"))
+        self.assertFalse(_is_url_only_line("recently."))
+        self.assertFalse(_is_url_only_line("music."))
+        self.assertFalse(_is_url_only_line("St."))
 
 
 if __name__ == "__main__":

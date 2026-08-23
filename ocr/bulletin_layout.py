@@ -87,6 +87,10 @@ _URL_ONLY = re.compile(
     r"^(?:https?://|www\.)\S+$",
     re.IGNORECASE,
 )
+_BARE_DOMAIN = re.compile(
+    r"^(?:[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?\.)+[a-z]{2,}$",
+    re.IGNORECASE,
+)
 
 _TOKEN_RE = re.compile(
     r"(<header\b[^>]*class=\"[^\"]*ocr-parish-masthead[\s\S]*?</header>)"
@@ -193,6 +197,34 @@ def render_parish_masthead(
     )
 
 
+def _notice_before_trailing_parish(plain: str, display_name: str) -> str | None:
+    """If a long notice ends with the parish name, return the leftover prefix.
+
+    Stitcher banners sometimes glue the parish name onto the last body line.
+    A leftover of at least 40 characters is real notice text, not a title.
+    """
+    text = _SPACE_RE.sub(" ", (plain or "").strip())
+    name = (display_name or "").strip()
+    if not text or not name:
+        return None
+    candidates = [name]
+    if name.lower().endswith(" parish"):
+        short = name[:-7].strip()
+        if short:
+            candidates.append(short)
+    else:
+        candidates.append(f"{name} Parish")
+    for cand in candidates:
+        if not cand or len(text) <= len(cand):
+            continue
+        if text.lower().endswith(cand.lower()):
+            leftover = text[: len(text) - len(cand)].rstrip()
+            leftover = leftover.rstrip(" *-").strip()
+            if len(leftover) >= 40:
+                return leftover
+    return None
+
+
 def _looks_like_parish_name(plain: str, entries: list[tuple[str, str, list[str], list[str]]], next_plain: str) -> tuple[str, str] | None:
     cleaned = _cleaned_title(plain)
     self_has_url = bool(_URL_ONLY.match(cleaned) or "http" in cleaned.lower() or cleaned.lower().startswith("www."))
@@ -206,6 +238,9 @@ def _looks_like_parish_name(plain: str, entries: list[tuple[str, str, list[str],
             self_has_url=self_has_url,
         ):
             return key, display_name
+        # Long notice + trailing parish name (URL may be the next <p>).
+        if _notice_before_trailing_parish(plain, display_name):
+            return key, display_name
     return None
 
 
@@ -215,8 +250,10 @@ def _is_url_only_line(plain: str) -> bool:
         return False
     if _URL_ONLY.match(text):
         return True
-    compact = text.lower().replace("https://", "").replace("http://", "")
-    return bool(compact) and " " not in compact and "." in compact and len(compact) < 80
+    compact = text.lower().replace("https://", "").replace("http://", "").rstrip(".")
+    if not compact or " " in compact or len(compact) >= 80:
+        return False
+    return bool(_BARE_DOMAIN.match(compact))
 
 
 def _emit_paragraph(lines: list[str]) -> str:
@@ -309,6 +346,9 @@ def structure_ocr_html(
             if allow_parish and packed:
                 hit = _looks_like_parish_name(plain, packed, nxt)
                 if hit:
+                    leftover = _notice_before_trailing_parish(plain, hit[1])
+                    if leftover:
+                        body.append(html.escape(leftover))
                     flush()
                     add_masthead(hit[1], hit[0])
                     continue
@@ -356,6 +396,9 @@ def structure_ocr_html(
                 inner = _plain(hm.group(3))
                 parish_hit = _looks_like_parish_name(inner, packed, "") if packed else None
                 if parish_hit:
+                    leftover = _notice_before_trailing_parish(inner, parish_hit[1])
+                    if leftover:
+                        out.append(f"<p>{html.escape(leftover)}</p>")
                     add_masthead(parish_hit[1], parish_hit[0])
                 elif classify_heading_line(inner) or "b-head" in (hm.group(2) or "") or "b-title" in (hm.group(2) or "") or "ocr-parish-name" in (hm.group(2) or ""):
                     out.append(token)
