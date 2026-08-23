@@ -12,8 +12,12 @@ from reportlab.lib.pagesizes import A4
 from reportlab.pdfgen import canvas as rl_canvas
 
 from harvester.diocese_intro import (
+    NEVER_PUBLISH_HEADING,
+    NEVER_PUBLISH_NOTE,
+    REPO_ROOT,
     build_diocese_week_summary,
     render_diocese_intro_html,
+    share_url,
     welcome_line,
 )
 from harvester.stitcher import stitch_mega_pdf
@@ -114,7 +118,11 @@ class DioceseIntroTests(unittest.TestCase):
             self.assertIn("1 of 3 parish bulletins were found", html)
             self.assertIn("Mevagh", html)
             self.assertIn("Stranolar", html)
-            self.assertIn("last known link", html)
+            self.assertIn(NEVER_PUBLISH_HEADING, html)
+            self.assertIn(NEVER_PUBLISH_NOTE, html)
+            self.assertNotIn("do not publish a downloadable bulletin online", html)
+            self.assertNotIn("last known link", html)
+            self.assertIn("https://www.facebook.com/example", html)
             self.assertIn("https://www.stranorlarparish.ie/newsletter/", html)
             self.assertNotIn("Ballintra Parish", html)
             self.assertNotIn("20 of 32", html)
@@ -153,6 +161,41 @@ class DioceseIntroTests(unittest.TestCase):
         self.assertIn("data-az-target", html)
         self.assertNotIn("Missing &amp; Online-Only", html)
         self.assertNotIn("Missing & Online-Only", html)
+
+    def test_share_url_prefers_proved_facebook_and_does_not_invent(self) -> None:
+        self.assertEqual(share_url({}, {}), "")
+        self.assertEqual(
+            share_url(
+                {"url": "https://www.kilbarron.org/bulletin"},
+                {"start_url": "https://www.facebook.com/kilbarronparishpastoralcouncil"},
+            ),
+            "https://www.facebook.com/kilbarronparishpastoralcouncil",
+        )
+        summary = build_diocese_week_summary(
+            "raphoe",
+            diocese_display_name="Raphoe Diocese",
+            recipes_root=REPO_ROOT / "parishes" / "recipes",
+        )
+        html = render_diocese_intro_html(summary)
+        self.assertIn(NEVER_PUBLISH_HEADING, html)
+        self.assertIn(NEVER_PUBLISH_NOTE, html)
+        self.assertNotIn("do not publish a downloadable bulletin online", html)
+        gweedore = [item for item in summary.never_publish if "Gaoth Dobhair" in item.name]
+        self.assertEqual(len(gweedore), 1)
+        self.assertEqual(
+            gweedore[0].url,
+            "https://www.facebook.com/paroisteghaothdobhair",
+        )
+        self.assertIn("https://www.facebook.com/paroisteghaothdobhair", html)
+        kilbarron = [item for item in summary.never_publish if item.name == "Kilbarron"]
+        self.assertEqual(len(kilbarron), 1)
+        self.assertIn("facebook.com/kilbarronparishpastoralcouncil", kilbarron[0].url)
+        mevagh = [item for item in summary.never_publish if item.name == "Mevagh"]
+        self.assertEqual(len(mevagh), 1)
+        self.assertIn("facebook.com", mevagh[0].url)
+        for item in summary.never_publish + summary.stale:
+            if item.url:
+                self.assertTrue(item.url.startswith(("http://", "https://")), item.name)
 
 
 class StitcherMissingPageTests(unittest.TestCase):
