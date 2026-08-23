@@ -8,6 +8,7 @@ from dataclasses import dataclass
 from pathlib import Path
 
 from harvester.diocese_intro import (
+    DioceseWeekSummary,
     build_diocese_week_summary,
     load_mega_page_index,
     render_diocese_intro_html,
@@ -657,10 +658,19 @@ BULLETINS_READY_AT = "16:00"
 
 
 def _ready_count_text(ready: int | None, total: int | None) -> str:
-    """Placeholder until harvest fills the real this-week count. Do not invent."""
+    """Honest this-week count. None means we do not know yet — do not invent."""
     if ready is None or total is None:
         return "—/—"
     return f"{ready}/{total}"
+
+
+def _card_counts_from_summary(
+    summary: DioceseWeekSummary | None,
+) -> tuple[int | None, int | None]:
+    """Use the same week summary as the diocese intro. total==0 stays unknown."""
+    if summary is None or summary.total <= 0:
+        return None, None
+    return summary.found, summary.total
 
 
 def _count_dot(ready: int | None, total: int | None) -> str:
@@ -1091,20 +1101,20 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
         trained = bool(keys)
         success_this_run = bool(downloaded.intersection(keys))
 
+        week_summary = None
         if diocese.key in LIVE_DIOCESES and trained:
             parish_links = _parish_links_for_big_bulletin(diocese.key, report_path)
             ocr_text, ocr_is_html = _ocr_content_for_diocese(diocese.key)
             display_short = diocese.name.removesuffix(" Diocese").strip() or diocese.name
             if display_short == "Down and Connor":
                 display_short = "Down & Connor"
-            intro_html = render_diocese_intro_html(
-                build_diocese_week_summary(
-                    diocese.key,
-                    diocese_display_name=diocese.name,
-                    recipes_root=RECIPES_DIR,
-                    parish_status_path=REPO_ROOT / "parishes" / "parish_status.json",
-                )
+            week_summary = build_diocese_week_summary(
+                diocese.key,
+                diocese_display_name=diocese.name,
+                recipes_root=RECIPES_DIR,
+                parish_status_path=REPO_ROOT / "parishes" / "parish_status.json",
             )
+            intro_html = render_diocese_intro_html(week_summary)
             render_diocese_raphoe_page(
                 parish_links=parish_links,
                 out_path=out_path,
@@ -1135,6 +1145,7 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
         avg = (sum(rates) / len(rates)) if rates else None
         dot = _status_dot(avg)
         status_label = _status_label(avg)
+        ready_count, total_count = _card_counts_from_summary(week_summary)
         rows.append(
             {
                 "key": diocese.key,
@@ -1142,8 +1153,8 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
                 "dot": dot,
                 "status_label": status_label,
                 "updated": updated_label,
-                "ready_count": None,
-                "total_count": None,
+                "ready_count": ready_count,
+                "total_count": total_count,
             }
         )
 

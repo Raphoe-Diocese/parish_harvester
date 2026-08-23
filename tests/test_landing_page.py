@@ -66,6 +66,23 @@ class LandingPageTests(unittest.TestCase):
                 ),
                 encoding="utf-8",
             )
+            (root / "parishes" / "parish_status.json").write_text(
+                json.dumps(
+                    {
+                        "parishes": {
+                            "ardmoreparish": {
+                                "outcome": "ok",
+                                "display_name": "Ardmore",
+                            },
+                            "antrimparish": {
+                                "outcome": "ok",
+                                "display_name": "Antrim",
+                            },
+                        }
+                    }
+                ),
+                encoding="utf-8",
+            )
 
             old = (site_builder.RECIPES_DIR, site_builder.BULLETINS_DIR, site_builder.RELIABILITY_PATH, site_builder.REPO_ROOT)
             site_builder.RECIPES_DIR = recipes
@@ -92,9 +109,14 @@ class LandingPageTests(unittest.TestCase):
             self.assertIn('class="is-long"', index_html)
             self.assertIn("white-space: nowrap", index_html)
             self.assertIn("Bulletins ready @ 16:00", index_html)
+            self.assertIn("🟢 Bulletins ready @ 16:00", index_html)
             self.assertIn("⚪ Bulletins ready @ 16:00", index_html)
-            self.assertEqual(index_html.count("⚪ Bulletins ready @ 16:00"), 4)
-            self.assertIn("—/— available", index_html)
+            # Derry + Down & Connor have recipes and parish_status ok → 1/1.
+            # Raphoe (evidence only) and Clogher (no recipes) stay —/—.
+            self.assertEqual(index_html.count("1/1 available"), 2)
+            self.assertEqual(index_html.count("—/— available"), 2)
+            self.assertEqual(index_html.count("🟢 Bulletins ready @ 16:00"), 2)
+            self.assertEqual(index_html.count("⚪ Bulletins ready @ 16:00"), 2)
             self.assertNotIn("30/57", index_html)
             self.assertIn("font-weight: 600", index_html)
             self.assertNotIn("Reliability available", index_html)
@@ -169,6 +191,23 @@ class LiveCardHeadingTests(unittest.TestCase):
     def test_live_card_ready_line_uses_placeholder_count(self) -> None:
         self.assertEqual(site_builder._ready_count_text(None, None), "—/—")
         self.assertEqual(site_builder._ready_count_text(30, 57), "30/57")
+        self.assertEqual(site_builder._card_counts_from_summary(None), (None, None))
+        self.assertEqual(
+            site_builder._card_counts_from_summary(
+                site_builder.DioceseWeekSummary(
+                    diocese_display_name="Raphoe", found=0, total=0
+                )
+            ),
+            (None, None),
+        )
+        self.assertEqual(
+            site_builder._card_counts_from_summary(
+                site_builder.DioceseWeekSummary(
+                    diocese_display_name="Raphoe", found=12, total=32
+                )
+            ),
+            (12, 32),
+        )
         self.assertEqual(site_builder._count_dot(None, None), "⚪")
         self.assertEqual(site_builder._count_dot(30, 57), "🟡")
         self.assertEqual(site_builder._count_dot(50, 57), "🟢")
