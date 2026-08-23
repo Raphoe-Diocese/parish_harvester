@@ -63,7 +63,7 @@
       position: fixed;
       right: 16px;
       bottom: 20px;
-      z-index: 30;
+      z-index: 9999;
       width: 46px;
       height: 46px;
       border: 0;
@@ -350,7 +350,7 @@
       </div>
     </div>
     </div>
-    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Drumquin</h2><p class="ocr-parish-date">23/08/2026</p></header>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead" id="ocr-parish-drumquin" data-parish-name="Drumquin"><h2 class="ocr-parish-name">Drumquin</h2><p class="ocr-parish-date">23/08/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>SUNDAY 23 AUGUST 2026<br>
 Twent y First Sunday Ordinary Time<br>
@@ -586,18 +586,74 @@ Drumquin</p></div>
     
     
     (function () {
-      var btn = document.getElementById('scroll-top-btn');
-      if (!btn) return;
-      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      function shown() {
-        var y = window.scrollY || document.documentElement.scrollTop || 0;
-        btn.classList.toggle('is-visible', y > 240);
+      function boot() {
+        var btn = document.getElementById('scroll-top-btn');
+        if (!btn) {
+          if (!document.body) return;
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scroll-top-btn';
+          btn.id = 'scroll-top-btn';
+          btn.setAttribute('aria-label', 'Back to top');
+          btn.textContent = '↑';
+          document.body.appendChild(btn);
+        }
+        function innerBoxes() {
+          return Array.prototype.slice.call(
+            document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+          );
+        }
+        function maxInnerScroll() {
+          return innerBoxes().reduce(function (max, el) {
+            return Math.max(max, el.scrollTop || 0);
+          }, 0);
+        }
+        function shown() {
+          var y = window.scrollY || document.documentElement.scrollTop || 0;
+          btn.classList.toggle('is-visible', y > 80 || maxInnerScroll() > 16);
+        }
+        function shownSoon() {
+          shown();
+          if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+          else window.setTimeout(shown, 16);
+        }
+        function bindBox(el) {
+          if (!el || el.getAttribute('data-pp-scroll-top') === '1') return;
+          el.setAttribute('data-pp-scroll-top', '1');
+          el.addEventListener('scroll', shownSoon, { passive: true });
+        }
+        function bindBoxes() {
+          innerBoxes().forEach(bindBox);
+          shown();
+        }
+        window.parishPressBindScrollTopBoxes = bindBoxes;
+        if (btn.getAttribute('data-pp-bound') !== 'inner-2') {
+          btn.setAttribute('data-pp-bound', 'inner-2');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.addEventListener('scroll', shownSoon, { passive: true });
+          document.addEventListener('scroll', shownSoon, { capture: true, passive: true });
+          document.addEventListener('wheel', shownSoon, { capture: true, passive: true });
+          document.addEventListener('touchmove', shownSoon, { capture: true, passive: true });
+          if (window.MutationObserver && document.body) {
+            new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+          }
+          btn.addEventListener('click', function () {
+            var behavior = reduce ? 'auto' : 'smooth';
+            window.scrollTo({ top: 0, behavior: behavior });
+            innerBoxes().forEach(function (el) {
+              el.scrollTop = 0;
+              if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+            });
+            window.setTimeout(shown, reduce ? 0 : 400);
+          });
+        }
+        bindBoxes();
       }
-      window.addEventListener('scroll', shown, { passive: true });
-      shown();
-      btn.addEventListener('click', function () {
-        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
-      });
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
     })();
     
   </script>

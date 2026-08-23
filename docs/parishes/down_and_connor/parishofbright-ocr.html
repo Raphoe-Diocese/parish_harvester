@@ -63,7 +63,7 @@
       position: fixed;
       right: 16px;
       bottom: 20px;
-      z-index: 30;
+      z-index: 9999;
       width: 46px;
       height: 46px;
       border: 0;
@@ -350,7 +350,7 @@
       </div>
     </div>
     </div>
-    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Bright</h2><p class="ocr-parish-date">23/08/2026</p></header>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead" id="ocr-parish-bright" data-parish-name="Bright"><h2 class="ocr-parish-name">Bright</h2><p class="ocr-parish-date">23/08/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>Parish of Bright BulletinTwenty-First Sunday in Ordinary Time - 23rd August 2026Parish Priest: Fr Peter O’Kane, 16 Rossglass Road, Killough, BT30 7QNTel: 028 4484 1221Email: <a href="mailto:parishofbright@downandconnor.orgWebsite" target="_blank" rel="noopener noreferrer">parishofbright@downandconnor.orgWebsite</a>: parishofbright.netMass Times: Week Beginning Monday 24th AugustSt Patrick’ s, Legamaddy St Joseph’ s, Killough24th August Monday 10am 25th August Tuesday 10am28th August Friday 7.30pm 26th August Wednesday 7.30pm30th August Sunday 10am 29th August Saturday Vigil 6.30pmOur Lady, Star of the Sea, Rossglass27th August Thursday 10.00amFaithful DepartedRecently Deceased: Ross Rice (Castlewellan), Baby Sonny O’Neill-DelougheryMonth’ s Mind: Anne Lusted (nee Armstrong, England formerly Killough)Anniversaries: Mary McClean, Harry Fagan, Mickey Doran Weekly ConfessionsSacrament of Reconciliation: after all weekday Masses; and in St Joseph’s every Wednesday 8.00pm-8.45pm and at 6.00pm before the Saturday Vigil Mass.Eucharistic AdorationSt Joseph’s, Killough every Wed: 3.30pm -7.30pm &amp; after Mass 8pm-9pm. St Patrick’s, Legamaddy every Friday: 6.30pm-7.30pm.Sunday Collections, 16th August: Weekly £649-27, Diocesan Cathedral Fund £403-01. Thank you for your generous contributions. Ice Cream Summer SundaysA sincere thank you to the Pastoral Council for organising the two very enjoyable Ice Cream Sundays! It was a lovely moment just to pause after Mass and to enjoy each other’s company. We can all look forward to next year’s 'Ice Cream Summer Sundays’!Medical Missioners of MaryBishop Alan McGuckian has given permission for the Medical Missionaries of Mary to visit the parishes of our Diocese. The sisters will be with us this weekend 22nd/23rd August and will speak at both Masses. Your support of their work would be much appreciated! Prayer for the Return of a Child to ChristSt Monica is the Patron Saint of mothers. Through her years of persevering prayer and tears she eventually brought her son, the now St Augustine, to faith in Christ. Her Feast Day is the 27th August.“In the name of the Father, and the Son, and the Holy Spirit.Under the weight of my heartful burden, I turn to you, dear Saint Monicaand request your assistance and intercession.From your place in heaven, I beg that you will plead before the Throne of the Holy One, for the sake of my child, [Name], who has wandered from the faith, and all that we have tried to teach.Your son, Augustine, wandered, too; eventually he found the faith, and came to believe, and in that belief became a true teacher.St. Monica, please teach me to persist in faithful prayer as you did for your son's sake. Inspire me to behave in ways that will not further distance my child from Christ, but only draw [Name] gently towards His marvellous light.Please teach me what you know about this painful mystery of separation,and how it is reconciled in the re-orientation of our children toward Heaven.O St. Monica, lover of Christ and His Church, pray for me, and for my child [Name], that we may acquire heaven, joining with you, there, in offering constant and thankful praise to God, Amen.”(By Elizabeth Scalia)Bright</p></div>
     <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
@@ -527,18 +527,74 @@
     
     
     (function () {
-      var btn = document.getElementById('scroll-top-btn');
-      if (!btn) return;
-      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      function shown() {
-        var y = window.scrollY || document.documentElement.scrollTop || 0;
-        btn.classList.toggle('is-visible', y > 240);
+      function boot() {
+        var btn = document.getElementById('scroll-top-btn');
+        if (!btn) {
+          if (!document.body) return;
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scroll-top-btn';
+          btn.id = 'scroll-top-btn';
+          btn.setAttribute('aria-label', 'Back to top');
+          btn.textContent = '↑';
+          document.body.appendChild(btn);
+        }
+        function innerBoxes() {
+          return Array.prototype.slice.call(
+            document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+          );
+        }
+        function maxInnerScroll() {
+          return innerBoxes().reduce(function (max, el) {
+            return Math.max(max, el.scrollTop || 0);
+          }, 0);
+        }
+        function shown() {
+          var y = window.scrollY || document.documentElement.scrollTop || 0;
+          btn.classList.toggle('is-visible', y > 80 || maxInnerScroll() > 16);
+        }
+        function shownSoon() {
+          shown();
+          if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+          else window.setTimeout(shown, 16);
+        }
+        function bindBox(el) {
+          if (!el || el.getAttribute('data-pp-scroll-top') === '1') return;
+          el.setAttribute('data-pp-scroll-top', '1');
+          el.addEventListener('scroll', shownSoon, { passive: true });
+        }
+        function bindBoxes() {
+          innerBoxes().forEach(bindBox);
+          shown();
+        }
+        window.parishPressBindScrollTopBoxes = bindBoxes;
+        if (btn.getAttribute('data-pp-bound') !== 'inner-2') {
+          btn.setAttribute('data-pp-bound', 'inner-2');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.addEventListener('scroll', shownSoon, { passive: true });
+          document.addEventListener('scroll', shownSoon, { capture: true, passive: true });
+          document.addEventListener('wheel', shownSoon, { capture: true, passive: true });
+          document.addEventListener('touchmove', shownSoon, { capture: true, passive: true });
+          if (window.MutationObserver && document.body) {
+            new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+          }
+          btn.addEventListener('click', function () {
+            var behavior = reduce ? 'auto' : 'smooth';
+            window.scrollTo({ top: 0, behavior: behavior });
+            innerBoxes().forEach(function (el) {
+              el.scrollTop = 0;
+              if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+            });
+            window.setTimeout(shown, reduce ? 0 : 400);
+          });
+        }
+        bindBoxes();
       }
-      window.addEventListener('scroll', shown, { passive: true });
-      shown();
-      btn.addEventListener('click', function () {
-        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
-      });
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
     })();
     
   </script>

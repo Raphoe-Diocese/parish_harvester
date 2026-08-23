@@ -63,7 +63,7 @@
       position: fixed;
       right: 16px;
       bottom: 20px;
-      z-index: 30;
+      z-index: 9999;
       width: 46px;
       height: 46px;
       border: 0;
@@ -350,57 +350,15 @@
       </div>
     </div>
     </div>
-    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Ballinascreen (&amp; Desertmartin amalgamated)</h2><p class="ocr-parish-date">23/08/2026</p></header>
-<p class="page-label">Page 1</p>
-<p>Mass &amp; Confession Times<br>
-Sunday<br>
-St Columb’s Church<br>
-10.00am, 12.30pm &amp; 6.00pm<br>
-Church of Immaculate Conception<br>
-10.15am &amp; 12.15pm<br>
-St Oliver Plunkett Church<br>
-11.15am<br>
-St Mary’s Oratory<br>
-9.15am<br>
-Monday – Friday<br>
-St Columb’s Church<br>
-10.00am &amp; 7.30pm<br>
-Church of Immaculate Conception<br>
-9.15am (Monday – Friday)<br>
-St Oliver Plunkett’s Church<br>
-11.00am (Mon, Tue and<br>
-Thursday)<br>
-St Mary’s Oratory<br>
-11.00am (Wednesday only)<br>
-Saturday<br>
-St Columb’s Church<br>
-10.00am &amp; 7.00pm (Vigil of Sunday)<br>
-Church of Immaculate Conception<br>
-6.00pm (Vigil of Sunday)<br>
-St Oliver Plunkett’s Church<br>
-6.00pm (Vigil of Sunday)<br>
-Confessions<br>
-St Columb’s Church<br>
-Monday – Friday 7.00pm – 7.25pm<br>
-Saturday after 10.00 Mass<br>
-Church of Immaculate Conception<br>
-Saturday 5.30pm – 5.55pm<br>
-St Oliver Plumkett’s Church<br>
-Saturday 5.30pm – 5.55pm<br>
-Parish Office 32 Chapel Road, Derry BT47 2BB. Tel. 02871 342303<br>
-Email: <a href="mailto:secretary@watersideparish.net" target="_blank" rel="noopener noreferrer">secretary@watersideparish.net</a> Web: <a href="https://www.watersideparish.net" target="_blank" rel="noopener noreferrer">www.watersideparish.net</a><br>
-YouTube Channel: <a href="https://www.youtube.com/WatersideParish" target="_blank" rel="noopener noreferrer">www.youtube.com/WatersideParish</a><br>
-Rev. Michael Canny PP<br>
-<a href="tel:+442871342303" style="color:#1d4ed8;font-weight:600;">02871342303</a> <a href="mailto:secretary@watersideparish.net" target="_blank" rel="noopener noreferrer">secretary@watersideparish.net</a><br>
-Rev. Patrick Lagan CC<br>
-<a href="tel:+442871342303" style="color:#1d4ed8;font-weight:600;">02871342303</a> <a href="mailto:secretary@watersidepaish.net" target="_blank" rel="noopener noreferrer">secretary@watersidepaish.net</a><br>
-Rev Joshy Parokkaran CC <a href="tel:+442871342303" style="color:#1d4ed8;font-weight:600;">02871342303</a> <a href="mailto:secretary@watersideparish.net" target="_blank" rel="noopener noreferrer">secretary@watersideparish.net</a><br>
-SAFEGUARDING CHILDREN AND VULNERABLE ADULTS – If you are concerned about<br>
-the welfare and safety of children or a vulnerable adult contact: Designated Diocesan Person Ms<br>
-Marie Gormley at <a href="tel:+3537596500793" style="color:#1d4ed8;font-weight:600;">07596500793</a> or <a href="mailto:marie.gormley@derrydiocese.org" target="_blank" rel="noopener noreferrer">marie.gormley@derrydiocese.org</a> or PSNI 101.<br>
-Our Churches are monitored by CCTV cameras and by live streaming. Live streaming can<br>
-be viewed online at the parish website. The Diocese of Derry Privacy Notice is displayed<br>
-on the parish website and Church notice board.</p></div>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead" id="ocr-parish-ballinascreen-desertmartin-amalgamated" data-parish-name="Ballinascreen (&amp; Desertmartin amalgamated)"><h2 class="ocr-parish-name">Ballinascreen (&amp; Desertmartin amalgamated)</h2><p class="ocr-parish-date">23/08/2026</p></header>
+<div class="ocr-failed-banner" role="status">ℹ️ Matched by parish name only (not exact PDF pages) this week — check the PDF above for the definitive version.</div>
+<p>Ballinascreen (&amp; Desertmartin amalgamated):<br>
+Coleraine (St John):<br>
+Desertmartin:<br>
+Greencastle:<br>
+Long Tower:<br>
+Malin:<br>
+Urney and Castlefin:</p></div>
     <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
   </div>
   <script>
@@ -575,18 +533,74 @@ on the parish website and Church notice board.</p></div>
     
     
     (function () {
-      var btn = document.getElementById('scroll-top-btn');
-      if (!btn) return;
-      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      function shown() {
-        var y = window.scrollY || document.documentElement.scrollTop || 0;
-        btn.classList.toggle('is-visible', y > 240);
+      function boot() {
+        var btn = document.getElementById('scroll-top-btn');
+        if (!btn) {
+          if (!document.body) return;
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scroll-top-btn';
+          btn.id = 'scroll-top-btn';
+          btn.setAttribute('aria-label', 'Back to top');
+          btn.textContent = '↑';
+          document.body.appendChild(btn);
+        }
+        function innerBoxes() {
+          return Array.prototype.slice.call(
+            document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+          );
+        }
+        function maxInnerScroll() {
+          return innerBoxes().reduce(function (max, el) {
+            return Math.max(max, el.scrollTop || 0);
+          }, 0);
+        }
+        function shown() {
+          var y = window.scrollY || document.documentElement.scrollTop || 0;
+          btn.classList.toggle('is-visible', y > 80 || maxInnerScroll() > 16);
+        }
+        function shownSoon() {
+          shown();
+          if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+          else window.setTimeout(shown, 16);
+        }
+        function bindBox(el) {
+          if (!el || el.getAttribute('data-pp-scroll-top') === '1') return;
+          el.setAttribute('data-pp-scroll-top', '1');
+          el.addEventListener('scroll', shownSoon, { passive: true });
+        }
+        function bindBoxes() {
+          innerBoxes().forEach(bindBox);
+          shown();
+        }
+        window.parishPressBindScrollTopBoxes = bindBoxes;
+        if (btn.getAttribute('data-pp-bound') !== 'inner-2') {
+          btn.setAttribute('data-pp-bound', 'inner-2');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.addEventListener('scroll', shownSoon, { passive: true });
+          document.addEventListener('scroll', shownSoon, { capture: true, passive: true });
+          document.addEventListener('wheel', shownSoon, { capture: true, passive: true });
+          document.addEventListener('touchmove', shownSoon, { capture: true, passive: true });
+          if (window.MutationObserver && document.body) {
+            new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+          }
+          btn.addEventListener('click', function () {
+            var behavior = reduce ? 'auto' : 'smooth';
+            window.scrollTo({ top: 0, behavior: behavior });
+            innerBoxes().forEach(function (el) {
+              el.scrollTop = 0;
+              if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+            });
+            window.setTimeout(shown, reduce ? 0 : 400);
+          });
+        }
+        bindBoxes();
       }
-      window.addEventListener('scroll', shown, { passive: true });
-      shown();
-      btn.addEventListener('click', function () {
-        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
-      });
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
     })();
     
   </script>
