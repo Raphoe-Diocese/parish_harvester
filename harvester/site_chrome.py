@@ -109,19 +109,44 @@ def sticky_search_js() -> str:
 
 
 def scroll_top_js() -> str:
+    """Show ↑ when the page *or* the locked PDF/OCR box is scrolled.
+
+    Raphoe (and the other live diocese pages) keep `.pdf-inpage-pages` and
+    `#ocr-panel` at a locked 850px / 450px with ``overflow: auto``. Readers
+    scroll inside those boxes, so ``window.scrollY`` stays near 0. Listen
+    to those inner boxes as well. Click jumps the boxes and the window.
+    """
     return """
     (function () {
       var btn = document.getElementById('scroll-top-btn');
       if (!btn) return;
+      if (btn.getAttribute('data-pp-bound') === '1') return;
+      btn.setAttribute('data-pp-bound', '1');
       var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function innerBoxes() {
+        return Array.prototype.slice.call(
+          document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+        );
+      }
+      function maxInnerScroll() {
+        return innerBoxes().reduce(function (max, el) {
+          return Math.max(max, el.scrollTop || 0);
+        }, 0);
+      }
       function shown() {
         var y = window.scrollY || document.documentElement.scrollTop || 0;
-        btn.classList.toggle('is-visible', y > 240);
+        btn.classList.toggle('is-visible', y > 240 || maxInnerScroll() > 80);
       }
       window.addEventListener('scroll', shown, { passive: true });
+      document.addEventListener('scroll', shown, { capture: true, passive: true });
       shown();
       btn.addEventListener('click', function () {
-        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+        var behavior = reduce ? 'auto' : 'smooth';
+        window.scrollTo({ top: 0, behavior: behavior });
+        innerBoxes().forEach(function (el) {
+          if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+          else el.scrollTop = 0;
+        });
       });
     })();
     """

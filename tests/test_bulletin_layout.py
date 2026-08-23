@@ -113,6 +113,8 @@ class BulletinLayoutTests(unittest.TestCase):
         self.assertIn("St Mary", html_out)
         self.assertIn("&lt;Parish&gt;", html_out)
         self.assertIn("16/08/2026", html_out)
+        self.assertIn('id="ocr-parish-st-mary-s-parish"', html_out)
+        self.assertIn('data-parish-name="St Mary&#x27;s &lt;Parish&gt;"', html_out)
         self.assertIn('target="_blank"', render_parish_masthead("X", website="https://x.ie"))
 
     def test_convert_bulletin_promotes_plain_topic_lines(self) -> None:

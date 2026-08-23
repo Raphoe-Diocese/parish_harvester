@@ -33,17 +33,17 @@ _SLUG_OVERRIDES: dict[str, str] = {
     "kincasslagh": "Kincasslagh",
     "ardara": "Ardara",
     "carrigart": "Mevagh",
-    "drive-1kna8f6t54": "Gartan/Termon",
+    "drive-1kna8f6t54": "Gartan/Termon (Kilmacrenan)",
     "drive-14alaxt4mv": "Glenties",
     "drive-1m6sogz3de": "Irish Martyrs",
     "drive-1jmslbrliw": "Raphoe",
     "drive-1hh7w-ew0v": "Templecrone",
     "drive-1rjeey-ayy": "Bruckless",
     "holy-cross-church": "Dunfanaghy",
-    "ballintra": "Ballintra Parish",
-    "kilmacrenan": "Kilmacrenan",
+    "ballintra": "Drumholm (Ballintra)",
+    "kilmacrenan": "Gartan/Termon (Kilmacrenan)",
     "rathmullan": "Rathmullan",
-    "drumholm-parish": "Drumholm",
+    "drumholm-parish": "Drumholm (Ballintra)",
 }
 
 

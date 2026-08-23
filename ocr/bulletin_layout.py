@@ -169,6 +169,11 @@ def classify_heading_line(plain: str) -> str | None:
     return None
 
 
+def parish_anchor_id(display_name: str) -> str:
+    slug = re.sub(r"[^a-z0-9]+", "-", (display_name or "").lower()).strip("-")
+    return f"ocr-parish-{slug}" if slug else "ocr-parish"
+
+
 def render_parish_masthead(
     display_name: str,
     bulletin_date: str = "",
@@ -176,7 +181,8 @@ def render_parish_masthead(
     website: str = "",
 ) -> str:
     """Visible header so the reader knows whose bulletin this is."""
-    name = html.escape((display_name or "").strip() or "Parish bulletin")
+    raw_name = (display_name or "").strip() or "Parish bulletin"
+    name = html.escape(raw_name)
     date_label = format_uk_date(bulletin_date)
     date_html = (
         f'<p class="ocr-parish-date">{html.escape(date_label)}</p>' if date_label else ""
@@ -189,8 +195,11 @@ def render_parish_masthead(
             f'<p class="ocr-parish-link"><a href="{safe_href}" target="_blank" '
             f'rel="noopener noreferrer">{html.escape(href)}</a></p>'
         )
+    anchor = html.escape(parish_anchor_id(raw_name), quote=True)
+    name_attr = html.escape(raw_name, quote=True)
     return (
-        f'<header class="ocr-parish-masthead">'
+        f'<header class="ocr-parish-masthead" id="{anchor}" '
+        f'data-parish-name="{name_attr}">'
         f'<h2 class="ocr-parish-name">{name}</h2>'
         f"{date_html}{link_html}"
         f"</header>"
