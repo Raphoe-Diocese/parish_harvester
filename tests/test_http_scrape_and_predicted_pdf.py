@@ -1051,6 +1051,90 @@ class CastleblayneyListingTests(unittest.TestCase):
         self.assertEqual(max(scored)[1], self.PDF_23)
         self.assertEqual(max(scored)[0], date(2026, 8, 23))
 
+    def test_listing_html_has_no_pdf_hrefs_so_follow_post(self) -> None:
+        html = f"""
+        <h2 class="entry-title"><a href="{self.POST_23}">23rd August 2026</a></h2>
+        <h2 class="entry-title"><a href="{self.POST_16}">Bulletin 16 Aug 2026</a></h2>
+        """
+        self.assertEqual(
+            _extract_matching_hrefs(html, self.LISTING, ["clontibret-muckno-bulletin"]),
+            [],
+        )
+        self.assertEqual(
+            _newest_dated_post_url_from_listing(
+                html, self.LISTING, ["/202"], date(2026, 8, 23)
+            ),
+            self.POST_23,
+        )
+
+    def test_spaced_and_percent20_filenames_match_hyphen_pattern(self) -> None:
+        spaced = (
+            "http://mucknoparish.ie/wp-content/uploads/2020/09/"
+            "F Clontibret Muckno Bulletin 23rd AUG 2026.pdf"
+        )
+        encoded = (
+            "http://mucknoparish.ie/wp-content/uploads/2020/09/"
+            "F%20Clontibret%20Muckno%20Bulletin%2023rd%20AUG%202026.pdf"
+        )
+        html = f'<a href="{spaced}">file</a><a href="{encoded}">file2</a>'
+        hrefs = _extract_matching_hrefs(
+            html, self.POST_23, ["clontibret-muckno-bulletin"]
+        )
+        self.assertEqual(set(hrefs), {spaced, encoded})
+        self.assertEqual(quote_http_url(spaced), encoded)
+
+    def test_listing_url_tries_http_when_https_given(self) -> None:
+        urls = _mdocs_listing_url_candidates(self.LISTING)
+        self.assertEqual(urls[0], self.LISTING)
+        self.assertIn("http://mucknoparish.ie/category/weekly-bulletin/", urls)
+
+
+class HttpFetchSslFallbackTests(unittest.TestCase):
+    SPACED = (
+        "http://mucknoparish.ie/wp-content/uploads/2020/09/"
+        "F Clontibret Muckno Bulletin 23rd AUG 2026.pdf"
+    )
+    ENCODED = (
+        "http://mucknoparish.ie/wp-content/uploads/2020/09/"
+        "F%20Clontibret%20Muckno%20Bulletin%2023rd%20AUG%202026.pdf"
+    )
+
+    def test_retries_unverified_on_missing_intermediate(self) -> None:
+        import ssl
+        from unittest.mock import MagicMock, patch
+        from urllib.error import URLError
+
+        seen: list[tuple[str, bool]] = []
+        pdf = b"%PDF-1.7 scraped"
+
+        def fake_urlopen(req, timeout=None, context=None):
+            seen.append((req.full_url, context is not None))
+            if context is None:
+                raise URLError(
+                    ssl.SSLCertVerificationError(
+                        "unable to get local issuer certificate"
+                    )
+                )
+            resp = MagicMock()
+            resp.status = 200
+            resp.read.return_value = pdf
+            resp.headers = {"Content-Type": "application/pdf"}
+            resp.__enter__.return_value = resp
+            resp.__exit__.return_value = False
+            return resp
+
+        with patch("harvester.replay.urlopen", side_effect=fake_urlopen):
+            hit = _fetch_bytes_with_retries(
+                self.SPACED,
+                max_attempts=2,
+                per_attempt_timeout_s=1,
+                total_budget_s=3,
+            )
+        self.assertIsNotNone(hit)
+        self.assertEqual(hit[0], pdf)
+        self.assertEqual(seen[0][0], self.ENCODED)
+        self.assertTrue(any(used_insecure for _url, used_insecure in seen))
+
 
 class ClonesSpaceUrlTests(unittest.TestCase):
     LISTING = "https://www.clonesparish.com/"
