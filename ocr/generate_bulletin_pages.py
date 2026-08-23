@@ -2197,9 +2197,9 @@ def regenerate_viewer_from_existing(existing_path: Path) -> Path:
     if not pdf_candidate.exists():
         pdf_candidate = REPO_ROOT / "mega_pdf" / config.pdf_filename
     if pdf_candidate.exists():
-        from ocr.sparse_page_ocr import prefer_embedded_pages_in_ocr_html
+        from ocr.sparse_page_ocr import polish_ocr_html_from_pdf
 
-        raw_ocr_fragment = prefer_embedded_pages_in_ocr_html(raw_ocr_fragment, pdf_candidate)
+        raw_ocr_fragment = polish_ocr_html_from_pdf(raw_ocr_fragment, pdf_candidate)
     parish_links = parse_parish_links(config.evidence_path)
     ocr_fragment = prepare_ocr_fragment(diocese, raw_ocr_fragment, parish_links, bulletin_date=bulletin_date)
     output_path = BULLETINS_DIR / existing_path.name
@@ -2233,9 +2233,9 @@ def write_viewer_page(diocese: str, bulletin_date: str, pdf_path: Path, ocr_html
     page_count = count_pdf_pages(pdf_path)
     raw_ocr_fragment = extract_ocr_fragment(ocr_html_path, tighten=False)
     if pdf_path and Path(pdf_path).exists():
-        from ocr.sparse_page_ocr import prefer_embedded_pages_in_ocr_html
+        from ocr.sparse_page_ocr import polish_ocr_html_from_pdf
 
-        raw_ocr_fragment = prefer_embedded_pages_in_ocr_html(raw_ocr_fragment, pdf_path)
+        raw_ocr_fragment = polish_ocr_html_from_pdf(raw_ocr_fragment, pdf_path)
     parish_links = parse_parish_links(config.evidence_path)
     ocr_plain_text = _fragment_to_plain_text(tighten_ocr_paragraphs(raw_ocr_fragment))
     ocr_fragment = prepare_ocr_fragment(diocese, raw_ocr_fragment, parish_links, bulletin_date=bulletin_date)

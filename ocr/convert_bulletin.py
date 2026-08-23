@@ -795,11 +795,13 @@ def main():
         print(f"Stub output saved to: {output_filename}")
         return
 
-    from ocr.sparse_page_ocr import fill_sparse_ocr_pages
+    from ocr.sparse_page_ocr import fill_sparse_ocr_pages, repair_image_page_ocr
 
     print("Filling sparse / banner-only mega pages from page images ...")
     pages_text = fill_sparse_ocr_pages(pdf_file, pages_text)
     pages_text = prefer_embedded_page_text(pdf_file, pages_text)
+    print("Repairing smashed image-only pages with column OCR ...")
+    pages_text = repair_image_page_ocr(pdf_file, pages_text)
 
     print("Building HTML ...")
     content = build_html_content(pages_text)

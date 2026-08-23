@@ -11,11 +11,16 @@ everywhere (diocese viewer + parish slice).
 
 import re
 import shutil
+import statistics
 import subprocess
 import tempfile
 from pathlib import Path
 
-from ocr.text_extract import page_is_sparse, page_text_char_count
+from ocr.text_extract import (
+    extract_all_page_lines,
+    page_is_sparse,
+    page_text_char_count,
+)
 
 _PAGE_MARK_RE = re.compile(
     r"(?:<hr\s*/?>\s*)?"
@@ -38,6 +43,11 @@ _ALREADY_HAS_BODY_RE = re.compile(
     re.IGNORECASE,
 )
 _SINGLE_TOKEN_RE = re.compile(r"\S+")
+_BROKEN_ORDINAL_RE = re.compile(r"\d+[™“”*]+|[™“”][A-Za-z]")
+_SMASH_FRAG_RE = re.compile(
+    r"gi\s+Teach|Réalt\s+n\b|thth|\bAn\s+thth\b",
+    re.IGNORECASE,
+)
 
 
 def page_html_is_sparse(html_fragment: str) -> bool:
@@ -63,6 +73,49 @@ def ocr_lines_look_usable(lines: list[str] | None) -> bool:
     if letters < 180:
         return False
     return True
+
+
+def ocr_lines_look_smashed(lines: list[str] | None) -> bool:
+    """True when vision read across columns (Annagry / Dunfanaghy style)."""
+    text = "\n".join(lines or []).strip()
+    if len(text) < 80:
+        return False
+    tokens = _SINGLE_TOKEN_RE.findall(text)
+    words = [
+        tok
+        for tok in tokens
+        if "@" not in tok
+        and "http" not in tok.lower()
+        and not tok.lower().startswith("www.")
+    ]
+    if len(words) < 20:
+        return False
+    if _SMASH_FRAG_RE.search(text):
+        return True
+    if text.count("|") >= 4:
+        return True
+    if len(_BROKEN_ORDINAL_RE.findall(text)) >= 3:
+        return True
+    short = sum(1 for tok in words if len(tok) <= 2)
+    singles = sum(1 for tok in words if len(tok) == 1 and tok.isalpha())
+    avg = sum(len(tok) for tok in words) / len(words)
+    if short / len(words) >= 0.38 and avg < 3.6:
+        return True
+    if singles / len(words) >= 0.16 and short / len(words) >= 0.30:
+        return True
+    return False
+
+
+def page_ocr_needs_image_repair(
+    vision_lines: list[str] | None,
+    embedded_lines: list[str] | None,
+) -> bool:
+    """Image/banner pages whose current OCR is empty or column-smashed."""
+    if embedded_lines and not page_is_sparse(embedded_lines):
+        return False
+    if page_is_sparse(vision_lines):
+        return True
+    return ocr_lines_look_smashed(vision_lines)
 
 
 def split_ocr_html_pages(fragment: str) -> list[tuple[int, str]]:
@@ -96,6 +149,21 @@ def render_pdf_page_image(pdf_path: str | Path, page_index: int, dpi: int = 200)
     if not path.is_file():
         return None
     first = page_index + 1
+    try:
+        import pymupdf
+        from PIL import Image
+
+        doc = pymupdf.open(str(path))
+        try:
+            if page_index < 0 or page_index >= doc.page_count:
+                return None
+            pix = doc[page_index].get_pixmap(dpi=dpi)
+            mode = "RGBA" if pix.alpha else "RGB"
+            return Image.frombytes(mode, (pix.width, pix.height), pix.samples)
+        finally:
+            doc.close()
+    except Exception:
+        pass
     try:
         from pdf2image import convert_from_path
 
@@ -197,22 +265,83 @@ def _tesseract_image(image, psm: int = 6) -> str:
         return txt.read_text(encoding="utf-8", errors="replace")
 
 
+def column_gutter_xs(image) -> list[int]:
+    """Return x positions of empty vertical gutters, or [] for one column.
+
+    Annagry is a narrow left sidebar (~30%) plus a wide right column — a
+    50/50 split cuts through the main text. Only split when a real empty
+    valley is present.
+    """
+    if image is None:
+        return []
+    gray = image.convert("L")
+    width, height = gray.size
+    if width < 80 or height < 80:
+        return []
+    pixels = gray.load()
+    y0 = int(height * 0.08)
+    ink = []
+    for x in range(width):
+        dark = 0
+        for y in range(y0, height):
+            if pixels[x, y] < 200:
+                dark += 1
+        ink.append(dark)
+    radius = max(3, width // 120)
+    smooth = []
+    for idx in range(width):
+        window = ink[max(0, idx - radius) : idx + radius + 1]
+        smooth.append(sum(window) / len(window))
+    median = statistics.median(smooth) if smooth else 0
+    if median < 8:
+        return []
+    threshold = max(20.0, median * 0.28)
+    neighbourhood = max(8, width // 40)
+    left_edge = int(width * 0.12)
+    right_edge = int(width * 0.88)
+    raw: list[int] = []
+    for x in range(left_edge, right_edge):
+        nearby = smooth[max(0, x - neighbourhood) : x + neighbourhood + 1]
+        if smooth[x] <= min(nearby) and smooth[x] < threshold:
+            if raw and x - raw[-1] < int(width * 0.12):
+                if smooth[x] < smooth[raw[-1]]:
+                    raw[-1] = x
+            else:
+                raw.append(x)
+    min_col = int(width * 0.18)
+    gutters: list[int] = []
+    prev = 0
+    for x in raw:
+        if x - prev >= min_col and width - x >= min_col:
+            gutters.append(x)
+            prev = x
+    return gutters[:2]
+
+
+def _column_strips(image, gutters: list[int]):
+    width, height = image.size
+    overlap = max(12, width // 80)
+    edges = [0, *gutters, width]
+    strips = []
+    last = len(edges) - 1
+    for idx in range(last):
+        x0 = max(0, edges[idx] - (overlap if idx else 0))
+        x1 = min(width, edges[idx + 1] + (overlap if idx < last - 1 else 0))
+        strips.append(image.crop((x0, 0, x1, height)))
+    return strips
+
+
 def ocr_page_image_columns(image) -> list[str]:
-    """OCR a two-column bulletin page. Crop the stitcher strip, then columns."""
+    """OCR a bulletin page left-to-right by detected columns, then top-to-bottom."""
     if image is None:
         return []
     width, height = image.size
     top = int(height * 0.035)
     body = image.crop((0, top, width, height))
-    mid = body.size[0] // 2
-    overlap = max(12, body.size[0] // 80)
-    left = body.crop((0, 0, mid + overlap, body.size[1]))
-    right = body.crop((mid - overlap, 0, body.size[0], body.size[1]))
-    left_text = _tesseract_image(left, psm=6)
-    right_text = _tesseract_image(right, psm=6)
-    combined = (left_text or "").rstrip() + "\n\n" + (right_text or "").rstrip()
+    strips = _column_strips(body, column_gutter_xs(body))
+    texts = [_tesseract_image(strip, psm=6) for strip in strips]
+    combined = "\n\n".join((text or "").rstrip() for text in texts)
     lines = [ln.rstrip() for ln in combined.splitlines()]
-    # Drop leftover stitcher URL crumbs from the cropped strip.
     cleaned: list[str] = []
     for line in lines:
         stripped = line.strip()
@@ -296,7 +425,6 @@ def prefer_embedded_pages_in_ocr_html(fragment: str, pdf_path: str | Path) -> st
     can still cover them.
     """
     from ocr.convert_bulletin import render_markdown_lines
-    from ocr.text_extract import extract_all_page_lines
 
     pages = split_ocr_html_pages(fragment)
     if not pages:
@@ -315,3 +443,60 @@ def prefer_embedded_pages_in_ocr_html(fragment: str, pdf_path: str | Path) -> st
             out.append((num, body))
     print(f"Preferred embedded PDF text on {preferred} page(s).")
     return join_ocr_html_pages(out)
+
+
+def repair_image_page_ocr(
+    pdf_path: str | Path,
+    pages_text: list[list[str]] | None,
+) -> list[list[str]] | None:
+    """Replace smashed/empty image-page OCR with column tesseract when usable."""
+    if not pages_text:
+        return pages_text
+    embedded = extract_all_page_lines(pdf_path) or []
+    filled = [list(lines or []) for lines in pages_text]
+    for idx, lines in enumerate(filled):
+        native = embedded[idx] if idx < len(embedded) else []
+        if not page_ocr_needs_image_repair(lines, native):
+            continue
+        replacement = ocr_pdf_page_lines(pdf_path, idx)
+        if not ocr_lines_look_usable(replacement):
+            continue
+        if ocr_lines_look_smashed(replacement):
+            continue
+        filled[idx] = replacement
+        print(
+            f"  Repaired image mega page {idx + 1} "
+            f"({page_text_char_count(lines)} -> {page_text_char_count(replacement)} chars)."
+        )
+    return filled
+
+
+def repair_image_pages_in_ocr_html(fragment: str, pdf_path: str | Path) -> str:
+    """Replace smashed image-page bodies in existing OCR HTML."""
+    from ocr.convert_bulletin import render_markdown_lines
+
+    pages = split_ocr_html_pages(fragment)
+    if not pages:
+        return fragment or ""
+    embedded = extract_all_page_lines(pdf_path) or []
+    out: list[tuple[int, str]] = []
+    for num, body in pages:
+        vision_lines = _plain(body).splitlines()
+        native = embedded[num - 1] if 0 <= num - 1 < len(embedded) else []
+        if not page_ocr_needs_image_repair(vision_lines, native):
+            out.append((num, body))
+            continue
+        lines = ocr_pdf_page_lines(pdf_path, num - 1)
+        if not ocr_lines_look_usable(lines) or ocr_lines_look_smashed(lines):
+            out.append((num, body))
+            continue
+        rendered = "\n".join(render_markdown_lines(lines))
+        out.append((num, rendered))
+        print(f"  Repaired smashed mega-OCR HTML page {num}.")
+    return join_ocr_html_pages(out)
+
+
+def polish_ocr_html_from_pdf(fragment: str, pdf_path: str | Path) -> str:
+    """Born-digital pages keep PDF text; smashed image pages get column OCR."""
+    polished = prefer_embedded_pages_in_ocr_html(fragment, pdf_path)
+    return repair_image_pages_in_ocr_html(polished, pdf_path)
