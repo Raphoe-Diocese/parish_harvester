@@ -4,6 +4,7 @@ import unittest
 from datetime import date
 
 from harvester.html_capture import (
+    CONTENT_SELECTORS,
     _HIDE_BEST_MATCH_JS,
     _HIDE_CHROME_JS,
     page_looks_like_listing,
@@ -47,6 +48,9 @@ class HtmlCaptureTests(unittest.TestCase):
         for script in (_HIDE_CHROME_JS, _HIDE_BEST_MATCH_JS):
             self.assertIn("if (child === root || child.contains(root))", script)
             self.assertNotIn("if (child === root || root.contains(child))", script)
+
+    def test_wix_blog_post_is_a_content_root(self) -> None:
+        self.assertIn('[data-hook="post"]', CONTENT_SELECTORS)
 
     def test_stale_link_scores_lower(self) -> None:
         target = date(2026, 6, 14)
