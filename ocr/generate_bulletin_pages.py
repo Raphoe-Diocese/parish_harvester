@@ -596,6 +596,36 @@ def _flatten_legacy_parish_accordions(fragment: str) -> str:
     return _LEGACY_PARISH_DETAILS_RE.sub(_replace, fragment or "")
 
 
+def _lead_parish_name(diocese: str) -> str:
+    """Display name of the parish the stitcher placed on page 1, if known."""
+    config = DIOCESES.get(diocese)
+    if not config:
+        return ""
+    stem = Path(config.pdf_filename).stem
+    for folder in (DOCS_DIR / "mega_pdf", REPO_ROOT / "mega_pdf"):
+        path = folder / f"{stem}.pages.json"
+        if not path.is_file():
+            continue
+        try:
+            index = json.loads(path.read_text(encoding="utf-8"))
+        except Exception:
+            continue
+        parishes = (index or {}).get("parishes") or {}
+        best_page, best_name = None, ""
+        for value in parishes.values():
+            if not isinstance(value, dict):
+                continue
+            start = value.get("start_page")
+            name = (value.get("display_name") or "").strip()
+            if not isinstance(start, int) or not name:
+                continue
+            if best_page is None or start < best_page:
+                best_page, best_name = start, name
+        if best_name:
+            return best_name
+    return ""
+
+
 def prepare_ocr_fragment(
     diocese: str,
     ocr_fragment: str,
@@ -622,6 +652,7 @@ def prepare_ocr_fragment(
         parish_entries=entries,
         bulletin_date=bulletin_date,
         parish_urls=url_by_name,
+        lead_parish_name=_lead_parish_name(diocese),
     )
     if not parish_links or not entries:
         return structured

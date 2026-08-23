@@ -302,12 +302,18 @@ def structure_ocr_html(
     bulletin_date: str = "",
     parish_urls: dict[str, str] | None = None,
     single_parish_name: str | None = None,
+    lead_parish_name: str | None = None,
 ) -> str:
     """Idempotent reader layout: parish mastheads + real section headings.
 
     Page order is preserved. No accordion / ``<details>``. Existing
     ``ocr-parish-masthead`` blocks are kept. Topic headings already marked
     ``b-head`` / ``b-title`` are left alone.
+
+    ``lead_parish_name`` is the parish the stitcher put on page 1. Mastheads
+    are otherwise found by matching the printed banner line, so a parish whose
+    banner is artwork (Annagry) got none and its text ran on unlabelled under
+    the previous parish's name. Only used when that name never matched.
     """
     source = _reset_reader_markup(fragment or "")
     entries_raw = list(parish_entries or [])
@@ -429,6 +435,9 @@ def structure_ocr_html(
         gap = source[pos:].strip()
         if gap:
             out.append(gap)
+    lead = (lead_parish_name or "").strip()
+    if lead and lead.lower() not in seen_parish:
+        out.insert(0, render_parish_masthead(lead, bulletin_date))
     return "\n".join(part for part in _drop_empty_directory_mastheads(out) if part)
 
 

@@ -227,6 +227,29 @@ class BulletinLayoutTests(unittest.TestCase):
         )
         self.assertEqual(html_out.strip(), "")
 
+    def test_lead_parish_gets_a_header_when_its_banner_is_artwork(self) -> None:
+        # Annagry's page 1 banner is an image, so no line matches its name and
+        # its text used to open the diocese panel with no parish header at all.
+        html_out = structure_ocr_html(
+            "<p>Parish Office: 074-9548902<br>Mass Bookings: call 074-9548902</p>"
+            "<p>Ardara</p>\n<p>Sun 23 Aug 10.00am</p>",
+            parish_entries=[("annagryparish", "Annagry"), ("ardara", "Ardara")],
+            bulletin_date="2026-08-23",
+            lead_parish_name="Annagry",
+        )
+        self.assertLess(html_out.index("Annagry"), html_out.index("Parish Office"))
+        self.assertIn('id="ocr-parish-annagry"', html_out)
+        self.assertEqual(html_out.count("ocr-parish-masthead"), 2)
+
+    def test_lead_parish_header_is_not_duplicated_when_its_banner_reads(self) -> None:
+        html_out = structure_ocr_html(
+            "<p>Ardara</p>\n<p>Sun 23 Aug 10.00am</p>",
+            parish_entries=[("ardara", "Ardara")],
+            bulletin_date="2026-08-23",
+            lead_parish_name="Ardara",
+        )
+        self.assertEqual(html_out.count("ocr-parish-masthead"), 1)
+
     def test_is_url_only_line_requires_real_host(self) -> None:
         self.assertTrue(_is_url_only_line("https://www.ballycastleparish.com"))
         self.assertTrue(_is_url_only_line("parishoflisburn.org"))
