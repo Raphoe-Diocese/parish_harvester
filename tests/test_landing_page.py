@@ -91,8 +91,14 @@ class LandingPageTests(unittest.TestCase):
             self.assertIn("Raphoe Diocese", index_html)
             self.assertIn('class="is-long"', index_html)
             self.assertIn("white-space: nowrap", index_html)
-            self.assertIn("No data yet", index_html)
-            self.assertNotIn("No reliability data yet", index_html)
+            self.assertIn("Bulletins ready @ 16:00", index_html)
+            self.assertIn("⚪ Bulletins ready @ 16:00", index_html)
+            self.assertEqual(index_html.count("⚪ Bulletins ready @ 16:00"), 4)
+            self.assertIn("—/— available", index_html)
+            self.assertNotIn("30/57", index_html)
+            self.assertIn("font-weight: 600", index_html)
+            self.assertNotIn("Reliability available", index_html)
+            self.assertNotIn("No data yet", index_html)
             self.assertIn(".live-card-eyebrow {", index_html)
             self.assertIn("<h2>Raphoe Diocese</h2>", index_html)
             self.assertNotIn('<h2 class="is-long">Raphoe Diocese</h2>', index_html)
@@ -107,8 +113,6 @@ class LandingPageTests(unittest.TestCase):
             self.assertNotIn("hero-slide-credit", index_html)
             self.assertNotIn("COST_DASHBOARD", index_html)
             self.assertNotIn("Browse the full OCR bulletin archive", index_html)
-            self.assertIn("🟢", index_html)
-            self.assertIn("🔴", index_html)
 
             # The other dioceses collapse into one small expandable list.
             self.assertIn("More dioceses — coming soon (22)", index_html)
@@ -159,31 +163,36 @@ class LiveCardHeadingTests(unittest.TestCase):
         html_out = site_builder._live_card_heading_html("Raphoe")
         self.assertEqual(html_out, "<h2>Raphoe Diocese</h2>")
 
-    def test_missing_reliability_eyebrow_stays_on_one_line(self) -> None:
-        self.assertEqual(site_builder._status_label(None), "No data yet")
-        self.assertEqual(site_builder._status_label(0.8), "Reliability available")
+    def test_live_card_ready_line_uses_placeholder_count(self) -> None:
+        self.assertEqual(site_builder._ready_count_text(None, None), "—/—")
+        self.assertEqual(site_builder._ready_count_text(30, 57), "30/57")
+        self.assertEqual(site_builder._count_dot(None, None), "⚪")
+        self.assertEqual(site_builder._count_dot(30, 57), "🟡")
+        self.assertEqual(site_builder._count_dot(50, 57), "🟢")
+        self.assertEqual(site_builder._count_dot(10, 57), "🔴")
         html = site_builder._landing_page(
             [
-                {
-                    "key": "clogher",
-                    "name": "Clogher",
-                    "dot": "⚪",
-                    "status_label": site_builder._status_label(None),
-                    "updated": "16/08/2026",
-                },
-                {
-                    "key": "derry",
-                    "name": "Derry",
-                    "dot": "🟡",
-                    "status_label": site_builder._status_label(0.5),
-                    "updated": "16/08/2026",
-                },
+                {"key": "clogher", "name": "Clogher", "dot": "⚪", "updated": "16/08/2026"},
+                {"key": "derry", "name": "Derry", "dot": "🟡", "updated": "16/08/2026",
+                 "ready_count": 30, "total_count": 57},
+                {"key": "raphoe", "name": "Raphoe", "dot": "⚪", "updated": "16/08/2026",
+                 "ready_count": 50, "total_count": 57},
+                {"key": "down-and-connor", "name": "Down and Connor", "dot": "⚪", "updated": "16/08/2026",
+                 "ready_count": 10, "total_count": 57},
             ]
         )
-        self.assertIn("No data yet", html)
-        self.assertNotIn("No reliability data yet", html)
+        self.assertIn("⚪ Bulletins ready @ 16:00", html)
+        self.assertIn("🟡 Bulletins ready @ 16:00", html)
+        self.assertIn("🟢 Bulletins ready @ 16:00", html)
+        self.assertIn("🔴 Bulletins ready @ 16:00", html)
+        self.assertIn("—/— available", html)
+        self.assertIn("30/57 available", html)
+        self.assertIn("50/57 available", html)
+        self.assertIn("10/57 available", html)
+        self.assertNotIn("Reliability available", html)
+        self.assertNotIn("No data yet", html)
+        self.assertIn("font-weight: 600", html)
         self.assertRegex(html, r"\.live-card-eyebrow\s*\{[^}]*white-space:\s*nowrap")
-        self.assertIn("Reliability available", html)
 
 
 class HeroSliderRenderTests(unittest.TestCase):
