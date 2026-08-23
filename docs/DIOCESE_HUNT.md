@@ -41,7 +41,7 @@ Clogher 22/08/2026 proved why: Expand-all cards said “no website.” The Paris
 
 ## Clogher leftover after kitchen sink (do not re-hunt blindly)
 
-Facebook / no live weekly file on 22/08/2026: Aughnamullen East, Belleek-Garrison, Brookeboro-Fivemiletown, Cleenish (`parishofcleenish.com` is a COVID ticket page), Clogher town, Eskra, Inniskeen (Kavanagh bulletin **404**), Killanny (`/parish-bulletin` locked on May 2021), Killeevan, Latton, Pettigo, Rockcorry, Trillick, Tydavnet. Shared (leave skipped): Clontibret → Castleblayney / Muckno; Tyholland → Monaghan & Rackwallace (`past-newsletters`).
+Facebook / no live weekly file on 22/08/2026: Aughnamullen East, Belleek-Garrison, Brookeboro-Fivemiletown, Cleenish (`parishofcleenish.com` is a COVID ticket page), Clogher town, Eskra, Inniskeen (Kavanagh bulletin **404**), Killeevan, Latton, Pettigo, Rockcorry, Trillick, Tydavnet. Shared (leave skipped): Clontibret → Castleblayney / Muckno; Tyholland → Monaghan & Rackwallace (`past-newsletters`). Killanny `/parish-bulletin` is harvested as stale HTML (May / 2021 lockdown text) until they overwrite it.
 
 ## Do not
 
