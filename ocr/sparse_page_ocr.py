@@ -106,6 +106,48 @@ def ocr_lines_look_smashed(lines: list[str] | None) -> bool:
     return False
 
 
+def column_smash_score(lines: list[str] | None) -> float:
+    """How much *lines* read like two columns glued together — lower is better.
+
+    :func:`ocr_lines_look_smashed` is a yes/no gate tuned to catch bad OCR,
+    so it also fires on clean column reads that keep printed superscript
+    ordinals (``22™Aug``). Comparing scores lets a repair be accepted when
+    it is genuinely better than what is on the page today.
+    """
+    text = "\n".join(lines or []).strip()
+    if not text:
+        return 0.0
+    tokens = _SINGLE_TOKEN_RE.findall(text)
+    words = [
+        tok
+        for tok in tokens
+        if "@" not in tok
+        and "http" not in tok.lower()
+        and not tok.lower().startswith("www.")
+    ]
+    if not words:
+        return 0.0
+    short = sum(1 for tok in words if len(tok) <= 2) / len(words)
+    singles = sum(1 for tok in words if len(tok) == 1 and tok.isalpha()) / len(words)
+    pipes = text.count("|") / max(1.0, len(text) / 1000.0)
+    score = short + 2.0 * singles + 0.05 * pipes
+    if _SMASH_FRAG_RE.search(text):
+        score += 1.0
+    return round(score, 4)
+
+
+def replacement_is_better(
+    replacement: list[str] | None,
+    current: list[str] | None,
+) -> bool:
+    """True when re-reading a page by column beat the text already there."""
+    if not ocr_lines_look_usable(replacement):
+        return False
+    if not ocr_lines_look_smashed(replacement):
+        return True
+    return column_smash_score(replacement) < column_smash_score(current) - 0.05
+
+
 def page_ocr_needs_image_repair(
     vision_lines: list[str] | None,
     embedded_lines: list[str] | None,
@@ -265,15 +307,72 @@ def _tesseract_image(image, psm: int = 6) -> str:
         return txt.read_text(encoding="utf-8", errors="replace")
 
 
-def column_gutter_xs(image) -> list[int]:
-    """Return x positions of empty vertical gutters, or [] for one column.
+def column_rule_xs(image) -> list[int]:
+    """Return x positions of printed vertical column rules.
 
-    Annagry is a narrow left sidebar (~30%) plus a wide right column — a
-    50/50 split cuts through the main text. Only split when a real empty
-    valley is present.
+    Many parish bulletins separate a narrow contacts sidebar from the main
+    column with a drawn line instead of white space. That line is *ink*, so
+    the empty-valley scan in :func:`column_gutter_xs` sees a peak exactly
+    where the gutter is and reports one column. A rule is recognised by a
+    single near-full-height run of dark pixels: body text never produces one.
     """
     if image is None:
         return []
+    gray = image.convert("L")
+    width, height = gray.size
+    if width < 80 or height < 80:
+        return []
+    pixels = gray.load()
+    y0 = int(height * 0.08)
+    span = height - y0
+    if span < 40:
+        return []
+    min_run = int(span * 0.6)
+    left_edge, right_edge = int(width * 0.12), int(width * 0.88)
+    runs: list[tuple[int, int]] = []
+    for x in range(left_edge, right_edge):
+        best = run = 0
+        for y in range(y0, height):
+            if pixels[x, y] < 200:
+                run += 1
+                if run > best:
+                    best = run
+            else:
+                run = 0
+        if best >= min_run:
+            runs.append((x, best))
+    if not runs:
+        return []
+    # A rule is 1–3px wide; keep one x per group of adjacent hits.
+    groups: list[list[tuple[int, int]]] = [[runs[0]]]
+    for item in runs[1:]:
+        if item[0] - groups[-1][-1][0] <= max(3, width // 200):
+            groups[-1].append(item)
+        else:
+            groups.append([item])
+    min_col = int(width * 0.18)
+    gutters: list[int] = []
+    prev = 0
+    for group in groups:
+        x = max(group, key=lambda item: item[1])[0]
+        if x - prev >= min_col and width - x >= min_col:
+            gutters.append(x)
+            prev = x
+    return gutters[:2]
+
+
+def column_gutter_xs(image) -> list[int]:
+    """Return x positions of vertical column gutters, or [] for one column.
+
+    Annagry is a narrow left sidebar (~30%) plus a wide right column — a
+    50/50 split cuts through the main text. Only split on a real boundary:
+    a drawn column rule, else an empty ink valley.
+    """
+    if image is None:
+        return []
+    ruled = column_rule_xs(image)
+    if ruled:
+        return ruled
     gray = image.convert("L")
     width, height = gray.size
     if width < 80 or height < 80:
@@ -319,16 +418,40 @@ def column_gutter_xs(image) -> list[int]:
 
 
 def _column_strips(image, gutters: list[int]):
+    """Crop one image per column, insetting past the boundary.
+
+    Overlapping the strips dragged the neighbouring column's first glyphs
+    (and any printed rule) into both reads, which is what produced the
+    ``t|`` / ``»|`` line prefixes. Only the outer page edges are kept whole.
+    """
     width, height = image.size
-    overlap = max(12, width // 80)
+    inset = max(4, width // 150)
     edges = [0, *gutters, width]
     strips = []
     last = len(edges) - 1
     for idx in range(last):
-        x0 = max(0, edges[idx] - (overlap if idx else 0))
-        x1 = min(width, edges[idx + 1] + (overlap if idx < last - 1 else 0))
+        x0 = max(0, edges[idx] + (inset if idx else 0))
+        x1 = min(width, edges[idx + 1] - (inset if idx < last - 1 else 0))
+        if x1 - x0 < 20:
+            continue
         strips.append(image.crop((x0, 0, x1, height)))
-    return strips
+    return strips or [image]
+
+
+_WORDISH_RE = re.compile(r"[^\W_]{3,}", re.UNICODE)
+
+
+def _is_scan_speckle(line: str) -> bool:
+    """True for short OCR crumbs off decorative artwork (``al 4``, ``| I '``).
+
+    Deliberately narrow: only short lines with no three-character run of
+    letters or digits anywhere. Real short notices (``10.00am``, ``€1,920``,
+    ``No Mass``) all keep such a run, so nothing readable is dropped.
+    """
+    text = (line or "").strip()
+    if not text or len(text) > 12:
+        return False
+    return not _WORDISH_RE.search(text)
 
 
 def ocr_page_image_columns(image) -> list[str]:
@@ -349,6 +472,8 @@ def ocr_page_image_columns(image) -> list[str]:
             cleaned.append("")
             continue
         if re.search(r"https?://\S*parishpress", stripped, re.I):
+            continue
+        if _is_scan_speckle(stripped):
             continue
         cleaned.append(line)
     while cleaned and not cleaned[0].strip():
@@ -459,9 +584,7 @@ def repair_image_page_ocr(
         if not page_ocr_needs_image_repair(lines, native):
             continue
         replacement = ocr_pdf_page_lines(pdf_path, idx)
-        if not ocr_lines_look_usable(replacement):
-            continue
-        if ocr_lines_look_smashed(replacement):
+        if not replacement_is_better(replacement, lines):
             continue
         filled[idx] = replacement
         print(
@@ -487,7 +610,7 @@ def repair_image_pages_in_ocr_html(fragment: str, pdf_path: str | Path) -> str:
             out.append((num, body))
             continue
         lines = ocr_pdf_page_lines(pdf_path, num - 1)
-        if not ocr_lines_look_usable(lines) or ocr_lines_look_smashed(lines):
+        if not replacement_is_better(lines, vision_lines):
             out.append((num, body))
             continue
         rendered = "\n".join(render_markdown_lines(lines))

@@ -9,15 +9,19 @@ from reportlab.pdfgen import canvas
 
 from ocr.sparse_page_ocr import (
     column_gutter_xs,
+    column_rule_xs,
+    column_smash_score,
     join_ocr_html_pages,
     ocr_lines_look_smashed,
     ocr_lines_look_usable,
+    ocr_page_image_columns,
     page_html_is_sparse,
     page_ocr_needs_image_repair,
     prefer_embedded_pages_in_ocr_html,
     render_pdf_page_image,
     repair_image_page_ocr,
     repair_image_pages_in_ocr_html,
+    replacement_is_better,
     split_ocr_html_pages,
 )
 
@@ -155,6 +159,57 @@ class SparsePageOcrHtmlTests(unittest.TestCase):
         single = Image.new("L", (800, 1000), 255)
         ImageDraw.Draw(single).rectangle((40, 40, 760, 960), fill=30)
         self.assertEqual(column_gutter_xs(single), [])
+
+    def test_printed_column_rule_is_a_gutter(self) -> None:
+        """Annagry draws a line between the sidebar and the main column.
+
+        The empty-valley scan sees ink there and reports one column, so the
+        page was OCR'd as a single block and read across the two columns.
+        """
+        from PIL import Image, ImageDraw
+
+        image = Image.new("L", (800, 1000), 255)
+        draw = ImageDraw.Draw(image)
+        draw.rectangle((20, 70, 235, 980), fill=30)
+        draw.rectangle((245, 40, 247, 990), fill=0)  # printed column rule
+        draw.rectangle((260, 70, 780, 980), fill=30)
+        rules = column_rule_xs(image)
+        self.assertEqual(len(rules), 1, rules)
+        self.assertGreater(rules[0], 235)
+        self.assertLess(rules[0], 260)
+        self.assertEqual(column_gutter_xs(image), rules)
+
+        single = Image.new("L", (800, 1000), 255)
+        ImageDraw.Draw(single).rectangle((40, 40, 760, 960), fill=30)
+        self.assertEqual(column_rule_xs(single), [])
+
+    def test_clean_column_read_beats_smashed_even_with_ordinals(self) -> None:
+        """Printed superscripts (``22™Aug``) must not veto a good repair."""
+        clean = [
+            "Sat 22™Aug 6.30pm John Gillespie, Braade & Girvan - Burial of ashes",
+            "Sun 23™Aug 9.00am Missa Pro Populo",
+            "Tues 25\"Aug 10.00am Frances (Mhici Jimmy) Greene, Rann na Feirsde",
+            "Parish Office: 074-9548902 and the newsletter deadline is Thursday.",
+            "The Holy Rosary is prayed before Mass every Tuesday to Friday and Sunday.",
+        ]
+        self.assertTrue(ocr_lines_look_smashed(_ANNAGRY_SMASH))
+        self.assertLess(column_smash_score(clean), column_smash_score(_ANNAGRY_SMASH))
+        self.assertTrue(replacement_is_better(clean, _ANNAGRY_SMASH))
+        self.assertFalse(replacement_is_better(_ANNAGRY_SMASH, clean))
+
+    def test_scan_speckle_dropped_but_short_notices_kept(self) -> None:
+        from PIL import Image, ImageDraw
+
+        image = Image.new("RGB", (60, 60), "white")
+        ImageDraw.Draw(image).rectangle((5, 5, 55, 55), fill="white")
+        self.assertEqual(ocr_page_image_columns(None), [])
+
+        from ocr.sparse_page_ocr import _is_scan_speckle
+
+        for junk in ("}", "ea", "| I '", "al 4", "of oS"):
+            self.assertTrue(_is_scan_speckle(junk), junk)
+        for real in ("10.00am", "€1,920", "No Mass", "6.30pm", "= Time", "Aifreann"):
+            self.assertFalse(_is_scan_speckle(real), real)
 
     def test_annagry_pdf_has_sidebar_gutter(self) -> None:
         pdf = Path("docs/parishes/raphoe/annagryparish.pdf")

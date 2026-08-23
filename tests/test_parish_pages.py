@@ -4,6 +4,7 @@ import io
 import json
 import tempfile
 import unittest
+import unittest.mock
 from pathlib import Path
 
 from PyPDF2 import PdfReader, PdfWriter
@@ -104,6 +105,61 @@ class SlicePdfPagesTests(unittest.TestCase):
 
     def test_missing_pdf_returns_none(self) -> None:
         self.assertIsNone(parish_pages.slice_pdf_pages(Path("/nonexistent/mega.pdf"), 1, 1))
+
+
+class LoadMegaPageIndexTests(unittest.TestCase):
+    """The OCR workflow OCRs a mega PDF staged in a temp folder, so the
+    sibling ``*.pages.json`` lookup found nothing and every parish fell back
+    to name-banner matching. Image-only banner pages never match, which left
+    Annagry's page blank."""
+
+    def _index(self, path: Path, pages: int = 1) -> None:
+        path.write_text(
+            json.dumps(
+                {
+                    "parishes": {
+                        "annagryparish": {
+                            "display_name": "Annagry",
+                            "start_page": 1,
+                            "end_page": pages,
+                        }
+                    }
+                }
+            ),
+            encoding="utf-8",
+        )
+
+    def test_falls_back_to_docs_copy_of_the_same_pdf(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            docs_mega = root / "docs" / "mega_pdf"
+            docs_mega.mkdir(parents=True)
+            body = _make_pdf(3)
+            staged = root / "staged" / "raphoe_mega_bulletin.pdf"
+            staged.parent.mkdir()
+            staged.write_bytes(body)
+            (docs_mega / "raphoe_mega_bulletin.pdf").write_bytes(body)
+            self._index(docs_mega / "raphoe_mega_bulletin.pages.json")
+
+            with unittest.mock.patch.object(parish_pages, "DOCS_DIR", root / "docs"):
+                self.assertEqual(
+                    parish_pages.load_mega_page_index(staged),
+                    {"annagryparish": (1, 1)},
+                )
+
+    def test_ignores_docs_index_for_a_different_pdf(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            docs_mega = root / "docs" / "mega_pdf"
+            docs_mega.mkdir(parents=True)
+            staged = root / "staged" / "raphoe_mega_bulletin.pdf"
+            staged.parent.mkdir()
+            staged.write_bytes(_make_pdf(2))
+            (docs_mega / "raphoe_mega_bulletin.pdf").write_bytes(_make_pdf(9))
+            self._index(docs_mega / "raphoe_mega_bulletin.pages.json", pages=9)
+
+            with unittest.mock.patch.object(parish_pages, "DOCS_DIR", root / "docs"):
+                self.assertEqual(parish_pages.load_mega_page_index(staged), {})
 
 
 class WriteParishPagesForDioceseTests(unittest.TestCase):

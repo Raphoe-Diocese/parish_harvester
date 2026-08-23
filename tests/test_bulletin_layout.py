@@ -200,6 +200,33 @@ class BulletinLayoutTests(unittest.TestCase):
         self.assertIn("recently.", html_out)
         self.assertIn("music.", html_out)
 
+    def test_failure_banner_survives_instead_of_a_blank_panel(self) -> None:
+        """A parish page that cannot be sliced must say so, not go blank.
+
+        The empty-directory-masthead trim treated the banner as filler and
+        dropped the masthead with it, so `annagryparish-ocr.html` shipped an
+        empty `<div class="ocr-body">`.
+        """
+        banner = (
+            '<div class="ocr-failed-banner" role="status">'
+            "⚠️ This parish is marked OK, but its page range could not be found "
+            "in this week's mega OCR.</div>"
+        )
+        html_out = structure_ocr_html(
+            banner, bulletin_date="2026-08-23", single_parish_name="Annagry"
+        )
+        self.assertIn("ocr-failed-banner", html_out)
+        self.assertIn("page range could not be found", html_out)
+        self.assertIn("Annagry", html_out)
+
+    def test_name_and_url_only_block_is_still_dropped(self) -> None:
+        html_out = structure_ocr_html(
+            "<p>Mevagh</p>\n<p>https://www.mevaghparish.com</p>",
+            parish_entries=[("mevagh", "Mevagh")],
+            bulletin_date="2026-08-23",
+        )
+        self.assertEqual(html_out.strip(), "")
+
     def test_is_url_only_line_requires_real_host(self) -> None:
         self.assertTrue(_is_url_only_line("https://www.ballycastleparish.com"))
         self.assertTrue(_is_url_only_line("parishoflisburn.org"))

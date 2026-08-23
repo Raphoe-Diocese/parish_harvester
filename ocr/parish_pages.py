@@ -93,12 +93,42 @@ def ocr_html_from_embedded_pdf(pdf_path: Path | str) -> str | None:
     return build_html_content(pages)
 
 
+def _page_index_candidates(pdf_path: Path) -> list[Path]:
+    """Where a mega PDF's stitcher page index may live.
+
+    The OCR workflow stages mega PDFs in a temp directory and OCRs from
+    there, so the sibling lookup found nothing and every parish fell back to
+    name-banner matching — which image-only banner pages (Annagry) never
+    match, leaving a blank page. The committed copy under ``docs/mega_pdf/``
+    is the same stitcher output, so accept it too, but only when that
+    directory holds a byte-identical copy of the PDF being sliced.
+    """
+    name = f"{pdf_path.stem}.pages.json"
+    candidates = [pdf_path.with_name(name)]
+    try:
+        size = pdf_path.stat().st_size
+    except OSError:
+        return candidates
+    for folder in (DOCS_DIR / "mega_pdf", REPO_ROOT / "mega_pdf"):
+        twin = folder / pdf_path.name
+        try:
+            same = twin.is_file() and twin.stat().st_size == size
+        except OSError:
+            same = False
+        if same:
+            candidates.append(folder / name)
+    return candidates
+
+
 def load_mega_page_index(pdf_path: Path | None) -> dict[str, tuple[int, int]]:
-    """Read stitcher ``*.pages.json`` next to a mega PDF, if present."""
+    """Read the stitcher ``*.pages.json`` for a mega PDF, if present."""
     if not pdf_path:
         return {}
-    index_path = Path(pdf_path).with_name(Path(pdf_path).stem + ".pages.json")
-    if not index_path.exists():
+    for candidate in _page_index_candidates(Path(pdf_path)):
+        if candidate.exists():
+            index_path = candidate
+            break
+    else:
         return {}
     try:
         data = json.loads(index_path.read_text(encoding="utf-8"))

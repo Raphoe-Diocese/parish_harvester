@@ -446,7 +446,9 @@ def _drop_empty_directory_mastheads(parts: list[str]) -> list[str]:
         filler = True
         while j < len(parts) and "ocr-parish-masthead" not in parts[j]:
             plain = _plain(parts[j])
-            if plain and not _is_url_only_line(plain) and "ocr-failed-banner" not in parts[j]:
+            # A failure banner is the honest "we could not read this" message
+            # on a single-parish page. Dropping it left a blank OCR panel.
+            if plain and not _is_url_only_line(plain):
                 filler = False
                 break
             j += 1
