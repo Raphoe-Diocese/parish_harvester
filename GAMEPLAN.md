@@ -369,7 +369,7 @@ back to it when a diocese has no viewer page. GitHub Pages drops the files on
 the next deploy because `deploy-pages.yml` builds `_site` from `cp -a docs/.`.
 *Risk if wrong:* old bookmarks 404. That is the intent.
 *Do N1 first,* or the next OCR run just starts refilling.
-**Status 24/08/2026: doing — PR [#127](https://github.com/Raphoe-Diocese/parish_harvester/pull/127), not merged, not live.**
+**Status 24/08/2026: done — PR [#127](https://github.com/Raphoe-Diocese/parish_harvester/pull/127) merged as `7fb20550`, Pages [32678700149](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/32678700149) success, live-proved.**
 No hand-written `git rm` list: N1's own `prune_old_viewers()` did the delete via
 `--rebuild-indexes`, so keep rule and delete rule are one piece of code. Counted
 on `1c7f7c60` first instead of trusting the audit — 180 dated files in 60
@@ -380,8 +380,16 @@ from 60 links to 4, and `docs/bulletins/raphoe/index.html`. Also had to rebuild
 documents linked pages this PR deletes, which would have turned `/search/` into a
 404 machine; it now holds 3 live `2026-08-23` documents. 0 broken dated
 `bulletins/…` references anywhere under `docs/`; 50 tests green.
-**Tick done only after the live check:** a diocese text bulletin still opens on
-parishpress.ie **and** one deleted URL 404s.
+*Live-proved 24/08/2026.* Baseline first: all four old URLs were HTTP 200 live
+before the merge. After merge + Pages they are HTTP **404** —
+`bulletins/derry-2026-07-19.html`, `bulletins/down_and_connor-2026-05-20.html`,
+`bulletins/raphoe-2026-08-21-ocr.html`, `bulletins/derry-2026-05-22-pdf.html`.
+This week is untouched: HTTP 200 on all 12 pages, the homepage, `bulletins/` and
+all four diocese pages; `bulletins/raphoe-2026-08-23-ocr.html` is 181,306 bytes,
+titled `Raphoe Diocese Text Bulletin — 23/08/2026`, 24 parish headers, Irish
+still Irish. Live `bulletins/` lists exactly 4 links. Live `/search/` is 200 with
+3 documents and **0** dead links. `docs/bulletins/` on `main` is now 14 files.
+Full evidence in `docs/WEBSITE_OCR_BACKLOG.md`.
 
 **N3. Make the harvest test gate real.** 1 file, one word.
 `.github/workflows/harvest.yml` line 103: `pytest -v --tb=short` →

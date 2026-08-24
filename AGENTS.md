@@ -122,7 +122,7 @@ Until this list is finished, do **not** start other work. Park new ideas for a l
 
 ## Parked (later list — do not start yet)
 
-- **Remove the bulletin archive page and nav entirely** — the wider "delete every trace of `…/parish_harvester/bulletins/`" request (2026-07-30) stays parked. What is **unparked** as of 23/08/2026 is the narrower, safe half: publish **this week only**. See the `todo (NOW)` row in [`docs/WEBSITE_OCR_BACKLOG.md`](docs/WEBSITE_OCR_BACKLOG.md) and items N1/N2 in [`GAMEPLAN.md`](GAMEPLAN.md). `docs/bulletins/index.html` must survive — `harvester/site_builder.py` (`_ocr_standalone_url`) falls back to it.
+- **Remove the bulletin archive page and nav entirely** — the wider "delete every trace of `…/parish_harvester/bulletins/`" request (2026-07-30) stays parked. The narrower, safe half — publish **this week only** — is **done and live-proved 24/08/2026** (N1 PR #115 merge `41c13064`, N2 PR #127 merge `7fb20550`): `docs/bulletins/` is 14 files, old weeks 404 on parishpress.ie. See the `done` row in [`docs/WEBSITE_OCR_BACKLOG.md`](docs/WEBSITE_OCR_BACKLOG.md) and items N1/N2 in [`GAMEPLAN.md`](GAMEPLAN.md). `docs/bulletins/index.html` must survive — `harvester/site_builder.py` (`_ocr_standalone_url`) falls back to it.
 
 ## Dates (user-facing)
 
