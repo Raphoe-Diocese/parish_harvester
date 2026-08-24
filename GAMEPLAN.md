@@ -343,7 +343,7 @@ run. Everything below was read on `origin/main` at commit `78063f98`.
 ### NOW — small PRs Frank can say `go` to, one at a time
 
 **N1. Turn off the tap (stop making new old-week pages).** ~4 files.
-**Status 23/08/2026: doing — PR [#115](https://github.com/Raphoe-Diocese/parish_harvester/pull/115) open, not merged.**
+**Status 24/08/2026: done — PR [#115](https://github.com/Raphoe-Diocese/parish_harvester/pull/115) merged as `41c13064`, confirmed an ancestor of `origin/main` `1c7f7c60`.**
 Add `prune_old_viewers()` to `ocr/generate_bulletin_pages.py` and call it from
 `rebuild_indexes()` (already runs at the end of every viewer write). Rule: for
 each diocese keep only the newest date's three files; never touch
@@ -369,10 +369,19 @@ back to it when a diocese has no viewer page. GitHub Pages drops the files on
 the next deploy because `deploy-pages.yml` builds `_site` from `cp -a docs/.`.
 *Risk if wrong:* old bookmarks 404. That is the intent.
 *Do N1 first,* or the next OCR run just starts refilling.
-**Still needed after N1.** N1's prune only fires when the OCR job regenerates a
-diocese, so the 168 already-published files stay live until then — next Sunday
-at the earliest, and only for dioceses that run. N2 is what takes them off
-parishpress.ie now. Waiting for `go`.
+**Status 24/08/2026: doing — PR [#127](https://github.com/Raphoe-Diocese/parish_harvester/pull/127), not merged, not live.**
+No hand-written `git rm` list: N1's own `prune_old_viewers()` did the delete via
+`--rebuild-indexes`, so keep rule and delete rule are one piece of code. Counted
+on `1c7f7c60` first instead of trusting the audit — 180 dated files in 60
+diocese-date trios, newest `2026-08-23` for all four dioceses, so **168** old
+files, exactly as audited. Left behind: 12 this-week pages, `index.html` rebuilt
+from 60 links to 4, and `docs/bulletins/raphoe/index.html`. Also had to rebuild
+`docs/search-index.json` — it was generated 29/07/2026 and all 999 of its
+documents linked pages this PR deletes, which would have turned `/search/` into a
+404 machine; it now holds 3 live `2026-08-23` documents. 0 broken dated
+`bulletins/…` references anywhere under `docs/`; 50 tests green.
+**Tick done only after the live check:** a diocese text bulletin still opens on
+parishpress.ie **and** one deleted URL 404s.
 
 **N3. Make the harvest test gate real.** 1 file, one word.
 `.github/workflows/harvest.yml` line 103: `pytest -v --tb=short` →
