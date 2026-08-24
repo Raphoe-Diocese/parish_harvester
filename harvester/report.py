@@ -26,7 +26,13 @@ PARISHES_DIR = Path(__file__).resolve().parent.parent / "parishes"
 _ERROR_PAGE_PATTERN = re.compile(
     r"(?i)(?:security\s*check|403\s*-?\s*forbidden|access denied|"
     r"page not found|404\s*(?:error|not found)|verify you are human|"
-    r"i['\u2019]?m not a robot|unusual traffic|checking your browser|captcha)"
+    r"i['\u2019]?m not a robot|unusual traffic|checking your browser|captcha|"
+    r"503\s*-?\s*(?:error|service unavailable)|"
+    r"502\s*-?\s*(?:error|bad gateway)|"
+    r"500\s*-?\s*internal server error|"
+    r"service unavailable|bad gateway|gateway time-?out|"
+    r"internal server error|under maintenance|temporarily unavailable|"
+    r"temporarily unable to service your request)"
 )
 _ERROR_PAGE_MAX_CHARS = 1500
 

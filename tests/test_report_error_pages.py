@@ -73,6 +73,31 @@ class PdfErrorPageTests(unittest.TestCase):
             pdf.write_bytes(b"%PDF-1.4 not a real pdf")
             self.assertIsNone(_pdf_error_page_reason(pdf))
 
+    def test_apache_503_service_unavailable_is_flagged(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "sacredheart.pdf"
+            _make_text_pdf(
+                pdf,
+                "503 Service Unavailable The server is temporarily unable "
+                "to service your request due to maintenance downtime",
+            )
+            self.assertIsNotNone(_pdf_error_page_reason(pdf))
+
+    def test_502_and_500_internal_server_error_are_flagged(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            bad_gateway = Path(tmp) / "502.pdf"
+            _make_text_pdf(bad_gateway, "502 Bad Gateway")
+            self.assertIsNotNone(_pdf_error_page_reason(bad_gateway))
+            internal = Path(tmp) / "500.pdf"
+            _make_text_pdf(internal, "500 Internal Server Error")
+            self.assertIsNotNone(_pdf_error_page_reason(internal))
+
+    def test_collection_500_number_is_not_flagged(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "collection.pdf"
+            _make_text_pdf(pdf, "Collection €500")
+            self.assertIsNone(_pdf_error_page_reason(pdf))
+
     def test_result_to_report_entry_routes_error_page_to_failed(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             tmp_path = Path(tmp)

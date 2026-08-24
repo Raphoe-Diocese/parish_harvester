@@ -81,7 +81,7 @@ tested; nothing new is invented. `extract_bulletin_date_from_text`
 `python -m pytest tests/test_bulletin_freshness.py tests/test_fetcher_capture_reliability.py -q`
 = 44 passed. Undated URL + July heading → `stale`; no heading / this-week
 heading stay `unknown`. This does **not** change parishpress.ie until the
-next harvest — do not tick H1 done as live/harvested. H2/H3 not started.
+next harvest — do not tick H1 done as live/harvested. H2 doing. H3 not started.
 
 ### Also NOW — two more one-file hardens
 
@@ -95,6 +95,10 @@ next harvest — do not tick H1 done as live/harvested. H2/H3 not started.
 that same deliberately-narrow regex. 1 file, 1 regex, 1 test. The existing rule
 still holds: it must never fire on "no extractable text", because `image_stack`
 photo bulletins legitimately have no text layer.
+**H2 status 24/08/2026: doing.** Narrow 5xx / outage phrases going into the
+same `_ERROR_PAGE_PATTERN` in `harvester/report.py` (not a bare `500`). Tests in
+`tests/test_report_error_pages.py`. Not live until the next harvest. H3 not
+started. `harvester/stitcher.py` still has the old copy — parked, not edited.
 
 **H3. The 8-day grace window accepts last Sunday as this Sunday.**
 `harvester/bulletin_freshness.py` line 289 —
