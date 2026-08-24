@@ -45,7 +45,27 @@ rewrite must become `30-8-26.pdf`. **H3 already merged** as PR
 [#131](https://github.com/Raphoe-Diocese/parish_harvester/pull/131)
 (`42861123` / `8eef477c`) — **not reverted**. No other recipes touched. No
 harvest. No `parish_status.json` edit. Not live / not harvested until the
-next harvest — do not tick this done as live.
+next harvest — do not tick this done as live. Merged as PR
+[#132](https://github.com/Raphoe-Diocese/parish_harvester/pull/132).
+
+## 24/08/2026 — Problems-tab recipes (Malin / Bangor / Malachy / Kilmore / Anthony / Derriaghy)
+
+**The real goal, in one sentence:** only fix a recipe when a **23/08/2026** bulletin URL is on the live parish site.
+
+Harvest truth is `parishes/parish_status.json` on `origin/main` (`last_tested_at` 2026-08-23T22:36:52+00:00). No harvest was run. H3 (PR #131) was not touched. Limavady was left for the other agent (PR #132 already on main). Carrick / Lisburn / Tyholland not touched.
+
+| Key | Result | Live proof 24/08/2026 |
+|---|---|---|
+| **kilmoreandkillyleagh** | **Fixed** — recipe was pinned to `9th_august_2026__1_.pdf`. Listing now has this week's file. | Listing `https://www.kilmoreandkillyleagh.com/latest-notices--downloads.html` (HTTP 200). File `https://www.kilmoreandkillyleagh.com/uploads/8/7/4/5/8745725/23rd_august_2026_combined-1.pdf` HTTP **200**, 2,151,572 bytes, `Last-Modified: Sun, 23 Aug 2026 18:16:42 GMT`. URL date 23/08/2026. PDF heading `23rd August 2026` / `21st Sunday of Ordinary Time`. **7 pages** (weekly bulletin + Mass readings, not a magazine) → `max_bulletin_pages=10`, `site_type:http_scrape_newest_pdf`. |
+| **malinparish** | **Content-gap** — do not invent. | Listing `https://malinparish.ie/index.php/bulletin/` HTTP 200. Newest listing/wp-json file is still `Bulletin-5th-April-2026.pdf` (HTTP 200, 331,159 bytes). Status URL `…/2026/08/Bulletin-23rd-August-2026.pdf` is HTTP **404** (predicted rewrite; file is not on the site). |
+| **bangorparish** | **Content-gap** — do not raise the 4-page cap. | Listing `https://www.bangorparish.com/parish-bulletin/` HTTP 200. Newest newsletter still `14-June-2026-NEWSLETTER.pdf` (HTTP 200, 4,565,986 bytes, **4 pages**, heading `14th June 2026`). Predicted 23/16/09 Aug NEWSLETTER filenames 404. `bangor-parish-200823.pdf` is 2023 (`Last-Modified: Mon, 21 Aug 2023`). Harvest's "6 pages" is not this week's weekly. |
+| **saintmalachysparish** | **Content-gap** — do not raise the cap. | Homepage `https://www.saintmalachysparish.com/` HTTP 200. Only bulletin file `https://www.saintmalachysparish.com/documents/bulletin.pdf` HTTP 200, `Last-Modified: Sat, 22 Feb 2025`, **6 pages**, heading `Sunday 23rd February 2025`. Raising `max_bulletin_pages` would fake `ok` on that Feb 2025 file. |
+| **saintanthony** | **Content-gap** — do not invent. | Listing `https://saintanthonys.uk/parish-bulletin/` HTTP 200 (no PDF href). wp-json newest bulletin still `Bulletin090826SunOT19afpub.pdf` (HTTP 200, 09/08/2026). `Bulletin230826SunOT21afpub.pdf` and `Bulletin160826SunOT20afpub.pdf` are HTTP **404**. |
+| **derriaghycatholicparish** | **Content-gap** — do not invent. | Homepage + `?page_id=262` HTTP 200 (slow One.com, but HTTP scrape worked). Newest dated bulletin image still `19th-Suday-in-ordinary-time-724x1024.png` (HTTP 200, `Last-Modified: Fri, 07 Aug 2026` = 19th Sunday OT = 09/08/2026). Predicted 20th/21st Sunday filenames 404. |
+
+**Next:** leave the five content-gaps stale/failed until the parish posts 23/08. Kilmore needs a harvest test after merge.
+
+**Parked:** none from this hunt.
 
 ---
 
