@@ -532,9 +532,17 @@ class OcrBulletinPageTests(unittest.TestCase):
         # is cleared, so an OCR letter click must retry too.
         self.assertNotIn("target === 'pdf' && (tries || 0) < 12", html_output)
         # The first PDF page used to be sized before the scrollbar appeared,
-        # leaving a horizontal scrollbar under a strip of the bulletin.
+        # leaving a horizontal scrollbar under a strip of the bulletin. Derry
+        # also has one link annotation whose PDF rect lands ~2100px off the
+        # page, which stretched the box's scrollWidth on its own.
         self.assertIn("scrollbar-gutter: stable", html_output)
         self.assertRegex(html_output, r"\.pdf-inpage-page-slot \{[^}]*max-width: 100%")
+        self.assertRegex(html_output, r"\.pdf-link-layer \{[^}]*overflow: hidden")
+        # Both locked blocks say `overflow: auto !important`, which resets the
+        # horizontal axis, so each one has to re-hide it.
+        self.assertEqual(
+            html_output.count(".pdf-inpage-pages { overflow-x: hidden !important; }"), 2
+        )
 
     def test_mobile_enlarges_only_the_tapped_panel(self) -> None:
         """Desktop stays 850px; a phone taps one panel open, never both."""
@@ -707,6 +715,9 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertIn('class="ocr-controls-row"', ocr_block, rel)
             self.assertIn("flashLanding", html_live, rel)
             self.assertIn("scrollbar-gutter: stable", html_live, rel)
+            self.assertIn(
+                ".pdf-inpage-pages { overflow-x: hidden !important; }", html_live, rel
+            )
             self.assertIn("/assets/pdf-inpage-viewer.js?v=", html_live, rel)
             self.assertIn(".ocr-sticky-chrome.is-searching", html_live, rel)
             self.assertIn("syncOcrSearchSticky", html_live, rel)

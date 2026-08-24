@@ -1228,6 +1228,10 @@ def desktop_viewer_height_lock_css() -> str:
         overflow: auto !important;
         overflow-y: auto !important;
       }
+      /* `overflow: auto` above resets both axes, so re-hide the horizontal one:
+         a single stray PDF link annotation off the right edge of a page used to
+         give the whole box a horizontal scrollbar. */
+      .pdf-inpage-pages { overflow-x: hidden !important; }
       /* Nothing to enlarge — the box is already the locked 850px. */
       .az-expand { display: none; }
     }
@@ -1294,7 +1298,12 @@ def pdf_inpage_viewer_css() -> str:
       position: relative;
     }}
     .pdf-inpage-page-slot canvas {{ display: block; width: 100%; height: auto; background: #fff; }}
-    .pdf-link-layer {{ position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }}
+    /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
+       page — one of those used to stretch the box's scrollWidth to 2988px. */
+    .pdf-link-layer {{
+      position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+      overflow: hidden; pointer-events: none;
+    }}
     .pdf-annot-link {{
       position: absolute; z-index: 2; pointer-events: auto;
       background: rgba(26, 107, 107, 0.08); border-radius: 2px;
@@ -1344,6 +1353,7 @@ def pdf_inpage_viewer_css() -> str:
         overflow: auto !important;
         overflow-y: auto !important;
       }}
+      .pdf-inpage-pages {{ overflow-x: hidden !important; }}
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {{
         display: none !important;
