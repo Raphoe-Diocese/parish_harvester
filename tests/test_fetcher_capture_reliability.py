@@ -20,6 +20,7 @@ from harvester.fetcher import (
     HTML_RENDER_MIN_BYTES,
     ParishEntry,
     classify_page_capped_pdf,
+    freshness_after_unknown_url,
     _is_real_pdf,
     _reject_if_oversized,
     recipe_max_bulletin_pages,
@@ -214,6 +215,51 @@ class RejectIfOversizedTests(unittest.TestCase):
             with self.assertRaises(ValueError):
                 _reject_if_oversized(pdf)
             self.assertFalse(pdf.exists())
+
+
+class FreshnessAfterUnknownUrlTests(unittest.TestCase):
+    """H1: undated URL + PDF heading date. Only a provably old body is stale."""
+
+    UNDATED = "https://example.com/weekly-bulletin.pdf"
+    TARGET = date(2026, 8, 23)
+
+    def _heading_pdf(self, path: Path, *lines: str) -> None:
+        c = canvas.Canvas(str(path))
+        y = 700
+        for line in lines:
+            c.drawString(72, y, line)
+            y -= 18
+        c.save()
+
+    def test_undated_url_july_heading_is_stale(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "weekly-bulletin.pdf"
+            self._heading_pdf(
+                pdf, "RAPHOE PARISH NEWSLETTER Sunday 19 July 2026"
+            )
+            verdict = freshness_after_unknown_url(self.UNDATED, pdf, self.TARGET)
+            self.assertEqual(verdict.status, "stale")
+            self.assertEqual(verdict.extracted_date, date(2026, 7, 19))
+
+    def test_undated_url_without_heading_stays_unknown(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "weekly-bulletin.pdf"
+            self._heading_pdf(
+                pdf,
+                "In memory of Mary 12 July 2026",
+                "© 2012-2026 Parish",
+            )
+            verdict = freshness_after_unknown_url(self.UNDATED, pdf, self.TARGET)
+            self.assertEqual(verdict.status, "unknown")
+            self.assertEqual(verdict.reason, "no_date_in_url")
+
+    def test_undated_url_this_week_heading_stays_unknown(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "weekly-bulletin.pdf"
+            self._heading_pdf(pdf, "Parish Newsletter 23 August 2026")
+            verdict = freshness_after_unknown_url(self.UNDATED, pdf, self.TARGET)
+            self.assertEqual(verdict.status, "unknown")
+            self.assertEqual(verdict.reason, "no_date_in_url")
 
 
 if __name__ == "__main__":

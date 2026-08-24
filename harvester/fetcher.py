@@ -57,6 +57,7 @@ from .browser_launch import (
     new_harvester_context,
 )
 from .bulletin_freshness import (
+    FreshnessVerdict,
     check_bulletin_freshness,
     extract_bulletin_date_from_text,
     mark_result_stale,
@@ -1944,6 +1945,27 @@ def _load_recipe_metadata(recipe_path: Path) -> dict:
     return data if isinstance(data, dict) else {}
 
 
+def freshness_after_unknown_url(url: str, dest: Path, target: date) -> FreshnessVerdict:
+    """URL-first freshness; only a provably old PDF heading flips unknown → stale.
+
+    Undated URLs stay ``unknown`` (accepted) unless the PDF heading date is
+    outside the existing week + grace window. This-week or grace-fresh
+    headings do not invent a new status — the URL verdict stays ``unknown``.
+    """
+    verdict = check_bulletin_freshness(url, target)
+    if verdict.status != "unknown":
+        return verdict
+    if not dest.exists():
+        return verdict
+    body_date = extract_pdf_bulletin_date(dest)
+    if body_date is None:
+        return verdict
+    body_verdict = verdict_for_extracted_date(body_date, target)
+    if body_verdict.status == "stale":
+        return body_verdict
+    return verdict
+
+
 async def _recover_stale_bulletin(
     result: FetchResult,
     entry: ParishEntry,
@@ -1968,7 +1990,7 @@ async def _recover_stale_bulletin(
             error=blocked,
         )
 
-    verdict = check_bulletin_freshness(result.url, target)
+    verdict = freshness_after_unknown_url(result.url, dest, target)
     if verdict.status != "stale":
         return result
 
