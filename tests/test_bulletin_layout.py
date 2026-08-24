@@ -227,28 +227,51 @@ class BulletinLayoutTests(unittest.TestCase):
         )
         self.assertEqual(html_out.strip(), "")
 
-    def test_lead_parish_gets_a_header_when_its_banner_is_artwork(self) -> None:
-        # Annagry's page 1 banner is an image, so no line matches its name and
-        # its text used to open the diocese panel with no parish header at all.
+    def test_header_lands_on_the_stitcher_page_not_the_printed_name(self) -> None:
+        # Tawnawilly's Mass times are mega page 26 and its Alpha notice page 27,
+        # but only page 27 prints the name, so the header sat on Alpha and the
+        # Mass times read as if they belonged to the parish before it.
         html_out = structure_ocr_html(
-            "<p>Parish Office: 074-9548902<br>Mass Bookings: call 074-9548902</p>"
-            "<p>Ardara</p>\n<p>Sun 23 Aug 10.00am</p>",
-            parish_entries=[("annagryparish", "Annagry"), ("ardara", "Ardara")],
+            "<p>Page 26</p><p>Mass Times Intentions for this Week</p>"
+            "<p>Page 27</p><p>Tawnawilly</p><p>Alpha is a 10-week series</p>",
+            parish_entries=[("tawnawillyparish", "Tawnawilly")],
             bulletin_date="2026-08-23",
-            lead_parish_name="Annagry",
+            parish_page_spans={"Tawnawilly": (26, 27)},
         )
-        self.assertLess(html_out.index("Annagry"), html_out.index("Parish Office"))
-        self.assertIn('id="ocr-parish-annagry"', html_out)
-        self.assertEqual(html_out.count("ocr-parish-masthead"), 2)
+        self.assertLess(html_out.index("Tawnawilly"), html_out.index("Mass Times"))
+        self.assertEqual(html_out.count("ocr-parish-masthead"), 1)
 
-    def test_lead_parish_header_is_not_duplicated_when_its_banner_reads(self) -> None:
+    def test_name_printed_in_another_parishs_notice_is_not_a_header(self) -> None:
+        # "Killybegs" is named in a page 3 notice; its own bulletin is page 19.
         html_out = structure_ocr_html(
-            "<p>Ardara</p>\n<p>Sun 23 Aug 10.00am</p>",
-            parish_entries=[("ardara", "Ardara")],
+            "<p>Page 3</p><p>Killybegs</p><p>Recent deaths</p>"
+            "<p>Page 19</p><p>Parish Office, Killybegs, Co. Donegal</p>",
+            parish_entries=[("killybegs", "Killybegs")],
             bulletin_date="2026-08-23",
-            lead_parish_name="Ardara",
+            parish_page_spans={"Killybegs": (19, 19)},
         )
         self.assertEqual(html_out.count("ocr-parish-masthead"), 1)
+        self.assertLess(html_out.index("Recent deaths"), html_out.index("ocr-parish-masthead"))
+        self.assertLess(html_out.index("ocr-parish-masthead"), html_out.index("Page 19"))
+
+    def test_index_and_evidence_spellings_share_one_header(self) -> None:
+        html_out = structure_ocr_html(
+            "<p>Page 8</p><p>Drumholm (Ballintra)</p><p>Mass at 10am</p>",
+            parish_entries=[("drumholm-parish", "Drumholm (Ballintra)")],
+            bulletin_date="2026-08-23",
+            parish_page_spans={"Drumholm": (8, 8)},
+        )
+        self.assertEqual(html_out.count("ocr-parish-masthead"), 1)
+        self.assertIn("Drumholm (Ballintra)", html_out)
+
+    def test_parish_missing_from_the_page_index_still_matches_by_name(self) -> None:
+        html_out = structure_ocr_html(
+            "<p>Page 29</p><p>Kilbarron</p><p>Mass at 10am</p>",
+            parish_entries=[("kilbarron", "Kilbarron")],
+            bulletin_date="2026-08-23",
+            parish_page_spans={"Tawnawilly": (26, 27)},
+        )
+        self.assertIn('id="ocr-parish-kilbarron"', html_out)
 
     def test_is_url_only_line_requires_real_host(self) -> None:
         self.assertTrue(_is_url_only_line("https://www.ballycastleparish.com"))

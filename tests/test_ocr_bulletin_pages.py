@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 
 from ocr.generate_bulletin_pages import (
+    PDF_INPAGE_VIEWER_VERSION,
     DioceseConfig,
     _fragment_to_plain_text,
     build_az_parish_ocr_html,
@@ -584,7 +585,9 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotRegex(html_live, r"#ocr-panel\s*\{[^}]*height:\s*auto")
         self.assertIn("ocr-sticky-chrome", html_live)
         self.assertIn('id="scroll-top-btn"', html_live)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823u", html_live)
+        self.assertIn(
+            f"/assets/pdf-inpage-viewer.js?v={PDF_INPAGE_VIEWER_VERSION}", html_live
+        )
         self.assertNotIn("85vh", html_live)
         self.assertIn("min-height: 450px", html_live)
         self.assertIn("height: 450px", html_live)
