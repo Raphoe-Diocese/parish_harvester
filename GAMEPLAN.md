@@ -75,9 +75,13 @@ tested; nothing new is invented. `extract_bulletin_date_from_text`
 `© 2012-2026` footer and it does not touch Irish text. ~1 file, ~15 lines,
 1 test. Parishes whose PDF has no heading date stay `unknown` → unchanged; only
 **provably** old bodies flip to `stale`.
-**H1 status 24/08/2026: doing.** Adding `freshness_after_unknown_url` so an
-undated URL is judged from the PDF heading date when that date is provably
-old. Not live/harvested until the next harvest.
+**H1 status 24/08/2026: tests proved, not live.** PR
+[#129](https://github.com/Raphoe-Diocese/parish_harvester/pull/129)
+(`e39b961e`). Targeted
+`python -m pytest tests/test_bulletin_freshness.py tests/test_fetcher_capture_reliability.py -q`
+= 44 passed. Undated URL + July heading → `stale`; no heading / this-week
+heading stay `unknown`. This does **not** change parishpress.ie until the
+next harvest — do not tick H1 done as live/harvested. H2/H3 not started.
 
 ### Also NOW — two more one-file hardens
 
