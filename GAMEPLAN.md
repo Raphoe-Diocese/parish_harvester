@@ -81,7 +81,7 @@ tested; nothing new is invented. `extract_bulletin_date_from_text`
 `python -m pytest tests/test_bulletin_freshness.py tests/test_fetcher_capture_reliability.py -q`
 = 44 passed. Undated URL + July heading → `stale`; no heading / this-week
 heading stay `unknown`. This does **not** change parishpress.ie until the
-next harvest — do not tick H1 done as live/harvested. H2 tests proved. H3 doing.
+next harvest — do not tick H1 done as live/harvested. H2 tests proved. H3 tests proved, not live.
 
 ### Also NOW — two more one-file hardens
 
@@ -104,7 +104,7 @@ photo bulletins legitimately have no text layer.
 and the existing real-bulletin / blank image_stack / unreadable-file cases
 not flagged. Same deliberately-narrow regex — no bare `500`. This does
 **not** change parishpress.ie until the next harvest — do not tick H2 done
-as live/harvested. H3 doing. `harvester/stitcher.py` still has the old
+as live/harvested. H3 tests proved, not live. `harvester/stitcher.py` still has the old
 copy of the regex — parked, not edited.
 
 **H3. The 8-day grace window accepts last Sunday as this Sunday.**
@@ -130,11 +130,17 @@ window", not on a correct `in_bulletin_week` match.
 **Say this out loud before doing it:** 8 parishes flip `ok` → `stale`, the
 Problems tab jumps from 15 to about 23, and the homepage ready counts drop.
 That is the truth, not a regression — but it must not be a surprise.
-**H3 status 24/08/2026: doing.** One-sided ahead grace only (`0 < days <= 8`).
-Last Sunday is outside `week_window` and must become stale. Ahead posts
-(Thursday/Friday for next Sunday) stay fresh. Do not tick H3 done as live —
-`parish_status.json` and parishpress.ie do not change until the next harvest.
-H4 not started.
+**H3 status 24/08/2026: tests proved, not live.** PR
+[#131](https://github.com/Raphoe-Diocese/parish_harvester/pull/131)
+(`8eef477c`). Targeted
+`python -m pytest tests/test_bulletin_freshness.py tests/test_fetcher_capture_reliability.py -q`
+= 45 passed. Last Sunday (Aug 9 vs 16 Aug) is `stale` / `date_behind_of_target`;
+Thursday 20/08 vs 16/08 is `fresh` / `within_grace_days`; +9 days is
+`date_ahead_of_target`. `week_window` unchanged. This does **not** change
+parishpress.ie or `parish_status.json` until the next harvest — do not tick
+H3 done as live/harvested. About 8 parishes will flip `ok` → `stale` on that
+harvest; Problems will get longer; homepage counts will drop. That is
+intended. Do not list those 8 as already stale. H4 not started.
 
 ### NEXT — after the three above land
 
