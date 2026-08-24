@@ -81,7 +81,7 @@ tested; nothing new is invented. `extract_bulletin_date_from_text`
 `python -m pytest tests/test_bulletin_freshness.py tests/test_fetcher_capture_reliability.py -q`
 = 44 passed. Undated URL + July heading → `stale`; no heading / this-week
 heading stay `unknown`. This does **not** change parishpress.ie until the
-next harvest — do not tick H1 done as live/harvested. H2/H3 not started.
+next harvest — do not tick H1 done as live/harvested. H2 doing. H3 not started.
 
 ### Also NOW — two more one-file hardens
 
@@ -95,6 +95,17 @@ next harvest — do not tick H1 done as live/harvested. H2/H3 not started.
 that same deliberately-narrow regex. 1 file, 1 regex, 1 test. The existing rule
 still holds: it must never fire on "no extractable text", because `image_stack`
 photo bulletins legitimately have no text layer.
+**H2 status 24/08/2026: tests proved, not live.** PR
+[#130](https://github.com/Raphoe-Diocese/parish_harvester/pull/130)
+(`389ac77f`). Targeted
+`python -m pytest tests/test_report_error_pages.py -q` = 10 passed. Apache
+`503 Service Unavailable` / `temporarily unable to service your request`,
+`502 Bad Gateway`, and `500 Internal Server Error` flagged; `Collection €500`
+and the existing real-bulletin / blank image_stack / unreadable-file cases
+not flagged. Same deliberately-narrow regex — no bare `500`. This does
+**not** change parishpress.ie until the next harvest — do not tick H2 done
+as live/harvested. H3 not started. `harvester/stitcher.py` still has the old
+copy of the regex — parked, not edited.
 
 **H3. The 8-day grace window accepts last Sunday as this Sunday.**
 `harvester/bulletin_freshness.py` line 289 —
