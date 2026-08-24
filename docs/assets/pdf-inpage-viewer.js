@@ -4,8 +4,9 @@
  * Phones cannot embed a raw PDF in <iframe> (sad-document icon). Desktop
  * Chrome/Edge iframes show a "Page X of Y" toolbar Frank asked to remove.
  * This script paints every page on stacked canvases with Mozilla PDF.js.
- * The visible PDF/OCR boxes are locked at 850px (450px on phones); extra
- * pages scroll INSIDE those boxes. Open PDF / Download stay.
+ * The visible PDF/OCR boxes are locked at 850px (450px on phones and short
+ * screens — not merely on windows under 1025px wide); extra pages scroll
+ * INSIDE those boxes. Open PDF / Download stay.
  *
  * Progressive load: disableAutoFetch + streaming + HTTP Range. Mega PDFs are
  * 14–20 MB; we must not wait for the whole file before showing page 1.
@@ -71,6 +72,21 @@
       "#panel-pdf.az-expanded .pdf-frame-wrap,#panel-pdf.az-expanded .pdf-inpage-viewer{min-height:850px!important}" +
       "#panel-pdf.az-expanded .pdf-frame-wrap iframe,#panel-pdf.az-expanded .pdf-inpage-pages," +
       "#panel-ocr.az-expanded #ocr-panel{height:850px!important;min-height:850px!important;max-height:850px!important}" +
+      "}" +
+      /* The 450 lock above is width-only, so a half-screen window, Windows
+         display scaling or browser zoom handed a desktop reader the phone box.
+         Wider than the phone layout (700px) and taller than a phone in
+         landscape (500px) means desktop: keep the locked 850px. Last block
+         wins, so this beats the max-width:1024px lock. */
+      "@media (min-width:701px) and (min-height:501px){" +
+      ".pdf-frame-wrap,.pdf-standalone-shell," +
+      ".pdf-frame-wrap.is-native-pdf,.pdf-standalone-shell.is-native-pdf," +
+      "body.is-native-pdf .pdf-standalone-shell,.pdf-inpage-viewer," +
+      ".pdf-mobile-fallback{min-height:850px!important}" +
+      ".pdf-inpage-pages,#ocr-panel,.pdf-frame-wrap iframe," +
+      ".pdf-standalone-shell iframe.pdf-frame{height:850px!important;min-height:850px!important;" +
+      "max-height:850px!important;overflow:auto!important;overflow-y:auto!important}" +
+      ".az-expand{display:none}" +
       "}";
   }
 
