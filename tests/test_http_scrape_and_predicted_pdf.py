@@ -879,7 +879,7 @@ class LimavadyRecipeTests(unittest.TestCase):
         self.assertNotIn("28-6-26.pdf", raw)
         self.assertEqual(data["site_type"], "predicted_dated_pdf")
         self.assertEqual(int(data["weeks_back"]), 8)
-        self.assertNotIn("use_captured_url", json.dumps(data))
+        self.assertNotIn("use_captured_url", data)
 
     def test_next_sunday_rewrite_and_this_week_listed_first(self) -> None:
         self.assertEqual(
