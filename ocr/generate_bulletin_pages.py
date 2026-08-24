@@ -1194,7 +1194,7 @@ def prefers_native_pdf_js() -> str:
 """
 
 
-PDF_INPAGE_VIEWER_VERSION = "20260823v"
+PDF_INPAGE_VIEWER_VERSION = "20260824a"
 PDF_INPAGE_VIEWER_SRC = f"/assets/pdf-inpage-viewer.js?v={PDF_INPAGE_VIEWER_VERSION}"
 
 
@@ -1279,6 +1279,12 @@ def pdf_inpage_viewer_css() -> str:
       max-height: 850px;
       overflow: auto;
       overflow-y: auto;
+      overflow-x: hidden;
+      /* Reserve the scrollbar gutter from the first paint. Without it the
+         first page is sized to the full width, the vertical scrollbar then
+         appears, and the page is suddenly ~16px too wide — a horizontal
+         scrollbar under a strip of the bulletin. */
+      scrollbar-gutter: stable;
       background: #525659;
       padding: 8px 0 16px;
     }}
@@ -1286,6 +1292,7 @@ def pdf_inpage_viewer_css() -> str:
       margin: 0 auto 10px;
       background: #3a3f42;
       min-height: 180px;
+      max-width: 100%;
       position: relative;
     }}
     .pdf-inpage-page-slot canvas {{ display: block; width: 100%; height: auto; background: #fff; }}
@@ -1615,6 +1622,17 @@ def az_jump_css() -> str:
     /* Desktop boxes are already the locked 850px, so there is nothing to
        enlarge — the button only appears on tablet/phone. */
     .az-expand {{ display: none; }}
+    /* A letter jump scrolls inside a locked box, so nothing moves on screen
+       except the text. Flag the parish the reader landed on. */
+    .az-landed {{
+      background: #fff6da;
+      box-shadow: 0 0 0 3px #f0d089;
+      border-radius: 3px;
+      transition: background 400ms ease, box-shadow 400ms ease;
+    }}
+    @media (prefers-reduced-motion: reduce) {{
+      .az-landed {{ transition: none; }}
+    }}
     .diocese-intro {{
       margin: 0 0 22px;
       padding: 18px 18px 16px;
@@ -1675,6 +1693,9 @@ def az_jump_js() -> str:
         }
         return true;
       }
+      function slugOf(s) {
+        return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      }
       function findOcr(box, name) {
         if (!box) return null;
         var wanted = [norm(name), norm(coreName(name))];
@@ -1685,7 +1706,38 @@ def az_jump_js() -> str:
           var got = norm(label);
           if (wanted.indexOf(got) >= 0 || wanted.indexOf(norm(coreName(label))) >= 0) return el;
         }
-        return null;
+        // The search box rebuilds #ocr-panel innerHTML, so fall back to the
+        // masthead id the layout writes (ocr-parish-<slug>).
+        var byId = box.querySelector('#ocr-parish-' + slugOf(name))
+          || box.querySelector('#ocr-parish-' + slugOf(coreName(name)));
+        return byId || null;
+      }
+      function flashLanding(el) {
+        if (!el || !el.classList) return;
+        el.classList.remove('az-landed');
+        void el.offsetWidth;
+        el.classList.add('az-landed');
+        window.setTimeout(function () { el.classList.remove('az-landed'); }, 1800);
+      }
+      function landInBox(box, el) {
+        // Move the box instantly (one smooth animation only — a second one on
+        // the same scroll chain used to be cancelled halfway, which left the
+        // reader in the middle of another parish), then bring the box itself
+        // on screen, then re-check because zoom/fonts can reflow the text.
+        var br = box.getBoundingClientRect();
+        var er = el.getBoundingClientRect();
+        box.scrollTop = Math.max(0, box.scrollTop + (er.top - br.top) - 8);
+        showBox(box);
+        var tries = 0;
+        (function settle() {
+          if (tries++ > 6) return;
+          var b2 = box.getBoundingClientRect();
+          var e2 = el.getBoundingClientRect();
+          var off = Math.round(e2.top - b2.top - 8);
+          if (Math.abs(off) > 3) box.scrollTop = Math.max(0, box.scrollTop + off);
+          window.setTimeout(settle, 150);
+        })();
+        flashLanding(el);
       }
       function pageFor(name) {
         var map = pageIndex();
@@ -1702,14 +1754,19 @@ def az_jump_js() -> str:
       }
       function showBox(box) {
         // The jump happens inside the locked box, so make sure the box itself
-        // is on screen first or a phone reader sees nothing move.
+        // is on screen first or a phone reader sees nothing move. Leave room
+        // for the sticky search bar when a term is typed, otherwise it covers
+        // the parish header the reader just asked for.
         if (!box || !box.getBoundingClientRect) return;
         var r = box.getBoundingClientRect();
         var h = window.innerHeight || document.documentElement.clientHeight || 0;
-        if (r.top < 0 || r.top > h - 120) {
-          if (box.scrollIntoView) {
-            box.scrollIntoView({ block: 'start', behavior: reduceMotion() ? 'auto' : 'smooth' });
-          }
+        var sticky = document.querySelector('.ocr-sticky-chrome.is-searching');
+        var pad = sticky ? Math.round(sticky.getBoundingClientRect().height) + 8 : 0;
+        if (r.top < pad || r.top > h - 120) {
+          window.scrollTo({
+            top: Math.max(0, (window.scrollY || window.pageYOffset || 0) + r.top - pad),
+            behavior: reduceMotion() ? 'auto' : 'smooth',
+          });
         }
       }
       function jumpPdf(names) {
@@ -1728,13 +1785,12 @@ def az_jump_js() -> str:
         return false;
       }
       function jumpOcr(names) {
-        var ocr = document.getElementById('ocr-panel');
+        var ocr = document.getElementById('ocr-panel') || document.getElementById('ocr-text');
         if (!ocr) return false;
         for (var i = 0; i < names.length; i++) {
           var hit = findOcr(ocr, names[i]);
           if (!hit) continue;
-          showBox(ocr);
-          scrollBoxTo(ocr, hit);
+          landInBox(ocr, hit);
           return true;
         }
         return false;
@@ -1742,8 +1798,9 @@ def az_jump_js() -> str:
       function jump(target, names, tries) {
         var done = target === 'pdf' ? jumpPdf(names) : jumpOcr(names);
         // PDF.js paints page slots as it streams, so the slot may not exist
-        // for a second or two after load. Retry briefly instead of failing.
-        if (!done && target === 'pdf' && (tries || 0) < 12) {
+        // for a second or two after load; the OCR panel is rebuilt whenever a
+        // search is cleared. Retry briefly instead of failing silently.
+        if (!done && (tries || 0) < 12) {
           window.setTimeout(function () { jump(target, names, (tries || 0) + 1); }, 400);
         }
       }
@@ -1967,17 +2024,39 @@ def render_bulletin_viewer_shell(
     .fullscreen-btn:hover {{ background: #fff; }}
     {pdf_inpage_viewer_css()}
 
-    .ocr-search-bar {{ position: relative; margin-bottom: 10px; }}
+    /* Search comes first in the OCR block and reads like the JUMP TO bar, so
+       a reader cannot scroll past it looking for "where is the search". */
+    .ocr-search-bar {{
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 8px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }}
+    .ocr-search-label {{
+      flex: 0 0 auto;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: {DEEP_TEAL};
+    }}
     .search-input {{
-      width: 100%;
-      border: 1px solid #c9d4d3;
+      flex: 1 1 auto;
+      min-width: 0;
+      width: auto;
+      border: 1px solid {TEAL};
       border-radius: 4px;
       padding: 11px 42px 11px 14px;
       font-size: 1rem;
+      background: #fff;
     }}
     .search-clear {{
       position: absolute;
-      right: 10px;
+      right: 16px;
       top: 50%;
       transform: translateY(-50%);
       width: 32px;
@@ -2014,18 +2093,48 @@ def render_bulletin_viewer_shell(
     {sticky_search_css("#fff")}
     {scroll_top_css()}
     {az_jump_css()}
+    /* Letters and text size share ONE bar, so neither hides the other and
+       neither pushes the search box off a short screen. The wrapper draws the
+       box; the letter row and zoom group go transparent inside it. */
+    .ocr-controls-row {{
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 12px;
+      margin: 0 0 10px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }}
+    .ocr-controls-row .az-row,
+    .ocr-controls-row .ocr-zoom-bar {{
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      border: 0;
+    }}
+    .ocr-controls-row .az-row {{ flex: 1 1 auto; }}
+    .ocr-controls-row .ocr-zoom-bar {{ flex: 0 0 auto; margin-left: auto; }}
     .ocr-zoom-bar {{
-      display: flex; justify-content: center; align-items: center; gap: 10px;
-      margin: 0 0 10px; padding: 6px 10px;
-      background: rgba(255, 255, 255, 0.94);
-      border: 1px solid #d4ddd9; border-radius: 4px;
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }}
+    .ocr-zoom-label {{
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: {DEEP_TEAL};
     }}
     .ocr-zoom-bar button {{
-      min-width: 40px; min-height: 40px; border: 1px solid {TEAL}; border-radius: 4px;
-      background: #fff; color: {TEAL}; font-weight: 700; font-size: 1.15rem; cursor: pointer;
+      min-width: 34px; height: 30px; border: 1px solid #cfdedd; border-radius: 4px;
+      background: #fff; color: {TEAL}; font-weight: 700; font-size: 1.05rem; line-height: 1; cursor: pointer;
     }}
+    .ocr-zoom-bar button:hover {{ background: {TEAL}; border-color: {TEAL}; color: #fff; }}
     .ocr-zoom-pct {{
-      min-width: 3.5rem; text-align: center; font-weight: 700; font-size: 0.95rem; color: {DEEP_TEAL};
+      min-width: 3.2rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: {DEEP_TEAL};
     }}
     .ocr-zoom-hint {{ display: none; font-size: 0.75rem; color: #5a6a68; }}
     @media (pointer: coarse) {{ .ocr-zoom-hint {{ display: inline; margin-left: 6px; }} }}
@@ -2158,7 +2267,8 @@ def render_bulletin_viewer_shell(
       /* Tap targets big enough for a thumb. */
       .az-expand {{ display: inline-block; }}
       .az-letter,
-      .az-expand {{
+      .az-expand,
+      .ocr-zoom-bar button {{
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
@@ -2200,10 +2310,23 @@ def render_bulletin_viewer_shell(
         padding: 16px 14px 28px;
       }}
       .ocr-search-tools {{ flex-direction: column; }}
+      .ocr-search-tools > div {{
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+      }}
       .ocr-search-tools button {{
         min-height: 44px;
         width: 100%;
       }}
+      /* One column on a phone: letters, then text size. Neither covers the
+         search box above them. */
+      .ocr-controls-row {{ flex-direction: column; }}
+      .ocr-controls-row .az-row,
+      .ocr-controls-row .ocr-zoom-bar {{ flex: 1 1 auto; }}
+      .ocr-search-bar {{ flex-wrap: wrap; }}
+      .ocr-search-bar .search-input {{ flex: 1 1 100%; }}
     }}
   </style>
   <script src="{PDF_INPAGE_VIEWER_SRC}" defer></script>
@@ -2240,19 +2363,10 @@ def render_bulletin_viewer_shell(
 
     <h2 class="section-heading">Bulletin — OCR Extracted Plain Text</h2>
     <div id="panel-ocr" class="viewer-block">
-      {az_ocr_html}
-      <div class="quiet-links">
-        <a href="{html.escape(ocr_standalone_href, quote=True)}" {blank}>Open text in new tab</a>
-      </div>
       <div class="ocr-sticky-chrome">
-      <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
-        <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
-        <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
-        <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
-        <span class="ocr-zoom-hint">or pinch to zoom</span>
-      </div>
       <div class="ocr-search-bar">
-        <input id="ocr-search" class="search-input" type="search" placeholder="Search OCR text..." aria-label="Search OCR text" />
+        <label class="ocr-search-label" for="ocr-search">Search</label>
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search OCR text — a parish, a name, a Mass time" aria-label="Search OCR text" />
         <button id="clear-search" class="search-clear" type="button" aria-label="Clear OCR search" hidden>×</button>
       </div>
       <div class="ocr-search-tools">
@@ -2262,6 +2376,19 @@ def render_bulletin_viewer_shell(
           <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
         </div>
       </div>
+      </div>
+      <div class="ocr-controls-row">
+        {az_ocr_html}
+        <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+          <span class="ocr-zoom-label">Text size</span>
+          <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+          <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+          <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+          <span class="ocr-zoom-hint">or pinch to zoom</span>
+        </div>
+      </div>
+      <div class="quiet-links">
+        <a href="{html.escape(ocr_standalone_href, quote=True)}" {blank}>Open text in new tab</a>
       </div>
       <div id="ocr-panel">{ocr_fragment}</div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>

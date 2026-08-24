@@ -210,7 +210,7 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertIn("pdf-fullscreen-btn", html_output)
             # Desktop + mobile: hide the raw-PDF iframe and show stacked PDF.js pages.
             self.assertIn("pdf-inpage-viewer", html_output)
-            self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823v", html_output)
+            self.assertIn("/assets/pdf-inpage-viewer.js?v=20260824a", html_output)
             self.assertIn("data-pdf-src", html_output)
             self.assertIn("is-native-pdf", html_output)
             self.assertIn("display: flex !important", html_output)
@@ -250,7 +250,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("<iframe", html_output)
         self.assertIn("embed-mode", html_output)
         self.assertIn("pdf-inpage-viewer", html_output)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823v", html_output)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260824a", html_output)
         self.assertIn("data-pdf-src", html_output)
         self.assertNotIn("pdf-inpage-prev", html_output)
         self.assertNotIn("pdf-inpage-next", html_output)
@@ -282,7 +282,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("is-native-pdf", boot)
         self.assertIn("pdf-frame-wrap", boot)
         self.assertIn("removeAttribute('src')", boot)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823v", boot)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260824a", boot)
         self.assertNotIn("prefersNativePdf", boot)
         self.assertNotIn("narrowViewport", boot)
         self.assertEqual(boot, pdf_mobile_fallback_boot_js())
@@ -446,7 +446,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn('id="scroll-top-btn"', html_output)
         self.assertIn("Georgia", html_output)
         self.assertIn("pdf-inpage-viewer", html_output)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823v", html_output)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260824a", html_output)
         self.assertIn("block: 'start'", html_output)
         self.assertNotIn("block: 'center'", html_output)
         self.assertIn("is-native-pdf", html_output)
@@ -475,6 +475,65 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn('data-az-target="pdf"', row)
         self.assertIn('data-az-expand="pdf"', row)
         self.assertEqual(render_az_jump_html([], target="ocr"), "")
+
+    def test_ocr_search_sits_above_the_letter_and_zoom_rows(self) -> None:
+        """Frank 24/08/2026: "where is the search bar gone!!!".
+
+        It was fourth in the OCR block — letters, then Open text in new tab,
+        then a full-width text-size bar, then search. On a short window that
+        pushed it off screen. Search now comes first, and the letters share one
+        row with the text-size controls so neither hides the other.
+        """
+        html_output = render_bulletin_viewer_shell(
+            page_title="Raphoe Diocese Collated Bulletin",
+            diocese_label="RAPHOE",
+            display_name="Raphoe Diocese",
+            headline="Raphoe Collated Bulletin",
+            meta_line="This week's bulletin — 23/08/2026.",
+            back_href="../../index.html",
+            back_label="← Back to home",
+            pdf_href="/mega_pdf/raphoe_mega_bulletin.pdf",
+            pdf_download_href="/mega_pdf/raphoe_mega_bulletin.pdf",
+            pdf_standalone_href="/mega_pdf/raphoe_mega_bulletin.pdf",
+            ocr_standalone_href="../../bulletins/raphoe-2026-08-23-ocr.html",
+            ocr_fragment=(
+                '<header class="ocr-parish-masthead" id="ocr-parish-tawnawilly"'
+                ' data-parish-name="Tawnawilly">'
+                '<h2 class="ocr-parish-name">Tawnawilly</h2></header>'
+            ),
+            parish_section_heading="RAPHOE Parishes with Working Bulletin Links",
+            parish_links_html='<ul class="parish-grid"><li class="parish-item">Tawnawilly</li></ul>',
+            az_names=["Tawnawilly", "Mevagh"],
+            parish_page_index={"Tawnawilly": 26},
+        )
+        panel = html_output.split('<div id="panel-ocr"', 1)[1].split('<div id="ocr-panel"', 1)[0]
+        search_at = panel.index('id="ocr-search"')
+        letters_at = panel.index('class="az-row"')
+        zoom_at = panel.index('class="ocr-zoom-bar"')
+        quiet_at = panel.index("Open text in new tab")
+        self.assertLess(search_at, letters_at, "search must come before the letter row")
+        self.assertLess(search_at, zoom_at, "search must come before the text-size bar")
+        self.assertLess(search_at, quiet_at)
+        # Letters and text size live in one row, sticky search stays outside
+        # #ocr-panel.
+        self.assertIn('class="ocr-controls-row"', panel)
+        self.assertLess(panel.index('class="ocr-controls-row"'), letters_at)
+        self.assertLess(panel.index('class="ocr-controls-row"'), zoom_at)
+        self.assertIn("ocr-sticky-chrome", panel)
+        self.assertIn('<label class="ocr-search-label" for="ocr-search">', panel)
+        self.assertIn('class="ocr-zoom-label"', panel)
+        # A letter jump moves text inside a locked box, so flag where it landed.
+        self.assertIn("flashLanding", html_output)
+        self.assertIn(".az-landed {", html_output)
+        self.assertIn("landInBox", html_output)
+        self.assertIn("ocr-parish-' + slugOf(name)", html_output)
+        # Retry is no longer PDF-only: the OCR panel is rebuilt when a search
+        # is cleared, so an OCR letter click must retry too.
+        self.assertNotIn("target === 'pdf' && (tries || 0) < 12", html_output)
+        # The first PDF page used to be sized before the scrollbar appeared,
+        # leaving a horizontal scrollbar under a strip of the bulletin.
+        self.assertIn("scrollbar-gutter: stable", html_output)
+        self.assertRegex(html_output, r"\.pdf-inpage-page-slot \{[^}]*max-width: 100%")
 
     def test_mobile_enlarges_only_the_tapped_panel(self) -> None:
         """Desktop stays 850px; a phone taps one panel open, never both."""
@@ -561,7 +620,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotIn("prefersNativePdf", text)
         loader = assets / "pdf-mobile-fallback.js"
         self.assertTrue(loader.is_file())
-        self.assertIn("pdf-inpage-viewer.js?v=20260823v", loader.read_text(encoding="utf-8"))
+        self.assertIn("pdf-inpage-viewer.js?v=20260824a", loader.read_text(encoding="utf-8"))
 
     def test_live_gortahork_ocr_has_mega_body_and_visible_850(self) -> None:
         """Frank 2026-08-21: parish slice must reuse mega OCR sentences; 850px on visible boxes."""
@@ -603,7 +662,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotIn("85vh", diocese)
         self.assertIn("inner-2", diocese)
         self.assertIn("data-pp-scroll-top", diocese)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823v", diocese)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260824a", diocese)
 
     def test_live_diocese_html_ships_inpage_viewer(self) -> None:
         """Generator-only changes are invisible on parishpress.ie — live HTML must include PDF.js."""
@@ -624,6 +683,25 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertEqual(html_live.count('class="az-row"'), 2, rel)
             self.assertIn('class="az-letter"', html_live, rel)
             self.assertIn("#panel-ocr.az-expanded #ocr-panel", html_live, rel)
+            # Search first in the OCR block (Frank 24/08/2026), letters and
+            # text size in one row, and a visible flag on the parish a letter
+            # jump landed on.
+            ocr_block = html_live.split('<div id="panel-ocr"', 1)[1].split(
+                '<div id="ocr-panel"', 1
+            )[0]
+            self.assertLess(
+                ocr_block.index('id="ocr-search"'),
+                ocr_block.index('class="az-row"'),
+                f"{rel}: OCR search must sit above the letter row",
+            )
+            self.assertLess(
+                ocr_block.index('id="ocr-search"'),
+                ocr_block.index('class="ocr-zoom-bar"'),
+                f"{rel}: OCR search must sit above the text-size bar",
+            )
+            self.assertIn('class="ocr-controls-row"', ocr_block, rel)
+            self.assertIn("flashLanding", html_live, rel)
+            self.assertIn("scrollbar-gutter: stable", html_live, rel)
             self.assertIn("/assets/pdf-inpage-viewer.js?v=", html_live, rel)
             self.assertIn(".ocr-sticky-chrome.is-searching", html_live, rel)
             self.assertIn("syncOcrSearchSticky", html_live, rel)
