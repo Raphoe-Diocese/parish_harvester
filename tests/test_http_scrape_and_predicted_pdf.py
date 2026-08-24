@@ -770,6 +770,59 @@ class ErrigalAndMalinRecipeTests(unittest.TestCase):
         )
 
 
+class KilmoreAndKillyleaghRecipeTests(unittest.TestCase):
+    LISTING = "https://www.kilmoreandkillyleagh.com/latest-notices--downloads.html"
+    THIS_WEEK = (
+        "https://www.kilmoreandkillyleagh.com/uploads/8/7/4/5/8745725/"
+        "23rd_august_2026_combined-1.pdf"
+    )
+    NINTH = (
+        "https://www.kilmoreandkillyleagh.com/uploads/8/7/4/5/8745725/"
+        "9th_august_2026__1_.pdf"
+    )
+    SECOND = (
+        "https://www.kilmoreandkillyleagh.com/uploads/8/7/4/5/8745725/"
+        "2nd_august_2026.pdf"
+    )
+    CONSENT = (
+        "https://www.kilmoreandkillyleagh.com/uploads/8/7/4/5/8745725/"
+        "registration_-_consent_form_liturgy_teconnaught.pdf"
+    )
+
+    def test_recipe_scrapes_listing_and_allows_seven_page_weekly(self) -> None:
+        data = json.loads(
+            Path("parishes/recipes/down_and_connor/kilmoreandkillyleagh.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(data["site_type"], "http_scrape_newest_pdf")
+        self.assertIn("8745725", data.get("href_patterns") or [])
+        self.assertGreaterEqual(int(data["max_bulletin_pages"]), 8)
+        steps = data.get("steps") or []
+        self.assertFalse(
+            any(
+                "9th_august" in str(step.get("url") or "").lower()
+                or "9th_august" in str(step.get("href") or "").lower()
+                or "9th_august" in str(step.get("selector") or "").lower()
+                for step in steps
+                if isinstance(step, dict)
+            ),
+            "pinned 9th August download would miss 23rd_august_2026_combined-1.pdf",
+        )
+
+    def test_combined_23_aug_beats_9_aug_and_skips_consent_form(self) -> None:
+        scored = _score_http_scrape_pdf_hrefs(
+            [self.THIS_WEEK, self.NINTH, self.SECOND, self.CONSENT],
+            date(2026, 8, 23),
+        )
+        self.assertTrue(scored)
+        best_date, best_url = max(scored)
+        self.assertEqual(best_date, date(2026, 8, 23))
+        self.assertEqual(best_url, self.THIS_WEEK)
+        self.assertTrue(_is_non_bulletin_url(self.CONSENT))
+        self.assertTrue(all("consent_form" not in url for _, url in scored))
+
+
 class CarrickfergusBackIssuesRecipeTests(unittest.TestCase):
     CATALOGUE = "https://www.carrickparish.org/registration"
     JUNE_28 = (

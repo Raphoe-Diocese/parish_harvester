@@ -1,15 +1,23 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "kilmoreandkillyleagh",
   "display_name": "Kilmore and Killyleagh",
   "diocese": "down_and_connor",
   "start_url": "https://www.kilmoreandkillyleagh.com/latest-notices--downloads.html",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": ["8745725"],
+  "playbook_type": "pdf_download_list",
+  "max_bulletin_pages": 10,
+  "timeout_ms": 55000,
+  "total_timeout_s": 250,
   "steps": [
     {
+      "action": "goto",
+      "url": "https://www.kilmoreandkillyleagh.com/latest-notices--downloads.html"
+    },
+    {
       "action": "click",
-      "selector": "a[href*=\"9th_august_2026__1_.pdf\"]",
-      "href": "/uploads/8/7/4/5/8745725/9th_august_2026__1_.pdf",
-      "text": "9th August 2026 Download File | ",
+      "selector": "a[href$='.pdf']",
       "pick_strategy": "newest_dated",
       "bulletin_position": "top",
       "fallback_selectors": [
@@ -18,27 +26,23 @@
       ]
     },
     {
-      "action": "download",
-      "url": "https://www.kilmoreandkillyleagh.com/uploads/8/7/4/5/8745725/9th_august_2026__1_.pdf"
+      "action": "download"
     }
   ],
-  "observed_load_ms": 9676.10009765625,
-  "timeout_ms": 55000,
-  "total_timeout_s": 250,
-  "playbook_type": "pdf_download_list",
-  "site_type": "pdf_link_list",
   "operator_notes": [
-    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
-    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-    "Do not worry if the filename or date in the link text changes every week."
+    "Weebly listing https://www.kilmoreandkillyleagh.com/latest-notices--downloads.html has dated PDFs in /uploads/8/7/4/5/8745725/.",
+    "2026-08-24: 23rd_august_2026_combined-1.pdf is HTTP 200 (2151572 bytes, Last-Modified Sun 23 Aug 2026 18:16:42 GMT). Heading '23rd August 2026' / '21st Sunday of Ordinary Time' / Parishes of Kilmore & Killyleagh. 7 pages (weekly bulletin + Mass readings). Not a magazine.",
+    "Old recipe pinned selector + download to 9th_august_2026__1_.pdf, so harvest stayed on 09/08/2026 after this week's file was posted.",
+    "site_type:http_scrape_newest_pdf picks the newest dated upload over HTTP. Playwright click newest_dated is fallback only. max_bulletin_pages=10 allows the 7-page weekly file (default cap is 4)."
   ],
   "do_not": [
-    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
-    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+    "Do not pin a dated filename in the selector or download URL (e.g. 9th_august_2026__1_.pdf) — it breaks next week.",
+    "Do not pick GDPR, Gift Aid, consent-form, or financial statement PDFs.",
+    "Do not leave the default 4-page cap — the weekly combined bulletin+readings file is 7 pages."
   ],
   "bulletin_layout": {
     "strategy": "newest_dated",
     "position": "top"
   },
-  "recorded_date": "2026-08-19"
+  "recorded_date": "2026-08-24"
 }
