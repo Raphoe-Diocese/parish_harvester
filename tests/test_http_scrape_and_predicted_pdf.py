@@ -860,6 +860,40 @@ class CarrickfergusBackIssuesRecipeTests(unittest.TestCase):
         self.assertEqual(june_bulletin.extracted_date, date(2026, 6, 28))
 
 
+class LimavadyRecipeTests(unittest.TestCase):
+    THIS_WEEK = "https://www.limavadyparish.org/onewebmedia/23-8-26.pdf"
+    NEXT_WEEK = "https://www.limavadyparish.org/onewebmedia/30-8-26.pdf"
+    RECIPE = Path("parishes/recipes/derry/limavadyparish.json")
+
+    def test_recipe_pins_this_week_not_stale_examples(self) -> None:
+        raw = self.RECIPE.read_text(encoding="utf-8")
+        data = json.loads(raw)
+        self.assertIn("23-8-26.pdf", data["start_url"])
+        download = next(
+            step
+            for step in data["steps"]
+            if isinstance(step, dict) and step.get("action") == "download"
+        )
+        self.assertIn("23-8-26.pdf", download.get("url") or "")
+        self.assertNotIn("16-8-26.pdf", raw)
+        self.assertNotIn("28-6-26.pdf", raw)
+        self.assertEqual(data["site_type"], "predicted_dated_pdf")
+        self.assertEqual(int(data["weeks_back"]), 8)
+        self.assertNotIn("use_captured_url", json.dumps(data))
+
+    def test_next_sunday_rewrite_and_this_week_listed_first(self) -> None:
+        self.assertEqual(
+            rewrite_date_url(self.THIS_WEEK, date(2026, 8, 30)),
+            self.NEXT_WEEK,
+        )
+        urls = predicted_dated_upload_urls(
+            self.THIS_WEEK, date(2026, 8, 23), weeks_back=8
+        )
+        self.assertTrue(urls, "predicted_dated_upload_urls returned nothing")
+        self.assertEqual(urls[0], self.THIS_WEEK)
+        self.assertTrue(urls[0].endswith("23-8-26.pdf"))
+
+
 class LisburnRecipeTests(unittest.TestCase):
     THIS_WEEK = (
         "https://parishoflisburn.org/wp-content/uploads/2026/08/"

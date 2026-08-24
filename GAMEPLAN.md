@@ -17,6 +17,38 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 24/08/2026 — Limavady recipe pin (this week’s file)
+
+**The real goal, in one sentence:** stop harvest using a stale Limavady example
+URL so the first guess is this week’s `23-8-26.pdf`.
+
+Frank proved on 24/08/2026 (screenshots win): listing
+https://www.limavadyparish.org/parish%20bulletins.html first button
+**23rd August 2026**; opened PDF `23-8-26.pdf` header **23 August 2026**,
+**TWENTY-FIRST SUNDAY IN ORDINARY TIME**. Harvest `parish_status.json` on
+main still says `ok` with `16-8-26.pdf` (last_tested 23/08/2026 22:36 UTC) —
+that file was **not** edited this turn; do not invent ok/stale.
+
+Cause: `predicted_dated_pdf` replay uses the **step** URL first. The step was
+still pinned to `28-6-26.pdf`; `weeks_back` then finds last week
+`16-8-26.pdf`. Pattern B rewrite already maps to `23-8-26.pdf` for Sunday
+23/08/2026 (existing
+`test_padded_dd_mm_yy_rewrite_keeps_zeros`). Sunday harvest almost certainly
+404’d this week’s file (not uploaded yet) and kept last week. Old H3 grace
+then called that `ok`. **Stale example URL in the recipe, not a rewrite bug.**
+
+**This turn:** `parishes/recipes/derry/limavadyparish.json` now points
+`start_url` and `steps[0].url` at `23-8-26.pdf`. Kept
+`site_type: predicted_dated_pdf`, `weeks_back: 8`, timeouts, and `do_not`
+(still no `use_captured_url`). `recorded_date` `2026-08-24`. Next Sunday
+rewrite must become `30-8-26.pdf`. **H3 already merged** as PR
+[#131](https://github.com/Raphoe-Diocese/parish_harvester/pull/131)
+(`42861123` / `8eef477c`) — **not reverted**. No other recipes touched. No
+harvest. No `parish_status.json` edit. Not live / not harvested until the
+next harvest — do not tick this done as live.
+
+---
+
 ## 23/08/2026 — Brittleness audit (what can lie to us)
 
 **The real goal, in one sentence:** find the places where harvest says `ok` but a
