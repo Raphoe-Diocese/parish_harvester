@@ -26,7 +26,7 @@ from .utils import (
 if TYPE_CHECKING:
     from .fetcher import FetchResult, ParishEntry
 
-# Match harvest_log / extension: >8 calendar days from harvest target = stale.
+# Ahead-only grace: up to 8 calendar days after harvest target is still fresh.
 MAX_STALE_DAYS_FROM_TARGET = 8
 # Bulletin week window used by fetcher candidate scoring (Sun − 6 … target Sun).
 WEEK_LOOKBACK_DAYS = 6
@@ -286,7 +286,7 @@ def verdict_for_extracted_date(extracted: date, target: date) -> FreshnessVerdic
         )
 
     days_from_target = (extracted - target).days
-    if abs(days_from_target) <= MAX_STALE_DAYS_FROM_TARGET:
+    if 0 < days_from_target <= MAX_STALE_DAYS_FROM_TARGET:
         return FreshnessVerdict(
             status="fresh",
             extracted_date=extracted,
@@ -308,8 +308,8 @@ def check_bulletin_freshness(url: str, target: date) -> FreshnessVerdict:
     Decide whether *url* points at the current harvest week's bulletin.
 
     * unknown — no parseable date (do not auto-reject; parish may use undated URLs)
-    * fresh   — date within the bulletin week or within MAX_STALE_DAYS of target
-    * stale   — explicit date clearly outside the acceptable window
+    * fresh   — date in the bulletin week, or up to MAX_STALE_DAYS ahead of target
+    * stale   — date before the bulletin week, or more than MAX_STALE_DAYS ahead
     """
     extracted = extract_bulletin_date(url)
     if extracted is None:

@@ -148,9 +148,10 @@ class BulletinFreshnessTests(unittest.TestCase):
         verdict = check_bulletin_freshness(url, date(2026, 8, 9))
         self.assertEqual(verdict.status, "fresh")
         self.assertEqual(verdict.reason, "in_bulletin_week")
-        # Same file must stay fresh against the following Sunday (8-day grace).
+        # Last Sunday is outside week_window — behind grace is gone.
         later = check_bulletin_freshness(url, date(2026, 8, 16))
-        self.assertEqual(later.status, "fresh")
+        self.assertEqual(later.status, "stale")
+        self.assertEqual(later.reason, "date_behind_of_target")
 
     def test_liturgical_only_filename_is_not_folder_day_one(self) -> None:
         # Holy Family / Loughshore: Twentieth-Sunday-in-Ordinary-Time.pdf
@@ -336,8 +337,8 @@ class BulletinFreshnessTests(unittest.TestCase):
 
     def test_yearless_month_day_slug_uses_harvest_year(self) -> None:
         # milfordrathmullanparishes.ie / rathmullan — filenames have no year.
-        # 09/08/2026 is 7 days behind 16/08/2026 so it is still inside the
-        # 8-day grace window. 05/07/2026 is 42 days behind and must be stale
+        # 09/08/2026 is last Sunday vs 16/08/2026 — outside week_window, stale.
+        # 05/07/2026 is 42 days behind and must stay stale
         # (previously these URLs were "unknown" and silently accepted).
         target = date(2026, 8, 16)
         august = (
@@ -351,7 +352,7 @@ class BulletinFreshnessTests(unittest.TestCase):
         self.assertIsNone(extract_bulletin_date(august))
         self.assertIsNone(extract_bulletin_date(july))
         august_verdict = check_bulletin_freshness(august, target)
-        self.assertEqual(august_verdict.status, "fresh")
+        self.assertEqual(august_verdict.status, "stale")
         self.assertEqual(august_verdict.extracted_date, date(2026, 8, 9))
         july_verdict = check_bulletin_freshness(july, target)
         self.assertEqual(july_verdict.status, "stale")
@@ -366,7 +367,8 @@ class BulletinFreshnessTests(unittest.TestCase):
             check_bulletin_freshness(limavady, target).status, "fresh"
         )
         self.assertEqual(extract_bulletin_date(claudy), date(2026, 8, 9))
-        self.assertEqual(
+        self.assertEqual(check_bulletin_freshness(claudy, target).status, "stale")
+        self.assertNotEqual(
             check_bulletin_freshness(claudy, target).reason, "within_grace_days"
         )
 
@@ -381,7 +383,8 @@ class BulletinFreshnessTests(unittest.TestCase):
             "https://www.ballymoneyparish.com/media/other/31871/26-08-16pdf.pdf"
         )
         self.assertEqual(extract_bulletin_date(old), date(2026, 8, 16))
-        self.assertEqual(
+        self.assertEqual(check_bulletin_freshness(old, target).status, "stale")
+        self.assertNotEqual(
             check_bulletin_freshness(old, target).reason, "within_grace_days"
         )
 
@@ -406,7 +409,8 @@ class BulletinFreshnessTests(unittest.TestCase):
         target = date(2026, 8, 16)
         self.assertEqual(extract_bulletin_date(post), date(2026, 8, 9))
         self.assertEqual(extract_bulletin_date(image), date(2026, 8, 9))
-        self.assertEqual(
+        self.assertEqual(check_bulletin_freshness(post, target).status, "stale")
+        self.assertNotEqual(
             check_bulletin_freshness(post, target).reason, "within_grace_days"
         )
         self.assertEqual(
@@ -435,6 +439,20 @@ class BulletinFreshnessTests(unittest.TestCase):
         self.assertEqual(check_bulletin_freshness(current, target).reason, "in_bulletin_week")
         self.assertEqual(extract_bulletin_date(archived), date(2026, 7, 12))
         self.assertEqual(check_bulletin_freshness(archived, target).status, "stale")
+
+    def test_ahead_grace_keeps_thursday_post_for_next_sunday(self) -> None:
+        # Parishes post Thursday/Friday for next Sunday. +4 days stays fresh;
+        # +9 days is past MAX_STALE_DAYS_FROM_TARGET and is stale.
+        target = date(2026, 8, 16)
+        ahead = "https://example.com/bulletin_200826.pdf"
+        too_far = "https://example.com/bulletin_250826.pdf"
+        self.assertEqual(extract_bulletin_date(ahead), date(2026, 8, 20))
+        ahead_verdict = check_bulletin_freshness(ahead, target)
+        self.assertEqual(ahead_verdict.status, "fresh")
+        self.assertEqual(ahead_verdict.reason, "within_grace_days")
+        too_far_verdict = check_bulletin_freshness(too_far, target)
+        self.assertEqual(too_far_verdict.status, "stale")
+        self.assertEqual(too_far_verdict.reason, "date_ahead_of_target")
 
 
 if __name__ == "__main__":

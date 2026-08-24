@@ -81,7 +81,7 @@ tested; nothing new is invented. `extract_bulletin_date_from_text`
 `python -m pytest tests/test_bulletin_freshness.py tests/test_fetcher_capture_reliability.py -q`
 = 44 passed. Undated URL + July heading → `stale`; no heading / this-week
 heading stay `unknown`. This does **not** change parishpress.ie until the
-next harvest — do not tick H1 done as live/harvested. H2 doing. H3 not started.
+next harvest — do not tick H1 done as live/harvested. H2 tests proved. H3 doing.
 
 ### Also NOW — two more one-file hardens
 
@@ -104,7 +104,7 @@ photo bulletins legitimately have no text layer.
 and the existing real-bulletin / blank image_stack / unreadable-file cases
 not flagged. Same deliberately-narrow regex — no bare `500`. This does
 **not** change parishpress.ie until the next harvest — do not tick H2 done
-as live/harvested. H3 not started. `harvester/stitcher.py` still has the old
+as live/harvested. H3 doing. `harvester/stitcher.py` still has the old
 copy of the regex — parked, not edited.
 
 **H3. The 8-day grace window accepts last Sunday as this Sunday.**
@@ -130,6 +130,11 @@ window", not on a correct `in_bulletin_week` match.
 **Say this out loud before doing it:** 8 parishes flip `ok` → `stale`, the
 Problems tab jumps from 15 to about 23, and the homepage ready counts drop.
 That is the truth, not a regression — but it must not be a surprise.
+**H3 status 24/08/2026: doing.** One-sided ahead grace only (`0 < days <= 8`).
+Last Sunday is outside `week_window` and must become stale. Ahead posts
+(Thursday/Friday for next Sunday) stay fresh. Do not tick H3 done as live —
+`parish_status.json` and parishpress.ie do not change until the next harvest.
+H4 not started.
 
 ### NEXT — after the three above land
 

@@ -315,7 +315,7 @@ def update_stale_bulletins(
 
         days_from_target = (extracted - reference).days
         days_old = abs(days_from_target)
-        if days_old > MAX_STALE_DAYS_FROM_TARGET:
+        if days_from_target < 0 or days_from_target > MAX_STALE_DAYS_FROM_TARGET:
             stale.append(
                 {
                     "key": key,

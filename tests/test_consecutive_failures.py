@@ -60,7 +60,7 @@ class ConsecutiveFailuresTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as tmp:
             stale_path = Path(tmp) / "stale_bulletins.json"
             old_date = (date.today() - timedelta(days=10)).strftime("%d%m%y")
-            fresh_date = (date.today() - timedelta(days=2)).strftime("%Y-%m-%d")
+            fresh_date = (date.today() + timedelta(days=2)).strftime("%Y-%m-%d")
             results = [
                 FetchResult(
                     key="staleparish",
@@ -122,7 +122,7 @@ class ConsecutiveFailuresTests(unittest.TestCase):
     def test_update_stale_bulletins_uses_strictly_more_than_8_days(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             stale_path = Path(tmp) / "stale_bulletins.json"
-            boundary_date = (date.today() - timedelta(days=8)).strftime("%Y-%m-%d")
+            boundary_date = (date.today() + timedelta(days=8)).strftime("%Y-%m-%d")
             payload = update_stale_bulletins(
                 [
                     FetchResult(
