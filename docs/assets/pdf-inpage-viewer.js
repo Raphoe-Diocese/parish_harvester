@@ -39,11 +39,11 @@
       ".pdf-inpage-backup{display:flex;gap:8px;flex-wrap:wrap}" +
       ".pdf-inpage-backup a{color:#fff;font-weight:700;font-size:.85rem}" +
       ".pdf-inpage-status{padding:10px 12px;background:#1f3d3c;color:#d8f0ee;font-size:.9rem}" +
-      ".pdf-inpage-pages{box-sizing:border-box;flex:0 0 auto;height:850px!important;min-height:850px!important;max-height:850px!important;overflow:auto!important;overflow-y:auto!important;background:#525659;padding:8px 0 16px}" +
-      "#ocr-panel{height:850px!important;min-height:850px!important;max-height:850px!important;overflow:auto!important;overflow-y:auto!important}" +
-      ".pdf-inpage-page-slot{margin:0 auto 10px;background:#3a3f42;min-height:180px;position:relative}" +
+      ".pdf-inpage-pages{box-sizing:border-box;flex:0 0 auto;height:850px!important;min-height:850px!important;max-height:850px!important;overflow:auto!important;overflow-y:auto!important;overflow-x:hidden!important;scrollbar-gutter:stable;background:#525659;padding:8px 0 16px}" +
+      "#ocr-panel{height:850px!important;min-height:850px!important;max-height:850px!important;overflow:auto!important;overflow-y:auto!important;scrollbar-gutter:stable}" +
+      ".pdf-inpage-page-slot{margin:0 auto 10px;background:#3a3f42;min-height:180px;max-width:100%;position:relative}" +
       ".pdf-inpage-page-slot canvas{display:block;width:100%;height:auto;background:#fff}" +
-      ".pdf-link-layer{position:absolute;left:0;top:0;width:100%;height:100%;pointer-events:none}" +
+      ".pdf-link-layer{position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden;pointer-events:none}" +
       ".pdf-annot-link{position:absolute;z-index:2;pointer-events:auto;background:rgba(26,107,107,0.08);border-radius:2px}" +
       ".pdf-annot-link:focus{outline:2px solid #1a6b6b;outline-offset:1px}" +
       ".pdf-frame-wrap,.pdf-standalone-shell{display:flex;flex-direction:column}" +
@@ -66,6 +66,7 @@
       ".pdf-inpage-viewer{min-height:450px!important}" +
       ".pdf-inpage-pages,#ocr-panel,.pdf-frame-wrap iframe," +
       ".pdf-standalone-shell iframe.pdf-frame{height:450px!important;min-height:450px!important;max-height:450px!important;overflow:auto!important;overflow-y:auto!important}" +
+      ".pdf-inpage-pages{overflow-x:hidden!important}" +
       /* "Tap to enlarge" grows ONLY the panel the reader tapped (extra id
          specificity beats the 450 lock above). The other panel stays 450 so a
          phone never shows two 850px boxes at once. */
@@ -86,6 +87,10 @@
       ".pdf-inpage-pages,#ocr-panel,.pdf-frame-wrap iframe," +
       ".pdf-standalone-shell iframe.pdf-frame{height:850px!important;min-height:850px!important;" +
       "max-height:850px!important;overflow:auto!important;overflow-y:auto!important}" +
+      /* `overflow: auto` resets both axes, so re-hide the horizontal one: a
+         single stray PDF link annotation off the right edge of a page used to
+         give the whole box a horizontal scrollbar. */
+      ".pdf-inpage-pages{overflow-x:hidden!important}" +
       ".az-expand{display:none}" +
       "}";
   }
@@ -100,18 +105,31 @@
   }
 
   function ensureStickySearch() {
-    if (!document.querySelector(".ocr-sticky-chrome")) {
-      var zoom = document.querySelector(".ocr-zoom-bar");
-      var bar = document.querySelector(".ocr-search-bar");
-      var tools = document.querySelector(".ocr-search-tools");
-      var first = zoom || bar || tools;
+    var chrome = document.querySelector(".ocr-sticky-chrome");
+    var zoom = document.querySelector(".ocr-zoom-bar");
+    var bar = document.querySelector(".ocr-search-bar");
+    var tools = document.querySelector(".ocr-search-tools");
+    if (!chrome) {
+      var first = bar || tools || zoom;
       if (first && first.parentNode) {
-        var wrap = document.createElement("div");
-        wrap.className = "ocr-sticky-chrome";
-        first.parentNode.insertBefore(wrap, first);
-        if (zoom) wrap.appendChild(zoom);
-        if (bar) wrap.appendChild(bar);
-        if (tools) wrap.appendChild(tools);
+        chrome = document.createElement("div");
+        chrome.className = "ocr-sticky-chrome";
+        first.parentNode.insertBefore(chrome, first);
+      }
+    }
+    if (chrome) {
+      // Search first. Pages generated before 24/08/2026 put the letter row and
+      // the text-size bar above it, so the search box was four rows down and
+      // readers could not find it.
+      if (bar) chrome.insertBefore(bar, chrome.firstChild);
+      if (tools) {
+        if (bar) chrome.insertBefore(tools, bar.nextSibling);
+        else chrome.appendChild(tools);
+      }
+      if (zoom && zoom.parentNode === chrome) {
+        var row = document.querySelector(".ocr-controls-row");
+        if (row) row.appendChild(zoom);
+        else if (chrome.parentNode) chrome.parentNode.insertBefore(zoom, chrome.nextSibling);
       }
     }
     syncOcrSearchSticky();
