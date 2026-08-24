@@ -5,6 +5,7 @@ import unittest
 from pathlib import Path
 
 from ocr.generate_bulletin_pages import (
+    PDF_INPAGE_VIEWER_VERSION,
     DioceseConfig,
     _fragment_to_plain_text,
     build_az_parish_ocr_html,
@@ -643,7 +644,11 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotRegex(html_live, r"#ocr-panel\s*\{[^}]*height:\s*auto")
         self.assertIn("ocr-sticky-chrome", html_live)
         self.assertIn('id="scroll-top-btn"', html_live)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260823u", html_live)
+        # Any pinned version, not today's: the 458 parish pages are rewritten
+        # by ocr-bulletin.yml, not by a viewer-chrome PR, so pinning them to
+        # PDF_INPAGE_VIEWER_VERSION makes every cache-bust fail CI. What
+        # matters here is that the parish page ships the viewer at all.
+        self.assertRegex(html_live, r"/assets/pdf-inpage-viewer\.js\?v=\d{8}[a-z]")
         self.assertNotIn("85vh", html_live)
         self.assertIn("min-height: 450px", html_live)
         self.assertIn("height: 450px", html_live)

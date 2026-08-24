@@ -253,6 +253,36 @@ def _looks_like_parish_name(plain: str, entries: list[tuple[str, str, list[str],
     return None
 
 
+def _match_entry_name(
+    name: str, entries: list[tuple[str, str]]
+) -> str:
+    """Map a stitcher-index parish name onto the evidence file's spelling."""
+    base = (name or "").strip()
+    for _key, display in entries:
+        other = (display or "").strip()
+        if other.lower() == base.lower():
+            return other
+        long, short = (other, base) if len(other) > len(base) else (base, other)
+        if short and long.lower().startswith(short.lower()) and long[len(short)] in " (":
+            return other
+    return base
+
+
+def _name_belongs_on_page(
+    display_name: str, page: int, spans: dict[str, tuple[int, int]]
+) -> bool:
+    """True when a matched parish name may head the page being read.
+
+    Parish names get printed in other parishes' notices, so a bare name match
+    is not a section boundary. When the stitcher told us the page span, honour
+    it; parishes it does not cover (directory-only entries) still match by name.
+    """
+    span = spans.get((display_name or "").lower())
+    if not span or not page:
+        return True
+    return span[0] <= page <= span[1]
+
+
 def _is_url_only_line(plain: str) -> bool:
     text = (plain or "").strip().rstrip("/")
     if not text:
@@ -302,7 +332,7 @@ def structure_ocr_html(
     bulletin_date: str = "",
     parish_urls: dict[str, str] | None = None,
     single_parish_name: str | None = None,
-    lead_parish_name: str | None = None,
+    parish_page_spans: dict[str, tuple[int, int]] | None = None,
 ) -> str:
     """Idempotent reader layout: parish mastheads + real section headings.
 
@@ -310,10 +340,13 @@ def structure_ocr_html(
     ``ocr-parish-masthead`` blocks are kept. Topic headings already marked
     ``b-head`` / ``b-title`` are left alone.
 
-    ``lead_parish_name`` is the parish the stitcher put on page 1. Mastheads
-    are otherwise found by matching the printed banner line, so a parish whose
-    banner is artwork (Annagry) got none and its text ran on unlabelled under
-    the previous parish's name. Only used when that name never matched.
+    ``parish_page_spans`` maps a display name to its ``(start, end)`` pages in
+    the stitched mega PDF. Without it a masthead lands wherever the parish name
+    happens to be printed, which is not the page boundary: Killybegs was named
+    in a page 3 notice and headed the panel there instead of at its own page
+    19, and Tawnawilly's header sat on its Alpha page so its Mass times read
+    under the previous parish. With it, headers go on the page the stitcher
+    assigned and a name printed outside that span is left as body text.
     """
     source = _reset_reader_markup(fragment or "")
     entries_raw = list(parish_entries or [])
@@ -322,8 +355,18 @@ def structure_ocr_html(
         strong, weak = _name_patterns(display_name)
         packed.append((key, display_name, strong, weak))
     urls = parish_urls or {}
+    # The stitcher index and the evidence file can spell a parish differently
+    # ("Drumholm" vs "Drumholm (Ballintra)"); without this both get a header.
+    resolved = {name: _match_entry_name(name, entries_raw) for name in parish_page_spans or {}}
+    spans = {
+        resolved[name].lower(): span for name, span in (parish_page_spans or {}).items()
+    }
+    starts: dict[int, str] = {}
+    for name, (start, _end) in (parish_page_spans or {}).items():
+        starts.setdefault(start, resolved[name])
     seen_parish: set[str] = set()
     out: list[str] = []
+    current_page = 0
 
     if single_parish_name and "ocr-parish-masthead" not in source:
         out.append(render_parish_masthead(single_parish_name, bulletin_date))
@@ -339,6 +382,7 @@ def structure_ocr_html(
         _ = website  # name + date only — grid/PDF already carry the URL
 
     def process_plain_lines(raw_lines: list[str], *, allow_parish: bool) -> None:
+        nonlocal current_page
         body: list[str] = []
 
         def flush() -> None:
@@ -353,14 +397,19 @@ def structure_ocr_html(
             if not plain:
                 flush()
                 continue
-            if re.fullmatch(r"Page\s+\d+", plain, re.IGNORECASE):
+            page_label = re.fullmatch(r"Page\s+(\d+)", plain, re.IGNORECASE)
+            if page_label:
+                current_page = int(page_label.group(1))
                 flush()
+                owner = starts.get(current_page)
+                if owner:
+                    add_masthead(owner)
                 out.append(f'<p class="page-label">{html.escape(plain)}</p>')
                 continue
             nxt = _plain(raw_lines[idx + 1]) if idx + 1 < len(raw_lines) else ""
             if allow_parish and packed:
                 hit = _looks_like_parish_name(plain, packed, nxt)
-                if hit:
+                if hit and _name_belongs_on_page(hit[1], current_page, spans):
                     leftover = _notice_before_trailing_parish(plain, hit[1])
                     if leftover:
                         body.append(html.escape(leftover))
@@ -410,6 +459,8 @@ def structure_ocr_html(
             if hm:
                 inner = _plain(hm.group(3))
                 parish_hit = _looks_like_parish_name(inner, packed, "") if packed else None
+                if parish_hit and not _name_belongs_on_page(parish_hit[1], current_page, spans):
+                    parish_hit = None
                 if parish_hit:
                     leftover = _notice_before_trailing_parish(inner, parish_hit[1])
                     if leftover:
@@ -435,9 +486,6 @@ def structure_ocr_html(
         gap = source[pos:].strip()
         if gap:
             out.append(gap)
-    lead = (lead_parish_name or "").strip()
-    if lead and lead.lower() not in seen_parish:
-        out.insert(0, render_parish_masthead(lead, bulletin_date))
     return "\n".join(part for part in _drop_empty_directory_mastheads(out) if part)
 
 
