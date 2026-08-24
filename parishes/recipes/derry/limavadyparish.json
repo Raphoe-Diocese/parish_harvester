@@ -3,11 +3,11 @@
   "parish_key": "limavadyparish",
   "display_name": "Limavady",
   "diocese": "derry",
-  "start_url": "https://www.limavadyparish.org/onewebmedia/16-8-26.pdf",
+  "start_url": "https://www.limavadyparish.org/onewebmedia/23-8-26.pdf",
   "steps": [
     {
       "action": "download",
-      "url": "https://www.limavadyparish.org/onewebmedia/28-6-26.pdf"
+      "url": "https://www.limavadyparish.org/onewebmedia/23-8-26.pdf"
     }
   ],
   "site_type": "predicted_dated_pdf",
@@ -15,10 +15,11 @@
   "timeout_ms": 45000,
   "total_timeout_s": 180,
   "playbook_type": "dated_pdf_bulletin",
-  "recorded_date": "2026-08-18",
+  "recorded_date": "2026-08-24",
   "operator_notes": [
-    "Dated PDF at /onewebmedia/D-M-YY.pdf (e.g. 16-8-26.pdf = 16/08/2026).",
-    "2026-08-18 FIX: recipe was pinned with use_captured_url to 28-6-26.pdf. Playwright then failed ENETUNREACH on that host's IPv6 address. The file itself is fine over IPv4 — a plain HTTP GET of the rewritten 16-8-26.pdf returns 200 application/pdf (703,960 bytes). site_type:predicted_dated_pdf skips the browser (and IPv6) and tries rewrite_date_url for this Sunday plus previous weeks."
+    "Dated PDF at /onewebmedia/D-M-YY.pdf (e.g. 23-8-26.pdf = 23/08/2026).",
+    "2026-08-24: this week's file is 23-8-26.pdf (listing first button + PDF header 23 August 2026 / 21st Sunday). Next Sunday rewrite must become 30-8-26.pdf. Do not freeze use_captured_url.",
+    "Keep site_type:predicted_dated_pdf. Playwright IPv6 ENETUNREACH on this host; HTTP rewrite tries this Sunday then previous weeks. Do not switch to a browser listing scrape."
   ],
   "do_not": [
     "Do not set use_captured_url — it freezes the recipe on the trained week's file.",
