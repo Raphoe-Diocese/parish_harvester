@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Ballinascreen (&amp; Desertmartin amalgamated) Bulletin — 23/08/2026</title>
+  <title>Ballinascreen (&amp; Desertmartin amalgamated) Bulletin — 25/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -170,6 +170,12 @@
       max-height: 850px;
       overflow: auto;
       overflow-y: auto;
+      overflow-x: hidden;
+      /* Reserve the scrollbar gutter from the first paint. Without it the
+         first page is sized to the full width, the vertical scrollbar then
+         appears, and the page is suddenly ~16px too wide — a horizontal
+         scrollbar under a strip of the bulletin. */
+      scrollbar-gutter: stable;
       background: #525659;
       padding: 8px 0 16px;
     }
@@ -177,10 +183,16 @@
       margin: 0 auto 10px;
       background: #3a3f42;
       min-height: 180px;
+      max-width: 100%;
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
-    .pdf-link-layer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
+    /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
+       page — one of those used to stretch the box's scrollWidth to 2988px. */
+    .pdf-link-layer {
+      position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+      overflow: hidden; pointer-events: none;
+    }
     .pdf-annot-link {
       position: absolute; z-index: 2; pointer-events: auto;
       background: rgba(26, 107, 107, 0.08); border-radius: 2px;
@@ -230,6 +242,7 @@
         overflow: auto !important;
         overflow-y: auto !important;
       }
+      .pdf-inpage-pages { overflow-x: hidden !important; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -256,22 +269,48 @@
         overflow: auto !important;
         overflow-y: auto !important;
       }
+      /* `overflow: auto` above resets both axes, so re-hide the horizontal one:
+         a single stray PDF link annotation off the right edge of a page used to
+         give the whole box a horizontal scrollbar. */
+      .pdf-inpage-pages { overflow-x: hidden !important; }
       /* Nothing to enlarge — the box is already the locked 850px. */
       .az-expand { display: none; }
     }
 
 
-    .ocr-search-bar { position: relative; margin-bottom: 10px; }
+    /* Search comes first in the OCR block and reads like the JUMP TO bar, so
+       a reader cannot scroll past it looking for "where is the search". */
+    .ocr-search-bar {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 8px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-search-label {
+      flex: 0 0 auto;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
+    }
     .search-input {
-      width: 100%;
-      border: 1px solid #c9d4d3;
+      flex: 1 1 auto;
+      min-width: 0;
+      width: auto;
+      border: 1px solid #1a6b6b;
       border-radius: 4px;
       padding: 11px 42px 11px 14px;
       font-size: 1rem;
+      background: #fff;
     }
     .search-clear {
       position: absolute;
-      right: 10px;
+      right: 16px;
       top: 50%;
       transform: translateY(-50%);
       width: 32px;
@@ -400,6 +439,17 @@
     /* Desktop boxes are already the locked 850px, so there is nothing to
        enlarge — the button only appears on tablet/phone. */
     .az-expand { display: none; }
+    /* A letter jump scrolls inside a locked box, so nothing moves on screen
+       except the text. Flag the parish the reader landed on. */
+    .az-landed {
+      background: #fff6da;
+      box-shadow: 0 0 0 3px #f0d089;
+      border-radius: 3px;
+      transition: background 400ms ease, box-shadow 400ms ease;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .az-landed { transition: none; }
+    }
     .diocese-intro {
       margin: 0 0 22px;
       padding: 18px 18px 16px;
@@ -421,18 +471,48 @@
     }
     .diocese-intro .intro-names li { margin: 0 0 4px; }
     
+    /* Letters and text size share ONE bar, so neither hides the other and
+       neither pushes the search box off a short screen. The wrapper draws the
+       box; the letter row and zoom group go transparent inside it. */
+    .ocr-controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 12px;
+      margin: 0 0 10px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-controls-row .az-row,
+    .ocr-controls-row .ocr-zoom-bar {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      border: 0;
+    }
+    .ocr-controls-row .az-row { flex: 1 1 auto; }
+    .ocr-controls-row .ocr-zoom-bar { flex: 0 0 auto; margin-left: auto; }
     .ocr-zoom-bar {
-      display: flex; justify-content: center; align-items: center; gap: 10px;
-      margin: 0 0 10px; padding: 6px 10px;
-      background: rgba(255, 255, 255, 0.94);
-      border: 1px solid #d4ddd9; border-radius: 4px;
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-zoom-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
     }
     .ocr-zoom-bar button {
-      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 4px;
-      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.15rem; cursor: pointer;
+      min-width: 34px; height: 30px; border: 1px solid #cfdedd; border-radius: 4px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.05rem; line-height: 1; cursor: pointer;
     }
+    .ocr-zoom-bar button:hover { background: #1a6b6b; border-color: #1a6b6b; color: #fff; }
     .ocr-zoom-pct {
-      min-width: 3.5rem; text-align: center; font-weight: 700; font-size: 0.95rem; color: #14524f;
+      min-width: 3.2rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
     }
     .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
     @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 6px; } }
@@ -721,7 +801,8 @@
       /* Tap targets big enough for a thumb. */
       .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand {
+      .az-expand,
+      .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
@@ -763,13 +844,26 @@
         padding: 16px 14px 28px;
       }
       .ocr-search-tools { flex-direction: column; }
+      .ocr-search-tools > div {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+      }
       .ocr-search-tools button {
         min-height: 44px;
         width: 100%;
       }
+      /* One column on a phone: letters, then text size. Neither covers the
+         search box above them. */
+      .ocr-controls-row { flex-direction: column; }
+      .ocr-controls-row .az-row,
+      .ocr-controls-row .ocr-zoom-bar { flex: 1 1 auto; }
+      .ocr-search-bar { flex-wrap: wrap; }
+      .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260823v" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
 </head>
 <body>
   <div class="page">
@@ -777,7 +871,7 @@
     <header class="header">
       <p class="diocese-label">DERRY</p>
       <h1>Ballinascreen (&amp; Desertmartin amalgamated) Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Ballinascreen (&amp; Desertmartin amalgamated) — 23/08/2026. Part of the Derry Diocese collated bulletin. This parish is marked OK, but its page range could not be found in this week&#x27;s mega OCR (no stitcher page index and no name-banner match).</p>
+      <p class="meta">This week&#x27;s bulletin for Ballinascreen (&amp; Desertmartin amalgamated) — 25/08/2026. Part of the Derry Diocese collated bulletin.</p>
       <a class="download-link-top" href="parishofballinascreen.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
     </header>
     
@@ -813,19 +907,10 @@
 
     <h2 class="section-heading">Bulletin — OCR Extracted Plain Text</h2>
     <div id="panel-ocr" class="viewer-block">
-      
-      <div class="quiet-links">
-        <a href="parishofballinascreen-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
-      </div>
       <div class="ocr-sticky-chrome">
-      <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
-        <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
-        <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
-        <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
-        <span class="ocr-zoom-hint">or pinch to zoom</span>
-      </div>
       <div class="ocr-search-bar">
-        <input id="ocr-search" class="search-input" type="search" placeholder="Search OCR text..." aria-label="Search OCR text" />
+        <label class="ocr-search-label" for="ocr-search">Search</label>
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search OCR text — a parish, a name, a Mass time" aria-label="Search OCR text" />
         <button id="clear-search" class="search-clear" type="button" aria-label="Clear OCR search" hidden>×</button>
       </div>
       <div class="ocr-search-tools">
@@ -836,22 +921,278 @@
         </div>
       </div>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-ballinascreen-desertmartin-amalgamated" data-parish-name="Ballinascreen (&amp; Desertmartin amalgamated)"><h2 class="ocr-parish-name">Ballinascreen (&amp; Desertmartin amalgamated)</h2><p class="ocr-parish-date">23/08/2026</p></header>
-<div class="ocr-failed-banner" role="status">ℹ️ Matched by parish name only (not exact PDF pages) this week — check the PDF above for the definitive version.</div>
-<p>Ballinascreen (&amp; Desertmartin amalgamated):<br>
-Coleraine (St John):<br>
+      <div class="ocr-controls-row">
+        
+        <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+          <span class="ocr-zoom-label">Text size</span>
+          <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+          <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+          <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+          <span class="ocr-zoom-hint">or pinch to zoom</span>
+        </div>
+      </div>
+      <div class="quiet-links">
+        <a href="parishofballinascreen-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
+      </div>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-ballinascreen-desertmartin-amalgamated" data-parish-name="Ballinascreen (&amp; Desertmartin amalgamated)"><h2 class="ocr-parish-name">Ballinascreen (&amp; Desertmartin amalgamated)</h2><p class="ocr-parish-date">25/08/2026</p></header>
+<p class="page-label">Page 1</p>
+<p>BALLINASCREEN &amp; DESER TMAR TIN P ARISHES<br>
+23_AUGUST_2026<br>
+No. 43 ~ TWENTY -FIRST SUNDA Y IN ORDINAR Y TIME<br>
+PARISH CONT ACT DET AILS<br>
+Fr. Peter Madden PP VF<br>
+31 Sixtowns Road<br>
+Telephone: 79628376<br>
+Email: <a href="mailto:ballinascreenparish@gmail.com" target="_blank" rel="noopener noreferrer">ballinascreenparish@gmail.com</a><br>
+Fr Michael McCaul CC<br>
+50 Tobermore Road, Desertmartin<br>
+Telephone: 79632196<br>
+Email: <a href="mailto:desertmartinparish@gmail.com" target="_blank" rel="noopener noreferrer">desertmartinparish@gmail.com</a></p>
+<h3 class="b-head">PARISH OFFICES</h3>
+<p>Ballinascr een:<br>
+9 High Street<br>
+Phone: (028)79628248<br>
+Email: ballinascr <a href="mailto:eenparish@gmail.com" target="_blank" rel="noopener noreferrer">eenparish@gmail.com</a><br>
+Opening Hours: Monday , Tuesday and Thursday: 8.45 am - 3.30 pm. Wednesday: 8.45 am - 3.00 pm.<br>
 Desertmartin:<br>
-Greencastle:<br>
-Long Tower:<br>
-Malin:<br>
-Urney and Castlefin:</p></div>
+St Patrick’ s Keenaught<br>
+Phone: (028)79397047<br>
+Email: <a href="mailto:desertmartinparish@gmail.com" target="_blank" rel="noopener noreferrer">desertmartinparish@gmail.com</a><br>
+Opening Hours: Wednesday and Thursday 10.30 am to 3.00 pm.<br>
+SAFEGUARDING Contact Information<br>
+If you have any concerns with regard to the safeguarding of children within the Church, please contact:<br>
+Marie O’Kane -  Diocesan Designated Liaison Person (DLP) Tel.: <a href="tel:+447596500793" style="color:#1d4ed8;font-weight:600;">+44 7596 500793</a> or Email: <a href="mailto:dlp@derrydiocese.or" target="_blank" rel="noopener noreferrer">dlp@derrydiocese.or</a> g<br>
+Northern Ir eland Emergency Services<br>
+LIFELINE<br>
+Tel: 0808 808 8000 / Textphone 18001 0808 808 8000.<br>
+www .lifelinehelpline.info<br>
+SVP HELPLINE telephone number: <a href="tel:+3537710838050" style="color:#1d4ed8;font-weight:600;">07710838050</a><br>
+GAMBLING HELPLINE<br>
+Help is available, phone: <a href="tel:+442871351329" style="color:#1d4ed8;font-weight:600;">02871351329</a><br>
+SPERRIN FOODBANK<br>
+Tel: <a href="tel:+3537543420639" style="color:#1d4ed8;font-weight:600;">07543420639</a><br>
+BALLINASCREEN COMMUNITY SUPPOR T GROUP<br>
+Please click the link <a href="https://www" target="_blank" rel="noopener noreferrer">https://www</a> .parishofballinascreen.com/ballinascreen-community-support-gro for full details of Ballinascreen Community<br>
+Support Group.<br>
+PSNI (Police Service of Northern Ireland): 101<br>
+Social Services:<br>
+Gateway Services, Western HSC Trust: <a href="tel:+442871314090" style="color:#1d4ed8;font-weight:600;">028 7131 4090</a> (ask for the Duty Social Worker)<br>
+Gateway Services, Northern HSC Trust: <a href="tel:+442894424459" style="color:#1d4ed8;font-weight:600;">028 9442 4459</a><br>
+Regional Emer gency Social Work Services: 0800 1979 995Ballinascreen (&amp; Desertmartin amalgamated)</p>
+<hr>
+<p class="page-label">Page 2</p>
+<p>NOTICES FOR THE BULLETIN should be received by 1.00 pm on Wednesday , preferably by email.<br>
+Email: ballinascr <a href="mailto:eenparish@gmail.com" target="_blank" rel="noopener noreferrer">eenparish@gmail.com</a><br>
+Email: <a href="mailto:desertmartinparish@gmail.com" target="_blank" rel="noopener noreferrer">desertmartinparish@gmail.com</a><br>
+VIGIL MASSES FOR SUNDA Y - SA TURDA Y 25 JUL Y<br>
+Holy Rosary: 6.00 pm<br>
+St Patrick’ s, Keenaught: 7.30 pm<br>
+SUNDA Y MASSES - SUNDA Y 26 JUL Y<br>
+St Columba’ s, Straw: 9.00 am<br>
+St Mary’ s, Coolcalm: 10.00 am<br>
+St Patrick’ s, Sixtowns: 1 1.00 am<br>
+St Eugene’ s, Moneyneena: 12 noon<br>
+MASSES FOR THIS WEEK<br>
+Monday ~ 24 August<br>
+10.00 am ~ Holy Rosary Church.<br>
+Tuesday ~ 25 August<br>
+10.00 am ~ St. Mary’ s, Coolcalm. DDS Mass.<br>
+Wednesday ~ 26 August<br>
+10.00 am ~ Holy Rosary Church.<br>
+Thursday ~ 27 August<br>
+10.00 am ~ St Mary&#x27;s, Coolcalm<br>
+Friday ~ 28 August<br>
+10.00 am ~ St. Mary’ s, Coolcalm.<br>
+7.30 pm ~ Holy Rosary .<br>
+CONFESSIONS<br>
+Ballinascr een: Holy Rosary 5.30 pm - before Vigil Mass.<br>
+Desertmartin : Keenaught, Saturday 6.30 pm until 7.10 pm.<br>
+FEASTS OF THE WEEK<br>
+Monday 24 August: St Bartholomew , apostle.<br>
+Thursday 20 August: St Monica.<br>
+Friday 28 August: St Augustine bishop &amp; doctor of the Church.<br>
+Saturday 29 August: The Passion of St John the Baptist.<br>
+DEA THS<br>
+We extend our prayerful sympathy to the family and relatives of:<br>
+Sean Lagan, Magherafelt;<br>
+Mary Patricia Kealey , Ballymaguigan;<br>
+Patsy McPeake Greenlough.</p>
+<h3 class="b-head">MONTH&#x27;S MIND MASS</h3>
+<p>Month&#x27;s Mind Mass for Bernadette Regan, St Patrick’ s Street, on Friday 28 August at 7.30 pm in Holy Rosary Church.<br>
+Month&#x27;s Mind Mass for Joe McGuigan, Moykeeran, on Friday 28 August at 7.30 pm in Holy Rosary Church.<br>
+Month&#x27;s Mind Mass for Joe Burke, Glenelly Villas, on Friday 28 August at 7.30 pm in Holy Rosary Church.<br>
+Month&#x27;s Mind Mass for Francie Donnelly , Ranaghan Road, on Friday 28 August at 7.30 pm in Holy Rosary Church.<br>
+Month&#x27;s Mind Mass for Madge Cullinan, Moykeeran on Friday 28 August at 7.30 pm in Holy Rosary Church.</p>
+<hr>
+<p class="page-label">Page 3</p>
+<h3 class="b-head">ANNIVERSARIES</h3>
+<p>Ballinascr een:<br>
+First Anniversary:<br>
+Geor gina McGlone, Glenelly Villas.</p>
+<h3 class="b-head">Anniversaries</h3>
+<p>Joseph Duf fy, Cavanreagh Road;<br>
+John Convery Gortnari;<br>
+Brendan McPeake, Cahore Terrace;<br>
+Mary McCullagh, Bancran Road;<br>
+Cathal McW illiams, Fivemilestraight;<br>
+Rosaleen Murray Dunlogan Road;<br>
+Mary Henry , Cahore Terrace and Ballinascreen Fold.<br>
+Desertmartin:<br>
+First Anniversary:<br>
+Johnny Donnelly , Magherafelt &amp; Brackalislea.</p>
+<h3 class="b-head">Anniversaries</h3>
+<p>Brendan McElhennon;<br>
+Bernard Donnelly;<br>
+Paddy Henry;<br>
+Bridget Henry;<br>
+Matilda Donnelly;<br>
+John Donnelly;<br>
+Mickey Donnelly;<br>
+Kathleen Donnelly;<br>
+Rose Donnelly;<br>
+Emily Murray .<br>
+BAPTISMS<br>
+We welcome into God’ s family through the Sacrament of Baptism:<br>
+Natalia Aoife McGuigan, Astudillo, Valencia;<br>
+Eadaoin McKeown, Cloane Lane;<br>
+Ceadach Francis Glass, Drumard Road.<br>
+WEDDING<br>
+Congratulations and best wishes for the future to:<br>
+Mary-Louise McBride and Conor McW illiams who were married recently in St. Patrick&#x27;s Church, Sixtowns.<br>
+PARISH COLLECTIONS<br>
+Ballinascr een:<br>
+Weekly Collection - £1849<br>
+Renovation Collection - £2196<br>
+Desertmartin:<br>
+Weekly Collection - £1,175<br>
+Renovation Collection - £25<br>
+Thank you for your generous support which is greatly appreciated.<br>
+SUMMER BONANZA DRA W WINNERS ~ WEEK 1 &amp; WEEK 2<br>
+Week 1<br>
+£1000 ~ Clinona and Charlie Conway ,<br>
+£200 ~ Shane Toner, Cahore Road,<br>
+£100 ~ Niamh McCullagh, Coolnasillagh Road.<br>
+Week 2<br>
+£1000 ~ Katie, Rose, Michael and Jack Millar , Drumard Lane,<br>
+£200 ~ Jack and Noah Higgins, Moneyneena Road,<br>
+£100 ~ Natasha McEldowney , Mulnavoo Road.<br>
+You may still pur chase a ticket to be enter ed in the draw for the two r emaining weeks!<br>
+Week 4 (29 August): 1st Prize ~ £1000, 2 nd Prize ~ £200, 3 rd Prize ~ £100.<br>
+Week 5 (5 September): 1st Prize ~ £2000, 2 nd Prize ~ £500, 3 rd Prize ~ £300.</p>
+<hr>
+<p class="page-label">Page 4</p>
+<p>ST PIO KNOCK PILGRIMAGE<br>
+National Knock Pilgrimage in honour of St Pio of Pietrelcina on Sunday September 20. Coach will leave from Holy Rosary Church at 7.00 am,<br>
+pickup at St Mary&#x27;s Coolcam (7.10 am) returning at 10.00 pm approx. Fare £35 (includes breakfast) payable on booking. All welcome.<br>
+To book please contact:<a href="tel:+3537836366949" style="color:#1d4ed8;font-weight:600;">07836366949</a> or <a href="tel:+3537732125316" style="color:#1d4ed8;font-weight:600;">07732125316</a> or <a href="tel:+3537769720546" style="color:#1d4ed8;font-weight:600;">07769720546</a>.<br>
+OUTDOOR SER VICE AT ST ANNE’S CHURCH SIXT OWNS<br>
+Today , Sunday 23 August at 4.00 pm, conducted by Rural Dean, Rev Gary Millar . The church has been closed since December 2023 and is still<br>
+awaiting repairs. All are very welcome to this outdoor service.<br>
+MICHAEL ENGLISH CONCER T ~ SPONSORSHIP<br>
+Any business or company who would like to be one of the sponsors for the Michael English Fundraising Concert should please contact Fr<br>
+Madden: Tel.: <a href="tel:+442879628376" style="color:#1d4ed8;font-weight:600;">028 79628376</a> or Email either Parish Office <a href="mailto:desertmartinparish@gmail.com" target="_blank" rel="noopener noreferrer">desertmartinparish@gmail.com</a>  or ballinascr <a href="mailto:eenparish@gmail.com" target="_blank" rel="noopener noreferrer">eenparish@gmail.com</a> .<br>
+All sponsorship will be gratefully received and acknowledged.<br>
+MICHAEL ENGLISH &amp; BAND LIVE CONCER T<br>
+Enjoy a rare and intimate evening with Michael English, one of Ireland’ s most popular entertainers. This exclusive acoustic performance of<br>
+uplifting music filled with hope, faith and community spirit takes place on Friday 2 October , at 8.00 pm in St. Patrick’ s Church, Keenaught. All<br>
+proceeds from this special fundraising concert will go to towards the Parish of Desertmartin, Church Renovation Fund. Tickets £30 each are now<br>
+available to buy from Heron’ s Gift Shop, Moneyneena Post Of fice, both Parish Of fices, or online ( Click Her e) with Eventbrite or use this QR<br>
+code:<br>
+KNOCKNAGIN HALL<br>
+Chair Exer cises : Tuesdays 10.00 am to 1 1.00 am. A fun and exciting way to get exercise and improve your wellbeing, all welcome. Adm £4.<br>
+Irish Dancing Lessons : Tuesday 5.30 pm to 7.00 pm to register , please contact Nicola 07518 207458.<br>
+Line Dancing Classes: Wednesdays from 7.30 pm, suitable for all ages from beginners to experts. A fun way to get exercise, improve your<br>
+mental health and develop your dancing skills! Adm £5. All welcome.<br>
+OUT &amp; ABOUT COMMUNITY TRANSPOR T<br>
+This registered charity has been providing an accessible rural transport service in the old Magherafelt District Council Area since 1999.<br>
+This or ganisation continues to provide af fordable and safe transport for the community . All their buses are fully accessible for a range of mobility<br>
+needs. Transport is provided to a range of services including medical appointments, visiting family , essential shopping, social outings, community<br>
+events and training and employment. If you or anyone you know would benefit from this very worthwhile service, please phone <a href="tel:+442879300123" style="color:#1d4ed8;font-weight:600;">028 79300123</a> or<br>
+visit www .outandaboutct.org<br>
+SIXT OWNS DANCE<br>
+Monthly Social Dance in Sixtowns Cross Community Centre on Friday 28 August at 9.30 pm. Music by Kieran McAree. Everyone welcome.<br>
+CORMAC Ó CEALLAIGH CCÉ MUSIC CLASSES.<br>
+Were you at the best Fleadh Cheoil ever in Belfast? Were you wishing that you or your children were able to play or sing like all those musicians<br>
+at the Fleadh? Maybe you played as a child and are now inspired to pick up your instrument again? There is an answer to all these questions!<br>
+Classes in fiddle, tin whistle, concertina, harp, banjo/mandolin, guitar , traditional singing and bodhran start at end of September .<br>
+There will also be an adult only mixed instrument class, for all lapsed players, who want to start playing again.<br>
+Two new classes will also be of fered: drumming (for beginners) and Seisiún tunes repertoire (for the more advanced musicians).<br>
+Please register early to avoid disappointment as classes are kept small. Preference will be given to current members.<br>
+Registration closes on 5 September to allow time to or ganise tutors. Further details and the Klubfunder link to register for classes are on<br>
+Cormac Ó Ceallaigh CCÉ Facebook page.<br>
+BUNCRANA GARDEN FETE 2026<br>
+Today Sunday , 23 August from 3.00 pm to 6.00 pm at Scoil Mhuire, Buncrana F93 PN53. Fun for all the family . All welcome.<br>
+BALLINASCREEN GAC<br>
+Irish Language and Culture Night at 7.00 pm on Friday 18 September . More details to follow on Ballinascreen GAC social media pages.<br>
+Ballinascreen GAC hope to enter teams in the Junior Scór Dhoire in October .  Contact John on <a href="tel:+3537471374398" style="color:#1d4ed8;font-weight:600;">07471374398</a> to register or for any queries.</p>
+<hr>
+<p class="page-label">Page 5</p>
+<p>KILCRONAGHAN CENTRE<br>
+Vintage Rally , Craft Fair and Family Fun Day , on Saturday 26 September from 1 1.00 am to 3.00 pm. For more details, please see Kilcronaghan<br>
+Facebook page or ring <a href="tel:+442879627826" style="color:#1d4ed8;font-weight:600;">028 79627826</a>.<br>
+CATHOLIC MOTHERS IRELAND – F AMIL Y DAY<br>
+Annual National Mass on Sunday 6 September at T ermonbacca Retreat Centre, Derry . Mass at 2.00 pm, celebrated by Bishop McKeown,<br>
+followed by refreshments, children&#x27;s activities, and a talk for parents.<br>
+This promises to be a lovely day for the whole family . For more details and to book please email  <a href="mailto:info@catholicmothers.ie" target="_blank" rel="noopener noreferrer">info@catholicmothers.ie</a> . All welcome.<br>
+BLESSING OF BIKERS AND MOT ORCYCLES<br>
+Sunday 13 September in St Aengus’ Chapel, Burt, at 1.30 pm. All welcome to attend the brief service and blessing, after which all are welcome<br>
+to join the run to Ned’ s Point RNLI Station, to present the donation to the RNLI.<br>
+Please note, Mass will be celebrated on Sunday 13 September at 1 1.30 am in St Patrick’ s Chur ch, Dungiven, for deceased bikers, especially<br>
+those who have died in the past year .<br>
+LEGION OF MAR Y ~ CONFERENCE FOR YOUNG ADUL TS<br>
+Conference on faith and culture for young adults (18-40) with talks, prayer , Mass, confession, workshops, food and social in Legion of Mary<br>
+Headquarters De Montfort House, North Brunswick Street, Dublin 7, on Saturday 29 August, 9.30 am to 6.00 pm, social after . Tickets €20 can be<br>
+booked online at Eventbrite under 'Embrace the Grace' . Any queries can be emailed to  <a href="mailto:deusetpatria@gmail.com" target="_blank" rel="noopener noreferrer">deusetpatria@gmail.com</a><br>
+ST JOSEPH MEN&#x27;S CAMINO<br>
+Every Camino changes us in ways we don&#x27;t expect, every man needs one.<br>
+25km pilgrimage through the Boyne Valley , beginning in Drogheda on Saturday 12 September . The day includes Mass, Adoration, Rosary ,<br>
+Confessions, fraternity , lunch and dinner . Open to men aged 18+. Cost: €65 /student €55. Registration and more details please visit<br>
+www .dominicans.ie/events or email  <a href="mailto:op.evangelisation@gmail.com" target="_blank" rel="noopener noreferrer">op.evangelisation@gmail.com</a><br>
+FREE ONLINE STRESS CONTROL CLASSES<br>
+Next block of classes commence at 9.00 am on Monday 7 September at <a href="https://ni.str" target="_blank" rel="noopener noreferrer">https://ni.str</a> esscontr ol.org/ . Any questions or queries, please email<br>
+stress.contr <a href="mailto:ol@northerntrust.hscni.net" target="_blank" rel="noopener noreferrer">ol@northerntrust.hscni.net</a><br>
+PARISH BAPTISMS 2026<br>
+Ballinascr een Parish :<br>
+All bookings to be made via Ballinascreen Parish Of fice on <a href="tel:+442879628248" style="color:#1d4ed8;font-weight:600;">02879628248</a> or Email: <a href="mailto:ballinascreenparish@gmail.com" target="_blank" rel="noopener noreferrer">ballinascreenparish@gmail.com</a><br>
+Baptisms will be held at 3.00 pm on the following dates:<br>
+23 August, Moneyneena.<br>
+30 August, Holy Rosary .<br>
+Saturday 5 September , Sixtowns.<br>
+13 September , Straw .<br>
+4 October , Holy Rosary .<br>
+Saturday 17 October , Sixtowns.<br>
+1 November , Straw .<br>
+Desertmartin Parish:<br>
+To book a baptism, contact Fr McCaul on <a href="tel:+442879632196" style="color:#1d4ed8;font-weight:600;">02879632196</a> or Desertmartin Parish Of fice on <a href="tel:+442879397047" style="color:#1d4ed8;font-weight:600;">02879397047</a>.  Baptisms can be held in either church<br>
+and are held at 1.30 pm on the following dates:<br>
+September 6 &amp; 27 2026<br>
+October 4 &amp; 18 2026<br>
+November 8 &amp; 22 2026<br>
+December 6 &amp; 20 2026<br>
+January 10 &amp; 24 2027<br>
+February 7 &amp; 21 2027<br>
+March 7 &amp; 14 2027<br>
+DERR Y DIOCESAN SOCIETY<br>
+If you wish to enrol someone in the society , please contact the parish of fice. The fee for a living or deceased member is £20.<br>
+NOTICES FOR THE BULLETIN<br>
+Notices should be received by 1.00 pm on Wednesday , preferably emailed to ballinascr <a href="mailto:eenparish@gmail.com" target="_blank" rel="noopener noreferrer">eenparish@gmail.com</a><br>
+PARISH ANNIVERSAR Y MASS &amp; MONTH’S MIND MASSES</p>
+<hr>
+<p class="page-label">Page 6</p>
+<p>If you wish to have a deceased loved one prayed for at any Anniversary Friday Mass, please email their name to the Parish Of fice by 1.00 pm on<br>
+Wednesday of the relevant week. Notices for First Anniversary and Month&#x27;s Mind Masses should be received before 1.00 pm on Wednesday of<br>
+the pr evious week so that, they may be printed in the Bulletin the weekend before the Anniversary Mass.<br>
+PRA YER FOR VOCA TIONS<br>
+In this Sunday&#x27;s gospel Peter acknowledges Jesus as the Christ, the Son of the living God, and Jesus confers on Peter ‘.the keys of the Kingdom.’<br>
+an image reflected in the First Reading where the Lord says He will ‘.place the key of David.’ on the shoulder of those called to lead His people,<br>
+those who will be called ‘father ’.</p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other DERRY Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghyaran"><a class="parish-link" href="parishofaghyaran.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li class="parish-item" data-name="ardmore"><a class="parish-link" href="ardmoreparish.html" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li class="parish-item" data-name="ardstraw east"><a class="parish-link" href="parishofardstraweast.html" target="_blank" rel="noopener noreferrer">Ardstraw East</a></li><li class="parish-item" data-name="banagher"><a class="parish-link" href="banagherparish.html" target="_blank" rel="noopener noreferrer">Banagher</a></li><li class="parish-item" data-name="bellaghy"><a class="parish-link" href="bellaghyparish.html" target="_blank" rel="noopener noreferrer">Bellaghy</a></li><li class="parish-item" data-name="buncrana"><a class="parish-link" href="buncranaparish.html" target="_blank" rel="noopener noreferrer">Buncrana</a></li><li class="parish-item" data-name="camus"><a class="parish-link" href="camusparish.html" target="_blank" rel="noopener noreferrer">Camus</a></li><li class="parish-item" data-name="carndonagh"><a class="parish-link" href="carndonaghparish.html" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li class="parish-item" data-name="castlederg"><a class="parish-link" href="castledergparish.html" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li class="parish-item" data-name="claudy"><a class="parish-link" href="parishofclaudy.html" target="_blank" rel="noopener noreferrer">Claudy</a></li><li class="parish-item" data-name="clonleigh (strabane pastoral area)"><a class="parish-link" href="clonleighparish.html" target="_blank" rel="noopener noreferrer">Clonleigh (Strabane Pastoral Area)</a></li><li class="parish-item" data-name="clonmany"><a class="parish-link" href="clonmanyparish.html" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li class="parish-item" data-name="culdaff"><a class="parish-link" href="culdaffparish.html" target="_blank" rel="noopener noreferrer">Culdaff</a></li><li class="parish-item" data-name="culmoe"><a class="parish-link" href="culmoreparish.html" target="_blank" rel="noopener noreferrer">Culmoe</a></li><li class="parish-item" data-name="dma parish (claudy area)"><a class="parish-link" href="dmaparish.html" target="_blank" rel="noopener noreferrer">DMA Parish (Claudy area)</a></li><li class="parish-item" data-name="drumquin"><a class="parish-link" href="drumquinparish.html" target="_blank" rel="noopener noreferrer">Drumquin</a></li><li class="parish-item" data-name="drumragh"><a class="parish-link" href="drumraghparish.html" target="_blank" rel="noopener noreferrer">Drumragh</a></li><li class="parish-item" data-name="dungiven"><a class="parish-link" href="parishofdungiven.html" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li class="parish-item" data-name="errigal"><a class="parish-link" href="errigalparish.html" target="_blank" rel="noopener noreferrer">Errigal</a></li><li class="parish-item" data-name="fahan"><a class="parish-link" href="fahanparish.html" target="_blank" rel="noopener noreferrer">Fahan</a></li><li class="parish-item" data-name="granaghan"><a class="parish-link" href="granaghanparish.html" target="_blank" rel="noopener noreferrer">Granaghan</a></li><li class="parish-item" data-name="greenlough"><a class="parish-link" href="greenlough.html" target="_blank" rel="noopener noreferrer">Greenlough</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holyfamily-parish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="iskaheen"><a class="parish-link" href="iskaheenparish.html" target="_blank" rel="noopener noreferrer">Iskaheen</a></li><li class="parish-item" data-name="kilrea"><a class="parish-link" href="parishofkilrea.html" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li class="parish-item" data-name="lavey"><a class="parish-link" href="laveyparish.html" target="_blank" rel="noopener noreferrer">Lavey</a></li><li class="parish-item" data-name="leckpatrick"><a class="parish-link" href="leckpatrickparish.html" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li class="parish-item" data-name="limavady"><a class="parish-link" href="limavadyparish.html" target="_blank" rel="noopener noreferrer">Limavady</a></li><li class="parish-item" data-name="maghera (derry)"><a class="parish-link" href="magheraparishderry.html" target="_blank" rel="noopener noreferrer">Maghera (Derry)</a></li><li class="parish-item" data-name="melmount (&amp; camus)"><a class="parish-link" href="melmountparish.html" target="_blank" rel="noopener noreferrer">Melmount (&amp; Camus)</a></li><li class="parish-item" data-name="moville"><a class="parish-link" href="movilleparish.html" target="_blank" rel="noopener noreferrer">Moville</a></li><li class="parish-item" data-name="sion mills"><a class="parish-link" href="parishofsionmills.html" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li class="parish-item" data-name="st eugene&#x27;s cathedral (templemore)"><a class="parish-link" href="steugenescathedral.html" target="_blank" rel="noopener noreferrer">St Eugene&#x27;s Cathedral (Templemore)</a></li><li class="parish-item" data-name="st mary&#x27;s parish creggan"><a class="parish-link" href="stmarysparishcreggan.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Parish Creggan</a></li><li class="parish-item" data-name="star of the sea (magilligan)"><a class="parish-link" href="staroftheseacatholic.html" target="_blank" rel="noopener noreferrer">Star of the Sea (Magilligan)</a></li><li class="parish-item" data-name="steelstown"><a class="parish-link" href="steelstownparish.html" target="_blank" rel="noopener noreferrer">Steelstown</a></li><li class="parish-item" data-name="three patrons"><a class="parish-link" href="threepatrons.html" target="_blank" rel="noopener noreferrer">Three Patrons</a></li><li class="parish-item" data-name="waterside (&amp; strathfoyle amalgamated)"><a class="parish-link" href="watersideparish.html" target="_blank" rel="noopener noreferrer">Waterside (&amp; Strathfoyle amalgamated)</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghyaran"><a class="parish-link" href="parishofaghyaran.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li class="parish-item" data-name="ardmore"><a class="parish-link" href="ardmoreparish.html" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li class="parish-item" data-name="ardstraw east"><a class="parish-link" href="parishofardstraweast.html" target="_blank" rel="noopener noreferrer">Ardstraw East</a></li><li class="parish-item" data-name="banagher"><a class="parish-link" href="banagherparish.html" target="_blank" rel="noopener noreferrer">Banagher</a></li><li class="parish-item" data-name="bellaghy"><a class="parish-link" href="bellaghyparish.html" target="_blank" rel="noopener noreferrer">Bellaghy</a></li><li class="parish-item" data-name="buncrana"><a class="parish-link" href="buncranaparish.html" target="_blank" rel="noopener noreferrer">Buncrana</a></li><li class="parish-item" data-name="camus"><a class="parish-link" href="camusparish.html" target="_blank" rel="noopener noreferrer">Camus</a></li><li class="parish-item" data-name="carndonagh"><a class="parish-link" href="carndonaghparish.html" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li class="parish-item" data-name="castlederg"><a class="parish-link" href="castledergparish.html" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li class="parish-item" data-name="clonleigh (strabane pastoral area)"><a class="parish-link" href="clonleighparish.html" target="_blank" rel="noopener noreferrer">Clonleigh (Strabane Pastoral Area)</a></li><li class="parish-item" data-name="clonmany"><a class="parish-link" href="clonmanyparish.html" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li class="parish-item" data-name="culdaff"><a class="parish-link" href="culdaffparish.html" target="_blank" rel="noopener noreferrer">Culdaff</a></li><li class="parish-item" data-name="culmoe"><a class="parish-link" href="culmoreparish.html" target="_blank" rel="noopener noreferrer">Culmoe</a></li><li class="parish-item" data-name="dma parish (claudy area)"><a class="parish-link" href="dmaparish.html" target="_blank" rel="noopener noreferrer">DMA Parish (Claudy area)</a></li><li class="parish-item" data-name="drumquin"><a class="parish-link" href="drumquinparish.html" target="_blank" rel="noopener noreferrer">Drumquin</a></li><li class="parish-item" data-name="drumragh"><a class="parish-link" href="drumraghparish.html" target="_blank" rel="noopener noreferrer">Drumragh</a></li><li class="parish-item" data-name="dungiven"><a class="parish-link" href="parishofdungiven.html" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li class="parish-item" data-name="errigal"><a class="parish-link" href="errigalparish.html" target="_blank" rel="noopener noreferrer">Errigal</a></li><li class="parish-item" data-name="fahan"><a class="parish-link" href="fahanparish.html" target="_blank" rel="noopener noreferrer">Fahan</a></li><li class="parish-item" data-name="granaghan"><a class="parish-link" href="granaghanparish.html" target="_blank" rel="noopener noreferrer">Granaghan</a></li><li class="parish-item" data-name="greenlough"><a class="parish-link" href="greenlough.html" target="_blank" rel="noopener noreferrer">Greenlough</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holyfamily-parish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="iskaheen"><a class="parish-link" href="iskaheenparish.html" target="_blank" rel="noopener noreferrer">Iskaheen</a></li><li class="parish-item" data-name="kilrea"><a class="parish-link" href="parishofkilrea.html" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li class="parish-item" data-name="lavey"><a class="parish-link" href="laveyparish.html" target="_blank" rel="noopener noreferrer">Lavey</a></li><li class="parish-item" data-name="leckpatrick"><a class="parish-link" href="leckpatrickparish.html" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li class="parish-item" data-name="maghera (derry)"><a class="parish-link" href="magheraparishderry.html" target="_blank" rel="noopener noreferrer">Maghera (Derry)</a></li><li class="parish-item" data-name="melmount (&amp; camus)"><a class="parish-link" href="melmountparish.html" target="_blank" rel="noopener noreferrer">Melmount (&amp; Camus)</a></li><li class="parish-item" data-name="moville"><a class="parish-link" href="movilleparish.html" target="_blank" rel="noopener noreferrer">Moville</a></li><li class="parish-item" data-name="sion mills"><a class="parish-link" href="parishofsionmills.html" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li class="parish-item" data-name="st eugene&#x27;s cathedral (templemore)"><a class="parish-link" href="steugenescathedral.html" target="_blank" rel="noopener noreferrer">St Eugene&#x27;s Cathedral (Templemore)</a></li><li class="parish-item" data-name="st mary&#x27;s parish creggan"><a class="parish-link" href="stmarysparishcreggan.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Parish Creggan</a></li><li class="parish-item" data-name="star of the sea (magilligan)"><a class="parish-link" href="staroftheseacatholic.html" target="_blank" rel="noopener noreferrer">Star of the Sea (Magilligan)</a></li><li class="parish-item" data-name="steelstown"><a class="parish-link" href="steelstownparish.html" target="_blank" rel="noopener noreferrer">Steelstown</a></li><li class="parish-item" data-name="three patrons"><a class="parish-link" href="threepatrons.html" target="_blank" rel="noopener noreferrer">Three Patrons</a></li><li class="parish-item" data-name="waterside (&amp; strathfoyle amalgamated)"><a class="parish-link" href="watersideparish.html" target="_blank" rel="noopener noreferrer">Waterside (&amp; Strathfoyle amalgamated)</a></li></ul>
     </section>
   </div>
   <footer>
@@ -903,9 +1244,9 @@ Urney and Castlefin:</p></div>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260823v"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260823v';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1277,6 +1618,9 @@ Urney and Castlefin:</p></div>
         }
         return true;
       }
+      function slugOf(s) {
+        return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      }
       function findOcr(box, name) {
         if (!box) return null;
         var wanted = [norm(name), norm(coreName(name))];
@@ -1287,7 +1631,38 @@ Urney and Castlefin:</p></div>
           var got = norm(label);
           if (wanted.indexOf(got) >= 0 || wanted.indexOf(norm(coreName(label))) >= 0) return el;
         }
-        return null;
+        // The search box rebuilds #ocr-panel innerHTML, so fall back to the
+        // masthead id the layout writes (ocr-parish-<slug>).
+        var byId = box.querySelector('#ocr-parish-' + slugOf(name))
+          || box.querySelector('#ocr-parish-' + slugOf(coreName(name)));
+        return byId || null;
+      }
+      function flashLanding(el) {
+        if (!el || !el.classList) return;
+        el.classList.remove('az-landed');
+        void el.offsetWidth;
+        el.classList.add('az-landed');
+        window.setTimeout(function () { el.classList.remove('az-landed'); }, 1800);
+      }
+      function landInBox(box, el) {
+        // Move the box instantly (one smooth animation only — a second one on
+        // the same scroll chain used to be cancelled halfway, which left the
+        // reader in the middle of another parish), then bring the box itself
+        // on screen, then re-check because zoom/fonts can reflow the text.
+        var br = box.getBoundingClientRect();
+        var er = el.getBoundingClientRect();
+        box.scrollTop = Math.max(0, box.scrollTop + (er.top - br.top) - 8);
+        showBox(box);
+        var tries = 0;
+        (function settle() {
+          if (tries++ > 6) return;
+          var b2 = box.getBoundingClientRect();
+          var e2 = el.getBoundingClientRect();
+          var off = Math.round(e2.top - b2.top - 8);
+          if (Math.abs(off) > 3) box.scrollTop = Math.max(0, box.scrollTop + off);
+          window.setTimeout(settle, 150);
+        })();
+        flashLanding(el);
       }
       function pageFor(name) {
         var map = pageIndex();
@@ -1304,14 +1679,19 @@ Urney and Castlefin:</p></div>
       }
       function showBox(box) {
         // The jump happens inside the locked box, so make sure the box itself
-        // is on screen first or a phone reader sees nothing move.
+        // is on screen first or a phone reader sees nothing move. Leave room
+        // for the sticky search bar when a term is typed, otherwise it covers
+        // the parish header the reader just asked for.
         if (!box || !box.getBoundingClientRect) return;
         var r = box.getBoundingClientRect();
         var h = window.innerHeight || document.documentElement.clientHeight || 0;
-        if (r.top < 0 || r.top > h - 120) {
-          if (box.scrollIntoView) {
-            box.scrollIntoView({ block: 'start', behavior: reduceMotion() ? 'auto' : 'smooth' });
-          }
+        var sticky = document.querySelector('.ocr-sticky-chrome.is-searching');
+        var pad = sticky ? Math.round(sticky.getBoundingClientRect().height) + 8 : 0;
+        if (r.top < pad || r.top > h - 120) {
+          window.scrollTo({
+            top: Math.max(0, (window.scrollY || window.pageYOffset || 0) + r.top - pad),
+            behavior: reduceMotion() ? 'auto' : 'smooth',
+          });
         }
       }
       function jumpPdf(names) {
@@ -1330,13 +1710,12 @@ Urney and Castlefin:</p></div>
         return false;
       }
       function jumpOcr(names) {
-        var ocr = document.getElementById('ocr-panel');
+        var ocr = document.getElementById('ocr-panel') || document.getElementById('ocr-text');
         if (!ocr) return false;
         for (var i = 0; i < names.length; i++) {
           var hit = findOcr(ocr, names[i]);
           if (!hit) continue;
-          showBox(ocr);
-          scrollBoxTo(ocr, hit);
+          landInBox(ocr, hit);
           return true;
         }
         return false;
@@ -1344,8 +1723,9 @@ Urney and Castlefin:</p></div>
       function jump(target, names, tries) {
         var done = target === 'pdf' ? jumpPdf(names) : jumpOcr(names);
         // PDF.js paints page slots as it streams, so the slot may not exist
-        // for a second or two after load. Retry briefly instead of failing.
-        if (!done && target === 'pdf' && (tries || 0) < 12) {
+        // for a second or two after load; the OCR panel is rebuilt whenever a
+        // search is cleared. Retry briefly instead of failing silently.
+        if (!done && (tries || 0) < 12) {
           window.setTimeout(function () { jump(target, names, (tries || 0) + 1); }, 400);
         }
       }

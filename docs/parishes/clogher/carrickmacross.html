@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Carrickmacross (Machaire Rois) Bulletin — 23/08/2026</title>
+  <title>Carrickmacross (Machaire Rois) Bulletin — 25/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -170,6 +170,12 @@
       max-height: 850px;
       overflow: auto;
       overflow-y: auto;
+      overflow-x: hidden;
+      /* Reserve the scrollbar gutter from the first paint. Without it the
+         first page is sized to the full width, the vertical scrollbar then
+         appears, and the page is suddenly ~16px too wide — a horizontal
+         scrollbar under a strip of the bulletin. */
+      scrollbar-gutter: stable;
       background: #525659;
       padding: 8px 0 16px;
     }
@@ -177,10 +183,16 @@
       margin: 0 auto 10px;
       background: #3a3f42;
       min-height: 180px;
+      max-width: 100%;
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
-    .pdf-link-layer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
+    /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
+       page — one of those used to stretch the box's scrollWidth to 2988px. */
+    .pdf-link-layer {
+      position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+      overflow: hidden; pointer-events: none;
+    }
     .pdf-annot-link {
       position: absolute; z-index: 2; pointer-events: auto;
       background: rgba(26, 107, 107, 0.08); border-radius: 2px;
@@ -230,6 +242,7 @@
         overflow: auto !important;
         overflow-y: auto !important;
       }
+      .pdf-inpage-pages { overflow-x: hidden !important; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -256,22 +269,48 @@
         overflow: auto !important;
         overflow-y: auto !important;
       }
+      /* `overflow: auto` above resets both axes, so re-hide the horizontal one:
+         a single stray PDF link annotation off the right edge of a page used to
+         give the whole box a horizontal scrollbar. */
+      .pdf-inpage-pages { overflow-x: hidden !important; }
       /* Nothing to enlarge — the box is already the locked 850px. */
       .az-expand { display: none; }
     }
 
 
-    .ocr-search-bar { position: relative; margin-bottom: 10px; }
+    /* Search comes first in the OCR block and reads like the JUMP TO bar, so
+       a reader cannot scroll past it looking for "where is the search". */
+    .ocr-search-bar {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 8px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-search-label {
+      flex: 0 0 auto;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
+    }
     .search-input {
-      width: 100%;
-      border: 1px solid #c9d4d3;
+      flex: 1 1 auto;
+      min-width: 0;
+      width: auto;
+      border: 1px solid #1a6b6b;
       border-radius: 4px;
       padding: 11px 42px 11px 14px;
       font-size: 1rem;
+      background: #fff;
     }
     .search-clear {
       position: absolute;
-      right: 10px;
+      right: 16px;
       top: 50%;
       transform: translateY(-50%);
       width: 32px;
@@ -400,6 +439,17 @@
     /* Desktop boxes are already the locked 850px, so there is nothing to
        enlarge — the button only appears on tablet/phone. */
     .az-expand { display: none; }
+    /* A letter jump scrolls inside a locked box, so nothing moves on screen
+       except the text. Flag the parish the reader landed on. */
+    .az-landed {
+      background: #fff6da;
+      box-shadow: 0 0 0 3px #f0d089;
+      border-radius: 3px;
+      transition: background 400ms ease, box-shadow 400ms ease;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .az-landed { transition: none; }
+    }
     .diocese-intro {
       margin: 0 0 22px;
       padding: 18px 18px 16px;
@@ -421,18 +471,48 @@
     }
     .diocese-intro .intro-names li { margin: 0 0 4px; }
     
+    /* Letters and text size share ONE bar, so neither hides the other and
+       neither pushes the search box off a short screen. The wrapper draws the
+       box; the letter row and zoom group go transparent inside it. */
+    .ocr-controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 12px;
+      margin: 0 0 10px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-controls-row .az-row,
+    .ocr-controls-row .ocr-zoom-bar {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      border: 0;
+    }
+    .ocr-controls-row .az-row { flex: 1 1 auto; }
+    .ocr-controls-row .ocr-zoom-bar { flex: 0 0 auto; margin-left: auto; }
     .ocr-zoom-bar {
-      display: flex; justify-content: center; align-items: center; gap: 10px;
-      margin: 0 0 10px; padding: 6px 10px;
-      background: rgba(255, 255, 255, 0.94);
-      border: 1px solid #d4ddd9; border-radius: 4px;
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-zoom-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
     }
     .ocr-zoom-bar button {
-      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 4px;
-      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.15rem; cursor: pointer;
+      min-width: 34px; height: 30px; border: 1px solid #cfdedd; border-radius: 4px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.05rem; line-height: 1; cursor: pointer;
     }
+    .ocr-zoom-bar button:hover { background: #1a6b6b; border-color: #1a6b6b; color: #fff; }
     .ocr-zoom-pct {
-      min-width: 3.5rem; text-align: center; font-weight: 700; font-size: 0.95rem; color: #14524f;
+      min-width: 3.2rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
     }
     .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
     @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 6px; } }
@@ -721,7 +801,8 @@
       /* Tap targets big enough for a thumb. */
       .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand {
+      .az-expand,
+      .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
@@ -763,13 +844,26 @@
         padding: 16px 14px 28px;
       }
       .ocr-search-tools { flex-direction: column; }
+      .ocr-search-tools > div {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+      }
       .ocr-search-tools button {
         min-height: 44px;
         width: 100%;
       }
+      /* One column on a phone: letters, then text size. Neither covers the
+         search box above them. */
+      .ocr-controls-row { flex-direction: column; }
+      .ocr-controls-row .az-row,
+      .ocr-controls-row .ocr-zoom-bar { flex: 1 1 auto; }
+      .ocr-search-bar { flex-wrap: wrap; }
+      .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260823v" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
 </head>
 <body>
   <div class="page">
@@ -777,7 +871,7 @@
     <header class="header">
       <p class="diocese-label">CLOGHER</p>
       <h1>Carrickmacross (Machaire Rois) Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Carrickmacross (Machaire Rois) — 23/08/2026. Part of the Clogher Diocese collated bulletin.</p>
+      <p class="meta">This week&#x27;s bulletin for Carrickmacross (Machaire Rois) — 25/08/2026. Part of the Clogher Diocese collated bulletin.</p>
       <a class="download-link-top" href="carrickmacross.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
     </header>
     
@@ -813,19 +907,10 @@
 
     <h2 class="section-heading">Bulletin — OCR Extracted Plain Text</h2>
     <div id="panel-ocr" class="viewer-block">
-      
-      <div class="quiet-links">
-        <a href="carrickmacross-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
-      </div>
       <div class="ocr-sticky-chrome">
-      <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
-        <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
-        <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
-        <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
-        <span class="ocr-zoom-hint">or pinch to zoom</span>
-      </div>
       <div class="ocr-search-bar">
-        <input id="ocr-search" class="search-input" type="search" placeholder="Search OCR text..." aria-label="Search OCR text" />
+        <label class="ocr-search-label" for="ocr-search">Search</label>
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search OCR text — a parish, a name, a Mass time" aria-label="Search OCR text" />
         <button id="clear-search" class="search-clear" type="button" aria-label="Clear OCR search" hidden>×</button>
       </div>
       <div class="ocr-search-tools">
@@ -836,7 +921,20 @@
         </div>
       </div>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-carrickmacross-machaire-rois" data-parish-name="Carrickmacross (Machaire Rois)"><h2 class="ocr-parish-name">Carrickmacross (Machaire Rois)</h2><p class="ocr-parish-date">23/08/2026</p></header>
+      <div class="ocr-controls-row">
+        
+        <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+          <span class="ocr-zoom-label">Text size</span>
+          <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+          <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+          <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+          <span class="ocr-zoom-hint">or pinch to zoom</span>
+        </div>
+      </div>
+      <div class="quiet-links">
+        <a href="carrickmacross-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
+      </div>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-carrickmacross-machaire-rois" data-parish-name="Carrickmacross (Machaire Rois)"><h2 class="ocr-parish-name">Carrickmacross (Machaire Rois)</h2><p class="ocr-parish-date">25/08/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>The Parish Of Machaire Rois<br>
 21st Sunday in O rdinary Time. Sunday 23rd August 2026.<br>
@@ -869,14 +967,188 @@ each of a us for a fuller coming of God&#x27;s kingdom on earth, &#x27;a kingdom
 holiness and grace, a kingdom of justice, love and peace&#x27;, in the words of the Mass for the Feast of<br>
 Christ the King.<br>
 Fr. Owen Joe.<br>
-Carrickmacross (Machaire Rois)</p></div>
+Carrickmacross (Machaire Rois)</p>
+<hr>
+<p class="page-label">Page 2</p>
+<p>The Parish Of Machaire Rois<br>
+Saturday<br>
+22nd August . 11.00a m. AM. Deceased Members of the Sherry family, Magheraboy.<br>
+AM. Stephanie Sherry, Carrickmacross.<br>
+AM. Matthew McCabe, London &amp; remembering his father Matt,<br>
+Meath Hill.<br>
+Saturday<br>
+22nd August. 6.00pm. Month’s Memory: Mark Rooney, Drummond Etra.<br>
+AM. Frank Connolly, ‘The Bridge’, Mullinary, Peter, Nora &amp; Pat<br>
+Callan &amp; Trever McGovern, Dublin.<br>
+AM. Pat Conlon, “Oriel” Mullinary, John Francis &amp; Bridget Conlon,<br>
+Peter &amp; Eileen Goodman, Mick &amp; Mary Fitzsimons &amp; deceased<br>
+members of the Fitzsimons family, Kingscourt Road.<br>
+AM. Kathleen &amp; James Lambe, St Macartan’s Villas, their son P.J.,<br>
+Dunogue &amp; deceased members of the Lambe &amp; Agnew<br>
+families.<br>
+AM. Jimmy &amp; Eddie Martin, Drumgoan &amp; late of Dernascobe,<br>
+Magheracloone.<br>
+AM. Phyllis Cunningham &amp; Catherine, Winnie &amp; Kitty Allen,<br>
+O’Neill Street.<br>
+AM. Una McEntee, Patrician Drive.<br>
+Sunday<br>
+23rd August . 9.30am. Month’s Memory: Stephen Gollogly, Greaghdrumitt.<br>
+Sunday<br>
+23rd August . 12Noon. 1st AM Frances McArdle, 31 Rockdaniel Road.<br>
+1st AM. Joe McConnon, Corcrin.<br>
+AM. The Deceased Members of the Cassidy family, Nafferty.<br>
+AM. Ann McArdle, (née Hanratty), Carrickmacross &amp; Randalstown,<br>
+Co Antrim.<br>
+Mon 24th Aug. 10.00am .<br>
+AM. Angeline McEneaney, Mullinary.<br>
+Tues 25th Aug. 10.00am . Morning Mass.<br>
+Wed 26th Aug. 10.00am . Morning Mass.<br>
+Thurs 27th Aug. 10.00am . Morning Mass.<br>
+Fri 28th Aug. 10.00a m. Morning Mass.<br>
+Saturday<br>
+29th August . 11.00a m. Month’s Memory: Elizabeth Gilsenan, Aghalile.<br>
+1st AM. May Callan, Creevy Oliver &amp; remembering her husband<br>
+Owen , their son David &amp; their daughter Yvonne &amp; deceased<br>
+members of the Hoey &amp; Callan families .<br>
+Remembrance Mass: Martina Scott, (née Murphy) Belfast &amp;<br>
+formerly Raferagh .<br>
+Saturday<br>
+29th August. 6.00pm. AM. Joe &amp; Molly O’Hara , Rockdaniel Road &amp; deceased members of<br>
+the O’Hara &amp; Kelly families .<br>
+AM. Kieran &amp; Liam McGinn, 14 Derryolam Park .<br>
+Sun 30 August . 9.30am. Mass for the People of the Parish.<br>
+Sunday<br>
+30 August . 12Noon. AM. Patrick &amp; Mary O’Donoghue, Mary &amp; Oliver Babbington<br>
+Mullinary, Philomena, Stephen &amp; Frank Duffy, Warrenpoint.<br>
+AM. Cecilia Marron, Highfield &amp; her parents Bridget &amp; James<br>
+Loughlin.<br>
+AM. Patsy &amp; Mary McBennett, Corcuillogue.</p>
+<h3 class="b-head">Recently Deceased</h3>
+<p>Leo McCarville, Cavanag eeragh, Carrickmacross.<br>
+Bridie (Bridget ) Devlin , Meadowlands , Carrickmacross .<br>
+Dympna Hamill, Corleygorm, Broomfield<br>
+Roisin McMahon , Capragh, Donaghmoyne.<br>
+Seamus Coyle, Latton.<br>
+James McGragh, Shantonagh.</p>
+<hr>
+<p class="page-label">Page 3</p>
+<p>The Parish Of Machaire Rois<br>
+Mass Time Corduff / Raferagh . Sunday at 11am (alternating)<br>
+Live streaming is available to be viewed Via the Parish webpage.<br>
+Should you have any difficulty accessing the live stream please contact via email<br>
+directly to <a href="mailto:Support@churchservices.tv" target="_blank" rel="noopener noreferrer">Support@churchservices.tv</a><br>
+Sunday<br>
+23rd August. Raferagh.<br>
+11.00am. AM. James &amp; Margaret McCahey, Corcreagh &amp; deceased family<br>
+members . Michael McCloskey, Corcreagh &amp; deceased family<br>
+members . Katie &amp; Johnny Lynch, Beagh &amp; deceased family<br>
+members.<br>
+Sunday<br>
+30th August. Corduff.<br>
+11.00am. AM. John, Pat &amp; Katie King, Corduff.<br>
+AM. Mary &amp; Thomas Keenan, their son Thomas &amp; deceased<br>
+members of the Keenan family, Sreenty &amp; deceased<br>
+members of the Rushe family, Greag hlane.<br>
+AM. Michael &amp; Mary Hanratty, their daughter Bridget<br>
+Greaghlatacapple &amp; deceased members of the Hanratty &amp;<br>
+Duffy famil ies.<br>
+Adoration in Blessed Sacrament Chapel. (St Joseph’s) .<br>
+The Blessed Sacrament Chapel opening hours are as follows.<br>
+Monday : 9am. - 10am. Tuesday : 9am. - 7pm. Wednesday :<br>
+9am.10am. Thursday : 8am. - 10am. Friday : 8am. - 10am.<br>
+Saturday 10am. - 11am. and 5pm. – 6pm. Sunday 1pm. - 6pm.<br>
+Rosary in St Joseph’s Church: Monday – Friday at 6.30pm.<br>
+Confessions in St Joseph’s every Saturday after the 11am Mass – and the Eve of the First Friday<br>
+(Thursday) after the 10am Mass.<br>
+Annual Healing Mass with the Anointing of the Sick , which will take place on Sunday, 6th<br>
+September at 4:00pm in St. Joseph’s Church. This special Mass offers the Sacrament of the<br>
+Anointing of the Sick to anyone experiencing illness, frailty, or difficulties in body, mind, or spirit.<br>
+It is a moment of grace, comfort, and strength for those carrying burdens of ill health in any form.<br>
+We extend a special welcome to those who are visited on the First Fridays to join us on this<br>
+sacred occasion, along with anyone who feels they would benefit from the healing and peace<br>
+that this beautiful Sacrament brings. Following the Mass, refreshments will be served in the<br>
+Holy Family Hall , offering a time for fellowship and community.<br>
+The Annual November Remembrance for those who have died in our parish during the previous<br>
+year will be held in St Joseph’s Church on Sunday 22nd November 2026 at 4.00pm.<br>
+Annual Family Mass and Blessings with relics of St. Therese , and her parents , St. Louis and<br>
+St. Zelie Martin will take place in St. Patrick’s Church, Bawn A75 FY98 , on Sunday, September 27th<br>
+at 11.30am. Celebrant: Fr. Ben Hughes .<br>
+Faith and Light Regional Pilgrimage to Lough Derg on Sunday September 13th. All members<br>
+and friends, past and present, invited. Bus leaving AIB , Carrickmacross 8.30am. Total cost €50.<br>
+Please ring Clare <a href="tel:+353860886846" style="color:#1d4ed8;font-weight:600;">0860886846</a> to book your place. There will also be some extra seats available on a<br>
+first come basis.<br>
+John Hamilton Vintage Memorial Run hosted by Aughnamullen Vintage Club takes place<br>
+on Sunday 23rd August 2026 . All proceeds in aid of Mary&#x27;s Meals South Monaghan Branch .<br>
+Registration 1:30pm. Cost €20 per vehicle . Run commences at 2:30pm from Aughnamullen Social<br>
+Centre A75CY82 . Refreshments available. Raffle on the day. Lines 1 for €5 or 3 for €10.<br>
+Revolut@pamela6ut1 to purchase lines . Donations are also accepted.<br>
+St Joseph Men&#x27;s Camino : Join men from across Ireland on Saturday 12th September for a 25km<br>
+pilgrimage through the Boyne Valley, beginning in Drogheda. The day includes Mass, Adoration,<br>
+Confessions and fellowship, with after -dinner speaker Fr. Mark Quinn founder of Men of St Josep h.<br>
+Open to men aged 18+. Cost: €65 (student €55) including lunch and Dinner. Book now and find<br>
+full details at: <a href="https://www.dominicans.ie/events" target="_blank" rel="noopener noreferrer">www.dominicans.ie/events</a></p>
+<hr>
+<p class="page-label">Page 4</p>
+<p>The Parish Of Machaire Rois<br>
+Lough Derg : Bus going on a One Day Retreat to Lough Derg on Saturday the 5th September<br>
+2026. Due to the increase demand for seat s, we have hired a larger bus, so we have some extra<br>
+seats available. To book please contact Pauline O’Hagan on <a href="tel:+353879499335" style="color:#1d4ed8;font-weight:600;">0879499335</a> or Pauline Fox on<br>
+<a href="tel:+353863669875" style="color:#1d4ed8;font-weight:600;">0863669875</a>.<br>
+Family Day Out : Today Sunday 23 August 2026 from 12pm – 5pm. Ramble at Lough Fea ,<br>
+All Proceeds to Carrick Cancer . Picnic Area, Pet Friendly, Light refreshments in The Great Hall,<br>
+Historical Talks, Live music by Brendan McCahey &amp; Friends, Nature Walks . This is a donation -event -<br>
+€10 per adult . Entry by Front Gate Kingscourt Road – A81F970 . With kind permission of Philip<br>
+Shirley and Family, in memory of Robert Henry. Organised by Carrickmacross Lions Club .<br>
+The Friends of Carrick Cancer would like to take this opportunity to thank all those who took<br>
+part in, supported, donated or sponsored the Croagh Patrick climb on Saturday the 1stAugust. It is<br>
+not too late to make a donation after such a special effort by all those who organised and took part<br>
+in this event. Our next event is on Saturday the 29thAugust, a walk in the Carlingford scenic area.<br>
+This year’s walk will take a different route, heading back to the Cooley Peninsula, but the walk will<br>
+be a lot shorter than before. We will start on EMPLETOWN Beach , walk towards Shelling Hill (via the<br>
+beach) then head back towards TEMP LETOWN passing KILWIRRA CEMETERY where President Joe<br>
+Biden ’s ancestors are buried. Finishing back on the beach with li ght refreshments. A Bus will leave<br>
+from Euro Spar at 10.30 am approximately. Contact the committee below for further details. Your<br>
+support is much appreciated. Committee Members : Pat McNally <a href="tel:+353874130727" style="color:#1d4ed8;font-weight:600;">0874130727</a> - Majella Hoey<br>
+<a href="tel:+353872975326" style="color:#1d4ed8;font-weight:600;">0872975326</a> - James Lambe <a href="tel:+353876329620" style="color:#1d4ed8;font-weight:600;">087 6329620</a> – Grainne McNally <a href="tel:+353872506045" style="color:#1d4ed8;font-weight:600;">0872506045</a> - Doreen McNulty<br>
+<a href="tel:+353874826990" style="color:#1d4ed8;font-weight:600;">0874826990</a> .<br>
+Clogher don Óige are excited to invite you to their upcoming special young adult series event —<br>
+The Chosen , a groundbreaking drama about the life of Jesus Christ, told through the eyes of those<br>
+who knew Him. Join us for evenings of reflection, discussion, and community as we journey<br>
+together through this inspiring portrayal of Jesus’ revolutionary life and te achings.<br>
+When: Thursdays, 3rd September 2026 – 29th October 2026 . Time: 7:30pm – 9:30pm<br>
+Where: St. Joseph’s Pastoral Centre, Monaghan . This is a wonderful opportunity for young adults<br>
+aged 18 –40 to: Watch the series together . Take part in group discussions and sharing . Experience<br>
+prayer and fellowship . If you have any questions, feel free to email us at <a href="mailto:info@clogherdonoige.org" target="_blank" rel="noopener noreferrer">info@clogherdonoige.org</a> .<br>
+We look forward to seeing you there for faith, friendship, and great conversation. No previous<br>
+experience of watching needed.<br>
+Poor Clares Galway : Half-Day Retreat for women 18 -40 with Women’s spirituality speaker Louise<br>
+Mc Guinness. An opportunity to encounter God&#x27;s love and deepen your life of prayer and<br>
+communion with God. The event will take place from 2pm to 6pm on Sunday 6th September. For<br>
+more information and to register: <a href="https://cherisheddaughters.eventbrite.ie" target="_blank" rel="noopener noreferrer">https://cherisheddaughters.eventbrite.ie</a><br>
+Monaghan Charismatic Prayer Group are organising a bus to Lough Derg on Sunday 6th Sept a<br>
+special day in honour of Carlo Acutis. Bus leaving Carrickmacross at 7am via Castleblayney<br>
+/Clontibret/Monaghan. The Island is €50 and bus fare €25. Booking essential and ASAP with:<br>
+Rosaleen <a href="tel:+353879717447" style="color:#1d4ed8;font-weight:600;">0879717447</a>/ Philip <a href="tel:+353872508043" style="color:#1d4ed8;font-weight:600;">0872508043</a><br>
+August &amp; September 2026 at Lough Derg .<br>
+One Day Retreats – Guided Days of Prayer and Reflection - places available on<br>
+August 29th and 31st September 5th, 6th, 9th, 12th, 15th, 19th and 20th<br>
+Admission €50. Group discounts available. Advance Booking Essential .<br>
+Includes Special Themed Retreats: 5th September – Pioneer Pilgrimage . 6th September – St<br>
+Carlos Acutis. 9th &amp; 12th September – Vocations Monstrance. 19th September – Divine Mercy<br>
+Pilgrimage.<br>
+Lakeshore Pilgrim Path Pilgrimage – In the footsteps of pilgrims through the centuries<br>
+Sunday 30th August. 8km &amp; 12km routes, fully guided. Outdoor Mass weather permitting. Admission<br>
+€25. Advance Booking Essential.<br>
+NEW FOR 2026 SEASON –Overnight accommodation available on Station Island the night before<br>
+beginning a Retreat or Pilgrimage. Lough Derg, Pettigo, Co Donegal. F94 PC60 . Tel.<br>
+<a href="tel:+353719861518" style="color:#1d4ed8;font-weight:600;">0719861518</a>. <a href="https://www.loughderg.org" target="_blank" rel="noopener noreferrer">www.loughderg.org</a> email. <a href="mailto:info@loughderg.org" target="_blank" rel="noopener noreferrer">info@loughderg.org</a></p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other CLOGHER Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ballybay (tullycorbet)"><a class="parish-link" href="ballybay.html" target="_blank" rel="noopener noreferrer">Ballybay (Tullycorbet)</a></li><li class="parish-item" data-name="castleblayney (muckno, includes clontibret)"><a class="parish-link" href="castleblayney.html" target="_blank" rel="noopener noreferrer">Castleblayney (Muckno, includes Clontibret)</a></li><li class="parish-item" data-name="clones"><a class="parish-link" href="clones.html" target="_blank" rel="noopener noreferrer">Clones</a></li><li class="parish-item" data-name="corcaghan-threemilehouse (kilmore &amp; drumsnatt)"><a class="parish-link" href="corcaghanthreemilehouse.html" target="_blank" rel="noopener noreferrer">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</a></li><li class="parish-item" data-name="derrygonnelly (botha)"><a class="parish-link" href="derrygonnelly.html" target="_blank" rel="noopener noreferrer">Derrygonnelly (Botha)</a></li><li class="parish-item" data-name="donagh"><a class="parish-link" href="donagh.html" target="_blank" rel="noopener noreferrer">Donagh</a></li><li class="parish-item" data-name="donaghmoyne"><a class="parish-link" href="donaghmoyne.html" target="_blank" rel="noopener noreferrer">Donaghmoyne</a></li><li class="parish-item" data-name="enniskillen (st michael&#x27;s parish)"><a class="parish-link" href="enniskillen.html" target="_blank" rel="noopener noreferrer">Enniskillen (St Michael&#x27;s Parish)</a></li><li class="parish-item" data-name="errigal truagh"><a class="parish-link" href="errigaltruagh.html" target="_blank" rel="noopener noreferrer">Errigal Truagh</a></li><li class="parish-item" data-name="fintona (donacavey)"><a class="parish-link" href="fintona.html" target="_blank" rel="noopener noreferrer">Fintona (Donacavey)</a></li><li class="parish-item" data-name="irvinestown (devenish)"><a class="parish-link" href="irvinestown.html" target="_blank" rel="noopener noreferrer">Irvinestown (Devenish)</a></li><li class="parish-item" data-name="killanny"><a class="parish-link" href="killanny.html" target="_blank" rel="noopener noreferrer">Killanny</a></li><li class="parish-item" data-name="lisnaskea-maguiresbridge (aghalurcher)"><a class="parish-link" href="lisnaskeamaguiresbridge.html" target="_blank" rel="noopener noreferrer">Lisnaskea-Maguiresbridge (Aghalurcher)</a></li><li class="parish-item" data-name="magheracloone"><a class="parish-link" href="magheracloone.html" target="_blank" rel="noopener noreferrer">Magheracloone</a></li><li class="parish-item" data-name="monaghan &amp; rackwallace (includes tyholland)"><a class="parish-link" href="monaghanrackwallace.html" target="_blank" rel="noopener noreferrer">Monaghan &amp; Rackwallace (includes Tyholland)</a></li><li class="parish-item" data-name="newtownbutler (galloon)"><a class="parish-link" href="newtownbutler.html" target="_blank" rel="noopener noreferrer">Newtownbutler (Galloon)</a></li><li class="parish-item" data-name="roslea"><a class="parish-link" href="roslea.html" target="_blank" rel="noopener noreferrer">Roslea</a></li><li class="parish-item" data-name="tempo (pobal)"><a class="parish-link" href="tempo.html" target="_blank" rel="noopener noreferrer">Tempo (Pobal)</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ballybay (tullycorbet)"><a class="parish-link" href="ballybay.html" target="_blank" rel="noopener noreferrer">Ballybay (Tullycorbet)</a></li><li class="parish-item" data-name="castleblayney (muckno, includes clontibret)"><a class="parish-link" href="castleblayney.html" target="_blank" rel="noopener noreferrer">Castleblayney (Muckno, includes Clontibret)</a></li><li class="parish-item" data-name="clones"><a class="parish-link" href="clones.html" target="_blank" rel="noopener noreferrer">Clones</a></li><li class="parish-item" data-name="corcaghan-threemilehouse (kilmore &amp; drumsnatt)"><a class="parish-link" href="corcaghanthreemilehouse.html" target="_blank" rel="noopener noreferrer">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</a></li><li class="parish-item" data-name="derrygonnelly (botha)"><a class="parish-link" href="derrygonnelly.html" target="_blank" rel="noopener noreferrer">Derrygonnelly (Botha)</a></li><li class="parish-item" data-name="donagh"><a class="parish-link" href="donagh.html" target="_blank" rel="noopener noreferrer">Donagh</a></li><li class="parish-item" data-name="donaghmoyne"><a class="parish-link" href="donaghmoyne.html" target="_blank" rel="noopener noreferrer">Donaghmoyne</a></li><li class="parish-item" data-name="enniskillen (st michael&#x27;s parish)"><a class="parish-link" href="enniskillen.html" target="_blank" rel="noopener noreferrer">Enniskillen (St Michael&#x27;s Parish)</a></li><li class="parish-item" data-name="errigal truagh"><a class="parish-link" href="errigaltruagh.html" target="_blank" rel="noopener noreferrer">Errigal Truagh</a></li><li class="parish-item" data-name="fintona (donacavey)"><a class="parish-link" href="fintona.html" target="_blank" rel="noopener noreferrer">Fintona (Donacavey)</a></li><li class="parish-item" data-name="irvinestown (devenish)"><a class="parish-link" href="irvinestown.html" target="_blank" rel="noopener noreferrer">Irvinestown (Devenish)</a></li><li class="parish-item" data-name="killanny"><a class="parish-link" href="killanny.html" target="_blank" rel="noopener noreferrer">Killanny</a></li><li class="parish-item" data-name="magheracloone"><a class="parish-link" href="magheracloone.html" target="_blank" rel="noopener noreferrer">Magheracloone</a></li><li class="parish-item" data-name="monaghan &amp; rackwallace (includes tyholland)"><a class="parish-link" href="monaghanrackwallace.html" target="_blank" rel="noopener noreferrer">Monaghan &amp; Rackwallace (includes Tyholland)</a></li><li class="parish-item" data-name="roslea"><a class="parish-link" href="roslea.html" target="_blank" rel="noopener noreferrer">Roslea</a></li><li class="parish-item" data-name="tempo (pobal)"><a class="parish-link" href="tempo.html" target="_blank" rel="noopener noreferrer">Tempo (Pobal)</a></li></ul>
     </section>
   </div>
   <footer>
@@ -928,9 +1200,9 @@ Carrickmacross (Machaire Rois)</p></div>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260823v"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260823v';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1302,6 +1574,9 @@ Carrickmacross (Machaire Rois)</p></div>
         }
         return true;
       }
+      function slugOf(s) {
+        return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      }
       function findOcr(box, name) {
         if (!box) return null;
         var wanted = [norm(name), norm(coreName(name))];
@@ -1312,7 +1587,38 @@ Carrickmacross (Machaire Rois)</p></div>
           var got = norm(label);
           if (wanted.indexOf(got) >= 0 || wanted.indexOf(norm(coreName(label))) >= 0) return el;
         }
-        return null;
+        // The search box rebuilds #ocr-panel innerHTML, so fall back to the
+        // masthead id the layout writes (ocr-parish-<slug>).
+        var byId = box.querySelector('#ocr-parish-' + slugOf(name))
+          || box.querySelector('#ocr-parish-' + slugOf(coreName(name)));
+        return byId || null;
+      }
+      function flashLanding(el) {
+        if (!el || !el.classList) return;
+        el.classList.remove('az-landed');
+        void el.offsetWidth;
+        el.classList.add('az-landed');
+        window.setTimeout(function () { el.classList.remove('az-landed'); }, 1800);
+      }
+      function landInBox(box, el) {
+        // Move the box instantly (one smooth animation only — a second one on
+        // the same scroll chain used to be cancelled halfway, which left the
+        // reader in the middle of another parish), then bring the box itself
+        // on screen, then re-check because zoom/fonts can reflow the text.
+        var br = box.getBoundingClientRect();
+        var er = el.getBoundingClientRect();
+        box.scrollTop = Math.max(0, box.scrollTop + (er.top - br.top) - 8);
+        showBox(box);
+        var tries = 0;
+        (function settle() {
+          if (tries++ > 6) return;
+          var b2 = box.getBoundingClientRect();
+          var e2 = el.getBoundingClientRect();
+          var off = Math.round(e2.top - b2.top - 8);
+          if (Math.abs(off) > 3) box.scrollTop = Math.max(0, box.scrollTop + off);
+          window.setTimeout(settle, 150);
+        })();
+        flashLanding(el);
       }
       function pageFor(name) {
         var map = pageIndex();
@@ -1329,14 +1635,19 @@ Carrickmacross (Machaire Rois)</p></div>
       }
       function showBox(box) {
         // The jump happens inside the locked box, so make sure the box itself
-        // is on screen first or a phone reader sees nothing move.
+        // is on screen first or a phone reader sees nothing move. Leave room
+        // for the sticky search bar when a term is typed, otherwise it covers
+        // the parish header the reader just asked for.
         if (!box || !box.getBoundingClientRect) return;
         var r = box.getBoundingClientRect();
         var h = window.innerHeight || document.documentElement.clientHeight || 0;
-        if (r.top < 0 || r.top > h - 120) {
-          if (box.scrollIntoView) {
-            box.scrollIntoView({ block: 'start', behavior: reduceMotion() ? 'auto' : 'smooth' });
-          }
+        var sticky = document.querySelector('.ocr-sticky-chrome.is-searching');
+        var pad = sticky ? Math.round(sticky.getBoundingClientRect().height) + 8 : 0;
+        if (r.top < pad || r.top > h - 120) {
+          window.scrollTo({
+            top: Math.max(0, (window.scrollY || window.pageYOffset || 0) + r.top - pad),
+            behavior: reduceMotion() ? 'auto' : 'smooth',
+          });
         }
       }
       function jumpPdf(names) {
@@ -1355,13 +1666,12 @@ Carrickmacross (Machaire Rois)</p></div>
         return false;
       }
       function jumpOcr(names) {
-        var ocr = document.getElementById('ocr-panel');
+        var ocr = document.getElementById('ocr-panel') || document.getElementById('ocr-text');
         if (!ocr) return false;
         for (var i = 0; i < names.length; i++) {
           var hit = findOcr(ocr, names[i]);
           if (!hit) continue;
-          showBox(ocr);
-          scrollBoxTo(ocr, hit);
+          landInBox(ocr, hit);
           return true;
         }
         return false;
@@ -1369,8 +1679,9 @@ Carrickmacross (Machaire Rois)</p></div>
       function jump(target, names, tries) {
         var done = target === 'pdf' ? jumpPdf(names) : jumpOcr(names);
         // PDF.js paints page slots as it streams, so the slot may not exist
-        // for a second or two after load. Retry briefly instead of failing.
-        if (!done && target === 'pdf' && (tries || 0) < 12) {
+        // for a second or two after load; the OCR panel is rebuilt whenever a
+        // search is cleared. Retry briefly instead of failing silently.
+        if (!done && (tries || 0) < 12) {
           window.setTimeout(function () { jump(target, names, (tries || 0) + 1); }, 400);
         }
       }

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Bright Bulletin — 23/08/2026</title>
+  <title>Bright Bulletin — 25/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -170,6 +170,12 @@
       max-height: 850px;
       overflow: auto;
       overflow-y: auto;
+      overflow-x: hidden;
+      /* Reserve the scrollbar gutter from the first paint. Without it the
+         first page is sized to the full width, the vertical scrollbar then
+         appears, and the page is suddenly ~16px too wide — a horizontal
+         scrollbar under a strip of the bulletin. */
+      scrollbar-gutter: stable;
       background: #525659;
       padding: 8px 0 16px;
     }
@@ -177,10 +183,16 @@
       margin: 0 auto 10px;
       background: #3a3f42;
       min-height: 180px;
+      max-width: 100%;
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
-    .pdf-link-layer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
+    /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
+       page — one of those used to stretch the box's scrollWidth to 2988px. */
+    .pdf-link-layer {
+      position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+      overflow: hidden; pointer-events: none;
+    }
     .pdf-annot-link {
       position: absolute; z-index: 2; pointer-events: auto;
       background: rgba(26, 107, 107, 0.08); border-radius: 2px;
@@ -230,6 +242,7 @@
         overflow: auto !important;
         overflow-y: auto !important;
       }
+      .pdf-inpage-pages { overflow-x: hidden !important; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -256,22 +269,48 @@
         overflow: auto !important;
         overflow-y: auto !important;
       }
+      /* `overflow: auto` above resets both axes, so re-hide the horizontal one:
+         a single stray PDF link annotation off the right edge of a page used to
+         give the whole box a horizontal scrollbar. */
+      .pdf-inpage-pages { overflow-x: hidden !important; }
       /* Nothing to enlarge — the box is already the locked 850px. */
       .az-expand { display: none; }
     }
 
 
-    .ocr-search-bar { position: relative; margin-bottom: 10px; }
+    /* Search comes first in the OCR block and reads like the JUMP TO bar, so
+       a reader cannot scroll past it looking for "where is the search". */
+    .ocr-search-bar {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 8px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-search-label {
+      flex: 0 0 auto;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
+    }
     .search-input {
-      width: 100%;
-      border: 1px solid #c9d4d3;
+      flex: 1 1 auto;
+      min-width: 0;
+      width: auto;
+      border: 1px solid #1a6b6b;
       border-radius: 4px;
       padding: 11px 42px 11px 14px;
       font-size: 1rem;
+      background: #fff;
     }
     .search-clear {
       position: absolute;
-      right: 10px;
+      right: 16px;
       top: 50%;
       transform: translateY(-50%);
       width: 32px;
@@ -400,6 +439,17 @@
     /* Desktop boxes are already the locked 850px, so there is nothing to
        enlarge — the button only appears on tablet/phone. */
     .az-expand { display: none; }
+    /* A letter jump scrolls inside a locked box, so nothing moves on screen
+       except the text. Flag the parish the reader landed on. */
+    .az-landed {
+      background: #fff6da;
+      box-shadow: 0 0 0 3px #f0d089;
+      border-radius: 3px;
+      transition: background 400ms ease, box-shadow 400ms ease;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .az-landed { transition: none; }
+    }
     .diocese-intro {
       margin: 0 0 22px;
       padding: 18px 18px 16px;
@@ -421,18 +471,48 @@
     }
     .diocese-intro .intro-names li { margin: 0 0 4px; }
     
+    /* Letters and text size share ONE bar, so neither hides the other and
+       neither pushes the search box off a short screen. The wrapper draws the
+       box; the letter row and zoom group go transparent inside it. */
+    .ocr-controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 12px;
+      margin: 0 0 10px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-controls-row .az-row,
+    .ocr-controls-row .ocr-zoom-bar {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      border: 0;
+    }
+    .ocr-controls-row .az-row { flex: 1 1 auto; }
+    .ocr-controls-row .ocr-zoom-bar { flex: 0 0 auto; margin-left: auto; }
     .ocr-zoom-bar {
-      display: flex; justify-content: center; align-items: center; gap: 10px;
-      margin: 0 0 10px; padding: 6px 10px;
-      background: rgba(255, 255, 255, 0.94);
-      border: 1px solid #d4ddd9; border-radius: 4px;
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-zoom-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
     }
     .ocr-zoom-bar button {
-      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 4px;
-      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.15rem; cursor: pointer;
+      min-width: 34px; height: 30px; border: 1px solid #cfdedd; border-radius: 4px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.05rem; line-height: 1; cursor: pointer;
     }
+    .ocr-zoom-bar button:hover { background: #1a6b6b; border-color: #1a6b6b; color: #fff; }
     .ocr-zoom-pct {
-      min-width: 3.5rem; text-align: center; font-weight: 700; font-size: 0.95rem; color: #14524f;
+      min-width: 3.2rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
     }
     .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
     @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 6px; } }
@@ -721,7 +801,8 @@
       /* Tap targets big enough for a thumb. */
       .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand {
+      .az-expand,
+      .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
@@ -763,13 +844,26 @@
         padding: 16px 14px 28px;
       }
       .ocr-search-tools { flex-direction: column; }
+      .ocr-search-tools > div {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+      }
       .ocr-search-tools button {
         min-height: 44px;
         width: 100%;
       }
+      /* One column on a phone: letters, then text size. Neither covers the
+         search box above them. */
+      .ocr-controls-row { flex-direction: column; }
+      .ocr-controls-row .az-row,
+      .ocr-controls-row .ocr-zoom-bar { flex: 1 1 auto; }
+      .ocr-search-bar { flex-wrap: wrap; }
+      .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260823v" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
 </head>
 <body>
   <div class="page">
@@ -777,7 +871,7 @@
     <header class="header">
       <p class="diocese-label">DOWN &amp; CONNOR</p>
       <h1>Bright Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Bright — 23/08/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
+      <p class="meta">This week&#x27;s bulletin for Bright — 25/08/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
       <a class="download-link-top" href="parishofbright.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
     </header>
     
@@ -813,19 +907,10 @@
 
     <h2 class="section-heading">Bulletin — OCR Extracted Plain Text</h2>
     <div id="panel-ocr" class="viewer-block">
-      
-      <div class="quiet-links">
-        <a href="parishofbright-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
-      </div>
       <div class="ocr-sticky-chrome">
-      <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
-        <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
-        <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
-        <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
-        <span class="ocr-zoom-hint">or pinch to zoom</span>
-      </div>
       <div class="ocr-search-bar">
-        <input id="ocr-search" class="search-input" type="search" placeholder="Search OCR text..." aria-label="Search OCR text" />
+        <label class="ocr-search-label" for="ocr-search">Search</label>
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search OCR text — a parish, a name, a Mass time" aria-label="Search OCR text" />
         <button id="clear-search" class="search-clear" type="button" aria-label="Clear OCR search" hidden>×</button>
       </div>
       <div class="ocr-search-tools">
@@ -836,7 +921,20 @@
         </div>
       </div>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-bright" data-parish-name="Bright"><h2 class="ocr-parish-name">Bright</h2><p class="ocr-parish-date">23/08/2026</p></header>
+      <div class="ocr-controls-row">
+        
+        <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+          <span class="ocr-zoom-label">Text size</span>
+          <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+          <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+          <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+          <span class="ocr-zoom-hint">or pinch to zoom</span>
+        </div>
+      </div>
+      <div class="quiet-links">
+        <a href="parishofbright-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
+      </div>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-bright" data-parish-name="Bright"><h2 class="ocr-parish-name">Bright</h2><p class="ocr-parish-date">25/08/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>Parish of Bright BulletinTwenty-First Sunday in Ordinary Time - 23rd August 2026Parish Priest: Fr Peter O’Kane, 16 Rossglass Road, Killough, BT30 7QNTel: 028 4484 1221Email: <a href="mailto:parishofbright@downandconnor.orgWebsite" target="_blank" rel="noopener noreferrer">parishofbright@downandconnor.orgWebsite</a>: parishofbright.netMass Times: Week Beginning Monday 24th AugustSt Patrick’ s, Legamaddy St Joseph’ s, Killough24th August Monday 10am 25th August Tuesday 10am28th August Friday 7.30pm 26th August Wednesday 7.30pm30th August Sunday 10am 29th August Saturday Vigil 6.30pmOur Lady, Star of the Sea, Rossglass27th August Thursday 10.00amFaithful DepartedRecently Deceased: Ross Rice (Castlewellan), Baby Sonny O’Neill-DelougheryMonth’ s Mind: Anne Lusted (nee Armstrong, England formerly Killough)Anniversaries: Mary McClean, Harry Fagan, Mickey Doran Weekly ConfessionsSacrament of Reconciliation: after all weekday Masses; and in St Joseph’s every Wednesday 8.00pm-8.45pm and at 6.00pm before the Saturday Vigil Mass.Eucharistic AdorationSt Joseph’s, Killough every Wed: 3.30pm -7.30pm &amp; after Mass 8pm-9pm. St Patrick’s, Legamaddy every Friday: 6.30pm-7.30pm.Sunday Collections, 16th August: Weekly £649-27, Diocesan Cathedral Fund £403-01. Thank you for your generous contributions. Ice Cream Summer SundaysA sincere thank you to the Pastoral Council for organising the two very enjoyable Ice Cream Sundays! It was a lovely moment just to pause after Mass and to enjoy each other’s company. We can all look forward to next year’s 'Ice Cream Summer Sundays’!Medical Missioners of MaryBishop Alan McGuckian has given permission for the Medical Missionaries of Mary to visit the parishes of our Diocese. The sisters will be with us this weekend 22nd/23rd August and will speak at both Masses. Your support of their work would be much appreciated! Prayer for the Return of a Child to ChristSt Monica is the Patron Saint of mothers. Through her years of persevering prayer and tears she eventually brought her son, the now St Augustine, to faith in Christ. Her Feast Day is the 27th August.“In the name of the Father, and the Son, and the Holy Spirit.Under the weight of my heartful burden, I turn to you, dear Saint Monicaand request your assistance and intercession.From your place in heaven, I beg that you will plead before the Throne of the Holy One, for the sake of my child, [Name], who has wandered from the faith, and all that we have tried to teach.Your son, Augustine, wandered, too; eventually he found the faith, and came to believe, and in that belief became a true teacher.St. Monica, please teach me to persist in faithful prayer as you did for your son's sake. Inspire me to behave in ways that will not further distance my child from Christ, but only draw [Name] gently towards His marvellous light.Please teach me what you know about this painful mystery of separation,and how it is reconciled in the re-orientation of our children toward Heaven.O St. Monica, lover of Christ and His Church, pray for me, and for my child [Name], that we may acquire heaven, joining with you, there, in offering constant and thankful praise to God, Amen.”(By Elizabeth Scalia)Bright</p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
@@ -845,7 +943,7 @@
     <section class="parish-section">
       <h2 class="section-heading">Other DOWN &amp; CONNOR Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="antrim"><a class="parish-link" href="antrimparish.html" target="_blank" rel="noopener noreferrer">Antrim</a></li><li class="parish-item" data-name="ballycastle"><a class="parish-link" href="ballycastleparish.html" target="_blank" rel="noopener noreferrer">Ballycastle</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="ballymenaparish.html" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="glenariffe"><a class="parish-link" href="glenariffeparish.html" target="_blank" rel="noopener noreferrer">Glenariffe</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="loughshore"><a class="parish-link" href="loughshoreparishes.html" target="_blank" rel="noopener noreferrer">Loughshore</a></li><li class="parish-item" data-name="maghera"><a class="parish-link" href="parishofmaghera.html" target="_blank" rel="noopener noreferrer">Maghera</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="port glenone (st mary&#x27;s portglenone)"><a class="parish-link" href="stmarysportglenone.html" target="_blank" rel="noopener noreferrer">Port Glenone (St Mary&#x27;s Portglenone)</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="sacred heart belfast"><a class="parish-link" href="sacredheartparishbelfast.html" target="_blank" rel="noopener noreferrer">Sacred Heart Belfast</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st brigids belfast"><a class="parish-link" href="stbrigidsparishbelfast.html" target="_blank" rel="noopener noreferrer">St Brigids Belfast</a></li><li class="parish-item" data-name="st colmcille&#x27;s holywood"><a class="parish-link" href="stcolmcillesholywood.html" target="_blank" rel="noopener noreferrer">St Colmcille&#x27;s Holywood</a></li><li class="parish-item" data-name="st colmcilles"><a class="parish-link" href="st-colmcilles.html" target="_blank" rel="noopener noreferrer">St Colmcilles</a></li><li class="parish-item" data-name="st gerards"><a class="parish-link" href="stgerardsparish.html" target="_blank" rel="noopener noreferrer">St Gerards</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st mary&#x27;s on the hill"><a class="parish-link" href="stmarysonthehill.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s on the Hill</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li><li class="parish-item" data-name="st teresas"><a class="parish-link" href="stteresasparish.html" target="_blank" rel="noopener noreferrer">St Teresas</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="ballycastle"><a class="parish-link" href="ballycastleparish.html" target="_blank" rel="noopener noreferrer">Ballycastle</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="ballymenaparish.html" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="glenariffe"><a class="parish-link" href="glenariffeparish.html" target="_blank" rel="noopener noreferrer">Glenariffe</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="kilmore and killyleagh"><a class="parish-link" href="kilmoreandkillyleagh.html" target="_blank" rel="noopener noreferrer">Kilmore and Killyleagh</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="port glenone (st mary&#x27;s portglenone)"><a class="parish-link" href="stmarysportglenone.html" target="_blank" rel="noopener noreferrer">Port Glenone (St Mary&#x27;s Portglenone)</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="sacred heart belfast"><a class="parish-link" href="sacredheartparishbelfast.html" target="_blank" rel="noopener noreferrer">Sacred Heart Belfast</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st brigids belfast"><a class="parish-link" href="stbrigidsparishbelfast.html" target="_blank" rel="noopener noreferrer">St Brigids Belfast</a></li><li class="parish-item" data-name="st gerards"><a class="parish-link" href="stgerardsparish.html" target="_blank" rel="noopener noreferrer">St Gerards</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st mary&#x27;s on the hill"><a class="parish-link" href="stmarysonthehill.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s on the Hill</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li></ul>
     </section>
   </div>
   <footer>
@@ -897,9 +995,9 @@
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260823v"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260823v';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1271,6 +1369,9 @@
         }
         return true;
       }
+      function slugOf(s) {
+        return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      }
       function findOcr(box, name) {
         if (!box) return null;
         var wanted = [norm(name), norm(coreName(name))];
@@ -1281,7 +1382,38 @@
           var got = norm(label);
           if (wanted.indexOf(got) >= 0 || wanted.indexOf(norm(coreName(label))) >= 0) return el;
         }
-        return null;
+        // The search box rebuilds #ocr-panel innerHTML, so fall back to the
+        // masthead id the layout writes (ocr-parish-<slug>).
+        var byId = box.querySelector('#ocr-parish-' + slugOf(name))
+          || box.querySelector('#ocr-parish-' + slugOf(coreName(name)));
+        return byId || null;
+      }
+      function flashLanding(el) {
+        if (!el || !el.classList) return;
+        el.classList.remove('az-landed');
+        void el.offsetWidth;
+        el.classList.add('az-landed');
+        window.setTimeout(function () { el.classList.remove('az-landed'); }, 1800);
+      }
+      function landInBox(box, el) {
+        // Move the box instantly (one smooth animation only — a second one on
+        // the same scroll chain used to be cancelled halfway, which left the
+        // reader in the middle of another parish), then bring the box itself
+        // on screen, then re-check because zoom/fonts can reflow the text.
+        var br = box.getBoundingClientRect();
+        var er = el.getBoundingClientRect();
+        box.scrollTop = Math.max(0, box.scrollTop + (er.top - br.top) - 8);
+        showBox(box);
+        var tries = 0;
+        (function settle() {
+          if (tries++ > 6) return;
+          var b2 = box.getBoundingClientRect();
+          var e2 = el.getBoundingClientRect();
+          var off = Math.round(e2.top - b2.top - 8);
+          if (Math.abs(off) > 3) box.scrollTop = Math.max(0, box.scrollTop + off);
+          window.setTimeout(settle, 150);
+        })();
+        flashLanding(el);
       }
       function pageFor(name) {
         var map = pageIndex();
@@ -1298,14 +1430,19 @@
       }
       function showBox(box) {
         // The jump happens inside the locked box, so make sure the box itself
-        // is on screen first or a phone reader sees nothing move.
+        // is on screen first or a phone reader sees nothing move. Leave room
+        // for the sticky search bar when a term is typed, otherwise it covers
+        // the parish header the reader just asked for.
         if (!box || !box.getBoundingClientRect) return;
         var r = box.getBoundingClientRect();
         var h = window.innerHeight || document.documentElement.clientHeight || 0;
-        if (r.top < 0 || r.top > h - 120) {
-          if (box.scrollIntoView) {
-            box.scrollIntoView({ block: 'start', behavior: reduceMotion() ? 'auto' : 'smooth' });
-          }
+        var sticky = document.querySelector('.ocr-sticky-chrome.is-searching');
+        var pad = sticky ? Math.round(sticky.getBoundingClientRect().height) + 8 : 0;
+        if (r.top < pad || r.top > h - 120) {
+          window.scrollTo({
+            top: Math.max(0, (window.scrollY || window.pageYOffset || 0) + r.top - pad),
+            behavior: reduceMotion() ? 'auto' : 'smooth',
+          });
         }
       }
       function jumpPdf(names) {
@@ -1324,13 +1461,12 @@
         return false;
       }
       function jumpOcr(names) {
-        var ocr = document.getElementById('ocr-panel');
+        var ocr = document.getElementById('ocr-panel') || document.getElementById('ocr-text');
         if (!ocr) return false;
         for (var i = 0; i < names.length; i++) {
           var hit = findOcr(ocr, names[i]);
           if (!hit) continue;
-          showBox(ocr);
-          scrollBoxTo(ocr, hit);
+          landInBox(ocr, hit);
           return true;
         }
         return false;
@@ -1338,8 +1474,9 @@
       function jump(target, names, tries) {
         var done = target === 'pdf' ? jumpPdf(names) : jumpOcr(names);
         // PDF.js paints page slots as it streams, so the slot may not exist
-        // for a second or two after load. Retry briefly instead of failing.
-        if (!done && target === 'pdf' && (tries || 0) < 12) {
+        // for a second or two after load; the OCR panel is rebuilt whenever a
+        // search is cleared. Retry briefly instead of failing silently.
+        if (!done && (tries || 0) < 12) {
           window.setTimeout(function () { jump(target, names, (tries || 0) + 1); }, 400);
         }
       }

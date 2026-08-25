@@ -3,314 +3,47 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Raphoe Diocese Bulletin Viewer — 23/08/2026</title>
+  <title>Raphoe Diocese Text Bulletin — 25/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
-    html { scroll-behavior: smooth; }
     body {
-      font-family: "Segoe UI", system-ui, sans-serif;
-      background: #f4f6f6;
-      color: #1a1a2e;
-      line-height: 1.55;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #eef1f0;
+      color: #1a1f1e;
+      line-height: 1.65;
+      font-size: 1.125rem;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
     }
-    a { color: #1a6b6b; text-decoration: none; }
-    a:hover { text-decoration: underline; }
-    .page { max-width: 960px; margin: 0 auto; padding: 20px 18px 48px; }
-    .back-link { display: inline-block; margin-bottom: 16px; font-weight: 600; color: #1a6b6b; font-size: 0.95rem; }
-    .header {
-      text-align: center;
-      margin-bottom: 28px;
-      background: #fff;
-      border: 1px solid #dde5e4;
-      padding: 28px 20px 22px;
+    a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
+    .page {
+      max-width: min(72ch, 100%);
+      margin: 0 auto;
+      padding: 14px 18px 40px;
     }
-    .diocese-label {
-      margin: 0 0 8px;
-      color: #14524f;
-      font-size: 0.8rem;
-      letter-spacing: 0.14em;
-      text-transform: uppercase;
-      font-weight: 700;
-    }
-    h1 {
-      margin: 0 0 8px;
-      color: #14524f;
-      font-family: Georgia, "Times New Roman", serif;
-      font-size: clamp(1.55rem, 3.2vw, 2.15rem);
-      font-weight: 700;
-      letter-spacing: 0.02em;
-      text-transform: uppercase;
-      line-height: 1.25;
-    }
-    .meta { color: #6b7280; font-size: 0.92rem; margin-bottom: 10px; }
-    .download-link-top {
-      display: inline-block;
-      margin-top: 4px;
-      font-weight: 700;
-      font-size: 1rem;
-      color: #1a6b6b;
-    }
-
-    /* Mobile-only jump + download (hidden on desktop) */
-    .mobile-jump {
-      display: none;
-      text-align: center;
-      margin: 0 0 22px;
-    }
-    .mobile-jump-btn {
-      display: block;
-      width: 100%;
-      max-width: 420px;
-      margin: 0 auto 12px;
-      padding: 12px 16px;
-      border: 1px solid #1a6b6b;
-      background: #fff;
-      color: #1a6b6b;
-      font-weight: 700;
-      font-size: 0.98rem;
-      text-decoration: none;
-      border-radius: 2px;
-    }
-    .mobile-jump-btn:hover { background: #f0f7f7; text-decoration: none; }
-    .mobile-jump-download {
-      display: inline-block;
-      font-weight: 700;
-      color: #1a6b6b;
-      font-size: 1rem;
-    }
-
-    .section-heading {
-      margin: 34px 0 14px;
-      text-align: center;
-      text-transform: uppercase;
-      letter-spacing: 0.07em;
-      font-weight: 700;
-      font-size: 0.98rem;
-      color: #4a5560;
-      font-family: Georgia, "Times New Roman", serif;
-    }
-
-    .viewer-block {
-      background: #fff;
-      border: 1px solid #dde5e4;
-      padding: 14px;
-      margin-bottom: 4px;
-    }
-
-    .quiet-links {
-      display: flex;
-      justify-content: flex-end;
-      gap: 14px;
-      flex-wrap: wrap;
-      margin-bottom: 10px;
-      font-size: 0.88rem;
-      font-weight: 600;
-    }
-    .quiet-links a { color: #1a6b6b; }
-
-    .pdf-frame-wrap {
-      position: relative;
-      min-height: 850px;
-      border: 1px solid #c9d4d3;
-      background: #3a3f42;
-    }
-    .pdf-frame-wrap iframe {
-      width: 100%;
-      height: 100%;
-      border: 0;
-      display: block;
-    }
-    .fullscreen-btn {
-      position: absolute;
-      top: 10px;
-      right: 10px;
-      z-index: 5;
-      width: 34px;
-      height: 34px;
-      border: 1px solid #1a6b6b;
-      border-radius: 4px;
-      background: rgba(255, 255, 255, 0.92);
-      color: #1a6b6b;
-      font-size: 1rem;
-      line-height: 1;
-      cursor: pointer;
-    }
-    .fullscreen-btn:hover { background: #fff; }
-    
-    .pdf-inpage-viewer,
-    .pdf-mobile-fallback {
-      display: flex !important;
-      flex-direction: column;
-      min-height: 850px;
-      flex: 1 1 auto;
-      background: #3a3f42;
-      color: #e8eeed;
-    }
-    .pdf-inpage-toolbar {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 8px;
-      padding: 8px 10px;
-      background: #14524f;
-      color: #fff;
-      flex: 0 0 auto;
-    }
-    .pdf-inpage-backup { display: flex; gap: 8px; flex-wrap: wrap; }
-    .pdf-inpage-backup a { color: #fff; font-weight: 700; font-size: 0.85rem; }
-    .pdf-inpage-status { padding: 10px 12px; background: #1f3d3c; color: #d8f0ee; font-size: 0.9rem; }
-    .pdf-inpage-pages {
-      box-sizing: border-box;
-      flex: 0 0 auto;
-      height: 850px;
-      min-height: 850px;
-      max-height: 850px;
-      overflow: auto;
-      overflow-y: auto;
-      background: #525659;
-      padding: 8px 0 16px;
-    }
-    .pdf-inpage-page-slot {
-      margin: 0 auto 10px;
-      background: #3a3f42;
-      min-height: 180px;
-      position: relative;
-    }
-    .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
-    .pdf-link-layer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
-    .pdf-annot-link {
-      position: absolute; z-index: 2; pointer-events: auto;
-      background: rgba(26, 107, 107, 0.08); border-radius: 2px;
-    }
-    .pdf-frame-wrap,
-    .pdf-standalone-shell {
-      display: flex;
-      flex-direction: column;
-    }
-    .pdf-frame-wrap iframe,
-    .pdf-standalone-shell iframe.pdf-frame,
-    body.is-native-pdf iframe.pdf-frame {
-      display: none !important;
-      height: 850px;
-      min-height: 850px;
-      max-height: 850px;
-    }
-    .pdf-frame-wrap.is-native-pdf,
-    .pdf-standalone-shell.is-native-pdf,
-    body.is-native-pdf .pdf-standalone-shell {
-      display: flex;
-      flex-direction: column;
-      min-height: 850px !important;
-      background: #3a3f42;
-    }
-    @media (max-width: 1024px) {
-      .pdf-frame-wrap,
-      .pdf-standalone-shell,
-      .pdf-frame-wrap.is-native-pdf,
-      .pdf-standalone-shell.is-native-pdf,
-      body.is-native-pdf .pdf-standalone-shell {
-        min-height: 450px !important;
-        display: flex;
-        flex-direction: column;
-        background: #3a3f42;
-      }
-      .pdf-inpage-viewer,
-      .pdf-mobile-fallback {
-        min-height: 450px !important;
-      }
-      .pdf-inpage-pages,
-      .pdf-frame-wrap iframe,
-      .pdf-standalone-shell iframe.pdf-frame {
-        height: 450px !important;
-        min-height: 450px !important;
-        max-height: 450px !important;
-        overflow: auto !important;
-        overflow-y: auto !important;
-      }
-      .pdf-frame-wrap iframe,
-      .pdf-standalone-shell iframe.pdf-frame {
-        display: none !important;
-      }
-    }
-
-    @media (min-width: 701px) and (min-height: 501px) {
-      .pdf-frame-wrap,
-      .pdf-standalone-shell,
-      .pdf-frame-wrap.is-native-pdf,
-      .pdf-standalone-shell.is-native-pdf,
-      body.is-native-pdf .pdf-standalone-shell,
-      .pdf-inpage-viewer,
-      .pdf-mobile-fallback {
-        min-height: 850px !important;
-      }
-      .pdf-inpage-pages,
-      #ocr-panel,
-      .pdf-frame-wrap iframe,
-      .pdf-standalone-shell iframe.pdf-frame {
-        height: 850px !important;
-        min-height: 850px !important;
-        max-height: 850px !important;
-        overflow: auto !important;
-        overflow-y: auto !important;
-      }
-      /* Nothing to enlarge — the box is already the locked 850px. */
-      .az-expand { display: none; }
-    }
-
-
-    .ocr-search-bar { position: relative; margin-bottom: 10px; }
-    .search-input {
-      width: 100%;
-      border: 1px solid #c9d4d3;
-      border-radius: 4px;
-      padding: 11px 42px 11px 14px;
-      font-size: 1rem;
-    }
-    .search-clear {
-      position: absolute;
-      right: 10px;
-      top: 50%;
-      transform: translateY(-50%);
-      width: 32px;
-      height: 32px;
-      border: 0;
-      border-radius: 50%;
-      background: transparent;
-      color: #6b7280;
-      font-size: 1.25rem;
-      cursor: pointer;
-    }
-    .search-clear[hidden] { display: none; }
-    .ocr-search-tools {
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      gap: 10px;
+    .top {
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+      gap: 8px 14px;
       margin-bottom: 12px;
-      flex-wrap: wrap;
     }
-    .ocr-search-tools button {
-      border: 0;
-      border-radius: 4px;
-      background: #1a6b6b;
-      color: white;
-      font-weight: 600;
-      padding: 7px 14px;
-      cursor: pointer;
-      font-size: 0.9rem;
+    .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+    .back-link {
+      font-size: 0.9rem; font-weight: 700;
+      color: #14524f; text-decoration: none;
     }
-    .ocr-search-tools button:disabled { background: #9bbfbd; cursor: not-allowed; }
-    .match-count { color: #6b7280; font-size: 0.9rem; font-weight: 600; }
+    .title-line {
+      font-size: 1rem; font-weight: 700; color: #1a1f1e;
+    }
     .font-size-controls { display: none; }
     
     .ocr-sticky-chrome {
       position: relative;
       top: auto;
       z-index: 8;
-      background: #fff;
+      background: #eef1f0;
       padding: 8px 0 10px;
       margin: 0 0 8px;
     }
@@ -359,85 +92,24 @@
       .scroll-top-btn { transition: none; }
     }
     
-    
-    .az-row {
-      display: flex;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 6px;
-      margin: 0 0 10px;
-      padding: 8px 10px;
-      background: #f7fafa;
-      border: 1px solid #dde5e4;
-    }
-    .az-row-label {
-      margin-right: 2px;
-      font-size: 0.72rem;
-      font-weight: 700;
-      letter-spacing: 0.06em;
-      text-transform: uppercase;
-      color: #14524f;
-    }
-    .az-letter {
-      min-width: 30px;
-      height: 30px;
-      padding: 0 6px;
-      background: #fff;
-      border: 1px solid #cfdedd;
-      border-radius: 4px;
-      color: #1a6b6b;
-      font-weight: 700;
-      font-size: 0.9rem;
-      line-height: 1;
-      cursor: pointer;
-    }
-    .az-letter:hover,
-    .az-letter:focus-visible {
-      background: #1a6b6b;
-      border-color: #1a6b6b;
-      color: #fff;
-    }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
-    .az-expand { display: none; }
-    .diocese-intro {
-      margin: 0 0 22px;
-      padding: 18px 18px 16px;
-      background: #fff;
-      border: 1px solid #dde5e4;
-    }
-    .diocese-intro p { margin: 0 0 10px; color: #1a1a2e; }
-    .diocese-intro .intro-welcome { font-size: 1.05rem; }
-    .diocese-intro .intro-count { font-weight: 600; color: #14524f; }
-    .diocese-intro h3 {
-      margin: 14px 0 8px;
-      font-size: 0.92rem;
-      color: #14524f;
-    }
-    .diocese-intro .intro-stale-note { color: #5a6a68; font-size: 0.9rem; }
-    .diocese-intro .intro-names {
-      margin: 0;
-      padding-left: 1.15em;
-    }
-    .diocese-intro .intro-names li { margin: 0 0 4px; }
-    
     .ocr-zoom-bar {
-      display: flex; justify-content: center; align-items: center; gap: 10px;
+      display: flex; justify-content: center; align-items: center; gap: 8px;
       margin: 0 0 10px; padding: 6px 10px;
-      background: rgba(255, 255, 255, 0.94);
-      border: 1px solid #d4ddd9; border-radius: 4px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
     }
     .ocr-zoom-bar button {
-      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 4px;
-      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.15rem; cursor: pointer;
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+      line-height: 1;
     }
     .ocr-zoom-pct {
-      min-width: 3.5rem; text-align: center; font-weight: 700; font-size: 0.95rem; color: #14524f;
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
     }
     .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
-    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 6px; } }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 4px; } }
     
-    #ocr-panel {
+    .ocr-body {
       background: #eef1f0;
       color: #1a1f1e;
       font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
@@ -454,7 +126,7 @@
       text-size-adjust: 100%;
       touch-action: pan-x pan-y pinch-zoom;
     }
-    #ocr-panel h1, #ocr-panel h2 {
+    .ocr-body h1, .ocr-body h2 {
       color: #14524f;
       margin: 1.35em 0 0.45em;
       font-weight: 700;
@@ -462,32 +134,32 @@
       line-height: 1.3;
       max-width: 100%;
     }
-    #ocr-panel h2.b-title, #ocr-panel .b-title {
+    .ocr-body h2.b-title, .ocr-body .b-title {
       font-size: 1.28em;
       color: #0f2b5b;
       border-bottom: 2px solid #c5d0c9;
       padding-bottom: 0.18em;
       margin-top: 1.5em;
     }
-    #ocr-panel h3.b-head, #ocr-panel .b-head {
+    .ocr-body h3.b-head, .ocr-body .b-head {
       font-size: 1.12em;
       color: #134e9c;
       margin: 1.1em 0 0.35em;
     }
-    #ocr-panel h4.b-sub, #ocr-panel .b-sub {
+    .ocr-body h4.b-sub, .ocr-body .b-sub {
       font-size: 1.04em;
       color: #1f6f4a;
       margin: 0.95em 0 0.3em;
     }
-    #ocr-panel h3, #ocr-panel h4 {
+    .ocr-body h3, .ocr-body h4 {
       color: #1a6b6b;
       margin: 1.1em 0 0.35em;
       font-weight: 700;
       line-height: 1.35;
       max-width: 100%;
     }
-    #ocr-panel h3.ocr-page-heading,
-    #ocr-panel .page-label {
+    .ocr-body h3.ocr-page-heading,
+    .ocr-body .page-label {
       font-size: 0.78rem;
       font-weight: 700;
       letter-spacing: 0.06em;
@@ -496,31 +168,31 @@
       color: #5a6a68;
       font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
     }
-    #ocr-panel p {
+    .ocr-body p {
       margin: 0 0 0.9em;
       max-width: 100%;
     }
-    #ocr-panel hr {
+    .ocr-body hr {
       border: 0;
       border-top: 1px solid #d4ddd9;
       margin: 1.35em 0;
     }
-    #ocr-panel strong { color: #0f2b5b; }
-    #ocr-panel a {
+    .ocr-body strong { color: #0f2b5b; }
+    .ocr-body a {
       color: #1a6b6b;
       font-weight: 600;
       overflow-wrap: anywhere;
     }
-    #ocr-panel mark {
+    .ocr-body mark {
       background: #fef08a;
       padding: 1px 3px;
       border-radius: 2px;
     }
-    #ocr-panel mark.search-active {
+    .ocr-body mark.search-active {
       background: #fde047;
       outline: 2px solid #0f5e5e;
     }
-    #ocr-panel table.b-table {
+    .ocr-body table.b-table {
       border-collapse: collapse;
       width: 100%;
       max-width: 100%;
@@ -530,38 +202,38 @@
       overflow-x: auto;
       -webkit-overflow-scrolling: touch;
     }
-    #ocr-panel table.b-table td, #ocr-panel table.b-table th {
+    .ocr-body table.b-table td, .ocr-body table.b-table th {
       border: 1px solid #c9d4cf;
       padding: 6px 10px;
       text-align: left;
       vertical-align: top;
     }
-    #ocr-panel table.b-table th {
+    .ocr-body table.b-table th {
       background: #e4ebe8;
       color: #0f2b5b;
     }
-    #ocr-panel table.b-table tr:nth-child(even) td {
+    .ocr-body table.b-table tr:nth-child(even) td {
       background: #f7f9f8;
     }
-    #ocr-panel img, #ocr-panel iframe, #ocr-panel video {
+    .ocr-body img, .ocr-body iframe, .ocr-body video {
       max-width: 100%;
       height: auto;
     }
-    #ocr-panel > :first-child {
+    .ocr-body > :first-child {
       margin-top: 0;
     }
     
-    #ocr-panel .ocr-parish-masthead {
+    .ocr-body .ocr-parish-masthead {
       margin: 2.1em 0 1.15em;
       padding: 0.85em 0 0.7em;
       border-top: 3px solid #14524f;
       border-bottom: 1px solid #c5d0c9;
     }
-    #ocr-panel .ocr-parish-masthead:first-child {
+    .ocr-body .ocr-parish-masthead:first-child {
       margin-top: 0;
     }
-    #ocr-panel h2.ocr-parish-name,
-    #ocr-panel .ocr-parish-name {
+    .ocr-body h2.ocr-parish-name,
+    .ocr-body .ocr-parish-name {
       font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
       font-size: 1.45em;
       font-weight: 700;
@@ -573,7 +245,7 @@
       padding: 0;
       text-transform: none;
     }
-    #ocr-panel .ocr-parish-date {
+    .ocr-body .ocr-parish-date {
       margin: 0;
       font-size: 0.88rem;
       font-weight: 600;
@@ -581,11 +253,11 @@
       color: #5a6a68;
       font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
     }
-    #ocr-panel .ocr-parish-link {
+    .ocr-body .ocr-parish-link {
       margin: 0.25em 0 0;
       font-size: 0.88rem;
     }
-    #ocr-panel h3.b-head {
+    .ocr-body h3.b-head {
       margin-top: 1.45em;
       margin-bottom: 0.5em;
       padding-bottom: 0.12em;
@@ -593,250 +265,92 @@
     }
 
 
-    #ocr-panel {
-      box-sizing: border-box;
-      height: 850px;
-      min-height: 850px;
-      max-height: 850px;
-      overflow: auto;
-      overflow-y: auto;
+    .ocr-body {
+      padding: 4px 2px 8px;
+    }
+    .search-panel {
+      margin: 0 0 12px;
       border: 1px solid #d4ddd9;
-      padding: 22px 24px 32px;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
     }
-    .pdf-frame-wrap iframe {
-      height: 850px;
-      min-height: 850px;
-      max-height: 850px;
+    .search-panel .ocr-search-bar { margin-bottom: 6px; }
+    .ocr-search-bar { position: relative; margin-bottom: 6px; }
+    .search-input {
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: #1a1f1e; background: #fff;
     }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 1px solid #1a6b6b; border-radius: 6px; background: #fff; color: #1a6b6b;
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { color: #999; border-color: #d4ddd9; cursor: not-allowed; }
+    .match-count { color: #5a6a68; font-size: 0.85rem; font-weight: 600; }
     .note-box {
-      margin-top: 12px;
-      color: #8a3b3b;
+      margin-top: 18px;
+      color: #5a6a68;
       font-weight: 400;
-      font-size: 0.82rem;
+      font-size: 0.85rem;
       line-height: 1.5;
+      padding: 0;
     }
     .ocr-failed-banner {
       margin: 12px 0;
       padding: 12px 14px;
       background: #fff4df;
       border: 1px solid #f5d08d;
-      border-radius: 4px;
+      border-radius: 8px;
       color: #713f12;
       font-weight: 600;
       font-size: 0.9rem;
       line-height: 1.45;
     }
-    .empty-state[hidden],
-    #parish-empty[hidden] { display: none !important; }
-    .parish-section {
-      margin-top: 36px;
-      padding: 8px 0 0;
-      background: transparent;
-      border: 0;
-    }
-    .parish-section h2.section-heading {
-      color: #14524f;
-      font-size: 1.15rem;
-      margin-bottom: 16px;
-    }
-    .parish-filter {
-      width: 100%;
-      max-width: 420px;
-      display: block;
-      margin: 0 auto 18px;
-      border: 1px solid #d0d8d7;
-      border-radius: 4px;
-      padding: 10px 12px;
-      font-size: 0.95rem;
-    }
-    ul.parish-grid {
-      list-style: none;
-      display: grid;
-      grid-template-columns: repeat(3, minmax(0, 1fr));
-      gap: 8px 28px;
-      padding: 0;
-      margin: 0;
-    }
-    .parish-item {
-      margin: 0;
-      padding: 2px 0 2px 1.1em;
-      position: relative;
-    }
-    .parish-item::before {
-      content: "•";
-      position: absolute;
-      left: 0;
-      top: 2px;
-      color: #1a6b6b;
-      font-weight: 700;
-    }
-    .parish-link {
-      color: #1a6b6b;
-      font-size: 0.98rem;
-      font-weight: 600;
-      text-decoration: none;
-      background: transparent;
-      border: 0;
-      padding: 0;
-      min-height: 0;
-      display: inline;
-    }
-    .parish-link:hover { text-decoration: underline; }
-    .empty-state { margin: 0 0 12px; color: #6b7280; font-size: 0.95rem; text-align: center; }
-
-    footer {
-      margin-top: 40px;
-      background: #114b4b;
-      color: white;
-      padding: 16px 20px;
-    }
-    .footer-inner {
-      max-width: 960px;
-      margin: 0 auto;
-      display: flex;
-      justify-content: space-between;
-      gap: 12px;
-      flex-wrap: wrap;
-      font-size: 0.88rem;
-    }
-    .footer-inner a { color: #d8f0ee; font-weight: 600; }
-
-    @media (max-width: 1024px) {
-      /* Harvest + OCR both call this generator — keep both panels here.
-         Desktop: locked 850px visible boxes, inner scroll.
-         Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
-      .pdf-frame-wrap,
-      .pdf-inpage-viewer {
-        min-height: 450px;
-      }
-      .pdf-frame-wrap iframe,
-      .pdf-inpage-pages,
-      #ocr-panel {
-        height: 450px;
-        min-height: 450px;
-        max-height: 450px;
-        overflow: auto;
-        overflow-y: auto;
-      }
-      /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
-      .az-letter,
-      .az-expand {
-        min-width: 40px;
-        height: 40px;
-        font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
-      }
-      /* Only the panel the reader tapped grows — the other one stays 450px.
-         Scoped to that panel's id so a phone never ends up with two 850px
-         boxes stacked on one screen. */
-      #panel-pdf.az-expanded .pdf-frame-wrap,
-      #panel-pdf.az-expanded .pdf-inpage-viewer {
-        min-height: 850px !important;
-      }
-      #panel-pdf.az-expanded .pdf-frame-wrap iframe,
-      #panel-pdf.az-expanded .pdf-inpage-pages,
-      #panel-ocr.az-expanded #ocr-panel {
-        height: 850px !important;
-        min-height: 850px !important;
-        max-height: 850px !important;
-      }
-    }
-    @media (max-width: 900px) {
-      ul.parish-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
-    }
-    @media (max-width: 700px) {
-      .page { padding: 14px 12px 36px; }
-      .mobile-jump { display: block; }
-      .download-link-top { display: none; }
-      .quiet-links { justify-content: center; }
-      ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
-      #ocr-panel {
-        padding: 16px 14px 28px;
-      }
-      .ocr-search-tools { flex-direction: column; }
-      .ocr-search-tools button {
-        min-height: 44px;
-        width: 100%;
-      }
+    body.embed-mode .top { display: none !important; }
+    body.embed-mode .page { padding-top: 8px; }
+    @media (max-width: 600px) {
+      .page { padding: 12px 14px 32px; }
+      .ocr-search-tools button { min-height: 48px; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260823v" defer></script>
 </head>
 <body>
   <div class="page">
-    <a class="back-link" href="index.html" target="_blank" rel="noopener noreferrer">← Back to bulletin archive</a>
-    <header class="header">
-      <p class="diocese-label">RAPHOE</p>
-      <h1>Raphoe Collated Bulletin</h1>
-      <p class="meta">Generated for 23/08/2026.</p>
-      <a class="download-link-top" href="../mega_pdf/raphoe_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
-    </header>
-    
-
-    <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
-      <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="../mega_pdf/raphoe_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
-    </div>
-
-    <h2 class="section-heading">Bulletin — Original PDF Version</h2>
-    <div id="panel-pdf" class="viewer-block">
-      <nav class="az-row" aria-label="Jump to a parish in the pdf viewer"><span class="az-row-label">Jump to</span><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Annagry|Ardara" title="Annagry, Ardara" aria-label="Jump to Annagry">A</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Bruckless" title="Bruckless" aria-label="Jump to Bruckless">B</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Cathedral" title="Cathedral" aria-label="Jump to Cathedral">C</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Drumholm (Ballintra)|Dunfanaghy" title="Drumholm (Ballintra), Dunfanaghy" aria-label="Jump to Drumholm (Ballintra)">D</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Falcarragh" title="Falcarragh" aria-label="Jump to Falcarragh">F</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Gartan/Termon (Kilmacrenan)|Glenfin|Glenties|Gortahork" title="Gartan/Termon (Kilmacrenan), Glenfin, Glenties, Gortahork" aria-label="Jump to Gartan/Termon (Kilmacrenan)">G</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Inver|Irish Martyrs" title="Inver, Irish Martyrs" aria-label="Jump to Inver">I</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Kilbarron|Kilcar|Killybegs|Kincasslagh" title="Kilbarron, Kilcar, Killybegs, Kincasslagh" aria-label="Jump to Kilbarron">K</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Mevagh|Milford Kilkeel" title="Mevagh, Milford Kilkeel" aria-label="Jump to Mevagh">M</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Newtown Killea" title="Newtown Killea" aria-label="Jump to Newtown Killea">N</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Raphoe|Rathmullan" title="Raphoe, Rathmullan" aria-label="Jump to Raphoe">R</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Stranolar" title="Stranolar" aria-label="Jump to Stranolar">S</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Tawnawilly|Templecrone" title="Tawnawilly, Templecrone" aria-label="Jump to Tawnawilly">T</button><button type="button" class="az-expand" data-az-expand="pdf" aria-expanded="false">Tap to enlarge</button></nav>
-      <div class="quiet-links">
-        <a href="../mega_pdf/raphoe_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="raphoe-2026-08-23-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
-      <div class="pdf-frame-wrap" id="pdf-frame-wrap">
-        <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="../mega_pdf/raphoe_mega_bulletin.pdf" title="Raphoe Diocese bulletin PDF"></iframe>
-        
-        <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="../mega_pdf/raphoe_mega_bulletin.pdf">
-          <div class="pdf-inpage-toolbar">
-            <div class="pdf-inpage-backup">
-              <a href="../mega_pdf/raphoe_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-              <a href="../mega_pdf/raphoe_mega_bulletin.pdf" download>Download</a>
-            </div>
-          </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
-          <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
-        </div>
+    <div class="top" id="ocr-top">
+      <div class="top-left">
+        <a class="back-link" href="raphoe-2026-08-25.html" target="_blank" rel="noopener noreferrer">← Viewer</a>
+        <span class="title-line">RAPHOE Text Bulletin · 25/08/2026</span>
       </div>
     </div>
-
-    <h2 class="section-heading">Bulletin — OCR Extracted Plain Text</h2>
-    <div id="panel-ocr" class="viewer-block">
-      <nav class="az-row" aria-label="Jump to a parish in the ocr viewer"><span class="az-row-label">Jump to</span><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Annagry|Ardara" title="Annagry, Ardara" aria-label="Jump to Annagry">A</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Bruckless" title="Bruckless" aria-label="Jump to Bruckless">B</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Cathedral" title="Cathedral" aria-label="Jump to Cathedral">C</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Drumholm (Ballintra)|Dunfanaghy" title="Drumholm (Ballintra), Dunfanaghy" aria-label="Jump to Drumholm (Ballintra)">D</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Falcarragh" title="Falcarragh" aria-label="Jump to Falcarragh">F</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Gartan/Termon (Kilmacrenan)|Glenfin|Glenties|Gortahork" title="Gartan/Termon (Kilmacrenan), Glenfin, Glenties, Gortahork" aria-label="Jump to Gartan/Termon (Kilmacrenan)">G</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Inver|Irish Martyrs" title="Inver, Irish Martyrs" aria-label="Jump to Inver">I</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Kilbarron|Kilcar|Killybegs|Kincasslagh" title="Kilbarron, Kilcar, Killybegs, Kincasslagh" aria-label="Jump to Kilbarron">K</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Mevagh|Milford Kilkeel" title="Mevagh, Milford Kilkeel" aria-label="Jump to Mevagh">M</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Newtown Killea" title="Newtown Killea" aria-label="Jump to Newtown Killea">N</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Raphoe|Rathmullan" title="Raphoe, Rathmullan" aria-label="Jump to Raphoe">R</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Stranolar" title="Stranolar" aria-label="Jump to Stranolar">S</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Tawnawilly|Templecrone" title="Tawnawilly, Templecrone" aria-label="Jump to Tawnawilly">T</button><button type="button" class="az-expand" data-az-expand="ocr" aria-expanded="false">Tap to enlarge</button></nav>
-      <div class="quiet-links">
-        <a href="raphoe-2026-08-23-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
-      </div>
-      <div class="ocr-sticky-chrome">
-      <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
-        <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
-        <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
-        <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
-        <span class="ocr-zoom-hint">or pinch to zoom</span>
-      </div>
+    <div class="ocr-sticky-chrome">
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+      <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+      <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+      <span class="ocr-zoom-hint">or pinch to zoom</span>
+    </div>
+    <div class="search-panel" role="search">
       <div class="ocr-search-bar">
-        <input id="ocr-search" class="search-input" type="search" placeholder="Search OCR text..." aria-label="Search OCR text" />
-        <button id="clear-search" class="search-clear" type="button" aria-label="Clear OCR search" hidden>×</button>
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search text (mass, bingo, parish…)" aria-label="Search bulletin text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
       </div>
       <div class="ocr-search-tools">
         <span id="ocr-match-count" class="match-count">0 matches</span>
         <div>
-          <button id="ocr-prev" type="button" disabled aria-label="Previous search match">← Prev match</button>
-          <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
+          <button id="ocr-prev" type="button" disabled>← Prev</button>
+          <button id="ocr-next" type="button" disabled>Next →</button>
         </div>
       </div>
-      </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-annagry" data-parish-name="Annagry"><h2 class="ocr-parish-name">Annagry</h2><p class="ocr-parish-date">23/08/2026</p></header>
+    </div>
+    </div>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead" id="ocr-parish-annagry" data-parish-name="Annagry"><h2 class="ocr-parish-name">Annagry</h2><p class="ocr-parish-date">25/08/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>21* Sunday -<br>
 § Ordinay &amp;<br>
@@ -943,9 +457,7 @@ Wednesdays 8.30pm. Gweedore: Mabs Centre, Derrybeg F92KF82, Saturday 10.00am. Gl
 The Hub, Main Street, F94 C8H7, Mondays &amp; Thursdays: 8.30pm. Ards Friary Creeslough:<br>
 Fridays 8.30pm; or visit <a href="https://www.alcoholicsanonymous.ie" target="_blank" rel="noopener noreferrer">www.alcoholicsanonymous.ie</a> or call <a href="tel:+35318420700" style="color:#1d4ed8;font-weight:600;">018420700</a>.</p>
 <hr>
-<p>Ardara</p>
-<hr>
-<header class="ocr-parish-masthead" id="ocr-parish-ardara" data-parish-name="Ardara"><h2 class="ocr-parish-name">Ardara</h2><p class="ocr-parish-date">23/08/2026</p></header>
+<header class="ocr-parish-masthead" id="ocr-parish-ardara" data-parish-name="Ardara"><h2 class="ocr-parish-name">Ardara</h2><p class="ocr-parish-date">25/08/2026</p></header>
 <p class="page-label">Page 2</p>
 <p>Twenty First Sunday in Ordinary Time – Week beginning: 23rd August 2026<br>
 Weekend Mass Times<br>
@@ -984,9 +496,7 @@ Parish Envelopes: €1674.00</p>
 <p>Thank you for your generous support<br>
 Share:</p>
 <hr>
-<p>Bruckless</p>
-<hr>
-<header class="ocr-parish-masthead" id="ocr-parish-bruckless" data-parish-name="Bruckless"><h2 class="ocr-parish-name">Bruckless</h2><p class="ocr-parish-date">23/08/2026</p></header>
+<header class="ocr-parish-masthead" id="ocr-parish-bruckless" data-parish-name="Bruckless"><h2 class="ocr-parish-name">Bruckless</h2><p class="ocr-parish-date">25/08/2026</p></header>
 <p class="page-label">Page 5</p>
 <h3 class="b-head">MASS TIMES ANNIVERSARIES /INTENTIONS</h3>
 <p>Saturday 22nd August 11:00am<br>
@@ -1057,7 +567,7 @@ For more information, please visit breastcancerresearch.ie or <a href="https://w
 International Coffee Day 2026 takes place on Thursday, October 1st, 2026. Please see<br>
 www.internationalcoffeeday.org for further details.</p>
 <hr>
-<header class="ocr-parish-masthead" id="ocr-parish-cathedral" data-parish-name="Cathedral"><h2 class="ocr-parish-name">Cathedral</h2><p class="ocr-parish-date">23/08/2026</p></header>
+<header class="ocr-parish-masthead" id="ocr-parish-cathedral" data-parish-name="Cathedral"><h2 class="ocr-parish-name">Cathedral</h2><p class="ocr-parish-date">25/08/2026</p></header>
 <p class="page-label">Page 6</p>
 <p>SUNDAY COLLECTION ~ 17th August - €7,679<br>
 HOLY DAY COLLECTION (15th August) : €2,450<br>
@@ -1215,7 +725,7 @@ Sunday 30th August ~ Twenty Second Sunday in Ordinary Time<br>
 Masses: 8 am, 10 am, 12 noon and 6 pm<br>
 Baptisms: 2.30 pm</p>
 <hr>
-<header class="ocr-parish-masthead" id="ocr-parish-drumholm-ballintra" data-parish-name="Drumholm (Ballintra)"><h2 class="ocr-parish-name">Drumholm (Ballintra)</h2><p class="ocr-parish-date">23/08/2026</p></header>
+<header class="ocr-parish-masthead" id="ocr-parish-drumholm-ballintra" data-parish-name="Drumholm (Ballintra)"><h2 class="ocr-parish-name">Drumholm (Ballintra)</h2><p class="ocr-parish-date">25/08/2026</p></header>
 <p class="page-label">Page 8</p>
 <p>20th SUNDAY<br>
 InIn<br>
@@ -1307,9 +817,10 @@ Bishops Conference dedicated to sharing the &#x27;Good News&#x27;<br>
 and the witness of the Catholic Church in Ireland. It is<br>
 intended to help people discover the faith, live the faith<br>
 and pass on the faith. It is for both seekers and followers. ST JOSEPH MEN’S CAMINO. ST JOSEPH MEN’S CAMINO. Join men from across Ireland on Saturday<br>
-12th September for a 25km pilgrimage through the Boyne Valley, beginning in</p>
+12th September for a 25km pilgrimage through the Boyne Valley, beginning in<br>
+Drogheda. SEE POSTER IN ADDITI ONAL NEWS. ONAL NEWS.</p>
 <hr>
-<header class="ocr-parish-masthead" id="ocr-parish-dunfanaghy" data-parish-name="Dunfanaghy"><h2 class="ocr-parish-name">Dunfanaghy</h2><p class="ocr-parish-date">23/08/2026</p></header>
+<header class="ocr-parish-masthead" id="ocr-parish-dunfanaghy" data-parish-name="Dunfanaghy"><h2 class="ocr-parish-name">Dunfanaghy</h2><p class="ocr-parish-date">25/08/2026</p></header>
 <p class="page-label">Page 9</p>
 <p>When we give cheerfully and accept<br>
 Pe = =, Gratefully, everyone is blessed. The Candle of Remembrance<br>
@@ -1365,9 +876,7 @@ of the Holy Spirit and so to experience the deeper friendship of Jesus, Son of G
 Am | open to accept such a gift and to live accordingly? Maybe God will surprise me Tits Fe pomreraion<br>
 in this Eucharist and in the days ahead. Come, Lord Jesus, come. I</p>
 <hr>
-<p>Falcarragh</p>
-<hr>
-<header class="ocr-parish-masthead" id="ocr-parish-falcarragh" data-parish-name="Falcarragh"><h2 class="ocr-parish-name">Falcarragh</h2><p class="ocr-parish-date">23/08/2026</p></header>
+<header class="ocr-parish-masthead" id="ocr-parish-falcarragh" data-parish-name="Falcarragh"><h2 class="ocr-parish-name">Falcarragh</h2><p class="ocr-parish-date">25/08/2026</p></header>
 <p class="page-label">Page 10</p>
 <p><a href="https://www.naomhfionan.com" target="_blank" rel="noopener noreferrer">www.naomhfionan.com</a> I Church Webcam: <a href="https://www.mcn.live" target="_blank" rel="noopener noreferrer">www.mcn.live</a> I Facebook: @falcarraghparish Fr. John Boyce P.P.<br>
 Parochial House, Falcarragh, Co. Donegal. F92 N6Y9.<br>
@@ -1538,7 +1047,7 @@ St. Vincent de Paul: Local number: <a href="tel:+353871443464" style="color:#1d4
 Cloughaneely Food Bank : <a href="tel:+353857560177" style="color:#1d4ed8;font-weight:600;">085 7560177</a><br>
 MABS Gweedore: 0818 072650</p>
 <hr>
-<header class="ocr-parish-masthead" id="ocr-parish-gartan-termon-kilmacrenan" data-parish-name="Gartan/Termon (Kilmacrenan)"><h2 class="ocr-parish-name">Gartan/Termon (Kilmacrenan)</h2><p class="ocr-parish-date">23/08/2026</p></header>
+<header class="ocr-parish-masthead" id="ocr-parish-gartan-termon-kilmacrenan" data-parish-name="Gartan/Termon (Kilmacrenan)"><h2 class="ocr-parish-name">Gartan/Termon (Kilmacrenan)</h2><p class="ocr-parish-date">25/08/2026</p></header>
 <p class="page-label">Page 12</p>
 <p>NEWSLETTER</p>
 <h3 class="b-head">Mass Times in St Columba ’s Church, Kilmacrenan</h3>
@@ -1651,7 +1160,7 @@ We ask this through Jesus Christ our Lord. Amen. We wish every Blessing on all t
 and School Staff as they return to school.<br>
 God Bless for the year ahead.</p>
 <hr>
-<header class="ocr-parish-masthead" id="ocr-parish-glenfin" data-parish-name="Glenfin"><h2 class="ocr-parish-name">Glenfin</h2><p class="ocr-parish-date">23/08/2026</p></header>
+<header class="ocr-parish-masthead" id="ocr-parish-glenfin" data-parish-name="Glenfin"><h2 class="ocr-parish-name">Glenfin</h2><p class="ocr-parish-date">25/08/2026</p></header>
 <p class="page-label">Page 13</p>
 <p>Paróiste Chill Taobhóige<br>
 Tithe Pobail Ghleann Fhinne agus<br>
@@ -1777,7 +1286,7 @@ Cloghan Day Centre.<br>
 The closing date for ap-<br>
 plications is Wednesday</p>
 <hr>
-<header class="ocr-parish-masthead" id="ocr-parish-glenties" data-parish-name="Glenties"><h2 class="ocr-parish-name">Glenties</h2><p class="ocr-parish-date">23/08/2026</p></header>
+<header class="ocr-parish-masthead" id="ocr-parish-glenties" data-parish-name="Glenties"><h2 class="ocr-parish-name">Glenties</h2><p class="ocr-parish-date">25/08/2026</p></header>
 <p class="page-label">Page 14</p>
 <p>Email: <a href="mailto:parishofiniskeel@gmail.com" target="_blank" rel="noopener noreferrer">parishofiniskeel@gmail.com</a> Parish of Iniskeel/Paróiste Inís Caol Telephone: <a href="tel:+353749551117" style="color:#1d4ed8;font-weight:600;">074 9551117</a><br>
 Webpage:<a href="https://www.parishpress.net/parishofiniskeel" target="_blank" rel="noopener noreferrer">www.parishpress.net/parishofiniskeel</a> Fr Gerard Cunningham Facebook: Parish of Iniskeel<br>
@@ -1991,10 +1500,10 @@ Everyone welcome.<br>
 Contact: <a href="tel:+353873969890" style="color:#1d4ed8;font-weight:600;">087 3969890</a> or<br>
 Email: <a href="mailto:glentiesvp@gmail.com" target="_blank" rel="noopener noreferrer">glentiesvp@gmail.com</a></p>
 <hr>
-<header class="ocr-parish-masthead" id="ocr-parish-gortahork" data-parish-name="Gortahork"><h2 class="ocr-parish-name">Gortahork</h2><p class="ocr-parish-date">23/08/2026</p></header>
+<header class="ocr-parish-masthead" id="ocr-parish-gortahork" data-parish-name="Gortahork"><h2 class="ocr-parish-name">Gortahork</h2><p class="ocr-parish-date">25/08/2026</p></header>
 <p class="page-label">Page 15</p>
-<p>POBAL CHRIOST RI<br>
-An tAth. Donnchadh Ó Baoill<br>
+<p>POBAL CHRIOST RI</p>
+<p>An tAth. Donnchadh Ó Baoill<br>
 (086) 603 1749 / (074) 91 35214<br>
 <a href="mailto:tpcr1906@gmail.com" target="_blank" rel="noopener noreferrer">tpcr1906@gmail.com</a><br>
 16ú Lúnasa 2026<br>
@@ -2087,9 +1596,7 @@ Alleluia!</p>
 San am sin chuaigh Íosa go dtí ceantar Tuíre agus<br>
 Síodón. Tháinig bean as Canán amach as na críocha</p>
 <hr>
-<p>Inver</p>
-<hr>
-<header class="ocr-parish-masthead" id="ocr-parish-inver" data-parish-name="Inver"><h2 class="ocr-parish-name">Inver</h2><p class="ocr-parish-date">23/08/2026</p></header>
+<header class="ocr-parish-masthead" id="ocr-parish-inver" data-parish-name="Inver"><h2 class="ocr-parish-name">Inver</h2><p class="ocr-parish-date">25/08/2026</p></header>
 <p class="page-label">Page 16</p>
 <p>Date Church Time Anniversaries/ Intention s<br>
 Saturday 22nd August<br>
@@ -2213,7 +1720,7 @@ Then in His great mercy<br>
 may He give us a safe lodging,<br>
 and a holy rest and peace at the last.</p>
 <hr>
-<header class="ocr-parish-masthead" id="ocr-parish-irish-martyrs" data-parish-name="Irish Martyrs"><h2 class="ocr-parish-name">Irish Martyrs</h2><p class="ocr-parish-date">23/08/2026</p></header>
+<header class="ocr-parish-masthead" id="ocr-parish-irish-martyrs" data-parish-name="Irish Martyrs"><h2 class="ocr-parish-name">Irish Martyrs</h2><p class="ocr-parish-date">25/08/2026</p></header>
 <p class="page-label">Page 17</p>
 <p>WE EXTEND OUR DEEPES T SYMPATHY to the families of Veronica (Vonnie) Gallagher<br>
 &amp; Marie Singleton who died recently. May they rest in peace.<br>
@@ -2293,7 +1800,7 @@ If you wish to donate to the Church online, you can do so<br>
 by scanning the QR Code to the left and following<br>
 the Instructions on the online form. Thank you.</p>
 <hr>
-<header class="ocr-parish-masthead" id="ocr-parish-kilcar" data-parish-name="Kilcar"><h2 class="ocr-parish-name">Kilcar</h2><p class="ocr-parish-date">23/08/2026</p></header>
+<header class="ocr-parish-masthead" id="ocr-parish-kilcar" data-parish-name="Kilcar"><h2 class="ocr-parish-name">Kilcar</h2><p class="ocr-parish-date">25/08/2026</p></header>
 <p class="page-label">Page 18</p>
 <p>M<br>
 ass Times<br>
@@ -2384,7 +1891,7 @@ to deepen your communication,<br>
 renew your love, and rediscover<br>
 the joy of your marriage.</p>
 <hr>
-<header class="ocr-parish-masthead" id="ocr-parish-killybegs" data-parish-name="Killybegs"><h2 class="ocr-parish-name">Killybegs</h2><p class="ocr-parish-date">23/08/2026</p></header>
+<header class="ocr-parish-masthead" id="ocr-parish-killybegs" data-parish-name="Killybegs"><h2 class="ocr-parish-name">Killybegs</h2><p class="ocr-parish-date">25/08/2026</p></header>
 <p class="page-label">Page 19</p>
 <p>St. Mary of the Visitation Parish, Killybegs<br>
 Parish Office, Killybegs, Co. Donegal, F94 CY56 Tel: +353 (0)74 9731013<br>
@@ -2510,8 +2017,137 @@ Know that I am with you through it all. (C) Down Syndrome Ireland Donegal<br>
 Annual Gate Collection next weekend</p>
 <p>https://mcn.live/Camera/st-mary-of-the-visitation-church</p>
 <hr>
-<header class="ocr-parish-masthead" id="ocr-parish-milford-kilkeel" data-parish-name="Milford Kilkeel"><h2 class="ocr-parish-name">Milford Kilkeel</h2><p class="ocr-parish-date">23/08/2026</p></header>
+<header class="ocr-parish-masthead" id="ocr-parish-kincasslagh" data-parish-name="Kincasslagh"><h2 class="ocr-parish-name">Kincasslagh</h2><p class="ocr-parish-date">25/08/2026</p></header>
 <p class="page-label">Page 20</p>
+<p>Mass Time Aug -22nd Aug -30th ADORATION<br>
+St. Mary’s Church Kincasslagh<br>
+Day Time Masses This Week<br>
+Sat 22nd 6.30pm<br>
+Sheila Mc Farlane<br>
+Wed 26th<br>
+St Anthony 7pm Special intention<br>
+Fri 28th 10am<br>
+Sat 29th Aug 6.30pm Owenie Teague<br>
+O’ Donnell,<br>
+Hugh Boyle,<br>
+Kathleen Richard,<br>
+John Mullholland<br>
+St Columba’s Church Burtonport<br>
+Day Time Masses This Week<br>
+Sun 23rd 10am Mass Offered for the<br>
+People of the Parish<br>
+Mon 24th 10am<br>
+Special Intention<br>
+Tues 25th 10am Tom Healy<br>
+Thurs 27th 10am James O Donnell (Get<br>
+Well)<br>
+Fri 28th 10am Maggie Gallagher<br>
+Sun 30th 10am Stephen Bonner (1st</p>
+<h3 class="b-head">anniversary)</h3>
+<p>Bridie Boyle (Months<br>
+Mind)<br>
+Anton Bán Sweeney<br>
+St. Crone’s Church Arranmore<br>
+Day Time Masses This Week<br>
+Sun 23rd 12.30 Bridget Boyle (Con)<br>
+John Boyle (Con)<br>
+Norah Boyle (Con)<br>
+Francie Ward (Galway<br>
+And Arranmore)<br>
+Tues 25th<br>
+10:00<br>
+Sun 30th<br>
+12:30<br>
+Mass offered for the<br>
+People of the Parish</p>
+<h3 class="b-head">Anniversaries</h3>
+<p>Hughie Ward The Glen/London<br>
+Maria Mc Hugh London</p>
+<h3 class="b-head">Recent Deaths</h3>
+<p>Madge McHugh<br>
+Don Breslin<br>
+Eucharistic Adoration in<br>
+St. Columba’s on Monday after<br>
+10am Mass for an hour, &amp; in<br>
+St. Mary’s on Wednesday 11 -12<br>
+noon.<br>
+PARISH BAPTISMS on request. Please see<br>
+Fr. Vincent to arrange a date and<br>
+time.<br>
+MARYS MEALS<br>
+If you have any old notes or coins that<br>
+you wish to donate to Marys Meals they<br>
+can be dropped off at<br>
+The Cope, Annagry, on Fri 28th August,<br>
+or The Cope Supermarket, Dungloe, on<br>
+Friday 4th September, between 9.30am<br>
+- 5pm. Otherwise collection can be<br>
+arranged by contacting Eilis Conneely<br>
+on <a href="tel:+353877060457" style="color:#1d4ed8;font-weight:600;">087 7060457</a>"<br>
+Thought for the Week<br>
+When Jesus asks, “Who do you<br>
+say I am?” , he is asking more<br>
+than a question of Peter — he<br>
+asks it of each one of us. Faith is<br>
+not simply knowing about<br>
+Jesus; it is knowing him,<br>
+trusting him, and allowing him<br>
+to shape the way we live.<br>
+Perhaps the most important<br>
+answer we give to Jesus is not<br>
+with our lips, but with our<br>
+lives. If you would like to donate<br>
+to the Kincasslagh Parish<br>
+Graveyards please use your phone<br>
+camera to scan the code and follow<br>
+the instructions.<br>
+Many thanks.<br>
+BURTONPORT COMMUNITY CENTRE<br>
+NEW BEGINNINGS COMMUNITY SHOP<br>
+The New Beginnings shop is open Monday -<br>
+Thursday 9am -1.30pm. A great selection of<br>
+items at very reasonable prices.<br>
+CAR BOOT SALE on Sunday 30th August from 10 -<br>
+3pm in the Cope car park main street Dungloe .<br>
+Vintage items, antiques, clothes, bargains galore.<br>
+All proceeds to the Cope community trust<br>
+DATE FOR YOUR DIARY<br>
+Annual Halloween Spooktacular walk on Friday<br>
+23rd October commencing at 7pm. Join us for<br>
+one of the big social events of the year.<br>
+MASS CARDS<br>
+Signed Mass Cards are available from the<br>
+Sacristy.<br>
+WATCH FROM HOME<br>
+Live -Streamed Masses from<br>
+St. Columba’s, go to mcn.live and<br>
+scroll through Donegal util you reach<br>
+St Columba’s Burtonport.<br>
+St. Mary’s is livestreamed on<br>
+Facebook.<br>
+St Anthony Devotions<br>
+Mass every Wednesday in<br>
+St. Mary’s Church<br>
+Kincasslagh at 7:00pm with<br>
+devotions. The Relic of St<br>
+Anthony will be available for<br>
+veneration. Confessions<br>
+available before the Mass.<br>
+CONFESSIONS: Sat 12:00 -<br>
+12:30pm Acres . Sat 5:45 -6:15pm<br>
+(Before Vigil Mass)<br>
+Confession is not about dwelling on<br>
+our failures; it is about experiencing<br>
+the mercy of God and beginning<br>
+again. Come as you are, leave the past<br>
+with God, and go away with a lighter<br>
+heart and a fresh start. HOUSE CALLS : If you would like<br>
+Fr. Vincent to visit or bless your house,<br>
+your family, visit the sick at home or<br>
+hospital please get in touch. 0877031366</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-milford-kilkeel" data-parish-name="Milford Kilkeel"><h2 class="ocr-parish-name">Milford Kilkeel</h2><p class="ocr-parish-date">25/08/2026</p></header>
+<p class="page-label">Page 21</p>
 <p>Sunday 23rd August<br>
 Twenty -First Sunday<br>
 in Ordinary Time<br>
@@ -2653,8 +2289,8 @@ Milford: €463.00 Glenvar: €41.50<br>
 Oughterlin : €151.63 Rathmullan: €399.30 Donation to Rathmullan Parish<br>
 I wish to acknowledge a very kind donation of £1,000 to Rathmullan Parish that was received during the week.</p>
 <hr>
-<header class="ocr-parish-masthead" id="ocr-parish-newtown-killea" data-parish-name="Newtown Killea"><h2 class="ocr-parish-name">Newtown Killea</h2><p class="ocr-parish-date">23/08/2026</p></header>
-<p class="page-label">Page 21</p>
+<header class="ocr-parish-masthead" id="ocr-parish-newtown-killea" data-parish-name="Newtown Killea"><h2 class="ocr-parish-name">Newtown Killea</h2><p class="ocr-parish-date">25/08/2026</p></header>
+<p class="page-label">Page 22</p>
 <p>ST. BAITHIN’S MASSES<br>
 22nd August Saturday 6pm Mass<br>
 23rd August Sunday 12.15pm Mass<br>
@@ -2727,7 +2363,7 @@ Parish of Newtowncunningham &amp; KilleaFr Philip Kemmy, PP Fr. Damien Nejad, CC
 Office Address: Parochial House, Main Street,<br>
 NewtowncunninghamEmergency Number</p>
 <hr>
-<p class="page-label">Page 22</p>
+<p class="page-label">Page 23</p>
 <p>Email: <a href="mailto:office@newtownkilleaparish.ie" target="_blank" rel="noopener noreferrer">office@newtownkilleaparish.ie</a><br>
 Website: <a href="https://www.newtownkilleaparish.ie" target="_blank" rel="noopener noreferrer">www.newtownkilleaparish.ie</a><br>
 Sunday Collections : €2040; Feast of the Assumption : €490. Thank you<br>
@@ -2774,8 +2410,8 @@ RSA’S CHECK IT FITS SERVICE - Did you know it’s the law that all children un
 as many as 54% of child car seats are incorrectly fitted which can lead to serious injury or even death in a collision. You are invited on Wednesday 26th August to have your car seat<br>
 checked beside the Smyths Toy Store, Letterkenny Retail Park.</p>
 <hr>
-<header class="ocr-parish-masthead" id="ocr-parish-raphoe" data-parish-name="Raphoe"><h2 class="ocr-parish-name">Raphoe</h2><p class="ocr-parish-date">23/08/2026</p></header>
-<p class="page-label">Page 23</p>
+<header class="ocr-parish-masthead" id="ocr-parish-raphoe" data-parish-name="Raphoe"><h2 class="ocr-parish-name">Raphoe</h2><p class="ocr-parish-date">25/08/2026</p></header>
+<p class="page-label">Page 24</p>
 <p>WEBSITE parishofraphoe.ie EMAIL: <a href="mailto:raphoeparish@gmail.com" target="_blank" rel="noopener noreferrer">raphoeparish@gmail.com</a><br>
 Fr Kelly: <a href="tel:+353879077985" style="color:#1d4ed8;font-weight:600;">087 9077985</a> Office Phone <a href="tel:+353873338714" style="color:#1d4ed8;font-weight:600;">0873338714</a> Sunday 19 July 2026</p>
 <p>St. Eunan ’s Church,<br>
@@ -2836,7 +2472,7 @@ us free from sin and make us a fertile place where your love can grow. Let the<b
 Word which you have planted in our hearts not return to you void, but may it<br>
 provide a rich harvest, a hundred, or fifty, or thirty -fold. Amen</p>
 <hr>
-<p class="page-label">Page 24</p>
+<p class="page-label">Page 25</p>
 <p>What do we live for, if it is not to make life less difficult for each other?<br>
 Anytime we step out boldly to make changes, we take a chance that we might fail. But the only way to get better<br>
 is to try.</p>
@@ -2887,8 +2523,8 @@ this summer. <a href="https://www.loughderg.org" target="_blank" rel="noopener n
 <p>We are always on the lookout for interesting articles for the newsletter. If you have one you might like to share it.<br>
 If you would like a notice in the newsletter, please email the notice to <a href="mailto:raphoeparish@gmail.com" target="_blank" rel="noopener noreferrer">raphoeparish@gmail.com</a></p>
 <hr>
-<header class="ocr-parish-masthead" id="ocr-parish-rathmullan" data-parish-name="Rathmullan"><h2 class="ocr-parish-name">Rathmullan</h2><p class="ocr-parish-date">23/08/2026</p></header>
-<p class="page-label">Page 25</p>
+<header class="ocr-parish-masthead" id="ocr-parish-rathmullan" data-parish-name="Rathmullan"><h2 class="ocr-parish-name">Rathmullan</h2><p class="ocr-parish-date">25/08/2026</p></header>
+<p class="page-label">Page 26</p>
 <p>Sunday 23rd August<br>
 Twenty -First Sunday<br>
 in Ordinary Time<br>
@@ -3030,8 +2666,8 @@ Milford: €463.00 Glenvar: €41.50<br>
 Oughterlin : €151.63 Rathmullan: €399.30 Donation to</p>
 <p>I wish to acknowledge a very kind donation of £1,000 to Rathmullan Parish that was received during the week.</p>
 <hr>
-<header class="ocr-parish-masthead" id="ocr-parish-tawnawilly" data-parish-name="Tawnawilly"><h2 class="ocr-parish-name">Tawnawilly</h2><p class="ocr-parish-date">23/08/2026</p></header>
-<p class="page-label">Page 26</p>
+<header class="ocr-parish-masthead" id="ocr-parish-tawnawilly" data-parish-name="Tawnawilly"><h2 class="ocr-parish-name">Tawnawilly</h2><p class="ocr-parish-date">25/08/2026</p></header>
+<p class="page-label">Page 27</p>
 <h3 class="b-head">Mass Times Intentions for this Week</h3>
 <p>Day St.<br>
 Agatha’s St.<br>
@@ -3129,7 +2765,7 @@ and follow the links. Sunday 23rd August 2026<br>
 21st Sunday in Ordinary Time/A<br>
 We pray for the Anniversaries of… David Hanna (Junior )</p>
 <hr>
-<p class="page-label">Page 27</p>
+<p class="page-label">Page 28</p>
 <p>Alpha<br>
 The Alpha is a 10 -week series of sessions<br>
 exploring the basics of the Christian faith.<br>
@@ -3308,8 +2944,8 @@ Church, to make your contributions and donations to St. Patrick’s<br>
 Church .<br>
 Notices</p>
 <hr>
-<header class="ocr-parish-masthead" id="ocr-parish-templecrone" data-parish-name="Templecrone"><h2 class="ocr-parish-name">Templecrone</h2><p class="ocr-parish-date">23/08/2026</p></header>
-<p class="page-label">Page 28</p>
+<header class="ocr-parish-masthead" id="ocr-parish-templecrone" data-parish-name="Templecrone"><h2 class="ocr-parish-name">Templecrone</h2><p class="ocr-parish-date">25/08/2026</p></header>
+<p class="page-label">Page 29</p>
 <p>A Thirty Third<br>
 Sunday in<br>
 Ordinary time<br>
@@ -3449,86 +3085,21 @@ Roseanne Melly, Toome</p>
 Gracie Gallagher, Gortahork<br>
 Donal Boyle, Falmore<br>
 Betty Smyth, Derrydruel<br>
-Mary Gillespie Née Gallaghe r, Dirlaught &amp; Carrick</p>
-<hr>
-<p class="page-label">Page 29</p>
-<p>Missing &amp; Online-Only Bulletins<br>
-Generated 23/08/2026<br>
-The following parishes do not have a downloadable PDF bulletin. Click a link to view the bulletin online.<br>
-Ballintra Parish: <a href="https://www.facebook.com/donalquinn1959" target="_blank" rel="noopener noreferrer">https://www.facebook.com/donalquinn1959</a></p>
-<header class="ocr-parish-masthead" id="ocr-parish-kilbarron" data-parish-name="Kilbarron"><h2 class="ocr-parish-name">Kilbarron</h2><p class="ocr-parish-date">23/08/2026</p></header>
-<p>Kilmacrenan: <a href="https://drive.google.com/file/d/1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa/view" target="_blank" rel="noopener noreferrer">https://drive.google.com/file/d/1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa/view</a></p></div>
-      <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
-    </div>
-
-    <section class="parish-section">
-      <h2 class="section-heading">RAPHOE Parishes with Working Bulletin Links</h2>
-      <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="https://annagryparish.ie/newsletter-2/" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="http://ardara.ie/news/" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="https://drive.google.com/drive/folders/1z9goh6DrkCUkpJMDbwfsi28Yc_t0_ltC" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="https://www.steunanscathedral.ie/newsletter/" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="https://www.parishpress.net/wp-content/uploads/parish-bulletins/donegal/raphoe/drumholm-parish/bulletin.pdf?t=1782303743" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="dunfanaghy"><a class="parish-link" href="https://mcn.live/Camera/holy-cross-church" target="_blank" rel="noopener noreferrer">Dunfanaghy</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="https://naomhfionan.com/nuachtlitir/" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="https://drive.usercontent.google.com/download?id=1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa&amp;export=download" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="https://mcn.live/Camera/our-lady-of-perpetual-succour-glenfinn" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="https://drive.usercontent.google.com/download?id=14aLAxt4mv7eYBvYx2GGthpsQnLrsysmK&amp;export=download" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="https://www.parishpress.net/wp-content/uploads/parish-bulletins/donegal/raphoe/gort-a-choirce/bulletin.pdf?t=1771000171" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="https://www.inverparish.com/parish-newsletter.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="https://drive.usercontent.google.com/download?id=1m6sOGz3dECWvbbpXCnRGdHG77yWiLXxR&amp;export=download" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilbarron"><a class="parish-link" href="https://www.kilbarron.org/bulletin" target="_blank" rel="noopener noreferrer">Kilbarron</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="https://www.mcn.live/Camera/st-carthas-church-kilcar,-f94-h2y5" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="https://mcn.live/Camera/st-mary-of-the-visitation-church-killybegs" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="kincasslagh"><a class="parish-link" href="https://www.kincasslagh.ie/?post_type=kbp_bulletins" target="_blank" rel="noopener noreferrer">Kincasslagh</a></li><li class="parish-item" data-name="mevagh"><a class="parish-link" href="https://www.facebook.com/profile.php?id=100079250566866" target="_blank" rel="noopener noreferrer">Mevagh</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="https://milfordrathmullanparishes.ie/bulletins/" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="https://newtownkilleaparish.ie/bulletin/raphoe/newtown-killea/" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="raphoe"><a class="parish-link" href="https://drive.usercontent.google.com/download?id=1jmslbrliw1BTtdrxHbqpUbhQEf6wXHy5&amp;export=download" target="_blank" rel="noopener noreferrer">Raphoe</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="https://milfordrathmullanparishes.ie/bulletins/" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="stranolar"><a class="parish-link" href="https://www.stranorlarparish.ie/newsletter/" target="_blank" rel="noopener noreferrer">Stranolar</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="https://tawnawillyparish.ie/bulletin/" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="https://drive.usercontent.google.com/download?id=1Hh7w-Ew0vLJUFMihFiVzVJGhjeYposIH&amp;export=download" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
-    </section>
+Mary Gillespie Née Gallaghe r, Dirlaught &amp; Carrick</p></div>
+    <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
   </div>
-  <footer>
-    <div class="footer-inner">
-      <span>© 2026 Parish Press</span>
-      <div style="display:flex;gap:14px;flex-wrap:wrap;">
-        <a href="https://github.com/Frankytyrone/parish_harvester" target="_blank" rel="noopener noreferrer">GitHub</a>
-        <a href="https://buymeacoffee.com/frankytyrone" target="_blank" rel="noopener noreferrer">Donate</a>
-      </div>
-    </div>
-  </footer>
-
   <script>
-    // PDF fullscreen shortcut (the browser's own PDF viewer already
-    // supplies page number / zoom / print controls inside the iframe).
     (function () {
-      var wrap = document.getElementById('pdf-frame-wrap');
-      var btn = document.getElementById('pdf-fullscreen-btn');
-      if (!wrap || !btn) return;
-      btn.addEventListener('click', function () {
-        try {
-          if (wrap.requestFullscreen) {
-            wrap.requestFullscreen();
-          } else if (wrap.webkitRequestFullscreen) {
-            wrap.webkitRequestFullscreen();
-          }
-        } catch (e) {}
-      });
-    })();
-
-    
-    (function () {
-      function activateWrap(wrap) {
-        if (!wrap) return;
-        wrap.classList.add('is-native-pdf');
-        var iframe = wrap.querySelector('iframe');
-        if (iframe) {
-          iframe.setAttribute('hidden', '');
-          try { iframe.removeAttribute('src'); } catch (e) {}
+      try {
+        if (new URLSearchParams(window.location.search).get('embed') === '1') {
+          document.body.classList.add('embed-mode');
         }
-      }
-
-      document.querySelectorAll('.pdf-frame-wrap').forEach(activateWrap);
-
-      var standalone = document.querySelector('iframe.pdf-frame');
-      if (standalone && !standalone.closest('.pdf-frame-wrap')) {
-        document.body.classList.add('is-native-pdf');
-        standalone.setAttribute('hidden', '');
-        try { standalone.removeAttribute('src'); } catch (e) {}
-      }
-
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260823v"]')) {
-        var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260823v';
-        s.defer = true;
-        document.head.appendChild(s);
-      }
+      } catch (e) {}
     })();
-
-
     (function () {
       var KEY = 'ph_ocr_scale';
       var percents = [75, 85, 100, 115, 130, 150, 175, 200];
-      var root = document.getElementById('ocr-panel');
+      var root = document.getElementById('ocr-text');
       var label = document.getElementById('ocr-zoom-pct');
       if (!root) return;
       function apply(pct) {
@@ -3562,39 +3133,27 @@ Ballintra Parish: <a href="https://www.facebook.com/donalquinn1959" target="_bla
         });
       });
     })();
-
     (function () {
-      const ocrPanel = document.getElementById('ocr-panel');
+      const ocrRoot = document.getElementById('ocr-text');
       const ocrSearch = document.getElementById('ocr-search');
       const clearSearch = document.getElementById('clear-search');
       const matchCount = document.getElementById('ocr-match-count');
       const prevMatchBtn = document.getElementById('ocr-prev');
       const nextMatchBtn = document.getElementById('ocr-next');
-      const parishFilter = document.getElementById('parish-filter');
-      const parishItems = Array.from(document.querySelectorAll('.parish-item'));
-      const parishEmpty = document.getElementById('parish-empty');
-      if (!ocrPanel || !ocrSearch) return;
-      const originalOcrHtml = ocrPanel.innerHTML;
+      if (!ocrRoot || !ocrSearch) return;
+      const originalHtml = ocrRoot.innerHTML;
       let ocrMatches = [];
       let currentMatchIndex = -1;
-
       function escapeRegExp(text) {
-        const specials = new Set(['\\', '^', '$', '.', '|', '?', '*', '+', '(', ')', '[', ']', '{', '}']);
-        return Array.from(text).map((ch) => specials.has(ch) ? `\\${ch}` : ch).join('');
+        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
       }
-
       function scrollToMatch(idx) {
         if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
         ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
-        const target = ocrMatches[idx];
-        target.classList.add('search-active');
-        const details = target.closest('details.parish-block');
-        if (details) details.open = true;
-        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        ocrMatches[idx].classList.add('search-active');
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
-
       function updateMatchUi() {
-        if (!matchCount || !prevMatchBtn || !nextMatchBtn) return;
         const total = ocrMatches.length;
         if (!total) {
           matchCount.textContent = '0 matches';
@@ -3602,13 +3161,12 @@ Ballintra Parish: <a href="https://www.facebook.com/donalquinn1959" target="_bla
           nextMatchBtn.disabled = true;
           return;
         }
-        matchCount.textContent = `${currentMatchIndex + 1} / ${total} matches`;
+        matchCount.textContent = `${currentMatchIndex + 1} of ${total} matches`;
         prevMatchBtn.disabled = false;
         nextMatchBtn.disabled = false;
       }
-
-      function applyOcrSearch(query) {
-        ocrPanel.innerHTML = originalOcrHtml;
+      function applySearch(query) {
+        ocrRoot.innerHTML = originalHtml;
         ocrMatches = [];
         currentMatchIndex = -1;
         if (!query) {
@@ -3618,40 +3176,32 @@ Ballintra Parish: <a href="https://www.facebook.com/donalquinn1959" target="_bla
         }
         clearSearch.hidden = false;
         const regex = new RegExp(escapeRegExp(query), 'gi');
-        const walker = document.createTreeWalker(ocrPanel, NodeFilter.SHOW_TEXT, null);
+        const walker = document.createTreeWalker(ocrRoot, NodeFilter.SHOW_TEXT, null);
         const nodes = [];
         while (walker.nextNode()) {
           const node = walker.currentNode;
-          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) {
-            nodes.push(node);
-          }
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) nodes.push(node);
         }
         nodes.forEach((node) => {
           const text = node.nodeValue;
           regex.lastIndex = 0;
-          if (!regex.test(text)) {
-            return;
-          }
+          if (!regex.test(text)) return;
           regex.lastIndex = 0;
           const fragment = document.createDocumentFragment();
           let lastIndex = 0;
-          let match = null;
+          let match;
           while ((match = regex.exec(text)) !== null) {
-            if (match.index > lastIndex) {
-              fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
-            }
+            if (match.index > lastIndex) fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
             const mark = document.createElement('mark');
             mark.textContent = match[0];
             fragment.appendChild(mark);
             ocrMatches.push(mark);
             lastIndex = match.index + match[0].length;
           }
-          if (lastIndex < text.length) {
-            fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
-          }
+          if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
           node.parentNode.replaceChild(fragment, node);
         });
-        ocrPanel.querySelectorAll('details.parish-block').forEach((details) => {
+        ocrRoot.querySelectorAll('details.parish-block').forEach((details) => {
           details.open = Boolean(details.querySelector('mark'));
         });
         if (ocrMatches.length) {
@@ -3660,102 +3210,28 @@ Ballintra Parish: <a href="https://www.facebook.com/donalquinn1959" target="_bla
         }
         updateMatchUi();
       }
-
-      ocrSearch.addEventListener('input', function (event) {
-        applyOcrSearch(event.target.value.trim());
-      });
-      clearSearch.addEventListener('click', function () {
-        ocrSearch.value = '';
-        applyOcrSearch('');
-        ocrSearch.focus();
-      });
-      prevMatchBtn.addEventListener('click', function () {
+      ocrSearch.addEventListener('input', (e) => applySearch(e.target.value.trim()));
+      clearSearch.addEventListener('click', () => { ocrSearch.value = ''; applySearch(''); ocrSearch.focus(); });
+      prevMatchBtn.addEventListener('click', () => {
         if (!ocrMatches.length) return;
         currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
         updateMatchUi();
         scrollToMatch(currentMatchIndex);
       });
-      nextMatchBtn.addEventListener('click', function () {
+      nextMatchBtn.addEventListener('click', () => {
         if (!ocrMatches.length) return;
         currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
         updateMatchUi();
         scrollToMatch(currentMatchIndex);
       });
-      ocrSearch.addEventListener('keydown', function (event) {
-        if (event.key === 'Enter' && ocrMatches.length) {
-          event.preventDefault();
+      ocrSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && ocrMatches.length) {
+          e.preventDefault();
           currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
           updateMatchUi();
           scrollToMatch(currentMatchIndex);
         }
       });
-
-      if (parishFilter) {
-        parishFilter.addEventListener('input', function (event) {
-          const term = event.target.value.trim().toLowerCase();
-          let visibleCount = 0;
-          parishItems.forEach((item) => {
-            const name = (item.dataset.name || '').toLowerCase();
-            const matches = !term || name.includes(term);
-            item.hidden = !matches;
-            if (matches) {
-              visibleCount += 1;
-            }
-          });
-          if (parishEmpty) {
-            parishEmpty.hidden = visibleCount !== 0;
-          }
-        });
-      }
-      if (parishEmpty) {
-        parishEmpty.hidden = parishItems.length === 0 ? false : true;
-      }
-
-      updateMatchUi();
-    })();
-
-    // ── View Counter (localStorage) ──────────────────────────────────
-    (function() {
-      var key = 'ph_views_' + location.pathname;
-      var weekKey = 'ph_views_week';
-      var now = new Date();
-      var weekId = now.getFullYear() + '-W' + String(Math.ceil((now - new Date(now.getFullYear(),0,1)) / 86400000 / 7)).padStart(2,'0');
-      try {
-        var views = JSON.parse(localStorage.getItem(key) || '{}'  );
-        if (views.week !== weekId) { views = { week: weekId, count: 0 }; }
-        views.count += 1;
-        localStorage.setItem(key, JSON.stringify(views));
-        // Update total weekly views across all pages
-        var total = JSON.parse(localStorage.getItem(weekKey) || '{}'  );
-        if (total.week !== weekId) { total = { week: weekId, count: 0 }; }
-        total.count += 1;
-        localStorage.setItem(weekKey, JSON.stringify(total));
-        var el = document.getElementById('view-count');
-        if (el) el.textContent = total.count;
-      } catch(e) {}
-    })();
-
-    // ── Self-Check: Is this week's bulletin available? ───────────────
-    (function() {
-      var generated = document.querySelector('.meta');
-      if (!generated) return;
-      var text = generated.textContent || '';
-      var match = text.match(/(\d{4})-(\d{2})-(\d{2})/);
-      if (!match) {
-        match = text.match(/(\d{2})[/](\d{2})[/](\d{4})/);
-        if (match) match = [null, match[3], match[2], match[1]];
-      }
-      if (!match) return;
-      var bulletinDate = new Date(match[1] + '-' + match[2] + '-' + match[3]);
-      var now = new Date();
-      var daysSince = Math.floor((now - bulletinDate) / 86400000);
-      if (daysSince > 8) {
-        var banner = document.createElement('div');
-        banner.style.cssText = 'max-width:1100px;margin:12px auto;padding:0 16px;';
-        banner.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px 16px;color:#991b1b;font-weight:600;text-align:center;">⚠️ This bulletin is ' + daysSince + ' days old. A newer version may be available — check back after Sunday\'s harvest run.</div>';
-        var page = document.querySelector('.page');
-        if (page) page.insertBefore(banner, page.firstChild);
-      }
     })();
     
     (function () {
@@ -3854,149 +3330,7 @@ Ballintra Parish: <a href="https://www.facebook.com/donalquinn1959" target="_bla
       }
     })();
     
-    
-    (function () {
-      // Read the page index lazily: this script runs before the
-      // #parish-page-index JSON later in the body exists, so reading it now
-      // would leave every PDF jump with an empty index.
-      var index = null;
-      function pageIndex() {
-        if (index) return index;
-        index = {};
-        var node = document.getElementById('parish-page-index');
-        if (node) {
-          try { index = JSON.parse(node.textContent || '{}') || {}; } catch (e) {}
-        }
-        return index;
-      }
-      function reduceMotion() {
-        return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-      }
-      function norm(s) {
-        return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
-      }
-      function coreName(s) {
-        return String(s || '').replace(/\s*\([^)]*\)\s*/g, ' ').trim();
-      }
-      function scrollBoxTo(box, el) {
-        if (!box || !el) return false;
-        var br = box.getBoundingClientRect();
-        var er = el.getBoundingClientRect();
-        var top = box.scrollTop + (er.top - br.top) - 8;
-        if (box.scrollTo) {
-          box.scrollTo({ top: Math.max(0, top), behavior: reduceMotion() ? 'auto' : 'smooth' });
-        } else {
-          box.scrollTop = Math.max(0, top);
-        }
-        return true;
-      }
-      function findOcr(box, name) {
-        if (!box) return null;
-        var wanted = [norm(name), norm(coreName(name))];
-        var nodes = box.querySelectorAll('.ocr-parish-masthead, [id^="ocr-parish-"]');
-        for (var i = 0; i < nodes.length; i++) {
-          var el = nodes[i];
-          var label = el.getAttribute('data-parish-name') || ((el.querySelector('.ocr-parish-name') || el).textContent || '');
-          var got = norm(label);
-          if (wanted.indexOf(got) >= 0 || wanted.indexOf(norm(coreName(label))) >= 0) return el;
-        }
-        return null;
-      }
-      function pageFor(name) {
-        var map = pageIndex();
-        if (map[name]) return map[name];
-        var n = norm(name);
-        var keys = Object.keys(map);
-        for (var i = 0; i < keys.length; i++) {
-          if (norm(keys[i]) === n || norm(coreName(keys[i])) === n || n === norm(coreName(keys[i]))) {
-            var val = map[keys[i]];
-            if (typeof val === 'number') return val;
-          }
-        }
-        return 0;
-      }
-      function showBox(box) {
-        // The jump happens inside the locked box, so make sure the box itself
-        // is on screen first or a phone reader sees nothing move.
-        if (!box || !box.getBoundingClientRect) return;
-        var r = box.getBoundingClientRect();
-        var h = window.innerHeight || document.documentElement.clientHeight || 0;
-        if (r.top < 0 || r.top > h - 120) {
-          if (box.scrollIntoView) {
-            box.scrollIntoView({ block: 'start', behavior: reduceMotion() ? 'auto' : 'smooth' });
-          }
-        }
-      }
-      function jumpPdf(names) {
-        var pages = document.querySelector('.pdf-inpage-pages');
-        if (!pages) return false;
-        for (var i = 0; i < names.length; i++) {
-          var page = pageFor(names[i]);
-          if (!page) continue;
-          var slot = pages.querySelector('[data-page="' + page + '"]');
-          if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
-          return true;
-        }
-        return false;
-      }
-      function jumpOcr(names) {
-        var ocr = document.getElementById('ocr-panel');
-        if (!ocr) return false;
-        for (var i = 0; i < names.length; i++) {
-          var hit = findOcr(ocr, names[i]);
-          if (!hit) continue;
-          showBox(ocr);
-          scrollBoxTo(ocr, hit);
-          return true;
-        }
-        return false;
-      }
-      function jump(target, names, tries) {
-        var done = target === 'pdf' ? jumpPdf(names) : jumpOcr(names);
-        // PDF.js paints page slots as it streams, so the slot may not exist
-        // for a second or two after load. Retry briefly instead of failing.
-        if (!done && target === 'pdf' && (tries || 0) < 12) {
-          window.setTimeout(function () { jump(target, names, (tries || 0) + 1); }, 400);
-        }
-      }
-      function namesOf(btn) {
-        var raw = btn.getAttribute('data-az-names') || btn.getAttribute('data-parish-name') || '';
-        var out = [];
-        raw.split('|').forEach(function (part) {
-          var name = String(part || '').trim();
-          if (name) out.push(name);
-        });
-        return out;
-      }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
-      document.addEventListener('click', function (ev) {
-        if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
-        var btn = ev.target.closest('.az-letter');
-        if (!btn) return;
-        ev.preventDefault();
-        jump(btn.getAttribute('data-az-target') || 'ocr', namesOf(btn), 0);
-      });
-    })();
-    
   </script>
-  <script type="application/json" id="parish-page-index">{}</script>
   <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
 </body>
 </html>
