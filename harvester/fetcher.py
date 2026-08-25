@@ -19,6 +19,7 @@ from datetime import date, timedelta
 from pathlib import Path
 from typing import Optional
 from urllib.parse import parse_qs, unquote, urljoin, urlparse
+from urllib.request import Request, urlopen
 
 from playwright.async_api import (
     Browser,
@@ -941,16 +942,28 @@ async def _download_image_bytes(url: str, page: Page | None = None) -> bytes:
         return await response.body()
 
     def _fetch() -> bytes:
-        timeout_s = PAGE_LOAD_TIMEOUT_MS / 1000
-        hit = _fetch_bytes_with_retries(
-            url,
-            max_attempts=2,
-            per_attempt_timeout_s=timeout_s,
-            total_budget_s=timeout_s,
-        )
-        if not hit:
-            raise RuntimeError(f"HTTP download failed for image {url}")
-        return hit[0]
+        parsed = urlparse(url)
+        scheme = (parsed.scheme or "").lower()
+        # Local JPEGs (image-stack unit test) are file:// or a bare path.
+        # The shared HTTP helper does IPv4 DNS/connect and is http/https only.
+        if scheme == "file":
+            return Path(unquote(parsed.path)).read_bytes()
+        if not scheme:
+            return Path(url).read_bytes()
+        if scheme in {"http", "https"}:
+            timeout_s = PAGE_LOAD_TIMEOUT_MS / 1000
+            hit = _fetch_bytes_with_retries(
+                url,
+                max_attempts=2,
+                per_attempt_timeout_s=timeout_s,
+                total_budget_s=timeout_s,
+            )
+            if not hit:
+                raise RuntimeError(f"HTTP download failed for image {url}")
+            return hit[0]
+        request = Request(url, headers={"User-Agent": "Mozilla/5.0"})
+        with urlopen(request, timeout=PAGE_LOAD_TIMEOUT_MS / 1000) as response:
+            return response.read()
 
     return await asyncio.to_thread(_fetch)
 
