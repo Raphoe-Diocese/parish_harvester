@@ -17,6 +17,34 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 25/08/2026 — Hunt this-week files for older Problems-tab parishes
+
+**The real goal, in one sentence:** only change a recipe when a **23/08/2026** bulletin is on the live parish site.
+
+Harvest truth is `origin/main` `parishes/parish_status.json` `generated_at` 2026-08-25T13:58:07Z, `target_date` 2026-08-23. No harvest was run. Timeouts not raised. H1/H3/#135 not touched. `parish_status.json` not edited. Carrick / Lisburn / Tyholland not touched. Newtownbutler / Antrim / Loughshore already on main via #137 — this PR does not re-edit those recipes.
+
+| Key | Result | Live proof 25/08/2026 |
+|---|---|---|
+| **derriaghycatholicparish** | **Fixed** — this-week image is on the listing. Recipe was pinned to 19th Sunday (09/08). Playwright `page.goto` of `?page_id=262` timed out on harvest. | Listing `https://derriaghycatholicparish.com/?page_id=262` HTTP 200. Original `https://derriaghycatholicparish.com/wp-content/uploads/2026/08/21st-Suday-in-ordinary-time.png` HTTP **200** `image/png` 448089 bytes, Last-Modified Mon 24 Aug 2026. Liturgical `21st Sunday in Ordinary Time` → **23/08/2026**. Resized `-724x1024` twin also 200 (519074 bytes). Predicted 20th-Sunday filenames 404. Recipe now `site_type:http_scrape_newest_images` (no browser, timeouts unchanged). Not live / not harvested until the next harvest. |
+| **ederney** | **Blocked** — this-week HTML is live; harvest 403 is access, not a missing file. Recipe already `print_to_pdf` + `skip_listing_nav`. No recipe change. | `https://culmaine.co.uk/newsletter` HTTP **200** this turn. Masthead `Sunday 23rd August 2026 21st Sunday in Ordinary Time`. Do not invent a PDF. Do not raise timeouts. |
+| **holycrossparishbelfast** | **Content-gap** — filename is this week; **body is still 12/07**. | `http://www.holycrossparishbelfast.com/pdf/230826.pdf` HTTP 200 `application/pdf` 455913 bytes, Last-Modified Fri 21 Aug 2026. Same MD5 as `120726.pdf` (`ac67defb3de0313fa365264355e14f4a`), 13 pages. Do not treat the filename as 23/08. |
+| **bangorparish** | **Content-gap** | Listing newest newsletter still `14-June-2026-NEWSLETTER.pdf` HTTP 200 4565986 bytes, Last-Modified Fri 12 Jun 2026. Predicted Aug/Jul NEWSLETTER filenames 404. wp-json newest NEWSLETTER still 14 June (notice docx is not the weekly). |
+| **bundoran** | **Content-gap** | Newest real file still `https://magheneparish.ie/wp-content/uploads/2025/02/Parish_Newsletter_09.02.2025.pdf` HTTP 200 1029778 bytes, Last-Modified Sat 08 Feb 2025. Predicted 23/16/09.08.2026 URLs 404. wp-json search `2026` = 0 items. |
+| **dromore** | **Content-gap** | NextGEN gallery newest still `…/gallery/bulletin-2026/14th-June.jpg` HTTP 200 `image/jpeg` 753793 bytes, Last-Modified Sun 14 Jun 2026. Predicted Aug/Jul gallery names 404. |
+| **dunsfordandardglassparish** | **Content-gap** | Listing headings still top out at `Sunday 5th July 2026`. `SUNDAY-5th-JULY-2026-1.pdf` HTTP 200 `application/pdf` 341138 bytes, Last-Modified Mon 06 Jul 2026. Predicted Aug PDF paths are WordPress HTML, not files. |
+| **parishofhannahstown** | **Content-gap** | Wix listing newest still `Bulletin 7th of June` / `Bulletin%207th%20June%202026.docx` HTTP 200, Last-Modified Mon 08 Jun 2026. No August docx in page HTML. |
+| **saintanthony** | **Content-gap** | wp-json newest still `Bulletin090826SunOT19afpub.pdf` HTTP 200 587456 bytes (09/08). `Bulletin230826SunOT21afpub.pdf` and `160826` are HTTP **404**. |
+| **saintmalachysparish** | **Content-gap** — do not raise the 4-page cap. | Only bulletin link `documents/bulletin.pdf` HTTP 200 2144332 bytes, **6 pages**, Last-Modified Sat 22 Feb 2025. Raising the cap would fake `ok` on that Feb 2025 file. |
+| **stoliverplunkettparish** | **Content-gap** | Listing headings end at `28th June 2026`. `Sun-28th-June-26.pdf` HTTP 200 1351887 bytes, Last-Modified Wed 24 Jun 2026. Predicted `Sun-23rd-August-26.pdf` and July/early-Aug names 404. |
+| **stpatricksbelfast** | **Content-gap** | Category archive headings newest `Weekly Bulletin for Sunday 5 July 2026`. Sitemap last bulletin loc is `…/weekly-bulletin-for-sunday-5-july-2026/`. Predicted 23/16/9/2 August slugs 404. |
+| **stranorlarparish** | **Content-gap** | Archive newest `28th-June-2026.pdf` HTTP 200 192876 bytes, Last-Modified Fri 26 Jun 2026. `/current-newsletter/` 302s to that same file. Predicted July/August filenames 404. |
+
+**Next:** Derriaghy needs a harvest test after merge. Leave the content-gaps stale until the parish posts 23/08. Ederney recipe is already right — harvest 403 is a later access job.
+
+**Parked:** none from this hunt.
+
+---
+
 ## 25/08/2026 — This-week recipe hunt (Claudy / Lisnaskea / Newtownbutler / …)
 
 **The real goal, in one sentence:** change a recipe only when a live

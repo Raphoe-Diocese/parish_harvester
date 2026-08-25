@@ -155,6 +155,16 @@ class BulletinFreshnessTests(unittest.TestCase):
         self.assertEqual(later.status, "stale")
         self.assertEqual(later.reason, "date_behind_of_target")
 
+    def test_21st_suday_filename_is_23_august_2026(self) -> None:
+        url = (
+            "https://derriaghycatholicparish.com/wp-content/uploads/2026/08/"
+            "21st-Suday-in-ordinary-time.png"
+        )
+        self.assertEqual(extract_bulletin_date(url), date(2026, 8, 23))
+        verdict = check_bulletin_freshness(url, date(2026, 8, 23))
+        self.assertEqual(verdict.status, "fresh")
+        self.assertEqual(verdict.reason, "in_bulletin_week")
+
     def test_liturgical_only_filename_is_not_folder_day_one(self) -> None:
         # Holy Family / Loughshore: Twentieth-Sunday-in-Ordinary-Time.pdf
         # inside /uploads/2026/08/ used to date as 01/08/2026 and fail the
