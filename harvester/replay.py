@@ -1033,6 +1033,16 @@ def _urlopen_ipv4(request, timeout=None, context=None):
     return opener.open(request, timeout=timeout)
 
 
+def _ok_http_body(response) -> tuple[bytes, dict[str, str]] | None:
+    """Accept HTTP 200, or a body with no status (file:// via FileHandler)."""
+    body = response.read()
+    status = getattr(response, "status", None)
+    if not body or status not in {None, 200}:
+        return None
+    headers = {k.lower(): v for k, v in response.headers.items()}
+    return body, headers
+
+
 def _fetch_bytes_with_retries(
     url: str,
     *,
@@ -1069,10 +1079,9 @@ def _fetch_bytes_with_retries(
             with _urlopen_ipv4(
                 request, timeout=per_attempt_timeout_s, context=ctx
             ) as response:
-                body = response.read()
-                if response.status == 200 and body:
-                    headers = {k.lower(): v for k, v in response.headers.items()}
-                    return body, headers
+                hit = _ok_http_body(response)
+                if hit:
+                    return hit
         except HTTPError as exc:
             # Missing predicted files are a hard miss — do not burn the
             # shared retry budget on 404/410 (newtownkillea dated uploads).
@@ -1092,10 +1101,9 @@ def _fetch_bytes_with_retries(
                     timeout=per_attempt_timeout_s,
                     context=insecure_ctx,
                 ) as response:
-                    body = response.read()
-                    if response.status == 200 and body:
-                        headers = {k.lower(): v for k, v in response.headers.items()}
-                        return body, headers
+                    hit = _ok_http_body(response)
+                    if hit:
+                        return hit
             except HTTPError as ssl_exc:
                 if ssl_exc.code in {404, 410}:
                     return None

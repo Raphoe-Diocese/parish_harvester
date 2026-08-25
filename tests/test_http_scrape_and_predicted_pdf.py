@@ -1282,6 +1282,25 @@ class HttpFetchSslFallbackTests(unittest.TestCase):
         self.assertEqual(len(calls), 1)
         self.assertIsNone(calls[0])
 
+    def test_file_uri_returns_body_without_http_status(self) -> None:
+        import tempfile
+        from pathlib import Path
+
+        with tempfile.NamedTemporaryFile(suffix=".pdf", delete=False) as handle:
+            handle.write(b"%PDF-1.7 file-uri")
+            path = Path(handle.name)
+        try:
+            hit = _fetch_bytes_with_retries(
+                path.as_uri(),
+                max_attempts=1,
+                per_attempt_timeout_s=2,
+                total_budget_s=2,
+            )
+        finally:
+            path.unlink(missing_ok=True)
+        self.assertIsNotNone(hit)
+        self.assertEqual(hit[0], b"%PDF-1.7 file-uri")
+
     def test_create_connection_ipv4_uses_af_inet(self) -> None:
         import socket
         from unittest.mock import MagicMock, patch
