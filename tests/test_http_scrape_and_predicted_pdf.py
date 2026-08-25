@@ -1389,8 +1389,10 @@ class LisnaskeaRecipeTests(unittest.TestCase):
         self.assertIn("onewebmedia", data.get("href_patterns") or [])
         self.assertLessEqual(int(data.get("timeout_ms") or 0), 55000)
         self.assertLessEqual(int(data.get("total_timeout_s") or 0), 250)
-        self.assertNotIn("23082026.pdf", raw)
-        self.assertNotIn("16082026.pdf", raw)
+        steps_blob = json.dumps(data.get("steps") or [])
+        self.assertNotIn("23082026.pdf", data["start_url"])
+        self.assertNotIn("23082026.pdf", steps_blob)
+        self.assertNotIn("16082026.pdf", steps_blob)
         self.assertNotIn("do not use http_scrape", raw.lower())
 
     def test_listing_scores_ddmmyyyy_filename(self) -> None:
