@@ -256,21 +256,55 @@ def _safe_parse_ddmmyy(day_s: str, month_s: str, year_s: str) -> date | None:
 _BULLETIN_HEADING_RE = re.compile(
     r"(?i)\b(?:parish\s+)?(?:bulletin|newsletter|parish\s+news)\b"
 )
+# Adjacent masthead date only (Raphoe Drive: "Sunday 19 July 2026" then
+# "RAPHOE PARISH NEWSLETTER" on the next line). Long body/memorial lines
+# stay out even when they sit next to the heading.
+_ADJACENT_DATE_LINE_OFFSETS = (-1, 1, -2, 2)
+_MAX_ADJACENT_DATE_LINE_CHARS = 80
+_MAX_ADJACENT_DATE_LINE_WORDS = 12
+_ADJACENT_BODY_PARAGRAPH_RE = re.compile(
+    r"(?i)\b(?:died|death|anniversary|anniversaries|in memory|deceased|"
+    r"will take|recently)\b"
+)
+
+
+def _nonempty_text_lines(text: str) -> list[str]:
+    return [line.strip() for line in (text or "").splitlines() if line.strip()]
+
+
+def _parse_short_adjacent_date_line(line: str) -> date | None:
+    """Parse a short date/liturgical neighbour; skip long body paragraphs."""
+    if len(line) > _MAX_ADJACENT_DATE_LINE_CHARS:
+        return None
+    if len(line.split()) > _MAX_ADJACENT_DATE_LINE_WORDS:
+        return None
+    if _ADJACENT_BODY_PARAGRAPH_RE.search(line):
+        return None
+    return extract_date_from_string(line)
 
 
 def extract_bulletin_date_from_text(text: str) -> date | None:
     """Parse a date from bulletin/newsletter heading lines in PDF text.
 
-    Ignores incidental dates in body copy (memorials, anniversary lists).
-    Used when a parish republishes an old file under a fresh-looking filename
-    (Holy Cross Belfast: ``160826.pdf`` still headed 11th & 12th July 2026).
+    Same-line heading dates win first (Holy Cross: ``Bulletin 11th & 12th
+    July 2026``). If that heading has no date, look at the previous and next
+    1–2 non-empty lines only when they are short date/liturgical lines.
+    Does not scan the whole page, so a memorial such as ``died on 9th July
+    2023`` with no nearby bulletin/newsletter word stays ``None``.
     """
-    for line in (text or "").splitlines():
+    lines = _nonempty_text_lines(text)
+    for index, line in enumerate(lines):
         if not _BULLETIN_HEADING_RE.search(line):
             continue
         parsed = extract_date_from_string(line)
         if parsed:
             return parsed
+        for offset in _ADJACENT_DATE_LINE_OFFSETS:
+            neighbour_index = index + offset
+            if 0 <= neighbour_index < len(lines):
+                parsed = _parse_short_adjacent_date_line(lines[neighbour_index])
+                if parsed:
+                    return parsed
     return None
 
 

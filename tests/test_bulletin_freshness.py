@@ -70,6 +70,30 @@ class BulletinFreshnessTests(unittest.TestCase):
                 "Caoimhin was just eight years old when he died on 9th July 2023."
             )
         )
+        self.assertIsNone(
+            extract_bulletin_date_from_text(
+                "PARISH NEWSLETTER\n"
+                "Caoimhin was just eight years old when he died on 9th July 2023."
+            )
+        )
+
+    def test_pdf_heading_date_reads_adjacent_raphoe_lines(self) -> None:
+        text = (
+            "WEBSITE parishofraphoe.ie EMAIL: raphoeparish@gmail.com\n"
+            "Sunday 19 July 2026\n"
+            "RAPHOE PARISH NEWSLETTER\n"
+            "St. Eunan's Church, Raphoe\n"
+            "Monday 20 July\n"
+            "NATIONAL GRANDPARENTS PILGRIMAGE will take place at Knock Shrine "
+            "on Sunday 26 July\n"
+        )
+        self.assertEqual(extract_bulletin_date_from_text(text), date(2026, 7, 19))
+        self.assertEqual(
+            extract_bulletin_date_from_text(
+                "RAPHOE PARISH NEWSLETTER\nSunday 19 July 2026\n"
+            ),
+            date(2026, 7, 19),
+        )
 
     def test_body_july_date_is_stale_against_august_sunday(self) -> None:
         verdict = verdict_for_extracted_date(date(2026, 7, 12), date(2026, 8, 16))
@@ -496,6 +520,34 @@ class SafetyNetUnknownUrlHeadingTests(unittest.TestCase):
             pdf = Path(tmp) / "raphoe.pdf"
             self._heading_pdf(
                 pdf, "Sunday 19 July 2026 RAPHOE PARISH NEWSLETTER"
+            )
+            result = self._ok_result("drive-1jmslbrliw", pdf)
+            queue_path = Path(tmp) / "retry_queue.json"
+            payload = apply_freshness_safety_net(
+                [result],
+                self.TARGET,
+                retry_queue_path=queue_path,
+            )
+            self.assertTrue(result.is_stale)
+            self.assertEqual(result.status, "error")
+            self.assertEqual(len(payload["rejected_from_mega"]), 1)
+            self.assertEqual(
+                payload["rejected_from_mega"][0]["extracted_date"],
+                "2026-07-19",
+            )
+
+    def test_undated_drive_july_heading_on_adjacent_line_is_rejected_stale(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "raphoe.pdf"
+            self._heading_pdf(
+                pdf,
+                "WEBSITE parishofraphoe.ie EMAIL: raphoeparish@gmail.com",
+                "Sunday 19 July 2026",
+                "RAPHOE PARISH NEWSLETTER",
+                "St. Eunan's Church, Raphoe",
+                "Monday 20 July",
+                "NATIONAL GRANDPARENTS PILGRIMAGE will take place at Knock Shrine "
+                "on Sunday 26 July",
             )
             result = self._ok_result("drive-1jmslbrliw", pdf)
             queue_path = Path(tmp) / "retry_queue.json"

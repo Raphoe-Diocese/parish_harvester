@@ -241,6 +241,18 @@ class FreshnessAfterUnknownUrlTests(unittest.TestCase):
             self.assertEqual(verdict.status, "stale")
             self.assertEqual(verdict.extracted_date, date(2026, 7, 19))
 
+    def test_undated_url_july_heading_on_adjacent_line_is_stale(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "weekly-bulletin.pdf"
+            self._heading_pdf(
+                pdf,
+                "Sunday 19 July 2026",
+                "RAPHOE PARISH NEWSLETTER",
+            )
+            verdict = freshness_after_unknown_url(self.UNDATED, pdf, self.TARGET)
+            self.assertEqual(verdict.status, "stale")
+            self.assertEqual(verdict.extracted_date, date(2026, 7, 19))
+
     def test_undated_url_without_heading_stays_unknown(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             pdf = Path(tmp) / "weekly-bulletin.pdf"
