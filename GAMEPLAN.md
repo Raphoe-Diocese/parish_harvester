@@ -17,6 +17,30 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 25/08/2026 — HTTP fetch: IPv4 first + expired-cert fallback
+
+**The real goal, in one sentence:** get Limavady’s already-known
+`23-8-26.pdf` without raising recipe timeouts.
+
+Harvest
+[32852633310](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/32852633310)
+(target 23/08/2026, generated 25/08/2026 13:58 UTC): 103 ok, Limavady
+**failed** `Total timeout exceeded` with the URL already
+`https://www.limavadyparish.org/onewebmedia/23-8-26.pdf`. Proved 25/08/2026:
+default `urlopen` → `CERTIFICATE_VERIFY_FAILED` (expired cert);
+unverified context → HTTP 200 PDF 685118 bytes. Nine predicted weeks × 12s
+IPv6 hang burns the 180s parish cap.
+
+**This turn:** `_fetch_bytes_with_retries` connects IPv4/A-record first, then
+retries the same URL once unverified only after a cert-verify/expired error.
+404/410 stay a hard miss. No `timeout_ms` / `total_timeout_s` /
+`per_attempt_timeout_s` / `total_budget_s` raised. Limavady stays
+`predicted_dated_pdf` (example still `23-8-26.pdf`). Claudy not changed.
+Lisnaskea switched to `http_scrape_newest_pdf` now the helper ignores expired
+certs. H1 and H3 not reverted. No harvest. No `parish_status.json` edit.
+
+---
+
 ## 25/08/2026 — H1 safety-net hole (undated URL still `ok`)
 
 **The real goal, in one sentence:** old Drive / hashed / `bulletin.pdf` files
