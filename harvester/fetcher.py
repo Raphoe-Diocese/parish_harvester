@@ -18,8 +18,6 @@ from dataclasses import dataclass, field
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Optional
-from urllib.error import HTTPError, URLError
-from urllib.request import Request, urlopen
 from urllib.parse import parse_qs, unquote, urljoin, urlparse
 
 from playwright.async_api import (
@@ -75,6 +73,7 @@ from .cloud_folders import (
 from .html_capture import capture_html_page_as_pdf
 from .replay import (
     RecipeReplayError,
+    _fetch_bytes_with_retries,
     _find_iframe_pdf_url,
     _is_non_bulletin_url,
     _print_page_to_pdf,
@@ -942,9 +941,16 @@ async def _download_image_bytes(url: str, page: Page | None = None) -> bytes:
         return await response.body()
 
     def _fetch() -> bytes:
-        request = Request(url, headers={"User-Agent": "Mozilla/5.0"})
-        with urlopen(request, timeout=PAGE_LOAD_TIMEOUT_MS / 1000) as response:
-            return response.read()
+        timeout_s = PAGE_LOAD_TIMEOUT_MS / 1000
+        hit = _fetch_bytes_with_retries(
+            url,
+            max_attempts=2,
+            per_attempt_timeout_s=timeout_s,
+            total_budget_s=timeout_s,
+        )
+        if not hit:
+            raise RuntimeError(f"HTTP download failed for image {url}")
+        return hit[0]
 
     return await asyncio.to_thread(_fetch)
 

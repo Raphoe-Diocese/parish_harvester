@@ -6,15 +6,17 @@ import fnmatch
 import io
 import json
 import re
+import socket
 import ssl
 import subprocess
 import tempfile
 import time
 from datetime import date, timedelta
+from http.client import HTTPConnection, HTTPSConnection
 from pathlib import Path
 from urllib.error import HTTPError
 from urllib.parse import parse_qs, unquote, urljoin, urlparse
-from urllib.request import Request, urlopen
+from urllib.request import HTTPHandler, HTTPSHandler, Request, build_opener, urlopen
 
 from playwright.async_api import (
     Browser,
@@ -957,6 +959,80 @@ def _dropfiles_example_href_from_recipe(recipe: dict) -> str:
     return ""
 
 
+def _create_connection_ipv4(
+    address,
+    timeout=socket._GLOBAL_DEFAULT_TIMEOUT,
+    source_address=None,
+    *args,
+    **kwargs,
+):
+    """Connect using A-records only so a blackholed IPv6 never eats the budget.
+
+    GitHub Actions often has AAAA first; urllib then sits on IPv6 until the
+    per-attempt timeout and never reaches a working IPv4 path (Limavady /
+    Claudy onewebmedia). If the host has no A record, fall back to the
+    default resolver (IPv6-only hosts).
+    """
+    host, port = address
+    try:
+        addrinfo = socket.getaddrinfo(host, port, socket.AF_INET, socket.SOCK_STREAM)
+    except OSError:
+        addrinfo = []
+    if not addrinfo:
+        return socket.create_connection(address, timeout, source_address, *args, **kwargs)
+    err: OSError | None = None
+    for family, socktype, proto, _canon, sockaddr in addrinfo:
+        sock = None
+        try:
+            sock = socket.socket(family, socktype, proto)
+            if timeout is not socket._GLOBAL_DEFAULT_TIMEOUT:
+                sock.settimeout(timeout)
+            else:
+                sock.settimeout(socket.getdefaulttimeout())
+            if source_address:
+                sock.bind(source_address)
+            sock.connect(sockaddr)
+            return sock
+        except OSError as exc:
+            err = exc
+            if sock is not None:
+                sock.close()
+    if err is not None:
+        raise err
+    raise OSError(f"IPv4 connect failed for {host}:{port}")
+
+
+class _IPv4HTTPConnection(HTTPConnection):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._create_connection = _create_connection_ipv4
+
+
+class _IPv4HTTPSConnection(HTTPSConnection):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self._create_connection = _create_connection_ipv4
+
+
+class _IPv4HTTPHandler(HTTPHandler):
+    def http_open(self, req):
+        return self.do_open(_IPv4HTTPConnection, req)
+
+
+class _IPv4HTTPSHandler(HTTPSHandler):
+    def https_open(self, req):
+        return self.do_open(_IPv4HTTPSConnection, req, context=self._context)
+
+
+def _urlopen_ipv4(request, timeout=None, context=None):
+    """urlopen-compatible GET that connects via IPv4 A-records first."""
+    if context is None:
+        opener = build_opener(_IPv4HTTPHandler, _IPv4HTTPSHandler())
+    else:
+        opener = build_opener(_IPv4HTTPHandler, _IPv4HTTPSHandler(context=context))
+    return opener.open(request, timeout=timeout)
+
+
 def _fetch_bytes_with_retries(
     url: str,
     *,
@@ -968,9 +1044,11 @@ def _fetch_bytes_with_retries(
 
     See the module-level _DROPFILES_HTTP_* comment for why this exists —
     urllib gets through the sg-captcha challenge far more often than a full
-    Playwright navigation to the identical URL. urlopen already follows the
-    redirect chain (SEF URL -> index.php?task=frontfile.download -> file)
-    transparently, so only the final response matters here.
+    Playwright navigation to the identical URL. Redirects are followed
+    (SEF URL -> index.php?task=frontfile.download -> file). Connects IPv4
+    first so a blackholed AAAA cannot burn the attempt. Tries verified TLS
+    first; one unverified retry only when the cert is expired / unverifiable.
+    Do not raise per_attempt_timeout_s or total_budget_s to paper over this.
     """
     started = time.monotonic()
     attempts = 0
@@ -982,11 +1060,15 @@ def _fetch_bytes_with_retries(
     if not url:
         return None
     insecure_ctx: ssl.SSLContext | None = None
+    prefer_unverified = False
     while attempts < max_attempts and (time.monotonic() - started) < total_budget_s:
         attempts += 1
         request = Request(url, headers=headers_out)
         try:
-            with urlopen(request, timeout=per_attempt_timeout_s) as response:
+            ctx = insecure_ctx if prefer_unverified else None
+            with _urlopen_ipv4(
+                request, timeout=per_attempt_timeout_s, context=ctx
+            ) as response:
                 body = response.read()
                 if response.status == 200 and body:
                     headers = {k.lower(): v for k, v in response.headers.items()}
@@ -997,15 +1079,15 @@ def _fetch_bytes_with_retries(
             if exc.code in {404, 410}:
                 return None
         except Exception as exc:
-            if not _is_certificate_verify_error(exc):
+            if prefer_unverified or not _is_certificate_verify_error(exc):
                 continue
-            # mucknoparish.ie leaf cert has no Sectigo intermediate in-chain.
-            # HTTP listing/post work; PDF http:// 302s to https://www and
-            # dies here unless we retry without verify (same as autofix).
+            # Expired leaf (limavadyparish.org) or missing intermediate
+            # (mucknoparish.ie). Retry this URL once without verify.
+            prefer_unverified = True
             if insecure_ctx is None:
                 insecure_ctx = _insecure_ssl_context()
             try:
-                with urlopen(
+                with _urlopen_ipv4(
                     request,
                     timeout=per_attempt_timeout_s,
                     context=insecure_ctx,
@@ -1527,12 +1609,18 @@ def _href_match_blob(url: str) -> str:
 
 
 def _is_certificate_verify_error(exc: BaseException) -> bool:
-    reason = getattr(exc, "reason", exc)
-    text = f"{type(reason).__name__} {reason} {exc}".lower()
+    if isinstance(exc, ssl.SSLCertVerificationError):
+        return True
+    reason = getattr(exc, "reason", None)
+    if isinstance(reason, ssl.SSLCertVerificationError):
+        return True
+    text = f"{type(reason).__name__ if reason is not None else ''} {reason} {exc}".lower()
     return (
         "certificate_verify" in text
         or "certificate verify failed" in text
         or "sslcertverificationerror" in text
+        or "certificate has expired" in text
+        or "certificate expired" in text
     )
 
 

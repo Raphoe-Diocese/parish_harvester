@@ -932,6 +932,8 @@ class LimavadyRecipeTests(unittest.TestCase):
         self.assertNotIn("28-6-26.pdf", raw)
         self.assertEqual(data["site_type"], "predicted_dated_pdf")
         self.assertEqual(int(data["weeks_back"]), 8)
+        self.assertEqual(int(data["timeout_ms"]), 45000)
+        self.assertEqual(int(data["total_timeout_s"]), 180)
         self.assertNotIn("use_captured_url", data)
 
     def test_next_sunday_rewrite_and_this_week_listed_first(self) -> None:
@@ -1210,7 +1212,7 @@ class HttpFetchSslFallbackTests(unittest.TestCase):
             resp.__exit__.return_value = False
             return resp
 
-        with patch("harvester.replay.urlopen", side_effect=fake_urlopen):
+        with patch("harvester.replay._urlopen_ipv4", side_effect=fake_urlopen):
             hit = _fetch_bytes_with_retries(
                 self.SPACED,
                 max_attempts=2,
@@ -1221,6 +1223,83 @@ class HttpFetchSslFallbackTests(unittest.TestCase):
         self.assertEqual(hit[0], pdf)
         self.assertEqual(seen[0][0], self.ENCODED)
         self.assertTrue(any(used_insecure for _url, used_insecure in seen))
+
+    def test_retries_unverified_on_expired_certificate(self) -> None:
+        import ssl
+        from unittest.mock import MagicMock, patch
+        from urllib.error import URLError
+
+        seen: list[bool] = []
+        pdf = b"%PDF-1.7 limavady-expired-cert"
+
+        def fake_urlopen(req, timeout=None, context=None):
+            seen.append(context is not None)
+            if context is None:
+                raise URLError(
+                    ssl.SSLCertVerificationError(
+                        "[SSL: CERTIFICATE_VERIFY_FAILED] certificate verify "
+                        "failed: certificate has expired"
+                    )
+                )
+            resp = MagicMock()
+            resp.status = 200
+            resp.read.return_value = pdf
+            resp.headers = {"Content-Type": "application/pdf"}
+            resp.__enter__.return_value = resp
+            resp.__exit__.return_value = False
+            return resp
+
+        with patch("harvester.replay._urlopen_ipv4", side_effect=fake_urlopen):
+            hit = _fetch_bytes_with_retries(
+                "https://www.limavadyparish.org/onewebmedia/23-8-26.pdf",
+                max_attempts=2,
+                per_attempt_timeout_s=1,
+                total_budget_s=3,
+            )
+        self.assertIsNotNone(hit)
+        self.assertEqual(hit[0], pdf)
+        self.assertEqual(seen, [False, True])
+
+    def test_404_is_hard_miss_without_unverified_retry(self) -> None:
+        from email.message import EmailMessage
+        from unittest.mock import patch
+        from urllib.error import HTTPError
+
+        calls: list[object] = []
+
+        def fake_urlopen(req, timeout=None, context=None):
+            calls.append(context)
+            raise HTTPError(req.full_url, 404, "Not Found", EmailMessage(), None)
+
+        with patch("harvester.replay._urlopen_ipv4", side_effect=fake_urlopen):
+            hit = _fetch_bytes_with_retries(
+                "https://www.limavadyparish.org/onewebmedia/missing.pdf",
+                max_attempts=3,
+                per_attempt_timeout_s=1,
+                total_budget_s=3,
+            )
+        self.assertIsNone(hit)
+        self.assertEqual(len(calls), 1)
+        self.assertIsNone(calls[0])
+
+    def test_create_connection_ipv4_uses_af_inet(self) -> None:
+        import socket
+        from unittest.mock import MagicMock, patch
+
+        from harvester.replay import _create_connection_ipv4
+
+        fake_sock = MagicMock()
+        info = [(socket.AF_INET, socket.SOCK_STREAM, 6, "", ("203.0.113.10", 443))]
+        with (
+            patch("harvester.replay.socket.getaddrinfo", return_value=info) as gai,
+            patch("harvester.replay.socket.socket", return_value=fake_sock),
+        ):
+            result = _create_connection_ipv4(
+                ("www.limavadyparish.org", 443), timeout=2.0
+            )
+        self.assertEqual(gai.call_args[0][2], socket.AF_INET)
+        fake_sock.connect.assert_called_once_with(("203.0.113.10", 443))
+        self.assertIs(result, fake_sock)
 
 
 class ClonesSpaceUrlTests(unittest.TestCase):
@@ -1275,7 +1354,7 @@ class ClonesSpaceUrlTests(unittest.TestCase):
         resp.__enter__.return_value = resp
         resp.__exit__.return_value = False
         with (
-            patch("harvester.replay.urlopen", return_value=resp) as mock_urlopen,
+            patch("harvester.replay._urlopen_ipv4", return_value=resp) as mock_urlopen,
             patch("harvester.replay.Request") as mock_req,
         ):
             mock_req.return_value = "REQ"
@@ -1290,6 +1369,38 @@ class ClonesSpaceUrlTests(unittest.TestCase):
             mock_urlopen.assert_called()
             self.assertIsNotNone(result)
             self.assertEqual(result[0], body)
+
+
+class LisnaskeaRecipeTests(unittest.TestCase):
+    LISTING = "https://www.lisnaskeamaguiresbridgeparish.com/bulletin.html"
+    THIS_WEEK = (
+        "https://www.lisnaskeamaguiresbridgeparish.com/onewebmedia/23082026.pdf"
+    )
+    LAST_WEEK = (
+        "https://www.lisnaskeamaguiresbridgeparish.com/onewebmedia/16082026.pdf"
+    )
+    RECIPE = Path("parishes/recipes/clogher/lisnaskeamaguiresbridge.json")
+
+    def test_recipe_scrapes_listing_and_does_not_pin_dated_file(self) -> None:
+        raw = self.RECIPE.read_text(encoding="utf-8")
+        data = json.loads(raw)
+        self.assertEqual(data["site_type"], "http_scrape_newest_pdf")
+        self.assertEqual(data["start_url"], self.LISTING)
+        self.assertIn("onewebmedia", data.get("href_patterns") or [])
+        self.assertLessEqual(int(data.get("timeout_ms") or 0), 55000)
+        self.assertLessEqual(int(data.get("total_timeout_s") or 0), 250)
+        self.assertNotIn("23082026.pdf", raw)
+        self.assertNotIn("16082026.pdf", raw)
+        self.assertNotIn("do not use http_scrape", raw.lower())
+
+    def test_listing_scores_ddmmyyyy_filename(self) -> None:
+        scored = _score_http_scrape_pdf_hrefs(
+            [self.THIS_WEEK, self.LAST_WEEK], date(2026, 8, 23)
+        )
+        self.assertTrue(scored)
+        best_date, best_url = max(scored)
+        self.assertEqual(best_date, date(2026, 8, 23))
+        self.assertEqual(best_url, self.THIS_WEEK)
 
 
 if __name__ == "__main__":
