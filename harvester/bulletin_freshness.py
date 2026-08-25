@@ -418,6 +418,10 @@ def apply_freshness_safety_net(
 
     Catches stale ok results that slipped past in-fetch recovery (e.g. undated
     URL that was actually old, or results rebuilt from cache).
+
+    Undated URLs stay unknown unless a PDF exists and the bulletin heading
+    date is provably old (same rule as H1 ``freshness_after_unknown_url``).
+    A this-week or grace-fresh heading does not invent ``fresh``.
     """
     entries_by_key = entries_by_key or {}
     queue_path = retry_queue_path or _RETRY_QUEUE_PATH
@@ -431,6 +435,17 @@ def apply_freshness_safety_net(
             continue
 
         verdict = check_bulletin_freshness(result.url, target)
+        pdf_path = result.file_path
+        if (
+            verdict.status == "unknown"
+            and pdf_path is not None
+            and Path(pdf_path).exists()
+        ):
+            from .fetcher import freshness_after_unknown_url
+
+            verdict = freshness_after_unknown_url(
+                result.url, Path(pdf_path), target
+            )
         if verdict.status != "stale":
             continue
 
