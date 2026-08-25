@@ -17,6 +17,31 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 25/08/2026 — Heading checker: date on the line next to newsletter
+
+**The real goal, in one sentence:** if the masthead date sits on the line
+before or after `newsletter` / `bulletin`, treat that as the bulletin date.
+
+Independent audit 25/08/2026: H1 **did run** on Raphoe Drive
+(`drive-1jmslbrliw`). Live OCR still prints `Sunday 19 July 2026` then
+`RAPHOE PARISH NEWSLETTER` on the **next** line.
+`extract_bulletin_date_from_text` only read a date on the **same line** as
+the heading, so it returned None and harvest kept `ok`.
+
+**This turn:** same-line heading date still wins first (Holy Cross
+`Bulletin 11th & 12th July 2026` → 2026-07-12). If that heading has no
+date, look at the previous and next 1–2 **non-empty** lines only when they
+are a short date/liturgical line, not a long body paragraph. Do not scan
+the whole page. Memorial-only (`died on 9th July 2023`) stays None. H1 and
+H3 (ahead-only grace) not reverted. No harvest. No `parish_status.json`
+edit. Timeouts not raised. Mega PDF stays on.
+
+**Not live / not harvested.** This does not change parishpress.ie or Raphoe
+on the live site until the next harvest. Do not say Raphoe is fixed on
+parishpress.
+
+---
+
 ## 25/08/2026 — Hunt this-week files for older Problems-tab parishes
 
 **The real goal, in one sentence:** only change a recipe when a **23/08/2026** bulletin is on the live parish site.
