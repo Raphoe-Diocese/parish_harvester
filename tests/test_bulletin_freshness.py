@@ -17,6 +17,8 @@ from harvester.bulletin_freshness import (
     verdict_for_extracted_date,
     week_window,
 )
+from reportlab.pdfgen import canvas
+
 from harvester.fetcher import FetchResult, ParishEntry
 
 
@@ -453,6 +455,86 @@ class BulletinFreshnessTests(unittest.TestCase):
         too_far_verdict = check_bulletin_freshness(too_far, target)
         self.assertEqual(too_far_verdict.status, "stale")
         self.assertEqual(too_far_verdict.reason, "date_ahead_of_target")
+
+
+class SafetyNetUnknownUrlHeadingTests(unittest.TestCase):
+    """Safety net must run H1 heading check when the URL has no date."""
+
+    DRIVE_URL = "https://drive.google.com/file/d/1jmslbrliw/view"
+    TARGET = date(2026, 8, 23)
+
+    def _heading_pdf(self, path: Path, *lines: str) -> None:
+        c = canvas.Canvas(str(path))
+        y = 700
+        for line in lines:
+            c.drawString(72, y, line)
+            y -= 18
+        c.save()
+
+    def _ok_result(self, key: str, pdf: Path) -> FetchResult:
+        return FetchResult(
+            key=key,
+            display_name=key,
+            status="ok",
+            url=self.DRIVE_URL,
+            file_path=pdf,
+            file_type="pdf",
+        )
+
+    def test_undated_drive_july_heading_is_rejected_stale(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "raphoe.pdf"
+            self._heading_pdf(
+                pdf, "Sunday 19 July 2026 RAPHOE PARISH NEWSLETTER"
+            )
+            result = self._ok_result("drive-1jmslbrliw", pdf)
+            queue_path = Path(tmp) / "retry_queue.json"
+            payload = apply_freshness_safety_net(
+                [result],
+                self.TARGET,
+                retry_queue_path=queue_path,
+            )
+            self.assertTrue(result.is_stale)
+            self.assertEqual(result.status, "error")
+            self.assertEqual(len(payload["rejected_from_mega"]), 1)
+            self.assertEqual(
+                payload["rejected_from_mega"][0]["extracted_date"],
+                "2026-07-19",
+            )
+
+    def test_undated_drive_this_week_heading_stays_not_stale(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "this-week.pdf"
+            self._heading_pdf(
+                pdf, "Sunday 23 August 2026 RAPHOE PARISH NEWSLETTER"
+            )
+            result = self._ok_result("drive-thisweek", pdf)
+            payload = apply_freshness_safety_net(
+                [result],
+                self.TARGET,
+                retry_queue_path=Path(tmp) / "retry_queue.json",
+            )
+            self.assertFalse(result.is_stale)
+            self.assertEqual(result.status, "ok")
+            self.assertEqual(payload["rejected_from_mega"], [])
+
+    def test_memorial_only_heading_stays_unknown_not_rejected(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            pdf = Path(tmp) / "memorial.pdf"
+            self._heading_pdf(
+                pdf,
+                "In memory of Mary 12 July 2026",
+                "© 2012-2026 Parish",
+            )
+            result = self._ok_result("drive-memorial", pdf)
+            payload = apply_freshness_safety_net(
+                [result],
+                self.TARGET,
+                retry_queue_path=Path(tmp) / "retry_queue.json",
+            )
+            self.assertFalse(result.is_stale)
+            self.assertEqual(result.status, "ok")
+            self.assertEqual(payload["rejected_from_mega"], [])
 
 
 if __name__ == "__main__":

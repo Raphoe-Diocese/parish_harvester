@@ -17,6 +17,29 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 25/08/2026 — H1 safety-net hole (undated URL still `ok`)
+
+**The real goal, in one sentence:** old Drive / hashed / `bulletin.pdf` files
+must not stay `ok` when the PDF heading is last month.
+
+H1 (`freshness_after_unknown_url`, PR
+[#129](https://github.com/Raphoe-Diocese/parish_harvester/pull/129)) already
+runs in `_recover_stale_bulletin`. The second-pass gate
+`apply_freshness_safety_net` was still URL-only, so `unknown` slipped through
+when recover was skipped or results were rebuilt from cache.
+
+**Proved still `ok` on GitHub status 25/08/2026** (live OCR body, title
+23/08/2026): Raphoe `drive-1jmslbrliw` **Sunday 19 July 2026**; Banagher
+**28th June 2026**; Melmount **12 July 2026**; Ardstraw East **5th July 2026**.
+
+**This turn:** safety net now runs the same H1 heading check when the URL
+verdict is `unknown` and a PDF is on `result.file_path`. Mark stale only when
+the heading is provably old. This-week heading stays not-stale. Memorial-only
+/ no bulletin heading stays unknown. H1 and H3 not reverted. No harvest. No
+`parish_status.json` edit. Not live until the next harvest.
+
+---
+
 ## 24/08/2026 — Limavady recipe pin (this week’s file)
 
 **The real goal, in one sentence:** stop harvest using a stale Limavady example
