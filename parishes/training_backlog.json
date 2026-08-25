@@ -1,17 +1,17 @@
 {
-  "generated_at": "2026-08-23",
+  "generated_at": "2026-08-25",
   "target_date": "2026-08-23",
   "summary": {
-    "downloaded": 112,
+    "downloaded": 103,
     "html_links": 0,
-    "skipped": 32,
-    "failed": 8,
-    "stale_rejected": 9
+    "skipped": 30,
+    "failed": 12,
+    "stale_rejected": 14
   },
   "action_counts": {
     "skip": 33,
-    "ok": 123,
-    "investigate": 6
+    "ok": 119,
+    "investigate": 10
   },
   "parishes": [
     {
@@ -150,10 +150,10 @@
         "notes": "SSL cert often expired. PDF Embedder loads PDFs from www-static.antrimparish.com via network (may have no a.pdfemb-viewer href)."
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: Page.goto: net::ERR_CONNECTION_TIMED_OUT at https://www.antrimparish.com/bulletinpage/\nCall log:\n  - navigating to \"https://www.antrimparish.com/bulletinpage/\", waiting until \"commit\"\n",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: Page.goto: net::ERR_CONNECTION_TIMED_OUT at https://www.antrimparish.com/bulletinpage/\nCall log:\n  - navigating to \"https://www.antrimpari"
     },
     {
       "parish_key": "ardara",
@@ -601,10 +601,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Too many pages: 6 pages (max 4)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Too many pages: 6 pages (max 4)"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "bellaghyparish",
@@ -1223,10 +1223,10 @@
         "notes": "Many docs.google.com/viewer iframes load slowly (2\u20134 min) \u2014 ignore previews. Bulletin is a Word file at onewebmedia/NEWSLETTER D-M-YY.docx \u2014 download directly. Iframe src URLs are in the HTML immediately; no need to wait for previews. Harvester rewrites the date each Sunday and t"
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "cleenish",
@@ -1886,7 +1886,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Same parish as Drumholm \u2014 weekly PDF is harvested via drumholm-parish. Facebook page is not a separate bulletin."
@@ -3305,7 +3305,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Shares Gartan/Termon Drive bulletin (same file 1KnA8F6t54) \u2014 harvested via drive-1kna8f6t54"
@@ -3317,24 +3317,26 @@
       "recipe_file": "parishes/recipes/down_and_connor/kilmoreandkillyleagh.json",
       "recipe": {
         "start_url": "https://www.kilmoreandkillyleagh.com/latest-notices--downloads.html",
-        "site_type": "pdf_link_list",
+        "site_type": "http_scrape_newest_pdf",
         "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 2,
+        "step_count": 3,
         "click_count": 1,
         "has_terminal": true,
         "operator_notes": [
-          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
-          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-          "Do not worry if the filename or date in the link text changes every week."
+          "Weebly listing https://www.kilmoreandkillyleagh.com/latest-notices--downloads.html has dated PDFs in /uploads/8/7/4/5/8745725/.",
+          "2026-08-24: 23rd_august_2026_combined-1.pdf is HTTP 200 (2151572 bytes, Last-Modified Sun 23 Aug 2026 18:16:42 GMT). Heading '23rd August 2026' / '21st Sunday of Ordinary Time' / Parishes of Kilmore & Killyleagh. 7 pages (weekly bulletin + Mass readings). Not a magazine.",
+          "Old recipe pinned selector + download to 9th_august_2026__1_.pdf, so harvest stayed on 09/08/2026 after this week's file was posted.",
+          "site_type:http_scrape_newest_pdf picks the newest dated upload over HTTP. Playwright click newest_dated is fallback only. max_bulletin_pages=10 allows the 7-page weekly file (default cap is 4)."
         ],
         "do_not": [
-          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
-          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+          "Do not pin a dated filename in the selector or download URL (e.g. 9th_august_2026__1_.pdf) \u2014 it breaks next week.",
+          "Do not pick GDPR, Gift Aid, consent-form, or financial statement PDFs.",
+          "Do not leave the default 4-page cap \u2014 the weekly combined bulletin+readings file is 7 pages."
         ],
-        "recorded_date": "2026-08-19"
+        "recorded_date": "2026-08-24"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
@@ -3526,7 +3528,7 @@
       "diocese": "derry",
       "recipe_file": "parishes/recipes/derry/limavadyparish.json",
       "recipe": {
-        "start_url": "https://www.limavadyparish.org/onewebmedia/16-8-26.pdf",
+        "start_url": "https://www.limavadyparish.org/onewebmedia/23-8-26.pdf",
         "site_type": "predicted_dated_pdf",
         "playbook_type": "dated_pdf_bulletin",
         "status": "",
@@ -3536,23 +3538,24 @@
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "Dated PDF at /onewebmedia/D-M-YY.pdf (e.g. 16-8-26.pdf = 16/08/2026).",
-          "2026-08-18 FIX: recipe was pinned with use_captured_url to 28-6-26.pdf. Playwright then failed ENETUNREACH on that host's IPv6 address. The file itself is fine over IPv4 \u2014 a plain HTTP GET of the rewritten 16-8-26.pdf returns 200 application/pdf (703,960 bytes). site_type:predicted_dated_pdf skips the browser (and IPv6) and tries rewrite_date_url for this Sunday plus previous weeks."
+          "Dated PDF at /onewebmedia/D-M-YY.pdf (e.g. 23-8-26.pdf = 23/08/2026).",
+          "2026-08-24: this week's file is 23-8-26.pdf (listing first button + PDF header 23 August 2026 / 21st Sunday). Next Sunday rewrite must become 30-8-26.pdf. Do not freeze use_captured_url.",
+          "Keep site_type:predicted_dated_pdf. Playwright IPv6 ENETUNREACH on this host; HTTP rewrite tries this Sunday then previous weeks. Do not switch to a browser listing scrape."
         ],
         "do_not": [
           "Do not set use_captured_url \u2014 it freezes the recipe on the trained week's file.",
           "Do not open the homepage in Playwright on this host \u2014 IPv6 from GitHub/Actions can ENETUNREACH."
         ],
-        "recorded_date": "2026-08-18"
+        "recorded_date": "2026-08-24"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "parishoflisburn",
@@ -3625,10 +3628,10 @@
         "total_timeout_s": 180
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: Page.goto: Timeout 55000ms exceeded.\nCall log:\n  - navigating to \"https://www.lisnaskeamaguiresbridgeparish.com/bulletin.html\", waiting until \"domcontentloaded\"\n",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: Page.goto: Timeout 55000ms exceeded.\nCall log:\n  - navigating to \"https://www.lisnaskeamaguiresbridgeparish.com/bulletin.html\", waiting un"
     },
     {
       "parish_key": "loughshoreparishes",
@@ -3992,7 +3995,7 @@
         "has_terminal": false,
         "operator_notes": [],
         "do_not": [],
-        "recorded_date": "2026-06-26"
+        "recorded_date": "2026-08-25"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -4075,10 +4078,10 @@
         "total_timeout_s": 180
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: Page.goto: Timeout 55000ms exceeded.\nCall log:\n  - navigating to \"https://www.galloonparish.com/bulletin-1.html\", waiting until \"domcontentloaded\"\n",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: Page.goto: Timeout 55000ms exceeded.\nCall log:\n  - navigating to \"https://www.galloonparish.com/bulletin-1.html\", waiting until \"domconten"
     },
     {
       "parish_key": "ourladyqueenofpeacekilwee",
@@ -4621,7 +4624,7 @@
         "has_terminal": false,
         "operator_notes": [],
         "do_not": [],
-        "recorded_date": "2026-06-26"
+        "recorded_date": "2026-08-25"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
