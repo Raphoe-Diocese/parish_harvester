@@ -1,18 +1,32 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "antrimparish",
   "display_name": "Antrim",
   "diocese": "down_and_connor",
   "start_url": "https://www.antrimparish.com/bulletinpage/",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    "uploads"
+  ],
+  "playbook_type": "pdf_download_list",
   "steps": [
     {
-      "action": "download",
-      "url_pattern": "*.pdf"
+      "action": "goto",
+      "url": "https://www.antrimparish.com/bulletinpage/"
     }
   ],
-  "observed_load_ms": 2788927885,
   "timeout_ms": 300000,
   "total_timeout_s": 900,
   "navigation_wait_until": "commit",
-  "recorded_date": "2026-08-16"
+  "recorded_date": "2026-08-25",
+  "operator_notes": [
+    "Listing /bulletinpage/ embeds dated PDFs on www-static via PDF Embedder.",
+    "CONFIRMED 2026-08-25: https://www-static.antrimparish.com/wp-content/uploads/2026/08/23rd-August-2026.pdf HTTP 200, 355100 bytes, application/pdf.",
+    "Playwright times out (ERR_CONNECTION_TIMED_OUT). site_type:http_scrape_newest_pdf uses the shared IPv4 + expired-cert HTTP helper.",
+    "Do not pin a dated filename."
+  ],
+  "do_not": [
+    "Do not pin a dated filename.",
+    "Do not harvest Volunteer-EOI-form.pdf."
+  ]
 }

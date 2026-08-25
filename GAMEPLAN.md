@@ -17,6 +17,36 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 25/08/2026 — This-week recipe hunt (Claudy / Lisnaskea / Newtownbutler / …)
+
+**The real goal, in one sentence:** change a recipe only when a live
+23/08/2026 bulletin file is HTTP 200.
+
+Harvest truth is `parishes/parish_status.json` on origin/main
+(`generated_at` 2026-08-25T13:58:07Z, target 2026-08-23). No harvest.
+No `parish_status.json` edit. H1 / H3 / #135 not reverted. Timeouts not
+raised. Limavady / Carrick / Lisburn / Tyholland not touched.
+
+| Key | Result | Live proof 25/08/2026 |
+|---|---|---|
+| **parishofclaudy** | **Content-gap** — leave `predicted_dated_pdf`. | `NEWSLETTER 23-8-26.docx` (space and `%20`) HTTP **404**. Newest real file `NEWSLETTER 9-8-26.docx` HTTP 200, 25,820 bytes. |
+| **lisnaskeamaguiresbridge** | **Already on main** (#135). | Listing `/bulletin.html` HTTP 200. `23082026.pdf` HTTP 200, 596,595 bytes, link text 23rd August 2026. Recipe already `http_scrape_newest_pdf`, no filename pin. |
+| **newtownbutler** | **Fixed** — HTTP scrape + link-text date. | Listing `/bulletin-1.html` HTTP 200. Link text **23rd August 2026** → hashed `S25C-*.pdf` HTTP 200, 205,065 bytes. Do not pin the hash. |
+| **antrimparish** | **Fixed** — HTTP scrape of `/bulletinpage/`. | `www-static…/2026/08/23rd-August-2026.pdf` HTTP 200, 355,100 bytes, `application/pdf`. Playwright still times out; do not raise timeouts. |
+| **malinparish** | **Content-gap**. | `Bulletin-23rd-August-2026.pdf` still HTTP **404**. Newest listing file `Bulletin-5th-April-2026.pdf` HTTP 200, 331,159 bytes. |
+| **st-colmcilles** | **Content-gap**. | Listing newest is `Parish-Bulletin-16082026.pdf` HTTP 200, 1,727,015 bytes. Predicted `…23082026.pdf` / `…23rd-August-2026.pdf` are HTML 46,451 bytes (soft 404), not PDFs. |
+| **stcolmcillesholywood** | **Content-gap**. | `/bulletin-notice-sunday-23rd-august-2026/` and `Bulletin-Notice-23rd-August-2026.pdf` HTTP **404**. Newest notice still 16th August 2026. |
+| **stteresasparish** | **Content-gap** — parish said no bulletin this Sunday. | WP.com post *Please note there is no Bulletin for Sunday, 23rd August 2026*. Newest real bulletin post is 16th August 2026. |
+| **loughshoreparishes** | **Fixed** — `wp_json_newest_media`, filter `sunday-in-ordinary-time`. | `21st-Sunday-in-Ordinary-Time.pdf` HTTP 200, 4,513,290 bytes (21st Sunday = 23/08/2026). Do not take `DC-Vocations-Newsletter.pdf`. |
+| **parishofmaghera** | **Content-gap**. | `/copy-of-contact-us-2` still only `160826B-0.jpg` / `160826B-1.jpg`. No `230826`. |
+
+**Next:** harvest after merge for the three fixed recipes. Leave the six
+content-gaps until the parish posts 23/08.
+
+**Parked:** none from this hunt.
+
+---
+
 ## 25/08/2026 — HTTP fetch: IPv4 first + expired-cert fallback
 
 **The real goal, in one sentence:** get Limavady’s already-known

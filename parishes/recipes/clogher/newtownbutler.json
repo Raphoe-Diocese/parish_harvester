@@ -4,33 +4,27 @@
   "display_name": "Newtownbutler (Galloon)",
   "diocese": "clogher",
   "start_url": "https://www.galloonparish.com/bulletin-1.html",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    "onewebmedia"
+  ],
   "playbook_type": "pdf_download_list",
   "timeout_ms": 55000,
   "total_timeout_s": 250,
-  "recorded_date": "2026-08-22",
+  "recorded_date": "2026-08-25",
   "steps": [
     {
       "action": "goto",
       "url": "https://www.galloonparish.com/bulletin-1.html"
-    },
-    {
-      "action": "click",
-      "selector": "a[href*='onewebmedia'][href$='.pdf']",
-      "pick_strategy": "newest_dated"
-    },
-    {
-      "action": "download",
-      "url_pattern": "*.pdf"
     }
   ],
   "operator_notes": [
-    "Listing /bulletin-1.html. Newest on 22/08/2026 is the 23rd August 2026 file S25C-1i26082010590.pdf (HTTP 200, 205065 bytes).",
-    "Many weekly files are hashed S25C-1i* names with no usable date in the URL — date is in the link text.",
-    "pick_strategy:newest_dated. Do not use http_scrape_newest_pdf here."
+    "Listing /bulletin-1.html. Newest on 25/08/2026 is link text 23rd August 2026 → hashed S25C-*.pdf (HTTP 200, 205065 bytes, application/pdf).",
+    "Hashed S25C names and 'Aug 16  2026.pdf' have no usable date in the URL — HTTP scrape scores the listing link text.",
+    "HTTPS certificate is expired — HTTP helper retries that URL once unverified. Do not pin a hash."
   ],
   "do_not": [
     "Do not pin a hashed S25C filename.",
-    "Do not use http_scrape_newest_pdf — hashed names have no date and Aug 16  2026.pdf does not parse.",
     "Do not harvest the homepage — bulletins live on /bulletin-1.html."
   ]
 }

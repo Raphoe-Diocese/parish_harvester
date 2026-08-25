@@ -13,6 +13,7 @@ from harvester.replay import (
     _best_scored_link_index,
     _decode_pdfemb_data_url,
     _extract_matching_hrefs,
+    _extract_matching_href_texts,
     _fetch_bytes_with_retries,
     _newest_dated_post_url_from_listing,
     _extract_mdocs_dated_downloads,
@@ -1419,6 +1420,130 @@ class LisnaskeaRecipeTests(unittest.TestCase):
             [self.THIS_WEEK, self.LAST_WEEK], date(2026, 8, 23)
         )
         self.assertTrue(scored)
+        best_date, best_url = max(scored)
+        self.assertEqual(best_date, date(2026, 8, 23))
+        self.assertEqual(best_url, self.THIS_WEEK)
+
+
+class NewtownbutlerRecipeTests(unittest.TestCase):
+    LISTING = "https://www.galloonparish.com/bulletin-1.html"
+    THIS_WEEK = (
+        "https://www.galloonparish.com/onewebmedia/S25C-1i26082010590.pdf"
+    )
+    LAST_WEEK = "https://www.galloonparish.com/onewebmedia/Aug 16  2026.pdf"
+    RECIPE = Path("parishes/recipes/clogher/newtownbutler.json")
+
+    def test_recipe_scrapes_listing_and_does_not_pin_hash(self) -> None:
+        raw = self.RECIPE.read_text(encoding="utf-8")
+        data = json.loads(raw)
+        self.assertEqual(data["site_type"], "http_scrape_newest_pdf")
+        self.assertEqual(data["start_url"], self.LISTING)
+        self.assertIn("onewebmedia", data.get("href_patterns") or [])
+        self.assertLessEqual(int(data.get("timeout_ms") or 0), 55000)
+        self.assertLessEqual(int(data.get("total_timeout_s") or 0), 250)
+        steps_blob = json.dumps(data.get("steps") or [])
+        self.assertNotIn("S25C-", data["start_url"])
+        self.assertNotIn("S25C-", steps_blob)
+        self.assertNotIn("do not use http_scrape", raw.lower())
+
+    def test_hashed_url_scores_from_link_text(self) -> None:
+        hrefs = [self.THIS_WEEK, self.LAST_WEEK]
+        labels = {
+            self.THIS_WEEK: "23rd August 2026",
+            self.LAST_WEEK: "16th August 2026",
+        }
+        self.assertFalse(_score_http_scrape_pdf_hrefs(hrefs, date(2026, 8, 23)))
+        scored = _score_http_scrape_pdf_hrefs(
+            hrefs, date(2026, 8, 23), labels=labels
+        )
+        self.assertTrue(scored)
+        best_date, best_url = max(scored)
+        self.assertEqual(best_date, date(2026, 8, 23))
+        self.assertEqual(best_url, self.THIS_WEEK)
+
+    def test_listing_html_pairs_link_text_with_hash(self) -> None:
+        html = (
+            '<a href="/onewebmedia/S25C-1i26082010590.pdf">23rd August 2026</a>'
+            '<a href="/onewebmedia/Aug 16  2026.pdf">16th August 2026</a>'
+        )
+        pairs = _extract_matching_href_texts(html, self.LISTING, ["onewebmedia"])
+        labels = {href: text for href, text in pairs}
+        self.assertEqual(labels[self.THIS_WEEK], "23rd August 2026")
+        scored = _score_http_scrape_pdf_hrefs(
+            [href for href, _text in pairs],
+            date(2026, 8, 23),
+            labels=labels,
+        )
+        self.assertEqual(max(scored)[1], self.THIS_WEEK)
+
+
+class AntrimRecipeTests(unittest.TestCase):
+    LISTING = "https://www.antrimparish.com/bulletinpage/"
+    THIS_WEEK = (
+        "https://www-static.antrimparish.com/wp-content/uploads/2026/08/"
+        "23rd-August-2026.pdf"
+    )
+    LAST_WEEK = (
+        "https://www-static.antrimparish.com/wp-content/uploads/2026/08/"
+        "16th-August-2026.pdf"
+    )
+    RECIPE = Path("parishes/recipes/down_and_connor/antrimparish.json")
+
+    def test_recipe_scrapes_listing_and_does_not_pin_dated_file(self) -> None:
+        raw = self.RECIPE.read_text(encoding="utf-8")
+        data = json.loads(raw)
+        self.assertEqual(data["site_type"], "http_scrape_newest_pdf")
+        self.assertEqual(data["start_url"], self.LISTING)
+        self.assertIn("uploads", data.get("href_patterns") or [])
+        self.assertLessEqual(int(data.get("timeout_ms") or 0), 300000)
+        self.assertLessEqual(int(data.get("total_timeout_s") or 0), 900)
+        steps_blob = json.dumps(data.get("steps") or [])
+        self.assertNotIn("23rd-August-2026.pdf", data["start_url"])
+        self.assertNotIn("23rd-August-2026.pdf", steps_blob)
+
+    def test_listing_scores_ordinal_filename(self) -> None:
+        scored = _score_http_scrape_pdf_hrefs(
+            [self.THIS_WEEK, self.LAST_WEEK], date(2026, 8, 23)
+        )
+        best_date, best_url = max(scored)
+        self.assertEqual(best_date, date(2026, 8, 23))
+        self.assertEqual(best_url, self.THIS_WEEK)
+
+
+class LoughshoreRecipeTests(unittest.TestCase):
+    THIS_WEEK = (
+        "https://www.loughshoreparishes.org/app/uploads/2026/08/"
+        "21st-Sunday-in-Ordinary-Time.pdf"
+    )
+    LAST_WEEK = (
+        "https://www.loughshoreparishes.org/app/uploads/2026/08/"
+        "20th-Sunday-in-Ordinary-Time.pdf"
+    )
+    RECIPE = Path("parishes/recipes/down_and_connor/loughshoreparishes.json")
+
+    def test_recipe_uses_wp_json_sunday_filter_not_20th_pin(self) -> None:
+        raw = self.RECIPE.read_text(encoding="utf-8")
+        data = json.loads(raw)
+        self.assertEqual(data["site_type"], "wp_json_newest_media")
+        self.assertIn("sunday-in-ordinary-time", data.get("href_patterns") or [])
+        self.assertLessEqual(int(data.get("timeout_ms") or 0), 55000)
+        self.assertLessEqual(int(data.get("total_timeout_s") or 0), 250)
+        steps_blob = json.dumps(data.get("steps") or [])
+        self.assertNotIn("20th-sunday", steps_blob.lower())
+        self.assertNotIn("21st-Sunday-in-Ordinary-Time.pdf", steps_blob)
+        self.assertFalse(
+            any(
+                str(step.get("action") or "") == "print_to_pdf"
+                for step in data.get("steps") or []
+                if isinstance(step, dict)
+            )
+        )
+
+    def test_21st_sunday_beats_20th(self) -> None:
+        scored = _score_http_scrape_pdf_hrefs(
+            [self.THIS_WEEK, self.LAST_WEEK],
+            date(2026, 8, 23),
+        )
         best_date, best_url = max(scored)
         self.assertEqual(best_date, date(2026, 8, 23))
         self.assertEqual(best_url, self.THIS_WEEK)

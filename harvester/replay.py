@@ -1645,6 +1645,55 @@ def _insecure_ssl_context() -> ssl.SSLContext:
     return ctx
 
 
+_A_HREF_WITH_TEXT_RE = re.compile(
+    r"""<a\b[^>]*\bhref=["']([^"']+)["'][^>]*>(.*?)</a>""",
+    re.IGNORECASE | re.DOTALL,
+)
+
+
+def _anchor_inner_text(inner: str) -> str:
+    text = re.sub(r"<[^>]+>", " ", inner or "")
+    return re.sub(r"\s+", " ", text).strip()
+
+
+def _extract_matching_href_texts(
+    html: str, base_url: str, keyword_patterns: list[str]
+) -> list[tuple[str, str]]:
+    """Return (absolute_href, link_text) pairs for matching listing links.
+
+    Hashed One.com files (Galloon / Newtownbutler ``S25C-*.pdf``) have no
+    date in the URL — the Sunday is only in the anchor text. Keep href-only
+    leftovers so PDF Embedder / bare ``href`` still scrape.
+    """
+    out: list[tuple[str, str]] = []
+    seen: set[str] = set()
+    patterns = [str(p).lower() for p in keyword_patterns if p]
+
+    def _want(href: str) -> bool:
+        if not patterns:
+            return False
+        blob = _href_match_blob(href)
+        return any(pat in blob for pat in patterns)
+
+    for href, inner in _A_HREF_WITH_TEXT_RE.findall(html or ""):
+        if not _want(href):
+            continue
+        absolute = urljoin(base_url, href)
+        if absolute in seen:
+            continue
+        seen.add(absolute)
+        out.append((absolute, _anchor_inner_text(inner)))
+    for href in re.findall(r"""href=["']([^"']+)["']""", html or "", re.IGNORECASE):
+        if not _want(href):
+            continue
+        absolute = urljoin(base_url, href)
+        if absolute in seen:
+            continue
+        seen.add(absolute)
+        out.append((absolute, ""))
+    return out
+
+
 def _extract_matching_hrefs(html: str, base_url: str, keyword_patterns: list[str]) -> list[str]:
     """Plain-regex href extraction (no bs4 dependency) for WAF-flaky sites where
     we fetch raw HTML via plain HTTP retries instead of a Playwright DOM."""
@@ -1669,18 +1718,39 @@ def _extract_matching_hrefs(html: str, base_url: str, keyword_patterns: list[str
 _HTTP_SCRAPE_AHEAD_DAYS = 7
 
 
+def _http_scrape_item_date(text: str, target_date: date) -> date | None:
+    """Date from a URL or listing-page label. Empty text is a miss."""
+    from .bulletin_freshness import extract_bulletin_date
+
+    blob = (text or "").strip()
+    if not blob:
+        return None
+    # Prefer the filename's own date over WordPress /uploads/YYYY/MM/
+    # folder dates — Malin uploads March bulletins into /2026/04/, and
+    # extract_bulletin_date then treats "29th-March" as 29/04.
+    return (
+        extract_date_from_string(blob)
+        or liturgical_date_from_text(
+            blob, year_hint_from_upload_url(blob, target_date.year)
+        )
+        or extract_bulletin_date(blob)
+        or yearless_slug_date(blob, target_date.year, near=target_date)
+    )
+
+
 def _score_http_scrape_pdf_hrefs(
     hrefs: list[str],
     target_date: date,
+    labels: dict[str, str] | None = None,
 ) -> list[tuple[date, str]]:
     """Rank listing-page PDF hrefs by extracted bulletin date.
 
     Drops non-bulletin URLs (Order of Mass, GDPR, …) and anything dated
     more than a week after the harvest Sunday. Yearless slugs such as
     Parish-Newsletter-Sunday-9th-August.pdf are dated with the harvest year.
+    When the URL has no date (hashed ``S25C-*.pdf``, ``Aug 16  2026.pdf``),
+    score the listing link text if one was passed.
     """
-    from .bulletin_freshness import extract_bulletin_date
-
     scored: list[tuple[date, str]] = []
     ahead = target_date + timedelta(days=_HTTP_SCRAPE_AHEAD_DAYS)
     for href in hrefs:
@@ -1689,17 +1759,9 @@ def _score_http_scrape_pdf_hrefs(
         path = urlparse(href).path.lower()
         if not path.endswith((".pdf", ".docx", ".doc", ".rtf")):
             continue
-        # Prefer the filename's own date over WordPress /uploads/YYYY/MM/
-        # folder dates — Malin uploads March bulletins into /2026/04/, and
-        # extract_bulletin_date then treats "29th-March" as 29/04.
-        found = (
-            extract_date_from_string(href)
-            or liturgical_date_from_text(
-                href, year_hint_from_upload_url(href, target_date.year)
-            )
-            or extract_bulletin_date(href)
-            or yearless_slug_date(href, target_date.year, near=target_date)
-        )
+        found = _http_scrape_item_date(href, target_date)
+        if not found and labels:
+            found = _http_scrape_item_date(labels.get(href, ""), target_date)
         if found and found <= ahead:
             scored.append((found, href))
     return scored
@@ -1764,8 +1826,12 @@ async def _try_http_scrape_newest_pdf(
         break
     if not listing_html:
         return None
-    hrefs = _extract_matching_hrefs(listing_html, listing_fetched_from, href_patterns)
-    scored = _score_http_scrape_pdf_hrefs(hrefs, target_date)
+    listing_pairs = _extract_matching_href_texts(
+        listing_html, listing_fetched_from, href_patterns
+    )
+    hrefs = [href for href, _text in listing_pairs]
+    labels = {href: text for href, text in listing_pairs if text}
+    scored = _score_http_scrape_pdf_hrefs(hrefs, target_date, labels=labels)
     if not scored:
         post_url = _newest_dated_post_url_from_listing(
             listing_html,
@@ -1795,8 +1861,12 @@ async def _try_http_scrape_newest_pdf(
             break
         if not post_html:
             return None
-        hrefs = _extract_matching_hrefs(post_html, post_fetched_from, href_patterns)
-        scored = _score_http_scrape_pdf_hrefs(hrefs, target_date)
+        post_pairs = _extract_matching_href_texts(
+            post_html, post_fetched_from, href_patterns
+        )
+        hrefs = [href for href, _text in post_pairs]
+        labels = {href: text for href, text in post_pairs if text}
+        scored = _score_http_scrape_pdf_hrefs(hrefs, target_date, labels=labels)
     if not scored:
         return None
     _best_date, pdf_url = max(scored)
