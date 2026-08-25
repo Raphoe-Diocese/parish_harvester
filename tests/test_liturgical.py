@@ -92,6 +92,12 @@ class LiturgicalCalendarTests(unittest.TestCase):
         )
         self.assertEqual(
             liturgical_date_from_text(
+                "21st-Suday-in-ordinary-time.png", 2026
+            ),
+            date(2026, 8, 23),
+        )
+        self.assertEqual(
+            liturgical_date_from_text(
                 "Sixteenth-Sunday-of-Ordinary-Time.pdf", 2026
             ),
             date(2026, 7, 19),
