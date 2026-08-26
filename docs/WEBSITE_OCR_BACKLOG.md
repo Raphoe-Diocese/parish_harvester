@@ -53,6 +53,8 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 
 ## Still open (do not pretend these are finished)
 
+- [ ] **doing** · 2026-08-26 · Phone Open PDF + gentle mega compress. Homepage Mega PDF is same-tab (no `target=_blank`). Viewer JS `?v=20260826a` paints stacked pages with page-scroll (`height:auto` / `overflow:visible` on `.pdf-inpage-pages` only; OCR stays locked 850/450). Phones strip `download`/`target` from mega PDF links and rename Download → Open PDF. Harvest runs Ghostscript `/ebook` after stitch (`harvester/pdf_compress.py`). This week's four megas are compressed in the same PR. **Not live yet** — wait for merge + Pages. Do not tick done until https://www.parishpress.ie/ mega PDFs are the new smaller bytes and a phone Open PDF stays in the same tab. · `docs/assets/pdf-inpage-viewer.js`, `harvester/pdf_compress.py`, `harvester/stitcher.py`, `docs/index.html`, `docs/mega_pdf/`
+
 - [ ] **todo** · 2026-08-24 · Single-parish OCR pages can trail the **next** parish's header. https://www.parishpress.ie/parishes/raphoe/gort-a-choirce.html ends with a bare `Inver` name + date after the Gortahork text. The diocese panel is now sliced on stitcher page boundaries (PR [#124](https://github.com/Raphoe-Diocese/parish_harvester/pull/124)); the per-parish page still keeps a trailing header from the following page. Small and cosmetic — do not reopen the header work for it. · `ocr/parish_pages.py`, `ocr/parish_splitter.py`
 
 - [x] **done** · 2026-08-24 · Gortahork (`gort-a-choirce`) OCR was empty (banner-only mega page, Irish image body never OCR'd). **Live-proved 24/08/2026** on https://www.parishpress.ie/parishes/raphoe/gort-a-choirce.html — body reads `POBAL CHRIOST RI` / `An tAth. Donnchadh Ó Baoill` / `AIFRINN NA SEACHTAINE` / `22.08 Satharn 7 i.n. Tom Dooley,Gort a' Choirce` / `BÁS LE GAIRID` / `CUIMHNEACHÁIN BÁIS`. Irish kept as Irish (`Ní bheidh aifreann`, `Buíochas don phobal`). Note the parish's own printed date is `16ú Lúnasa 2026` — that is a staleness question for the recipe row, not OCR. · `ocr/sparse_page_ocr.py`, `ocr/parish_splitter.py`, `ocr/parish_pages.py`
@@ -141,6 +143,6 @@ Spot-check generated CSS for:
 - `#ocr-search` comes **before** `class="az-row"` and `class="ocr-zoom-bar"` inside `<div id="panel-ocr"`, and the letters + text size sit in one `.ocr-controls-row` (Frank could not find the search box under them)
 - `scrollbar-gutter: stable` on `.pdf-inpage-pages` and `max-width: 100%` on `.pdf-inpage-page-slot`, or the first PDF page is sized before the scrollbar appears and the box grows a horizontal scrollbar
 - `.pdf-inpage-pages { overflow-x: hidden !important }` in **both** locked media blocks (their `overflow: auto !important` resets the axis) and `overflow: hidden` on `.pdf-link-layer`, or one off-page PDF link annotation stretches the box (Derry: `scrollWidth` 2988)
-- `/assets/pdf-inpage-viewer.js?v=20260824a` (cache-bust; live HTML stays older until harvest/OCR regenerates)
+- `/assets/pdf-inpage-viewer.js?v=20260826a` (cache-bust; live diocese HTML may still pin an older `?v=` until harvest/OCR regenerates — the asset file itself is what Pages serves)
 - `ocr-parish-masthead` / `ocr-parish-name` in the OCR panel
 - `getAnnotations` + `target="_blank"` in `docs/assets/pdf-inpage-viewer.js`

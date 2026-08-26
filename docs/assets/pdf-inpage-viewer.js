@@ -4,12 +4,13 @@
  * Phones cannot embed a raw PDF in <iframe> (sad-document icon). Desktop
  * Chrome/Edge iframes show a "Page X of Y" toolbar Frank asked to remove.
  * This script paints every page on stacked canvases with Mozilla PDF.js.
- * The visible PDF/OCR boxes are locked at 850px (450px on phones and short
- * screens — not merely on windows under 1025px wide); extra pages scroll
- * INSIDE those boxes. Open PDF / Download stay.
  *
- * Progressive load: disableAutoFetch + streaming + HTTP Range. Mega PDFs are
- * 14–20 MB; we must not wait for the whole file before showing page 1.
+ * PDF pages scroll with the page (height:auto / overflow:visible) so a phone
+ * is not stuck inside a locked 850px box. OCR stays a locked 850/450 box.
+ * Open PDF is same-tab on phones (no blank iPhone tab).
+ *
+ * Progressive load: disableAutoFetch + streaming + HTTP Range on desktop.
+ * Phones first try disableStream + disableRange, then a full-file retry.
  */
 (function () {
   if (window.__parishPressPdfInpage) return;
@@ -24,6 +25,34 @@
     "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js",
   ];
 
+  var paintPdfPage = null;
+
+  function isPhone() {
+    var ua = navigator.userAgent || "";
+    if (/Android/i.test(ua)) return true;
+    if (/iPhone|iPod/i.test(ua)) return true;
+    if (/iPad/i.test(ua)) return true;
+    if (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) return true;
+    return false;
+  }
+
+  function fixMobilePdfLinks() {
+    if (!isPhone()) return;
+    var nodes = document.querySelectorAll(
+      'a[href*="mega_bulletin.pdf"], a.mobile-jump-download, a.download-link, a.download-link-top, .pdf-inpage-backup a, .quiet-links a[href*=".pdf"]'
+    );
+    Array.prototype.forEach.call(nodes, function (a) {
+      if (!a || (a.className && String(a.className).indexOf("pdf-annot-link") !== -1)) return;
+      a.removeAttribute("download");
+      a.removeAttribute("target");
+      a.removeAttribute("rel");
+      var t = (a.textContent || "").replace(/\s+/g, " ").trim();
+      if (/^⬇?\s*Download(\s+PDF)?$/i.test(t)) {
+        a.textContent = "Open PDF";
+      }
+    });
+  }
+
   function ensureStyles() {
     var style = document.getElementById("pdf-inpage-viewer-style");
     if (!style) {
@@ -31,24 +60,27 @@
       style.id = "pdf-inpage-viewer-style";
       document.head.appendChild(style);
     }
-    /* !important so old HTML cannot stretch the page. Visible boxes stay
-       locked 850/450; extra content scrolls inside. */
+    /* PDF pages grow with the document (page scroll). OCR stays locked. */
     style.textContent =
-      ".pdf-inpage-viewer{display:flex!important;flex-direction:column;min-height:850px!important;flex:1 1 auto;background:#3a3f42;color:#e8eeed}" +
+      ".pdf-inpage-viewer{display:flex!important;flex-direction:column;min-height:850px!important;height:auto!important;flex:1 1 auto;background:#3a3f42;color:#e8eeed}" +
       ".pdf-inpage-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:8px;padding:8px 10px;background:#14524f;color:#fff;flex:0 0 auto}" +
       ".pdf-inpage-backup{display:flex;gap:8px;flex-wrap:wrap}" +
       ".pdf-inpage-backup a{color:#fff;font-weight:700;font-size:.85rem}" +
       ".pdf-inpage-status{padding:10px 12px;background:#1f3d3c;color:#d8f0ee;font-size:.9rem}" +
-      ".pdf-inpage-pages{box-sizing:border-box;flex:0 0 auto;height:850px!important;min-height:850px!important;max-height:850px!important;overflow:auto!important;overflow-y:auto!important;overflow-x:hidden!important;scrollbar-gutter:stable;background:#525659;padding:8px 0 16px}" +
+      ".pdf-inpage-pages{box-sizing:border-box;flex:0 0 auto;height:auto!important;min-height:850px!important;max-height:none!important;overflow:visible!important;overflow-y:visible!important;overflow-x:hidden!important;background:#525659;padding:8px 0 16px}" +
+      "#panel-pdf.az-expanded .pdf-inpage-pages{height:auto!important;min-height:850px!important;max-height:none!important;overflow:visible!important}" +
       "#ocr-panel{height:850px!important;min-height:850px!important;max-height:850px!important;overflow:auto!important;overflow-y:auto!important;scrollbar-gutter:stable}" +
       ".pdf-inpage-page-slot{margin:0 auto 10px;background:#3a3f42;min-height:180px;max-width:100%;position:relative}" +
       ".pdf-inpage-page-slot canvas{display:block;width:100%;height:auto;background:#fff}" +
       ".pdf-link-layer{position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden;pointer-events:none}" +
       ".pdf-annot-link{position:absolute;z-index:2;pointer-events:auto;background:rgba(26,107,107,0.08);border-radius:2px}" +
       ".pdf-annot-link:focus{outline:2px solid #1a6b6b;outline-offset:1px}" +
-      ".pdf-frame-wrap,.pdf-standalone-shell{display:flex;flex-direction:column}" +
+      ".pdf-frame-wrap,.pdf-standalone-shell{display:flex;flex-direction:column;height:auto!important;min-height:850px!important;overflow:visible!important}" +
       ".pdf-frame-wrap iframe,.pdf-standalone-shell iframe.pdf-frame," +
       "body.is-native-pdf iframe.pdf-frame{display:none!important;height:850px!important;min-height:850px!important;max-height:850px!important}" +
+      ".pdf-frame-wrap.is-iframe-fallback iframe," +
+      ".pdf-standalone-shell.is-iframe-fallback iframe.pdf-frame," +
+      "body.is-iframe-fallback iframe.pdf-frame{display:block!important}" +
       ".pdf-frame-wrap.is-native-pdf,.pdf-standalone-shell.is-native-pdf," +
       "body.is-native-pdf .pdf-standalone-shell{" +
       "display:flex;flex-direction:column;min-height:850px!important;background:#3a3f42}" +
@@ -64,32 +96,24 @@
       "body.is-native-pdf .pdf-standalone-shell{" +
       "min-height:450px!important}" +
       ".pdf-inpage-viewer{min-height:450px!important}" +
-      ".pdf-inpage-pages,#ocr-panel,.pdf-frame-wrap iframe," +
+      ".pdf-inpage-pages{height:auto!important;min-height:450px!important;max-height:none!important;overflow:visible!important}" +
+      "#panel-pdf.az-expanded .pdf-inpage-pages{height:auto!important;min-height:450px!important;max-height:none!important;overflow:visible!important}" +
+      "#ocr-panel,.pdf-frame-wrap iframe," +
       ".pdf-standalone-shell iframe.pdf-frame{height:450px!important;min-height:450px!important;max-height:450px!important;overflow:auto!important;overflow-y:auto!important}" +
       ".pdf-inpage-pages{overflow-x:hidden!important}" +
-      /* "Tap to enlarge" grows ONLY the panel the reader tapped (extra id
-         specificity beats the 450 lock above). The other panel stays 450 so a
-         phone never shows two 850px boxes at once. */
       "#panel-pdf.az-expanded .pdf-frame-wrap,#panel-pdf.az-expanded .pdf-inpage-viewer{min-height:850px!important}" +
-      "#panel-pdf.az-expanded .pdf-frame-wrap iframe,#panel-pdf.az-expanded .pdf-inpage-pages," +
       "#panel-ocr.az-expanded #ocr-panel{height:850px!important;min-height:850px!important;max-height:850px!important}" +
       "}" +
-      /* The 450 lock above is width-only, so a half-screen window, Windows
-         display scaling or browser zoom handed a desktop reader the phone box.
-         Wider than the phone layout (700px) and taller than a phone in
-         landscape (500px) means desktop: keep the locked 850px. Last block
-         wins, so this beats the max-width:1024px lock. */
       "@media (min-width:701px) and (min-height:501px){" +
       ".pdf-frame-wrap,.pdf-standalone-shell," +
       ".pdf-frame-wrap.is-native-pdf,.pdf-standalone-shell.is-native-pdf," +
       "body.is-native-pdf .pdf-standalone-shell,.pdf-inpage-viewer," +
       ".pdf-mobile-fallback{min-height:850px!important}" +
-      ".pdf-inpage-pages,#ocr-panel,.pdf-frame-wrap iframe," +
+      ".pdf-inpage-pages{height:auto!important;min-height:850px!important;max-height:none!important;overflow:visible!important}" +
+      "#panel-pdf.az-expanded .pdf-inpage-pages{height:auto!important;min-height:850px!important;max-height:none!important;overflow:visible!important}" +
+      "#ocr-panel,.pdf-frame-wrap iframe," +
       ".pdf-standalone-shell iframe.pdf-frame{height:850px!important;min-height:850px!important;" +
       "max-height:850px!important;overflow:auto!important;overflow-y:auto!important}" +
-      /* `overflow: auto` resets both axes, so re-hide the horizontal one: a
-         single stray PDF link annotation off the right edge of a page used to
-         give the whole box a horizontal scrollbar. */
       ".pdf-inpage-pages{overflow-x:hidden!important}" +
       ".az-expand{display:none}" +
       "}";
@@ -104,7 +128,7 @@
     document.documentElement.classList.toggle("is-ocr-searching", active);
   }
 
-  function ensureStickySearch() {
+  function ensureOcrStickyChrome() {
     var chrome = document.querySelector(".ocr-sticky-chrome");
     var zoom = document.querySelector(".ocr-zoom-bar");
     var bar = document.querySelector(".ocr-search-bar");
@@ -118,9 +142,6 @@
       }
     }
     if (chrome) {
-      // Search first. Pages generated before 24/08/2026 put the letter row and
-      // the text-size bar above it, so the search box was four rows down and
-      // readers could not find it.
       if (bar) chrome.insertBefore(bar, chrome.firstChild);
       if (tools) {
         if (bar) chrome.insertBefore(tools, bar.nextSibling);
@@ -133,6 +154,10 @@
       }
     }
     syncOcrSearchSticky();
+  }
+
+  function ensureStickySearch() {
+    ensureOcrStickyChrome();
   }
 
   document.addEventListener(
@@ -217,17 +242,18 @@
   }
 
   window.parishPressScrollPdfToPage = function (pageNum) {
+    if (typeof paintPdfPage === "function") {
+      paintPdfPage(pageNum);
+    }
     var pagesEl = document.querySelector(".pdf-inpage-pages");
     if (!pagesEl) return;
     var slot = pagesEl.querySelector('[data-page="' + pageNum + '"]');
     if (!slot) return;
-    var boxRect = pagesEl.getBoundingClientRect();
-    var elRect = slot.getBoundingClientRect();
-    var top = pagesEl.scrollTop + (elRect.top - boxRect.top) - 8;
-    if (pagesEl.scrollTo) {
-      pagesEl.scrollTo({ top: Math.max(0, top), behavior: "smooth" });
-    } else {
-      pagesEl.scrollTop = Math.max(0, top);
+    try {
+      slot.scrollIntoView({ block: "start", behavior: "smooth" });
+    } catch (e) {
+      var top = (window.scrollY || window.pageYOffset || 0) + slot.getBoundingClientRect().top - 8;
+      window.scrollTo(0, Math.max(0, top));
     }
   };
 
@@ -298,22 +324,24 @@
       '<div class="pdf-inpage-backup">' +
       '<a href="' +
       pdfUrl.replace(/"/g, "&quot;") +
-      '" target="_blank" rel="noopener noreferrer">Open PDF</a>' +
+      '">Open PDF</a>' +
       '<a href="' +
       pdfUrl.replace(/"/g, "&quot;") +
-      '" download>Download</a>' +
+      '">Download</a>' +
       "</div></div>" +
       '<div class="pdf-inpage-status">Showing first page…</div>' +
       '<div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>';
     if (typeof window.parishPressBindScrollTopBoxes === "function") {
       window.parishPressBindScrollTopBoxes();
     }
+    fixMobilePdfLinks();
     return host;
   }
 
   function unloadIframe(wrap) {
     if (!wrap) return;
     wrap.classList.add("is-native-pdf");
+    wrap.classList.remove("is-iframe-fallback");
     var iframe = wrap.querySelector("iframe");
     if (iframe) {
       iframe.setAttribute("hidden", "");
@@ -321,6 +349,24 @@
         iframe.removeAttribute("src");
       } catch (e) {}
     }
+  }
+
+  function restoreNativeIframe(host, pdfUrl) {
+    if (isPhone()) return;
+    var wrap =
+      (host && host.closest && (host.closest(".pdf-frame-wrap") || host.closest(".pdf-standalone-shell"))) ||
+      document.querySelector(".pdf-frame-wrap") ||
+      document.querySelector(".pdf-standalone-shell");
+    if (!wrap) return;
+    wrap.classList.add("is-iframe-fallback");
+    wrap.classList.remove("is-native-pdf");
+    document.body.classList.add("is-iframe-fallback");
+    var iframe = wrap.querySelector("iframe");
+    if (!iframe) return;
+    iframe.removeAttribute("hidden");
+    try {
+      iframe.src = pdfUrl;
+    } catch (e) {}
   }
 
   function overlayPageLinks(page, slot, cssWidth) {
@@ -377,6 +423,7 @@
     var unscaled = page.getViewport({ scale: 1 });
     var cssWidth = Math.max(240, width || slot.clientWidth || 320);
     var dpr = window.devicePixelRatio || 1;
+    dpr = isPhone() ? Math.min(dpr, 1) : Math.min(dpr, 2);
     var scale = (cssWidth / unscaled.width) * dpr;
     var viewport = page.getViewport({ scale: scale });
     var canvas = slot.querySelector("canvas") || document.createElement("canvas");
@@ -393,6 +440,33 @@
       .promise.then(function () {
         return overlayPageLinks(page, slot, cssWidth);
       });
+  }
+
+  function openPdfDocument(pdfjsLib, pdfUrl) {
+    var phone = isPhone();
+    var first = phone
+      ? { url: pdfUrl, disableAutoFetch: true, disableStream: true, disableRange: true }
+      : {
+          url: pdfUrl,
+          disableAutoFetch: true,
+          disableStream: false,
+          disableRange: false,
+          rangeChunkSize: 65536,
+        };
+    return pdfjsLib.getDocument(first).promise.catch(function (err) {
+      if (!phone) throw err;
+      return fetch(pdfUrl, { credentials: "same-origin" }).then(function (res) {
+        if (!res.ok) throw new Error("PDF fetch " + res.status);
+        return res.arrayBuffer();
+      }).then(function (buf) {
+        return pdfjsLib.getDocument({
+          data: new Uint8Array(buf),
+          disableAutoFetch: true,
+          disableStream: true,
+          disableRange: true,
+        }).promise;
+      });
+    });
   }
 
   function startViewer(host, pdfUrl) {
@@ -431,39 +505,52 @@
       return rendering[num];
     }
 
+    paintPdfPage = paint;
+
     function stackAllPages() {
       if (!pdfDoc) return;
       var n;
       for (n = 1; n <= pdfDoc.numPages; n++) ensureSlot(n);
-      var next = 1;
-      function paintNext() {
-        if (next > pdfDoc.numPages) return;
-        var num = next++;
-        paint(num).then(paintNext);
-      }
-      paintNext();
+      paint(1).then(function () {
+        setStatus(host, "");
+        if (!window.IntersectionObserver) {
+          var next = 2;
+          function paintNext() {
+            if (next > pdfDoc.numPages) return;
+            var num = next++;
+            paint(num).then(paintNext);
+          }
+          paintNext();
+          return;
+        }
+        var io = new IntersectionObserver(
+          function (entries) {
+            entries.forEach(function (entry) {
+              if (!entry.isIntersecting) return;
+              var num = parseInt(entry.target.getAttribute("data-page"), 10);
+              if (num) paint(num);
+            });
+          },
+          { root: null, rootMargin: "900px 0px", threshold: 0.01 }
+        );
+        for (n = 2; n <= pdfDoc.numPages; n++) io.observe(ensureSlot(n));
+      });
     }
 
     setStatus(host, "Showing first page…");
     loadPdfJs()
       .then(function (pdfjsLib) {
-        return pdfjsLib.getDocument({
-          url: pdfUrl,
-          disableAutoFetch: true,
-          disableStream: false,
-          disableRange: false,
-          rangeChunkSize: 65536,
-        }).promise;
+        return openPdfDocument(pdfjsLib, pdfUrl);
       })
       .then(function (pdf) {
         pdfDoc = pdf;
-        setStatus(host, "");
         stackAllPages();
       })
       .catch(function (err) {
         console.warn("PDF.js failed", err);
         setStatus(host, "Could not show the PDF here. Use Open PDF or Download.", true);
         host.setAttribute("data-pdf-started", "0");
+        if (!isPhone()) restoreNativeIframe(host, pdfUrl);
       });
   }
 
@@ -485,8 +572,9 @@
 
   function run() {
     ensureStyles();
-    ensureStickySearch();
+    ensureOcrStickyChrome();
     ensureScrollTop();
+    fixMobilePdfLinks();
 
     document.querySelectorAll(".pdf-frame-wrap").forEach(function (wrap) {
       activateWrap(wrap, resolvePdfUrl(wrap));
