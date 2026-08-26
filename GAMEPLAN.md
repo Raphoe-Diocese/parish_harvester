@@ -17,6 +17,20 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 26/08/2026 — Phone Open PDF + gentle mega compress
+
+**The real goal, in one sentence:** phones can open this week's mega PDF in the same tab, and the four live files are smaller after Pages.
+
+Harvest still builds the mega PDF (`HARVEST_MEGA_PDF=1`). Ghostscript `/ebook` runs after stitch; same page count or the original file is kept. Irish stays Irish. Dates DD/MM/YYYY. No full harvest. No regenerate-all `docs/`.
+
+**Not live yet.** parishpress.ie still has the old 10–19 MB files until this PR merges and Pages deploys.
+
+**Next:** merge, wait for Pages, then check the four `/mega_pdf/*_mega_bulletin.pdf` sizes and a phone same-tab Open PDF.
+
+**Parked:** none from this job.
+
+---
+
 ## 25/08/2026 — Heading checker: date on the line next to newsletter
 
 **The real goal, in one sentence:** if the masthead date sits on the line

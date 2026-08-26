@@ -1192,7 +1192,7 @@ def prefers_native_pdf_js() -> str:
 """
 
 
-PDF_INPAGE_VIEWER_VERSION = "20260824a"
+PDF_INPAGE_VIEWER_VERSION = "20260826a"
 PDF_INPAGE_VIEWER_SRC = f"/assets/pdf-inpage-viewer.js?v={PDF_INPAGE_VIEWER_VERSION}"
 
 
@@ -1374,7 +1374,7 @@ def pdf_inpage_viewer_html(pdf_href: str) -> str:
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="{safe}">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="{safe}" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="{safe}">Open PDF</a>
               <a href="{safe}" download>Download</a>
             </div>
           </div>
@@ -1517,7 +1517,7 @@ def render_pdf_standalone_page(config: DioceseConfig, bulletin_date: str, pdf_hr
       <a class="back-link" href="{html.escape(viewer_href, quote=True)}" target="_blank" rel="noopener noreferrer">← Viewer</a>
       <span class="title-line">{html.escape(diocese_label)} · {html.escape(uk_bulletin_date)}</span>
     </div>
-    <a class="download-link" href="{safe_pdf}" target="_blank" rel="noopener noreferrer" download>⬇ Download PDF</a>
+    <a class="download-link" href="{safe_pdf}">Open PDF</a>
   </div>
   <div class="pdf-standalone-shell">
     <iframe class="pdf-frame" src="{safe_pdf}" title="{html.escape(config.display_name)} bulletin PDF"></iframe>
@@ -2346,13 +2346,13 @@ def render_bulletin_viewer_shell(
       <p class="diocese-label">{html.escape(diocese_label)}</p>
       <h1>{html.escape(headline)}</h1>
       <p class="meta">{html.escape(meta_line)}</p>
-      <a class="download-link-top" href="{html.escape(pdf_download_href, quote=True)}" {blank} download>Download PDF</a>
+      <a class="download-link-top" href="{html.escape(pdf_download_href, quote=True)}">Download PDF</a>
     </header>
     {intro_html}
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="{html.escape(pdf_download_href, quote=True)}" {blank} download>Download PDF</a>
+      <a class="mobile-jump-download" href="{html.escape(pdf_download_href, quote=True)}">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>

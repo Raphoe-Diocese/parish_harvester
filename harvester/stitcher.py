@@ -337,6 +337,12 @@ def stitch_mega_pdf(
         output_path.parent.mkdir(parents=True, exist_ok=True)
         with output_path.open("wb") as fh:
             merger.write(fh)
+        try:
+            from harvester.pdf_compress import compress_pdf_inplace
+
+            compress_pdf_inplace(output_path)
+        except Exception as exc:
+            print(f"     ⚠️  Mega PDF compress skipped: {exc}")
         index_payload = {
             "date": target.isoformat(),
             "pdf": output_path.name,
