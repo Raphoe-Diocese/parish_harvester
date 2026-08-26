@@ -25,7 +25,7 @@ PR #139 merged (`f939336b`) and Pages deploy 33021078771 succeeded, but the live
 
 **This turn:** skip that harvest-artifact download when committed `*_mega_bulletin.pdf` files exist; always copy `docs/mega_pdf` last (overwrite). Mega PDF stays on. No docs regenerate.
 
-**Not live until** HEAD https://www.parishpress.ie/mega_pdf/raphoe_mega_bulletin.pdf is 6,383,586 bytes.
+**Live-proved 26/08/2026** after PR [#140](https://github.com/Raphoe-Diocese/parish_harvester/pull/140) squash-merge `a1682ec4` + Pages run [33021470980](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/33021470980) success. HEAD https://www.parishpress.ie/mega_pdf/raphoe_mega_bulletin.pdf is **6,383,586** bytes (`Last-Modified: Wed, 26 Aug 2026 22:57:50 GMT`). Before this deploy it was 17,525,750.
 
 ---
 
@@ -35,9 +35,9 @@ PR #139 merged (`f939336b`) and Pages deploy 33021078771 succeeded, but the live
 
 Harvest still builds the mega PDF (`HARVEST_MEGA_PDF=1`). Ghostscript `/ebook` runs after stitch; same page count or the original file is kept. Irish stays Irish. Dates DD/MM/YYYY. No full harvest. No regenerate-all `docs/`.
 
-**Not live yet.** parishpress.ie still has the old 10–19 MB files until this PR merges and Pages deploys.
+**Smaller mega bytes are live 26/08/2026** (PR #140 + Pages 33021470980). Raphoe HEAD is 6,383,586. Phone same-tab Open PDF not watched this turn.
 
-**Next:** merge, wait for Pages, then check the four `/mega_pdf/*_mega_bulletin.pdf` sizes and a phone same-tab Open PDF.
+**Next:** watch a phone Open PDF staying in the same tab. Do not tick the phone row done until that.
 
 **Parked:** none from this job.
 
