@@ -127,6 +127,10 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p _harvest_artifacts
+          if find docs/mega_pdf -maxdepth 1 -type f -name '*_mega_bulletin.pdf' 2>/dev/null | grep -q .; then
+            echo "Using committed docs/mega_pdf — skip stale harvest artifacts"
+            exit 0
+          fi
           if find _harvest_artifacts -type f -name '*_mega_bulletin.pdf' | grep -q .; then
             echo "Mega PDFs already present from the triggering harvest run"
             exit 0
@@ -169,9 +173,7 @@ jobs:
           if [ -d docs/mega_pdf ]; then
             while IFS= read -r -d '' pdf; do
               dest="mega_pdf/$(basename "${pdf}")"
-              if [ ! -e "${dest}" ]; then
-                cp "${pdf}" "${dest}"
-              fi
+              cp "${pdf}" "${dest}"
             done < <(find docs/mega_pdf -maxdepth 1 -type f -name '*_mega_bulletin.pdf' -print0 2>/dev/null || true)
           fi
 
