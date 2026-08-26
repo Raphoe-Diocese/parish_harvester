@@ -17,6 +17,18 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 26/08/2026 — Pages must publish committed mega PDFs
+
+**The real goal, in one sentence:** parishpress.ie must serve the smaller files already in `docs/mega_pdf`, not leftover fat harvest artifacts.
+
+PR #139 merged (`f939336b`) and Pages deploy 33021078771 succeeded, but the live mega PDFs stayed 16–18 MB. Two lines in `deploy-pages.yml`: the “latest harvest” download always ran, and Verify copied artifacts first then only copied `docs/mega_pdf` when dest was missing.
+
+**This turn:** skip that harvest-artifact download when committed `*_mega_bulletin.pdf` files exist; always copy `docs/mega_pdf` last (overwrite). Mega PDF stays on. No docs regenerate.
+
+**Not live until** HEAD https://www.parishpress.ie/mega_pdf/raphoe_mega_bulletin.pdf is 6,383,586 bytes.
+
+---
+
 ## 26/08/2026 — Phone Open PDF + gentle mega compress
 
 **The real goal, in one sentence:** phones can open this week's mega PDF in the same tab, and the four live files are smaller after Pages.
