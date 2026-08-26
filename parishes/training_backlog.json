@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-08-25",
+  "generated_at": "2026-08-26",
   "target_date": "2026-08-23",
   "summary": {
     "downloaded": 104,
@@ -126,19 +126,27 @@
       "recipe_file": "parishes/recipes/down_and_connor/antrimparish.json",
       "recipe": {
         "start_url": "https://www.antrimparish.com/bulletinpage/",
-        "site_type": "",
-        "playbook_type": "",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-08-16"
+        "has_terminal": false,
+        "operator_notes": [
+          "Listing /bulletinpage/ embeds dated PDFs on www-static via PDF Embedder.",
+          "CONFIRMED 2026-08-25: https://www-static.antrimparish.com/wp-content/uploads/2026/08/23rd-August-2026.pdf HTTP 200, 355100 bytes, application/pdf.",
+          "Playwright times out (ERR_CONNECTION_TIMED_OUT). site_type:http_scrape_newest_pdf uses the shared IPv4 + expired-cert HTTP helper.",
+          "Do not pin a dated filename."
+        ],
+        "do_not": [
+          "Do not pin a dated filename.",
+          "Do not harvest Volunteer-EOI-form.pdf."
+        ],
+        "recorded_date": "2026-08-25"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": {
         "navigation_timeout_ms": 90000,
@@ -1593,19 +1601,29 @@
       "recipe_file": "parishes/recipes/down_and_connor/derriaghycatholicparish.json",
       "recipe": {
         "start_url": "https://derriaghycatholicparish.com/?page_id=262",
-        "site_type": "",
-        "playbook_type": "",
+        "site_type": "http_scrape_newest_images",
+        "playbook_type": "stacked_image_bulletin",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
         "has_terminal": true,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-08-19"
+        "operator_notes": [
+          "Weekly bulletin is a full-page PNG on /?page_id=262. Filenames use the liturgical Sunday and the parish typo Suday (19th-Suday-in-ordinary-time.png = 09/08/2026; 21st-Suday-in-ordinary-time.png = 23/08/2026).",
+          "Proved 25/08/2026: listing HTTP 200. This-week original https://derriaghycatholicparish.com/wp-content/uploads/2026/08/21st-Suday-in-ordinary-time.png HTTP 200 image/png 448089 bytes Last-Modified Mon 24 Aug 2026. Liturgical map 21st Sunday in Ordinary Time \u2192 23/08/2026. Resized -724x1024 twin also 200.",
+          "site_type:http_scrape_newest_images \u2014 Playwright page.goto of the listing timed out on harvest (do not raise timeouts). Plain HTTP scrape of the listing picks the newest Suday / ordinary-time / Bulletin_ image. Never pin 19th-Suday or 21st-Suday.",
+          "Do not invent a 20th-Sunday file \u2014 that filename 404'd on 25/08/2026. 21st_Sunday_OT_2026.png is a same-day extra scan with no liturgical day in the scorer (folder day 1); href_patterns skip it."
+        ],
+        "do_not": [
+          "Do not pin a dated Suday filename \u2014 it goes stale every week.",
+          "Do not raise timeout_ms / total_timeout_s.",
+          "Do not Save page as PDF \u2014 that captures every old letter on the listing.",
+          "Do not open Playwright on this One.com listing when HTTP scrape can read the images."
+        ],
+        "recorded_date": "2026-08-25"
       },
-      "bulletin_format": "image",
+      "bulletin_format": "image_stack",
       "learned_pattern": "WordPress permanent bulletin page (wp-block-file)",
       "host_profile": {
         "navigation_timeout_ms": 180000,
@@ -3639,26 +3657,28 @@
       "recipe_file": "parishes/recipes/down_and_connor/loughshoreparishes.json",
       "recipe": {
         "start_url": "https://www.loughshoreparishes.org/sunday-bulletin/",
-        "site_type": "html_text_bulletin",
-        "playbook_type": "wix_html",
+        "site_type": "wp_json_newest_media",
+        "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 2,
-        "click_count": 1,
-        "has_terminal": true,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
         "operator_notes": [
-          "Bulletin text is on the web page \u2014 not a downloadable PDF file.",
-          "Use Save page as PDF on the newsletter article page.",
-          "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
+          "Weekly file is app/uploads/.../Nth-Sunday-in-Ordinary-Time.pdf. 21st Sunday in Ordinary Time = 23/08/2026.",
+          "CONFIRMED 2026-08-25: https://www.loughshoreparishes.org/app/uploads/2026/08/21st-Sunday-in-Ordinary-Time.pdf HTTP 200, 4513290 bytes, application/pdf. Listing article /21st-sunday-in-ordinary-time-4/ serves the same PDF.",
+          "wp-json /wp/v2/media also lists DC-Vocations-Newsletter.pdf \u2014 href_patterns must stay sunday-in-ordinary-time.",
+          "Do not pin 20th Sunday or a dated filename. Skip Playwright / print_to_pdf."
         ],
         "do_not": [
-          "Do not use Pick bulletin image when the page is mostly text paragraphs.",
-          "Do not stop at click-only \u2014 need print_to_pdf as the final step."
+          "Do not pin 20th Sunday in Ordinary Time.",
+          "Do not download DC-Vocations-Newsletter.pdf or Safeguarding PDFs.",
+          "Do not print_to_pdf the listing."
         ],
-        "recorded_date": "2026-08-19"
+        "recorded_date": "2026-08-25"
       },
-      "bulletin_format": "html",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -4049,27 +4069,26 @@
       "recipe_file": "parishes/recipes/clogher/newtownbutler.json",
       "recipe": {
         "start_url": "https://www.galloonparish.com/bulletin-1.html",
-        "site_type": "",
+        "site_type": "http_scrape_newest_pdf",
         "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 3,
-        "click_count": 1,
-        "has_terminal": true,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
         "operator_notes": [
-          "Listing /bulletin-1.html. Newest on 22/08/2026 is the 23rd August 2026 file S25C-1i26082010590.pdf (HTTP 200, 205065 bytes).",
-          "Many weekly files are hashed S25C-1i* names with no usable date in the URL \u2014 date is in the link text.",
-          "pick_strategy:newest_dated. Do not use http_scrape_newest_pdf here."
+          "Listing /bulletin-1.html. Newest on 25/08/2026 is link text 23rd August 2026 \u2192 hashed S25C-*.pdf (HTTP 200, 205065 bytes, application/pdf).",
+          "Hashed S25C names and 'Aug 16  2026.pdf' have no usable date in the URL \u2014 HTTP scrape scores the listing link text.",
+          "HTTPS certificate is expired \u2014 HTTP helper retries that URL once unverified. Do not pin a hash."
         ],
         "do_not": [
           "Do not pin a hashed S25C filename.",
-          "Do not use http_scrape_newest_pdf \u2014 hashed names have no date and Aug 16  2026.pdf does not parse.",
           "Do not harvest the homepage \u2014 bulletins live on /bulletin-1.html."
         ],
-        "recorded_date": "2026-08-22"
+        "recorded_date": "2026-08-25"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": {
         "navigation_timeout_ms": 45000,
