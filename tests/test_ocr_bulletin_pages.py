@@ -658,13 +658,15 @@ class OcrBulletinPageTests(unittest.TestCase):
         run_idx = text.find("function run()")
         load_in_run = text.find("loadPdfJs()", run_idx)
         self.assertGreater(load_in_run, run_idx)
+        open_idx = text.find("function openPdfDocument")
         start_idx = text.find("function startViewer")
-        get_idx = text.find("getDocument", start_idx)
+        self.assertGreater(open_idx, 0)
         self.assertGreater(start_idx, 0)
-        self.assertGreater(get_idx, start_idx)
-        gate = text[start_idx:get_idx]
-        self.assertNotIn("data-pdf-tapped", gate)
-        self.assertNotIn("armPhoneTapToLoad", gate)
+        self.assertIn("getDocument", text[open_idx:start_idx] if open_idx < start_idx else text[open_idx:])
+        start_fn = text[start_idx:]
+        self.assertIn("openPdfDocument", start_fn)
+        self.assertNotIn("data-pdf-tapped", start_fn)
+        self.assertNotIn("armPhoneTapToLoad", start_fn)
         self.assertRegex(
             compact,
             r"\.pdf-frame-wrap[^{]*\{[^}]*overflow:hidden",
