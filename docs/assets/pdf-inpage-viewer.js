@@ -9,8 +9,9 @@
  * is not stuck inside a locked 850px box. OCR stays a locked 850/450 box.
  * Open PDF is same-tab on phones (no blank iPhone tab).
  *
- * Progressive load: disableAutoFetch + streaming + HTTP Range on desktop.
- * Phones first try disableStream + disableRange, then a full-file retry.
+ * Progressive load uses streaming + HTTP Range on phone and desktop so page 1
+ * can show before the whole mega arrives. If Range fails, fall back to a
+ * full-file load. Do not restore iframe on iPhone.
  */
 (function () {
   if (window.__parishPressPdfInpage) return;
@@ -443,18 +444,14 @@
   }
 
   function openPdfDocument(pdfjsLib, pdfUrl) {
-    var phone = isPhone();
-    var first = phone
-      ? { url: pdfUrl, disableAutoFetch: true, disableStream: true, disableRange: true }
-      : {
-          url: pdfUrl,
-          disableAutoFetch: true,
-          disableStream: false,
-          disableRange: false,
-          rangeChunkSize: 65536,
-        };
-    return pdfjsLib.getDocument(first).promise.catch(function (err) {
-      if (!phone) throw err;
+    var first = {
+      url: pdfUrl,
+      disableAutoFetch: true,
+      disableStream: false,
+      disableRange: false,
+      rangeChunkSize: 65536,
+    };
+    return pdfjsLib.getDocument(first).promise.catch(function () {
       return fetch(pdfUrl, { credentials: "same-origin" }).then(function (res) {
         if (!res.ok) throw new Error("PDF fetch " + res.status);
         return res.arrayBuffer();
