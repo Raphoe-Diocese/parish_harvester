@@ -8,6 +8,14 @@ from harvester.pdf_compress import compress_pdf_inplace
 
 
 class PdfCompressTests(unittest.TestCase):
+    def test_ghostscript_cmd_downsamples_and_linearizes(self) -> None:
+        from harvester.pdf_compress import _ghostscript_cmd
+
+        cmd = " ".join(_ghostscript_cmd("gs", Path("in.pdf"), Path("out.pdf")))
+        self.assertIn("-dFastWebView=true", cmd)
+        self.assertIn("-dColorImageResolution=100", cmd)
+        self.assertIn("-dGrayImageResolution=100", cmd)
+
     def test_missing_file_returns_false(self) -> None:
         self.assertFalse(compress_pdf_inplace("/tmp/does-not-exist-pp-mega.pdf"))
 

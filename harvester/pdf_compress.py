@@ -1,9 +1,10 @@
-"""Gentle mega-PDF shrink so phones are not pulling 14–20 MB.
+"""Shrink mega-PDFs for phones and linearize so page 1 can stream first.
 
-Keeps the same page count. Prefers Ghostscript ``/ebook`` (~150 dpi) when
-``gs`` is installed (GitHub Actions). Falls back to PyMuPDF deflate + JPEG
-recompress of large images. Never replaces the file if the result is bigger,
-invalid, or a different number of pages.
+Keeps the same page count. Prefers Ghostscript ``/ebook`` at ~100 dpi with
+``-dFastWebView=true`` (linearize) when ``gs`` is installed (GitHub Actions).
+Falls back to PyMuPDF deflate + JPEG recompress of large images. Never
+replaces the file if the result is bigger, invalid, or a different number
+of pages.
 """
 from __future__ import annotations
 
@@ -40,24 +41,41 @@ def _ghostscript_bin() -> str | None:
     return None
 
 
-def _run_ghostscript(src: Path, dest: Path) -> bool:
-    bin_name = _ghostscript_bin()
-    if not bin_name:
-        return False
-    dest.parent.mkdir(parents=True, exist_ok=True)
-    cmd = [
+def _ghostscript_cmd(bin_name: str, src: Path, dest: Path) -> list[str]:
+    return [
         bin_name,
         "-sDEVICE=pdfwrite",
         "-dCompatibilityLevel=1.4",
         "-dPDFSETTINGS=/ebook",
+        "-dDownsampleColorImages=true",
+        "-dDownsampleGrayImages=true",
+        "-dColorImageDownsampleType=/Bicubic",
+        "-dGrayImageDownsampleType=/Bicubic",
+        "-dColorImageResolution=100",
+        "-dGrayImageResolution=100",
+        "-dFastWebView=true",
         "-dNOPAUSE",
         "-dQUIET",
         "-dBATCH",
         f"-sOutputFile={dest}",
         str(src),
     ]
+
+
+def _run_ghostscript(src: Path, dest: Path) -> bool:
+    bin_name = _ghostscript_bin()
+    if not bin_name:
+        return False
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    cmd = _ghostscript_cmd(bin_name, src, dest)
     try:
-        subprocess.run(cmd, check=True, timeout=180)
+        subprocess.run(
+            cmd,
+            check=True,
+            timeout=300,
+            stdout=subprocess.DEVNULL,
+            stderr=subprocess.DEVNULL,
+        )
     except (OSError, subprocess.SubprocessError):
         return False
     return dest.is_file() and dest.stat().st_size > 0
