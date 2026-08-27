@@ -5,13 +5,14 @@
  * Chrome/Edge iframes show a "Page X of Y" toolbar Frank asked to remove.
  * This script paints every page on stacked canvases with Mozilla PDF.js.
  *
- * Desktop PDF is a locked 850px box with inner scroll, not every parish
- * down the page. Phones use a locked 450px box. OCR stays locked 850/450.
+ * Desktop PDF is a locked 850px window (wrap + viewer overflow hidden, 1px
+ * border). Pages scroll inside. Phones use a locked 450px box and do not
+ * auto-download the mega — tap Show PDF first. OCR stays locked 850/450.
  * Open PDF is same-tab on phones. Do not restore a raw iPhone iframe.
  *
- * Progressive load uses streaming + HTTP Range on phone and desktop so page 1
- * can show before the whole mega arrives. If Range fails, fall back to a
- * full-file load. Do not restore iframe on iPhone.
+ * Progressive load uses streaming + HTTP Range after the reader asks for the
+ * pictures (desktop: on load; phone: after Show PDF). If Range fails, fall
+ * back to a full-file load. Do not restore iframe on iPhone.
  */
 (function () {
   if (window.__parishPressPdfInpage) return;
@@ -61,10 +62,10 @@
       style.id = "pdf-inpage-viewer-style";
       document.head.appendChild(style);
     }
-    /* Desktop PDF is a locked 850px box (inner scroll). OCR stays locked. */
+    /* Desktop PDF is a locked 850px window (wrap overflow hidden). OCR stays locked. */
     style.textContent =
       ".az-expand{display:none!important}" +
-      ".pdf-inpage-viewer{display:flex!important;flex-direction:column;min-height:850px!important;height:auto!important;flex:1 1 auto;background:#3a3f42;color:#e8eeed}" +
+      ".pdf-inpage-viewer{display:flex!important;flex-direction:column;height:850px!important;min-height:850px!important;max-height:850px!important;overflow:hidden!important;flex:1 1 auto;background:#3a3f42;color:#e8eeed;border:1px solid #c9d4d3;box-sizing:border-box}" +
       ".pdf-inpage-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:8px;padding:8px 10px;background:#14524f;color:#fff;flex:0 0 auto}" +
       ".pdf-inpage-backup{display:flex;gap:8px;flex-wrap:wrap}" +
       ".pdf-inpage-backup a{color:#fff;font-weight:700;font-size:.85rem}" +
@@ -77,7 +78,10 @@
       ".pdf-link-layer{position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden;pointer-events:none}" +
       ".pdf-annot-link{position:absolute;z-index:2;pointer-events:auto;background:rgba(26,107,107,0.08);border-radius:2px}" +
       ".pdf-annot-link:focus{outline:2px solid #1a6b6b;outline-offset:1px}" +
-      ".pdf-frame-wrap,.pdf-standalone-shell{display:flex;flex-direction:column;height:auto!important;min-height:850px!important;overflow:visible!important}" +
+      ".pdf-phone-tap-gate{display:flex;flex-direction:column;align-items:center;justify-content:center;box-sizing:border-box;min-height:100%;padding:28px 16px;color:#e8eeed;text-align:center;gap:16px}" +
+      ".pdf-phone-tap-gate p{margin:0;font-size:1rem;line-height:1.45;max-width:22rem}" +
+      ".pdf-show-pdf-btn{appearance:none;border:1px solid #d8f0ee;background:#14524f;color:#fff;font-weight:700;font-size:1rem;padding:12px 22px;border-radius:6px;cursor:pointer}" +
+      ".pdf-frame-wrap,.pdf-standalone-shell{display:flex;flex-direction:column;height:850px!important;min-height:850px!important;max-height:850px!important;overflow:hidden!important;border:1px solid #c9d4d3;box-sizing:border-box}" +
       ".pdf-frame-wrap iframe,.pdf-standalone-shell iframe.pdf-frame," +
       "body.is-native-pdf iframe.pdf-frame{display:none!important;height:850px!important;min-height:850px!important;max-height:850px!important}" +
       ".pdf-frame-wrap.is-iframe-fallback iframe," +
@@ -85,7 +89,7 @@
       "body.is-iframe-fallback iframe.pdf-frame{display:block!important}" +
       ".pdf-frame-wrap.is-native-pdf,.pdf-standalone-shell.is-native-pdf," +
       "body.is-native-pdf .pdf-standalone-shell{" +
-      "display:flex;flex-direction:column;min-height:850px!important;background:#3a3f42}" +
+      "display:flex;flex-direction:column;height:850px!important;min-height:850px!important;max-height:850px!important;overflow:hidden!important;background:#3a3f42}" +
       ".ocr-sticky-chrome{position:relative!important;top:auto;z-index:8;background:#fff;padding:8px 0 10px;margin:0 0 8px}" +
       ".ocr-sticky-chrome.is-searching{position:sticky!important;top:0!important}" +
       "html.is-ocr-searching{scroll-padding-top:10rem}" +
@@ -95,22 +99,21 @@
       "@media (max-width:1024px){" +
       ".pdf-frame-wrap,.pdf-standalone-shell," +
       ".pdf-frame-wrap.is-native-pdf,.pdf-standalone-shell.is-native-pdf," +
-      "body.is-native-pdf .pdf-standalone-shell{" +
-      "min-height:450px!important}" +
-      ".pdf-inpage-viewer{min-height:450px!important}" +
+      "body.is-native-pdf .pdf-standalone-shell,.pdf-inpage-viewer{" +
+      "height:450px!important;min-height:450px!important;max-height:450px!important;overflow:hidden!important}" +
       ".pdf-inpage-pages{height:450px!important;min-height:450px!important;max-height:450px!important;overflow:auto!important;overflow-y:auto!important}" +
       "#panel-pdf.az-expanded .pdf-inpage-pages{height:850px!important;min-height:850px!important;max-height:850px!important;overflow:auto!important;overflow-y:auto!important}" +
       "#ocr-panel,.pdf-frame-wrap iframe," +
       ".pdf-standalone-shell iframe.pdf-frame{height:450px!important;min-height:450px!important;max-height:450px!important;overflow:auto!important;overflow-y:auto!important}" +
       ".pdf-inpage-pages{overflow-x:hidden!important}" +
-      "#panel-pdf.az-expanded .pdf-frame-wrap,#panel-pdf.az-expanded .pdf-inpage-viewer{min-height:850px!important}" +
+      "#panel-pdf.az-expanded .pdf-frame-wrap,#panel-pdf.az-expanded .pdf-inpage-viewer{height:850px!important;min-height:850px!important;max-height:850px!important;overflow:hidden!important}" +
       "#panel-ocr.az-expanded #ocr-panel{height:850px!important;min-height:850px!important;max-height:850px!important}" +
       "}" +
       "@media (min-width:701px) and (min-height:501px){" +
       ".pdf-frame-wrap,.pdf-standalone-shell," +
       ".pdf-frame-wrap.is-native-pdf,.pdf-standalone-shell.is-native-pdf," +
       "body.is-native-pdf .pdf-standalone-shell,.pdf-inpage-viewer," +
-      ".pdf-mobile-fallback{min-height:850px!important}" +
+      ".pdf-mobile-fallback{height:850px!important;min-height:850px!important;max-height:850px!important;overflow:hidden!important}" +
       ".pdf-inpage-pages{height:850px!important;min-height:850px!important;max-height:850px!important;overflow:auto!important;overflow-y:auto!important}" +
       "#panel-pdf.az-expanded .pdf-inpage-pages{height:850px!important;min-height:850px!important;max-height:850px!important;overflow:auto!important;overflow-y:auto!important}" +
       "#ocr-panel,.pdf-frame-wrap iframe," +
@@ -462,10 +465,38 @@
     });
   }
 
+  function armPhoneTapToLoad(host, pdfUrl) {
+    if (!host) return;
+    var pagesEl = host.querySelector(".pdf-inpage-pages");
+    if (pagesEl && !pagesEl.querySelector("[data-pdf-show]")) {
+      pagesEl.innerHTML =
+        '<div class="pdf-phone-tap-gate">' +
+        "<p>Tap Show PDF when you want the pictures.</p>" +
+        '<button type="button" class="pdf-show-pdf-btn" data-pdf-show>Show PDF</button>' +
+        "</div>";
+    }
+    setStatus(host, "Tap Show PDF when you want the pictures.");
+    if (host.getAttribute("data-pdf-tap-bound") === "1") return;
+    host.setAttribute("data-pdf-tap-bound", "1");
+    host.addEventListener("click", function (event) {
+      var t = event.target;
+      if (!t || !t.closest || !t.closest("[data-pdf-show]")) return;
+      event.preventDefault();
+      host.setAttribute("data-pdf-tapped", "1");
+      startViewer(host, pdfUrl);
+    });
+  }
+
   function startViewer(host, pdfUrl) {
+    /* Phones: do not start the load until Show PDF is tapped. */
+    if (isPhone() && host.getAttribute("data-pdf-tapped") !== "1") {
+      armPhoneTapToLoad(host, pdfUrl);
+      return;
+    }
     if (host.getAttribute("data-pdf-started") === "1") return;
     host.setAttribute("data-pdf-started", "1");
     var pagesEl = host.querySelector(".pdf-inpage-pages");
+    if (pagesEl) pagesEl.innerHTML = "";
     var pdfDoc = null;
     var rendering = Object.create(null);
 
@@ -531,8 +562,13 @@
     }
 
     setStatus(host, "Showing first page…");
+    /* isPhone() + data-pdf-tapped already gated above — getDocument only after tap. */
+    if (isPhone() && host.getAttribute("data-pdf-tapped") !== "1") {
+      return;
+    }
     loadPdfJs()
       .then(function (pdfjsLib) {
+        if (isPhone() && host.getAttribute("data-pdf-tapped") !== "1") return null;
         return openPdfDocument(pdfjsLib, pdfUrl);
       })
       .then(function (pdf) {
