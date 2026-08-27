@@ -1192,7 +1192,7 @@ def prefers_native_pdf_js() -> str:
 """
 
 
-PDF_INPAGE_VIEWER_VERSION = "20260827d"
+PDF_INPAGE_VIEWER_VERSION = "20260827e"
 PDF_INPAGE_VIEWER_SRC = f"/assets/pdf-inpage-viewer.js?v={PDF_INPAGE_VIEWER_VERSION}"
 
 
@@ -1298,6 +1298,14 @@ def pdf_inpage_viewer_css() -> str:
       background: #525659;
       padding: 8px 0 16px;
     }}
+    #ocr-panel {{
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }}
     .pdf-inpage-page-slot {{
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -1368,6 +1376,7 @@ def pdf_inpage_viewer_css() -> str:
         overflow: hidden !important;
       }}
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {{
         height: 450px !important;
