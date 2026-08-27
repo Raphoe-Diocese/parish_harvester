@@ -301,6 +301,10 @@ https://www.antrimparish.com
         self.assertIn("timeout-minutes: 360", workflow)
         self.assertIn("Warn if git commit failed", workflow)
         self.assertLess(workflow.index("- name: Run tests"), workflow.index("- name: Run Bulletin Harvester"))
+        self.assertIn("ghostscript", workflow)
+        self.assertIn("gs --version", workflow)
+        stitcher = (repo_root / "harvester" / "stitcher.py").read_text(encoding="utf-8")
+        self.assertIn("compress_pdf_inplace", stitcher)
         commit_step = workflow.split("- name: Commit bulletins back to repo", 1)[1]
         self.assertNotIn("continue-on-error: true", commit_step.split("- name:", 1)[0])
 
@@ -350,6 +354,8 @@ https://www.antrimparish.com
         self.assertIn("Applied OCR docs/parishes snapshot", workflow)
         self.assertNotIn("find docs/mega_pdf -maxdepth 1 -type f -name '*.pdf' -delete", workflow)
         self.assertIn("Mega PDFs stay in docs/mega_pdf", workflow)
+        self.assertIn("Using committed docs/mega_pdf — skip stale harvest artifacts", workflow)
+        self.assertIn("Keep smaller committed", workflow)
         self.assertIn("parish_trainer.zip", workflow)
         self.assertIn("_site/updates.xml", workflow)
 
@@ -367,6 +373,7 @@ https://www.antrimparish.com
         self.assertIn("docs/parishes/", workflow)
         self.assertIn("docs/mega_pdf/", workflow)
         self.assertIn("Copied staged mega PDFs into docs/mega_pdf", workflow)
+        self.assertIn("Keep smaller committed", workflow)
         self.assertIn("id: commit_ocr", workflow)
         self.assertIn("OCR push attempt", workflow)
         self.assertIn("github.event_name == 'workflow_dispatch'", workflow)

@@ -109,8 +109,19 @@ jobs:
           fi
           if [ -d _ocr_docs/docs/mega_pdf ]; then
             mkdir -p docs/mega_pdf
-            cp -a _ocr_docs/docs/mega_pdf/. docs/mega_pdf/
-            echo "Applied OCR docs/mega_pdf snapshot"
+            while IFS= read -r -d '' pdf; do
+              dest="docs/mega_pdf/$(basename "${pdf}")"
+              if [ -f "${dest}" ]; then
+                src_sz=$(stat -c%s "${pdf}")
+                dest_sz=$(stat -c%s "${dest}")
+                if [ "${src_sz}" -gt "${dest_sz}" ]; then
+                  echo "Keep smaller committed ${dest} (${dest_sz}) — skip larger OCR snapshot ${src_sz}"
+                  continue
+                fi
+              fi
+              cp "${pdf}" "${dest}"
+            done < <(find _ocr_docs/docs/mega_pdf -maxdepth 1 -type f -name '*_mega_bulletin.pdf' -print0)
+            echo "Applied OCR docs/mega_pdf snapshot (kept smaller files)"
             applied=true
           fi
           if [ "${applied}" = "false" ]; then

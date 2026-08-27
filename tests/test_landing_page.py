@@ -127,6 +127,7 @@ class LandingPageTests(unittest.TestCase):
             self.assertIn('href="/favicon.png"', index_html)
             self.assertIn("Open bulletin", index_html)
             self.assertIn("Mega PDF", index_html)
+            self.assertNotRegex(index_html, r"_mega_bulletin\.pdf\" target=\"_blank\"")
             self.assertIn(">Text<", index_html)
             self.assertIn("live-card-photo", index_html)
             self.assertIn("St Macartan", index_html)
