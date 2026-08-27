@@ -53,6 +53,8 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 
 ## Still open (do not pretend these are finished)
 
+- [ ] **doing** · 2026-08-27 · Delete **Tap to enlarge** (broken, not needed). Frank 27/08. Do not mark done until live Raphoe JUMP TO row has no enlarge button. · `ocr/generate_bulletin_pages.py`, `docs/assets/pdf-inpage-viewer.js`
+
 - [ ] **doing** · 2026-08-27 · Desktop PDF must be an **850px box** with inner scroll, not every bulletin down the page. Frank 27/08/2026 (overrides 22/08 page-scroll). Phone box **450px**. Do not use Chrome’s PDF iframe (Page X of Y). Do not mark done until live Raphoe desktop shows one 850px window. · `render_bulletin_viewer_shell`, `docs/assets/pdf-inpage-viewer.js`
 
 - [ ] **doing** · 2026-08-27 · Phone mega still ages / 20–30s. Live Raphoe is 6.1 MB and was **not** linearized (xref at the end), so Stream/Range cannot show page 1 until the whole file arrives. Viewer Range fetch stays on. This turn shrinks the four committed megas harder (~100 dpi) and linearizes (`-dFastWebView=true`, qpdf fallback if needed). Harvest Ghostscript in `harvester/pdf_compress.py` now does the same. **PR [#145](https://github.com/Raphoe-Diocese/parish_harvester/pull/145) merge `838ec254`.** Live HEAD 27/08/2026 after Pages [33070711783](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/33070711783): Raphoe 5,823,354 `/Linearized` (was 6,383,586); Derry 6,012,465; Down & Connor 6,482,119; Clogher 3,398,769. **Not done** — Frank’s phone not tested this turn. · `harvester/pdf_compress.py`, `docs/mega_pdf/`, `docs/assets/pdf-inpage-viewer.js`
