@@ -1,15 +1,14 @@
 /**
  * Parish Press — in-page PDF viewer (desktop + mobile)
  *
- * Phone / tablet (isMobileView): do not run PDF.js. The locked 450px box
- * is one same-tab link to this week's mega PDF (class pdf-phone-native),
- * the same path as homepage Mega PDF. No canvas, no loadPdfJs, no
- * startViewer. Do not restore a raw iPhone iframe.
- *
- * Desktop (!isMobileView): locked 850px PDF.js window. Self-hosted
+ * Phone and desktop both run PDF.js so Jump-to can find
+ * `.pdf-inpage-pages` / `[data-page]` slots and call
+ * window.parishPressScrollPdfToPage. Self-hosted
  * /assets/pdf.min.js, stream/Range, rangeChunkSize 262144.
- * OCR stays locked 850/450. Keep fixMobilePdfLinks. Do not restore
- * a tap-to-load button, enlarge control, or a raw iPhone iframe.
+ * Phone pages paint at least 720px wide (pan sideways).
+ * Locked 850px desktop / 450px phone boxes. Keep fixMobilePdfLinks.
+ * Do not restore a tap-to-load button, enlarge control,
+ * a same-tab native-link replacement, or a raw iPhone iframe.
  */
 (function () {
   if (window.__parishPressPdfInpage) return;
@@ -69,11 +68,11 @@
       ".pdf-inpage-backup{display:flex;gap:8px;flex-wrap:wrap}" +
       ".pdf-inpage-backup a{color:#fff;font-weight:700;font-size:.85rem}" +
       ".pdf-inpage-status{padding:10px 12px;background:#1f3d3c;color:#d8f0ee;font-size:.9rem}" +
-      ".pdf-inpage-pages{box-sizing:border-box;flex:0 0 auto;height:850px!important;min-height:850px!important;max-height:850px!important;overflow:auto!important;overflow-y:auto!important;overflow-x:hidden!important;scrollbar-gutter:stable;background:#525659;padding:8px 0 16px}" +
+      ".pdf-inpage-pages{box-sizing:border-box;flex:0 0 auto;height:850px!important;min-height:850px!important;max-height:850px!important;overflow:auto!important;overflow-y:auto!important;overflow-x:hidden!important;scrollbar-gutter:stable;background:#525659;padding:8px 0 16px;touch-action:pan-x pan-y pinch-zoom}" +
       "#panel-pdf.az-expanded .pdf-inpage-pages{height:850px!important;min-height:850px!important;max-height:850px!important;overflow:auto!important;overflow-y:auto!important}" +
       "#ocr-panel{height:850px!important;min-height:850px!important;max-height:850px!important;overflow:auto!important;overflow-y:auto!important;scrollbar-gutter:stable}" +
       ".pdf-inpage-page-slot{margin:0 auto 10px;background:#3a3f42;min-height:180px;max-width:100%;position:relative}" +
-      ".pdf-inpage-page-slot canvas{display:block;width:100%;height:auto;background:#fff}" +
+      ".pdf-inpage-page-slot canvas{display:block;height:auto;background:#fff}" +
       ".pdf-link-layer{position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden;pointer-events:none}" +
       ".pdf-annot-link{position:absolute;z-index:2;pointer-events:auto;background:rgba(26,107,107,0.08);border-radius:2px}" +
       ".pdf-annot-link:focus{outline:2px solid #1a6b6b;outline-offset:1px}" +
@@ -86,9 +85,6 @@
       ".pdf-frame-wrap.is-native-pdf,.pdf-standalone-shell.is-native-pdf," +
       "body.is-native-pdf .pdf-standalone-shell{" +
       "display:flex;flex-direction:column;height:850px!important;min-height:850px!important;max-height:850px!important;overflow:hidden!important;background:#3a3f42}" +
-      ".pdf-frame-wrap.is-phone-native,.pdf-standalone-shell.is-phone-native{" +
-      "background:#14524f}" +
-      ".pdf-phone-native{display:flex!important;align-items:center;justify-content:center;box-sizing:border-box;width:100%;height:100%;min-height:450px;padding:24px 20px;background:#14524f;color:#fff;font-size:1.85rem;font-weight:700;line-height:1.3;text-align:center;text-decoration:none}" +
       ".ocr-sticky-chrome{position:relative!important;top:auto;z-index:8;background:#fff;padding:8px 0 10px;margin:0 0 8px}" +
       ".ocr-sticky-chrome.is-searching{position:sticky!important;top:0!important}" +
       "html.is-ocr-searching{scroll-padding-top:10rem}" +
@@ -104,10 +100,10 @@
       "#panel-pdf.az-expanded .pdf-inpage-pages{height:850px!important;min-height:850px!important;max-height:850px!important;overflow:auto!important;overflow-y:auto!important}" +
       "#ocr-panel,.pdf-frame-wrap iframe," +
       ".pdf-standalone-shell iframe.pdf-frame{height:450px!important;min-height:450px!important;max-height:450px!important;overflow:auto!important;overflow-y:auto!important}" +
-      ".pdf-inpage-pages{overflow-x:hidden!important}" +
+      ".pdf-inpage-pages{overflow-x:auto!important}" +
+      ".pdf-inpage-page-slot{max-width:none}" +
       "#panel-pdf.az-expanded .pdf-frame-wrap,#panel-pdf.az-expanded .pdf-inpage-viewer{height:850px!important;min-height:850px!important;max-height:850px!important;overflow:hidden!important}" +
       "#panel-ocr.az-expanded #ocr-panel{height:850px!important;min-height:850px!important;max-height:850px!important}" +
-      ".pdf-phone-native{min-height:450px;height:100%}" +
       "}" +
       "@media (min-width:701px) and (min-height:501px){" +
       ".pdf-frame-wrap,.pdf-standalone-shell," +
@@ -274,9 +270,6 @@
 
   var pdfJsLoading = null;
   function loadPdfJs() {
-    if (isMobileView()) {
-      return Promise.reject(new Error("PDF.js is desktop-only"));
-    }
     if (window.pdfjsLib) {
       window.pdfjsLib.GlobalWorkerOptions.workerSrc = "/assets/pdf.worker.min.js";
       return Promise.resolve(window.pdfjsLib);
@@ -345,18 +338,6 @@
     }
     fixMobilePdfLinks();
     return host;
-  }
-
-  function fillPhoneNativeLink(wrap, pdfUrl) {
-    if (!wrap || !pdfUrl) return;
-    unloadIframe(wrap);
-    wrap.classList.add("is-phone-native");
-    wrap.innerHTML = "";
-    var a = document.createElement("a");
-    a.className = "pdf-phone-native";
-    a.href = pdfUrl;
-    a.textContent = "This week's PDF";
-    wrap.appendChild(a);
   }
 
   function unloadIframe(wrap) {
@@ -443,8 +424,7 @@
   function renderPageToSlot(page, slot, width) {
     var unscaled = page.getViewport({ scale: 1 });
     var cssWidth = Math.max(240, width || slot.clientWidth || 320);
-    var dpr = window.devicePixelRatio || 1;
-    dpr = isPhone() ? Math.min(dpr, 1) : Math.min(dpr, 2);
+    var dpr = Math.min(window.devicePixelRatio || 1, 2);
     var scale = (cssWidth / unscaled.width) * dpr;
     var viewport = page.getViewport({ scale: scale });
     var canvas = slot.querySelector("canvas") || document.createElement("canvas");
@@ -493,7 +473,6 @@
   }
 
   function startViewer(host, pdfUrl) {
-    if (isMobileView()) return;
     if (host.getAttribute("data-pdf-started") === "1") return;
     host.setAttribute("data-pdf-started", "1");
     var pagesEl = host.querySelector(".pdf-inpage-pages");
@@ -502,7 +481,11 @@
     var rendering = Object.create(null);
 
     function pageWidth() {
-      return Math.floor((pagesEl && pagesEl.clientWidth) || host.clientWidth || 320);
+      var boxWidth = Math.floor((pagesEl && pagesEl.clientWidth) || host.clientWidth || 320);
+      if (isPhone() || (window.matchMedia && window.matchMedia("(max-width: 1024px)").matches)) {
+        return Math.max(boxWidth, 720);
+      }
+      return boxWidth;
     }
 
     function ensureSlot(num) {
@@ -601,25 +584,6 @@
     ensureOcrStickyChrome();
     ensureScrollTop();
     fixMobilePdfLinks();
-
-    if (isMobileView()) {
-      document.querySelectorAll(".pdf-frame-wrap").forEach(function (wrap) {
-        fillPhoneNativeLink(wrap, resolvePdfUrl(wrap));
-      });
-      var phoneStandalone = document.querySelector("iframe.pdf-frame");
-      if (phoneStandalone && !phoneStandalone.closest(".pdf-frame-wrap")) {
-        var phoneUrl =
-          phoneStandalone.getAttribute("src") ||
-          phoneStandalone.src ||
-          (document.querySelector(".download-link") || {}).href ||
-          "";
-        if (phoneUrl && phoneUrl.indexOf("about:blank") !== 0) {
-          var phoneShell = phoneStandalone.parentElement;
-          if (phoneShell) fillPhoneNativeLink(phoneShell, phoneUrl);
-        }
-      }
-      return;
-    }
 
     loadPdfJs();
     document.querySelectorAll(".pdf-frame-wrap").forEach(function (wrap) {
