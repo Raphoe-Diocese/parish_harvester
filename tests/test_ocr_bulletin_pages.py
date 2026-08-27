@@ -211,7 +211,7 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertIn("pdf-fullscreen-btn", html_output)
             # Desktop + mobile: hide the raw-PDF iframe and show stacked PDF.js pages.
             self.assertIn("pdf-inpage-viewer", html_output)
-            self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827c", html_output)
+            self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827d", html_output)
             self.assertIn("data-pdf-src", html_output)
             self.assertIn("is-native-pdf", html_output)
             self.assertIn("display: flex !important", html_output)
@@ -251,7 +251,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("<iframe", html_output)
         self.assertIn("embed-mode", html_output)
         self.assertIn("pdf-inpage-viewer", html_output)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827c", html_output)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827d", html_output)
         self.assertIn("data-pdf-src", html_output)
         self.assertNotIn("pdf-inpage-prev", html_output)
         self.assertNotIn("pdf-inpage-next", html_output)
@@ -283,7 +283,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("is-native-pdf", boot)
         self.assertIn("pdf-frame-wrap", boot)
         self.assertIn("removeAttribute('src')", boot)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827c", boot)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827d", boot)
         self.assertNotIn("prefersNativePdf", boot)
         self.assertNotIn("narrowViewport", boot)
         self.assertEqual(boot, pdf_mobile_fallback_boot_js())
@@ -306,6 +306,8 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertRegex(css, r"\.pdf-inpage-pages\s*\{[^}]*max-height:\s*850px")
         self.assertRegex(css, r"\.pdf-inpage-pages\s*\{[^}]*overflow:\s*auto")
         self.assertNotRegex(css, r"\.pdf-inpage-pages\s*\{[^}]*height:\s*auto")
+        self.assertRegex(css, r"\.pdf-frame-wrap[^{]*\{[^}]*overflow:\s*hidden")
+        self.assertRegex(css, r"\.pdf-frame-wrap[^{]*\{[^}]*height:\s*850px")
         self.assertIn(".pdf-inpage-viewer", css)
         self.assertIn(".pdf-inpage-pages", css)
         self.assertNotIn("pdf-inpage-nav", css)
@@ -447,7 +449,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn('id="scroll-top-btn"', html_output)
         self.assertIn("Georgia", html_output)
         self.assertIn("pdf-inpage-viewer", html_output)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827c", html_output)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827d", html_output)
         self.assertIn("block: 'start'", html_output)
         self.assertNotIn("block: 'center'", html_output)
         self.assertIn("is-native-pdf", html_output)
@@ -583,7 +585,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         assets = Path(__file__).resolve().parent.parent / "docs" / "assets"
         viewer = assets / "pdf-inpage-viewer.js"
         self.assertTrue(viewer.is_file(), "docs/assets/pdf-inpage-viewer.js must exist for live pages")
-        self.assertEqual(PDF_INPAGE_VIEWER_VERSION, "20260827c")
+        self.assertEqual(PDF_INPAGE_VIEWER_VERSION, "20260827d")
         text = viewer.read_text(encoding="utf-8")
         self.assertIn("pdfjs", text.lower())
         self.assertIn("disableAutoFetch", text)
@@ -633,6 +635,28 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotRegex(
             text,
             r"\.pdf-inpage-pages\{[^}]*overflow:visible!important",
+        )
+        self.assertNotRegex(
+            text,
+            r"\.pdf-inpage-pages\{[^}]*overflow:visible",
+        )
+        self.assertIn("Show PDF", text)
+        self.assertIn("data-pdf-tapped", text)
+        self.assertIn("Tap Show PDF when you want the pictures.", text)
+        start_idx = text.find("function startViewer")
+        get_idx = text.find("getDocument", start_idx)
+        self.assertGreater(start_idx, 0)
+        self.assertGreater(get_idx, start_idx)
+        gate = text[start_idx:get_idx]
+        self.assertIn("isPhone()", gate)
+        self.assertIn("data-pdf-tapped", gate)
+        self.assertRegex(
+            compact,
+            r"\.pdf-frame-wrap[^{]*\{[^}]*overflow:hidden",
+        )
+        self.assertRegex(
+            compact,
+            r"\.pdf-frame-wrap[^{]*\{[^}]*height:850px",
         )
         self.assertIn("root: pagesEl", text)
         self.assertIn('rootMargin: "200px 0px"', text)
@@ -719,7 +743,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotIn("85vh", diocese)
         self.assertIn("inner-2", diocese)
         self.assertIn("data-pp-scroll-top", diocese)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260824a", diocese)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827d", diocese)
 
     def test_live_diocese_html_ships_inpage_viewer(self) -> None:
         """Generator-only changes are invisible on parishpress.ie — live HTML must include PDF.js."""

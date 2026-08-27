@@ -1192,7 +1192,7 @@ def prefers_native_pdf_js() -> str:
 """
 
 
-PDF_INPAGE_VIEWER_VERSION = "20260827c"
+PDF_INPAGE_VIEWER_VERSION = "20260827d"
 PDF_INPAGE_VIEWER_SRC = f"/assets/pdf-inpage-viewer.js?v={PDF_INPAGE_VIEWER_VERSION}"
 
 
@@ -1216,7 +1216,10 @@ def desktop_viewer_height_lock_css() -> str:
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -1254,10 +1257,15 @@ def pdf_inpage_viewer_css() -> str:
     .pdf-mobile-fallback {{
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }}
     .pdf-inpage-toolbar {{
       display: flex;
@@ -1312,6 +1320,12 @@ def pdf_inpage_viewer_css() -> str:
     .pdf-standalone-shell {{
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }}
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -1326,7 +1340,10 @@ def pdf_inpage_viewer_css() -> str:
     body.is-native-pdf .pdf-standalone-shell {{
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }}
     @media (max-width: 1024px) {{
@@ -1335,14 +1352,20 @@ def pdf_inpage_viewer_css() -> str:
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {{
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }}
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {{
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }}
       .pdf-inpage-pages,
       .pdf-frame-wrap iframe,
@@ -1985,7 +2008,10 @@ def render_bulletin_viewer_shell(
 
     .pdf-frame-wrap {{
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }}
@@ -2242,7 +2268,10 @@ def render_bulletin_viewer_shell(
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {{
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }}
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
