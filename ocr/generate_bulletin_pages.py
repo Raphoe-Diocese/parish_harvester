@@ -1624,7 +1624,7 @@ def az_jump_css() -> str:
       border-color: {TEAL};
       color: #fff;
     }}
-    /* Tap to enlarge is gone. Hide any leftover .az-expand in old HTML. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand {{ display: none; }}
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -2253,7 +2253,7 @@ def render_bulletin_viewer_shell(
         overflow: auto;
         overflow-y: auto;
       }}
-      /* Tap to enlarge is gone — never show a leftover button. */
+      /* Enlarge control removed — never show a leftover button. */
       .az-expand {{ display: none !important; }}
       /* Tap targets big enough for a thumb. */
       .az-letter,

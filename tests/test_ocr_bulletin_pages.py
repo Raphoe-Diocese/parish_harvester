@@ -546,7 +546,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         )
 
     def test_mobile_enlarges_only_the_tapped_panel(self) -> None:
-        """Tap to enlarge is gone. Letter rows stay; boxes stay locked."""
+        """Enlarge control is gone. Letter rows stay; boxes stay locked."""
         html_output = render_bulletin_viewer_shell(
             page_title="Raphoe Diocese Collated Bulletin",
             diocese_label="RAPHOE",
@@ -566,6 +566,8 @@ class OcrBulletinPageTests(unittest.TestCase):
             parish_page_index={"Tawnawilly": 26},
         )
         self.assertEqual(html_output.count('class="az-row"'), 2)
+        self.assertNotIn("Tap to enlarge</button>", html_output)
+        self.assertNotIn("Tap to shrink</button>", html_output)
         self.assertNotIn("Tap to enlarge", html_output)
         self.assertNotIn("Tap to shrink", html_output)
         self.assertNotIn('class="az-expand"', html_output)
