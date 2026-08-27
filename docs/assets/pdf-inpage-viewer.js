@@ -1,19 +1,15 @@
 /**
  * Parish Press — in-page PDF viewer (desktop + mobile)
  *
- * Phones cannot embed a raw PDF in <iframe> (sad-document icon). Desktop
- * Chrome/Edge iframes show a "Page X of Y" toolbar Frank asked to remove.
- * This script paints every page on stacked canvases with Mozilla PDF.js.
+ * Phone / tablet (isMobileView): do not run PDF.js. The locked 450px box
+ * is one same-tab link to this week's mega PDF (class pdf-phone-native),
+ * the same path as homepage Mega PDF. No canvas, no loadPdfJs, no
+ * startViewer. Do not restore a raw iPhone iframe.
  *
- * Desktop PDF is a locked 850px window (wrap + viewer overflow hidden, 1px
- * border). Pages scroll inside. Phones use a locked 450px box. The in-page
- * viewer starts on load (phone and desktop). OCR stays locked 850/450.
- * Open PDF is same-tab on phones. Do not restore a raw iPhone iframe.
- *
- * PDF.js 3.11.174 is hosted on parishpress.ie (/assets/pdf.min.js).
- * Progressive load uses streaming + HTTP Range immediately. If Range fails,
- * retry streaming once; only then fall back to a full-file load.
- * Do not restore iframe on iPhone.
+ * Desktop (!isMobileView): locked 850px PDF.js window. Self-hosted
+ * /assets/pdf.min.js, stream/Range, rangeChunkSize 262144.
+ * OCR stays locked 850/450. Keep fixMobilePdfLinks. Do not restore
+ * a tap-to-load button, enlarge control, or a raw iPhone iframe.
  */
 (function () {
   if (window.__parishPressPdfInpage) return;
@@ -35,6 +31,10 @@
     if (/iPad/i.test(ua)) return true;
     if (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1) return true;
     return false;
+  }
+
+  function isMobileView() {
+    return isPhone() || (window.matchMedia && window.matchMedia("(max-width: 1024px)").matches);
   }
 
   function fixMobilePdfLinks() {
@@ -86,6 +86,9 @@
       ".pdf-frame-wrap.is-native-pdf,.pdf-standalone-shell.is-native-pdf," +
       "body.is-native-pdf .pdf-standalone-shell{" +
       "display:flex;flex-direction:column;height:850px!important;min-height:850px!important;max-height:850px!important;overflow:hidden!important;background:#3a3f42}" +
+      ".pdf-frame-wrap.is-phone-native,.pdf-standalone-shell.is-phone-native{" +
+      "background:#14524f}" +
+      ".pdf-phone-native{display:flex!important;align-items:center;justify-content:center;box-sizing:border-box;width:100%;height:100%;min-height:450px;padding:24px 20px;background:#14524f;color:#fff;font-size:1.85rem;font-weight:700;line-height:1.3;text-align:center;text-decoration:none}" +
       ".ocr-sticky-chrome{position:relative!important;top:auto;z-index:8;background:#fff;padding:8px 0 10px;margin:0 0 8px}" +
       ".ocr-sticky-chrome.is-searching{position:sticky!important;top:0!important}" +
       "html.is-ocr-searching{scroll-padding-top:10rem}" +
@@ -104,6 +107,7 @@
       ".pdf-inpage-pages{overflow-x:hidden!important}" +
       "#panel-pdf.az-expanded .pdf-frame-wrap,#panel-pdf.az-expanded .pdf-inpage-viewer{height:850px!important;min-height:850px!important;max-height:850px!important;overflow:hidden!important}" +
       "#panel-ocr.az-expanded #ocr-panel{height:850px!important;min-height:850px!important;max-height:850px!important}" +
+      ".pdf-phone-native{min-height:450px;height:100%}" +
       "}" +
       "@media (min-width:701px) and (min-height:501px){" +
       ".pdf-frame-wrap,.pdf-standalone-shell," +
@@ -270,6 +274,9 @@
 
   var pdfJsLoading = null;
   function loadPdfJs() {
+    if (isMobileView()) {
+      return Promise.reject(new Error("PDF.js is desktop-only"));
+    }
     if (window.pdfjsLib) {
       window.pdfjsLib.GlobalWorkerOptions.workerSrc = "/assets/pdf.worker.min.js";
       return Promise.resolve(window.pdfjsLib);
@@ -340,6 +347,18 @@
     return host;
   }
 
+  function fillPhoneNativeLink(wrap, pdfUrl) {
+    if (!wrap || !pdfUrl) return;
+    unloadIframe(wrap);
+    wrap.classList.add("is-phone-native");
+    wrap.innerHTML = "";
+    var a = document.createElement("a");
+    a.className = "pdf-phone-native";
+    a.href = pdfUrl;
+    a.textContent = "This week's PDF";
+    wrap.appendChild(a);
+  }
+
   function unloadIframe(wrap) {
     if (!wrap) return;
     wrap.classList.add("is-native-pdf");
@@ -354,7 +373,7 @@
   }
 
   function restoreNativeIframe(host, pdfUrl) {
-    if (isPhone()) return;
+    if (isMobileView()) return;
     var wrap =
       (host && host.closest && (host.closest(".pdf-frame-wrap") || host.closest(".pdf-standalone-shell"))) ||
       document.querySelector(".pdf-frame-wrap") ||
@@ -474,6 +493,7 @@
   }
 
   function startViewer(host, pdfUrl) {
+    if (isMobileView()) return;
     if (host.getAttribute("data-pdf-started") === "1") return;
     host.setAttribute("data-pdf-started", "1");
     var pagesEl = host.querySelector(".pdf-inpage-pages");
@@ -576,13 +596,32 @@
   }
 
   function run() {
-    loadPdfJs();
     document.querySelectorAll(".az-expand").forEach(function (btn) { btn.remove(); });
     ensureStyles();
     ensureOcrStickyChrome();
     ensureScrollTop();
     fixMobilePdfLinks();
 
+    if (isMobileView()) {
+      document.querySelectorAll(".pdf-frame-wrap").forEach(function (wrap) {
+        fillPhoneNativeLink(wrap, resolvePdfUrl(wrap));
+      });
+      var phoneStandalone = document.querySelector("iframe.pdf-frame");
+      if (phoneStandalone && !phoneStandalone.closest(".pdf-frame-wrap")) {
+        var phoneUrl =
+          phoneStandalone.getAttribute("src") ||
+          phoneStandalone.src ||
+          (document.querySelector(".download-link") || {}).href ||
+          "";
+        if (phoneUrl && phoneUrl.indexOf("about:blank") !== 0) {
+          var phoneShell = phoneStandalone.parentElement;
+          if (phoneShell) fillPhoneNativeLink(phoneShell, phoneUrl);
+        }
+      }
+      return;
+    }
+
+    loadPdfJs();
     document.querySelectorAll(".pdf-frame-wrap").forEach(function (wrap) {
       activateWrap(wrap, resolvePdfUrl(wrap));
     });

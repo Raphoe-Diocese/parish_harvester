@@ -770,7 +770,7 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
             f"{_live_card_heading_html(row['name'])}"
             f"<p class=\"live-card-updated\">Updated {html.escape(row['updated'])}</p>"
             "<div class=\"live-card-actions\">"
-            f"<a class=\"live-btn primary\" href=\"dioceses/{row['key']}/\" target=\"_blank\" rel=\"noopener noreferrer\">Open bulletin</a>"
+            f"<a class=\"live-btn primary\" href=\"dioceses/{row['key']}/\">Open bulletin</a>"
             f"<a class=\"live-btn secondary\" href=\"{html.escape(_mega_pdf_url(row['key'], same_origin=True), quote=True)}\">Mega PDF</a>"
             f"<a class=\"live-btn secondary\" href=\"{html.escape(_ocr_standalone_url(row['key']), quote=True)}\" target=\"_blank\" rel=\"noopener noreferrer\">Text</a>"
             "</div>"
