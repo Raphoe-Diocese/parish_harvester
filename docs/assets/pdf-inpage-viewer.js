@@ -6,25 +6,24 @@
  * This script paints every page on stacked canvases with Mozilla PDF.js.
  *
  * Desktop PDF is a locked 850px window (wrap + viewer overflow hidden, 1px
- * border). Pages scroll inside. Phones use a locked 450px box and do not
- * auto-download the mega — tap Show PDF first. OCR stays locked 850/450.
+ * border). Pages scroll inside. Phones use a locked 450px box. The in-page
+ * viewer starts on load (phone and desktop). OCR stays locked 850/450.
  * Open PDF is same-tab on phones. Do not restore a raw iPhone iframe.
  *
- * Progressive load uses streaming + HTTP Range after the reader asks for the
- * pictures (desktop: on load; phone: after Show PDF). If Range fails, fall
- * back to a full-file load. Do not restore iframe on iPhone.
+ * PDF.js 3.11.174 is hosted on parishpress.ie (/assets/pdf.min.js).
+ * Progressive load uses streaming + HTTP Range immediately. If Range fails,
+ * retry streaming once; only then fall back to a full-file load.
+ * Do not restore iframe on iPhone.
  */
 (function () {
   if (window.__parishPressPdfInpage) return;
   window.__parishPressPdfInpage = true;
 
   var PDFJS_SCRIPTS = [
-    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js",
-    "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.min.js",
+    "/assets/pdf.min.js",
   ];
   var PDFJS_WORKERS = [
-    "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js",
-    "https://cdn.jsdelivr.net/npm/pdfjs-dist@3.11.174/build/pdf.worker.min.js",
+    "/assets/pdf.worker.min.js",
   ];
 
   var paintPdfPage = null;
@@ -78,9 +77,6 @@
       ".pdf-link-layer{position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden;pointer-events:none}" +
       ".pdf-annot-link{position:absolute;z-index:2;pointer-events:auto;background:rgba(26,107,107,0.08);border-radius:2px}" +
       ".pdf-annot-link:focus{outline:2px solid #1a6b6b;outline-offset:1px}" +
-      ".pdf-phone-tap-gate{display:flex;flex-direction:column;align-items:center;justify-content:center;box-sizing:border-box;min-height:100%;padding:28px 16px;color:#e8eeed;text-align:center;gap:16px}" +
-      ".pdf-phone-tap-gate p{margin:0;font-size:1rem;line-height:1.45;max-width:22rem}" +
-      ".pdf-show-pdf-btn{appearance:none;border:1px solid #d8f0ee;background:#14524f;color:#fff;font-weight:700;font-size:1rem;padding:12px 22px;border-radius:6px;cursor:pointer}" +
       ".pdf-frame-wrap,.pdf-standalone-shell{display:flex;flex-direction:column;height:850px!important;min-height:850px!important;max-height:850px!important;overflow:hidden!important;border:1px solid #c9d4d3;box-sizing:border-box}" +
       ".pdf-frame-wrap iframe,.pdf-standalone-shell iframe.pdf-frame," +
       "body.is-native-pdf iframe.pdf-frame{display:none!important;height:850px!important;min-height:850px!important;max-height:850px!important}" +
@@ -272,8 +268,13 @@
     });
   }
 
+  var pdfJsLoading = null;
   function loadPdfJs() {
-    if (window.pdfjsLib) return Promise.resolve(window.pdfjsLib);
+    if (window.pdfjsLib) {
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = "/assets/pdf.worker.min.js";
+      return Promise.resolve(window.pdfjsLib);
+    }
+    if (pdfJsLoading) return pdfJsLoading;
     var i = 0;
     function next() {
       if (i >= PDFJS_SCRIPTS.length) {
@@ -282,11 +283,12 @@
       var src = PDFJS_SCRIPTS[i++];
       return loadScript(src).catch(next);
     }
-    return next().then(function () {
+    pdfJsLoading = next().then(function () {
       if (!window.pdfjsLib) throw new Error("pdfjsLib missing after load");
-      window.pdfjsLib.GlobalWorkerOptions.workerSrc = PDFJS_WORKERS[0];
+      window.pdfjsLib.GlobalWorkerOptions.workerSrc = "/assets/pdf.worker.min.js";
       return window.pdfjsLib;
     });
+    return pdfJsLoading;
   }
 
   function resolvePdfUrl(wrap) {
@@ -443,14 +445,20 @@
   }
 
   function openPdfDocument(pdfjsLib, pdfUrl) {
-    var first = {
+    var streaming = {
       url: pdfUrl,
       disableAutoFetch: true,
       disableStream: false,
       disableRange: false,
-      rangeChunkSize: 65536,
+      rangeChunkSize: 262144,
     };
-    return pdfjsLib.getDocument(first).promise.catch(function () {
+    function streamOnce() {
+      return pdfjsLib.getDocument(streaming).promise;
+    }
+    return streamOnce().catch(function () {
+      /* Retry streaming once. Do not fetch() the whole file on first error. */
+      return streamOnce();
+    }).catch(function () {
       return fetch(pdfUrl, { credentials: "same-origin" }).then(function (res) {
         if (!res.ok) throw new Error("PDF fetch " + res.status);
         return res.arrayBuffer();
@@ -465,34 +473,7 @@
     });
   }
 
-  function armPhoneTapToLoad(host, pdfUrl) {
-    if (!host) return;
-    var pagesEl = host.querySelector(".pdf-inpage-pages");
-    if (pagesEl && !pagesEl.querySelector("[data-pdf-show]")) {
-      pagesEl.innerHTML =
-        '<div class="pdf-phone-tap-gate">' +
-        "<p>Tap Show PDF when you want the pictures.</p>" +
-        '<button type="button" class="pdf-show-pdf-btn" data-pdf-show>Show PDF</button>' +
-        "</div>";
-    }
-    setStatus(host, "Tap Show PDF when you want the pictures.");
-    if (host.getAttribute("data-pdf-tap-bound") === "1") return;
-    host.setAttribute("data-pdf-tap-bound", "1");
-    host.addEventListener("click", function (event) {
-      var t = event.target;
-      if (!t || !t.closest || !t.closest("[data-pdf-show]")) return;
-      event.preventDefault();
-      host.setAttribute("data-pdf-tapped", "1");
-      startViewer(host, pdfUrl);
-    });
-  }
-
   function startViewer(host, pdfUrl) {
-    /* Phones: do not start the load until Show PDF is tapped. */
-    if (isPhone() && host.getAttribute("data-pdf-tapped") !== "1") {
-      armPhoneTapToLoad(host, pdfUrl);
-      return;
-    }
     if (host.getAttribute("data-pdf-started") === "1") return;
     host.setAttribute("data-pdf-started", "1");
     var pagesEl = host.querySelector(".pdf-inpage-pages");
@@ -562,13 +543,8 @@
     }
 
     setStatus(host, "Showing first page…");
-    /* isPhone() + data-pdf-tapped already gated above — getDocument only after tap. */
-    if (isPhone() && host.getAttribute("data-pdf-tapped") !== "1") {
-      return;
-    }
     loadPdfJs()
       .then(function (pdfjsLib) {
-        if (isPhone() && host.getAttribute("data-pdf-tapped") !== "1") return null;
         return openPdfDocument(pdfjsLib, pdfUrl);
       })
       .then(function (pdf) {
@@ -600,6 +576,7 @@
   }
 
   function run() {
+    loadPdfJs();
     document.querySelectorAll(".az-expand").forEach(function (btn) { btn.remove(); });
     ensureStyles();
     ensureOcrStickyChrome();
