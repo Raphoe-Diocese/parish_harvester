@@ -5,7 +5,7 @@
  * `.pdf-inpage-pages` / `[data-page]` slots and call
  * window.parishPressScrollPdfToPage. Self-hosted
  * /assets/pdf.min.js, stream/Range, rangeChunkSize 262144.
- * Phone pages paint at least 720px wide (pan sideways).
+ * Pages fit the PDF box width (no 720px minimum).
  * Locked 850px desktop / 450px phone boxes. Keep fixMobilePdfLinks.
  * Do not restore a tap-to-load button, enlarge control,
  * a same-tab native-link replacement, or a raw iPhone iframe.
@@ -22,6 +22,23 @@
   ];
 
   var paintPdfPage = null;
+  var refitPaintedPages = null;
+  var refitTimer = null;
+
+  function schedulePdfRefit() {
+    if (refitTimer) window.clearTimeout(refitTimer);
+    refitTimer = window.setTimeout(function () {
+      refitTimer = null;
+      if (typeof refitPaintedPages === "function") refitPaintedPages();
+    }, 150);
+  }
+
+  function bindPdfRefit() {
+    if (window.__parishPressPdfRefitBound) return;
+    window.__parishPressPdfRefitBound = true;
+    window.addEventListener("resize", schedulePdfRefit);
+    window.addEventListener("orientationchange", schedulePdfRefit);
+  }
 
   function isPhone() {
     var ua = navigator.userAgent || "";
@@ -72,7 +89,7 @@
       "#panel-pdf.az-expanded .pdf-inpage-pages{height:850px!important;min-height:850px!important;max-height:850px!important;overflow:auto!important;overflow-y:auto!important}" +
       "#ocr-panel{height:850px!important;min-height:850px!important;max-height:850px!important;overflow:auto!important;overflow-y:auto!important;scrollbar-gutter:stable}" +
       ".pdf-inpage-page-slot{margin:0 auto 10px;background:#3a3f42;min-height:180px;max-width:100%;position:relative}" +
-      ".pdf-inpage-page-slot canvas{display:block;height:auto;background:#fff}" +
+      ".pdf-inpage-page-slot canvas{display:block;width:100%;height:auto;background:#fff}" +
       ".pdf-link-layer{position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden;pointer-events:none}" +
       ".pdf-annot-link{position:absolute;z-index:2;pointer-events:auto;background:rgba(26,107,107,0.08);border-radius:2px}" +
       ".pdf-annot-link:focus{outline:2px solid #1a6b6b;outline-offset:1px}" +
@@ -100,8 +117,8 @@
       "#panel-pdf.az-expanded .pdf-inpage-pages{height:850px!important;min-height:850px!important;max-height:850px!important;overflow:auto!important;overflow-y:auto!important}" +
       "#ocr-panel,.pdf-frame-wrap iframe," +
       ".pdf-standalone-shell iframe.pdf-frame{height:450px!important;min-height:450px!important;max-height:450px!important;overflow:auto!important;overflow-y:auto!important}" +
-      ".pdf-inpage-pages{overflow-x:auto!important}" +
-      ".pdf-inpage-page-slot{max-width:none}" +
+      ".pdf-inpage-pages{overflow-x:hidden!important}" +
+      ".pdf-inpage-page-slot{max-width:100%}" +
       "#panel-pdf.az-expanded .pdf-frame-wrap,#panel-pdf.az-expanded .pdf-inpage-viewer{height:850px!important;min-height:850px!important;max-height:850px!important;overflow:hidden!important}" +
       "#panel-ocr.az-expanded #ocr-panel{height:850px!important;min-height:850px!important;max-height:850px!important}" +
       "}" +
@@ -430,12 +447,13 @@
     var canvas = slot.querySelector("canvas") || document.createElement("canvas");
     canvas.width = Math.floor(viewport.width);
     canvas.height = Math.floor(viewport.height);
-    canvas.style.width = cssWidth + "px";
-    canvas.style.height = Math.floor(unscaled.height * (cssWidth / unscaled.width)) + "px";
+    canvas.style.width = "100%";
+    canvas.style.height = "auto";
     if (!canvas.parentNode) slot.appendChild(canvas);
     slot.style.position = "relative";
     slot.style.width = cssWidth + "px";
-    slot.style.minHeight = canvas.style.height;
+    slot.style.maxWidth = "100%";
+    slot.style.minHeight = Math.floor(unscaled.height * (cssWidth / unscaled.width)) + "px";
     return page
       .render({ canvasContext: canvas.getContext("2d", { alpha: false }), viewport: viewport })
       .promise.then(function () {
@@ -481,11 +499,7 @@
     var rendering = Object.create(null);
 
     function pageWidth() {
-      var boxWidth = Math.floor((pagesEl && pagesEl.clientWidth) || host.clientWidth || 320);
-      if (isPhone() || (window.matchMedia && window.matchMedia("(max-width: 1024px)").matches)) {
-        return Math.max(boxWidth, 720);
-      }
-      return boxWidth;
+      return Math.max(240, Math.floor((pagesEl.clientWidth || host.clientWidth || 320) - 4));
     }
 
     function ensureSlot(num) {
@@ -515,12 +529,41 @@
 
     paintPdfPage = paint;
 
+    refitPaintedPages = function () {
+      if (!pdfDoc || !pagesEl) return;
+      Object.keys(rendering).forEach(function (k) {
+        delete rendering[k];
+      });
+      var top = pagesEl.scrollTop - 200;
+      var bottom = pagesEl.scrollTop + pagesEl.clientHeight + 200;
+      var any = false;
+      var slots = pagesEl.querySelectorAll("[data-page]");
+      Array.prototype.forEach.call(slots, function (slot) {
+        var num = parseInt(slot.getAttribute("data-page"), 10);
+        if (!num) return;
+        var slotTop = slot.offsetTop;
+        var slotBottom = slotTop + (slot.offsetHeight || 0);
+        if (slotBottom >= top && slotTop <= bottom) {
+          any = true;
+          paint(num);
+        }
+      });
+      if (!any) paint(1);
+    };
+    bindPdfRefit();
+
     function stackAllPages() {
       if (!pdfDoc) return;
       var n;
       for (n = 1; n <= pdfDoc.numPages; n++) ensureSlot(n);
+      var boxBefore = pagesEl.clientWidth;
       paint(1).then(function () {
         setStatus(host, "");
+        if (pagesEl.clientWidth && pagesEl.clientWidth !== boxBefore) {
+          delete rendering[1];
+          return paint(1);
+        }
+      }).then(function () {
         if (!window.IntersectionObserver) {
           var next = 2;
           function paintNext() {
