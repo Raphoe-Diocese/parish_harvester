@@ -211,7 +211,7 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertIn("pdf-fullscreen-btn", html_output)
             # Desktop + mobile: hide the raw-PDF iframe and show stacked PDF.js pages.
             self.assertIn("pdf-inpage-viewer", html_output)
-            self.assertIn("/assets/pdf-inpage-viewer.js?v=20260826a", html_output)
+            self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827a", html_output)
             self.assertIn("data-pdf-src", html_output)
             self.assertIn("is-native-pdf", html_output)
             self.assertIn("display: flex !important", html_output)
@@ -251,7 +251,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("<iframe", html_output)
         self.assertIn("embed-mode", html_output)
         self.assertIn("pdf-inpage-viewer", html_output)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260826a", html_output)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827a", html_output)
         self.assertIn("data-pdf-src", html_output)
         self.assertNotIn("pdf-inpage-prev", html_output)
         self.assertNotIn("pdf-inpage-next", html_output)
@@ -283,7 +283,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("is-native-pdf", boot)
         self.assertIn("pdf-frame-wrap", boot)
         self.assertIn("removeAttribute('src')", boot)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260826a", boot)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827a", boot)
         self.assertNotIn("prefersNativePdf", boot)
         self.assertNotIn("narrowViewport", boot)
         self.assertEqual(boot, pdf_mobile_fallback_boot_js())
@@ -447,7 +447,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn('id="scroll-top-btn"', html_output)
         self.assertIn("Georgia", html_output)
         self.assertIn("pdf-inpage-viewer", html_output)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260826a", html_output)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827a", html_output)
         self.assertIn("block: 'start'", html_output)
         self.assertNotIn("block: 'center'", html_output)
         self.assertIn("is-native-pdf", html_output)
@@ -584,6 +584,11 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("disableAutoFetch", text)
         self.assertIn("disableStream", text)
         self.assertIn("disableRange", text)
+        self.assertIn("disableStream: false", text)
+        self.assertIn("disableRange: false", text)
+        self.assertNotIn("disableStream: phone", text)
+        self.assertNotIn("disableRange: phone", text)
+        self.assertNotIn("var first = phone", text)
         self.assertIn("cdnjs.cloudflare.com/ajax/libs/pdf.js", text)
         self.assertNotIn("docs.google.com", text)
         self.assertIn("is-native-pdf", text)
@@ -635,7 +640,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotIn("prefersNativePdf", text)
         loader = assets / "pdf-mobile-fallback.js"
         self.assertTrue(loader.is_file())
-        self.assertIn("pdf-inpage-viewer.js?v=20260826a", loader.read_text(encoding="utf-8"))
+        self.assertIn("pdf-inpage-viewer.js?v=20260827a", loader.read_text(encoding="utf-8"))
 
     def test_live_gortahork_ocr_has_mega_body_and_visible_850(self) -> None:
         """Frank 2026-08-21: parish slice must reuse mega OCR sentences; 850px on visible boxes."""
