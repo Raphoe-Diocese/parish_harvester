@@ -1192,7 +1192,7 @@ def prefers_native_pdf_js() -> str:
 """
 
 
-PDF_INPAGE_VIEWER_VERSION = "20260827b"
+PDF_INPAGE_VIEWER_VERSION = "20260827c"
 PDF_INPAGE_VIEWER_SRC = f"/assets/pdf-inpage-viewer.js?v={PDF_INPAGE_VIEWER_VERSION}"
 
 
@@ -1581,9 +1581,6 @@ def render_az_jump_html(names: list[str], *, target: str) -> str:
         f'<nav class="az-row" aria-label="Jump to a parish in the {html.escape(target)} viewer">'
         f'<span class="az-row-label">Jump to</span>'
         f'{"".join(buttons)}'
-        f'<button type="button" class="az-expand" '
-        f'data-az-expand="{html.escape(target, quote=True)}" aria-expanded="false">'
-        f"Tap to enlarge</button>"
         "</nav>"
     )
 
@@ -1627,8 +1624,7 @@ def az_jump_css() -> str:
       border-color: {TEAL};
       color: #fff;
     }}
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand {{ display: none; }}
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -1821,23 +1817,8 @@ def az_jump_js() -> str:
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();
@@ -2272,23 +2253,14 @@ def render_bulletin_viewer_shell(
         overflow: auto;
         overflow-y: auto;
       }}
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand {{ display: none !important; }}
       /* Tap targets big enough for a thumb. */
-      .az-expand {{ display: inline-block; }}
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {{
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }}
-      .az-expand {{
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid {TEAL};
-        border-radius: 4px;
-        color: {TEAL};
-        font-weight: 700;
-        cursor: pointer;
       }}
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px

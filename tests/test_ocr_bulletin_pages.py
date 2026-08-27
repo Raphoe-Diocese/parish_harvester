@@ -211,7 +211,7 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertIn("pdf-fullscreen-btn", html_output)
             # Desktop + mobile: hide the raw-PDF iframe and show stacked PDF.js pages.
             self.assertIn("pdf-inpage-viewer", html_output)
-            self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827b", html_output)
+            self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827c", html_output)
             self.assertIn("data-pdf-src", html_output)
             self.assertIn("is-native-pdf", html_output)
             self.assertIn("display: flex !important", html_output)
@@ -251,7 +251,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("<iframe", html_output)
         self.assertIn("embed-mode", html_output)
         self.assertIn("pdf-inpage-viewer", html_output)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827b", html_output)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827c", html_output)
         self.assertIn("data-pdf-src", html_output)
         self.assertNotIn("pdf-inpage-prev", html_output)
         self.assertNotIn("pdf-inpage-next", html_output)
@@ -283,7 +283,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("is-native-pdf", boot)
         self.assertIn("pdf-frame-wrap", boot)
         self.assertIn("removeAttribute('src')", boot)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827b", boot)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827c", boot)
         self.assertNotIn("prefersNativePdf", boot)
         self.assertNotIn("narrowViewport", boot)
         self.assertEqual(boot, pdf_mobile_fallback_boot_js())
@@ -447,7 +447,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn('id="scroll-top-btn"', html_output)
         self.assertIn("Georgia", html_output)
         self.assertIn("pdf-inpage-viewer", html_output)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827b", html_output)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827c", html_output)
         self.assertIn("block: 'start'", html_output)
         self.assertNotIn("block: 'center'", html_output)
         self.assertIn("is-native-pdf", html_output)
@@ -474,7 +474,8 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn('data-az-names="Tawnawilly|Templecrone"', row)
         self.assertIn('data-az-names="Mevagh|Milford Kilkeel"', row)
         self.assertIn('data-az-target="pdf"', row)
-        self.assertIn('data-az-expand="pdf"', row)
+        self.assertNotIn("Tap to enlarge", row)
+        self.assertNotIn("az-expand", row)
         self.assertEqual(render_az_jump_html([], target="ocr"), "")
 
     def test_ocr_search_sits_above_the_letter_and_zoom_rows(self) -> None:
@@ -545,7 +546,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         )
 
     def test_mobile_enlarges_only_the_tapped_panel(self) -> None:
-        """Desktop stays 850px; a phone taps one panel open, never both."""
+        """Enlarge control is gone. Letter rows stay; boxes stay locked."""
         html_output = render_bulletin_viewer_shell(
             page_title="Raphoe Diocese Collated Bulletin",
             diocese_label="RAPHOE",
@@ -565,21 +566,24 @@ class OcrBulletinPageTests(unittest.TestCase):
             parish_page_index={"Tawnawilly": 26},
         )
         self.assertEqual(html_output.count('class="az-row"'), 2)
-        self.assertIn('data-az-expand="pdf"', html_output)
-        self.assertIn('data-az-expand="ocr"', html_output)
-        # Scoped to one panel id each — no shared rule that opens both.
-        self.assertIn("#panel-pdf.az-expanded .pdf-inpage-pages", html_output)
-        self.assertIn("#panel-ocr.az-expanded #ocr-panel", html_output)
-        self.assertNotIn("#panel-ocr.az-expanded .pdf-inpage-pages", html_output)
-        # Desktop lock untouched; Back to Top still re-measures after a resize.
+        self.assertNotIn("Tap to enlarge</button>", html_output)
+        self.assertNotIn("Tap to shrink</button>", html_output)
+        self.assertNotIn("Tap to enlarge", html_output)
+        self.assertNotIn("Tap to shrink", html_output)
+        self.assertNotIn('class="az-expand"', html_output)
+        self.assertNotIn("toggleExpand", html_output)
+        self.assertNotIn(".az-expand { display: inline-block; }", html_output)
+        self.assertIn(".az-expand { display: none", html_output)
+        self.assertIn('class="az-letter"', html_output)
+        self.assertIn('data-az-target="pdf"', html_output)
+        self.assertIn('data-az-target="ocr"', html_output)
         self.assertRegex(html_output, r"#ocr-panel \{[^}]*height: 850px")
-        self.assertIn("parishPressBindScrollTopBoxes", html_output)
 
     def test_pdf_inpage_viewer_asset_streams_first_page(self) -> None:
         assets = Path(__file__).resolve().parent.parent / "docs" / "assets"
         viewer = assets / "pdf-inpage-viewer.js"
         self.assertTrue(viewer.is_file(), "docs/assets/pdf-inpage-viewer.js must exist for live pages")
-        self.assertEqual(PDF_INPAGE_VIEWER_VERSION, "20260827b")
+        self.assertEqual(PDF_INPAGE_VIEWER_VERSION, "20260827c")
         text = viewer.read_text(encoding="utf-8")
         self.assertIn("pdfjs", text.lower())
         self.assertIn("disableAutoFetch", text)
@@ -664,7 +668,12 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotIn("prefersNativePdf", text)
         loader = assets / "pdf-mobile-fallback.js"
         self.assertTrue(loader.is_file())
-        self.assertIn("pdf-inpage-viewer.js?v=20260827b", loader.read_text(encoding="utf-8"))
+        self.assertIn("pdf-inpage-viewer.js?v=20260827c", loader.read_text(encoding="utf-8"))
+        self.assertIn(".az-expand{display:none", text)
+        self.assertIn(
+            'document.querySelectorAll(".az-expand").forEach(function (btn) { btn.remove(); });',
+            text,
+        )
 
     def test_live_gortahork_ocr_has_mega_body_and_visible_850(self) -> None:
         """Frank 2026-08-21: parish slice must reuse mega OCR sentences; 850px on visible boxes."""

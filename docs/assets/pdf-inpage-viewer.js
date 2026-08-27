@@ -63,6 +63,7 @@
     }
     /* Desktop PDF is a locked 850px box (inner scroll). OCR stays locked. */
     style.textContent =
+      ".az-expand{display:none!important}" +
       ".pdf-inpage-viewer{display:flex!important;flex-direction:column;min-height:850px!important;height:auto!important;flex:1 1 auto;background:#3a3f42;color:#e8eeed}" +
       ".pdf-inpage-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:8px;padding:8px 10px;background:#14524f;color:#fff;flex:0 0 auto}" +
       ".pdf-inpage-backup{display:flex;gap:8px;flex-wrap:wrap}" +
@@ -563,6 +564,7 @@
   }
 
   function run() {
+    document.querySelectorAll(".az-expand").forEach(function (btn) { btn.remove(); });
     ensureStyles();
     ensureOcrStickyChrome();
     ensureScrollTop();
