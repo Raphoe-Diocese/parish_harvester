@@ -211,7 +211,7 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertIn("pdf-fullscreen-btn", html_output)
             # Desktop + mobile: hide the raw-PDF iframe and show stacked PDF.js pages.
             self.assertIn("pdf-inpage-viewer", html_output)
-            self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827f", html_output)
+            self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827g", html_output)
             self.assertIn("data-pdf-src", html_output)
             self.assertIn("is-native-pdf", html_output)
             self.assertIn("display: flex !important", html_output)
@@ -251,7 +251,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("<iframe", html_output)
         self.assertIn("embed-mode", html_output)
         self.assertIn("pdf-inpage-viewer", html_output)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827f", html_output)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827g", html_output)
         self.assertIn("data-pdf-src", html_output)
         self.assertNotIn("pdf-inpage-prev", html_output)
         self.assertNotIn("pdf-inpage-next", html_output)
@@ -283,7 +283,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("is-native-pdf", boot)
         self.assertIn("pdf-frame-wrap", boot)
         self.assertIn("removeAttribute('src')", boot)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827f", boot)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827g", boot)
         self.assertNotIn("prefersNativePdf", boot)
         self.assertNotIn("narrowViewport", boot)
         self.assertEqual(boot, pdf_mobile_fallback_boot_js())
@@ -453,7 +453,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn('id="scroll-top-btn"', html_output)
         self.assertIn("Georgia", html_output)
         self.assertIn("pdf-inpage-viewer", html_output)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827f", html_output)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827g", html_output)
         self.assertIn("block: 'start'", html_output)
         self.assertNotIn("block: 'center'", html_output)
         self.assertIn("is-native-pdf", html_output)
@@ -545,11 +545,13 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("scrollbar-gutter: stable", html_output)
         self.assertRegex(html_output, r"\.pdf-inpage-page-slot \{[^}]*max-width: 100%")
         self.assertRegex(html_output, r"\.pdf-link-layer \{[^}]*overflow: hidden")
-        # Both locked blocks say `overflow: auto !important`, which resets the
-        # horizontal axis, so each one has to re-hide it.
+        # Desktop lock re-hides the horizontal axis. Phone/tablet must keep
+        # overflow-x auto so a 720px page can pan sideways.
         self.assertEqual(
-            html_output.count(".pdf-inpage-pages { overflow-x: hidden !important; }"), 2
+            html_output.count(".pdf-inpage-pages { overflow-x: hidden !important; }"), 1
         )
+        self.assertIn(".pdf-inpage-pages { overflow-x: auto !important; }", html_output)
+        self.assertIn(".pdf-inpage-page-slot { max-width: none; }", html_output)
 
     def test_mobile_enlarges_only_the_tapped_panel(self) -> None:
         """Enlarge control is gone. Letter rows stay; boxes stay locked."""
@@ -589,7 +591,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         assets = Path(__file__).resolve().parent.parent / "docs" / "assets"
         viewer = assets / "pdf-inpage-viewer.js"
         self.assertTrue(viewer.is_file(), "docs/assets/pdf-inpage-viewer.js must exist for live pages")
-        self.assertEqual(PDF_INPAGE_VIEWER_VERSION, "20260827f")
+        self.assertEqual(PDF_INPAGE_VIEWER_VERSION, "20260827g")
         text = viewer.read_text(encoding="utf-8")
         self.assertIn("pdfjs", text.lower())
         self.assertIn("disableAutoFetch", text)
@@ -654,19 +656,29 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotIn("armPhoneTapToLoad", text)
         self.assertNotIn("data-pdf-tapped", text)
         self.assertNotIn("data-pdf-show", text)
-        self.assertIn("isMobileView", text)
-        self.assertIn("pdf-phone-native", text)
-        self.assertIn("This week's PDF", text)
+        self.assertNotIn("fillPhoneNativeLink", text)
+        self.assertNotIn("pdf-phone-native", text)
+        self.assertNotIn("is-phone-native", text)
+        self.assertNotIn("This week's PDF", text)
+        self.assertNotIn("PDF.js is desktop-only", text)
         self.assertIn("function run()", text)
         run_idx = text.find("function run()")
-        mobile_in_run = text.find("isMobileView()", run_idx)
-        load_in_run = text.find("loadPdfJs()", run_idx)
-        self.assertGreater(mobile_in_run, run_idx)
-        self.assertGreater(load_in_run, mobile_in_run)
-        run_mobile = text[mobile_in_run:load_in_run]
-        self.assertIn("fillPhoneNativeLink", run_mobile)
-        self.assertNotIn("getDocument", run_mobile)
-        self.assertNotIn("startViewer", run_mobile)
+        run_end = text.find("if (document.readyState", run_idx)
+        run_fn = text[run_idx:run_end]
+        self.assertGreater(run_idx, 0)
+        self.assertIn("loadPdfJs()", run_fn)
+        self.assertIn("startViewer(host, pdfUrl)", run_fn)
+        self.assertNotIn("fillPhoneNativeLink", run_fn)
+        self.assertNotIn("isMobileView()", run_fn)
+        load_idx = text.find("function loadPdfJs()")
+        load_fn = text[load_idx:text.find("function resolvePdfUrl")]
+        self.assertNotIn("isMobileView()", load_fn)
+        start_head = text[text.find("function startViewer"):text.find("function activateWrap")]
+        self.assertNotIn("if (isMobileView()) return;", start_head)
+        self.assertIn("Math.max(boxWidth, 720)", text)
+        self.assertIn("overflow-x:auto!important", text.replace(" ", ""))
+        self.assertIn("Math.min(window.devicePixelRatio || 1, 2)", text)
+        self.assertNotIn("Math.min(dpr, 1)", text)
         landing = Path(__file__).resolve().parent.parent / "docs" / "index.html"
         landing_html = landing.read_text(encoding="utf-8")
         self.assertIn('class="live-btn primary"', landing_html)
@@ -729,7 +741,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotIn("prefersNativePdf", text)
         loader = assets / "pdf-mobile-fallback.js"
         self.assertTrue(loader.is_file())
-        self.assertIn("pdf-inpage-viewer.js?v=20260827f", loader.read_text(encoding="utf-8"))
+        self.assertIn("pdf-inpage-viewer.js?v=20260827g", loader.read_text(encoding="utf-8"))
         self.assertIn(".az-expand{display:none", text)
         self.assertIn(
             'document.querySelectorAll(".az-expand").forEach(function (btn) { btn.remove(); });',
@@ -777,7 +789,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotIn("85vh", diocese)
         self.assertIn("inner-2", diocese)
         self.assertIn("data-pp-scroll-top", diocese)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827f", diocese)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827g", diocese)
 
     def test_live_diocese_html_ships_inpage_viewer(self) -> None:
         """Generator-only changes are invisible on parishpress.ie — live HTML must include PDF.js."""

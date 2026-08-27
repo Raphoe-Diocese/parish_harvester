@@ -1192,7 +1192,7 @@ def prefers_native_pdf_js() -> str:
 """
 
 
-PDF_INPAGE_VIEWER_VERSION = "20260827f"
+PDF_INPAGE_VIEWER_VERSION = "20260827g"
 PDF_INPAGE_VIEWER_SRC = f"/assets/pdf-inpage-viewer.js?v={PDF_INPAGE_VIEWER_VERSION}"
 
 
@@ -1313,7 +1313,7 @@ def pdf_inpage_viewer_css() -> str:
       max-width: 100%;
       position: relative;
     }}
-    .pdf-inpage-page-slot canvas {{ display: block; width: 100%; height: auto; background: #fff; }}
+    .pdf-inpage-page-slot canvas {{ display: block; height: auto; background: #fff; }}
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {{
@@ -1385,7 +1385,8 @@ def pdf_inpage_viewer_css() -> str:
         overflow: auto !important;
         overflow-y: auto !important;
       }}
-      .pdf-inpage-pages {{ overflow-x: hidden !important; }}
+      .pdf-inpage-pages {{ overflow-x: auto !important; }}
+      .pdf-inpage-page-slot {{ max-width: none; }}
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {{
         display: none !important;
