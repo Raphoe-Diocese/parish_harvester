@@ -211,7 +211,7 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertIn("pdf-fullscreen-btn", html_output)
             # Desktop + mobile: hide the raw-PDF iframe and show stacked PDF.js pages.
             self.assertIn("pdf-inpage-viewer", html_output)
-            self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827a", html_output)
+            self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827b", html_output)
             self.assertIn("data-pdf-src", html_output)
             self.assertIn("is-native-pdf", html_output)
             self.assertIn("display: flex !important", html_output)
@@ -251,7 +251,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("<iframe", html_output)
         self.assertIn("embed-mode", html_output)
         self.assertIn("pdf-inpage-viewer", html_output)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827a", html_output)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827b", html_output)
         self.assertIn("data-pdf-src", html_output)
         self.assertNotIn("pdf-inpage-prev", html_output)
         self.assertNotIn("pdf-inpage-next", html_output)
@@ -283,7 +283,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("is-native-pdf", boot)
         self.assertIn("pdf-frame-wrap", boot)
         self.assertIn("removeAttribute('src')", boot)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827a", boot)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827b", boot)
         self.assertNotIn("prefersNativePdf", boot)
         self.assertNotIn("narrowViewport", boot)
         self.assertEqual(boot, pdf_mobile_fallback_boot_js())
@@ -447,7 +447,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn('id="scroll-top-btn"', html_output)
         self.assertIn("Georgia", html_output)
         self.assertIn("pdf-inpage-viewer", html_output)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827a", html_output)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260827b", html_output)
         self.assertIn("block: 'start'", html_output)
         self.assertNotIn("block: 'center'", html_output)
         self.assertIn("is-native-pdf", html_output)
@@ -579,6 +579,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         assets = Path(__file__).resolve().parent.parent / "docs" / "assets"
         viewer = assets / "pdf-inpage-viewer.js"
         self.assertTrue(viewer.is_file(), "docs/assets/pdf-inpage-viewer.js must exist for live pages")
+        self.assertEqual(PDF_INPAGE_VIEWER_VERSION, "20260827b")
         text = viewer.read_text(encoding="utf-8")
         self.assertIn("pdfjs", text.lower())
         self.assertIn("disableAutoFetch", text)
@@ -601,15 +602,38 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("pdf-annot-link", text)
         self.assertIn('target = "_blank"', text)
         self.assertIn("noopener noreferrer", text)
-        self.assertIn("min-height:850px", text.replace(" ", ""))
-        self.assertIn("height:auto!important", text.replace(" ", ""))
-        self.assertIn("overflow:visible!important", text.replace(" ", ""))
-        self.assertIn("height:850px!important", text.replace(" ", ""))
-        self.assertIn("max-height:850px!important", text.replace(" ", ""))
-        self.assertIn("overflow:auto!important", text.replace(" ", ""))
-        self.assertIn("overflow-y:auto!important", text.replace(" ", ""))
-        self.assertIn("height:450px!important", text.replace(" ", ""))
-        self.assertIn("max-height:450px!important", text.replace(" ", ""))
+        compact = text.replace(" ", "")
+        self.assertIn("min-height:850px", compact)
+        self.assertIn("height:850px!important", compact)
+        self.assertIn("max-height:850px!important", compact)
+        self.assertIn("overflow:auto!important", compact)
+        self.assertIn("overflow-y:auto!important", compact)
+        self.assertIn("height:450px!important", compact)
+        self.assertIn("max-height:450px!important", compact)
+        self.assertRegex(
+            text,
+            r"\.pdf-inpage-pages\{[^}]*height:850px!important",
+        )
+        self.assertRegex(
+            text,
+            r"\.pdf-inpage-pages\{[^}]*max-height:850px!important",
+        )
+        self.assertRegex(
+            text,
+            r"\.pdf-inpage-pages\{[^}]*overflow:auto!important",
+        )
+        self.assertNotRegex(
+            text,
+            r"\.pdf-inpage-pages\{[^}]*height:auto!important",
+        )
+        self.assertNotRegex(
+            text,
+            r"\.pdf-inpage-pages\{[^}]*overflow:visible!important",
+        )
+        self.assertIn("root: pagesEl", text)
+        self.assertIn('rootMargin: "200px 0px"', text)
+        self.assertIn("pagesEl.scrollTop = slot.offsetTop", text)
+        self.assertNotIn("scrollIntoView", text)
         self.assertIn("#panel-pdf.az-expanded .pdf-inpage-pages", text)
         self.assertIn("!important", text)
         self.assertIn("#ocr-panel", text)
@@ -640,7 +664,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotIn("prefersNativePdf", text)
         loader = assets / "pdf-mobile-fallback.js"
         self.assertTrue(loader.is_file())
-        self.assertIn("pdf-inpage-viewer.js?v=20260827a", loader.read_text(encoding="utf-8"))
+        self.assertIn("pdf-inpage-viewer.js?v=20260827b", loader.read_text(encoding="utf-8"))
 
     def test_live_gortahork_ocr_has_mega_body_and_visible_850(self) -> None:
         """Frank 2026-08-21: parish slice must reuse mega OCR sentences; 850px on visible boxes."""
