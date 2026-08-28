@@ -5,13 +5,13 @@
     "downloaded": 105,
     "html_links": 0,
     "skipped": 30,
-    "failed": 11,
-    "stale_rejected": 13
+    "failed": 12,
+    "stale_rejected": 12
   },
   "action_counts": {
     "skip": 33,
-    "ok": 122,
-    "investigate": 9
+    "ok": 121,
+    "investigate": 10
   },
   "parishes": [
     {
@@ -3741,35 +3741,33 @@
       "recipe_file": "parishes/recipes/down_and_connor/loughshoreparishes.json",
       "recipe": {
         "start_url": "https://www.loughshoreparishes.org/sunday-bulletin/",
-        "site_type": "wp_json_newest_media",
-        "playbook_type": "pdf_download_list",
+        "site_type": "html_text_bulletin",
+        "playbook_type": "wix_html",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "Weekly file is app/uploads/.../Nth-Sunday-in-Ordinary-Time.pdf. 21st Sunday in Ordinary Time = 23/08/2026.",
-          "CONFIRMED 2026-08-25: https://www.loughshoreparishes.org/app/uploads/2026/08/21st-Sunday-in-Ordinary-Time.pdf HTTP 200, 4513290 bytes, application/pdf. Listing article /21st-sunday-in-ordinary-time-4/ serves the same PDF.",
-          "wp-json /wp/v2/media also lists DC-Vocations-Newsletter.pdf \u2014 href_patterns must stay sunday-in-ordinary-time.",
-          "Do not pin 20th Sunday or a dated filename. Skip Playwright / print_to_pdf."
+          "Bulletin text is on the web page \u2014 not a downloadable PDF file.",
+          "Use Save page as PDF on the newsletter article page.",
+          "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
         ],
         "do_not": [
-          "Do not pin 20th Sunday in Ordinary Time.",
-          "Do not download DC-Vocations-Newsletter.pdf or Safeguarding PDFs.",
-          "Do not print_to_pdf the listing."
+          "Do not use Pick bulletin image when the page is mostly text paragraphs.",
+          "Do not stop at click-only \u2014 need print_to_pdf as the final step."
         ],
-        "recorded_date": "2026-08-25"
+        "recorded_date": "2026-08-28"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "html",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: \u274c Too many pages: 11 pages (max 4)",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: \u274c Too many pages: 11 pages (max 4)"
     },
     {
       "parish_key": "magheraparishderry",
