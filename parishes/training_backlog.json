@@ -1709,30 +1709,32 @@
     },
     {
       "parish_key": "dmaparish",
-      "display_name": "DMA Parish (Claudy Area)",
+      "display_name": "DMA Parish (Claudy area)",
       "diocese": "unknown",
       "recipe_file": "parishes/recipes/unknown/dmaparish.json",
       "recipe": {
-        "start_url": "https://dmaparish.com/pdf/020826.pdf",
+        "start_url": "https://dmaparish.com/parishnews.html",
         "site_type": "dated_pdf_path",
         "playbook_type": "dated_pdf_bulletin",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 2,
-        "click_count": 0,
+        "click_count": 1,
         "has_terminal": true,
         "operator_notes": [
-          "index.html on this host is very slow/heavy for a headless browser and was timing out the whole recipe.",
-          "The PDF itself lives at a predictable dated path: /pdf/DDMMYY.pdf (e.g. 020826.pdf = 2 Aug 2026).",
-          "Confirmed 2026-08-09: https://dmaparish.com/pdf/090826.pdf already returns HTTP 200 application/pdf via a plain HTTP request.",
-          "Harvester rewrites DDMMYY in the URL each Sunday, same mechanism as castledergparish.json."
+          "Bulletin is a real PDF (often made in Microsoft Word \u2192 Print to PDF).",
+          "Tab title may say .docx or .jpg \u2014 ignore that; check the address bar ends in .pdf.",
+          "On the PDF page: tap Save this PDF \u2014 saves the full https://\u2026 address for Sunday harvest.",
+          "Or start on parishnews.html \u2192 point at this week's link \u2192 Yes \u2192 Save this PDF.",
+          "Harvester rewrites DDMMYY in the URL each Sunday (e.g. 140626 \u2192 210626)."
         ],
         "do_not": [
-          "Do not go back to loading index.html as the start_url \u2014 that is what caused the 250s+ timeouts.",
-          "Do not click-hunt for *.pdf on the homepage \u2014 go straight to the dated PDF path."
+          "Do not use use_page_url only \u2014 GitHub cannot read Chrome's internal PDF viewer address.",
+          "Do not worry if Document Properties title mentions Microsoft Word.",
+          "Do not skip a news.html page because view-source is empty \u2014 the /pdf/DDMMYY.pdf links are often JavaScript."
         ],
-        "recorded_date": "2026-08-09"
+        "recorded_date": "2026-08-28"
       },
       "bulletin_format": "download",
       "learned_pattern": "Parish Services / Parish Messenger widget",
