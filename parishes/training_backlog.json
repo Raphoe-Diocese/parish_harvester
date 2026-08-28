@@ -5,13 +5,13 @@
     "downloaded": 105,
     "html_links": 0,
     "skipped": 30,
-    "failed": 10,
-    "stale_rejected": 14
+    "failed": 11,
+    "stale_rejected": 13
   },
   "action_counts": {
     "skip": 33,
     "ok": 122,
-    "investigate": 8
+    "investigate": 9
   },
   "parishes": [
     {
@@ -2426,6 +2426,45 @@
       "bulletin_format": "image_stack",
       "learned_pattern": "",
       "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "galloonparish",
+      "display_name": "Galloonparish",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/galloonparish.json",
+      "recipe": {
+        "start_url": "https://www.galloonparish.com/bulletin-1.html",
+        "site_type": "pdf_link_list",
+        "playbook_type": "pdf_download_list",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 2,
+        "click_count": 0,
+        "has_terminal": true,
+        "operator_notes": [
+          "onewebmedia/*.pdf \u2014 newest row is usually a DDMMYYYY name or hashed S25C with dated link text.",
+          "If the HTTPS certificate is expired, harvest must ignore TLS errors (Playwright).",
+          "Do not pin a dated or hashed filename."
+        ],
+        "do_not": [
+          "Do not pin a dated or hashed onewebmedia filename.",
+          "Do not use plain HTTP scrape when the certificate is expired."
+        ],
+        "recorded_date": "2026-08-28"
+      },
+      "bulletin_format": "download",
+      "learned_pattern": "",
+      "host_profile": {
+        "navigation_timeout_ms": 45000,
+        "ignore_https_errors": true,
+        "total_timeout_s": 180
+      },
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
       "last_error": "",
@@ -5159,9 +5198,9 @@
       "diocese": "down_and_connor",
       "recipe_file": "parishes/recipes/down_and_connor/stteresasparish.json",
       "recipe": {
-        "start_url": "https://stteresasparish.church/",
-        "site_type": "wp_json_newest_post_images",
-        "playbook_type": "stacked_image_bulletin",
+        "start_url": "https://stteresasparish.church/parish-news/",
+        "site_type": "html_text_bulletin",
+        "playbook_type": "wix_html",
         "status": "",
         "skip": false,
         "placeholder": false,
@@ -5169,31 +5208,17 @@
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "WordPress.com site. Each bulletin is a dated post with exactly two",
-          "full-page scans (microsoft-word-D-month-YYYY.docx.jpg and .docx-2.jpg).",
-          "Permalink pattern: /{YYYY}/{MM}/{DD}/the-st-teresas-parish-bulletin-for-sunday-{Nth}-{month}-{YYYY}/",
-          "Slug Sunday is the bulletin Sunday; path YYYY/MM/DD is the post date",
-          "(usually 2\u20134 days earlier). rewrite_date_url would keep the old post-day",
-          "folder and 404 (e.g. /2026/08/06/\u2026-16th-august-2026/).",
-          "On-site /wp-json/wp/v2/posts is an HTML 404. Prefer",
-          "public-api.wordpress.com/wp/v2/sites/stteresasparish.church/posts,",
-          "then /feed/, then homepage links, then a small post-date range.",
-          "site_type:wp_json_newest_post_images then image_stack count=2.",
-          "CONFIRMED 2026-08-20: 16 Aug 2026 post and images are not up yet.",
-          "Newest real post is Sunday 9 Aug 2026 at /2026/08/06/\u2026-9th-august-2026/.",
-          "Recipe must surface that 9 Aug permalink (not invent a 16 Aug URL).",
-          "The 'no bulletin this Sunday' announcement uses a different slug and is",
-          "excluded by post_slug_patterns."
+          "Bulletin text is on the web page \u2014 not a downloadable PDF file.",
+          "Use Save page as PDF on the newsletter article page.",
+          "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
         ],
         "do_not": [
-          "Do not hardcode one post permalink or image URL \u2014 it goes stale every week.",
-          "Do not use rewrite_date_url on the permalink \u2014 it keeps the old /DD/ folder.",
-          "Do not click the 'no bulletin this week' announcement as if it had images.",
-          "Do not print_to_pdf the homepage."
+          "Do not use Pick bulletin image when the page is mostly text paragraphs.",
+          "Do not stop at click-only \u2014 need print_to_pdf as the final step."
         ],
-        "recorded_date": "2026-08-20"
+        "recorded_date": "2026-08-28"
       },
-      "bulletin_format": "image_stack",
+      "bulletin_format": "html",
       "learned_pattern": "Wix HTML bulletin",
       "host_profile": {
         "total_timeout_s": 90,
@@ -5201,10 +5226,10 @@
         "notes": "Bulletin text is on the web page \u2014 not a downloadable PDF file. Use Save page as PDF on the newsletter article page. Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: \u274c Too many pages: 21 pages (max 4)",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: \u274c Too many pages: 21 pages (max 4)"
     },
     {
       "parish_key": "stvincentdepaulparishbelfast",
