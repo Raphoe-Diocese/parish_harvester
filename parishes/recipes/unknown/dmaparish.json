@@ -1,35 +1,48 @@
 {
   "version": 1,
   "parish_key": "dmaparish",
-  "display_name": "DMA Parish (Claudy Area)",
-  "diocese": "",
-  "start_url": "https://dmaparish.com/pdf/020826.pdf",
+  "display_name": "DMA Parish (Claudy area)",
+  "diocese": "unknown",
+  "start_url": "https://dmaparish.com/parishnews.html",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://dmaparish.com/pdf/020826.pdf",
-      "use_target_url": true
+      "action": "click",
+      "selector": "a:has-text(\"View Newsletter\")",
+      "href": "https://dmaparish.com/pdf/230826.pdf",
+      "text": "Sunday, 23rd August 2026 21st Sunday Ord. Time View Newslett",
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "a[href$='.pdf']",
+        "a[href*='.pdf']"
+      ]
     },
     {
       "action": "download",
-      "url": "https://dmaparish.com/pdf/020826.pdf",
-      "use_captured_url": true
+      "url": "https://dmaparish.com/pdf/230826.pdf"
     }
   ],
-  "timeout_ms": 45000,
-  "total_timeout_s": 180,
+  "observed_load_ms": 95596.10009765625,
+  "timeout_ms": 300000,
+  "total_timeout_s": 600,
+  "navigation_wait_until": "commit",
   "playbook_type": "dated_pdf_bulletin",
   "site_type": "dated_pdf_path",
   "operator_notes": [
-    "index.html on this host is very slow/heavy for a headless browser and was timing out the whole recipe.",
-    "The PDF itself lives at a predictable dated path: /pdf/DDMMYY.pdf (e.g. 020826.pdf = 2 Aug 2026).",
-    "Confirmed 2026-08-09: https://dmaparish.com/pdf/090826.pdf already returns HTTP 200 application/pdf via a plain HTTP request.",
-    "Harvester rewrites DDMMYY in the URL each Sunday, same mechanism as castledergparish.json."
+    "Bulletin is a real PDF (often made in Microsoft Word → Print to PDF).",
+    "Tab title may say .docx or .jpg — ignore that; check the address bar ends in .pdf.",
+    "On the PDF page: tap Save this PDF — saves the full https://… address for Sunday harvest.",
+    "Or start on parishnews.html → point at this week's link → Yes → Save this PDF.",
+    "Harvester rewrites DDMMYY in the URL each Sunday (e.g. 140626 → 210626)."
   ],
   "do_not": [
-    "Do not go back to loading index.html as the start_url — that is what caused the 250s+ timeouts.",
-    "Do not click-hunt for *.pdf on the homepage — go straight to the dated PDF path."
+    "Do not use use_page_url only — GitHub cannot read Chrome's internal PDF viewer address.",
+    "Do not worry if Document Properties title mentions Microsoft Word.",
+    "Do not skip a news.html page because view-source is empty — the /pdf/DDMMYY.pdf links are often JavaScript."
   ],
-  "recorded_date": "2026-08-09",
-  "auto_fixed": false
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  },
+  "recorded_date": "2026-08-28"
 }
