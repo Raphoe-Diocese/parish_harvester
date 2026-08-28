@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -179,6 +187,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -201,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +275,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +472,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -863,7 +892,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260827d" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -872,7 +901,7 @@
       <p class="diocese-label">DOWN &amp; CONNOR</p>
       <h1>Down &amp; Connor Collated Bulletin</h1>
       <p class="meta">This week&#x27;s bulletin — 23/08/2026.</p>
-      <a class="download-link-top" href="/mega_pdf/down_and_connor_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="download-link-top" href="/mega_pdf/down_and_connor_mega_bulletin.pdf">Download PDF</a>
     </header>
     <section class="diocese-intro" aria-label="This week's bulletin">
 <p class="intro-welcome">Welcome to the Diocese of Down &amp; Connor.</p>
@@ -883,12 +912,12 @@
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="/mega_pdf/down_and_connor_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="/mega_pdf/down_and_connor_mega_bulletin.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
-      <nav class="az-row" aria-label="Jump to a parish in the pdf viewer"><span class="az-row-label">Jump to</span><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Aghagallon and Ballinderry|Antrim" title="Aghagallon and Ballinderry, Antrim" aria-label="Jump to Aghagallon and Ballinderry">A</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Ballycastle|Ballyclare and Ballygowan|Ballymena|Ballymoney|Bangor|Bright" title="Ballycastle, Ballyclare and Ballygowan, Ballymena, Ballymoney, Bangor, Bright" aria-label="Jump to Ballycastle">B</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Carrickfergus|Carryduffsaintfield|Christ the Redeemer|Corpus Christi Belfast" title="Carrickfergus, Carryduffsaintfield, Christ the Redeemer, Corpus Christi Belfast" aria-label="Jump to Carrickfergus">C</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Derriaghy|Drumbo and Carryduff|Dundrum-and-tyrella-parish-dundrum|Dunsford and Ardglass" title="Derriaghy, Drumbo and Carryduff, Dundrum-and-tyrella-parish-dundrum, Dunsford and Ardglass" aria-label="Jump to Derriaghy">D</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Glenariffe|Glenavy and Killead" title="Glenariffe, Glenavy and Killead" aria-label="Jump to Glenariffe">G</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Hannahstown|Holy Cross Belfast|Holy Family|Holy Rosary Belfast|Holy Trinity Belfast" title="Hannahstown, Holy Cross Belfast, Holy Family, Holy Rosary Belfast, Holy Trinity Belfast" aria-label="Jump to Hannahstown">H</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Kilmore and Killyleagh" title="Kilmore and Killyleagh" aria-label="Jump to Kilmore and Killyleagh">K</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Lisburn|Loughshore" title="Lisburn, Loughshore" aria-label="Jump to Lisburn">L</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Maghera" title="Maghera" aria-label="Jump to Maghera">M</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Nativity" title="Nativity" aria-label="Jump to Nativity">N</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Our Lady Queen of Peace" title="Our Lady Queen of Peace" aria-label="Jump to Our Lady Queen of Peace">O</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Parishofardkeen|Port Glenone (St Mary&#x27;s Portglenone)|Portaferry|Portstewart" title="Parishofardkeen, Port Glenone (St Mary&#x27;s Portglenone), Portaferry, Portstewart" aria-label="Jump to Parishofardkeen">P</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Sacred Heart Belfast|Saint Annes|Saint Anthony|Saint Malachy&#x27;s|Saul and Ballee|St Agnes Belfast|St Bernadettes|St Brigids Belfast|St Colmcille&#x27;s Holywood|St Colmcilles|St Gerards|St Luke&#x27;s Belfast|St MacNissi Randalstown|St Mary&#x27;s Belfast|St Mary&#x27;s on the Hill|St Matthew&#x27;s|St Michael the Archangel|St Oliver Plunkett|St Patrick&#x27;s Downpatrick|St Patricks Belfast|St Teresas|St Vincent de Paul Belfast|St-patricks-loughguile" title="Sacred Heart Belfast, Saint Annes, Saint Anthony, Saint Malachy&#x27;s, Saul and Ballee, St Agnes Belfast, St Bernadettes, St Brigids Belfast, St Colmcille&#x27;s Holywood, St Colmcilles, St Gerards, St Luke&#x27;s Belfast, St MacNissi Randalstown, St Mary&#x27;s Belfast, St Mary&#x27;s on the Hill, St Matthew&#x27;s, St Michael the Archangel, St Oliver Plunkett, St Patrick&#x27;s Downpatrick, St Patricks Belfast, St Teresas, St Vincent de Paul Belfast, St-patricks-loughguile" aria-label="Jump to Sacred Heart Belfast">S</button><button type="button" class="az-expand" data-az-expand="pdf" aria-expanded="false">Tap to enlarge</button></nav>
+      <nav class="az-row" aria-label="Jump to a parish in the pdf viewer"><span class="az-row-label">Jump to</span><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Aghagallon and Ballinderry|Antrim" title="Aghagallon and Ballinderry, Antrim" aria-label="Jump to Aghagallon and Ballinderry">A</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Ballycastle|Ballyclare and Ballygowan|Ballymena|Ballymoney|Bangor|Bright" title="Ballycastle, Ballyclare and Ballygowan, Ballymena, Ballymoney, Bangor, Bright" aria-label="Jump to Ballycastle">B</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Carrickfergus|Carryduffsaintfield|Christ the Redeemer|Corpus Christi Belfast" title="Carrickfergus, Carryduffsaintfield, Christ the Redeemer, Corpus Christi Belfast" aria-label="Jump to Carrickfergus">C</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Derriaghy|Drumbo and Carryduff|Dundrum-and-tyrella-parish-dundrum|Dunsford and Ardglass" title="Derriaghy, Drumbo and Carryduff, Dundrum-and-tyrella-parish-dundrum, Dunsford and Ardglass" aria-label="Jump to Derriaghy">D</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Glenariffe|Glenavy and Killead" title="Glenariffe, Glenavy and Killead" aria-label="Jump to Glenariffe">G</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Hannahstown|Holy Cross Belfast|Holy Family|Holy Rosary Belfast|Holy Trinity Belfast" title="Hannahstown, Holy Cross Belfast, Holy Family, Holy Rosary Belfast, Holy Trinity Belfast" aria-label="Jump to Hannahstown">H</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Kilmore and Killyleagh" title="Kilmore and Killyleagh" aria-label="Jump to Kilmore and Killyleagh">K</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Lisburn|Loughshore" title="Lisburn, Loughshore" aria-label="Jump to Lisburn">L</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Maghera" title="Maghera" aria-label="Jump to Maghera">M</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Nativity" title="Nativity" aria-label="Jump to Nativity">N</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Our Lady Queen of Peace" title="Our Lady Queen of Peace" aria-label="Jump to Our Lady Queen of Peace">O</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Parishofardkeen|Port Glenone (St Mary&#x27;s Portglenone)|Portaferry|Portstewart" title="Parishofardkeen, Port Glenone (St Mary&#x27;s Portglenone), Portaferry, Portstewart" aria-label="Jump to Parishofardkeen">P</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Sacred Heart Belfast|Saint Annes|Saint Anthony|Saint Malachy&#x27;s|Saul and Ballee|St Agnes Belfast|St Bernadettes|St Brigids Belfast|St Colmcille&#x27;s Holywood|St Colmcilles|St Gerards|St Luke&#x27;s Belfast|St MacNissi Randalstown|St Mary&#x27;s Belfast|St Mary&#x27;s on the Hill|St Matthew&#x27;s|St Michael the Archangel|St Oliver Plunkett|St Patrick&#x27;s Downpatrick|St Patricks Belfast|St Teresas|St Vincent de Paul Belfast|St-patricks-loughguile" title="Sacred Heart Belfast, Saint Annes, Saint Anthony, Saint Malachy&#x27;s, Saul and Ballee, St Agnes Belfast, St Bernadettes, St Brigids Belfast, St Colmcille&#x27;s Holywood, St Colmcilles, St Gerards, St Luke&#x27;s Belfast, St MacNissi Randalstown, St Mary&#x27;s Belfast, St Mary&#x27;s on the Hill, St Matthew&#x27;s, St Michael the Archangel, St Oliver Plunkett, St Patrick&#x27;s Downpatrick, St Patricks Belfast, St Teresas, St Vincent de Paul Belfast, St-patricks-loughguile" aria-label="Jump to Sacred Heart Belfast">S</button></nav>
       <div class="quiet-links">
         <a href="/mega_pdf/down_and_connor_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
         <a href="https://raphoe-diocese.github.io/parish_harvester/bulletins/down_and_connor-2026-08-25-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
@@ -900,7 +929,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="/mega_pdf/down_and_connor_mega_bulletin.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="/mega_pdf/down_and_connor_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="/mega_pdf/down_and_connor_mega_bulletin.pdf">Open PDF</a>
               <a href="/mega_pdf/down_and_connor_mega_bulletin.pdf" download>Download</a>
             </div>
           </div>
@@ -927,7 +956,7 @@
       </div>
       </div>
       <div class="ocr-controls-row">
-        <nav class="az-row" aria-label="Jump to a parish in the ocr viewer"><span class="az-row-label">Jump to</span><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Aghagallon and Ballinderry|Antrim" title="Aghagallon and Ballinderry, Antrim" aria-label="Jump to Aghagallon and Ballinderry">A</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Ballycastle|Ballyclare and Ballygowan|Ballymena|Ballymoney|Bangor|Bright" title="Ballycastle, Ballyclare and Ballygowan, Ballymena, Ballymoney, Bangor, Bright" aria-label="Jump to Ballycastle">B</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Carrickfergus|Carryduffsaintfield|Christ the Redeemer|Corpus Christi Belfast" title="Carrickfergus, Carryduffsaintfield, Christ the Redeemer, Corpus Christi Belfast" aria-label="Jump to Carrickfergus">C</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Derriaghy|Drumbo and Carryduff|Dundrum-and-tyrella-parish-dundrum|Dunsford and Ardglass" title="Derriaghy, Drumbo and Carryduff, Dundrum-and-tyrella-parish-dundrum, Dunsford and Ardglass" aria-label="Jump to Derriaghy">D</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Glenariffe|Glenavy and Killead" title="Glenariffe, Glenavy and Killead" aria-label="Jump to Glenariffe">G</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Hannahstown|Holy Cross Belfast|Holy Family|Holy Rosary Belfast|Holy Trinity Belfast" title="Hannahstown, Holy Cross Belfast, Holy Family, Holy Rosary Belfast, Holy Trinity Belfast" aria-label="Jump to Hannahstown">H</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Kilmore and Killyleagh" title="Kilmore and Killyleagh" aria-label="Jump to Kilmore and Killyleagh">K</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Lisburn|Loughshore" title="Lisburn, Loughshore" aria-label="Jump to Lisburn">L</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Maghera" title="Maghera" aria-label="Jump to Maghera">M</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Nativity" title="Nativity" aria-label="Jump to Nativity">N</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Our Lady Queen of Peace" title="Our Lady Queen of Peace" aria-label="Jump to Our Lady Queen of Peace">O</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Parishofardkeen|Port Glenone (St Mary&#x27;s Portglenone)|Portaferry|Portstewart" title="Parishofardkeen, Port Glenone (St Mary&#x27;s Portglenone), Portaferry, Portstewart" aria-label="Jump to Parishofardkeen">P</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Sacred Heart Belfast|Saint Annes|Saint Anthony|Saint Malachy&#x27;s|Saul and Ballee|St Agnes Belfast|St Bernadettes|St Brigids Belfast|St Colmcille&#x27;s Holywood|St Colmcilles|St Gerards|St Luke&#x27;s Belfast|St MacNissi Randalstown|St Mary&#x27;s Belfast|St Mary&#x27;s on the Hill|St Matthew&#x27;s|St Michael the Archangel|St Oliver Plunkett|St Patrick&#x27;s Downpatrick|St Patricks Belfast|St Teresas|St Vincent de Paul Belfast|St-patricks-loughguile" title="Sacred Heart Belfast, Saint Annes, Saint Anthony, Saint Malachy&#x27;s, Saul and Ballee, St Agnes Belfast, St Bernadettes, St Brigids Belfast, St Colmcille&#x27;s Holywood, St Colmcilles, St Gerards, St Luke&#x27;s Belfast, St MacNissi Randalstown, St Mary&#x27;s Belfast, St Mary&#x27;s on the Hill, St Matthew&#x27;s, St Michael the Archangel, St Oliver Plunkett, St Patrick&#x27;s Downpatrick, St Patricks Belfast, St Teresas, St Vincent de Paul Belfast, St-patricks-loughguile" aria-label="Jump to Sacred Heart Belfast">S</button><button type="button" class="az-expand" data-az-expand="ocr" aria-expanded="false">Tap to enlarge</button></nav>
+        <nav class="az-row" aria-label="Jump to a parish in the ocr viewer"><span class="az-row-label">Jump to</span><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Aghagallon and Ballinderry|Antrim" title="Aghagallon and Ballinderry, Antrim" aria-label="Jump to Aghagallon and Ballinderry">A</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Ballycastle|Ballyclare and Ballygowan|Ballymena|Ballymoney|Bangor|Bright" title="Ballycastle, Ballyclare and Ballygowan, Ballymena, Ballymoney, Bangor, Bright" aria-label="Jump to Ballycastle">B</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Carrickfergus|Carryduffsaintfield|Christ the Redeemer|Corpus Christi Belfast" title="Carrickfergus, Carryduffsaintfield, Christ the Redeemer, Corpus Christi Belfast" aria-label="Jump to Carrickfergus">C</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Derriaghy|Drumbo and Carryduff|Dundrum-and-tyrella-parish-dundrum|Dunsford and Ardglass" title="Derriaghy, Drumbo and Carryduff, Dundrum-and-tyrella-parish-dundrum, Dunsford and Ardglass" aria-label="Jump to Derriaghy">D</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Glenariffe|Glenavy and Killead" title="Glenariffe, Glenavy and Killead" aria-label="Jump to Glenariffe">G</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Hannahstown|Holy Cross Belfast|Holy Family|Holy Rosary Belfast|Holy Trinity Belfast" title="Hannahstown, Holy Cross Belfast, Holy Family, Holy Rosary Belfast, Holy Trinity Belfast" aria-label="Jump to Hannahstown">H</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Kilmore and Killyleagh" title="Kilmore and Killyleagh" aria-label="Jump to Kilmore and Killyleagh">K</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Lisburn|Loughshore" title="Lisburn, Loughshore" aria-label="Jump to Lisburn">L</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Maghera" title="Maghera" aria-label="Jump to Maghera">M</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Nativity" title="Nativity" aria-label="Jump to Nativity">N</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Our Lady Queen of Peace" title="Our Lady Queen of Peace" aria-label="Jump to Our Lady Queen of Peace">O</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Parishofardkeen|Port Glenone (St Mary&#x27;s Portglenone)|Portaferry|Portstewart" title="Parishofardkeen, Port Glenone (St Mary&#x27;s Portglenone), Portaferry, Portstewart" aria-label="Jump to Parishofardkeen">P</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Sacred Heart Belfast|Saint Annes|Saint Anthony|Saint Malachy&#x27;s|Saul and Ballee|St Agnes Belfast|St Bernadettes|St Brigids Belfast|St Colmcille&#x27;s Holywood|St Colmcilles|St Gerards|St Luke&#x27;s Belfast|St MacNissi Randalstown|St Mary&#x27;s Belfast|St Mary&#x27;s on the Hill|St Matthew&#x27;s|St Michael the Archangel|St Oliver Plunkett|St Patrick&#x27;s Downpatrick|St Patricks Belfast|St Teresas|St Vincent de Paul Belfast|St-patricks-loughguile" title="Sacred Heart Belfast, Saint Annes, Saint Anthony, Saint Malachy&#x27;s, Saul and Ballee, St Agnes Belfast, St Bernadettes, St Brigids Belfast, St Colmcille&#x27;s Holywood, St Colmcilles, St Gerards, St Luke&#x27;s Belfast, St MacNissi Randalstown, St Mary&#x27;s Belfast, St Mary&#x27;s on the Hill, St Matthew&#x27;s, St Michael the Archangel, St Oliver Plunkett, St Patrick&#x27;s Downpatrick, St Patricks Belfast, St Teresas, St Vincent de Paul Belfast, St-patricks-loughguile" aria-label="Jump to Sacred Heart Belfast">S</button></nav>
         <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
           <span class="ocr-zoom-label">Text size</span>
           <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
@@ -5617,9 +5646,9 @@ benefit from counselling please give us call on <a href="tel:+442843727549" styl
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827d"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260827d';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -6111,23 +6140,8 @@ benefit from counselling please give us call on <a href="tel:+442843727549" styl
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

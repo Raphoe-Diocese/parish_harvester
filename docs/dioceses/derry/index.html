@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -179,6 +187,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -201,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +275,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +472,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -863,7 +892,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260827d" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -872,23 +901,23 @@
       <p class="diocese-label">DERRY</p>
       <h1>Derry Collated Bulletin</h1>
       <p class="meta">This week&#x27;s bulletin — 23/08/2026.</p>
-      <a class="download-link-top" href="/mega_pdf/derry_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="download-link-top" href="/mega_pdf/derry_mega_bulletin.pdf">Download PDF</a>
     </header>
     <section class="diocese-intro" aria-label="This week's bulletin">
 <p class="intro-welcome">Welcome to the Diocese of Derry.</p>
-<p class="intro-count">This week's collated bulletin: 25 of 31 parish bulletins were found.</p>
+<p class="intro-count">This week's collated bulletin: 26 of 31 parish bulletins were found.</p>
 <div class="intro-never"><h3>Parishes that share news on Facebook or their website</h3><p class="intro-never-note">We just have no downloadable PDF to stitch this week.</p><ul class="intro-names"><li><a href="https://www.parishofstjohncoleraine.com" target="_blank" rel="noopener noreferrer">Coleraine (St John)</a></li><li><a href="https://www.desertmartinparish.com" target="_blank" rel="noopener noreferrer">Desertmartin</a></li><li><a href="http://urneyandcastlefinparish.com" target="_blank" rel="noopener noreferrer">Urney and Castlefin</a></li></ul></div>
 <div class="intro-stale"><h3>Parishes whose bulletin is from last week or older</h3><p class="intro-stale-note">They share news on Facebook or their website — we just have no downloadable PDF to stitch this week.</p><ul class="intro-names"><li><a href="http://malinparish.ie" target="_blank" rel="noopener noreferrer">Malin</a></li></ul></div>
 </section>
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="/mega_pdf/derry_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="/mega_pdf/derry_mega_bulletin.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
-      <nav class="az-row" aria-label="Jump to a parish in the pdf viewer"><span class="az-row-label">Jump to</span><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Aghyaran|Ardmore|Ardstraw East" title="Aghyaran, Ardmore, Ardstraw East" aria-label="Jump to Aghyaran">A</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Ballinascreen (&amp; Desertmartin amalgamated)|Banagher|Bellaghy|Buncrana|Buncrana Parish" title="Ballinascreen (&amp; Desertmartin amalgamated), Banagher, Bellaghy, Buncrana, Buncrana Parish" aria-label="Jump to Ballinascreen (&amp; Desertmartin amalgamated)">B</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Camus|Cappaghparish|Carndonagh|Castlederg|Claudy|Clonleigh (Strabane Pastoral Area)|Clonmany|Coleraine (St John)|Culdaff|Culmoe|Culmore Parish" title="Camus, Cappaghparish, Carndonagh, Castlederg, Claudy, Clonleigh (Strabane Pastoral Area), Clonmany, Coleraine (St John), Culdaff, Culmoe, Culmore Parish" aria-label="Jump to Camus">C</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Desertmartin|DMA Parish (Claudy area)|Drumquin|Drumragh|Dungiven" title="Desertmartin, DMA Parish (Claudy area), Drumquin, Drumragh, Dungiven" aria-label="Jump to Desertmartin">D</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Errigal" title="Errigal" aria-label="Jump to Errigal">E</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Fahan" title="Fahan" aria-label="Jump to Fahan">F</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Granaghan|Greencastle|Greenlough" title="Granaghan, Greencastle, Greenlough" aria-label="Jump to Granaghan">G</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Holy Family" title="Holy Family" aria-label="Jump to Holy Family">H</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Iskaheen" title="Iskaheen" aria-label="Jump to Iskaheen">I</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Kilrea" title="Kilrea" aria-label="Jump to Kilrea">K</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Lavey|Leckpatrick|Limavady|Long Tower" title="Lavey, Leckpatrick, Limavady, Long Tower" aria-label="Jump to Lavey">L</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Maghera (Derry)|Malin|Melmount (&amp; Camus)|Moville" title="Maghera (Derry), Malin, Melmount (&amp; Camus), Moville" aria-label="Jump to Maghera (Derry)">M</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Sion Mills|St Eugene&#x27;s Cathedral (Templemore)|St Mary&#x27;s Parish Creggan|Star of the Sea (Magilligan)|Steelstown" title="Sion Mills, St Eugene&#x27;s Cathedral (Templemore), St Mary&#x27;s Parish Creggan, Star of the Sea (Magilligan), Steelstown" aria-label="Jump to Sion Mills">S</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Three Patrons" title="Three Patrons" aria-label="Jump to Three Patrons">T</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Urney and Castlefin" title="Urney and Castlefin" aria-label="Jump to Urney and Castlefin">U</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Waterside (&amp; Strathfoyle amalgamated)" title="Waterside (&amp; Strathfoyle amalgamated)" aria-label="Jump to Waterside (&amp; Strathfoyle amalgamated)">W</button><button type="button" class="az-expand" data-az-expand="pdf" aria-expanded="false">Tap to enlarge</button></nav>
+      <nav class="az-row" aria-label="Jump to a parish in the pdf viewer"><span class="az-row-label">Jump to</span><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Aghyaran|Ardmore|Ardstraw East" title="Aghyaran, Ardmore, Ardstraw East" aria-label="Jump to Aghyaran">A</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Ballinascreen (&amp; Desertmartin amalgamated)|Banagher|Bellaghy|Buncrana|Buncrana Parish" title="Ballinascreen (&amp; Desertmartin amalgamated), Banagher, Bellaghy, Buncrana, Buncrana Parish" aria-label="Jump to Ballinascreen (&amp; Desertmartin amalgamated)">B</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Camus|Cappaghparish|Carndonagh|Castlederg|Claudy|Clonleigh (Strabane Pastoral Area)|Clonmany|Coleraine (St John)|Culdaff|Culmoe|Culmore Parish" title="Camus, Cappaghparish, Carndonagh, Castlederg, Claudy, Clonleigh (Strabane Pastoral Area), Clonmany, Coleraine (St John), Culdaff, Culmoe, Culmore Parish" aria-label="Jump to Camus">C</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Desertmartin|DMA Parish (Claudy area)|Drumquin|Drumragh|Dungiven" title="Desertmartin, DMA Parish (Claudy area), Drumquin, Drumragh, Dungiven" aria-label="Jump to Desertmartin">D</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Errigal" title="Errigal" aria-label="Jump to Errigal">E</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Fahan" title="Fahan" aria-label="Jump to Fahan">F</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Granaghan|Greencastle|Greenlough" title="Granaghan, Greencastle, Greenlough" aria-label="Jump to Granaghan">G</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Holy Family" title="Holy Family" aria-label="Jump to Holy Family">H</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Iskaheen" title="Iskaheen" aria-label="Jump to Iskaheen">I</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Kilrea" title="Kilrea" aria-label="Jump to Kilrea">K</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Lavey|Leckpatrick|Limavady|Long Tower" title="Lavey, Leckpatrick, Limavady, Long Tower" aria-label="Jump to Lavey">L</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Maghera (Derry)|Malin|Melmount (&amp; Camus)|Moville" title="Maghera (Derry), Malin, Melmount (&amp; Camus), Moville" aria-label="Jump to Maghera (Derry)">M</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Sion Mills|St Eugene&#x27;s Cathedral (Templemore)|St Mary&#x27;s Parish Creggan|Star of the Sea (Magilligan)|Steelstown" title="Sion Mills, St Eugene&#x27;s Cathedral (Templemore), St Mary&#x27;s Parish Creggan, Star of the Sea (Magilligan), Steelstown" aria-label="Jump to Sion Mills">S</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Three Patrons" title="Three Patrons" aria-label="Jump to Three Patrons">T</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Urney and Castlefin" title="Urney and Castlefin" aria-label="Jump to Urney and Castlefin">U</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Waterside (&amp; Strathfoyle amalgamated)" title="Waterside (&amp; Strathfoyle amalgamated)" aria-label="Jump to Waterside (&amp; Strathfoyle amalgamated)">W</button></nav>
       <div class="quiet-links">
         <a href="/mega_pdf/derry_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
         <a href="https://raphoe-diocese.github.io/parish_harvester/bulletins/derry-2026-08-25-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
@@ -900,7 +929,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="/mega_pdf/derry_mega_bulletin.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="/mega_pdf/derry_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="/mega_pdf/derry_mega_bulletin.pdf">Open PDF</a>
               <a href="/mega_pdf/derry_mega_bulletin.pdf" download>Download</a>
             </div>
           </div>
@@ -927,7 +956,7 @@
       </div>
       </div>
       <div class="ocr-controls-row">
-        <nav class="az-row" aria-label="Jump to a parish in the ocr viewer"><span class="az-row-label">Jump to</span><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Aghyaran|Ardmore|Ardstraw East" title="Aghyaran, Ardmore, Ardstraw East" aria-label="Jump to Aghyaran">A</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Ballinascreen (&amp; Desertmartin amalgamated)|Banagher|Bellaghy|Buncrana|Buncrana Parish" title="Ballinascreen (&amp; Desertmartin amalgamated), Banagher, Bellaghy, Buncrana, Buncrana Parish" aria-label="Jump to Ballinascreen (&amp; Desertmartin amalgamated)">B</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Camus|Cappaghparish|Carndonagh|Castlederg|Claudy|Clonleigh (Strabane Pastoral Area)|Clonmany|Coleraine (St John)|Culdaff|Culmoe|Culmore Parish" title="Camus, Cappaghparish, Carndonagh, Castlederg, Claudy, Clonleigh (Strabane Pastoral Area), Clonmany, Coleraine (St John), Culdaff, Culmoe, Culmore Parish" aria-label="Jump to Camus">C</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Desertmartin|DMA Parish (Claudy area)|Drumquin|Drumragh|Dungiven" title="Desertmartin, DMA Parish (Claudy area), Drumquin, Drumragh, Dungiven" aria-label="Jump to Desertmartin">D</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Errigal" title="Errigal" aria-label="Jump to Errigal">E</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Fahan" title="Fahan" aria-label="Jump to Fahan">F</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Granaghan|Greencastle|Greenlough" title="Granaghan, Greencastle, Greenlough" aria-label="Jump to Granaghan">G</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Holy Family" title="Holy Family" aria-label="Jump to Holy Family">H</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Iskaheen" title="Iskaheen" aria-label="Jump to Iskaheen">I</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Kilrea" title="Kilrea" aria-label="Jump to Kilrea">K</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Lavey|Leckpatrick|Limavady|Long Tower" title="Lavey, Leckpatrick, Limavady, Long Tower" aria-label="Jump to Lavey">L</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Maghera (Derry)|Malin|Melmount (&amp; Camus)|Moville" title="Maghera (Derry), Malin, Melmount (&amp; Camus), Moville" aria-label="Jump to Maghera (Derry)">M</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Sion Mills|St Eugene&#x27;s Cathedral (Templemore)|St Mary&#x27;s Parish Creggan|Star of the Sea (Magilligan)|Steelstown" title="Sion Mills, St Eugene&#x27;s Cathedral (Templemore), St Mary&#x27;s Parish Creggan, Star of the Sea (Magilligan), Steelstown" aria-label="Jump to Sion Mills">S</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Three Patrons" title="Three Patrons" aria-label="Jump to Three Patrons">T</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Urney and Castlefin" title="Urney and Castlefin" aria-label="Jump to Urney and Castlefin">U</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Waterside (&amp; Strathfoyle amalgamated)" title="Waterside (&amp; Strathfoyle amalgamated)" aria-label="Jump to Waterside (&amp; Strathfoyle amalgamated)">W</button><button type="button" class="az-expand" data-az-expand="ocr" aria-expanded="false">Tap to enlarge</button></nav>
+        <nav class="az-row" aria-label="Jump to a parish in the ocr viewer"><span class="az-row-label">Jump to</span><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Aghyaran|Ardmore|Ardstraw East" title="Aghyaran, Ardmore, Ardstraw East" aria-label="Jump to Aghyaran">A</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Ballinascreen (&amp; Desertmartin amalgamated)|Banagher|Bellaghy|Buncrana|Buncrana Parish" title="Ballinascreen (&amp; Desertmartin amalgamated), Banagher, Bellaghy, Buncrana, Buncrana Parish" aria-label="Jump to Ballinascreen (&amp; Desertmartin amalgamated)">B</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Camus|Cappaghparish|Carndonagh|Castlederg|Claudy|Clonleigh (Strabane Pastoral Area)|Clonmany|Coleraine (St John)|Culdaff|Culmoe|Culmore Parish" title="Camus, Cappaghparish, Carndonagh, Castlederg, Claudy, Clonleigh (Strabane Pastoral Area), Clonmany, Coleraine (St John), Culdaff, Culmoe, Culmore Parish" aria-label="Jump to Camus">C</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Desertmartin|DMA Parish (Claudy area)|Drumquin|Drumragh|Dungiven" title="Desertmartin, DMA Parish (Claudy area), Drumquin, Drumragh, Dungiven" aria-label="Jump to Desertmartin">D</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Errigal" title="Errigal" aria-label="Jump to Errigal">E</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Fahan" title="Fahan" aria-label="Jump to Fahan">F</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Granaghan|Greencastle|Greenlough" title="Granaghan, Greencastle, Greenlough" aria-label="Jump to Granaghan">G</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Holy Family" title="Holy Family" aria-label="Jump to Holy Family">H</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Iskaheen" title="Iskaheen" aria-label="Jump to Iskaheen">I</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Kilrea" title="Kilrea" aria-label="Jump to Kilrea">K</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Lavey|Leckpatrick|Limavady|Long Tower" title="Lavey, Leckpatrick, Limavady, Long Tower" aria-label="Jump to Lavey">L</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Maghera (Derry)|Malin|Melmount (&amp; Camus)|Moville" title="Maghera (Derry), Malin, Melmount (&amp; Camus), Moville" aria-label="Jump to Maghera (Derry)">M</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Sion Mills|St Eugene&#x27;s Cathedral (Templemore)|St Mary&#x27;s Parish Creggan|Star of the Sea (Magilligan)|Steelstown" title="Sion Mills, St Eugene&#x27;s Cathedral (Templemore), St Mary&#x27;s Parish Creggan, Star of the Sea (Magilligan), Steelstown" aria-label="Jump to Sion Mills">S</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Three Patrons" title="Three Patrons" aria-label="Jump to Three Patrons">T</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Urney and Castlefin" title="Urney and Castlefin" aria-label="Jump to Urney and Castlefin">U</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Waterside (&amp; Strathfoyle amalgamated)" title="Waterside (&amp; Strathfoyle amalgamated)" aria-label="Jump to Waterside (&amp; Strathfoyle amalgamated)">W</button></nav>
         <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
           <span class="ocr-zoom-label">Text size</span>
           <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
@@ -6041,7 +6070,7 @@ on the parish website and Church notice board.</p></div>
     <section class="parish-section">
       <h2 class="section-heading">DERRY Parishes with Working Bulletin Links</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghyaran"><a class="parish-link" href="../../parishes/derry/parishofaghyaran.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li class="parish-item" data-name="ardmore"><a class="parish-link" href="../../parishes/derry/ardmoreparish.html" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li class="parish-item" data-name="ardstraw east"><a class="parish-link" href="../../parishes/derry/parishofardstraweast.html" target="_blank" rel="noopener noreferrer">Ardstraw East</a></li><li class="parish-item" data-name="ballinascreen (&amp; desertmartin amalgamated)"><a class="parish-link" href="../../parishes/derry/parishofballinascreen.html" target="_blank" rel="noopener noreferrer">Ballinascreen (&amp; Desertmartin amalgamated)</a></li><li class="parish-item" data-name="banagher"><a class="parish-link" href="../../parishes/derry/banagherparish.html" target="_blank" rel="noopener noreferrer">Banagher</a></li><li class="parish-item" data-name="bellaghy"><a class="parish-link" href="../../parishes/derry/bellaghyparish.html" target="_blank" rel="noopener noreferrer">Bellaghy</a></li><li class="parish-item" data-name="buncrana"><a class="parish-link" href="../../parishes/derry/buncranaparish.html" target="_blank" rel="noopener noreferrer">Buncrana</a></li><li class="parish-item" data-name="buncrana parish"><a class="parish-link" href="https://www.buncranaparish.com/pdf/230826.pdf" target="_blank" rel="noopener noreferrer">Buncrana Parish</a></li><li class="parish-item" data-name="camus"><a class="parish-link" href="../../parishes/derry/camusparish.html" target="_blank" rel="noopener noreferrer">Camus</a></li><li class="parish-item" data-name="cappaghparish"><a class="parish-link" href="https://www.cappaghparish.com/index.html" target="_blank" rel="noopener noreferrer">Cappaghparish</a></li><li class="parish-item" data-name="carndonagh"><a class="parish-link" href="../../parishes/derry/carndonaghparish.html" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li class="parish-item" data-name="castlederg"><a class="parish-link" href="../../parishes/derry/castledergparish.html" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li class="parish-item" data-name="claudy"><a class="parish-link" href="https://www.parishofclaudy.com/welcome/weekly-bulletin.html" target="_blank" rel="noopener noreferrer">Claudy</a></li><li class="parish-item" data-name="clonleigh (strabane pastoral area)"><a class="parish-link" href="../../parishes/derry/clonleighparish.html" target="_blank" rel="noopener noreferrer">Clonleigh (Strabane Pastoral Area)</a></li><li class="parish-item" data-name="clonmany"><a class="parish-link" href="../../parishes/derry/clonmanyparish.html" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li class="parish-item" data-name="coleraine (st john)"><a class="parish-link" href="https://www.parishofstjohncoleraine.com/" target="_blank" rel="noopener noreferrer">Coleraine (St John)</a></li><li class="parish-item" data-name="culdaff"><a class="parish-link" href="../../parishes/derry/culdaffparish.html" target="_blank" rel="noopener noreferrer">Culdaff</a></li><li class="parish-item" data-name="culmoe"><a class="parish-link" href="../../parishes/derry/culmoreparish.html" target="_blank" rel="noopener noreferrer">Culmoe</a></li><li class="parish-item" data-name="culmore parish"><a class="parish-link" href="http://culmoreparish.com/pdf/230826.pdf" target="_blank" rel="noopener noreferrer">Culmore Parish</a></li><li class="parish-item" data-name="desertmartin"><a class="parish-link" href="https://www.desertmartinparish.com/?page_id=6" target="_blank" rel="noopener noreferrer">Desertmartin</a></li><li class="parish-item" data-name="dma parish (claudy area)"><a class="parish-link" href="../../parishes/derry/dmaparish.html" target="_blank" rel="noopener noreferrer">DMA Parish (Claudy area)</a></li><li class="parish-item" data-name="drumquin"><a class="parish-link" href="../../parishes/derry/drumquinparish.html" target="_blank" rel="noopener noreferrer">Drumquin</a></li><li class="parish-item" data-name="drumragh"><a class="parish-link" href="../../parishes/derry/drumraghparish.html" target="_blank" rel="noopener noreferrer">Drumragh</a></li><li class="parish-item" data-name="dungiven"><a class="parish-link" href="../../parishes/derry/parishofdungiven.html" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li class="parish-item" data-name="errigal"><a class="parish-link" href="../../parishes/derry/errigalparish.html" target="_blank" rel="noopener noreferrer">Errigal</a></li><li class="parish-item" data-name="fahan"><a class="parish-link" href="../../parishes/derry/fahanparish.html" target="_blank" rel="noopener noreferrer">Fahan</a></li><li class="parish-item" data-name="granaghan"><a class="parish-link" href="../../parishes/derry/granaghanparish.html" target="_blank" rel="noopener noreferrer">Granaghan</a></li><li class="parish-item" data-name="greencastle"><a class="parish-link" href="https://greencastleparish.com/" target="_blank" rel="noopener noreferrer">Greencastle</a></li><li class="parish-item" data-name="greenlough"><a class="parish-link" href="../../parishes/derry/greenlough.html" target="_blank" rel="noopener noreferrer">Greenlough</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="../../parishes/derry/holyfamily-parish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="iskaheen"><a class="parish-link" href="../../parishes/derry/iskaheenparish.html" target="_blank" rel="noopener noreferrer">Iskaheen</a></li><li class="parish-item" data-name="kilrea"><a class="parish-link" href="../../parishes/derry/parishofkilrea.html" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li class="parish-item" data-name="lavey"><a class="parish-link" href="../../parishes/derry/laveyparish.html" target="_blank" rel="noopener noreferrer">Lavey</a></li><li class="parish-item" data-name="leckpatrick"><a class="parish-link" href="../../parishes/derry/leckpatrickparish.html" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li class="parish-item" data-name="limavady"><a class="parish-link" href="../../parishes/derry/limavadyparish.html" target="_blank" rel="noopener noreferrer">Limavady</a></li><li class="parish-item" data-name="long tower"><a class="parish-link" href="https://longtowerchurch.org/" target="_blank" rel="noopener noreferrer">Long Tower</a></li><li class="parish-item" data-name="maghera (derry)"><a class="parish-link" href="../../parishes/derry/magheraparishderry.html" target="_blank" rel="noopener noreferrer">Maghera (Derry)</a></li><li class="parish-item" data-name="malin"><a class="parish-link" href="http://malinparish.ie/" target="_blank" rel="noopener noreferrer">Malin</a></li><li class="parish-item" data-name="melmount (&amp; camus)"><a class="parish-link" href="../../parishes/derry/melmountparish.html" target="_blank" rel="noopener noreferrer">Melmount (&amp; Camus)</a></li><li class="parish-item" data-name="moville"><a class="parish-link" href="../../parishes/derry/movilleparish.html" target="_blank" rel="noopener noreferrer">Moville</a></li><li class="parish-item" data-name="sion mills"><a class="parish-link" href="../../parishes/derry/parishofsionmills.html" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li class="parish-item" data-name="st eugene&#x27;s cathedral (templemore)"><a class="parish-link" href="../../parishes/derry/steugenescathedral.html" target="_blank" rel="noopener noreferrer">St Eugene&#x27;s Cathedral (Templemore)</a></li><li class="parish-item" data-name="st mary&#x27;s parish creggan"><a class="parish-link" href="../../parishes/derry/stmarysparishcreggan.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Parish Creggan</a></li><li class="parish-item" data-name="star of the sea (magilligan)"><a class="parish-link" href="../../parishes/derry/staroftheseacatholic.html" target="_blank" rel="noopener noreferrer">Star of the Sea (Magilligan)</a></li><li class="parish-item" data-name="steelstown"><a class="parish-link" href="../../parishes/derry/steelstownparish.html" target="_blank" rel="noopener noreferrer">Steelstown</a></li><li class="parish-item" data-name="three patrons"><a class="parish-link" href="../../parishes/derry/threepatrons.html" target="_blank" rel="noopener noreferrer">Three Patrons</a></li><li class="parish-item" data-name="urney and castlefin"><a class="parish-link" href="http://urneyandcastlefinparish.com/?page_id=1227" target="_blank" rel="noopener noreferrer">Urney and Castlefin</a></li><li class="parish-item" data-name="waterside (&amp; strathfoyle amalgamated)"><a class="parish-link" href="../../parishes/derry/watersideparish.html" target="_blank" rel="noopener noreferrer">Waterside (&amp; Strathfoyle amalgamated)</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghyaran"><a class="parish-link" href="../../parishes/derry/parishofaghyaran.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li class="parish-item" data-name="ardmore"><a class="parish-link" href="../../parishes/derry/ardmoreparish.html" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li class="parish-item" data-name="ardstraw east"><a class="parish-link" href="../../parishes/derry/parishofardstraweast.html" target="_blank" rel="noopener noreferrer">Ardstraw East</a></li><li class="parish-item" data-name="ballinascreen (&amp; desertmartin amalgamated)"><a class="parish-link" href="../../parishes/derry/parishofballinascreen.html" target="_blank" rel="noopener noreferrer">Ballinascreen (&amp; Desertmartin amalgamated)</a></li><li class="parish-item" data-name="banagher"><a class="parish-link" href="../../parishes/derry/banagherparish.html" target="_blank" rel="noopener noreferrer">Banagher</a></li><li class="parish-item" data-name="bellaghy"><a class="parish-link" href="../../parishes/derry/bellaghyparish.html" target="_blank" rel="noopener noreferrer">Bellaghy</a></li><li class="parish-item" data-name="buncrana"><a class="parish-link" href="../../parishes/derry/buncranaparish.html" target="_blank" rel="noopener noreferrer">Buncrana</a></li><li class="parish-item" data-name="buncrana parish"><a class="parish-link" href="https://www.buncranaparish.com/pdf/230826.pdf" target="_blank" rel="noopener noreferrer">Buncrana Parish</a></li><li class="parish-item" data-name="camus"><a class="parish-link" href="../../parishes/derry/camusparish.html" target="_blank" rel="noopener noreferrer">Camus</a></li><li class="parish-item" data-name="cappaghparish"><a class="parish-link" href="https://www.cappaghparish.com/index.html" target="_blank" rel="noopener noreferrer">Cappaghparish</a></li><li class="parish-item" data-name="carndonagh"><a class="parish-link" href="../../parishes/derry/carndonaghparish.html" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li class="parish-item" data-name="castlederg"><a class="parish-link" href="../../parishes/derry/castledergparish.html" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li class="parish-item" data-name="claudy"><a class="parish-link" href="../../parishes/derry/parishofclaudy.html" target="_blank" rel="noopener noreferrer">Claudy</a></li><li class="parish-item" data-name="clonleigh (strabane pastoral area)"><a class="parish-link" href="../../parishes/derry/clonleighparish.html" target="_blank" rel="noopener noreferrer">Clonleigh (Strabane Pastoral Area)</a></li><li class="parish-item" data-name="clonmany"><a class="parish-link" href="../../parishes/derry/clonmanyparish.html" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li class="parish-item" data-name="coleraine (st john)"><a class="parish-link" href="https://www.parishofstjohncoleraine.com/" target="_blank" rel="noopener noreferrer">Coleraine (St John)</a></li><li class="parish-item" data-name="culdaff"><a class="parish-link" href="../../parishes/derry/culdaffparish.html" target="_blank" rel="noopener noreferrer">Culdaff</a></li><li class="parish-item" data-name="culmoe"><a class="parish-link" href="../../parishes/derry/culmoreparish.html" target="_blank" rel="noopener noreferrer">Culmoe</a></li><li class="parish-item" data-name="culmore parish"><a class="parish-link" href="http://culmoreparish.com/pdf/230826.pdf" target="_blank" rel="noopener noreferrer">Culmore Parish</a></li><li class="parish-item" data-name="desertmartin"><a class="parish-link" href="https://www.desertmartinparish.com/?page_id=6" target="_blank" rel="noopener noreferrer">Desertmartin</a></li><li class="parish-item" data-name="dma parish (claudy area)"><a class="parish-link" href="../../parishes/derry/dmaparish.html" target="_blank" rel="noopener noreferrer">DMA Parish (Claudy area)</a></li><li class="parish-item" data-name="drumquin"><a class="parish-link" href="../../parishes/derry/drumquinparish.html" target="_blank" rel="noopener noreferrer">Drumquin</a></li><li class="parish-item" data-name="drumragh"><a class="parish-link" href="../../parishes/derry/drumraghparish.html" target="_blank" rel="noopener noreferrer">Drumragh</a></li><li class="parish-item" data-name="dungiven"><a class="parish-link" href="../../parishes/derry/parishofdungiven.html" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li class="parish-item" data-name="errigal"><a class="parish-link" href="../../parishes/derry/errigalparish.html" target="_blank" rel="noopener noreferrer">Errigal</a></li><li class="parish-item" data-name="fahan"><a class="parish-link" href="../../parishes/derry/fahanparish.html" target="_blank" rel="noopener noreferrer">Fahan</a></li><li class="parish-item" data-name="granaghan"><a class="parish-link" href="../../parishes/derry/granaghanparish.html" target="_blank" rel="noopener noreferrer">Granaghan</a></li><li class="parish-item" data-name="greencastle"><a class="parish-link" href="https://greencastleparish.com/" target="_blank" rel="noopener noreferrer">Greencastle</a></li><li class="parish-item" data-name="greenlough"><a class="parish-link" href="../../parishes/derry/greenlough.html" target="_blank" rel="noopener noreferrer">Greenlough</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="../../parishes/derry/holyfamily-parish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="iskaheen"><a class="parish-link" href="../../parishes/derry/iskaheenparish.html" target="_blank" rel="noopener noreferrer">Iskaheen</a></li><li class="parish-item" data-name="kilrea"><a class="parish-link" href="../../parishes/derry/parishofkilrea.html" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li class="parish-item" data-name="lavey"><a class="parish-link" href="../../parishes/derry/laveyparish.html" target="_blank" rel="noopener noreferrer">Lavey</a></li><li class="parish-item" data-name="leckpatrick"><a class="parish-link" href="../../parishes/derry/leckpatrickparish.html" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li class="parish-item" data-name="limavady"><a class="parish-link" href="../../parishes/derry/limavadyparish.html" target="_blank" rel="noopener noreferrer">Limavady</a></li><li class="parish-item" data-name="long tower"><a class="parish-link" href="https://longtowerchurch.org/" target="_blank" rel="noopener noreferrer">Long Tower</a></li><li class="parish-item" data-name="maghera (derry)"><a class="parish-link" href="../../parishes/derry/magheraparishderry.html" target="_blank" rel="noopener noreferrer">Maghera (Derry)</a></li><li class="parish-item" data-name="malin"><a class="parish-link" href="http://malinparish.ie/" target="_blank" rel="noopener noreferrer">Malin</a></li><li class="parish-item" data-name="melmount (&amp; camus)"><a class="parish-link" href="../../parishes/derry/melmountparish.html" target="_blank" rel="noopener noreferrer">Melmount (&amp; Camus)</a></li><li class="parish-item" data-name="moville"><a class="parish-link" href="../../parishes/derry/movilleparish.html" target="_blank" rel="noopener noreferrer">Moville</a></li><li class="parish-item" data-name="sion mills"><a class="parish-link" href="../../parishes/derry/parishofsionmills.html" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li class="parish-item" data-name="st eugene&#x27;s cathedral (templemore)"><a class="parish-link" href="../../parishes/derry/steugenescathedral.html" target="_blank" rel="noopener noreferrer">St Eugene&#x27;s Cathedral (Templemore)</a></li><li class="parish-item" data-name="st mary&#x27;s parish creggan"><a class="parish-link" href="../../parishes/derry/stmarysparishcreggan.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Parish Creggan</a></li><li class="parish-item" data-name="star of the sea (magilligan)"><a class="parish-link" href="../../parishes/derry/staroftheseacatholic.html" target="_blank" rel="noopener noreferrer">Star of the Sea (Magilligan)</a></li><li class="parish-item" data-name="steelstown"><a class="parish-link" href="../../parishes/derry/steelstownparish.html" target="_blank" rel="noopener noreferrer">Steelstown</a></li><li class="parish-item" data-name="three patrons"><a class="parish-link" href="../../parishes/derry/threepatrons.html" target="_blank" rel="noopener noreferrer">Three Patrons</a></li><li class="parish-item" data-name="urney and castlefin"><a class="parish-link" href="http://urneyandcastlefinparish.com/?page_id=1227" target="_blank" rel="noopener noreferrer">Urney and Castlefin</a></li><li class="parish-item" data-name="waterside (&amp; strathfoyle amalgamated)"><a class="parish-link" href="../../parishes/derry/watersideparish.html" target="_blank" rel="noopener noreferrer">Waterside (&amp; Strathfoyle amalgamated)</a></li></ul>
     </section>
   </div>
   <footer>
@@ -6093,9 +6122,9 @@ on the parish website and Church notice board.</p></div>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827d"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260827d';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -6587,23 +6616,8 @@ on the parish website and Church notice board.</p></div>
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();
