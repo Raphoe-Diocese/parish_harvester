@@ -132,8 +132,9 @@ PDFEMB_SELECTOR = "a.pdfemb-viewer[href]"
 PDFEMB_HREF_EXTRACT_JS = "(els) => els.map(el => el.getAttribute('href')).filter(Boolean)"
 
 _ALWAYS_NON_BULLETIN_RE = re.compile(
-    r"gdpr|privacy[-_\s]?policy|wedding[-_\s]?parish|\bwedding\b|"
-    r"order[-_\s]?of[-_\s]?mass|giftaid|gift[-_\s]?aid",
+    r"gdpr|\bprivacy\b|privacy[-_\s]?policy|wedding[-_\s]?parish|\bwedding\b|"
+    r"order[-_\s]?of[-_\s]?mass|giftaid|gift[-_\s]?aid|"
+    r"dataentry|data[-_\s]?entry|new[-_\s]?parishioner|parishioner[-_\s]?form",
     re.IGNORECASE,
 )
 _NON_BULLETIN_RE = re.compile(
@@ -177,6 +178,42 @@ def _is_non_bulletin_url(url: str) -> bool:
     if _BULLETIN_KEYWORD_RE.search(text):
         return False
     return bool(_NON_BULLETIN_RE.search(text))
+
+
+def _normalized_href_patterns(values) -> list[str]:
+    if not isinstance(values, list):
+        return []
+    return [str(p).strip().lower() for p in values if str(p).strip()]
+
+
+def _click_href_filters(step: dict, recipe: dict | None) -> tuple[list[str], list[str]]:
+    recipe = recipe or {}
+    patterns = _normalized_href_patterns(recipe.get("href_patterns"))
+    patterns.extend(_normalized_href_patterns(step.get("href_patterns")))
+    skips = _normalized_href_patterns(recipe.get("href_skip_patterns"))
+    skips.extend(_normalized_href_patterns(step.get("href_skip_patterns")))
+    return patterns, skips
+
+
+def _href_is_skipped(url: str, skip_patterns: list[str]) -> bool:
+    if not skip_patterns:
+        return False
+    blob = _href_match_blob(url)
+    return any(pat.replace(" ", "-") in blob or pat in blob for pat in skip_patterns)
+
+
+def _href_allowed_for_click(
+    url: str,
+    href_patterns: list[str] | None = None,
+    href_skip: list[str] | None = None,
+) -> bool:
+    if _is_non_bulletin_url(url):
+        return False
+    if _href_is_skipped(url, href_skip or []):
+        return False
+    if href_patterns and not _href_matches_patterns(url, href_patterns):
+        return False
+    return True
 
 
 def _looks_like_http_url(url: str) -> bool:
@@ -3422,12 +3459,14 @@ def _best_newsletter_link_index(
     page_url: str,
     *,
     position: str = "top",
+    href_patterns: list[str] | None = None,
+    href_skip: list[str] | None = None,
 ) -> int | None:
     """Pattern H: pick highest /Newsletters/NNN/, /Weekly-Bulletins/NNN/, or /Bulletins/NNN/ number."""
     ranks: list[tuple[int, int, int]] = []
     for ent in entries:
         resolved = urljoin(page_url, ent["href"])
-        if resolved and _is_non_bulletin_url(resolved):
+        if not _href_allowed_for_click(resolved, href_patterns, href_skip):
             continue
         num = extract_newsletter_number(resolved)
         if num is None:
@@ -3444,12 +3483,14 @@ def _best_scored_link_index(
     page_url: str,
     *,
     position: str = "top",
+    href_patterns: list[str] | None = None,
+    href_skip: list[str] | None = None,
 ) -> int | None:
     best_idx: int | None = None
     best_rank: tuple[int, int] = (-1, -1)
     for ent in entries:
         resolved = urljoin(page_url, ent["href"])
-        if resolved and _is_non_bulletin_url(resolved):
+        if not _href_allowed_for_click(resolved, href_patterns, href_skip):
             continue
         total, _date_score, _keyword = _score_bulletin_link(resolved, ent["text"])
         tiebreak = ent["idx"] if position == "bottom" else -ent["idx"]
@@ -3465,6 +3506,9 @@ async def _replay_click_by_strategy(
     step: dict,
     selectors: list[str],
     step_timeout_ms: int,
+    *,
+    href_patterns: list[str] | None = None,
+    href_skip: list[str] | None = None,
 ) -> bool:
     """Click the best bulletin link when pick_strategy is set. Returns True on success."""
     strategy = (step.get("pick_strategy") or "").strip().lower()
@@ -3481,46 +3525,52 @@ async def _replay_click_by_strategy(
                 continue
 
             locator = page.locator(sel)
-            count = len(entries)
+            safe_entries = [
+                ent
+                for ent in entries
+                if _href_allowed_for_click(
+                    urljoin(page.url, ent["href"]), href_patterns, href_skip
+                )
+            ]
+            if not safe_entries:
+                errors.append(
+                    f"{sel}: only non-bulletin links matched (GDPR/Safeguarding/"
+                    "Privacy/DataEntry/New Parishioner etc.) — no genuine bulletin link found"
+                )
+                continue
 
             if strategy == "first_match":
-                await _click_locator_match(page, locator.nth(entries[0]["idx"]), step_timeout_ms)
+                await _click_locator_match(
+                    page, locator.nth(safe_entries[0]["idx"]), step_timeout_ms
+                )
                 return True
             if strategy == "last_match":
                 await _click_locator_match(
-                    page, locator.nth(entries[-1]["idx"]), step_timeout_ms
+                    page, locator.nth(safe_entries[-1]["idx"]), step_timeout_ms
                 )
                 return True
 
             newsletter_idx = _best_newsletter_link_index(
-                entries, page.url, position=position
+                entries,
+                page.url,
+                position=position,
+                href_patterns=href_patterns,
+                href_skip=href_skip,
             )
             if newsletter_idx is not None:
                 await _click_locator_match(page, locator.nth(newsletter_idx), step_timeout_ms)
                 return True
 
-            best_idx = _best_scored_link_index(entries, page.url, position=position)
+            best_idx = _best_scored_link_index(
+                entries,
+                page.url,
+                position=position,
+                href_patterns=href_patterns,
+                href_skip=href_skip,
+            )
             if best_idx is not None:
                 await _click_locator_match(page, locator.nth(best_idx), step_timeout_ms)
                 return True
-
-            # _best_scored_link_index already excludes non-bulletin URLs
-            # (GDPR/Safeguarding/Privacy notice etc.) and returned None
-            # here because every matched entry was one of those. Never fall
-            # back to blindly clicking entries[0]/entries[-1] in that case —
-            # that silently harvests a GDPR/Safeguarding PDF as "the
-            # bulletin" (seen on camusparish, leckpatrickparish). Only fall
-            # back among the remaining genuine candidates, if any.
-            safe_entries = [
-                ent for ent in entries
-                if not _is_non_bulletin_url(urljoin(page.url, ent["href"]))
-            ]
-            if not safe_entries:
-                errors.append(
-                    f"{sel}: only non-bulletin links matched (GDPR/Safeguarding/"
-                    "Privacy notice etc.) — no genuine bulletin link found"
-                )
-                continue
 
             fallback_idx = safe_entries[-1]["idx"] if position == "bottom" else safe_entries[0]["idx"]
             await _click_locator_match(page, locator.nth(fallback_idx), step_timeout_ms)
@@ -3680,6 +3730,7 @@ async def _replay_click(
     step_timeout_ms: int,
     *,
     target_date: date | None = None,
+    recipe: dict | None = None,
 ) -> None:
     is_year_folder = is_year_folder_click_step(step)
     is_cloud_folder = is_cloud_folder_click_step(step)
@@ -3730,14 +3781,41 @@ async def _replay_click(
             )
             selectors = [s for s in selectors if s]
 
+    href_patterns, href_skip = _click_href_filters(step, recipe)
+
     if step.get("pick_strategy") and not is_cloud_folder and not is_year_folder:
-        if await _replay_click_by_strategy(page, step, selectors, step_timeout_ms):
+        if await _replay_click_by_strategy(
+            page,
+            step,
+            selectors,
+            step_timeout_ms,
+            href_patterns=href_patterns,
+            href_skip=href_skip,
+        ):
             return
 
     errors: list[str] = []
     for sel in selectors:
         try:
-            await _click_locator_match(page, page.locator(sel).first, step_timeout_ms)
+            if href_patterns or href_skip:
+                entries = await _collect_anchor_entries(page, sel)
+                allowed = [
+                    ent
+                    for ent in entries
+                    if _href_allowed_for_click(
+                        urljoin(page.url, ent["href"]), href_patterns, href_skip
+                    )
+                ]
+                if not allowed:
+                    errors.append(
+                        f"{sel}: no href matched recipe href_patterns / skip list"
+                    )
+                    continue
+                await _click_locator_match(
+                    page, page.locator(sel).nth(allowed[0]["idx"]), step_timeout_ms
+                )
+            else:
+                await _click_locator_match(page, page.locator(sel).first, step_timeout_ms)
             if is_cloud_folder:
                 await _open_selected_drive_row(page, step_timeout_ms)
             return
@@ -4096,7 +4174,13 @@ async def replay_recipe(
                             if tried:
                                 return dest, tried[1], tried[0]
                 try:
-                    await _replay_click(page, step, step_timeout_ms, target_date=target_date)
+                    await _replay_click(
+                        page,
+                        step,
+                        step_timeout_ms,
+                        target_date=target_date,
+                        recipe=recipe,
+                    )
                 except RecipeReplayError:
                     # joomla_dropfiles sites (threepatrons.org,
                     # stmarysportglenone.org) sit behind a PROBABILISTIC WAF
@@ -4124,9 +4208,15 @@ async def replay_recipe(
                         pass
                 if downloads:
                     download = downloads.pop(0)
-                    file_type = await _save_download_to_pdf(download, dest)
                     source_url = _download_source_url(download, page)
-                    return dest, file_type, source_url
+                    _skip = _normalized_href_patterns(recipe.get("href_skip_patterns"))
+                    if _is_non_bulletin_url(source_url) or _href_is_skipped(
+                        source_url, _skip
+                    ):
+                        downloads.clear()
+                    else:
+                        file_type = await _save_download_to_pdf(download, dest)
+                        return dest, file_type, source_url
                 picked = await _try_joomla_dropfiles_click_download(
                     page,
                     dest,
@@ -4351,6 +4441,11 @@ async def replay_recipe(
                 pdf_url = raw_pdf_url or page.url
                 if not pdf_url:
                     raise RecipeReplayError("Recipe print_to_pdf step missing URL")
+                _skip = _normalized_href_patterns(recipe.get("href_skip_patterns"))
+                if _is_non_bulletin_url(pdf_url) or _href_is_skipped(pdf_url, _skip):
+                    raise RecipeReplayError(
+                        f"Refusing non-bulletin print_to_pdf URL: {pdf_url}"
+                    )
                 if raw_pdf_url:
                     await page.goto(pdf_url, timeout=step_timeout_ms, wait_until="domcontentloaded")
                 await _prepare_page_for_html_print(page, recipe, step_timeout_ms)
@@ -4453,8 +4548,13 @@ async def replay_recipe(
 
         if downloads:
             download = downloads.pop(0)
-            file_type = await _save_download_to_pdf(download, dest)
-            return dest, file_type, _download_source_url(download, page)
+            source_url = _download_source_url(download, page)
+            _skip = _normalized_href_patterns(recipe.get("href_skip_patterns"))
+            if _is_non_bulletin_url(source_url) or _href_is_skipped(source_url, _skip):
+                downloads.clear()
+            else:
+                file_type = await _save_download_to_pdf(download, dest)
+                return dest, file_type, source_url
         if _is_document_url(page.url):
             source_url, file_type = await _download_document_url(page, page.url, dest)
             return dest, file_type, source_url
