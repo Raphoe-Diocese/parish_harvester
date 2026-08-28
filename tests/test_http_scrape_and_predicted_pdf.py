@@ -1549,5 +1549,80 @@ class LoughshoreRecipeTests(unittest.TestCase):
         self.assertEqual(best_url, self.THIS_WEEK)
 
 
+class ClaudyGoogleIframeScrapeTests(unittest.TestCase):
+    LISTING = "https://www.parishofclaudy.com/welcome/weekly-bulletin.html"
+    NEWEST = "http://parishofclaudy.com/onewebmedia/NEWSLETTER 9-8-26.docx"
+    OLDER = "http://parishofclaudy.com/onewebmedia/NEWSLETTER 2-8-26.docx"
+    GDPR = (
+        "http://parishofclaudy.com/onewebmedia/"
+        "Diocese of Derry - GDPR Guide for Parishes v1 (Feb2019).pdf"
+    )
+    FINANCIAL = (
+        "http://parishofclaudy.com/onewebmedia/"
+        "financial statement for bulletin, our version.docx"
+    )
+    RECIPE = Path("parishes/recipes/derry/parishofclaudy.json")
+    LISTING_HTML = (
+        '<iframe src="https://docs.google.com/viewer?url='
+        "http%3A%2F%2Fparishofclaudy.com%2Fonewebmedia%2F"
+        "Diocese%2520of%2520Derry%2520-%2520GDPR%2520Guide%2520for%2520"
+        'Parishes%2520v1%2520(Feb2019).pdf&amp;embedded=true"></iframe>'
+        '<iframe src="https://docs.google.com/viewer?url='
+        "http%3A%2F%2Fparishofclaudy.com%2Fonewebmedia%2F"
+        'NEWSLETTER%25209-8-26.docx&amp;embedded=true"></iframe>'
+        '<iframe src="https://docs.google.com/viewer?url='
+        "http%3A%2F%2Fparishofclaudy.com%2Fonewebmedia%2F"
+        'NEWSLETTER%25202-8-26.docx&amp;embedded=true"></iframe>'
+        '<iframe src="https://docs.google.com/viewer?url='
+        "http%3A%2F%2Fparishofclaudy.com%2Fonewebmedia%2F"
+        "financial%2520statement%2520for%2520bulletin%252C%2520"
+        'our%2520version.docx&amp;embedded=true"></iframe>'
+    )
+
+    def test_recipe_http_scrapes_listing_and_does_not_pin_23_aug(self) -> None:
+        raw = self.RECIPE.read_text(encoding="utf-8")
+        data = json.loads(raw)
+        self.assertEqual(data["site_type"], "http_scrape_newest_pdf")
+        self.assertEqual(data["start_url"], self.LISTING)
+        self.assertIn("newsletter", data.get("href_patterns") or [])
+        self.assertEqual(data.get("playbook_type"), "oneweb_docx")
+        self.assertLessEqual(int(data.get("timeout_ms") or 0), 55000)
+        self.assertLessEqual(int(data.get("total_timeout_s") or 0), 250)
+        blob = raw.lower()
+        self.assertNotIn("23-8-26", data["start_url"])
+        self.assertNotIn("23-8-26", json.dumps(data.get("steps") or []))
+        self.assertIn("do not open weekly-bulletin.html in playwright", blob)
+        self.assertIn("content gap", blob)
+
+    def test_google_viewer_iframes_unwrap_to_onewebmedia_docx(self) -> None:
+        pairs = _extract_matching_href_texts(
+            self.LISTING_HTML, self.LISTING, ["newsletter"]
+        )
+        hrefs = [href for href, _text in pairs]
+        joined = " ".join(hrefs)
+        self.assertIn("9-8-26", joined)
+        self.assertIn("2-8-26", joined)
+        self.assertTrue(
+            any(href.rstrip("/").endswith(".docx") for href in hrefs),
+            hrefs,
+        )
+        self.assertFalse(any("gdpr" in href.lower() for href in hrefs))
+
+    def test_listing_picks_newest_newsletter_and_skips_junk(self) -> None:
+        pairs = _extract_matching_href_texts(
+            self.LISTING_HTML, self.LISTING, ["newsletter"]
+        )
+        hrefs = [href for href, _text in pairs]
+        scored = _score_http_scrape_pdf_hrefs(hrefs, date(2026, 8, 23))
+        self.assertTrue(scored, hrefs)
+        best_date, best_url = max(scored)
+        self.assertEqual(best_date, date(2026, 8, 9))
+        self.assertIn("9-8-26", best_url)
+        self.assertTrue(_is_non_bulletin_url(self.GDPR))
+        self.assertTrue(_is_non_bulletin_url(self.FINANCIAL))
+        self.assertFalse(_is_non_bulletin_url(self.NEWEST))
+        self.assertFalse(any("23-8-26" in url for _, url in scored))
+
+
 if __name__ == "__main__":
     unittest.main()

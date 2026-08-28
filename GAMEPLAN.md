@@ -17,6 +17,27 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 28/08/2026 — Claudy kitchen sink (no Google iframes)
+
+**The real goal, in one sentence:** get Claudy’s newsletter without waiting
+for Google Docs viewer iframes, and do not invent a 23/08 file.
+
+**Proof 28/08/2026 (IPv4 + harvest UA, no Playwright):**
+- Listing `https://www.parishofclaudy.com/welcome/weekly-bulletin.html` HTTP **200** in 1.2s, 51042 bytes HTML. Iframe `url=` files: GDPR, Privacy, MCN notice, financial statement, then newsletters **9-8-26, 2-8-26, 5-7-26, 12-7-26, 26-7-26, 19-7-26**. No 23/08 or 16/08 iframe.
+- `NEWSLETTER 23-8-26.docx` / `23-08-26` / `.pdf` HTTP **404**.
+- `NEWSLETTER 16-8-26.docx` / `16-08-26` HTTP **404**.
+- Newest real file `http://parishofclaudy.com/onewebmedia/NEWSLETTER 9-8-26.docx` HTTP **200**, 25820 bytes, `PK`/docx, heading **NEWSLETTER 9 / 8 /26**. “24 August 2026” in the body is a diocese deadline, not the bulletin date.
+- `onewebmedia/` directory HTTP **403**. `wp-json` HTTP **404**.
+
+**CONTENT GAP** for harvest Sunday 23/08/2026. Recipe now
+`http_scrape_newest_pdf` on the listing (unwrap viewer `url=`), skip junk
+iframes, fall back to dated onewebmedia rewrite of the 9-8-26 example.
+Do not stamp 23-8-26. Not a live harvest ok.
+
+Carrick / Lisburn / Tyholland not touched. No mega download. No full harvest.
+
+---
+
 ## 26/08/2026 — Pages must publish committed mega PDFs
 
 **The real goal, in one sentence:** parishpress.ie must serve the smaller files already in `docs/mega_pdf`, not leftover fat harvest artifacts.
