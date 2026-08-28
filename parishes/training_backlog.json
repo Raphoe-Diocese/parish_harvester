@@ -2,16 +2,16 @@
   "generated_at": "2026-08-28",
   "target_date": "2026-08-23",
   "summary": {
-    "downloaded": 104,
+    "downloaded": 105,
     "html_links": 0,
     "skipped": 30,
-    "failed": 11,
+    "failed": 10,
     "stale_rejected": 14
   },
   "action_counts": {
     "skip": 33,
-    "ok": 120,
-    "investigate": 9
+    "ok": 122,
+    "investigate": 8
   },
   "parishes": [
     {
@@ -244,8 +244,8 @@
       "recipe_file": "parishes/recipes/derry/parishofardstraweast.json",
       "recipe": {
         "start_url": "http://parishofardstraweast.com/parishnews.html",
-        "site_type": "",
-        "playbook_type": "",
+        "site_type": "html_text_bulletin",
+        "playbook_type": "html_text_bulletin",
         "status": "",
         "skip": false,
         "placeholder": false,
@@ -253,10 +253,16 @@
         "click_count": 1,
         "has_terminal": true,
         "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-08-09"
+        "do_not": [
+          "Do not harvest DataEntryFormPdf.pdf, DataEntryFormWord.doc, New Parishioner, GDPR, or privacy files.",
+          "Do not pin templates/?a= article ids or dated weekly URLs.",
+          "Do not stamp harvest Sunday on a July article. If the newest Past Newsletter is still 5 July 2026, harvest that HTML and leave it stale.",
+          "Do not print parishnews.html itself \u2014 Latest Parish Newsletter widget is the placeholder '...'.",
+          "Do not rescrape the listing after a stale July capture \u2014 that can pick the undated form and report a false ok."
+        ],
+        "recorded_date": "2026-08-28"
       },
-      "bulletin_format": "print_to_pdf",
+      "bulletin_format": "html",
       "learned_pattern": "Parish Services / Parish Messenger widget",
       "host_profile": {
         "navigation_timeout_ms": 60000,
@@ -3618,26 +3624,26 @@
       "recipe_file": "parishes/recipes/clogher/lisnaskeamaguiresbridge.json",
       "recipe": {
         "start_url": "https://www.lisnaskeamaguiresbridgeparish.com/bulletin.html",
-        "site_type": "http_scrape_newest_pdf",
+        "site_type": "pdf_link_list",
         "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "Listing /bulletin.html newest on 22/08/2026 is onewebmedia/23082026.pdf (HTTP 200, 596595 bytes).",
-          "HTTPS certificate is expired \u2014 HTTP helper retries that URL once unverified. site_type:http_scrape_newest_pdf. Do not pin a dated filename.",
-          "Pattern A DDMMYYYY in the filename and the link text."
+          "onewebmedia/*.pdf \u2014 newest row is usually a DDMMYYYY name or hashed S25C with dated link text.",
+          "If the HTTPS certificate is expired, harvest must ignore TLS errors (Playwright).",
+          "Do not pin a dated or hashed filename."
         ],
         "do_not": [
-          "Do not pin a dated filename.",
-          "Do not harvest the homepage \u2014 bulletins live on /bulletin.html."
+          "Do not pin a dated or hashed onewebmedia filename.",
+          "Do not use plain HTTP scrape when the certificate is expired."
         ],
-        "recorded_date": "2026-08-25"
+        "recorded_date": "2026-08-28"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": {
         "navigation_timeout_ms": 45000,
@@ -3645,10 +3651,49 @@
         "total_timeout_s": 180
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: Page.goto: Timeout 55000ms exceeded.\nCall log:\n  - navigating to \"https://www.lisnaskeamaguiresbridgeparish.com/bulletin.html\", waiting until \"domcontentloaded\"\n",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: Page.goto: Timeout 55000ms exceeded.\nCall log:\n  - navigating to \"https://www.lisnaskeamaguiresbridgeparish.com/bulletin.html\", waiting un"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "lisnaskeamaguiresbridgeparish",
+      "display_name": "Lisnaskeamaguiresbridgeparish",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/lisnaskeamaguiresbridgeparish.json",
+      "recipe": {
+        "start_url": "https://www.lisnaskeamaguiresbridgeparish.com/bulletin.html",
+        "site_type": "pdf_link_list",
+        "playbook_type": "pdf_download_list",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 2,
+        "click_count": 0,
+        "has_terminal": true,
+        "operator_notes": [
+          "onewebmedia/*.pdf \u2014 newest row is usually a DDMMYYYY name or hashed S25C with dated link text.",
+          "If the HTTPS certificate is expired, harvest must ignore TLS errors (Playwright).",
+          "Do not pin a dated or hashed filename."
+        ],
+        "do_not": [
+          "Do not pin a dated or hashed onewebmedia filename.",
+          "Do not use plain HTTP scrape when the certificate is expired."
+        ],
+        "recorded_date": "2026-08-28"
+      },
+      "bulletin_format": "download",
+      "learned_pattern": "",
+      "host_profile": {
+        "navigation_timeout_ms": 45000,
+        "ignore_https_errors": true,
+        "total_timeout_s": 180
+      },
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "loughshoreparishes",
