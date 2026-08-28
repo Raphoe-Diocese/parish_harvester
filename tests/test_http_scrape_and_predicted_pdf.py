@@ -167,6 +167,26 @@ class PredictedDatedUploadTests(unittest.TestCase):
             urls[:8],
         )
 
+    def test_antrim_doubled_month_variant_and_weeks_ahead(self) -> None:
+        example = (
+            "https://www-static.antrimparish.com/wp-content/uploads/2026/08/"
+            "23rd-August-2026.pdf"
+        )
+        urls = predicted_dated_upload_urls(
+            example, date(2026, 8, 23), weeks_back=0, weeks_ahead=1
+        )
+        self.assertEqual(
+            urls[0],
+            "https://www-static.antrimparish.com/wp-content/uploads/2026/08/"
+            "30th-August-2026.pdf",
+        )
+        self.assertIn(
+            "https://www-static.antrimparish.com/wp-content/uploads/2026/08/"
+            "30th-August-August-2026-1-1.pdf",
+            urls,
+        )
+        self.assertIn(example, urls)
+
 
 class HttpScrapeScoreTests(unittest.TestCase):
     def test_picks_newest_parish_newsletter_and_skips_order_of_mass(self) -> None:

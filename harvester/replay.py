@@ -1938,15 +1938,20 @@ async def _try_predicted_dated_pdf(
     target_date: date,
     *,
     weeks_back: int = 8,
+    weeks_ahead: int = 0,
 ) -> tuple[str, str] | None:
-    """Try rewrite_date_url guesses for *target_date* and previous Sundays.
+    """Try rewrite_date_url guesses for *target_date* and nearby Sundays.
 
     Skips any listing page entirely — used when the HTML index is
     Cloudflare-challenged but ``wp-content/uploads`` dated files are not
-    (newtownkilleaparish.ie).
+    (newtownkilleaparish.ie). *weeks_ahead* (recipe key ``weeks_ahead``)
+    tries next Sunday first when this week's file is already the next one.
     """
     for url in predicted_dated_upload_urls(
-        example_url, target_date, weeks_back=weeks_back
+        example_url,
+        target_date,
+        weeks_back=weeks_back,
+        weeks_ahead=weeks_ahead,
     ):
         file_result = await asyncio.to_thread(
             _fetch_bytes_with_retries,
@@ -3986,8 +3991,13 @@ async def replay_recipe(
         if not example_url:
             example_url = start_url
         weeks_back = int(recipe.get("weeks_back") or 8)
+        weeks_ahead = int(recipe.get("weeks_ahead") or 0)
         found = await _try_predicted_dated_pdf(
-            example_url, dest, target_date, weeks_back=weeks_back
+            example_url,
+            dest,
+            target_date,
+            weeks_back=weeks_back,
+            weeks_ahead=weeks_ahead,
         )
         if found:
             return dest, found[1], found[0]
