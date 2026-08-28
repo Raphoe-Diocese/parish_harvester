@@ -4,6 +4,19 @@
   "display_name": "Ardstraw East",
   "diocese": "derry",
   "start_url": "http://parishofardstraweast.com/parishnews.html",
+  "site_type": "html_text_bulletin",
+  "playbook_type": "html_text_bulletin",
+  "href_patterns": [
+    "templates/?a="
+  ],
+  "href_skip_patterns": [
+    "dataentry",
+    "dataentryform",
+    "parishioner",
+    "gdpr",
+    "privacy"
+  ],
+  "disable_stale_rescrape_fallback": true,
   "steps": [
     {
       "action": "goto",
@@ -11,18 +24,35 @@
     },
     {
       "action": "click",
-      "selector": "a:has-text('Ardstraw East Parish Newsletter')",
-      "pick_strategy": "newest_dated"
+      "selector": "a[href*='templates/?a=']:has-text('Ardstraw East Parish Newsletter')",
+      "pick_strategy": "newest_dated",
+      "fallback_selectors": [
+        "a[href*='109.228.27.39/templates/']:has-text('Newsletter')",
+        "a[href*='templates/?a=']:has-text('Newsletter')"
+      ]
     },
     {
-      "action": "print_to_pdf"
+      "action": "print_to_pdf",
+      "skip_listing_nav": true
     }
   ],
-  "recorded_date": "2026-08-09",
-  "notes": "HTML bulletin lives on parishnews.html every week — no link click needed. Harvester prints this page into the mega PDF each Sunday.",
+  "recorded_date": "2026-08-28",
+  "notes": "Past Newsletters are JS-injected HTML articles on 109.228.27.39/templates/?a=. Never harvest the New Parishioner / DataEntry / GDPR files.",
+  "do_not": [
+    "Do not harvest DataEntryFormPdf.pdf, DataEntryFormWord.doc, New Parishioner, GDPR, or privacy files.",
+    "Do not pin templates/?a= article ids or dated weekly URLs.",
+    "Do not stamp harvest Sunday on a July article. If the newest Past Newsletter is still 5 July 2026, harvest that HTML and leave it stale.",
+    "Do not print parishnews.html itself — Latest Parish Newsletter widget is the placeholder '...'.",
+    "Do not rescrape the listing after a stale July capture — that can pick the undated form and report a false ok."
+  ],
   "operator_notes_2026_08_09": [
     "The original 'no link click needed' assumption stopped being true: the page's own 'Latest Parish Newsletter' widget slot is broken/empty (literally contains placeholder text '...') — printing parishnews.html directly captured header chrome + nav + an unrelated image, no bulletin text at all.",
     "The real content lives in the 'Past Newsletters' list, each a target=_blank link to a legacy IP-hosted CMS article (http://109.228.27.39/templates/?a=<id>&z=19) whose link text is 'Sunday, Dth Month YYYY - Ardstraw East Parish Newsletter'. Added a click step with pick_strategy:newest_dated on that link text, then print_to_pdf the resulting article page (confirmed it's a real HTML page with full liturgy/notices text, not another PDF/embed).",
     "STILL STALE at time of fix: newest available link in the Past Newsletters list was 'Sunday, 5th July 2026' — 5 weeks behind the 09/08/2026 target. This is a genuine site-content gap (the site's own newest-newsletter widget is broken and no newer article has been published in that legacy CMS either) — the recipe now correctly surfaces whatever the newest *real* content is instead of an empty placeholder page, but will keep reporting 'stale' until the parish either fixes their widget or the legacy CMS gets a newer entry. Not further fixable from the harvester side; flag for human review if it doesn't self-resolve in a few weeks."
+  ],
+  "operator_notes_2026_08_28": [
+    "Kitchen sink for harvest Sunday 23/08/2026: parishnews.html Last-Modified 06/07/2026. Latest widget still '...'. Past Newsletters JS (May/June/July only; August archive is also '...'): newest real row is Sunday, 5th July 2026 → http://109.228.27.39/templates/?a=22826&z=19 (HTML, 14th Sunday in Ordinary Time, real Mass/anniversary text). No 23/08 file invented.",
+    "/pdf/ directory listing 403. Predicted dated PDFs 230826/160826/090826/020826/260726/190726/120726/050726/240526 and WP / Drive paths 404. Only live /pdf/ files: DataEntryFormPdf.pdf (2015-02-09, 84903 bytes) and GDPR.pdf (2019-04-20). Menu also has DataEntryFormWord.doc (2015-02-09).",
+    "Harvest 28/08/2026 reported ok on DataEntryFormPdf.pdf — lie. Form is undated so freshness stayed unknown. Recipe now clicks only templates/?a= newsletter links, skips DataEntry/New Parishioner/GDPR/privacy, prints the HTML article with skip_listing_nav, and disables stale rescrape so recover cannot swap the July article for the form."
   ]
 }

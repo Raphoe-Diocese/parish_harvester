@@ -17,6 +17,16 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 28/08/2026 — Ardstraw East harvested the parishioner form
+
+**The real goal, in one sentence:** stop treating `DataEntryFormPdf.pdf` as this week's bulletin.
+
+Kitchen sink 28/08/2026 (harvest Sunday 23/08/2026): no August file. Newest real Past Newsletter is **Sunday, 5th July 2026** at `http://109.228.27.39/templates/?a=22826&z=19`. `/pdf/` listing 403; predicted dated PDFs 404. Form is 2015. Content gap — harvest that HTML, mark stale. Do not invent 23/08. Do not stamp harvest Sunday on July. Carrick / Lisburn / Tyholland not touched.
+
+**This turn:** recipe clicks only `templates/?a=` newsletter links, `href_skip_patterns` for DataEntry / New Parishioner / GDPR / privacy, `skip_listing_nav`, `disable_stale_rescrape_fallback`. Skip-name + July heading freshness tests. Not harvested this turn. Do not say ok / this week.
+
+---
+
 ## 26/08/2026 — Pages must publish committed mega PDFs
 
 **The real goal, in one sentence:** parishpress.ie must serve the smaller files already in `docs/mega_pdf`, not leftover fat harvest artifacts.
