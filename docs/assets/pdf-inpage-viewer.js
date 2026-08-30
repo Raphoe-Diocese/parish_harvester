@@ -9,6 +9,8 @@
  * Locked 850px desktop / 450px phone boxes. Keep fixMobilePdfLinks.
  * Do not restore a tap-to-load button, enlarge control,
  * a same-tab native-link replacement, or a raw iPhone iframe.
+ * Never put a mega PDF URL on iframe src (parse starts a full
+ * download before PDF.js can stream page 1).
  */
 (function () {
   if (window.__parishPressPdfInpage) return;
@@ -370,22 +372,9 @@
     }
   }
 
-  function restoreNativeIframe(host, pdfUrl) {
-    if (isMobileView()) return;
-    var wrap =
-      (host && host.closest && (host.closest(".pdf-frame-wrap") || host.closest(".pdf-standalone-shell"))) ||
-      document.querySelector(".pdf-frame-wrap") ||
-      document.querySelector(".pdf-standalone-shell");
-    if (!wrap) return;
-    wrap.classList.add("is-iframe-fallback");
-    wrap.classList.remove("is-native-pdf");
-    document.body.classList.add("is-iframe-fallback");
-    var iframe = wrap.querySelector("iframe");
-    if (!iframe) return;
-    iframe.removeAttribute("hidden");
-    try {
-      iframe.src = pdfUrl;
-    } catch (e) {}
+  function restoreNativeIframe() {
+    /* Never put the PDF URL back on the iframe. That starts a second
+       full download and on iPhone shows a sad document. Open PDF stays. */
   }
 
   function overlayPageLinks(page, slot, cssWidth) {
@@ -473,9 +462,12 @@
       return pdfjsLib.getDocument(streaming).promise;
     }
     return streamOnce().catch(function () {
-      /* Retry streaming once. Do not fetch() the whole file on first error. */
+      /* Retry streaming once. Do not fetch() the whole mega as arrayBuffer. */
       return streamOnce();
     }).catch(function () {
+      if (/mega_bulletin\.pdf/i.test(pdfUrl) || isMobileView()) {
+        throw new Error("PDF stream failed");
+      }
       return fetch(pdfUrl, { credentials: "same-origin" }).then(function (res) {
         if (!res.ok) throw new Error("PDF fetch " + res.status);
         return res.arrayBuffer();
@@ -601,7 +593,7 @@
         console.warn("PDF.js failed", err);
         setStatus(host, "Could not show the PDF here. Use Open PDF or Download.", true);
         host.setAttribute("data-pdf-started", "0");
-        if (!isPhone()) restoreNativeIframe(host, pdfUrl);
+        restoreNativeIframe();
       });
   }
 
@@ -635,14 +627,10 @@
 
     var standalone = document.querySelector("iframe.pdf-frame");
     if (standalone && !standalone.closest(".pdf-frame-wrap")) {
-      var pdfUrl =
-        standalone.getAttribute("src") ||
-        standalone.src ||
-        (document.querySelector(".download-link") || {}).href ||
-        "";
+      var shell = standalone.parentElement;
+      var pdfUrl = resolvePdfUrl(shell);
       if (!pdfUrl || pdfUrl.indexOf("about:blank") === 0) return;
       document.body.classList.add("is-native-pdf");
-      var shell = standalone.parentElement;
       if (shell) shell.classList.add("is-native-pdf");
       try {
         standalone.setAttribute("hidden", "");
