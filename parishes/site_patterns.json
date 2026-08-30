@@ -62,18 +62,19 @@
     },
     "oneweb_docx+direct_docx": {
       "page_type": "oneweb_docx",
-      "recipe_flow": "direct_docx",
+      "recipe_flow": "http_scrape_newest_pdf",
       "label": "One.com Word bulletin (Google preview iframes)",
-      "advice": "Many docs.google.com/viewer iframes load slowly (2–4 min) — ignore previews. Bulletin is a Word file at onewebmedia/NEWSLETTER D-M-YY.docx — download directly. Iframe src URLs are in the HTML immediately; no need to wait for previews. Harvester rewrites the date each Sunday and tries filename variants (spaces before .docx).",
+      "advice": "HTTP GET the listing HTML only — do not open it in Playwright. Unwrap docs.google.com/viewer iframe src / url= to the real onewebmedia NEWSLETTER D-M-YY.docx. Skip GDPR, Privacy, financial statement, Gift Aid, DataEntry, Income & Expenditure. If the listing has no newsletter iframe, rewrite the dated onewebmedia file (weeks_back 8). Long timeout is only the file GET + docx→PDF.",
       "operator_notes": [
-        "Many docs.google.com/viewer iframes load slowly (2–4 min) — ignore previews.",
-        "Bulletin is a Word file at onewebmedia/NEWSLETTER D-M-YY.docx — download directly.",
-        "Iframe src URLs are in the HTML immediately; no need to wait for previews.",
-        "Harvester rewrites the date each Sunday and tries filename variants (spaces before .docx)."
+        "HTTP GET the listing HTML only — do not open weekly-bulletin.html in Playwright.",
+        "Google Docs viewer iframes take 2–4 min; the file URL is in iframe src / url= immediately.",
+        "Bulletin is a Word file at onewebmedia/NEWSLETTER D-M-YY.docx — download directly (IPv4 + harvest UA).",
+        "Skip GDPR, Privacy, financial statement, Gift Aid, DataEntry, Income & Expenditure.",
+        "If the listing HTML has no newsletter, fall back to predicted D-M-YY rewrite (weeks_back 8)."
       ],
       "do_not": [
+        "Do not wait for Google viewer iframes to load in Playwright.",
         "Do not pick the first iframe PDF — often a GDPR or Privacy notice.",
-        "Do not use goto-only recipes on this page.",
         "Do not train on financial-statement or admin docx files."
       ],
       "html_fingerprint": "oneweb_newsletter_docx",
@@ -583,23 +584,24 @@
     },
     "parishofclaudy": {
       "page_type": "oneweb_docx",
-      "recipe_flow": "direct_docx",
+      "recipe_flow": "http_scrape_newest_pdf",
       "combined_key": "oneweb_docx+direct_docx",
       "display_name": "Claudy",
       "start_url_host": "parishofclaudy.com",
-      "updated": "2026-06-24",
+      "updated": "2026-08-28",
       "step_count": 1,
       "playbook_type": "oneweb_docx",
       "operator_notes": [
-        "Many docs.google.com/viewer iframes load slowly (2–4 min) — ignore previews.",
-        "Bulletin is a Word file at onewebmedia/NEWSLETTER D-M-YY.docx — download directly.",
-        "Iframe src URLs are in the HTML immediately; no need to wait for previews.",
-        "Harvester rewrites the date each Sunday and tries filename variants (spaces before .docx)."
+        "HTTP GET https://www.parishofclaudy.com/welcome/weekly-bulletin.html only — do not open it in Playwright.",
+        "Unwrap Google Docs viewer iframe src / url= to onewebmedia/NEWSLETTER D-M-YY.docx.",
+        "Skip GDPR, Privacy, financial statement, Gift Aid, DataEntry, Income & Expenditure.",
+        "CONTENT GAP 28/08/2026: newest real file NEWSLETTER 9-8-26.docx (HTTP 200, 25820 bytes, heading 9 / 8 /26). 23-8-26 and 16-8-26 are 404."
       ],
       "do_not": [
+        "Do not wait for Google viewer iframes to load in Playwright.",
         "Do not pick the first iframe PDF — often a GDPR or Privacy notice.",
-        "Do not use goto-only recipes on this page.",
-        "Do not train on financial-statement or admin docx files."
+        "Do not train on financial-statement or admin docx files.",
+        "Do not stamp NEWSLETTER 23-8-26.docx while it is 404."
       ],
       "html_fingerprint": "oneweb_newsletter_docx",
       "html_markers": [

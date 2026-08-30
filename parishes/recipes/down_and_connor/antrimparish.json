@@ -1,32 +1,33 @@
 {
-  "version": 2,
+  "version": 3,
   "parish_key": "antrimparish",
   "display_name": "Antrim",
   "diocese": "down_and_connor",
-  "start_url": "https://www.antrimparish.com/bulletinpage/",
-  "site_type": "http_scrape_newest_pdf",
-  "href_patterns": [
-    "uploads"
-  ],
-  "playbook_type": "pdf_download_list",
+  "start_url": "https://www-static.antrimparish.com/wp-content/uploads/2026/08/23rd-August-2026.pdf",
+  "site_type": "predicted_dated_pdf",
+  "weeks_ahead": 1,
+  "weeks_back": 4,
+  "playbook_type": "dated_pdf_bulletin",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.antrimparish.com/bulletinpage/"
+      "action": "download",
+      "url": "https://www-static.antrimparish.com/wp-content/uploads/2026/08/23rd-August-2026.pdf"
     }
   ],
-  "timeout_ms": 300000,
-  "total_timeout_s": 900,
-  "navigation_wait_until": "commit",
-  "recorded_date": "2026-08-25",
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-08-28",
   "operator_notes": [
-    "Listing /bulletinpage/ embeds dated PDFs on www-static via PDF Embedder.",
-    "CONFIRMED 2026-08-25: https://www-static.antrimparish.com/wp-content/uploads/2026/08/23rd-August-2026.pdf HTTP 200, 355100 bytes, application/pdf.",
-    "Playwright times out (ERR_CONNECTION_TIMED_OUT). site_type:http_scrape_newest_pdf uses the shared IPv4 + expired-cert HTTP helper.",
-    "Do not pin a dated filename."
+    "Do not open https://www.antrimparish.com/bulletinpage/ — GitHub Page.goto ERR_CONNECTION_TIMED_OUT (proved 28/08/2026).",
+    "Predict dated files on www-static. Live newest 28/08/2026: https://www-static.antrimparish.com/wp-content/uploads/2026/08/30th-August-August-2026-1-1.pdf HTTP 200, 345797 bytes, %PDF. Visual masthead 30/08/2026, 22nd Sunday in Ordinary Time.",
+    "https://www-static.antrimparish.com/wp-content/uploads/2026/08/30th-August-2026.pdf is HTTP 404. 23rd-August-2026.pdf is HTTP 200.",
+    "weeks_ahead 1 so a harvest before Sunday still tries 30/08/2026 first. Page-1 text layer still says 2nd APRIL 2017 leftover — visual + page 3 are 30/08/2026.",
+    "Skip Volunteer-EOI-form.pdf."
   ],
   "do_not": [
-    "Do not pin a dated filename.",
-    "Do not harvest Volunteer-EOI-form.pdf."
+    "Do not set start_url back to /bulletinpage/.",
+    "Do not open https://www.antrimparish.com/bulletinpage/.",
+    "Do not harvest Volunteer-EOI-form.pdf.",
+    "Do not treat the leftover 2nd APRIL 2017 text layer as the heading."
   ]
 }

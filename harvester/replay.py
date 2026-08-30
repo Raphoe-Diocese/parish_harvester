@@ -134,6 +134,7 @@ PDFEMB_HREF_EXTRACT_JS = "(els) => els.map(el => el.getAttribute('href')).filter
 _ALWAYS_NON_BULLETIN_RE = re.compile(
     r"gdpr|\bprivacy\b|privacy[-_\s]?policy|wedding[-_\s]?parish|\bwedding\b|"
     r"order[-_\s]?of[-_\s]?mass|giftaid|gift[-_\s]?aid|"
+    r"financial[-_\s]?statement|income[-_\s]?(?:&|and)?[-_\s]?expenditure|"
     r"dataentry|data[-_\s]?entry|new[-_\s]?parishioner|parishioner[-_\s]?form",
     re.IGNORECASE,
 )
@@ -1686,6 +1687,30 @@ _A_HREF_WITH_TEXT_RE = re.compile(
     r"""<a\b[^>]*\bhref=["']([^"']+)["'][^>]*>(.*?)</a>""",
     re.IGNORECASE | re.DOTALL,
 )
+_IFRAME_OR_EMBED_SRC_RE = re.compile(
+    r"""<(?:iframe|embed)\b[^>]*?\bsrc=["']([^"']+)["']""",
+    re.IGNORECASE,
+)
+_OBJECT_DATA_RE = re.compile(
+    r"""<object\b[^>]*?\bdata=["']([^"']+)["']""",
+    re.IGNORECASE,
+)
+_QUERY_URL_PARAM_RE = re.compile(r"""[?&]url=([^&"'#\s]+)""", re.IGNORECASE)
+
+
+def _listing_src_to_file_url(raw: str, base_url: str) -> str:
+    """Turn an iframe src / viewer wrapper / url= value into the real file URL."""
+    text = (raw or "").strip()
+    if not text:
+        return ""
+    absolute = urljoin(base_url, text)
+    unwrapped = unwrap_docs_viewer_url(absolute)
+    if unwrapped and unwrapped != absolute:
+        return unwrapped
+    decoded = unquote(text)
+    if decoded.lower().startswith(("http://", "https://")):
+        return unwrap_docs_viewer_url(decoded) or decoded
+    return urljoin(base_url, decoded)
 
 
 def _anchor_inner_text(inner: str) -> str:
@@ -1728,6 +1753,20 @@ def _extract_matching_href_texts(
             continue
         seen.add(absolute)
         out.append((absolute, ""))
+    extra_raw: list[str] = []
+    extra_raw.extend(_IFRAME_OR_EMBED_SRC_RE.findall(html or ""))
+    extra_raw.extend(_OBJECT_DATA_RE.findall(html or ""))
+    extra_raw.extend(_QUERY_URL_PARAM_RE.findall(html or ""))
+    for raw in extra_raw:
+        file_url = _listing_src_to_file_url(raw, base_url)
+        if not file_url:
+            continue
+        if not (_want(file_url) or _want(raw)):
+            continue
+        if file_url in seen:
+            continue
+        seen.add(file_url)
+        out.append((file_url, ""))
     return out
 
 
@@ -1938,15 +1977,20 @@ async def _try_predicted_dated_pdf(
     target_date: date,
     *,
     weeks_back: int = 8,
+    weeks_ahead: int = 0,
 ) -> tuple[str, str] | None:
-    """Try rewrite_date_url guesses for *target_date* and previous Sundays.
+    """Try rewrite_date_url guesses for *target_date* and nearby Sundays.
 
     Skips any listing page entirely — used when the HTML index is
     Cloudflare-challenged but ``wp-content/uploads`` dated files are not
-    (newtownkilleaparish.ie).
+    (newtownkilleaparish.ie). *weeks_ahead* (recipe key ``weeks_ahead``)
+    tries next Sunday first when this week's file is already the next one.
     """
     for url in predicted_dated_upload_urls(
-        example_url, target_date, weeks_back=weeks_back
+        example_url,
+        target_date,
+        weeks_back=weeks_back,
+        weeks_ahead=weeks_ahead,
     ):
         file_result = await asyncio.to_thread(
             _fetch_bytes_with_retries,
@@ -3968,6 +4012,31 @@ async def replay_recipe(
         )
         if found:
             return dest, found[1], found[0]
+        example_url = str(recipe.get("example_url") or "").strip()
+        if not example_url:
+            for step in steps:
+                if not isinstance(step, dict):
+                    continue
+                step_url = str(step.get("url") or "").strip()
+                if step_url and _looks_like_direct_document_url(step_url):
+                    example_url = step_url
+                    break
+        playbook = str(recipe.get("playbook_type") or "").strip().lower()
+        if example_url and (
+            playbook == "oneweb_docx"
+            or (
+                "onewebmedia" in example_url.lower()
+                and "newsletter" in example_url.lower()
+            )
+        ):
+            predicted = await _try_predicted_dated_pdf(
+                example_url,
+                dest,
+                target_date,
+                weeks_back=int(recipe.get("weeks_back") or 8),
+            )
+            if predicted:
+                return dest, predicted[1], predicted[0]
         raise RecipeReplayError(
             f"HTTP-scrape listing {start_url} — no dated bulletin PDF matching "
             f"{href_patterns} (not a selector problem; parish may not have posted)"
@@ -3986,8 +4055,13 @@ async def replay_recipe(
         if not example_url:
             example_url = start_url
         weeks_back = int(recipe.get("weeks_back") or 8)
+        weeks_ahead = int(recipe.get("weeks_ahead") or 0)
         found = await _try_predicted_dated_pdf(
-            example_url, dest, target_date, weeks_back=weeks_back
+            example_url,
+            dest,
+            target_date,
+            weeks_back=weeks_back,
+            weeks_ahead=weeks_ahead,
         )
         if found:
             return dest, found[1], found[0]

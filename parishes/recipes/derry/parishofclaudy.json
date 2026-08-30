@@ -3,26 +3,35 @@
   "parish_key": "parishofclaudy",
   "display_name": "Claudy",
   "diocese": "derry",
-  "start_url": "http://parishofclaudy.com/onewebmedia/NEWSLETTER 9-8-26.docx",
-  "steps": [
-    {
-      "action": "download",
-      "url": "http://parishofclaudy.com/onewebmedia/NEWSLETTER 21-6-26.docx"
-    }
+  "start_url": "https://www.parishofclaudy.com/welcome/weekly-bulletin.html",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    "newsletter"
   ],
-  "site_type": "predicted_dated_pdf",
   "weeks_back": 8,
   "timeout_ms": 45000,
   "total_timeout_s": 90,
   "playbook_type": "oneweb_docx",
-  "recorded_date": "2026-08-18",
+  "example_url": "http://parishofclaudy.com/onewebmedia/NEWSLETTER 9-8-26.docx",
+  "recorded_date": "2026-08-28",
+  "steps": [
+    {
+      "action": "goto",
+      "url": "https://www.parishofclaudy.com/welcome/weekly-bulletin.html"
+    }
+  ],
   "operator_notes": [
-    "Word bulletin at onewebmedia/NEWSLETTER D-M-YY.docx. Harvester converts docx→PDF.",
-    "2026-08-18 FIX: start_url was the weekly-bulletin.html listing, which times out in Playwright (45s). The file itself is a direct onewebmedia download. Confirmed 18/08/2026: NEWSLETTER 16-8-26.docx is 404 (parish has not posted this Sunday yet); NEWSLETTER 9-8-26.docx is HTTP 200 (25,820 bytes, PK zip/docx). predicted_dated_pdf tries this Sunday then previous weeks and never opens the listing."
+    "CONTENT GAP 28/08/2026 for harvest Sunday 23/08/2026: listing and onewebmedia have no 23-8-26 or 16-8-26 file. Newest real newsletter is NEWSLETTER 9-8-26.docx.",
+    "Kitchen sink: HTTP GET weekly-bulletin.html only (no Playwright). Unwrap Google Docs viewer iframe src / url= to the onewebmedia file. Skip GDPR, Privacy, financial statement, Gift Aid, DataEntry, Income & Expenditure.",
+    "Proved 28/08/2026: listing HTTPS 200 in 1.2s (51042 bytes HTML). Iframe url= newest NEWSLETTER 9-8-26.docx. Direct IPv4 GET of that file HTTP 200, 25820 bytes, PK/docx, heading NEWSLETTER 9 / 8 /26. NEWSLETTER 23-8-26.docx and 16-8-26.docx HTTP 404. onewebmedia/ directory 403. wp-json 404.",
+    "site_type:http_scrape_newest_pdf — never wait for Google viewer iframes (2–4 min). If the listing HTML has no newsletter iframe, fall back to predicted_dated rewrite of example_url (weeks_back 8). Long wait is only the file GET + docx→PDF, not the listing.",
+    "Do not stamp a 23/08 URL. When the parish posts NEWSLETTER 23-8-26.docx the listing scrape will pick it."
   ],
   "do_not": [
-    "Do not set start_url to weekly-bulletin.html — Playwright times out there before the download step runs.",
-    "Do not set use_captured_url.",
-    "Do not pick GDPR/Privacy iframes on the listing page."
+    "Do not open weekly-bulletin.html in Playwright — Google Docs viewer iframes take 2–4 minutes and burn the parish timeout.",
+    "Do not wait for iframe previews to load. The file URL is in the HTML url= param immediately.",
+    "Do not pick GDPR, Privacy, financial statement, Gift Aid, DataEntry, or Income & Expenditure documents.",
+    "Do not pin NEWSLETTER 23-8-26.docx — that file is 404 (content gap).",
+    "Do not set use_captured_url."
   ]
 }

@@ -1489,17 +1489,21 @@ class AntrimRecipeTests(unittest.TestCase):
     )
     RECIPE = Path("parishes/recipes/down_and_connor/antrimparish.json")
 
-    def test_recipe_scrapes_listing_and_does_not_pin_dated_file(self) -> None:
+    def test_recipe_predicts_www_static_and_skips_listing(self) -> None:
         raw = self.RECIPE.read_text(encoding="utf-8")
         data = json.loads(raw)
-        self.assertEqual(data["site_type"], "http_scrape_newest_pdf")
-        self.assertEqual(data["start_url"], self.LISTING)
-        self.assertIn("uploads", data.get("href_patterns") or [])
-        self.assertLessEqual(int(data.get("timeout_ms") or 0), 300000)
-        self.assertLessEqual(int(data.get("total_timeout_s") or 0), 900)
+        self.assertEqual(data["site_type"], "predicted_dated_pdf")
+        self.assertEqual(data["start_url"], self.THIS_WEEK)
+        self.assertEqual(int(data.get("weeks_ahead") or 0), 1)
+        self.assertEqual(int(data.get("weeks_back") or 0), 4)
+        self.assertNotIn("bulletinpage", data["start_url"])
         steps_blob = json.dumps(data.get("steps") or [])
-        self.assertNotIn("23rd-August-2026.pdf", data["start_url"])
-        self.assertNotIn("23rd-August-2026.pdf", steps_blob)
+        self.assertNotIn("bulletinpage", steps_blob)
+        self.assertNotIn("Volunteer-EOI", data["start_url"])
+        self.assertNotIn("Volunteer-EOI", steps_blob)
+        do_not = " ".join(data.get("do_not") or []).lower()
+        self.assertIn("bulletinpage", do_not)
+        self.assertIn("volunteer-eoi", do_not)
 
     def test_listing_scores_ordinal_filename(self) -> None:
         scored = _score_http_scrape_pdf_hrefs(
