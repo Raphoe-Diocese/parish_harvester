@@ -389,31 +389,95 @@ def quote_http_url(url: str) -> str:
     return parsed._replace(path=quote(unquote(parsed.path), safe="/")).geturl()
 
 
+# Antrim www-static filenames: 23rd-August-2026.pdf and the live doubled-month
+# quirk 30th-August-August-2026-1-1.pdf (plain 30th-August-2026.pdf is 404).
+_ANTRIM_ORDINAL_PDF_RE = re.compile(
+    rf"(?P<day>\d{{1,2}})(?:st|nd|rd|th)-"
+    rf"(?P<month>{_MONTH_ALT})"
+    rf"(?:-(?P<month2>{_MONTH_ALT}))?"
+    rf"-(?P<year>20\d{{2}})"
+    rf"(?:-1(?:-1)?)?"
+    rf"\.pdf$",
+    re.IGNORECASE,
+)
+
+
+def antrim_doubled_month_pdf_urls(example_url: str, week: date) -> list[str]:
+    """Antrim-only ordinal PDF names, including doubled-month -1-1 variants.
+
+    Scoped to antrimparish.com. Does not invent names for other hosts or for
+    non-bulletin files such as Volunteer-EOI-form.pdf.
+    """
+    raw = (example_url or "").strip()
+    if not raw:
+        return []
+    parsed = urlparse(raw)
+    if "antrimparish.com" not in (parsed.netloc or "").lower():
+        return []
+    leaf = unquote(parsed.path).rstrip("/").rsplit("/", 1)[-1]
+    if not _ANTRIM_ORDINAL_PDF_RE.search(leaf):
+        return []
+    rewritten = rewrite_date_url(raw, week)
+    parsed_r = urlparse(rewritten)
+    directory = unquote(parsed_r.path).rsplit("/", 1)[0]
+    directory = re.sub(
+        r"/\d{4}/\d{2}$",
+        f"/{week.year}/{week.month:02d}",
+        directory,
+    )
+    day_ord = f"{week.day}{_ordinal_suffix(week.day)}"
+    month = _MONTH_NAMES[week.month].capitalize()
+    year = week.year
+    names = (
+        f"{day_ord}-{month}-{year}.pdf",
+        f"{day_ord}-{month}-{year}-1.pdf",
+        f"{day_ord}-{month}-{year}-1-1.pdf",
+        f"{day_ord}-{month}-{month}-{year}.pdf",
+        f"{day_ord}-{month}-{month}-{year}-1.pdf",
+        f"{day_ord}-{month}-{month}-{year}-1-1.pdf",
+    )
+    out: list[str] = []
+    seen: set[str] = set()
+    for name in names:
+        url = parsed_r._replace(path=f"{directory}/{name}").geturl()
+        if url not in seen:
+            seen.add(url)
+            out.append(url)
+    return out
+
+
 def predicted_dated_upload_urls(
     example_url: str,
     target: date,
     *,
     weeks_back: int = 8,
+    weeks_ahead: int = 0,
 ) -> list[str]:
-    """Rewrite a dated upload URL for *target* and the previous *weeks_back* Sundays.
+    """Rewrite a dated upload URL for *target* and nearby Sundays.
 
-    Also tries .docx/.jpg/.jpeg/.png siblings of each .pdf guess (uploader
-    fallback). First match in the returned list is the current Sunday.
+    Tries *weeks_ahead* future Sundays first (default 0 so urls[0] stays
+    the current Sunday), then *target*, then the previous *weeks_back*
+    Sundays. Also tries .docx/.jpg/.jpeg/.png siblings of each .pdf guess
+    (uploader fallback).
     """
     seen: list[str] = []
+    weeks_back = max(0, int(weeks_back or 0))
+    weeks_ahead = max(0, int(weeks_ahead or 0))
 
     def _add(url: str) -> None:
         url = (url or "").strip()
         if url and url not in seen:
             seen.append(url)
 
-    for i in range(weeks_back + 1):
+    for i in range(-weeks_ahead, weeks_back + 1):
         week = target - timedelta(days=7 * i)
         rewritten = rewrite_date_url(example_url, week)
         _add(rewritten)
         if "onewebmedia" in rewritten.lower() and "newsletter" in rewritten.lower():
             for extra in oneweb_newsletter_download_urls(example_url, week):
                 _add(extra)
+        for extra in antrim_doubled_month_pdf_urls(example_url, week):
+            _add(extra)
         lower = rewritten.lower()
         if lower.endswith(".pdf"):
             stem = rewritten[:-4]
