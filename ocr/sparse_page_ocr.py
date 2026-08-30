@@ -15,7 +15,11 @@ import subprocess
 import tempfile
 from pathlib import Path
 
-from ocr.text_extract import page_is_sparse, page_text_char_count
+from ocr.text_extract import (
+    extract_all_page_lines,
+    page_is_sparse,
+    page_text_char_count,
+)
 
 _PAGE_MARK_RE = re.compile(
     r"(?:<hr\s*/?>\s*)?"
@@ -286,4 +290,33 @@ def fill_sparse_pages_in_ocr_html(
         rendered = "\n".join(render_markdown_lines(lines))
         out.append((num, rendered))
         print(f"  Filled sparse mega-OCR HTML page {num}.")
+    return join_ocr_html_pages(out)
+
+
+def prefer_embedded_pages_in_ocr_html(fragment: str, pdf_path: str | Path) -> str:
+    """Replace vision-OCR page bodies with embedded PDF text when it is rich.
+
+    Used when regenerating diocese HTML from an existing OCR file so we do
+    not spend another vision pass. Image/banner pages are left untouched.
+    """
+    from ocr.convert_bulletin import render_markdown_lines
+
+    embedded = extract_all_page_lines(pdf_path)
+    if not embedded:
+        return fragment or ""
+    pages = split_ocr_html_pages(fragment)
+    if not pages:
+        return fragment or ""
+    out: list[tuple[int, str]] = []
+    replaced = 0
+    for num, body in pages:
+        native = embedded[num - 1] if 0 <= num - 1 < len(embedded) else []
+        if page_is_sparse(native):
+            out.append((num, body))
+            continue
+        rendered = "\n".join(render_markdown_lines(native))
+        out.append((num, rendered))
+        replaced += 1
+    if replaced:
+        print(f"  Preferred embedded PDF text on {replaced} OCR HTML page(s).")
     return join_ocr_html_pages(out)

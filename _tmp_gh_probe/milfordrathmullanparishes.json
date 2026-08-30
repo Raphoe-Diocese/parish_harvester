@@ -1,0 +1,28 @@
+{
+  "version": 2,
+  "parish_key": "milfordrathmullanparishes",
+  "display_name": "Milford Kilkeel",
+  "diocese": "raphoe",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": ["parish-newsletter"],
+  "playbook_type": "pdf_download_list",
+  "recorded_date": "2026-08-18",
+  "start_url": "https://milfordrathmullanparishes.ie/bulletins/",
+  "steps": [
+    {
+      "action": "goto",
+      "url": "https://milfordrathmullanparishes.ie/bulletins/"
+    }
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "operator_notes": [
+    "This week's bulletin is under the Extra/Divi 'This week's bulletin' toggle — Parish-Newsletter-*.pdf.",
+    "Rathmullan shares this bulletin page.",
+    "2026-08-18 FIX: download step had use_captured_url pinned to Parish-Newsletter-5th-July.pdf. The filename has no year, so freshness reported unknown and the harvest was marked ok while serving a June/July file. Same HTTP-scrape helper as rathmullan.json — picks the newest Parish-Newsletter PDF from the listing HTML each Sunday."
+  ],
+  "do_not": [
+    "Do not use generic a[href$='.pdf'] — it grabs Order-of-Mass.pdf from the site menu.",
+    "Do not set use_captured_url on a dated Parish-Newsletter filename — it freezes the recipe and freshness cannot see a year."
+  ]
+}

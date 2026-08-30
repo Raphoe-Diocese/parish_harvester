@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
   <title>Greenlough Text Bulletin — 21/08/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -14,7 +16,7 @@
       font-size: 1.125rem;
       -webkit-text-size-adjust: 100%;
       text-size-adjust: 100%;
-      overflow-x: hidden;
+      overflow-x: clip;
     }
     a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
     .page {
@@ -36,8 +38,62 @@
       font-size: 1rem; font-weight: 700; color: #1a1f1e;
     }
     .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 40;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+      box-shadow: 0 8px 16px #eef1f0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 8rem; }
+    mark.search-active { scroll-margin-top: 8rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 30;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
     .ocr-zoom-bar {
-      position: sticky; top: 0; z-index: 6;
       display: flex; justify-content: center; align-items: center; gap: 8px;
       margin: 0 0 10px; padding: 6px 10px;
       background: rgba(255, 255, 255, 0.92);
@@ -63,7 +119,7 @@
       max-width: min(72ch, 100%);
       margin-left: auto;
       margin-right: auto;
-      overflow-x: hidden;
+      overflow-x: clip;
       overflow-wrap: anywhere;
       word-wrap: break-word;
       hyphens: auto;
@@ -274,6 +330,7 @@
         <span class="title-line">GREENLOUGH Text Bulletin · 21/08/2026</span>
       </div>
     </div>
+    <div class="ocr-sticky-chrome">
     <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
       <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
       <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
@@ -293,12 +350,13 @@
         </div>
       </div>
     </div>
-    <div class="ocr-body" id="ocr-text"><p class="page-label">Page 50</p>
+    </div>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Greenlough</h2><p class="ocr-parish-date">21/08/2026</p></header>
+<p class="page-label">Page 1</p>
 <p>GREENLOUGH PARISH. Mass Schedule/Notices: 24 - 30 August 2026<br>
-Twenty First Sunday in Ordinary Time</p>
-<h2 class="ocr-parish-name">Greenlough</h2>
-<p>21/08/2026</p>
-<p>Tuesday 25 August: NO MASS; 7.30pm: Rosary<br>
+Twenty First Sunday in Ordinary Time<br>
+GREENLOUGH<br>
+Tuesday 25 August: NO MASS; 7.30pm: Rosary<br>
 Thursday 27 August: 9.00am - 5.00pm Adoration<br>
 Friday 28 August: 9.30am Mass<br>
 Twenty Second Sunday in Ordinary Time<br>
@@ -306,6 +364,7 @@ Saturday 29 August: 5.30pm (Streamed to Bellaghy)</p>
 <h3 class="b-head">Anniversary Mass for Kathleen McCloskey</h3>
 <p>50th Anniversary Mass for John Joseph McErlean<br>
 Sunday 30 August: 11.00am (Streamed from Bellaghy)<br>
+BELLAGHY<br>
 Monday 24 August: 9.30am Mass; Wednesday 26 August: 9.30am Mass<br>
 Friday 28 August: Adoration 10am - 7pm; Rosary at 6.30pm<br>
 Friday 28 August: 7.00pm Mass<br>
@@ -315,6 +374,7 @@ BALLYSCULLION<br>
 Sunday 30 August: 9.45am<br>
 Deaths: We offer our sympathy to the family and friends of Patsy McPeake, Mullaghnamoyagh Road,<br>
 Manus McShane, Ballyscullion Lane and Gregory McErlain, USA, formerly Loughbeg Road, who died<br>
+recently.<br>
 Anniversaries: Kelly Maria McGoldrick, Joe Picken, Patricia Campbell, Geraldine Maguire.<br>
 Vocations: In this Sunday&#x27;s gospel Peter acknowledges Jesus as the Christ, the Son of the living God, and<br>
 Jesus confers on Peter &quot;.the keys of the Kingdom.&quot; an image reflected in the First Reading where the Lord<br>
@@ -335,8 +395,8 @@ Parish Newsletter: Please send Notices &amp; Anniversaries in writing or via ema
 Blessing of Bikers and Motorcycles will take place on Sunday 13 September in St Aengus’ Chapel, Burt,<br>
 Co Donegal, at 1:30pm . All are welcome to attend the brief service and blessing. Following the blessing all<br>
 are welcome to join the run to Ned’s Point RNLI Station, to present the donation to the RNLI. Please note,<br>
-Mass will be celebrated on Sunday 13 September in St Patrick’s Chapel, DUNGIVEN, at 11:30am for</p>
-<hr></div>
+Mass will be celebrated on Sunday 13 September in St Patrick’s Chapel, DUNGIVEN, at 11:30am for<br>
+deceased bikers, especially those who have died in past year. Greenlough</p></div>
     <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
   </div>
   <script>
@@ -402,7 +462,7 @@ Mass will be celebrated on Sunday 13 September in St Patrick’s Chapel, DUNGIVE
         if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
         ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
         ocrMatches[idx].classList.add('search-active');
-        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
       function updateMatchUi() {
         const total = ocrMatches.length;
@@ -484,6 +544,48 @@ Mass will be celebrated on Sunday 13 September in St Patrick’s Chapel, DUNGIVE
         }
       });
     })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      var btn = document.getElementById('scroll-top-btn');
+      if (!btn) return;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function shown() {
+        var y = window.scrollY || document.documentElement.scrollTop || 0;
+        btn.classList.toggle('is-visible', y > 240);
+      }
+      window.addEventListener('scroll', shown, { passive: true });
+      shown();
+      btn.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      });
+    })();
+    
   </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
 </body>
 </html>

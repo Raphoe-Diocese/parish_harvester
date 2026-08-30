@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
   <title>Raphoe Text Bulletin — 21/08/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -14,7 +16,7 @@
       font-size: 1.125rem;
       -webkit-text-size-adjust: 100%;
       text-size-adjust: 100%;
-      overflow-x: hidden;
+      overflow-x: clip;
     }
     a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
     .page {
@@ -36,8 +38,62 @@
       font-size: 1rem; font-weight: 700; color: #1a1f1e;
     }
     .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 40;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+      box-shadow: 0 8px 16px #eef1f0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 8rem; }
+    mark.search-active { scroll-margin-top: 8rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 30;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
     .ocr-zoom-bar {
-      position: sticky; top: 0; z-index: 6;
       display: flex; justify-content: center; align-items: center; gap: 8px;
       margin: 0 0 10px; padding: 6px 10px;
       background: rgba(255, 255, 255, 0.92);
@@ -63,7 +119,7 @@
       max-width: min(72ch, 100%);
       margin-left: auto;
       margin-right: auto;
-      overflow-x: hidden;
+      overflow-x: clip;
       overflow-wrap: anywhere;
       word-wrap: break-word;
       hyphens: auto;
@@ -274,6 +330,7 @@
         <span class="title-line">RAPHOE Text Bulletin · 21/08/2026</span>
       </div>
     </div>
+    <div class="ocr-sticky-chrome">
     <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
       <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
       <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
@@ -293,12 +350,13 @@
         </div>
       </div>
     </div>
-    <div class="ocr-body" id="ocr-text"><p class="page-label">Page 21</p>
+    </div>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Raphoe</h2><p class="ocr-parish-date">21/08/2026</p></header>
+<p class="page-label">Page 1</p>
 <p>WEBSITE parishofraphoe.ie EMAIL: <a href="mailto:raphoeparish@gmail.com" target="_blank" rel="noopener noreferrer">raphoeparish@gmail.com</a><br>
-Fr Kelly: <a href="tel:+353879077985" style="color:#1d4ed8;font-weight:600;">087 9077985</a> Office Phone <a href="tel:+353873338714" style="color:#1d4ed8;font-weight:600;">0873338714</a> Sunday 19 July 2026</p>
-<h2 class="ocr-parish-name">Raphoe</h2>
-<p>21/08/2026</p>
-<p>St. Eunan ’s Church,<br>
+Fr Kelly: <a href="tel:+353879077985" style="color:#1d4ed8;font-weight:600;">087 9077985</a> Office Phone <a href="tel:+353873338714" style="color:#1d4ed8;font-weight:600;">0873338714</a> Sunday 19 July 2026<br>
+RAPHOE PARISH NEWSLETTER<br>
+St. Eunan ’s Church,<br>
 Raphoe St. Patrick ’s Church,<br>
 Drumkeen St. Mary ’s Church,<br>
 Convoy<br>
@@ -354,9 +412,10 @@ following prayer this week:<br>
 Lord Jesus, plant your Word in our hearts and make it fruitful in our lives. Keep<br>
 us free from sin and make us a fertile place where your love can grow. Let the<br>
 Word which you have planted in our hearts not return to you void, but may it<br>
-provide a rich harvest, a hundred, or fifty, or thirty -fold. Amen</p>
+provide a rich harvest, a hundred, or fifty, or thirty -fold. Amen<br>
+Raphoe</p>
 <hr>
-<p class="page-label">Page 22</p>
+<p class="page-label">Page 2</p>
 <p>What do we live for, if it is not to make life less difficult for each other?<br>
 Anytime we step out boldly to make changes, we take a chance that we might fail. But the only way to get better<br>
 is to try.</p>
@@ -396,7 +455,8 @@ this session, please email <a href="mailto:donegal@encounterschool.org" target="
 Youth 2000 Summer Festival in Newbridge College, Co. Kildare. This is a donation -only event, with free buses<br>
 available across the country and all meals included. Expect inspiring talks and workshops, Youth Mass, music,<br>
 prayer, and plenty of opportunities to chill out and meet other young Catholics. Whether you are new to the faith<br>
-or looking to be refreshed, all are welcome. To register or to find out more please visit: youth2000.ie or follow</p>
+or looking to be refreshed, all are welcome. To register or to find out more please visit: youth2000.ie or follow<br>
+@Youth2000Ireland.</p>
 <hr>
 <p>The Lough Derg Three -Day Pilgrimage runs until 15 August. Booking is advised. The one -day retreats and<br>
 guided Pilgrim Path experience has the following dates available in August: 18, 22, 23, 29 and 31; and in<br>
@@ -404,8 +464,7 @@ September: 5, 6, 9, 12, 15, 19, and 20. Booking is essential. All of us are invi
 this summer. <a href="https://www.loughderg.org" target="_blank" rel="noopener noreferrer">www.loughderg.org</a> , email <a href="mailto:info@loughderg.org" target="_blank" rel="noopener noreferrer">info@loughderg.org</a> or telephone 0(0353) 71 9861518.</p>
 <hr>
 <p>We are always on the lookout for interesting articles for the newsletter. If you have one you might like to share it.<br>
-If you would like a notice in the newsletter, please email the notice to <a href="mailto:raphoeparish@gmail.com" target="_blank" rel="noopener noreferrer">raphoeparish@gmail.com</a></p>
-<hr></div>
+If you would like a notice in the newsletter, please email the notice to <a href="mailto:raphoeparish@gmail.com" target="_blank" rel="noopener noreferrer">raphoeparish@gmail.com</a></p></div>
     <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
   </div>
   <script>
@@ -471,7 +530,7 @@ If you would like a notice in the newsletter, please email the notice to <a href
         if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
         ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
         ocrMatches[idx].classList.add('search-active');
-        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
       function updateMatchUi() {
         const total = ocrMatches.length;
@@ -553,6 +612,48 @@ If you would like a notice in the newsletter, please email the notice to <a href
         }
       });
     })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      var btn = document.getElementById('scroll-top-btn');
+      if (!btn) return;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function shown() {
+        var y = window.scrollY || document.documentElement.scrollTop || 0;
+        btn.classList.toggle('is-visible', y > 240);
+      }
+      window.addEventListener('scroll', shown, { passive: true });
+      shown();
+      btn.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      });
+    })();
+    
   </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
 </body>
 </html>

@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
   <title>Raphoe Diocese Bulletin Viewer — 21/08/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -95,6 +97,11 @@
       border: 1px solid #dde5e4;
       padding: 14px;
       margin-bottom: 4px;
+      overflow: visible;
+    }
+    #panel-pdf,
+    #panel-ocr {
+      overflow: visible;
     }
 
     .quiet-links {
@@ -112,7 +119,7 @@
       position: relative;
       height: auto;
       min-height: 850px;
-      overflow: hidden;
+      overflow: visible;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -165,10 +172,9 @@
     .pdf-inpage-pages {
       box-sizing: border-box;
       flex: 0 0 auto;
-      height: 850px;
+      height: auto;
       min-height: 850px;
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
+      overflow: visible;
       background: #525659;
       padding: 8px 0 16px;
     }
@@ -194,7 +200,7 @@
     .pdf-standalone-shell iframe.pdf-frame,
     body.is-native-pdf iframe.pdf-frame {
       display: none !important;
-      height: 850px;
+      height: auto;
       min-height: 850px;
     }
     .pdf-frame-wrap.is-native-pdf,
@@ -225,8 +231,9 @@
       .pdf-inpage-pages,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
-        height: 450px !important;
+        height: auto !important;
         min-height: 450px !important;
+        overflow: visible !important;
       }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
@@ -279,8 +286,62 @@
     .ocr-search-tools button:disabled { background: #9bbfbd; cursor: not-allowed; }
     .match-count { color: #6b7280; font-size: 0.9rem; font-weight: 600; }
     .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 40;
+      background: #fff;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+      box-shadow: 0 8px 16px #fff;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 8rem; }
+    mark.search-active { scroll-margin-top: 8rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 30;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
     .ocr-zoom-bar {
-      position: sticky; top: 0; z-index: 6;
       display: flex; justify-content: center; align-items: center; gap: 10px;
       margin: 0 0 10px; padding: 6px 10px;
       background: rgba(255, 255, 255, 0.94);
@@ -305,7 +366,7 @@
       max-width: min(72ch, 100%);
       margin-left: auto;
       margin-right: auto;
-      overflow-x: hidden;
+      overflow-x: clip;
       overflow-wrap: anywhere;
       word-wrap: break-word;
       hyphens: auto;
@@ -454,14 +515,14 @@
 
     #ocr-panel {
       box-sizing: border-box;
-      height: 850px;
+      height: auto;
       min-height: 850px;
-      overflow-y: auto;
+      overflow: visible;
       border: 1px solid #d4ddd9;
       padding: 22px 24px 32px;
     }
     .pdf-frame-wrap iframe {
-      height: 850px;
+      height: auto;
       min-height: 850px;
     }
     .note-box {
@@ -568,8 +629,9 @@
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
       #ocr-panel {
-        height: 450px;
+        height: auto;
         min-height: 450px;
+        overflow: visible;
       }
     }
     @media (max-width: 900px) {
@@ -591,7 +653,7 @@
       }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260822" defer></script>
 </head>
 <body>
   <div class="page">
@@ -636,6 +698,7 @@
       <div class="quiet-links">
         <a href="raphoe-2026-08-21-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
+      <div class="ocr-sticky-chrome">
       <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
         <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
         <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
@@ -652,6 +715,7 @@
           <button id="ocr-prev" type="button" disabled aria-label="Previous search match">← Prev match</button>
           <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
         </div>
+      </div>
       </div>
       <div id="ocr-panel"><p class="page-label">Page 1</p>
 <header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Annagry</h2><p class="ocr-parish-date">21/08/2026</p></header>
@@ -693,7 +757,7 @@ Share:</p>
 <hr>
 <p class="page-label">Page 4</p>
 <h3 class="b-head">MASS TIMES ANNIVERSARIES /INTENTIONS</h3>
-<p>Saturday 2nd August 11:00am<br>
+<p>Saturday 22nd August 11:00am<br>
 6:30pm Angela McGlynn, New York, sister of Raymond McGlynn, Mass and<br>
 Burial of Ashes<br>
 Get W ell Intention<br>
@@ -714,12 +778,13 @@ Church of St Joseph &amp; St Conal, Bruckless<br>
 Fr Joseph Ndiraba Tel: 074 97 3 7015<br>
 E-mail : <a href="mailto:parishofficebruckless@gmail.com" target="_blank" rel="noopener noreferrer">parishofficebruckless@gmail.com</a><br>
 21ST SUNDAY IN ORDINARY TIME<br>
-Saturday 2nd / Sunday 23rd August 2026 - Year A<br>
+Saturday 22nd / Sunday 23rd August 2026 - Year A<br>
 Parish Newsletter available online at: - tiny.cc/PBNL<br>
 Church Envelopes If you are new to the area or would like a box please contact the Parish Office on <a href="tel:+353749737015" style="color:#1d4ed8;font-weight:600;">074<br>
 9737015</a> or email <a href="mailto:parishofficebruckless@gmail.com" target="_blank" rel="noopener noreferrer">parishofficebruckless@gmail.com</a><br>
-You may contribute by Direct Debit/Online Banking if you wish. Bank details: Bank of Ireland, Killybegs<br>
-Sunday Envelopes: Killaghtee Parish Church account : IBAN: IE35 BOFI 9049 0729 4874 30<br>
+You may contribute by Direct Debit/Online Banking if you wish. Bank details: Bank of Ireland,</p>
+<header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Killybegs</h2><p class="ocr-parish-date">21/08/2026</p></header>
+<p>Sunday Envelopes: Killaghtee Parish Church account : IBAN: IE35 BOFI 9049 0729 4874 30<br>
 Parish Projects: Killaghtee Parish Repair Fund : IBAN IE28 BOFI 9049 0729 1660 98<br>
 August &amp; September 2026 @ Lough Derg<br>
 One Day Retreats – Guided Days of Prayer and Reflection - places available on August 29th and 31st<br>
@@ -758,7 +823,8 @@ Enquiries: <a href="mailto:op.evangelisation@gmail.com" target="_blank" rel="noo
 Please Note there will be no newsletter for the<br>
 weekend of Sat 5th / Sun 6th September Breast Cancer Awareness Month 2026 takes place Thursday, Oct 1st, 2026 – Saturday, Oct 31st, 2026.<br>
 For more information, please visit breastcancerresearch.ie or <a href="https://www.breastcancerireland.com" target="_blank" rel="noopener noreferrer">www.breastcancerireland.com</a> .<br>
-International Coffee Day 2026 takes place on Thursday, October 1st, 2026. Please see</p>
+International Coffee Day 2026 takes place on Thursday, October 1st, 2026. Please see<br>
+www.internationalcoffeeday.org for further details</p>
 <header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Bruckless</h2><p class="ocr-parish-date">21/08/2026</p></header>
 <hr>
 <p class="page-label">Page 5</p>
@@ -776,15 +842,16 @@ BAPTISM PREPARATION ~ We have uploaded a number of videos under<br>
 website: <a href="https://www.steunanscathedral.ie" target="_blank" rel="noopener noreferrer">www.steunanscathedral.ie</a> Parish Office Hours: Monday to Thursday: 9.30am - 4.30pm/Friday 9.30am – 1pm<br>
 Phone: <a href="tel:+353749121021" style="color:#1d4ed8;font-weight:600;">074 - 9121021</a><br>
 Parish Email: <a href="mailto:office@steunanscathedral.ie" target="_blank" rel="noopener noreferrer">office@steunanscathedral.ie</a><br>
-Website: <a href="https://www.steunanscathedral.ie" target="_blank" rel="noopener noreferrer">www.steunanscathedral.ie</a> St. Eunan ’s Cathedral<br>
-Live Web Streaming from the Cathedral ~ churchservices.tv/letterkenny<br>
+Website: www.steunanscathedral.ie St. Eunan ’s</p>
+<header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Cathedral</h2><p class="ocr-parish-date">21/08/2026</p></header>
+<p>Live Web Streaming from the Cathedral ~ churchservices.tv/letterkenny<br>
 EMPOWER Cumasú Programme - Applications are now open . Are you a<br>
 female living in the Gaeltacht looking to start or grow your own business? Whether<br>
 it’s food, farming, crafts or a service business, we want to hear from you. Apply now:<br>
 <a href="https://empowerprogramme.ie/" target="_blank" rel="noopener noreferrer">https://empowerprogramme.ie/</a> Places are limited. The closing date for applications<br>
 is 5 pm on Friday 4th September. Phone: 091 -742851or email: <a href="mailto:michelle.lee@atu.ie" target="_blank" rel="noopener noreferrer">michelle.lee@atu.ie</a><br>
 LOUGH DERG One Day Retreats - Guided Days of Prayer and Reflection<br>
-August: 18th, 2nd, 23rd, 29th and 31st ~ September: 5th, 6th, 9th, 12th, 15th, 19th<br>
+August: 18th, 22nd, 23rd, 29th and 31st ~ September: 5th, 6th, 9th, 12th, 15th, 19th<br>
 and 20th. Admission €50. Group discounts available. Advance Booking Essential .<br>
 Special Themed Retreats: 23rd August - St. Peregrine; 5th September - Pioneer<br>
 Pilgrimage; 6th September - St. Carlos Acutis; 9th and 12th September - Vocations<br>
@@ -820,6 +887,7 @@ Eucharistic Adoration is a devotion whereby members of a parish unite in<br>
 making continuous adoration before the exposed Blessed Sacrament, for as<br>
 many hours as may be possible, based on the number of people who pledge to<br>
 do a weekly holy hour. Eucharistic Adoration is silent and contemplative in<br>
+nature.<br>
 We in this parish are very blessed that St. Pius X Adoration<br>
 Chapel (located in the grounds of Loreto Secondary School) is<br>
 open from Sunday 1 pm – Friday 8 pm and that we have<br>
@@ -836,7 +904,6 @@ an hour of your choice - please contact Mary on <a href="tel:+353860870446" styl
 it is the most profitable for salvation, because it gives us the Author of Grace;<br>
 it is the sweetest, because the Lord is Sweetness itself. ” Pope Pius X<br>
 (Feast of St. Pius X - Friday 21st August)</p>
-<header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Cathedral</h2><p class="ocr-parish-date">21/08/2026</p></header>
 <hr>
 <p class="page-label">Page 6</p>
 <p>The NATIONAL NOVENA TO OUR LADY OF KNOCK continues until<br>
@@ -910,7 +977,7 @@ Quigley, Deceased Members of the Quigley Family, Eileen O ’Doherty, Patrick<br
 Greene, Kathleen Doherty, Liam Doherty, Duncan Doherty, Brigid Friel, Mason<br>
 Anderson, John Sadler, Kathleen Sadler, Brendan Sadler, John Sadler, Kathleen<br>
 McCauley, Eddie McCauley, Kathleen Lally, Eileen Boyle and Grace Marley RIP<br>
-Saturday 2nd August ~ The Queenship of Mary<br>
+Saturday 22nd August ~ The Queenship of Mary<br>
 10 am Mass ~ Frank McManus RIP (Month ’s Mind Mass)<br>
 Confessions: 12 noon - 1 pm and 7 pm<br>
 Baptisms: 4 pm<br>
@@ -957,7 +1024,8 @@ Anniv Occurs, all those whose</p>
 10.00 am THURSDAY 20TH AUG.<br>
 10.00 am FRIDAY 21ST AUG .<br>
 11.00am SUNDAY 23RD AUG. 06.30 pm SATURDAY 15 TH AUG.<br>
-06.30pm SATURDAY 2ND AUG. WEDNESDAY 19TH AUG . PRO POPULO<br>
+MASS.<br>
+06.30pm SATURDAY 22ND AUG. WEDNESDAY 19TH AUG . PRO POPULO<br>
 NO MASS. MASS<br>
 PRAYER Suitable for 20th SUNDAY in Ordinary Time.for 20th SUNDAY in Ordinary Time. .<br>
 “Almighty and everlasting God, You have taken up body and soul into the<br>
@@ -1009,7 +1077,8 @@ Bishops Conference dedicated to sharing the &#x27;Good News&#x27;<br>
 and the witness of the Catholic Church in Ireland. It is<br>
 intended to help people discover the faith, live the faith<br>
 and pass on the faith. It is for both seekers and followers. ST JOSEPH MEN’S CAMINO. ST JOSEPH MEN’S CAMINO. Join men from across Ireland on Saturday<br>
-12th September for a 25km pilgrimage through the Boyne Valley, beginning in</p>
+12th September for a 25km pilgrimage through the Boyne Valley, beginning in<br>
+Drogheda. SEE POSTER IN ADDITI ONAL NEWS. ONAL NEWS</p>
 <hr>
 <p class="page-label">Page 8</p>
 <header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Dunfanaghy</h2><p class="ocr-parish-date">21/08/2026</p></header>
@@ -1031,7 +1100,7 @@ Tuesday 18th 9: 30 am Private Intention<br>
 Wednesday 19th 9: 30 am Willie Doohan Anniversary<br>
 Thursday 20th 9: 30 am Private Intention<br>
 Friday 21st 7: 00 pm Susie O’Donnell Anniversary<br>
-Saturday 2nd 11: 00 am Latin Mass<br>
+Saturday 22nd 11: 00 am Latin Mass<br>
 7: 00 pm Mass<br>
 Sunday 23rd 9: 00 am Aifreann don Phobal<br>
 10: 30 am Mass<br>
@@ -1062,6 +1131,7 @@ he has a tendency to test his followers. His disciples, who know him well and ha
 this woman passes with flying colours. Jesus can see that she is a person of strong faith, clever and determined. She is not<br>
 easily dismissed. In allowing her to state her case, Jesus also presents a challenge to the religious and social status quo.<br>
 This pagan woman (Jesus ’ reference to ‘house -dogs ’ tells us a lot about her status) exhibits more faith than his own<br>
+disciples.<br>
 Jesus does not want us to be silent, compliant or complacent. He rejoices in those who are brave and persistent,<br>
 and eager to challenge the injustices they see around them – those who have the gift of changing minds and hearts.<br>
 We might call it the gift of prophecy. Tríona Doherty</p>
@@ -1074,7 +1144,7 @@ Sheila Geaney, Balliness and Gerry McKenna, Craigtown and Glengormley, whose Mon
 <header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Falcarragh</h2><p class="ocr-parish-date">21/08/2026</p></header>
 <hr>
 <p class="page-label">Page 10</p>
-<h3 class="b-head">Freagra an tSailm </h3>
+<h3 class="b-head">Freagra an tSailm</h3>
 <p>Go mola na ciníocha thú, a Dhia; go mola na ciníocha go léir thú.<br>
 HOW TO REPORT CLERICAL ABUSE<br>
 If you have a concern, or complaint of child abuse, either current or<br>
@@ -1095,6 +1165,7 @@ on the front of this newsletter, with your mobile phone camera. One QR<br>
 code is for the Sunday Collection and one QR code is for the<br>
 Graveyard Collection. You can also make donations by going to the parish<br>
 website and clicking on the DONATE button. All donations are gratefully<br>
+accepted.<br>
 Embrace the Grace —Legion of Mary Young Adult Catholic Conference<br>
 Saturday 29th August 2026 9:30 am —6: 00 pm, De Montfort House, Dublin.<br>
 Special ticket price €15 for full day. Contact Manus <a href="tel:+353873720740" style="color:#1d4ed8;font-weight:600;">087 3720740</a>.<br>
@@ -1140,7 +1211,7 @@ faith. It is for both seekers and followers. Use the QR code<br>
 to access the site.<br>
 Lough Derg<br>
 One Day Retreats – Guided Days of Prayer and Reflection - places available<br>
-on August 18th, 2nd, 23rd, 29th and 31st. September 5th, 6th, 9th, 12th,<br>
+on August 18th, 22nd, 23rd, 29th and 31st. September 5th, 6th, 9th, 12th,<br>
 15th, 19th and 20th. Admission €50. Advance booking essential.<br>
 Becoming Peacemakers<br>
 Starting in August 2026, we will be gathering on the 2nd Saturday of every<br>
@@ -1148,6 +1219,7 @@ month to begin our own journeys toward becoming peacemakers. We invite<br>
 everyone who is interested in healing inner wounds and finding peace.<br>
 Together over the first 5 Saturdays we will walk the path of inner healing and<br>
 peace, sharing together, offering a Mass for Peace, and engaging in creative<br>
+activities.<br>
 Pobail Le Chéile CDP<br>
 DLDC FREE 6 week Healthy Eating Course<br>
 Learn how to cook delicious, healthy meals on a budget! Starts on Tuesday<br>
@@ -1157,6 +1229,7 @@ Ionad Naomh Fionnán<br>
 Congratulations to George Cox who was this week ’s winner of €1090.<br>
 Well done George, enjoy your winnings.<br>
 Tickets available with Patsy at the hut and in all businesses locally and<br>
+online.<br>
 Next weeks Bingo jackpot is €5050. Join us every Monday night at 8p.m.<br>
 Thank you all for your continued support.<br>
 Congratulations to the Banna Cheoil Cloich Cheann Fhaola agus Buíon<br>
@@ -1199,7 +1272,7 @@ Sunday 16th August 11:00am Pro Populo<br>
 Monday 17th August 9.30am Priest’s IntenƟon<br>
 Tuesday 18th August 9:30am Priest’s IntenƟon<br>
 Wednesday 19th August 9:30am Priest’s IntenƟon<br>
-Saturday 2nd August 6.00pm Vigil Mass —Priests IntenƟon<br>
+Saturday 22nd August 6.00pm Vigil Mass —Priests IntenƟon<br>
 Sunday 23rd August 11:00am Adrian Boyce, Kilmacrenan, Anniversary</p>
 <h3 class="b-head">Mass Times in The Church of The Immaculate ConcepƟon, Coole</h3>
 <p>Sunday 16th August 9:30am Sunday Mass – Priest’s IntenƟon<br>
@@ -1209,16 +1282,17 @@ Sunday 23rd August 9:30am Sunday Mass – Priest’s IntenƟon</p>
 Sunday 16th August 9:00am Pro Populo<br>
 Wednesday 19th August 9.30am Eileen Coyle and Peter Doherty, Anniversaries<br>
 Thursday 20th August, 7.00pm PADRE PIO HEALING MASS<br>
-Saturday 2nd August 6:30pm Vigil Mass - Priest’s IntenƟon<br>
+Saturday 22nd August 6:30pm Vigil Mass - Priest’s IntenƟon<br>
 Sunday 23rd August 9:00am Pro Populo</p>
 <h3 class="b-head">Mass Times in St Colmcille ’s Church, Glendowan</h3>
 <p>Saturday 15th August 8:00pm Tanya McCaﬀerty, Church Hill, Anniversary<br>
 Sunday 16th August 10:30am Mickey Mc Cormack, Inniskill, Anniversary Mass<br>
 Friday 21st August 7:00pm Peggy Crerand, Stackernaugh, Anniversary Mass<br>
 Friday 21st August 8.00pm Maisie Connaghan, Whitehill, 1st Anniversary<br>
-Saturday 2nd August 8:00pm Frank MelleƩ, Lacknacoo, Anniversary<br>
-Sunday 23rd August 10:30am Sunday Mass – Priest’s IntenƟon St Columba ’s Church, Kilmacrenan<br>
-St Columba ’s Church, Termon<br>
+Saturday 22nd August 8:00pm Frank MelleƩ, Lacknacoo, Anniversary<br>
+Sunday 23rd August 10:30am Sunday Mass – Priest’s IntenƟon St Columba ’s Church,</p>
+<header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Kilmacrenan</h2><p class="ocr-parish-date">21/08/2026</p></header>
+<p>St Columba ’s Church, Termon<br>
 St Colmcille ’s Church, Glendowan<br>
 The Church of The Immaculate ConcepƟon, Coole<br>
 St Brigid’s Church, Golan Fr. Michael Mc Keever, PP</p>
@@ -1227,6 +1301,7 @@ St Brigid’s Church, Golan Fr. Michael Mc Keever, PP</p>
 <h3 class="b-head">Parochial House, Termon</h3>
 <p><a href="tel:+353749139016" style="color:#1d4ed8;font-weight:600;">074 91 39016</a><br>
 Email Addresses:<br>
+<a href="mailto:gartantermon@raphoediocese.ie" target="_blank" rel="noopener noreferrer">gartantermon@raphoediocese.ie</a><br>
 <a href="mailto:kilmacrenan@raphoediocese.ie" target="_blank" rel="noopener noreferrer">kilmacrenan@raphoediocese.ie</a> Parish Website:<br>
 Parish Oﬃce in Termon<br>
 Opened Monday &amp; Friday 10am – 1pm <a href="tel:+353749139016" style="color:#1d4ed8;font-weight:600;">074 9139016</a><br>
@@ -1274,6 +1349,7 @@ would do? Then this course is for you. Beginning in September<br>
 unƟl the end of May on Thursdays from 6.30pm to 9.00pm<br>
 at All Saints Church, Newtowncunningham.<br>
 For more informaƟon on the course or to register go to<br>
+hƩps://encounterschool.org/donegal/<br>
 or email <a href="mailto:donegal@encounterschool.org" target="_blank" rel="noopener noreferrer">donegal@encounterschool.org</a> NaƟonal Novena to our Lady of Knock<br>
 13th–21st August 2026.<br>
 Sheltered in God ’s Love<br>
@@ -1288,7 +1364,8 @@ The Sacrament of Confession is available before and aŌer any<br>
 of the Masses celebrated in both Parishes. Come to the Sacristy.<br>
 Mass Cards: Mass Bouquet Cards, Mass Sympathy Cards<br>
 Birthday Mass Bouquet cards are available from the sacristy of<br>
-any of the Churches and from the Parish Oﬃce in Termon.</p>
+any of the Churches and from the Parish Oﬃce in Termon.<br>
+Recommended Diocesan sƟpend is €10 per Mass, cards cost €1</p>
 <header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Gartan/Termon</h2><p class="ocr-parish-date">21/08/2026</p></header>
 <hr>
 <p class="page-label">Page 12</p>
@@ -1347,7 +1424,7 @@ Anthony McGlynn<br>
 11 a.m.<br>
 John Carlin, Ballincor<br>
 12th anniversary.<br>
-Saturday 2nd August 6 p.m.<br>
+Saturday 22nd August 6 p.m.<br>
 John McGinty (John Dhónall<br>
 Andy)<br>
 15th anniversary.<br>
@@ -1380,6 +1457,7 @@ clinics offer you a space and time talk<br>
 over the phone in the comfort of your<br>
 own home. To Book Call/text<br>
 <a href="tel:+353868363842" style="color:#1d4ed8;font-weight:600;">0868363842</a> or email Done-<br>
+<a href="mailto:galcs@familycarers.ie" target="_blank" rel="noopener noreferrer">galcs@familycarers.ie</a><br>
 There will be a Mass for Expectant Families in the Cathedral, Letterkenny at 7 p.m. on Tuesday 8th September.<br>
 Bishop Coll will be Celebrant.<br>
 Heritage Week This very interesting topic on what is known as ‘A Ribbon Conspiracy<br>
@@ -1421,8 +1499,9 @@ plications is Wednesday</p>
 Webpage:<a href="https://www.parishpress.net/parishofiniskeel" target="_blank" rel="noopener noreferrer">www.parishpress.net/parishofiniskeel</a> Fr Gerard Cunningham Facebook: Parish of Iniskeel<br>
 Please note that Glenties and Fintown Church webcams are live at all times. Recordings take place for all liturgies unless r equested otherwise. CCTV is operational in Glenties and Fintown churches.<br>
 NOTICES FOR PARISH NEWSLETTER TO BE RECEIVED BY 5pm ON THUR SDAY BY EMAIL TO <a href="mailto:parishofiniskeel@gmail.com" target="_blank" rel="noopener noreferrer">parishofiniskeel@gmail.com</a> OR IN WRITING TO THE PAROCHIAL HOUSE.<br>
-ITEMS FOR THE NEWSLETTER MAY BE EDITED OR OMITTED DEPENDING ON SPACE AVAILABLE. PLEASE KEEP NOTICES TO A MINIMUM. St Connell’s Church, Glenties<br>
-Webcam: <a href="https://www.churchservices.tv/glenties" target="_blank" rel="noopener noreferrer">www.churchservices.tv/glenties</a><br>
+ITEMS FOR THE NEWSLETTER MAY BE EDITED OR OMITTED DEPENDING ON SPACE AVAILABLE. PLEASE KEEP NOTICES TO A MINIMUM. St Connell’s Church,</p>
+<header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Glenties</h2><p class="ocr-parish-date">21/08/2026</p></header>
+<p>Webcam: <a href="https://www.churchservices.tv/glenties" target="_blank" rel="noopener noreferrer">www.churchservices.tv/glenties</a><br>
 Saturday<br>
 15th August 11:00am<br>
 6:00pm Assumption of Blessed Virgin<br>
@@ -1445,7 +1524,7 @@ Kilraine , 2nd Anniversary<br>
 Friday<br>
 21st August 7:30pm<br>
 Saturday<br>
-2nd August 6:00pm<br>
+22nd August 6:00pm<br>
 Sunday<br>
 23rd August 11:00am<br>
 Teach Pobail an Teaghlaigh Naofa,<br>
@@ -1477,7 +1556,7 @@ Ballinamore<br>
 Friday<br>
 21st August 7:00i.n. Eibhl ín Bn Uí Bhaoill R.I.P.<br>
 Saturday<br>
-2nd August 7:30i.n.<br>
+22nd August 7:30i.n.<br>
 Sunday Collection<br>
 Glenties € 2,210, Fintown €468,<br>
 Edeninfagh €410. Thank yo u<br>
@@ -1579,6 +1658,7 @@ church gates on Saturday 29th and Sunday 30th<br>
 August 2026 . Anyone interested in volunteering<br>
 can contact the Donegal Down Syndrome<br>
 Association office by email at<br>
+<a href="mailto:info@donegal.downsyndrome.ie" target="_blank" rel="noopener noreferrer">info@donegal.downsyndrome.ie</a><br>
 or call <a href="tel:+353857870075" style="color:#1d4ed8;font-weight:600;">085 787 0075</a>.<br>
 Contact: <a href="tel:+353873969890" style="color:#1d4ed8;font-weight:600;">087 3969890</a> or<br>
 Email: <a href="mailto:glentiesvp@gmail.com" target="_blank" rel="noopener noreferrer">glentiesvp@gmail.com</a><br>
@@ -1632,7 +1712,6 @@ Newtowncunningham . For more information<br>
 on the course or to register go to<br>
 <a href="https://encounterschool.org/donegal/" target="_blank" rel="noopener noreferrer">https://encounterschool.org/donegal/</a> or<br>
 email <a href="mailto:donegal@encounterschool.org" target="_blank" rel="noopener noreferrer">donegal@encounterschool.org</a></p>
-<header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Glenties</h2><p class="ocr-parish-date">21/08/2026</p></header>
 <hr>
 <p class="page-label">Page 14</p>
 <p>POBAL CHRIOST RI</p>
@@ -1745,7 +1824,7 @@ Tuesday 18th August Frosses 10:00am Holy Mass<br>
 Wednesday 19th Aug Frosses 10:00am Holy Mass<br>
 Thursday 20th August Frosses 10:00am Holy Mass<br>
 Friday 21st August Mountcharles 7:00pm Caroline Murray Month’s Mind<br>
-Saturday 2nd August Drimarone 3:00pm Baptism<br>
+Saturday 22nd August Drimarone 3:00pm Baptism<br>
 Ardaghey 6:00pm Patrick and Dan F riel<br>
 Willie Rose<br>
 Drimarone 7:30pm Holy Mass<br>
@@ -1814,6 +1893,7 @@ Tel: 01 4045378 Email: <a href="mailto:i.wiessner@anamcara.ie" target="_blank" r
 MARRIAGE ENCOUNTER Ireland invites married couples to a residential Weekend from Friday 2nd to Sunday<br>
 4th October 2026 <a href="https://www.marriageencounter.ie" target="_blank" rel="noopener noreferrer">www.marriageencounter.ie</a> INVER HERITAGE GROUP invite you to come along on Tuesday 18th August at 7pm to St Nauls Church<br>
 ruins at Inver for a talk by archaeologist Kate Robb and a demonstration of conservation masonry by Brian<br>
+Kerrigan.<br>
 Low-Gluten Hosts are available at all the Masses in the Parish. If you would like to receive a low -gluten host,<br>
 please feel free to come forward to the priest and cross one arm across your chest indicating your preference.<br>
 They may or may not be suitable depending on the various intolerances. If you have any questions please do<br>
@@ -1831,7 +1911,7 @@ NATIONAL NOVENA to Our Lady of Knock 13–21 August 2026. Visit: <a href="https:
 board for details. August &amp; September 2026 @ Lough Derg<br>
 “A pilgrimage has a vital part to play in our life of faith, for it removes us from our daily routines, and gives us<br>
 time and space to encounter God more deeply .” Pope Leo XIV<br>
-One Day Retreats – Guided Days of Prayer and Reflection - places available on August 18th, 2nd, 23rd, 29th<br>
+One Day Retreats – Guided Days of Prayer and Reflection - places available on August 18th, 22nd, 23rd, 29th<br>
 and 31st September 5th, 6th, 9th, 12th, 15th, 19th and 20th Admission €50. Group discounts available. Advance<br>
 Booking Essential . Includes Special Themed Retreats : 23rd August - St Peregrine | 5th September – Pioneer<br>
 Pilgrimage | 6th September – St Carlos Acutis | 9th &amp; 12th September – Vocations Monstrance | 19th September<br>
@@ -1853,7 +1933,8 @@ provided<br>
 The Stables Motorsport Centre – Community Event Join us on Sunday 23rd August 11am – 3pm<br>
 Rally Cars &amp; Displays | Meet the Community | Motorsports Atmosphere. Open invitation , all welcome .<br>
 The Stables Motorsport Centre , Frosses F94 C82Y ANNIVERSARIES AT THIS TIME : Kathleen McCabe<br>
-PLEASE NOTE: There will be no newsletter for the weekend of Saturday 5th / Sunday 6th September . The Donegal Down Syndrome Annual Church Gate Collection will take place throughout County Donegal</p>
+PLEASE NOTE: There will be no newsletter for the weekend of Saturday 5th / Sunday 6th September . The Donegal Down Syndrome Annual Church Gate Collection will take place throughout County Donegal<br>
+on Saturday 29th and Sunday 30th August 2026</p>
 <header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Inver</h2><p class="ocr-parish-date">21/08/2026</p></header>
 <hr>
 <p class="page-label">Page 16</p>
@@ -1885,7 +1966,7 @@ restraint correctly and answer any queries. We aim to put your minds at ease tha
 child’s car seat is safely and securely fitted in their car. Visit <a href="https://www.checkitfits.ie" target="_blank" rel="noopener noreferrer">www.checkitfits.ie</a>.<br>
 LOUGH DERG : 3.Day Pilgrimages: Begin on any day of the week until Thurs13th August.<br>
 Admission €85. Discounts available for Groups, Seniors &amp; Students. One Day Retreats –<br>
-Guided Days of Prayer and Reflection: Aug18th, 2nd, 23rd (St Peregrine), 29th, 31st, Sept<br>
+Guided Days of Prayer and Reflection: Aug18th, 22nd, 23rd (St Peregrine), 29th, 31st, Sept<br>
 5th (Pioneer Pilgrimage), 6th (Carlos Acutis), 9th &amp; 12th (Vocations Monstrance), 15th,<br>
 19th (Divine Mercy Pilgrimage) and 20th. Admission €50. Group discounts available.<br>
 Booking Essential. <a href="https://www.loughderg" target="_blank" rel="noopener noreferrer">www.loughderg</a>. Email. <a href="mailto:info@loughderg.org" target="_blank" rel="noopener noreferrer">info@loughderg.org</a>. Tel. <a href="tel:+353719861518" style="color:#1d4ed8;font-weight:600;">0719861518</a>.<br>
@@ -1903,8 +1984,9 @@ greater works that Jesus said believers would do? Then this COURSE is for you. B
 in September until end of May on Thursdays from 6.30pm to 9.00pm at All Saints Church,<br>
 Newtowncunningham. For more information on the course or to register go to<br>
 <a href="https://encounterschool.org/donegal/" target="_blank" rel="noopener noreferrer">https://encounterschool.org/donegal/</a> or email <a href="mailto:donegal@encounterschool.org" target="_blank" rel="noopener noreferrer">donegal@encounterschool.org</a>.<br>
-OFFICE CLOSED from Monday 10th to Thursday 13th August inclusive. Church of the Irish Martyrs<br>
-Fr Ciaran Harkin P.P./Fr Dominic Thoomkuzhy C.C.<br>
+OFFICE CLOSED from Monday 10th to Thursday 13th August inclusive. Church of the</p>
+<header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Irish Martyrs</h2><p class="ocr-parish-date">21/08/2026</p></header>
+<p>Fr Ciaran Harkin P.P./Fr Dominic Thoomkuzhy C.C.<br>
 Ballyraine, Letterkenny. <a href="tel:+353749127600" style="color:#1d4ed8;font-weight:600;">074 91 27600</a>; <a href="mailto:irishmartyrschurch@gmail.com" target="_blank" rel="noopener noreferrer">irishmartyrschurch@gmail.com</a><br>
 Newsletter 09 August 2026</p>
 <h3 class="b-head">MASS TIMES</h3>
@@ -1917,7 +1999,7 @@ Brendan O ’Donnell RIP, Kathleen Blake RIP<br>
 Billy Black RIP<br>
 Mass for Syro Malabar Community<br>
 10th August Monday 9.30am For all the sick of the Parish<br>
-1th August Tuesday 9.30am Holy Souls in Purgatory<br>
+11th August Tuesday 9.30am Holy Souls in Purgatory<br>
 12th August Wednesday 9.30am Margaret &amp; Charlie Gallen RIP<br>
 13th August Thursday 9.30am Private Intention<br>
 14th August Friday 9.30am Andy, Liz &amp; Noelle Crumlish RIP<br>
@@ -1932,12 +2014,11 @@ Mass for Syro Malabar Community<br>
 If you wish to donate to the Church online, you can do so<br>
 by scanning the QR Code to the left and following<br>
 the Instructions on the online form. Thank you.</p>
-<header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Irish Martyrs</h2><p class="ocr-parish-date">21/08/2026</p></header>
 <hr>
 <p class="page-label">Page 17</p>
 <p>M<br>
 ass Times<br>
-Saturday 2nd 6pm Josie Boyle – Months Mind<br>
+Saturday 22nd 6pm Josie Boyle – Months Mind<br>
 Kathleen &amp; Mick McGillicuddy – Anniversaries<br>
 Kathy Carr Cully – Anniversary<br>
 Sunday 23rd 11am Maryann Byrne – First Anniversary &amp; Hugh<br>
@@ -1966,7 +2047,7 @@ Glencolmcille and Kilcar<br>
 To check eligibility, please contact James at <a href="tel:+353876788188" style="color:#1d4ed8;font-weight:600;">087<br>
 6788188</a><br>
 Áislann Chill Chartha<br>
-Friday 1th September Onoir &amp; Friday 25th<br>
+Friday 11th September Onoir &amp; Friday 25th<br>
 September Frankie Gavan &amp; Catherine Mc<br>
 Hugh. All tickets available at reception.<br>
 Enrolment for our winter classes are now being<br>
@@ -1990,12 +2071,14 @@ People are often unreasonable and<br>
 self-centered . Forgive them anyway.<br>
 If you are kind, people may accuse<br>
 you of ulterior motives. Be kind<br>
+anyway.<br>
 If you are honest, people may cheat<br>
 you. Be honest anyway.<br>
 If you find happiness, people may be<br>
 jealous. Be h appy anyway.<br>
 The good you do today may be<br>
 forgotten tomorrow. Do good<br>
+anyway.<br>
 Give the world the best you have and<br>
 it may never be enough. Give your<br>
 best anyway.<br>
@@ -2068,7 +2151,9 @@ The Begonia by Rosaleen Carry<br>
 The Begonia Mary gave me in the front room<br>
 It looks very beautiful now it ’s in full bloom.<br>
 Sitting on my window sill for all the world to see<br>
-While Lotto seems quite comfortable sitting on my birthday Mary gave it to me,<br>
+While Lotto seems quite comfortable sitting on my<br>
+knee.<br>
+On my birthday Mary gave it to me,<br>
 Everyday I see it, fills my heart with glee.<br>
 Thank you for the Begonia, it means a lot to me.<br>
 God will help you carry your cross,<br>
@@ -2095,7 +2180,7 @@ See church noticeboard for full details.<br>
 Áislann Chill Chartha: <a href="tel:+353749738376" style="color:#1d4ed8;font-weight:600;">0749738376</a><br>
 Enrolment for Winter classes now being taken.<br>
 A History of Textiles available at reception.<br>
-Fridays: 1th Sept Onoir, 25th Sept Frankie Gavan<br>
+Fridays: 11th Sept Onoir, 25th Sept Frankie Gavan<br>
 &amp; Catherine Mc Hugh. <a href="mailto:eolas@aislann.ie" target="_blank" rel="noopener noreferrer">eolas@aislann.ie</a> Killybegs Cruise Schedule 2026<br>
 Date Ship Arrive/Depart Passengers<br>
 15 Aug Seabourn Ovation 8am / 5pm 638 Gluten -free Communion is available at all Masses.<br>
@@ -2121,7 +2206,7 @@ Tuesday 18th August: 10.00am - Special Intention<br>
 Thursday 20th August: 10.00am - Lilyan Holmes (1st Anniv) &amp; baby Noel &amp;<br>
 John &amp; Rosaleen Melly (Anniversaries)<br>
 Friday 21st August: 07.00pm - Terence Cunningham (1st Anniversary)<br>
-Saturday 2nd August: 07.00pm - Eddie McGuinness (1st Anniversary)<br>
+Saturday 22nd August: 07.00pm - Eddie McGuinness (1st Anniversary)<br>
 Ken Byrne (8th Anniversary)<br>
 Margaret &amp; Frank Brennan (Anniversaries)<br>
 Intentions of Conlin Rd residents, present and past (75 years)<br>
@@ -2168,7 +2253,7 @@ The darkness has come,<br>
 The sun came to die.<br>
 The evening draws on, the sun disappears,<br>
 But Jesus is living, and his Spirit is near. (Chorus) See everything/overlook a great deal/correct a little</p>
-<header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Killybegs</h2><p class="ocr-parish-date">21/08/2026</p></header>
+<p>https://mcn.live/Camera/st-mary-of-the-visitation-church</p>
 <hr>
 <p class="page-label">Page 19</p>
 <p>NEWTOWNCUNNINGHAM MASSES<br>
@@ -2177,7 +2262,7 @@ But Jesus is living, and his Spirit is near. (Chorus) See everything/overlook a 
 18th August Tuesday No Mass<br>
 19th August Wednesday 9.30am Mass<br>
 20th August Thursday No Mass<br>
-2nd August Saturday 7.30pm Ann McGlinchey RIP<br>
+22nd August Saturday 7.30pm Ann McGlinchey RIP<br>
 23rd August Sunday 11am Hugh &amp; Darren McDaid RIP<br>
 KILLEA MASSES<br>
 16th August Sunday 9.30am Mass<br>
@@ -2195,7 +2280,7 @@ ST. BAITHIN’S MASSES<br>
 20th August Thursday 7pm Mass<br>
 21st August Friday 7pm Thomas &amp; Kathleen Wilson<br>
 &amp; Carmel Kelly RIP<br>
-2nd August Saturday 6pm Mass<br>
+22nd August Saturday 6pm Mass<br>
 23rd August Sunday 12.15pm Mass<br>
 WEEKLY NEWSLETTER<br>
 16th August 2026 – Twentie th Sunday of Ordinary Time<br>
@@ -2242,6 +2327,7 @@ Emergency Number</p>
 Email : <a href="mailto:office@newtownkilleaparish.ie" target="_blank" rel="noopener noreferrer">office@newtownkilleaparish.ie</a><br>
 Website: <a href="https://www.newtownkilleaparish.ie" target="_blank" rel="noopener noreferrer">www.newtownkilleaparish.ie</a><br>
 Sunday Collections : €1790. Thank you for your continued generosity to your<br>
+Parish.<br>
 Sacrament of Confession: All Saints Newtown every Saturday 10.30am –<br>
 11.30am .<br>
 Eucharistic Adoration: will take place on Wednesday in Newtown from<br>
@@ -2267,6 +2353,7 @@ Encounter School : Do you want to know more about what it means to be a son or d
 with God? How to effectively evangelise others? Do you want a deeper knowledge of Scripture &amp; Church teaching? Wha t it means to be priest, prophet &amp; king in Christ<br>
 Jesus? How to do the greater works that Jesus said believers would do? Then this course is for you. Beginning in September un til the end of May on Thursdays from<br>
 6.30pm to 9.00pm at All Saints Church, Newto wncunningham. For more information on the course or to register go to <a href="https://encounterschool.org/donegal/" target="_blank" rel="noopener noreferrer">https://encounterschool.org/donegal/</a> or email<br>
+<a href="mailto:donegal@encounterschool.org" target="_blank" rel="noopener noreferrer">donegal@encounterschool.org</a><br>
 Mass for Expectant Families. Are you or someone you know pregnant? A Special Mass will be celebrated by Bishop Coll in St. Eunan’s Cathedral, Letterkenny<br>
 at 7pm on Tuesday 8th September (Feast of Our Lady’s Birthday).<br>
 COME &amp; SEE: Have you heard about the Encounter School of Ministry Course but aren’t sure what it’s about or if it’s for you? We invite you to join us for our September<br>
@@ -2378,7 +2465,8 @@ this session, please email <a href="mailto:donegal@encounterschool.org" target="
 Youth 2000 Summer Festival in Newbridge College, Co. Kildare. This is a donation -only event, with free buses<br>
 available across the country and all meals included. Expect inspiring talks and workshops, Youth Mass, music,<br>
 prayer, and plenty of opportunities to chill out and meet other young Catholics. Whether you are new to the faith<br>
-or looking to be refreshed, all are welcome. To register or to find out more please visit: youth2000.ie or follow</p>
+or looking to be refreshed, all are welcome. To register or to find out more please visit: youth2000.ie or follow<br>
+@Youth2000Ireland.</p>
 <hr>
 <p>The Lough Derg Three -Day Pilgrimage runs until 15 August. Booking is advised. The one -day retreats and<br>
 guided Pilgrim Path experience has the following dates available in August: 18, 22, 23, 29 and 31; and in<br>
@@ -2410,7 +2498,7 @@ FRI 21st AUG . ST. PIUS X , POPE<br>
 10AM Patrick &amp; Gracie Stevenson, and their<br>
 daughter Ann Teresa Stevenson . Mary Teresa<br>
 Hanlon &amp; Matthew Hanlon, Leitir<br>
-SAT 2nd AUG .<br>
+SAT 22nd AUG .<br>
 6.30PM James Shovlin, Caravan Road . 1st Anniversary<br>
 Joey Forker, Meenmore . 1st Anniversary<br>
 Jamie Bonner, Dungloe<br>
@@ -2450,6 +2538,7 @@ Remembrance Service to remember and honour all friends<br>
 and family gone before us. On the 30th August at 4 pm with<br>
 our Rector Rev Janet Broderick. Afterwards we can share our<br>
 memories with family and friends with light refr eshments at<br>
+church.<br>
 SPEEDING THROUGH LETTERMACAWARD VILLAGE – A<br>
 demonstartion / protest which is been organised by<br>
 community groups will place on Wednesday 2nd September<br>
@@ -2465,6 +2554,7 @@ community last weekend, carefully watched by her big sister s.<br>
 Congrats to Shane and Dawn on her big day!<br>
 Administrator &amp; Director of Music: Lisa Philbin (087) 123 9354<br>
 Newsletter: Maureen Mc Cahill (087) 673 7821<br>
+…………………………………………………………………………………………………………………………………………………………….<br>
 ST. CRONA’S CHURCH, CHAPEL ROAD, DUNGLOE, CO.DONEGAL, F94 W2P2 …………………….……………………………………………………………………………………………………………………………………….<br>
 TWENT IETH<br>
 SUNDAY IN<br>
@@ -2494,7 +2584,7 @@ Masses or Parish contributions<br>
 ST.PATRICK’S MEENACROSS<br>
 SUN 16th AUG . 20th SUNDAY IN ORDINARY TIME<br>
 9AM<br>
-SAT 2nd AUG.<br>
+SAT 22nd AUG.<br>
 1PM Mass before inter ment for Moira Thomas<br>
 who died at the end of June<br>
 SUN 23rd AUG . 21st SUNDAY IN ORDINARY TIME<br>
@@ -2506,7 +2596,7 @@ SAT 15th AUG .<br>
 John Manus O’Donnell, Renny &amp; London<br>
 Margaret O’Donnell, Dooey<br>
 Donal Breslin, Corrpoint - Birthday<br>
-SAT 2nd AUG .<br>
+SAT 22nd AUG .<br>
 7PM Sean Mc Cready, Corr Point. 1st Anniversary<br>
 ST.CONAL’S DOOCHARY<br>
 SUN 16th AUG . 20th SUNDAY IN ORDINARY TIME<br>
@@ -2583,9 +2673,9 @@ The following parishes do not have a downloadable PDF bulletin. Click a link to 
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260822"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260822';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -2657,7 +2747,7 @@ The following parishes do not have a downloadable PDF bulletin. Click a link to 
         target.classList.add('search-active');
         const details = target.closest('details.parish-block');
         if (details) details.open = true;
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
 
       function updateMatchUi() {
@@ -2824,6 +2914,48 @@ The following parishes do not have a downloadable PDF bulletin. Click a link to 
         if (page) page.insertBefore(banner, page.firstChild);
       }
     })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      var btn = document.getElementById('scroll-top-btn');
+      if (!btn) return;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function shown() {
+        var y = window.scrollY || document.documentElement.scrollTop || 0;
+        btn.classList.toggle('is-visible', y > 240);
+      }
+      window.addEventListener('scroll', shown, { passive: true });
+      shown();
+      btn.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      });
+    })();
+    
   </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
 </body>
 </html>

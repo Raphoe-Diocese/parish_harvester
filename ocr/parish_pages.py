@@ -35,11 +35,33 @@ from ocr.parish_splitter import (
     split_ocr_html_by_page_ranges,
     split_ocr_html_by_parish,
 )
+from ocr.text_extract import all_pages_have_embedded_text, extract_all_page_lines
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DOCS_DIR = REPO_ROOT / "docs"
 PARISHES_OUT_DIR = DOCS_DIR / "parishes"
 PARISH_STATUS_PATH = REPO_ROOT / "parishes" / "parish_status.json"
+
+
+def _write_text(path: Path, text: str) -> None:
+    """Write UTF-8 HTML, stripping NULs that Windows rejects as EINVAL."""
+    data = (text or "").replace("\x00", "")
+    tmp = path.with_name(path.name + ".tmp")
+    last_error: OSError | None = None
+    for _attempt in range(3):
+        try:
+            tmp.write_text(data, encoding="utf-8")
+            tmp.replace(path)
+            return
+        except OSError as exc:
+            last_error = exc
+            try:
+                tmp.unlink(missing_ok=True)
+            except OSError:
+                pass
+    if last_error is not None:
+        raise last_error
+    path.write_text(data, encoding="utf-8")
 
 # parish_status.json's `diocese` field uses the full display name; map the
 # short config keys used everywhere else in ocr/generate_bulletin_pages.py.
@@ -203,6 +225,20 @@ def _render_other_parishes_grid(parishes: list[OkParish], current_key: str) -> s
     )
 
 
+def ocr_html_from_embedded_pdf(pdf_path: Path) -> str | None:
+    """Build parish OCR HTML from the slice PDF's own text when it is rich.
+
+    No vision API call. Image-only slices return None so the mega OCR chunk
+    is kept.
+    """
+    pages = extract_all_page_lines(pdf_path)
+    if not all_pages_have_embedded_text(pages):
+        return None
+    from ocr.convert_bulletin import build_html_content
+
+    return build_html_content(pages)
+
+
 def write_parish_pages_for_diocese(
     diocese_key: str,
     bulletin_date: str,
@@ -276,6 +312,7 @@ def write_parish_pages_for_diocese(
     written: list[str] = []
 
     for parish in parishes:
+      try:
         chunk = html_chunks.get(parish.key)
         indexed = page_index.get(parish.key)
         start_page = (indexed[0] if indexed else None) or (chunk.start_page if chunk else None)
@@ -348,6 +385,12 @@ def write_parish_pages_for_diocese(
                     f"⚠️ {html.escape(why)}</div>"
                 )
 
+        slice_pdf = out_root / f"{parish.key}.pdf"
+        if slice_pdf.exists() and not fail_reason:
+            embedded_html = ocr_html_from_embedded_pdf(slice_pdf)
+            if embedded_html:
+                ocr_fragment = embedded_html
+
         from ocr.bulletin_layout import structure_ocr_html
 
         ocr_fragment = structure_ocr_html(
@@ -383,15 +426,17 @@ def write_parish_pages_for_diocese(
             parish_section_heading=f"Other {diocese_label} Parishes",
             parish_links_html=_render_other_parishes_grid(parishes, parish.key),
         )
-        (out_root / viewer_filename).write_text(page_html, encoding="utf-8")
-        (out_root / f"{parish.key}-pdf.html").write_text(
+        _write_text(out_root / viewer_filename, page_html)
+        _write_text(
+            out_root / f"{parish.key}-pdf.html",
             render_pdf_standalone_page(parish_config, bulletin_date, pdf_href=pdf_href, viewer_href=viewer_filename),
-            encoding="utf-8",
         )
-        (out_root / f"{parish.key}-ocr.html").write_text(
+        _write_text(
+            out_root / f"{parish.key}-ocr.html",
             render_ocr_standalone_page(parish_config, bulletin_date, ocr_fragment, viewer_href=viewer_filename),
-            encoding="utf-8",
         )
         written.append(parish.key)
+      except Exception as exc:
+        print(f"  Skipped {parish.key} ({type(exc).__name__}: {exc})")
 
     return written

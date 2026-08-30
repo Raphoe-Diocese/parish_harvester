@@ -222,6 +222,26 @@
   }
 
   const FIX_NOW_TIMER_ID = "ph-fix-now-load-timer";
+  const FIX_NOW_CLOCK_MAX_AGE_MS = 10 * 60 * 1000;
+
+  const _hostKey = (host) => String(host || "").toLowerCase().replace(/^www\./, "");
+
+  const _fixNowUrlIsThisPage = (fixUrl) => {
+    try {
+      const stored = new URL(String(fixUrl || ""));
+      if (_hostKey(stored.hostname) !== _hostKey(location.hostname)) return false;
+      const storedPath = stored.pathname.replace(/\/+$/, "") || "/";
+      const herePath = location.pathname.replace(/\/+$/, "") || "/";
+      if (storedPath === "/") return herePath === "/";
+      return herePath === storedPath || herePath.startsWith(`${storedPath}/`);
+    } catch (_e) {
+      return false;
+    }
+  };
+
+  const _removeFixNowTimerEl = () => {
+    document.getElementById(FIX_NOW_TIMER_ID)?.remove();
+  };
 
   const _formatLoadDuration = (ms) => {
     const n = Math.max(0, Math.round(Number(ms) || 0));
@@ -282,9 +302,14 @@
       const el = _ensureFixNowTimerEl();
       if (!el) return;
       const elapsed = Math.max(0, Date.now() - startedAt);
+      if (elapsed > FIX_NOW_CLOCK_MAX_AGE_MS) {
+        _removeFixNowTimerEl();
+        if (interval) clearInterval(interval);
+        return;
+      }
       const nav = performance.getEntriesByType?.("navigation")?.[0];
       const loadMs = nav && nav.loadEventEnd > 0 ? Math.round(nav.loadEventEnd) : null;
-      const stillLoading = document.readyState !== "complete" || !loadMs;
+      const stillLoading = document.readyState !== "complete";
       if (stillLoading) {
         el.style.color = elapsed >= 30000 ? "#fde68a" : "#93c5fd";
         el.textContent =
@@ -308,6 +333,10 @@
 
   const _bootFixNowClockFromStorage = async () => {
     if (!chrome?.storage) return;
+    if (window.top !== window) {
+      _removeFixNowTimerEl();
+      return;
+    }
     const hostname = (() => {
       try {
         return location.hostname.toLowerCase();
@@ -324,11 +353,7 @@
         for (const [key, val] of Object.entries(sessionKeys || {})) {
           if (!key.startsWith("ph_fix_now_tab_") || !val || typeof val !== "object") continue;
           const fixUrl = String(val.url || "");
-          try {
-            if (fixUrl && new URL(fixUrl).hostname.toLowerCase() !== hostname) continue;
-          } catch (_e) {
-            continue;
-          }
+          if (!fixUrl || !_fixNowUrlIsThisPage(fixUrl)) continue;
           navAt = Number(val.nav_started_at) || 0;
           break;
         }
@@ -337,21 +362,11 @@
       // ignore
     }
 
-    if (!navAt) {
-      try {
-        const stored = await chrome.storage.local.get(["ph_recording_sessions"]);
-        const session = stored?.ph_recording_sessions?.[hostname];
-        if (session?.fixNow) {
-          navAt = Number(session.updatedAt) || 0;
-        }
-      } catch (_e) {
-        // ignore
-      }
-    }
-
-    if (navAt > 0) {
+    if (navAt > 0 && Date.now() - navAt <= FIX_NOW_CLOCK_MAX_AGE_MS) {
       _startFixNowLoadTimer(navAt);
+      return;
     }
+    _removeFixNowTimerEl();
   };
 
   document.addEventListener("ph-show-toolbar", () => {

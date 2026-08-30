@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
   <title>Down &amp; Connor Diocese Bulletin Viewer — 21/08/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -95,6 +97,11 @@
       border: 1px solid #dde5e4;
       padding: 14px;
       margin-bottom: 4px;
+      overflow: visible;
+    }
+    #panel-pdf,
+    #panel-ocr {
+      overflow: visible;
     }
 
     .quiet-links {
@@ -112,7 +119,7 @@
       position: relative;
       height: auto;
       min-height: 850px;
-      overflow: hidden;
+      overflow: visible;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -165,10 +172,9 @@
     .pdf-inpage-pages {
       box-sizing: border-box;
       flex: 0 0 auto;
-      height: 850px;
+      height: auto;
       min-height: 850px;
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
+      overflow: visible;
       background: #525659;
       padding: 8px 0 16px;
     }
@@ -194,7 +200,7 @@
     .pdf-standalone-shell iframe.pdf-frame,
     body.is-native-pdf iframe.pdf-frame {
       display: none !important;
-      height: 850px;
+      height: auto;
       min-height: 850px;
     }
     .pdf-frame-wrap.is-native-pdf,
@@ -225,8 +231,9 @@
       .pdf-inpage-pages,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
-        height: 450px !important;
+        height: auto !important;
         min-height: 450px !important;
+        overflow: visible !important;
       }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
@@ -279,8 +286,62 @@
     .ocr-search-tools button:disabled { background: #9bbfbd; cursor: not-allowed; }
     .match-count { color: #6b7280; font-size: 0.9rem; font-weight: 600; }
     .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 40;
+      background: #fff;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+      box-shadow: 0 8px 16px #fff;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 8rem; }
+    mark.search-active { scroll-margin-top: 8rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 30;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
     .ocr-zoom-bar {
-      position: sticky; top: 0; z-index: 6;
       display: flex; justify-content: center; align-items: center; gap: 10px;
       margin: 0 0 10px; padding: 6px 10px;
       background: rgba(255, 255, 255, 0.94);
@@ -305,7 +366,7 @@
       max-width: min(72ch, 100%);
       margin-left: auto;
       margin-right: auto;
-      overflow-x: hidden;
+      overflow-x: clip;
       overflow-wrap: anywhere;
       word-wrap: break-word;
       hyphens: auto;
@@ -454,14 +515,14 @@
 
     #ocr-panel {
       box-sizing: border-box;
-      height: 850px;
+      height: auto;
       min-height: 850px;
-      overflow-y: auto;
+      overflow: visible;
       border: 1px solid #d4ddd9;
       padding: 22px 24px 32px;
     }
     .pdf-frame-wrap iframe {
-      height: 850px;
+      height: auto;
       min-height: 850px;
     }
     .note-box {
@@ -568,8 +629,9 @@
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
       #ocr-panel {
-        height: 450px;
+        height: auto;
         min-height: 450px;
+        overflow: visible;
       }
     }
     @media (max-width: 900px) {
@@ -591,7 +653,7 @@
       }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260822" defer></script>
 </head>
 <body>
   <div class="page">
@@ -636,6 +698,7 @@
       <div class="quiet-links">
         <a href="down_and_connor-2026-08-21-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
+      <div class="ocr-sticky-chrome">
       <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
         <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
         <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
@@ -652,6 +715,7 @@
           <button id="ocr-prev" type="button" disabled aria-label="Previous search match">← Prev match</button>
           <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
         </div>
+      </div>
       </div>
       <div id="ocr-panel"><p class="page-label">Page 1</p>
 <p>WEEKLY BULLETIN<br>
@@ -687,7 +751,7 @@ Register your interest now email <a href="mailto:glenavy@downandconnor.org" targ
 There will be no bulletin next weekend.</p>
 <h3 class="b-head">ANNIVERSARIES AT THIS TIME</h3>
 <p>Josie McSherry Anniv Mass Sat 8th August at 7pm<br>
-Cassie Reynolds(7) Anniv Mass Tue 1th August at 7pm<br>
+Cassie Reynolds(7) Anniv Mass Tue 11th August at 7pm<br>
 Deceased members of the Savage Family Anniv Mass Wed 12th August at 10am<br>
 Mary Bridget Lappin Anniv Mass Sat 15th August at 7pm<br>
 Fidelis Walsh (14)<br>
@@ -813,16 +877,16 @@ Prayer Group – Every Wed 7pm in Sr.<br>
 Catherine ’s Room<br>
 St. Comgall’s<br>
 16th AUGUST 2026 –– 20TH SUNDAY IN ORDINARY TIME<br>
-Figure 1<br>
-St Comgall, St Joseph, St MacNissius<br>
+Figure 1</p>
+<p>St Comgall, St Joseph, St MacNissius<br>
 Rev Sean Emerson PP, St Comgall’s Presbytery: 94428016<br>
 Rev David Aksenc zuk, St Joseph’s Presbytery:<br>
 Parish Support Officer : Mrs Bernie Mann: 94428016<br>
 Antrim Parish website <a href="https://www.antrimparish.com" target="_blank" rel="noopener noreferrer">www.antrimparish.com</a><br>
 Facebook: Parish of Antrim<br>
 Mass is available to view on the Parish<br>
-facebook page and youtube: Parish of<br>
-PRAYER PEOPLE<br>
+facebook page and youtube: Parish of</p>
+<p>PRAYER PEOPLE<br>
 Intention for Parish Community Year 1 3<br>
 Week 39<br>
 We pray for parishioners who will<br>
@@ -912,8 +976,8 @@ these prayers through Christ our Lord. Amen.</p>
 <hr>
 <p class="page-label">Page 5</p>
 <p>Parish Emergency Mobile: <a href="tel:+3537809553349" style="color:#1d4ed8;font-weight:600;">07809553349</a>. Parish Office, Mon -Fri 9am -2pm: 20762223<br>
-Office will be close on Friday 21st Aug and reopen on Tuesday 1st September *<br>
-There will be no bulletin for Saturday 29th / Sunday 30th August<br>
+<strong> Office will be close on Friday 21st Aug and reopen on Tuesday 1st September </strong>*<br>
+<strong> There will be no bulletin for Saturday 29th / Sunday 30th August </strong><br>
 <a href="https://www.ballycastleparish.com" target="_blank" rel="noopener noreferrer">www.ballycastleparish.com</a> <a href="mailto:ballycastle@downandconnor.org" target="_blank" rel="noopener noreferrer">ballycastle@downandconnor.org</a><br>
 16th August 2026 - 20th Sunday in Ordinary Time<br>
 Parish Bulletin<br>
@@ -925,8 +989,9 @@ Ballintoy &amp; Ballinlea<br>
 (Mass Readings: Sunday Cycle A)<br>
 Exposition of the Blessed Sacrament<br>
 every Monday, immediately after 10am Mass until 1.30pm. All welcome Upcoming Mass Schedule<br>
-Ballinlea : Sun 16th Aug at 9am. Ballintoy : Sat 5th Sept at 5.30pm Glenshesk : Sun 13th Sept at 9am. Mass and Confessions Schedule in Ballycastle<br>
-Vigil Mass on Saturday at 6.30pm, and Masses on Sunday at 10am and 12noon.<br>
+Ballinlea : Sun 16th Aug at 9am. Ballintoy : Sat 5th Sept at 5.30pm Glenshesk : Sun 13th Sept at 9am. Mass and Confessions Schedule in</p>
+<header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Ballycastle</h2><p class="ocr-parish-date">21/08/2026</p></header>
+<p>Vigil Mass on Saturday at 6.30pm, and Masses on Sunday at 10am and 12noon.<br>
 Daily Mass:10am, with Sacrament of Reconciliation after Saturday 10am Mass<br>
 *still time to join up<br>
 Lammas Fair Carparking Fundraiser<br>
@@ -941,13 +1006,13 @@ If you could help out, please contact Louise on <a href="tel:+3537754357104" sty
 Apostolic Work Society<br>
 are holding a<br>
 Coffee Morning<br>
-in the crypt at 10.30am on Saturday 2nd August<br>
+in the crypt at 10.30am on Saturday 22nd August<br>
 with all proceeds going to the Foreign Missions.<br>
 Please join us for a cuppa and a chat<br>
 The church door collection<br>
-after the Vigil Mass on Saturday 2nd and the Masses on Sunday 23rd will be for the Apostolic Work<br>
-(with thanks to SVdP for stepping aside to facilitate this collection)</p>
-<header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Ballycastle</h2><p class="ocr-parish-date">21/08/2026</p></header>
+after the Vigil Mass on Saturday 22nd and the Masses on Sunday 23rd will be for the Apostolic Work<br>
+(with thanks to SVdP for stepping aside to facilitate this collection)<br>
+Church Car Park will be closed immediately after 12noon Mass on Sunday 23rd August</p>
 <hr>
 <p class="page-label">Page 6</p>
 <p>We pray for our deceased parishioners, relatives and friends, especially those who died recently<br>
@@ -983,7 +1048,7 @@ season has ended for 2026</p>
 <hr>
 <p>One Day Retreats<br>
 of guided prayer and reflection are available on<br>
-August 18th, 2nd, 23rd, 29th and 31st<br>
+August 18th, 22nd, 23rd, 29th and 31st<br>
 September 5th, 6th, 9th, 12th, 15th, 19th and 20th<br>
 Further information at <a href="https://www.loughderg.org" target="_blank" rel="noopener noreferrer">www.loughderg.org</a> or <a href="mailto:info@loughderg.org" target="_blank" rel="noopener noreferrer">info@loughderg.org</a><br>
 Macmillan Coffee Morning<br>
@@ -992,8 +1057,8 @@ are holding their yearly Macmillan Coffee Morning on<br>
 Saturday 5th September in St Josephs Hall Ballintoy,<br>
 starting from 10.30am.<br>
 All welcome.<br>
-Office will be close on Friday 21st Aug and reopen on Tuesday 1st September *<br>
-There will be no bulletin on Saturday 29th / Sunday 30th August</p>
+<strong> Office will be close on Friday 21st Aug and reopen on Tuesday 1st September </strong>*<br>
+<strong> There will be no bulletin on Saturday 29th / Sunday 30th August </strong></p>
 <hr>
 <p class="page-label">Page 7</p>
 <p>Notice Board<br>
@@ -1006,15 +1071,20 @@ Masses this week: Monday - Thursday 9.00am</p>
 <hr>
 <p class="page-label">Page 8</p>
 <p>Please click on the button if you wish to make an online donatation to<br>
-the Parish of Ballyclare and Ballygowan. Thank you.This Week’s Hymns<br>
+the Parish of Ballyclare and Ballygowan. Thank you.<br>
+This Week’s Hymns<br>
 Entrance<br>
-OffertoryCommunion<br>
-Recessional395<br>
-687260<br>
+Offertory<br>
+Communion<br>
+Recessional<br>
+395<br>
+687<br>
+260<br>
 442<br>
-Copyright   2025 Ballyclare and Ballygowan Parish</p>
+Copyright  2025 Ballyclare and Ballygowan Parish</p>
 <hr>
 <p class="page-label">Page 9</p>
+<p>Parish of Bright BulletinTwentieth Sunday in Ordinary Time - 16th August 2026Parish Priest: Fr Peter O’Kane, 16 Rossglass Road, Killough, BT30 7QNTel: 028 4484 1221Email: parishofbright@downandconnor.orgWebsite : parishofbright.netMass Times: Week Beginning Monday 17th AugustSt Patrick’ s, Legamaddy St Joseph’ s, Killough17th August Monday 10am 18th August Tuesday 10am21st August Friday 7.30pm 19th August Wednesday 7.30pm23rd August Sunday 10am 22nd August Saturday Vigil 6.30pmOur Lady, Star of the Sea, Rossglass20th August Thursday 10.00amFaithful DepartedMonth’ s Mind: Patricia FoyAnniversaries: John Patrick McIlmail, Elizabeth Gelston, Kate Burns,James &amp; Mary Teggart, John Mageean, Paul Clendenning, Anne Doran.Weekly ConfessionsSacrament of Reconciliation: after all weekday Masses; and in St Joseph’s every Wednesday 8.00pm-8.45pm and at 6.00pm before the Saturday Vigil Mass.Eucharistic AdorationSt Joseph’s, Killough every Wed: 3.30pm -7.30pm &amp; after Mass 8pm-9pm. St Patrick’s, Legamaddy every Friday: 6.30pm-7.30pm.Sunday Collections, 9th August: Weekly £655-40. Thank you for your generous contributions. Ice Cream Summer SundaysWe look forward to ‘Ice Cream Summer Sunday’ this weekend atSt Joseph’s on 15th August after the 6.30pm Vigil Mass and at St Patrick’s on 16th August after the 10.00am morning Mass. Everyone welcome! Divine Mercy Holy HourWill take place on Sunday 16th August in St Joseph’s, Killough at 3.00pmMedical Missioners of MaryBishop Alan McGuckian has given permission for the Medical Missionaries of Mary to visit the parishes of our Diocese. The sisters will be with us next weekend 22nd/23rd August and will speak at both Masses. Your support of their work would be much appreciated! Why Our Lady of Knock is celebrated on two different days in Ireland‘The anniversary of the apparition at Knock is on August 21, but most of Ireland honours Our Lady on August 17 in the liturgy.Our Lady appeared in Knock on the night of August 21, 1879. Though she never said a word, her appearance comforted many and gave a renewed vigour to the faith of the people of Ireland, and encouraged many to turn to the Virgin Mary.The anniversary of this apparition is remembered each year at the Knock Shrine on August 21 with a special liturgy offered at the site of Mary&#x27;s appearance.However, the rest of Ireland celebrates Our Lady of Knock on August 17. It is classiﬁed as a &quot;memorial,&quot; and parishes around Ireland may celebrate Our Lady&#x27;s apparition on that day.Currently this celebration is only on select calendars, primarily in Ireland, and not on the universal Roman calendar.Knock Shrine social media explains that, &quot;Although the Anniversary of the Apparition takes place on the 21st August, the 17th August was chosen as the Feast day of our Lady of Knock, as the 21st August is already assigned to St. Pius X, the Pope of the Eucharist.”For the rest of Ireland (and most of the Roman Catholic world), August 21 remains dedicated to St. Pius X. The rationale behind the switching of liturgical days is to give more focus to a particular feast day, instead of supplanting one that is already being widely celebrated.’ (By Philip Kosloski)Our Lady of Knock, pray for us!</p>
 <header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Bright</h2><p class="ocr-parish-date">21/08/2026</p></header>
 <hr>
 <p class="page-label">Page 10</p>
@@ -1036,6 +1106,7 @@ Wheel Balancing, Wheel Alignment, Batteries, General Service and repairs Tel: 02
 4423 113.<br>
 ST CLARE’S HALL, WHAT’S ON?– MONDAY Bootcamp with CM Fitness 6am – 7.20am, Multi<br>
 Sensory baby class 10—11am, Flip Fusion 5.30pm —6.30pm, Pilates 7pm – 9pm, Bowls 8pm –<br>
+10pm.<br>
 TUESDAY Brazier School of Dance 4.45PM – 7.45PM, Pickle Ball 8pm – 10pm.<br>
 WEDNESDAY Bootcamp with CM Fitness 6am – 7.20am, Friendship Group 10.30am –<br>
 12.30pm, Yoga 7pm – 8pm, Bowls 8pm – 10pm (Matches ).<br>
@@ -1144,6 +1215,7 @@ McCann, Aodh Cormican, William McGarrell, Daniel Crossey, Kathleen Henry,<br>
 Fr Eamon O ’Brien, Jim Brazier, Maureen O ’Rourke.<br>
 Sanctuary lamp intentions: Liz Donnelly, G &amp; M<br>
 Adoration No Adoration in Mater Dei on Wednesday mornings in July &amp;<br>
+August.<br>
 Collection 9 August 2026<br>
 Weekly Offering: £3,356<br>
 Thank you for your generosity Feumore Mass<br>
@@ -1168,6 +1240,7 @@ conference bank account. Account number 41965035, sort code<br>
 <a href="tel:+3537784955647" style="color:#1d4ed8;font-weight:600;">07784955647</a>. Donation can be made to our bank account, Sort Code<br>
 98-04-60. Account Number 41966009. Your support is very much<br>
 appreciated as we support those most vulnerable in your local<br>
+community.<br>
 CATHOLIC MOTHERS IRELAND – FAMILY DAY Catholic Mothers Ireland will hold its<br>
 Annual National Mass on Sunday, 6 September at Termonbacca Retreat Centre,<br>
 Derry City. The day will begin with Mass at 2.00pm, celebrated by Bishop Donal<br>
@@ -1196,7 +1269,8 @@ Session 5: The Spirit -Empowered Life,<br>
 Session 6: The Heart of a Disciple<br>
 Session 7: Going On with the Lord.<br>
 Book your place before the 24 August as numbers are limited by leaving<br>
-your name and contact details in the parish office Tel. <a href="tel:+442894422278" style="color:#1d4ed8;font-weight:600;">02894422278</a> or email</p>
+your name and contact details in the parish office Tel. <a href="tel:+442894422278" style="color:#1d4ed8;font-weight:600;">02894422278</a> or email<br>
+<a href="mailto:glenavy@downandconnor.org" target="_blank" rel="noopener noreferrer">glenavy@downandconnor.org</a></p>
 <hr>
 <p class="page-label">Page 13</p>
 <p>Liturgical ‘Sign of Peace ’ The Sign of Peace remains an integral part of<br>
@@ -1393,11 +1467,14 @@ SUNDAY<br>
 23rd AUGUST<br>
 Readings: A (I) ❖ Psalter: Week 1<br>
 Fr. Brendan Hickland, PP (028) 90642446 (Option 1)<br>
+<a href="mailto:b.hickland@downandconnor.org" target="_blank" rel="noopener noreferrer">b.hickland@downandconnor.org</a><br>
 Fr. Jose Bharanikulangara Assistant Priest (028) 9079 3023.<br>
+<a href="mailto:j.thomas@downandconnor.org" target="_blank" rel="noopener noreferrer">j.thomas@downandconnor.org</a><br>
 Rev. Patrick Keown (Deacon) <a href="mailto:p.keown@downandconnor.org" target="_blank" rel="noopener noreferrer">p.keown@downandconnor.org</a><br>
 Kylee (Parish Support Officer ) Office Hours<br>
 Mon-Thurs 9.15a.m - 1p.m. Closed Fridays<br>
 Holy Rosary Parish Office (028) 90642446 Option 2<br>
+<a href="mailto:holyrosary@downandconnor.org" target="_blank" rel="noopener noreferrer">holyrosary@downandconnor.org</a><br>
 Philomena (Finance Officer) <a href="mailto:p.dawson@downandconnor.org" target="_blank" rel="noopener noreferrer">p.dawson@downandconnor.org</a><br>
 More Information and resources:<br>
 holyrosaryparishbelfast.net and <a href="https://www.st.bernadettesparish.org" target="_blank" rel="noopener noreferrer">www.st.bernadettesparish.org</a> CONTACT INFORMATION We warmly welcome back<br>
@@ -1640,6 +1717,7 @@ Email: <a href="mailto:pulkilmore@gmail.com" target="_blank" rel="noopener noref
 gentle reminder for all anniversary masses to be<br>
 booked via t he parish office by email or leaving a<br>
 message on the answer machine no later than 4pm on<br>
+Thursday.<br>
 YOU CAN MAKE A DIFFERENCE:<br>
 We have excellent and dedicated volunteers in the<br>
 parish who ensure the parish functions as it does.<br>
@@ -1777,7 +1855,7 @@ Vigil Mass Sunday Mass<br>
 15th /16th<br>
 August Greencastle 5pm St Colman’s 9.30am<br>
 St James’ 11am<br>
-2nd /23rd<br>
+22nd /23rd<br>
 August Whitehouse 5pm St James’ 11am<br>
 29th / 30th<br>
 August Greencastle 5pm St James’ 11am<br>
@@ -1835,6 +1913,7 @@ August 25th at 7pm online: If a member of your parish<br>
 team would like to join this meeting to hear more about<br>
 the Season of Creatio n 2026, they are very welcome.<br>
 Please contact <a href="mailto:Roisin.Pye@Trocaire.org" target="_blank" rel="noopener noreferrer">Roisin.Pye@Trocaire.org</a> for the link to<br>
+join.<br>
 Faith in Bloom Conference ~ Saturday, 29 August,<br>
 Knock Shrine is hosting Faith in Bloom , a day<br>
 conference celebrating its inspiring Return to Nature<br>
@@ -1873,6 +1952,7 @@ followed by refreshments, children&#x27;s activities, and a<br>
 talk for parents. This promises to be a lovely day for the<br>
 whole family. For more information and booking<br>
 details , please email <a href="mailto:info@catholicmothers.ie" target="_blank" rel="noopener noreferrer">info@catholicmothers.ie</a>. All are<br>
+welcome.<br>
 BEREAVEMENT INFORMATION EVENING<br>
 Anam Cara is very pleased to announce our first<br>
 Bereavement Information Evening especially dedicated<br>
@@ -1925,6 +2005,7 @@ catering. Thank you.</p>
 <p>The Parish Office will be closed<br>
 from Thursday 13th August and<br>
 will reopen on Wednesday 19th<br>
+August.<br>
 Congratulations<br>
 I would like to offer my warm<br>
 congratulations to the Casements<br>
@@ -1941,13 +2022,13 @@ concerned. You did Portglenone<br>
 proud!<br>
 Apostolic Work Down and Connor<br>
 MINISTERS OF THE WORD<br>
-SATURDAY 2ND AUG BREDGE GRAHAM<br>
+SATURDAY 22ND AUG BREDGE GRAHAM<br>
 SUNDAY 23RD AUG BRIGID Mc ATEER<br>
 SATURDAY 29TH AUG PATRICIA FRIEL<br>
 SUNDAY 30TH AUG BIBIANA MC<br>
 CAVERA<br>
 MINISTERS OF THE EUCHARIST<br>
-SATURDAY 2ND AUG<br>
+SATURDAY 22ND AUG<br>
 SUNDAY 23RD AUG<br>
 SATURDAY 29TH AUG<br>
 PAULINE MC MANUS, CAROLINE McDONNELL, ADRIAN McKEEVER<br>
@@ -1976,6 +2057,7 @@ Graham, Damian Mc Allister<br>
 Carer required in the Portglenone Area<br>
 A carer is required for a kind and quiet gentleman with<br>
 learning difficulties, who enjoys outings, visiting friends and<br>
+family.<br>
 Approximately 18 hours per week (May be split into two posts<br>
 – usually Wednesday, Friday, Saturday and Sunday hours)<br>
 with potential to increase hours. Holiday cover also required.<br>
@@ -2019,10 +2101,14 @@ whose anniversaries occur at this time.<br>
 Eternal rest grant unto them, O Lord<br>
 ~Weekly Collection~<br>
 (August 2nd)<br>
+£1525.47<br>
 ~Monthly Offering~<br>
+£383.85<br>
 ~Weekly Collection~<br>
 (August 9th)<br>
+£1169.34<br>
 ~Building Fund~<br>
+£329.50<br>
 The Parish Thanks You<br>
 For Your Kindness And Generosity<br>
 ~A Spiritual Communion~<br>
@@ -2080,7 +2166,7 @@ removes us from our daily routine, and gives us time<br>
 and space to encounter God more deeply. ’<br>
 Pope Leo XIV<br>
 One Day Retreats – Guided Days of Prayer and<br>
-Reflection - places available on August 18th, 2nd,<br>
+Reflection - places available on August 18th, 22nd,<br>
 23rd, 29th and 31st &amp; September 5th, 6th, 9th, 12th,<br>
 15th, 19th and 20th. Admission €50. Group discounts<br>
 available. Advance Booking Essential.<br>
@@ -2096,6 +2182,7 @@ As part of National Heritage Week celebrations, visitors<br>
 will enjoy a guided boat trip on the lake, guided tour of<br>
 Station Island and refreshments. Admission €15.<br>
 Student &amp; Child discounts available. Advance Booking<br>
+Essential.<br>
 Lakeshore Pilgrim Path Pilgrimage – In the footsteps<br>
 of pilgrims through the centuries. Sunday 30th August.<br>
 8km &amp; 12km routes, fully guided. Outdoor Mass weather<br>
@@ -2135,7 +2222,7 @@ fraternity, lunch and dinner, with after -dinner speaker Fr<br>
 Mark Quinn. Open to men aged 18+. Cost €65 (student €55).<br>
 Registration and accommodation details<br>
 @ : <a href="https://www.dominicans.ie/events" target="_blank" rel="noopener noreferrer">www.dominicans.ie/events</a>.<br>
-Enquiries: <a href="mailto:op.evangelisation@gmail.com" target="_blank" rel="noopener noreferrer">op.evangelisation@gmail.com</a>. Please note: There will be an extra collection for Sr Patricia Speight next weekend (August 2nd &amp; 23rd).<br>
+Enquiries: <a href="mailto:op.evangelisation@gmail.com" target="_blank" rel="noopener noreferrer">op.evangelisation@gmail.com</a>. Please note: There will be an extra collection for Sr Patricia Speight next weekend (August 22nd &amp; 23rd).<br>
 Sr Speight founded the Love and Hope Centre in Nakuru, Kenya and has been helping the poor and marginalised<br>
 there for over 30 years. Please show your support so that she and her team may continue their invaluable work.<br>
 Can you spare a few hours?<br>
@@ -2244,7 +2331,8 @@ Retreat Centre, Derry City. Beginning with Mass at 2.00pm,<br>
 celebrated by Bishop Donal McKeown, followed by refreshments,<br>
 children&#x27;s activities, and a talk for parents. Leaflet below.<br>
 DIOCESAN NOTICES – All leaflets are available on the parish<br>
-website: <a href="https://www.saintannesparish.net" target="_blank" rel="noopener noreferrer">www.saintannesparish.net</a> of from the Parish</p>
+website: <a href="https://www.saintannesparish.net" target="_blank" rel="noopener noreferrer">www.saintannesparish.net</a> of from the Parish<br>
+Office.</p>
 <hr>
 <p class="page-label">Page 29</p>
 <p>19th SUNDAY IN ORDINARY TIME<br>
@@ -2259,7 +2347,7 @@ Anniversary, and mentioned in the Prayer of the Faithful, or<br>
 a mass be celebrated, please let Fr McCann know ]<br>
 FEASTS THIS WEEK<br>
 Mon 10th: St Laurence, deacon &amp; martyr<br>
-Tues 1th: St Clare, virgin<br>
+Tues 11th: St Clare, virgin<br>
 Wed 12th: St Jane Frances de Chantal, religious; St<br>
 Attracta, virgin<br>
 Thur 13th: St Pontian, pope and Hippolytus, priest,<br>
@@ -2269,6 +2357,7 @@ Sat 15th : The Assumption of the Blessed Virgin Mary<br>
 Fr Carlin will be saying Mass in St Anthony’s for the vigil<br>
 of the Assumption at 7pm on Fri 14th August. After that<br>
 the new times of mass will take effect on Saturday 15th<br>
+August.<br>
 St Anthony’s Music Ministry. We are looking for musicians<br>
 of all instruments to support our singing group. Please<br>
 contact our musical director Liam after mass. PLEASE<br>
@@ -2327,6 +2416,7 @@ welcoming many visitors to this event. For a full programme<br>
 of events, visit <a href="https://www.fleadhcheoil.ie" target="_blank" rel="noopener noreferrer">www.fleadhcheoil.ie</a> . As part of the festivities,<br>
 Mass will be celebrated in Irish by Bishop Alan McGuckin, in<br>
 St Patrick’s church on Sunday 9th August at 11am. All<br>
+welcome.<br>
 The Northern Ireland Youth Assembly is seeking young<br>
 people&#x27;s views on the School Uniforms (Trousers) Bill, and<br>
 we would be grateful for your support in sharing our survey<br>
@@ -2369,11 +2459,13 @@ day will begin with Mass at 2pm celebrated by Bishop Donal<br>
 McKeown, followed by refreshments, children’s activities,<br>
 and a talk for parents. This promises to be a lovely date for<br>
 the whole family. For more information and booking details, please email <a href="mailto:info@catholicmothers.ie" target="_blank" rel="noopener noreferrer">info@catholicmothers.ie</a> . All are<br>
+welcome.<br>
 New Mass Times for St Anthonys, St Malachy’s and<br>
 St Matthews to be in place for 15th/16th August. These<br>
 times will be under review<br>
 Polish Masses on Sunday: 11am and 6pm.<br>
 Weekdays: Tues &amp; Thurs at 7pm. Sat 9am. First Fri at<br>
+7pm.<br>
 Farewell by Fr Henry McCann. This Sunday 9th August will<br>
 mark the last Sunday Mass celebrated by me in the parish<br>
 of St Anthony, as its parish priest. I thank God for 12 fond<br>
@@ -2500,7 +2592,7 @@ Tuesday 18th August NO MASS<br>
 Weds 19th August 10am<br>
 Thursday 20th August<br>
 Friday 21st August 7pm 9.30am<br>
-Saturday 2nd August 5pm 6.30pm<br>
+Saturday 22nd August 5pm 6.30pm<br>
 Sunday 23rd August 9.30am 11am 12noon<br>
 Masses are available to view online at <a href="https://www.saulandballeeparish.com" target="_blank" rel="noopener noreferrer">www.saulandballeeparish.com</a> and<br>
 Please note – there will be NO MASSES in the Parishes on Monday and Tuesday this<br>
@@ -2524,13 +2616,13 @@ All bulletin notices should be with the Parish office by 12noon on Wednesday</p>
 <hr>
 <p class="page-label">Page 31</p>
 <p>Parish of Saul &amp; Ballee<br>
-Months Mind Mass: Gerry McCashin on Saturday 2nd August at 5pm in St Patrick’s, Saul</p>
+Months Mind Mass: Gerry McCashin on Saturday 22nd August at 5pm in St Patrick’s, Saul</p>
 <h3 class="b-head">Anniversary Masses</h3>
 <p>Saturday 15th August – Joe Curran, Leonard Curran, Roseanne &amp; Patrick Sloan<br>
 Sunday 16th August – Margaret Curran, Lennie Curran (9.30am) Bill Kearney, John &amp; Oliver<br>
 O’Hare, Patrick Taggart, Allie Dobbin &amp; Siobhan Smyth<br>
 Friday 21st August – Marie Cully, Gareth Fitzsimons , Harry Hampton<br>
-Saturday 2nd August - Mary McGreevy , Eithne McMullan<br>
+Saturday 22nd August - Mary McGreevy , Eithne McMullan<br>
 Sunday 23rd August – Warren Rodgers, Tom McVeigh (9.30am) , Ann Brennan (12noon)<br>
 Friday 28th August – Philip Smith<br>
 Saturday 29th August – Frank, Norah and Michael Donnelly<br>
@@ -2581,6 +2673,7 @@ Burren Outdoor Retreat , Friday 4th September to Sunday 6th September. Would you
 come with us on a journey through the Burren with its limestone pavements, rare flora and ancient<br>
 sacred sites? Let the beauty of this place renew you in body and soul. Residential (people within easy<br>
 reach may commute). Contact Mary at <a href="tel:+353879701130" style="color:#1d4ed8;font-weight:600;">087 970 1130</a> for information or Des at <a href="tel:+353851614951" style="color:#1d4ed8;font-weight:600;">085 161 4951</a> for<br>
+bookings.<br>
 Abide in His Love Women’s Conference . The Great Northern Hotel, Bundoran, 20 –22<br>
 November 2026. Join women from across Ireland for a faith -filled weekend with inspiring speakers<br>
 including Sarah Swafford, Danielle Noonan, Fr Mark Wharton, Fr Barry Braum, Fr Oisín Martin,<br>
@@ -2616,6 +2709,7 @@ In 1925 a porch was built but was later replaced by a geometrical tower which<br
 housed the bell which was blessed by Fr Crossin on 15th August 1952 and was<br>
 rung for the first time. Fr Crossin christened the new bell “Joseph”.<br>
 Unfortunately the bell cracked and a new bell was fitted and blessed on 10th May<br>
+1956.<br>
 In 1968/69 as assessment was carried out on the Church which stated the roof<br>
 and walls were in an advanced state of decay and it was decided the Church<br>
 should be replaced. The site for the new Church was given to the Parish by Mrs<br>
@@ -2639,11 +2733,14 @@ SUNDAY<br>
 23rd AUGUST<br>
 Readings: A (I) ❖ Psalter: Week 1<br>
 Fr. Brendan Hickland, PP (028) 90642446 (Option 1)<br>
+<a href="mailto:b.hickland@downandconnor.org" target="_blank" rel="noopener noreferrer">b.hickland@downandconnor.org</a><br>
 Fr. Jose Bharanikulangara Assistant Priest (028) 9079 3023.<br>
+<a href="mailto:j.thomas@downandconnor.org" target="_blank" rel="noopener noreferrer">j.thomas@downandconnor.org</a><br>
 Rev. Patrick Keown (Deacon) <a href="mailto:p.keown@downandconnor.org" target="_blank" rel="noopener noreferrer">p.keown@downandconnor.org</a><br>
 Kylee (Parish Support Officer ) Office Hours<br>
 Mon-Thurs 9.15a.m - 1p.m. Closed Fridays<br>
 Holy Rosary Parish Office (028) 90642446 Option 2<br>
+<a href="mailto:holyrosary@downandconnor.org" target="_blank" rel="noopener noreferrer">holyrosary@downandconnor.org</a><br>
 Philomena (Finance Officer) <a href="mailto:p.dawson@downandconnor.org" target="_blank" rel="noopener noreferrer">p.dawson@downandconnor.org</a><br>
 More Information and resources:<br>
 holyrosaryparishbelfast.net and <a href="https://www.st.bernadettesparish.org" target="_blank" rel="noopener noreferrer">www.st.bernadettesparish.org</a> CONTACT INFORMATION We warmly welcome back<br>
@@ -2856,6 +2953,7 @@ Enrolment for St Brigid’s Parish Confirmation Preparation Classes 2026/27 is<b
 now open to Year 7 pupils, who are not attending St Bride’s Primary School,<br>
 and Year 8 pupils. Each class lasts one hour, 5.45pm -6.45pm, on Tuesdays in<br>
 St. Brigid’s Parish Hall. The first class will be 5.45pm -6.45pm on Tuesday 8th<br>
+September.<br>
 Each pupil intending to enroll in the preparation classes must have received<br>
 their First Holy Communion and be able to attend all the one hour sessions.<br>
 The limited places available will be awarded on the first come first served<br>
@@ -2902,7 +3000,7 @@ We pray for those who have died recently and for those whose anniversaries<br>
 occur around this time .</p>
 <h3 class="b-head">Recently Deceased : Ashleigh Hunter , Gerard Henvey</h3>
 <h3 class="b-head">Months Mind: Margaret Treacy</h3>
-<p>Anniversaries : Sheila Conlon, Harry Graham (1th), Etta and Larry McWilliams, Jarleth McWiiliams,<br>
+<p>Anniversaries : Sheila Conlon, Harry Graham (11th), Etta and Larry McWilliams, Jarleth McWiiliams,<br>
 Frank McGarry, Maureen Hawkins, Annie Murphy, Alex Overend (27th) , Daniel Overend (67th),<br>
 Nuala MacManus, Annie Cushnahan , Kate Dornan (Bangor), His Eminence Noel Treanor ,<br>
 Rev Richard O’Rawe, Rev Edward Donnelly, V Rev Vincent McKinley<br>
@@ -3059,6 +3157,7 @@ Admission is free , with a suggested donation of £3<br>
 towards costs . Tea and coffee will be served<br>
 following the screening.<br>
 Everyone is very welcome – please bring family and<br>
+friends.<br>
 Parish Facebook page has been<br>
 launched by the Parish Council<br>
 which aims to keep parishioners up to<br>
@@ -3086,6 +3185,7 @@ To request a Mass for an Intention of<br>
 a family member or friend. Please give your request<br>
 either by calling the office <a href="tel:+442890422167" style="color:#1d4ed8;font-weight:600;">028 90422167</a><br>
 (Option 2) or by sending an email to<br>
+<a href="mailto:holywood@downandconnor.org" target="_blank" rel="noopener noreferrer">holywood@downandconnor.org</a><br>
 Although we cannot guarantee the date you<br>
 request will be available,<br>
 Fr Stephen will be offering<br>
@@ -3113,6 +3213,7 @@ Dr Abigail regarding the conversation around<br>
 ordaining Women.<br>
 The link to watch the video can be found on the<br>
 Diocesan Website, Facebook and is also on<br>
+YouTube.<br>
 Abide in His Love Women’s Conference.<br>
 The Great Northern Hotel, Bundoran,<br>
 20–22 November 2026. Join women from across<br>
@@ -3130,24 +3231,35 @@ ST COLMCILLE’S<br>
 BALLYHACKAMORE<br>
 St Colmcilles Parish, 191 Upper Newtownards Road, Belfast, BT4 3JB<br>
 Parish Priest: Fr Conor McGrath PP, Fr Anthony Curran PE<br>
-Website: <a href="https://www.st-colmcilles.net" target="_blank" rel="noopener noreferrer">www.st-colmcilles.net</a> SUN Mass: 9.30am &amp; 11.30am<br>
-MON Morning Prayer: 9.00am<br>
-TUEHoly Hour, Confessions: 6.00pm<br>
+Website: <a href="https://www.st-colmcilles.net" target="_blank" rel="noopener noreferrer">www.st-colmcilles.net</a><br>
+SUN<br>
+Mass: 9.30am &amp; 11.30am<br>
+MON<br>
+Morning Prayer: 9.00am<br>
+TUE<br>
+Holy Hour, Confessions: 6.00pm<br>
 Mass: 7.00pm.<br>
-WED Mass: 9.30am<br>
-THU Mass: 9.30am<br>
-FRI Morning Prayer: 9.00am, Mass: 9.30am<br>
-SAT Confession: 5.00pm –5.20pm, Mass: 5.30pm<br>
+WED<br>
+Mass: 9.30am<br>
+THU<br>
+Mass: 9.30am<br>
+FRI<br>
+Morning Prayer: 9.00am, Mass: 9.30am<br>
+SAT<br>
+Confession: 5.00pm –5.20pm, Mass: 5.30pm<br>
 Phone: 02890 654157<br>
 Email: stcolmcilles@<br>
-downandconnor.org 16 AUGUST 2026TH<br>
-Missal Pg 631“To know the joy<br>
+16<br>
+AUGUST 2026<br>
+TH<br>
+Missal Pg 631<br>
+“To know the joy<br>
 of God’s love and<br>
 make the love of<br>
 God known to all”<br>
-19TH SUNDAY IN ORDINARY TIM E- YEAR A<br>
+19TH SUNDAY IN ORDINARY TIME- YEAR A<br>
 MASS THIS SUNDAY<br>
-First Reading: Isaiah 56:1,6-7<br>
+First Reading: Isaiah 56:1,6‐7<br>
 Psalm 66<br>
 Let the peoples praise you, O God; let all<br>
 the peoples praise you.<br>
@@ -3174,9 +3286,10 @@ Collection will be taken up at all<br>
 Masses this weekend.</p>
 <h3 class="b-head">Contactless giving is available</h3>
 <p>via the QR code below or on the<br>
-parish website.<a href="https://donate.m" target="_blank" rel="noopener noreferrer">https://donate.m</a><br>
+parish website.<br>
 colmcilles-<br>
-parish-belfast</p>
+parish-belfast<br>
+DONATIONS</p>
 <header class="ocr-parish-masthead"><h2 class="ocr-parish-name">St Colmcilles</h2><p class="ocr-parish-date">21/08/2026</p></header>
 <hr>
 <p class="page-label">Page 41</p>
@@ -3185,7 +3298,8 @@ USEFUL C ONTACTS<br>
 Parish Secretary:<br>
 Ciyana James - <a href="mailto:stcolmcilles@downandconnor.org" target="_blank" rel="noopener noreferrer">stcolmcilles@downandconnor.org</a>.<br>
 Finance Officer:<br>
-Philomena Dawson - <a href="mailto:p.dawson@downandconnor.orgParish" target="_blank" rel="noopener noreferrer">p.dawson@downandconnor.orgParish</a> Engagement Group -</p>
+Philomena Dawson - <a href="mailto:p.dawson@downandconnor.orgParish" target="_blank" rel="noopener noreferrer">p.dawson@downandconnor.orgParish</a> Engagement Group -<br>
+<a href="mailto:stcolmcillespeg@gmail.com" target="_blank" rel="noopener noreferrer">stcolmcillespeg@gmail.com</a></p>
 <h3 class="b-head">Parish Office</h3>
 <p>Mon- Fri 10:00 - 13:00<br>
 THE LISTENING EAR<br>
@@ -3243,7 +3357,7 @@ INTENTIONS WK BEGINNING 17 -August</p>
 <h3 class="b-head">MONTHS MIND</h3>
 <p>Joseph McNally – Tue 18th Aug 7pm</p>
 <h3 class="b-head">ANNIVERSARY MASS</h3>
-<p>Jim McKenna (1st Anniversary) Sat 2nd Aug 6pm<br>
+<p>Jim McKenna (1st Anniversary) Sat 22nd Aug 6pm<br>
 Our priest is obligated to offer Sunday Mass<br>
 on behalf of ALL the people (pro populo) in the<br>
 parish. The deceased are remembered in our<br>
@@ -3252,7 +3366,7 @@ FEAST DAY S THIS WEEK<br>
 Mon 17th Aug – Our Lady of Knock<br>
 Wed 19th Aug – St John Eudes<br>
 Thur 20th Aug – St Bernard<br>
-Sat 2nd Aug - Mary, Queen of Heaven PARISH WEEKLY COLLECTION £1,279.00<br>
+Sat 22nd Aug - Mary, Queen of Heaven PARISH WEEKLY COLLECTION £1,279.00<br>
 Thank you for your support of our parish .<br>
 To set up a standing order for Direct Debit<br>
 please call or email the parish office to arrange.<br>
@@ -3315,7 +3429,7 @@ routines, and gives us time and space to<br>
 encounter God more deeply. Pope Leo XIV<br>
 One Day Retreats – Guided Days of Prayer and<br>
 Reflection - places available on<br>
-August 18th, 2nd, 23rd, 29th and 31st<br>
+August 18th, 22nd, 23rd, 29th and 31st<br>
 September 5th, 6th, 9th, 12th, 15th, 19th and 20th<br>
 Admission €50. Group discounts available.<br>
 Advance Booking Essential .<br>
@@ -3376,6 +3490,7 @@ Marriage Encounter Ireland invites married<br>
 couples to a residential Weekend from Friday<br>
 2nd to Sunday 4th October 2026 at the<br>
 “Focolare Centre” &quot;Curryhills &quot;, Prosperous, Co.<br>
+Kildare.<br>
 Step away from daily distractions to deepen<br>
 your communication, renew your love, and<br>
 rediscover the joy of your marriage.<br>
@@ -3384,7 +3499,8 @@ Jackpot<br>
 £5,000</p>
 <hr>
 <p class="page-label">Page 45</p>
-<p>PRIESTS OF THE PARISH<br>
+<p>.<br>
+PRIESTS OF THE PARISH<br>
 Fr Pat Sheehan &amp; Fr Aidan Kerr<br>
 PARISH OFFICE <a href="tel:+442890832979" style="color:#1d4ed8;font-weight:600;">028 90832979</a><br>
 Lorraine Carlin &amp; Patricia Gillespie<br>
@@ -3419,7 +3535,7 @@ Tues 18th 9.45am Mary Horan<br>
 Wed 19th 9.45am Patrick Hughes<br>
 Thur 20th 9.45am Veronica Mulholland<br>
 Fri 21st 9.45am Baby Michael McKee<br>
-Sat 2nd 9.45am William McCotter<br>
+Sat 22nd 9.45am William McCotter<br>
 We welcome<br>
 Alivia O’Neill<br>
 recently baptised in the parish.<br>
@@ -3441,9 +3557,11 @@ carpark will not be available for parking; the area<br>
 nearest the steps leading to the Church will NOT BE<br>
 OPEN and t he GREEN GATES WILL REMAIN CLOSED .<br>
 The rest of the top carpark is usable but will not be<br>
+lined.<br>
 To help with parking we have permission to use the<br>
 school carpark, on the right of the laneway leading to<br>
 the church , until the lining in the top carpark is<br>
+completed.<br>
 Weekday masses will remain in St Marys on the Hill<br>
 Monday 17th &amp; Tuesday 18th August and resume in<br>
 St Bernard’s on Wednesday 19th August 9.45am.<br>
@@ -3569,7 +3687,7 @@ routines, and gives us time and space to<br>
 encounter God more deeply.<br>
 Pope Leo XIV One Day Retreats – Guided Days of Prayer and<br>
 Reflection - places available on<br>
-August 18th, 2nd, 23rd, 29th and 31st<br>
+August 18th, 22nd, 23rd, 29th and 31st<br>
 Sept. 5th, 6th, 9th, 12th , 15th, 19th &amp; 20th<br>
 Admission €50. Group discounts available.<br>
 Advance Booking Essential .<br>
@@ -3620,6 +3738,7 @@ weekend with inspiring speakers including Sarah<br>
 Swafford, Danielle Noonan, Fr Mark Wharton,<br>
 Fr Barry Braum, Fr Oisín Martin, the Dominica n<br>
 Sisters of Nashville, Bishop Fintan Gavin, and<br>
+more.<br>
 A conference not to be missed!<br>
 Register<br>
 now: <a href="https://abideinhislove.eventbrite.com" target="_blank" rel="noopener noreferrer">https://abideinhislove.eventbrite.com</a><br>
@@ -3731,7 +3850,7 @@ August: Fridays 21st &amp; 28th and Thursday 20th.<br>
 The office can still be reached by phone or email on these<br>
 days. Please note the new temporary Parish Office number -<br>
 07337 485743 MEDICAL MISSIONARIES OF MARY: The Medical Missionaries of Mary have been invited to visit us this year and will be in Downpatrick Parish on the<br>
-weekend of 2nd and 23rd August 2026. They will speak of their work, mainly in Africa and South America, and their mission to bring Christ’s h ealing love<br>
+weekend of 22nd and 23rd August 2026. They will speak of their work, mainly in Africa and South America, and their mission to bring Christ’s h ealing love<br>
 to those most in need. Our parish and our diocese have supported MMM generously in the past, both in finance and in prayer, a nd MMM wishes to<br>
 express gratitude for that support and to emphasise that we here at home are the body of mission, and those who are sent to far away places are the<br>
 hands and the feet. When they speak to us and share their story they serve as a connection between us and those whom they ser ve. NAME CHANGE<br>
@@ -3751,6 +3870,7 @@ The post holder will be required to:<br>
 confidential financial support to the Parish Priest and Parish<br>
 Finance Committee.<br>
 The terms are based on a permanent appointment requiring 8 hours per<br>
+week.<br>
 Work pattern: Thursday and Friday from 10.00 am to 2.00 pm.<br>
 Rate of Pay - £14.04 gross per hour<br>
 Full details relating to the vacancy can be found on the Diocesan website<br>
@@ -3856,9 +3976,9 @@ The following parishes do not have a downloadable PDF bulletin. Click a link to 
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260822"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260822';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -3930,7 +4050,7 @@ The following parishes do not have a downloadable PDF bulletin. Click a link to 
         target.classList.add('search-active');
         const details = target.closest('details.parish-block');
         if (details) details.open = true;
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
 
       function updateMatchUi() {
@@ -4097,6 +4217,48 @@ The following parishes do not have a downloadable PDF bulletin. Click a link to 
         if (page) page.insertBefore(banner, page.firstChild);
       }
     })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      var btn = document.getElementById('scroll-top-btn');
+      if (!btn) return;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function shown() {
+        var y = window.scrollY || document.documentElement.scrollTop || 0;
+        btn.classList.toggle('is-visible', y > 240);
+      }
+      window.addEventListener('scroll', shown, { passive: true });
+      shown();
+      btn.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      });
+    })();
+    
   </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
 </body>
 </html>

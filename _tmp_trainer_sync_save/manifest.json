@@ -1,0 +1,57 @@
+{
+  "manifest_version": 3,
+  "name": "Parish Trainer",
+  "version": "1.61.10",
+  "update_url": "https://raphoe-diocese.github.io/parish_harvester/updates.xml",
+  "permissions": [
+    "activeTab",
+    "tabs",
+    "scripting",
+    "contextMenus",
+    "storage",
+    "downloads"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
+  },
+  "action": {
+    "default_title": "Parish Trainer",
+    "default_popup": "popup.html"
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "bridge_boot.js",
+        "toolbar_diag.js",
+        "recipe_diag_kit.js"
+      ],
+      "run_at": "document_start",
+      "world": "ISOLATED"
+    },
+    {
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "pattern_library.js",
+        "html_fingerprint.js",
+        "site_memory.js",
+        "parish_pickers.js",
+        "github_recipe_push.js",
+        "copilot.js",
+        "toolbar_playbook.js",
+        "click-chain.js",
+        "isolated.js",
+        "content.js"
+      ],
+      "run_at": "document_idle",
+      "world": "ISOLATED"
+    }
+  ]
+}

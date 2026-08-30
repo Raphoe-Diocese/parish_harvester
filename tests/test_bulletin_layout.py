@@ -7,6 +7,7 @@ from ocr.bulletin_layout import (
     render_parish_masthead,
     split_heading_prefix,
     structure_ocr_html,
+    _is_url_only_line,
 )
 from ocr.generate_bulletin_pages import prepare_ocr_fragment
 
@@ -93,6 +94,23 @@ class BulletinLayoutTests(unittest.TestCase):
         self.assertNotIn("<details", html_out)
         self.assertLess(html_out.index("ocr-parish-masthead"), html_out.index("MASS TIMES"))
 
+    def test_keeps_notice_when_parish_name_is_glued_on_the_end(self) -> None:
+        fragment = (
+            "<p>The church door collection after the Vigil Mass.</p>\n"
+            "<p>******Church Car Park will be closed immediately after 12noon "
+            "Mass on Sunday 23rd August*******  Ballycastle</p>\n"
+            "<p>https://www.ballycastleparish.com</p>\n"
+            "<p>We pray for our deceased parishioners.</p>"
+        )
+        html_out = structure_ocr_html(
+            fragment,
+            parish_entries=[("ballycastleparish", "Ballycastle")],
+            bulletin_date="2026-08-21",
+        )
+        self.assertIn("Church Car Park will be closed", html_out)
+        self.assertIn("ocr-parish-masthead", html_out)
+        self.assertIn("Ballycastle", html_out)
+
     def test_masthead_is_idempotent(self) -> None:
         first = structure_ocr_html(
             "<p>Ardara Parish</p><p>Mass times Saturday 6pm</p>",
@@ -164,6 +182,25 @@ class BulletinLayoutTests(unittest.TestCase):
         self.assertEqual(classify_heading_line("AIFRINN NA SEACHTAINE"), "AIFRINN NA SEACHTAINE")
         self.assertEqual(classify_heading_line("BÁS LE GAIRID"), "BÁS LE GAIRID")
         self.assertEqual(classify_heading_line("AN CHÉAD LÉACHT"), "AN CHÉAD LÉACHT")
+
+    def test_keeps_wrapped_sentence_endings(self) -> None:
+        html_out = structure_ocr_html(
+            "<p>Gregory McErlain, USA, formerly Loughbeg Road, who died<br>\n"
+            "recently.<br>\n"
+            "All welcome to this full body workout to<br>\n"
+            "music.</p>",
+            single_parish_name="Greenlough",
+            bulletin_date="2026-08-21",
+        )
+        self.assertIn("recently.", html_out)
+        self.assertIn("music.", html_out)
+
+    def test_url_only_line_rejects_plain_words(self) -> None:
+        self.assertTrue(_is_url_only_line("https://www.ballycastleparish.com"))
+        self.assertTrue(_is_url_only_line("parishoflisburn.org"))
+        self.assertFalse(_is_url_only_line("recently."))
+        self.assertFalse(_is_url_only_line("music."))
+        self.assertFalse(_is_url_only_line("St."))
 
 
 if __name__ == "__main__":

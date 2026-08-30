@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
   <title>Cathedral Text Bulletin — 21/08/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -14,7 +16,7 @@
       font-size: 1.125rem;
       -webkit-text-size-adjust: 100%;
       text-size-adjust: 100%;
-      overflow-x: hidden;
+      overflow-x: clip;
     }
     a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
     .page {
@@ -36,8 +38,62 @@
       font-size: 1rem; font-weight: 700; color: #1a1f1e;
     }
     .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 40;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+      box-shadow: 0 8px 16px #eef1f0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 8rem; }
+    mark.search-active { scroll-margin-top: 8rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 30;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
     .ocr-zoom-bar {
-      position: sticky; top: 0; z-index: 6;
       display: flex; justify-content: center; align-items: center; gap: 8px;
       margin: 0 0 10px; padding: 6px 10px;
       background: rgba(255, 255, 255, 0.92);
@@ -63,7 +119,7 @@
       max-width: min(72ch, 100%);
       margin-left: auto;
       margin-right: auto;
-      overflow-x: hidden;
+      overflow-x: clip;
       overflow-wrap: anywhere;
       word-wrap: break-word;
       hyphens: auto;
@@ -274,6 +330,7 @@
         <span class="title-line">CATHEDRAL Text Bulletin · 21/08/2026</span>
       </div>
     </div>
+    <div class="ocr-sticky-chrome">
     <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
       <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
       <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
@@ -293,7 +350,9 @@
         </div>
       </div>
     </div>
-    <div class="ocr-body" id="ocr-text"><p class="page-label">Page 5</p>
+    </div>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Cathedral</h2><p class="ocr-parish-date">21/08/2026</p></header>
+<p class="page-label">Page 1</p>
 <p>SUNDAY COLLECTION ~ 9th August - €6,373<br>
 BUILDING FUND: €1,850<br>
 PARISH EXPENDITURE ~ €5,872.14<br>
@@ -316,7 +375,7 @@ it’s food, farming, crafts or a service business, we want to hear from you. Ap
 <a href="https://empowerprogramme.ie/" target="_blank" rel="noopener noreferrer">https://empowerprogramme.ie/</a> Places are limited. The closing date for applications<br>
 is 5 pm on Friday 4th September. Phone: 091 -742851or email: <a href="mailto:michelle.lee@atu.ie" target="_blank" rel="noopener noreferrer">michelle.lee@atu.ie</a><br>
 LOUGH DERG One Day Retreats - Guided Days of Prayer and Reflection<br>
-August: 18th, 2nd, 23rd, 29th and 31st ~ September: 5th, 6th, 9th, 12th, 15th, 19th<br>
+August: 18th, 22nd, 23rd, 29th and 31st ~ September: 5th, 6th, 9th, 12th, 15th, 19th<br>
 and 20th. Admission €50. Group discounts available. Advance Booking Essential .<br>
 Special Themed Retreats: 23rd August - St. Peregrine; 5th September - Pioneer<br>
 Pilgrimage; 6th September - St. Carlos Acutis; 9th and 12th September - Vocations<br>
@@ -352,6 +411,7 @@ Eucharistic Adoration is a devotion whereby members of a parish unite in<br>
 making continuous adoration before the exposed Blessed Sacrament, for as<br>
 many hours as may be possible, based on the number of people who pledge to<br>
 do a weekly holy hour. Eucharistic Adoration is silent and contemplative in<br>
+nature.<br>
 We in this parish are very blessed that St. Pius X Adoration<br>
 Chapel (located in the grounds of Loreto Secondary School) is<br>
 open from Sunday 1 pm – Friday 8 pm and that we have<br>
@@ -367,11 +427,10 @@ an hour of your choice - please contact Mary on <a href="tel:+353860870446" styl
 “Devotion to the Eucharist is the most noble, because it has God as its object;<br>
 it is the most profitable for salvation, because it gives us the Author of Grace;<br>
 it is the sweetest, because the Lord is Sweetness itself. ” Pope Pius X<br>
-(Feast of St. Pius X - Friday 21st August)</p>
-<h2 class="ocr-parish-name">Cathedral</h2>
-<p>21/08/2026</p>
+(Feast of St. Pius X - Friday 21st August)<br>
+Cathedral</p>
 <hr>
-<p class="page-label">Page 6</p>
+<p class="page-label">Page 2</p>
 <p>The NATIONAL NOVENA TO OUR LADY OF KNOCK continues until<br>
 Friday 21st August. To participate in this Novena, please visit: https://<br>
 <a href="https://www.knockshrine.ie/watch" target="_blank" rel="noopener noreferrer">www.knockshrine.ie/watch</a> -live/<br>
@@ -443,15 +502,14 @@ Quigley, Deceased Members of the Quigley Family, Eileen O ’Doherty, Patrick<br
 Greene, Kathleen Doherty, Liam Doherty, Duncan Doherty, Brigid Friel, Mason<br>
 Anderson, John Sadler, Kathleen Sadler, Brendan Sadler, John Sadler, Kathleen<br>
 McCauley, Eddie McCauley, Kathleen Lally, Eileen Boyle and Grace Marley RIP<br>
-Saturday 2nd August ~ The Queenship of Mary<br>
+Saturday 22nd August ~ The Queenship of Mary<br>
 10 am Mass ~ Frank McManus RIP (Month ’s Mind Mass)<br>
 Confessions: 12 noon - 1 pm and 7 pm<br>
 Baptisms: 4 pm<br>
 Vigil Mass ~ 6 pm<br>
 Sunday 23rd August ~ Twenty -first Sunday in Ordinary Time<br>
 Masses: 8 am, 10 am, 12 noon and 6 pm<br>
-Baptisms: 2.30 pm</p>
-<hr></div>
+Baptisms: 2.30 pm</p></div>
     <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
   </div>
   <script>
@@ -517,7 +575,7 @@ Baptisms: 2.30 pm</p>
         if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
         ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
         ocrMatches[idx].classList.add('search-active');
-        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
       function updateMatchUi() {
         const total = ocrMatches.length;
@@ -599,6 +657,48 @@ Baptisms: 2.30 pm</p>
         }
       });
     })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      var btn = document.getElementById('scroll-top-btn');
+      if (!btn) return;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function shown() {
+        var y = window.scrollY || document.documentElement.scrollTop || 0;
+        btn.classList.toggle('is-visible', y > 240);
+      }
+      window.addEventListener('scroll', shown, { passive: true });
+      shown();
+      btn.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      });
+    })();
+    
   </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
 </body>
 </html>

@@ -303,6 +303,81 @@ class WriteParishPagesForDioceseTests(unittest.TestCase):
             self.assertIn("Sunday mass at 10am", html_out)
             self.assertIn('href="ardara.pdf"', html_out)
 
+    def test_prefers_embedded_slice_text_over_incomplete_vision(self) -> None:
+        rich_lines = [
+            "Ardara Parish Bulletin this Sunday",
+            "Coffee morning Saturday 22nd August in the hall.",
+            "Church Car Park will be closed immediately after 12noon Mass on Sunday 23rd August.",
+            "Recently deceased: Mary Boyle. Anniversaries as listed in the parish.",
+            "Weekend Mass Times Saturday Vigil 7.30pm Sunday 11.00am.",
+        ]
+        buf = io.BytesIO()
+        c = canvas.Canvas(buf)
+        y = 760
+        for line in rich_lines:
+            c.drawString(72, y, line)
+            y -= 14
+        c.showPage()
+        c.save()
+        vision_fragment = """
+<p class="page-label">Page 1</p>
+<p>Ardara Parish<br>
+http://ardara.ie</p>
+<p>Coffee morning Saturday 2nd August. Sunday mass at 10am.</p>
+"""
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            status_path = root / "parish_status.json"
+            status_path.write_text(
+                json.dumps(
+                    {
+                        "parishes": {
+                            "ardara": {
+                                "outcome": "ok",
+                                "diocese": "Raphoe Diocese",
+                                "display_name": "Ardara",
+                                "url": "http://ardara.ie",
+                            },
+                        }
+                    }
+                ),
+                encoding="utf-8",
+            )
+            pdf_path = root / "raphoe_mega_bulletin.pdf"
+            pdf_path.write_bytes(buf.getvalue())
+            (root / "raphoe_mega_bulletin.pages.json").write_text(
+                json.dumps(
+                    {
+                        "date": "2026-08-16",
+                        "pdf": "raphoe_mega_bulletin.pdf",
+                        "parishes": {"ardara": {"display_name": "Ardara", "start_page": 1, "end_page": 1}},
+                    }
+                ),
+                encoding="utf-8",
+            )
+            out_dir = root / "docs" / "parishes" / "raphoe"
+            written = parish_pages.write_parish_pages_for_diocese(
+                "raphoe",
+                "2026-08-16",
+                pdf_path,
+                vision_fragment,
+                diocese_pdf_href="../../mega_pdf/raphoe_mega_bulletin.pdf",
+                out_dir=out_dir,
+                parish_status_path=status_path,
+            )
+            self.assertEqual(written, ["ardara"])
+            html_out = (out_dir / "ardara-ocr.html").read_text(encoding="utf-8")
+            self.assertIn("Church Car Park will be closed", html_out)
+            self.assertIn("22nd August", html_out)
+            self.assertNotIn("Saturday 2nd August", html_out)
+
+    def test_write_text_strips_null_bytes(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "page.html"
+            parish_pages._write_text(path, "hello\x00world")
+            self.assertEqual(path.read_text(encoding="utf-8"), "helloworld")
+            self.assertFalse((Path(tmpdir) / "page.html.tmp").exists())
+
 
 if __name__ == "__main__":
     unittest.main()

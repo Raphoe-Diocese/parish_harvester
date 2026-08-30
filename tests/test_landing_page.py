@@ -86,20 +86,32 @@ class LandingPageTests(unittest.TestCase):
             self.assertEqual(index_html.count("live-card\""), 4)
             self.assertIn("Clogher Diocese", index_html)
             self.assertIn("Derry Diocese", index_html)
-            self.assertIn("Down and Connor Diocese", index_html)
+            self.assertIn("Down &amp; Connor Diocese", index_html)
+            self.assertIn('class="is-long"', index_html)
+            self.assertIn("white-space: nowrap", index_html)
+            self.assertIn("Bulletins ready @ 16:00", index_html)
+            self.assertIn("—/— available", index_html)
+            self.assertNotIn("Reliability available", index_html)
+            self.assertNotIn("No data yet", index_html)
+            self.assertIn("font-weight: 600", index_html)
+            self.assertIn(".live-card-eyebrow {", index_html)
+            self.assertNotIn("<h2>Down and Connor Diocese</h2>", index_html)
             self.assertIn("Raphoe Diocese", index_html)
             self.assertIn("Open bulletin", index_html)
             self.assertIn("Mega PDF", index_html)
+            self.assertNotRegex(index_html, r"_mega_bulletin\.pdf\" target=\"_blank\"")
             self.assertIn(">Text<", index_html)
             self.assertIn("live-card-photo", index_html)
             self.assertIn("St Macartan", index_html)
             self.assertIn("Welcome to Parish Press", index_html)
+            self.assertIn("ongoing project", index_html)
+            self.assertIn("may be incomplete", index_html)
+            self.assertIn("original PDF", index_html)
             self.assertNotIn("auto-collected", index_html.lower())
             self.assertNotIn("hero-slide-credit", index_html)
             self.assertNotIn("COST_DASHBOARD", index_html)
             self.assertNotIn("Browse the full OCR bulletin archive", index_html)
-            self.assertIn("🟢", index_html)
-            self.assertIn("🔴", index_html)
+            self.assertIn("⚪", index_html)
 
             # The other dioceses collapse into one small expandable list.
             self.assertIn("More dioceses — coming soon (22)", index_html)
@@ -124,6 +136,8 @@ class LandingPageTests(unittest.TestCase):
             self.assertIn('matchMedia', index_html)
             self.assertIn('id="scroll-top-btn"', index_html)
             self.assertIn("Back to top", index_html)
+            self.assertIn('href="/favicon.png"', index_html)
+            self.assertIn('rel="apple-touch-icon"', index_html)
 
             self.assertIn('upload.wikimedia.org', index_html)
             self.assertIn('Wikimedia Commons', index_html)
@@ -237,6 +251,44 @@ class HeroSliderRenderTests(unittest.TestCase):
             eyebrows,
             {"Clogher Diocese", "Raphoe Diocese", "Derry Diocese", "Down & Connor Diocese"},
         )
+
+    def test_live_card_heading_keeps_down_and_connor_on_one_line(self) -> None:
+        self.assertEqual(
+            site_builder._live_card_heading("Down and Connor"),
+            "Down & Connor Diocese",
+        )
+        self.assertIn('class="is-long"', site_builder._live_card_heading_html("Down and Connor"))
+        self.assertEqual(site_builder._live_card_heading("Raphoe"), "Raphoe Diocese")
+        self.assertNotIn("is-long", site_builder._live_card_heading_html("Raphoe"))
+
+    def test_live_card_ready_line_uses_placeholder_count(self) -> None:
+        self.assertEqual(site_builder._ready_count_text(None, None), "—/—")
+        self.assertEqual(site_builder._ready_count_text(30, 57), "30/57")
+        html = site_builder._landing_page(
+            [
+                {
+                    "key": "clogher",
+                    "name": "Clogher",
+                    "dot": "⚪",
+                    "updated": "16/08/2026",
+                },
+                {
+                    "key": "derry",
+                    "name": "Derry",
+                    "dot": "🟡",
+                    "updated": "16/08/2026",
+                    "ready_count": 30,
+                    "total_count": 57,
+                },
+            ]
+        )
+        self.assertIn("Bulletins ready @ 16:00", html)
+        self.assertIn("—/— available", html)
+        self.assertIn("30/57 available", html)
+        self.assertNotIn("Reliability available", html)
+        self.assertNotIn("No data yet", html)
+        self.assertIn("font-weight: 600", html)
+        self.assertRegex(html, r"\.live-card-eyebrow\s*\{[^}]*white-space:\s*nowrap")
 
     def test_hero_slider_html_empty_when_no_slides(self) -> None:
         original = site_builder.HERO_SLIDES

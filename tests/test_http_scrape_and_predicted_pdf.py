@@ -149,6 +149,28 @@ class PredictedDatedUploadTests(unittest.TestCase):
             urls[:8],
         )
 
+    def test_antrim_doubled_month_variant_and_weeks_ahead(self) -> None:
+        example = (
+            "https://www-static.antrimparish.com/wp-content/uploads/2026/08/"
+            "23rd-August-2026.pdf"
+        )
+        urls = predicted_dated_upload_urls(
+            example, date(2026, 8, 23), weeks_back=0, weeks_ahead=1
+        )
+        self.assertTrue(
+            any("30th-August-August-2026-1-1.pdf" in u for u in urls),
+            urls[:12],
+        )
+        self.assertTrue(
+            any("23rd-August-2026.pdf" in u for u in urls),
+            urls[:12],
+        )
+        self.assertEqual(
+            urls[0],
+            "https://www-static.antrimparish.com/wp-content/uploads/2026/08/"
+            "30th-August-2026.pdf",
+        )
+
 
 class HttpScrapeScoreTests(unittest.TestCase):
     def test_picks_newest_parish_newsletter_and_skips_order_of_mass(self) -> None:
@@ -516,6 +538,44 @@ class StTeresasPredictedPostTests(unittest.TestCase):
             _pick_newest_dated_post_url(links, date(2026, 8, 16)),
             self.EXAMPLE,
         )
+
+    def test_friday_next_sunday_image_post_is_accepted(self) -> None:
+        live_30 = (
+            "https://stteresasparish.church/2026/08/27/"
+            "the-st-teresas-parish-bulletin-for-sunday-30th-august-2026/"
+        )
+        live_16 = (
+            "https://stteresasparish.church/2026/08/21/"
+            "the-st-teresas-parish-bulletin-for-sunday-16th-august-2026/"
+        )
+        links = _wordpress_post_links_from_payload(
+            [
+                {
+                    "slug": "the-st-teresas-parish-bulletin-for-sunday-30th-august-2026",
+                    "link": live_30,
+                    "title": {"rendered": "Sunday 30th August 2026"},
+                },
+                {
+                    "slug": "please-note-there-is-no-bulletin-for-sunday-23rd-august-2026",
+                    "link": (
+                        "https://stteresasparish.church/2026/08/21/"
+                        "please-note-there-is-no-bulletin-for-sunday-23rd-august-2026/"
+                    ),
+                    "title": {"rendered": "No bulletin 23rd August"},
+                },
+                {
+                    "slug": "the-st-teresas-parish-bulletin-for-sunday-16th-august-2026",
+                    "link": live_16,
+                    "title": {"rendered": "Sunday 16th August 2026"},
+                },
+            ],
+            [self.SLUG],
+        )
+        self.assertEqual(
+            _pick_newest_dated_post_url(links, date(2026, 8, 23)),
+            live_30,
+        )
+        self.assertNotIn("please-note", " ".join(links))
 
     def test_wp_json_prefers_this_sunday_when_it_exists(self) -> None:
         live_16 = (

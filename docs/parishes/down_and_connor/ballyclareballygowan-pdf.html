@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Ballyclare and Ballygowan PDF — 21/08/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
@@ -64,10 +66,9 @@
     .pdf-inpage-pages {
       box-sizing: border-box;
       flex: 0 0 auto;
-      height: 850px;
+      height: auto;
       min-height: 850px;
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
+      overflow: visible;
       background: #525659;
       padding: 8px 0 16px;
     }
@@ -93,7 +94,7 @@
     .pdf-standalone-shell iframe.pdf-frame,
     body.is-native-pdf iframe.pdf-frame {
       display: none !important;
-      height: 850px;
+      height: auto;
       min-height: 850px;
     }
     .pdf-frame-wrap.is-native-pdf,
@@ -124,8 +125,9 @@
       .pdf-inpage-pages,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
-        height: 450px !important;
+        height: auto !important;
         min-height: 450px !important;
+        overflow: visible !important;
       }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
@@ -136,7 +138,7 @@
     body.is-native-pdf { background: #3a3f42; }
     body.is-native-pdf .pdf-standalone-shell { background: #3a3f42; }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260822" defer></script>
 </head>
 <body>
   <div class="top" id="pdf-top">
@@ -189,9 +191,9 @@
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260822"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260822';
         s.defer = true;
         document.head.appendChild(s);
       }

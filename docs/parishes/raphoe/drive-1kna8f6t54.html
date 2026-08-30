@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
   <title>Gartan/Termon Bulletin — 21/08/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -95,6 +97,11 @@
       border: 1px solid #dde5e4;
       padding: 14px;
       margin-bottom: 4px;
+      overflow: visible;
+    }
+    #panel-pdf,
+    #panel-ocr {
+      overflow: visible;
     }
 
     .quiet-links {
@@ -112,7 +119,7 @@
       position: relative;
       height: auto;
       min-height: 850px;
-      overflow: hidden;
+      overflow: visible;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -165,10 +172,9 @@
     .pdf-inpage-pages {
       box-sizing: border-box;
       flex: 0 0 auto;
-      height: 850px;
+      height: auto;
       min-height: 850px;
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
+      overflow: visible;
       background: #525659;
       padding: 8px 0 16px;
     }
@@ -194,7 +200,7 @@
     .pdf-standalone-shell iframe.pdf-frame,
     body.is-native-pdf iframe.pdf-frame {
       display: none !important;
-      height: 850px;
+      height: auto;
       min-height: 850px;
     }
     .pdf-frame-wrap.is-native-pdf,
@@ -225,8 +231,9 @@
       .pdf-inpage-pages,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
-        height: 450px !important;
+        height: auto !important;
         min-height: 450px !important;
+        overflow: visible !important;
       }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
@@ -279,8 +286,62 @@
     .ocr-search-tools button:disabled { background: #9bbfbd; cursor: not-allowed; }
     .match-count { color: #6b7280; font-size: 0.9rem; font-weight: 600; }
     .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 40;
+      background: #fff;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+      box-shadow: 0 8px 16px #fff;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 8rem; }
+    mark.search-active { scroll-margin-top: 8rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 30;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
     .ocr-zoom-bar {
-      position: sticky; top: 0; z-index: 6;
       display: flex; justify-content: center; align-items: center; gap: 10px;
       margin: 0 0 10px; padding: 6px 10px;
       background: rgba(255, 255, 255, 0.94);
@@ -305,7 +366,7 @@
       max-width: min(72ch, 100%);
       margin-left: auto;
       margin-right: auto;
-      overflow-x: hidden;
+      overflow-x: clip;
       overflow-wrap: anywhere;
       word-wrap: break-word;
       hyphens: auto;
@@ -454,14 +515,14 @@
 
     #ocr-panel {
       box-sizing: border-box;
-      height: 850px;
+      height: auto;
       min-height: 850px;
-      overflow-y: auto;
+      overflow: visible;
       border: 1px solid #d4ddd9;
       padding: 22px 24px 32px;
     }
     .pdf-frame-wrap iframe {
-      height: 850px;
+      height: auto;
       min-height: 850px;
     }
     .note-box {
@@ -568,8 +629,9 @@
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
       #ocr-panel {
-        height: 450px;
+        height: auto;
         min-height: 450px;
+        overflow: visible;
       }
     }
     @media (max-width: 900px) {
@@ -591,7 +653,7 @@
       }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260822" defer></script>
 </head>
 <body>
   <div class="page">
@@ -636,6 +698,7 @@
       <div class="quiet-links">
         <a href="drive-1kna8f6t54-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
+      <div class="ocr-sticky-chrome">
       <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
         <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
         <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
@@ -653,7 +716,9 @@
           <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
         </div>
       </div>
-      <div id="ocr-panel"><p class="page-label">Page 11</p>
+      </div>
+      <div id="ocr-panel"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Gartan/Termon</h2><p class="ocr-parish-date">21/08/2026</p></header>
+<p class="page-label">Page 1</p>
 <p>NEWSLETTER</p>
 <h3 class="b-head">Mass Times in St Columba ’s Church, Kilmacrenan</h3>
 <p>Date Time Intention<br>
@@ -663,7 +728,7 @@ Sunday 16th August 11:00am Pro Populo<br>
 Monday 17th August 9.30am Priest’s IntenƟon<br>
 Tuesday 18th August 9:30am Priest’s IntenƟon<br>
 Wednesday 19th August 9:30am Priest’s IntenƟon<br>
-Saturday 2nd August 6.00pm Vigil Mass —Priests IntenƟon<br>
+Saturday 22nd August 6.00pm Vigil Mass —Priests IntenƟon<br>
 Sunday 23rd August 11:00am Adrian Boyce, Kilmacrenan, Anniversary</p>
 <h3 class="b-head">Mass Times in The Church of The Immaculate ConcepƟon, Coole</h3>
 <p>Sunday 16th August 9:30am Sunday Mass – Priest’s IntenƟon<br>
@@ -673,14 +738,14 @@ Sunday 23rd August 9:30am Sunday Mass – Priest’s IntenƟon</p>
 Sunday 16th August 9:00am Pro Populo<br>
 Wednesday 19th August 9.30am Eileen Coyle and Peter Doherty, Anniversaries<br>
 Thursday 20th August, 7.00pm PADRE PIO HEALING MASS<br>
-Saturday 2nd August 6:30pm Vigil Mass - Priest’s IntenƟon<br>
+Saturday 22nd August 6:30pm Vigil Mass - Priest’s IntenƟon<br>
 Sunday 23rd August 9:00am Pro Populo</p>
 <h3 class="b-head">Mass Times in St Colmcille ’s Church, Glendowan</h3>
 <p>Saturday 15th August 8:00pm Tanya McCaﬀerty, Church Hill, Anniversary<br>
 Sunday 16th August 10:30am Mickey Mc Cormack, Inniskill, Anniversary Mass<br>
 Friday 21st August 7:00pm Peggy Crerand, Stackernaugh, Anniversary Mass<br>
 Friday 21st August 8.00pm Maisie Connaghan, Whitehill, 1st Anniversary<br>
-Saturday 2nd August 8:00pm Frank MelleƩ, Lacknacoo, Anniversary<br>
+Saturday 22nd August 8:00pm Frank MelleƩ, Lacknacoo, Anniversary<br>
 Sunday 23rd August 10:30am Sunday Mass – Priest’s IntenƟon St Columba ’s Church, Kilmacrenan<br>
 St Columba ’s Church, Termon<br>
 St Colmcille ’s Church, Glendowan<br>
@@ -691,6 +756,7 @@ St Brigid’s Church, Golan Fr. Michael Mc Keever, PP</p>
 <h3 class="b-head">Parochial House, Termon</h3>
 <p><a href="tel:+353749139016" style="color:#1d4ed8;font-weight:600;">074 91 39016</a><br>
 Email Addresses:<br>
+<a href="mailto:gartantermon@raphoediocese.ie" target="_blank" rel="noopener noreferrer">gartantermon@raphoediocese.ie</a><br>
 <a href="mailto:kilmacrenan@raphoediocese.ie" target="_blank" rel="noopener noreferrer">kilmacrenan@raphoediocese.ie</a> Parish Website:<br>
 Parish Oﬃce in Termon<br>
 Opened Monday &amp; Friday 10am – 1pm <a href="tel:+353749139016" style="color:#1d4ed8;font-weight:600;">074 9139016</a><br>
@@ -738,6 +804,7 @@ would do? Then this course is for you. Beginning in September<br>
 unƟl the end of May on Thursdays from 6.30pm to 9.00pm<br>
 at All Saints Church, Newtowncunningham.<br>
 For more informaƟon on the course or to register go to<br>
+hƩps://encounterschool.org/donegal/<br>
 or email <a href="mailto:donegal@encounterschool.org" target="_blank" rel="noopener noreferrer">donegal@encounterschool.org</a> NaƟonal Novena to our Lady of Knock<br>
 13th–21st August 2026.<br>
 Sheltered in God ’s Love<br>
@@ -752,17 +819,15 @@ The Sacrament of Confession is available before and aŌer any<br>
 of the Masses celebrated in both Parishes. Come to the Sacristy.<br>
 Mass Cards: Mass Bouquet Cards, Mass Sympathy Cards<br>
 Birthday Mass Bouquet cards are available from the sacristy of<br>
-any of the Churches and from the Parish Oﬃce in Termon.</p>
-<h2 class="ocr-parish-name">Gartan/Termon</h2>
-<p>21/08/2026</p>
-<hr></div>
+any of the Churches and from the Parish Oﬃce in Termon.<br>
+Recommended Diocesan sƟpend is €10 per Mass, cards cost €1. Gartan/Termon</p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other RAPHOE Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="raphoe"><a class="parish-link" href="drive-1jmslbrliw.html" target="_blank" rel="noopener noreferrer">Raphoe</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="raphoe"><a class="parish-link" href="drive-1jmslbrliw.html" target="_blank" rel="noopener noreferrer">Raphoe</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="tawnawillyparish.html" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
     </section>
   </div>
   <footer>
@@ -814,9 +879,9 @@ any of the Churches and from the Parish Oﬃce in Termon.</p>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260822"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260822';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -888,7 +953,7 @@ any of the Churches and from the Parish Oﬃce in Termon.</p>
         target.classList.add('search-active');
         const details = target.closest('details.parish-block');
         if (details) details.open = true;
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
 
       function updateMatchUi() {
@@ -1055,6 +1120,48 @@ any of the Churches and from the Parish Oﬃce in Termon.</p>
         if (page) page.insertBefore(banner, page.firstChild);
       }
     })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      var btn = document.getElementById('scroll-top-btn');
+      if (!btn) return;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function shown() {
+        var y = window.scrollY || document.documentElement.scrollTop || 0;
+        btn.classList.toggle('is-visible', y > 240);
+      }
+      window.addEventListener('scroll', shown, { passive: true });
+      shown();
+      btn.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      });
+    })();
+    
   </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
 </body>
 </html>

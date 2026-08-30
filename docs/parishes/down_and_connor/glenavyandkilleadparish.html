@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
   <title>Glenavy and Killead Bulletin — 21/08/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -95,6 +97,11 @@
       border: 1px solid #dde5e4;
       padding: 14px;
       margin-bottom: 4px;
+      overflow: visible;
+    }
+    #panel-pdf,
+    #panel-ocr {
+      overflow: visible;
     }
 
     .quiet-links {
@@ -112,7 +119,7 @@
       position: relative;
       height: auto;
       min-height: 850px;
-      overflow: hidden;
+      overflow: visible;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -165,10 +172,9 @@
     .pdf-inpage-pages {
       box-sizing: border-box;
       flex: 0 0 auto;
-      height: 850px;
+      height: auto;
       min-height: 850px;
-      overflow: auto;
-      -webkit-overflow-scrolling: touch;
+      overflow: visible;
       background: #525659;
       padding: 8px 0 16px;
     }
@@ -194,7 +200,7 @@
     .pdf-standalone-shell iframe.pdf-frame,
     body.is-native-pdf iframe.pdf-frame {
       display: none !important;
-      height: 850px;
+      height: auto;
       min-height: 850px;
     }
     .pdf-frame-wrap.is-native-pdf,
@@ -225,8 +231,9 @@
       .pdf-inpage-pages,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
-        height: 450px !important;
+        height: auto !important;
         min-height: 450px !important;
+        overflow: visible !important;
       }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
@@ -279,8 +286,62 @@
     .ocr-search-tools button:disabled { background: #9bbfbd; cursor: not-allowed; }
     .match-count { color: #6b7280; font-size: 0.9rem; font-weight: 600; }
     .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 40;
+      background: #fff;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+      box-shadow: 0 8px 16px #fff;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 8rem; }
+    mark.search-active { scroll-margin-top: 8rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 30;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
     .ocr-zoom-bar {
-      position: sticky; top: 0; z-index: 6;
       display: flex; justify-content: center; align-items: center; gap: 10px;
       margin: 0 0 10px; padding: 6px 10px;
       background: rgba(255, 255, 255, 0.94);
@@ -305,7 +366,7 @@
       max-width: min(72ch, 100%);
       margin-left: auto;
       margin-right: auto;
-      overflow-x: hidden;
+      overflow-x: clip;
       overflow-wrap: anywhere;
       word-wrap: break-word;
       hyphens: auto;
@@ -454,14 +515,14 @@
 
     #ocr-panel {
       box-sizing: border-box;
-      height: 850px;
+      height: auto;
       min-height: 850px;
-      overflow-y: auto;
+      overflow: visible;
       border: 1px solid #d4ddd9;
       padding: 22px 24px 32px;
     }
     .pdf-frame-wrap iframe {
-      height: 850px;
+      height: auto;
       min-height: 850px;
     }
     .note-box {
@@ -568,8 +629,9 @@
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
       #ocr-panel {
-        height: 450px;
+        height: auto;
         min-height: 450px;
+        overflow: visible;
       }
     }
     @media (max-width: 900px) {
@@ -591,7 +653,7 @@
       }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260822" defer></script>
 </head>
 <body>
   <div class="page">
@@ -636,6 +698,7 @@
       <div class="quiet-links">
         <a href="glenavyandkilleadparish-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
+      <div class="ocr-sticky-chrome">
       <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
         <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
         <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
@@ -653,7 +716,9 @@
           <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
         </div>
       </div>
-      <div id="ocr-panel"><p class="page-label">Page 11</p>
+      </div>
+      <div id="ocr-panel"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Glenavy and Killead</h2><p class="ocr-parish-date">21/08/2026</p></header>
+<p class="page-label">Page 1</p>
 <p>Twentieth Sunday in Ordinary Time<br>
 16 August 2026<br>
 Very Rev. Rory Sheehan P.P.: St Joseph ’s<br>
@@ -669,6 +734,7 @@ Wheel Balancing, Wheel Alignment, Batteries, General Service and repairs Tel: 02
 4423 113.<br>
 ST CLARE’S HALL, WHAT’S ON?– MONDAY Bootcamp with CM Fitness 6am – 7.20am, Multi<br>
 Sensory baby class 10—11am, Flip Fusion 5.30pm —6.30pm, Pilates 7pm – 9pm, Bowls 8pm –<br>
+10pm.<br>
 TUESDAY Brazier School of Dance 4.45PM – 7.45PM, Pickle Ball 8pm – 10pm.<br>
 WEDNESDAY Bootcamp with CM Fitness 6am – 7.20am, Friendship Group 10.30am –<br>
 12.30pm, Yoga 7pm – 8pm, Bowls 8pm – 10pm (Matches ).<br>
@@ -727,11 +793,10 @@ Faith in a surprising God who, in Jesus, his Son, never says no to<br>
 goodness. Faith that keeps us energetic and alive, not tired, in soul as<br>
 well as body.<br>
 Remember your feeling of gratitude for the children of your family.<br>
-Lord, I believe. Strengthen my faith.</p>
-<h2 class="ocr-parish-name">Glenavy and Killead</h2>
-<p>21/08/2026</p>
+Lord, I believe. Strengthen my faith.<br>
+Glenavy and Killead</p>
 <hr>
-<p class="page-label">Page 12</p>
+<p class="page-label">Page 2</p>
 <p>17 —23 August 2026 Mass Intentions<br>
 ST JOSEPH ’S MATER DEI St James<br>
 Monday<br>
@@ -778,6 +843,7 @@ McCann, Aodh Cormican, William McGarrell, Daniel Crossey, Kathleen Henry,<br>
 Fr Eamon O ’Brien, Jim Brazier, Maureen O ’Rourke.<br>
 Sanctuary lamp intentions: Liz Donnelly, G &amp; M<br>
 Adoration No Adoration in Mater Dei on Wednesday mornings in July &amp;<br>
+August.<br>
 Collection 9 August 2026<br>
 Weekly Offering: £3,356<br>
 Thank you for your generosity Feumore Mass<br>
@@ -802,6 +868,7 @@ conference bank account. Account number 41965035, sort code<br>
 <a href="tel:+3537784955647" style="color:#1d4ed8;font-weight:600;">07784955647</a>. Donation can be made to our bank account, Sort Code<br>
 98-04-60. Account Number 41966009. Your support is very much<br>
 appreciated as we support those most vulnerable in your local<br>
+community.<br>
 CATHOLIC MOTHERS IRELAND – FAMILY DAY Catholic Mothers Ireland will hold its<br>
 Annual National Mass on Sunday, 6 September at Termonbacca Retreat Centre,<br>
 Derry City. The day will begin with Mass at 2.00pm, celebrated by Bishop Donal<br>
@@ -830,9 +897,10 @@ Session 5: The Spirit -Empowered Life,<br>
 Session 6: The Heart of a Disciple<br>
 Session 7: Going On with the Lord.<br>
 Book your place before the 24 August as numbers are limited by leaving<br>
-your name and contact details in the parish office Tel. <a href="tel:+442894422278" style="color:#1d4ed8;font-weight:600;">02894422278</a> or email</p>
+your name and contact details in the parish office Tel. <a href="tel:+442894422278" style="color:#1d4ed8;font-weight:600;">02894422278</a> or email<br>
+<a href="mailto:glenavy@downandconnor.org" target="_blank" rel="noopener noreferrer">glenavy@downandconnor.org</a></p>
 <hr>
-<p class="page-label">Page 13</p>
+<p class="page-label">Page 3</p>
 <p>Liturgical ‘Sign of Peace ’ The Sign of Peace remains an integral part of<br>
 the celebration of the Eucharist and has been reintroduced as a normal<br>
 practice across the Diocese. The customary expression of the Sign of Peace<br>
@@ -879,15 +947,14 @@ Mary to any sick parishioner for one week. If you would like to avail of<br>
 the statue, please contact the parish office.<br>
 Sanctuary lamp intentions: A Sanctuary Lamp burns for a week in each of our<br>
 two churches. If you would like to dedicate a lamp for a loved one or a special<br>
-Intention please contact the Parish Office. There is a suggested offering of £5</p>
-<hr></div>
+Intention please contact the Parish Office. There is a suggested offering of £5</p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other DOWN &amp; CONNOR Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="antrim"><a class="parish-link" href="antrimparish.html" target="_blank" rel="noopener noreferrer">Antrim</a></li><li class="parish-item" data-name="ballycastle"><a class="parish-link" href="ballycastleparish.html" target="_blank" rel="noopener noreferrer">Ballycastle</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="derriaghy"><a class="parish-link" href="derriaghycatholicparish.html" target="_blank" rel="noopener noreferrer">Derriaghy</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="kilmore and killyleagh"><a class="parish-link" href="kilmoreandkillyleagh.html" target="_blank" rel="noopener noreferrer">Kilmore and Killyleagh</a></li><li class="parish-item" data-name="loughshore"><a class="parish-link" href="loughshoreparishes.html" target="_blank" rel="noopener noreferrer">Loughshore</a></li><li class="parish-item" data-name="maghera"><a class="parish-link" href="parishofmaghera.html" target="_blank" rel="noopener noreferrer">Maghera</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="port glenone (st mary&#x27;s portglenone)"><a class="parish-link" href="stmarysportglenone.html" target="_blank" rel="noopener noreferrer">Port Glenone (St Mary&#x27;s Portglenone)</a></li><li class="parish-item" data-name="sacred heart belfast"><a class="parish-link" href="sacredheartparishbelfast.html" target="_blank" rel="noopener noreferrer">Sacred Heart Belfast</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="saint anthony"><a class="parish-link" href="saintanthony.html" target="_blank" rel="noopener noreferrer">Saint Anthony</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st brigids belfast"><a class="parish-link" href="stbrigidsparishbelfast.html" target="_blank" rel="noopener noreferrer">St Brigids Belfast</a></li><li class="parish-item" data-name="st colmcille&#x27;s holywood"><a class="parish-link" href="stcolmcillesholywood.html" target="_blank" rel="noopener noreferrer">St Colmcille&#x27;s Holywood</a></li><li class="parish-item" data-name="st colmcilles"><a class="parish-link" href="st-colmcilles.html" target="_blank" rel="noopener noreferrer">St Colmcilles</a></li><li class="parish-item" data-name="st gerards"><a class="parish-link" href="stgerardsparish.html" target="_blank" rel="noopener noreferrer">St Gerards</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st mary&#x27;s on the hill"><a class="parish-link" href="stmarysonthehill.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s on the Hill</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li><li class="parish-item" data-name="st teresas"><a class="parish-link" href="stteresasparish.html" target="_blank" rel="noopener noreferrer">St Teresas</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="antrim"><a class="parish-link" href="antrimparish.html" target="_blank" rel="noopener noreferrer">Antrim</a></li><li class="parish-item" data-name="ballycastle"><a class="parish-link" href="ballycastleparish.html" target="_blank" rel="noopener noreferrer">Ballycastle</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="ballymenaparish.html" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="derriaghy"><a class="parish-link" href="derriaghycatholicparish.html" target="_blank" rel="noopener noreferrer">Derriaghy</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="kilmore and killyleagh"><a class="parish-link" href="kilmoreandkillyleagh.html" target="_blank" rel="noopener noreferrer">Kilmore and Killyleagh</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="loughshore"><a class="parish-link" href="loughshoreparishes.html" target="_blank" rel="noopener noreferrer">Loughshore</a></li><li class="parish-item" data-name="maghera"><a class="parish-link" href="parishofmaghera.html" target="_blank" rel="noopener noreferrer">Maghera</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="port glenone (st mary&#x27;s portglenone)"><a class="parish-link" href="stmarysportglenone.html" target="_blank" rel="noopener noreferrer">Port Glenone (St Mary&#x27;s Portglenone)</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="sacred heart belfast"><a class="parish-link" href="sacredheartparishbelfast.html" target="_blank" rel="noopener noreferrer">Sacred Heart Belfast</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="saint anthony"><a class="parish-link" href="saintanthony.html" target="_blank" rel="noopener noreferrer">Saint Anthony</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st brigids belfast"><a class="parish-link" href="stbrigidsparishbelfast.html" target="_blank" rel="noopener noreferrer">St Brigids Belfast</a></li><li class="parish-item" data-name="st colmcille&#x27;s holywood"><a class="parish-link" href="stcolmcillesholywood.html" target="_blank" rel="noopener noreferrer">St Colmcille&#x27;s Holywood</a></li><li class="parish-item" data-name="st colmcilles"><a class="parish-link" href="st-colmcilles.html" target="_blank" rel="noopener noreferrer">St Colmcilles</a></li><li class="parish-item" data-name="st gerards"><a class="parish-link" href="stgerardsparish.html" target="_blank" rel="noopener noreferrer">St Gerards</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st mary&#x27;s on the hill"><a class="parish-link" href="stmarysonthehill.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s on the Hill</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li><li class="parish-item" data-name="st teresas"><a class="parish-link" href="stteresasparish.html" target="_blank" rel="noopener noreferrer">St Teresas</a></li></ul>
     </section>
   </div>
   <footer>
@@ -939,9 +1006,9 @@ Intention please contact the Parish Office. There is a suggested offering of £5
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260822"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260822';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1013,7 +1080,7 @@ Intention please contact the Parish Office. There is a suggested offering of £5
         target.classList.add('search-active');
         const details = target.closest('details.parish-block');
         if (details) details.open = true;
-        target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
 
       function updateMatchUi() {
@@ -1180,6 +1247,48 @@ Intention please contact the Parish Office. There is a suggested offering of £5
         if (page) page.insertBefore(banner, page.firstChild);
       }
     })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      var btn = document.getElementById('scroll-top-btn');
+      if (!btn) return;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function shown() {
+        var y = window.scrollY || document.documentElement.scrollTop || 0;
+        btn.classList.toggle('is-visible', y > 240);
+      }
+      window.addEventListener('scroll', shown, { passive: true });
+      shown();
+      btn.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      });
+    })();
+    
   </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
 </body>
 </html>

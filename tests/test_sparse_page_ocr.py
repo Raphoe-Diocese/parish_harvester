@@ -6,6 +6,7 @@ from ocr.sparse_page_ocr import (
     join_ocr_html_pages,
     ocr_lines_look_usable,
     page_html_is_sparse,
+    prefer_embedded_pages_in_ocr_html,
     split_ocr_html_pages,
 )
 
@@ -52,6 +53,40 @@ class SparsePageOcrHtmlTests(unittest.TestCase):
         ]
         self.assertTrue(ocr_lines_look_usable(irish))
         self.assertFalse(ocr_lines_look_usable(["H", "q", "‘", ". aN wy ?", "at i Réalt n"]))
+
+    def test_prefer_embedded_html_restores_dropped_line(self) -> None:
+        import io
+        import tempfile
+        from pathlib import Path
+
+        from reportlab.pdfgen import canvas
+
+        lines = [
+            "Ramoan Parish Ballycastle weekend bulletin",
+            "Coffee morning Saturday 22nd August in the crypt.",
+            "Church Car Park will be closed immediately after 12noon Mass on Sunday 23rd August.",
+            "Lough Derg retreats August 18th, 22nd, 23rd please book in the sacristy.",
+            "Weekend Mass Times Saturday Vigil 6.30pm Sunday 10.00am and 12.00noon.",
+        ]
+        buf = io.BytesIO()
+        c = canvas.Canvas(buf)
+        y = 760
+        for line in lines:
+            c.drawString(72, y, line)
+            y -= 14
+        c.showPage()
+        c.save()
+        vision_html = (
+            '<p class="page-label">Page 1</p>\n'
+            "<p>Coffee morning Saturday 2nd August in the crypt.</p>"
+        )
+        with tempfile.TemporaryDirectory() as tmpdir:
+            pdf_path = Path(tmpdir) / "slice.pdf"
+            pdf_path.write_bytes(buf.getvalue())
+            out = prefer_embedded_pages_in_ocr_html(vision_html, pdf_path)
+        self.assertIn("Church Car Park will be closed", out)
+        self.assertIn("22nd August", out)
+        self.assertNotIn("Saturday 2nd August", out)
 
 
 if __name__ == "__main__":

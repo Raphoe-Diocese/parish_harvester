@@ -25,8 +25,8 @@ from pathlib import Path
 # ---------------------------------------------------------------------------
 DEFAULT_POLICY: dict = {
     "create_archives": False,
-    "keep_weeks_individual": 8,
-    "keep_weeks_mega_pdf": 12,
+    "keep_weeks_individual": 1,
+    "keep_weeks_mega_pdf": 1,
     "keep_months_archive": 0,
     "hard_size_cap_gb": 4.0,
 }

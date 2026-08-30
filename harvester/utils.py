@@ -254,19 +254,28 @@ def extract_date_from_string(text: str) -> date | None:
         except ValueError:
             pass
 
-    # Pattern B: D-M-YY (1–2 digit day/month) — limavady 16-8-26.pdf,
-    # claudy NEWSLETTER 9-8-26.docx. Must come after the 6/8-digit compact
-    # forms so "160826" is not split into 16-08-26 by accident (those have
-    # no dashes).
+    # Pattern B: D-M-YY (1–2 digit day/month). Ambiguous between UK
+    # DD-MM-YY (limavady 16-8-26.pdf, claudy NEWSLETTER 9-8-26.docx) and
+    # YY-MM-DD (ballymoneyparish 26-08-23pdf.pdf → 23/08/2026). Reading
+    # Ballymoney as DD-MM-YY made this week's file look like 2016/2023 and
+    # harvest rejected it (found 2026-08-23). Same later-year pick as the
+    # dotted form below. Must come after the 6/8-digit compact forms so
+    # "160826" is not split into 16-08-26 by accident (those have no dashes).
     m = _first_match_outside_hash(_D_M_YY_RE, text, spans)
     if m:
+        g1, g2, g3 = int(m.group(1)), int(m.group(2)), int(m.group(3))
+        dashed: list[date] = []
         try:
-            year = 2000 + int(m.group(3))
-            candidate = date(year, int(m.group(2)), int(m.group(1)))
-            if _is_plausible_bulletin_year(candidate.year):
-                return candidate
+            dashed.append(date(2000 + g1, g2, g3))  # YY-MM-DD
         except ValueError:
             pass
+        try:
+            dashed.append(date(2000 + g3, g2, g1))  # DD-MM-YY
+        except ValueError:
+            pass
+        plausible_dashed = [c for c in dashed if _is_plausible_bulletin_year(c.year)]
+        if plausible_dashed:
+            return max(plausible_dashed, key=lambda d: (d.year, d.month, d.day))
 
     # Dot-separated N.N.NN — ambiguous between YY.MM.DD (Google Drive folder
     # rows: 26.06.14 → 2026-06-14, 29.01.05 → 2029-01-05; locked by
@@ -362,16 +371,54 @@ def yearless_slug_date(
     return candidate
 
 
+_ANTRIM_ORDINAL_PDF_RE = re.compile(
+    r"(?P<day>\d{1,2}(?:st|nd|rd|th))-(?P<month>[A-Za-z]+)(?:-(?P=month))?-"
+    r"(?P<year>\d{4})(?:-\d+)*\.pdf$",
+    re.IGNORECASE,
+)
+
+
+def _antrim_static_pdf_name_variants(url: str) -> list[str]:
+    """Extra Antrim www-static names: 30th-August-August-2026-1-1.pdf.
+
+    Proved 28/08/2026: rewrite of 23rd-August-2026.pdf for 30 Aug is
+    30th-August-2026.pdf (404). The live iframe file is the doubled-month
+    ``-1-1`` name. Keep this scoped to antrimparish.com.
+    """
+    if "antrimparish.com" not in (url or "").lower():
+        return []
+    parsed = urlparse(url)
+    folder, name = unquote(parsed.path).rsplit("/", 1)
+    match = _ANTRIM_ORDINAL_PDF_RE.match(name)
+    if not match:
+        return []
+    day, month, year = match.group("day"), match.group("month"), match.group("year")
+    extras: list[str] = []
+    for filename in (
+        f"{day}-{month}-{year}.pdf",
+        f"{day}-{month}-{year}-1.pdf",
+        f"{day}-{month}-{year}-1-1.pdf",
+        f"{day}-{month}-{month}-{year}.pdf",
+        f"{day}-{month}-{month}-{year}-1.pdf",
+        f"{day}-{month}-{month}-{year}-1-1.pdf",
+    ):
+        path = f"{folder}/{filename}"
+        extras.append(parsed._replace(path=quote(path, safe="/")).geturl())
+    return extras
+
+
 def predicted_dated_upload_urls(
     example_url: str,
     target: date,
     *,
     weeks_back: int = 8,
+    weeks_ahead: int = 0,
 ) -> list[str]:
     """Rewrite a dated upload URL for *target* and the previous *weeks_back* Sundays.
 
     Also tries .docx/.jpg/.jpeg/.png siblings of each .pdf guess (uploader
-    fallback). First match in the returned list is the current Sunday.
+    fallback). First match in the returned list is the current Sunday unless
+    *weeks_ahead* is set (Antrim posts next Sunday's file on Friday).
     """
     seen: list[str] = []
 
@@ -380,10 +427,13 @@ def predicted_dated_upload_urls(
         if url and url not in seen:
             seen.append(url)
 
-    for i in range(weeks_back + 1):
+    ahead = max(0, int(weeks_ahead or 0))
+    for i in range(-ahead, weeks_back + 1):
         week = target - timedelta(days=7 * i)
         rewritten = rewrite_date_url(example_url, week)
         _add(rewritten)
+        for extra in _antrim_static_pdf_name_variants(rewritten):
+            _add(extra)
         if "onewebmedia" in rewritten.lower() and "newsletter" in rewritten.lower():
             for extra in oneweb_newsletter_download_urls(example_url, week):
                 _add(extra)

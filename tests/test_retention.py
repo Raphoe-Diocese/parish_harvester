@@ -112,6 +112,8 @@ class RetentionOldFilesTests(unittest.TestCase):
     def test_default_policy_disables_archives(self) -> None:
         self.assertFalse(DEFAULT_POLICY["create_archives"])
         self.assertEqual(DEFAULT_POLICY["keep_months_archive"], 0)
+        self.assertEqual(DEFAULT_POLICY["keep_weeks_individual"], 1)
+        self.assertEqual(DEFAULT_POLICY["keep_weeks_mega_pdf"], 1)
 
 
 class RetentionHardCapTests(unittest.TestCase):

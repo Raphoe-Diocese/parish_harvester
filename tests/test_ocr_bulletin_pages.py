@@ -146,7 +146,15 @@ class OcrBulletinPageTests(unittest.TestCase):
             )
             self.assertRegex(
                 html_output,
+                r"\.pdf-inpage-pages\s*\{[^}]*overflow:\s*auto",
+            )
+            self.assertRegex(
+                html_output,
                 r"#ocr-panel\s*\{[^}]*height:\s*850px",
+            )
+            self.assertRegex(
+                html_output,
+                r"#ocr-panel\s*\{[^}]*overflow:\s*auto",
             )
             self.assertNotIn("85vh", html_output)
             # Tablet/phone: shorter balanced panels (not desktop 850px).
@@ -177,6 +185,18 @@ class OcrBulletinPageTests(unittest.TestCase):
                 html_output.index("Bulletin — Original PDF Version"),
                 html_output.index("Bulletin — OCR Extracted Plain Text"),
             )
+
+    def test_extract_ocr_fragment_from_standalone_ocr_body(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            path = Path(tmpdir) / "derry-ocr.html"
+            path.write_text(
+                '<html><body><div class="ocr-body" id="ocr-text">'
+                '<p class="page-label">Page 1</p><p>Church Car Park will be closed</p>'
+                '</div><p class="note-box">Check the original PDF.</p></body></html>',
+                encoding="utf-8",
+            )
+            fragment = extract_ocr_fragment(path, tighten=False)
+            self.assertIn("Church Car Park will be closed", fragment)
 
     def test_render_pdf_standalone_page(self) -> None:
         config = DioceseConfig(
@@ -217,7 +237,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("pdf-inpage-pages", panel)
         self.assertIn("Open PDF", panel)
         self.assertIn("Download", panel)
-        self.assertIn('target="_blank"', panel)
+        self.assertNotIn('target="_blank"', panel)
         self.assertNotIn("pdf-inpage-prev", panel)
         self.assertNotIn("pdf-inpage-next", panel)
         self.assertNotIn("pdf-inpage-page-label", panel)
@@ -239,13 +259,14 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("display: flex !important", css)
         self.assertIn(".pdf-frame-wrap iframe", css)
         self.assertIn("min-height: 850px", css)
-        self.assertIn("height: 850px", css)
+        self.assertIn("height: auto", css)
         self.assertNotIn("85vh", css)
         self.assertIn("min-height: 450px", css)
         self.assertIn("overflow: auto", css)
         self.assertIn(".pdf-inpage-viewer", css)
         self.assertRegex(css, r"\.pdf-inpage-pages\s*\{[^}]*height:\s*850px")
         self.assertRegex(css, r"\.pdf-inpage-pages\s*\{[^}]*min-height:\s*850px")
+        self.assertRegex(css, r"\.pdf-inpage-pages\s*\{[^}]*overflow:\s*auto")
         self.assertIn(".pdf-inpage-viewer", css)
         self.assertIn(".pdf-inpage-pages", css)
         self.assertNotIn("pdf-inpage-nav", css)
@@ -271,6 +292,7 @@ class OcrBulletinPageTests(unittest.TestCase):
             parish_links_html='<ul class="parish-grid"><li>Example Parish</li></ul>',
         )
         self.assertIn("Sunday mass at 10am", html_output)
+        self.assertIn('href="/favicon.png"', html_output)
         self.assertIn('id="panel-pdf"', html_output)
         self.assertIn('id="panel-ocr"', html_output)
         self.assertIn("https://example.com/example-pdf.html", html_output)
@@ -297,7 +319,15 @@ class OcrBulletinPageTests(unittest.TestCase):
         )
         self.assertRegex(
             html_output,
+            r"\.pdf-inpage-pages\s*\{[^}]*overflow:\s*auto",
+        )
+        self.assertRegex(
+            html_output,
             r"#ocr-panel\s*\{[^}]*height:\s*850px",
+        )
+        self.assertRegex(
+            html_output,
+            r"#ocr-panel\s*\{[^}]*overflow:\s*auto",
         )
         self.assertRegex(
             html_output,
@@ -311,6 +341,8 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("Tap to go to plain text bulletin", html_output)
         self.assertIn('id="ocr-search"', html_output)
         self.assertIn("ocr-sticky-chrome", html_output)
+        self.assertIn(".ocr-sticky-chrome.is-searching", html_output)
+        self.assertIn("syncOcrSearchSticky", html_output)
         self.assertIn('id="scroll-top-btn"', html_output)
         self.assertIn("Georgia", html_output)
         self.assertIn("pdf-inpage-viewer", html_output)
@@ -330,17 +362,31 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("disableAutoFetch", text)
         self.assertIn("disableStream", text)
         self.assertIn("disableRange", text)
+        self.assertIn("disableStream: false", text)
+        self.assertIn("disableRange: false", text)
+        self.assertNotIn("disableStream: phone", text)
+        self.assertNotIn("disableRange: phone", text)
         self.assertIn("cdnjs.cloudflare.com/ajax/libs/pdf.js", text)
         self.assertNotIn("docs.google.com", text)
         self.assertIn("is-native-pdf", text)
         self.assertIn("stackAllPages", text)
+        self.assertIn("IntersectionObserver", text)
+        self.assertIn("parishPressScrollPdfToPage", text)
+        self.assertIn("fixMobilePdfLinks", text)
+        self.assertIn("isPhone", text)
         self.assertIn("numPages", text)
         self.assertIn("getAnnotations", text)
         self.assertIn("pdf-annot-link", text)
         self.assertIn('target = "_blank"', text)
         self.assertIn("noopener noreferrer", text)
         self.assertIn("min-height:850px", text.replace(" ", ""))
-        self.assertIn("height:850px", text.replace(" ", ""))
+        self.assertIn("height:850px!important", text.replace(" ", ""))
+        self.assertIn("max-height:850px!important", text.replace(" ", ""))
+        self.assertIn("overflow:auto!important", text.replace(" ", ""))
+        self.assertIn("root: pagesEl", text)
+        self.assertIn("ensureOcrStickyChrome", text)
+        self.assertIn("ensureScrollTop", text)
+        self.assertIn("#ocr-panel", text)
         self.assertNotIn("85vh", text)
         self.assertIn(".pdf-inpage-pages", text)
         self.assertIn("Open PDF", text)
@@ -360,18 +406,20 @@ class OcrBulletinPageTests(unittest.TestCase):
         docs = Path(__file__).resolve().parent.parent / "docs"
         html_live = (docs / "parishes" / "raphoe" / "gort-a-choirce.html").read_text(encoding="utf-8")
         self.assertIn("AIFRINN NA SEACHTAINE", html_live)
-        self.assertIn("GORT A", html_live)
+        self.assertIn("Gortahork", html_live)
         self.assertIn("16ú Lúnasa 2026", html_live)
         self.assertIn("Donnchadh", html_live)
-        self.assertRegex(html_live, r"\.pdf-inpage-pages\s*\{[^}]*height:\s*850px")
-        self.assertRegex(html_live, r"\.pdf-inpage-pages\s*\{[^}]*min-height:\s*850px")
-        self.assertRegex(html_live, r"#ocr-panel\s*\{[^}]*height:\s*850px")
-        self.assertRegex(html_live, r"#ocr-panel\s*\{[^}]*min-height:\s*850px")
+        viewer = (docs / "assets" / "pdf-inpage-viewer.js").read_text(encoding="utf-8")
+        self.assertIn("height:850px!important", viewer.replace(" ", ""))
+        self.assertIn("max-height:850px!important", viewer.replace(" ", ""))
+        self.assertIn("overflow:auto!important", viewer.replace(" ", ""))
+        self.assertIn("height:850px!important", viewer.replace(" ", ""))
+        self.assertIn("#ocr-panel{height:850px!important", viewer.replace(" ", ""))
         self.assertNotIn("85vh", html_live)
         self.assertIn("min-height: 450px", html_live)
         diocese = (docs / "dioceses" / "raphoe" / "index.html").read_text(encoding="utf-8")
         self.assertIn("AIFRINN NA SEACHTAINE", diocese)
-        self.assertRegex(diocese, r"\.pdf-inpage-pages\s*\{[^}]*height:\s*850px")
+        self.assertIn("pdf-inpage-viewer.js", diocese)
         self.assertNotIn("85vh", diocese)
 
     def test_live_diocese_html_ships_inpage_viewer(self) -> None:
@@ -392,6 +440,11 @@ class OcrBulletinPageTests(unittest.TestCase):
                 html_live,
                 r"\.pdf-frame-wrap\s*\{[^}]*min-height:\s*850px",
                 msg=f"{rel} lost desktop PDF min-height 850px",
+            )
+            self.assertRegex(
+                html_live,
+                r"#ocr-panel\s*\{[^}]*min-height:\s*850px",
+                msg=f"{rel} lost desktop OCR min-height 850px",
             )
             self.assertRegex(
                 html_live,
@@ -427,9 +480,13 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("Gaeilge", html_output)
         self.assertIn("19/05/2026", html_output)
         self.assertIn("ocr-sticky-chrome", html_output)
+        self.assertIn(".ocr-sticky-chrome.is-searching", html_output)
         self.assertIn("position: sticky", html_output)
+        self.assertIn("syncOcrSearchSticky", html_output)
+        self.assertIn("is-ocr-searching", html_output)
         self.assertIn('id="scroll-top-btn"', html_output)
         self.assertIn("Back to top", html_output)
+        self.assertIn('href="/favicon.png"', html_output)
 
     def test_ocr_reading_styles_are_legible(self) -> None:
         """OCR pane must stay easy to read: soft paper, generous measure/line-height,

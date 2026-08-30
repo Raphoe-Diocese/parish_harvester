@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
   <title>Dungiven Text Bulletin — 21/08/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -14,7 +16,7 @@
       font-size: 1.125rem;
       -webkit-text-size-adjust: 100%;
       text-size-adjust: 100%;
-      overflow-x: hidden;
+      overflow-x: clip;
     }
     a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
     .page {
@@ -36,8 +38,62 @@
       font-size: 1rem; font-weight: 700; color: #1a1f1e;
     }
     .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 40;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+      box-shadow: 0 8px 16px #eef1f0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 8rem; }
+    mark.search-active { scroll-margin-top: 8rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 30;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
     .ocr-zoom-bar {
-      position: sticky; top: 0; z-index: 6;
       display: flex; justify-content: center; align-items: center; gap: 8px;
       margin: 0 0 10px; padding: 6px 10px;
       background: rgba(255, 255, 255, 0.92);
@@ -63,7 +119,7 @@
       max-width: min(72ch, 100%);
       margin-left: auto;
       margin-right: auto;
-      overflow-x: hidden;
+      overflow-x: clip;
       overflow-wrap: anywhere;
       word-wrap: break-word;
       hyphens: auto;
@@ -274,6 +330,7 @@
         <span class="title-line">DUNGIVEN Text Bulletin · 21/08/2026</span>
       </div>
     </div>
+    <div class="ocr-sticky-chrome">
     <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
       <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
       <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
@@ -293,7 +350,9 @@
         </div>
       </div>
     </div>
-    <div class="ocr-body" id="ocr-text"><p class="page-label">Page 47</p>
+    </div>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Dungiven</h2><p class="ocr-parish-date">21/08/2026</p></header>
+<p class="page-label">Page 1</p>
 <h3 class="b-head">SUNDAY MASS TIMES</h3>
 <p>Sat. 4.30 pm. - Gortnaghey<br>
 Sat. 6.00 pm. - Dungiven<br>
@@ -305,10 +364,10 @@ Sun. 11.30 am. - Dungiven</p>
 Wednesday 10.00 am. Thursday 7.00 pm.<br>
 Friday 10.00 am.<br>
 MONTH’S MIND MASSES<br>
-For Donal Kealey on Saturday 2nd<br>
+For Donal Kealey on Saturday 22nd<br>
 August at 4.30 pm.in Imm. Conception<br>
 Church, Gortnaghey.<br>
-For Margaret Bond on Saturday 2nd<br>
+For Margaret Bond on Saturday 22nd<br>
 August at 6.00 pm. in St. Patrick’s Church<br>
 CONFESSIONS<br>
 Will take place in St. Patrick’s<br>
@@ -337,6 +396,7 @@ DEATH<br>
 We extend our sympathy to the O’Kane<br>
 family circle on the death of Ben O’Kane,<br>
 Magherabuoy Terrace. May he rest in<br>
+peace.<br>
 WEDDING BELLS - We<br>
 congratulate Shauna Lynch and<br>
 Kiernan McCormick on the occasion of<br>
@@ -353,6 +413,7 @@ your interest by texting Mary McKnight<br>
 on <a href="tel:+3537548887" style="color:#1d4ed8;font-weight:600;">07548 887</a> 853 , or by leaving your<br>
 name with the Parish Office. The<br>
 approximate bus fare will be £25 per<br>
+person.<br>
 BENEDY COMMUNITY ASSOCIATION<br>
 We wish to employ a person for 6 hours<br>
 on a Monday for catering duties. Start<br>
@@ -449,10 +510,9 @@ PRONI staff in the library&#x27;s lobby area.<br>
 16th August 2026 Dungiven Parish Bulletin No 1856<br>
 Fr. Gerard Sweeney P.P. Tel: 777 41219.<br>
 Parish Office Tel: 777 40702. Email address<br>
-Parish Website <a href="https://www.parishofdungiven.com" target="_blank" rel="noopener noreferrer">https://www.parishofdungiven.com</a></p>
-<h2 class="ocr-parish-name">Dungiven</h2>
-<p>21/08/2026</p>
-<hr></div>
+<a href="mailto:dungivenparish@derrydiocese.org" target="_blank" rel="noopener noreferrer">dungivenparish@derrydiocese.org</a><br>
+Parish Website <a href="https://www.parishofdungiven.com" target="_blank" rel="noopener noreferrer">https://www.parishofdungiven.com</a><br>
+Dungiven</p></div>
     <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
   </div>
   <script>
@@ -518,7 +578,7 @@ Parish Website <a href="https://www.parishofdungiven.com" target="_blank" rel="n
         if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
         ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
         ocrMatches[idx].classList.add('search-active');
-        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
       function updateMatchUi() {
         const total = ocrMatches.length;
@@ -600,6 +660,48 @@ Parish Website <a href="https://www.parishofdungiven.com" target="_blank" rel="n
         }
       });
     })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      var btn = document.getElementById('scroll-top-btn');
+      if (!btn) return;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function shown() {
+        var y = window.scrollY || document.documentElement.scrollTop || 0;
+        btn.classList.toggle('is-visible', y > 240);
+      }
+      window.addEventListener('scroll', shown, { passive: true });
+      shown();
+      btn.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      });
+    })();
+    
   </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
 </body>
 </html>

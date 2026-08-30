@@ -156,7 +156,14 @@ _D_M_YY_DOT_IN_URL_RE = re.compile(r"(?<!\d)(\d{1,2})\.(\d{1,2})\.(\d{2})(?!\d)"
 # named after the liturgical feast: "Sixteenth-Sunday-of-Ordinary-Time.pdf"). Used
 # as a score floor so a recent undated bulletin still outranks an old but
 # explicitly-dated one from a prior year (see glenariffeparish 2026-08-09 fix).
-_WP_UPLOADS_YEAR_MONTH_RE = re.compile(r"/wp-content/uploads/(20\d{2})/(0?[1-9]|1[0-2])/", re.IGNORECASE)
+# WordPress and Kirby/custom parish CMS folders. kincasslagh.ie uses
+# /app/uploads/YYYY/MM/ not /wp-content/uploads/ — without that, an
+# undated Newsletter-21st-Aug.pdf scored 0 and lost to 20260705.pdf
+# (found 2026-08-23).
+_WP_UPLOADS_YEAR_MONTH_RE = re.compile(
+    r"/(?:wp-content/|app/)?uploads/(20\d{2})/(0?[1-9]|1[0-2])/",
+    re.IGNORECASE,
+)
 
 
 def _is_non_bulletin_url(url: str) -> bool:
@@ -327,6 +334,20 @@ def _score_bulletin_url(url: str) -> tuple[int, int]:
     parsed = extract_date_from_string(text)
     if parsed:
         date_score = max(date_score, parsed.year * 10000 + parsed.month * 100 + parsed.day)
+    today = date.today()
+    yearless = yearless_slug_date(text, today.year, near=today)
+    if yearless:
+        date_score = max(
+            date_score, yearless.year * 10000 + yearless.month * 100 + yearless.day
+        )
+    liturgical = liturgical_date_from_text(
+        text, year_hint_from_upload_url(text, today.year)
+    )
+    if liturgical:
+        date_score = max(
+            date_score,
+            liturgical.year * 10000 + liturgical.month * 100 + liturgical.day,
+        )
     # Floor: an undated slug still belongs to its upload month (WordPress
     # /uploads/YYYY/MM/ folder), so it should outrank an older bulletin that
     # merely happens to have an explicit (but stale) date in its filename.
@@ -1590,6 +1611,7 @@ async def _try_predicted_dated_pdf(
     target_date: date,
     *,
     weeks_back: int = 8,
+    weeks_ahead: int = 0,
 ) -> tuple[str, str] | None:
     """Try rewrite_date_url guesses for *target_date* and previous Sundays.
 
@@ -1598,7 +1620,10 @@ async def _try_predicted_dated_pdf(
     (newtownkilleaparish.ie).
     """
     for url in predicted_dated_upload_urls(
-        example_url, target_date, weeks_back=weeks_back
+        example_url,
+        target_date,
+        weeks_back=weeks_back,
+        weeks_ahead=weeks_ahead,
     ):
         file_result = await asyncio.to_thread(
             _fetch_bytes_with_retries,
@@ -1756,7 +1781,7 @@ def _score_wordpress_post_hrefs(
             or extract_date_from_string(slug)
             or liturgical_date_from_text(slug, target_date.year)
         )
-        if found and found <= target_date + timedelta(days=3):
+        if found and found <= target_date + timedelta(days=_HTTP_SCRAPE_AHEAD_DAYS):
             scored.append((found, href))
     return scored
 
@@ -2051,7 +2076,7 @@ def _extract_scored_upload_images(
             or extract_bulletin_date(url)
             or date(year, month, 1)
         )
-        if found <= target_date + timedelta(days=3):
+        if found <= target_date + timedelta(days=_HTTP_SCRAPE_AHEAD_DAYS):
             scored.append((found, url))
     return scored
 
@@ -3590,8 +3615,13 @@ async def replay_recipe(
         if not example_url:
             example_url = start_url
         weeks_back = int(recipe.get("weeks_back") or 8)
+        weeks_ahead = int(recipe.get("weeks_ahead") or 0)
         found = await _try_predicted_dated_pdf(
-            example_url, dest, target_date, weeks_back=weeks_back
+            example_url,
+            dest,
+            target_date,
+            weeks_back=weeks_back,
+            weeks_ahead=weeks_ahead,
         )
         if found:
             return dest, found[1], found[0]

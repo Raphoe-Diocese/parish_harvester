@@ -11,7 +11,7 @@ from harvester.fetcher import parse_evidence_file
 from harvester.page_renderer import (
     render_diocese_raphoe_page,
 )
-from harvester.site_chrome import scroll_top_css, scroll_top_html, scroll_top_js
+from harvester.site_chrome import favicon_link_tags, scroll_top_css, scroll_top_html, scroll_top_js
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DOCS_DIR = REPO_ROOT / "docs"
@@ -556,6 +556,7 @@ def _placeholder_page(diocese: DioceseCard, out_path: Path) -> None:
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{html.escape(diocese.name)} Collated Bulletin — Parish Press</title>
+  {favicon_link_tags()}
   <style>
     * {{ box-sizing: border-box; }}
     body {{
@@ -622,6 +623,81 @@ def _status_dot(avg_success_rate: float | None) -> str:
     return "🔴"
 
 
+def _status_label(avg_success_rate: float | None) -> str:
+    """Keep homepage card status on one line so the four cards stay level."""
+    if avg_success_rate is None:
+        return "No data yet"
+    return "Reliability available"
+
+
+# Public ready-by time on diocese cards (Irish clock). Harvest cron is 10:00 IST;
+# Frank asked for 16:00 as the time readers should expect the week's set.
+BULLETINS_READY_AT = "16:00"
+
+
+def _ready_count_text(ready: int | None, total: int | None) -> str:
+    """Placeholder until harvest fills the real this-week count. Do not invent."""
+    if ready is None or total is None:
+        return "—/—"
+    return f"{ready}/{total}"
+
+
+def _live_card_ready_html(row: dict[str, str]) -> str:
+    count = _ready_count_text(
+        row.get("ready_count") if isinstance(row.get("ready_count"), int) else None,
+        row.get("total_count") if isinstance(row.get("total_count"), int) else None,
+    )
+    return (
+        "<p class=\"live-card-eyebrow\">"
+        f"<span class=\"live-card-ready\">Bulletins ready @ {html.escape(BULLETINS_READY_AT)}</span>"
+        f"<span class=\"live-card-count\">{html.escape(count)} available</span>"
+        "</p>"
+    )
+
+
+_LONG_NAME_CHARS = 20
+_VERY_LONG_NAME_CHARS = 28
+
+
+def _short_diocese_name(name: str) -> str:
+    """Ampersand form so long Irish diocese names stay on one line."""
+    short = name.removesuffix(" Diocese").strip()
+    short = short.replace("-and-", " & ").replace(" and ", " & ")
+    return re.sub(r"\s+", " ", short).strip()
+
+
+def _length_class(label: str) -> str:
+    n = len(label)
+    if n >= _VERY_LONG_NAME_CHARS:
+        return "is-very-long"
+    if n >= _LONG_NAME_CHARS:
+        return "is-long"
+    return ""
+
+
+def _class_attr(label: str) -> str:
+    css = _length_class(label)
+    return f' class="{css}"' if css else ""
+
+
+def _live_card_heading(name: str) -> str:
+    return f"{_short_diocese_name(name)} Diocese"
+
+
+def _live_card_heading_html(name: str) -> str:
+    heading = _live_card_heading(name)
+    return f"<h2{_class_attr(heading)}>{html.escape(heading)}</h2>"
+
+
+def _more_diocese_item_html(row: dict[str, str]) -> str:
+    label = _short_diocese_name(row["name"])
+    return (
+        f"<li{_class_attr(label)}>{row['dot']} "
+        f"<a href=\"dioceses/{row['key']}/\" target=\"_blank\" rel=\"noopener noreferrer\">"
+        f"{html.escape(label)}</a></li>"
+    )
+
+
 def _landing_page(rows: list[dict[str, str]]) -> str:
     """Homepage: live dioceses prominent up top, the rest collapsed.
 
@@ -653,12 +729,12 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
             "<article class=\"live-card\">"
             f"{photo}"
             "<div class=\"live-card-body\">"
-            f"<p class=\"live-card-eyebrow\">{row['dot']} {html.escape(row['status_label'])}</p>"
-            f"<h2>{html.escape(row['name'])} Diocese</h2>"
+            f"{_live_card_ready_html(row)}"
+            f"{_live_card_heading_html(row['name'])}"
             f"<p class=\"live-card-updated\">Updated {html.escape(row['updated'])}</p>"
             "<div class=\"live-card-actions\">"
             f"<a class=\"live-btn primary\" href=\"dioceses/{row['key']}/\" target=\"_blank\" rel=\"noopener noreferrer\">Open bulletin</a>"
-            f"<a class=\"live-btn secondary\" href=\"{html.escape(_mega_pdf_url(row['key'], same_origin=True), quote=True)}\" target=\"_blank\" rel=\"noopener noreferrer\">Mega PDF</a>"
+            f"<a class=\"live-btn secondary\" href=\"{html.escape(_mega_pdf_url(row['key'], same_origin=True), quote=True)}\">Mega PDF</a>"
             f"<a class=\"live-btn secondary\" href=\"{html.escape(_ocr_standalone_url(row['key']), quote=True)}\" target=\"_blank\" rel=\"noopener noreferrer\">Text</a>"
             "</div>"
             "</div>"
@@ -667,10 +743,7 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
 
     live_cards_html = "".join(_live_card(row) for row in live_rows)
 
-    other_rows_html = "".join(
-        f"<li>{row['dot']} <a href=\"dioceses/{row['key']}/\" target=\"_blank\" rel=\"noopener noreferrer\">{html.escape(row['name'])}</a></li>"
-        for row in other_rows
-    )
+    other_rows_html = "".join(_more_diocese_item_html(row) for row in other_rows)
 
     return f"""<!DOCTYPE html>
 <html lang=\"en\">
@@ -678,6 +751,7 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
   <meta charset=\"utf-8\" />
   <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
   <title>Parish Press — Irish Catholic Bulletins</title>
+  {favicon_link_tags()}
   <link rel=\"stylesheet\" href=\"assets/site.css\" />
   <style>
     * {{ box-sizing: border-box; }}
@@ -751,8 +825,26 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     .live-card-photo {{ height: 118px; background: #0f2f2f; }}
     .live-card-photo-empty {{ background: linear-gradient(135deg, #1a6b6b, #3fae9a); }}
     .live-card-body {{ padding: 10px 12px 12px; }}
-    .live-card-eyebrow {{ margin: 0 0 4px; font-size: 0.7rem; font-weight: 700; color: #4b5563; text-transform: uppercase; letter-spacing: 0.04em; }}
-    .live-card h2 {{ margin: 0 0 2px; font-size: 1.02rem; color: #114b4b; }}
+    .live-card-eyebrow {{
+      margin: 0 0 4px;
+      display: flex;
+      flex-direction: column;
+      gap: 1px;
+      font-size: 0.68rem;
+      font-weight: 600;
+      color: #4b5563;
+      letter-spacing: 0.01em;
+      line-height: 1.25;
+      white-space: nowrap;
+    }}
+    .live-card h2 {{
+      margin: 0 0 2px;
+      font-size: 1.02rem;
+      color: #114b4b;
+      white-space: nowrap;
+    }}
+    .live-card h2.is-long {{ font-size: 0.82rem; }}
+    .live-card h2.is-very-long {{ font-size: 0.7rem; }}
     .live-card-updated {{ margin: 0 0 8px; color: #6b7686; font-size: 0.78rem; }}
     .live-card-actions {{ display: flex; flex-direction: column; gap: 6px; }}
     .live-btn {{ display: inline-flex; align-items: center; justify-content: center; padding: 7px 10px; border-radius: 8px; font-weight: 700; font-size: 0.8rem; text-decoration: none; }}
@@ -771,8 +863,10 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     .more-dioceses summary::before {{ content: "▸ "; }}
     .more-dioceses[open] summary::before {{ content: "▾ "; }}
     .more-dioceses-note {{ margin: 10px 0 12px; color: #6b7280; font-size: 0.88rem; }}
-    .more-dioceses-grid {{ list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(190px, 1fr)); gap: 6px 16px; }}
-    .more-dioceses-grid li {{ margin: 0; font-size: 0.92rem; }}
+    .more-dioceses-grid {{ list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 6px 16px; }}
+    .more-dioceses-grid li {{ margin: 0; font-size: 0.92rem; white-space: nowrap; }}
+    .more-dioceses-grid li.is-long {{ font-size: 0.8rem; }}
+    .more-dioceses-grid li.is-very-long {{ font-size: 0.7rem; }}
     .more-dioceses-grid a {{ color: #375569; text-decoration: none; }}
     .more-dioceses-grid a:hover {{ text-decoration: underline; color: #1a6b6b; }}
     .footer {{ border-top: 1px solid #d6ecea; margin-top: 28px; padding: 16px 16px 28px; color: #16202a; font-size: 0.92rem; line-height: 1.6; }}
@@ -797,7 +891,7 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
   <main class=\"content\">
     <div class=\"intro\">
       <h1>Welcome to Parish Press</h1>
-      <p>Weekly Catholic parish bulletins from across Ireland, in one place. Always check Mass times and names against the original PDF.</p>
+      <p>Weekly Catholic parish bulletins from across Ireland, in one place. Parish Press is an ongoing project. Searchable text is produced automatically from each week's PDFs and may be incomplete — please confirm Mass times, names, and notices against the original PDF.</p>
     </div>
     <p class=\"section-title\">Live dioceses</p>
     <section class=\"live-grid\">{live_cards_html}</section>
@@ -881,6 +975,7 @@ def _subscribe_page(dioceses: list[DioceseCard]) -> str:
   <meta charset=\"utf-8\" />
   <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
   <title>Subscribe — Parish Press</title>
+  {favicon_link_tags()}
   <link rel=\"stylesheet\" href=\"../assets/site.css\" />
 </head>
 <body>
@@ -1007,7 +1102,7 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
                     rates.append(float(rate))
         avg = (sum(rates) / len(rates)) if rates else None
         dot = _status_dot(avg)
-        status_label = "Reliability available" if avg is not None else "No reliability data yet"
+        status_label = _status_label(avg)
         rows.append(
             {
                 "key": diocese.key,
@@ -1015,6 +1110,8 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
                 "dot": dot,
                 "status_label": status_label,
                 "updated": updated_label,
+                "ready_count": None,
+                "total_count": None,
             }
         )
 

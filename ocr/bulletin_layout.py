@@ -87,6 +87,14 @@ _URL_ONLY = re.compile(
     r"^(?:https?://|www\.)\S+$",
     re.IGNORECASE,
 )
+# Bare hostnames such as parishoflisburn.org — not wrap leftovers like "recently."
+_BARE_DOMAIN = re.compile(
+    r"^(?:www\.)?"
+    r"[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?"
+    r"(?:\.[a-z0-9](?:[a-z0-9-]{0,61}[a-z0-9])?)+"
+    r"(?:/\S*)?$",
+    re.IGNORECASE,
+)
 
 _TOKEN_RE = re.compile(
     r"(<header\b[^>]*class=\"[^\"]*ocr-parish-masthead[\s\S]*?</header>)"
@@ -193,6 +201,26 @@ def render_parish_masthead(
     )
 
 
+def _notice_before_trailing_parish(plain: str, display_name: str) -> str:
+    """Keep a real notice when a stitcher name is glued onto the last line.
+
+    Mega extract often ends a page with ``******Church Car Park…*******  Ballycastle``
+    then the parish URL. That is a notice plus a banner, not a title line.
+    """
+    text = _plain(plain)
+    name = (display_name or "").strip()
+    if not text or not name:
+        return ""
+    lower = text.lower()
+    needle = name.lower()
+    if not lower.endswith(needle):
+        return ""
+    prefix = text[: -len(name)].strip(" \t*-.")
+    if len(prefix) < 40:
+        return ""
+    return prefix
+
+
 def _looks_like_parish_name(plain: str, entries: list[tuple[str, str, list[str], list[str]]], next_plain: str) -> tuple[str, str] | None:
     cleaned = _cleaned_title(plain)
     self_has_url = bool(_URL_ONLY.match(cleaned) or "http" in cleaned.lower() or cleaned.lower().startswith("www."))
@@ -206,6 +234,10 @@ def _looks_like_parish_name(plain: str, entries: list[tuple[str, str, list[str],
             self_has_url=self_has_url,
         ):
             return key, display_name
+        # URL may sit in the next <p>, so banner matching never sees it.
+        # A long notice that merely ends with the parish name still counts.
+        if _notice_before_trailing_parish(plain, display_name):
+            return key, display_name
     return None
 
 
@@ -215,8 +247,10 @@ def _is_url_only_line(plain: str) -> bool:
         return False
     if _URL_ONLY.match(text):
         return True
-    compact = text.lower().replace("https://", "").replace("http://", "")
-    return bool(compact) and " " not in compact and "." in compact and len(compact) < 80
+    compact = text.lower().replace("https://", "").replace("http://", "").rstrip(".")
+    if " " in compact or "." not in compact or len(compact) >= 80:
+        return False
+    return bool(_BARE_DOMAIN.match(compact))
 
 
 def _emit_paragraph(lines: list[str]) -> str:
@@ -309,6 +343,9 @@ def structure_ocr_html(
             if allow_parish and packed:
                 hit = _looks_like_parish_name(plain, packed, nxt)
                 if hit:
+                    leftover = _notice_before_trailing_parish(plain, hit[1])
+                    if leftover:
+                        body.append(html.escape(leftover))
                     flush()
                     add_masthead(hit[1], hit[0])
                     continue

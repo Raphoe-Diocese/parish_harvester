@@ -1,18 +1,32 @@
 {
-  "version": 1,
+  "version": 3,
   "parish_key": "antrimparish",
   "display_name": "Antrim",
   "diocese": "down_and_connor",
-  "start_url": "https://www.antrimparish.com/bulletinpage/",
+  "start_url": "https://www-static.antrimparish.com/wp-content/uploads/2026/08/23rd-August-2026.pdf",
+  "site_type": "predicted_dated_pdf",
+  "playbook_type": "pdf_download_list",
+  "weeks_back": 4,
+  "weeks_ahead": 1,
   "steps": [
     {
       "action": "download",
-      "url_pattern": "*.pdf"
+      "url": "https://www-static.antrimparish.com/wp-content/uploads/2026/08/23rd-August-2026.pdf"
     }
   ],
-  "observed_load_ms": 2788927885,
-  "timeout_ms": 300000,
-  "total_timeout_s": 900,
-  "navigation_wait_until": "commit",
-  "recorded_date": "2026-08-16"
+  "timeout_ms": 60000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-08-28",
+  "operator_notes": [
+    "Listing /bulletinpage/ embeds dated PDFs on www-static via PDF Embedder.",
+    "CONFIRMED 2026-08-28: https://www-static.antrimparish.com/wp-content/uploads/2026/08/30th-August-August-2026-1-1.pdf HTTP 200, 345797 bytes, application/pdf. Visual masthead is 30th August 2026, 22nd Sunday in Ordinary Time.",
+    "30th-August-2026.pdf is 404. The live name doubles the month and adds -1-1.",
+    "www.antrimparish.com times out from GitHub Playwright (ERR_CONNECTION_TIMED_OUT). Never open /bulletinpage/ on harvest. Predict www-static files only.",
+    "weeks_ahead=1 because they post next Sunday on Friday."
+  ],
+  "do_not": [
+    "Do not set start_url to https://www.antrimparish.com/bulletinpage/ — GitHub Playwright times out there.",
+    "Do not pin only 30th-August-August-2026-1-1.pdf — predict the date each week.",
+    "Do not harvest Volunteer-EOI-form.pdf."
+  ]
 }

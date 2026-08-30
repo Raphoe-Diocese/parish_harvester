@@ -189,8 +189,17 @@ jobs:
           mkdir -p docs/mega_pdf
           for pdf in "${STAGED_PDFS[@]}"; do
             [ -n "${pdf}" ] || continue
-            cp "${pdf}" "docs/mega_pdf/$(basename "${pdf}")"
-            ls -lh "docs/mega_pdf/$(basename "${pdf}")"
+            dest="docs/mega_pdf/$(basename "${pdf}")"
+            if [ -f "${dest}" ]; then
+              src_sz=$(stat -c%s "${pdf}")
+              dest_sz=$(stat -c%s "${dest}")
+              if [ "${src_sz}" -gt "${dest_sz}" ]; then
+                echo "Keep smaller committed ${dest} (${dest_sz}) — skip larger staged ${src_sz}"
+                continue
+              fi
+            fi
+            cp "${pdf}" "${dest}"
+            ls -lh "${dest}"
           done
           echo "Copied staged mega PDFs into docs/mega_pdf for Pages"
 

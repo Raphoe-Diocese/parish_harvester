@@ -16,7 +16,7 @@ from PyPDF2 import PdfReader
 from harvester.ai_summaries import summarise_bulletin
 from harvester.events_extractor import extract_events, write_events_json
 from harvester.weekly_diff import diff_bulletins
-from harvester.site_chrome import scroll_top_css, scroll_top_html, scroll_top_js, sticky_search_css
+from harvester.site_chrome import favicon_link_tags, scroll_top_css, scroll_top_html, scroll_top_js, sticky_search_css, sticky_search_js
 from ocr.bulletin_layout import ocr_masthead_css, structure_ocr_html
 from ocr.parish_splitter import split_ocr_by_parish
 
@@ -35,6 +35,10 @@ CONTACTS_PATH_BY_DIOCESE = {
 
 HEADER_PATTERN = re.compile(r"^#\s*---\s*(.*?)\s*---\s*$")
 OCR_BODY_PATTERN = re.compile(r'<div class="scrollable-viewer">\s*(.*?)\s*</div>\s*</body>', re.DOTALL | re.IGNORECASE)
+OCR_STANDALONE_BODY_PATTERN = re.compile(
+    r'<div class="ocr-body"[^>]*>\s*(.*?)\s*</div>\s*<p class="note-box">',
+    re.DOTALL | re.IGNORECASE,
+)
 OCR_PAGE_HEADING_PATTERN = re.compile(r"<h2>\s*Page\s+(\d+)\s*</h2>", re.IGNORECASE)
 VIEWER_FILE_PATTERN = re.compile(r"^([a-z0-9_]+)-(\d{4}-\d{2}-\d{2})\.html$")
 OCR_PANEL_PATTERN = re.compile(
@@ -74,7 +78,7 @@ def ocr_reading_css(selector: str) -> str:
       max-width: {OCR_MEASURE};
       margin-left: auto;
       margin-right: auto;
-      overflow-x: hidden;
+      overflow-x: clip;
       overflow-wrap: anywhere;
       word-wrap: break-word;
       hyphens: auto;
@@ -280,6 +284,10 @@ def parse_parish_links(path: Path) -> list[tuple[str, str]]:
 def extract_ocr_fragment(path: Path, *, tighten: bool = True) -> str:
     raw_html = path.read_text(encoding="utf-8")
     match = OCR_BODY_PATTERN.search(raw_html)
+    if not match:
+        match = OCR_STANDALONE_BODY_PATTERN.search(raw_html)
+    if not match:
+        match = OCR_PANEL_PATTERN.search(raw_html)
     if not match:
         raise ValueError(f"Could not find OCR content wrapper in {path}")
     fragment = OCR_PAGE_HEADING_PATTERN.sub(r"<h3>PAGE \1</h3>", match.group(1).strip())
@@ -825,6 +833,7 @@ def render_ocr_standalone_page(
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
   <title>{html.escape(config.display_name)} Text Bulletin — {html.escape(uk_bulletin_date)}</title>
+  {favicon_link_tags()}
   <style>
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
     body {{
@@ -835,7 +844,7 @@ def render_ocr_standalone_page(
       font-size: {OCR_BASE_SIZE};
       -webkit-text-size-adjust: 100%;
       text-size-adjust: 100%;
-      overflow-x: hidden;
+      overflow-x: clip;
     }}
     a {{ color: {TEAL}; text-decoration: underline; font-weight: 600; }}
     .page {{
@@ -1027,7 +1036,7 @@ def render_ocr_standalone_page(
         if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
         ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
         ocrMatches[idx].classList.add('search-active');
-        ocrMatches[idx].scrollIntoView({{ behavior: 'smooth', block: 'center' }});
+        ocrMatches[idx].scrollIntoView({{ behavior: 'smooth', block: 'start' }});
       }}
       function updateMatchUi() {{
         const total = ocrMatches.length;
@@ -1109,6 +1118,7 @@ def render_ocr_standalone_page(
         }}
       }});
     }})();
+    {sticky_search_js()}
     {scroll_top_js()}
   </script>
   {scroll_top_html()}
@@ -1144,15 +1154,16 @@ def prefers_native_pdf_js() -> str:
 """
 
 
-PDF_INPAGE_VIEWER_SRC = "/assets/pdf-inpage-viewer.js"
+PDF_INPAGE_VIEWER_SRC = "/assets/pdf-inpage-viewer.js?v=20260827b"
 
 
 def pdf_inpage_viewer_css() -> str:
     """Hide the raw-PDF iframe on every device; show stacked PDF.js pages.
 
-    The VISIBLE gray box is ``.pdf-inpage-pages`` (iframe is display:none).
-    Desktop that box is 850px tall. Tablet/phone (max-width 1024px): 450px.
-    The wrap must grow around the toolbar + 850px pages — do not clip with 85vh.
+    The VISIBLE gray box is ``.pdf-inpage-pages`` (raw iframe is display:none
+    so Chrome does not show Page X of Y). Desktop: locked **850px** height
+    with inner scroll — not every parish down the page. Tablet/phone
+    (max-width 1024px): locked **450px** box. Do not clip with 85vh.
     """
     return f"""
     .pdf-inpage-viewer,
@@ -1180,11 +1191,11 @@ def pdf_inpage_viewer_css() -> str:
     .pdf-inpage-status {{ padding: 10px 12px; background: #1f3d3c; color: #d8f0ee; font-size: 0.9rem; }}
     .pdf-inpage-pages {{
       box-sizing: border-box;
-      flex: 0 0 auto;
+      flex: 1 1 auto;
       height: 850px;
       min-height: 850px;
+      max-height: 850px;
       overflow: auto;
-      -webkit-overflow-scrolling: touch;
       background: #525659;
       padding: 8px 0 16px;
     }}
@@ -1210,7 +1221,7 @@ def pdf_inpage_viewer_css() -> str:
     .pdf-standalone-shell iframe.pdf-frame,
     body.is-native-pdf iframe.pdf-frame {{
       display: none !important;
-      height: 850px;
+      height: auto;
       min-height: 850px;
     }}
     .pdf-frame-wrap.is-native-pdf,
@@ -1243,6 +1254,8 @@ def pdf_inpage_viewer_css() -> str:
       .pdf-standalone-shell iframe.pdf-frame {{
         height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: auto !important;
       }}
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {{
@@ -1264,7 +1277,7 @@ def pdf_inpage_viewer_html(pdf_href: str) -> str:
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="{safe}">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="{safe}" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="{safe}">Open PDF</a>
               <a href="{safe}" download>Download</a>
             </div>
           </div>
@@ -1360,6 +1373,7 @@ def render_pdf_standalone_page(config: DioceseConfig, bulletin_date: str, pdf_hr
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{html.escape(config.display_name)} PDF — {html.escape(uk_bulletin_date)}</title>
+  {favicon_link_tags()}
   <style>
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
     html, body {{ height: 100%; }}
@@ -1405,7 +1419,7 @@ def render_pdf_standalone_page(config: DioceseConfig, bulletin_date: str, pdf_hr
       <a class="back-link" href="{html.escape(viewer_href, quote=True)}" target="_blank" rel="noopener noreferrer">← Viewer</a>
       <span class="title-line">{html.escape(diocese_label)} · {html.escape(uk_bulletin_date)}</span>
     </div>
-    <a class="download-link" href="{safe_pdf}" target="_blank" rel="noopener noreferrer" download>⬇ Download PDF</a>
+    <a class="download-link" href="{safe_pdf}">Open PDF</a>
   </div>
   <div class="pdf-standalone-shell">
     <iframe class="pdf-frame" src="{safe_pdf}" title="{html.escape(config.display_name)} bulletin PDF"></iframe>
@@ -1466,6 +1480,7 @@ def render_bulletin_viewer_shell(
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
   <title>{html.escape(page_title)}</title>
+  {favicon_link_tags()}
   <style>
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
     html {{ scroll-behavior: smooth; }}
@@ -1557,6 +1572,11 @@ def render_bulletin_viewer_shell(
       border: 1px solid #dde5e4;
       padding: 14px;
       margin-bottom: 4px;
+      overflow: visible;
+    }}
+    #panel-pdf,
+    #panel-ocr {{
+      overflow: visible;
     }}
 
     .quiet-links {{
@@ -1574,7 +1594,7 @@ def render_bulletin_viewer_shell(
       position: relative;
       height: auto;
       min-height: 850px;
-      overflow: hidden;
+      overflow: visible;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }}
@@ -1668,12 +1688,13 @@ def render_bulletin_viewer_shell(
       box-sizing: border-box;
       height: 850px;
       min-height: 850px;
-      overflow-y: auto;
+      max-height: 850px;
+      overflow: auto;
       border: 1px solid #d4ddd9;
       padding: 22px 24px 32px;
     }}
     .pdf-frame-wrap iframe {{
-      height: 850px;
+      height: auto;
       min-height: 850px;
     }}
     .note-box {{
@@ -1778,10 +1799,17 @@ def render_bulletin_viewer_shell(
         min-height: 450px;
       }}
       .pdf-frame-wrap iframe,
-      .pdf-inpage-pages,
+      .pdf-inpage-pages {{
+        height: 450px;
+        min-height: 450px;
+        max-height: 450px;
+        overflow: auto;
+      }}
       #ocr-panel {{
         height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: auto;
       }}
     }}
     @media (max-width: 900px) {{
@@ -1812,12 +1840,12 @@ def render_bulletin_viewer_shell(
       <p class="diocese-label">{html.escape(diocese_label)}</p>
       <h1>{html.escape(headline)}</h1>
       <p class="meta">{html.escape(meta_line)}</p>
-      <a class="download-link-top" href="{html.escape(pdf_download_href, quote=True)}" {blank} download>Download PDF</a>
+      <a class="download-link-top" href="{html.escape(pdf_download_href, quote=True)}">Download PDF</a>
     </header>
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="{html.escape(pdf_download_href, quote=True)}" {blank} download>Download PDF</a>
+      <a class="mobile-jump-download" href="{html.escape(pdf_download_href, quote=True)}">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
@@ -1962,7 +1990,7 @@ def render_bulletin_viewer_shell(
         target.classList.add('search-active');
         const details = target.closest('details.parish-block');
         if (details) details.open = true;
-        target.scrollIntoView({{ behavior: 'smooth', block: 'center' }});
+        target.scrollIntoView({{ behavior: 'smooth', block: 'start' }});
       }}
 
       function updateMatchUi() {{
@@ -2129,6 +2157,7 @@ def render_bulletin_viewer_shell(
         if (page) page.insertBefore(banner, page.firstChild);
       }}
     }})();
+    {sticky_search_js()}
     {scroll_top_js()}
   </script>
   {scroll_top_html()}
@@ -2166,6 +2195,13 @@ def regenerate_viewer_from_existing(existing_path: Path) -> Path:
     if not panel_match:
         raise ValueError(f"Could not find OCR panel in {existing_path}")
     raw_ocr_fragment = panel_match.group(1).strip()
+    pdf_candidate = DOCS_DIR / "mega_pdf" / config.pdf_filename
+    if not pdf_candidate.exists():
+        pdf_candidate = REPO_ROOT / "mega_pdf" / config.pdf_filename
+    if pdf_candidate.exists():
+        from ocr.sparse_page_ocr import prefer_embedded_pages_in_ocr_html
+
+        raw_ocr_fragment = prefer_embedded_pages_in_ocr_html(raw_ocr_fragment, pdf_candidate)
     parish_links = parse_parish_links(config.evidence_path)
     ocr_fragment = prepare_ocr_fragment(diocese, raw_ocr_fragment, parish_links, bulletin_date=bulletin_date)
     output_path = BULLETINS_DIR / existing_path.name
@@ -2201,6 +2237,9 @@ def write_viewer_page(diocese: str, bulletin_date: str, pdf_path: Path, ocr_html
     config = DIOCESES[diocese]
     page_count = count_pdf_pages(pdf_path)
     raw_ocr_fragment = extract_ocr_fragment(ocr_html_path, tighten=False)
+    from ocr.sparse_page_ocr import prefer_embedded_pages_in_ocr_html
+
+    raw_ocr_fragment = prefer_embedded_pages_in_ocr_html(raw_ocr_fragment, pdf_path)
     parish_links = parse_parish_links(config.evidence_path)
     ocr_plain_text = _fragment_to_plain_text(tighten_ocr_paragraphs(raw_ocr_fragment))
     ocr_fragment = prepare_ocr_fragment(diocese, raw_ocr_fragment, parish_links, bulletin_date=bulletin_date)
@@ -2247,11 +2286,11 @@ def _write_parish_bulletin_pages(
             preserve_existing_pdfs=preserve_existing_pdfs,
         )
         if written:
-            print(f"  📄 Wrote {len(written)} per-parish bulletin page(s) for {diocese}")
+            print(f"  Wrote {len(written)} per-parish bulletin page(s) for {diocese}")
         else:
-            print(f"  ℹ️  No 'ok' parishes found for {diocese} in parish_status.json — no per-parish pages written")
+            print(f"  No 'ok' parishes found for {diocese} in parish_status.json — no per-parish pages written")
     except Exception as exc:
-        print(f"  ⚠️  Per-parish bulletin pages failed for {diocese} (non-fatal): {exc}")
+        print(f"  Per-parish bulletin pages failed for {diocese} (non-fatal): {exc}")
 
 
 def scan_viewer_entries() -> list[ViewerEntry]:
@@ -2271,9 +2310,17 @@ def scan_viewer_entries() -> list[ViewerEntry]:
     return sorted(entries, key=lambda entry: (entry.date, entry.diocese), reverse=True)
 
 
+def _current_week_entries(entries: list[ViewerEntry]) -> list[ViewerEntry]:
+    """Public site keeps this week's viewers only — not a growing archive."""
+    if not entries:
+        return []
+    latest = max(entry.date for entry in entries)
+    return [entry for entry in entries if entry.date == latest]
+
+
 def write_bulletins_index(entries: list[ViewerEntry]) -> None:
     items = []
-    for entry in entries:
+    for entry in _current_week_entries(entries):
         config = DIOCESES[entry.diocese]
         items.append(
             f"<li><a href=\"{entry.path.name}\" target=\"_blank\" rel=\"noopener noreferrer\">{html.escape(config.display_name)} — {html.escape(format_uk_date(entry.date))}</a></li>"
@@ -2287,7 +2334,8 @@ def write_bulletins_index(entries: list[ViewerEntry]) -> None:
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>OCR Bulletin Archive</title>
+  <title>This week’s text bulletins — Parish Press</title>
+  {favicon_link_tags()}
   <style>
     body {{ margin: 0; font-family: Arial, Helvetica, sans-serif; background: #f7faf9; color: {TEXT}; }}
     .page {{ max-width: 960px; margin: 0 auto; padding: 28px 20px 40px; }}
@@ -2303,8 +2351,8 @@ def write_bulletins_index(entries: list[ViewerEntry]) -> None:
 <body>
   <div class="page">
     <a href="../index.html" target="_blank" rel="noopener noreferrer">← Back to dashboard</a>
-    <h1>OCR Bulletin Archive</h1>
-    <p>Newest generated bulletin viewer pages appear first.</p>
+    <h1>This week’s text bulletins</h1>
+    <p>Only this week is kept. Older weeks are removed to save space.</p>
     <div class="archive">
       <ul>{''.join(items)}</ul>
     </div>
@@ -2394,9 +2442,34 @@ def write_root_index(entries: list[ViewerEntry]) -> None:
     )
 
 
+_DATED_BULLETIN_HTML = re.compile(
+    r"^([a-z0-9_]+)-(\d{4}-\d{2}-\d{2})(?:-ocr|-pdf)?\.html$"
+)
+
+
+def prune_old_bulletin_viewers(entries: list[ViewerEntry] | None = None) -> list[Path]:
+    """Delete dated bulletin HTML that is not this week's latest date."""
+    scanned = entries if entries is not None else scan_viewer_entries()
+    current = _current_week_entries(scanned)
+    keep_date = current[0].date if current else None
+    if not keep_date or not BULLETINS_DIR.exists():
+        return []
+    removed: list[Path] = []
+    for path in BULLETINS_DIR.glob("*.html"):
+        if path.name == "index.html":
+            continue
+        match = _DATED_BULLETIN_HTML.match(path.name)
+        if not match or match.group(2) == keep_date:
+            continue
+        path.unlink(missing_ok=True)
+        removed.append(path)
+    return removed
+
+
 def rebuild_indexes() -> None:
     entries = scan_viewer_entries()
-    write_bulletins_index(entries)
+    prune_old_bulletin_viewers(entries)
+    write_bulletins_index(scan_viewer_entries())
 
 
 def main() -> None:

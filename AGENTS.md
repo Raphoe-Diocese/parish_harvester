@@ -110,7 +110,7 @@ Extension Send & test
 
 Until this list is finished, do **not** start other work. Park new ideas for a later list.
 
-1. **OCR reader** — ~95% done (reader UI live; new OCR runs will use stronger layout prompt)
+1. **OCR reader** — missing-text fix first: prefer embedded PDF text on born-digital pages; vision OCR only for image/banner pages. Still **one pass per diocese (max ~26)**, then split — never 700 parish OCRs.
 2. **Problems console** — full work-queue polish
 3. **Recipe success** — one parish at a time
 4. **parishpress.ie** — live DNS/Pages when user is ready
@@ -118,7 +118,11 @@ Until this list is finished, do **not** start other work. Park new ideas for a l
 
 ## Parked (later list — do not start yet)
 
-- **Remove bulletin archive entirely** — delete all traces of `https://raphoe-diocese.github.io/parish_harvester/bulletins/` (page, links, nav, generators, sitemaps). User request 2026-07-30.
+- **Old bulletin weeks** — keep **this week only**. Frank asked again 2026-08-22 (disk space). Do not keep a growing `/bulletins/` archive.
+- **Scale to ~26 dioceses / 600–700 parish pages** — Frank 23/08/2026. Discussed, not started. Full write-up in [`docs/WEBSITE_OCR_BACKLOG.md`](docs/WEBSITE_OCR_BACKLOG.md) (Scale gameplan). Do not turn on 26-diocese harvest until jobs are split (one diocese per job + a final stitch). Do not OCR 700 PDFs one-by-one; keep mega-PDF OCR.
+- **Homepage copy** — Welcome line: newsletters are posted after Sunday harvest (no exact clock until harvest time is stable). Cards: bulletin **count only** (e.g. `12/32 available`), not “ready @ 16:00” and not “Updated DD/MM/YYYY” as the fresh-weekly claim. Wait for Frank to say do it.
+- **Agent hard-stops (prompt)** — **done** 23/08/2026. Slim “How Frank works” is in Cursor User Rules + `.cursor/rules/how-i-work.mdc`. Old novel is retired. Hard stops included.
+- **Chat power (remember)** — **corrected** 23/08/2026. Frank tested `ok` in an old chat: **nothing visible changed**. That advice was wrong. An old chat keeps the old conversation. To use the new short prompt: **start a new chat** in that folder. Do not tell him `ok` updates the old tab.
 
 ## Dates (user-facing)
 

@@ -7,6 +7,7 @@ from pathlib import Path
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 CONTENT_JS = REPO_ROOT / "extension" / "content.js"
+BRIDGE_BOOT_JS = REPO_ROOT / "extension" / "bridge_boot.js"
 SIDEPANEL_JS = REPO_ROOT / "extension" / "sidepanel.js"
 POPUP_HTML = REPO_ROOT / "extension" / "popup.html"
 POPUP_JS = REPO_ROOT / "extension" / "popup.js"
@@ -132,7 +133,7 @@ class ExtensionMessagingTests(unittest.TestCase):
         content = CONTENT_JS.read_text(encoding="utf-8")
         html = SIDEPANEL_HTML.read_text(encoding="utf-8")
         manifest = json.loads(MANIFEST_JSON.read_text(encoding="utf-8"))
-        self.assertEqual(manifest.get("version"), "1.61.15")
+        self.assertEqual(manifest.get("version"), "1.61.16")
         self.assertIn("ph-long-bulletin-cb", content)
         self.assertIn("max_bulletin_pages", content)
         self.assertIn("Long bulletin — allow extra pages", content)
@@ -169,6 +170,16 @@ class ExtensionMessagingTests(unittest.TestCase):
             )
         all_urls_entries = [e for e in content_scripts if "<all_urls>" in e.get("matches", [])]
         self.assertGreaterEqual(len(all_urls_entries), 1)
+
+    def test_fix_now_timer_does_not_bleed_onto_other_sites(self) -> None:
+        boot = BRIDGE_BOOT_JS.read_text(encoding="utf-8")
+        self.assertIn("const _fixNowUrlIsThisPage = (fixUrl) =>", boot)
+        self.assertIn("if (!fixUrl || !_fixNowUrlIsThisPage(fixUrl)) continue", boot)
+        self.assertIn("FIX_NOW_CLOCK_MAX_AGE_MS", boot)
+        self.assertIn("window.top !== window", boot)
+        self.assertIn("_removeFixNowTimerEl()", boot)
+        self.assertNotIn("ph_recording_sessions?.[hostname]", boot)
+        self.assertNotIn("session?.fixNow", boot)
 
 
 if __name__ == "__main__":

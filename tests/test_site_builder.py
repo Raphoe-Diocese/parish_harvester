@@ -116,6 +116,7 @@ class SiteBuilderTests(unittest.TestCase):
             self.assertIn("Georgia", derry_page)
             self.assertIn("pdf-inpage-viewer", derry_page)
             self.assertIn("/assets/pdf-inpage-viewer.js", derry_page)
+            self.assertIn('href="/favicon.png"', derry_page)
             self.assertIn('src="/mega_pdf/derry_mega_bulletin.pdf"', derry_page)
             self.assertIn('data-pdf-src="/mega_pdf/derry_mega_bulletin.pdf"', derry_page)
 

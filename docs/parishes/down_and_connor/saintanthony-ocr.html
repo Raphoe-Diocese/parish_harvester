@@ -4,6 +4,8 @@
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
   <title>Saint Anthony Text Bulletin — 21/08/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     body {
@@ -14,7 +16,7 @@
       font-size: 1.125rem;
       -webkit-text-size-adjust: 100%;
       text-size-adjust: 100%;
-      overflow-x: hidden;
+      overflow-x: clip;
     }
     a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
     .page {
@@ -36,8 +38,62 @@
       font-size: 1rem; font-weight: 700; color: #1a1f1e;
     }
     .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 40;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+      box-shadow: 0 8px 16px #eef1f0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 8rem; }
+    mark.search-active { scroll-margin-top: 8rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 30;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
     .ocr-zoom-bar {
-      position: sticky; top: 0; z-index: 6;
       display: flex; justify-content: center; align-items: center; gap: 8px;
       margin: 0 0 10px; padding: 6px 10px;
       background: rgba(255, 255, 255, 0.92);
@@ -63,7 +119,7 @@
       max-width: min(72ch, 100%);
       margin-left: auto;
       margin-right: auto;
-      overflow-x: hidden;
+      overflow-x: clip;
       overflow-wrap: anywhere;
       word-wrap: break-word;
       hyphens: auto;
@@ -274,6 +330,7 @@
         <span class="title-line">SAINT ANTHONY Text Bulletin · 21/08/2026</span>
       </div>
     </div>
+    <div class="ocr-sticky-chrome">
     <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
       <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
       <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
@@ -293,7 +350,9 @@
         </div>
       </div>
     </div>
-    <div class="ocr-body" id="ocr-text"><p class="page-label">Page 29</p>
+    </div>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead"><h2 class="ocr-parish-name">Saint Anthony</h2><p class="ocr-parish-date">21/08/2026</p></header>
+<p class="page-label">Page 1</p>
 <p>19th SUNDAY IN ORDINARY TIME<br>
 WE REMEMBER OUR DECEASED LOVED-ONES</p>
 <h3 class="b-head">Recently Deceased: Robert Graham</h3>
@@ -306,7 +365,7 @@ Anniversary, and mentioned in the Prayer of the Faithful, or<br>
 a mass be celebrated, please let Fr McCann know ]<br>
 FEASTS THIS WEEK<br>
 Mon 10th: St Laurence, deacon &amp; martyr<br>
-Tues 1th: St Clare, virgin<br>
+Tues 11th: St Clare, virgin<br>
 Wed 12th: St Jane Frances de Chantal, religious; St<br>
 Attracta, virgin<br>
 Thur 13th: St Pontian, pope and Hippolytus, priest,<br>
@@ -316,6 +375,7 @@ Sat 15th : The Assumption of the Blessed Virgin Mary<br>
 Fr Carlin will be saying Mass in St Anthony’s for the vigil<br>
 of the Assumption at 7pm on Fri 14th August. After that<br>
 the new times of mass will take effect on Saturday 15th<br>
+August.<br>
 St Anthony’s Music Ministry. We are looking for musicians<br>
 of all instruments to support our singing group. Please<br>
 contact our musical director Liam after mass. PLEASE<br>
@@ -374,6 +434,7 @@ welcoming many visitors to this event. For a full programme<br>
 of events, visit <a href="https://www.fleadhcheoil.ie" target="_blank" rel="noopener noreferrer">www.fleadhcheoil.ie</a> . As part of the festivities,<br>
 Mass will be celebrated in Irish by Bishop Alan McGuckin, in<br>
 St Patrick’s church on Sunday 9th August at 11am. All<br>
+welcome.<br>
 The Northern Ireland Youth Assembly is seeking young<br>
 people&#x27;s views on the School Uniforms (Trousers) Bill, and<br>
 we would be grateful for your support in sharing our survey<br>
@@ -416,11 +477,13 @@ day will begin with Mass at 2pm celebrated by Bishop Donal<br>
 McKeown, followed by refreshments, children’s activities,<br>
 and a talk for parents. This promises to be a lovely date for<br>
 the whole family. For more information and booking details, please email <a href="mailto:info@catholicmothers.ie" target="_blank" rel="noopener noreferrer">info@catholicmothers.ie</a> . All are<br>
+welcome.<br>
 New Mass Times for St Anthonys, St Malachy’s and<br>
 St Matthews to be in place for 15th/16th August. These<br>
 times will be under review<br>
 Polish Masses on Sunday: 11am and 6pm.<br>
 Weekdays: Tues &amp; Thurs at 7pm. Sat 9am. First Fri at<br>
+7pm.<br>
 Farewell by Fr Henry McCann. This Sunday 9th August will<br>
 mark the last Sunday Mass celebrated by me in the parish<br>
 of St Anthony, as its parish priest. I thank God for 12 fond<br>
@@ -527,10 +590,8 @@ Children and Vulnerable Adults are accompanied at all<br>
 times when entering the Sacristy / Toilet facilities. If you<br>
 have any queries regarding the Safeguarding Policy<br>
 please contact a member of the Parish Safeguarding<br>
-Committee. Thanks. Fr Henry McCann PP.</p>
-<h2 class="ocr-parish-name">Saint Anthony</h2>
-<p>21/08/2026</p>
-<hr></div>
+Committee. Thanks. Fr Henry McCann PP.<br>
+Saint Anthony</p></div>
     <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
   </div>
   <script>
@@ -596,7 +657,7 @@ Committee. Thanks. Fr Henry McCann PP.</p>
         if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
         ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
         ocrMatches[idx].classList.add('search-active');
-        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'center' });
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
       }
       function updateMatchUi() {
         const total = ocrMatches.length;
@@ -678,6 +739,48 @@ Committee. Thanks. Fr Henry McCann PP.</p>
         }
       });
     })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      var btn = document.getElementById('scroll-top-btn');
+      if (!btn) return;
+      var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      function shown() {
+        var y = window.scrollY || document.documentElement.scrollTop || 0;
+        btn.classList.toggle('is-visible', y > 240);
+      }
+      window.addEventListener('scroll', shown, { passive: true });
+      shown();
+      btn.addEventListener('click', function () {
+        window.scrollTo({ top: 0, behavior: reduce ? 'auto' : 'smooth' });
+      });
+    })();
+    
   </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
 </body>
 </html>

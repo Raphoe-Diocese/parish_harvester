@@ -8,7 +8,13 @@ import html as html_utils
 import sys
 
 from ocr.bulletin_layout import split_heading_prefix
-from ocr.text_extract import extract_text_pages
+from ocr.text_extract import (
+    all_pages_have_embedded_text,
+    extract_all_page_lines,
+    extract_text_pages,
+    page_is_sparse,
+    prefer_embedded_page_text,
+)
 
 # Keep in sync with ocr.generate_bulletin_pages.ocr_reading_css (presentation only).
 CSS = """
@@ -203,7 +209,9 @@ HEADING_MD_PATTERN = re.compile(r"^(#{1,6})\s+(.*)$")
 HR_MD_PATTERN = re.compile(r"^\s*(?:-{3,}|\*{3,}|_{3,})\s*$")
 BOLD_MD_PATTERN = re.compile(r"\*\*(.+?)\*\*")
 _WORD_DUP_RE = re.compile(r"\b([A-Za-zÀ-ÿ0-9'’&./+-]{2,})\b(?:\s+\1\b)+", re.IGNORECASE)
-_ORDINAL_DUP_RE = re.compile(r"\b(\d+)\1(st|nd|rd|th)\b", re.IGNORECASE)
+# 1717th → 17th (true doubled ordinals). Must be 2+ digits or 22nd/11th
+# collapse to 2nd/1th — that is real bulletin wording, not an OCR artefact.
+_ORDINAL_DUP_RE = re.compile(r"\b(\d{2,})\1(st|nd|rd|th)\b", re.IGNORECASE)
 _SPACE_ORDINAL_RE = re.compile(r"\b(\d)\s+(\d)(st|nd|rd|th)\b", re.IGNORECASE)
 _WORD_TH_DUP_RE = re.compile(
     r"\b([A-Za-zÀ-ÿ]{3,})(st|nd|rd|th)\s+\1\b", re.IGNORECASE
@@ -668,7 +676,25 @@ def main():
     openai_api_key = os.environ.get("OPENAI_API_KEY")
     has_vision_keys = bool(mistral_api_key or gemini_api_key or github_token or openai_api_key)
 
-    if not has_vision_keys:
+    print("Checking for embedded PDF text (no extra OCR when pages are born-digital) ...")
+    try:
+        embedded_pages = extract_all_page_lines(pdf_file)
+        if all_pages_have_embedded_text(embedded_pages):
+            pages_text = embedded_pages
+            provider_used = "Tier0-text"
+            print(
+                f"  All {len(embedded_pages)} page(s) have embedded text — "
+                "skipping vision OCR (one diocese pass stays the cap; text PDFs cost zero)."
+            )
+        elif embedded_pages:
+            print(
+                f"  Mixed PDF: {sum(1 for p in embedded_pages if page_is_sparse(p))} "
+                "sparse/image page(s) still need OCR."
+            )
+    except Exception as e:
+        print(f"  Embedded-text precheck failed ({type(e).__name__}: {e}).")
+
+    if pages_text is None and not has_vision_keys:
         print("No vision OCR keys set — trying Tier 0 text extraction only ...")
         try:
             tier0_pages = extract_text_pages(pdf_file)
@@ -780,6 +806,8 @@ def main():
 
     print("Filling sparse / banner-only mega pages from page images ...")
     pages_text = fill_sparse_ocr_pages(pdf_file, pages_text)
+    pages_text = prefer_embedded_page_text(pdf_file, pages_text)
+    print("Preferring embedded PDF text on born-digital pages (vision kept only where the PDF has no text).")
 
     print("Building HTML ...")
     content = build_html_content(pages_text)

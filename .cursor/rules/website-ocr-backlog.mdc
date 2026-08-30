@@ -9,7 +9,7 @@ Before any website, OCR, diocese viewer, parish page, mega-PDF, or `docs/` HTML 
 
 1. Read `docs/WEBSITE_OCR_BACKLOG.md` and update it when you add or finish an item.
 2. Do **not** mark an item done unless you verified it on **generated** HTML/CSS (`docs/dioceses/`, `docs/parishes/`, `docs/bulletins/`, or a fresh `render_bulletin_viewer_shell` render). Python-only changes disappear on the next harvest.
-3. Desktop PDF **and** OCR panels: `min-height: 850px`. Mobile/tablet (`max-width: 1024px`): `~450px`. Put this in `render_bulletin_viewer_shell` (canonical generator), then regenerate live diocese pages.
+3. Desktop PDF box: locked **850px** height with **inner scroll** (iframe-like; PDF.js, not Chrome’s Page X of Y iframe). Mobile/tablet (`max-width: 1024px`): locked **450px** box. OCR can stay a locked 850/450 reading box. Put this in `render_bulletin_viewer_shell` and `docs/assets/pdf-inpage-viewer.js`. Do not restore a raw PDF iframe on iPhone.
 4. OCR must show a parish name header, real section headings (promote existing Mass times / Anniversaries / notices / fundraising / contact lines — do not invent events), and professional spacing. Keep Irish/Gaeilge as Irish.
 5. Parish and diocese links open in a new tab (`target="_blank"` `rel="noopener noreferrer"`). Mega-PDF header URLs must work in the in-page PDF.js viewer (annotation overlay), not only in a downloaded PDF.
 6. Mega PDF generation stays on. Do not disable `HARVEST_MEGA_PDF`.
