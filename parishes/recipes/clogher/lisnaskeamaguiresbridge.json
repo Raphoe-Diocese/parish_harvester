@@ -1,28 +1,30 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "lisnaskeamaguiresbridge",
   "display_name": "Lisnaskea-Maguiresbridge (Aghalurcher)",
   "diocese": "clogher",
   "start_url": "https://www.lisnaskeamaguiresbridgeparish.com/bulletin.html",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    "onewebmedia"
+  ],
+  "playbook_type": "pdf_download_list",
+  "timeout_ms": 55000,
+  "total_timeout_s": 250,
+  "recorded_date": "2026-08-25",
   "steps": [
     {
-      "action": "download",
-      "url": "https://www.lisnaskeamaguiresbridgeparish.com/onewebmedia/23082026.pdf"
+      "action": "goto",
+      "url": "https://www.lisnaskeamaguiresbridgeparish.com/bulletin.html"
     }
   ],
-  "observed_load_ms": 15857.199951171875,
-  "timeout_ms": 55000,
-  "total_timeout_s": 190,
-  "playbook_type": "pdf_download_list",
-  "site_type": "pdf_link_list",
   "operator_notes": [
-    "onewebmedia/*.pdf — newest row is usually a DDMMYYYY name or hashed S25C with dated link text.",
-    "If the HTTPS certificate is expired, harvest must ignore TLS errors (Playwright).",
-    "Do not pin a dated or hashed filename."
+    "Listing /bulletin.html newest on 22/08/2026 is onewebmedia/23082026.pdf (HTTP 200, 596595 bytes).",
+    "HTTPS certificate is expired — HTTP helper retries that URL once unverified. site_type:http_scrape_newest_pdf. Do not pin a dated filename.",
+    "Pattern A DDMMYYYY in the filename and the link text."
   ],
   "do_not": [
-    "Do not pin a dated or hashed onewebmedia filename.",
-    "Do not use plain HTTP scrape when the certificate is expired."
-  ],
-  "recorded_date": "2026-08-28"
+    "Do not pin a dated filename.",
+    "Do not harvest the homepage — bulletins live on /bulletin.html."
+  ]
 }

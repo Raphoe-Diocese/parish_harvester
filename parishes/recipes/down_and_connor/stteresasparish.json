@@ -1,31 +1,53 @@
 {
-  "version": 1,
+  "version": 4,
   "parish_key": "stteresasparish",
   "display_name": "St Teresas",
   "diocese": "down_and_connor",
   "start_url": "https://stteresasparish.church/parish-news/",
+  "site_type": "wp_json_newest_post_images",
+  "playbook_type": "stacked_image_bulletin",
+  "post_slug_patterns": [
+    "the-st-teresas-parish-bulletin-for-sunday"
+  ],
+  "example_post_url": "https://stteresasparish.church/2026/08/27/the-st-teresas-parish-bulletin-for-sunday-30th-august-2026/",
+  "weeks_back": 3,
+  "image_count": 2,
   "steps": [
     {
       "action": "goto",
-      "url": "https://stteresasparish.church/author/ogilvietony/"
+      "url": "https://stteresasparish.church/parish-news/"
     },
     {
-      "action": "print_to_pdf"
+      "action": "image_stack",
+      "count": 2,
+      "selector": "img"
     }
   ],
-  "observed_load_ms": 3819.800048828125,
-  "timeout_ms": 55000,
-  "total_timeout_s": 250,
-  "playbook_type": "wix_html",
-  "site_type": "html_text_bulletin",
+  "observed_load_ms": 2235,
+  "timeout_ms": 45000,
+  "total_timeout_s": 120,
+  "recorded_date": "2026-08-28",
   "operator_notes": [
-    "Bulletin text is on the web page — not a downloadable PDF file.",
-    "Use Save page as PDF on the newsletter article page.",
-    "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
+    "WordPress.com site. Each bulletin is a dated post with exactly two",
+    "full-page scans (microsoft-word-D-month-YYYY.docx-1.jpg and .docx-2.jpg).",
+    "Permalink pattern: /{YYYY}/{MM}/{DD}/the-st-teresas-parish-bulletin-for-sunday-{Nth}-{month}-{YYYY}/",
+    "Slug Sunday is the bulletin Sunday; path YYYY/MM/DD is the post date",
+    "(usually 2–4 days earlier). rewrite_date_url would keep the old post-day",
+    "folder and 404.",
+    "On-site /wp-json/wp/v2/posts is an HTML 404. Prefer",
+    "public-api.wordpress.com/wp/v2/sites/stteresasparish.church/posts,",
+    "then /feed/, then homepage links, then a small post-date range.",
+    "site_type:wp_json_newest_post_images then image_stack count=2.",
+    "CONFIRMED 28/08/2026: latest real post is",
+    "https://stteresasparish.church/2026/08/27/the-st-teresas-parish-bulletin-for-sunday-30th-august-2026/",
+    "with microsoft-word-30-august-2026.docx-1.jpg and .docx-2.jpg.",
+    "There is no bulletin for Sunday 23/08/2026 (announcement slug, different).",
+    "Do not print_to_pdf parish-news or the author page — that will not stack the two images."
   ],
   "do_not": [
-    "Do not use Pick bulletin image when the page is mostly text paragraphs.",
-    "Do not stop at click-only — need print_to_pdf as the final step."
-  ],
-  "recorded_date": "2026-08-28"
+    "Do not hardcode one post permalink or image URL — it goes stale every week.",
+    "Do not use rewrite_date_url on the permalink — it keeps the old /DD/ folder.",
+    "Do not click the 'no bulletin this week' announcement as if it had images.",
+    "Do not print_to_pdf the homepage, parish-news, or the author page."
+  ]
 }
