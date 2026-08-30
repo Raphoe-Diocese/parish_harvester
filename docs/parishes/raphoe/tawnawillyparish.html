@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Tawnawilly Bulletin — 25/08/2026</title>
+  <title>Tawnawilly Bulletin — 30/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -179,6 +187,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -201,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +275,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +472,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -863,7 +892,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,14 +900,14 @@
     <header class="header">
       <p class="diocese-label">RAPHOE</p>
       <h1>Tawnawilly Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Tawnawilly — 25/08/2026. Part of the Raphoe Diocese collated bulletin.</p>
-      <a class="download-link-top" href="tawnawillyparish.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Tawnawilly — 30/08/2026. Part of the Raphoe Diocese collated bulletin.</p>
+      <a class="download-link-top" href="tawnawillyparish.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="tawnawillyparish.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="tawnawillyparish.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
@@ -895,7 +924,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="tawnawillyparish.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="tawnawillyparish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="tawnawillyparish.pdf">Open PDF</a>
               <a href="tawnawillyparish.pdf" download>Download</a>
             </div>
           </div>
@@ -934,81 +963,75 @@
       <div class="quiet-links">
         <a href="tawnawillyparish-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-tawnawilly" data-parish-name="Tawnawilly"><h2 class="ocr-parish-name">Tawnawilly</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-tawnawilly" data-parish-name="Tawnawilly"><h2 class="ocr-parish-name">Tawnawilly</h2><p class="ocr-parish-date">30/08/2026</p></header>
 <p class="page-label">Page 1</p>
 <h3 class="b-head">Mass Times Intentions for this Week</h3>
 <p>Day St.<br>
 Agatha’s St.<br>
 Patrick’s Intention<br>
-Saturday 22nd Aug 6.00 pm Danny &amp; Betty<br>
-Meehan<br>
-Helen Doherty Anniversaries<br>
-Sunday 23rd Aug<br>
-21st Sunday in Ordinary<br>
-Time/A 10.00 am John Hone<br>
-Patric k Mc Mullin Anniversaries<br>
-11: 30 am Margaret, John &amp;<br>
-Michael Mc Daid Anniversaries<br>
-Monday 24th No Mass<br>
-Tuesday 25th 10.00 am Intention<br>
-Wednesday 26th 10.00 am Madge, Paddy &amp;<br>
-Sean Mc Cready Anniversaries<br>
-Thursday 27th 10.00 am John &amp; Kathleen<br>
-Burke &amp; Family Ann iversar ies<br>
-Friday 28th 10.00 am Intention<br>
-Saturday 29th 6.00 pm Billy Reid<br>
+Saturday 29th Aug 6.00 pm Billy Reid<br>
 Mary O’Donnell<br>
 John Sinclair 1st Anniversary</p>
 <h3 class="b-head">Anniversary</h3>
 <h3 class="b-head">Anniversary</h3>
-<p>Sunday 30th<br>
+<p>Sunday 30th Aug<br>
 22nd Sunday in<br>
 Ordinary Time/A 10.00 am John Harvey Anniversary<br>
 11: 30 am<br>
-Mary Green e<br>
+Mary Greene<br>
 Frank Fehilly<br>
-Ava Fehilly Ha rrington</p>
+Ava Fehilly Harrington</p>
 <h3 class="b-head">Months Mind</h3>
 <p>Recently<br>
 Deceased</p>
 <h3 class="b-head">Anniversary</h3>
-<p>Parish Priest<br>
+<p>Monday 31st No Mass<br>
+Tuesday 1st Sept 10.00 am Intention<br>
+Wednesday 2nd Sept 10.00 am John Hyland<br>
+Thursday 3rd Sept 10.00 am No Mass<br>
+Friday 4th Sept 10.00 am Kathleen Mc<br>
+Nicholas Anniversary<br>
+Saturday 5th Sept 6.00 pm Oliver Plunkett Months Mind<br>
+Sunday 6th Sept<br>
+23rd Sunday in<br>
+Ordinary Time/A 10.00 am Intention<br>
+11: 30 am Intention<br>
+Parish Priest<br>
 Fr. James Gillespie, P. P.</p>
 <h3 class="b-head">Parochial House, Upper Main St.,</h3>
 <p>Donegal Town, Co. Donegal<br>
 F94 D8X0<br>
 Phone: <a href="tel:+353749721026" style="color:#1d4ed8;font-weight:600;">074 97 21026</a><br>
-Email : <a href="mailto:ppdonegal@gmail.com" target="_blank" rel="noopener noreferrer">ppdonegal@gmail.com</a></p>
+Email: <a href="mailto:ppdonegal@gmail.com" target="_blank" rel="noopener noreferrer">ppdonegal@gmail.com</a></p>
 <h3 class="b-head">Parish Office</h3>
 <p>Parish Centre, Upper Main St.,<br>
 Donegal Town, Co. Donegal.<br>
 F94 EWR4<br>
 Phone: <a href="tel:+353749721026" style="color:#1d4ed8;font-weight:600;">074 97 21026</a> / 97 40461<br>
 <a href="mailto:stpatricksparishcentre@gmail.com" target="_blank" rel="noopener noreferrer">stpatricksparishcentre@gmail.com</a><br>
-Opening Times :<br>
-Mon ., Tues., Wed . &amp; Friday<br>
+Opening Times:<br>
+Mon., Tues., Wed. &amp; Friday<br>
 9: 00 am – 2: 00 pm<br>
 Parish Bookings<br>
 To book a baptism, wedding or to<br>
 book the Parish Centre itself, please</p>
 <h3 class="b-head">contact the Parish Office</h3>
-<p>Baptism s<br>
-Baptisms take place in St. Patrick’s<br>
+<p>Baptisms take place in St. Patrick’s<br>
 on the 1st &amp; 3rd weekends and in<br>
 St. Agatha’s Church on the 2nd &amp; 4th<br>
-weekends of each month .<br>
+weekends of each month.<br>
 Baptisms are held on Saturdays at<br>
-4: 00 pm or Sundays at 1 : 00 pm.<br>
+4: 00 pm or Sundays at 1: 00 pm.<br>
 Baptismal Preparation course takes<br>
 place in the Parish Centre on the<br>
 last Tuesday of each month for all<br>
 families requiring their child to be<br>
-bapti sed.<br>
+baptised.<br>
 Weddings<br>
 Please allow at least four months’<br>
 notice for weddings in the parish.<br>
 Please see our website for further<br>
-information on parish weddings .<br>
+information on parish weddings.<br>
 Parish Newsletter<br>
 Please submit items for the<br>
 Newsletter to the parish office no<br>
@@ -1029,188 +1052,183 @@ Upon request or after any Mass.<br>
 All Masses in both Churches<br>
 are broadcast live on our parish<br>
 website or on <a href="https://www.mcn" target="_blank" rel="noopener noreferrer">www.mcn</a> live<br>
-and follow the links. Sunday 23rd August 2026<br>
-21st Sunday in Ordinary Time/A<br>
-We pray for the Anniversaries of… David Hanna (Junior )<br>
-Tawnawilly</p>
+and follow the links. Sunday 30 August 2026<br>
+22nd Sunday in Ordinary Time/A<br>
+We pray for the recently deceased.Lillian Sweeney, Claredon Drive, whose funeral took<br>
+place on Thursday in St. Patrick’s with burial in Bruckless.<br>
+Des Corley, The Glebe, whose funeral takes place today (Sunday) at 2pm in St. Patrick’s<br>
+Enda Bonner, Dungloe, who died on Thursday (Brother of Cr óna O’Reilly, Brookfield,<br>
+Donegal Town)<br>
+Tawnawilly <a href="https://tawnawillyparish.ie/bulletin/" target="_blank" rel="noopener noreferrer">https://tawnawillyparish.ie/bulletin/</a></p>
 <hr>
 <p class="page-label">Page 2</p>
-<p>Alpha<br>
-The Alpha is a 10 -week series of sessions<br>
+<p>Down Syndrome Ireland<br>
+Annual Church Gate Collection<br>
+Fundraiser, 29th-30th August 26.<br>
+Social Dancing returns to Leghowney Hall<br>
+on Wed. the 9th of Sept 8.30-10.30pm.<br>
+Music by Sprig of Heather. Looking<br>
+forward to welcoming back all our<br>
+dancers for a great evening of good<br>
+music, good company and that lovely<br>
+supper<br>
+Lough Derg Pilgrimages 2026<br>
+For One Day Retreats, Heritage Day<br>
+Tours and Lakeshore Pilgrim Path<br>
+Pilgrimages please see<br>
+email:<a href="mailto:info@loughderg.org" target="_blank" rel="noopener noreferrer">info@loughderg.org</a>. Tel<br>
+<a href="tel:+353719861518" style="color:#1d4ed8;font-weight:600;">0719861518</a> for further information.<br>
+Alpha<br>
+The Alpha is a 10-week series of sessions<br>
 exploring the basics of the Christian faith.<br>
-Alpha provides a safe space for people of all<br>
-ages to discuss life, meaning and faith in a<br>
-friendly and informal environment.<br>
-Each Alpha session start with a bit of social<br>
-time and a cup of tea or something to eat.<br>
-There is then a video on some aspects of the<br>
-faith which includes a discussion on the<br>
-topic with a small group. This time is an<br>
-opportunity for people to discuss aspects of<br>
-faith in a very friendly and informative<br>
-manner.<br>
-Alpha is open to everyone who wants to<br>
-explore the Christian faith, particularly<br>
-those who know little or nothing about it at<br>
-present and would want to find out more.<br>
+Alpha provides a safe space for people of<br>
+all ages to discuss life, meaning and faith<br>
+in a friendly and informal environment.<br>
+Each Alpha session start with a bit of<br>
+social time and a cup of tea or something<br>
+to eat. There is then a video on some<br>
+aspects of the faith which includes a<br>
+discussion on the topic with a small<br>
+group. This time is an opportunity for<br>
+people to discuss aspects of faith in a very<br>
+friendly and informative manner. Alpha is<br>
+open to everyone who wants to explore<br>
+the Christian faith, particularly those who<br>
+know little or nothing about it at present<br>
+and would want to find out more.<br>
 If anyone is interested in finding out a bit<br>
-more about Alpha or being part of the next<br>
-course in the parish starting in September,<br>
-please contact the Parish Office with your<br>
-details or speak with Fr. James or any<br>
-member of the Parish Council. For further<br>
-information on Alpha, please visit:<br>
-Empower Cumasú Programme -<br>
-applications are now open .<br>
-Are you a female living in the Gaeltacht<br>
-looking to start or grow your own business?<br>
-Whether it’s food, farming, crafts or a<br>
-service business, we want to hear from you.<br>
-Apply now: <a href="https://empowerprogramme.ie/" target="_blank" rel="noopener noreferrer">https://empowerprogramme.ie/</a><br>
-Places are limited. The closing date for<br>
-applications is 5:00PM on Friday, 4th<br>
-September 2026. Further information: <a href="tel:+35391742851" style="color:#1d4ed8;font-weight:600;">091<br>
-742851</a> / <a href="mailto:michelle.lee@atu.ie" target="_blank" rel="noopener noreferrer">michelle.lee@atu.ie</a><br>
+more about Alpha or being part of the<br>
+next course in the parish starting in<br>
+September, please contact the Parish<br>
+Office with your details or speak with Fr.<br>
+James or any member of the Parish<br>
+Council. For further information on Alpha,<br>
+please visit: alphaireland.org/<br>
 Jump’ N Jig Irish Dance , a fun non -<br>
 competitive programme for girls &amp; boys<br>
-aged 3 +. Join this innovative, high -energy<br>
+aged 3+. Join this innovative, high-energy<br>
 class, learn to dance and have lots of fun.<br>
-No term fee or upfront costs, just pay as you<br>
-attend. Thursday 5pm at The Parish Centre,<br>
-new term commences Thursday September<br>
-3rd. For more information or to regist er<br>
-WhatsApp <a href="tel:+353876852634" style="color:#1d4ed8;font-weight:600;">0876852634</a><br>
-Heritage Week<br>
-During Heritage Week , Clogher Le Chéile<br>
-will host an event at Clogher Bridge (post<br>
-code F94YO1X) on Sunday August 23rd at<br>
-4pm. It will include the unveiling of the<br>
-restored area around the Monument and<br>
-the launch of an updated version of the<br>
-inscriptions on the headstones at St<br>
-Agatha’s from 2021 to 2024 and a booklet<br>
-about the 1926 Census. All are welcome .<br>
-Down Syndrome Ireland<br>
-Annual Church Gate Collection Fundraiser,<br>
-29th-30th August 26. Come &amp; See : Have you heard about<br>
-the Encounter School of Ministry Course but<br>
-aren’t sure what it’s about or if it’s for you? We<br>
-invite you to join us for our September classes<br>
-for free. The class will take place on Thursdays<br>
-from 6.30pm (first half hour is prayer and<br>
-worship) to 9.00pm beginning in September at<br>
-All Saints Churc h, Newtowncunningham. You<br>
-can register for your place or find out more<br>
-here: <a href="https://encounterschool.org/donegal/" target="_blank" rel="noopener noreferrer">https://encounterschool.org/donegal/</a> or<br>
-email <a href="mailto:donegal@encounterschool.org" target="_blank" rel="noopener noreferrer">donegal@encounterschool.org</a> for more<br>
-information. You will not be invoiced until<br>
-October and if you decide it’s not for you, you<br>
-can leave the course without incurring any<br>
-charges .<br>
+No term fee or upfront costs, just pay as<br>
+you attend. Thursday 5pm at The Parish<br>
+Centre, new term commences Thursday<br>
+September 3rd. For more information or<br>
+to register WhatsApp <a href="tel:+353876852634" style="color:#1d4ed8;font-weight:600;">0876852634</a><br>
+Alone Volunteer Recruitment - Friday 4th<br>
+September 10.00am 12.00pm Raphoe<br>
+Credit Union Cathedral Hill Townparks. “Exercise with Physio Éireann this September<br>
+in Townawilly<br>
+Something for everyone…<br>
+Chair Pilates – movement and falls<br>
+prevention for all abilities with tea after.<br>
+Clinical Pilates – great for back pain<br>
+StrongHER – ladies weights to build strength<br>
+&amp; support bone health Call <a href="tel:+353851707997" style="color:#1d4ed8;font-weight:600;">085 170 7997</a>”<br>
 Community Heritage Grant Scheme 2027<br>
-The Heritage Council has introduced a new two -<br>
-stage application process for the Community<br>
-Heritage Grant Scheme 2027. An initial<br>
-Expression of Interest stage will open in<br>
+The Heritage Council has introduced a new<br>
+two-stage application process for the<br>
+Community Heritage Grant Scheme 2027. An<br>
+initial Expression of Interest stage will open in<br>
 September 2026, allowing groups to outline<br>
-project ideas without the need for detaile d<br>
+project ideas without the need for detailed<br>
 budgets or supporting documents.<br>
 Shortlisted applicants will then be invited to<br>
 submit a full application by January 2027.<br>
 Projects must align with one of five themes:<br>
 Heritage at Risk, Biodiversity &amp; Nature<br>
 Restoration, Traditional Skills &amp; Conservation,<br>
-Digital Heritage, Access &amp; Storyt elling, or<br>
-Diversity, Equity &amp; Inclusion. Further details will<br>
-be available from The Heritage Council in late<br>
-August 2026.<br>
+Digital Heritage, Access &amp; Storytelling, or<br>
+Diversity, Equity &amp; Inclusion. Further details<br>
+will be available from The Heritage Council in<br>
+late August 2026.<br>
 Donegal Town Community Alert reps will be<br>
-calling to homes in the area to inform people of<br>
-how the scheme operates, and collect<br>
+calling to homes in the area to inform people<br>
+of how the scheme operates, and collect<br>
 telephone numbers of those who wish to be<br>
-included. Anyone wishing to be an Area Rep for<br>
-the group can contact Rory O’Donnell at <a href="tel:+353872456994" style="color:#1d4ed8;font-weight:600;">087<br>
-2456 994</a>.<br>
-“Exercise with Physio Éireann this September in<br>
-Townawilly<br>
-Something for everyone…<br>
-Chair Pilates – movement and falls prevention<br>
-for all abilities with tea after.<br>
-Clinical Pilates – great for back pain<br>
-StrongHER – ladies weights to build strength &amp;<br>
-support bone health Call <a href="tel:+353851707997" style="color:#1d4ed8;font-weight:600;">085 170 7997</a>”<br>
-Dunkineely Social<br>
-“The next Sunday Social in Dunkineely<br>
-Community Centre will be on Sunday<br>
-30th August 2026 from 8pm to 10pm. Music by<br>
-Country Traditions. Admission €10 which<br>
+included. Anyone wishing to be an Area Rep<br>
+for the group can contact Rory O’Donnell at<br>
+<a href="tel:+353872456994" style="color:#1d4ed8;font-weight:600;">087 2456 994</a>.<br>
+Dunkineely Social- “The next Sunday Social in<br>
+Dunkineely Community Centre will be on<br>
+Sunday 30th Aug 2026 from 8pm to 10pm.<br>
+Music by Country Traditions. Adm €10 which<br>
 includes refreshments”.<br>
-Alone Volunteer Recruitment<br>
-Friday 28th Aug 10.00am -12.00pm<br>
-Newtowncunningham Credit Union, Ballyhasky.<br>
-Friday 4th September 10.00am 12.00pm Raphoe<br>
-Credit Union Cathe dral Hill Townparks .<br>
-Clea ning of St. Patrick’s Church<br>
-Will take place on Monday 24th August at<br>
-5pm. All help is greatly appreciated.<br>
-Míle Bu íochas.<br>
-Eucharistic Adoration – St. Patrick’s<br>
-There will be a short meeting regarding<br>
-Eucharistic Adoration and its future, in St.<br>
-Patrick’s church on Tuesday 25th @<br>
-7:30 pm. It would be great if everyone<br>
-involved with adoration in St Patrick’s<br>
-could come along to this meeting and<br>
-anyone interested in giving of their time to<br>
-become an adorer. Thank you.<br>
-Family Carers Ireland<br>
-Are you feeling overwhelmed, have a query<br>
-or simply want to discuss your caring role?<br>
-Family Carers Ireland are running 1.1<br>
-support clinics remotely every Tuesday for<br>
-the months of July and August. These<br>
-clinics offer you a space and time talk over<br>
-the phone in the comfort of your own<br>
-home. To Book Call/text <a href="tel:+353868363842" style="color:#1d4ed8;font-weight:600;">0868363842</a> or<br>
-email <a href="mailto:Donegalcs@familycarers.ie" target="_blank" rel="noopener noreferrer">Donegalcs@familycarers.ie</a><br>
-Abide in His Love Women’s Conference.<br>
-The Great Northern Hotel, Bundoran, 20 –<br>
-22 November 2026.<br>
-Join women from across Ireland for a faith -<br>
-filled weekend with inspiring speakers<br>
-including Sarah Swafford, Danielle Noonan,<br>
-Fr Mark Wharton, Fr Barry Braum, Fr Oisín<br>
-Martin, the Dominican Sisters of Nashville,<br>
-Bishop Fintan Gavin, and more. Register<br>
-now at:<br>
-Lough Derg Pilgrimages for 2026<br>
-For the One Day Retreats, Heritage Day<br>
-Tours and Lakeshore Pilgrim Path<br>
-Pilgrimage please see <a href="https://www.loughderg.org" target="_blank" rel="noopener noreferrer">www.loughderg.org</a> ,<br>
-or email <a href="mailto:info@loughderg.org" target="_blank" rel="noopener noreferrer">info@loughderg.org</a> , Tel<br>
-<a href="tel:+353719861518" style="color:#1d4ed8;font-weight:600;">0719861518</a> for further information o n the<br>
-above retreats .<br>
+Donegal Group 173 Rise and Shine Trust<br>
+(formerly The Irish Handicapped<br>
+Children ’s Pilgrimage Trust and The Irish<br>
+Pilgrimage Trust ) are celebrating forty<br>
+years of taking young people with special<br>
+needs to Lourdes each Easter.<br>
+We are celebrating with a special Mass on<br>
+Saturday 26th Sept in the Church of the Irish<br>
+Martyrs, Letterkenny at 12 noon. The Mass<br>
+will be concelebrated by Bishop Niall Coll and<br>
+Bishop Donal Mc Keowan, Bishop of<br>
+Derry and many of the priests who travelled<br>
+to Lourdes with us over the years. We invite<br>
+all the guests and their families and all the<br>
+helpers who travelled with us over the years<br>
+to our Mass to celebrate the work of the<br>
+Donegal Group over these forty years. Eucharistic Adoration – St. Patrick’s<br>
+Following on from the recent meeting of<br>
+those involved in Eucharistic Adoration,<br>
+it was agreed to change the hours of<br>
+adoration in St. Patrick’s , from Thursday<br>
+10th September. The hours of adoration<br>
+in St. Patricks will take place between<br>
+2: 00 pm and 8: 00pm each week.<br>
+St. John Paul II said of adoration that,<br>
+‘Jesus himself is calling you…’<br>
+All of us are encouraged to take part in<br>
+Eucharistic Adoration to help us grow<br>
+and strengthen our relationship and our<br>
+closeness to God, the Father, Son and<br>
+Holy Spirit. It’s not a time that’s wasted,<br>
+but a time that nourishes us in our faith<br>
+and a place where we gain a better<br>
+awareness of the presence of God with<br>
+us and his love for us. Spending time<br>
+with God in adoration connects us with<br>
+God, but also with one another, as we<br>
+pray not only for our own needs but for<br>
+others as well. It can also benefit us<br>
+personally as it offers us peace, clarity<br>
+and strength to help us through all we<br>
+deal with each day in our lives. These are<br>
+just some of the many blessings and gifts<br>
+given through adoration. So please<br>
+consider giving some time to Jesus in the<br>
+Eucharist. “Deepen your prayer life as<br>
+well. Spend time praying before the<br>
+Eucharist in Eucharistic adoration.<br>
+These practises help you to hear God’s<br>
+voice clearly.”<br>
+Pope Leo XIV<br>
+Coffee Morning- A complimentary coffee<br>
+morning will be held on Friday 4th of<br>
+Sept. at 10.30 – 11.30am in St. Patrick’s<br>
+Parish Centre . Everyone welcome.<br>
 Mass for Expectant Families<br>
 Tues 8th September 2026 at 7pm in St.<br>
 Eunan’s Cathedral, Letterkenny.<br>
 Celebrated by Bishop Niall Coll.<br>
 Breast Cancer Awareness Month<br>
-Takes place Thursday, Oct ober 1st, 2026 –<br>
-Saturday, Oct 31st, 2026. For more<br>
-information,<br>
-pleasevisit breastcancerresearch.ie<br>
+Takes place Thursday, October 1st, 2026<br>
+– Saturday, Oct 31st, 2026. For more<br>
+information, please<br>
+visit breastcancerresearch.ie<br>
 or <a href="https://www.breastcancerireland.com" target="_blank" rel="noopener noreferrer">www.breastcancerireland.com</a> .<br>
-International Coffee Day 2026 takes place<br>
-on Thursday, October 1st, 2026. Please<br>
+International Coffee Day 2026 takes<br>
+place on Thursday, October 1st, 2026.<br>
+Please<br>
 see <a href="https://www.internationalcoffeeday.org" target="_blank" rel="noopener noreferrer">www.internationalcoffeeday.org</a> for<br>
 further details.<br>
-Sunday Collections – Sunda y 16th August<br>
-St. Patrick’s Church: €1,885<br>
-St. Agatha’s Church: €1,030<br>
-Thank you for you r contribution to the parish.<br>
+Sunday Collections – Sunday 23rd August<br>
+St. Patrick’s Church: €1,665<br>
+St. Agatha’s Church: € 1,115<br>
+Thank you for your contribution to the parish.<br>
 You can also use your card or phone to ‘ Tap to Donate ’ in Donegal<br>
 Church, to make your contributions and donations to St. Patrick’s<br>
-Church .<br>
+Church.<br>
 Notices</p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
@@ -1218,7 +1236,7 @@ Notices</p></div>
     <section class="parish-section">
       <h2 class="section-heading">Other RAPHOE Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="kincasslagh"><a class="parish-link" href="kincasslagh.html" target="_blank" rel="noopener noreferrer">Kincasslagh</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="raphoe"><a class="parish-link" href="drive-1jmslbrliw.html" target="_blank" rel="noopener noreferrer">Raphoe</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1270,9 +1288,9 @@ Notices</p></div>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1764,23 +1782,8 @@ Notices</p></div>
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

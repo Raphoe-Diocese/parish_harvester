@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Drumholm (Ballintra) Bulletin — 25/08/2026</title>
+  <title>Drumholm (Ballintra) Bulletin — 30/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -179,6 +187,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -201,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +275,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +472,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -863,7 +892,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,14 +900,14 @@
     <header class="header">
       <p class="diocese-label">RAPHOE</p>
       <h1>Drumholm (Ballintra) Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Drumholm (Ballintra) — 25/08/2026. Part of the Raphoe Diocese collated bulletin.</p>
-      <a class="download-link-top" href="drumholm-parish.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Drumholm (Ballintra) — 30/08/2026. Part of the Raphoe Diocese collated bulletin.</p>
+      <a class="download-link-top" href="drumholm-parish.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="drumholm-parish.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="drumholm-parish.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
@@ -895,7 +924,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="drumholm-parish.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="drumholm-parish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="drumholm-parish.pdf">Open PDF</a>
               <a href="drumholm-parish.pdf" download>Download</a>
             </div>
           </div>
@@ -934,11 +963,11 @@
       <div class="quiet-links">
         <a href="drumholm-parish-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-drumholm-ballintra" data-parish-name="Drumholm (Ballintra)"><h2 class="ocr-parish-name">Drumholm (Ballintra)</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-drumholm-ballintra" data-parish-name="Drumholm (Ballintra)"><h2 class="ocr-parish-name">Drumholm (Ballintra)</h2><p class="ocr-parish-date">30/08/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>20th SUNDAY<br>
 InIn<br>
-Ordinary Time.<br>
+Ordi nary Time. Ordi nary Time.<br>
 ST BRIDGET’S CHURCH<br>
 Drumholm Parish,<br>
 Ballintra.<br>
@@ -947,7 +976,7 @@ Fr Adrian Gavigan.<br>
 EMAIL: <a href="mailto:drumholmparish@gmail.com" target="_blank" rel="noopener noreferrer">drumholmparish@gmail.com</a><br>
 FACEBOOK; DRUMHOLM RC PARISH.<br>
 ST VINCENT DE PAUL ; <a href="tel:+353873433409" style="color:#1d4ed8;font-weight:600;">087 3433409</a><br>
-PARISH COLLECTIONS<br>
+PARISH C OLLECTIONS<br>
 A big thank you to everyone who<br>
 continues to support the parish.<br>
 Contributions can be made in the<br>
@@ -962,22 +991,22 @@ If electronic payments please<br>
 include your name and the<br>
 envelope number.<br>
 Collection - €1,430.00<br>
-Graveyard Extra - €285.00 WE PRAY FOR OUR DEAD ,<br>
+Graveyard Extra - €285.00 WE PRAY FOR OUR DEAD,<br>
 We Pray for all our Dead,<br>
 and for MARGARET GALLAGHER<br>
 Anniv Occurs, all those whose</p>
 <h3 class="b-head">anniversaries occurs</h3>
-<p>around this time</p>
-<h3 class="b-head">REST IN PEACE</h3>
-<p>10.00 am MONDAY 17TH AUG.<br>
-10.00 am TUESDAY 18TH AUG.<br>
-10.00 am THURSDAY 20TH AUG.<br>
-10.00 am FRIDAY 21ST AUG .<br>
-11.00am SUNDAY 23RD AUG. 06.30 pm SATURDAY 15 TH AUG.<br>
+<p>around this time<br>
+REST IN PEA CE. REST IN PEA CE.<br>
+10.00am MONDAY 17TH AUG.<br>
+10.00am TUESDAY 18TH AUG.<br>
+10.00am THURSDAY 20TH AUG.<br>
+10.00am FRIDAY 21ST AUG .<br>
+11.00am SUNDAY 23RD AUG. 06.30pm SATURDAY 15TH AUG.<br>
 MASS.<br>
-06.30pm SATURDAY 22ND AUG. WEDNESDAY 19TH AUG . PRO POPULO<br>
+06.30pm SATURDAY 22ND AUG. WEDNESDAY 19TH AUG. PRO POPULO<br>
 NO MASS. MASS<br>
-PRAYER Suitable for 20th SUNDAY in Ordinary Time.for 20th SUNDAY in Ordinary Time. .<br>
+PRAYER Suitabl e for 20th SUN DAY in Ordinary Time . for 20th SUN DAY in Ordinary Time .<br>
 “Almighty and everlasting God, You have taken up body and soul into the<br>
 heavenly glory the Immaculate Virgin Mary, Mother of Your Son: Grant,<br>
 we beseech You, that, ever intent upon heavenly things,we may be<br>
@@ -986,56 +1015,56 @@ Lord, who lives and reigns with You and the Holy Spirit, One God, forever<br>
 and ever. Amen ”. MASS<br>
 KITTY &amp; PAT DOHERTY .<br>
 BETTY O’SULLIVAN - Months Mind 11.00am. SUNDAY 16TH AUG.<br>
-MASS INTENTIONS; MASS INTENTIONS;<br>
+MAS S INTENTIONS; MAS S INTENTIONS;<br>
 From now on only three<br>
 Anniversary Masses will be offered<br>
 on Saturday &amp; Sunday Masses .<br>
 Please book your Masses early.<br>
 MARY O’SHEA.<br>
-NOEL DUIGNAN. NATIONAL NOVEANA to our LADY OF KNOCK 13 --21 AUG. 21 AUG.<br>
+NOEL DUIGNAN. NAT IONAL NOVEANA to our LADY OF KNOC K 13--21 AUG . 21 AUG .<br>
 Raphoe Diocese Section will take place Sat 15th Aug. The main celebrant is<br>
 Bishop Niall Coll. His talk is titled &quot;Our Lady: A Quiet Shelter of God&#x27;s Love.&quot;<br>
-SEE POSTER IN ADDITI ONAL NEWS. ONAL NEWS.<br>
-MARY’S MEALS. MARY’S MEALS. Mary&#x27;s Meals are happy to announce the launch of their<br>
+SEE POSTER IN ADDITI SEE POSTER IN ADDITIONAL NEWS. ONAL NEWS.<br>
+MARY ’S MEALS. MARY ’S MEALS. Mary&#x27;s Meals are happy to announce the launch of their<br>
 sponsored walk, Step by Step to Feed the Next Child. They have eight walks<br>
-across Ireland, starting on 7 August and all arriving in Knock, Co Mayo on15 Aug.<br>
+across Ireland, starting on 7 August and all arriving in Kn ock, Co Mayo on15 Aug.<br>
 The Donegal Mary&#x27;s Meals Group will begin their walk in Malin Town. You are<br>
-invited to join in any part of the walk. Mary&#x27;s Meals are providing food for over<br>
-three million children every school day, bringing great hope for the future.<br>
+invited to join in any part of the walk. Mary&#x27;s Meals are pro viding food for over<br>
+three million children every school day, bringing great h ope for the future.<br>
 Mary&#x27;s Meals are looking for walkers, collectors, supporters and drivers. We are<br>
-holding a meeting in the Pastoral Centre, Letterkenny to organise the walk on<br>
-Sunday 26 July at 7pm and we would love to see you there. CLG NAOMH BRÍD WEEKLY NEWSCLG NAOMH BRÍD WEEKLY NEWS . LOTTO R ESULTS ; ;<br>
+holding a meeting in the Pastoral Centre, Letterkenny to organ ise the walk on<br>
+Sunday 26 July at 7pm and we would love to see you there. CLG NAOMH BRÍD WEEKLY NEWS. LOTTO R LOTTO RESULTS ESULTS; ;<br>
 10/08/26 , This week’s numbers are 03,07,14,16,19, There were no winners of<br>
 this week&#x27;s jackpot . Next week&#x27;s jackpot is now €6,700 . Lucky dip<br>
 winners of €25, Evelyn Toland, Martin Gallagher, Bridie Gorman, Josh<br>
 McLaughlin, Thanks for all your support with this week’s draw, Tickets are on<br>
-sale online through Clupzap or in the Post Office, Cassidy&#x27;s Shop, Kee&#x27;s Shop.<br>
-Next draw on Monday 10th Aug at 8.30pm in THE S EVEN ARCHES BAR.<br>
-SIGNED MASS CARDS.<br>
+sale online through Clupzap or in the Post OfÏce, Cassidy&#x27;s Shop, Kee&#x27;s Shop.<br>
+Next draw on Monday 10th Aug at 8.30pm in THE SEVEN ARCHES BAR.<br>
+SIGNED MASS C ARDS. SIGNED MASS C ARDS.<br>
 Signed Mass Cards / Bouquets will be<br>
 available now at the Sacristy and<br>
 Parochial House . Stipend €10 .<br>
-MARRIAGE ENCOUNTER IRELAND invites married couples to a<br>
+MARR IAGE ENCOUNT ER IRELAND invites married couples to a<br>
 residential Weekend from Friday 2nd to Sunday 4th October 2026 at the<br>
 “Focolare Centre” &quot;Curryhills&quot;, Prosperous, Co. Kildare. Step away from<br>
 daily distractions to deepen your communication, renew your love, and<br>
 rediscover the joy of your marriage. <a href="https://www.marriageencounter.ie" target="_blank" rel="noopener noreferrer">www.marriageencounter.ie</a><br>
-MASS FOR EXPECTANT F AMILIES on 8th September in St Eunan&#x27;s<br>
+MAS S FOR EXPECTANT F MAS S FOR EXPECTANT FAMI LIES on 8th September in St Eunan&#x27;s<br>
 Cathedral Letterkenny celebrated by Bishop Coll.<br>
 THEWAY.IE is a new digital platform set up by the Irish<br>
 Bishops Conference dedicated to sharing the &#x27;Good News&#x27;<br>
 and the witness of the Catholic Church in Ireland. It is<br>
 intended to help people discover the faith, live the faith<br>
-and pass on the faith. It is for both seekers and followers. ST JOSEPH MEN’S CAMINO. ST JOSEPH MEN’S CAMINO. Join men from across Ireland on Saturday<br>
-12th September for a 25km pilgrimage through the Boyne Valley, beginning in<br>
-Drogheda. SEE POSTER IN ADDITI ONAL NEWS. ONAL NEWS. Drumholm (Ballintra)</p></div>
+and pass on the faith. It is for both seekers and followers. ST JOSEPH ME N’S CAMI NO. ST JOSEPH ME N’S CAMI NO. Join men from across Ireland on Saturday<br>
+12th September for a 25km pilgrimage through the Boyne Valley, beginn ing in<br>
+Drogheda. SEE POSTER IN ADDITI SEE POSTER IN ADDITIONAL NEWS. ONAL NEWS. Drumholm (Ballintra) <a href="https://www.parishpress.net/wp-content/uploads/parish-bulletins/donegal/raphoe/drumholm-parish/bulletin.pdf?t=1782303743" target="_blank" rel="noopener noreferrer">https://www.parishpress.net/wp-content/uploads/parish-bulletins/donegal/raphoe/drumholm-parish/bulletin.pdf?t=1782303743</a></p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other RAPHOE Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="kincasslagh"><a class="parish-link" href="kincasslagh.html" target="_blank" rel="noopener noreferrer">Kincasslagh</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="raphoe"><a class="parish-link" href="drive-1jmslbrliw.html" target="_blank" rel="noopener noreferrer">Raphoe</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="tawnawillyparish.html" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="tawnawillyparish.html" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1087,9 +1116,9 @@ Drogheda. SEE POSTER IN ADDITI ONAL NEWS. ONAL NEWS. Drumholm (Ballintra)</p></d
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1581,23 +1610,8 @@ Drogheda. SEE POSTER IN ADDITI ONAL NEWS. ONAL NEWS. Drumholm (Ballintra)</p></d
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

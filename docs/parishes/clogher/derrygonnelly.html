@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Derrygonnelly (Botha) Bulletin — 25/08/2026</title>
+  <title>Derrygonnelly (Botha) Bulletin — 30/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -179,6 +187,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -201,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +275,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +472,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -863,7 +892,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,14 +900,14 @@
     <header class="header">
       <p class="diocese-label">CLOGHER</p>
       <h1>Derrygonnelly (Botha) Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Derrygonnelly (Botha) — 25/08/2026. Part of the Clogher Diocese collated bulletin.</p>
-      <a class="download-link-top" href="derrygonnelly.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Derrygonnelly (Botha) — 30/08/2026. Part of the Clogher Diocese collated bulletin.</p>
+      <a class="download-link-top" href="derrygonnelly.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="derrygonnelly.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="derrygonnelly.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
@@ -895,7 +924,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="derrygonnelly.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="derrygonnelly.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="derrygonnelly.pdf">Open PDF</a>
               <a href="derrygonnelly.pdf" download>Download</a>
             </div>
           </div>
@@ -934,163 +963,161 @@
       <div class="quiet-links">
         <a href="derrygonnelly-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-derrygonnelly-botha" data-parish-name="Derrygonnelly (Botha)"><h2 class="ocr-parish-name">Derrygonnelly (Botha)</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-derrygonnelly-botha" data-parish-name="Derrygonnelly (Botha)"><h2 class="ocr-parish-name">Derrygonnelly (Botha)</h2><p class="ocr-parish-date">30/08/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>Parish of Botha<br>
 Parish Priest: Fr. Cathal Deery Tel: <a href="tel:+442868641207" style="color:#1d4ed8;font-weight:600;">028 68641207</a> Email: <a href="mailto:frcathaldeery@clogherparishes.ie" target="_blank" rel="noopener noreferrer">frcathaldeery@clogherparishes.ie</a><br>
 Parish Oﬃce: Tel: <a href="tel:+442868641889" style="color:#1d4ed8;font-weight:600;">028 68641889</a> Email: <a href="mailto:botha@clogherparishes.ie" target="_blank" rel="noopener noreferrer">botha@clogherparishes.ie</a><br>
-Hours: Monday and Thursday 6.30pm – 9.30pm Wednesday 1.30pm – 9.30pm<br>
-Parish webcam : churchmedia.tv website: hƩp://bothaparish.com<br>
-Twenty-First Sunday in Ordinary Time<br>
-When Jesus presses the question, who do you say I am?, we feel him speaking to us. Naturally, we think of our faith now<br>
-in the light of our own journey of life and pilgrimage of faith. How did I start out? What was my image of Jesus then and<br>
-how did I relate to him? Has there been a major turning point for me and can I name one or two? How have I deepened<br>
-my familiarity with Jesus and who he is for me now? If I were to choose an image or a metaphor what would come to<br>
-mind? If I were to explain to someone what my faith in Jesus is, what words would I use?<br>
+Hours: Monday 6pm – 9pm Wednesday 10.30am – 6.30pm Thursda y 10.30am – 1.30pm<br>
+Parish webcam : churchmedia.tv website : hƩp://bothaparish.com<br>
+Twenty-Second Sunday in Ordinary Time<br>
+As the day of resurrection, Sunday is not only a remembr ance of a past event; it is a celebration of the living<br>
+presence of the risen Lord in the midst of his own people. For this presence to be properly proclaimed it is<br>
+important that the disciples of Christ, saved as the people of God, come together to express fully the very<br>
+identity of the Church (Pope John Paul II, Dies Domini 31 ).<br>
 Masses for the Week<br>
-Sacred Heart Boho:<br>
-Sunday 23rd August 10am Mass Anniversary: Phil Corrigan, Aghaherrish – John Gilroy,<br>
-Aghamore – Susan and Jim McAfee and Deceased of the McAfee Family, Aghahooran –<br>
-Charlie McManus and Deceased of the McManus Family, Farnaconnell<br>
-St Patrick’s Derrygonnelly:<br>
-Sunday 23rd August 11:30am Mass Anniversary: Kevin Sheerin and Deceased of the<br>
-Sheerin Family, Donegall - Gavin and Phil Meehan and Deceased of the Meehan Family, Main<br>
-Street<br>
-Tuesday 25th August Eucharistic Adoration 10am – 7pm<br>
-Sunday 30th August 11:30am Mass Anniversary: Danny and Madeline McGarry, Tonagh –<br>
-Packie and Mary McTeggart, Derryvary – Thomas Murphy, Drumanane<br>
 Immaculate Conception Monea:<br>
 Sunday 30th August 10am Mass People of the Parish<br>
-Daily Mass: As Father Cathal is currently on retreat there will be no daily masses this week.<br>
-Envelope Collection : Week ending 16th August – Weekly o Ưerings £1525.00 and €21.30. Thank<br>
-you for your generous support. Prayer to St Monica<br>
-Feast Day 27th August<br>
-Great St. Monica,<br>
-patroness of fathers and mothers,<br>
-please take our children, especially those<br>
-who have turned from the ways of God<br>
-and His Church, under your protection.<br>
-Help them always remain faithful to<br>
-their baptismal vows.<br>
-Give them strength to walk always in<br>
-the ways of the Lord, despite the<br>
-temptations and false values they find in<br>
-the world today.<br>
-Grant that they may share with you in<br>
-the joys of eternal life in God. Amen. Prayer to St Agustine<br>
-Feast Day 28th August<br>
-Glorious Saint Augustine,<br>
-patron of the restless heart<br>
-and seeker of truth,<br>
-I turn to you with confidence.<br>
-Obtain for me from God<br>
-the wisdom to know His will,<br>
-the courage to follow it,<br>
-and the grace to bring my restless heart<br>
-to rest in Him.<br>
-Hear my prayer and intercede for my<br>
-present distress. Amen<br>
-one of the greatest theologians and philosophers of the early<br>
-Church: his writings – especially Confessions and The City<br>
-of God – are ﬁlled with deep spiritual insights.<br>
-Derrygonnelly (Botha)</p>
+St Patrick’s Derrygonnelly:<br>
+Sunday 30th August 11:30am Mass Anniversary: Danny and Madeline McGarry, Tonagh –<br>
+Packie and Mary McTeggart, Derryvary – Thomas Murphy, Drumanane<br>
+Tuesday 1st September Eucharistic Adoration 10am – 7pm<br>
+Tuesday 1st September Mass and Novena to St Peregrine 7pm Anniversary: Leo Grifﬁn and<br>
+Deceased of the Grifﬁn Family, Kilduff – Maurice and Agnes Cassidy, Drumgormley<br>
+Wednesday 2nd September 10am Mass<br>
+Thursday 3rd September 10am Mass<br>
+Sunday 6th September 11:30am Mass Anniversary: People of the Parish<br>
+Sacred Heart Boho:<br>
+Sunday 6th September 10am Mass Months Memory: Mary Gallagher, Drumbeggar -<br>
+Anniversary: Jackie McGrath, Tobradan – Rita Howe and Deceased of the Howe Family,<br>
+Leitrim<br>
+Recently Deceased: as a parish community we extend sympathy to the family, re latives<br>
+and friends of James Maguire, Spain, formerly London and Marl bank. May he rest in peace.<br>
+Annual Memorial Service: for<br>
+all our dead will take place on<br>
+Sunday 8th November at 3pm in<br>
+St. Patrick’s Church Derrygonnelly.<br>
+All the dead will be remembered but<br>
+in particular those who have died<br>
+since November last year.<br>
+Parish OfȦce Hours: from 1st<br>
+September the parish office will be<br>
+open as follows:<br>
+Monday 6pm – 9pm<br>
+Wednesday 10.30am – 6.30pm<br>
+Thursday 10.30am – 1.30pm<br>
+Visitation of the sick: The elderly, sick and housebound will next receive a parish<br>
+visit at the beginning of October.<br>
+Prayer for the New School Year<br>
+God of wisdom and might, we praise you<br>
+for the wonder of our being,<br>
+for mind, body, and spirit.<br>
+Be with our children as they begin<br>
+a new school year.<br>
+Bless them, their teachers and staff.<br>
+Give them the strength and grace<br>
+as their bodies grow; wisdom and knowledge to<br>
+their minds as they search for understanding; and<br>
+peace and zeal to their hearts. Amen.<br>
+Derrygonnelly (Botha) <a href="http://www.bothaparish.com/" target="_blank" rel="noopener noreferrer">http://www.bothaparish.com/</a></p>
 <hr>
 <p class="page-label">Page 2</p>
-<p>The Season of Creation: &quot;All of us can cooperate as<br>
-instruments of God for the care of creation, each according to his<br>
-or her own culture, experience, involvements and talents.&quot;<br>
-(Laudato Si&#x27; , 14)<br>
-Laudato Si’ Ireland Network Meeting: Tuesday August<br>
-25th at 7pm online: If you would like to join this meeting to hear<br>
-more about the Season of Creation 2026, you are very welcome.<br>
-Please contact <a href="mailto:Roisin.Pye@Trocaire.org" target="_blank" rel="noopener noreferrer">Roisin.Pye@Trocaire.org</a> for the link to join.<br>
-Faith in Bloom Conference ~ Saturday, 29 August, Knock<br>
-Shrine is hosting a day conference celebrating its inspiring Return<br>
-to Nature project. Over the past year, the Shrine has worked closely<br>
-with Mayo County Council Biodiversity O Ưicer Sheila Murphy to<br>
-transform areas of its grounds through pollinator-friendly habitats,<br>
-native orchards, bird and bat boxes, reduced mowing, and the<br>
-development of a Biodiversity Action Plan. The conference will<br>
-share practical lessons from Knock&#x27;s experience and o Ưer<br>
-inspiration for other parishes wishing to put care for creation into<br>
-action. Further information: <a href="https://www.knockshrine.ie/church-" target="_blank" rel="noopener noreferrer">https://www.knockshrine.ie/church-</a><br>
-return-to-nature-conference-saturday-august-29th-2026/<br>
-Clogher don Óige: are excited to invite you to their upcoming<br>
-special young adult series event — The Chosen , a groundbreaking<br>
-drama about the life of Jesus Christ, told through the eyes of those<br>
-who knew Him. Join us for evenings of reﬂection, discussion, and<br>
-community as we journey together through this inspiring portrayal<br>
-of Jesus’ revolutionary life and teachings. On Thursdays, 3rd<br>
-September 2026 – 29th October 2026 from 7:30pm – 9:30pm in St.<br>
-Joseph’s Pastoral Centre, Monaghan. More info at<br>
-<a href="mailto:info@clogherdonoige.org" target="_blank" rel="noopener noreferrer">info@clogherdonoige.org</a> .<br>
-Poor Clares Galway: Half-Day Retreat for women 18-40 with<br>
-women’s spirituality speaker Louise Mc Guinness. An opportunity to encounter God&#x27;s love and deepen your<br>
-life of prayer and communion with God. The event will take place from 2pm to 6pm on Sunday 6th<br>
-September. For more information and to register: <a href="https://cherisheddaughters.eventbrite.ie" target="_blank" rel="noopener noreferrer">https://cherisheddaughters.eventbrite.ie</a><br>
-Derrygonnelly Harps GFC : Jackpot £4300. £20 Sheena Dolan, Boho, online player, Siobhan Maguire<br>
-and Michael Corrigan, Derrygonnelly. Draw in Old Pals tonight. Thanks to all Lotto supporters, promoters and<br>
-supervisors. Condolence to the McConnell Family on the passing of Seamus McGovern, Enniskillen.<br>
-‘You have made us for Yourself, O Lord, and our hearts are restless until they rest in You.’<br>
-St Agustine<br>
+<p>Altar Society September: Derrygonnelly – Claire Miller and<br>
+Teresa Foy. Collection after 11.30am Mass on Sunday 13th<br>
+September in St Patrick’s, Derrygonnelly. Boho – Anne McHugh<br>
+and Rose McHugh. Collector: Dominic McGurren. Monea:<br>
+Breda and Niamh DuƯy. Collector – Eamon Jones<br>
+Envelope Collection : Week ending 23rd August – Weekly<br>
+oƯerings £1465.00 and €49.30. Thank you for your ge nerous<br>
+support.<br>
+The Season of Creation: Creation is God’s sacred gift,<br>
+entrusted to our care. Christians are called to pro tect and<br>
+nurture Creation working in partnership with others and passing<br>
+this responsibility on to future generations. The e ssential<br>
+element of water maintains the balance of earth, and if our<br>
+waters are polluted and threatened, our earth’s ﬂou rishing is<br>
+compromised. Pope Francis challenges us: “What is the goal of<br>
+our work? What need does the Earth have of us? Leaving a n<br>
+inhabitable planet to future generations is up to us” (Laudato Si’,<br>
+160).<br>
+Rise and Shine Trust-Easter 2027 Pilgrimage:<br>
+Applications are invited from young people with additi onal social,<br>
+emotional, physical and learning needs aged 11 - 30 who are<br>
+interested in travelling as guests to Lourdes with the Rise and<br>
+Shine Trust. Apply online at riseandshine.ie . Closing date 15th<br>
+October. Applications are also sought for carers aged 18+ w ho<br>
+would be interested in accompanying guests on the tr ip. Carers<br>
+applications at riseandshine.ie For more information contact Sian<br>
+<a href="tel:+3537960211352" style="color:#1d4ed8;font-weight:600;">07960211352</a> or Maurice <a href="tel:+3537711504821" style="color:#1d4ed8;font-weight:600;">07711504821</a> or at <a href="https://www.riseandshine.ie" target="_blank" rel="noopener noreferrer">www.riseandshine.ie</a><br>
+Enniskillen VSOSJ Branch: Monthly Holy Hour Devotion<br>
+and Benediction for Vocations will be held in St Mic hael&#x27;s Church<br>
+on Friday 4th September at 7pm. Everyone welcome to attend .<br>
+Derrygonnelly Harps GFC : Jackpot £4400. £20 Marie Hoy,<br>
+Boho, Irene McGovern, and Bridget Greene, Derrygonne lly. Draw in Doogies tonight. Thanks to all Lotto<br>
+supporters, promoters and supervisors.<br>
+Boho Seniors’: lunch will resume on Tuesday 8th September at 1pm. Ne w members welcome.<br>
+Popes Intention for September - For the care of water - Let us pray for a just and<br>
+sustainable management of water, a vital resource, s o that everyone may have equal access to it.<br>
 Points to Ponder<br>
-On many occasions, Jesus asks his<br>
-disciples not to tell anyone that he is<br>
-the Son of God, the Messiah. Why<br>
-might that be? The only reason I can<br>
-imagine is that he’s saying every one<br>
-of us has to come to that knowledge<br>
-for ourselves.<br>
-We can’t let someone else do our<br>
-spiritual homework for us, but many of<br>
-us do. We Catholics let the pope,<br>
-bishops, and priests give us all the<br>
-answers and then we just parrot them<br>
-back. Has there been any experience<br>
-of it ourselves?<br>
-Often, the answer is ‘usually not.’<br>
-Many Christians believe what we’re<br>
-supposed to believe. But here Jesus<br>
-says, ‘Who do you say that I am?’<br>
-What have you experienced? What<br>
-have you personally discovered?<br>
-What knowledge do you have?<br>
-This passage is most often used to<br>
-preach the primacy of the papacy<br>
-since Jesus tells Peter, ‘You are the<br>
-rock upon which I will build my<br>
-church.’<br>
-That’s true, but a couple chapters<br>
-later Jesus says the identical thing to<br>
-the whole community: ‘Whatever you<br>
-bind on earth will be bound in heaven.<br>
-What you loose on earth, will be<br>
-loosed in heaven’ (Matthew 18:18).<br>
-Jesus is not only talking about the<br>
-pope; he’s talking about the people of<br>
-God, all of us. Peter as the symbolic<br>
-leader has to do it ﬁrst, but then we all<br>
-participate in passing on the message.<br>
-Centre for action and contemplation<br>
-cac.org Thought for Today<br>
-What we believe about God matters. More than anything<br>
-else in this world. And there is no more important time to<br>
-wrestle with this than right now. In the midst of all that<br>
-we are going through in our world today, we confess once<br>
-again our faith and trust in Jesus, believing, with all our<br>
-heart, soul, mind and strength, that he is the Savior of our<br>
-world, the son of the living God. Who promises to calm our<br>
-every storm, who offers us a peace that surpasses<br>
-understanding, who is eager to hear our every prayer, and<br>
-who assures us that he will be with us always, even to the<br>
-end of the age. mypastoralponderings.com</p></div>
+Peter has just been congratulated as<br>
+the rock on which Jesus will build his<br>
+church. He is comfortable in a<br>
+theology of grace and glory. Suddenly<br>
+that rock looks sandy and unsafe.<br>
+Jesus calls him abruptly out of his<br>
+comfort zone into the real world<br>
+where suƯering must be faced (cross<br>
+is used here as a proverbial term for<br>
+suƯering and agony, not referring<br>
+speciﬁcally to Jesus’ cruciﬁxion).<br>
+One of the ideas in the gospel is that<br>
+we take up the cross of doing what is<br>
+right and being willing to bear it. Like<br>
+parents who try to explain, cajole,<br>
+encourage and deﬁne what is right for<br>
+their children, even when they are<br>
+thought foolish. Jesus bore a cross to<br>
+the end of his convictions and love.<br>
+Taking the cross is also accepting and<br>
+living with pain, suƯering of any sort,<br>
+and the griefs of life we can do nothing<br>
+about. Crosses may be inﬂicted on us<br>
+by others.<br>
+We know of people who have<br>
+accepted a heavy burden in life and<br>
+who ploughed tough furrows, through<br>
+no fault of their own. They have been<br>
+helped often by the example of the<br>
+one who carried the cross to the end.<br>
+Help often came to them also from<br>
+family, friends and neighbours.<br>
+On the way to Calvary, Jesus was<br>
+helped by one man, remembered<br>
+forever, Simon from Africa. Help can<br>
+come from expected or unexpected<br>
+quarters, but help there must be if we<br>
+are to bear our crosses in life. In prayer<br>
+we might ask how we help those near<br>
+us carry the burdens of their lives.<br>
+sacredspace.com • The Irish Jesuit<br>
+Why Sunday Matters<br>
+The Sunday Mass is not only a time for worship but also for<br>
+mission. Having listened to God’s word and received the gift<br>
+of Christ’s Body and Blood, we are sent to live out our faith<br>
+in the world as missionaries ; sent to share the love of Christ<br>
+with others. As the late Pope Francis reminded us, ‘We do<br>
+not go to Mass in order to give something to God, but to<br>
+receive what we truly need from Him. In this spirit, we ar e<br>
+called to approach the Eucharist not out of obligation, bu t<br>
+with a deep desire for spiritual transformation.’<br>
+(Irish Catholic Bishops’ Conference, Why Sunday Matters, 2025)</p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other CLOGHER Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ballybay (tullycorbet)"><a class="parish-link" href="ballybay.html" target="_blank" rel="noopener noreferrer">Ballybay (Tullycorbet)</a></li><li class="parish-item" data-name="carrickmacross (machaire rois)"><a class="parish-link" href="carrickmacross.html" target="_blank" rel="noopener noreferrer">Carrickmacross (Machaire Rois)</a></li><li class="parish-item" data-name="castleblayney (muckno, includes clontibret)"><a class="parish-link" href="castleblayney.html" target="_blank" rel="noopener noreferrer">Castleblayney (Muckno, includes Clontibret)</a></li><li class="parish-item" data-name="clones"><a class="parish-link" href="clones.html" target="_blank" rel="noopener noreferrer">Clones</a></li><li class="parish-item" data-name="corcaghan-threemilehouse (kilmore &amp; drumsnatt)"><a class="parish-link" href="corcaghanthreemilehouse.html" target="_blank" rel="noopener noreferrer">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</a></li><li class="parish-item" data-name="donagh"><a class="parish-link" href="donagh.html" target="_blank" rel="noopener noreferrer">Donagh</a></li><li class="parish-item" data-name="donaghmoyne"><a class="parish-link" href="donaghmoyne.html" target="_blank" rel="noopener noreferrer">Donaghmoyne</a></li><li class="parish-item" data-name="enniskillen (st michael&#x27;s parish)"><a class="parish-link" href="enniskillen.html" target="_blank" rel="noopener noreferrer">Enniskillen (St Michael&#x27;s Parish)</a></li><li class="parish-item" data-name="errigal truagh"><a class="parish-link" href="errigaltruagh.html" target="_blank" rel="noopener noreferrer">Errigal Truagh</a></li><li class="parish-item" data-name="fintona (donacavey)"><a class="parish-link" href="fintona.html" target="_blank" rel="noopener noreferrer">Fintona (Donacavey)</a></li><li class="parish-item" data-name="irvinestown (devenish)"><a class="parish-link" href="irvinestown.html" target="_blank" rel="noopener noreferrer">Irvinestown (Devenish)</a></li><li class="parish-item" data-name="killanny"><a class="parish-link" href="killanny.html" target="_blank" rel="noopener noreferrer">Killanny</a></li><li class="parish-item" data-name="magheracloone"><a class="parish-link" href="magheracloone.html" target="_blank" rel="noopener noreferrer">Magheracloone</a></li><li class="parish-item" data-name="monaghan &amp; rackwallace (includes tyholland)"><a class="parish-link" href="monaghanrackwallace.html" target="_blank" rel="noopener noreferrer">Monaghan &amp; Rackwallace (includes Tyholland)</a></li><li class="parish-item" data-name="roslea"><a class="parish-link" href="roslea.html" target="_blank" rel="noopener noreferrer">Roslea</a></li><li class="parish-item" data-name="tempo (pobal)"><a class="parish-link" href="tempo.html" target="_blank" rel="noopener noreferrer">Tempo (Pobal)</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ballybay (tullycorbet)"><a class="parish-link" href="ballybay.html" target="_blank" rel="noopener noreferrer">Ballybay (Tullycorbet)</a></li><li class="parish-item" data-name="carrickmacross (machaire rois)"><a class="parish-link" href="carrickmacross.html" target="_blank" rel="noopener noreferrer">Carrickmacross (Machaire Rois)</a></li><li class="parish-item" data-name="castleblayney (muckno, includes clontibret)"><a class="parish-link" href="castleblayney.html" target="_blank" rel="noopener noreferrer">Castleblayney (Muckno, includes Clontibret)</a></li><li class="parish-item" data-name="clones"><a class="parish-link" href="clones.html" target="_blank" rel="noopener noreferrer">Clones</a></li><li class="parish-item" data-name="corcaghan-threemilehouse (kilmore &amp; drumsnatt)"><a class="parish-link" href="corcaghanthreemilehouse.html" target="_blank" rel="noopener noreferrer">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</a></li><li class="parish-item" data-name="donagh"><a class="parish-link" href="donagh.html" target="_blank" rel="noopener noreferrer">Donagh</a></li><li class="parish-item" data-name="enniskillen (st michael&#x27;s parish)"><a class="parish-link" href="enniskillen.html" target="_blank" rel="noopener noreferrer">Enniskillen (St Michael&#x27;s Parish)</a></li><li class="parish-item" data-name="errigal truagh"><a class="parish-link" href="errigaltruagh.html" target="_blank" rel="noopener noreferrer">Errigal Truagh</a></li><li class="parish-item" data-name="irvinestown (devenish)"><a class="parish-link" href="irvinestown.html" target="_blank" rel="noopener noreferrer">Irvinestown (Devenish)</a></li><li class="parish-item" data-name="killanny"><a class="parish-link" href="killanny.html" target="_blank" rel="noopener noreferrer">Killanny</a></li><li class="parish-item" data-name="magheracloone"><a class="parish-link" href="magheracloone.html" target="_blank" rel="noopener noreferrer">Magheracloone</a></li><li class="parish-item" data-name="monaghan &amp; rackwallace (includes tyholland)"><a class="parish-link" href="monaghanrackwallace.html" target="_blank" rel="noopener noreferrer">Monaghan &amp; Rackwallace (includes Tyholland)</a></li><li class="parish-item" data-name="tempo (pobal)"><a class="parish-link" href="tempo.html" target="_blank" rel="noopener noreferrer">Tempo (Pobal)</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1142,9 +1169,9 @@ end of the age. mypastoralponderings.com</p></div>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1636,23 +1663,8 @@ end of the age. mypastoralponderings.com</p></div>
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

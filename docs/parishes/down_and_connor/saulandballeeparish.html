@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Saul and Ballee Bulletin — 25/08/2026</title>
+  <title>Saul and Ballee Bulletin — 30/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -179,6 +187,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -201,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +275,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +472,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -863,7 +892,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,14 +900,14 @@
     <header class="header">
       <p class="diocese-label">DOWN &amp; CONNOR</p>
       <h1>Saul and Ballee Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Saul and Ballee — 25/08/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
-      <a class="download-link-top" href="saulandballeeparish.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Saul and Ballee — 30/08/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
+      <a class="download-link-top" href="saulandballeeparish.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="saulandballeeparish.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="saulandballeeparish.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
@@ -895,7 +924,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="saulandballeeparish.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="saulandballeeparish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="saulandballeeparish.pdf">Open PDF</a>
               <a href="saulandballeeparish.pdf" download>Download</a>
             </div>
           </div>
@@ -934,11 +963,11 @@
       <div class="quiet-links">
         <a href="saulandballeeparish-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-saul-and-ballee" data-parish-name="Saul and Ballee"><h2 class="ocr-parish-name">Saul and Ballee</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-saul-and-ballee" data-parish-name="Saul and Ballee"><h2 class="ocr-parish-name">Saul and Ballee</h2><p class="ocr-parish-date">30/08/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>Downpatrick Family of Parishes of Saul &amp; Ballee and Kilclief<br>
-Twentieth Sunday of Ordinary Time<br>
-Sunday 23rd August 2026</p>
+Twent y Second Sunday of Ordinary Time<br>
+Sunday 30th August 2026</p>
 <h3 class="b-head">Mass Schedule for the coming week</h3>
 <p>Date St Patrick’s<br>
 Saul Stella Maris<br>
@@ -946,51 +975,52 @@ Strangford St Joseph’s<br>
 Ballycruttle St Malachy’s<br>
 Kilclief St Tassach’s<br>
 Carlin<br>
-Sunday 23rd August 9.30am 11am 12noon<br>
-Monday 24th August 10am 7.30pm<br>
-Tuesday 25th August 10am<br>
-Weds 26th August 10am<br>
-Thursday 27th August<br>
-Friday 28th August 7pm 9.30am<br>
-Saturday 29th August 5pm 6.30pm<br>
 Sunday 30th August 9.30am 11am<br>
+Monday 31st August 10am 7.30pm<br>
+Tuesday 1st Sept 10am<br>
+Weds 2nd Sept 10am<br>
+Thursday 3rd Sept<br>
+Friday 4th Sept 7pm 9.30am<br>
+Saturday 5th Sept 5pm 6.30pm<br>
+Sunday 6th Sept 9.30am 12noon 11am<br>
 Masses are available to view online at <a href="https://www.saulandballeeparish.com" target="_blank" rel="noopener noreferrer">www.saulandballeeparish.com</a> and<br>
-Eucharistic Adoration in St Patrick’s Church, Saul<br>
-Due to a wedding in St Patrick’s Church this Tuesday we have to make the<br>
-following amendments to Adoration: -<br>
-There will be no Adoration this Tuesday morning<br>
-Holy Hour will take place from 2 pm to 3pm followed by Adoration until 8pm<br>
-Everyone welcome<br>
+Eucharistic Adoration in St Patrick’s Church, Saul each Tuesday after 10am Mass<br>
+concluding at 8pm. Holy Hour from 2-3pm<br>
 Our Lady of Knock Novena each Monday evening in Stella Maris, Strangford at 7.10pm .<br>
 The Sanctuary Lamp in St Patrick’s Church, Saul has been lit for private intentions. If you<br>
 would like it lit for your intentions please contact the Parish office. The cost is £5 per week.<br>
-Cemetery Sunday collection taken up at Ballycruttle amounted to £ 639. We thank all those<br>
-who donated. There was no collection taken up at Saul.<br>
-The Parish office will be closed on Tuesday 23rd and Wednesday 24th August and re -<br>
-open on Thursday 25th.<br>
-Saul and Ballee</p>
+The Parish office will be closed on Monday 31st August and Tuesday 1st September and<br>
+re-open on Wednesday 2nd September.<br>
+Sick and housebound Parishioners will be attended this week as usual.<br>
+Down &amp; Connor vocations newsletter is available in the Churches. Please take a copy home<br>
+to read.<br>
+Job vacancy – Pastoral Ministry Co-Ordinator in Belfast Jesuit Centre (fixed term<br>
+contract for 2 years). Further details can be obtained from <a href="https://www.downandconnor.org" target="_blank" rel="noopener noreferrer">www.downandconnor.org</a> and<br>
+click on “job vacancies”. Closing date is 12noon on Thursday 10th September 2026 Saul and Ballee <a href="https://www.saulandballeeparish.com" target="_blank" rel="noopener noreferrer">https://www.saulandballeeparish.com</a></p>
 <hr>
 <p class="page-label">Page 2</p>
-<p>Parish of Saul &amp; Ballee</p>
-<h3 class="b-head">Months Mind Mass es</h3>
-<p>Gerry McCashin on Saturday 22nd August at 5pm in St Patrick’s, Saul<br>
-Adrian Higgins on Saturday 29th August at 5pm in St Patrick’s, Saul</p>
+<h3 class="b-head">Recently Deceased: Conleith Fitzsimons</h3>
+<p>Parish of Saul &amp; Ballee<br>
+Months Mind Mass: Adrian Higgins on Saturday 29th August at 5pm in St Patrick’s, Saul</p>
 <h3 class="b-head">Anniversary Masses</h3>
-<p>Saturday 22nd August - Mary McGreevy , Eithne McMullan<br>
-Sunday 23rd August – Warren Rodgers, Tom McVeigh (9.30am) , Ann Brennan (12noon)<br>
-Friday 28th August – Philip Smith<br>
-Saturday 29th August – Frank, Norah and Michael Donnelly<br>
+<p>Saturday 29th August – Frank, Norah and Michael Donnelly<br>
 Sunday 30th August – John McKervey (9.30am)<br>
 Saturday 5th September – Kenny Kelly<br>
 Sunday 6th September – Michael Burns (12noon)<br>
-Parish of Kilclief</p>
+Wednesday 9th September – Spencer Cusack<br>
+Friday 11th September – Niall Laverty<br>
+Saturday 12th September – James Hynds<br>
+Sunday 13th September – Raymond Blaney (12noon)<br>
+Parish of Kilclief<br>
+Months Mind Mass: Maeve Savage Saturday 29th August at 6.30pm in Stella Maris</p>
 <h3 class="b-head">Anniversary Masses</h3>
-<p>Saturday 22nd August – Jack &amp; Barry Fitzsimons<br>
-Sunday 23rd August – Leo McGurnaghan<br>
-Monday 31st August – Louise Fitzsimons, Marie &amp; Louie Fitzsimons<br>
+<p>Monday 31st August – Louise Fitzsimons, Marie &amp; Louie Fitzsimons<br>
+Saturday 5th September – Jason Hynds<br>
+Sunday 13th September – Kevin Cultra, Seamus McMorrow, Mary Polley, Patrick King<br>
 Saul &amp; Ballee Kilclief<br>
-Weekly Collection £1,429.50 £847.63<br>
-Diocesan Cathedral Fund £867.00 £600.80<br>
+Weekly Collection £1,582.75 £907.75<br>
+Parish of Kilclief Cemetery collection amounted to £9,005.45. We thank those who<br>
+contributed.<br>
 Hymns – St Malachy’s, Kilclief<br>
 Entrance: 348v1 Praise to the Lord Offertory: 183v1 I am the bread of life<br>
 Communion: 466v1, 2 You shall cross the barren desert<br>
@@ -998,35 +1028,32 @@ Recessional: 175v1 Go to the Mass is ended<br>
 Hymns - St Patrick’s, Saul<br>
 Entrance – 240 Do not be afraid Offertory – 256 Fill my house<br>
 Communion – 165 Be still for the presence of the Lord<br>
-Recessional – 330 He’s got the whole world in his hands<br>
-St Vincent de Paul Helplines - Are you struggling with the cost of school uniform? Please<br>
-call us for help. Strangford Conference helpline number is displayed in the Church or phone<br>
-Saul Conference on <a href="tel:+3537928346114" style="color:#1d4ed8;font-weight:600;">07928346114</a> or <a href="tel:+3537801896229" style="color:#1d4ed8;font-weight:600;">07801896229</a></p>
+Recessional – 330 He’s got the whole world in his hands</p>
 <hr>
 <p class="page-label">Page 3</p>
 <p>Legion of Mary Annual Trip to Knock will take place on Sunday 27th September. The cost<br>
 is £30 per person, making the usual stops for breaks. Pick up points are at the following<br>
-Churches :-<br>
-Newcastle – (back of the Church ) 6.15am , Castlewellan – 6.30am , Downpatrick – 6.45am ,<br>
+Churches:-<br>
+Newcastle – (back of the Church) 6.15am , Castlewellan – 6.30am , Downpatrick – 6.45am ,<br>
 Crossgar – 7am and Saintfield – 7.15am<br>
 To book your place you can place your money in an envelope along with your name and<br>
 phone number and drop it into the Parish offices in Saul or Downpatrick (Patrician Youth<br>
 Centre) or you can phone Geraldine on 07845 422723<br>
 MATT TALBOT – URBAN MYSTIC<br>
-The Knights of St Columbanus, CK12 Downpatrick , invite you to a special screening of<br>
+The Knights of St Columbanus, CK12 Downpatrick, invite you to a special screening of<br>
 Matt Talbot – Urban Mystic at Newcastle Community Cinema, St Mary&#x27;s Hall, Main Street,<br>
-Newcastle , on Friday 4th September at 7.00pm .<br>
+Newcastle, on Friday 4th September at 7.00pm.<br>
 Matt Talbot&#x27;s remarkable true story of faith, struggle, addiction and redemption continues to<br>
 inspire people throughout the world and offers a powerful message of hope to those<br>
 affected by addiction and their families.<br>
-The evening will also feature guest speaker Michael Murphy .<br>
-Admission is free , with a suggested donation of £3 towards costs . Tea and coffee will be<br>
+The evening will also feature guest speaker Michael Murphy.<br>
+Admission is free, with a suggested donation of £3 towards costs. Tea and coffee will be<br>
 served following the screening.<br>
 Everyone is very welcome – please bring family and friends.<br>
 Catholic Mothers Ireland – Family Day<br>
 Catholic Mothers Ireland will hold its Annual National Mass on Sunday, 6 September at<br>
-Termonbacca Retreat Centre, Derry City . The day will begin with Mass at 2.00pm , celebrated<br>
-by Bishop Donal McKeown , followed by refreshments, children&#x27;s activities, and a talk for<br>
+Termonbacca Retreat Centre, Derry City . The day will begin with Mass at 2.00pm, celebrated<br>
+by Bishop Donal McKeown, followed by refreshments, children&#x27;s activities, and a talk for<br>
 parents. This promises to be a lovely day for the whole family. For more information and<br>
 booking details, please email <a href="mailto:info@catholicmothers.ie" target="_blank" rel="noopener noreferrer">info@catholicmothers.ie</a> . All are welcome.<br>
 Burren Outdoor Retreat , Friday 4th September to Sunday 6th September. Would you like<br>
@@ -1035,7 +1062,7 @@ and ancient sacred sites? Let the beauty of this place renew you in body and sou
 (people within easy reach may commute). Contact Mary at <a href="tel:+353879701130" style="color:#1d4ed8;font-weight:600;">087 970 1130</a> for information or<br>
 Des at <a href="tel:+353851614951" style="color:#1d4ed8;font-weight:600;">085 161 4951</a> for bookings.<br>
 Abide in His Love Women’s Conference . The Great Northern Hotel, Bundoran, 20 –22<br>
-November 2026. Join women from across Ireland for a faith -filled weekend with inspiring<br>
+November 2026. Join women from across Ireland for a faith-filled weekend with inspiring<br>
 speakers including Sarah Swafford, Danielle Noonan, Fr Mark Wharton, Fr Barry Braum, Fr<br>
 Oisín Martin, the Dominican Sisters of Nashville, Bishop Fintan Gavin, and more. Register<br>
 now: <a href="https://abideinhislove.eventbrite.com/" target="_blank" rel="noopener noreferrer">https://abideinhislove.eventbrite.com/</a></p>
@@ -1043,28 +1070,33 @@ now: <a href="https://abideinhislove.eventbrite.com/" target="_blank" rel="noope
 <p class="page-label">Page 4</p>
 <p>MYMY is an accredited counselling service for adults based in Newcastle. If you or<br>
 someone you know could benefit from counselling please give us call on <a href="tel:+442843727549" style="color:#1d4ed8;font-weight:600;">028 4372 7549</a>,<br>
-email <a href="mailto:hello@mymy.org.uk" target="_blank" rel="noopener noreferrer">hello@mymy.org.uk</a> or self -refer via our website."<br>
+email <a href="mailto:hello@mymy.org.uk" target="_blank" rel="noopener noreferrer">hello@mymy.org.uk</a> or self-refer via our website."<br>
 St Joseph Men&#x27;s Camino - Every Camino changes us in ways we don&#x27;t expect, every man needs one.<br>
 Join men from across Ireland on Saturday 12th September for a 25km pilgrimage through<br>
 the Boyne Valley, beginning in Drogheda. The day includes Mass, Adoration, Rosary,<br>
-Confessions, fraternity, lunch and dinner, with after -dinner speaker Fr Mark Quinn . Open to<br>
-men aged 18+. Cost: €65 (student € 55). Registration, accom modation and details:<br>
+Confessions, fraternity, lunch and dinner, with after-dinner speaker Fr Mark Quinn. Open to<br>
+men aged 18+. Cost: €65 (student € 55). Registration, accommodation and details:<br>
 <a href="https://www.dominicans.ie/events" target="_blank" rel="noopener noreferrer">www.dominicans.ie/events</a> . Enquiries: <a href="mailto:op.evangelisation@gmail.com" target="_blank" rel="noopener noreferrer">op.evangelisation@gmail.com</a> .<br>
-“We should strive to<br>
-keep our hearts open<br>
-to the sufferings<br>
-and wretchedness<br>
-of others and pray, continually,<br>
-that God may grant us<br>
-that spirit of compassion<br>
-which is truly the Spirit of God.”<br>
-Saint Vincent de Paul<br>
-SAFEGUARDING - If you have a concern, suspicion, or wish to make an allegation of child abuse, or abuse in relation to an<br>
-adult at risk, please contact the Diocesan Safeguarding Office: Philip O&#x27;Hara, Designated Liaison Person, 120, Cliftonville R oad,<br>
+Thinking about becoming Catholic or want to deepen your understanding of the faith?<br>
+The Diocesan RCIA (Rite of Christian Initiation of Adults) is a journey of faith,<br>
+formation, and community for adults who wish to explore the teachings of Jesus Christ<br>
+and the Catholic Church. It is open to those who are not baptised, those baptised in<br>
+another Christian tradition, or Catholics who wish to reconnect with their faith.<br>
+The 2025–2026 programme begins on Wednesday 1st October and runs weekly from<br>
+6.30–8.00 pm at St Mary’s Hall, Chapel Lane, Belfast. Sessions include prayer, teaching,<br>
+discussion, and time for questions. Spouses, fiancés or friends are welcome<br>
+to attend alongside participants.<br>
+All are welcome, whether you are exploring faith for the first time or<br>
+returning after some time away.<br>
+To register or find out more, please email <a href="mailto:rcia@downandconnor.org" target="_blank" rel="noopener noreferrer">rcia@downandconnor.org</a> or scan the QR code.<br>
+“Jesus does not demand great action from us but simply surrender and gratitude .”<br>
+St Therese of Lisieux<br>
+SAFEGUARDING - If you have a concern, suspicion, or wish to make an allegatio n of child abuse, or abuse in relation to an<br>
+adult at risk, please contact the Diocesan Safeguarding Office: Philip O&#x27;Hara, Designated Liais on Person, 120, Cliftonville Road,<br>
 Belfast BT14 6LA. Mobile: 07534 992124 or Telephone: 028 90 492798. Email: <a href="mailto:philip.ohara@soddc.org" target="_blank" rel="noopener noreferrer">philip.ohara@soddc.org</a> or visit<br>
 Very Rev Fr Aidan Brankin, Parish Priest 02844 612525 (Saul) or 02844 260101 (Strangford)<br>
-Saul Office: 02844 612525 , Office Hours: Mon to Fri 9 .30am to 12noon 10 St Patrick’s Rd, Downpatrick, BT30 7JG<br>
-Kilclief Office: 02844 260101 Office Hours: Monday 1pm to 3pm 8 Shore Rd, Strangford, BT30 7NL<br>
+Saul Office: 02844 612525, Office Hours: Mon to Fri 9.30am to 12noon 10 St Patrick’s Rd, Downpatrick, BT30 7JG<br>
+Kilclief Office: <a href="tel:+442844260101" style="color:#1d4ed8;font-weight:600;">02844260101</a> Office Hours: Monday 1pm to 3pm 8 Shore Rd, Strangford, B T30 7NL<br>
 Website: <a href="https://www.saulandballeeparish.com" target="_blank" rel="noopener noreferrer">www.saulandballeeparish.com</a><br>
 Email: <a href="mailto:saul@downandconnor.org" target="_blank" rel="noopener noreferrer">saul@downandconnor.org</a> <a href="mailto:strangfordandkilclief@downandconnor.org" target="_blank" rel="noopener noreferrer">strangfordandkilclief@downandconnor.org</a></p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
@@ -1073,7 +1105,7 @@ Email: <a href="mailto:saul@downandconnor.org" target="_blank" rel="noopener nor
     <section class="parish-section">
       <h2 class="section-heading">Other DOWN &amp; CONNOR Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="ballycastle"><a class="parish-link" href="ballycastleparish.html" target="_blank" rel="noopener noreferrer">Ballycastle</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="ballymenaparish.html" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="glenariffe"><a class="parish-link" href="glenariffeparish.html" target="_blank" rel="noopener noreferrer">Glenariffe</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="kilmore and killyleagh"><a class="parish-link" href="kilmoreandkillyleagh.html" target="_blank" rel="noopener noreferrer">Kilmore and Killyleagh</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="port glenone (st mary&#x27;s portglenone)"><a class="parish-link" href="stmarysportglenone.html" target="_blank" rel="noopener noreferrer">Port Glenone (St Mary&#x27;s Portglenone)</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="sacred heart belfast"><a class="parish-link" href="sacredheartparishbelfast.html" target="_blank" rel="noopener noreferrer">Sacred Heart Belfast</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st brigids belfast"><a class="parish-link" href="stbrigidsparishbelfast.html" target="_blank" rel="noopener noreferrer">St Brigids Belfast</a></li><li class="parish-item" data-name="st gerards"><a class="parish-link" href="stgerardsparish.html" target="_blank" rel="noopener noreferrer">St Gerards</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st mary&#x27;s on the hill"><a class="parish-link" href="stmarysonthehill.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s on the Hill</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="ballymenaparish.html" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st colmcilles"><a class="parish-link" href="st-colmcilles.html" target="_blank" rel="noopener noreferrer">St Colmcilles</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1125,9 +1157,9 @@ Email: <a href="mailto:saul@downandconnor.org" target="_blank" rel="noopener nor
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1619,23 +1651,8 @@ Email: <a href="mailto:saul@downandconnor.org" target="_blank" rel="noopener nor
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

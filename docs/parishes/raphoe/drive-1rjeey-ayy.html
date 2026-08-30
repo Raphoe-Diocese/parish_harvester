@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Bruckless Bulletin — 25/08/2026</title>
+  <title>Bruckless Bulletin — 30/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -179,6 +187,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -201,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +275,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +472,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -863,7 +892,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,14 +900,14 @@
     <header class="header">
       <p class="diocese-label">RAPHOE</p>
       <h1>Bruckless Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Bruckless — 25/08/2026. Part of the Raphoe Diocese collated bulletin.</p>
-      <a class="download-link-top" href="drive-1rjeey-ayy.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Bruckless — 30/08/2026. Part of the Raphoe Diocese collated bulletin.</p>
+      <a class="download-link-top" href="drive-1rjeey-ayy.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="drive-1rjeey-ayy.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="drive-1rjeey-ayy.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
@@ -895,7 +924,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="drive-1rjeey-ayy.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="drive-1rjeey-ayy.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="drive-1rjeey-ayy.pdf">Open PDF</a>
               <a href="drive-1rjeey-ayy.pdf" download>Download</a>
             </div>
           </div>
@@ -934,83 +963,94 @@
       <div class="quiet-links">
         <a href="drive-1rjeey-ayy-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-bruckless" data-parish-name="Bruckless"><h2 class="ocr-parish-name">Bruckless</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-bruckless" data-parish-name="Bruckless"><h2 class="ocr-parish-name">Bruckless</h2><p class="ocr-parish-date">30/08/2026</p></header>
 <p class="page-label">Page 1</p>
 <h3 class="b-head">MASS TIMES ANNIVERSARIES /INTENTIONS</h3>
-<p>Saturday 22nd August 11:00am<br>
-6:30pm Angela McGlynn, New York, sister of Raymond McGlynn, Mass and<br>
-Burial of Ashes<br>
-Get W ell Intention<br>
-Sunday 23rd August 11:00am<br>
-7:00pm Margaret Moloney (Month’s Mind)<br>
-Ken Byrne (Anniversary)<br>
-Cenacle<br>
-Monday 24th August 10:00am Eamonn McManus ( RIP)<br>
-Tuesday 25th August 10:00am Joan Burke (RIP)<br>
-Wednesday 26th August 10:00am Padraig Horan (RIP)<br>
-Thursday 27th August 10:00am Holy Mass<br>
-Friday 28th August 10:00am Pauline Hughes (RIP)<br>
-Saturday 29th August 6:30pm Martin McMenamin (Anniversary)<br>
+<p>Saturday 29th August 6:30pm Martin McMenamin (Anniversary)<br>
 Sunday 30th August 11:00am<br>
-7:00pm Dessie Gallagher (Month ’s Mind)<br>
+7:00pm Dessie Gallagher (Month’s Mind)<br>
+Cenacle<br>
+Monday 31st August 10:00am Con Conaghan (Anniversary) and Deceased Family Members<br>
+Tuesday 1st September 10:00am Holy Mass<br>
+Wednesday 2nd Sept 10:00am Holy Mass<br>
+Thursday 3rd Sept 10:00am Holy Mass<br>
+Friday 4th Sept 10:00am Holy Mass<br>
+Saturday 5th Sept 6:30pm Stevie McSharry (Month’s Mind)<br>
+Marian Murrin (1st Anniversary)<br>
+Michael Conaghan, Dublin formerly Calhame (Recently Deceased)<br>
+Sally Cannon (Anniversary)<br>
+Sunday 6th September 11:00am<br>
+7:00pm Holy Mass<br>
+Cenacle<br>
+Monday 7th Sept 10:00am Holy Mass<br>
+Tuesday 8th Sept 10:00am Holy Mass<br>
+Wednesday 9th Sept 10:00am Holy Mass<br>
+Thursday 10th Sept 10:00am Holy Mass<br>
+Friday 11th Sept 10:00am Holy Mass<br>
+Saturday 12th Sept 6:30pm Holy Mass<br>
+Sunday 13th September 11:00am<br>
+1:00pm<br>
+7:00pm Georgie McMullin (10th Anniversary)<br>
+Baptism<br>
 Cenacle<br>
 Church of St Joseph &amp; St Conal, Bruckless<br>
-Fr Joseph Ndiraba Tel: 074 97 3 7015<br>
-E-mail : <a href="mailto:parishofficebruckless@gmail.com" target="_blank" rel="noopener noreferrer">parishofficebruckless@gmail.com</a><br>
-21ST SUNDAY IN ORDINARY TIME<br>
-Saturday 22nd / Sunday 23rd August 2026 - Year A<br>
+Fr Joseph Ndiraba Tel: <a href="tel:+353749737015" style="color:#1d4ed8;font-weight:600;">074 97 37015</a><br>
+E-mail: <a href="mailto:parishofficebruckless@gmail.com" target="_blank" rel="noopener noreferrer">parishofficebruckless@gmail.com</a><br>
+22ND SUNDAY IN ORDINARY TIME<br>
+Saturday 29th / Sunday 30th August 2026 - Year A<br>
 Parish Newsletter available online at: - tiny.cc/PBNL<br>
 Church Envelopes If you are new to the area or would like a box please contact the Parish Office on <a href="tel:+353749737015" style="color:#1d4ed8;font-weight:600;">074<br>
 9737015</a> or email <a href="mailto:parishofficebruckless@gmail.com" target="_blank" rel="noopener noreferrer">parishofficebruckless@gmail.com</a><br>
 You may contribute by Direct Debit/Online Banking if you wish. Bank details: Bank of Ireland, Killybegs<br>
 Sunday Envelopes: Killaghtee Parish Church account : IBAN: IE35 BOFI 9049 0729 4874 30<br>
 Parish Projects: Killaghtee Parish Repair Fund : IBAN IE28 BOFI 9049 0729 1660 98<br>
-August &amp; September 2026 @ Lough Derg<br>
-One Day Retreats – Guided Days of Prayer and Reflection - places available on August 29th and 31st<br>
-September 5th, 6th, 9th, 12th, 15th, 19th and 20th Admission €50. Group discounts available. Advance<br>
-Booking Essential. Includes Special Themed Retreats: 5th September – Pioneer Pilgrimage | 6th September<br>
-– St Carlos Acutis | 9th &amp; 12th September – Vocations Monstrance | 19th Sep t – Divine Mercy Pilgrimage<br>
-Lakeshore Pilgrim Path Pilgrimage – In the footsteps of pilgrims through the centuries Sunday 30th<br>
-August. 8km &amp; 12km routes, fully guided. Outdoor Mass weather permitting. Admission €25. Advance<br>
-Booking Essential.<br>
-<a href="https://www.loughderg.org" target="_blank" rel="noopener noreferrer">www.loughderg.org</a> email. <a href="mailto:info@loughderg.org" target="_blank" rel="noopener noreferrer">info@loughderg.org</a> Tel. <a href="tel:+353719861518" style="color:#1d4ed8;font-weight:600;">0719861518</a><br>
+Celebration Mass on 26th September : Donegal Group 173 Rise and Shine Trust (formerly The Irish<br>
+Handicapped Children&#x27;s Pilgrimage Trust and The Irish Pilgrimage Trust) are celebrating forty years of<br>
+taking young people with special needs to Lourdes each Easter.<br>
+We are celebrating with a special Mass on Saturday 26th September in the Church of the Irish<br>
+Martyrs, Letterkenny at 12 noon . The Mass will be concelebrated by Bishop Niall Coll and Bishop Donal<br>
+McKeowan, Bishop of Derry and many of the priests who travelled to Lourdes with us over the years.<br>
+We invite all the guests and their families and all the helpers who travelled with us over the years to our<br>
+Mass to celebrate the work of the Donegal Group over these forty years.<br>
 CLG Naomh Ultan Sponsor a Seat - Lifetime Sponsorship initiative is still open, name or a dedication in<br>
 memory of a loved one, former player, or supporter - permanently recognised on a commemorative plaque<br>
 at the grounds. Visit <a href="https://www.naomhultan.com" target="_blank" rel="noopener noreferrer">www.naomhultan.com</a> to take part.<br>
-St Catherines Vocational School, Killybegs –School Opening :<br>
-Monday, 31st August: First Years only (8:50 AM - 1:15 PM).<br>
-Please note there will be no bus service on this day.<br>
-Tuesday, 1st September: 1st, 3rd &amp; 6th Years only (8:50 AM - 3:20 PM).<br>
-Wednesday, 2nd September: All year groups (8:50 AM - 3:20 PM).<br>
-PAROCHIAL HOUSE TEL. NO’S: Killybegs: <a href="tel:+3537497310" style="color:#1d4ed8;font-weight:600;">074 97 310</a> 13 or <a href="tel:+353749731030" style="color:#1d4ed8;font-weight:600;">074 97 31030</a> ; Inver Parish : 074 97 3 6006 ; Donegal Town: <a href="tel:+353749721026" style="color:#1d4ed8;font-weight:600;">074 97 21026</a> Undertaker: John B O’Donnell <a href="tel:+353872769565" style="color:#1d4ed8;font-weight:600;">0872769565</a><br>
-Notices for newsletter : email to <a href="mailto:parishofficebruckless@gmail.com" target="_blank" rel="noopener noreferrer">parishofficebruckless@gmail.com</a> Deadline 12noon on Thursdays<br>
+Anam Cara Donegal , the organisation that supports bereaved parents, will hold it&#x27;s monthly Face to Face<br>
+Parent Support Evening for bereaved parents on Thursday 10th September 2026 at 7.30 pm in the Raddison<br>
+Blu Hotel, Letterkenny F92 FK15. We also offer online support group meetings. To find out more call<br>
+01 4045378 or email <a href="mailto:info@anamcara.ie" target="_blank" rel="noopener noreferrer">info@anamcara.ie</a><br>
+PAROCHIAL HOUSE TEL. NO’S: Killybegs: <a href="tel:+353749731013" style="color:#1d4ed8;font-weight:600;">074 97 31013</a> or <a href="tel:+353749731030" style="color:#1d4ed8;font-weight:600;">074 97 31030</a>; Inver Parish: <a href="tel:+353749736006" style="color:#1d4ed8;font-weight:600;">074 97 36006</a>; Donegal Town: <a href="tel:+353749721026" style="color:#1d4ed8;font-weight:600;">074 97 21026</a> Undertaker: John B O’Donnell <a href="tel:+353872769565" style="color:#1d4ed8;font-weight:600;">0872769565</a><br>
+Notices for newsletter: email to <a href="mailto:parishofficebruckless@gmail.com" target="_blank" rel="noopener noreferrer">parishofficebruckless@gmail.com</a> Deadline 12noon on Thursdays<br>
 The next Sunday Social in Dunkineely Community Centre will be on Sunday 30th August 2026 from<br>
 8pm to 10pm. Music by Country Traditions. Admission €10 which includes refreshments Mass for Expectant Families on 8th September at 7:00pm in St Eunan&#x27;s Cathedral Letterkenny celebrated<br>
 by Bishop Coll.<br>
-We welcome Fr Josep h Ndiraba from Uganda to the<br>
-parish and wish him well in his ministry in our parish.<br>
-Sincere thanks to Fr Morty for all his help in the parish<br>
-since October last year , wishing him good health and<br>
-every blessing in God ’s service.<br>
-St Vincent DePaul Bruckless/Dunkineely :<br>
-Confidential contact number <a href="tel:+353873426068" style="color:#1d4ed8;font-weight:600;">087 3426068</a><br>
-2 COLLECTIO NS: €1780<br>
+Please Note there will be no newsletter next weekend, Sat 5th / Sun 6th September<br>
 St Joseph Men&#x27;s Camino Join men from across Ireland on Saturday 12th September for a 25km<br>
 pilgrimage through the Boyne Valley, beginning in Drogheda. Open to men aged 18+. Cost: €65 (student<br>
 €55). Registration, accommodation and details: <a href="https://www.dominicans.ie/events" target="_blank" rel="noopener noreferrer">www.dominicans.ie/events</a> .<br>
-Enquiries: <a href="mailto:op.evangelisation@gmail.com" target="_blank" rel="noopener noreferrer">op.evangelisation@gmail.com</a> . CONFESSIONS : Available on request.<br>
-Please Note there will be no newsletter for the<br>
-weekend of Sat 5th / Sun 6th September Breast Cancer Awareness Month 2026 takes place Thursday, Oct 1st, 2026 – Saturday, Oct 31st, 2026.<br>
+Enquiries: <a href="mailto:op.evangelisation@gmail.com" target="_blank" rel="noopener noreferrer">op.evangelisation@gmail.com</a> . Breast Cancer Awareness Month 2026 takes place Thursday, Oct 1st, 2026 – Saturday, Oct 31st, 2026.<br>
 For more information, please visit breastcancerresearch.ie or <a href="https://www.breastcancerireland.com" target="_blank" rel="noopener noreferrer">www.breastcancerireland.com</a> .<br>
 International Coffee Day 2026 takes place on Thursday, October 1st, 2026. Please see<br>
-<a href="https://www.internationalcoffeeday.org" target="_blank" rel="noopener noreferrer">www.internationalcoffeeday.org</a> for further details. Bruckless</p></div>
+<a href="https://www.internationalcoffeeday.org" target="_blank" rel="noopener noreferrer">www.internationalcoffeeday.org</a> for further details.<br>
+St Vincent DePaul Bruckless/Dunkineely:<br>
+Confidential contact number <a href="tel:+353873426068" style="color:#1d4ed8;font-weight:600;">087 3426068</a><br>
+Ministers of the Word for September 2026<br>
+Saturday 6:30pm Eugene Meehan<br>
+Sunday 11:00am Aisling McGowan<br>
+Ministers of the Eucharist for September 2026<br>
+Saturday 6:30pm Marguerite Cowburn<br>
+Sunday 11:00am Ethna Erskine<br>
+COMMUNION VISITS will take place<br>
+on Monday 7th and Tuesday 8th September<br>
+CONFESSIONS : Available on request.<br>
+Bruckless <a href="https://drive.google.com/drive/folders/1jPOi4GRU22vAxeKNe5Y_doBJ3riPh7ZK" target="_blank" rel="noopener noreferrer">https://drive.google.com/drive/folders/1jPOi4GRU22vAxeKNe5Y_doBJ3riPh7ZK</a></p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other RAPHOE Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="kincasslagh"><a class="parish-link" href="kincasslagh.html" target="_blank" rel="noopener noreferrer">Kincasslagh</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="raphoe"><a class="parish-link" href="drive-1jmslbrliw.html" target="_blank" rel="noopener noreferrer">Raphoe</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="tawnawillyparish.html" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="tawnawillyparish.html" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1062,9 +1102,9 @@ International Coffee Day 2026 takes place on Thursday, October 1st, 2026. Please
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1556,23 +1596,8 @@ International Coffee Day 2026 takes place on Thursday, October 1st, 2026. Please
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

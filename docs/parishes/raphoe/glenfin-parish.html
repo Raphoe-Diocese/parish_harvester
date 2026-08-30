@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Glenfin Bulletin — 25/08/2026</title>
+  <title>Glenfin Bulletin — 30/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -179,6 +187,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -201,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +275,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +472,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -863,7 +892,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,14 +900,14 @@
     <header class="header">
       <p class="diocese-label">RAPHOE</p>
       <h1>Glenfin Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Glenfin — 25/08/2026. Part of the Raphoe Diocese collated bulletin.</p>
-      <a class="download-link-top" href="glenfin-parish.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Glenfin — 30/08/2026. Part of the Raphoe Diocese collated bulletin.</p>
+      <a class="download-link-top" href="glenfin-parish.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="glenfin-parish.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="glenfin-parish.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
@@ -895,7 +924,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="glenfin-parish.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="glenfin-parish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="glenfin-parish.pdf">Open PDF</a>
               <a href="glenfin-parish.pdf" download>Download</a>
             </div>
           </div>
@@ -934,14 +963,14 @@
       <div class="quiet-links">
         <a href="glenfin-parish-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-glenfin" data-parish-name="Glenfin"><h2 class="ocr-parish-name">Glenfin</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-glenfin" data-parish-name="Glenfin"><h2 class="ocr-parish-name">Glenfin</h2><p class="ocr-parish-date">30/08/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>Paróiste Chill Taobhóige<br>
 Tithe Pobail Ghleann Fhinne agus<br>
 Leitir Bric<br>
 Twentieth Sunday of —Year A — 16th August 2026<br>
-An tAth Lorcán Ó Searcaigh .S.P.<br>
-Kiltyferrigal, Cloghan, Lifford . eircode: F93 P2YA<br>
+An tAth Lorcán Ó Se arcaigh .S.P.<br>
+Kiltyferrigal, Clog han, Lifford . eircode: F93 P2YA<br>
 Fón: <a href="tel:+353749133007" style="color:#1d4ed8;font-weight:600;">074 9133007</a>; Fón Póca: <a href="tel:+353872836732" style="color:#1d4ed8;font-weight:600;">087 2836732</a>; ríomhphost: (email) <a href="mailto:9lorcan49@gmail.com" target="_blank" rel="noopener noreferrer">9lorcan49@gmail.com</a><br>
 Next Weekend Masses<br>
 August Intentions of our Holy<br>
@@ -952,10 +981,10 @@ and loneliness, we find new<br>
 ways to proclaim the Gospel,<br>
 discovering creative paths to<br>
 build community.<br>
-Dé Sathairn —Saturday<br>
+Dé Sathairn— Saturday<br>
 Glenfinn @ 6.00 p.m<br>
 Dé Domhnaigh Sunday<br>
-Leitir -Bric @9.45am<br>
+Leitir-Bric @9.45am<br>
 Glenfinn @ 11.00am Confessions<br>
 After Mass any day and es-<br>
 pecially after Mass on Satur-<br>
@@ -980,7 +1009,7 @@ You can join in from<br>
 home as well because<br>
 the Blessed Sacrament<br>
 can be viewed<br>
-On live -streaming.<br>
+On live-streaming.<br>
 Saturday August 15th 6 p.m.<br>
 John &amp; Annie McGlynn</p>
 <h3 class="b-head">Anniversaries</h3>
@@ -999,22 +1028,22 @@ Sunday 23rd 11 a.m.<br>
 Maureen &amp; Jim Foy</p>
 <h3 class="b-head">Anniversaries</h3>
 <p>Thoughts on the Readings for the 19th Sunday August 16th 2026<br>
-Today in the Gospel, we have a continuation of last week’s story about the feeding<br>
+Today in the Gospel, we have a continuation of last week’s story about the fee ding<br>
 of thousands of people by Jesus in the desert. Immediately after the event, we are<br>
-told that Jesus: …made the disciples get into a boat and go on ahead to the other<br>
+told that Jesus: …made the disciples get into a boat and go on ahead to the oth er<br>
 side, while he dismissed the crowds. Was there reluctance on their part to go? Cer-<br>
-tainly there is the implication that the disciples were not too willing to leave the scene. They were en-<br>
-joying the reflected glory of being part of Jesus’ ‘miracle’ and the enthusiasm of the crowds for Jesus,<br>
-‘their’ Jesus. They were basking in the reputation of being partners with Jesus. Yet, it won’t be very<br>
+tainly there is the implication that the disciples were not too willi ng to leave the scene. They were en-<br>
+joying the reflected glory of being part of Jesus’ ‘miracle’ and the enthusiasm of the c rowds for Jesus,<br>
+‘their’ Jesus. They were basking in the reputation of being partners with Jes us. Yet, it won’t be very<br>
 long before they will be hiding, even denying under oath, ever having had connection with him. Jesus<br>
 himself, after having dismissed the crowds: …went up the mountain by himself to pray. In John’s ver-<br>
-sion of this story he tells us that the people, after being fed by Jesus, actually wanted to make him their<br>
+sion of this story he tells us that the people, after being fed by Jesus, actua lly wanted to make him their<br>
 king. They, like the disciples, have totally missed the meaning of what has happened. Here indeed was<br>
 a real source of temptation. Jesus could easily have convinced himself that here was a golden opportu-<br>
-nity to get control of the crowds and ‘save’ them. They were so ready to follow him —it seemed. The<br>
-world was at his feet. There is an echo here of one of the temptations in the desert after his baptism: …<br>
-the devil took him to a very high mountain and showed him all the kingdoms of the world and their<br>
-glory, and he said to him, “All these I will give you, if you will fall down and worship me.”<br>
+nity to get control of the crowds and ‘save’ them. They were so ready to follow him— it seemed. The<br>
+world was at his feet. There is an echo here of one of the temptations in the desert aft er his baptism: …<br>
+the devil took him to a very high mountain and showed him all the kingd oms of the world and their<br>
+glory, and he said to him, “All these I will give you, if you will fal l down and worship me.”<br>
 Are you feeling overwhelmed, have a<br>
 query or simply want to discuss your<br>
 caring role? Family Carers Ireland are<br>
@@ -1031,7 +1060,7 @@ Heritage Week This very interesting topic on what is known as ‘A Ribbon Conspi
 in Cloghan’. Will be the subject of a talk on Local History this Sunday night, Sunday<br>
 16th at 7 .30 p.m. In the Day Centre. All Welcome.<br>
 CLG GHLEANN FHINNE Lotto numbers for Tues-<br>
-day 28th July were 7 -6-2-3-5-8-1-4. Congratulations<br>
+day 28th July were 7-6-2-3-5-8-1-4. Congratulations<br>
 to Ryan Dorrian who wins €60.The jackpot next week<br>
 is €10,000.<br>
 Club App CLG Ghleann Fhinne is excited to an-<br>
@@ -1046,7 +1075,7 @@ place outside church gates on Saturday 29th<br>
 and Sunday 30th August 2026. Glenfin Area Council - Monthly Draw 2026/27<br>
 The Glenfin Area Council would like to express their sincere appreciation for your ongoing support of<br>
 local initiatives. Your support is greatly valued.<br>
-Proceeds from this year’s monthly draw will be dedicated to the development of Independent Living<br>
+Proceeds from this year’s monthly draw will be dedicated to the development of I ndependent Living<br>
 Accommodation for seniors adjacent to Ionad Pobail Gleann Fhinne.<br>
 In the coming weeks, volunteers will be visiting homes to provide information and sell-<br>
 ing lines in the new Monthly Draw for 2026/27. The monthly prize fund totals €1,000,<br>
@@ -1054,19 +1083,19 @@ with a first prize of €500 and five additional prizes of €100 each. Addition
 be a special bonus draw in December, featuring ten €100 prizes.<br>
 The Community Em-<br>
 ployment Scheme is<br>
-seeking a part -time<br>
+seeking a part-time<br>
 Kitchen Assistant for the<br>
 Cloghan Day Centre.<br>
 The closing date for ap-<br>
 plications is Wednesday<br>
-9th September 2026. Glenfin</p></div>
+9th September 2026. Glenfin <a href="https://mcn.live/Camera/our-lady-of-perpetual-succour-glenfinn" target="_blank" rel="noopener noreferrer">https://mcn.live/Camera/our-lady-of-perpetual-succour-glenfinn</a></p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other RAPHOE Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="kincasslagh"><a class="parish-link" href="kincasslagh.html" target="_blank" rel="noopener noreferrer">Kincasslagh</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="raphoe"><a class="parish-link" href="drive-1jmslbrliw.html" target="_blank" rel="noopener noreferrer">Raphoe</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="tawnawillyparish.html" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="tawnawillyparish.html" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1118,9 +1147,9 @@ plications is Wednesday<br>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1612,23 +1641,8 @@ plications is Wednesday<br>
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

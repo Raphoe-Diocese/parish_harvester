@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Killanny Bulletin — 25/08/2026</title>
+  <title>Killanny Bulletin — 30/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -179,6 +187,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -201,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +275,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +472,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -863,7 +892,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,14 +900,14 @@
     <header class="header">
       <p class="diocese-label">CLOGHER</p>
       <h1>Killanny Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Killanny — 25/08/2026. Part of the Clogher Diocese collated bulletin.</p>
-      <a class="download-link-top" href="killanny.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Killanny — 30/08/2026. Part of the Clogher Diocese collated bulletin.</p>
+      <a class="download-link-top" href="killanny.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="killanny.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="killanny.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
@@ -895,7 +924,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="killanny.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="killanny.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="killanny.pdf">Open PDF</a>
               <a href="killanny.pdf" download>Download</a>
             </div>
           </div>
@@ -934,20 +963,20 @@
       <div class="quiet-links">
         <a href="killanny-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-killanny" data-parish-name="Killanny"><h2 class="ocr-parish-name">Killanny</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-killanny" data-parish-name="Killanny"><h2 class="ocr-parish-name">Killanny</h2><p class="ocr-parish-date">30/08/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>HOME<br>
-CLOGHER W ALKS WITH POPE<br>
+CLOGHER WALKS WITH POPE<br>
 FRANCIS<br>
 PARISH BULLETIN<br>
 HISTORY<br>
 SCHOOLS<br>
 ST ENDA&#x27;S CHURCH AT<br>
-TULL YDRUM<br>
+TULLYDRUM<br>
 ST. PEREGRINE NOVENA MASS<br>
 FOR THE SICK<br>
-KILLANNY OLD GRA VEYARD<br>
-PHOT O ALBUM<br>
+KILLANNY OLD GRAVEYARD<br>
+PHOTO ALBUM<br>
 PARISH SAFEGUARDING<br>
 CHILDREN POLICY<br>
 LINKS</p>
@@ -960,61 +989,61 @@ St. Enda&#x27;s Parish, Killanny<br>
 Fr. Michael Jordan – <a href="tel:+353429661452" style="color:#1d4ed8;font-weight:600;">042 966 1452</a><br>
 Email : <a href="mailto:michaeljordan@aol.com" target="_blank" rel="noopener noreferrer">michaeljordan@aol.com</a> /<br>
 <a href="mailto:killannyparish@hotmail.com" target="_blank" rel="noopener noreferrer">killannyparish@hotmail.com</a><br>
-website : www .killannyparish.ie<br>
-Parish W eb Cam: <a href="https://churchmedia.tv/camera/stendas-parish" target="_blank" rel="noopener noreferrer">https://churchmedia.tv/camera/stendas-parish</a> IBAN:   IE23BOFI90326942685351<br>
-ss Intentions :<br>
-nday 16th May: 11:30am: ‘ The Ascension of The Lord’ William &amp; Rose Casey , Annamarron<br>
+website : <a href="https://www.killannyparish.ie" target="_blank" rel="noopener noreferrer">www.killannyparish.ie</a><br>
+Parish Web Cam: <a href="https://churchmedia.tv/camera/stendas-parish" target="_blank" rel="noopener noreferrer">https://churchmedia.tv/camera/stendas-parish</a> IBAN:   IE23BOFI90326942685351<br>
+ss Intentions:<br>
+nday 16th May: 11:30am: ‘ The Ascension of The Lord’ William &amp; Rose Casey, Annamarron<br>
 trick &amp; Kathleen Mc Ardle, Tullynaskeagh &amp; deceased members of the Mc Ardle &amp; Duff<br>
-milies. Lil &amp; James Byrne &amp; Pauline &amp; Dermot Byrne, T ullydrum.<br>
+milies. Lil &amp; James Byrne &amp; Pauline &amp; Dermot Byrne, Tullydrum.<br>
 nday 17th May: 9:30am<br>
 esday 18th May: 7pm:<br>
 ednesday 19th May: No Mass<br>
 ursday 20th May: No Mass<br>
 day 21st May : 7pm<br>
 nday 23rd May : 11:30am: ‘ Pentecost Sunday’ Francis Goodman &amp; deceased members of th<br>
-odman Family , Ballingarry .<br>
-rish Web Cam:<a href="https://churchmedia.tv/camera/stendas-parish" target="_blank" rel="noopener noreferrer">https://churchmedia.tv/camera/stendas-parish</a><br>
+odman Family, Ballingarry.<br>
+rish Web Cam: <a href="https://churchmedia.tv/camera/stendas-parish" target="_blank" rel="noopener noreferrer">https://churchmedia.tv/camera/stendas-parish</a><br>
 sses this week ( also available via web cam)<br>
 nday 9:30am<br>
 esday 7pm &amp; Friday 7pm<br>
-nday 1 1.30am<br>
+nday 11.30am<br>
 aders<br>
 ader: Sunday 16th May : Caroline Farrelly Eucharistic Minister : Collette Connolly<br>
-ader: Friday 21st May : Roisin Campbell Eucharistic Minister : Elisabeth T raynor<br>
+ader: Friday 21st May : Roisin Campbell Eucharistic Minister : Elisabeth Traynor<br>
 ader : Sunday 23rd May: Patrica Malone Eucharistic Minister: Noleen Byrne<br>
 urch re- opening Fr Martin &amp; Fr. Michael welcomes back our parishioners to the weekday &amp; Sunda<br>
 sses. It’s great having a live congregation back in the church after the long lockdown. All thos<br>
 ending are reminded that face covering are a necessary part of life still if we are to ensure th<br>
 ety and health of each other while in the church and in the grounds. It is most important that peopl<br>
-o are vulnerable or unwell, and especially those with any symptom s that might suggest Covid-1<br>
+o are vulnerable or unwell, and especially those with any symptoms that might suggest Covid-1<br>
 ection, should stay at home and, if possible, participate, via webcam. The same applies to those wh<br>
 ve been in recent contact with someone who has the virus, in accordance with public health advice.<br>
 look forward to welcoming you back.<br>
 niversary Masses<br>
 ople are encouraged to have these Masses on a Friday evening as well as the Sunday Mass. This w<br>
-sure that there is no overcrowding in the church during any Mass Meeting of Ushers. After thKillanny</p>
+sure that there is no overcrowding in the church during any Mass Meeting of Ushers. After thKillanny <a href="https://www.killannyparish.ie/parish-bulletin" target="_blank" rel="noopener noreferrer">https://www.killannyparish.ie/parish-bulletin</a></p>
 <hr>
 <p class="page-label">Page 2</p>
 <p>esday evening Mass there will be a short meeting to organise ushers over the next few months<br>
 esent ushers and new members are invited to attend.<br>
 urch cleaning Thanks to all those that have helped in keeping the inside of the church and th<br>
-unds clean and tidy . The work of both groups is greatly appreciated.<br>
+unds clean and tidy. The work of both groups is greatly appreciated.<br>
 velopes &amp; Donations can be dropped into the metal box on the porch wall or into the basket as yo<br>
 k into the body of the church. Alternatively people can donate to the parish electronically throug<br>
 onate or using the IBAN IE23BOFI90326942685351<br>
-lanny GAA Notes Lotto Results for 9th May draw…. 5, 9, 26 &amp; 28 - No jackpot winner! Weekly priz<br>
+lanny GAA Notes LottoResults for 9th May draw…. 5, 9, 26 &amp; 28 - No jackpot winner!Weekly priz<br>
 ners €20 each – Brian &amp; Deirdre Byrne, James Duffy, Peadar Duffy, Sade &amp; Joan Caffrey, Peada<br>
-oleyNext week’ s jackpot will be a Whopping €11,100 !(Socially distanced) draw will be held i<br>
+oleyNext week’s jackpot will be a Whopping €11,100 !(Socially distanced) draw will be held i<br>
 mmunity Centre next Sunday night - €2 each or 3 for €5Many thanks to all who continue to suppo<br>
-mbership 2021 Reminder that 2021 online registration is still available via www .foireann.ie<br>
+mbership 2021Reminder that 2021 online registration is still available via <a href="https://www.foireann.ie" target="_blank" rel="noopener noreferrer">www.foireann.ie</a><br>
 gistration fees for 2021 are Adult Players €100, non-playing adults €40, children €40 (reduced to €3<br>
 every subsequent sibling). All players of all ages &amp; grades must be registered with the club prior t<br>
 ing to the field. New members welcome!<br>
-AA Cul Camps This summer ’s Kellogg’ s GAA Cul Camps are scheduled to come to Killanny in wee<br>
+AA Cul Camps This summer’s Kellogg’s GAA Cul Camps are scheduled to come to Killanny in wee<br>
 mmencing Monday 19th July – registration is now open and spots are filling up fast – simply log on t<br>
-website www .kelloggsculcamps.gaa.ie<br>
-DAY IS WORLD COMMUNICA TIONS DAY throughout the Catholic Church. The theme this year i<br>
-ome and See” (Jn 1:46). Commu nicating by Encountering People Where and as They Are. Pop<br>
+website <a href="https://www.kelloggsculcamps.gaa.ie" target="_blank" rel="noopener noreferrer">www.kelloggsculcamps.gaa.ie</a><br>
+DAY IS WORLD COMMUNICATIONS DAY throughout the Catholic Church. The theme this year i<br>
+ome and See” (Jn 1:46). Communicating by Encountering People Where and as They Are. Pop<br>
 ancis tells us that ‘the Gospel comes alive in our own day, whenever we accept the compelling witnes<br>
 people whose lives have been changed by their encounter with Jesus… The challenge that awaits us<br>
 n, is to communicate by encountering people, where they are and as they are.’<br>
@@ -1024,16 +1053,16 @@ ars has been announced. Submissions are invited as to what methods/models to ado
 ming years of conversations. You are invited to offer feedback (300 words max) to the followin<br>
 estion: What would be your preferred option for engagement in a conversation process about th<br>
 nod? The responses will be considered by the task group to be put in place by the bishops thi<br>
-mmer to plan and oversee the first steps along the synodal pathway . Submissions should be made vi<br>
-new Synodal Pathway webpage: www .catholicbishops.ie/synod ,<br>
+mmer to plan and oversee the first steps along the synodal pathway. Submissions should be made vi<br>
+new Synodal Pathway webpage: <a href="https://www.catholicbishops.ie/synod" target="_blank" rel="noopener noreferrer">www.catholicbishops.ie/synod</a> ,<br>
 cord Catholic Marriage Care Service is currently recruiting volunteers to train as marriag<br>
 paration programme facilitators. Contact Aisling on 01 505 3112 or by email to <a href="mailto:info@accord.ie" target="_blank" rel="noopener noreferrer">info@accord.ie</a> . Th<br>
 sing date for receipt of registration of interest forms to be included in Selections for this year is Frida<br>
 y 28th. Registration of Interest form and additional information about becoming a facilitator ar<br>
-ailable on www .accord.ie<br>
-ANGELA ’S COLLEGE , SLIGO is offering a new, online MA (Religious Education and Social Justice<br>
-September 2021. Please visit www .stangelas.nuigalway .ie for more.”<br>
-E MAY50k for MS IRELAND Visit www .themay50k.com to register for this fundraising initiative t<br>
+ailable on <a href="https://www.accord.ie" target="_blank" rel="noopener noreferrer">www.accord.ie</a><br>
+ANGELA’S COLLEGE , SLIGO is offering a new, online MA (Religious Education and Social Justice<br>
+September 2021. Please visit <a href="https://www.stangelas.nuigalway.ie" target="_blank" rel="noopener noreferrer">www.stangelas.nuigalway.ie</a> for more.”<br>
+E MAY50k for MS IRELAND Visit <a href="https://www.themay50k.com" target="_blank" rel="noopener noreferrer">www.themay50k.com</a> to register for this fundraising initiative t<br>
 mbat Multiple Sclerosis in Ireland. Ideal for workplace participation.<br>
 ONE COVID-19 Support Line for Older People is open seven days a week, 8am - 8pm, by callin<br>
 18 222 024.<br>
@@ -1044,7 +1073,7 @@ ONE COVID-19 Support Line for Older People is open seven days a week, 8am - 8pm,
     <section class="parish-section">
       <h2 class="section-heading">Other CLOGHER Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ballybay (tullycorbet)"><a class="parish-link" href="ballybay.html" target="_blank" rel="noopener noreferrer">Ballybay (Tullycorbet)</a></li><li class="parish-item" data-name="carrickmacross (machaire rois)"><a class="parish-link" href="carrickmacross.html" target="_blank" rel="noopener noreferrer">Carrickmacross (Machaire Rois)</a></li><li class="parish-item" data-name="castleblayney (muckno, includes clontibret)"><a class="parish-link" href="castleblayney.html" target="_blank" rel="noopener noreferrer">Castleblayney (Muckno, includes Clontibret)</a></li><li class="parish-item" data-name="clones"><a class="parish-link" href="clones.html" target="_blank" rel="noopener noreferrer">Clones</a></li><li class="parish-item" data-name="corcaghan-threemilehouse (kilmore &amp; drumsnatt)"><a class="parish-link" href="corcaghanthreemilehouse.html" target="_blank" rel="noopener noreferrer">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</a></li><li class="parish-item" data-name="derrygonnelly (botha)"><a class="parish-link" href="derrygonnelly.html" target="_blank" rel="noopener noreferrer">Derrygonnelly (Botha)</a></li><li class="parish-item" data-name="donagh"><a class="parish-link" href="donagh.html" target="_blank" rel="noopener noreferrer">Donagh</a></li><li class="parish-item" data-name="donaghmoyne"><a class="parish-link" href="donaghmoyne.html" target="_blank" rel="noopener noreferrer">Donaghmoyne</a></li><li class="parish-item" data-name="enniskillen (st michael&#x27;s parish)"><a class="parish-link" href="enniskillen.html" target="_blank" rel="noopener noreferrer">Enniskillen (St Michael&#x27;s Parish)</a></li><li class="parish-item" data-name="errigal truagh"><a class="parish-link" href="errigaltruagh.html" target="_blank" rel="noopener noreferrer">Errigal Truagh</a></li><li class="parish-item" data-name="fintona (donacavey)"><a class="parish-link" href="fintona.html" target="_blank" rel="noopener noreferrer">Fintona (Donacavey)</a></li><li class="parish-item" data-name="irvinestown (devenish)"><a class="parish-link" href="irvinestown.html" target="_blank" rel="noopener noreferrer">Irvinestown (Devenish)</a></li><li class="parish-item" data-name="magheracloone"><a class="parish-link" href="magheracloone.html" target="_blank" rel="noopener noreferrer">Magheracloone</a></li><li class="parish-item" data-name="monaghan &amp; rackwallace (includes tyholland)"><a class="parish-link" href="monaghanrackwallace.html" target="_blank" rel="noopener noreferrer">Monaghan &amp; Rackwallace (includes Tyholland)</a></li><li class="parish-item" data-name="roslea"><a class="parish-link" href="roslea.html" target="_blank" rel="noopener noreferrer">Roslea</a></li><li class="parish-item" data-name="tempo (pobal)"><a class="parish-link" href="tempo.html" target="_blank" rel="noopener noreferrer">Tempo (Pobal)</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ballybay (tullycorbet)"><a class="parish-link" href="ballybay.html" target="_blank" rel="noopener noreferrer">Ballybay (Tullycorbet)</a></li><li class="parish-item" data-name="carrickmacross (machaire rois)"><a class="parish-link" href="carrickmacross.html" target="_blank" rel="noopener noreferrer">Carrickmacross (Machaire Rois)</a></li><li class="parish-item" data-name="castleblayney (muckno, includes clontibret)"><a class="parish-link" href="castleblayney.html" target="_blank" rel="noopener noreferrer">Castleblayney (Muckno, includes Clontibret)</a></li><li class="parish-item" data-name="clones"><a class="parish-link" href="clones.html" target="_blank" rel="noopener noreferrer">Clones</a></li><li class="parish-item" data-name="corcaghan-threemilehouse (kilmore &amp; drumsnatt)"><a class="parish-link" href="corcaghanthreemilehouse.html" target="_blank" rel="noopener noreferrer">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</a></li><li class="parish-item" data-name="derrygonnelly (botha)"><a class="parish-link" href="derrygonnelly.html" target="_blank" rel="noopener noreferrer">Derrygonnelly (Botha)</a></li><li class="parish-item" data-name="donagh"><a class="parish-link" href="donagh.html" target="_blank" rel="noopener noreferrer">Donagh</a></li><li class="parish-item" data-name="enniskillen (st michael&#x27;s parish)"><a class="parish-link" href="enniskillen.html" target="_blank" rel="noopener noreferrer">Enniskillen (St Michael&#x27;s Parish)</a></li><li class="parish-item" data-name="errigal truagh"><a class="parish-link" href="errigaltruagh.html" target="_blank" rel="noopener noreferrer">Errigal Truagh</a></li><li class="parish-item" data-name="irvinestown (devenish)"><a class="parish-link" href="irvinestown.html" target="_blank" rel="noopener noreferrer">Irvinestown (Devenish)</a></li><li class="parish-item" data-name="magheracloone"><a class="parish-link" href="magheracloone.html" target="_blank" rel="noopener noreferrer">Magheracloone</a></li><li class="parish-item" data-name="monaghan &amp; rackwallace (includes tyholland)"><a class="parish-link" href="monaghanrackwallace.html" target="_blank" rel="noopener noreferrer">Monaghan &amp; Rackwallace (includes Tyholland)</a></li><li class="parish-item" data-name="tempo (pobal)"><a class="parish-link" href="tempo.html" target="_blank" rel="noopener noreferrer">Tempo (Pobal)</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1096,9 +1125,9 @@ ONE COVID-19 Support Line for Older People is open seven days a week, 8am - 8pm,
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1590,23 +1619,8 @@ ONE COVID-19 Support Line for Older People is open seven days a week, 8am - 8pm,
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

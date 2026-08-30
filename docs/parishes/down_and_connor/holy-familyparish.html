@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Holy Family Bulletin — 25/08/2026</title>
+  <title>Holy Family Bulletin — 30/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -179,6 +187,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -201,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +275,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +472,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -863,7 +892,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,14 +900,14 @@
     <header class="header">
       <p class="diocese-label">DOWN &amp; CONNOR</p>
       <h1>Holy Family Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Holy Family — 25/08/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
-      <a class="download-link-top" href="holy-familyparish.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Holy Family — 30/08/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
+      <a class="download-link-top" href="holy-familyparish.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="holy-familyparish.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="holy-familyparish.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
@@ -895,7 +924,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="holy-familyparish.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="holy-familyparish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="holy-familyparish.pdf">Open PDF</a>
               <a href="holy-familyparish.pdf" download>Download</a>
             </div>
           </div>
@@ -934,11 +963,11 @@
       <div class="quiet-links">
         <a href="holy-familyparish-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-holy-family" data-parish-name="Holy Family"><h2 class="ocr-parish-name">Holy Family</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-holy-family" data-parish-name="Holy Family"><h2 class="ocr-parish-name">Holy Family</h2><p class="ocr-parish-date">30/08/2026</p></header>
 <p class="page-label">Page 1</p>
-<p>21ST SUNDAY IN ORDINARY TIME<br>
-23RD AUGUST 2026<br>
-Readings: A (II) Psalter: Week I<br>
+<p>22ND SUNDAY IN ORDINARY TIME<br>
+30TH AUGUST 2026<br>
+Readings: A (II) Psalter: Week II<br>
 Parish Clergy: Very Rev. Michael Spence PP,<br>
 Rev. John O ’Laverty CC &amp; Rev. Deacon Brendan Dowd<br>
 Parish Telephone (Office hours): 90743119<br>
@@ -949,21 +978,39 @@ Society of St Vincent de Paul (Helpline): <a href="tel:+442890351561" style="col
 Email: <a href="mailto:holyfamily@downandconnor.org" target="_blank" rel="noopener noreferrer">holyfamily@downandconnor.org</a><br>
 Website &amp; Webcam: <a href="https://www.holy" target="_blank" rel="noopener noreferrer">www.holy</a> -familyparish.com CONTACT INFORMATION For more information and resources:<br>
 <a href="https://www.holy" target="_blank" rel="noopener noreferrer">www.holy</a> -familyparish.com PARISH NEWS &amp; EVENTS<br>
-WEEKLY OFFERING. The weekly collection on Sunday 16th August came to<br>
-£2,353.67, and the collection for the Diocesan Cathedral Fund was £1,355.28, with<br>
-an additional £315 in standing order donations. Thank you for your continued<br>
-generosity and support. For information on standing order and contactless methods<br>
-of donation, please contact the parish office.<br>
-PARISH 100 CLUB. Week 15 winners: Mrs Ashmore, Anne Cassidy, Niall<br>
-McKeefry &amp; Angela Mullin (Promoter). Congratulations to all the winners.<br>
-LOUGH DERG . Visit <a href="https://www.loughderg.com" target="_blank" rel="noopener noreferrer">www.loughderg.com</a>, for details of events during<br>
-August &amp; September, incl. one day retreats, Heritage Day tours, and the<br>
-Lakeshore Pilgrim Path Pilgrimage.<br>
-HOLY FAMILY BEREAVEM ENT MINISTRY, (formally known as Bethany), is a<br>
-voluntary parish -based service offering support to the bereaved, no matter when a loved<br>
-one died. Our Bereavement Ministers offer a listening ear at any stage of the grieving<br>
-process. If you would like the support of our Bereavement Ministry team, please contact<br>
-the parish office, to arrange.<br>
+WEEKLY OFFERING. The weekly collection on Sunday 23rd August came to £2,028.53<br>
+Thank you for your continued generosity and support. For infor mation on standing order<br>
+and contactless methods of donation, please contact the parish office.<br>
+PARISH 100 CLUB. Week 16 winners: Brenda Killough, Christine Treanor, Peggy<br>
+Butcher &amp; Fiontan Eastwood. Congratulations to all the winners.<br>
+CHILDREN ’S LITURGY. Will resume next Sunday 06th September at 10.30am Mass.<br>
+RCIA (THE RITE OF CHRISTIAN INITIATION FOR ADULTS). RCIA exists to<br>
+accompany adults wishing to be received into the Catholic Church. Progra mme starts 23rd<br>
+September. To register, email <a href="mailto:rcia@downandconnor.org" target="_blank" rel="noopener noreferrer">rcia@downandconnor.org</a>.<br>
+D&amp;C VOCATIONS NEWSLETTER. Offers a glimpse into the encouraging vocations<br>
+work across the Diocese. It can be viewed in the Latest News section of the paris h website.<br>
+ROSARY VIGIL FOR LIFE. Outside Belfast City Hall TODAY Sunday 30th August at<br>
+2pm. Contact <a href="tel:+442890278484" style="color:#1d4ed8;font-weight:600;">02890278484</a> / 07592 280522 or email info@precious life.com.<br>
+PUBLIC MEETING ON BUILDING A PRO -LIFE IRELAND. In the Lansdowne<br>
+Hotel on Thursday 10th September at 7.30pm. Featuring key speakers including Aontú<br>
+Party Leader Peadar Tóibín TD, and Bernadette Smyth of Precious Life.<br>
+NEWINGTON CREDIT UNION SEEKS VOLUNTEERS, for the Board of Directors<br>
+&amp; Supervisory Committee. No previous experience is required. Full training and support<br>
+will be provided. Contact <a href="tel:+442890351040" style="color:#1d4ed8;font-weight:600;">028 9035 1040</a> or E: info@newingtoncreditunio n.co.uk.<br>
+THE OLD PAROCHIAL HOUSE AT<br>
+ST THÉRÈSE CHURCH<br>
+At Masses on the weekend of 28th June, parish-<br>
+ioners were informed that a group called Dom<br>
+Polski had expressed an interest in acquiring the<br>
+old presbytery. This group is keen to establish a<br>
+Polish Cultural Hub for their community in Bel-<br>
+fast.<br>
+As a way to officially launch this project, a gar-<br>
+den party has been organised by Dom Polski for<br>
+TODAY Sunday 30th August 2026, 4pm— 6pm,<br>
+in the grounds of St Thérèse church. There is an<br>
+open invitation to all parishioners and neigh-<br>
+bours. Full details here.<br>
 Holy Family Parish<br>
 A praying, caring community, centred in Christ<br>
 Holy Family Parish is a member of a Family of Parishes,<br>
@@ -990,75 +1037,75 @@ Novena to Our Mother of Perpetual Help: Wed 9:15am Mass<br>
 First Saturday: 10am (Holy Family)<br>
 Taizé Prayer: last Friday of the month 8 -9pm (Holy Family)<br>
 MASS INTENTIONS<br>
-Sat 22 (6pm): Patrick McDermott<br>
-Sun 23 (9am): Tom Downey<br>
-Sun 23 (10.30am): For the People of the Parish<br>
-Sun 23 (12 Noon): Bernadette Lenny MM<br>
-Mon 24 : Margaret Walsh<br>
-Tue 25: Aleykutty Joseph<br>
-Wed 26: For someone who is recently deceased<br>
-Thu 27: Priest’s Intention<br>
-Fri 28: Priest’s Intention<br>
-Sat 29 (10am): Priest’s Intention<br>
-THE OLD PAROCHIAL HOUSE AT ST THÉRÈSE CHURCH<br>
-At Masses on the weekend of 28th June, parishioners were informed that a group<br>
-called Dom Polski had expressed an interest in acquiring the old presbytery. This<br>
-group is keen to establish a Polish Cultural Hub for their community in Belfast.<br>
-As a way to officially launch this project, a garden party has been organised by Dom<br>
-Polski for Sunday 30th August 2026, 4pm —6pm, in the grounds of St Thérèse church.<br>
-There is an open invitation to all parishioners and neighbours. Full details below.<br>
-JUBILEE YEAR OF SAIN T FRANCIS<br>
-“Jesus is happy to come with us, as truth is happy to be spoken, as life to be lived, as<br>
-light to be lit, as love to be loved, as joy to be given, as peace to be spread ” (St Fran-<br>
-cis)<br>
+Sat 29 (6pm): Seamus Agnew<br>
+Sun 30 (9am): For the People of the Parish<br>
+Sun 30 (10.30am): Eileen McGuinness<br>
+Sun 30 (12 Noon): Dermot McGarry<br>
+Mon 31 : Richard Amaefule<br>
+Tue 1: Ruairí Huddleston (1st)<br>
+Wed 2: Anne &amp; Peter O ’Hare<br>
+Thu 3: Peter Kerr<br>
+Fri 4: Priest ’s Intention<br>
+Sat 5 (10am): Joe Magee (1st)<br>
+Prayer of Gratitude for the Blessings of Summer<br>
+Heavenly Father,<br>
+Thank You for walking with me through every day of this summer. Thank You for the<br>
+sunshine, the peaceful mornings, the laughter of loved ones, and every blessing t hat<br>
+often went unnoticed. Even during difÏcult moments, You never left my side. Y ou<br>
+gave me strength when I was tired, comfort when I felt worried, and hope when I<br>
+needed encouragement.<br>
+As this season comes to an end, I choose to remember Your goodness, inst ead of my<br>
+disappointments. Help me keep a thankful heart in every season of life. May I ne ver<br>
+forget that every good gift comes from You. Fill my heart with joy that lasts beyond<br>
+the summer months, and help me continue sharing Your love with everyone I meet.<br>
+In Jesus ’ name, Amen.<br>
+The Season of Creation is celebrated each year from September 1 (the World<br>
+Day of Prayer for Creation) to October 4 (the Feast of Saint Francis of Assisi).<br>
+This season is celebrated in all Christian Churches around the world &amp; it invites<br>
+us all to renew our participation in our vocation as custodians of God ’s creation.<br>
+For 2026, the official theme is “Living Water ”, which is inspired by the biblical<br>
+vision found in the Book of Ezekiel (47:9, 12). The passage describes water flow-<br>
+ing from God ’s sanctuary, bringing life and restoration to ecosystems and com-<br>
+munities.<br>
+Faith leaders invite us to join this 2026 season of Creation -see the invitation at<br>
+Events<br>
+Tue. 1st Sept: 9.15am Mass, marking World Day of Prayer for the Care of Creation.<br>
+Tue. 1st Sept : Opening Prayer Service with global faith leaders – hosted online.<br>
+See seasonofcreation.org<br>
+JUBILEE YEAR OF SAINT FRANCIS<br>
+Brother Sun. “Be praised, my Lord, through all your creatures, especially<br>
+through my lord Brother Sun, who brings the day; and you give light through him.<br>
+And he is beautiful and radiant in all his splendour! ” (St Francis)<br>
 A Prayer Resource<br>
 30 DAYS WITH ST FRANCIS OF ASSISI. To mark this anniversary year,<br>
 and to prepare for the feast day of St Francis ’ on 04th October, this<br>
 booklet is available from the parish office, price £3. Using the words<br>
 of St Francis himself, it offers Scripture and short prayers. This simple<br>
 resource can help us to reflect on the wisdom of St Francis, for today. REST IN PEACE</p>
-<h3 class="b-head">Recently Deceased: Bertha Tracey, Mary Jamieson,</h3>
-<p>Kieran O’Mahony OSA<br>
-Month’s Mind: Bernadette Lenny</p>
-<h3 class="b-head">Anniversaries</h3>
-<p>Fr Jim McWilliams, Alice O ’Kane,<br>
-Tommy John O ’Kane, Ita Rooney, Maureen Hession, Tom<br>
-Downey, Patrick McDermott, Mick McAleer, Bernice<br>
-Shirazi (née Deery), Aleykutty Joseph, Mona Conlan,<br>
-Margaret Walsh, Bernie McCormack, Gerard Rea, Mary<br>
-Rea,<br>
+<h3 class="b-head">Recently Deceased: Mary Jamieson</h3>
+<h3 class="b-head">Anniversaries: Ella Donaghy, Orlaith Graham O&#x27;Kane,</h3>
+<p>Brendan &amp; Geraldine Graham, Edward Comerton, Seamus<br>
+Agnew, Eileen McGuinness, Dermot McGarry, Richard<br>
+Amaefule, Ruairí Huddleston (1st), Anne &amp; Peter O ’Hare,<br>
+Peter Kerr<br>
 Eternal rest grant unto them, O Lord!<br>
 SAINTS OF THE WEEK<br>
-Sun 23: St Eugene (St Eoghan)<br>
-Mon 24: St Bartholomew, Apostle<br>
-Thu 27: St Monica<br>
-Fri 28: St Augustine<br>
-Sat 29: The Beheading of St John the Baptist<br>
-St Monica, speaking about her death: “Lay this body anywhere; let not<br>
-the care for it trouble you at all. This only I ask; that you remember me<br>
-at the Lord ’s altar, wherever you may be. ”<br>
-Back to school Prayer<br>
-Dear Lord, as our students begin a new school year, we<br>
-pray that you will keep them in your care. Send your Spirit<br>
-to open their minds to all that is true, beautiful and good.<br>
-Help them to see the gifts and talents you have given<br>
-them, and to use them well. Help them to grow in knowledge and wisdom. Help them<br>
-be kind to others, and lead others to be kind to them. Give their teachers patience<br>
-and understanding, and help them teach what is just and true. Send your angels to<br>
-guide and guard our children, and to keep them from all harm. Open their young<br>
-hearts to your presence, and enfold them in your peace and protection. Hold them in<br>
-the palm of your hand, and bring them home safely at day’s end. Amen.<br>
-CONGRATULATIONS to the young people of our parish, on<br>
-your recent exam achievements. May the Holy Spirit guide you in<br>
-your choices for the future.<br>
-Holy Family</p></div>
+Mon 31: St Aidan of Lindisfarne<br>
+Tue 1: World Day of Prayer for the Care of Creation<br>
+Thu 3: St Gregory the Great<br>
+Fri 4: St MacNissi, co -patron saint of Down and Connor<br>
+Sat 5: St Teresa of Calcutta (Mother Teresa)<br>
+“It was not enough for Jesus to die for us, Jesus wanted that we loved one<br>
+another, that we see him in each other. ”<br>
+St Teresa ’s acceptance speech for her 1979 Nobel Peace Prize<br>
+Holy Family <a href="https://www.holy-familyparish.com" target="_blank" rel="noopener noreferrer">https://www.holy-familyparish.com</a></p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other DOWN &amp; CONNOR Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="ballycastle"><a class="parish-link" href="ballycastleparish.html" target="_blank" rel="noopener noreferrer">Ballycastle</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="ballymenaparish.html" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="glenariffe"><a class="parish-link" href="glenariffeparish.html" target="_blank" rel="noopener noreferrer">Glenariffe</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="kilmore and killyleagh"><a class="parish-link" href="kilmoreandkillyleagh.html" target="_blank" rel="noopener noreferrer">Kilmore and Killyleagh</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="port glenone (st mary&#x27;s portglenone)"><a class="parish-link" href="stmarysportglenone.html" target="_blank" rel="noopener noreferrer">Port Glenone (St Mary&#x27;s Portglenone)</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="sacred heart belfast"><a class="parish-link" href="sacredheartparishbelfast.html" target="_blank" rel="noopener noreferrer">Sacred Heart Belfast</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st brigids belfast"><a class="parish-link" href="stbrigidsparishbelfast.html" target="_blank" rel="noopener noreferrer">St Brigids Belfast</a></li><li class="parish-item" data-name="st gerards"><a class="parish-link" href="stgerardsparish.html" target="_blank" rel="noopener noreferrer">St Gerards</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st mary&#x27;s on the hill"><a class="parish-link" href="stmarysonthehill.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s on the Hill</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="ballymenaparish.html" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st colmcilles"><a class="parish-link" href="st-colmcilles.html" target="_blank" rel="noopener noreferrer">St Colmcilles</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1110,9 +1157,9 @@ Holy Family</p></div>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1604,23 +1651,8 @@ Holy Family</p></div>
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

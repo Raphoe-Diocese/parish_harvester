@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Monaghan &amp; Rackwallace (includes Tyholland) Bulletin — 25/08/2026</title>
+  <title>Monaghan &amp; Rackwallace (includes Tyholland) Bulletin — 30/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -179,6 +187,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -201,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +275,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +472,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -863,7 +892,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,14 +900,14 @@
     <header class="header">
       <p class="diocese-label">CLOGHER</p>
       <h1>Monaghan &amp; Rackwallace (includes Tyholland) Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Monaghan &amp; Rackwallace (includes Tyholland) — 25/08/2026. Part of the Clogher Diocese collated bulletin.</p>
-      <a class="download-link-top" href="monaghanrackwallace.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Monaghan &amp; Rackwallace (includes Tyholland) — 30/08/2026. Part of the Clogher Diocese collated bulletin.</p>
+      <a class="download-link-top" href="monaghanrackwallace.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="monaghanrackwallace.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="monaghanrackwallace.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
@@ -895,7 +924,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="monaghanrackwallace.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="monaghanrackwallace.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="monaghanrackwallace.pdf">Open PDF</a>
               <a href="monaghanrackwallace.pdf" download>Download</a>
             </div>
           </div>
@@ -934,67 +963,49 @@
       <div class="quiet-links">
         <a href="monaghanrackwallace-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-monaghan-rackwallace-includes-tyholland" data-parish-name="Monaghan &amp; Rackwallace (includes Tyholland)"><h2 class="ocr-parish-name">Monaghan &amp; Rackwallace (includes Tyholland)</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-monaghan-rackwallace-includes-tyholland" data-parish-name="Monaghan &amp; Rackwallace (includes Tyholland)"><h2 class="ocr-parish-name">Monaghan &amp; Rackwallace (includes Tyholland)</h2><p class="ocr-parish-date">30/08/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>Check out our<br>
 Facebook page:<br>
 Monaghan Rackwallace Parish<br>
 St. Patrick’s Tyholland Contact Parish Office <a href="tel:+3534781220" style="color:#1d4ed8;font-weight:600;">047 81220</a><br>
-Sunday 23rd August<br>
-10.30a.m. (Month’s Mind) ● Francie Ward, Cavancreevy, Castleshane.<br>
-● Genie &amp; Katie Mullen, Killyneil, daughters Catherine McSkeane &amp; Theresa Keaveney &amp; sons Gerard &amp; Seamus &amp; his wife Mary.<br>
-● Brendan Hughes, Tiravray, Castleshane.<br>
 Sunday 30th August<br>
-10.30a.m. ● Christina McKenna, Shelvins, Tyholland.<br>
-● Thomas &amp; Josephine Crudden, Killyneill &amp; dec’d. of the Crudden &amp; O’Brien families. Monaghan &amp; Rackwallace Parish Bulletin<br>
-Sunday 23rd August 2026<br>
+10.30a.m. ● Christina McKenna, Shelvins, Tyholland ● Thomas &amp; Ellen Rushe, Killyneill.<br>
+● Thomas &amp; Josephine Crudden, Killyneill &amp; dec’d. of the Crudden &amp; O’Brien families.<br>
+Sunday 6th September<br>
+10.30a.m. ● Sean &amp; Mary McCaffrey, New Houses &amp; dec’d. of the McCaffrey &amp; Lee families.<br>
+Recently deceased: you are asked to pray for Paddy McMahon, Shelvins, Glaslough. May he Rest in Peace.<br>
+TYHOLLAND PARISH CHURCH HARVEST THANKSGIVING: Sun 20th Sept at 3pm . Parking available at Monaghan Mushrooms<br>
+Refreshments served afterwards in Tyholland Community Centre. Everyone is welcome Monaghan &amp; Rackwallace Parish Bulletin<br>
+Sunday 30th August 2026<br>
 Tel: <a href="tel:+3534781220" style="color:#1d4ed8;font-weight:600;">047 81220</a><br>
 Priests of the Parish<br>
 Fr. Leo Creelman, Adm.<br>
-Fr. Humphrey Ude, C.C. Fr. Peter Tambala, C.C. Fr. Stephen Sherry, assisting.<br>
+Fr. Humphrey Ude, C.C. Fr. Peter Tambala, C.C. Fr. Stephen Sherry, C.C.<br>
 St. Joseph ’s - Daily Mass Monday to Saturday - 10a.m. Sunday Mass 8.30a.m. &amp; 11.30a.m.<br>
 St. Macartan ’s - Vigil Mass Saturday at 6pm, Sunday Mass - 12.30p.m.<br>
 St. Michael ’s Ardaghey - every other Sunday 9.30a.m.<br>
 Email: <a href="mailto:monaghan@clogherparishes.ie" target="_blank" rel="noopener noreferrer">monaghan@clogherparishes.ie</a><br>
-Parish website address: <a href="https://www.monaghan" target="_blank" rel="noopener noreferrer">www.monaghan</a> -rackwallace.com<br>
+Parish website address: <a href="https://www.monaghan-rackwallace.com" target="_blank" rel="noopener noreferrer">www.monaghan-rackwallace.com</a><br>
 Parish Pastoral Centre Manager: Enda Mc Skeane <a href="tel:+353873346435" style="color:#1d4ed8;font-weight:600;">087 3346435</a> Website: <a href="https://www.stjosephspastoralcentre.com" target="_blank" rel="noopener noreferrer">www.stjosephspastoralcentre.com</a> Check out our<br>
 Facebook page:<br>
 Monaghan Rackwallace Parish<br>
-You are asked to pray for our parishioner Dympna Corbett, Woodview, who died recently.<br>
-May she Rest in Peace. Praying the Stations of the Cross after 10a.m. Mass on this Tuesday 25th Aug. led by Vocations Society of St. Joseph.<br>
+You are asked to pray for our parishioner Bríd Steele (née Duggan), Castleshane &amp;<br>
+Patrick (Sonny) Power, Mullaghmatt, who died recently.<br>
+May they Rest in Peace. Vocations Society of St Joseph branch meeting this Weds Sept 2nd at 7pm in the Pastoral Centre. New members welcome.<br>
 Clogher don Óige will host the second series of – The Chosen – a groundbreaking drama for young adults about the life of Jesus<br>
 Christ, told through the eyes of those who knew Him. It will take place each Thursday, for 8 weeks, beginning 10th September,<br>
 from 7.30pm to 9.30pm in St. Joseph’s Pastoral Centre. An opportunity for young adults aged 18 -40 to watch the series, take part in<br>
 discussions, group sharing and prayer. To register or for more information contact <a href="mailto:info@clogherdonoige.org" target="_blank" rel="noopener noreferrer">info@clogherdonoige.org</a> or call <a href="tel:+3534772784" style="color:#1d4ed8;font-weight:600;">047 72784</a>.<br>
-St. Macartan’s Bowling restarts its short mat bowling on Thursday 3rd Sept. at 8p.m. New members welcome.<br>
-Radio Maria Ireland is an Irish -run Catholic Talk -Radio Station who enjoy commercial free broadcasting with Prayer, Catechesis,<br>
-Uplifting Music, Talks, Interviews and Testimonies. Visit <a href="https://www.radiomaria.ie" target="_blank" rel="noopener noreferrer">www.radiomaria.ie</a> for more info &amp; ways to listen. Anniversary Mass Intentions<br>
-Saturday 22nd August<br>
-6.00p.m. Vigil Mass (Month’s Mind) ● Cathal Murray, Tirkeenan.<br>
-Sunday 23rd August<br>
-● 8.30a.m. &amp; 11.30a.m. (St. Joseph’s)<br>
-● 12.30p.m. (Cathedral)<br>
-Monday 24th August<br>
-10.00a.m. (St. Joseph’s) ● Seamus McCleary, Glenview Heights &amp; dec’d. of the McCleary family, Glaslough St.<br>
-● Peter Comiskey, Crosses.<br>
-Tuesday 25th August<br>
-10.00a.m. (St. Joseph’s) ● Desmond &amp; Lana Hamill, North Road &amp; dec’d. family members.<br>
-Wednesday 26th August<br>
-10.00a.m. (St. Joseph’s) ● James, Mary Rose, Jim, Brigid &amp; Oliver McElvaney, Hill Street.<br>
-● Sofia &amp; Vaclouas Stanevicia, Lithuania.<br>
-Thursday 27th August<br>
-10.00a.m. (St. Joseph’s) ● Sheila &amp; James Fullerton, Fairview Crescent &amp; dec’d. of the Swift, Maguire &amp; Corrigan families.<br>
-● John Pat Murphy &amp; dec’d. of the Murphy &amp; Owens families, Old Cross Square.<br>
-Friday 28th August<br>
-10.00a.m. (St. Joseph’s) ● Vincent McEntee &amp; decd. of the McEntee &amp; Hanley families, Killyvane.<br>
-● Patricia &amp; Dermot Cassidy &amp; son Peter, Mall Road.<br>
+Children’s Rosary: The Legion of Mary invites all children to join to say the rosary on 5th Sept in St. Joseph’s Church at 9.30a.m.<br>
+Contact Agnes for more information <a href="tel:+353833450655" style="color:#1d4ed8;font-weight:600;">083 3450655</a>.<br>
+The Companions of the Gospel (COTG) are hosting an evening of prayer and testimony on Sunday 13th Sept in St. Joseph’s<br>
+Pastoral Centre from 6:30pm-8:30pm, all are welcome.<br>
+Monaghan Charismatic Prayer Group are organising a bus to Lough Derg on Sunday 6th September, a special day in honour of<br>
+Saint Carlo Acutis. Bus leaving Carrickmacross at 7am via Castleblayney/Clontibret/Monaghan. The island is €50 and bus fare €25.<br>
+Booking essential and ASAP with: Rosaleen <a href="tel:+353879717447" style="color:#1d4ed8;font-weight:600;">0879717447</a>/ Philip <a href="tel:+353872508043" style="color:#1d4ed8;font-weight:600;">0872508043</a> Anniversary Mass Intentions<br>
 Saturday 29th August<br>
-10.00a.m. (St. Joseph’s) ● Kit &amp; Pat McCormick, Broad Rd. &amp; Killymarley; Felix &amp; Catherine McCormick &amp; Teresa Hooper.<br>
-● Sean Boyle, Drumhirk.<br>
-● Biney &amp; Tim O’Hanrahan, Killyconnigan; Jack &amp; Mary Treanor, Dr. McKenna Tce.; Win &amp; Peter O’Hanrahan<br>
-Killyconnigan &amp; Billy McDonald, Monaghan.<br>
-● Bridie &amp; Seamus Fanning, Liseraw &amp; dec’d. family members; Jimmy Fanning, Drumbear &amp; dec’d. family.<br>
-6.00p.m. (Cathedral) Vigil Mass (Month’s Mind) ● Mary McKenna, formerly Dublin Street.<br>
+6.00p.m. (Cathedral) Vigil Mass (Month’s Mind) ● Mary McKenna, formerly Dublin St.<br>
 ● John McCoy, Clones Road.<br>
 ● Pauline Ormrod, Ard Glas, Killygoan.<br>
 Sunday 30th August<br>
@@ -1003,48 +1014,68 @@ Sunday 30th August<br>
 ● Gerry Rooney, Greaghglass; Bernard, Bridget, Brian &amp; Nancy Rooney.<br>
 ● Darren Allister, Dunraymond, Sam &amp; Mary Agnes Allister; Billy &amp; Jenny Allister;<br>
 Rose &amp; Gerry Clerkin, Crosshue &amp; dec’d. of the Clerkin &amp; McCourt families &amp; Billy Savage.<br>
-● 12.30p.m. (Cathedral) Parish One Day Pilgrimage to Lough Derg — Saturday 29th August<br>
-Bus: €25 per person, leaves back of Courthouse, the lower carpark, at 7.30am. To book a seat contact: Adrian on <a href="tel:+353877859582" style="color:#1d4ed8;font-weight:600;">087 7859582</a><br>
-Maura on <a href="tel:+353870547149" style="color:#1d4ed8;font-weight:600;">087 0547149</a> or Mary on <a href="tel:+353868358137" style="color:#1d4ed8;font-weight:600;">086 8358137</a>. Anyone going to Lough Derg can leave their name &amp; monies into the parish office ST. JOSEPH’S CHURCH: TEMPORARY CLOSING FOR REPAINTING<br>
-31st August to 12th September<br>
-We plan to repaint the interior of St Joseph’s Church, commencing on Mon 31st August, with work expected to be completed with in<br>
-two weeks. During this period, St Joseph’s will be closed from Monday to Saturday. As a result, all weekday Masses and Adora tion<br>
-will take place in St Macartan’s Cathedral for the duration of the works. The usual Sunday Mass schedule at St Joseph’s Churc h will<br>
-remain unchanged and will continue as normal. Please note that all Anniversary Masses scheduled during this time will be tra ns-<br>
-ferred to the Cathedral. We thank you for your understanding and cooperation as we carry out these improvements to our church .<br>
+● 12.30p.m. (Cathedral)<br>
+Monday 31st August<br>
+10.00a.m. (Cathedral)<br>
+Tuesday 1st September<br>
+10.00a.m. (Cathedral) ● Joe &amp; Peggy White, Belgium Park &amp; dec’d. members of the Cassidy family.<br>
+Wednesday 2nd September — (Adoration in Cathedral after Mass until 6pm)<br>
+10.00a.m. (Cathedral)<br>
+Thursday 3rd September<br>
+10.00a.m. (Cathedral) ● John Gilleese, Drumbear &amp; dec’d. of the Gilleese &amp; McGuinness families.<br>
+Friday 4th September — (Adoration in Cathedral after Mass until 6pm)<br>
+10.00a.m. (Cathedral) ● Peter &amp; Nellie McArdle, Killymonaghan, Castleshane; Peter &amp; May Grimley, Madden, Co. Armagh.<br>
+Saturday 5th September<br>
+10.00a.m. (Cathedral) ● Eugene, Betty &amp; Colin McKeown, Fairview Crescent, Killygoan.<br>
+● Anthony Lynch, Belgium Square.<br>
+● Dec’d. members of the Cahill family, Newry.<br>
+● Catherine, Frank &amp; James Brennan; Hugh Sweeney, Donegal.<br>
+Confessions in Cathedral after 10am Saturday Mass until 12pm Sharp<br>
+6.00p.m. (Cathedral) Vigil Mass (Month’s Mind) ● Anthony Ballantine, Devin Reilly Tce.<br>
+Sunday 6th September<br>
+● 8.30a.m. &amp; 11.30a.m. (St. Joseph’s)<br>
+● 12.30p.m. (Cathedral) ST. JOSEPH’S CHURCH: TEMPORARY CLOSING FOR REPAINTING this Monday 31st August to 12th September<br>
+During this period, St Joseph’s will be closed from Monday to Saturday, and all weekday Masses, Adoration and Saturday<br>
+morning confession will take place in St Macartan’s Cathedral for the duration of the work and all scheduled Anniversary<br>
+Masses will be transferred to the Cathedral. The usual Sunday Mass schedule at St Josep h’s Church will remain unchanged.<br>
 Monaghan &amp; Rackwallace Cemetery Sunday 2026<br>
 Blessing of the Graves on Sunday 6th September at 3p.m.<br>
 There will be a collection taken up on the day and proceeds will go to the upkeep of the graveyards.<br>
 Please Note: Due to Health &amp; Safety and expected large crowds,<br>
 NO VEHICLES can be admitted into the Cemetery grounds on Cemetery Sunday .<br>
-We also ask parishioners to bring a bottle of water with them and it will be blessed on the day. Sacrament of Marriage : Congratulations to Mark Greenan &amp; Jocelyn Meyer, who were recently married. UPDATE ON ST. MACART AN’S CATHEDRAL:<br>
-As you are all aware the scaffolding has recently been removed and we can now see the transformation. It is heartsome to see our<br>
-beloved Cathedral in all her glory once more, shining in the summer sun. The stone work, the details, the windows, have all b een<br>
-brought back to former glory and we give thanks for the craftsmanship, both past and present. This immense project ensures th at<br>
-St. Macartan’s Cathedral is now protected for further generations. As mentioned, our attentions now turn to the finer comfort s, such<br>
-as heating and toilet facilities. We are working hard with both our consultants and building team to provide the best soluti on to meet<br>
-the needs of parishioners, whilst keeping in mind our responsibility to ensure that we provide a sustainable system which pro tects<br>
-our fragile environment. We thank you for your continued patience.<br>
-Fundraising : Our current figure stands at €2,313,000. This money has been raised thanks to the amazing generosity of parishion-<br>
-ers clergy, and diocesan -wide support.<br>
+We also ask parishioners to bring a bottle of water with them and it will be blessed on the day. UPDATE ON ST. MACART AN’S CATHEDRAL:<br>
+With the scaffolding now removed, we can now see our beloved Cathedral in all her glory once more. This immense project ensures<br>
+that St. Macartan’s Cathedral is now protected for further generations. As mentioned, our attentions now turn to the finer co mforts,<br>
+such as heating and toilet facilities, working hard to provide the best solution to meet the needs of parishioners, whilst conscious of<br>
+our responsibility to ensure that we provide a sustainable system which protects our fragile environment. Our current fundraising<br>
+figure stands at €2.3million, raised thanks to the amazing generosity of our parishioners, clergy and diocesan wide support.<br>
 What happens next : Charitable Donations Scheme (separate to Monaghan Parish) will be rolled out in the coming months and we<br>
 ask, if you receive a CHY3/Enduring Certificate from us, that you complete and return same.<br>
 Yearly Pledges : If you have pledged to pay yearly and have yet to make your 2026 payment, just a reminder if you are paying by<br>
 cheque, please make cheque payable to Diocese of Clogher. You can drop it in Parish Office, or post to Bishop’s House,<br>
-FAO Gail. If paying by Bank Transfer, please ensure you use your name as reference. If you have any questions, please call G ail<br>
-at Bishop’s Office - <a href="tel:+3534781019" style="color:#1d4ed8;font-weight:600;">047 81019</a>, or by email at <a href="mailto:gail@clogherdiocese.ie" target="_blank" rel="noopener noreferrer">gail@clogherdiocese.ie</a><br>
-A sincere thanks to everyone for their continued support in this momentous task.<br>
-MONAGHAN RACKWALLACE PARISH DRAW<br>
-The August Draw will be held on Thursday next 27th August . Draw secretaries will receive monies at the Parish Office<br>
-during office hours and on Thursday 27th August from 10a.m. - 7p.m. (Please note new hours)<br>
-The draw will take place in the parish office live via the parish Facebook page at 7.30p.m. on Thursday 30th July Monaghan &amp; Rackwallace (includes Tyholland)</p></div>
+FAO Gail. If paying by Bank Transfer, please ensure you use your name as reference. If you have an y questions, please call Gail<br>
+at Bishop’s Office - <a href="tel:+3534781019" style="color:#1d4ed8;font-weight:600;">047 81019</a>, or by email: <a href="mailto:gail@clogherdiocese.ie" target="_blank" rel="noopener noreferrer">gail@clogherdiocese.ie</a> A sincere thanks to all for your continued support and patience.<br>
+Monaghan &amp; Rackwallace Draw Results - August 2026<br>
+€1000: Kevin &amp; Kathleen Connolly, New Houses, Tyholland<br>
+4 x €200: Darragh Sheridan, Mullaghdun; Jake &amp; Elliot Taylor, Glencove Manor;<br>
+Marilyn McFadden, Ard Gleann; Kathleen &amp; Arlene Marron, Arthurstown, Ardee<br>
+8 x €150: Gerry Coyle, Castleshane; Tawnie Swift, Clones Rd.; Cora Flannery, Tandarageebrack;<br>
+Owen &amp; Adelaide McCormick, Killyrane; Keenan Family, Mullach Glas;<br>
+Brendan &amp; Catherine Quigley, Lisdoonan; Rosemary McElvaney, Castleshane;<br>
+O’Driscoll &amp; Kelly Families, Tullyherim.<br>
+Promoter’s Prizes 4 x €100: Malachy Trainor; Damien Morgan; Peter Holland; Mary Hughes.<br>
+Promoters: Housecard x2; Joan O’Hanlon; Anne Smyth; Anne Lenane; Malachy Trainor; Bridie Kelly;<br>
+Mairead Dalton; Complimentary; Bridie Gilsenan x2; Anthony Bannon; Mary Hughes; We sincerely thank Fr Peter Tambala for his ministry here in the parish and wish him all the best as he moves to Inniskeen parish<br>
+and to undertake studies in Maynooth. Although already with us for some time now, after his appointment as our new curate, we<br>
+formerly welcome Fr. Stephen Shery to the parish. We offer our prayers and ask God’s blessings for both men in their new ministry<br>
+Monaghan &amp; Rackwallace Parish Draw 2026 Monaghan &amp; Rackwallace (includes Tyholland) <a href="https://monaghan-rackwallace.com/" target="_blank" rel="noopener noreferrer">https://monaghan-rackwallace.com/</a></p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other CLOGHER Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ballybay (tullycorbet)"><a class="parish-link" href="ballybay.html" target="_blank" rel="noopener noreferrer">Ballybay (Tullycorbet)</a></li><li class="parish-item" data-name="carrickmacross (machaire rois)"><a class="parish-link" href="carrickmacross.html" target="_blank" rel="noopener noreferrer">Carrickmacross (Machaire Rois)</a></li><li class="parish-item" data-name="castleblayney (muckno, includes clontibret)"><a class="parish-link" href="castleblayney.html" target="_blank" rel="noopener noreferrer">Castleblayney (Muckno, includes Clontibret)</a></li><li class="parish-item" data-name="clones"><a class="parish-link" href="clones.html" target="_blank" rel="noopener noreferrer">Clones</a></li><li class="parish-item" data-name="corcaghan-threemilehouse (kilmore &amp; drumsnatt)"><a class="parish-link" href="corcaghanthreemilehouse.html" target="_blank" rel="noopener noreferrer">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</a></li><li class="parish-item" data-name="derrygonnelly (botha)"><a class="parish-link" href="derrygonnelly.html" target="_blank" rel="noopener noreferrer">Derrygonnelly (Botha)</a></li><li class="parish-item" data-name="donagh"><a class="parish-link" href="donagh.html" target="_blank" rel="noopener noreferrer">Donagh</a></li><li class="parish-item" data-name="donaghmoyne"><a class="parish-link" href="donaghmoyne.html" target="_blank" rel="noopener noreferrer">Donaghmoyne</a></li><li class="parish-item" data-name="enniskillen (st michael&#x27;s parish)"><a class="parish-link" href="enniskillen.html" target="_blank" rel="noopener noreferrer">Enniskillen (St Michael&#x27;s Parish)</a></li><li class="parish-item" data-name="errigal truagh"><a class="parish-link" href="errigaltruagh.html" target="_blank" rel="noopener noreferrer">Errigal Truagh</a></li><li class="parish-item" data-name="fintona (donacavey)"><a class="parish-link" href="fintona.html" target="_blank" rel="noopener noreferrer">Fintona (Donacavey)</a></li><li class="parish-item" data-name="irvinestown (devenish)"><a class="parish-link" href="irvinestown.html" target="_blank" rel="noopener noreferrer">Irvinestown (Devenish)</a></li><li class="parish-item" data-name="killanny"><a class="parish-link" href="killanny.html" target="_blank" rel="noopener noreferrer">Killanny</a></li><li class="parish-item" data-name="magheracloone"><a class="parish-link" href="magheracloone.html" target="_blank" rel="noopener noreferrer">Magheracloone</a></li><li class="parish-item" data-name="roslea"><a class="parish-link" href="roslea.html" target="_blank" rel="noopener noreferrer">Roslea</a></li><li class="parish-item" data-name="tempo (pobal)"><a class="parish-link" href="tempo.html" target="_blank" rel="noopener noreferrer">Tempo (Pobal)</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ballybay (tullycorbet)"><a class="parish-link" href="ballybay.html" target="_blank" rel="noopener noreferrer">Ballybay (Tullycorbet)</a></li><li class="parish-item" data-name="carrickmacross (machaire rois)"><a class="parish-link" href="carrickmacross.html" target="_blank" rel="noopener noreferrer">Carrickmacross (Machaire Rois)</a></li><li class="parish-item" data-name="castleblayney (muckno, includes clontibret)"><a class="parish-link" href="castleblayney.html" target="_blank" rel="noopener noreferrer">Castleblayney (Muckno, includes Clontibret)</a></li><li class="parish-item" data-name="clones"><a class="parish-link" href="clones.html" target="_blank" rel="noopener noreferrer">Clones</a></li><li class="parish-item" data-name="corcaghan-threemilehouse (kilmore &amp; drumsnatt)"><a class="parish-link" href="corcaghanthreemilehouse.html" target="_blank" rel="noopener noreferrer">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</a></li><li class="parish-item" data-name="derrygonnelly (botha)"><a class="parish-link" href="derrygonnelly.html" target="_blank" rel="noopener noreferrer">Derrygonnelly (Botha)</a></li><li class="parish-item" data-name="donagh"><a class="parish-link" href="donagh.html" target="_blank" rel="noopener noreferrer">Donagh</a></li><li class="parish-item" data-name="enniskillen (st michael&#x27;s parish)"><a class="parish-link" href="enniskillen.html" target="_blank" rel="noopener noreferrer">Enniskillen (St Michael&#x27;s Parish)</a></li><li class="parish-item" data-name="errigal truagh"><a class="parish-link" href="errigaltruagh.html" target="_blank" rel="noopener noreferrer">Errigal Truagh</a></li><li class="parish-item" data-name="irvinestown (devenish)"><a class="parish-link" href="irvinestown.html" target="_blank" rel="noopener noreferrer">Irvinestown (Devenish)</a></li><li class="parish-item" data-name="killanny"><a class="parish-link" href="killanny.html" target="_blank" rel="noopener noreferrer">Killanny</a></li><li class="parish-item" data-name="magheracloone"><a class="parish-link" href="magheracloone.html" target="_blank" rel="noopener noreferrer">Magheracloone</a></li><li class="parish-item" data-name="tempo (pobal)"><a class="parish-link" href="tempo.html" target="_blank" rel="noopener noreferrer">Tempo (Pobal)</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1096,9 +1127,9 @@ The draw will take place in the parish office live via the parish Facebook page 
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1590,23 +1621,8 @@ The draw will take place in the parish office live via the parish Facebook page 
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

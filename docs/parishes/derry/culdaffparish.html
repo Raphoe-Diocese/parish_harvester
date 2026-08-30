@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Culdaff Bulletin — 25/08/2026</title>
+  <title>Culdaff Bulletin — 30/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -179,6 +187,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -201,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +275,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +472,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -863,7 +892,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,14 +900,14 @@
     <header class="header">
       <p class="diocese-label">DERRY</p>
       <h1>Culdaff Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Culdaff — 25/08/2026. Part of the Derry Diocese collated bulletin.</p>
-      <a class="download-link-top" href="culdaffparish.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Culdaff — 30/08/2026. Part of the Derry Diocese collated bulletin.</p>
+      <a class="download-link-top" href="culdaffparish.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="culdaffparish.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="culdaffparish.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
@@ -895,7 +924,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="culdaffparish.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="culdaffparish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="culdaffparish.pdf">Open PDF</a>
               <a href="culdaffparish.pdf" download>Download</a>
             </div>
           </div>
@@ -934,209 +963,198 @@
       <div class="quiet-links">
         <a href="culdaffparish-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-culdaff" data-parish-name="Culdaff"><h2 class="ocr-parish-name">Culdaff</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-culdaff" data-parish-name="Culdaff"><h2 class="ocr-parish-name">Culdaff</h2><p class="ocr-parish-date">30/08/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>Fr John McDevitt P.P. 9376273 / <a href="tel:+353858237119" style="color:#1d4ed8;font-weight:600;">0858237119</a><br>
 Fr. Karl Haan C.C. 9379107<br>
 email: <a href="mailto:culdaffnotes@gmail.com" target="_blank" rel="noopener noreferrer">culdaffnotes@gmail.com</a><br>
-Weekly Offering €970<br>
-Development Collection €280.<br>
-Envelopes can be left in McGuinness’ shop.</p>
-<h3 class="b-head">Daily Mass</h3>
-<p>Monday 7,30 pm; Tuesday &amp; Wednesday, 10 am<br>
+Weekly Offering €680<br>
+Development Collection €265.<br>
+Envelopes can be left in McGuinness’ shop.Daily Mass<br>
+Monday 7.30 pm; Tuesday &amp; Wednesday , 10 am<br>
 [Blessed Sacrament Exposition after 10 am Mass until 2<br>
-pm]; Thursday 7.30 pm; Friday 10am; No Mass on<br>
-Saturday morning.<br>
+pm]; no Mass on Thursday; Friday First Friday of the<br>
+Month, 7.30 pm; No Mass on Saturday morning .<br>
 Saturday Vigil 8 pm<br>
 Sunday 10 am.<br>
 First Reading<br>
-Isaiah 22:19-23<br>
-God will remove Shebna from his office as master of the palace.<br>
+Jeremiah 20:7-9<br>
+Jeremiah laments but cannot fail to speak in God’s name.<br>
 Second Reading<br>
-Romans 11:33-36<br>
-Paul sings praise to God.<br>
+Romans 12:1-2<br>
+Paul encourages the Romans to stay faithful to God.<br>
 Gospel Reading<br>
-Matthew 16:13-20<br>
-Simon Peter acknowledges Jesus as the Christ and is given the key to<br>
-the Kingdom of Heaven.<br>
-40 Hours Adoration – continues today, Sunday 23rd August.<br>
-VOCATIONS: In this Sunday&#x27;s gospel Peter acknowledges Jesus as<br>
-the Christ, the Son of the living God, and Jesus confers on Peter &quot;.the<br>
-keys of the Kingdom.&quot; an image reflected in the First Reading where<br>
-the Lord says He will &quot;.place the key of David.&quot; on the shoulder of<br>
-those called to lead His people, those who will be called &quot;father.&quot;<br>
-A Feast of Folk with<br>
+Matthew 16:21-27<br>
+Jesus speaks of his Passion and rebukes Peter for his<br>
+objection .<br>
+VOCATIONS That the men called to priesthood will be filled<br>
+with courage and hope as they hear Jesus calling them to<br>
+follow Him by renouncing themselves, taking up their cross<br>
+every day, and finding life in Him and in the service of Hi s<br>
+people.A Feast of Folk with<br>
 Patsy Cavanagh and<br>
 friends every Tuesday<br>
 evening at 8pm during<br>
 July and August in<br>
 The<br>
 Cairn Greencastle.<br>
-Enquiries tel <a href="tel:+353749381104" style="color:#1d4ed8;font-weight:600;">074<br>
-9381104</a></p>
-<h3 class="b-head">Anniversary Mass this weekend</h3>
-<p>Sunday, 10 am Bernard McGuinness, Culdaff<br>
-We welcome into our Faith Community<br>
-through the Sacrament of Baptism: Ziggi<br>
-Joe McLaughlin, Francistown, Malin. A<br>
-son for Brendan &amp; Sevanagh.<br>
-Carrowmenagh Community Centre Tel <a href="tel:+353749367061" style="color:#1d4ed8;font-weight:600;">074 93 67061</a><br>
-Cream Teas available at the Centre every Tuesday 2-4pm,<br>
-during August. Cost €5. No need to book - just call in.<br>
-Carrowmenagh Community Centre will host The<br>
-Holiday Hop, a special summer Sunday night dance for<br>
-regulars, holiday makers and visitors, on Sunday 16th<br>
-August at 8pm. Admission €5, including supper. Everyone<br>
-is very welcome.<br>
-Celebrate Carrowmenagh – Join Carrowmenagh<br>
-Community Centre, Carrowmenagh Residents Association<br>
-and Tremone Historical Society for a special afternoon<br>
-celebrating the heritage, people and stories of<br>
-Carrowmenagh. The event will take place on Sunday 30th<br>
-August at 2pm. It includes a guided historical village<br>
-walk, talks on the stories behind the new memorial plaques<br>
-in the recently renovated memorial garden and at the<br>
-Centre, a cream tea, and entry into a prize draw to win an<br>
-original painting by local artist Jenny Craven. All proceeds<br>
-will support the Carrowmenagh Residents Association and<br>
-the Memorial Garden Renovation Fund. Tickets €10<br>
-children €5. Booking is essential through<br>
-Carrowmenagh Community Centre.<br>
+Enquiries tel 074<br>
+9381104Anniversary Mass next weekend<br>
+Saturday, 8 pm : Mary Mc Conalogue, Cashel<br>
+Sunday, 10 am James Doherty, The Cottages, GleneelyCarrowmenagh Community Centre Tel <a href="tel:+353749367061" style="color:#1d4ed8;font-weight:600;">074 93 67061</a><br>
+TheSunday Night Dance will take place this Sunday, 30th August,<br>
+8pm. Old time, ceilidh, line dancing and jiving. Admiss ion €5<br>
+including supper.<br>
 We have lots of great courses coming up for the autumn<br>
-including beauty therapy, upholstery, plumbing, phone<br>
-photography, dressmaking and alterations, pottery,<br>
-creative painting, guitar lessons, tablet and smartphone for<br>
-beginners, crafts, silversmithing, line dancing, glass fusion<br>
-and Internet Skills. Contact the Centre for more<br>
-information and to book.<br>
-Whist: 1st Vera Deeny, 2nd<br>
-Mickey O’Donnell; 3rd Rose<br>
-Thompson<br>
-Tickets John Doherty,<br>
-Mickey O’Donnell, Kevin<br>
-Lafferty<br>
-Other Winners Kevin<br>
-Lafferty Rose Thompson, Fr<br>
-Jim, Ernie McLucas; Eileen<br>
-Gormley<br>
-Car boot sale on Saturday 5th Sept in Malin<br>
-G.A.A training pitch. Commencing from 9am to<br>
-1pm. €10 per car boot. Money going toward<br>
-Marinwood, The Field Group. A great way to<br>
-support the club, either by buying or selling<br>
-something. Sure to be a great event. Hope to see<br>
-you all there.<br>
-Charity walk. From Carn to Malin on Sunday<br>
-13th September at 12pm. Meeting in the diamond<br>
-in Carn at 11:45 am.<br>
+including Spanish conversation and culture, beauty thera py,<br>
+plumbing and heating, phone photography, dressmaking and<br>
+alterations, creative painting, guitar lessons, tablet and smartphone<br>
+for beginners, creative crafts, digital skills for farme rs and internet<br>
+skills level 3. Contact the Centre for more informatio n and to book.<br>
+Car boot sale on Saturday 5th Sept in Malin G.A.A<br>
+training pitch. Commencing from 9am to 1pm. €10<br>
+per car boot. Money going toward Marinwood, The<br>
+Field Group. A great way to support the club, either<br>
+by buying or selling something. Sure to be a great<br>
+event. Hope to see you all there.<br>
+Charity walk. From Carn to Malin on Sunday 13th<br>
+September at 12pm. Meeting in the diamond in Carn<br>
+at 11:45 am.<br>
 Adults : €10, Kids : €5, Family : €20<br>
-All proceeds in aid of Malinwood, The Field<br>
-Group.<br>
+All proceeds in aid of Malinwood, The Field Group.<br>
 Get your walking shoes on and join in the fun !<br>
-Altar Society Rota is on the Noticeboard at the back of the church<br>
-The Men&#x27;s Shed Carn is running a<br>
-Furniture Restoration and Upholstery course<br>
-starting on Monday, September 14. From 7<br>
-pm to 9 pm, for 6 weeks. It&#x27;s a great chance<br>
-to learn new skills and finally restore that<br>
-piece of furniture you have been meaning to<br>
-for ages !<br>
-To<br>
-book, email <a href="mailto:mens.shed.carn@gmail.com" target="_blank" rel="noopener noreferrer">mens.shed.carn@gmail.com</a> or<br>
-call <a href="tel:+353874611571" style="color:#1d4ed8;font-weight:600;">087 4611571</a>.<br>
-The Men&#x27;s Shed Carn is also<br>
-hosting &quot;DROP IN WEDNESDAYS&quot; for<br>
-men every Wednesday from 11 am -1<br>
-pm. Pop in for a coffee and a chat and see<br>
-what we do here at the shed, a place to<br>
-connect, learn and create. Bring a friend,<br>
-meet new people. All ages welcome<br>
-SERENITY HOUSE - 8-week classes starting in September<br>
-Macrame and Glass painting Wednesday 9th September 7pm-9pm €5 per class<br>
-Crochet class Tuesday 15th September 1pm-3pm.€6 per class<br>
-Art Classes Tuesday 13th October 7pm-9pm and Friday 16th October, 10.30 am-12.30 pm. €60 per course<br>
-The Chiropodist will be in Serenity house on Friday 28th August. Phone <a href="tel:+353749382945" style="color:#1d4ed8;font-weight:600;">0749382945</a> or <a href="tel:+353868936788" style="color:#1d4ed8;font-weight:600;">0868936788</a> to book<br>
-Catholic Mothers Ireland – Family Day: Catholic Mothers Ireland<br>
+The Men&#x27;s Shed Carn is running a Furniture Restoration and Upholstery cou rse starting on Monday, September 14.<br>
+From 7 pm to 9 pm, for 6 weeks. It&#x27;s a great chance to l earn new skills and finally restore that piece of furni ture you<br>
+have been meaning to for ages !<br>
+To book, email <a href="mailto:mens.shed.carn@gmail.com" target="_blank" rel="noopener noreferrer">mens.shed.carn@gmail.com</a> or call <a href="tel:+353874611571" style="color:#1d4ed8;font-weight:600;">087 4611571</a>.<br>
+The Men&#x27;s Shed Carn is also hosting &quot;DROP IN WEDNESDAYS&quot; for men every Wednesday from 11 am -1<br>
+pm. Pop in for a coffee and a chat and see what we do h ere at the shed, a place to connect, learn and create. Bri ng a<br>
+friend, meet new people. All ages welcomeCatholic Mothers Ireland – Family Day: Catholic Mothers Ireland<br>
 will hold its Annual National Mass on Sunday, 6<br>
-September at Termonbacca Retreat Centre, Derry.<br>
-The day will begin with Mass at 2.00pm, celebrated by Bishop Donal<br>
-McKeown, followed by refreshments, children&#x27;s activities, and a talk<br>
-for parents.<br>
-This promises to be a lovely day for the whole family. For more<br>
-information and booking details, please<br>
-email <a href="mailto:info@catholicmothers.ie" target="_blank" rel="noopener noreferrer">info@catholicmothers.ie</a>.<br>
-All are welcome.<br>
-IDP is delighted to bring the successful Exploring<br>
-Me programme to Moville for the first time.<br>
-This FREE 4-week programme for family carers offers an<br>
-opportunity to focus on you, with sessions on personal<br>
-development, self-care, wellbeing and therapeutic flower<br>
-arranging<br>
-Join us for an informal coffee morning to find out more<br>
-about the programme at Methodist Hall, Moville, Friday<br>
-4th September at 10am.<br>
-For more information call Emily on <a href="tel:+353749362218" style="color:#1d4ed8;font-weight:600;">07493 62218</a> or<br>
-email <a href="mailto:emily@inishowen.ie" target="_blank" rel="noopener noreferrer">emily@inishowen.ie</a><br>
-BUNCRANA GARDEN FETE 2026: The Annual Garden<br>
-Fete will take place this Sunday, 23 August, from 3.00 -<br>
-6.00pm in the grounds of Scoil Mhuire, Buncrana F93<br>
-PN53. Fun for all the family with Bouncy Castles,<br>
-Mechanical Bull, Petting Farm, Facepainting, Bingo,<br>
-Rickety Wheel, Children&#x27;s Games, Raffle Prizes and more.<br>
-Entry €5pp or €15 per family (cash only). All welcome.<br>
-Daring to be Different by Harold E Kohn<br>
-The<br>
-best<br>
-servants<br>
-of<br>
-mankind<br>
-have<br>
-always<br>
-been<br>
-maladjusted to their timers.<br>
-They dared to be difficult, to think differently, to act<br>
-differently.<br>
-Christ did, and his apostles did, or there would be no<br>
-Christianity.<br>
-Copernicus, and Galileo and others did, or we would still<br>
-believe in a pygmy universe.<br>
-Inventors did, or we would still be ploughing fields with a<br>
-stick and lighting our houses with torches and candles.<br>
-The Abolitionists and Abraham Lincoln did, or we would<br>
-till have slavery.<br>
-Mankind’s most noble servants have refused to become<br>
-adjusted to man’s cruelty to man, to predatory economic<br>
-practices, to the idea that disease is inevitable and useless<br>
-to<br>
-oppose,<br>
-to<br>
-dictatorships,<br>
-to<br>
-the<br>
-persecution<br>
-of<br>
-minorities, to race prejudice, to narrow nationalism, to the<br>
-war method of solving international differences.<br>
-For conscience’s sake, for man’s sake and for God’s sake<br>
-they lived daringly.<br>
-They rejected the premium that others put on a safe<br>
-conformity and they ventured to become uncommon men.<br>
-Greencastle Community Centre (9381054) <a href="mailto:info@greencastlecentre.ie" target="_blank" rel="noopener noreferrer">info@greencastlecentre.ie</a><br>
-– Free Bridge Builders Adventure Camp (25, 26, 27 August) for 13 to<br>
-16 year olds – bushcrafts, coasteering, and outdoor adventures. Baby<br>
-Reflexology with Chantel from Tuesday 1 September. Call<br>
-<a href="tel:+353863137817" style="color:#1d4ed8;font-weight:600;">0863137817</a> to register. QQI Level 5 Certificate in Healthcare Support<br>
-starting in September. Names are being taken for Bridge Classes,<br>
-commencing mid-September. To register or for further information<br>
-please contact Margaret on <a href="tel:+353863936255" style="color:#1d4ed8;font-weight:600;">0863936255</a> as soon as possible<br>
-Culdaff</p></div>
+September atTermonbacca Retreat Centre, Derry .<br>
+The day will begin with Mass at 2.00pm , celebrated by Bishop Donal<br>
+McKeown , followed by refreshments, children&#x27;s activities, and a talk<br>
+for parents. This promises to be a lovely day for th e whole family. For<br>
+more information and booking details, please<br>
+email <a href="mailto:info@catholicmothers.ie" target="_blank" rel="noopener noreferrer">info@catholicmothers.ie</a> .<br>
+All are welcome.Greencastle Community Centre (9381054)<br>
+-Baby Reflexology with Chantel starting Tuesday<br>
+1stSeptember <a href="tel:+353863137817" style="color:#1d4ed8;font-weight:600;">0863137817</a> to register your interest.<br>
+- The Mindful Maker crafting and upcycling course, 6<br>
+weeks starting Monday 14thSeptember 7-9pm €30.<br>
+- Sewing Club starting back Wednesday 9thSeptember 7-<br>
+9pm Tel: 00447752682086 to book.<br>
+Group 1 of the Altar Society begin this weekendDonegal Group 173 Rise and Shine Trust (formerly The<br>
+Irish Handicapped Children&#x27;s Pilgrimage Trust and The<br>
+Irish Pilgrimage Trust) are celebrating 40 years of taking<br>
+young people with special needs to Lourdes each<br>
+Easter. We are celebrating with a special Mass on Sat urday<br>
+26th September in the Church of the Irish Martyr&#x27;s<br>
+Letterkenny at 12 noon. The Mass will be concelebrated by<br>
+Bishop Niall Coll and Bishop Donal Mc Keown Diocese<br>
+of Derry and many of the priests who travelled to Lourdes<br>
+with us over the years. We invite all the guests and t heir<br>
+families and all the helpers who travelled with us over th e<br>
+years to our mass to celebrate Our Lady of Lourdes.<br>
+Anam Cara Donegal, the organisation that supports<br>
+bereaved parents, will hold it&#x27;s monthly Face to Face<br>
+Parent Support Evening for bereaved parents<br>
+onThursday 10th September 2026 at 7.30pm in the<br>
+Raddison Blu Hotel, Letterkenny F92 FK15.<br>
+This event is free and open to all bereaved parents<br>
+regardless of the age of their child, the circumstances of<br>
+their death, or how recent their death was. There is no<br>
+need for registration, this is a walk in meeting.<br>
+We also offer online support group meetings. To find out<br>
+more call<br>
+01 4045378 or email <a href="mailto:info@anamcara.ieThe" target="_blank" rel="noopener noreferrer">info@anamcara.ieThe</a> Deep End: Not Again Peter!<br>
+by Jane Mellett<br>
+Poor Peter. He never seems to get it quite right.<br>
+His journey throughout the Gospel is definitely<br>
+one of ups and downs as one minute he is a<br>
+ROCK, the next a failure. Peter wants the<br>
+journey of discipleship to be a happy, rosy place<br>
+where all is well because God is in his life.<br>
+Unfortunately it is not that simple as having our<br>
+minds set on ‘divine things’ means that we must<br>
+be agents of change in this world where ‘human<br>
+things’ are concerned. Peter is being moulded<br>
+into the rock that he needs to be although at times<br>
+he appears as a small stone.<br>
+To be an agent of change usually means being<br>
+counter-cultural and that brings many challenges<br>
+and ‘crosses’. That is Jesus’ message to his<br>
+followers – if you are interested in my Kingdom,<br>
+then that will involve hardship along the way.<br>
+Why? Because the Kingdom that Jesus<br>
+proclaims is one where everyone is included,<br>
+where justice and peace reign and communities<br>
+are built on the principles of solidarity, mutuality,<br>
+respect and love. And not just any love, but<br>
+AGAPE love, i.e. love of people we may not<br>
+even like. Why is this so hard?<br>
+Jesus’ love changes things. It is a radical love,<br>
+one with no boundaries, to achieve a world<br>
+where this Kingdom is a reality will most<br>
+definitely involve going against the grain and<br>
+therein lie the crosses. Jesus is trying to explain<br>
+to Peter the path that lies ahead.<br>
+As the children and young<br>
+people prepare to return to<br>
+school, we wish them well.<br>
+We also spare a thought for<br>
+their parents and teachers to<br>
+whom we entrust their<br>
+welfare. May God bless them<br>
+all and keep them safe during<br>
+this school year.<br>
+POINTS TO PONDER - Peter has just been<br>
+congratulated as the rock on which Jesus will build h is<br>
+church. He is comfortable in a theology of grace and<br>
+glory. Suddenly that rock looks sandy and unsafe.<br>
+Jesus calls him abruptly out of his comfort zone into<br>
+the real world where suffering must be faced (cross is<br>
+used here as a proverbial term for suffering and ag ony,<br>
+not referring specifically to Jesus’ crucifixion).<br>
+One of the ideas in the gospel is that we take up th e<br>
+cross of doing what is right and being willing to b ear<br>
+it. Like parents who try to explain, cajole, encoura ge<br>
+and define what is right for their children, even wh en<br>
+they are thought foolish. Jesus bore a cross to the end<br>
+of his convictions and love.<br>
+Taking the cross is also accepting and living with<br>
+pain, suffering of any sort, and the griefs of life we<br>
+can do nothing about. Crosses may be inflicted on u s<br>
+by others.<br>
+We know of people who have accepted a heavy<br>
+burden in life and who ploughed tough furrows,<br>
+through no fault of their own. They have been helpe d<br>
+often by the example of the one who carried the cro ss<br>
+to the end. Help often came to them also from famil y,<br>
+friends and neighbours.<br>
+On the way to Calvary, Jesus was helped by one man,<br>
+remembered forever, Simon from Africa. Help can<br>
+come from expected or unexpected quarters, but help<br>
+there must be if we are to bear our crosses in life. I n<br>
+prayer we might ask how we help those near us carry<br>
+the burdens of their lives.The Padre Pio Prayer Group ,<br>
+Holy Family Chapel,<br>
+Ballymagroarty will take place<br>
+onTuesday 1 September<br>
+2026. Starting with Rosary at<br>
+6.45pm before mass, celebration<br>
+of holy mass at 7.15pm, then the<br>
+priest will bless everyone with a<br>
+first class relic of St. Pio, while<br>
+closing prayers are recited.<br>
+EVERYONE WELCOME.Culdaff <a href="http://www.culdaffparish.com" target="_blank" rel="noopener noreferrer">http://www.culdaffparish.com</a></p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other DERRY Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghyaran"><a class="parish-link" href="parishofaghyaran.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li class="parish-item" data-name="ardmore"><a class="parish-link" href="ardmoreparish.html" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li class="parish-item" data-name="ardstraw east"><a class="parish-link" href="parishofardstraweast.html" target="_blank" rel="noopener noreferrer">Ardstraw East</a></li><li class="parish-item" data-name="ballinascreen (&amp; desertmartin amalgamated)"><a class="parish-link" href="parishofballinascreen.html" target="_blank" rel="noopener noreferrer">Ballinascreen (&amp; Desertmartin amalgamated)</a></li><li class="parish-item" data-name="banagher"><a class="parish-link" href="banagherparish.html" target="_blank" rel="noopener noreferrer">Banagher</a></li><li class="parish-item" data-name="bellaghy"><a class="parish-link" href="bellaghyparish.html" target="_blank" rel="noopener noreferrer">Bellaghy</a></li><li class="parish-item" data-name="buncrana"><a class="parish-link" href="buncranaparish.html" target="_blank" rel="noopener noreferrer">Buncrana</a></li><li class="parish-item" data-name="camus"><a class="parish-link" href="camusparish.html" target="_blank" rel="noopener noreferrer">Camus</a></li><li class="parish-item" data-name="carndonagh"><a class="parish-link" href="carndonaghparish.html" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li class="parish-item" data-name="castlederg"><a class="parish-link" href="castledergparish.html" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li class="parish-item" data-name="clonleigh (strabane pastoral area)"><a class="parish-link" href="clonleighparish.html" target="_blank" rel="noopener noreferrer">Clonleigh (Strabane Pastoral Area)</a></li><li class="parish-item" data-name="clonmany"><a class="parish-link" href="clonmanyparish.html" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li class="parish-item" data-name="culmoe"><a class="parish-link" href="culmoreparish.html" target="_blank" rel="noopener noreferrer">Culmoe</a></li><li class="parish-item" data-name="dma parish (claudy area)"><a class="parish-link" href="dmaparish.html" target="_blank" rel="noopener noreferrer">DMA Parish (Claudy area)</a></li><li class="parish-item" data-name="drumquin"><a class="parish-link" href="drumquinparish.html" target="_blank" rel="noopener noreferrer">Drumquin</a></li><li class="parish-item" data-name="drumragh"><a class="parish-link" href="drumraghparish.html" target="_blank" rel="noopener noreferrer">Drumragh</a></li><li class="parish-item" data-name="dungiven"><a class="parish-link" href="parishofdungiven.html" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li class="parish-item" data-name="errigal"><a class="parish-link" href="errigalparish.html" target="_blank" rel="noopener noreferrer">Errigal</a></li><li class="parish-item" data-name="fahan"><a class="parish-link" href="fahanparish.html" target="_blank" rel="noopener noreferrer">Fahan</a></li><li class="parish-item" data-name="granaghan"><a class="parish-link" href="granaghanparish.html" target="_blank" rel="noopener noreferrer">Granaghan</a></li><li class="parish-item" data-name="greenlough"><a class="parish-link" href="greenlough.html" target="_blank" rel="noopener noreferrer">Greenlough</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holyfamily-parish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="iskaheen"><a class="parish-link" href="iskaheenparish.html" target="_blank" rel="noopener noreferrer">Iskaheen</a></li><li class="parish-item" data-name="kilrea"><a class="parish-link" href="parishofkilrea.html" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li class="parish-item" data-name="lavey"><a class="parish-link" href="laveyparish.html" target="_blank" rel="noopener noreferrer">Lavey</a></li><li class="parish-item" data-name="leckpatrick"><a class="parish-link" href="leckpatrickparish.html" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li class="parish-item" data-name="maghera (derry)"><a class="parish-link" href="magheraparishderry.html" target="_blank" rel="noopener noreferrer">Maghera (Derry)</a></li><li class="parish-item" data-name="melmount (&amp; camus)"><a class="parish-link" href="melmountparish.html" target="_blank" rel="noopener noreferrer">Melmount (&amp; Camus)</a></li><li class="parish-item" data-name="moville"><a class="parish-link" href="movilleparish.html" target="_blank" rel="noopener noreferrer">Moville</a></li><li class="parish-item" data-name="sion mills"><a class="parish-link" href="parishofsionmills.html" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li class="parish-item" data-name="st eugene&#x27;s cathedral (templemore)"><a class="parish-link" href="steugenescathedral.html" target="_blank" rel="noopener noreferrer">St Eugene&#x27;s Cathedral (Templemore)</a></li><li class="parish-item" data-name="st mary&#x27;s parish creggan"><a class="parish-link" href="stmarysparishcreggan.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Parish Creggan</a></li><li class="parish-item" data-name="star of the sea (magilligan)"><a class="parish-link" href="staroftheseacatholic.html" target="_blank" rel="noopener noreferrer">Star of the Sea (Magilligan)</a></li><li class="parish-item" data-name="steelstown"><a class="parish-link" href="steelstownparish.html" target="_blank" rel="noopener noreferrer">Steelstown</a></li><li class="parish-item" data-name="three patrons"><a class="parish-link" href="threepatrons.html" target="_blank" rel="noopener noreferrer">Three Patrons</a></li><li class="parish-item" data-name="waterside (&amp; strathfoyle amalgamated)"><a class="parish-link" href="watersideparish.html" target="_blank" rel="noopener noreferrer">Waterside (&amp; Strathfoyle amalgamated)</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghyaran"><a class="parish-link" href="parishofaghyaran.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li class="parish-item" data-name="ardmore"><a class="parish-link" href="ardmoreparish.html" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li class="parish-item" data-name="banagher"><a class="parish-link" href="banagherparish.html" target="_blank" rel="noopener noreferrer">Banagher</a></li><li class="parish-item" data-name="buncrana"><a class="parish-link" href="buncranaparish.html" target="_blank" rel="noopener noreferrer">Buncrana</a></li><li class="parish-item" data-name="camus"><a class="parish-link" href="camusparish.html" target="_blank" rel="noopener noreferrer">Camus</a></li><li class="parish-item" data-name="carndonagh"><a class="parish-link" href="carndonaghparish.html" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li class="parish-item" data-name="castlederg"><a class="parish-link" href="castledergparish.html" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li class="parish-item" data-name="clonleigh (strabane pastoral area)"><a class="parish-link" href="clonleighparish.html" target="_blank" rel="noopener noreferrer">Clonleigh (Strabane Pastoral Area)</a></li><li class="parish-item" data-name="clonmany"><a class="parish-link" href="clonmanyparish.html" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li class="parish-item" data-name="culmoe"><a class="parish-link" href="culmoreparish.html" target="_blank" rel="noopener noreferrer">Culmoe</a></li><li class="parish-item" data-name="dma parish (claudy area)"><a class="parish-link" href="dmaparish.html" target="_blank" rel="noopener noreferrer">DMA Parish (Claudy area)</a></li><li class="parish-item" data-name="drumquin"><a class="parish-link" href="drumquinparish.html" target="_blank" rel="noopener noreferrer">Drumquin</a></li><li class="parish-item" data-name="drumragh"><a class="parish-link" href="drumraghparish.html" target="_blank" rel="noopener noreferrer">Drumragh</a></li><li class="parish-item" data-name="dungiven"><a class="parish-link" href="parishofdungiven.html" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li class="parish-item" data-name="errigal"><a class="parish-link" href="errigalparish.html" target="_blank" rel="noopener noreferrer">Errigal</a></li><li class="parish-item" data-name="fahan"><a class="parish-link" href="fahanparish.html" target="_blank" rel="noopener noreferrer">Fahan</a></li><li class="parish-item" data-name="granaghan"><a class="parish-link" href="granaghanparish.html" target="_blank" rel="noopener noreferrer">Granaghan</a></li><li class="parish-item" data-name="greenlough"><a class="parish-link" href="greenlough.html" target="_blank" rel="noopener noreferrer">Greenlough</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holyfamily-parish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="iskaheen"><a class="parish-link" href="iskaheenparish.html" target="_blank" rel="noopener noreferrer">Iskaheen</a></li><li class="parish-item" data-name="kilrea"><a class="parish-link" href="parishofkilrea.html" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li class="parish-item" data-name="lavey"><a class="parish-link" href="laveyparish.html" target="_blank" rel="noopener noreferrer">Lavey</a></li><li class="parish-item" data-name="leckpatrick"><a class="parish-link" href="leckpatrickparish.html" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li class="parish-item" data-name="maghera (derry)"><a class="parish-link" href="magheraparishderry.html" target="_blank" rel="noopener noreferrer">Maghera (Derry)</a></li><li class="parish-item" data-name="melmount (&amp; camus)"><a class="parish-link" href="melmountparish.html" target="_blank" rel="noopener noreferrer">Melmount (&amp; Camus)</a></li><li class="parish-item" data-name="moville"><a class="parish-link" href="movilleparish.html" target="_blank" rel="noopener noreferrer">Moville</a></li><li class="parish-item" data-name="sion mills"><a class="parish-link" href="parishofsionmills.html" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li class="parish-item" data-name="st eugene&#x27;s cathedral (templemore)"><a class="parish-link" href="steugenescathedral.html" target="_blank" rel="noopener noreferrer">St Eugene&#x27;s Cathedral (Templemore)</a></li><li class="parish-item" data-name="st mary&#x27;s parish creggan"><a class="parish-link" href="stmarysparishcreggan.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Parish Creggan</a></li><li class="parish-item" data-name="star of the sea (magilligan)"><a class="parish-link" href="staroftheseacatholic.html" target="_blank" rel="noopener noreferrer">Star of the Sea (Magilligan)</a></li><li class="parish-item" data-name="steelstown"><a class="parish-link" href="steelstownparish.html" target="_blank" rel="noopener noreferrer">Steelstown</a></li><li class="parish-item" data-name="waterside (&amp; strathfoyle amalgamated)"><a class="parish-link" href="watersideparish.html" target="_blank" rel="noopener noreferrer">Waterside (&amp; Strathfoyle amalgamated)</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1188,9 +1206,9 @@ Culdaff</p></div>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1682,23 +1700,8 @@ Culdaff</p></div>
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

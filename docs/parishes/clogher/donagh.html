@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Donagh Bulletin — 25/08/2026</title>
+  <title>Donagh Bulletin — 30/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -179,6 +187,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -201,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +275,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +472,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -863,7 +892,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,14 +900,14 @@
     <header class="header">
       <p class="diocese-label">CLOGHER</p>
       <h1>Donagh Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Donagh — 25/08/2026. Part of the Clogher Diocese collated bulletin.</p>
-      <a class="download-link-top" href="donagh.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Donagh — 30/08/2026. Part of the Clogher Diocese collated bulletin.</p>
+      <a class="download-link-top" href="donagh.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="donagh.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="donagh.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
@@ -895,7 +924,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="donagh.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="donagh.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="donagh.pdf">Open PDF</a>
               <a href="donagh.pdf" download>Download</a>
             </div>
           </div>
@@ -934,193 +963,185 @@
       <div class="quiet-links">
         <a href="donagh-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-donagh" data-parish-name="Donagh"><h2 class="ocr-parish-name">Donagh</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-donagh" data-parish-name="Donagh"><h2 class="ocr-parish-name">Donagh</h2><p class="ocr-parish-date">30/08/2026</p></header>
 <p class="page-label">Page 17</p>
 <h3 class="b-head">Parish News</h3>
 <p>“Pray, hope, and don’t worry.” – Padre Pio<br>
 <br>
 DONAGH PARISH<br>
-23rd August 2026<br>
-You are asked to pray for Pat<br>
-Gallagher, Emyvale. Jennifer Kelly,<br>
-nee Clerkin, Corcaghan. Teasie<br>
-McKenna, Brackagh. Jim Donnelly,<br>
-Donaghmore. Sr Paul Hoban, LCM,<br>
-Limerick. Teresa Connolly, Tully.<br>
-Paddy Coyle, Threemilehouse.<br>
+3 0 th Au gu st 2 0 2 6<br>
+You are aske d to pray for Pat<br>
+Gallaghe r, Emy v ale . Paddy C oy le ,<br>
+Thre e mile house . M ay M cGiv e rn,<br>
+A ughnacloy . Paddy M cM ahon,<br>
+Ty holland. M ay the y re st in pe ace<br>
 We Pray For All Our</p>
 <h3 class="b-head">Recently Deceased</h3>
 <p>If you would prefer to donate<br>
 to our parish via your bank,<br>
-<br>
-Anniversary Masses 22nd –<br>
-30th Aug<br>
-Saturday 22nd Aug St Mary’s<br>
-6.30pm<br>
+please click the link below to<br>
+download a standing order<br>
+Anniversary Masses 29th –<br>
+6th Sept<br>
+Satu r day 2 9 th Au g St Mar y’s<br>
+6 .3 0 pm<br>
 Vigil<br>
-Anniv: Felix &amp; Lucy McKenna,<br>
-Lisgoagh.<br>
-John McKenna, Sillis.<br>
-Sunday 23rd Aug St Patrick’s 11am<br>
-Mass<br>
-Friday 28th Aug St Patrick’s<br>
-7.30pm<br>
-Anniv: Mick Sherlock, Clarna.<br>
-Anniv: Alan Crampton, Craigavon.<br>
-Pat &amp; Elizabeth Farmer, Emyvale &amp;<br>
-dec’d members of Farmer &amp; O’Neill<br>
-families.<br>
-Donagh</p>
+A nniv : John, Kathle e n &amp; Patrick<br>
+C urle y , De rry hoash.<br>
+Su n day 3 0 th Au g St Patr ic k ’s<br>
+1 1 am<br>
+M ass<br>
+Mon day 3 1 st Au g Don agh Or ator y<br>
+1 0 am<br>
+M ass<br>
+T u esday 1 st Sept St Mar y’s 1 0 am<br>
+M ass<br>
+T u esday 1 st Au g Don agh Or ator y<br>
+(5 pm – 8 pm)<br>
+Donagh <a href="https://donaghparish.com/" target="_blank" rel="noopener noreferrer">https://donaghparish.com/</a></p>
 <hr>
 <p class="page-label">Page 18</p>
-<p>please click the link below to<br>
-download a standing order<br>
-form. Sincere thanks for your<br>
+<p>form. Sincere thanks for your<br>
 support<br>
-To download a standing order<br>
-form click here<br>
-Donagh Oratory will be<br>
-closed from Monday 17th<br>
-August and will re-open on<br>
-Monday 31st August.<br>
-This is to facilitate repairs.<br>
-August &amp; September 2026<br>
-@ Lough Derg<br>
-One Day Retreats – Guided Days<br>
-of Prayer and Reflection – places<br>
-available on<br>
-August 29th and 31st<br>
-September 5th, 6th, 9th, 12th, 15th,<br>
-19th and 20th<br>
-Admission €50. Group discounts<br>
-available. Advance booking<br>
-essential .<br>
-Includes Special Themed Retreats:<br>
-23rd August – St Peregrine<br>
-5th September – Pioneer<br>
+T o down load a stan din g or der<br>
+f or m c lic k h er e<br>
+Sick and Seniors will be<br>
+visited on Friday 4th<br>
+September.<br>
+September 2026 @ Lough<br>
+Derg<br>
+On e Day R etr eats – Guide d Day s<br>
+of Pray e r and Re e ction – place s<br>
+av ailable on<br>
+Se pte mbe r 5t h<br>
+, 6t h<br>
+, 9t h<br>
+, 1 2t h<br>
+, 1 5t h<br>
+,<br>
+1 9t h<br>
+and 2 0t h<br>
+A dmission € 5 0 . Group discounts<br>
+av ailable . A dv ance booking<br>
+e sse ntial .<br>
+I n c lu des Spec ial T h emed R etr eats:<br>
+5t h<br>
+Se pte mbe r – Pione e r<br>
 Pilgrimage<br>
-6th September – St Carlos Acutis<br>
-9th &amp; 12th September –<br>
-Vocations Monstrance<br>
+6t h<br>
+Se pte mbe r – St C arlos A cutis<br>
+9t h<br>
+&amp; 1 2t h<br>
+Se pte mbe r –<br>
+Vocations M onstrance<br>
+1 9t h<br>
+Se pte mbe r – Div ine M e rcy<br>
+Pilgrimage<br>
+New f or 2 0 2 6 season – Ov e rnight<br>
+accommodation av ailable on <br>
 <br>
-<br>
-Anniv: Val, Frank, Mary, Sean, Patsy<br>
-&amp; Carmel Forde, Emyvale.<br>
-Tommy &amp; Catherine McKenna,<br>
-Dublin.<br>
-Saturday 29th Aug St Mary’s<br>
-6.30pm<br>
+Eucharistic A doration<br>
+Wedn esday 2 n d Sept St Mar y’s<br>
+1 0 am<br>
+A nniv : Patrick O’ Dohe rty , Drumully .<br>
+A lso de c’ d me mbe rs of O’ Dohe rty &amp;<br>
+M oy lan familie s<br>
+T h u r sday 3 n d Sept St Mar y’s 1 0 am<br>
+M ass<br>
+Fr iday 4 th Au g St Patr ic k ’s 7 .3 0 pm<br>
+A nniv : Be tty &amp; Jimmy Skinnade r,<br>
+M ain St, Emy v ale .<br>
+A nniv : John &amp; Lizzie M cKe nna,<br>
+C larna &amp; de c’ d family me mbe rs.<br>
+Satu r day 5 th Sept St Mar y’s<br>
+6 .3 0 pm<br>
 Vigil<br>
-Anniv: John, Kathleen &amp; Patrick<br>
-Curley, Derryhoash.<br>
-Sunday 30th Aug St Patrick’s<br>
-11am<br>
-Mass<br>
+A nniv : Patsy Thornton, Glaslough<br>
+Su n day 6 th Sept St Patr ic k ’s 1 1 am<br>
+M ass<br>
 Eucharistic ministers:<br>
-St. Mary’s Glennan:<br>
-29th Aug Ann McMahon,<br>
-Pauline McKenna.<br>
-St. Patrick’s, Corracrin:<br>
-30th Aug Gerard McQuillan,<br>
-Arthur McMeel.<br>
-Emyvale Youth Club is a voluntary<br>
-run club which meet over school<br>
-term-time in the Emyvale Leisure<br>
-Centre. We run two groups: 10<br>
-years+ (Primary school) from 6pm<br>
--7pm and Post Primary is from 7-<br>
-8pm Friday evenings. We have<br>
-recently signed up to be GAISCE pals<br>
-and so volunteer hours can go<br>
-towards a President’s medal (Gaisce<br>
-Award).<br>
-We need some more volunteers for<br>
-this coming term Sept – June 27. It’s<br>
-2 hours per week and we operate a<br>
-<br>
+St. Mar y’s Glen n an :<br>
+5 th Se pt A nn M cM ahon,<br>
+Pauline M cKe nna.<br>
+St. Patr ic k ’s, C or r ac r in :<br>
+6 th Se pt M ichae l M cC arron,<br>
+Se amus Fie lds<br>
+St Vincent De Paul:<br>
+Education grants are av ailable to<br>
+Third Le v e l Stude nts of all age s who<br>
+may struggle nancially to acce ss or<br>
+stay in third le v e l e ducation or<br>
+training programme s. Ple ase call<br>
+1 8 0 0 6 7 7 7 to re que st an<br>
 </p>
 <hr>
 <p class="page-label">Page 19</p>
-<p>19th September – Divine Mercy<br>
-Pilgrimage<br>
-New for 2026 season – Overnight<br>
-accommodation available on<br>
-Station Island the night before<br>
-beginning a Retreat or Pilgrimage.<br>
-Lakeshore Pilgrim Path Pilgrimage<br>
-– In the footsteps of pilgrims<br>
-through the centuries – Sunday 30th<br>
-August. 8km &amp; 12km routes, fully<br>
-guided. Outdoor Mass weather<br>
-permitting. Admission €25.<br>
-Advance Booking Essential.<br>
-Knocknagrave<br>
-Environmental Centre<br>
-Knocknagrave Environmental<br>
-Centre (H18 EE08) is hosting two<br>
-Age Friendly &amp; Healthy Ireland<br>
-supported Learn About Nature days<br>
-on Monday and Tuesday 24th and<br>
-25th August. All ages welcome. Join<br>
-us for interactive activities from<br>
-10am to 12.30pm each day. FREE<br>
-event. Booking is essential with<br>
-<a href="mailto:gretta@thekec.ie" target="_blank" rel="noopener noreferrer">gretta@thekec.ie</a> or text <a href="tel:+353873811733" style="color:#1d4ed8;font-weight:600;">087<br>
-3811733</a>.<br>
-Heritage Week Event:<br>
-You are warmly invited to the<br>
-Emyvale Community Summer Party,<br>
-at the Mill Race Green, with live<br>
-music and refreshments on Sunday<br>
-23rd August 3-5pm (indoors at the<br>
+<p>Station Island the night be fore<br>
+be ginning a Re tre at or Pilgrimage .<br>
+Clogher don Óige<br>
+C loghe r don Óige will host the<br>
+se cond se rie s of – The C hose n – a<br>
+groundbre aking drama for y oung<br>
+adults about the life of Je sus C hrist,<br>
+told through the e y e s of those who<br>
+kne w Him. It will take place e ach<br>
+Thursday , for 8 we e ks, be ginning<br>
+1 0 th Se pte mbe r from 7 :3 0 pm to<br>
+9 :3 0 pm in St. Jose ph’ s Pastoral<br>
+C e ntre , M onaghan. A n opportunity<br>
+for y oung adults age d 1 8 -4 0 to<br>
+watch the se rie s, take part in<br>
+discussions, group sharing and<br>
+pray e r. To re giste r or for more<br>
+Monaghan Charismatic<br>
+Prayer Group:<br>
+M onaghan C harismatic Pray e r<br>
+Group are organising a bus to<br>
+Lough De rg on Sunday 6 th Se pt – a<br>
+spe cial day in honour of C arlo<br>
+A cutis. Bus le av ing C arrickmacross<br>
+at 7 am v ia<br>
+C astle blay ne y / C lontibre t/ M onaghan.<br>
+The island is € 5 0 and bus fare € 2 5 .<br>
+Booking e sse ntial and A SA P with:<br>
+Rosale e n 0 8 7 9 7 1 7 4 4 7 or Philip<br>
+0 8 7 2 5 0 8 0 4 3 .<br>
+Ac tivate Pole Walk in g c lass<br>
+star tin g in St. J oseph ’s Mon agh an<br>
+n ext T h u r sday 3r d<br>
+September at<br>
+2 pm. I t is a 6 week c ou r se, c ostin g<br>
+€ 1 2 in total. T h e c lass is k in dly<br>
 <br>
-<br>
-rota so you don’t have to be there<br>
-every Friday.<br>
-Ideally, we would love 4 additional<br>
-volunteers 18 years plus. It might<br>
-suit someone that is interested in<br>
-pursuing a career in youth work,<br>
-teaching, social care, coaching …. Or<br>
-someone who has some extra time<br>
-on their hands. You absolutely have<br>
-to enjoy being with young people,<br>
-and garda vetting will be required<br>
-and child protection training.<br>
-Please contact Collette on <a href="tel:+353877946789" style="color:#1d4ed8;font-weight:600;">087 794<br>
-6789</a> or Monica on <a href="tel:+353872441447" style="color:#1d4ed8;font-weight:600;">087 244 1447</a><br>
-if you would like to volunteer.<br>
-Run To Remember Gary<br>
-Askin 2026<br>
-The ninth annual Run To Remember<br>
-Gary Askin will take place on Friday<br>
-28th August at 7.00pm sharp. The<br>
-5km walk/run will start and finish at<br>
-Emyvale GAA Grounds, via Emy<br>
-Lake, with light refreshments served<br>
-afterwards. The event is free to<br>
-enter with all donations going<br>
-toward The Willowbridge Ward,<br>
-Monaghan Hospital &amp; The Kevin Bell<br>
-Repatriation Trust. You can donate<br>
-on the day or online via the Run To<br>
-Remember Gary Askin Facebook<br>
-Page<br>
-All runners, joggers, walkers, family<br>
-&amp; friends are very welcome. The<br>
-Run To Remember event has been a<br>
-huge success over the last number<br>
-of years and we are very grateful for<br>
-all the support and generosity that it<br>
-</p>
+application form ( this will be<br>
+e maile d to y ou) .<br>
+He lp is also av ailable to any one in<br>
+ne e d for childre n re turning to<br>
+Primary or Se condary school, by<br>
+also ringing the numbe r 1 8 0 0 6 7 7 7 to re que st assistance whe re a<br>
+me mbe r of the local confe re nce will<br>
+ge t in contact with y ou.<br>
+Truagh Spirit Wise &amp; We ll C oe e<br>
+M orning will be on Thursday<br>
+Se pte mbe r 3 rd from 1 1 am – 1 pm in<br>
+St M e llans C omple x, with Fire Safe ty<br>
+Talk from M onaghan Fire Se rv ice .<br>
+A ll we lcome .<br>
+Meals On Wheels<br>
+M e als On Whe e ls se rv ice ope rate s<br>
+M onday , We dne sday &amp; Friday ,<br>
+de liv e ring fre shly pre pare d hot<br>
+dinne rs in Truagh, Donagh, Emy v ale<br>
+&amp; the wide r north M onaghan are a.<br>
+C ontact 0 4 7 -8 7 0 4 9 for furthe r<br>
+information on this inv aluable<br>
+se rv ice .</p>
 <hr>
 <p class="page-label">Page 20</p>
-<p>Leisure Centre if the weather is wet).<br>
-Contact <a href="tel:+353873117271" style="color:#1d4ed8;font-weight:600;">087 311 7271</a> for queries<br>
+<p>spon sore d by Mon a gh a n Sports<br>
+Pa rtn e rsh ip.<br>
 .<br>
-has received from the local<br>
-community.<br>
-© Copyright - SMGdesignPlus.co.uk</p>
+© Co p y r i gh t - SMGd esi gn P l u s.co .u k</p>
 <hr></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
@@ -1128,7 +1149,7 @@ community.<br>
     <section class="parish-section">
       <h2 class="section-heading">Other CLOGHER Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ballybay (tullycorbet)"><a class="parish-link" href="ballybay.html" target="_blank" rel="noopener noreferrer">Ballybay (Tullycorbet)</a></li><li class="parish-item" data-name="carrickmacross (machaire rois)"><a class="parish-link" href="carrickmacross.html" target="_blank" rel="noopener noreferrer">Carrickmacross (Machaire Rois)</a></li><li class="parish-item" data-name="castleblayney (muckno, includes clontibret)"><a class="parish-link" href="castleblayney.html" target="_blank" rel="noopener noreferrer">Castleblayney (Muckno, includes Clontibret)</a></li><li class="parish-item" data-name="clones"><a class="parish-link" href="clones.html" target="_blank" rel="noopener noreferrer">Clones</a></li><li class="parish-item" data-name="corcaghan-threemilehouse (kilmore &amp; drumsnatt)"><a class="parish-link" href="corcaghanthreemilehouse.html" target="_blank" rel="noopener noreferrer">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</a></li><li class="parish-item" data-name="derrygonnelly (botha)"><a class="parish-link" href="derrygonnelly.html" target="_blank" rel="noopener noreferrer">Derrygonnelly (Botha)</a></li><li class="parish-item" data-name="donaghmoyne"><a class="parish-link" href="donaghmoyne.html" target="_blank" rel="noopener noreferrer">Donaghmoyne</a></li><li class="parish-item" data-name="enniskillen (st michael&#x27;s parish)"><a class="parish-link" href="enniskillen.html" target="_blank" rel="noopener noreferrer">Enniskillen (St Michael&#x27;s Parish)</a></li><li class="parish-item" data-name="errigal truagh"><a class="parish-link" href="errigaltruagh.html" target="_blank" rel="noopener noreferrer">Errigal Truagh</a></li><li class="parish-item" data-name="fintona (donacavey)"><a class="parish-link" href="fintona.html" target="_blank" rel="noopener noreferrer">Fintona (Donacavey)</a></li><li class="parish-item" data-name="irvinestown (devenish)"><a class="parish-link" href="irvinestown.html" target="_blank" rel="noopener noreferrer">Irvinestown (Devenish)</a></li><li class="parish-item" data-name="killanny"><a class="parish-link" href="killanny.html" target="_blank" rel="noopener noreferrer">Killanny</a></li><li class="parish-item" data-name="magheracloone"><a class="parish-link" href="magheracloone.html" target="_blank" rel="noopener noreferrer">Magheracloone</a></li><li class="parish-item" data-name="monaghan &amp; rackwallace (includes tyholland)"><a class="parish-link" href="monaghanrackwallace.html" target="_blank" rel="noopener noreferrer">Monaghan &amp; Rackwallace (includes Tyholland)</a></li><li class="parish-item" data-name="roslea"><a class="parish-link" href="roslea.html" target="_blank" rel="noopener noreferrer">Roslea</a></li><li class="parish-item" data-name="tempo (pobal)"><a class="parish-link" href="tempo.html" target="_blank" rel="noopener noreferrer">Tempo (Pobal)</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ballybay (tullycorbet)"><a class="parish-link" href="ballybay.html" target="_blank" rel="noopener noreferrer">Ballybay (Tullycorbet)</a></li><li class="parish-item" data-name="carrickmacross (machaire rois)"><a class="parish-link" href="carrickmacross.html" target="_blank" rel="noopener noreferrer">Carrickmacross (Machaire Rois)</a></li><li class="parish-item" data-name="castleblayney (muckno, includes clontibret)"><a class="parish-link" href="castleblayney.html" target="_blank" rel="noopener noreferrer">Castleblayney (Muckno, includes Clontibret)</a></li><li class="parish-item" data-name="clones"><a class="parish-link" href="clones.html" target="_blank" rel="noopener noreferrer">Clones</a></li><li class="parish-item" data-name="corcaghan-threemilehouse (kilmore &amp; drumsnatt)"><a class="parish-link" href="corcaghanthreemilehouse.html" target="_blank" rel="noopener noreferrer">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</a></li><li class="parish-item" data-name="derrygonnelly (botha)"><a class="parish-link" href="derrygonnelly.html" target="_blank" rel="noopener noreferrer">Derrygonnelly (Botha)</a></li><li class="parish-item" data-name="enniskillen (st michael&#x27;s parish)"><a class="parish-link" href="enniskillen.html" target="_blank" rel="noopener noreferrer">Enniskillen (St Michael&#x27;s Parish)</a></li><li class="parish-item" data-name="errigal truagh"><a class="parish-link" href="errigaltruagh.html" target="_blank" rel="noopener noreferrer">Errigal Truagh</a></li><li class="parish-item" data-name="irvinestown (devenish)"><a class="parish-link" href="irvinestown.html" target="_blank" rel="noopener noreferrer">Irvinestown (Devenish)</a></li><li class="parish-item" data-name="killanny"><a class="parish-link" href="killanny.html" target="_blank" rel="noopener noreferrer">Killanny</a></li><li class="parish-item" data-name="magheracloone"><a class="parish-link" href="magheracloone.html" target="_blank" rel="noopener noreferrer">Magheracloone</a></li><li class="parish-item" data-name="monaghan &amp; rackwallace (includes tyholland)"><a class="parish-link" href="monaghanrackwallace.html" target="_blank" rel="noopener noreferrer">Monaghan &amp; Rackwallace (includes Tyholland)</a></li><li class="parish-item" data-name="tempo (pobal)"><a class="parish-link" href="tempo.html" target="_blank" rel="noopener noreferrer">Tempo (Pobal)</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1180,9 +1201,9 @@ community.<br>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1674,23 +1695,8 @@ community.<br>
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

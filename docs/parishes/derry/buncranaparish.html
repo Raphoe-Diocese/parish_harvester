@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Buncrana Bulletin — 25/08/2026</title>
+  <title>Buncrana Bulletin — 30/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -179,6 +187,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -201,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +275,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +472,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -863,7 +892,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,14 +900,14 @@
     <header class="header">
       <p class="diocese-label">DERRY</p>
       <h1>Buncrana Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Buncrana — 25/08/2026. Part of the Derry Diocese collated bulletin.</p>
-      <a class="download-link-top" href="buncranaparish.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Buncrana — 30/08/2026. Part of the Derry Diocese collated bulletin.</p>
+      <a class="download-link-top" href="buncranaparish.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="buncranaparish.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="buncranaparish.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
@@ -895,7 +924,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="buncranaparish.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="buncranaparish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="buncranaparish.pdf">Open PDF</a>
               <a href="buncranaparish.pdf" download>Download</a>
             </div>
           </div>
@@ -934,48 +963,34 @@
       <div class="quiet-links">
         <a href="buncranaparish-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-buncrana" data-parish-name="Buncrana"><h2 class="ocr-parish-name">Buncrana</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-buncrana" data-parish-name="Buncrana"><h2 class="ocr-parish-name">Buncrana</h2><p class="ocr-parish-date">30/08/2026</p></header>
 <p class="page-label">Page 1</p>
-<p>Last week’s collection totalled €5,475.<br>
-The collection on 15th August totalled €1,400.<br>
-We gratefully acknowledge a donation from<br>
-Pancake Headquarters of €2649.87 raised for<br>
-St Mary’s Hall, and three donations of €150,<br>
-€200 and €300 towards the Garden Fete.<br>
-Sincere thanks. Email: <a href="mailto:buncranaparish@gmail.com" target="_blank" rel="noopener noreferrer">buncranaparish@gmail.com</a><br>
+<p>Last week’s collection totalled €6,052<br>
+Sincere thanks.<br>
+Email: <a href="mailto:buncranaparish@gmail.com" target="_blank" rel="noopener noreferrer">buncranaparish@gmail.com</a><br>
 Website: <a href="https://www.buncranaparish.com" target="_blank" rel="noopener noreferrer">www.buncranaparish.com</a><br>
-Twenty -First Sunday in Ordinary Time<br>
-23 August 2026 Fr Bradley 9363455<br>
+Twenty-Second Sunday in Ordinary Time<br>
+30 August 2026 Fr Bradley 9363455<br>
 Fr Walsh 9361393<br>
 Fr Baker 9360151<br>
 Parish Office 9361253<br>
 Parish Catechist <a href="tel:+353867853726" style="color:#1d4ed8;font-weight:600;">086 785 3726</a><br>
 Community Corner<br>
-EMBRACE THE GRACE YOUNG ADULT<br>
-CATHOLIC CONFERENCE 29 Aug 2026 -<br>
-Legion of Mary: &#x27;Embrace the Grace&#x27; is a<br>
-conference on faith and culture for young<br>
-adults (18 -40) with talks, prayer, Mass,<br>
-confession, workshops, food and social in<br>
-the historic Legion of Mary headquarters at<br>
-De Montfort House, North Brunswick<br>
-Street, Dublin 7 from 9.30am to 6pm with a<br>
-social after. Tickets €20 and can be booked<br>
-on the eventbrite website by looking up<br>
-&#x27;Embrace the Grace&#x27;. Any queries email<br>
-<a href="mailto:deusetpatria@gmail.com" target="_blank" rel="noopener noreferrer">deusetpatria@gmail.com</a>.<br>
-MICHAEL ENGLISH CHURCH CON-<br>
-CERT An evening of Faith, Hope and Inspi-<br>
-ration. The concert takes place on Fri 2 Oct<br>
-at 7.15pm, in St Patrick&#x27;s Church,<br>
-Keenaught, Desertmartin. Tickets are £30,<br>
-and available to buy at Herons Gift Shop,<br>
-Draperstown, Moneyneena Post Office,<br>
-Ballinascreen and Desertmartin Parish of-<br>
-fices, or online with Eventbrite: https://<br>
-<a href="https://www.eventbrite.co.uk/e/michael" target="_blank" rel="noopener noreferrer">www.eventbrite.co.uk/e/michael</a> -english -<br>
-band -fundraising -concert -tickets -<br>
-1996641829460<br>
+LEGION OF MARY Pilgrimage to Knock on<br>
+Sunday 27 September leaving from<br>
+Buncrana. More details to follow<br>
+FIRST SATURDAY ROSARY Sat 5 Sept at<br>
+1pm in Market Square, Letterkenny. Please<br>
+bring a friend or two.<br>
+MEN’S ROSARY Sat 5 Sept at 1pm in The<br>
+Square, Malin Town All welcome<br>
+BUNCRANA PANTOMIME SOCIETY Are<br>
+calling all children aged 7-12 to audition for<br>
+this year’s production of Robinson Crusoe<br>
+on Sat 5 Sept in St Mary’s Hall, Buncrana<br>
+from 12noon-2pm. Come along and<br>
+showcase your talent. Looking forward to<br>
+seeing you all there.<br>
 CATHOLIC MOTHERS IRELAND – FAMILY<br>
 DAY Catholic Mothers Ireland will hold its<br>
 Annual National Mass on Sun 6<br>
@@ -983,48 +998,56 @@ Sept at Termonbacca Retreat Centre,<br>
 Derry . The day will begin with Mass at<br>
 2pm, celebrated by Bishop Donal McKe-<br>
 own, followed by refreshments, children&#x27;s<br>
-activities, and a talk for parents. This prom-<br>
-ises to be a lovely day for the whole family.<br>
-For info and booking, please email<br>
+activities, and a talk for parents. This<br>
+promises to be a lovely day for the whole<br>
+family. For info and booking, please email<br>
 <a href="mailto:info@catholicmothers.ie" target="_blank" rel="noopener noreferrer">info@catholicmothers.ie</a>. All welcome.<br>
 COFFEE MORNING for the Niall Mellon<br>
 Township Trust on Sat 5th Sept 10am to<br>
-2pm in The Fowler Hall Tooban. All pro-<br>
-ceeds will help raise funds to support Paul<br>
-Bradley, Gerard Curran, Kieran Toner and<br>
-Oisin Bradley to travel to South Africa with<br>
-the Niall Mellon Township Trust to help<br>
-build a school for impoverished children.<br>
-Everyone welcome.<br>
-BRIDGE CLASSES starting Wed 23 Sept in<br>
-Buncrana Youth Club. For details contact<br>
-John <a href="tel:+353870562188" style="color:#1d4ed8;font-weight:600;">0870562188</a> or Mary <a href="tel:+353860608588" style="color:#1d4ed8;font-weight:600;">0860608588</a><br>
-LIFELINE INISHOWEN Domestic Violence<br>
-Support Services have free counselling<br>
-sessions available for Women &amp; Children,<br>
-We also offer support, drop -in and outreach<br>
-services. Contact us on our HELPLINE <a href="tel:+353749373232" style="color:#1d4ed8;font-weight:600;">074<br>
-9373232</a> or 086 0065035330 between 10am<br>
-- 1.30pm<br>
-RACHEL ’S VINEYARD Have you been af-<br>
-fected or hurt by abortion? Please contact<br>
-Michelle on 00447871765181<br>
-SLIABH SNEACHT CENTRE Drumfries Walking Group<br>
-will be meeting on Fri 28 Aug at the Famine Village<br>
-carpark, at 10am everyone welcome. Weekly drop in<br>
-Craft Class starts back on Wed 9 Sept. (Sewing /<br>
-Embroidery/ Knitting) no tutor, just a group of like<br>
-minded people supporting each other while enjoying a<br>
-cup of tea and a chat, bring your own materials and sew-<br>
-ing machine. €3 per class. Contact the centre on<br>
-<a href="tel:+353749361742" style="color:#1d4ed8;font-weight:600;">0749361742</a> for more info. Chair Yoga with Marie<br>
-starts back on Mon 7 Sept at 11:15am, also an evening<br>
-Yoga class starting on 7 Sept at 7pm. To book a place on<br>
-either of these classes contact Marie on <a href="tel:+353872962646" style="color:#1d4ed8;font-weight:600;">0872962646</a>.<br>
+2pm in The Fowler Hall Tooban. All<br>
+proceeds will help raise funds to support<br>
+Paul Bradley, Gerard Curran, Kieran Toner<br>
+and Oisin Bradley to travel to South Africa<br>
+with the Niall Mellon Township Trust to<br>
+help build a school for impoverished<br>
+children. Everyone welcome.<br>
+DONEGAL GROUP 173 Rise and Shine<br>
+Trust (formerly The Irish Handicapped<br>
+Children&#x27;s Pilgrimage Trust and The Irish<br>
+Pilgrimage Trust) are celebrating 40 years<br>
+of taking young people with special needs<br>
+to Lourdes each Easter. We are celebrating<br>
+with a special Mass on Sat 26th September<br>
+in the Church of the Irish Martyrs,<br>
+Letterkenny at 12 noon. The Mass will be<br>
+concelebrated by Bishop Niall Coll and<br>
+Bishop Donal McKeown, Diocese of<br>
+Derry, and many of the priests who trav-<br>
+elled to Lourdes with us over the years. We<br>
+invite all the guests and their families and<br>
+all the helpers who travelled with us over<br>
+the years to our mass to celebrate Our Lady<br>
+of Lourdes.<br>
+ANAM CARA Donegal, the organisation that<br>
+supports bereaved parents, will hold its<br>
+monthly Face to Face Parent Support<br>
+Evening for bereaved parents on Thur 10th<br>
+Sept at 7.30pm in the Raddison Blu Hotel,<br>
+Letterkenny F92 FK15 .<br>
+SLIABH SNEACHT CENTRE Yoga class starting on Mon<br>
+7 Sept at 7pm. To book a place contact Marie on<br>
+<a href="tel:+353872962646" style="color:#1d4ed8;font-weight:600;">0872962646</a>. Weekly drop in Craft Class starts back on<br>
+Wed 9 September. (Sewing /Embroidery/ Knitting) no<br>
+tutor, just a group of like minded people supporting each<br>
+other while enjoying a cup of tea and a chat, bring your<br>
+own materials and sewing machine. €3 per class, contact<br>
+the centre on <a href="tel:+353749361742" style="color:#1d4ed8;font-weight:600;">0749361742</a> for more info. Free Smart-<br>
+phone &amp; Tablet course starting Tues 22 Sept from 10:30<br>
+-12:30, to book contact the centre on <a href="tel:+353749361742" style="color:#1d4ed8;font-weight:600;">0749361742</a>.<br>
 THE CHILD BEHAVIOUR CONSULTANCY Roisín<br>
 Doherty - Behaviour Analyst consults with parents of<br>
-children 3 -12 years of age (with or without a diagnosis)<br>
-to help their child accept ‘no’, listen, regulate their big<br>
+children 3-12 years of age (with or without a diagnosis)<br>
+to help their child accept ‘no’, listen, regulate their bi g<br>
 emotions etc. Contact <a href="tel:+353894511432" style="color:#1d4ed8;font-weight:600;">0894511432</a> to get a consultation<br>
 set up.<br>
 ALCOHOLICS ANONYMOUS Amazing Grace Group,<br>
@@ -1036,7 +1059,7 @@ AL-ANON GROUP (for anyone whose life is or has been<br>
 affected by someone else’s drinking) meet in St Teresa’s<br>
 Room on Thurs at 6:45pm.<br>
 GAMBLERS ANONYMOUS weekly meeting in St Teresa’s<br>
-Room each Sun 5pm -6.30pm for anyone struggling with<br>
+Room each Sun 5pm-6.30pm for anyone struggling with<br>
 a gambling addiction.<br>
 GAMBLERS ANONYMOUS HELPLINE Is gambling<br>
 affecting your life? We would like to help. Pick up the<br>
@@ -1044,17 +1067,16 @@ phone and ring <a href="tel:+3534871351329" style="color:#1d4ed8;font-weight:600
 THE PLAZA Dance Classes starting back on Tues 25<br>
 August from 10:30am. From Wed 26 August : Junior<br>
 Line Dancing &amp; Jiving Class 5pm-6pm. Beginners<br>
-Line Dancing 6:15pm -7:15pm. Advanced Line Danc-<br>
-ing 7:30pm -8:30pm. From Mon 31 Aug: A Beginners<br>
+Line Dancing 6:15pm-7:15pm. Advanced Line Danc-<br>
+ing 7:30pm-8:30pm. From Mon 31 Aug: A Beginners<br>
 Line Dancing and Jiving Class at the Laurentic 7:30pm<br>
--9pm. Social Dances: Sat 22 August Michael Cleary<br>
-and Jackie Bannon; Sat 29 August Trevor Loughery.<br>
+-9pm. Social Dances: Sat 29 August Trevor Loughery.<br>
 Doors 9pm, Dancing 9:30pm. Admission €10. Hall<br>
 available for hire &amp; for children’s birthday parties. Con-<br>
 tact Ursula on <a href="tel:+353877538317" style="color:#1d4ed8;font-weight:600;">0877538317</a><br>
 INISHOWEN MEDICAL Hearing loss? Earache? Blocked<br>
 ears? It could just be wax. Inishowen Medical can help<br>
-with that. We can offer both our patients and non -<br>
+with that. We can offer both our patients and non-<br>
 patients microsuction. Microsuction is a newer and<br>
 more patient friendly way of clearing wax from ears. It is<br>
 considered comfortable for the patient and can be used in<br>
@@ -1063,42 +1085,42 @@ fee is €60 for all patients including medical card &amp; GP<br>
 Visit card holders. Get your hearing back today by call-<br>
 ing Inishowen Medical to make an appointment on <a href="tel:+353749361800" style="color:#1d4ed8;font-weight:600;">074<br>
 93 61800</a> or <a href="tel:+3537476173" style="color:#1d4ed8;font-weight:600;">074 76173</a>.<br>
-PIANO LESSONS Beginner piano lessons available in the<br>
-Buncrana area, contact Lauren on <a href="tel:+353864558483" style="color:#1d4ed8;font-weight:600;">0864558483</a> for<br>
-more details.<br>
-NOWDOC Phone Number: <a href="tel:+353818400911" style="color:#1d4ed8;font-weight:600;">0818400911</a> Priest on Call <a href="tel:+353749361253" style="color:#1d4ed8;font-weight:600;">074 9361253</a><br>
+BEGINNER PIANO LESSONS available in the Buncrana<br>
+area, contact Lauren on <a href="tel:+353864558483" style="color:#1d4ed8;font-weight:600;">0864558483</a> for more details.<br>
+BRIDGE CLASSES starting Wed 23 Sept in Buncrana<br>
+Youth Club. For details contact John <a href="tel:+353870562188" style="color:#1d4ed8;font-weight:600;">0870562188</a> or<br>
+Mary <a href="tel:+35386060858" style="color:#1d4ed8;font-weight:600;">086060858</a> Priest on Call <a href="tel:+353749361253" style="color:#1d4ed8;font-weight:600;">074 9361253</a><br>
 ST MARY’S ORATORY<br>
 Masses streamed on churchservices.tv/buncrana<br>
-Monday 24 Aug - Mass at 10am<br>
-Special Intention<br>
-Tuesday 25 Aug - Mass at 10am<br>
-Miriam O’Brien,<br>
-Charles Hegarty, plus<br>
-Evelyn Fletcher (30th A)<br>
-Wednesday 26 Aug - Mass at 10am<br>
-Mary Bradley, plus<br>
-Bridie Doherty<br>
-Thursday 27 Aug - Mass at 10am<br>
-Colm Hegarty<br>
-Saturday 29 Aug - Mass at 4:30pm<br>
-Sunday 30 Aug - Mass at 8:30am<br>
-Sunday 30 Aug - Mass at 12:30pm<br>
-Brigid Duffy (1st A) Anniversary Masses &amp; Times<br>
+Monday 31 Aug - Mass at 10am<br>
+Noel Bradley (3rd A), plus<br>
+Bridie Bradley (10th A)<br>
+Tuesday 1 Sept - Mass at 10am<br>
+Betty McDaid (1st A)<br>
+Wednesday 2 Sept - Mass at 10am<br>
+Diane Hurley (5th A)<br>
+Thursday 3 Sept - Mass at 10am<br>
+Saturday 5 Sept - Mass at 4:30pm<br>
+Mary McGonagle (2nd A),<br>
+John Martin (2nd A), plus<br>
+James and Mary-Ann Martin<br>
+Sunday 6 Sept - Mass at 8:30am<br>
+Sunday 6 Sept - Mass at 12:30pm<br>
+Liam Grant (MM) Anniversary M asses &amp; T imes<br>
 ST. MARY’S, COCKHILL<br>
 Masses streamed on churchservices.tv/cockhill<br>
-Friday 28 Aug - Mass at 7pm<br>
-Special Intention<br>
-Sunday 30 Aug - Mass at 11am<br>
-Kathleen Bradley (8th A), plus<br>
-Owen Kavanagh (1st A)<br>
+Friday 4 Sept - Mass at 7pm<br>
+Hugh Dick (MM), plus<br>
+Frances Doherty (1st A)<br>
+Sunday 6 Sept - Mass at 11am<br>
 STAR OF THE SEA, DESERTEGNEY<br>
 Masses streamed on<br>
-Sunday 30 Aug - Mass at 9:45am<br>
+Sunday 6 Sept - Mass at 9:45am<br>
 SAFEGUARDING NOTICE : If you have any concerns with regards to Safeguarding Children or adults in need of protection within the Church please<br>
 contact Marie O’Kane, the Diocesan Designated Liaison Person (DLP) at 0044 7596500793, or at <a href="mailto:dlp@derrydiocese.org" target="_blank" rel="noopener noreferrer">dlp@derrydiocese.org</a> or Garda Síochána, Buncrana<br>
 <a href="tel:+353749320540" style="color:#1d4ed8;font-weight:600;">074 9320540</a>, Letterkenny HQ <a href="tel:+353749167100" style="color:#1d4ed8;font-weight:600;">074 9167100</a> or TUSLA Family &amp; Child Agency 00353 749102233 ROI Vetting Office: <a href="tel:+353749363108" style="color:#1d4ed8;font-weight:600;">074 93 63108</a> PARISH DRAW<br>
-PRIVACY NOTICE : The Diocese of Derry complies with GDPR regulations. A Privacy Notice is available on the Parish Website or by contacting The Parish Office. Live stream and recordings of Mass<br>
-and Services in St Mary’s Oratory and St Mary’s Cockhill are available online. Parishioners should note that the first two ro ws of seats are visible online in St Mary’s Oratory and the first seven rows of<br>
+PRIVACY NOTICE : The Diocese of Derry complies with GDPR regulations. A Priva cy Notice is available on the Parish Website or by contacting The Parish Office. Live stream and recordings of Mass<br>
+and Services in St Mary’s Oratory and St Mary’s Cockhill are availa ble online. Parishioners should note that the first two ro ws of seats are visible online in St Mary’s Oratory and the first seve n rows of<br>
 seats are visible in St Mary’s Cockhill. SLIMMING WORLD Buncrana : The Exchange<br>
 every Tues 8am, 9.30am &amp; 11am with Ann<br>
 Marie <a href="tel:+353860848705" style="color:#1d4ed8;font-weight:600;">0860848705</a>, 6pm with Marie<br>
@@ -1108,7 +1130,7 @@ Newtowncunningham: The Orange Hall<br>
 every Wed at 6.30pm with Ann Marie<br>
 <a href="tel:+353860848705" style="color:#1d4ed8;font-weight:600;">0860848705</a>.<br>
 GET THE GRADE English Tuition. Friendly,<br>
-exam -focused, Junior &amp; Leaving Cert tuition<br>
+exam-focused, Junior &amp; Leaving Cert tuition<br>
 with experienced teacher of English &amp; SEC<br>
 Examiner (Teaching Council and Garda vetted).<br>
 Text/Call Mark <a href="tel:+353866655334" style="color:#1d4ed8;font-weight:600;">0866655334</a><br>
@@ -1126,7 +1148,7 @@ change.<br>
 COCKHILL CEILI CLUB Classes have now<br>
 stopped for the summer months.<br>
 CEILI in Cockhill School Hall Fri 4 Sept. Music<br>
-by Martin. Dancing from 8pm -11pm. Adm €10<br>
+by Martin. Dancing from 8pm- 11pm. Adm €10<br>
 incl Supper and Raffle tickets. All welcome<br>
 GAELSCOIL BHUN CRANNCHA Give us a call<br>
 on <a href="tel:+353749361988" style="color:#1d4ed8;font-weight:600;">074 9361988</a> or an email at<br>
@@ -1152,27 +1174,43 @@ back 9 Sept)<br>
 GENTLE HATHA YOGA CLASS beginning on 7<br>
 Sept at 7pm in Angler’s Centre. Contact Anne<br>
 Nelson <a href="tel:+353862586864" style="color:#1d4ed8;font-weight:600;">086 2586864</a> for further information.<br>
-A F EAST OF FOLK MUSIC in The Cairn, Green-<br>
-castle every Tues at 8pm in July and August.<br>
-Limited Seating Tel <a href="tel:+353749381104" style="color:#1d4ed8;font-weight:600;">0749381104</a>.<br>
 SAMARITANS Call Free 116 123, Text <a href="tel:+353872609090" style="color:#1d4ed8;font-weight:600;">087<br>
-2609090</a>. BUNCRANA CINEMA See all show times <a href="https://www.thecinemabuncrana.com" target="_blank" rel="noopener noreferrer">www.thecinemabuncrana.com</a> BINGO<br>
-Friday 14 August: Week 91st Prize: €500<br>
-Vincent Deehan, Lisowen Ave<br>
-Promoter: Marie Deehan<br>
+2609090</a>.<br>
+NOWDOC Phone Number: <a href="tel:+353818400911" style="color:#1d4ed8;font-weight:600;">0818400911</a> BLESSING AT THE FRONT DOOR FOR THE<br>
+FIRST DAY OF SCHOOL<br>
+Heavenly Father, as we close the door to<br>
+our home to begin our journey,<br>
+we ask you to bless (children’s name/s) on<br>
+their first day back to / of school.<br>
+We ask you to open the doors of new hope,<br>
+new possibilities, new friendships and new<br>
+learning for them.<br>
+Bless their teachers, friends and all the staff<br>
+of the school.<br>
+Be with them in all they will do this year.<br>
+Protect them and keep them safe until they<br>
+return through this door to<br>
+the home where they are<br>
+cherished and loved.<br>
+We make this prayer<br>
+through<br>
+Christ our Lord. Amen BUNCRANA CINEMA See all show times <a href="https://www.thecinemabuncrana.com" target="_blank" rel="noopener noreferrer">www.thecinemabuncrana.com</a> BINGO<br>
+Friday 21August: Week 10<br>
+1st Prize: €500<br>
+Teishie Doherty (Conn), c/o Promoter: Mary McGonagle<br>
 2nd Prize: €300<br>
-Kathleen Porter, Rockytown<br>
-Promoter: Kathleen Porter<br>
+Claire McCarron, Tullydish<br>
+Promoter: Mary McGonagle<br>
 3rd Prize: €150<br>
-Tessie Doherty, Kinnego<br>
-Promoter: Tessie Doherty<br>
+The Hutchinson Family, Cluain Mhuire<br>
+Promoter: Helen Doherty<br>
 SVP P ILGRIMAGE TO KNOCK<br>
 The Vincentian Pilgrimage to Knock will take<br>
-place on Sat 12 Sept 2026. The cost per person<br>
-is €55. This includes travel by bus, breakfast<br>
-and dinner in The Central Hotel, Donegal<br>
-Town. If you would like to book a seat, please<br>
-contact Fiona on <a href="tel:+353863517177" style="color:#1d4ed8;font-weight:600;">0863517177</a> by 25 August. ADORATION CHAPEL<br>
+place on Sat 12 Sept. The cost per person is<br>
+€55. This includes travel by bus, breakfast and<br>
+dinner in The Central Hotel, Donegal Town. If<br>
+you would like to book a seat, contact Fiona on<br>
+<a href="tel:+353863517177" style="color:#1d4ed8;font-weight:600;">0863517177</a> by 25 August. ADORATION CHAPEL<br>
 Please consider spending an hour in the<br>
 Adoration Chapel<br>
 Sunday 2pm - 10pm<br>
@@ -1181,135 +1219,87 @@ Friday 6am - 10pm<br>
 GUIDED HOLY HOUR<br>
 The Holy Hour in honour of the Holy Face<br>
 of Jesus continues this Sunday at 6pm in St<br>
-Mary’s Oratory. All Welcome. The End Of Oak<br>
-Street 15A | 100Mins<br>
-Sat 22 &amp; Sun 23Aug -<br>
-8.15pm<br>
-Mon 24 - Thurs 27 -<br>
-8.15pm<br>
+Mary’s Oratory. All Welcome. Harry Potter And The Philosopher’s Stone 25th Anniversary<br>
+Sat 29th - 8:15pm Sun 30th -5pm<br>
+Paw Patrol: Dino Movie G | 88mins Sat 29th - 5pm Sun 30th<br>
+Sensory Screening - 11am Matinee Sunday 30th - 3pm<br>
+National Theatre -All My Sons Sun 30th &amp; Mon 31st 8:15pm<br>
+Tickets €12 cash only at door<br>
+Holy Days 12A | 100mins Tues 1st - 8:15pm Wed 2nd &amp; Thurs<br>
+3rd - 8:15pm<br>
 ROSARY<br>
 The Rosary is said in the Oratory at 9.30am<br>
-before Mass Monday to Thursday.<br>
-ONE DAY PILGRIMAGE TO LOUGH DERG<br>
-The Parish is running a one -day pilgrimage to Lough<br>
-Derg on Saturday 5 September. Bus leaving The Ora-<br>
-tory at 7:30am for arrival at the island at 9:30am. Cost<br>
-for the day including return bus, boat fare, day pilgrim-<br>
-age and meal on way home is €85. For more info and<br>
-booking please contact the Parish Office. Spaces on a<br>
-first-come first -served basis. DEATHS<br>
-Your prayers are asked for<br>
-James Love<br>
-Danny Bradley<br>
-who were died recently and for their<br>
-families &amp; friends saddened by their loss. St Mary’s Hall<br>
+before Mass Monday to Thursday. St Mary’s Hall<br>
 Fridays at 8pm<br>
 Single book €11<br>
 Double €17<br>
-Snowball: €5000<br>
-DONEGAL DOWN SYNDROME<br>
-ASSOCIATION<br>
-Annual church -gate collection will take<br>
-place on the weekend of 29 /30 Aug. Any-<br>
-one interested in helping on the day can</p>
-<h3 class="b-head">contact the Donegal Down Syndrome As-</h3>
-<p>sociation office by calling <a href="tel:+353857870075" style="color:#1d4ed8;font-weight:600;">0857870075</a> or<br>
-email <a href="mailto:info@donegal.downsyndrome.ie" target="_blank" rel="noopener noreferrer">info@donegal.downsyndrome.ie</a> READINGS FOR 21ST SUNDAY IN ORDINARY TIME<br>
-First Reading: Is 22: 19 -23. Shebna, master of the<br>
-royal palace, having climbed to become master of King<br>
-Hezekiah’s palace had become proud and self -<br>
-important. In the interest of good governance, he is<br>
-replaced by Eliakim. The metaphor of ‘the key of the<br>
-House of David on his shoulder’ is borrowed from an<br>
-ancient Egyptian custom. (What may be Shebna’s ac-<br>
-tual, elaborate tomb was recently discovered at Siloam<br>
-cemetery in Jerusalem.)<br>
-Second Reading: Rom. 11:33 -36. At the end of three<br>
-chapters setting out how pagans and Jews have been<br>
-part of God’s plan of salvation, Paul composes this<br>
-triumphant hymn to the wisdom of God. As Creator He<br>
-has an overview of all time and place. Who could ever<br>
-teach him? Who could ever be his counsellor?<br>
-Gospel: Mt. 16:13 -20. By a special divine grace Peter<br>
-declares timelessly that Jesus is “the Messiah and Son<br>
-of the living God.&quot; Jesus now gives him a hitherto un-<br>
-known personal name - ‘petros’ - meaning ‘rock’. The<br>
-new name emphasises his new role as the strengthener<br>
-of his brothers’ faith and foundation of unity for his<br>
-church. This is also a watershed moment. From this<br>
-time on, Jesus began to speak of his coming passion. GARDEN FETE 2026<br>
-The Annual Garden Fete will take place today (Sunday)<br>
-from 3pm -6pm in the grounds of Scoil Mhuire. This is a<br>
-great family day out before the new terms starts. There<br>
-are Bouncy Castles, Face -painting, Children’s Races,<br>
-Mechanical Bull, Human Whack -a-Mole, Tractor and<br>
-Digger challenges, Bingo, Rickety Wheel and more.<br>
-Blue Badge holders must use St Oran’s Road Entrance.<br>
-Cash only on the day - no card facilities available.<br>
-DRAW CARDS<br>
-Any promoter who has outstanding cards/money is<br>
-asked to bring them to the Fete on Sunday.<br>
-CALLING OUT TO ALL BAKERS required to provided goods for the tea/coffee.<br>
-Please leave any goods in the Convent kitchen anytime<br>
-from 11am onwards on the day.<br>
-CLIMB TO THE EUCHARISTIC CROSS , SCALP<br>
-on Sun 30 Aug meeting at the Water Tank at 1.30pm.<br>
-The Rosary will be said on the way up. All Welcome. ACKNOWLEDGEMENT<br>
-Maeve McGinley, Mary McCarron, Bill<br>
-McLaughlin wish to thank everyone who<br>
-helped make the fundraiser event “Tea On<br>
-The Terrace” such a success. An incredible<br>
-amount of €5,450.45 was raised in aid of<br>
-the Irish Lung Fibrosis Association and in<br>
-memory of ‘ Big John’. Thank you to all<br>
-those who volunteered, made tea, provided<br>
-food &amp; plants, sponsored prizes, attended<br>
-and donated so generously. PRAYER FOR VOCATIONS<br>
-In this Sunday&#x27;s gospel Peter acknowledges<br>
-Jesus as the Christ, the Son of the living God,<br>
-and Jesus confers on Peter &quot;.the keys of the<br>
-Kingdom.&quot; an image reflected in the First<br>
-Reading where the Lord says He will &quot;.place<br>
-the key of David.&quot; on the shoulder of those<br>
-called to lead His people, those who will be<br>
-called &quot;father.&quot; ST JOSEPH MEN&#x27;S CAMINO<br>
-Every Camino changes us in ways we don&#x27;t<br>
-expect, every man needs one.<br>
-Join men from across Ireland on Sat 12th<br>
-Sept for a 25km pilgrimage through the<br>
-Boyne Valley, beginning in Drogheda. The<br>
-day includes Mass, Adoration, Rosary,<br>
-Confessions, fraternity, lunch and dinner,<br>
-with after -dinner speaker Fr. Mark Quinn .<br>
-Open to men aged 18+. Cost: €65<br>
-(student € 55). Registration, accommoda-<br>
-tion and details: <a href="https://www.dominicans.ie/events" target="_blank" rel="noopener noreferrer">www.dominicans.ie/events</a><br>
-Enquiries: <a href="mailto:op.evangelisation@gmail.com" target="_blank" rel="noopener noreferrer">op.evangelisation@gmail.com</a>.<br>
-LEGION OF MARY<br>
-Pilgrimage to Knock on Sunday 27 September<br>
-leaving from Buncrana. More details to follow. Paw Patrol:<br>
-Dino Movie<br>
-G | 88mins<br>
-Sat 22 Aug -<br>
-5pm<br>
-Sun 23rd - 3pm COMING NEXT WEEK<br>
-Harry Potter And<br>
-The Philosopher&#x27;s<br>
-Stone<br>
-25th Anniversary<br>
-28 - 30 Aug COMING SOON<br>
-Movies &amp; Tea<br>
-Holy Days - Tues 1st<br>
-Sept. Adm €10 incl<br>
-Afternoon Tea. Carers<br>
-go free.<br>
-MARRIAGE ENRICHMENT WEEKEND<br>
-Marriage Encounter Ireland invites married couples to a<br>
-residential Weekend from Fri 2 to Sun 4 Oct 2026 at<br>
-the Focolare Centre, Curryhills, Prosperous, Co. Kil-<br>
-dare. Step away from daily distractions to deepen your<br>
-communication, renew your love, and rediscover the<br>
-joy of your marriage. Visit <a href="https://www.marriageencounter.ie" target="_blank" rel="noopener noreferrer">www.marriageencounter.ie</a> BLESSING OF BIKERS AND<br>
+Snowball:<br>
+€5050<br>
+THE PADRE PIO PRAYER GROUP ,<br>
+Holy Family Chapel, Ballymagroarty<br>
+on Tues 1 Sept. Starting with Rosary at<br>
+6.45pm before Mass at 7.15pm, the priest<br>
+will bless everyone with a first class relic<br>
+of St. Pio, while closing prayers are recited.<br>
+Everyone Welcome<br>
+READINGS FOR 22ND SUNDAY IN ORDINARY TIME<br>
+1st Reading: Jer 20: 7-9. The prophet Jeremiah lived<br>
+through the siege of Jerusalem (600 BC), the destruc-<br>
+tion of the Temple and deportations to Babylon. His<br>
+prophesying urged a shift from outward practices to a<br>
+person-to-person, relational, heartfelt religion. For this<br>
+he was ridiculed and imprisoned. ‘The prophet here<br>
+foreshadows Christ on the eve of his passion: the living<br>
+word of God had lit a similar consuming fire deep in<br>
+Jeremiah’s heart.’<br>
+2nd Reading: Rm 12:1-2. Merely external, outward<br>
+practice is not acceptable. Our behaviour has to spring<br>
+from a whole new mind, offering ourselves in all things<br>
+like Jesus, &#x27;as a holy sacrifice pleasing to God.&#x27;<br>
+Gospel: Mt 16: 21-27. Back in 1994 at the Maynooth<br>
+launch of the Catechism of the Catholic Church<br>
+Cardinal Desmond Connell described and explained<br>
+how Jesus will proudly wear the wounds of his Passion<br>
+for all eternity. Christians should accept their cross just<br>
+as Christ did GARDEN FETE THANKS<br>
+The Garden Fête 2026 was a lovely success due to the<br>
+help and support of a tremendous number of people,<br>
+some of whom are mentioned herewith and many of<br>
+whom are anonymous. Those who baked and bought<br>
+tickets, those who sold raffle lines and secured<br>
+sponsorship, those who helped in so many ways on the<br>
+day itself – to say nothing of those who turned out in<br>
+great numbers to give their support on the day. Our<br>
+sincere thanks to the businesses and individuals who<br>
+gave sponsorship and prizes – your generosity is noted<br>
+and appreciated. Sincere thanks to Scoil Mhuire for the<br>
+use of their facilities. A great “thank you” to all<br>
+concerned and to those in the Parish Office and those<br>
+who attended the meetings and who were in the eye of<br>
+the storm. Hopefully, such a lovely experience and<br>
+expression of who we are as a Parish can be repeated<br>
+again in the years to come. Our crowds were smaller<br>
+than in other years, but we hope that there is still good<br>
+support for this initiative. We thank God too for the<br>
+lovely weather we all enjoyed.<br>
+Father Bradley<br>
+BAPTISMS<br>
+We welcome into God’s Family the following<br>
+children who were recently baptised:<br>
+Adam Neil Patrick Moran<br>
+Annie Moran<br>
+Rosie Méabh Lavery Watson<br>
+May God guide and protect our children<br>
+always.<br>
+ONE DAY PILGRIMAGE TO LOUGH DERG<br>
+The Parish is running a one-day pilgrimage to<br>
+Lough Derg on Sat 5 Sept. Bus leaving The<br>
+Oratory at 7:30am for arrival at the island at<br>
+9:30am. Cost for the day including return bus,<br>
+boat fare, day pilgrimage and meal on way<br>
+home is €85. For more info and booking please</p>
+<h3 class="b-head">contact the Parish Office. Spaces on a first-</h3>
+<p>come first-served basis. BLESSING OF BIKERS AND<br>
 MOTORCYCLES<br>
 takes place on Sun 13 Sept in St Aengus’<br>
 Chapel, Burt at 1:30pm. All welcome to<br>
@@ -1318,16 +1308,47 @@ lowing the blessing all are welcome to join<br>
 the run to Ned’s Point RNLI Station, to<br>
 present the donation to the RNLI. Please<br>
 note, Mass will be celebrated on Sun 13<br>
-Sept in St Patrick’s Chapel, DUNGIVEN,<br>
-at 11:30am for deceased bikers, especially<br>
-those who have died in past year. Buncrana</p></div>
+Sept in St Patrick’s Chapel, Dungiven, at<br>
+11:30am for deceased bikers, especially<br>
+those who have died in past year.<br>
+CLIMB TO THE EUCHARISTIC CROSS , SCALP<br>
+Sun 30 Aug meeting at the Water Tank at 1.30pm. The<br>
+Rosary will be said on the way up. All Welcome. SEASON OF CREATION 2026<br>
+The Season of Creation takes place from 1 September<br>
+to 4 October, bringing Christians throughout the world<br>
+together in prayer, reflection and action for the care of<br>
+our common home. This year’s theme, Living Water ,<br>
+invites us to give thanks for the gift of water and renew<br>
+our care for God’s creation.<br>
+To mark the beginning of the season, the Three Patrons<br>
+Parish Laudato Si’ group are inviting people to a short<br>
+prayer service on Tues 1 Sept at 6:30pm in St Joseph’s<br>
+Church, Galliagh. All are welcome<br>
+DEATH<br>
+Your prayers are asked for<br>
+Charlie Campbell<br>
+who was buried during the week and for his<br>
+family and friends saddened by their loss. Movies &amp; Tea<br>
+Holy Days -<br>
+Tues 1st Sept<br>
+1-4pm Adm €10 |<br>
+Followed by<br>
+Afternoon tea<br>
+Carers go free<br>
+PRAYER FOR VOCATIONS<br>
+That the men called to priesthood will be<br>
+filled with courage and hope as they hear<br>
+Jesus calling them to follow Him by re-<br>
+nouncing themselves, taking up their cross<br>
+every day, and finding life in Him and in<br>
+the service of His people. Buncrana <a href="https://www.buncranaparish.com" target="_blank" rel="noopener noreferrer">https://www.buncranaparish.com</a></p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other DERRY Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghyaran"><a class="parish-link" href="parishofaghyaran.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li class="parish-item" data-name="ardmore"><a class="parish-link" href="ardmoreparish.html" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li class="parish-item" data-name="ardstraw east"><a class="parish-link" href="parishofardstraweast.html" target="_blank" rel="noopener noreferrer">Ardstraw East</a></li><li class="parish-item" data-name="ballinascreen (&amp; desertmartin amalgamated)"><a class="parish-link" href="parishofballinascreen.html" target="_blank" rel="noopener noreferrer">Ballinascreen (&amp; Desertmartin amalgamated)</a></li><li class="parish-item" data-name="banagher"><a class="parish-link" href="banagherparish.html" target="_blank" rel="noopener noreferrer">Banagher</a></li><li class="parish-item" data-name="bellaghy"><a class="parish-link" href="bellaghyparish.html" target="_blank" rel="noopener noreferrer">Bellaghy</a></li><li class="parish-item" data-name="camus"><a class="parish-link" href="camusparish.html" target="_blank" rel="noopener noreferrer">Camus</a></li><li class="parish-item" data-name="carndonagh"><a class="parish-link" href="carndonaghparish.html" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li class="parish-item" data-name="castlederg"><a class="parish-link" href="castledergparish.html" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li class="parish-item" data-name="clonleigh (strabane pastoral area)"><a class="parish-link" href="clonleighparish.html" target="_blank" rel="noopener noreferrer">Clonleigh (Strabane Pastoral Area)</a></li><li class="parish-item" data-name="clonmany"><a class="parish-link" href="clonmanyparish.html" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li class="parish-item" data-name="culdaff"><a class="parish-link" href="culdaffparish.html" target="_blank" rel="noopener noreferrer">Culdaff</a></li><li class="parish-item" data-name="culmoe"><a class="parish-link" href="culmoreparish.html" target="_blank" rel="noopener noreferrer">Culmoe</a></li><li class="parish-item" data-name="dma parish (claudy area)"><a class="parish-link" href="dmaparish.html" target="_blank" rel="noopener noreferrer">DMA Parish (Claudy area)</a></li><li class="parish-item" data-name="drumquin"><a class="parish-link" href="drumquinparish.html" target="_blank" rel="noopener noreferrer">Drumquin</a></li><li class="parish-item" data-name="drumragh"><a class="parish-link" href="drumraghparish.html" target="_blank" rel="noopener noreferrer">Drumragh</a></li><li class="parish-item" data-name="dungiven"><a class="parish-link" href="parishofdungiven.html" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li class="parish-item" data-name="errigal"><a class="parish-link" href="errigalparish.html" target="_blank" rel="noopener noreferrer">Errigal</a></li><li class="parish-item" data-name="fahan"><a class="parish-link" href="fahanparish.html" target="_blank" rel="noopener noreferrer">Fahan</a></li><li class="parish-item" data-name="granaghan"><a class="parish-link" href="granaghanparish.html" target="_blank" rel="noopener noreferrer">Granaghan</a></li><li class="parish-item" data-name="greenlough"><a class="parish-link" href="greenlough.html" target="_blank" rel="noopener noreferrer">Greenlough</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holyfamily-parish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="iskaheen"><a class="parish-link" href="iskaheenparish.html" target="_blank" rel="noopener noreferrer">Iskaheen</a></li><li class="parish-item" data-name="kilrea"><a class="parish-link" href="parishofkilrea.html" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li class="parish-item" data-name="lavey"><a class="parish-link" href="laveyparish.html" target="_blank" rel="noopener noreferrer">Lavey</a></li><li class="parish-item" data-name="leckpatrick"><a class="parish-link" href="leckpatrickparish.html" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li class="parish-item" data-name="maghera (derry)"><a class="parish-link" href="magheraparishderry.html" target="_blank" rel="noopener noreferrer">Maghera (Derry)</a></li><li class="parish-item" data-name="melmount (&amp; camus)"><a class="parish-link" href="melmountparish.html" target="_blank" rel="noopener noreferrer">Melmount (&amp; Camus)</a></li><li class="parish-item" data-name="moville"><a class="parish-link" href="movilleparish.html" target="_blank" rel="noopener noreferrer">Moville</a></li><li class="parish-item" data-name="sion mills"><a class="parish-link" href="parishofsionmills.html" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li class="parish-item" data-name="st eugene&#x27;s cathedral (templemore)"><a class="parish-link" href="steugenescathedral.html" target="_blank" rel="noopener noreferrer">St Eugene&#x27;s Cathedral (Templemore)</a></li><li class="parish-item" data-name="st mary&#x27;s parish creggan"><a class="parish-link" href="stmarysparishcreggan.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Parish Creggan</a></li><li class="parish-item" data-name="star of the sea (magilligan)"><a class="parish-link" href="staroftheseacatholic.html" target="_blank" rel="noopener noreferrer">Star of the Sea (Magilligan)</a></li><li class="parish-item" data-name="steelstown"><a class="parish-link" href="steelstownparish.html" target="_blank" rel="noopener noreferrer">Steelstown</a></li><li class="parish-item" data-name="three patrons"><a class="parish-link" href="threepatrons.html" target="_blank" rel="noopener noreferrer">Three Patrons</a></li><li class="parish-item" data-name="waterside (&amp; strathfoyle amalgamated)"><a class="parish-link" href="watersideparish.html" target="_blank" rel="noopener noreferrer">Waterside (&amp; Strathfoyle amalgamated)</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghyaran"><a class="parish-link" href="parishofaghyaran.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li class="parish-item" data-name="ardmore"><a class="parish-link" href="ardmoreparish.html" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li class="parish-item" data-name="banagher"><a class="parish-link" href="banagherparish.html" target="_blank" rel="noopener noreferrer">Banagher</a></li><li class="parish-item" data-name="camus"><a class="parish-link" href="camusparish.html" target="_blank" rel="noopener noreferrer">Camus</a></li><li class="parish-item" data-name="carndonagh"><a class="parish-link" href="carndonaghparish.html" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li class="parish-item" data-name="castlederg"><a class="parish-link" href="castledergparish.html" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li class="parish-item" data-name="clonleigh (strabane pastoral area)"><a class="parish-link" href="clonleighparish.html" target="_blank" rel="noopener noreferrer">Clonleigh (Strabane Pastoral Area)</a></li><li class="parish-item" data-name="clonmany"><a class="parish-link" href="clonmanyparish.html" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li class="parish-item" data-name="culdaff"><a class="parish-link" href="culdaffparish.html" target="_blank" rel="noopener noreferrer">Culdaff</a></li><li class="parish-item" data-name="culmoe"><a class="parish-link" href="culmoreparish.html" target="_blank" rel="noopener noreferrer">Culmoe</a></li><li class="parish-item" data-name="dma parish (claudy area)"><a class="parish-link" href="dmaparish.html" target="_blank" rel="noopener noreferrer">DMA Parish (Claudy area)</a></li><li class="parish-item" data-name="drumquin"><a class="parish-link" href="drumquinparish.html" target="_blank" rel="noopener noreferrer">Drumquin</a></li><li class="parish-item" data-name="drumragh"><a class="parish-link" href="drumraghparish.html" target="_blank" rel="noopener noreferrer">Drumragh</a></li><li class="parish-item" data-name="dungiven"><a class="parish-link" href="parishofdungiven.html" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li class="parish-item" data-name="errigal"><a class="parish-link" href="errigalparish.html" target="_blank" rel="noopener noreferrer">Errigal</a></li><li class="parish-item" data-name="fahan"><a class="parish-link" href="fahanparish.html" target="_blank" rel="noopener noreferrer">Fahan</a></li><li class="parish-item" data-name="granaghan"><a class="parish-link" href="granaghanparish.html" target="_blank" rel="noopener noreferrer">Granaghan</a></li><li class="parish-item" data-name="greenlough"><a class="parish-link" href="greenlough.html" target="_blank" rel="noopener noreferrer">Greenlough</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holyfamily-parish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="iskaheen"><a class="parish-link" href="iskaheenparish.html" target="_blank" rel="noopener noreferrer">Iskaheen</a></li><li class="parish-item" data-name="kilrea"><a class="parish-link" href="parishofkilrea.html" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li class="parish-item" data-name="lavey"><a class="parish-link" href="laveyparish.html" target="_blank" rel="noopener noreferrer">Lavey</a></li><li class="parish-item" data-name="leckpatrick"><a class="parish-link" href="leckpatrickparish.html" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li class="parish-item" data-name="maghera (derry)"><a class="parish-link" href="magheraparishderry.html" target="_blank" rel="noopener noreferrer">Maghera (Derry)</a></li><li class="parish-item" data-name="melmount (&amp; camus)"><a class="parish-link" href="melmountparish.html" target="_blank" rel="noopener noreferrer">Melmount (&amp; Camus)</a></li><li class="parish-item" data-name="moville"><a class="parish-link" href="movilleparish.html" target="_blank" rel="noopener noreferrer">Moville</a></li><li class="parish-item" data-name="sion mills"><a class="parish-link" href="parishofsionmills.html" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li class="parish-item" data-name="st eugene&#x27;s cathedral (templemore)"><a class="parish-link" href="steugenescathedral.html" target="_blank" rel="noopener noreferrer">St Eugene&#x27;s Cathedral (Templemore)</a></li><li class="parish-item" data-name="st mary&#x27;s parish creggan"><a class="parish-link" href="stmarysparishcreggan.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Parish Creggan</a></li><li class="parish-item" data-name="star of the sea (magilligan)"><a class="parish-link" href="staroftheseacatholic.html" target="_blank" rel="noopener noreferrer">Star of the Sea (Magilligan)</a></li><li class="parish-item" data-name="steelstown"><a class="parish-link" href="steelstownparish.html" target="_blank" rel="noopener noreferrer">Steelstown</a></li><li class="parish-item" data-name="waterside (&amp; strathfoyle amalgamated)"><a class="parish-link" href="watersideparish.html" target="_blank" rel="noopener noreferrer">Waterside (&amp; Strathfoyle amalgamated)</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1379,9 +1400,9 @@ those who have died in past year. Buncrana</p></div>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1873,23 +1894,8 @@ those who have died in past year. Buncrana</p></div>
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

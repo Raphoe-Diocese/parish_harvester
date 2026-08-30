@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Newtown Killea Bulletin — 25/08/2026</title>
+  <title>Newtown Killea Bulletin — 30/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -179,6 +187,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -201,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +275,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +472,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -863,7 +892,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,14 +900,14 @@
     <header class="header">
       <p class="diocese-label">RAPHOE</p>
       <h1>Newtown Killea Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Newtown Killea — 25/08/2026. Part of the Raphoe Diocese collated bulletin.</p>
-      <a class="download-link-top" href="newtownkilleaparish.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Newtown Killea — 30/08/2026. Part of the Raphoe Diocese collated bulletin.</p>
+      <a class="download-link-top" href="newtownkilleaparish.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="newtownkilleaparish.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="newtownkilleaparish.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
@@ -895,7 +924,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="newtownkilleaparish.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="newtownkilleaparish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="newtownkilleaparish.pdf">Open PDF</a>
               <a href="newtownkilleaparish.pdf" download>Download</a>
             </div>
           </div>
@@ -934,134 +963,129 @@
       <div class="quiet-links">
         <a href="newtownkilleaparish-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-newtown-killea" data-parish-name="Newtown Killea"><h2 class="ocr-parish-name">Newtown Killea</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-newtown-killea" data-parish-name="Newtown Killea"><h2 class="ocr-parish-name">Newtown Killea</h2><p class="ocr-parish-date">30/08/2026</p></header>
 <p class="page-label">Page 1</p>
-<p>ST. BAITHIN’S MASSES<br>
-22nd August Saturday 6pm Mass<br>
-23rd August Sunday 12.15pm Mass<br>
-25th August Tuesday 9.30amMass<br>
-26th August Wednesday 9.30amMass<br>
-27th August Thursday 7pmMass<br>
-28th August Friday No Mass<br>
-29th August Saturday 6pm Pro-Populo<br>
-30th August Sunday 12.15pm Patricia McBrearty RIP<br>
-NEWTOWNCUNNINGHAM MASSES<br>
-22nd August Saturday 7.30pm Ann McGlinchey RIP<br>
-23rd August Sunday 11am Hugh &amp; Darren McDaid RIP<br>
-24th AugustMonday9.30amMass<br>
-25th AugustTuesday7pm Brigid Holmes RIP<br>
-26th August Wednesday 9.30amMass<br>
-27th August Thursday No Mass<br>
+<p>NEWTOWNCUNNINGHAM MASSES<br>
 29th August Saturday 7.30pm George &amp; Annie Rodgers and<br>
 Marian Douglas RIP<br>
 30th August Sunday 11am Adam Mulrine RIP<br>
+01st Sept Tuesday 7pm Mass<br>
+02nd Sept Wednesday No Mass<br>
+03rd Sept Thursday 9.30am Mass<br>
+05th Sept Saturday 10am Jim Sheerin RIP ( Month’s Mind )<br>
+05th Sept Saturday 7.30pm John Fullerton RIP ( 1st Anniv)<br>
+06th Sept Sunday 11am Susan Kierce Marsh RIP<br>
 KILLEA MASSES<br>
-23rd August Sunday 9.30am Pro-Populo<br>
-28th AugustFriday7pmJohn Lynch RIP (1st Anniv)<br>
 30th August Sunday 9.30am Mass<br>
-Recent Deaths: We pray for the soul of Lynn McGee (nee Brown), Mullenan<br>
-Road, Derry and formerly of Dunmore, Carrigans. May her soul and all the souls of<br>
-the faithful, departed rest in peace.<br>
-Anniversaries: John McCartney RIP. May his soul and all the souls of the<br>
-faithful, departed rest in peace.<br>
-Prayer to St. Monica (Feast Day August 27th) – Patron of Mothers<br>
-Lord Jesus, you were moved by the prayers and tears of St. Monica and you gave the grace of<br>
-conversion to St. Augustine her son. Touch our hearts and convert us from fear to love, from<br>
-sickness to health and from conflict to peace of mind. Bless all mothers, living or dead, known<br>
-or unknown, married, single or widowed. May their lives, their prayer and their Christian<br>
-witness draw others to love you. St. Monica pray for all children of all ages who cause their<br>
-parents to worry.WEEKLY NEWSLETTER<br>
-23rd August 2026 – Twenty-first Sunday of Ordinary Time<br>
-Step by Step through the Mass<br>
-The Liturgy of the Eucharist (Part 7)<br>
-The next small ritual that the priest carries out is known as the Lavabo – which derives from the<br>
-Latin word for washing. In this ritual the priest has water poured over his hands by a server or<br>
-he dips his hands into a bowl of water. This is not a hygiene ritual – though perhaps in the<br>
-distant past it may he begun life as a necessary hand washing. In the distant past (as in some<br>
-Missionary Lands to this day) not only the Bread and Wine (and offertory collection) are<br>
-brought forward at this stage of the Mass, but also many other gifts of food, oil, meat or dairy<br>
-produce are brought forward – often to be distributed later to the poor. This could be grubby<br>
-business and would have necessitated that the priest, who received these gifts, had to wash his<br>
-hands.<br>
-However, this is not the primary reason or purpose for this ritual. It takes its inspiration from<br>
-the ritual washing that the Jewish Temple Priests carried out before they offered the sacrifices<br>
-to God in the Temple. That ritual washing in the Old Testament Law of Moses was mandatory<br>
-for priests every time they would offer a sacrifice. Its meaning was clearly a physical act<br>
-seeking to communicate a spiritual reality. It was essential for maintaining the sanctity<br>
-required to approach God and perform sacred duties. The hands of a person are symbolic of<br>
-their actions – and so the washing of the hands by the priest in a sense reminded him (and those<br>
-who witnessed it) that not all his works are good, holy and sinless, since he is a mortal man and<br>
-therefore prone to sin. However, he washes his hands now to show that they are being prepared<br>
-to do something good and holy – the offering of sacrifice to God. In the Old Testament, when<br>
-the people saw a priest ritually wash his hands – they understood that a sacrifice was about to<br>
-take place. For us at the Holy Sacrifice of the Mass, when we see the priest perform this simple<br>
-ritual which could go unnoticed because it is so brief, we know that the reason for our gathering<br>
-at the Church at this Mass is now, in a sense, moving up a gear – the Sacrifice of Jesus on<br>
-Calvary is about to be made present in the here and now of our celebration of this Mass.<br>
-The priest accompanies this ritual action with a short prayer which he speaks almost inaudibly:<br>
-“Wash me, O Lord, from my iniquity and cleanse me from my sin.” It reinforces the fact that<br>
-this action is not about physical hygiene, but about being pure in heart and holy in soul –<br>
-treating the Holy Things of God in a holy way and with holy fear of the Lord. It is in some way<br>
-akin to a little last examination of conscience for the priest before he advances any further in the<br>
-offering of Holy Mass.<br>
-Parish of Newtowncunningham &amp; KilleaFr Philip Kemmy, PP Fr. Damien Nejad, CC<br>
-Office Address: Parochial House, Main Street,<br>
-NewtowncunninghamEmergency Number<br>
-087 3443600Newtown Killea</p>
+04th Sept Friday 9.30am Mass<br>
+06th Sept Sunday 9.30am Pro Populo<br>
+Anniversaries: Cissie McFadden RIP, Garshuey; Jimmy McDaid RIP,<br>
+Colehill. May their souls and all the souls of the faithful, departed rest in peace.<br>
+ST. BAITHIN’S MASSES<br>
+29th August Saturday 6pm Pro-Populo<br>
+30th August Sunday 12.15pm Patricia McBrearty RIP<br>
+01st Sept Tuesday No Mass<br>
+02nd Sept Wednesday 9.30am Mass<br>
+03rd Sept Thursday 7pm Mass<br>
+04th Sept Friday 7pm Susan Tinney RIP<br>
+05th Sept Saturday 6pm Michael Browne RIP<br>
+06th Sept Sunday 12.15pm John McCartney RIP<br>
+WEEKLY NEWSLETTER<br>
+30th August 2026 – Twenty-Second Sunday of Ordinary Time<br>
+The Greatness of Eucharistic Adoration<br>
+“Those who stand before the Lord in Eucharistic Adoration are fulfilling an eminent service.<br>
+They are presenting to Christ all those who do not know him or are far f rom him; they keep<br>
+watch in his presence on their behalf,&quot; Pope St. John Paul II<br>
+The above quotation from Pope John Paul II speaks of the service we render to others by<br>
+presenting them to the Lord during our time of Eucharistic Adoration. The Holy Father<br>
+intended by these words to remind people of the immense good their prayers before the<br>
+Blessed Sacrament could do for those who right now have little or no knowledge of or<br>
+time for God and the things of God. In other words, we can and do win graces for others<br>
+who have need of them; graces of conversion, graces that will set them and confirm them<br>
+upon their path to God.<br>
+During our Holy Hour we sit or kneel in the presence of the Lord Jesus Christ truly present<br>
+in the Most Holy Eucharist. We gaze upon that little white host and by faith we declare<br>
+that behind the appearance of bread we encounter the face of the Lord of life. And we<br>
+bring to him ourselves and those we hold dear – living and deceased.<br>
+Only in heaven will we understand the value of our Holy Hour and the good it does our<br>
+souls and the souls of so many others. And so, we would encourage you to try some time<br>
+of Eucharistic Adoration for yourself. From the middle of September, across our 2<br>
+Parishes and 3 Churches we will have Adoration 3 days a week ( Wednesday in Newtown<br>
+11am to 8pm ; Thursday in St. Johnston 1pm to 6pm ; &amp; Friday in Killea 2pm to 6pm ).<br>
+There is, therefore, ample opportunity to find time to be with Jesus’ face to face in the<br>
+Blessed Sacrament. However, these hours are contingent on there being at least 2 people<br>
+covering each hour. If you have already taken an hour but would like to change your hour,<br>
+or if you would like to be assigned a particular hour then please fill out and return the<br>
+leaflets you will find in the porch by next weekend. All hours are available to be taken<br>
+but we have particular need of adorers from 3pm to 6pm in St. Johnston, and from 7pm –<br>
+8pm in Newtown. New adorers would also be needed for the Killea hours on Friday<br>
+afternoon. Entire family groups might consider taking a particular hour – and then at least<br>
+two of the group would be present for the hour they have signed up for. Fr Philip Kemmy, PP Fr. Damien Nejad, CC<br>
+Office Address : Parochial House, Main Street, Newtowncunningham<br>
+<a href="tel:+353749156138" style="color:#1d4ed8;font-weight:600;">074 9156138</a> Emergency Number<br>
+<a href="tel:+353873443600" style="color:#1d4ed8;font-weight:600;">087 3443600</a> Newtown Killea <a href="https://newtownkilleaparish.ie/bulletin/raphoe/newtown-killea/" target="_blank" rel="noopener noreferrer">https://newtownkilleaparish.ie/bulletin/raphoe/newtown-killea/</a></p>
 <hr>
 <p class="page-label">Page 2</p>
-<p>Email: <a href="mailto:office@newtownkilleaparish.ie" target="_blank" rel="noopener noreferrer">office@newtownkilleaparish.ie</a><br>
+<p>Parish of Newtowncunningham &amp; Killea<br>
+Email: <a href="mailto:office@newtownkilleaparish.ie" target="_blank" rel="noopener noreferrer">office@newtownkilleaparish.ie</a><br>
 Website: <a href="https://www.newtownkilleaparish.ie" target="_blank" rel="noopener noreferrer">www.newtownkilleaparish.ie</a><br>
-Sunday Collections : €2040; Feast of the Assumption : €490. Thank you<br>
-for your continued generosity to your Parish.<br>
+Sunday Collections : €1630; Development Fund : €1050; Feast of the<br>
+Assumption : €75. Thank you for your continued generosity to your Parish.<br>
+The sum of €1,050 was raised in the recent Draw for the Renovation funds of Killea<br>
+Chapel . Well done to all involved. Raffle winners were Patrick Gibson, Rachel<br>
+McKinney, Jack Lynch, Mark Carlin, Damien McCauley, Tommy McNamee, Ann<br>
+McElhinney &amp; Martin McCurriskin.<br>
 Sacrament of Confession: All Saints Newtown every Saturday 10.30am –<br>
 11.30am.<br>
-Eucharistic Adoration: will take place on Wednesday in Newtown from<br>
-11am – 7pm and in Killea from 2pm – 6pm on Friday .<br>
-Donegal Down Syndrome Association will hold their annual Church Gate<br>
-Collection next weekend, Saturday 29th and Sunday 30th August. Donegal<br>
-Down Syndrome Association will hold their annual Church Gate Collection<br>
-next weekend, Saturday 29th and Sunday 30th August.<br>
+The First Saturday Devotions begin next Saturday at 9am with the Rosary and 15<br>
+Minute Meditation, followed by Mass at 10am.<br>
+Eucharistic Adoration: will take place on Wednesday in Newtown from 11am –<br>
+7pm and in Killea from 2pm – 6pm on Friday.<br>
+Please Note : Fr. Philip WILL NOT be visiting the Housebound Sick of his Areas<br>
+this week ahead, but on the 10th and 11th September instead.<br>
+Fr. Damien will visit the sick in his area in Newtown on Thursday of this week.<br>
 Parish of Taughboyne, St Baithin’s<br>
 Email: <a href="mailto:stbaithins@yahoo.com" target="_blank" rel="noopener noreferrer">stbaithins@yahoo.com</a><br>
-Sunday Collections : €1050; Feast of the Assumption: €450;<br>
-Development Fund: €50. Thank you for your continued generosity to<br>
-your Parish.<br>
-Sacrament of Confession: St. Baithin’s each Saturday from 4.30 – 5.30pm.Eucharistic Adoration: will take place on Tuesday from 10am to 12 Noon.<br>
+Sunday Collections : €1080; Feast of the Assumption: €70;<br>
+Development Fund: €55; Heat &amp; Light : €40 . Thank you for your<br>
+continued generosity to your Parish.<br>
+Sacrament of Confession: St. Baithin’s each Saturday from 4.30 –<br>
+5.30pm. No Eucharistic Adoration this week.<br>
 Adoration and Holy Rosary , led by Fr. Damien on Thursdays from 6pm until<br>
-7pm in St. Baithin&#x27;s Church. Come and pray for our community. Everyone welcome.<br>
-Adorers Needed from September : From early September, we intend to<br>
+7pm in St. Baithin&#x27;s Church. Come and pray for our community. Everyone welcom e.<br>
+Adorers Needed from September : From mid-September, we intend to<br>
 have Eucharistic Adoration every Thursday in St. Baithin’s beginning at 1pm and<br>
 finishing with Fr. Damien’s guided Holy Hour from 6pm – 7pm. A Minimum of 2<br>
-Adorers are need for each hour. If you could cover one of the hours between 1pm and<br>
-6pm then please fill out one of the cards on the table in the porch and leave it in the<br>
-sacristy in the coming days or weeks.<br>
-Items for the Parish Newsletter must be submitted to the Parish office<br>
-no later than 12 Noon on a Thursday to be considered for the<br>
-Newsletter<br>
-Mass for Expectant Families. Are you or someone you know pregnant? A Special Mass will be celebrated by Bishop Coll in St. Eunan’s Cathedral, Letterkenny at 7pm on<br>
+Adorers are need for each hour. If you could cover one of the hours between 1pm<br>
+and 6pm then please fill out one of the cards on the table in the porch and leave it in<br>
+the sacristy in the coming days or week. Hours from 3pm to 6pm are particularly<br>
+in need of being filled.<br>
+Fr. Damien will visit the sick in Carrigans/St. Johnston areas on Friday of this<br>
+week.<br>
+Items for the Parish Newsletter must be submitted to the Parish office no later<br>
+than 12 Noon on a Thursday to be considered for the Newsletter<br>
+Mass for Expectant Families. Are you or someone you know pregnant? A Special Mass will be celebrated by Bishop Coll i n St. Eunan’s Cathedral, Letterkenny at 7pm on<br>
 Tuesday 8th September (Feast of Our Lady’s Birthday).<br>
-ENCOUNTER COME &amp; SEE: Have you heard about the Encounter School of Ministry Course but aren’t sure what it’s about or if it’s for you? We invite you to ‘Come &amp; see’<br>
-what it’s about before you make your decision. Class will take place on Thursdays from 6.30pm (first half hour is prayer and worship) to 9.00pm beginning on Thursday 3rd<br>
-September at All Saints Church, Newtowncunningham . Participants can attend up to 3 classes without committing to pay for the course. If a participant decides to enrol before<br>
-the application deadline of October 1st, tuition fees will then be applied. If a participant decides not to continue, there is no obligation. More info or register here:<br>
-<a href="https://encounterschool.org/donegal/" target="_blank" rel="noopener noreferrer">https://encounterschool.org/donegal/</a> or email <a href="mailto:donegal@encounterschool.org" target="_blank" rel="noopener noreferrer">donegal@encounterschool.org</a> for more information.<br>
-Breast Cancer Awareness Month 2026 will take place this year from Thursday 1st – Saturday 31st October. For further information, please<br>
-visit breastcancerresearch.ie  or <a href="https://www.breastcancerireland.com" target="_blank" rel="noopener noreferrer">www.breastcancerireland.com</a><br>
-International Coffee Day 2026  takes place on Thursday 1st October. Please see <a href="https://www.internationalcoffeeday.org" target="_blank" rel="noopener noreferrer">www.internationalcoffeeday.org</a>  for further details.<br>
-Kitchen/Care Assistant required for Newtowncunningham Day Centre under the Community Emploment Scheme (Ref. CES-2460526).<br>
-To apply email: <a href="mailto:dmytro@letterkennychamber.com" target="_blank" rel="noopener noreferrer">dmytro@letterkennychamber.com</a> or contact your local intreo office using the above reference number.<br>
-ALONE has am information session regarding ALONE services at Newtowncunningham Credit Union on Friday 28th august from 10am til Noon.<br>
-RSA’S CHECK IT FITS SERVICE - Did you know it’s the law that all children under 150cms or 36kgs must use a child car seat appropriate to their weight and height. In Ireland<br>
-as many as 54% of child car seats are incorrectly fitted which can lead to serious injury or even death in a collision. You are invited on Wednesday 26th August to have your car seat<br>
-checked beside the Smyths Toy Store, Letterkenny Retail Park.</p></div>
+ENCOUNTER COME &amp; SEE: Have you heard about the Encounter School of Ministry Course but aren’t sure what it’s about or if it’s for you? We invite you to ‘Come &amp; see’ what<br>
+it’s about before you make your decision. Class will take place on Thursdays from 6.30pm (f irst half hour is prayer and worship) to 9.00pm beginning on Thursday 3rd September at<br>
+All Saints Church, Newtowncunningham . Participants can attend up to 3 classes without committing to pay for the course. If a participant decides to enrol before the application deadline<br>
+of October 1st, tuition fees will then be applied. If a participant decides n ot to continue, there is no obligation. More info or register here: <a href="https://encounterschool.org/" target="_blank" rel="noopener noreferrer">https://encounterschool.org/</a> donegal/ or email<br>
+<a href="mailto:donegal@encounterschool.org" target="_blank" rel="noopener noreferrer">donegal@encounterschool.org</a> for more information.<br>
+Donegal Group 173 Rise and Shine Trust (formerly The Irish Handicapped Childre n’s Pilgrimage Trust and The Irish Pilgrimage Trust) are celebrating forty years of taki ng<br>
+young people with special needs to Lourdes each Easter. We are celebrating with a special Mass on Saturday 26th September in the Church of the Irish Martyrs, Letterkenny at 12 noon.<br>
+The Mass will be concelebrated by Bishop Niall Coll and Bishop Donal Mc Keowan, Bisho p of Derry and many of the priests who travelled to Lourdes with us over the years. We invite<br>
+all the guests and their families and all the helpers who travelled with us over the years to our Mass to celebrate the wor k of the Donegal Group over these forty years.<br>
+Kitchen/Care Assistant required for Newtowncunningham Day Centre under the Community Emploment Scheme (Ref. CES-2460526). To apply please email:<br>
+<a href="mailto:dmytro@letterkennychamber.com" target="_blank" rel="noopener noreferrer">dmytro@letterkennychamber.com</a> or contact your local intreo office using the above reference number.<br>
+Men’s Rosary will take place at Market Square, Letterkenny on Saturday 5th September at 1pm .<br>
+Burt&#x27;s Big Bingo this Sunday 30th August in St. Mary&#x27;s hall at 3pm.</p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other RAPHOE Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="kincasslagh"><a class="parish-link" href="kincasslagh.html" target="_blank" rel="noopener noreferrer">Kincasslagh</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="raphoe"><a class="parish-link" href="drive-1jmslbrliw.html" target="_blank" rel="noopener noreferrer">Raphoe</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="tawnawillyparish.html" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="tawnawillyparish.html" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1113,9 +1137,9 @@ checked beside the Smyths Toy Store, Letterkenny Retail Park.</p></div>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1607,23 +1631,8 @@ checked beside the Smyths Toy Store, Letterkenny Retail Park.</p></div>
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

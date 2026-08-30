@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Our Lady Queen of Peace Bulletin — 25/08/2026</title>
+  <title>Our Lady Queen of Peace Bulletin — 30/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -179,6 +187,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -201,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +275,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +472,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -863,7 +892,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,14 +900,14 @@
     <header class="header">
       <p class="diocese-label">DOWN &amp; CONNOR</p>
       <h1>Our Lady Queen of Peace Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Our Lady Queen of Peace — 25/08/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
-      <a class="download-link-top" href="ourladyqueenofpeacekilwee.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Our Lady Queen of Peace — 30/08/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
+      <a class="download-link-top" href="ourladyqueenofpeacekilwee.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="ourladyqueenofpeacekilwee.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="ourladyqueenofpeacekilwee.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
@@ -895,7 +924,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="ourladyqueenofpeacekilwee.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="ourladyqueenofpeacekilwee.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="ourladyqueenofpeacekilwee.pdf">Open PDF</a>
               <a href="ourladyqueenofpeacekilwee.pdf" download>Download</a>
             </div>
           </div>
@@ -934,88 +963,84 @@
       <div class="quiet-links">
         <a href="ourladyqueenofpeacekilwee-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-our-lady-queen-of-peace" data-parish-name="Our Lady Queen of Peace"><h2 class="ocr-parish-name">Our Lady Queen of Peace</h2><p class="ocr-parish-date">25/08/2026</p></header>
-<p class="page-label">Page 33</p>
-<p>A Our Lady<br>
-\!|Queen<br>
-——— VISIT OUR PARISH WEBSITE<br>
-I Peace <a href="https://www.ourladyqueenofpeacekilwee.com" target="_blank" rel="noopener noreferrer">www.ourladyqueenofpeacekilwee.com</a><br>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-our-lady-queen-of-peace" data-parish-name="Our Lady Queen of Peace"><h2 class="ocr-parish-name">Our Lady Queen of Peace</h2><p class="ocr-parish-date">30/08/2026</p></header>
+<p class="page-label">Page 22</p>
+<p>I Qu Lady<br>
+jueen<br>
+a VISIT OUR PARISH WEBSITE<br>
+Peace <a href="https://www.ourladyqueenofpeacekilwee.com" target="_blank" rel="noopener noreferrer">www.ourladyqueenofpeacekilwee.com</a><br>
 KILWEE</p>
 <h3 class="b-head">Parish Office Contact Numbers and Email Addresses</h3>
 <p>Christ the Redeemer <a href="tel:+442890309011" style="color:#1d4ed8;font-weight:600;">02890309011</a> — <a href="mailto:christtheredeemer@downandconnor.org" target="_blank" rel="noopener noreferrer">christtheredeemer@downandconnor.org</a><br>
-Derriaghy <a href="tel:+442892660073" style="color:#1d4ed8;font-weight:600;">028 92660073</a> <a href="mailto:derriaghy@downandconnor.org" target="_blank" rel="noopener noreferrer">derriaghy@downandconnor.org</a><br>
+Derriaghy <a href="tel:+442892660073" style="color:#1d4ed8;font-weight:600;">028 92660073</a> <a href="mailto:derrlaghy@downandconnor.org" target="_blank" rel="noopener noreferrer">derrlaghy@downandconnor.org</a><br>
 Nativity <a href="tel:+442890625739" style="color:#1d4ed8;font-weight:600;">028 90625739</a> <a href="mailto:_nativity@downandconnor.org" target="_blank" rel="noopener noreferrer">_nativity@downandconnor.org</a><br>
-OLQP <a href="tel:+442890616300" style="color:#1d4ed8;font-weight:600;">028 90616300</a> <a href="mailto:ourladyqueenofpeace@downandconnor.ordy" target="_blank" rel="noopener noreferrer">ourladyqueenofpeace@downandconnor.ordy</a><br>
-St Luke’s <a href="tel:+442890625739" style="color:#1d4ed8;font-weight:600;">028 90625739</a> — stlukes@downandconnor,org<br>
+OLQP <a href="tel:+442890616300" style="color:#1d4ed8;font-weight:600;">028 90616300</a> <a href="mailto:ourladyqueenofpeace@downandconnor.orq" target="_blank" rel="noopener noreferrer">ourladyqueenofpeace@downandconnor.orq</a><br>
+St Luke's <a href="tel:+442890625739" style="color:#1d4ed8;font-weight:600;">028 90625739</a> — <a href="mailto:stlukes@downandconnor.org" target="_blank" rel="noopener noreferrer">stlukes@downandconnor.org</a><br>
 St Anne's <a href="tel:+442890610112" style="color:#1d4ed8;font-weight:600;">02890610112</a> <a href="mailto:stannes@downandconnor.org" target="_blank" rel="noopener noreferrer">stannes@downandconnor.org</a><br>
 Pope Leo’s prayer intentions for August: For evangelisation in the city.<br>
 Let us pray that in large cities often marked by anonymity and loneliness we find new ways<br>
 to proclaim the Gospel, discovering creative paths to build community.<br>
-PLEASE NOTE WEDNESDAY MORNING MASS WILL BE AT 10.am<br>
-MEDICAL MISSIONARIES OF MARY<br>
-Iam pleased to let you know that a total of £1279.10 + €45 was raised at Our Lady Queen<br>
-of Peace Dunmurty Parish over the collection weekend. The MMM would like to extend their<br>
-heartfelt thanks to everyone who contributed, as well as to those who helped organise and<br>
-facilitate the visits.<br>
+re Kol The Sacrament of Baptism in Our Lady Queen of Peace will be on the hae<br>
+Baptism second Saturday of each month at 2.30pm. 5.<br>
+&gt; All parents are required to attend a Pre Baptism meeting which ‘is held on the<br>
+&gt;, third Tuesday of each month at 7pm in St Colman&#x27;s; CC CCC<br>
+KNIT &amp; NATTER: Our Lady Queen of Peace Knit &amp; Natter re-opens on Wednesday 34<br>
+Sept 10.30-12pm. All new members welcome.<br>
 If there is anyone in the parish who is sick and housebound and would like a<br>
 priest to visit, please contact the parish office or email <a href="mailto:kilweeparish@gmail.com" target="_blank" rel="noopener noreferrer">kilweeparish@gmail.com</a><br>
-WHAT IS THE DIFFERENCE BETWEEN A HOLIDAY AND A PILGRIMAGE?<br>
-A holiday is for yourself and a pilgrimage is for others. A group of your : =<br>
-fellow parishioners from the Colin and Derriaghy Parish Area will be going s<br>
-on pilgrimage in early September, walking the Camino Celta, and In the ‘<br>
-spirit of pilgrimage want to carry you with them!<br>
-From this Sunday to Saturday 5th September, there will be a special pilgrim<br>
-prayer box in the foyer of our Lady Queen of Peace, Kilwee, for you to place<br>
-your written intentions. Our pilgrims will physically carry these in their day<br>
-packs, lifting you up in prayer as they walk, as they reflect together and at<br>
-the tomb of St. James in Santiago,<br>
-le RECENTLY DECEASED Clair Owens<br>
-Wwe MONTHS MIND Yvonne Burke i<br>
-&amp; We pray for those whose anniversarles occur around this time I</p>
-<table class="b-table">
-<tr><td>Eternal rest grant unto them O Lord and may perpetual light shine upon them</td></tr>
-</table>
-<p>FAMILY FUNDRAISER- St Anne&#x27;s<br>
-Sunday 30th August in St Anne&#x27;s Parish Centre after 11am mass to 2.30pm to raise money<br>
-for a Solar Panel Water Project for a village in Northern India.<br>
-£5 per child aged over 4yrs. Fun, Games &amp; Sports Activities, Face Painting etc.<br>
-Coffee Morning, Tombola, Gift, Craft &amp; Cake Stalls for Adults.<br>
-NB: No card facilities, strictly cash only.<br>
+PLEASE NOTE the parish office will be closed this Tuesday &amp; Wednesday. . 7<br>
+CAMINO -PARISH PILGRIMAGE .<br>
+There willl be a special pilgrim prayer box in the foyer of our Lady Oueen of<br>
+Peace, Kilwee, for you to place your written intentions. Our pilgrims will<br>
+physically carry these in their day packs, lifting you up in prayer as they<br>
+walk, as they reflect together and at the tomb of St. James in Santiago.</p>
+<h3 class="b-head">ANNIVERSARIES Bridie, Billy and Bernard Rooney</h3>
+<p>Wwe We pray for those whose anniversaries occur around this time<br>
+~ Eternal rest grant unto them O Lord and may perpetual light shine upon them<br>
+FIRST SATURDAY DEVOTIONS will take place in St. Matthias’s Church, Glen Road on<br>
+Saturday, 5th September 2026 3.00 p.m. Adoration of the Blessed Sacrament Confessions<br>
+Act of Consecration 4.00 p.m. Holy Sacrifice of the Mass<br>
+TO MAKE A DONATION TO THE PARISH PLEASE VISIT OUR WEBSITE<br>
+ourladygueenofpeacekilwee.com DONATE BUTTON |<br>
+If you requlre a box of envelopes, please contact the Parish Office 90616300<br>
 ST JOSEPH MEN&#x27;S CAMINO<br>
-Every Camino changes us in ways we don&#x27;t expect, every man needs one. Join men from<br>
+Every Camino changes us in ways we dont expect, every man needs one. Join men from<br>
 across Ireland on Saturday 12th September for a 25km pilgrimage through the Boyne<br>
 Valley, beginning in Drogheda. The day includes Mass, Adoration, Rosary, Confessions,<br>
 fraternity, lunch and dinner, with after-dinner speaker Fr. Mark Quinn. Open to men aged<br>
 18+. Cost: €65 (student € 55). Registration, accomodation and<br>
-details: <a href="https://www.dominicans.ie/events" target="_blank" rel="noopener noreferrer">www.dominicans.ie/events</a>. Enquiries: <a href="mailto:op.evangelisation@gmail.com" target="_blank" rel="noopener noreferrer">op.evangelisation@gmail.com</a>.<br>
-TO MAKE A DONATION TO THE PARISH PLEASE VISIT OUR WEBSITE<br>
-ourladyqueenofpeacekilwee.com DONATE BUTTON<br>
-Weekly Collection £587 Please consider using envelopes. |<br>
-. If you require a box of envelopes, please contact the Parish Office 90616300 J<br>
-EMBRACE THE GRACE&#x27; Young Adult Catholic Conference<br>
-29 AUGUST 2026 - LEGION OF MARY<br>
-‘Embrace the Grace’ is a conference on faith and culture for young adults (18-40) with talks,<br>
-prayer, Mass, confession, workshops, food and social in the historic Legion of Mary<br>
-headquarters at De Montfort House, North Brunswick Street, Dublin 7. It will be a chance to<br>
-build faith in friendship with young adults from across the country.<br>
-This event takes place on Saturday 29 August from 9.30am to 6.00pm with a social<br>
-afterward.<br>
-Tickets cost €20 and can be booked on the eventbrite website by looking up ‘Embrace the<br>
-Grace’. Any queries can be directed towards <a href="mailto:deusetpatria@gmail.com" target="_blank" rel="noopener noreferrer">deusetpatria@gmail.com</a>.<br>
+details: <a href="https://www.dominicans,le/events" target="_blank" rel="noopener noreferrer">www.dominicans,le/events</a>, Enquiries: op,<a href="mailto:evangelisation@gmail.com" target="_blank" rel="noopener noreferrer">evangelisation@gmail.com</a>.<br>
 MATT TALBOT — URBAN MYSTIC<br>
 The Knights of St Columbanus, CK12 Downpatrick, invite you to a special screening<br>
 of Matt Talbot — Urban Mystic at Newcastle Community Cinema, St Mary&#x27;s Hall, Main<br>
-Street, Newcastle, on Friday 4th September at 7.00pm,<br>
+Street, Newcastle, on Friday 4th September at 7.00pm.<br>
 Matt Talbot&#x27;s remarkable true story of faith, struggle, addiction and<br>
 redemption continues to inspire people throughout the world and offers a powerful<br>
 message of hope to those affected by addiction and their families.<br>
 The evening will also feature guest speaker Michael Murphy.<br>
 Admission is free, with a suggested donation of £3 towards costs. Tea and coffee will<br>
-be served following the screening<br>
-Everyone is welcome -please bring family and friends.<br>
+be served following the screening.Everyone is welcome -please bring family and friends.<br>
+URGENT: STOP ASSISTED SUICIDE - postcards available<br>
+The vote on assisted suicide is on 11 September./Vot Dead Yet UK have provided postcards<br>
+you can send to your MP to ask them to vote NO to assisted suicide in the vote in the<br>
+House of Commons on 11 September.<br>
+Please take action now - collect a red and white postcard, fill out your details,<br>
+add a stamp and post it to your MP today!<br>
+ROSARY VIGIL FOR LIFE - outside Belfast City Hall on Sunday 30th August at<br>
+2.00pm. Join Precious Life in prayer to uphold the sacredness and dignity of unborn life,<br>
+and pray that Belfast Council will reject plans to illuminate the City Hall in celebration of<br>
+abortion. For more information, contact <a href="tel:+442890278484" style="color:#1d4ed8;font-weight:600;">028 9027 8484</a> / 07592 280522 or email<br>
+<a href="mailto:info@preciouslife.com" target="_blank" rel="noopener noreferrer">info@preciouslife.com</a>.<br>
 FIRST SATURDAY DEVOTIONS will take place in St. Matthias’s Church, Glen Road on<br>
 Saturday, 5th September 2026 3.00 p.m. Adoration of the Blessed Sacrament Confessions<br>
-Act of Consecration 4.00 p.m. Holy Sacrifice of the Mass</p>
+Act of Consecration 4.00 p.m. Holy Sacrifice of the Mass<br>
+CATHOLIC MEN&#x27;S RETREAT - Standing in the Breach<br>
+A Catholic Men&#x27;s Retreat will take place at<br>
+Portglenone Monastery on Saturday 19 September 2026, from 9am to 1pm,<br>
+The theme of the retreat is “It is no longer I who live, but Christ who lives in me” (Galatians<br>
+2:20). The morning will include prayer, teaching, fellowship and men’s testimonies, with Fr<br>
+Eddie McGee as keynote speaker. All men are very welcome. For further information,<br>
+contact Thomas Carey on 07967 620435 or email <a href="mailto:sean@icatholicminute.co.uk" target="_blank" rel="noopener noreferrer">sean@icatholicminute.co.uk</a>.</p>
 <hr></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
@@ -1023,7 +1048,7 @@ Act of Consecration 4.00 p.m. Holy Sacrifice of the Mass</p>
     <section class="parish-section">
       <h2 class="section-heading">Other DOWN &amp; CONNOR Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="ballycastle"><a class="parish-link" href="ballycastleparish.html" target="_blank" rel="noopener noreferrer">Ballycastle</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="ballymenaparish.html" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="glenariffe"><a class="parish-link" href="glenariffeparish.html" target="_blank" rel="noopener noreferrer">Glenariffe</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="kilmore and killyleagh"><a class="parish-link" href="kilmoreandkillyleagh.html" target="_blank" rel="noopener noreferrer">Kilmore and Killyleagh</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="port glenone (st mary&#x27;s portglenone)"><a class="parish-link" href="stmarysportglenone.html" target="_blank" rel="noopener noreferrer">Port Glenone (St Mary&#x27;s Portglenone)</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="sacred heart belfast"><a class="parish-link" href="sacredheartparishbelfast.html" target="_blank" rel="noopener noreferrer">Sacred Heart Belfast</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st brigids belfast"><a class="parish-link" href="stbrigidsparishbelfast.html" target="_blank" rel="noopener noreferrer">St Brigids Belfast</a></li><li class="parish-item" data-name="st gerards"><a class="parish-link" href="stgerardsparish.html" target="_blank" rel="noopener noreferrer">St Gerards</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st mary&#x27;s on the hill"><a class="parish-link" href="stmarysonthehill.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s on the Hill</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="ballymenaparish.html" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st colmcilles"><a class="parish-link" href="st-colmcilles.html" target="_blank" rel="noopener noreferrer">St Colmcilles</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1075,9 +1100,9 @@ Act of Consecration 4.00 p.m. Holy Sacrifice of the Mass</p>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1569,23 +1594,8 @@ Act of Consecration 4.00 p.m. Holy Sacrifice of the Mass</p>
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

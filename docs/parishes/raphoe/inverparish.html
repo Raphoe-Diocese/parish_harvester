@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Inver Bulletin — 25/08/2026</title>
+  <title>Inver Bulletin — 30/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -179,6 +187,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -201,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +275,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +472,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -863,7 +892,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,14 +900,14 @@
     <header class="header">
       <p class="diocese-label">RAPHOE</p>
       <h1>Inver Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Inver — 25/08/2026. Part of the Raphoe Diocese collated bulletin.</p>
-      <a class="download-link-top" href="inverparish.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Inver — 30/08/2026. Part of the Raphoe Diocese collated bulletin.</p>
+      <a class="download-link-top" href="inverparish.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="inverparish.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="inverparish.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
@@ -895,7 +924,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="inverparish.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="inverparish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="inverparish.pdf">Open PDF</a>
               <a href="inverparish.pdf" download>Download</a>
             </div>
           </div>
@@ -934,74 +963,108 @@
       <div class="quiet-links">
         <a href="inverparish-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-inver" data-parish-name="Inver"><h2 class="ocr-parish-name">Inver</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-inver" data-parish-name="Inver"><h2 class="ocr-parish-name">Inver</h2><p class="ocr-parish-date">30/08/2026</p></header>
 <p class="page-label">Page 1</p>
-<p>Date Church Time Anniversaries/ Intention s<br>
-Saturday 22nd August<br>
-Drimarone 3:00pm Baptism<br>
-Ardaghey 6:00pm Patrick and Dan Friel<br>
-Willie Rose<br>
+<p>Date Church Time Anniversaries/Intentions<br>
+Saturday 29th August Ardaghey 6:00pm Patrick John McBrearty<br>
 Drimarone 7:30pm Holy Mass<br>
-Sunday 23rd August<br>
-Frosses 10:00am Willie and Margaret Gallagher , Ballymacahill<br>
-Geraldine Carbery, Lifford (née Gallagher )<br>
-Mountcharles 11:30am Michael McCoole<br>
-Desmond Quinn<br>
-Vincent McCrea<br>
-Mountcharles 3:00pm Baptism<br>
-Monday 24th August<br>
-Frosses 10:00am Holy Mass<br>
-Tuesday 25th August<br>
-Frosses 10:00am Holy Mass<br>
-Wednesday 26th Aug<br>
-Frosses 10:00am Holy Mass<br>
-Thursday 27th August<br>
-Frosses 10:00am Holy Mass<br>
-Friday 28th August<br>
-Mountcharles 7:00pm Mary Meehan , Month’s Mind<br>
-Saturday 29th August<br>
-Ardaghey 6:00pm Patrick John McBrearty<br>
+Sunday 30th August Frosses 10:00am David Charlton<br>
+Mountcharles 11:30am Margaret Bonner, New York, née Keeney, Dromore<br>
+(Recently Deceased)<br>
+Monday 31st August Mountcharles 10:00am Holy Mass<br>
+Tuesday 1st<br>
+September Frosses 10:00am People of the Parish<br>
+Wednesday 2nd Sept Ardaghey 10:00am Holy Mass<br>
+Thursday 3rd Sept Drimarone 10:00am Holy Mass<br>
+Friday 4th Sept Mountcharles 3pm–4pm Adoration, Benediction and Confession<br>
+Drimarone 7:00pm Letterbarrow FC 50th Anniversary Mass<br>
+Saturday 5th Sept Ardaghey 6:00pm John Ward<br>
 Drimarone 7:30pm Holy Mass<br>
-Sunday 30th August<br>
-Frosses 10:00am David Charlton<br>
-Mountcharles 11:30am Holy Mass<br>
+Sunday 6th Sept Frosses 10:00am Holy Mass<br>
+Mountcharles 11:30am Casey Dorrian Ward (Month’s Mind)<br>
+Kathleen McDaid<br>
+Mary Byrne (1st Anniversary)<br>
+Harry and Mary Leonard<br>
+Lizzie Dunnion<br>
+Ardaghey 3:00pm Baptism<br>
+Monday 7th Sept Mountcharles 10:00am Holy Mass<br>
+Tuesday 8th Sept Frosses 10:00am People of the Parish<br>
+Wednesday 9th Sept Ardaghey 10:00am Holy Mass<br>
+Thursday 10th Sept Drimarone 10:00am Holy Mass<br>
+Friday 11th Sept Frosses 10:00am Holy Mass<br>
+Saturday 12th Sept Mountcharles 1:00pm Baptism<br>
+Ardaghey 6:00pm Holy Mass<br>
+Drimarone 7:30pm Seamus McGinty<br>
+Sunday 13th Sept Frosses 10:00am Sean Breslin<br>
+Mountcharles 11:30am Liam Paul and Frank McGinty<br>
+Mary Friel, Glencoagh<br>
 EUCHARISTIC ADORATION<br>
 Tuesdays Frosses 10:30am –11:30am<br>
 Thursdays Ardaghey 7:00pm – 8:00pm<br>
-Fridays Mountcharles No Adoration for the month of August<br>
-CHURCH COLLECTIONS : Thank you for your support<br>
-Ardaghey: €508 Assumption €209<br>
-Mountcharles : €735.35 Assumption €363.10<br>
-Frosses : 9th August €1015 Assumption €335 16th August € 1385 Breast Cancer Awareness Month 2026 takes place Thursday, Oct 1st, 2026 – Saturday, Oct 31st, 2026. For<br>
+Fridays Mountcharles 3:00pm – 4:00pm<br>
+Breast Cancer Awareness Month 2026 takes place Thursday, Oct 1st, 2026 – Saturday, Oct 31st, 2026. For<br>
 more information, please visit breastcancerresearch.ie or <a href="https://www.breastcancerireland.com" target="_blank" rel="noopener noreferrer">www.breastcancerireland.com</a> .<br>
 International Coffee Day 2026 takes place on Thursday, October 1st, 2026. For further details please see<br>
 <a href="https://www.internationalcoffeeday.org" target="_blank" rel="noopener noreferrer">www.internationalcoffeeday.org</a> .<br>
-Naomh Naille GAA &amp; LGFA SLOTTO . <a href="https://member.clubspot.app/club/st" target="_blank" rel="noopener noreferrer">https://member.clubspot.app/club/st</a> -nauls -gaa/fundraisers<br>
-Data; 16 Lúnasa : Torthaí Slotto na seachtaine, ní raibh buaiteoir ar bith ar an Phota Óir . Is iad na h -uimhreacha<br>
-5-2-6-7-1-4-3 Duais aitheantais €80.00 Comhgairdeas le Claire Galligan<br>
+Naomh Naille GAA &amp; LGFA SLOTTO . <a href="https://member.clubspot.app/club/st-nauls-" target="_blank" rel="noopener noreferrer">https://member.clubspot.app/club/st-nauls-</a> gaa/fundraisers<br>
+Data : 23 Lúnasa Torthaí Slotto na seachtaine, ní raibh buaiteoir ar bith ar an Phota Óir. Is iad na h-uimhreacha<br>
+5-4-2-6-3-7-1 Duais aitheantais €80.00 comhgairdeas le Claire McInaw<br>
 Don’t forget to get your ticket for next week: Londis Mountcharles, Cassidy’s of Inver or from our online platform<br>
-through St Naul&#x27;s Club A pp. Thank you for your continued support €12,170 in the pot.<br>
-Senior Men are home to Burt GAA on Saturday 22nd Aug . Both teams had success away to Milford last week.<br>
-Reserve game 2.15pm / Senior Game 4.00pm<br>
-Ladies Championship ; Our Senior ladies are home to Glenfin this Sunday 23rd Aug at 10.30am in rd 3 of<br>
-the Senior Championship. Good luck to everyone. Frosses COMHALTAS CEOLTOIRI EIREANN present an Oiche Gaelach (IRISH NIGHT ) Traditional Céilí &amp;<br>
-Oldtime Dancing in Frosses Hall with instructions provided on the night . Every Wednesday night during<br>
-August . From: 9pm - 11.30pm . Admission: €10 - Supper Served . EVERYONE WELCOME<br>
+through St Naul&#x27;s Club A pp. Thank you for your continued support €12,24 0 in the pot.<br>
+Best wishes to everyone taking part in the Monty Challenge this weekend.<br>
+We have no Senior Games this weekend .<br>
+Senior Ladies are away to Termon on Friday 4th September at 7.00pm .<br>
+Senior Men are away to Naomh Muire Íochtar na Rosann on Saturday 5th September.<br>
+Reserve game at 2.15pm followed by the Senior game at 4.00pm. Good luck all .<br>
 A defibrillator has been installed in the Football Club Rooms at Tymeen. Eircode F94 VW74<br>
-The defibrillator is registered with the ambulance service. CLogheravaddy Community Fund The Clogheravaddy Community Benefit Fund 2026 is live. Applications<br>
-are made on line by using the above link . Applications close September 2nd.<br>
-Gratitude invites us to notice God&#x27;s loving presence in the ordinary moments of each day. Whether shared in a<br>
-kind word, a quiet sunrise, or the simple gift of time with those we love, these everyday blessings remind us that<br>
-grace is never far away. As we cultivate thankful hearts, we begin to see that even the smallest moments can<br>
-become encounters with God&#x27;s generous love, drawing us closer to him and inspiring us to share that love with<br>
-others. A grateful heart sees God’s hand in everything, the laughter of a friend, the gift of a new day, even the<br>
-challenges that help us grow.<br>
-MARRIAGE ENCOUNTER Ireland invites married couples to a residential Weekend from Friday 2nd to Sunday<br>
+The defibrillator is registered with the ambulance service.<br>
+CHURCH COLLECTIONS : Thank you for your support<br>
+Ardaghey: €1180 Additional Assumption € 24 Mountcharles : €880 Frosses : €795<br>
+Drimarone : 9th Aug € 460, 15th Aug €375 Assumption €105 22nd Aug € 320 Building Fund €1250 MARRIAGE ENCOUNTER Ireland invites married couples to a residential Weekend from Friday 2nd to Sunday<br>
 4th October 2026 <a href="https://www.marriageencounter.ie" target="_blank" rel="noopener noreferrer">www.marriageencounter.ie</a><br>
-THE ST VINCENT DE PAUL SOCIETY : Frosses and Inver Area : CONFIDENTIAL NUMBER <a href="tel:+353877020601" style="color:#1d4ed8;font-weight:600;">087 7020601</a><br>
+THE ST VINCENT DE PAUL SOCIETY : Frosses and Inver Area: CONFIDENTIAL NUMBER <a href="tel:+353877020601" style="color:#1d4ed8;font-weight:600;">087 7020601</a><br>
 Mountcharles and Drimarone Area : CONFIDENTIAL NUMBER <a href="tel:+353861690524" style="color:#1d4ed8;font-weight:600;">086 1690524</a><br>
-PA R O C H I A L HO U S E TEL. NO’S: Frosses: <a href="tel:+353749736006" style="color:#1d4ed8;font-weight:600;">074 9736006</a> | Ardaghey <a href="tel:+353749736007" style="color:#1d4ed8;font-weight:600;">074 9736007</a><br>
-Killymard: <a href="tel:+353749721929" style="color:#1d4ed8;font-weight:600;">074 9721929</a> | Donegal Town: <a href="tel:+353749721026" style="color:#1d4ed8;font-weight:600;">074 9721026</a> | Killybegs: <a href="tel:+353749731013" style="color:#1d4ed8;font-weight:600;">074 973 1013</a><br>
+PARISH OF INVER Saturday 29th – Sunday 30th August 2026 ~ 22ND SUNDAY IN ORDINARY TIME ~ Year A<br>
+Fr Liam Boyle, PP, Parochial House, Frosses Tel: <a href="tel:+353749736006" style="color:#1d4ed8;font-weight:600;">074 9736006</a> – In case of emergency only ring <a href="tel:+353899712498" style="color:#1d4ed8;font-weight:600;">089 9712498</a><br>
+Email: <a href="mailto:inverparish@gmail.com" target="_blank" rel="noopener noreferrer">inverparish@gmail.com</a> Website: <a href="https://www.inverparish.com" target="_blank" rel="noopener noreferrer">www.inverparish.com</a><br>
+Low-Gluten Hosts are available at all the Masses in the Parish. If you would like to receive a low-gluten host,<br>
+please feel free to come forward to the priest and cross one arm across your chest indicating your preference.<br>
+They may or may not be suitable depending on the various intolerances. If you have any questions please do<br>
+not hesitate to contact Fr. Boyle. Mass for Expectant Families on 8th September at 7:00pm in St Eunan&#x27;s Cathedral Letterkenny celebrated by<br>
+Bishop Coll.<br>
+Celebration Mass on 26th September: Donegal Group 173 Rise and Shine Trust (formerly The Irish<br>
+Handicapped Children&#x27;s Pilgrimage Trust and The Irish Pilgrimage Trust) are celebrating forty years of taking<br>
+young people with special needs to Lourdes each Easter.<br>
+We are celebrating with a special Mass on Saturday 26th September in the Church of the Irish Martyrs,<br>
+Letterkenny at 12 noon. The Mass will be concelebrated by Bishop Niall Coll and Bishop Donal McKeowan,<br>
+Bishop of Derry and many of the priests who travelled to Lourdes with us over the years. We invite all the guests<br>
+and their families and all the helpers who travelled with us over the years to our Mass to celebrate the work of<br>
+the Donegal Group over these forty years.<br>
+St Joseph Men&#x27;s Camino Join men from across Ireland on Saturday 12th September for a 25km pilgrimage<br>
+through the Boyne Valley, beginning in Drogheda. Open to men aged 18+. Cost: €65 (student €55). Registration,<br>
+accommodation and details: <a href="https://www.dominicans.ie/events" target="_blank" rel="noopener noreferrer">www.dominicans.ie/events</a> . Enquiries: <a href="mailto:op.evangelisation@gmail.com" target="_blank" rel="noopener noreferrer">op.evangelisation@gmail.com</a>. Poor Clares Galway, Half-Day Retreat for women 18-40 The event will take place from 2pm to 6pm on<br>
+Sunday 6th September For more information and to register: <a href="https://cherisheddaughters.eventbrite.ie" target="_blank" rel="noopener noreferrer">https://cherisheddaughters.eventbrite.ie</a> The Annual Pilgrimage to Knock Shrine in honour of St. Pio will take place on Sunday 20th Sept. Bus<br>
+departing from St. Agatha&#x27;s Church, Clar at 8am, Donegal Town at 8.15am (car park at the Old Stone cafe) and<br>
+Laghey Village at 8.30am. Please book seat early. For further details and to book a seat please contact Betty<br>
+Carrabin (<a href="tel:+353860812394" style="color:#1d4ed8;font-weight:600;">086 0812394</a>) or Margaret Harte (<a href="tel:+353876422197" style="color:#1d4ed8;font-weight:600;">087 6422197</a>).<br>
+The Donegal Down Syndrome Annual Church Gate Collection will take place throughout County Donegal<br>
+on Saturday 29th and Sunday 30th August 2026. NET MINISTRIES My name is Thomas O’Donoghue, from Inver Parish. I will be starting a mission year in Ireland<br>
+in August 2026 with a young Catholic organisation called NET Ministries. NET’s mission is to encourage and<br>
+support young people to encounter Jesus and embrace the life of the Church. They do this through road teams<br>
+and through parish teams, organising different clubs and retreats. I’m looking for support in the mission by<br>
+people financially contributing to it, as we solely rely on the generosity of others for the mission. You can donate<br>
+on, <a href="https://netireland.org/missionary/thomas-o-donoghue" target="_blank" rel="noopener noreferrer">https://netireland.org/missionary/thomas-o-donoghue</a> or contact me on <a href="tel:+353877080884" style="color:#1d4ed8;font-weight:600;">087 708 0884</a> or NET Ministries<br>
+directly at College Court, Main Street, Ballybofey, Co. Donegal, F93 HYE0.<br>
+The next Sunday Social in Dunkineely Community Centre will be on Sunday 30th August 2026 from 8pm to<br>
+10pm. Music by Country Traditions. Admission €10 which includes refreshments St. Nauls G.A.A.&amp; L.G.F.A. Scor na n-Og The Club would like to invite any young people interested in<br>
+representing the Club in Scor na n-Og to contact Anne Marie on <a href="tel:+353872749158" style="color:#1d4ed8;font-weight:600;">087 2749158</a> as soon as possible as the first<br>
+Semi Final takes place in Inver Community Centre on Friday 7th. Oct. The different categories are as follows<br>
+Ceili Dancing, Solo Singing, Recitation, Instrumental Music , Ballad Group, Novelty Act and Quiz and the age<br>
+limit is U17&#x27;S<br>
+NOTICES FOR NEWSLETTER : Notices of community/non-commercial nature are always welcome for<br>
+our newsletter. Email <a href="mailto:inverparish@gmail.com" target="_blank" rel="noopener noreferrer">inverparish@gmail.com</a> , deadline 12noon on Thursday.<br>
+PA R O C H IA L HO U S E TE L . NO’S: Frosses: <a href="tel:+353749736006" style="color:#1d4ed8;font-weight:600;">074 9736006</a> | Ardaghey <a href="tel:+353749736007" style="color:#1d4ed8;font-weight:600;">074 9736007</a><br>
+Killymard: <a href="tel:+353749721929" style="color:#1d4ed8;font-weight:600;">074 9721929</a> | Donegal Town: <a href="tel:+353749721026" style="color:#1d4ed8;font-weight:600;">074 9721026</a> | Killybegs: <a href="tel:+353749731013" style="color:#1d4ed8;font-weight:600;">074 9731013</a><br>
 SUPPORTING YOUR CHURCH Please consider making your contributions by online banking, standing<br>
 order/direct debit when supporting your Church. Please include your name as the reference . Thank<br>
 you for supporting your Church. Bank details for each Church as follows:<br>
@@ -1010,61 +1073,21 @@ Frosses Development Fund Account: IBAN IE92 DTCU 9921 3010 1932 56 (Building Fun
 Ardaghey : St Nauls Ardaghey IBAN: IE79 BOFI 9048 3556 8661 61<br>
 Mountcharles : Mountcharles Church Account IBAN: IE08 BOFI 9048 3556 8660 81<br>
 Drimarone : Drimarone Church Account IBAN: IE22 BOFI 9048 3556 8662 17<br>
-PARISH OF INVER Saturday 22nd – Sunday 23rd August 2026 ~ 21ST SUNDAY IN ORDINARY TIME ~ Year A<br>
-Fr Liam Boyle, PP, Parochial House, Frosses Tel: <a href="tel:+353749736006" style="color:#1d4ed8;font-weight:600;">074 9736006</a> – In case of emergency only ring <a href="tel:+353899712498" style="color:#1d4ed8;font-weight:600;">089 9712498</a><br>
-Email : <a href="mailto:inverparish@gmail.com" target="_blank" rel="noopener noreferrer">inverparish@gmail.com</a> Website: <a href="https://www.inverparish.com" target="_blank" rel="noopener noreferrer">www.inverparish.com</a><br>
-Low-Gluten Hosts are available at all the Masses in the Parish. If you would like to receive a low -gluten host,<br>
-please feel free to come forward to the priest and cross one arm across your chest indicating your preference.<br>
-They may or may not be suitable depending on the various intolerances. If you have any questions please do<br>
-not hesitate to contact Fr. Boyle.<br>
-NOTICES FOR NEWSLETTER : Notices of community/non -commercial nature are always welcome for<br>
-our newsletter. Email <a href="mailto:inverparish@gmail.com" target="_blank" rel="noopener noreferrer">inverparish@gmail.com</a> , deadline 12noon on Thursday. Mass for Expectant Families on 8th September at 7:00pm in St Eunan's Cathedral Letterkenny celebrated by<br>
-Bishop Coll. August &amp; September 2026 @ Lough Derg<br>
-“A pilgrimage has a vital part to play in our life of faith, for it removes us from our daily routines, and gives us<br>
-time and space to encounter God more deeply .” Pope Leo XIV<br>
-One Day Retreats – Guided Days of Prayer and Reflection - places available on August 29th and 31st<br>
-September 5th, 6th, 9th, 12th, 15th, 19th and 20th Admission €50. Group discounts available. Advance Booking<br>
-Essential. Includes Special Themed Retreats : 5th September – Pioneer Pilgrimage | 6th September – St<br>
-Carlos Acutis | 9th &amp; 12th September – Vocations Monstrance | 19th September – Divine Mercy Pilgrimage<br>
-Lakeshore Pilgrim Path Pilgrimage – In the footsteps of pilgrims through the centuries Sunday 30th August.<br>
-8km &amp; 12km routes, fully guided. Outdoor Mass weather permitting. Admission €25. Advance Booking Essential.<br>
-NEW FOR 2026 SEASON –Overnight accommodation available on Station Island the night before beginning a<br>
-Retreat or Pilgrimage. Lough Derg, Pettigo, Co Donegal. F94 PC60 www .loughderg.org email .<br>
-<a href="mailto:info@loughderg.org" target="_blank" rel="noopener noreferrer">info@loughderg.org</a> Tel. <a href="tel:+353719861518" style="color:#1d4ed8;font-weight:600;">0719861518</a><br>
-St Joseph Men&#x27;s Camino Join men from across Ireland on Saturday 12th September for a 25km pilgrimage<br>
-through the Boyne Valley, beginning in Drogheda. Open to men aged 18+. Cost: €65 (student €55). Registration,<br>
-accommodation and details: <a href="https://www.dominicans.ie/events" target="_blank" rel="noopener noreferrer">www.dominicans.ie/events</a> . Enquiries: <a href="mailto:op.evangelisation@gmail.com" target="_blank" rel="noopener noreferrer">op.evangelisation@gmail.com</a>. Poor Clares Galway, Half -Day Retreat for women 18 -40 The event will take place from 2pm to 6pm on<br>
-Sunday 6th September For more information and to register: <a href="https://cherisheddaughters.eventbrite.ie" target="_blank" rel="noopener noreferrer">https://cherisheddaughters.eventbrite.ie</a> The Stables Motorsport Centre – Community Event Join us on Sunday 23rd August 11am – 3pm<br>
-Rally Cars &amp; Displays | Meet the Community | Motorsports Atmosphere. Open invitation , all welcome .<br>
-The Stables Motorsport Centre , Frosses F94 C82Y<br>
-PLEASE NOTE:<br>
-There will be no newsletter for the weekend of Saturday 5th / Sunday 6th September . The Donegal Down Syndrome Annual Church Gate Collection will take place throughout County Donegal<br>
-on Saturday 29th and Sunday 30th August 2026 . NET MINISTRIES My name is Thomas O’Donoghue, from Inver Parish. I will be starting a mission year in Ireland<br>
-in August 2026 with a young Catholic organisation called NET Ministries. NET’s mission is to encourage and<br>
-support young people to encounter Jesus and embrace th e life of the Church. They do this through road teams<br>
-and through parish teams, organising different clubs and retreats. I’m looking for support in the mission by<br>
-people financially contributing to it, as we solely rely on the generosity of others for the mission. You can donate<br>
-on, <a href="https://netireland.org/missionary/thomas" target="_blank" rel="noopener noreferrer">https://netireland.org/missionary/thomas</a> -o-donoghue or contact me on <a href="tel:+353877080884" style="color:#1d4ed8;font-weight:600;">087 708 0884</a> or NET Ministries<br>
-directly at College Court, Main Street, Ballybofey, Co. Donegal, F93 HYE0.<br>
-The next Sunday Social in Dunkineely Community Centre will be on Sunday 30th August 2026 from 8pm to<br>
-10pm. Music by Country Traditions. Admission €10 which includes refreshments<br>
-Cardinal Newman Prayer<br>
-May the Lord support us all day long,<br>
-till the shadows lengthen and the evening comes,<br>
-and the busy world is hushed<br>
-and the fever of life is over,<br>
-and our work is done.<br>
-Then in His great mercy<br>
-may He give us a safe lodging,<br>
-and a holy rest and peace at the last.<br>
-Amen Inver</p></div>
+To celebrate the 50th Anniversary of Letterbarrow FC there will be Mass celebrated by Fr Liam Boyle in<br>
+Drimarone church on Friday 4th September at 7:00pm . Fr Charlie Byrne and Rev David Huss will be in<br>
+attendance. Your support would be greatly appreciated on this momentous occasion.<br>
+PRO-LIFE WITNESS takes place at the roundabout close to Letterkenny hospital from 1-2pm on Friday 4th.</p>
+<h3 class="b-head">Contact</h3>
+<p>Fr Morty for more information.<br>
+PLEASE NOTE: There will be no newsletter next weekend Saturd ay 5th / Sunday 6th September.<br>
+RECENTLY DECEASED : Margaret Bonner , New York (née Keeney, Dromore), Sister of Rosaleen Mogan Inver <a href="https://www.inverparish.com/parish-newsletter.html" target="_blank" rel="noopener noreferrer">https://www.inverparish.com/parish-newsletter.html</a></p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other RAPHOE Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="kincasslagh"><a class="parish-link" href="kincasslagh.html" target="_blank" rel="noopener noreferrer">Kincasslagh</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="raphoe"><a class="parish-link" href="drive-1jmslbrliw.html" target="_blank" rel="noopener noreferrer">Raphoe</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="tawnawillyparish.html" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="tawnawillyparish.html" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1116,9 +1139,9 @@ Amen Inver</p></div>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1610,23 +1633,8 @@ Amen Inver</p></div>
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>St MacNissi Randalstown Bulletin — 25/08/2026</title>
+  <title>St MacNissi Randalstown Bulletin — 30/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -179,6 +187,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -201,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +275,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +472,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -863,7 +892,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,14 +900,14 @@
     <header class="header">
       <p class="diocese-label">DOWN &amp; CONNOR</p>
       <h1>St MacNissi Randalstown Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for St MacNissi Randalstown — 25/08/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
-      <a class="download-link-top" href="stmacnissirandalstown.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for St MacNissi Randalstown — 30/08/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
+      <a class="download-link-top" href="stmacnissirandalstown.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="stmacnissirandalstown.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="stmacnissirandalstown.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
@@ -895,7 +924,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="stmacnissirandalstown.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="stmacnissirandalstown.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="stmacnissirandalstown.pdf">Open PDF</a>
               <a href="stmacnissirandalstown.pdf" download>Download</a>
             </div>
           </div>
@@ -934,28 +963,28 @@
       <div class="quiet-links">
         <a href="stmacnissirandalstown-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-st-macnissi-randalstown" data-parish-name="St MacNissi Randalstown"><h2 class="ocr-parish-name">St MacNissi Randalstown</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-st-macnissi-randalstown" data-parish-name="St MacNissi Randalstown"><h2 class="ocr-parish-name">St MacNissi Randalstown</h2><p class="ocr-parish-date">30/08/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>Church of St. MacNissi<br>
 TWENTIETH SUNDAY IN ORDINARY TIME<br>
 15TH &amp; 16TH AUGUST 2026</p>
 <h3 class="b-head">WEEKDAY MASSES</h3>
-<p>Tuesday -7.00pm,<br>
+<p>Tuesday-7.00pm,<br>
 Wednesday – Friday 9.30am<br>
 WEEKEND MASSES<br>
 Saturday 6pm Sunday 10am<br>
 CONFESSIONS: On request after all Masses<br>
-EXPOSITION OF THE BLESSE D SACRAMENT<br>
-Mon-10am -11am Tues - 5:30pm -7pm<br>
+EXPOSITION OF THE BLESSED SACRAMENT<br>
+Mon-10am-11am Tues - 5:30pm-7pm<br>
 LEGION OF MARY Tuesday evening in the<br>
 Parish Centre after Mass. Fatima statue<br>
 visitation. To have the statue in your home or<br>
 to have your intentions prayed for;<br>
 <a href="tel:+3537798865887" style="color:#1d4ed8;font-weight:600;">07798865887</a><br>
 PARISH CENTRE<br>
-Prayer Meeting - Wednesday 7:45p m<br>
+Prayer Meeting - Wednesday 7:45pm<br>
 THE ROSARY GROUP each Thurs at 6pm in<br>
-the Church and ‘live’ online mcn media.<br>
+the Church and ‘ live’ online mcn media.<br>
 DIVINE MERCY Friday 3pm</p>
 <h3 class="b-head">MONTHS MIND</h3>
 <p>Ali McDowell – Sat 15th Aug 6pm.</p>
@@ -963,12 +992,12 @@ DIVINE MERCY Friday 3pm</p>
 <p>Eddie McStravick (1st Anniversary) Sat 15th Aug 6pm<br>
 Teresa Donnelly, Elizabeth McGuigan,<br>
 Shirley Murray, Peggy Donnelly, Charlie Devlin,<br>
-Madge Creighton, John Sawyer , Tom McCormack ,<br>
+Madge Creighton, John Sawyer, Tom McCormack,<br>
 Thomas Gavin, Thomas Cardwell, Sarah Martin<br>
 Patrick McKenna, Charlie O’Boyle , Brian Kerr,<br>
 Mary Jane Loughran, Annie Hamilton,<br>
-Rosaleen Kelly , Alice Hurrell, Mary Kate Fallon .<br>
-INTENTIONS WK BEGINNING 17 -August</p>
+Rosaleen Kelly, Alice Hurrell, Mary Kate Fallon.<br>
+INTENTIONS WK BEGINNING 17-August</p>
 <h3 class="b-head">MONTHS MIND</h3>
 <p>Joseph McNally – Tue 18th Aug 7pm</p>
 <h3 class="b-head">ANNIVERSARY MASS</h3>
@@ -977,12 +1006,12 @@ Our priest is obligated to offer Sunday Mass<br>
 on behalf of ALL the people (pro populo) in the<br>
 parish. The deceased are remembered in our<br>
 Prayers of the Faithful.<br>
-FEAST DAY S THIS WEEK<br>
+FEAST DAYS THIS WEEK<br>
 Mon 17th Aug – Our Lady of Knock<br>
 Wed 19th Aug – St John Eudes<br>
 Thur 20th Aug – St Bernard<br>
 Sat 22nd Aug - Mary, Queen of Heaven PARISH WEEKLY COLLECTION £1,279.00<br>
-Thank you for your support of our parish .<br>
+Thank you for your support of our parish.<br>
 To set up a standing order for Direct Debit<br>
 please call or email the parish office to arrange.<br>
 MINISTERS OF THE WORD<br>
@@ -1003,7 +1032,7 @@ Or EMAIL <a href="mailto:randalstown@downandconnor.org" target="_blank" rel="noo
 EMERGENCY CONTACT ONLY 07834 383314<br>
 PARISH WEBSITE To watch Mass online<br>
 Select WEBCAM from the parish website menu<br>
-or go to mcn.live/cameras/st -macnissis.<br>
+or go to mcn.live/cameras/st-macnissis.<br>
 Funerals/weds recorded at the specific request<br>
 of the family<br>
 PARISH DRAW FOR AUGUST will be held on<br>
@@ -1013,20 +1042,20 @@ Wednesday 19th August at 4.30pm in the</p>
 AND TRUTH !<br>
 every Wednesday in St<br>
 MacNissi&#x27;s Church<br>
-7pm- 8pm (Yr 8 – 6th Form Welcome )<br>
+7pm- 8pm (Yr 8 – 6th Form Welcome)<br>
 EVER YOUNG ” YOUTH GROUP FOR P7<br>
 LEAVERS - who will be entering Yr 8 in Sept! @<br>
 St Oliver Plunkett&#x27;s Church Toome every<br>
-Sunday 4pm - 6pm&quot;<br>
+Sunday 4pm - 6pm &quot;<br>
 PILGRIMAGE TO FATIMA Belfast International<br>
 7 Nights F/B Avenida Hotel 14th/21st August<br>
 £845pps. Contact Joe <a href="tel:+3537776425631" style="color:#1d4ed8;font-weight:600;">07776425631</a><br>
 KNOCK TRIP 8th &amp; 9th Sep 16 seater bus<br>
-leavin g St. MacNissi’s Church at 8.am . Luncheon<br>
+leaving St. MacNissi’s Church at 8.am. Luncheon<br>
 en-route, evening meal and b &amp; b at<br>
 Knock House Hotel £185pps. (night stay)<br>
 Contact <a href="tel:+3537519915325" style="color:#1d4ed8;font-weight:600;">07519915325</a><br>
-St MacNissi Randalstown</p>
+St MacNissi Randalstown <a href="https://www.stmacnissirandalstown.com" target="_blank" rel="noopener noreferrer">https://www.stmacnissirandalstown.com</a></p>
 <hr>
 <p class="page-label">Page 2</p>
 <p>&quot;MEDJUGORJE YOUTH PILGRIMAGE 2027:<br>
@@ -1062,7 +1091,7 @@ Saturday 12th September for a 25km<br>
 pilgrimage through the Boyne Valley, beginning<br>
 in Drogheda. The day includes Mass, Adoration,<br>
 Rosary, Confessions, fraternity, lunch and<br>
-dinner, with after -dinner speaker Fr. Mark<br>
+dinner, with after-dinner speaker Fr. Mark<br>
 Quinn . Open to men aged 18+. Cost: €65<br>
 (student € 55). Registration, accommodation<br>
 and details: <a href="https://www.dominicans.ie/events" target="_blank" rel="noopener noreferrer">www.dominicans.ie/events</a> .<br>
@@ -1082,29 +1111,28 @@ TÍR NA NÓG LOTTO Tues 11/08/2026<br>
 JACKPOT WINNER :<br>
 WINNING NUMBERS :6,13,18,26<br>
 £25 WINNERS: Rory McVeigh, Marg D Bunting,<br>
-Michael McNally, Dermot Corr .<br>
+Michael McNally, Dermot Corr.<br>
 Next week<br>
 Tues 18/08/2026<br>
-Kickham’s GAC Wed 12/08/2026<br>
+Kickham’s GAC Wed 12 /08/2026<br>
 WINNING NUMBERS: 4,8,19,24<br>
 £30 WINNERS:<br>
 Yvonne Loughran &amp; Frances Bateson<br>
 Next week&#x27;s draw is on Wednesday 19/08/2026<br>
 at 8.30pm. Tickets must be bought by 7.30pm.<br>
-Jackpot £ 6,400 Tickets are available online at<br>
-<a href="https://member.clubspot.app/club/creggan" target="_blank" rel="noopener noreferrer">https://member.clubspot.app/club/creggan</a> -<br>
-Kickhams -gac/fundraisers from outlets in town or<br>
+Jackpot £6,400 Tickets are available online at<br>
+Kickhams-gac/fundraisers from outlets in town or<br>
 your usual ticket sellers.<br>
 COMMUNITY ADVICE Antrim and N’Abbey<br>
 (Formerly Citizens Advice)<br>
-Monday from 1.30 pm to 4.30 pm, in Arches. No<br>
+Monday from 1.30pm to 4.30pm, in Arches. No<br>
 appointment needed as this is a drop-in service<br>
 MARRIAGE ENRICHMENT WEEKEND<br>
 (2–4 OCT 2026)<br>
 Marriage Encounter Ireland invites married<br>
 couples to a residential Weekend from Friday<br>
 2nd to Sunday 4th October 2026 at the<br>
-“Focolare Centre” &quot;Curryhills &quot;, Prosperous, Co.<br>
+“Focolare Centre” &quot;Curryhills&quot;, Prosperous, Co.<br>
 Kildare.<br>
 Step away from daily distractions to deepen<br>
 your communication, renew your love, and<br>
@@ -1118,7 +1146,7 @@ Jackpot<br>
     <section class="parish-section">
       <h2 class="section-heading">Other DOWN &amp; CONNOR Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="ballycastle"><a class="parish-link" href="ballycastleparish.html" target="_blank" rel="noopener noreferrer">Ballycastle</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="ballymenaparish.html" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="glenariffe"><a class="parish-link" href="glenariffeparish.html" target="_blank" rel="noopener noreferrer">Glenariffe</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="kilmore and killyleagh"><a class="parish-link" href="kilmoreandkillyleagh.html" target="_blank" rel="noopener noreferrer">Kilmore and Killyleagh</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="port glenone (st mary&#x27;s portglenone)"><a class="parish-link" href="stmarysportglenone.html" target="_blank" rel="noopener noreferrer">Port Glenone (St Mary&#x27;s Portglenone)</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="sacred heart belfast"><a class="parish-link" href="sacredheartparishbelfast.html" target="_blank" rel="noopener noreferrer">Sacred Heart Belfast</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st brigids belfast"><a class="parish-link" href="stbrigidsparishbelfast.html" target="_blank" rel="noopener noreferrer">St Brigids Belfast</a></li><li class="parish-item" data-name="st gerards"><a class="parish-link" href="stgerardsparish.html" target="_blank" rel="noopener noreferrer">St Gerards</a></li><li class="parish-item" data-name="st mary&#x27;s on the hill"><a class="parish-link" href="stmarysonthehill.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s on the Hill</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="ballymenaparish.html" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st colmcilles"><a class="parish-link" href="st-colmcilles.html" target="_blank" rel="noopener noreferrer">St Colmcilles</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1170,9 +1198,9 @@ Jackpot<br>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1664,23 +1692,8 @@ Jackpot<br>
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

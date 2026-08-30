@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Carrickmacross (Machaire Rois) Bulletin — 25/08/2026</title>
+  <title>Carrickmacross (Machaire Rois) Bulletin — 30/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -179,6 +187,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -201,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +275,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +472,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -863,7 +892,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,14 +900,14 @@
     <header class="header">
       <p class="diocese-label">CLOGHER</p>
       <h1>Carrickmacross (Machaire Rois) Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Carrickmacross (Machaire Rois) — 25/08/2026. Part of the Clogher Diocese collated bulletin.</p>
-      <a class="download-link-top" href="carrickmacross.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Carrickmacross (Machaire Rois) — 30/08/2026. Part of the Clogher Diocese collated bulletin.</p>
+      <a class="download-link-top" href="carrickmacross.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="carrickmacross.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="carrickmacross.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
@@ -895,7 +924,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="carrickmacross.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="carrickmacross.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="carrickmacross.pdf">Open PDF</a>
               <a href="carrickmacross.pdf" download>Download</a>
             </div>
           </div>
@@ -934,221 +963,226 @@
       <div class="quiet-links">
         <a href="carrickmacross-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-carrickmacross-machaire-rois" data-parish-name="Carrickmacross (Machaire Rois)"><h2 class="ocr-parish-name">Carrickmacross (Machaire Rois)</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-carrickmacross-machaire-rois" data-parish-name="Carrickmacross (Machaire Rois)"><h2 class="ocr-parish-name">Carrickmacross (Machaire Rois)</h2><p class="ocr-parish-date">30/08/2026</p></header>
 <p class="page-label">Page 1</p>
-<p>The Parish Of Machaire Rois<br>
-21st Sunday in O rdinary Time. Sunday 23rd August 2026.<br>
+<p>The Parish Of Mach aire Rois<br>
+22nd Sunday in Ordinary Time. Sunday 30th August 2026.<br>
 A copy of this weekend’s readings are available in the church. (Beside Newsletter)<br>
 Carrickmacross St Michael’s Corduff St John’s Raferagh<br>
-Mgr. Shane Mc McCaughey: PP <a href="tel:+353429664367" style="color:#1d4ed8;font-weight:600;">042 -9664367</a><br>
+Mgr. Shane Mc McCaughey: PP <a href="tel:+353429664367" style="color:#1d4ed8;font-weight:600;">042-9664367</a><br>
 Canon Owen Joe McEneaney: <a href="tel:+353429661231" style="color:#1d4ed8;font-weight:600;">042-9661231</a><br>
 Fr Sylvester Chasweka: <a href="tel:+353830025311" style="color:#1d4ed8;font-weight:600;">0830025311</a>.<br>
 Parish Office: <a href="tel:+353429661231" style="color:#1d4ed8;font-weight:600;">042-9661231</a><br>
-Office opening hours : 10am - 12.30pm Monday - Friday.<br>
+Office opening hours : 10am- 12.30pm Monday- Friday.<br>
 Email: <a href="mailto:carrickmacross@clogherparishes.ie" target="_blank" rel="noopener noreferrer">carrickmacross@clogherparishes.ie</a><br>
 Website: <a href="https://www.carrickmacrossparish.ie" target="_blank" rel="noopener noreferrer">www.carrickmacrossparish.ie</a><br>
-Webcam – Live streaming : This can be viewed by our own webpage<br>
-<a href="https://www.carrickmacrossparish.ie/our" target="_blank" rel="noopener noreferrer">https://www.carrickmacrossparish.ie/our</a> -parish/web -cam/ or<br>
+Webcam – Live streaming: This can be viewed by our own webpage<br>
+<a href="https://www.carrickmacrossparish.ie/our-parish/web-cam/" target="_blank" rel="noopener noreferrer">https://www.carrickmacrossparish.ie/our-parish/web-cam/</a> or<br>
 <a href="https://www.churchservices.tv/carrickmacross" target="_blank" rel="noopener noreferrer">www.churchservices.tv/carrickmacross</a> Parish Radio 92.1 FM.<br>
-Should you have any difficulty accessing the live streaming please contact via email directly<br>
+Should you have any difficulty accessing the live streaming ple ase contact via email directly<br>
 to <a href="mailto:Support@churchservices.tv" target="_blank" rel="noopener noreferrer">Support@churchservices.tv</a><br>
 St Vincent De Paul: Contact - Free Phone 1800677777 .<br>
 Weekly Reflection.<br>
-Unlocking the riches of the Kingdom of Heaven!<br>
-The role that Jesus gives to Peter in today&#x27;s Gospel reading is, in some sense, unique to him. Nowhere<br>
-else in the Gospels does Jesus say to someone, &#x27;you are the rock on which I will build my Church and<br>
-to you I give the keys of the kingdom of heaven&#x27;.<br>
-Yet, we all have a role to play in unlocking the riches of the kingdom of heaven for each other. The<br>
-last words of the risen Lord in Matthew&#x27;s Gospel were addressed not to Peter but to the disciples as<br>
-a group, who represent us all, &#x27;Go, therefore, and mak e disciples of all nations&#x27;. The risen Lord<br>
-commissions us to bring others, each other, into an experience of the kingdom of heaven in the here<br>
-and now. The Lord, who is present with us, his Church, until the end of time, wants to work through<br>
-each of a us for a fuller coming of God&#x27;s kingdom on earth, &#x27;a kingdom of truth and life, a kingdom of<br>
-holiness and grace, a kingdom of justice, love and peace&#x27;, in the words of the Mass for the Feast of<br>
-Christ the King.<br>
-Fr. Owen Joe.<br>
-Carrickmacross (Machaire Rois)</p>
+“Quo vadis? (Where are you going?)<br>
+An ancient legend about St. Peter can help us reflect on this Sunday’s gospel. It is said that at the<br>
+time of the great persecution under Emperor Nero, the Christians of Rome told Peter to<br>
+leave. “You’re too valuable, ” they said. “Get out of town! Find your safety! Go to another<br>
+place and preach the Gospel.” Peter hastily hurried out of town as fast as he could. But as he<br>
+hurried along the Appian Way, away from the Eternal City, he was met by Christ, going<br>
+toward the city . Peter said to him in Latin, “Quo vadis, Domine ?” “Where are you going,<br>
+Lord?” To which Jesus replied, “Back to Rome , to be crucified with my people. Where are you<br>
+going, Peter ?” Peter’s eyes filled with tears of remorse, as he turned and walked back to Rome,<br>
+where, according to tradition, he was crucified head downward, feeling that he was not worthy to<br>
+die in the same manner as had his Lord.<br>
+The cost of discipleship involves self-sacrifice and the cross . Jesus said, “If anyone wants to<br>
+be a follower of mine, let him renounce himself and take up his cross and follow me” (Matt 16,26).<br>
+The question is “Are we going to carry our cross/crosses and follow Christ, or will we<br>
+walk away His cross? Ultimately, Christ always assures us that “take my yoke and learn from<br>
+me … for my yoke is easy and my burden is light” (Matt 11,30). Fr. Sylvester.<br>
+Carrickmacross (Machaire Rois) <a href="https://www.carrickmacrossparish.ie/" target="_blank" rel="noopener noreferrer">https://www.carrickmacrossparish.ie/</a></p>
 <hr>
 <p class="page-label">Page 2</p>
-<p>The Parish Of Machaire Rois<br>
+<p>The Parish Of Mach aire Rois<br>
 Saturday<br>
-22nd August . 11.00a m. AM. Deceased Members of the Sherry family, Magheraboy.<br>
-AM. Stephanie Sherry, Carrickmacross.<br>
-AM. Matthew McCabe, London &amp; remembering his father Matt,<br>
-Meath Hill.<br>
-Saturday<br>
-22nd August. 6.00pm. Month’s Memory: Mark Rooney, Drummond Etra.<br>
-AM. Frank Connolly, ‘The Bridge’, Mullinary, Peter, Nora &amp; Pat<br>
-Callan &amp; Trever McGovern, Dublin.<br>
-AM. Pat Conlon, “Oriel” Mullinary, John Francis &amp; Bridget Conlon,<br>
-Peter &amp; Eileen Goodman, Mick &amp; Mary Fitzsimons &amp; deceased<br>
-members of the Fitzsimons family, Kingscourt Road.<br>
-AM. Kathleen &amp; James Lambe, St Macartan’s Villas, their son P.J.,<br>
-Dunogue &amp; deceased members of the Lambe &amp; Agnew<br>
-families.<br>
-AM. Jimmy &amp; Eddie Martin, Drumgoan &amp; late of Dernascobe,<br>
-Magheracloone.<br>
-AM. Phyllis Cunningham &amp; Catherine, Winnie &amp; Kitty Allen,<br>
-O’Neill Street.<br>
-AM. Una McEntee, Patrician Drive.<br>
-Sunday<br>
-23rd August . 9.30am. Month’s Memory: Stephen Gollogly, Greaghdrumitt.<br>
-Sunday<br>
-23rd August . 12Noon. 1st AM Frances McArdle, 31 Rockdaniel Road.<br>
-1st AM. Joe McConnon, Corcrin.<br>
-AM. The Deceased Members of the Cassidy family, Nafferty.<br>
-AM. Ann McArdle, (née Hanratty), Carrickmacross &amp; Randalstown,<br>
-Co Antrim.<br>
-Mon 24th Aug. 10.00am .<br>
-AM. Angeline McEneaney, Mullinary.<br>
-Tues 25th Aug. 10.00am . Morning Mass.<br>
-Wed 26th Aug. 10.00am . Morning Mass.<br>
-Thurs 27th Aug. 10.00am . Morning Mass.<br>
-Fri 28th Aug. 10.00a m. Morning Mass.<br>
-Saturday<br>
-29th August . 11.00a m. Month’s Memory: Elizabeth Gilsenan, Aghalile.<br>
+29th August. 11.00am. Month’s Memory: Elizabeth Gilsenan, Aghalile.<br>
 1st AM. May Callan, Creevy Oliver &amp; remembering her husband<br>
-Owen , their son David &amp; their daughter Yvonne &amp; deceased<br>
-members of the Hoey &amp; Callan families .<br>
+Owen, their son David &amp; their daughter Yvonne &amp; deceased<br>
+members of the Hoey &amp; Callan families.<br>
 Remembrance Mass: Martina Scott, (née Murphy) Belfast &amp;<br>
-formerly Raferagh .<br>
+formerly Raferagh.<br>
 Saturday<br>
-29th August. 6.00pm. AM. Joe &amp; Molly O’Hara , Rockdaniel Road &amp; deceased members of<br>
-the O’Hara &amp; Kelly families .<br>
-AM. Kieran &amp; Liam McGinn, 14 Derryolam Park .<br>
-Sun 30 August . 9.30am. Mass for the People of the Parish.<br>
+29th August. 6.00pm. AM. Joe &amp; Molly O’Hara, Rockdaniel Road &amp; deceased members of<br>
+the O’Hara &amp; Kelly families.<br>
+AM. Kieran &amp; Liam McGinn, 14 Derryolam Park.<br>
+Sun 30 August. 9.30am. Mass for the People of the Parish.<br>
 Sunday<br>
-30 August . 12Noon. AM. Patrick &amp; Mary O’Donoghue, Mary &amp; Oliver Babbington<br>
+30 August. 12Noon. AM. Patrick &amp; Mary O’Donoghue, Mary &amp; Oliver Babbington<br>
 Mullinary, Philomena, Stephen &amp; Frank Duffy, Warrenpoint.<br>
 AM. Cecilia Marron, Highfield &amp; her parents Bridget &amp; James<br>
 Loughlin.<br>
-AM. Patsy &amp; Mary McBennett, Corcuillogue.</p>
+AM. Patsy &amp; Mary McBennett, Corcuillogue.<br>
+AM. Pat Joe Callan, 88 Cloughvalley &amp; deceased members of the<br>
+Callan family, St. Macartans Villas.<br>
+Mon 31st Aug. 10.00am. Morning Mass.<br>
+Tuesday<br>
+1st September. 10.00am. AM. Siobhan McConnon, Lisanisk &amp; her grandparents Annie<br>
+McConnon &amp; Murtagh &amp; Helena Montgomery.<br>
+Wednesday<br>
+2nd September. 10.00am. AM. Charles &amp; Helen Martin, Pearse Avenue &amp; their daughter<br>
+Marion Hand, Kingscourt.<br>
+Thurs 3rd Sept. 10.00am. Morning Mass.<br>
+Fri 4th Sept. 10.00am. Morning Mass for the First Friday.<br>
+Friday<br>
+4th September. 7.30pm. AM. James &amp; Annie Callan, 43 O’Neill Street &amp; their son Sean<br>
+Callan, Dublin &amp; deceased members of the Fitzgerald family,<br>
+Carlow.<br>
+AM. Thomas &amp; Margaret Murrray, Kevin Murray, James Finnegan,<br>
+Aidan Murray, Laurence &amp; Annie McCabe, baby Margaret<br>
+Murray &amp; Andrew Maguire.<br>
+AM. The Deceased McNally family &amp; John Hughes, Bridge<br>
+Street.<br>
+Saturday<br>
+5th September. 11.00am. 35th AM. Garda Joe Gillan, Ardross Avenue.<br>
+Saturday<br>
+5th September. 6.00pm. 1st AM. Gerry Kieran, 26 Valley Close.<br>
+AM. Jim &amp; Annie Conlon, Rockdaniel Road.<br>
+AM. Philomena McConnon, Monaghan Street.<br>
+AM. Kathleen Smith-Fowler, Cloughvalley.<br>
+AM. The Deceased Kelly family, Monalty.<br>
+Sunday 6th<br>
+September. 9.30am. AM. Michael &amp; Ellen Ward &amp; their daughters Anne, Margaret,<br>
+Ethna &amp; baby Ellen &amp; their daughter-in-law Catherine Ward,<br>
+Dublin &amp; deceased Members of the Ward family, Monaghan<br>
+Street.<br>
+Sunday<br>
+6th September. 12Noon. AM. Frank Mayes, Mullinary &amp; remembering his wife Sally Mayes.<br>
+Sunday<br>
+6th September 4.00pm. Annu al Hea ling Mass<br>
+with the Anoi nting of the S ick.</p>
 <h3 class="b-head">Recently Deceased</h3>
-<p>Leo McCarville, Cavanag eeragh, Carrickmacross.<br>
-Bridie (Bridget ) Devlin , Meadowlands , Carrickmacross .<br>
-Dympna Hamill, Corleygorm, Broomfield<br>
-Roisin McMahon , Capragh, Donaghmoyne.<br>
-Seamus Coyle, Latton.<br>
-James McGragh, Shantonagh.</p>
+<p>Peter Smyth, Ardee Road, Carrickmacross.<br>
+P.J. Kiernan, England &amp; formerly Derryolam.<br>
+Bridget Moran, (née Keenan) England &amp; formerly of Drumberagh, Laragh.</p>
 <hr>
 <p class="page-label">Page 3</p>
-<p>The Parish Of Machaire Rois<br>
-Mass Time Corduff / Raferagh . Sunday at 11am (alternating)<br>
+<p>The Parish Of Mach aire Rois<br>
+Mass Time Corduff / Raferagh. Sunday at 11am (alternating)<br>
 Live streaming is available to be viewed Via the Parish webpage.<br>
 Should you have any difficulty accessing the live stream please contact via email<br>
 directly to <a href="mailto:Support@churchservices.tv" target="_blank" rel="noopener noreferrer">Support@churchservices.tv</a><br>
-Sunday<br>
-23rd August. Raferagh.<br>
-11.00am. AM. James &amp; Margaret McCahey, Corcreagh &amp; deceased family<br>
-members . Michael McCloskey, Corcreagh &amp; deceased family<br>
-members . Katie &amp; Johnny Lynch, Beagh &amp; deceased family<br>
-members.<br>
 Sunday<br>
 30th August. Corduff.<br>
 11.00am. AM. John, Pat &amp; Katie King, Corduff.<br>
 AM. Mary &amp; Thomas Keenan, their son Thomas &amp; deceased<br>
 members of the Keenan family, Sreenty &amp; deceased<br>
-members of the Rushe family, Greag hlane.<br>
+members of the Rushe family, Greaghlane.<br>
 AM. Michael &amp; Mary Hanratty, their daughter Bridget<br>
 Greaghlatacapple &amp; deceased members of the Hanratty &amp;<br>
-Duffy famil ies.<br>
-Adoration in Blessed Sacrament Chapel. (St Joseph’s) .<br>
-The Blessed Sacrament Chapel opening hours are as follows.<br>
-Monday : 9am. - 10am. Tuesday : 9am. - 7pm. Wednesday :<br>
-9am.10am. Thursday : 8am. - 10am. Friday : 8am. - 10am.<br>
-Saturday 10am. - 11am. and 5pm. – 6pm. Sunday 1pm. - 6pm.<br>
-Rosary in St Joseph’s Church: Monday – Friday at 6.30pm.<br>
-Confessions in St Joseph’s every Saturday after the 11am Mass – and the Eve of the First Friday<br>
-(Thursday) after the 10am Mass.<br>
-Annual Healing Mass with the Anointing of the Sick , which will take place on Sunday, 6th<br>
-September at 4:00pm in St. Joseph’s Church. This special Mass offers the Sacrament of the<br>
-Anointing of the Sick to anyone experiencing illness, frailty, or difficulties in body, mind, or spirit.<br>
-It is a moment of grace, comfort, and strength for those carrying burdens of ill health in any form.<br>
-We extend a special welcome to those who are visited on the First Fridays to join us on this<br>
+Duffy families.<br>
+Sunday<br>
+6th September. Raferagh.<br>
+11.00am. AM. Michael McEnaney, Ardragh.<br>
+Season of Creation – 1st September to 4th October 2026.<br>
+The Season of Creation begins on Tuesday 1st September marking the World Day of Prayer for<br>
+the Care of Creation , which offers to individual believers and to the community a precious<br>
+opportunity to renew our personal participation in this vocation as custodians of creation, raising to<br>
+God our thanks for the marvellous work that He has entrusted to our care, invoking his help for the<br>
+protection of creation and his mercy for the sins committed against the world in which we live.<br>
+A Prayer for our Earth.<br>
+All-powerful God, you are present in the whole universe<br>
+and in the smallest of your creatures.<br>
+You embrace with your tenderness all that exists.<br>
+Pour out upon us the power of your love,<br>
+that we may protect life and beauty.<br>
+Fill us with peace, that we may live<br>
+as brothers and sisters, harming no one.<br>
+O God of the poor,<br>
+help us to rescue the abandoned and forgotten of this earth,<br>
+so precious in your eyes.<br>
+Bring healing to our lives,<br>
+that we may protect the world and not prey on it,<br>
+that we may sow beauty, not pollution and destruction.<br>
+Touch the hearts<br>
+of those who look only for gain<br>
+at the expense of the poor and the earth.<br>
+Teach us to discover the worth of each thing,<br>
+to be filled with awe and contemplation,<br>
+to recognize that we are profoundly<br>
+united with every creature<br>
+as we journey towards your infinite light.<br>
+We thank you for being with us each day.<br>
+Encourage us, we pray, in our struggle<br>
+for justice, love and peace.<br>
+Pope Francis Laudato Si΄<br>
+Annual Healing Mass with the Anointing of the Sick , which will take place on Sunday next,<br>
+6th September at 4:00pm in St. Joseph’s Church. This special Mass offers the Sacrament of<br>
+the Anointing of the Sick to anyone experiencing illness, frailty, or difficulties in body, mind, or<br>
+spirit. It is a moment of grace, comfort, and strength for those carrying burdens of ill health in any<br>
+form. We extend a special welcome to those who are visited on the First Fridays to join us on this<br>
 sacred occasion, along with anyone who feels they would benefit from the healing and peace<br>
 that this beautiful Sacrament brings. Following the Mass, refreshments will be served in the<br>
-Holy Family Hall , offering a time for fellowship and community.<br>
-The Annual November Remembrance for those who have died in our parish during the previous<br>
-year will be held in St Joseph’s Church on Sunday 22nd November 2026 at 4.00pm.<br>
-Annual Family Mass and Blessings with relics of St. Therese , and her parents , St. Louis and<br>
-St. Zelie Martin will take place in St. Patrick’s Church, Bawn A75 FY98 , on Sunday, September 27th<br>
-at 11.30am. Celebrant: Fr. Ben Hughes .<br>
-Faith and Light Regional Pilgrimage to Lough Derg on Sunday September 13th. All members<br>
-and friends, past and present, invited. Bus leaving AIB , Carrickmacross 8.30am. Total cost €50.<br>
-Please ring Clare <a href="tel:+353860886846" style="color:#1d4ed8;font-weight:600;">0860886846</a> to book your place. There will also be some extra seats available on a<br>
-first come basis.<br>
-John Hamilton Vintage Memorial Run hosted by Aughnamullen Vintage Club takes place<br>
-on Sunday 23rd August 2026 . All proceeds in aid of Mary&#x27;s Meals South Monaghan Branch .<br>
-Registration 1:30pm. Cost €20 per vehicle . Run commences at 2:30pm from Aughnamullen Social<br>
-Centre A75CY82 . Refreshments available. Raffle on the day. Lines 1 for €5 or 3 for €10.<br>
-Revolut@pamela6ut1 to purchase lines . Donations are also accepted.<br>
-St Joseph Men&#x27;s Camino : Join men from across Ireland on Saturday 12th September for a 25km<br>
-pilgrimage through the Boyne Valley, beginning in Drogheda. The day includes Mass, Adoration,<br>
-Confessions and fellowship, with after -dinner speaker Fr. Mark Quinn founder of Men of St Josep h.<br>
-Open to men aged 18+. Cost: €65 (student €55) including lunch and Dinner. Book now and find<br>
-full details at: <a href="https://www.dominicans.ie/events" target="_blank" rel="noopener noreferrer">www.dominicans.ie/events</a></p>
+Holy Family Hall , offering a time for fellowship and community.</p>
 <hr>
 <p class="page-label">Page 4</p>
-<p>The Parish Of Machaire Rois<br>
-Lough Derg : Bus going on a One Day Retreat to Lough Derg on Saturday the 5th September<br>
-2026. Due to the increase demand for seat s, we have hired a larger bus, so we have some extra<br>
+<p>The Parish Of Mach aire Rois<br>
+Mass Duties for September in St Joseph ’s.<br>
+Weekend Readers: 6.00pm . Bernard Marron. 9.30am. Jimmy Hayes.<br>
+12Noon. Gus O’Gorman .<br>
+Weekday Readers : Mon: Gretta Murphy. Tues: Valerie Campion. Wed: Joanne Mundy.<br>
+Thurs: Pat Drury. Friday am.: Tracey Mac Ardle.<br>
+Friday pm.: Ciara Nolan. Saturday 11am.: Ann O’Reilly.<br>
+Collectors: 6.00pm. Mass: Terry Kiernan, Paul Martin and Patrick Shields.<br>
+9.30am. Mass: Paddy King, John McGlynn and Jim McNally .<br>
+12Noon. Mass: Gerry Cassidy, Ollie Swinburne and Phil Gartlan.<br>
+The Annual November Remembrance for those who have died in our parish during the previous<br>
+year will be held in St Joseph’s Church on Sunday 22nd November 2026 at 4.00pm.<br>
+Senior Citizen Monthly Party takes place on Wednesday 2nd September 7.30pm to 9.30pm in<br>
+the Ceilidh Centre Cloughvalley. All are welcome.<br>
+St Enda’s Prayer Group : Tuesday 1st September, Confessions at 7.00pm and Holy Mass at<br>
+7.30pm with Cardinal Sean Brady, in Stonetown National School A91 X923.<br>
+Faith and Light Regional Pilgrimage to Lough Derg on Sunday September 13th. All members<br>
+and friends, past and present, invited. Bus leaving AIB, Carrickmacross 8.30am . Total cost €50.<br>
+Please ring Clare <a href="tel:+353860886846" style="color:#1d4ed8;font-weight:600;">0860886846</a> to book your place. There will also be some extra seats available on a<br>
+first come basis.<br>
+St Joseph Men&#x27;s Camino: Join men from across Ireland on Saturday 12th September for a 25km<br>
+pilgrimage through the Boyne Valley, beginning in Drogheda. The day includes Mass, Adoration,<br>
+Confessions and fellowship, with after-dinner speaker Fr. Mark Quinn founder of Men of St Joseph.<br>
+Open to men aged 18+. Cost: €65 (student €55) including lunch and Dinner. Book now and find<br>
+full details at: <a href="https://www.dominicans.ie/events" target="_blank" rel="noopener noreferrer">www.dominicans.ie/events</a><br>
+Lough Derg: Bus going on a One Day Retreat to Lough Derg on Saturday next the 5th September<br>
+2026. Due to the increase demand for seats, we have hired a larger bus, so we have some extra<br>
 seats available. To book please contact Pauline O’Hagan on <a href="tel:+353879499335" style="color:#1d4ed8;font-weight:600;">0879499335</a> or Pauline Fox on<br>
 <a href="tel:+353863669875" style="color:#1d4ed8;font-weight:600;">0863669875</a>.<br>
-Family Day Out : Today Sunday 23 August 2026 from 12pm – 5pm. Ramble at Lough Fea ,<br>
-All Proceeds to Carrick Cancer . Picnic Area, Pet Friendly, Light refreshments in The Great Hall,<br>
-Historical Talks, Live music by Brendan McCahey &amp; Friends, Nature Walks . This is a donation -event -<br>
-€10 per adult . Entry by Front Gate Kingscourt Road – A81F970 . With kind permission of Philip<br>
-Shirley and Family, in memory of Robert Henry. Organised by Carrickmacross Lions Club .<br>
-The Friends of Carrick Cancer would like to take this opportunity to thank all those who took<br>
-part in, supported, donated or sponsored the Croagh Patrick climb on Saturday the 1stAugust. It is<br>
-not too late to make a donation after such a special effort by all those who organised and took part<br>
-in this event. Our next event is on Saturday the 29thAugust, a walk in the Carlingford scenic area.<br>
-This year’s walk will take a different route, heading back to the Cooley Peninsula, but the walk will<br>
-be a lot shorter than before. We will start on EMPLETOWN Beach , walk towards Shelling Hill (via the<br>
-beach) then head back towards TEMP LETOWN passing KILWIRRA CEMETERY where President Joe<br>
-Biden ’s ancestors are buried. Finishing back on the beach with li ght refreshments. A Bus will leave<br>
-from Euro Spar at 10.30 am approximately. Contact the committee below for further details. Your<br>
-support is much appreciated. Committee Members : Pat McNally <a href="tel:+353874130727" style="color:#1d4ed8;font-weight:600;">0874130727</a> - Majella Hoey<br>
-<a href="tel:+353872975326" style="color:#1d4ed8;font-weight:600;">0872975326</a> - James Lambe <a href="tel:+353876329620" style="color:#1d4ed8;font-weight:600;">087 6329620</a> – Grainne McNally <a href="tel:+353872506045" style="color:#1d4ed8;font-weight:600;">0872506045</a> - Doreen McNulty<br>
-<a href="tel:+353874826990" style="color:#1d4ed8;font-weight:600;">0874826990</a> .<br>
-Clogher don Óige are excited to invite you to their upcoming special young adult series event —<br>
-The Chosen , a groundbreaking drama about the life of Jesus Christ, told through the eyes of those<br>
-who knew Him. Join us for evenings of reflection, discussion, and community as we journey<br>
-together through this inspiring portrayal of Jesus’ revolutionary life and te achings.<br>
-When: Thursdays, 3rd September 2026 – 29th October 2026 . Time: 7:30pm – 9:30pm<br>
-Where: St. Joseph’s Pastoral Centre, Monaghan . This is a wonderful opportunity for young adults<br>
-aged 18 –40 to: Watch the series together . Take part in group discussions and sharing . Experience<br>
-prayer and fellowship . If you have any questions, feel free to email us at <a href="mailto:info@clogherdonoige.org" target="_blank" rel="noopener noreferrer">info@clogherdonoige.org</a> .<br>
-We look forward to seeing you there for faith, friendship, and great conversation. No previous<br>
-experience of watching needed.<br>
-Poor Clares Galway : Half-Day Retreat for women 18 -40 with Women’s spirituality speaker Louise<br>
-Mc Guinness. An opportunity to encounter God&#x27;s love and deepen your life of prayer and<br>
-communion with God. The event will take place from 2pm to 6pm on Sunday 6th September. For<br>
-more information and to register: <a href="https://cherisheddaughters.eventbrite.ie" target="_blank" rel="noopener noreferrer">https://cherisheddaughters.eventbrite.ie</a><br>
+Depression &amp; Anxiety Support Group – Corduff: A professionally facilitated 6-week support<br>
+group for depression and anxiety will begin on Monday 7th September in Corduff. This group is<br>
+suitable for adults experiencing low mood, depression, or anxiety and will be facilitated by Susan<br>
+Byrne, Psychotherapist (CBT). Places are limited. For further information or to book a place, please<br>
+contact: <a href="tel:+353851076821" style="color:#1d4ed8;font-weight:600;">085 107 6821</a>. Email: <a href="mailto:susan.a.byrne01@gmail.com" target="_blank" rel="noopener noreferrer">susan.a.byrne01@gmail.com</a><br>
+Fr Noel Conlon Charitable Trust – Date for Your Diary. The Fr Noel Conlon Charitable Trust is<br>
+holding its annual walk in Carlingford on Saturday, 19th September 2026. Registration: 10:30am<br>
+Walk starts: 11:00am. Registration fee: €25. Join us for a beautiful scenic walk, starting at the<br>
+Marina, followed by a short walk to St Jude’s Shrine. Everyone is very welcome to come along and<br>
+join us on the day. For any further information please contact Fr Noel Conlon on <a href="tel:+353429378678" style="color:#1d4ed8;font-weight:600;">042 9378678</a>.<br>
 Monaghan Charismatic Prayer Group are organising a bus to Lough Derg on Sunday 6th Sept a<br>
 special day in honour of Carlo Acutis. Bus leaving Carrickmacross at 7am via Castleblayney<br>
-/Clontibret/Monaghan. The Island is €50 and bus fare €25. Booking essential and ASAP with:<br>
+/Clontibret/Monaghan. The Island fee is €50 and bus fare €25. Booking essential and ASAP with:<br>
 Rosaleen <a href="tel:+353879717447" style="color:#1d4ed8;font-weight:600;">0879717447</a>/ Philip <a href="tel:+353872508043" style="color:#1d4ed8;font-weight:600;">0872508043</a><br>
-August &amp; September 2026 at Lough Derg .<br>
-One Day Retreats – Guided Days of Prayer and Reflection - places available on<br>
-August 29th and 31st September 5th, 6th, 9th, 12th, 15th, 19th and 20th<br>
-Admission €50. Group discounts available. Advance Booking Essential .<br>
-Includes Special Themed Retreats: 5th September – Pioneer Pilgrimage . 6th September – St<br>
-Carlos Acutis. 9th &amp; 12th September – Vocations Monstrance. 19th September – Divine Mercy<br>
-Pilgrimage.<br>
-Lakeshore Pilgrim Path Pilgrimage – In the footsteps of pilgrims through the centuries<br>
-Sunday 30th August. 8km &amp; 12km routes, fully guided. Outdoor Mass weather permitting. Admission<br>
-€25. Advance Booking Essential.<br>
-NEW FOR 2026 SEASON –Overnight accommodation available on Station Island the night before<br>
-beginning a Retreat or Pilgrimage. Lough Derg, Pettigo, Co Donegal. F94 PC60 . Tel.<br>
-<a href="tel:+353719861518" style="color:#1d4ed8;font-weight:600;">0719861518</a>. <a href="https://www.loughderg.org" target="_blank" rel="noopener noreferrer">www.loughderg.org</a> email. <a href="mailto:info@loughderg.org" target="_blank" rel="noopener noreferrer">info@loughderg.org</a></p></div>
+Annual Family Mass and Blessings with relics of St. Therese , and her parents , St. Louis and<br>
+St. Zelie Martin will take place in S t. Patrick’s Church, Bawn A75 FY98 , on Sunday, September 27th<br>
+at 11.30am. Celebrant: Fr. Ben Hughes.<br>
+Clogher don Óige will host the second series of – The Chosen – a groundbreaking drama for<br>
+young adults about the life of Jesus Christ, told through the eyes of those who knew Him. It will<br>
+take place each Thursday , for 8 weeks, beginning 10th September from 7:30pm to 9:30pm in<br>
+St. Joseph’s Pastoral Centre, Monaghan. An opportunity for young adults aged 18 -40 to watch the<br>
+series, take part in discussions, group sharing and prayer. To register or for more information<br>
+contact <a href="mailto:info@clogherdonoige.org" target="_blank" rel="noopener noreferrer">info@clogherdonoige.org</a> or call <a href="tel:+3534772784" style="color:#1d4ed8;font-weight:600;">047 72784</a>.</p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other CLOGHER Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ballybay (tullycorbet)"><a class="parish-link" href="ballybay.html" target="_blank" rel="noopener noreferrer">Ballybay (Tullycorbet)</a></li><li class="parish-item" data-name="castleblayney (muckno, includes clontibret)"><a class="parish-link" href="castleblayney.html" target="_blank" rel="noopener noreferrer">Castleblayney (Muckno, includes Clontibret)</a></li><li class="parish-item" data-name="clones"><a class="parish-link" href="clones.html" target="_blank" rel="noopener noreferrer">Clones</a></li><li class="parish-item" data-name="corcaghan-threemilehouse (kilmore &amp; drumsnatt)"><a class="parish-link" href="corcaghanthreemilehouse.html" target="_blank" rel="noopener noreferrer">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</a></li><li class="parish-item" data-name="derrygonnelly (botha)"><a class="parish-link" href="derrygonnelly.html" target="_blank" rel="noopener noreferrer">Derrygonnelly (Botha)</a></li><li class="parish-item" data-name="donagh"><a class="parish-link" href="donagh.html" target="_blank" rel="noopener noreferrer">Donagh</a></li><li class="parish-item" data-name="donaghmoyne"><a class="parish-link" href="donaghmoyne.html" target="_blank" rel="noopener noreferrer">Donaghmoyne</a></li><li class="parish-item" data-name="enniskillen (st michael&#x27;s parish)"><a class="parish-link" href="enniskillen.html" target="_blank" rel="noopener noreferrer">Enniskillen (St Michael&#x27;s Parish)</a></li><li class="parish-item" data-name="errigal truagh"><a class="parish-link" href="errigaltruagh.html" target="_blank" rel="noopener noreferrer">Errigal Truagh</a></li><li class="parish-item" data-name="fintona (donacavey)"><a class="parish-link" href="fintona.html" target="_blank" rel="noopener noreferrer">Fintona (Donacavey)</a></li><li class="parish-item" data-name="irvinestown (devenish)"><a class="parish-link" href="irvinestown.html" target="_blank" rel="noopener noreferrer">Irvinestown (Devenish)</a></li><li class="parish-item" data-name="killanny"><a class="parish-link" href="killanny.html" target="_blank" rel="noopener noreferrer">Killanny</a></li><li class="parish-item" data-name="magheracloone"><a class="parish-link" href="magheracloone.html" target="_blank" rel="noopener noreferrer">Magheracloone</a></li><li class="parish-item" data-name="monaghan &amp; rackwallace (includes tyholland)"><a class="parish-link" href="monaghanrackwallace.html" target="_blank" rel="noopener noreferrer">Monaghan &amp; Rackwallace (includes Tyholland)</a></li><li class="parish-item" data-name="roslea"><a class="parish-link" href="roslea.html" target="_blank" rel="noopener noreferrer">Roslea</a></li><li class="parish-item" data-name="tempo (pobal)"><a class="parish-link" href="tempo.html" target="_blank" rel="noopener noreferrer">Tempo (Pobal)</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ballybay (tullycorbet)"><a class="parish-link" href="ballybay.html" target="_blank" rel="noopener noreferrer">Ballybay (Tullycorbet)</a></li><li class="parish-item" data-name="castleblayney (muckno, includes clontibret)"><a class="parish-link" href="castleblayney.html" target="_blank" rel="noopener noreferrer">Castleblayney (Muckno, includes Clontibret)</a></li><li class="parish-item" data-name="clones"><a class="parish-link" href="clones.html" target="_blank" rel="noopener noreferrer">Clones</a></li><li class="parish-item" data-name="corcaghan-threemilehouse (kilmore &amp; drumsnatt)"><a class="parish-link" href="corcaghanthreemilehouse.html" target="_blank" rel="noopener noreferrer">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</a></li><li class="parish-item" data-name="derrygonnelly (botha)"><a class="parish-link" href="derrygonnelly.html" target="_blank" rel="noopener noreferrer">Derrygonnelly (Botha)</a></li><li class="parish-item" data-name="donagh"><a class="parish-link" href="donagh.html" target="_blank" rel="noopener noreferrer">Donagh</a></li><li class="parish-item" data-name="enniskillen (st michael&#x27;s parish)"><a class="parish-link" href="enniskillen.html" target="_blank" rel="noopener noreferrer">Enniskillen (St Michael&#x27;s Parish)</a></li><li class="parish-item" data-name="errigal truagh"><a class="parish-link" href="errigaltruagh.html" target="_blank" rel="noopener noreferrer">Errigal Truagh</a></li><li class="parish-item" data-name="irvinestown (devenish)"><a class="parish-link" href="irvinestown.html" target="_blank" rel="noopener noreferrer">Irvinestown (Devenish)</a></li><li class="parish-item" data-name="killanny"><a class="parish-link" href="killanny.html" target="_blank" rel="noopener noreferrer">Killanny</a></li><li class="parish-item" data-name="magheracloone"><a class="parish-link" href="magheracloone.html" target="_blank" rel="noopener noreferrer">Magheracloone</a></li><li class="parish-item" data-name="monaghan &amp; rackwallace (includes tyholland)"><a class="parish-link" href="monaghanrackwallace.html" target="_blank" rel="noopener noreferrer">Monaghan &amp; Rackwallace (includes Tyholland)</a></li><li class="parish-item" data-name="tempo (pobal)"><a class="parish-link" href="tempo.html" target="_blank" rel="noopener noreferrer">Tempo (Pobal)</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1200,9 +1234,9 @@ beginning a Retreat or Pilgrimage. Lough Derg, Pettigo, Co Donegal. F94 PC60 . T
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1694,23 +1728,8 @@ beginning a Retreat or Pilgrimage. Lough Derg, Pettigo, Co Donegal. F94 PC60 . T
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

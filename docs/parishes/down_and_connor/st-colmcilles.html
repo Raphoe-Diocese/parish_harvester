@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>St Colmcilles Bulletin — 23/08/2026</title>
+  <title>St Colmcilles Bulletin — 30/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -170,17 +178,37 @@
       max-height: 850px;
       overflow: auto;
       overflow-y: auto;
+      overflow-x: hidden;
+      /* Reserve the scrollbar gutter from the first paint. Without it the
+         first page is sized to the full width, the vertical scrollbar then
+         appears, and the page is suddenly ~16px too wide — a horizontal
+         scrollbar under a strip of the bulletin. */
+      scrollbar-gutter: stable;
       background: #525659;
       padding: 8px 0 16px;
+    }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
     }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
       min-height: 180px;
+      max-width: 100%;
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
-    .pdf-link-layer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
+    /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
+       page — one of those used to stretch the box's scrollWidth to 2988px. */
+    .pdf-link-layer {
+      position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+      overflow: hidden; pointer-events: none;
+    }
     .pdf-annot-link {
       position: absolute; z-index: 2; pointer-events: auto;
       background: rgba(26, 107, 107, 0.08); border-radius: 2px;
@@ -189,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -203,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -212,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -230,6 +274,8 @@
         overflow: auto !important;
         overflow-y: auto !important;
       }
+      .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -244,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -256,22 +305,48 @@
         overflow: auto !important;
         overflow-y: auto !important;
       }
+      /* `overflow: auto` above resets both axes, so re-hide the horizontal one:
+         a single stray PDF link annotation off the right edge of a page used to
+         give the whole box a horizontal scrollbar. */
+      .pdf-inpage-pages { overflow-x: hidden !important; }
       /* Nothing to enlarge — the box is already the locked 850px. */
       .az-expand { display: none; }
     }
 
 
-    .ocr-search-bar { position: relative; margin-bottom: 10px; }
+    /* Search comes first in the OCR block and reads like the JUMP TO bar, so
+       a reader cannot scroll past it looking for "where is the search". */
+    .ocr-search-bar {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 8px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-search-label {
+      flex: 0 0 auto;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
+    }
     .search-input {
-      width: 100%;
-      border: 1px solid #c9d4d3;
+      flex: 1 1 auto;
+      min-width: 0;
+      width: auto;
+      border: 1px solid #1a6b6b;
       border-radius: 4px;
       padding: 11px 42px 11px 14px;
       font-size: 1rem;
+      background: #fff;
     }
     .search-clear {
       position: absolute;
-      right: 10px;
+      right: 16px;
       top: 50%;
       transform: translateY(-50%);
       width: 32px;
@@ -397,9 +472,19 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
+    /* A letter jump scrolls inside a locked box, so nothing moves on screen
+       except the text. Flag the parish the reader landed on. */
+    .az-landed {
+      background: #fff6da;
+      box-shadow: 0 0 0 3px #f0d089;
+      border-radius: 3px;
+      transition: background 400ms ease, box-shadow 400ms ease;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .az-landed { transition: none; }
+    }
     .diocese-intro {
       margin: 0 0 22px;
       padding: 18px 18px 16px;
@@ -421,18 +506,48 @@
     }
     .diocese-intro .intro-names li { margin: 0 0 4px; }
     
+    /* Letters and text size share ONE bar, so neither hides the other and
+       neither pushes the search box off a short screen. The wrapper draws the
+       box; the letter row and zoom group go transparent inside it. */
+    .ocr-controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 12px;
+      margin: 0 0 10px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-controls-row .az-row,
+    .ocr-controls-row .ocr-zoom-bar {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      border: 0;
+    }
+    .ocr-controls-row .az-row { flex: 1 1 auto; }
+    .ocr-controls-row .ocr-zoom-bar { flex: 0 0 auto; margin-left: auto; }
     .ocr-zoom-bar {
-      display: flex; justify-content: center; align-items: center; gap: 10px;
-      margin: 0 0 10px; padding: 6px 10px;
-      background: rgba(255, 255, 255, 0.94);
-      border: 1px solid #d4ddd9; border-radius: 4px;
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-zoom-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
     }
     .ocr-zoom-bar button {
-      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 4px;
-      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.15rem; cursor: pointer;
+      min-width: 34px; height: 30px; border: 1px solid #cfdedd; border-radius: 4px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.05rem; line-height: 1; cursor: pointer;
     }
+    .ocr-zoom-bar button:hover { background: #1a6b6b; border-color: #1a6b6b; color: #fff; }
     .ocr-zoom-pct {
-      min-width: 3.5rem; text-align: center; font-weight: 700; font-size: 0.95rem; color: #14524f;
+      min-width: 3.2rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
     }
     .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
     @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 6px; } }
@@ -707,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -718,22 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand {
+      .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -763,13 +873,26 @@
         padding: 16px 14px 28px;
       }
       .ocr-search-tools { flex-direction: column; }
+      .ocr-search-tools > div {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+      }
       .ocr-search-tools button {
         min-height: 44px;
         width: 100%;
       }
+      /* One column on a phone: letters, then text size. Neither covers the
+         search box above them. */
+      .ocr-controls-row { flex-direction: column; }
+      .ocr-controls-row .az-row,
+      .ocr-controls-row .ocr-zoom-bar { flex: 1 1 auto; }
+      .ocr-search-bar { flex-wrap: wrap; }
+      .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260823v" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -777,14 +900,14 @@
     <header class="header">
       <p class="diocese-label">DOWN &amp; CONNOR</p>
       <h1>St Colmcilles Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for St Colmcilles — 23/08/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
-      <a class="download-link-top" href="st-colmcilles.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for St Colmcilles — 30/08/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
+      <a class="download-link-top" href="st-colmcilles.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="st-colmcilles.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="st-colmcilles.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
@@ -801,7 +924,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="st-colmcilles.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="st-colmcilles.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="st-colmcilles.pdf">Open PDF</a>
               <a href="st-colmcilles.pdf" download>Download</a>
             </div>
           </div>
@@ -813,19 +936,10 @@
 
     <h2 class="section-heading">Bulletin — OCR Extracted Plain Text</h2>
     <div id="panel-ocr" class="viewer-block">
-      
-      <div class="quiet-links">
-        <a href="st-colmcilles-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
-      </div>
       <div class="ocr-sticky-chrome">
-      <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
-        <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
-        <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
-        <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
-        <span class="ocr-zoom-hint">or pinch to zoom</span>
-      </div>
       <div class="ocr-search-bar">
-        <input id="ocr-search" class="search-input" type="search" placeholder="Search OCR text..." aria-label="Search OCR text" />
+        <label class="ocr-search-label" for="ocr-search">Search</label>
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search OCR text — a parish, a name, a Mass time" aria-label="Search OCR text" />
         <button id="clear-search" class="search-clear" type="button" aria-label="Clear OCR search" hidden>×</button>
       </div>
       <div class="ocr-search-tools">
@@ -836,8 +950,21 @@
         </div>
       </div>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-st-colmcilles" data-parish-name="St Colmcilles"><h2 class="ocr-parish-name">St Colmcilles</h2><p class="ocr-parish-date">23/08/2026</p></header>
-<p class="page-label">Page 54</p>
+      <div class="ocr-controls-row">
+        
+        <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+          <span class="ocr-zoom-label">Text size</span>
+          <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+          <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+          <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+          <span class="ocr-zoom-hint">or pinch to zoom</span>
+        </div>
+      </div>
+      <div class="quiet-links">
+        <a href="st-colmcilles-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
+      </div>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-st-colmcilles" data-parish-name="St Colmcilles"><h2 class="ocr-parish-name">St Colmcilles</h2><p class="ocr-parish-date">30/08/2026</p></header>
+<p class="page-label">Page 1</p>
 <p>PARISH OF<br>
 ST COLMCILLE’S<br>
 BALLYHACKAMORE<br>
@@ -861,41 +988,45 @@ SAT<br>
 Confession: 5.00pm –5.20pm, Mass: 5.30pm<br>
 Phone: 02890 654157<br>
 Email: stcolmcilles@<br>
-16<br>
+30<br>
 AUGUST 2026<br>
 TH<br>
-Missal Pg 631<br>
+Missal Pg 643<br>
 “To know the joy<br>
 of God’s love and<br>
 make the love of<br>
 God known to all”<br>
-19TH SUNDAY IN ORDINARY TIME- YEAR A<br>
+22ND SUNDAY IN ORDINARY TIME- YEAR A<br>
 MASS THIS SUNDAY<br>
-First Reading: Isaiah 56:1,6‐7<br>
-Psalm 66<br>
-Let the peoples praise you, O God; let all<br>
-the peoples praise you.<br>
-Second Reading: Romans 11: 13-32<br>
+First Reading: Jeremiah 20: 7-9<br>
+Psalm 62<br>
+For you my soul is thirsting, O Lord my<br>
+God.<br>
+Second Reading: Romans 12: 1-2<br>
 Gospel Acclamation<br>
-Alleluia, alleluia! The sheep that belong to<br>
-me listen to my voice, says the Lord, I<br>
-know them and they follow me. Alleluia!<br>
-Gospel: Matthew 14: 22-33<br>
+Alleluia, alleluia! May the Father of our<br>
+Lord Jesus Christ enlighten the eyes of<br>
+our mind, so that we can see what hope<br>
+his call holds for us. Alleluia!<br>
+Gospel: Matthew 16: 21-27<br>
 DECEASED<br>
 We pray for the repose of the souls of<br>
 all those who have died recently.<br>
-Eugene O’Kane and Margaret Wilson</p>
+Joe McGourty, Alice Lokhart (month’s<br>
+mind)</p>
 <h3 class="b-head">ANNIVERSARIES</h3>
 <p>We also remember in prayer all those<br>
 whose anniversaries occur at this time:<br>
-Andres Soriano, Priscilla Cruz, Liam<br>
-O’Flaherty, Paul Judge, Rita Rooney,<br>
-Anne O’Hare and William Strain.<br>
+Lizzy Rocky Vavakkatt, Martin<br>
+Derrig, Josephine McGuinness and<br>
+Leo Galway.<br>
 THIS WEEK AT ST COLMCILLE’S<br>
-Weekly collection: £1145.10<br>
-The Diocesan Cathedral<br>
-Collection will be taken up at all<br>
-Masses this weekend.</p>
+Weekly collection - £1,137.21<br>
+The Monthly Offering Collection<br>
+for the support of the priests will<br>
+be taken up at all Masses next<br>
+weekend.<br>
+Many thanks for your donations.</p>
 <h3 class="b-head">Contactless giving is available</h3>
 <p>via the QR code below or on the<br>
 parish website.<br>
@@ -905,38 +1036,85 @@ parish-belfast<br>
 DONATIONS<br>
 St Colmcilles</p>
 <hr>
-<p class="page-label">Page 55</p>
-<p>PARISH NEW S AND NOTICES<br>
-USEFUL C ONTACTS<br>
+<p class="page-label">Page 2</p>
+<p>Lost Property<br>
+A collection of clothing left<br>
+in the church hall is currently<br>
+on display on the long bench<br>
+in the church foyer.<br>
+If you have lost an item,<br>
+please check the collection<br>
+and claim it by Saturday<br>
+12th September. Any<br>
+unclaimed items after this<br>
+date will be disposed of.<br>
+Safeguarding Training<br>
+Child Safeguarding Level 2<br>
+training session:<br>
+St John’s Parish Centre, Falls<br>
+Rd, Belfast on 16 and 23<br>
+September 2026.<br>
+These sessions are<br>
+mandatory for all Clergy,<br>
+Religious and Group Leaders<br>
+who have regular or direct</p>
+<h3 class="b-head">contact with children and</h3>
+<p>young people.<br>
+Please note, this will be the<br>
+only Level 2 session in your<br>
+area at this time (Sept 2026-<br>
+Dec 2026).<br>
+Register via QR code:<br>
+Parish Group Notices:<br>
+John Paul II Award – Information Session<br>
+Calling all 16-17 year olds, especially those who have recently finished<br>
+their GCSEs!<br>
+Come along to find out more about this year’s John Paul II Award and<br>
+hear from young people who have recently completed it, sharing their<br>
+experiences of volunteering and the benefits of the programme.<br>
+When: Thursday 17 September at 7pm<br>
+Where: Parish Hall – Iona Room<br>
+A great opportunity to get involved in parish and community life while<br>
+gaining a recognised award for your CV and future applications.<br>
+New members are very welcome!<br>
+St Colmcille&#x27;s Indoor Mixed Bowling Club resumes on Thursday 3rd September 26 at 7pm.<br>
+New members are welcome!<br>
+Enquiries: Please contact Deirdre on <a href="tel:+3537479329938" style="color:#1d4ed8;font-weight:600;">07479329938</a>, or just turn up!<br>
+St Colmcille&#x27;s Parent &amp; Toddler Group<br>
+We provide an opportunity for anyone caring for a child from 0 to 4<br>
+years to come along with the child and enjoy company, snacks and<br>
+play. We meet on Wednesdays at 10 am, and we resume on<br>
+Wednesday 9th September 2026 after the summer break. If you<br>
+haven&#x27;t been before, it&#x27;s a great way to make new friends. All mums,<br>
+dads, grandparents, childminders and carers are welcome, with their<br>
+children!<br>
+Align Physio-led Pilates<br>
+Classes will resume Monday 7th September in the Parish hall. Class<br>
+times on a Monday are 9.30am, 10.30am, 7.15pm and 8.15pm.<br>
+Suitable for all ages, men and women. If interested and for more<br>
+information, please contact <a href="mailto:oliviadavidson42@hotmail.co.uk" target="_blank" rel="noopener noreferrer">oliviadavidson42@hotmail.co.uk</a><br>
+St Colmcille’s Parish Youth Group<br>
+The Youth Club returns on Saturday 12 September at 6.30 pm.<br>
+New and existing members (Years 8–11) are very welcome!<br>
+Parents who would like to volunteer and help with the Youth Club are<br>
+warmly invited to contact Jarek on 07704 410446.</p>
+<h3 class="b-head">PARISH NEWS AND NOTICES</h3>
+<p>USEFUL CONTACTS<br>
 Parish Secretary:<br>
 Ciyana James - <a href="mailto:stcolmcilles@downandconnor.org" target="_blank" rel="noopener noreferrer">stcolmcilles@downandconnor.org</a>.<br>
 Finance Officer:<br>
-Philomena Dawson - <a href="mailto:p.dawson@downandconnor.orgParish" target="_blank" rel="noopener noreferrer">p.dawson@downandconnor.orgParish</a> Engagement Group -<br>
+Philomena Dawson - <a href="mailto:p.dawson@downandconnor.org" target="_blank" rel="noopener noreferrer">p.dawson@downandconnor.org</a><br>
+Parish Engagement Group -<br>
 <a href="mailto:stcolmcillespeg@gmail.com" target="_blank" rel="noopener noreferrer">stcolmcillespeg@gmail.com</a></p>
 <h3 class="b-head">Parish Office</h3>
-<p>Mon- Fri 10:00 - 13:00<br>
-THE LISTENING EAR<br>
-Parishioners are invited to speak with<br>
-members of the Parish Engagement Group in<br>
-the foyer of the Church after Masses THIS<br>
-W EEKEND, should you have queries or<br>
-comments in the context of parish - Worship,<br>
-Evangelisation, Community, MinistryMARRIAGE ENRICHMENT W EEKEND<br>
-Marriage Encounter Ireland invites married<br>
-couples to a residential Weekend:<br>
-02-04 October 2026<br>
-“Focolare Centre” Prosperous, Co. Kildare.<br>
-Step away from daily distractions to deepen<br>
-your communication, renew your love, and<br>
-rediscover the joy of your marriage.</p>
-<hr></div>
+<p>Mon- Fri 10:00 - 13:00</p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other DOWN &amp; CONNOR Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="antrim"><a class="parish-link" href="antrimparish.html" target="_blank" rel="noopener noreferrer">Antrim</a></li><li class="parish-item" data-name="ballycastle"><a class="parish-link" href="ballycastleparish.html" target="_blank" rel="noopener noreferrer">Ballycastle</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="ballymenaparish.html" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="glenariffe"><a class="parish-link" href="glenariffeparish.html" target="_blank" rel="noopener noreferrer">Glenariffe</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="loughshore"><a class="parish-link" href="loughshoreparishes.html" target="_blank" rel="noopener noreferrer">Loughshore</a></li><li class="parish-item" data-name="maghera"><a class="parish-link" href="parishofmaghera.html" target="_blank" rel="noopener noreferrer">Maghera</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="port glenone (st mary&#x27;s portglenone)"><a class="parish-link" href="stmarysportglenone.html" target="_blank" rel="noopener noreferrer">Port Glenone (St Mary&#x27;s Portglenone)</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="sacred heart belfast"><a class="parish-link" href="sacredheartparishbelfast.html" target="_blank" rel="noopener noreferrer">Sacred Heart Belfast</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st brigids belfast"><a class="parish-link" href="stbrigidsparishbelfast.html" target="_blank" rel="noopener noreferrer">St Brigids Belfast</a></li><li class="parish-item" data-name="st colmcille&#x27;s holywood"><a class="parish-link" href="stcolmcillesholywood.html" target="_blank" rel="noopener noreferrer">St Colmcille&#x27;s Holywood</a></li><li class="parish-item" data-name="st gerards"><a class="parish-link" href="stgerardsparish.html" target="_blank" rel="noopener noreferrer">St Gerards</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st mary&#x27;s on the hill"><a class="parish-link" href="stmarysonthehill.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s on the Hill</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li><li class="parish-item" data-name="st teresas"><a class="parish-link" href="stteresasparish.html" target="_blank" rel="noopener noreferrer">St Teresas</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="ballymenaparish.html" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li></ul>
     </section>
   </div>
   <footer>
@@ -988,9 +1166,9 @@ rediscover the joy of your marriage.</p>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260823v"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260823v';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1362,6 +1540,9 @@ rediscover the joy of your marriage.</p>
         }
         return true;
       }
+      function slugOf(s) {
+        return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      }
       function findOcr(box, name) {
         if (!box) return null;
         var wanted = [norm(name), norm(coreName(name))];
@@ -1372,7 +1553,38 @@ rediscover the joy of your marriage.</p>
           var got = norm(label);
           if (wanted.indexOf(got) >= 0 || wanted.indexOf(norm(coreName(label))) >= 0) return el;
         }
-        return null;
+        // The search box rebuilds #ocr-panel innerHTML, so fall back to the
+        // masthead id the layout writes (ocr-parish-<slug>).
+        var byId = box.querySelector('#ocr-parish-' + slugOf(name))
+          || box.querySelector('#ocr-parish-' + slugOf(coreName(name)));
+        return byId || null;
+      }
+      function flashLanding(el) {
+        if (!el || !el.classList) return;
+        el.classList.remove('az-landed');
+        void el.offsetWidth;
+        el.classList.add('az-landed');
+        window.setTimeout(function () { el.classList.remove('az-landed'); }, 1800);
+      }
+      function landInBox(box, el) {
+        // Move the box instantly (one smooth animation only — a second one on
+        // the same scroll chain used to be cancelled halfway, which left the
+        // reader in the middle of another parish), then bring the box itself
+        // on screen, then re-check because zoom/fonts can reflow the text.
+        var br = box.getBoundingClientRect();
+        var er = el.getBoundingClientRect();
+        box.scrollTop = Math.max(0, box.scrollTop + (er.top - br.top) - 8);
+        showBox(box);
+        var tries = 0;
+        (function settle() {
+          if (tries++ > 6) return;
+          var b2 = box.getBoundingClientRect();
+          var e2 = el.getBoundingClientRect();
+          var off = Math.round(e2.top - b2.top - 8);
+          if (Math.abs(off) > 3) box.scrollTop = Math.max(0, box.scrollTop + off);
+          window.setTimeout(settle, 150);
+        })();
+        flashLanding(el);
       }
       function pageFor(name) {
         var map = pageIndex();
@@ -1389,14 +1601,19 @@ rediscover the joy of your marriage.</p>
       }
       function showBox(box) {
         // The jump happens inside the locked box, so make sure the box itself
-        // is on screen first or a phone reader sees nothing move.
+        // is on screen first or a phone reader sees nothing move. Leave room
+        // for the sticky search bar when a term is typed, otherwise it covers
+        // the parish header the reader just asked for.
         if (!box || !box.getBoundingClientRect) return;
         var r = box.getBoundingClientRect();
         var h = window.innerHeight || document.documentElement.clientHeight || 0;
-        if (r.top < 0 || r.top > h - 120) {
-          if (box.scrollIntoView) {
-            box.scrollIntoView({ block: 'start', behavior: reduceMotion() ? 'auto' : 'smooth' });
-          }
+        var sticky = document.querySelector('.ocr-sticky-chrome.is-searching');
+        var pad = sticky ? Math.round(sticky.getBoundingClientRect().height) + 8 : 0;
+        if (r.top < pad || r.top > h - 120) {
+          window.scrollTo({
+            top: Math.max(0, (window.scrollY || window.pageYOffset || 0) + r.top - pad),
+            behavior: reduceMotion() ? 'auto' : 'smooth',
+          });
         }
       }
       function jumpPdf(names) {
@@ -1415,13 +1632,12 @@ rediscover the joy of your marriage.</p>
         return false;
       }
       function jumpOcr(names) {
-        var ocr = document.getElementById('ocr-panel');
+        var ocr = document.getElementById('ocr-panel') || document.getElementById('ocr-text');
         if (!ocr) return false;
         for (var i = 0; i < names.length; i++) {
           var hit = findOcr(ocr, names[i]);
           if (!hit) continue;
-          showBox(ocr);
-          scrollBoxTo(ocr, hit);
+          landInBox(ocr, hit);
           return true;
         }
         return false;
@@ -1429,8 +1645,9 @@ rediscover the joy of your marriage.</p>
       function jump(target, names, tries) {
         var done = target === 'pdf' ? jumpPdf(names) : jumpOcr(names);
         // PDF.js paints page slots as it streams, so the slot may not exist
-        // for a second or two after load. Retry briefly instead of failing.
-        if (!done && target === 'pdf' && (tries || 0) < 12) {
+        // for a second or two after load; the OCR panel is rebuilt whenever a
+        // search is cleared. Retry briefly instead of failing silently.
+        if (!done && (tries || 0) < 12) {
           window.setTimeout(function () { jump(target, names, (tries || 0) + 1); }, 400);
         }
       }
@@ -1443,23 +1660,8 @@ rediscover the joy of your marriage.</p>
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

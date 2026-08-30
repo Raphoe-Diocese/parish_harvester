@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>St Eugene&#x27;s Cathedral (Templemore) Bulletin — 25/08/2026</title>
+  <title>St Eugene&#x27;s Cathedral (Templemore) Bulletin — 30/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -179,6 +187,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -201,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +275,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +472,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -863,7 +892,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,14 +900,14 @@
     <header class="header">
       <p class="diocese-label">DERRY</p>
       <h1>St Eugene&#x27;s Cathedral (Templemore) Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for St Eugene&#x27;s Cathedral (Templemore) — 25/08/2026. Part of the Derry Diocese collated bulletin.</p>
-      <a class="download-link-top" href="steugenescathedral.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for St Eugene&#x27;s Cathedral (Templemore) — 30/08/2026. Part of the Derry Diocese collated bulletin.</p>
+      <a class="download-link-top" href="steugenescathedral.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="steugenescathedral.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="steugenescathedral.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
@@ -895,7 +924,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="steugenescathedral.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="steugenescathedral.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="steugenescathedral.pdf">Open PDF</a>
               <a href="steugenescathedral.pdf" download>Download</a>
             </div>
           </div>
@@ -934,152 +963,147 @@
       <div class="quiet-links">
         <a href="steugenescathedral-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-st-eugene-s-cathedral-templemore" data-parish-name="St Eugene&#x27;s Cathedral (Templemore)"><h2 class="ocr-parish-name">St Eugene&#x27;s Cathedral (Templemore)</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-st-eugene-s-cathedral-templemore" data-parish-name="St Eugene&#x27;s Cathedral (Templemore)"><h2 class="ocr-parish-name">St Eugene&#x27;s Cathedral (Templemore)</h2><p class="ocr-parish-date">30/08/2026</p></header>
 <p class="page-label">Page 1</p>
-<p>A short reflection on today’s Gospel Matthew 1 6:13-20<br>
-In today’s Gospel, Jesus asks his disciples a question that goes to the heart of our faith:<br>
-“Who do you say that I am?” Peter answers with courage and conviction: “You are the<br>
-Christ, the Son of the living God.”<br>
-It is a question Jesus asks each one of us too. We may know about Jesus through Scripture,<br>
-prayer and the life of the Church, but Jesus invites us to something deeper than simply<br>
-knowing about him. He asks us to recognise him personally as the Son of God a nd to place<br>
-our lives in his hands.<br>
-Peter’s answer is a moment of great faith, yet Jesus also reminds him that this faith is a gift<br>
-from God. The Church itself is built upon this faith, and Christ promises that the powers of<br>
-evil will not overcome it. These words are a source of hope for us, especially when our own<br>
-faith feels weak or when the Church faces difficulties.<br>
-Our response to Jesus cannot remain only words. To call him “the Christ” means allowing<br>
-his presence to shape the way we live: how we treat others, how readily we forgive, how we<br>
-respond to those in need, and how faithfully we carry our own crosses.<br>
-Perhaps then, this Gospel invites us to pause and answer Jesus’ question for ourselves: Who<br>
-is Jesus for me? May we have the grace to recognise him more clearly, trust him more<br>
-deeply, and follow him more faithfully each day.<br>
-Prayer for Vocations to the Priesthood : In this Sunday&#x27;s gospel Peter acknowledges Jesus<br>
-as the Christ, the Son of the living God, and Jesus confers on Peter &quot;.the keys of the<br>
-Kingdom.&quot; an image reflected in the First Reading where the Lord says He will &quot;.place<br>
-the key of David.&quot; on the shoulder of those called to lead His people, those who will be<br>
-called &quot;father.&quot;<br>
-Today, Sunday 23rd August, we celebrate with joy the Solemnity of our patron,<br>
-Saint Eugene, whose name and witness have a special place in the life of S aint Eugene’s<br>
-Cathedral. Saint Eugene served the Church with courage and faith, remaining faithful to<br>
-Christ in challenging times. His life reminds us that holiness is not simply about great deeds,<br>
-but about faithfully following Christ in the circumstances in which God has placed us.<br>
-As we celebrate our patronal feast, we give thanks for the faith handed down to us and for<br>
-the living community that gathers in this Cathedral. S aint Eugene’s witness encourages us<br>
-to remain steadfast in our faith, generous in our service of others, and united as a parish<br>
-family.<br>
-May S aint Eugene pray for our Cathedral community and for all who enter through its doors.<br>
-May his example inspire us to proclaim Christ with courage and to live our faith with joy.<br>
-St Eugene, pray for us .<br>
-Save the Date: Saint Carlo Acutis Day of Prayer . You are invited to come to St Eugene’s<br>
+<p>A short reflection on today’s Gospel Matthew 1 6:21-27<br>
+In today’s Gospel, Jesus reminds us that following him is not always the easy path. He<br>
+speaks honestly about suffering, sacrifice and the cross, and calls his disciples to take up<br>
+their own cross and follow him with courage and trust.<br>
+These words can challenge us. We naturally want a life free from difficulty, yet Jesus shows<br>
+us that true love often involves self-giving and putting others before ourselves. Taking up<br>
+our cross does not mean seeking out suffering, but faithfully responding to the demands of<br>
+love, forgiveness, service and faithfulness in the circumstances of our daily lives.<br>
+Jesus also asks a profound question: What will it profit us to gain the whole world but lose<br>
+our true selves? In a world that can place great value on success, possessions, comfort and<br>
+recognition, the Gospel calls us to step back and remember what truly matters. Our<br>
+relationship with God and the way we love others are worth far more than anything the<br>
+world can offer.<br>
+May we have the courage to follow Christ faithfully, especially when the path is difficult,<br>
+trusting that the way of the cross ultimately leads to life. And may our everyday acts of love,<br>
+kindness and service become a quiet witness to the hope we have in him.<br>
+Prayer for Vocations to the Priesthood : That the men called to priesthood will be filled<br>
+with courage and hope as they hear Jesus calling them to follow Him by renouncing<br>
+themselves, taking up their cross every day, and finding life in Him and in the service of His<br>
+people.<br>
+Save the Date: Saint Carlo Acutis Day of Prayer. You are invited to come to St Eugene’s<br>
 Cathedral, Derry on Sunday 11th October from 2.00pm where we will have Veneration of a<br>
 First Class Relic of St Carlo Acutis, gifted to the Cathedral by Carlo’s mother, Antonia.<br>
 The Sacrament of Confession will be available from 2.00pm until Mass at 7.00pm, which<br>
 will be celebrated by Bishop Michael Router. Adoration of the Blessed Sacrament will take<br>
 place in the Mother Teresa Chapel during the Celebrations. A short film on Carlo ’s life will<br>
 be shown in the Conference Room. Everyone is welcome to this special time.<br>
-St Monica and St Augustine : On 28th August, we celebrate St Monica, whose faithful<br>
-prayers for her son Augustine never ceased, even when he had wandered far from the<br>
-Christian faith. Her patience, trust and perseverance are an encouragement to all who pray<br>
-for their loved ones. On 29th August, we celebrate St Augustine, Bishop and Doctor of the<br>
-Church. Through God’s grace and his mother’s prayers, Augustine experienced a profound<br>
-conversion and became one of the Church’s greatest teachers.<br>
-Their lives remind us that no one is beyond God’s mercy and that persistent prayer can bear<br>
-beautiful fruit. May St Monica teach us to trust God patiently, and St Augustine inspire us<br>
-always to seek the truth and rest our hearts in God. Thank you<br>
+St Teresa of Calcutta: A Life of Love. On 5th September, the Church celebrates the<br>
+memorial of St Teresa of Calcutta, a woman whose life was a remarkable witness to Christ’s<br>
+love for the poor, the sick and the forgotten.<br>
+Born in Skopje in 1910, Mother Teresa dedicated her life to serving those most in need.<br>
+Through the Missionaries of Charity, she sought to see Christ in every person she<br>
+encountered, especially those who were suffering or abandoned. Her simple message was<br>
+powerful: we are called to do small things with great love.<br>
+Her life reminds us that holiness is not always found in extraordinary deeds, but in the<br>
+faithful, loving actions of everyday life. A kind word, a visit to someone who is lonely, an<br>
+act of forgiveness, or practical help offered to someone in need can all become expressions<br>
+of God&#x27;s love.<br>
+As we remember St Teresa this September, may her example encourage us to look around<br>
+our own communities with compassionate eyes and generous hearts. May we recognise<br>
+Christ in those we meet and, in whatever small ways we can, bring something of His love<br>
+and mercy to others.<br>
+St Teresa of Calcutta, pray for us.<br>
+Welcome Back! As the summer holidays come to an end, we wish all our children a very<br>
+happy return to school. We hope you have enjoyed a wonderful summer filled with fun,<br>
+friendship and happy memories.<br>
+A new school year is a fresh beginning - a chance to learn new things, make new friends<br>
+and discover the gifts and talents God has given each of us. Whatever the year ahead brings,<br>
+remember that God is always with you, guiding and encouraging you.<br>
+We pray for all our children, families and teachers as they begin this new chapter. May the<br>
+year ahead be filled with joy, kindness, courage and many opportunities to grow.<br>
+Thank you<br>
 Fr Farren acknowledges with thanks the<br>
 following donations for:<br>
-Mary’s Meals: £100 £50 £300 £20 £20<br>
-Smile Train: £50 £50 £20 £300 £60<br>
-£150 £40<br>
-Sight Savers: £300 £40 £20<br>
-Trócaire: £10</p>
+St Therese £40<br>
+Flowers for the Altar: £40<br>
+SVdP: £60<br>
+Smile Train: £20 £10<br>
+Sight Savers: £20 £10 £20<br>
+Hungry Children: £5<br>
+Mary’s Meals £200 £20<br>
+Gaza Appeal: £400</p>
 <h3 class="b-head">Anniversaries</h3>
 <h3 class="b-head">Please pray for the repose of the souls</h3>
-<p>of: Jeanie Gallacher<br>
-Philomena Duffy<br>
-Margaret Lewis<br>
-Sheila Lewis<br>
-Johnny Lewis<br>
-Nancé Gallagher<br>
-Nellie Kerlin<br>
-John Feeney<br>
+<p>of:<br>
+Marian Gill<br>
+Sheila Bradley<br>
+May Doherty<br>
+Helen Nash<br>
 May they rest in peace<br>
 Baptisms<br>
-We welcome as member s of God’s<br>
+We welcome as members of God’s<br>
 family:<br>
-Jackson James Burke<br>
-Órlaith Joan Nicholas<br>
-Matthew David Saunders<br>
+Fían Daniel Deeney<br>
+Rían Canice Harkin<br>
+Róan McConnell<br>
+Kai Gillen<br>
 To book a Baptism contact the<br>
 Parish Office 02871 262894<br>
 Collection<br>
-Weekly Collection: £5,877<br>
-Parish Development: £1,122<br>
+Weekly Collection: £5,926<br>
+Parish Development: £1,032<br>
 Thank you for your generosity<br>
-Readers for 29th /30th August<br>
-6.15pm Roisin Rice Cutter<br>
-7.30pm Niamh Kehoe<br>
-9.30am Kate Doherty<br>
-11.00am Helen Sweeney<br>
-12.30pm Megan Dallet<br>
-7.00pm Anna Begley<br>
+Readers for 5th /6th September<br>
+6.15pm Garth Tucker<br>
+7.30pm Liz McMonagle<br>
+9.30am Kay McGinn<br>
+11.00am Uju A<br>
+12.30pm Ursula Doherty<br>
+7.00pm Marian Boyle<br>
 Sympathy<br>
 We offer our sympathy to the family<br>
 and friends of:<br>
-Bobby Moran<br>
-Willie Shiels<br>
-Jim Moore<br>
-May they rest in peace<br>
-Sick Visitation<br>
-Fr Shaun Doherty will attend the sick<br>
-and housebound in his care on Tuesday<br>
-and Friday.<br>
-Sick Visitation<br>
-Fr Paul Farren will attend the sick and<br>
-housebound in his care during the<br>
-coming week:<br>
-Monday afternoon from 1.30pm :<br>
-Lisfannon Park, William Street,<br>
-Creggan Street, Fahan Street,<br>
-Cable Street, Lower Road, Abbey<br>
-House, Little Diamond<br>
-Mulvey Park, Laburnum Terrace,<br>
-Elmwood Terrace,<br>
-Westland Street, Westland Terrace,<br>
-Gartan Square, Clarendon Manor,<br>
-Northland Road St Eugene&#x27;s Cathedral (Templemore)</p>
+Maureen McClay<br>
+Kay Hamill<br>
+Harry Hamill<br>
+Fr John Carlin S.J.<br>
+Sr Bridget McCourt<br>
+May they rest in peace Sacrament of Marriage<br>
+We congratulate<br>
+Amy Doherty &amp; Caolán McCosker<br>
+Caragh McCool &amp; Robert Deane<br>
+who celebrated the Sacrament of<br>
+Marriage recently in the Cathedral<br>
+May God bless you abundantly in love,<br>
+joy and happiness<br>
+St Eugene's Cathedral (Templemore) <a href="https://steugenescathedral.com" target="_blank" rel="noopener noreferrer">https://steugenescathedral.com</a></p>
 <hr>
 <p class="page-label">Page 2</p>
-<p>Blessing of Bikers and Motorcycles will take place on Sunday 13th September in<br>
-St Aengus’ Chapel, Burt, Co Donegal, at 1 .30pm. All are welcome to attend the brief<br>
+<p>The Padre Pio Prayer Group at Holy Family Church, Ballymagroarty, will take place<br>
+on Tuesday, 1st September 2026. The evening will begin with the Rosary at 6.45pm,<br>
+followed by the celebration of Holy Mass at 7.15pm. After Mass, the priest will bless<br>
+everyone with a first-class relic of St Pio while the closing prayers are recited. Everyone is<br>
+welcome.<br>
+Season of Creation 2026: The Season of Creation takes place from 1st September to 4<br>
+October, bringing Christians throughout the world together in prayer, reflection and action<br>
+for the care of our common home. This year’s theme, Living Water , invites us to give thanks<br>
+for the gift of water and renew our care for God’s creation.<br>
+Blessing of Bikers and Motorcycles will take place on Sunday 13th September in<br>
+St Aengus’ Chapel, Burt, Co Donegal, at 1.30pm. All are welcome to attend the brief<br>
 service and blessing. Following the blessing all are welcome to join the run to Ned’s Point<br>
 RNLI Station, to present the donation to the RNLI.<br>
-Please note, Mass will be celebrated on Sunday 13th September in St Patrick’s Ch urch,<br>
-Dungiven , at 11 .30am for deceased bikers, especially those who have died in past year.<br>
-Catholic Mothers Ireland – Family Day: Catholic Mothers Ireland will hold its Annual<br>
-National Mass on Sunday, 6th September at Termonbacca Retreat Centre, Derry .<br>
-The day will begin with Mass at 2.00pm, celebrated by Bishop Donal McKeown, followed<br>
-by refreshments, children&#x27;s activities, and a talk for parents. This promises to be a lovely<br>
-day for the whole family. For more information and booking details, please email<br>
-<a href="mailto:info@catholicmothers.ie" target="_blank" rel="noopener noreferrer">info@catholicmothers.ie</a> . All are welcome.<br>
+Please note, Mass will be celebrated on Sunday 13th September in St Patrick’s Church,<br>
+Dungiven, at 11.30am for deceased bikers, especially those who have died in past year.<br>
+Job Opportunity: Derry Diocesan Trust - Granaghan (Swatragh) Parish : Sacristan,<br>
+hours of work: 12 hours per week. Place of work: St John the Baptist Church. Rate of Pay:<br>
+£12.88 per hour. For application packs please email: <a href="mailto:recruitment@derrydiocese.org" target="_blank" rel="noopener noreferrer">recruitment@derrydiocese.org</a> or<br>
+telephone <a href="tel:+442871262302" style="color:#1d4ed8;font-weight:600;">028 7126 2302</a>. Completed applications must be returned to Personnel, Bishop’s<br>
+House, St Eugene’s Cathedral, Francis Street, Derry, BT48 9AP or via email to<br>
+<a href="mailto:recruitment@derrydiocese.org" target="_blank" rel="noopener noreferrer">recruitment@derrydiocese.org</a> no later than 12noon on Tuesday 15 September 2026. Derry<br>
+Diocesan Trust is an Equal Opportunities Employer. We welcome applications from all men<br>
+and women and from members of all communities.<br>
 Just five minutes from Derry, the IOSAS Centre and Celtic Prayer Garden is a special<br>
 place of peace, community and connection. Enjoy freshly prepared homemade food in<br>
 our warm and welcoming surroundings, then take time in our beautiful Celtic Prayer Garden,<br>
 relax and experience its wonderful peace and serenity.<br>
 Come along, meet friends and discover somewhere truly different. Group bookings are very<br>
 welcome, with ample parking and easy level access for visitors with mobility needs. Find<br>
-us at F93 F104. For more information contact us at 00353 74 9384866 .<br>
-Accord Derry – Marriage Preparation Workshops 2026 - Accord Derry is pleased to<br>
-announce upcoming Marriage Preparation Workshops taking place in 2026. These courses<br>
-are designed to support couples as they prepare for the Sacrament of Marriage.<br>
-The remaining available dates for 2026 are as follows:<br>
-• September: 25th –26th 2026<br>
-• November: 20th –21st 2026<br>
-All courses are now available for online booking at: <a href="https://www.accordni.com" target="_blank" rel="noopener noreferrer">www.accordni.com</a> .<br>
-Please note that Accord Derry will not be facilitating Marriage Preparation Courses during<br>
-October or December 2026. Couples are encouraged to book early to secure a place on their<br>
-preferred date.<br>
+us at F93 F104. For more information contact us at 00353 74 9384866.<br>
 St Eugene’s Cathedral is monitored by CCTV cameras and by two live streaming<br>
 cameras. Live streaming can be viewed online at <a href="https://www.churchservices.tv" target="_blank" rel="noopener noreferrer">www.churchservices.tv</a>,<br>
 <a href="https://www.watchmcnmedia" target="_blank" rel="noopener noreferrer">www.watchmcnmedia</a> or the parish website. The Diocese of Derry Privacy Notice is<br>
@@ -1087,17 +1111,17 @@ displayed on the parish website and Cathedral notice board, or you may obtain a 
 the Parish Office.<br>
 Safeguarding Notice : If you have any concerns with regard to the Safeguarding of children<br>
 within the Church please contact Marie O’Kane, the Diocesan Designated Liaison Person<br>
-(DLP) on <a href="tel:+447596500793" style="color:#1d4ed8;font-weight:600;">+447596500793</a> or email : <a href="mailto:dlp@derrydiocese.org" target="_blank" rel="noopener noreferrer">dlp@derrydiocese.org</a><br>
+(DLP) on <a href="tel:+447596500793" style="color:#1d4ed8;font-weight:600;">+447596500793</a> or email: <a href="mailto:dlp@derrydiocese.org" target="_blank" rel="noopener noreferrer">dlp@derrydiocese.org</a><br>
 Northern Ireland emergency services: PSNI (Police Service of Northern Ireland): 101 Social<br>
 Services: Gateway Services, Western HSC Trust: <a href="tel:+442871314090" style="color:#1d4ed8;font-weight:600;">028 7131 4090</a> (and ask for the Duty<br>
 Social Worker), Gateway Services, Northern HSC Trust: <a href="tel:+442894424459" style="color:#1d4ed8;font-weight:600;">028 9442 4459</a>, Regional<br>
-Emergency Social Work Services: 0800 197 9 995. Republic of Ireland emergency services:<br>
+Emergency Social Work Services: 0800 1979 995. Republic of Ireland emergency services:<br>
 Garda Síochána Buncrana: 00353 749 320 540 Letterkenny: 00353 749 167 100, TUSLA<br>
 (ROI) Child and Family Agency: 00353 749 102 23<br>
-Vol 5 4 No 32<br>
-Twent y-First Sunday<br>
-in Ordinar y Time<br>
-23rd August 2026<br>
+Vol 54 No 34<br>
+Twenty- Second Sunday<br>
+in Ordinary Time<br>
+30th August 2026<br>
 Priests: Fr Paul Farren, Fr Shaun Doherty</p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
@@ -1105,7 +1129,7 @@ Priests: Fr Paul Farren, Fr Shaun Doherty</p></div>
     <section class="parish-section">
       <h2 class="section-heading">Other DERRY Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghyaran"><a class="parish-link" href="parishofaghyaran.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li class="parish-item" data-name="ardmore"><a class="parish-link" href="ardmoreparish.html" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li class="parish-item" data-name="ardstraw east"><a class="parish-link" href="parishofardstraweast.html" target="_blank" rel="noopener noreferrer">Ardstraw East</a></li><li class="parish-item" data-name="ballinascreen (&amp; desertmartin amalgamated)"><a class="parish-link" href="parishofballinascreen.html" target="_blank" rel="noopener noreferrer">Ballinascreen (&amp; Desertmartin amalgamated)</a></li><li class="parish-item" data-name="banagher"><a class="parish-link" href="banagherparish.html" target="_blank" rel="noopener noreferrer">Banagher</a></li><li class="parish-item" data-name="bellaghy"><a class="parish-link" href="bellaghyparish.html" target="_blank" rel="noopener noreferrer">Bellaghy</a></li><li class="parish-item" data-name="buncrana"><a class="parish-link" href="buncranaparish.html" target="_blank" rel="noopener noreferrer">Buncrana</a></li><li class="parish-item" data-name="camus"><a class="parish-link" href="camusparish.html" target="_blank" rel="noopener noreferrer">Camus</a></li><li class="parish-item" data-name="carndonagh"><a class="parish-link" href="carndonaghparish.html" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li class="parish-item" data-name="castlederg"><a class="parish-link" href="castledergparish.html" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li class="parish-item" data-name="clonleigh (strabane pastoral area)"><a class="parish-link" href="clonleighparish.html" target="_blank" rel="noopener noreferrer">Clonleigh (Strabane Pastoral Area)</a></li><li class="parish-item" data-name="clonmany"><a class="parish-link" href="clonmanyparish.html" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li class="parish-item" data-name="culdaff"><a class="parish-link" href="culdaffparish.html" target="_blank" rel="noopener noreferrer">Culdaff</a></li><li class="parish-item" data-name="culmoe"><a class="parish-link" href="culmoreparish.html" target="_blank" rel="noopener noreferrer">Culmoe</a></li><li class="parish-item" data-name="dma parish (claudy area)"><a class="parish-link" href="dmaparish.html" target="_blank" rel="noopener noreferrer">DMA Parish (Claudy area)</a></li><li class="parish-item" data-name="drumquin"><a class="parish-link" href="drumquinparish.html" target="_blank" rel="noopener noreferrer">Drumquin</a></li><li class="parish-item" data-name="drumragh"><a class="parish-link" href="drumraghparish.html" target="_blank" rel="noopener noreferrer">Drumragh</a></li><li class="parish-item" data-name="dungiven"><a class="parish-link" href="parishofdungiven.html" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li class="parish-item" data-name="errigal"><a class="parish-link" href="errigalparish.html" target="_blank" rel="noopener noreferrer">Errigal</a></li><li class="parish-item" data-name="fahan"><a class="parish-link" href="fahanparish.html" target="_blank" rel="noopener noreferrer">Fahan</a></li><li class="parish-item" data-name="granaghan"><a class="parish-link" href="granaghanparish.html" target="_blank" rel="noopener noreferrer">Granaghan</a></li><li class="parish-item" data-name="greenlough"><a class="parish-link" href="greenlough.html" target="_blank" rel="noopener noreferrer">Greenlough</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holyfamily-parish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="iskaheen"><a class="parish-link" href="iskaheenparish.html" target="_blank" rel="noopener noreferrer">Iskaheen</a></li><li class="parish-item" data-name="kilrea"><a class="parish-link" href="parishofkilrea.html" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li class="parish-item" data-name="lavey"><a class="parish-link" href="laveyparish.html" target="_blank" rel="noopener noreferrer">Lavey</a></li><li class="parish-item" data-name="leckpatrick"><a class="parish-link" href="leckpatrickparish.html" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li class="parish-item" data-name="maghera (derry)"><a class="parish-link" href="magheraparishderry.html" target="_blank" rel="noopener noreferrer">Maghera (Derry)</a></li><li class="parish-item" data-name="melmount (&amp; camus)"><a class="parish-link" href="melmountparish.html" target="_blank" rel="noopener noreferrer">Melmount (&amp; Camus)</a></li><li class="parish-item" data-name="moville"><a class="parish-link" href="movilleparish.html" target="_blank" rel="noopener noreferrer">Moville</a></li><li class="parish-item" data-name="sion mills"><a class="parish-link" href="parishofsionmills.html" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li class="parish-item" data-name="st mary&#x27;s parish creggan"><a class="parish-link" href="stmarysparishcreggan.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Parish Creggan</a></li><li class="parish-item" data-name="star of the sea (magilligan)"><a class="parish-link" href="staroftheseacatholic.html" target="_blank" rel="noopener noreferrer">Star of the Sea (Magilligan)</a></li><li class="parish-item" data-name="steelstown"><a class="parish-link" href="steelstownparish.html" target="_blank" rel="noopener noreferrer">Steelstown</a></li><li class="parish-item" data-name="three patrons"><a class="parish-link" href="threepatrons.html" target="_blank" rel="noopener noreferrer">Three Patrons</a></li><li class="parish-item" data-name="waterside (&amp; strathfoyle amalgamated)"><a class="parish-link" href="watersideparish.html" target="_blank" rel="noopener noreferrer">Waterside (&amp; Strathfoyle amalgamated)</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghyaran"><a class="parish-link" href="parishofaghyaran.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li class="parish-item" data-name="ardmore"><a class="parish-link" href="ardmoreparish.html" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li class="parish-item" data-name="banagher"><a class="parish-link" href="banagherparish.html" target="_blank" rel="noopener noreferrer">Banagher</a></li><li class="parish-item" data-name="buncrana"><a class="parish-link" href="buncranaparish.html" target="_blank" rel="noopener noreferrer">Buncrana</a></li><li class="parish-item" data-name="camus"><a class="parish-link" href="camusparish.html" target="_blank" rel="noopener noreferrer">Camus</a></li><li class="parish-item" data-name="carndonagh"><a class="parish-link" href="carndonaghparish.html" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li class="parish-item" data-name="castlederg"><a class="parish-link" href="castledergparish.html" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li class="parish-item" data-name="clonleigh (strabane pastoral area)"><a class="parish-link" href="clonleighparish.html" target="_blank" rel="noopener noreferrer">Clonleigh (Strabane Pastoral Area)</a></li><li class="parish-item" data-name="clonmany"><a class="parish-link" href="clonmanyparish.html" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li class="parish-item" data-name="culdaff"><a class="parish-link" href="culdaffparish.html" target="_blank" rel="noopener noreferrer">Culdaff</a></li><li class="parish-item" data-name="culmoe"><a class="parish-link" href="culmoreparish.html" target="_blank" rel="noopener noreferrer">Culmoe</a></li><li class="parish-item" data-name="dma parish (claudy area)"><a class="parish-link" href="dmaparish.html" target="_blank" rel="noopener noreferrer">DMA Parish (Claudy area)</a></li><li class="parish-item" data-name="drumquin"><a class="parish-link" href="drumquinparish.html" target="_blank" rel="noopener noreferrer">Drumquin</a></li><li class="parish-item" data-name="drumragh"><a class="parish-link" href="drumraghparish.html" target="_blank" rel="noopener noreferrer">Drumragh</a></li><li class="parish-item" data-name="dungiven"><a class="parish-link" href="parishofdungiven.html" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li class="parish-item" data-name="errigal"><a class="parish-link" href="errigalparish.html" target="_blank" rel="noopener noreferrer">Errigal</a></li><li class="parish-item" data-name="fahan"><a class="parish-link" href="fahanparish.html" target="_blank" rel="noopener noreferrer">Fahan</a></li><li class="parish-item" data-name="granaghan"><a class="parish-link" href="granaghanparish.html" target="_blank" rel="noopener noreferrer">Granaghan</a></li><li class="parish-item" data-name="greenlough"><a class="parish-link" href="greenlough.html" target="_blank" rel="noopener noreferrer">Greenlough</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holyfamily-parish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="iskaheen"><a class="parish-link" href="iskaheenparish.html" target="_blank" rel="noopener noreferrer">Iskaheen</a></li><li class="parish-item" data-name="kilrea"><a class="parish-link" href="parishofkilrea.html" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li class="parish-item" data-name="lavey"><a class="parish-link" href="laveyparish.html" target="_blank" rel="noopener noreferrer">Lavey</a></li><li class="parish-item" data-name="leckpatrick"><a class="parish-link" href="leckpatrickparish.html" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li class="parish-item" data-name="maghera (derry)"><a class="parish-link" href="magheraparishderry.html" target="_blank" rel="noopener noreferrer">Maghera (Derry)</a></li><li class="parish-item" data-name="melmount (&amp; camus)"><a class="parish-link" href="melmountparish.html" target="_blank" rel="noopener noreferrer">Melmount (&amp; Camus)</a></li><li class="parish-item" data-name="moville"><a class="parish-link" href="movilleparish.html" target="_blank" rel="noopener noreferrer">Moville</a></li><li class="parish-item" data-name="sion mills"><a class="parish-link" href="parishofsionmills.html" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li class="parish-item" data-name="st mary&#x27;s parish creggan"><a class="parish-link" href="stmarysparishcreggan.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Parish Creggan</a></li><li class="parish-item" data-name="star of the sea (magilligan)"><a class="parish-link" href="staroftheseacatholic.html" target="_blank" rel="noopener noreferrer">Star of the Sea (Magilligan)</a></li><li class="parish-item" data-name="steelstown"><a class="parish-link" href="steelstownparish.html" target="_blank" rel="noopener noreferrer">Steelstown</a></li><li class="parish-item" data-name="waterside (&amp; strathfoyle amalgamated)"><a class="parish-link" href="watersideparish.html" target="_blank" rel="noopener noreferrer">Waterside (&amp; Strathfoyle amalgamated)</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1157,9 +1181,9 @@ Priests: Fr Paul Farren, Fr Shaun Doherty</p></div>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1651,23 +1675,8 @@ Priests: Fr Paul Farren, Fr Shaun Doherty</p></div>
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

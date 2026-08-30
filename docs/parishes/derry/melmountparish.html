@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Melmount (&amp; Camus) Bulletin — 25/08/2026</title>
+  <title>Melmount (&amp; Camus) Bulletin — 30/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -179,6 +187,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -201,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +275,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +472,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -863,7 +892,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,14 +900,14 @@
     <header class="header">
       <p class="diocese-label">DERRY</p>
       <h1>Melmount (&amp; Camus) Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Melmount (&amp; Camus) — 25/08/2026. Part of the Derry Diocese collated bulletin.</p>
-      <a class="download-link-top" href="melmountparish.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Melmount (&amp; Camus) — 30/08/2026. Part of the Derry Diocese collated bulletin.</p>
+      <a class="download-link-top" href="melmountparish.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="melmountparish.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="melmountparish.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
@@ -895,7 +924,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="melmountparish.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="melmountparish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="melmountparish.pdf">Open PDF</a>
               <a href="melmountparish.pdf" download>Download</a>
             </div>
           </div>
@@ -934,182 +963,170 @@
       <div class="quiet-links">
         <a href="melmountparish-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-melmount-camus" data-parish-name="Melmount (&amp; Camus)"><h2 class="ocr-parish-name">Melmount (&amp; Camus)</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-melmount-camus" data-parish-name="Melmount (&amp; Camus)"><h2 class="ocr-parish-name">Melmount (&amp; Camus)</h2><p class="ocr-parish-date">30/08/2026</p></header>
 <p class="page-label">Page 1</p>
-<p>15 Sunday in Ordinary Time (Year A)<br>
-12 July 2026<br>
-The Soil of Our Lives<br>
-This Sunday Jesus tells us the parable of the sower. It is one of the most<br>
-familiar stories in the Gospels. A farmer scatters seed. Some falls on the<br>
-path, some on rocky ground, some among thorns, and some on rich soil.<br>
-Only the rich soil produces a harvest.<br>
-Anyone who has ever grown anything in soil knows that you can have the<br>
-best seed in the world, but if the ground isn&#x27;t ready, nothing will come of<br>
-it. The work is in the preparation. The digging, the clearing, the weeding.<br>
-It is slow and unspectacular, and nobody sees it. But it makes all the<br>
-difference.<br>
-Isaiah reminds us this weekend that God&#x27;s Word never returns to Him<br>
-empty. Like the rain and the snow that water the earth, His word always<br>
-accomplishes what it was sent to do. The seed is never the problem. God<br>
-is endlessly generous. He scatters His grace everywhere, on all of us,<br>
-without measure and without favourites. The question the parable puts to<br>
-each of us is a simple one: what kind of ground is He landing on?<br>
-Every one of us has been planted with gifts. Gifts of faith, of kindness, of<br>
-patience, of prayer. Some of them are lying dormant because the soil of<br>
-our lives has become hardened, or crowded, or shallow. The worries of<br>
-the week, the busyness, the old hurts we haven&#x27;t let go of — these are<br>
-the thorns and the stones. They don&#x27;t destroy the seed. They just stop it<br>
-growing.<br>
-The good news is that soil can always be worked: A little time in prayer<br>
-each day. An honest look at what is choking the Word in us. A return to<br>
-the Sacraments. Small, quiet acts of clearing the ground! When we do<br>
-th<br>
-Melmount (&amp; Camus)</p>
+<p>22 Sunday in Ordinary Time<br>
+30 August 2026<br>
+Welcome Back<br>
+After the summer break, it is good to be back with our weekly reflection<br>
+and the Gospel this Sunday is a great place to rest art.<br>
+Last week we heard Peter&#x27;s great confession: &quot;You are the Christ.&quot; This<br>
+week, only moments later in the same conversation, the same Peter gets<br>
+it badly wrong. Jesus speaks of the cross, and Pete r takes him aside to<br>
+talk him out of it. &quot;Get behind me, Satan,&quot; Jesus replies. Peter, the rock,<br>
+has become a stumbling block!<br>
+There is great comfort in that. Peter is not a badd ie here; he is a man who<br>
+loves Jesus and cannot bear the thought of him suff ering. His mistake is<br>
+one we all make: wanting God on our terms, wanting faith without cost,<br>
+wanting the crown without the cross.<br>
+Jesus does not reject Peter. He simply tells him to get back where a<br>
+disciple belongs: behind the Master, following, not leading.<br>
+Jeremiah knew the same struggle. In the first readi ng he complains that<br>
+God has seduced him, that being a prophet has broug ht him nothing but<br>
+insult and derision. He decides to say no more and then finds a fire<br>
+burning in his heart that he cannot hold in. Faith is like that. It costs, and<br>
+yet we cannot walk away from it, because it is life itself.<br>
+&quot;Anyone who loses his life for my sake will find it .&quot; As a new school and<br>
+parish year begins, that is the question the Gospel puts to each of us:<br>
+where am I spending my life? On things that will pa ss, or on the One who<br>
+lasts?ndMelmount (&amp; Camus) <a href="https://www.melmountparish.com" target="_blank" rel="noopener noreferrer">https://www.melmountparish.com</a></p>
 <hr>
 <p class="page-label">Page 2</p>
-<p>that, our roots go down deeper into God, and we find a steadiness that<br>
-the heat of life cannot wither.<br>
-St Paul tells us the whole of creation is groaning, waiting to be set free.<br>
-That freedom begins in small plots of ground, that is in hearts like yours<br>
-and mine that let the Word take root and grow.<br>
-So this week, ask the Lord: what needs clearing in me? Then let Him in<br>
-with the spade! The harvest He promises is thirty, sixty, a hundredfold.<br>
+<p>Welcome back and every blessing as we continue our journeys. May we<br>
+find life by giving it away for God.<br>
 Fr Sean<br>
-FATIMA PILGRIMAGE<br>
-I’m in Fatima with Fr Stephen Baxter (our newly ordained) and 60 others<br>
-from our Parishes and others in Fatima. Please be assured of our prayers<br>
-at all our Masses, Rosaries and Processions for you all and your<br>
-intentions, and I ask for yours for us as well. Thanks to Fr Michael Canny<br>
-PP, Fr Patrick Lagan CC and Fr Joshy Parokkaran CC from Waterside for<br>
-providing cover while I’m away.<br>
+Announcements<br>
+Last week’s collections amounted to: Melmount: £2483.00; Sion Mills :<br>
+£1135.00. Thank you. Sunday 12 July: Melmount: £3234.00; Sion Mills :<br>
+£1206.00. Thank you.<br>
+Sunday 19 July: Thank you for your contributions to the Priest Collection.<br>
+Sunday 26 July: Melmount: £2859.00; Sion Mills : £1291.00. Thank you.<br>
+Sunday 2 August: Melmount: £3353.00; Sion Mills : £1050.00. Thank<br>
+you.<br>
+Sunday 9 August: Melmount: £2373.00; Sion Mills : £1076.00. Thank<br>
+you.<br>
+Sunday 16 August: Melmount: £2595.00; Sion Mills : £1320.00. Thank<br>
+you.<br>
+Fr. Sean would like to thank you all for your conti nued support.<br>
+Exposition of the Blessed Sacrament will take place in St. Mary’s,<br>
+Melmount tomorrow, Monday 31 August after 10.00am M ass until 6.30pm.<br>
 We welcome into God’s Family through the Sacrament of Baptism:<br>
-Lottie Kimberley Jowett<br>
-Remy Petroosbabakhan<br>
-May they Rest in Peace<br>
-Deaths<br>
-Gerard O’Connell, 60 Belldoo<br>
-Bernard O’Brien, 2 Mourne Park<br>
-Jackie Begley, 217 Ballycolman Estate<br>
-Jim Harley, 1 Melmount Park<br>
-Thomas Martin Roulston, 89 Carlton Drive</p>
-<h3 class="b-head">Anniversaries</h3>
+Cait Cooke, Oliver Terence Coyle Burrows, Max Dean Harkin, Mia Jean<br>
+Hoynes<br>
+Lochlan Eamon Sweeney, Logan Samuel Warden, Adi Bob jee Gary<br>
+McKearney<br>
+Darragh Stephen Kearney, Leo Naoise McCrossan, Wren Kerri<br>
+McLaughlin</p>
 <hr>
 <p class="page-label">Page 3</p>
-<p>Sr. Monica O’Kane, Mary Kate Mullen, William Robinson<br>
-Conor McCarron, Tony McAleer, Susan Logue<br>
-Vincent Gormley, Betty McColgan, Ellen Jane McCormick<br>
-John Ellis, Frances O’Connor, Tommy McGarrigle<br>
-Gerard Blake, Joe Millar, Tom Skehan<br>
-Kay McGuigan, William Devine, Jude Crotty<br>
-Frank Molloy, Maureen Devine, Eunan Herron<br>
-Tommy Finlay, Harry McCrossan, Anne McCay<br>
-Magdalene Curry, Molly McDaid, David Coyle<br>
-Deirdre Drumm Pearce, Dessie Drumm, Grace Drumm<br>
-Noel Brennan, Joe McNulty, Alice Alexander<br>
-Robert Brennan, George Fitzpatrick, Francis Moss<br>
-Margaret Quigley, Packie Duncan, Frank McElwee<br>
-Michael McDaid, Ann McShane, Patrick Early<br>
-George Early, Sarah Early, George Devenney<br>
-David McDaid, Marie Henderson<br>
-Announcements<br>
-Last week’s collections amounted to: Melmount: £3373.00; Sion Mills:<br>
-£1465.00. Thank you. Those who pay to the weekly collection or any<br>
-special collections, including Priest’s Collection by cheque are asked that<br>
-all cheques should be made payable to ‘Melmount Parish’ or ‘Sion Mills<br>
-Parish’ depending on the Parish. This is a banking requirement.<br>
-Parishioners can still leave their contributions in the Parish Office. If the<br>
-Office is closed, please use the letterbox.<br>
-Parish Bulletin This is the last bulletin until September.</p>
+<p>Amelia Patricia Turnbull, Ava Michelle Turnbull, Ad a Helen Mullen<br>
+Amelia Bernadette McDonnell, Cian Thomas Martin, Bl aine Michael Kelly<br>
+May they Rest in Peace<br>
+Deaths<br>
+Terry McGonigle , 59 Carrick Strand<br>
+Pat Quinn , 24 Ashgrove Park<br>
+Frank Connolly , 1 Glebe Park<br>
+Anthony McGillian , 23 Innisfree Gardens<br>
+Garvan O’Connor , 35 Castlegrange Park<br>
+Jane O’Friel , Lifford<br>
+Michael Boyce , Laurel Drive<br>
+Michael (Mixer) McCrossan , 4 Marian Park<br>
+John Duncan , 18 Church View<br>
+Harry Mullen , 300 Victoria Road<br>
+Charlie Gillespie , 33 Belldoo<br>
+Laurence Gallagher , 16 Drumman Court<br>
+Maureen Duffy , 32 Ballycolman Road<br>
+Tommy Curley , Lisnafin Park<br>
+Margaret Sweeney , 66 Glebe Gardens<br>
+Leo O’Kane , Wicklow, formerly Bridge Street<br>
+Speedy Rouse , 22 Upper Main Street</p>
+<h3 class="b-head">Anniversaries</h3>
 <hr>
 <p class="page-label">Page 4</p>
-<p>Exposition of the Blessed Sacrament will take place in St. Mary’s,<br>
-Melmount tomorrow, Monday 13 July after 10.00am Mass until 6.30pm.<br>
-Vocations We pray for the men called to serve the Church as priests of<br>
-our diocese, that their hearts will be the fertile soil Jesus needs to receive<br>
-the seed which is His Word, and that they will spread His Word, His Good<br>
-News, by their preaching and by the example of their lives.<br>
-Adoration Everyday The Blessed Sacrament can be adored in the<br>
-Adoration Room, St. Theresa’s, Sion Mills anytime while the church is<br>
-open.<br>
+<p>Columba O’Neill, Thomas James Devlin, Gerard Kearne y<br>
+Annie Mary Elliott, Liam Corry, Danny Carlin<br>
+Mark McGrath, Geraldine McBrearty, Damien McGrath<br>
+Tony McAleer, Ruby Duffy, Raymond Allen, Sheila McH ugh<br>
+Willie Christy, Joe McShane, Owen Sweeney<br>
+Willie Doyle, Pearl McAneny, Aidan Callaghan<br>
+Arthur O’Kane, Paddy Connolly, Dympna Coyle<br>
+First Friday of this week is the First Friday. Mass will be at<br>
+10.00am in St. Mary’s, Melmount. Confessions will t ake place there on<br>
+the Thursday before the First Friday after 10.00am Mass and on Friday<br>
+after 10.00am Mass (if no funeral). Mass in St. Theresa’s, Sion Mills at<br>
+7.00pm on the First Friday.<br>
+Vocations We pray that the men called to priesthood will be f illed with<br>
+courage and hope as they hear Jesus calling them to follow Him by<br>
+renouncing themselves, taking up their cross every day, and finding life in<br>
+Him and in the service of His people.<br>
 Baptism Dates Melmount<br>
-July: Sunday 19; Saturday 25; Sunday 26.<br>
-August: Saturday 8; Saturday 29.<br>
 September: Saturday 5; Sunday 13; Saturday 19.<br>
-October: Sunday 4; Saturday 10; Saturday 17; Saturday 24.<br>
-November: Sunday 8; Saturday 14; Saturday 21; Saturday 28.<br>
-Baptisms will be at 3.30pm on a Saturday and 12.45pm on a Sunday.<br>
-To book a Baptism contact the Parish Office on 71383777 during office<br>
+October: Sunday 4; Saturday 10; Saturday 17; Saturd ay 24.<br>
+November: Sunday 8; Saturday 14; Saturday 21; Satur day 28.<br>
+Baptisms will be at 3.30pm on a Saturday and 12.45p m on a Sunday.<br>
+To book a Baptism contact the Parish Office on 7138 3777 during office<br>
 hours.<br>
-Accord Marriage Preparation Courses (Pre-Marriage Courses) will<br>
-take place in September 25/26 and November 20/21. All courses are now<br>
-online for booking at<br>
-Please Note: These courses are in person and not online courses.<br>
-Accord Derry will NOT be facilitating courses during October or<br>
-December.</p>
+Adoration Everyday The Blessed Sacrament can be adored in the<br>
+Adoration Room, St. Theresa’s, Sion Mills anytime w hile the church is<br>
+open.</p>
 <hr>
 <p class="page-label">Page 5</p>
-<p>Safeguarding Notice If you have any concerns with regard to the<br>
-Safeguarding of children within the church please contact Marie O’Kane,<br>
-the Diocesan Designated Liaison Person (DLP) on <a href="tel:+447596500793" style="color:#1d4ed8;font-weight:600;">+447596500793</a> or<br>
+<p>Leukaemia &amp; Lymphoma NI Our Strabane Branch’s Annual Walk for<br>
+Blood Cancer Awareness Month will take place on Fri day 4 September<br>
+leaving from MK’s Bar, Derry Road at 7.00pm. You ca n register on the<br>
+night from 6.30pm or pre-book your place at:<br>
+<a href="https://llni.co.uk/event/strabane-walk-for-blood-ca" target="_blank" rel="noopener noreferrer">https://llni.co.uk/event/strabane-walk-for-blood-ca</a> ncer-awareness-month/<br>
+Holy Cross College will reopen for pupils as follow s:<br>
+Tuesday 1 September – Year 8 and Peer Mentors<br>
+Wednesday 2 September – Years 8, 12, 13 &amp; 14<br>
+Thursday 3 September – Years 9, 10, 11, 12, 13 &amp; 14<br>
+Friday 4 September – All Year Groups<br>
+Donegal Group 173 Rise and Shine Trust (formerly The Irish<br>
+Handicapped Children’s Pilgrimage Trust and The Iri sh Pilgrimage<br>
+Trust) are celebrating 40 years of taking young people wit h special needs<br>
+to Lourdes each Easter. We are celebrating with a s pecial Mass on<br>
+Saturday 26 September in the Church of the Irish Ma rtyr’s, Letterkenny at<br>
+12 noon. The Mass will be concelebrated by Bishop N iall Coll and Bishop<br>
+Donal McKeown and many of the priests who travelled to Lourdes with us<br>
+over the years. We invite all the guests and their families and all the<br>
+helpers who travelled with us over the years to our mass to celebrate Our<br>
+Lady of Lourdes.<br>
+Catholic Mothers Ireland – Family Day Catholic Mothers Ireland will<br>
+hold its Annual National Mass on Sunday 6 September at Termonbacca<br>
+Retreat Centre, Derry. The day will begin with Mass at 2.00pm, celebrated<br>
+by Bishop Donal McKeown, followed by refreshments, children’s activities<br>
+and a talk for parents. For more information and bo oking details email:<br>
+<a href="mailto:Info@Catholicmothers.Ie" target="_blank" rel="noopener noreferrer">Info@Catholicmothers.Ie</a><br>
+Season of Creation 2026 The Season of Creation takes place from 1<br>
+September to 4 October, bringing Christians through out the world<br>
+together in prayer, reflection and action for the c are of our common home.</p>
+<hr>
+<p class="page-label">Page 6</p>
+<p>This year’s theme ‘Living Water’ invites us to give thanks for the gift of<br>
+water.<br>
+Blessing of Bikers and Motorcycles will take place on Sunday 13<br>
+September in St. Aengus’ Chapel, Burt, Co. Donegal at 1.30pm. All are<br>
+welcome to attend the brief service and blessing. F ollowing the blessing<br>
+all are welcome to join the run to Ned’s Point RNLI Station to present the<br>
+donation to the RNLI. Please Note: Mass will be celebrated on Sunday<br>
+13 September in St. Patrick’s Church, Dungiven at 1 1.30am for deceased<br>
+bikers, especially those who have died in the past year.<br>
+Safeguarding Notice If you have any concerns with regard to the<br>
+Safeguarding of children within the church please c ontact Marie O’Kane,<br>
+the Diocesan Designated Liaison Person (DLP) on <a href="tel:+447596500793" style="color:#1d4ed8;font-weight:600;">+44 7596500793</a> or<br>
 email@<br>
 <a href="mailto:Dlp@Derrydiocese.Org" target="_blank" rel="noopener noreferrer">Dlp@Derrydiocese.Org</a><br>
 . Northern Ireland emergency services: PSNI on 101; Social Services:<br>
-Gateway Services, Western HSC Trust, <a href="tel:+442871314090" style="color:#1d4ed8;font-weight:600;">028 71314090</a> and ask for the<br>
+Gateway Services, Western HSC Trust, <a href="tel:+442871314090" style="color:#1d4ed8;font-weight:600;">028 71314090</a> a nd ask for the<br>
 Duty Social Worker. Regional Emergency Social Work Services 0800<br>
-1979 995.<br>
-The Parish Draws for July and August took place on Wednesday 8<br>
-July. The winners are as follows:<br>
-July Draw<br>
-£500: 1027 Genevieve O’Neill – Genevieve O’Neill<br>
-£250: 1350 Concepta McGarrigle – Ann Donaghey<br>
-£250: 1708 Thomas Moore – Teresa Quigg<br>
-£250: 1338 Marianne Patton – Carol-ann Stewart<br>
-£150: 1995 Tammy McNulty – Irene Callan<br>
-£150: 1304 Ina O’Neill – Sheelagh McKelvey<br>
-£150: 1719 Christine McHugh – Teresa Quigg<br>
-£100: 1243 Bronagh Lynch – Declan Duffy<br>
-£100: 1669 Declan McColgan – Madeleine McColgan<br>
-£100: 1702 Terrie Logue - Genevieve O’Neill<br>
-August Draw<br>
-£500: 1756 Vincent McCarron – Katrina Houston<br>
-£250: 1626 Anne Neeson – Madeleine McColgan<br>
-£250: 1379 Gary McNicholl – Sheelagh McKelvey</p>
-<hr>
-<p class="page-label">Page 6</p>
-<p>£250: 1862 Emma Lynch – Elizabeth O’Hare<br>
-£150: 1825 Susan McGuinness – John Donohoe<br>
-£150: 1684 Teresa Boggs – Katrina Houston<br>
-£150: 1380 Bridget McCrory – Sheelagh McKelvey<br>
-£100: 1010 Mya McNulty – Dolores Houston<br>
-£100: 1258 Corrine Hannigan – Elizabeth O’Hare<br>
-£100: 1507 Jacintha Gillespie - Elizabeth O’Hare<br>
-Forty Hours<br>
-Adoration – St<br>
-Mary’s<br>
-Melmount<br>
-Join us for Forty Hours<br>
-Adoration in St Mary’s<br>
-Melmount between 26th and<br>
-27th October 2025.<br>
-You can view or download the<br>
-full programme by opening the<br>
-link below. To open in a new<br>
-tab, right-click and select<br>
-“Open link in new tab”, or hold<br>
-Ctrl (Windows) / Cmd (Mac)<br>
-and click.<br>
-📄<br>
-View Forty Hours Adoration<br>
-PDF<br>
-✍️<br>
-Sign-Up Sheet (PDF)</p></div>
+1979 995.</p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other DERRY Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghyaran"><a class="parish-link" href="parishofaghyaran.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li class="parish-item" data-name="ardmore"><a class="parish-link" href="ardmoreparish.html" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li class="parish-item" data-name="ardstraw east"><a class="parish-link" href="parishofardstraweast.html" target="_blank" rel="noopener noreferrer">Ardstraw East</a></li><li class="parish-item" data-name="ballinascreen (&amp; desertmartin amalgamated)"><a class="parish-link" href="parishofballinascreen.html" target="_blank" rel="noopener noreferrer">Ballinascreen (&amp; Desertmartin amalgamated)</a></li><li class="parish-item" data-name="banagher"><a class="parish-link" href="banagherparish.html" target="_blank" rel="noopener noreferrer">Banagher</a></li><li class="parish-item" data-name="bellaghy"><a class="parish-link" href="bellaghyparish.html" target="_blank" rel="noopener noreferrer">Bellaghy</a></li><li class="parish-item" data-name="buncrana"><a class="parish-link" href="buncranaparish.html" target="_blank" rel="noopener noreferrer">Buncrana</a></li><li class="parish-item" data-name="camus"><a class="parish-link" href="camusparish.html" target="_blank" rel="noopener noreferrer">Camus</a></li><li class="parish-item" data-name="carndonagh"><a class="parish-link" href="carndonaghparish.html" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li class="parish-item" data-name="castlederg"><a class="parish-link" href="castledergparish.html" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li class="parish-item" data-name="clonleigh (strabane pastoral area)"><a class="parish-link" href="clonleighparish.html" target="_blank" rel="noopener noreferrer">Clonleigh (Strabane Pastoral Area)</a></li><li class="parish-item" data-name="clonmany"><a class="parish-link" href="clonmanyparish.html" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li class="parish-item" data-name="culdaff"><a class="parish-link" href="culdaffparish.html" target="_blank" rel="noopener noreferrer">Culdaff</a></li><li class="parish-item" data-name="culmoe"><a class="parish-link" href="culmoreparish.html" target="_blank" rel="noopener noreferrer">Culmoe</a></li><li class="parish-item" data-name="dma parish (claudy area)"><a class="parish-link" href="dmaparish.html" target="_blank" rel="noopener noreferrer">DMA Parish (Claudy area)</a></li><li class="parish-item" data-name="drumquin"><a class="parish-link" href="drumquinparish.html" target="_blank" rel="noopener noreferrer">Drumquin</a></li><li class="parish-item" data-name="drumragh"><a class="parish-link" href="drumraghparish.html" target="_blank" rel="noopener noreferrer">Drumragh</a></li><li class="parish-item" data-name="dungiven"><a class="parish-link" href="parishofdungiven.html" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li class="parish-item" data-name="errigal"><a class="parish-link" href="errigalparish.html" target="_blank" rel="noopener noreferrer">Errigal</a></li><li class="parish-item" data-name="fahan"><a class="parish-link" href="fahanparish.html" target="_blank" rel="noopener noreferrer">Fahan</a></li><li class="parish-item" data-name="granaghan"><a class="parish-link" href="granaghanparish.html" target="_blank" rel="noopener noreferrer">Granaghan</a></li><li class="parish-item" data-name="greenlough"><a class="parish-link" href="greenlough.html" target="_blank" rel="noopener noreferrer">Greenlough</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holyfamily-parish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="iskaheen"><a class="parish-link" href="iskaheenparish.html" target="_blank" rel="noopener noreferrer">Iskaheen</a></li><li class="parish-item" data-name="kilrea"><a class="parish-link" href="parishofkilrea.html" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li class="parish-item" data-name="lavey"><a class="parish-link" href="laveyparish.html" target="_blank" rel="noopener noreferrer">Lavey</a></li><li class="parish-item" data-name="leckpatrick"><a class="parish-link" href="leckpatrickparish.html" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li class="parish-item" data-name="maghera (derry)"><a class="parish-link" href="magheraparishderry.html" target="_blank" rel="noopener noreferrer">Maghera (Derry)</a></li><li class="parish-item" data-name="moville"><a class="parish-link" href="movilleparish.html" target="_blank" rel="noopener noreferrer">Moville</a></li><li class="parish-item" data-name="sion mills"><a class="parish-link" href="parishofsionmills.html" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li class="parish-item" data-name="st eugene&#x27;s cathedral (templemore)"><a class="parish-link" href="steugenescathedral.html" target="_blank" rel="noopener noreferrer">St Eugene&#x27;s Cathedral (Templemore)</a></li><li class="parish-item" data-name="st mary&#x27;s parish creggan"><a class="parish-link" href="stmarysparishcreggan.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Parish Creggan</a></li><li class="parish-item" data-name="star of the sea (magilligan)"><a class="parish-link" href="staroftheseacatholic.html" target="_blank" rel="noopener noreferrer">Star of the Sea (Magilligan)</a></li><li class="parish-item" data-name="steelstown"><a class="parish-link" href="steelstownparish.html" target="_blank" rel="noopener noreferrer">Steelstown</a></li><li class="parish-item" data-name="three patrons"><a class="parish-link" href="threepatrons.html" target="_blank" rel="noopener noreferrer">Three Patrons</a></li><li class="parish-item" data-name="waterside (&amp; strathfoyle amalgamated)"><a class="parish-link" href="watersideparish.html" target="_blank" rel="noopener noreferrer">Waterside (&amp; Strathfoyle amalgamated)</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghyaran"><a class="parish-link" href="parishofaghyaran.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li class="parish-item" data-name="ardmore"><a class="parish-link" href="ardmoreparish.html" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li class="parish-item" data-name="banagher"><a class="parish-link" href="banagherparish.html" target="_blank" rel="noopener noreferrer">Banagher</a></li><li class="parish-item" data-name="buncrana"><a class="parish-link" href="buncranaparish.html" target="_blank" rel="noopener noreferrer">Buncrana</a></li><li class="parish-item" data-name="camus"><a class="parish-link" href="camusparish.html" target="_blank" rel="noopener noreferrer">Camus</a></li><li class="parish-item" data-name="carndonagh"><a class="parish-link" href="carndonaghparish.html" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li class="parish-item" data-name="castlederg"><a class="parish-link" href="castledergparish.html" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li class="parish-item" data-name="clonleigh (strabane pastoral area)"><a class="parish-link" href="clonleighparish.html" target="_blank" rel="noopener noreferrer">Clonleigh (Strabane Pastoral Area)</a></li><li class="parish-item" data-name="clonmany"><a class="parish-link" href="clonmanyparish.html" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li class="parish-item" data-name="culdaff"><a class="parish-link" href="culdaffparish.html" target="_blank" rel="noopener noreferrer">Culdaff</a></li><li class="parish-item" data-name="culmoe"><a class="parish-link" href="culmoreparish.html" target="_blank" rel="noopener noreferrer">Culmoe</a></li><li class="parish-item" data-name="dma parish (claudy area)"><a class="parish-link" href="dmaparish.html" target="_blank" rel="noopener noreferrer">DMA Parish (Claudy area)</a></li><li class="parish-item" data-name="drumquin"><a class="parish-link" href="drumquinparish.html" target="_blank" rel="noopener noreferrer">Drumquin</a></li><li class="parish-item" data-name="drumragh"><a class="parish-link" href="drumraghparish.html" target="_blank" rel="noopener noreferrer">Drumragh</a></li><li class="parish-item" data-name="dungiven"><a class="parish-link" href="parishofdungiven.html" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li class="parish-item" data-name="errigal"><a class="parish-link" href="errigalparish.html" target="_blank" rel="noopener noreferrer">Errigal</a></li><li class="parish-item" data-name="fahan"><a class="parish-link" href="fahanparish.html" target="_blank" rel="noopener noreferrer">Fahan</a></li><li class="parish-item" data-name="granaghan"><a class="parish-link" href="granaghanparish.html" target="_blank" rel="noopener noreferrer">Granaghan</a></li><li class="parish-item" data-name="greenlough"><a class="parish-link" href="greenlough.html" target="_blank" rel="noopener noreferrer">Greenlough</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holyfamily-parish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="iskaheen"><a class="parish-link" href="iskaheenparish.html" target="_blank" rel="noopener noreferrer">Iskaheen</a></li><li class="parish-item" data-name="kilrea"><a class="parish-link" href="parishofkilrea.html" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li class="parish-item" data-name="lavey"><a class="parish-link" href="laveyparish.html" target="_blank" rel="noopener noreferrer">Lavey</a></li><li class="parish-item" data-name="leckpatrick"><a class="parish-link" href="leckpatrickparish.html" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li class="parish-item" data-name="maghera (derry)"><a class="parish-link" href="magheraparishderry.html" target="_blank" rel="noopener noreferrer">Maghera (Derry)</a></li><li class="parish-item" data-name="moville"><a class="parish-link" href="movilleparish.html" target="_blank" rel="noopener noreferrer">Moville</a></li><li class="parish-item" data-name="sion mills"><a class="parish-link" href="parishofsionmills.html" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li class="parish-item" data-name="st eugene&#x27;s cathedral (templemore)"><a class="parish-link" href="steugenescathedral.html" target="_blank" rel="noopener noreferrer">St Eugene&#x27;s Cathedral (Templemore)</a></li><li class="parish-item" data-name="st mary&#x27;s parish creggan"><a class="parish-link" href="stmarysparishcreggan.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Parish Creggan</a></li><li class="parish-item" data-name="star of the sea (magilligan)"><a class="parish-link" href="staroftheseacatholic.html" target="_blank" rel="noopener noreferrer">Star of the Sea (Magilligan)</a></li><li class="parish-item" data-name="steelstown"><a class="parish-link" href="steelstownparish.html" target="_blank" rel="noopener noreferrer">Steelstown</a></li><li class="parish-item" data-name="waterside (&amp; strathfoyle amalgamated)"><a class="parish-link" href="watersideparish.html" target="_blank" rel="noopener noreferrer">Waterside (&amp; Strathfoyle amalgamated)</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1161,9 +1178,9 @@ Sign-Up Sheet (PDF)</p></div>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1655,23 +1672,8 @@ Sign-Up Sheet (PDF)</p></div>
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

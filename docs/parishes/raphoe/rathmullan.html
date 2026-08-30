@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Rathmullan Bulletin — 25/08/2026</title>
+  <title>Rathmullan Bulletin — 30/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -179,6 +187,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -201,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +275,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +472,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -863,7 +892,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,14 +900,14 @@
     <header class="header">
       <p class="diocese-label">RAPHOE</p>
       <h1>Rathmullan Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Rathmullan — 25/08/2026. Part of the Raphoe Diocese collated bulletin.</p>
-      <a class="download-link-top" href="rathmullan.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Rathmullan — 30/08/2026. Part of the Raphoe Diocese collated bulletin.</p>
+      <a class="download-link-top" href="rathmullan.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="rathmullan.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="rathmullan.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
@@ -895,7 +924,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="rathmullan.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="rathmullan.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="rathmullan.pdf">Open PDF</a>
               <a href="rathmullan.pdf" download>Download</a>
             </div>
           </div>
@@ -934,10 +963,10 @@
       <div class="quiet-links">
         <a href="rathmullan-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-rathmullan" data-parish-name="Rathmullan"><h2 class="ocr-parish-name">Rathmullan</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-rathmullan" data-parish-name="Rathmullan"><h2 class="ocr-parish-name">Rathmullan</h2><p class="ocr-parish-date">30/08/2026</p></header>
 <p class="page-label">Page 1</p>
-<p>Sunday 23rd August<br>
-Twenty -First Sunday<br>
+<p>Sunday 30th August<br>
+Twenty-Second Sunday<br>
 in Ordinary Time<br>
 Fr Stephen Gorman PP. Parochial House, Rathmullan<br>
 <a href="tel:+353749158156" style="color:#1d4ed8;font-weight:600;">074 9158156</a>/<a href="tel:+353833552428" style="color:#1d4ed8;font-weight:600;">083 3552428</a> Email: <a href="mailto:pprathmullan@gmail.com" target="_blank" rel="noopener noreferrer">pprathmullan@gmail.com</a><br>
@@ -945,10 +974,10 @@ Fr Raymond Mc Quarrie CC. Parochial House, Milford<br>
 <a href="tel:+353749153236" style="color:#1d4ed8;font-weight:600;">074 9153236</a>/<a href="tel:+353873647920" style="color:#1d4ed8;font-weight:600;">087 3647920</a> Email: <a href="mailto:milfordkerrykeel@gmail.com" target="_blank" rel="noopener noreferrer">milfordkerrykeel@gmail.com</a><br>
 Parish Website: <a href="https://www.milfordrathmullanparishes.ie" target="_blank" rel="noopener noreferrer">www.milfordrathmullanparishes.ie</a><br>
 St Mary’s Church, Glenvar<br>
-Saturday 22nd August at 5:45pm<br>
-Vigil Mass<br>
 Saturday 29th August at 5:45pm<br>
 Winnie Hagan Anniversary Mass<br>
+Saturday 5th September at 5:45pm<br>
+Ellen Green 1st Anniversary Mass<br>
 Rathmullan, Milford,<br>
 Glenvar, Oughterlin &amp;<br>
 Kerrykeel Parish<br>
@@ -956,133 +985,147 @@ Deadline for Newsletter Notices:<br>
 Please email or phone before 10am on Thursday.<br>
 St Peter’s Church, Milford<br>
 Webcam: <a href="https://www.churchservices.tv/milford" target="_blank" rel="noopener noreferrer">www.churchservices.tv/milford</a><br>
-Saturday 22nd August at 6:00pm<br>
-Ricky Mc Ginley -Devine Anniversary Mass<br>
-Sunday 23rd August at 11:00am<br>
-Paddy Gallagher Anniversary Mass<br>
-Tuesday 25th August at 7:00pm<br>
-Evening Mass<br>
-Thursday 27th August<br>
-No Mass Today<br>
-Friday 28th August at 7:00pm<br>
-Joe Toye Month’s Mind Mass<br>
 Saturday 29th August at 6:00pm<br>
 Tom &amp; Enda Waters Anniversary Mass<br>
 Sunday 30th August at 11:00am<br>
-Mary -Ellen Gillespie Anniversary Mass<br>
-Our Lady of Lourdes Church, Kerrykeel<br>
-Sunday 23rd August at 9:30am</p>
-<h3 class="b-head">Sunday Mass</h3>
-<p>Monday 24th August at 9:30am<br>
+Mary-Ellen Gillespie Anniversary Mass<br>
+Tuesday 1st September at 10:00am<br>
+Ellen Devine Anniversary Mass<br>
+Thursday 3rd September at 10:00am<br>
 Morning Mass<br>
+Friday 4th September at 10:00am<br>
+Morning Mass<br>
+Saturday 5th September at 6:00pm<br>
+Anthony &amp; Paul Peoples Anniversary Mass<br>
+Sunday 6th September at 11:00am</p>
+<h3 class="b-head">Sunday Mass</h3>
+<p>Our Lady of Lourdes Church, Kerrykeel<br>
 Sunday 30th August at 9:30am</p>
-<h3 class="b-head">Sunday Mass KILLYGARVAN &amp; TULLYF ERN PARISH</h3>
-<p>RATHMULLAN - MILFORD - OUGHTERLIN - KERRYKEEL - GLENVAR<br>
+<h3 class="b-head">Sunday Mass</h3>
+<p>Monday 31st August at 9:30am<br>
+Morning Mass<br>
+Sunday 6th September at 9:30am<br>
+Kathleen, Francie &amp; Frank Friel Anniversary Mass KILLYGARV AN &amp; T ULLYF ERN PARISH<br>
+RATHMULLAN - MILFORD - OUGHT ERLIN - KERRYKE EL - GLENVAR<br>
 F92 E772 F92 YV27 F92 A432 F92 R8P7 F92 D897<br>
 Weekly Collections<br>
-Rathmullan &amp; Oughterlin: €1,950<br>
-Donation Received: £1,000<br>
-St Mary’s Glenvar: €435<br>
-Thank you for your generosity St Catherine’s Church, Oughterlin<br>
-Sunday 23rd August at 11:00am</p>
-<h3 class="b-head">Sunday Mass</h3>
-<p>Sunday 30th August at 11:00am<br>
-Missa Pro Populo</p>
-<h3 class="b-head">Recently Deceased</h3>
-<p>Nora O’ Reilly &amp; Ann Mooney,<br>
-whose ashes were interred in<br>
-Rathmullan Graveyard on Saturday.<br>
-Month’s Mind:<br>
-Joe Toye, whose Month’s Mind Mass takes place in<br>
-St Peter’s Church, Milford on Friday evening at 7pm.</p>
+Rathmullan &amp; Oughterlin: €1,930<br>
+St Mary’s Glenvar: €495<br>
+St Peter’s Milford:<br>
+Sat 22nd/Sun23rd August : €1,430<br>
+Sat 29th/Sun30th August: €1,550<br>
+Our Lady of Lourdes, Kerrykeel:<br>
+Sat 22nd/Sun23rd August: €275<br>
+Sat 29th/Sun30th August: €305<br>
+Thank you for your generosity and continued support. St Catherine’s Church, Oughterlin<br>
+Sunday 30th August at 11:00am<br>
+Missa Pro Populo<br>
+Sunday 6th September at 11:00am<br>
+John Loughrey Anniversary Mass</p>
 <h3 class="b-head">Anniversaries</h3>
-<p>Dan Doherty, Charlie Barrett.<br>
-Eternal Rest Grant unto them O Lord St Vincent de Paul:<br>
-Rathmullan: <a href="tel:+353876982822" style="color:#1d4ed8;font-weight:600;">087 6982822</a> Milford: <a href="tel:+353860611040" style="color:#1d4ed8;font-weight:600;">086 0611040</a> Adoration of the Blessed Sacrament<br>
+<p>Christopher, Kieran &amp; William Deeney,<br>
+John, Teresa &amp; Daniel Doherty,<br>
+Paul Brannigan &amp; Grace Campbell.<br>
+Eternal Rest Grant unto them O Lord<br>
+St Vincent de Paul:<br>
+Rathmullan: <a href="tel:+353876982822" style="color:#1d4ed8;font-weight:600;">087 6982822</a><br>
+Milford: <a href="tel:+353860611040" style="color:#1d4ed8;font-weight:600;">086 0611040</a> Adoration of the Blessed Sacrament<br>
 St Peter’s Church, Milford:<br>
 Thursdays 10am —10pm<br>
 Directed Holy Hour takes place on the second<br>
-Thursday of every month from 9pm -10pm.<br>
+Thursday of every month from 9pm-10pm.<br>
 Our Lady of Lourdes Church, Kerrykeel:<br>
 Wednesday 10am - 12 Noon St Joseph’s Church, Rathmullan<br>
 Webcam: <a href="https://www.mcn.live/rathmullan" target="_blank" rel="noopener noreferrer">www.mcn.live/rathmullan</a><br>
-Saturday 22nd August at 7:15pm<br>
-Vigil Mass<br>
-Sunday 23rd August at 9:00am<br>
-Missa Pro Populo<br>
-Tuesday 25th August at 10:00am<br>
-Pauline Mc Gloin Senior 1st Anniversary Mass<br>
-Wednesday 26th August at 10:00am<br>
-Morning Mass<br>
-Thursday 27th August at 10:00am<br>
-Peter Wright Anniversary Mass<br>
-Friday 28th August at 7:00pm<br>
-Evening Mass<br>
 Saturday 29th August at 7:15pm<br>
 The Gallagher Family Intention Living &amp; Deceased<br>
 Sunday 30th August at 9:00am<br>
 Terry &amp; Ciaran O’ Reilly Anniversary Mass<br>
+Tuesday 1st September at 10:00am<br>
+John Mc Carron Anniversary Mass<br>
+Wednesday 2nd September at 10:00am<br>
+Morning Mass<br>
+Thursday 3rd September at 7:00pm<br>
+Evening Mass<br>
+Friday 4th September at 10:00am<br>
+Morning Mass<br>
+Saturday 5th September at 7:15pm<br>
+Amelie O’ Sullivan 1st Anniversary Mass<br>
+Sunday 6th September at 9:00am<br>
+Willie Gallagher Anniversary Mass<br>
 Towards Healing<br>
 If you have been abused in the past or have a<br>
 concern about the welfare and safety of a child,<br>
 please contact: Raphoe Diocesan<br>
 Designated Liaison Person,<br>
 Margaret Northage: <a href="tel:+353862183011" style="color:#1d4ed8;font-weight:600;">086 2183011</a> or<br>
-alternatively you can go directly to the Gardaí or Túsla who<br>
-are the Child &amp; Family Agency.<br>
+alternatively you can go directly to the Gardaí or<br>
+Túsla who are the Child &amp; Family Agency.<br>
 Letterkenny Garda Station: <a href="tel:+353749167100" style="color:#1d4ed8;font-weight:600;">074 91 67100</a><br>
 Túsla – Child and Family Agency:<br>
-<a href="tel:+353749123672" style="color:#1d4ed8;font-weight:600;">074 91 23672</a> / <a href="tel:+353749123770" style="color:#1d4ed8;font-weight:600;">074 91 23770</a>. St Monica Memorial – Thursday 27th August<br>
-Prayers To St. Monica<br>
-Exemplary Mother of the Great Augustine,<br>
-you perseveringly pursued your wayward son,<br>
-not with wild threats but with prayerful cries to heaven.<br>
-Intercede for all mothers in our day so that they may learn to draw their children to God.<br>
-Teach them how to remain close to their children,<br>
-even the prodigal sons and daughters who have sadly gone astray. Amen.<br>
-Parent’s Prayer for Children Returning to School<br>
-Heavenly Father,<br>
-Thank you for the gift of my child/children. Please watch over them as they begin a new school year.<br>
-Bless their teachers, school administrators, bus drivers, school support staff, friends and classmates.<br>
-Keep them safe every day. I pray they may feel Your presence and know that You are always with them.<br>
-Help them recall my loving words of support for them. Give them wisdom to make good choices, and an openness to<br>
-learn new things. Fill them with knowledge and positive thinking. Help them overcome obstacles and shield them from<br>
-negativity. Surround my child/children with good friends who also know and love You. Help them treat each other<br>
-with kindness, fairness, and respect. May they treat each person they encounter as another child of God.<br>
-Grant them the Grace to place their trust in You so they may know Your peace. Amen. Thank you - Ray Grotto Mass<br>
-Thank you to everyone who helped<br>
-out in any way at the Ray Grotto<br>
-Mass last Saturday, and to all who<br>
-provided the refreshments<br>
-afterwards in Community Centre .<br>
-Fr Stephen. Mass for Expectant Families will be celebrated<br>
-by Bishop Niall Coll in St Eunan’s Cathedral,<br>
-Letterkenny on Tuesday 8th of September at 7pm.<br>
-All welcome.<br>
-“It was you who created my inmost part and knit me<br>
-together in my mother’s womb” - psalm 139<br>
-The Certified Seed Potato Scheme of the 1960s involved a<br>
-very busy time for farming families in Rathmullan and far<br>
-beyond. The unique story of the work, hardships and<br>
-rewards is captured in a short film by Arthur Lynch.<br>
-The Rathmullan History &amp; Heritage Group presents the<br>
-first viewing in the SVP Centre, Rathmullan at 7:30pm on<br>
-Thursday 27th August. Refreshments afterwards. Pro-Life Thank you<br>
-A sincere thank you to the collectors and to all who<br>
-contributed to the Pro -Life collection last weekend.<br>
-Your contribution will help support those who<br>
-experience pregnancy crises and help protect<br>
-the lives of our unborn children.<br>
-Milford: €463.00 Glenvar: €41.50<br>
-Oughterlin : €151.63 Rathmullan: €399.30 Donation to Rathmullan Parish<br>
-I wish to acknowledge a very kind donation of £1,000 to Rathmullan Parish that was received during the week. Rathmullan</p></div>
+<a href="tel:+353749123672" style="color:#1d4ed8;font-weight:600;">074 91 23672</a> / <a href="tel:+353749123770" style="color:#1d4ed8;font-weight:600;">074 91 23770</a>. Mass for Expectant Families will be celebrated<br>
+by Bishop Niall Coll in St Eunan’s Cathedral, Letterkenny on<br>
+Tuesday 8th of September at 7pm. All welcome.<br>
+“It was you who created my inmost part and knit me together<br>
+in my mother’s womb” - psalm 139 Parish Retreat to Lough Derg<br>
+Fr Stephen will lead a One-Day Retreat to Lough Derg on Saturday 19th Se ptember.<br>
+The Retreat which will be delivered by Fr La &amp; his team. The cost is €50 per person which<br>
+includes tea &amp; scones and a light lunch. A bus will leave Rathmullan on Saturday 19th at 7:30am<br>
+and will pick up at Milford at 7:45 am. We will leave Lough Derg after Mass, at 4:30pm,<br>
+approximately. The parish will cover the cost of the bus. Bookings must be made in advance.<br>
+If interested please give your name to Geraldine on <a href="tel:+353863369095" style="color:#1d4ed8;font-weight:600;">086 3369095</a> ASAP<br>
+or by Friday 11th September at the latest.<br>
+Miraculous Medal<br>
+Sister Claire Sweeney will join us for Mass<br>
+in St Peter’s Church, Milford on<br>
+Tuesday 1st September at 10am . Sister<br>
+Claire will give a talk on the Miraculous<br>
+Medal and will also distribute Miraculous<br>
+Medals to those present. All welcome.<br>
+Medjugorje Holy Rosary<br>
+You are invited to join in praying the Holy Rosary in<br>
+honour of Our Lady of Medjugorje on<br>
+Tuesday 1st September at 7:00pm in the Oratory of<br>
+St Peter&#x27;s Church, Milford.<br>
+We will have a cuppa afterwards<br>
+and all are most welcome.<br>
+Donegal Group 173 Rise and Shine Trust<br>
+(formerly The Irish Handicapped Children’s Pilgrimage Trust<br>
+and The Irish Pilgrimage Trust) are celebrating forty years of<br>
+taking young people with special needs to Lourdes each Easter.<br>
+We are celebrating with a special Mass on Saturday 26th<br>
+September in the Church of the Irish Martyrs, Letterkenny<br>
+at 12 noon. The Mass will be concelebrated by Bishop Niall<br>
+Coll and Bishop Donal Mc Keowan, Bishop of Derry and<br>
+many of the priests who travelled to Lourdes with us over<br>
+the years. We invite all the guests and their families and<br>
+all the helpers who travelled with us over the years to<br>
+our Mass to celebrate the work of the<br>
+Donegal Group over these forty years. Loreto Community School Milford<br>
+Loreto Community School, formerly Loreto College,<br>
+Milford, is delighted to announce an Afternoon of<br>
+Celebration on Saturday, 26th September 2026 ,<br>
+marking three very special milestones in our school’s<br>
+history: 60 years since the school first opened, 30 years<br>
+since it became a Community School, and 20 years<br>
+since we moved into our new school building.<br>
+It promises to be a wonderful opportunity to celebrate<br>
+our school’s rich history, the many generations of<br>
+students and staff who have been part of our journey,<br>
+and the strong community links that endure. Please<br>
+save the date – we look forward to celebrating with you!<br>
+Age Action Free Programme<br>
+Need help with your mobile phone or digital device? Register for Age Action’s free one -to-one digital skills tutoring.<br>
+Letterkenny Central Library (Wednesday’s 10.30am -12.30pm). To register call: <a href="tel:+35391527831" style="color:#1d4ed8;font-weight:600;">091-527831</a> or email: <a href="mailto:aaw@ageaction.ie" target="_blank" rel="noopener noreferrer">aaw@ageaction.ie</a><br>
+The Monthly SVP Collection will be taken up in<br>
+Rathmullan on Saturday 5th &amp; Sunday 6th September. Rathmullan <a href="https://milfordrathmullanparishes.ie/bulletins/" target="_blank" rel="noopener noreferrer">https://milfordrathmullanparishes.ie/bulletins/</a></p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other RAPHOE Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="kincasslagh"><a class="parish-link" href="kincasslagh.html" target="_blank" rel="noopener noreferrer">Kincasslagh</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="raphoe"><a class="parish-link" href="drive-1jmslbrliw.html" target="_blank" rel="noopener noreferrer">Raphoe</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="tawnawillyparish.html" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="tawnawillyparish.html" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1134,9 +1177,9 @@ I wish to acknowledge a very kind donation of £1,000 to Rathmullan Parish that 
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1628,23 +1671,8 @@ I wish to acknowledge a very kind donation of £1,000 to Rathmullan Parish that 
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

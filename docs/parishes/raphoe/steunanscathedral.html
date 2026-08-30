@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Cathedral Bulletin — 25/08/2026</title>
+  <title>Cathedral Bulletin — 30/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -179,6 +187,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -201,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +275,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +472,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -863,7 +892,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,14 +900,14 @@
     <header class="header">
       <p class="diocese-label">RAPHOE</p>
       <h1>Cathedral Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Cathedral — 25/08/2026. Part of the Raphoe Diocese collated bulletin.</p>
-      <a class="download-link-top" href="steunanscathedral.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Cathedral — 30/08/2026. Part of the Raphoe Diocese collated bulletin.</p>
+      <a class="download-link-top" href="steunanscathedral.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="steunanscathedral.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="steunanscathedral.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
@@ -895,7 +924,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="steunanscathedral.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="steunanscathedral.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="steunanscathedral.pdf">Open PDF</a>
               <a href="steunanscathedral.pdf" download>Download</a>
             </div>
           </div>
@@ -934,12 +963,12 @@
       <div class="quiet-links">
         <a href="steunanscathedral-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-cathedral" data-parish-name="Cathedral"><h2 class="ocr-parish-name">Cathedral</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-cathedral" data-parish-name="Cathedral"><h2 class="ocr-parish-name">Cathedral</h2><p class="ocr-parish-date">30/08/2026</p></header>
 <p class="page-label">Page 1</p>
-<p>SUNDAY COLLECTION ~ 17th August - €7,679<br>
-HOLY DAY COLLECTION (15th August) : €2,450<br>
-PARISH EXPENDITURE ~ €22,406.52 - includes €14,700 for paths in Conwal<br>
-DONATIONS: 2 x €10 and 1 x €5<br>
+<p>SUN DAY CO LLECTION ~ 23rd August - €6,506<br>
+HOLY DAY COLLECTION (15th August - LATE DONATIONS) : €115<br>
+PARISH EXP ENDITURE ~ €8,951.95<br>
+DONATIONS: 3 x €20, 2 x €10 and 3 x €5<br>
 Thank you for your gift to God and His Church<br>
 We deeply appreciate your continued Spiritual and Financial support .<br>
 To BOOK A BAPTISM please phone the Parochial House on 9121021. Please<br>
@@ -951,20 +980,20 @@ Phone: <a href="tel:+353749121021" style="color:#1d4ed8;font-weight:600;">074 - 
 Parish Email: <a href="mailto:office@steunanscathedral.ie" target="_blank" rel="noopener noreferrer">office@steunanscathedral.ie</a><br>
 Website: <a href="https://www.steunanscathedral.ie" target="_blank" rel="noopener noreferrer">www.steunanscathedral.ie</a> St. Eunan ’s Cathedral<br>
 Live Web Streaming from the Cathedral ~ churchservices.tv/letterkenny<br>
-The annual DOWN SYNDROME IRELAN D (Donegal Branch) Church Gate<br>
-Collection will be held on the 29th and 30th August . Every contribution helps<br>
-provide vital support, services, and opportunities for individuals with Down<br>
-Syndrome and their families in Donegal. Your support would be appreciated.<br>
-ALONE INFORMATION SESSIONS : Volunteering changes lives including<br>
-yours . Volunteer Recruitment will take place at: Newtowncunningham Credit Union,<br>
-Ballyhasky on Friday 28th August from 10 am - 12 noon; and at the Raphoe Credit<br>
-Union, Cathedral Hill, Raphoe on Friday 4th September from 10 am - 12 noon.<br>
-EMPOWER Cumasú Programme - Applications are now open . Are you a<br>
+ALONE INFORMATION SESSIONS: Volunteering changes lives including<br>
+yours . Volunteer Recruitment will take place at: the Raphoe Credit Union, Ca thedral<br>
+Hill, Raphoe on Friday 4th September from 10 am - 12 noon.<br>
+EVANGELISATION COURSE ~ The New Springtime Community is happy to<br>
+announce that it will be hosting a 10 -week course running from Wednesday 9th<br>
+September to Wednesday 11th November . Zoom meeting - starts at 7.30 pm and<br>
+ends 9 pm. Curated Fr Pat Collins who is a well known figure, author and thought<br>
+after speaker. Phone: <a href="tel:+353894490683" style="color:#1d4ed8;font-weight:600;">089 -449 0683</a> or visit: <a href="https://www.newspringtime.ie" target="_blank" rel="noopener noreferrer">www.newspringtime.ie</a> for details.<br>
+EMPOWE R Cumasú Programme - Applications are now open . Are you a<br>
 female living in the Gaeltacht looking to start or grow your own business? Whether<br>
-it’s food, farming, crafts or a service business, we want to hear from you. Apply now:<br>
+it’s food, farming, crafts or a service business, we want to hear from you. Apply n ow:<br>
 <a href="https://empowerprogramme.ie/" target="_blank" rel="noopener noreferrer">https://empowerprogramme.ie/</a> Places are limited. The closing date for applications<br>
 is 5 pm on Friday 4th September. Phone: 091 -742851or email: <a href="mailto:michelle.lee@atu.ie" target="_blank" rel="noopener noreferrer">michelle.lee@atu.ie</a><br>
-MARRIAGE ENCOUNTER I RELAND invites married couples to a<br>
+MARRIAGE ENCOUNTER IRELAND invites married couples to a<br>
 residential Weekend from Friday 2nd October - Sunday 4th October at the Focolare<br>
 Centre, Curryhills, Prosperous, Co. Kildare. Step away from daily distractions to<br>
 deepen your communication, renew your love, and rediscover the joy of your<br>
@@ -974,130 +1003,127 @@ Conference dedicated to sharing the ‘Good News ’ and the witness of the<br>
 Catholic Church in Ireland. It is intended to help people discover the faith,<br>
 live the faith and pass on the faith. It is for both seekers and followers.<br>
 Use the QR code to access the site.<br>
-St. Eunan’s Cathedral<br>
-Letterkenny<br>
-NEWSLETTER<br>
-Sunday 23rd August 2026<br>
-Twenty First Sunday in Ordinary Time<br>
-PRAYER TO ST. MONICA<br>
-Lord Jesus,<br>
-you were moved by the prayers and tears of St. Monica<br>
-and you gave the grace of conversion to St. Augustine your son.<br>
-Touch our hearts and convert us from fear to love,<br>
-from sickness to health and from conflict to peace of mind.<br>
-Bless all mothers, living or dead, known or unknown,<br>
-married, single or widowed.<br>
-May our lives draw others to love you.<br>
-Lord, it was at your altar that Saint Monica wanted to be remembered.<br>
-(St. Monica - Feast Day: 27th August )<br>
-PRAYER TO ST. AUGUST INE<br>
-Holy Father Augustine,<br>
-saint and once a sinner, pray for us sinners.<br>
-Help us to imitate you in seeking God with all our hearts,<br>
-in seeking the grace of repentance and renewal of life.<br>
-Help us to Love God and neighbour at all times.<br>
-Help us to realise, as you did,<br>
-that we are made for God<br>
-and that our hearts will be restless,<br>
-always restless, until they rest in Him. (St. Augustine - Feast Day: 28th<br>
-August)<br>
-PRAYER TO ST. JOHN T HE BAPTIST<br>
-O God, You raised up St. John the Baptist<br>
-to prepare a perfect people for Christ.<br>
-Fill Your people with the joy<br>
-of possessing His grace,<br>
-and direct the minds of all the faithful<br>
-in the way of peace and salvation.<br>
-Grant that as St. John was martyred<br>
-for truth and justice,<br>
-so we may energetically profess our Faith in You,<br>
-and lead others to the Way, the Truth, and Eternal Life. Amen.<br>
-(The Passion of St. John the Baptist - 29th August) Cathedral</p>
+St. Eunan ’s Cathed ral<br>
+Letterkenn y<br>
+NE WSLE TTER<br>
+Sunday 30th Augus t 2026<br>
+Twenty Second Sund ay in O rdinary Time<br>
+A PRAYER FOR OUR EARTH<br>
+(Tuesday 1st September ~ World Day of Prayer for the Care of Creation)<br>
+All-powerful God, you are present in the whole universe and in the smallest<br>
+of your creatures.<br>
+You embrace with your tenderness all that exists.<br>
+Pour out upon us the power of your love, that we may protect life and beauty.<br>
+Fill us with peace, that we may live as brothers and sisters, harming no one.<br>
+O God of the poor, help us to rescue the abandoned and forgotten of this<br>
+earth, so precious in your eyes.<br>
+Bring healing to our lives, that we may protect the world and not prey on it,<br>
+that we may sow beauty, not pollution and destruction.<br>
+Touch the hearts of those who look only for gain at the expense of the poor<br>
+and the earth.<br>
+Teach us to discover the worth of each thing, to be filled with awe and<br>
+contemplation, to recognise that we are profoundly united with every creature<br>
+as we journey towards your infinite light.<br>
+We thank you for being with us each day.<br>
+Encourage us, we pray, in our struggle for justice, love and peace.<br>
+Pope Francis, Laudato Si ’, 246<br>
+PRAY ER FO R A N EW SCHOOL YEAR<br>
+Blessed are you, Lord God, Creator of body and mind and heart;<br>
+you have sent the Spirit of wisdom and knowledge to guide your people<br>
+in all their ways.<br>
+At the beginning of this new school year, we implore your mercy:<br>
+bless students, teachers and staff, that together we may grow in faith, hope,<br>
+and love as we learn from you and each other how to follow your Son Jesus.<br>
+Expand the horizons of our minds, that we may grow in wisdom,<br>
+understanding, and knowledge; deepen our commitment to seek the truth<br>
+of your ways; and enliven our faith to reach out to those in need.<br>
+Glory and praise to you, Lord God, in the Church and in Christ Jesus<br>
+forever and ever. Amen Cathedral <a href="https://www.steunanscathedral.ie/newsletter/" target="_blank" rel="noopener noreferrer">https://www.steunanscathedral.ie/newsletter/</a></p>
 <hr>
 <p class="page-label">Page 2</p>
-<p>RSA’S CHECK IT FITS SERVICE - Did you know it ’s the law that all<br>
-children under 150cms or 36kgs must use a child car seat appropriate to their<br>
-weight and height. In Ireland as many as 54% of child car seats are incorrectly fitted<br>
-which can lead to serious injury or even death in a collision. You are invited on<br>
-Wednesday 26th August to have your car seat checked beside the Smyths Toy<br>
-Store, Letterkenny Retail Park.<br>
-‘EMBRACE THE GRACE ’ (Legion of Mary) Young Adut (18 -40) Catholic<br>
-Conference will be held on Saturday 29th August from 9.30 am - 6 pm in Legion of<br>
-Mary, De Montfort Houst Morning Star Avenue, Dublin 7, D07VA03. Tickets<br>
-available at <a href="https://www.eventbrite.ie" target="_blank" rel="noopener noreferrer">www.eventbrite.ie</a> (search ‘Embrace the Grace ’<br>
-The DONEGAL HALF MARATHO N will take place on Sunday 30th August<br>
-starting at 9 am on Conwal Straight on the R250 coming in to Ballymacool, along<br>
-Pearse Road, out Port Road, in Neil T. Blaney Road and Paddy Harte Road, onto<br>
-Pearse Road over Oldtown Bridge along Crieve Road through New Mills on<br>
-to Rashedoge junction turning right at Foxhall Junction and returning to Letterkenny<br>
-along the main Churchill Road on the R250 and finishing at the Aura Letterkenny<br>
-Leisure Complex. The initial loop of the town should be finished by 9.50 am.<br>
-Traffic management will be in place between the hours of 8.30 am and 12.00 pm<br>
-around the Town Centre and Newmills/Conwal so please plan for some delays.<br>
+<p>Best wishes to the Organisers and Participants for today ’s DONEGAL HALF<br>
+MARATHON (Sunday 30th August). Traffic management will be in place<br>
+between the hours of 8.30 am and 12.00 pm around the Town Centre and Newmills/<br>
+Conwal so please plan for some delays.<br>
+LETTERKENNY MEMORIES will take place on Monday 31st August at<br>
+8 pm in the Station House Hotel. All are welcome. Light refreshments served.<br>
+SCHOOL TRANSPORT BUS ESCORT NEEDED for Woodland National<br>
+School, Monday to Friday. Please contact the School Principal at <a href="tel:+353749124498" style="color:#1d4ed8;font-weight:600;">0749124498</a>.<br>
+MEN ’S ROSARY will take place at the Market Square, Letterkenny on Saturday<br>
+5th September at 1 pm.<br>
 MASS FOR EXPECTANT FAMILIES will be held on Tuesday 8th<br>
 September in St. Eunan ’s Cathedral at 7 pm. Celebrant will be Bishop Niall Coll.<br>
 All are welcome.<br>
 COME &amp; SEE: Have you heard about the Encounter School of Ministry Course<br>
-but aren ’t sure what it ’s about or if it ’s for you? We invite you to join us for our<br>
-September classes for free . The class will take place on Thursdays from 6.30 pm<br>
-(first half hour is prayer and worship) to 9 pm beginning in September at All Saints<br>
-Church, Newtowncunningham. To register or for more information please visit:<br>
-<a href="https://encounterschool.org/donegal/" target="_blank" rel="noopener noreferrer">https://encounterschool.org/donegal/</a> or email: <a href="mailto:donegal@encounterschool.org" target="_blank" rel="noopener noreferrer">donegal@encounterschool.org</a> You<br>
-will not be invoiced until October and if you decide it ’s not for you, you can leave the<br>
-course without incurring any charges.<br>
-BREAST CANCER AWAREN ESS MONTH 2026 takes place the 1st<br>
-October - 31st October. For further information please visit: breastcancerresearch.ie<br>
-or <a href="https://www.breastcancerireland.com" target="_blank" rel="noopener noreferrer">www.breastcancerireland.com</a><br>
-INTERNATIONAL COFFEE DAY 2026 takes place on Thursday 1st<br>
-October. Please see <a href="https://www.internationalcoffeeday.org" target="_blank" rel="noopener noreferrer">www.internationalcoffeeday.org</a> for further details.<br>
+but aren ’t sure what it ’s about or if it ’s for you? We invite you to ‘Come &amp; see ’ what<br>
+it&#x27;s about before you make your decision. Class will take place on Thursdays from<br>
+6.30 pm (first half hour is prayer and worship) to 9 pm beginning on 3rd September<br>
+at All Saints Church, Newtowncunningham. Participants can attend up to 3 classes<br>
+without committing to pay for the course. If a participant decides to enrol before the<br>
+application deadline of October 1st, tuition fees will then be applied. If a part icipant<br>
+decides not to continue, there is no obligation. More info or register here: http s://<br>
+encounterschool.org/donegal/ or email: <a href="mailto:donegal@encounterschool.org" target="_blank" rel="noopener noreferrer">donegal@encounterschool.org</a> for details.<br>
+DONEGAL GROUP 173 RISE AND SHINE TRUST (formerly The Irish<br>
+Handicapped Children ’s Pilgrimage Trust and The Irish Pilgrimage Trust) are<br>
+celebrating forty years of taking young people with special needs to Lourdes each<br>
+Easter. We are celebrating with a special Mass on Saturday 26th September in the<br>
+Church of the Irish Martyrs, Letterkenny at 12 noon. The Mass will be<br>
+concelebrated by Bishop Niall Coll and Bishop Donal Mc Keown, Bishop of Derry<br>
+and many of the Priests who travelled to Lourdes with us over the years. We invite all<br>
+the guests and their families and all the helpers who travelled with us over the y ears<br>
+to our Mass to celebrate the work of the Donegal Group over these forty years.<br>
 LOUGH DERG One Day Retreats - Guided Days of Prayer and Reflection<br>
-August: 29th and 31st ~ September: 5th, 6th, 9th, 12th, 15th, 19th and 20th.<br>
-Admission €50. Group discounts available. Advance Booking Essential . Special<br>
-Themed Retreats: 5th September - Pioneer Pilgrimage; 6th September - St. Carlos<br>
-Acutis; 9th and 12th September - Vocations Monstrance; 19th September - Divine<br>
-Mercy Pilgrimage. Overnight accommodation available on Station Island the night<br>
-before beginning a Retreat/Pilgrimage. For bookings etc . please contact: <a href="tel:+353719861518" style="color:#1d4ed8;font-weight:600;">071 -<br>
-9861518</a> or visit: <a href="https://www.loughderg.org" target="_blank" rel="noopener noreferrer">www.loughderg.org</a> Sunday 23rd August ~ Twenty First Sunday in Ordinary Time<br>
+August: 31st ~ September: 5th, 6th, 9th, 12th, 15th, 19th and 20th. Admission €50.<br>
+Group discounts available. Advance Booking Essential . Special Themed Retreats:<br>
+5th September - Pioneer Pilgrimage; 6th September - St. Carlos Acutis; 9th and 12th<br>
+September - Vocations Monstrance; 19th September - Divine Mercy Pilgrimage.<br>
+Overnight accommodation available on Station Island the night before beginning a<br>
+Retreat/Pilgrimage. For bookings etc . please contact: <a href="tel:+353719861518" style="color:#1d4ed8;font-weight:600;">071 -9861518</a> or visit:<br>
+Letterkenny Community Centre will host a FUNDRAISING BOOK FAIR on<br>
+Sunday 6th September from 11 am - 4 pm, with a wide selection of books for all<br>
+ages and interests. The fair takes place ahead of UNESCO World Literacy Day on the<br>
+8th September. Entry is free, with donations Community Centre Development Fund. Sunday 30th August ~ Twenty Second Sunday in Ordinary Time<br>
 Masses: 8 am, 10 am, 12 noon and 6 pm<br>
 Baptisms: 2.30 pm<br>
-Monday 24th August ~ St. Bartholomew, Apostle<br>
-8 am Mass ~ Special Intention<br>
-10 am Mass ~ Pat Tobin RIP<br>
-Tuesday 25th August ~ St. Louis of France<br>
-8 am Mass ~ Maureen Keene RIP and Peter Ryder RIP<br>
-10 am Mass ~ Eileen Browne RIP<br>
+Monday 31st August ~ St. Aidan of Lindisfarne<br>
+8 am Mass ~ Holy Souls in Purgatory RIP<br>
+10 am Mass ~ Hugo McNulty RIP<br>
+Tuesday 1st September ~ World Day of Prayer for the Care of Creation<br>
+8 am Mass ~ Priest ’s Intention<br>
+10 am Mass ~ Special Intention<br>
 Holy Face Prayer Group after 10 am Mass and Rosary<br>
 Legion of Mary Meeting ~ 10.30 am in the Pastoral Centre<br>
-Wednesday 26th August<br>
-8 am Mass ~ Fionn McLaughlin RIP<br>
-10 am Mass ~ Paddy Geoghegan RIP<br>
+Wednesday 2nd September<br>
+8 am Mass ~ Dolores McIntyre RIP<br>
+10 am Mass ~ Sheena and Kathleen Dillon RIP<br>
 7.30 pm ~ Confessions<br>
-8 pm ~ Medjugorje Prayer Group in the Pastoral Centre<br>
-Thursday 27th August ~ St. Monica<br>
-8 am Mass ~ Holy Souls in Purgatory RIP<br>
-10 am Mass ~ Mary Geoghegan RIP<br>
+Thursday 3rd September ~ St. Gregory the Great<br>
+8 am Mass ~ Peg Allison RIP<br>
+10 am Mass ~ Fiona Doherty (nee Gallagher) RIP<br>
 8 pm ~ Charismatic Prayer Group in the Conference Room<br>
-Friday 28th August ~ St. Augustine, bishop and doctor of the Church<br>
-8 am Mass ~ Priest ’s Intention<br>
-10 am Mass ~ Brendan Fanneran RIP<br>
-7 pm Mass ~ Mary Sweeney (Month’s Mind Mass) , John Mullen, James Ferry,<br>
-Eileen O ’Doherty, Margaret Coyle and Dan Gallagher RIP<br>
-Saturday 29th August ~ The Passion of St. John the Baptist<br>
-10 am Mass ~ Pauline Felder RIP (First Anniversary) and Laurence and Maura<br>
-Maguire RIP<br>
+Friday 4th September ~ St. MacNissi, bishop<br>
+8 am Mass ~ Anton Gallagher RIP<br>
+10 am Mass ~ Priest ’s Intention<br>
+7 pm Mass ~ Eamonn McGee, Joan McGee, Aidan McGlynn, Willie John Price,<br>
+Maggie Price, Jim Price, Margaret Price, Peadar Higgins, Áine Ronaghan, Sean<br>
+Kyles and Dolores McIntyre RIP<br>
+Saturday 5th September ~ St. Teresa of Calcutta (Mother Teresa)<br>
+10 am Mass ~ Priest ’s Intention<br>
+First Saturday Devotions ~ Will take place after 10 am Mass<br>
 Confessions: 12 noon - 1 pm and 7 pm<br>
-Baptisms: 4 pm<br>
-Vigil Mass ~ 6 pm<br>
+Baptisms: 4 pm Vigil Mass ~ 6 pm<br>
 Sunday 30th August ~ Twenty Second Sunday in Ordinary Time<br>
 Masses: 8 am, 10 am, 12 noon and 6 pm<br>
-Baptisms: 2.30 pm</p></div>
+Baptisms: 2.30 pm<br>
+INTERNATIONAL COFFEE DAY 2026 takes place on Thursday 1st<br>
+October. Please see <a href="https://www.internationalcoffeeday.org" target="_blank" rel="noopener noreferrer">www.internationalcoffeeday.org</a> for further details.</p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other RAPHOE Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="kincasslagh"><a class="parish-link" href="kincasslagh.html" target="_blank" rel="noopener noreferrer">Kincasslagh</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="raphoe"><a class="parish-link" href="drive-1jmslbrliw.html" target="_blank" rel="noopener noreferrer">Raphoe</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="tawnawillyparish.html" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="tawnawillyparish.html" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1149,9 +1175,9 @@ Baptisms: 2.30 pm</p></div>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1643,23 +1669,8 @@ Baptisms: 2.30 pm</p></div>
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Bright Bulletin — 25/08/2026</title>
+  <title>Bright Bulletin — 30/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -179,6 +187,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -201,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +275,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +472,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -863,7 +892,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,14 +900,14 @@
     <header class="header">
       <p class="diocese-label">DOWN &amp; CONNOR</p>
       <h1>Bright Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Bright — 25/08/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
-      <a class="download-link-top" href="parishofbright.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Bright — 30/08/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
+      <a class="download-link-top" href="parishofbright.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="parishofbright.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="parishofbright.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
@@ -895,7 +924,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="parishofbright.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="parishofbright.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="parishofbright.pdf">Open PDF</a>
               <a href="parishofbright.pdf" download>Download</a>
             </div>
           </div>
@@ -934,16 +963,79 @@
       <div class="quiet-links">
         <a href="parishofbright-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-bright" data-parish-name="Bright"><h2 class="ocr-parish-name">Bright</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-bright" data-parish-name="Bright"><h2 class="ocr-parish-name">Bright</h2><p class="ocr-parish-date">30/08/2026</p></header>
 <p class="page-label">Page 1</p>
-<p>Parish of Bright BulletinTwenty-First Sunday in Ordinary Time - 23rd August 2026Parish Priest: Fr Peter O’Kane, 16 Rossglass Road, Killough, BT30 7QNTel: 028 4484 1221Email: <a href="mailto:parishofbright@downandconnor.orgWebsite" target="_blank" rel="noopener noreferrer">parishofbright@downandconnor.orgWebsite</a>: parishofbright.netMass Times: Week Beginning Monday 24th AugustSt Patrick’ s, Legamaddy St Joseph’ s, Killough24th August Monday 10am 25th August Tuesday 10am28th August Friday 7.30pm 26th August Wednesday 7.30pm30th August Sunday 10am 29th August Saturday Vigil 6.30pmOur Lady, Star of the Sea, Rossglass27th August Thursday 10.00amFaithful DepartedRecently Deceased: Ross Rice (Castlewellan), Baby Sonny O’Neill-DelougheryMonth’ s Mind: Anne Lusted (nee Armstrong, England formerly Killough)Anniversaries: Mary McClean, Harry Fagan, Mickey Doran Weekly ConfessionsSacrament of Reconciliation: after all weekday Masses; and in St Joseph’s every Wednesday 8.00pm-8.45pm and at 6.00pm before the Saturday Vigil Mass.Eucharistic AdorationSt Joseph’s, Killough every Wed: 3.30pm -7.30pm &amp; after Mass 8pm-9pm. St Patrick’s, Legamaddy every Friday: 6.30pm-7.30pm.Sunday Collections, 16th August: Weekly £649-27, Diocesan Cathedral Fund £403-01. Thank you for your generous contributions. Ice Cream Summer SundaysA sincere thank you to the Pastoral Council for organising the two very enjoyable Ice Cream Sundays! It was a lovely moment just to pause after Mass and to enjoy each other’s company. We can all look forward to next year’s 'Ice Cream Summer Sundays’!Medical Missioners of MaryBishop Alan McGuckian has given permission for the Medical Missionaries of Mary to visit the parishes of our Diocese. The sisters will be with us this weekend 22nd/23rd August and will speak at both Masses. Your support of their work would be much appreciated! Prayer for the Return of a Child to ChristSt Monica is the Patron Saint of mothers. Through her years of persevering prayer and tears she eventually brought her son, the now St Augustine, to faith in Christ. Her Feast Day is the 27th August.“In the name of the Father, and the Son, and the Holy Spirit.Under the weight of my heartful burden, I turn to you, dear Saint Monicaand request your assistance and intercession.From your place in heaven, I beg that you will plead before the Throne of the Holy One, for the sake of my child, [Name], who has wandered from the faith, and all that we have tried to teach.Your son, Augustine, wandered, too; eventually he found the faith, and came to believe, and in that belief became a true teacher.St. Monica, please teach me to persist in faithful prayer as you did for your son's sake. Inspire me to behave in ways that will not further distance my child from Christ, but only draw [Name] gently towards His marvellous light.Please teach me what you know about this painful mystery of separation,and how it is reconciled in the re-orientation of our children toward Heaven.O St. Monica, lover of Christ and His Church, pray for me, and for my child [Name], that we may acquire heaven, joining with you, there, in offering constant and thankful praise to God, Amen.”(By Elizabeth Scalia)Bright</p></div>
+<p>Parish of Bright Bulletin<br>
+Twenty-Second Sunday Ordinary Time - 30th August 2026<br>
+Parish Priest : Fr Peter OÕKane,<br>
+16 Rossglass Road, Killough, BT30 7QN<br>
+Tel: <a href="tel:+442844841221" style="color:#1d4ed8;font-weight:600;">028 4484 1221</a><br>
+Email: <a href="mailto:parishofbright@downandconnor.org" target="_blank" rel="noopener noreferrer">parishofbright@downandconnor.org</a><br>
+Website: parishofbright.net<br>
+Mass Times: Week Beginning Monday 31st August<br>
+St PatrickÕ s, Legamaddy St JosephÕ s, Killough<br>
+31st August Monday 10am 1st September Tuesday 10am<br>
+4th September Friday 7.30pm 2nd September Wednesday 7.30pm<br>
+6th September Sunday 10am 5th September Saturday 10am<br>
+5th September Saturday Vigil 6.30pm<br>
+Our Lady, Star of the Sea, Rossglass<br>
+3rd September Thursday 10.00am</p>
+<h3 class="b-head">Faithful Departed</h3>
+<p>MonthÕ s Mind : Michael Hood</p>
+<h3 class="b-head">Anniversaries : Jim Cahalane</h3>
+<p>Weekly Confessions<br>
+Sacrament of Reconciliation: after all weekday Masses; and in St JosephÕs<br>
+every Wednesday 8.00pm-8.45pm and at 6.00pm before the Saturday Vigil<br>
+Mass.<br>
+Eucharistic Adoration<br>
+St JosephÕs, Killough every Wed: 3.30pm -7.30pm &amp; after Mass 8pm-9pm.<br>
+St PatrickÕs, Legamaddy every Friday: 6.30pm-7.30pm.<br>
+Sunday Collections 23rd August<br>
+Weekly £546-90. Thank you for your generous contributions.<br>
+First Saturday Fatima Devotion<br>
+St JosephÕs Church, Killough, Saturday 5th September: 9.15am Holy<br>
+Rosary; 9.40am Meditation on the Mysteries; 10.00am Holy SacriÞce of the<br>
+Mass; 10.40am Confessions. Mass for the Sick and InÞrm<br>
+The annual ÔMass for the Sick and the InÞrmÕ will take place in Bright<br>
+Community Hall, Ballynoe, BT30 8AJ at 12noon on Saturday 12th<br>
+September. Neighbouring parishes are also very welcome to attend.<br>
+Refreshments will be served afterwards. If you need transport please<br>
+contact St Vincent de Paul: Nickey 07745 004510 or Sean 07548<br>
+647301.<br>
+The Presence of the Risen Lord<br>
+Ô&quot;I am with you always, to the end of the age&quot; (Mt 28:20). This promise<br>
+of Christ never ceases to resound in the Church as the fertile secret of<br>
+her life and the wellspring of her hope. As the day of Resurrection,<br>
+Sunday is not only the remembrance of a past event: it is a celebration of<br>
+the living presence of the Risen Lord in the midst of his own people.<br>
+For this presence to be properly proclaimed and lived, it is not enough<br>
+that the disciples of Christ pray individually and commemorate the death<br>
+and Resurrection of Christ inwardly, in the secrecy of their hearts.<br>
+Those who have received the grace of baptism are not saved as<br>
+individuals alone, but as members of the Mystical Body, having become<br>
+part of the People of God. It is important therefore that they come<br>
+together to express fully the very identity of the Church, the assembly<br>
+called together by the Risen Lord who offered his life &quot;to reunite the<br>
+scattered children of God&quot; (Jn 11:52).<br>
+They have become &quot;one&quot; in Christ (cf. Gal 3:28) through the gift of the<br>
+Spirit. This unity becomes visible when Christians gather together: it is<br>
+then that they come to know vividly and to testify to the world that they<br>
+are the people redeemed, drawn &quot;from every tribe and language and<br>
+people and nation&quot; (Rev 5:9).<br>
+The assembly of Christ&#x27;s disciples embodies from age to age the image<br>
+of the Þrst Christian community which Luke gives as an example in the<br>
+Acts of the Apostles, when he recounts that the Þrst baptised believers<br>
+&quot;devoted themselves to the apostles&#x27; teaching and fellowship, to the<br>
+breaking of bread and the prayers&quot; (2:42).Õ<br>
+(From the Apostolic Letter of Pope St John Paul, The LordÕ s Day ,<br>
+31st May 1998)Bright <a href="https://parishofbright.net" target="_blank" rel="noopener noreferrer">https://parishofbright.net</a></p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other DOWN &amp; CONNOR Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="ballycastle"><a class="parish-link" href="ballycastleparish.html" target="_blank" rel="noopener noreferrer">Ballycastle</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="ballymenaparish.html" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="glenariffe"><a class="parish-link" href="glenariffeparish.html" target="_blank" rel="noopener noreferrer">Glenariffe</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="kilmore and killyleagh"><a class="parish-link" href="kilmoreandkillyleagh.html" target="_blank" rel="noopener noreferrer">Kilmore and Killyleagh</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="port glenone (st mary&#x27;s portglenone)"><a class="parish-link" href="stmarysportglenone.html" target="_blank" rel="noopener noreferrer">Port Glenone (St Mary&#x27;s Portglenone)</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="sacred heart belfast"><a class="parish-link" href="sacredheartparishbelfast.html" target="_blank" rel="noopener noreferrer">Sacred Heart Belfast</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st brigids belfast"><a class="parish-link" href="stbrigidsparishbelfast.html" target="_blank" rel="noopener noreferrer">St Brigids Belfast</a></li><li class="parish-item" data-name="st gerards"><a class="parish-link" href="stgerardsparish.html" target="_blank" rel="noopener noreferrer">St Gerards</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st mary&#x27;s on the hill"><a class="parish-link" href="stmarysonthehill.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s on the Hill</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="ballymenaparish.html" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st colmcilles"><a class="parish-link" href="st-colmcilles.html" target="_blank" rel="noopener noreferrer">St Colmcilles</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li></ul>
     </section>
   </div>
   <footer>
@@ -995,9 +1087,9 @@
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1489,23 +1581,8 @@
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

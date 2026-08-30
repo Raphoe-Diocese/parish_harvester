@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Portstewart Bulletin — 25/08/2026</title>
+  <title>Portstewart Bulletin — 30/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -179,6 +187,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -201,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +275,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +472,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -863,7 +892,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,14 +900,14 @@
     <header class="header">
       <p class="diocese-label">DOWN &amp; CONNOR</p>
       <h1>Portstewart Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Portstewart — 25/08/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
-      <a class="download-link-top" href="portstewartparish.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Portstewart — 30/08/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
+      <a class="download-link-top" href="portstewartparish.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="portstewartparish.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="portstewartparish.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
@@ -895,7 +924,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="portstewartparish.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="portstewartparish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="portstewartparish.pdf">Open PDF</a>
               <a href="portstewartparish.pdf" download>Download</a>
             </div>
           </div>
@@ -934,206 +963,200 @@
       <div class="quiet-links">
         <a href="portstewartparish-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-portstewart" data-parish-name="Portstewart"><h2 class="ocr-parish-name">Portstewart</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-portstewart" data-parish-name="Portstewart"><h2 class="ocr-parish-name">Portstewart</h2><p class="ocr-parish-date">30/08/2026</p></header>
 <p class="page-label">Page 1</p>
-<p>THE PARISHES OF POR TSTEWART, PORTRUSH &amp; BUSHMILL S &amp; ST. MALACHY’S COLERAINE<br>
-North Connor Pastoral Comm unity<br>
-Fr Kevin McGuckien PP Telephone: <a href="tel:+442870832534" style="color:#1d4ed8;font-weight:600;">028 7083 2534</a> Email: <a href="mailto:k.mcguckien@downandconnor.org" target="_blank" rel="noopener noreferrer">k.mcguckien@downandconnor.org</a><br>
-23rd August 2026 TWENT Y FIRST SUNDAY IN ORDINARY TIME Sunday A / Psalter Week 1<br>
-PORTSTEWART: 07508 549572 / PORTRUSH: 07508 549574 / COLERAINE: 07738 837959 If you have any item for inclusion in the parish weekend bulletin, please email: <a href="mailto:portstewart@downandconnor.org" target="_blank" rel="noopener noreferrer">portstewart@downandconnor.org</a> by 11am on Thursday. Thank you.</p>
+<p>THE PARISHES OF PORTSTEWART, PORTRUSH &amp; BUSHMILLS &amp; ST. MALACHY’S COLERAINE<br>
+North Connor Pastoral Community<br>
+Fr Kevin McGuckien PP Telephone: <a href="tel:+442870832534" style="color:#1d4ed8;font-weight:600;">028 7083 2534</a> Email: k.mcguckien@downandconnor .org<br>
+30th August 2026 TWENTY SECOND SUNDAY IN ORDINARY TIME Sunday A / Psalter Week 2<br>
+PORTSTEWART: 07508 549572/ PORTRUSH: 07508 549574/ COLERAINE: 07738 837959 If you have any item for inclusion in the parish weekend bulletin, please email: <a href="mailto:portstewart@downandconnor.org" target="_blank" rel="noopener noreferrer">portstewart@downandconnor.org</a> by 11am on Thursday. Thank you.</p>
 <h3 class="b-head">MASS TIMES</h3>
 <p>STAR OF THE SEA CHURCH, PORTSTEWART<br>
-TUESDAY : 7.00pm<br>
-WEDNESDAY – FRIDAY : 9.30am<br>
-SATURDAY VIGIL MASS: 4.30 pm<br>
+TUESDAY: 7.00pm<br>
+WEDNESDAY – FRIDAY: 9.30am<br>
+SATURDAY VIGIL MASS: 4.30pm<br>
 SUNDAY MASS: 10.00am<br>
 CONFESSION:<br>
 SATURDAY: 4.00pm<br>
-EUCHARISTIC ADORATION - THURSDAY 10am -5pm</p>
+EUCHARISTIC ADORATION - THURSDAY 10am-5pm</p>
 <hr>
 <p>ST. MALACHY’S CHURCH , COLERAINE<br>
-TUES , THURS , FRI &amp; SAT : 10.00am<br>
-SUNDAY MASS : 11.30am &amp; 5.00pm<br>
+TUES, THURS, FRI &amp; SAT: 10.00am<br>
+SUNDAY MASS: 11.30am &amp; 5.00pm<br>
 CONFESSION:<br>
 SATURDAYS: After 10.00am Mass<br>
-SUNDAYS: 4.30 -4.50pm</p>
+SUNDAYS: 4.30-4.50pm</p>
 <hr>
 <p>ST. PATRICK’S CHURCH, PORTRUSH<br>
-MON , TUES &amp; FRI : 10.30am<br>
+MON, TUES &amp; FRI: 10.30am<br>
 SUNDAY MASS: 12 Noon<br>
-EUCHARISTIC ADORATION - FRIDAY 11am -1pm</p>
+EUCHARISTIC ADORATION - FRIDAY 11am-1pm</p>
 <hr>
 <p>OUR LADY &amp; ST PATRICK’S CHURCH, BALLYMONEY<br>
-MON &amp; WED : 10.00am<br>
+MON &amp; WED: 10.00am<br>
 FRIDAY: 7.00pm<br>
 SATURDAY VIGIL MASS: 6.00pm<br>
 SUNDAY MASS: 9.30am<br>
 COLLECTIONS<br>
 PORTSTEWART<br>
-Last weekend’s Collections: Weekly Offering: £1510<br>
-DIOCESAN CATHEDRAL COLLECTION: £ 830<br>
+Last weekend’s Collections: Weekly Offering: £1870<br>
 Our account details are: Portstewart Parish<br>
-Sort Code: 95 -04-28 Account number: 91011049<br>
+Sort Code: 95-04-28 Account number: 91011049<br>
 PORTRUSH<br>
-Last weekend’s Collections: Weekly Offering: £505<br>
-DIOCESAN CATHEDRAL COLLECTION: £ 266<br>
+Last weekend’s Collections: Weekly Offering: £553<br>
 Our account details are: Portrush Parish<br>
-Sort Code: 95 -06-79 Account number: 00254207<br>
+Sort Code: 95-06-79 Account number: 00254207<br>
 ST. MALACHY’S COLERAINE<br>
-Last weekend’s Collections: Weekly Offering: £1003<br>
-DIOCESAN CATHEDRAL COLLECTION: £ 472<br>
+Last weekend’s Collections: Weekly Offering: £1011<br>
 Our account details are: St Malachy’s Church<br>
-Sort Code: 90 -48-00 Account number: 88609151<br>
+Sort Code: 90-48-00 Account number: 88609151<br>
 THANK YOU FOR YOUR SUPPORT AND GENEROSITY!<br>
 PORTSTEWART<br>
-Parish Secretary: <a href="tel:+442870832534" style="color:#1d4ed8;font-weight:600;">028 7083 2534</a><br>
+Parish Support Officer: <a href="tel:+442870832534" style="color:#1d4ed8;font-weight:600;">028 7083 2534</a><br>
 Email: <a href="mailto:portstewart@downandconnor.org" target="_blank" rel="noopener noreferrer">portstewart@downandconnor.org</a><br>
-Parish Office Hours : Mon 9.00am – 1.00pm<br>
-Tues 2.00pm -5.00pm, Wed &amp; Fri : 9.00am – 5.00pm</p>
+Parish Office Hours: Tues 2.00pm-5.00pm,<br>
+Wed &amp; Fri: 9.00am – 5.00pm</p>
 <h3 class="b-head">REST IN PEACE</h3>
-<p>RECENT : Dr. James Harley, Jody Campbell, Paul<br>
-O’Neill, Sean Hughes, Stacey McLaughlin, Martin<br>
-McGinnis , Bill O’Doherty, Michael (Mike) Forde, Mary<br>
-Hanvey, Esther Conway , Kyle Johnston , Walter Gregg<br>
-Yates , Bertie Doyle , Brian McCaffrey RIP</p>
-<h3 class="b-head">ANNIVERSARIES : Owen McWilliams, William Cunning ,</h3>
-<p>Christina Passmore, James Casey, James Sweeney,<br>
-Justi n Murray , Paul Harvey , Ellen Doyle , Denis<br>
-McGowan , Patrick Trolan , Alice Duffy RIP<br>
-The Requie m Mas s for Jod y Campbell will be<br>
-celebrated on Monday 24th August at 10. 00am in St.<br>
-Mary’s, Star of the Sea Church, Port stewart .<br>
-NEXT WEEKEND – 29 &amp; 30 AUGUST (PORTSTEWART)<br>
+<p>RECENT: Fr. Michael McConville, Dr. James Harley,<br>
+Jody Campbell, Paul O’Neill, Sean Hughes,<br>
+Stacey McLaughlin, Bill O’Doherty, Brian McCaffrey,<br>
+Mary Convery RIP<br>
+ONE MONTH AGO: Michael (Mike) Forde RIP</p>
+<h3 class="b-head">ANNIVERSARIES: Noel Quigg, Teresa Taggart,</h3>
+<p>Eamon Forbes, Jean Loughrey, Sarah Sweeney,<br>
+Brigid Mullan, Garth Moore, Sean Farrell,<br>
+Phoebe O’Hara, Patrick Conway, Bridget Conway,<br>
+Massie McAleer, Charlie Booth, Andrew Diamond,<br>
+Colum Duddy, Patrick (Pat) Reid RIP<br>
+NEXT WEEKEND – 05 &amp; 06 SEPT (PORTSTEWART)<br>
 VIGIL MASS: 4.30pm<br>
-Minister of the Word: Mary T O’Hara<br>
-Eucharistic Ministers: Tracy McMorrough, Mary<br>
-Lough rey, Alison Rankin/Deirdre McCann<br>
+Minister of the Word: Brendan McLernon<br>
+Eucharistic Ministers: Mary Loughrey, Margaret<br>
+McQuillan, Alison Rankin/Deirdre McCann<br>
 SUNDAY MASS: 10.00am<br>
-Minister of the Word: Teresa Dolan<br>
-Eucharistic Ministers : Margaret Conway *, Mar k<br>
-Donaghy* , Julie Roantree *, Liam Brolly<br>
+Minister of the Word: Eugene Kelly<br>
+Eucharistic Ministers : Alison Rankin*, Pat Calvert*,<br>
+Margaret McLernon*, Brian Lenehan<br>
 COLERAINE<br>
 Email: <a href="mailto:coleraine@downandconnor.org" target="_blank" rel="noopener noreferrer">coleraine@downandconnor.org</a></p>
 <h3 class="b-head">Parish Office</h3>
-<p>Mon : 2.15 – 5.00pm</p>
+<p>Thurs: 9.00 – 5.00pm</p>
 <h3 class="b-head">REST IN PEACE</h3>
-<p>RECENT: Pearl Walsby nee Holmes, Joann a McBride,<br>
-Michael Forde, Tommy Quinn , Walter Gregg Yates RIP<br>
-ONE MONTH AGO: Ernie Gorham RIP<br>
-ONE YEAR AGO: Aaron Duffy RIP</p>
-<h3 class="b-head">ANNIVERSARIES : Sean McColgan, Elizabeth (Lily)</h3>
-<p>McCrudden, Pat Kennedy, Bridget Doherty , Robert<br>
-McLaughlin RIP<br>
+<p>RECENT: Fr. Michael McConville, Pearl Walsby nee<br>
+Holmes, Joanna McBride, Michael Forde, Tommy<br>
+Quinn, Walter Gregg Yates RIP</p>
+<h3 class="b-head">ANNIVERSARIES: Christine Conneely, Charlie</h3>
+<p>Booth, Dave Armstrong, Garth Moore, Agnes<br>
+Sweeney, Rose Young, Harry Young, Marian Hanson,<br>
+Rita McKenna, Billy Steele RIP<br>
 PORTRUSH<br>
 Fr Patrick Delargy: <a href="tel:+442870823388" style="color:#1d4ed8;font-weight:600;">028 7082 3388</a><br>
 Email: <a href="mailto:portrush@downandconnor.org" target="_blank" rel="noopener noreferrer">portrush@downandconnor.org</a></p>
 <h3 class="b-head">PARISH OFFICE</h3>
-<p>Tuesday – 9.00am -1.00pm<br>
-NEXT SUNDAY – 30 AUGUST (PORTRUSH) 12.00 Noon<br>
-Minister of the Word: Peter Sheridan<br>
-Eucharistic Minister: Stephen O’Neill</p>
+<p>Tuesday – 9.00am-1.00pm<br>
+NEXT SUNDAY – 06 SEPT (PORTRUSH) 12.00 Noon<br>
+Minister of the Word: Marie McAuley<br>
+Eucharistic Minister: Jimmy Friel</p>
 <h3 class="b-head">REST IN PEACE</h3>
-<p>RECENT: Clare Kinney, Gerard B ritovšek,<br>
-Tommy Quinn , Helen Scullion RIP<br>
-ONE YEAR AGO: Pauline McNicholl R IP</p>
-<h3 class="b-head">ANNIVERSARIES : Susan McNicholl , Tony Lovell RIP</h3>
-<p>Requiem Mass for Gerard Britovšek, Slovenia and<br>
-formerly of Portrush, will be celebrated on Mon 24th<br>
-August at 10.30am in St. Patrick’s Church, Portrush . ST MALACHY&#x27;S SUNDAE SUNDAY<br>
-We will be holding our<br>
-Sundae Sunday after<br>
-11.30am Mass in St<br>
-Malachy&#x27;s on Sunday 30th<br>
+<p>RECENT: Fr. Michael McConville, Gerard Britov šek,<br>
+Helen Scullion RIP<br>
+ONE YEAR AGO: Teresa Clarke RIP</p>
+<h3 class="b-head">ANNIVERSARIES : James McGrath, Jaroslav</h3>
+<p>Rekawek Rita McMacken, Fr. John Hurson RIP<br>
+ST MALACHY&#x27;S SUNDAE SUNDAY<br>
+We will have ice cream and<br>
+a cuppa for everyone after<br>
+11.30am Mass today in St.<br>
+Malachy&#x27;s, Sunday 30th<br>
 August. We are inviting<br>
 everyone to join us at the<br>
-Parish Centre for tea, coffee<br>
-and ice cream! We hope<br>
-you will come over and<br>
+Parish Centre for tea,<br>
+coffee, and ice cream! We<br>
+hope you will come over and<br>
 enjoy a cuppa and catch up<br>
 with the other members of<br>
 our parish family. We look<br>
-forward to welcoming you on the 30th!<br>
+forward to welcoming you!<br>
 PARISH FUNDRAISER<br>
 BANK HOLIDAY SEQUENCE DANCE<br>
-in St. Mary’s , Star of the Sea Parish Centre,<br>
-Portstewart on Monday 31st August.<br>
-Dancing from 8. 00-11.00pm. Admission £6<br>
-(including light refreshments).<br>
-Raffle tickets available . Music by Liam<br>
-McLaughlin. Everyone welcome! All<br>
+in St . Mary’s , Star of the Sea Parish<br>
+Centre, Portstewart on Monday 31st<br>
+August. Dancing from 8.00-11.00pm.<br>
+Admission £6 (including light<br>
+refreshments). Raffle tickets available.<br>
+Music by Liam McLaughlin. Everyone welcome! All<br>
 proceeds going to Parish Funds.<br>
-PORTSTEWART PARISH CENTRE CAR -PARK<br>
-Finding it difficult to get parking for Vigil Mass on<br>
-Saturdays and 10am Mass on Sundays in Portstewart?<br>
-Our Parish Centre carpark, 37A The Diamond, behind<br>
-Buds Spar shop is open during Mass times and for half an<br>
-hour before and after Mass.<br>
-CATHOLIC MOTHERS IRELAND – FAMILY DAY<br>
-Catholic Mothers Ireland will hold its Annual National<br>
-Mass on Sunday, 6 September at Termonbacca Retreat<br>
-Centre, Derry City. The day will begin with Mass at<br>
-2.00pm, celebrated by Bishop Donal McKeown, followed<br>
-by refreshments, children&#x27;s activities, and a talk for<br>
-parents. This promises to be a lovely day for the whole<br>
-family. For more information and booking details, please<br>
-email <a href="mailto:info@catholicmothers.ie" target="_blank" rel="noopener noreferrer">info@catholicmothers.ie</a> . All are welcome.<br>
+Catholic Men’s Retreat - Standing in the Breach<br>
+A Catholic Men’s Retreat will take<br>
+place at Portglenone Monastery on<br>
+Saturday 19 September 2026, from<br>
+9am to 1pm . The theme of the<br>
+retreat is “It is no longer I who live,<br>
+but Christ who lives in me”<br>
+(Galatians 2:20). The morning will include prayer,<br>
+teaching, fellowship and men’s testimonies, with Fr<br>
+Eddie McGee as keynote speaker. All men are very<br>
+welcome. For further information, contact Thomas<br>
+Carey on 07967 620435 or email<br>
+<a href="mailto:sean@catholicminute.co.uk" target="_blank" rel="noopener noreferrer">sean@catholicminute.co.uk</a> .<br>
 ST. MALACHY’S PARISH QUESTIONNAIRE<br>
-The Pastoral Council would like to invite all<br>
-parishioners to take some time to fill out<br>
-the parish questionnaire. It will be great to<br>
-hear your views and ideas and we look<br>
-forward to formulating a pastoral plan in the coming<br>
-month s. Just scan this QR code with the camera on your<br>
-phone and take 10 minutes to answer the questionnaire<br>
-which is anonymous and comes directly to the Parish<br>
-Office. Alternatively, there will be paper copies of the<br>
-questionnaire at the door of the Church . You are invited to<br>
-take one , complete it and return it to the basket at the<br>
-main entrance of the Church next weekend or as soon<br>
-after that as you can. Thank you in advance.<br>
-&#x27;Embrace The Grace&#x27; Young Adult Catholic Conference<br>
-- 29 August 2026 - Legion of Mary<br>
-&#x27;Embrace the Grace&#x27; is a conference on faith and culture<br>
-for young adults (18 -40) with talks, prayer, Mass,<br>
-confession, workshops, food and social in the historic<br>
-Legion of Mary headquarters at De Montfort House, North<br>
-Brunswick Street, Dublin 7. It will b e a chance to build<br>
-faith in friendship with young adults from across the<br>
-country. This event takes place on Saturday 29 August<br>
-from 9.30am to 6.00pm with a social afterward. Tickets<br>
-cost €20 and can be booked on the Eventbrite website by<br>
-looking up &#x27;Embrace the Grace&#x27;. Any queries can be<br>
-directed towards <a href="mailto:deusetpatria@gmail.com" target="_blank" rel="noopener noreferrer">deusetpatria@gmail.com</a> .<br>
-MATT TALBOT – URBAN MYSTIC<br>
-The Knights of St Columbanus, CK12 Downpatrick ,<br>
-invite you to a special screening of Matt Talbot – Urban<br>
-Mystic at Newcastle Community Cinema, St Mary&#x27;s<br>
-Hall, Main Street, Newcastle , on Friday 4th September<br>
-at 7.00pm . Matt Talbot&#x27;s remarkable true story of faith,<br>
-struggle, addiction and redemption continues to inspire<br>
-people throughout the world and offers a powerful<br>
-message of hope to those affected by addiction and their<br>
-families. The evening will also feature guest speaker<br>
-Michael Murphy . Admission is free , with a suggested<br>
-donation of £3 towards co sts. Tea and coffee will be<br>
-served following the screening. All are welcome !<br>
-MENS’ CAMINO<br>
-Join men from across Ireland on Sat 12th Sept . for a<br>
-25km pilgrimage through the Boyne Valley, beginning in<br>
-Drogheda. The day includes Mass, Adoration, Rosary,<br>
-Confessions, fraternity, lunch and dinner, with after -<br>
-dinner speaker Fr. Mark Quinn . Open to men aged 18+.<br>
-Cost: €65 (student €55). Registration, accommodation<br>
-and details: <a href="https://www.dominicans.ie/events" target="_blank" rel="noopener noreferrer">www.dominicans.ie/events</a> .<br>
-Enquiries: <a href="mailto:op.evangelisation@gmail.com" target="_blank" rel="noopener noreferrer">op.evangelisation@gmail.com</a><br>
-Portstewart</p></div>
+Just a little reminder to return your parish<br>
+questionnaires as soon as possible please<br>
+or to complete the questionnaire online by<br>
+scanning the QR code here with the camera<br>
+of your phone. You can also access the questionnaire by<br>
+clicking the following link:<br>
+LITTLE STARS’ BABY AND TODDLER GROUP<br>
+Our Parish Little Stars’ baby and toddler group will<br>
+be back on Tuesday 1 September 10.00-11.30am<br>
+and every Tuesday in term time in St. Mary’s, Star of the<br>
+Sea Parish Centre, Portstewart. Parents, grandparents,<br>
+carers and little ones are all invited for playtime, chat, a<br>
+friendly cuppa and the best scones in Portstewart!<br>
+We will have a warm welcome for all, lots of fun toys and<br>
+activities to occupy the little ones and refreshments for<br>
+both kids and adults are provided. There is a voluntary<br>
+donation of £2 per family to cover costs. We have a great<br>
+team of volunteers who help create a lovely environment<br>
+for everyone and it’s a fun way to give of your time. If<br>
+you’d like to join our team , contact Emer on <a href="tel:+3537709043921" style="color:#1d4ed8;font-weight:600;">07709043921</a><br>
+or <a href="mailto:emer.m.okeeffe@gmail.com" target="_blank" rel="noopener noreferrer">emer.m.okeeffe@gmail.com</a><br>
+FLAME CLUB IS NEARLY BACK!<br>
+We are excited that our Parish Youth Club<br>
+Flame will return on 4 September and each<br>
+Friday night in term time in St. Mary’s, Star of the Sea<br>
+Parish Centre, Portstewart from 6-8pm, £2 per child<br>
+which includes break. The club is open to children from 6<br>
+years old and above and we provide a range of fun<br>
+activities; games, arts and crafts, gardening, cooking,<br>
+singing and prayer time. All are welcome as we support<br>
+the wonderful children of our Parish to grow in friendship,<br>
+fun and faith! Registration forms are available at the back<br>
+of the Church or at the Parish Centre on the 4 Sept. For<br>
+more information text Emer on <a href="tel:+3537709043921" style="color:#1d4ed8;font-weight:600;">07709043921</a> /email<br>
+<a href="mailto:flameclubportstewart@gmail.com" target="_blank" rel="noopener noreferrer">flameclubportstewart@gmail.com</a><br>
+Flame Club is led by a brilliant team of young leaders<br>
+supported by adult volunteers. We are always happy to<br>
+welcome new youth volunteers; training and support will<br>
+be provided. Volunteering with Flame is a great way to<br>
+give of your time, gain experience in working with<br>
+children, build your skills, creativity and leadership, all<br>
+whilst having fun. It also is a great addition to your CV<br>
+and works in conjunction with John Paul II, Duke of<br>
+Edinburgh, Oscar Romero and school-based awards.<br>
+We also welcome new adult volunteers who give one<br>
+Friday a month to help provide support and ensure our<br>
+safeguarding protocols, all whilst seeing the kids have a<br>
+ball! If you are interested in giving your time or would like<br>
+to find out more, please contact Emer as above.<br>
+Portstewart <a href="http://portstewartparish.website/bulletins/" target="_blank" rel="noopener noreferrer">http://portstewartparish.website/bulletins/</a></p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other DOWN &amp; CONNOR Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="ballycastle"><a class="parish-link" href="ballycastleparish.html" target="_blank" rel="noopener noreferrer">Ballycastle</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="ballymenaparish.html" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="glenariffe"><a class="parish-link" href="glenariffeparish.html" target="_blank" rel="noopener noreferrer">Glenariffe</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="kilmore and killyleagh"><a class="parish-link" href="kilmoreandkillyleagh.html" target="_blank" rel="noopener noreferrer">Kilmore and Killyleagh</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="port glenone (st mary&#x27;s portglenone)"><a class="parish-link" href="stmarysportglenone.html" target="_blank" rel="noopener noreferrer">Port Glenone (St Mary&#x27;s Portglenone)</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="sacred heart belfast"><a class="parish-link" href="sacredheartparishbelfast.html" target="_blank" rel="noopener noreferrer">Sacred Heart Belfast</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st brigids belfast"><a class="parish-link" href="stbrigidsparishbelfast.html" target="_blank" rel="noopener noreferrer">St Brigids Belfast</a></li><li class="parish-item" data-name="st gerards"><a class="parish-link" href="stgerardsparish.html" target="_blank" rel="noopener noreferrer">St Gerards</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st mary&#x27;s on the hill"><a class="parish-link" href="stmarysonthehill.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s on the Hill</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="ballymenaparish.html" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st colmcilles"><a class="parish-link" href="st-colmcilles.html" target="_blank" rel="noopener noreferrer">St Colmcilles</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1185,9 +1208,9 @@ Portstewart</p></div>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1679,23 +1702,8 @@ Portstewart</p></div>
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

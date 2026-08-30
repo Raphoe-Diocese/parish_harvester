@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Tempo (Pobal) Bulletin — 25/08/2026</title>
+  <title>Tempo (Pobal) Bulletin — 30/08/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
   <style>
@@ -112,7 +112,10 @@
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -143,10 +146,15 @@
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
@@ -179,6 +187,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -201,6 +217,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +237,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +249,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +275,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +290,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +472,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +822,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +836,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -863,7 +892,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,14 +900,14 @@
     <header class="header">
       <p class="diocese-label">CLOGHER</p>
       <h1>Tempo (Pobal) Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Tempo (Pobal) — 25/08/2026. Part of the Clogher Diocese collated bulletin.</p>
-      <a class="download-link-top" href="tempo.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Tempo (Pobal) — 30/08/2026. Part of the Clogher Diocese collated bulletin.</p>
+      <a class="download-link-top" href="tempo.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="tempo.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <a class="mobile-jump-download" href="tempo.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
@@ -895,7 +924,7 @@
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="tempo.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="tempo.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a href="tempo.pdf">Open PDF</a>
               <a href="tempo.pdf" download>Download</a>
             </div>
           </div>
@@ -934,66 +963,66 @@
       <div class="quiet-links">
         <a href="tempo-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-tempo-pobal" data-parish-name="Tempo (Pobal)"><h2 class="ocr-parish-name">Tempo (Pobal)</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-tempo-pobal" data-parish-name="Tempo (Pobal)"><h2 class="ocr-parish-name">Tempo (Pobal)</h2><p class="ocr-parish-date">30/08/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>PARISH OF POBAL<br>
-Twenty -First Sunday in Ordinary Time 23rd August 2026<br>
-Website : pobalparish.com and Webcam - <a href="https://www.churchservices.tv/Tempo" target="_blank" rel="noopener noreferrer">www.churchservices.tv/Tempo</a><br>
-Priest : Fr. John Halton, Parochial House, Tempo. Tel. 895 41344.<br>
+Twenty-Second Sunday in Ordinary Time 30th August 2026<br>
+Website: pobalparish.com and Webcam - <a href="https://www.churchservices.tv/Tempo" target="_blank" rel="noopener noreferrer">www.churchservices.tv/Tempo</a><br>
+Priest: Fr. John Halton, Parochial House, Tempo. Tel. 895 41344.<br>
 Sunday Masses: Tempo: 11.00am<br>
-Cradien : 9.30am (First and Last Sunday of the month); 9.30am Lisbellaw (Middle Sundays )<br>
-Eucharistic Ministers: Tem po: Sund ay 30th August – Ciaran &amp; Catherine Gallagher .<br>
-Cradien : Sunday 30th August – Gerry Naan.<br>
-Weekday Mass : Tempo: Friday 7.00pm<br>
+Cradien: 9.30am (First and Last Sunday of the month); 9.30am Lisbellaw (Middle Sundays)<br>
+Eucharistic Ministers: Tempo: Sunday 6th September – Maire McKeagney &amp; Liam McQuaid.<br>
+Cradien : Sunday 6th September – Patricia McKeever.<br>
+Weekday Mass: Tempo: Friday 7.00pm<br>
 Adoration of the Blessed Sacrament: takes place in the Church of the Immaculate Conception, Tempo each<br>
 Friday morning from 10am – 1pm. Parishioners are welcome to come along.<br>
-Confession s: in St Michael’s Church, Enniskillen each Saturday 10 am – 12 noon and 5pm – 5.45pm<br>
-Anniversaries: Tempo : Sunday 23/08 (11.00a m) Bridie McCaffrey, Ballyreagh . (1st Anniversary)<br>
-Francie McCaffrey, Killaculla (2nd Anniversary)<br>
-Friday 28/08 (7.00pm) Thomas &amp; Veronica Gallagher, Drumackin.<br>
-Margaret &amp; John McCaughey &amp; deceased family members<br>
-Bridget &amp; Philip McKeaney &amp; deceased family members,<br>
-Coolcran.<br>
-Mrs Mary B. McGrenaghan, Tattinwei r &amp; deceased<br>
-members of McGrenaghan &amp; McCusker families.<br>
+Confessions: in St Michael’s Chur ch, Enniskillen each Saturday 10am – 12 noon and 5pm – 5.45pm<br>
+Anniversaries: Tempo Friday 04/09 (7.00pm) Rita McGovern, Lettan,<br>
+Benny &amp; Gretta Bogue, Lower Doon.<br>
+Molly Harkin, Manor View.<br>
+Paddy Shannon, Manor View<br>
+Tom Owens, Ballygawley &amp; Tempo.<br>
+James, Mary Brigid &amp; Robert Woods, Knocknastacken.<br>
+Bridie &amp; Jim Breen, Brocagh (1st &amp; 8th Anniversary)<br>
 Cradien: Sunday 30/08 (9.30am) Johnnie Woods, Breagho<br>
 M.M.M Jim Curran, Chanterhill Park<br>
-Reflection : When Faith Becomes a Life<br>
-Jesus asks his disciples a question that becomes very personal: “But you - who do you say I am?” Peter<br>
-recognises something true: Jesus is “the Christ, the Son of the living God.” But Peter will spend the rest of<br>
-his life learning what that answer means and allowing it to shape the person he becomes. The same is true<br>
-for us. What we really believe eventually becomes visible in the way we live: in our choices, our<br>
-relationships, what we stand for and what we are prepared to carry. That gives each of us more influence<br>
-than we sometimes realise. There is a quiet authority in a life where words and actions belong together. We<br>
-see it in parents, friends, young people and neighbours whose convictions give strength to others. Jesus still<br>
-asks: “Who do you say I am?” Our answer is given in words. But, over a lifetime, it is also given in the<br>
-people we become.<br>
-Baptism or Marriage: To arrange for these, please contact Enniskillen Parish Office 6632 -2075: Monday to<br>
+Reflection: The Life That Is Found<br>
+Peter&#x27;s reaction to Jesus in this Sunday&#x27;s Gospel seems entirely reasonable. Jesus speaks of suffering and<br>
+death; Peter immediately says that this must not happen. Yet Jesus tells him that he needs to learn to see<br>
+differently. That is part of discipleship for all of us. We naturally associate what is good with what makes<br>
+life easier. Yet some of the best things we do will cost us something: caring for another person, keeping a<br>
+promise, accepting responsibility, remaining faithful, forgiving. Christianity does not teach us to seek<br>
+suffering. The cross is not good because it hurts. But neither should we walk away from what is good<br>
+simply because it is difficult. Saint Paul speaks of allowing our minds to be renewed so that we can<br>
+recognise what God wants. Perhaps that gives us a useful question for the week ahead: What is the good that<br>
+God is asking of me here?<br>
+Baptism or Marriage: To arrange for these, please contact Enniskillen Parish Office 6632-2075 : Monday to<br>
 Bingo: Bingo continues in St Mary’s Community Centre each Thursday night at 8.30pm with the usual prizes,<br>
 £5,000 Jackpot on Game 10 *(on 44 calls or less) Everyone welcome.<br>
 Choir Practice for Youth Choir: each Thursday evening 6.30 – 7.30pm.<br>
-Lough Derg 2026 : One Day Retreats: August: Sunday 23rd, Saturday 29th, Monday 31st. September:<br>
-Saturday 5th, Sunday 6th, Wednesday 9th, Saturday 12th, Tuesday 15th, Saturday 19th and Sunday 20th.<br>
+Lough Derg 2026 : One Day Retreats: August: Monday 31st. September: Saturday 5th, Sunday 6th,<br>
+Wednesday 9th, Saturday 12th, Tuesday 15th, Saturday 19th and Sunday 20th.<br>
 Advance Registration is essential for all events. Call 00353 71 9861518. Email <a href="mailto:info@loughderg.org" target="_blank" rel="noopener noreferrer">info@loughderg.org</a><br>
 Census: The Diocese requires a Census from each Parish every 5 years. This will be carried out over the<br>
 coming weeks. Your help in assisting with the Census would be greatly appreciated.<br>
-Sunday Collections: 16/08/2026 Week ly - £661; Development Fund - £520 ; Pope’s Collection £335.00 .<br>
-Vintage Afternoon Tea: today Sunday 23rd August from 3 .00 to 5.00pm in Dooneen Education Centre.<br>
-£10 per person. Games &amp; Raffle. Gluten Free options available. All proceeds to “Breast Cancer Now”<br>
+Sunday Collections: 23/08/2026 Weekly - £1,140; Graveyard - £40.00 ; Pope’s Collection £65.00 .<br>
 Church of the Immaculate Conception 200th Anniversary: We are planning to mark this significant<br>
 milestone later this year. We would appreciate if you had any old photos, memories or recollections to<br>
 share. More details to follow.<br>
-Tractor Run: A special word of thanks to all who helped in any way and made the day such a success. The<br>
-total amount raised was £1,211.00 for Marie Curie Cancer and £715.00 + €16 for maintenance of Edenmore<br>
-Cemetery. Aga in special thanks to all who made it a wonderful success.<br>
-Keep Free: Saturday 26th September 2026. Charity Auction 2 .00pm St Mary’s Community Centre. Tempo (Pobal)</p></div>
+Enniskillen VSOSJ Branch Monthly Holy Hour Devotion &amp; Benediction for Vocations will be held in St<br>
+Michael&#x27;s Church on Friday 4th September at 7pm. New parishioners are welcome to attend.<br>
+St Vincent De Paul: The collection will take place in Cradien this Sunday 30th August and in Tempo on<br>
+Sunday 6th September, 2026.<br>
+Pobal Parish Pastoral Council: will meet on Wednesday 2nd September at 8.00pm in the Parish House.<br>
+Keep Free: Saturday 26th September 2026. Charity Auction 2.00 pm St Mary’s Community Centre.<br>
+Reader: September – Maire McKeagney Tempo (Pobal) <a href="http://www.pobalparish.com/" target="_blank" rel="noopener noreferrer">http://www.pobalparish.com/</a></p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other CLOGHER Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ballybay (tullycorbet)"><a class="parish-link" href="ballybay.html" target="_blank" rel="noopener noreferrer">Ballybay (Tullycorbet)</a></li><li class="parish-item" data-name="carrickmacross (machaire rois)"><a class="parish-link" href="carrickmacross.html" target="_blank" rel="noopener noreferrer">Carrickmacross (Machaire Rois)</a></li><li class="parish-item" data-name="castleblayney (muckno, includes clontibret)"><a class="parish-link" href="castleblayney.html" target="_blank" rel="noopener noreferrer">Castleblayney (Muckno, includes Clontibret)</a></li><li class="parish-item" data-name="clones"><a class="parish-link" href="clones.html" target="_blank" rel="noopener noreferrer">Clones</a></li><li class="parish-item" data-name="corcaghan-threemilehouse (kilmore &amp; drumsnatt)"><a class="parish-link" href="corcaghanthreemilehouse.html" target="_blank" rel="noopener noreferrer">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</a></li><li class="parish-item" data-name="derrygonnelly (botha)"><a class="parish-link" href="derrygonnelly.html" target="_blank" rel="noopener noreferrer">Derrygonnelly (Botha)</a></li><li class="parish-item" data-name="donagh"><a class="parish-link" href="donagh.html" target="_blank" rel="noopener noreferrer">Donagh</a></li><li class="parish-item" data-name="donaghmoyne"><a class="parish-link" href="donaghmoyne.html" target="_blank" rel="noopener noreferrer">Donaghmoyne</a></li><li class="parish-item" data-name="enniskillen (st michael&#x27;s parish)"><a class="parish-link" href="enniskillen.html" target="_blank" rel="noopener noreferrer">Enniskillen (St Michael&#x27;s Parish)</a></li><li class="parish-item" data-name="errigal truagh"><a class="parish-link" href="errigaltruagh.html" target="_blank" rel="noopener noreferrer">Errigal Truagh</a></li><li class="parish-item" data-name="fintona (donacavey)"><a class="parish-link" href="fintona.html" target="_blank" rel="noopener noreferrer">Fintona (Donacavey)</a></li><li class="parish-item" data-name="irvinestown (devenish)"><a class="parish-link" href="irvinestown.html" target="_blank" rel="noopener noreferrer">Irvinestown (Devenish)</a></li><li class="parish-item" data-name="killanny"><a class="parish-link" href="killanny.html" target="_blank" rel="noopener noreferrer">Killanny</a></li><li class="parish-item" data-name="magheracloone"><a class="parish-link" href="magheracloone.html" target="_blank" rel="noopener noreferrer">Magheracloone</a></li><li class="parish-item" data-name="monaghan &amp; rackwallace (includes tyholland)"><a class="parish-link" href="monaghanrackwallace.html" target="_blank" rel="noopener noreferrer">Monaghan &amp; Rackwallace (includes Tyholland)</a></li><li class="parish-item" data-name="roslea"><a class="parish-link" href="roslea.html" target="_blank" rel="noopener noreferrer">Roslea</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ballybay (tullycorbet)"><a class="parish-link" href="ballybay.html" target="_blank" rel="noopener noreferrer">Ballybay (Tullycorbet)</a></li><li class="parish-item" data-name="carrickmacross (machaire rois)"><a class="parish-link" href="carrickmacross.html" target="_blank" rel="noopener noreferrer">Carrickmacross (Machaire Rois)</a></li><li class="parish-item" data-name="castleblayney (muckno, includes clontibret)"><a class="parish-link" href="castleblayney.html" target="_blank" rel="noopener noreferrer">Castleblayney (Muckno, includes Clontibret)</a></li><li class="parish-item" data-name="clones"><a class="parish-link" href="clones.html" target="_blank" rel="noopener noreferrer">Clones</a></li><li class="parish-item" data-name="corcaghan-threemilehouse (kilmore &amp; drumsnatt)"><a class="parish-link" href="corcaghanthreemilehouse.html" target="_blank" rel="noopener noreferrer">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</a></li><li class="parish-item" data-name="derrygonnelly (botha)"><a class="parish-link" href="derrygonnelly.html" target="_blank" rel="noopener noreferrer">Derrygonnelly (Botha)</a></li><li class="parish-item" data-name="donagh"><a class="parish-link" href="donagh.html" target="_blank" rel="noopener noreferrer">Donagh</a></li><li class="parish-item" data-name="enniskillen (st michael&#x27;s parish)"><a class="parish-link" href="enniskillen.html" target="_blank" rel="noopener noreferrer">Enniskillen (St Michael&#x27;s Parish)</a></li><li class="parish-item" data-name="errigal truagh"><a class="parish-link" href="errigaltruagh.html" target="_blank" rel="noopener noreferrer">Errigal Truagh</a></li><li class="parish-item" data-name="irvinestown (devenish)"><a class="parish-link" href="irvinestown.html" target="_blank" rel="noopener noreferrer">Irvinestown (Devenish)</a></li><li class="parish-item" data-name="killanny"><a class="parish-link" href="killanny.html" target="_blank" rel="noopener noreferrer">Killanny</a></li><li class="parish-item" data-name="magheracloone"><a class="parish-link" href="magheracloone.html" target="_blank" rel="noopener noreferrer">Magheracloone</a></li><li class="parish-item" data-name="monaghan &amp; rackwallace (includes tyholland)"><a class="parish-link" href="monaghanrackwallace.html" target="_blank" rel="noopener noreferrer">Monaghan &amp; Rackwallace (includes Tyholland)</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1045,9 +1074,9 @@ Keep Free: Saturday 26th September 2026. Charity Auction 2 .00pm St Mary’s Com
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1539,23 +1568,8 @@ Keep Free: Saturday 26th September 2026. Charity Auction 2 .00pm St Mary’s Com
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();
