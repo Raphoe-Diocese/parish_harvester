@@ -1192,8 +1192,17 @@ def prefers_native_pdf_js() -> str:
 """
 
 
-PDF_INPAGE_VIEWER_VERSION = "20260827h"
+PDF_INPAGE_VIEWER_VERSION = "20260830a"
 PDF_INPAGE_VIEWER_SRC = f"/assets/pdf-inpage-viewer.js?v={PDF_INPAGE_VIEWER_VERSION}"
+
+
+def pdf_iframe_tag(pdf_href: str, *, title: str, css_class: str | None = None) -> str:
+    """Keep the iframe box. Do not set src — the browser would start a full
+    PDF download before PDF.js runs (double pull; ~28s phone LCP)."""
+    safe = html.escape(pdf_href, quote=True)
+    safe_title = html.escape(title)
+    cls = f' class="{html.escape(css_class, quote=True)}"' if css_class else ""
+    return f'<iframe{cls} data-pdf-url="{safe}" title="{safe_title} bulletin PDF"></iframe>'
 
 
 def desktop_viewer_height_lock_css() -> str:
@@ -1553,7 +1562,7 @@ def render_pdf_standalone_page(config: DioceseConfig, bulletin_date: str, pdf_hr
     <a class="download-link" href="{safe_pdf}">Open PDF</a>
   </div>
   <div class="pdf-standalone-shell">
-    <iframe class="pdf-frame" src="{safe_pdf}" title="{html.escape(config.display_name)} bulletin PDF"></iframe>
+    {pdf_iframe_tag(pdf_href, title=config.display_name, css_class="pdf-frame")}
     {pdf_inpage_viewer_html(pdf_href)}
   </div>
   <script>
@@ -2375,7 +2384,7 @@ def render_bulletin_viewer_shell(
       </div>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="{html.escape(pdf_href, quote=True)}" title="{html.escape(display_name)} bulletin PDF"></iframe>
+        {pdf_iframe_tag(pdf_href, title=display_name)}
         {pdf_inpage_viewer_html(pdf_href)}
       </div>
     </div>

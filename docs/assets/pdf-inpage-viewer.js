@@ -314,6 +314,8 @@
     var fromData = host && host.getAttribute("data-pdf-src");
     if (fromData) return fromData;
     var iframe = wrap.querySelector("iframe");
+    var fromIframe = iframe && iframe.getAttribute("data-pdf-url");
+    if (fromIframe) return fromIframe;
     var pdfUrl = (iframe && (iframe.getAttribute("src") || iframe.src)) || "";
     if (pdfUrl && pdfUrl.indexOf("about:blank") !== 0) return pdfUrl;
     var openBtn = document.querySelector(
@@ -636,6 +638,7 @@
     var standalone = document.querySelector("iframe.pdf-frame");
     if (standalone && !standalone.closest(".pdf-frame-wrap")) {
       var pdfUrl =
+        standalone.getAttribute("data-pdf-url") ||
         standalone.getAttribute("src") ||
         standalone.src ||
         (document.querySelector(".download-link") || {}).href ||
