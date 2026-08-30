@@ -451,19 +451,19 @@
   }
 
   function openPdfDocument(pdfjsLib, pdfUrl) {
-    var streaming = {
+    /* Range chunks only. A streaming full-file GET is the ~30s phone wait. */
+    var ranged = {
       url: pdfUrl,
       disableAutoFetch: true,
-      disableStream: false,
+      disableStream: true,
       disableRange: false,
       rangeChunkSize: 262144,
     };
-    function streamOnce() {
-      return pdfjsLib.getDocument(streaming).promise;
+    function rangeOnce() {
+      return pdfjsLib.getDocument(ranged).promise;
     }
-    return streamOnce().catch(function () {
-      /* Retry streaming once. Do not fetch() the whole mega as arrayBuffer. */
-      return streamOnce();
+    return rangeOnce().catch(function () {
+      return rangeOnce();
     }).catch(function () {
       if (/mega_bulletin\.pdf/i.test(pdfUrl) || isMobileView()) {
         throw new Error("PDF stream failed");
