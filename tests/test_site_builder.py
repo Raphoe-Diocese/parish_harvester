@@ -121,7 +121,8 @@ class SiteBuilderTests(unittest.TestCase):
             self.assertIn("Georgia", derry_page)
             self.assertIn("pdf-inpage-viewer", derry_page)
             self.assertIn("/assets/pdf-inpage-viewer.js", derry_page)
-            self.assertIn('src="/mega_pdf/derry_mega_bulletin.pdf"', derry_page)
+            self.assertIn('data-pdf-url="/mega_pdf/derry_mega_bulletin.pdf"', derry_page)
+            self.assertNotRegex(derry_page, r"<iframe[^>]+src=")
             self.assertIn('data-pdf-src="/mega_pdf/derry_mega_bulletin.pdf"', derry_page)
 
 

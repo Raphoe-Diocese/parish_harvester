@@ -1,32 +1,47 @@
 {
-  "version": 1,
+  "version": 3,
   "parish_key": "parishofmaghera",
-  "display_name": "Parish of Maghera",
+  "display_name": "Maghera",
   "diocese": "down_and_connor",
+  "recorded_date": "2026-08-20",
   "start_url": "https://www.parishofmaghera.com/copy-of-contact-us-2",
+  "site_type": "wix_stacked_image_bulletin",
+  "playbook_type": "stacked_image_bulletin",
+  "disable_stale_rescrape_fallback": true,
+  "operator_notes": [
+    "Permanent Weekly Bulletin page is /copy-of-contact-us-2 (Wix).",
+    "Exactly two page-scan images, filenames DDMMYYB-0.jpg and DDMMYYB-1.jpg.",
+    "CONFIRMED 2026-08-20: live images are 160826B-0.jpg and 160826B-1.jpg (16/08/2026).",
+    "Homepage still archives the old July set (120726-0.jpg .. 120726-3.jpg).",
+    "Do not harvest the homepage — image_stack count=4 last there is the July archive.",
+    "/copy-of-weekly-bulletin is the Sunday Missalette (m160826-*.jpg), not the bulletin.",
+    "Wix 1x fills are ~423x600 / ~422x622 (2x ~846x1200). min_short_side=400 keeps the 1x pair; logo 357x179 is excluded.",
+    "No PDF file exists; image_stack merges the two pages into one PDF.",
+    "disable_stale_rescrape_fallback is a real recipe flag: a stale-retry homepage rescrape can pick July archives or hashed decorative CDN assets and report a false ok."
+  ],
+  "do_not": [
+    "Do not use the homepage image_stack (July archive).",
+    "Do not use copy-of-weekly-bulletin or copy-of-sunday-missalette (missalette, not bulletin).",
+    "Do not use Wix PDF viewer blob URLs.",
+    "Do not use download *.pdf — there is no bulletin PDF.",
+    "Do not Save page as PDF — that captures chrome, not just the two scans.",
+    "Do not confuse with Derry Ballinascreen (parishofballinascreen) or magheraparishderry."
+  ],
   "steps": [
+    {
+      "action": "goto",
+      "url": "https://www.parishofmaghera.com/copy-of-contact-us-2"
+    },
     {
       "action": "image_stack",
       "count": 2,
-      "urls": [
-        "https://static.wixstatic.com/media/596648_b0abf059f78b4dddbb521f0aeec0b508~mv2.jpg/v1/fill/w_423,h_600,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/160826B-0.jpg",
-        "https://static.wixstatic.com/media/596648_a5c04962893d40a1a71da55ac24084c4~mv2.jpg/v1/fill/w_422,h_622,al_c,q_80,usm_0.66_1.00_0.01,enc_avif,quality_auto/160826B-1.jpg"
-      ]
+      "position": "first",
+      "scroll_bottom": true,
+      "selector": "img",
+      "min_long_side": 550,
+      "min_short_side": 400
     }
   ],
-  "observed_load_ms": 1040.300048828125,
-  "timeout_ms": 55000,
-  "total_timeout_s": 190,
-  "playbook_type": "stacked_image_bulletin",
-  "site_type": "stacked_image_bulletin",
-  "operator_notes": [
-    "Bulletins are full-page images stacked on one page — newest week at the top.",
-    "Pick the first two images, or use Pick another image too after the first.",
-    "Harvester grabs the top N large images automatically each Sunday — no dated URLs."
-  ],
-  "do_not": [
-    "Do not hardcode one image URL — it goes stale every week.",
-    "Do not Save page as PDF — that captures every old bulletin on the page."
-  ],
-  "recorded_date": "2026-08-28"
+  "timeout_ms": 90000,
+  "total_timeout_s": 180
 }

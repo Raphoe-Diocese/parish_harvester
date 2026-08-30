@@ -53,6 +53,8 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 
 ## Still open (do not pretend these are finished)
 
+- [ ] **doing** · 2026-08-30 · Keep the iframe box; stop the double PDF pull. Iframe stays; URL is `data-pdf-url` (no `src` on parse). Viewer `?v=20260830a`. Not live until Pages. Do not call fast until a new phone lab run. PageSpeed 30/08: LCP 28.0s. · `ocr/generate_bulletin_pages.py`, `docs/assets/pdf-inpage-viewer.js`
+
 - [ ] **doing** · 2026-08-27 · Fit in-page PDF to the box width. PR [#150](https://github.com/Raphoe-Diocese/parish_harvester/pull/150) (`?v=20260827g`) made phone `pageWidth()` `Math.max(boxWidth, 720)`, so a ~333px phone box painted a 720px page — sideways pan / clipped parish seal. Desktop can clip a few pixels vs scrollbar-gutter. This turn: `pageWidth()` is `clientWidth - 4` (no 720 min) on phone and desktop; phone `.pdf-inpage-pages { overflow-x: hidden }`; canvas `width:100%`; re-paint page 1 if the scrollbar changes the width; debounce resize/orientationchange ~150ms and re-paint visible pages. Keep PDF.js + Jump-to slots. Viewer `?v=20260827h`. Do not mark done — not live until Pages; not phone-tested. · `docs/assets/pdf-inpage-viewer.js`, `ocr/generate_bulletin_pages.py`
 
 - [ ] **doing** · 2026-08-27 · Delete **Tap to enlarge** (broken, not needed). Frank 27/08. Do not mark done until live Raphoe JUMP TO row has no enlarge button. · `ocr/generate_bulletin_pages.py`, `docs/assets/pdf-inpage-viewer.js`

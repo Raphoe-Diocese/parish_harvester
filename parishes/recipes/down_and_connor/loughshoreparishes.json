@@ -1,31 +1,32 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "loughshoreparishes",
   "display_name": "Loughshore",
   "diocese": "down_and_connor",
   "start_url": "https://www.loughshoreparishes.org/sunday-bulletin/",
+  "site_type": "wp_json_newest_media",
+  "href_patterns": [
+    "sunday-in-ordinary-time"
+  ],
+  "playbook_type": "pdf_download_list",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.loughshoreparishes.org/"
-    },
-    {
-      "action": "print_to_pdf"
+      "url": "https://www.loughshoreparishes.org/sunday-bulletin/"
     }
   ],
-  "observed_load_ms": 6539.10009765625,
   "timeout_ms": 55000,
   "total_timeout_s": 250,
-  "playbook_type": "wix_html",
-  "site_type": "html_text_bulletin",
+  "recorded_date": "2026-08-25",
   "operator_notes": [
-    "Bulletin text is on the web page — not a downloadable PDF file.",
-    "Use Save page as PDF on the newsletter article page.",
-    "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
+    "Weekly file is app/uploads/.../Nth-Sunday-in-Ordinary-Time.pdf. 21st Sunday in Ordinary Time = 23/08/2026.",
+    "CONFIRMED 2026-08-25: https://www.loughshoreparishes.org/app/uploads/2026/08/21st-Sunday-in-Ordinary-Time.pdf HTTP 200, 4513290 bytes, application/pdf. Listing article /21st-sunday-in-ordinary-time-4/ serves the same PDF.",
+    "wp-json /wp/v2/media also lists DC-Vocations-Newsletter.pdf — href_patterns must stay sunday-in-ordinary-time.",
+    "Do not pin 20th Sunday or a dated filename. Skip Playwright / print_to_pdf."
   ],
   "do_not": [
-    "Do not use Pick bulletin image when the page is mostly text paragraphs.",
-    "Do not stop at click-only — need print_to_pdf as the final step."
-  ],
-  "recorded_date": "2026-08-28"
+    "Do not pin 20th Sunday in Ordinary Time.",
+    "Do not download DC-Vocations-Newsletter.pdf or Safeguarding PDFs.",
+    "Do not print_to_pdf the listing."
+  ]
 }
