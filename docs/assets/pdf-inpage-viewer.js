@@ -450,35 +450,55 @@
       });
   }
 
-  function openPdfDocument(pdfjsLib, pdfUrl) {
-    /* Range chunks only. A streaming full-file GET is the ~30s phone wait. */
-    var ranged = {
-      url: pdfUrl,
-      disableAutoFetch: true,
-      disableStream: true,
-      disableRange: false,
-      rangeChunkSize: 262144,
-    };
-    function rangeOnce() {
-      return pdfjsLib.getDocument(ranged).promise;
-    }
-    return rangeOnce().catch(function () {
-      return rangeOnce();
-    }).catch(function () {
-      if (/mega_bulletin\.pdf/i.test(pdfUrl) || isMobileView()) {
-        throw new Error("PDF range failed");
-      }
-      return fetch(pdfUrl, { credentials: "same-origin" }).then(function (res) {
-        if (!res.ok) throw new Error("PDF fetch " + res.status);
-        return res.arrayBuffer();
-      }).then(function (buf) {
-        return pdfjsLib.getDocument({
-          data: new Uint8Array(buf),
-          disableAutoFetch: true,
-          disableStream: true,
-          disableRange: true,
-        }).promise;
+  function pdfByteLength(pdfUrl) {
+    return fetch(pdfUrl, { method: "HEAD", credentials: "same-origin" }).then(function (res) {
+      var len = parseInt(res.headers.get("content-length") || "0", 10);
+      if (len > 0) return len;
+      return fetch(pdfUrl, {
+        credentials: "same-origin",
+        headers: { Range: "bytes=0-0" },
+      }).then(function (r) {
+        var cr = r.headers.get("content-range") || "";
+        var m = /\/(\d+)\s*$/.exec(cr);
+        if (m) return parseInt(m[1], 10);
+        throw new Error("PDF size unknown");
       });
+    });
+  }
+
+  function openPdfDocument(pdfjsLib, pdfUrl) {
+    /* Custom Range transport — never pass url to getDocument.
+       A url+disableStream still starts one un-ranged full GET (5.3 MB). */
+    var Transport = pdfjsLib.PDFDataRangeTransport;
+    if (!Transport) throw new Error("PDFDataRangeTransport missing");
+    return pdfByteLength(pdfUrl).then(function (length) {
+      var transport = new Transport(length, new Uint8Array(0));
+      transport.requestDataRange = function (begin, end) {
+        var self = this;
+        fetch(pdfUrl, {
+          credentials: "same-origin",
+          headers: { Range: "bytes=" + begin + "-" + (end - 1) },
+        })
+          .then(function (res) {
+            if (!res.ok && res.status !== 206) throw new Error("PDF range " + res.status);
+            return res.arrayBuffer();
+          })
+          .then(function (buf) {
+            self.onDataRange(begin, new Uint8Array(buf));
+          })
+          .catch(function (err) {
+            console.warn("PDF range chunk failed", begin, end, err);
+            throw err;
+          });
+      };
+      return pdfjsLib.getDocument({
+        range: transport,
+        length: length,
+        disableAutoFetch: true,
+        disableStream: true,
+        disableRange: false,
+        rangeChunkSize: 262144,
+      }).promise;
     });
   }
 
