@@ -124,6 +124,9 @@ class SiteBuilderTests(unittest.TestCase):
             self.assertIn('data-pdf-url="/mega_pdf/derry_mega_bulletin.pdf"', derry_page)
             self.assertNotRegex(derry_page, r"<iframe[^>]+src=")
             self.assertIn('data-pdf-src="/mega_pdf/derry_mega_bulletin.pdf"', derry_page)
+            self.assertIn('data-pdf-preview="/mega_pdf/derry_mega_bulletin_p1.jpg"', derry_page)
+            self.assertIn('rel="preload"', derry_page)
+            self.assertIn("/mega_pdf/derry_mega_bulletin_p1.jpg", derry_page)
 
 
 if __name__ == "__main__":

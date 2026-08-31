@@ -53,6 +53,8 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 
 ## Still open (do not pretend these are finished)
 
+- [ ] **doing** · 2026-08-31 · Frank’s phone: **~12 seconds** for page 1 after #160 (Range transport live `?v=20260831b`). Cause: page 1 bytes sit far into the 5.5 MB mega. 12s is not good enough. This turn: ship a tiny `*_mega_bulletin_p1.jpg` (preload + `<img>` in the box) so page 1 paints before PDF.js; then Range-load the mega for Jump-to. Viewer `?v=20260831c`. Do **not** mark done until Frank’s phone after Ctrl+F5. · `harvester/pdf_compress.py` `write_first_page_preview`, `docs/assets/pdf-inpage-viewer.js`, `ocr/generate_bulletin_pages.py`
+
 - [ ] **doing** · 2026-08-31 · Stop the PDF.js **full-file stream** of the mega. PR [#158](https://github.com/Raphoe-Diocese/parish_harvester/pull/158) killed iframe `src` (live `data-pdf-url`, `?v=20260830a`). PageSpeed 30/08 still pulled **5,264 KiB** `/mega_pdf/raphoe_mega_bulletin.pdf` because `disableStream: false` starts a whole-file GET. This turn: custom `PDFDataRangeTransport` (HEAD + Range only — never pass `url` to `getDocument`, because that still full-GETs 5.3 MB). Never restore iframe `src`. Viewer `?v=20260831b`. Do **not** mark done until Frank’s phone after Ctrl+F5 (page 1 visible). Not live until Pages. Do not bring back PR #149. · `docs/assets/pdf-inpage-viewer.js`, `ocr/generate_bulletin_pages.py`, `docs/dioceses/{raphoe,derry,clogher,down-and-connor}/index.html`
 
 - [ ] **doing** · 2026-08-30 · Keep the iframe box; stop the double PDF pull. Iframe stays; URL is `data-pdf-url` (no `src` on parse). Viewer `?v=20260830a`. **Live** after PR [#158](https://github.com/Raphoe-Diocese/parish_harvester/pull/158). PageSpeed still downloaded the 5.26 MB mega (stream). Leave open until phone page-1 is acceptable. · `ocr/generate_bulletin_pages.py`, `docs/assets/pdf-inpage-viewer.js`
@@ -162,6 +164,6 @@ Spot-check generated CSS for:
 - `#ocr-search` comes **before** `class="az-row"` and `class="ocr-zoom-bar"` inside `<div id="panel-ocr"`, and the letters + text size sit in one `.ocr-controls-row` (Frank could not find the search box under them)
 - `scrollbar-gutter: stable` on `.pdf-inpage-pages` and `max-width: 100%` on `.pdf-inpage-page-slot`, or the first PDF page is sized before the scrollbar appears and the box grows a horizontal scrollbar
 - Desktop lock keeps `.pdf-inpage-pages { overflow-x: hidden !important }`. Phone/tablet (`max-width: 1024px`) is `overflow-x: auto !important` so a 720px page can pan. `overflow: hidden` on `.pdf-link-layer` still clips a stray annotation (Derry: `scrollWidth` 2988)
-- `/assets/pdf-inpage-viewer.js?v=20260831b` (cache-bust; four live diocese pages pinned this turn — parish HTML may still pin an older `?v=` but fetches the same `/assets/pdf-inpage-viewer.js` after cache)
+- `/assets/pdf-inpage-viewer.js?v=20260831c` (cache-bust; four live diocese pages pinned this turn — parish HTML may still pin an older `?v=` but fetches the same `/assets/pdf-inpage-viewer.js` after cache)
 - `ocr-parish-masthead` / `ocr-parish-name` in the OCR panel
 - `getAnnotations` + `target="_blank"` in `docs/assets/pdf-inpage-viewer.js`

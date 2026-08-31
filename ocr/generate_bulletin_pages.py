@@ -1192,8 +1192,22 @@ def prefers_native_pdf_js() -> str:
 """
 
 
-PDF_INPAGE_VIEWER_VERSION = "20260831b"
+PDF_INPAGE_VIEWER_VERSION = "20260831c"
 PDF_INPAGE_VIEWER_SRC = f"/assets/pdf-inpage-viewer.js?v={PDF_INPAGE_VIEWER_VERSION}"
+
+
+def pdf_first_page_preview_href(pdf_href: str) -> str:
+    """Sibling phone-width JPEG of mega page 1 (``…_mega_bulletin_p1.jpg``)."""
+    if "mega_bulletin.pdf" not in pdf_href:
+        return ""
+    return pdf_href.replace("mega_bulletin.pdf", "mega_bulletin_p1.jpg", 1)
+
+
+def pdf_first_page_preload_tag(pdf_href: str) -> str:
+    preview = pdf_first_page_preview_href(pdf_href)
+    if not preview:
+        return ""
+    return f'<link rel="preload" href="{html.escape(preview, quote=True)}" as="image">'
 
 
 def pdf_iframe_tag(pdf_href: str, *, title: str, css_class: str | None = None) -> str:
@@ -1323,6 +1337,7 @@ def pdf_inpage_viewer_css() -> str:
       position: relative;
     }}
     .pdf-inpage-page-slot canvas {{ display: block; width: 100%; height: auto; background: #fff; }}
+    .pdf-first-preview {{ display: block; width: 100%; height: auto; background: #fff; }}
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {{
@@ -1412,8 +1427,18 @@ def pdf_inpage_viewer_html(pdf_href: str) -> str:
     ``[hidden] {{ display: none !important }}`` which fights flex layout.
     """
     safe = html.escape(pdf_href, quote=True)
+    preview = pdf_first_page_preview_href(pdf_href)
+    preview_attr = f' data-pdf-preview="{html.escape(preview, quote=True)}"' if preview else ""
+    preview_img = ""
+    if preview:
+        safe_preview = html.escape(preview, quote=True)
+        preview_img = (
+            f'<div class="pdf-inpage-page-slot" data-page="1">'
+            f'<img class="pdf-first-preview" src="{safe_preview}" alt="" style="display:block;width:100%;height:auto">'
+            f"</div>"
+        )
     return f"""
-        <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="{safe}">
+        <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="{safe}"{preview_attr}>
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
               <a href="{safe}">Open PDF</a>
@@ -1421,7 +1446,7 @@ def pdf_inpage_viewer_html(pdf_href: str) -> str:
             </div>
           </div>
           <div class="pdf-inpage-status">Showing first page…</div>
-          <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
+          <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages">{preview_img}</div>
         </div>"""
 
 
@@ -1514,6 +1539,7 @@ def render_pdf_standalone_page(config: DioceseConfig, bulletin_date: str, pdf_hr
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>{html.escape(config.display_name)} PDF — {html.escape(uk_bulletin_date)}</title>
   {favicon_link_tags()}
+  {pdf_first_page_preload_tag(pdf_href)}
   <style>
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
     html, body {{ height: 100%; }}
@@ -1921,6 +1947,7 @@ def render_bulletin_viewer_shell(
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
   <title>{html.escape(page_title)}</title>
   {favicon_link_tags()}
+  {pdf_first_page_preload_tag(pdf_href)}
   <style>
     * {{ box-sizing: border-box; margin: 0; padding: 0; }}
     html {{ scroll-behavior: smooth; }}

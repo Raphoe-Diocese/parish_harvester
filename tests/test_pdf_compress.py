@@ -4,7 +4,7 @@ import tempfile
 import unittest
 from pathlib import Path
 
-from harvester.pdf_compress import compress_pdf_inplace
+from harvester.pdf_compress import compress_pdf_inplace, first_page_preview_path, write_first_page_preview
 
 
 class PdfCompressTests(unittest.TestCase):
@@ -41,3 +41,9 @@ class PdfCompressTests(unittest.TestCase):
             finally:
                 doc.close()
             self.assertLessEqual(path.stat().st_size, before)
+            p1 = write_first_page_preview(path)
+            self.assertIsNotNone(p1)
+            self.assertEqual(p1, first_page_preview_path(path))
+            self.assertTrue(p1.read_bytes()[:3] == b"\xff\xd8\xff")
+            self.assertGreater(p1.stat().st_size, 32)
+            self.assertLess(p1.stat().st_size, 200_000)
