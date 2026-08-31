@@ -4,7 +4,8 @@
  * Phone and desktop both run PDF.js so Jump-to can find
  * `.pdf-inpage-pages` / `[data-page]` slots and call
  * window.parishPressScrollPdfToPage. Self-hosted
- * /assets/pdf.min.js, stream/Range, rangeChunkSize 262144.
+ * /assets/pdf.min.js, Range chunks only, rangeChunkSize 262144.
+ * Do not start a full-file stream GET of the mega.
  * Pages fit the PDF box width (no 720px minimum).
  * Locked 850px desktop / 450px phone boxes. Keep fixMobilePdfLinks.
  * Do not restore a tap-to-load button, enlarge control,
@@ -372,22 +373,8 @@
     }
   }
 
-  function restoreNativeIframe(host, pdfUrl) {
-    if (isMobileView()) return;
-    var wrap =
-      (host && host.closest && (host.closest(".pdf-frame-wrap") || host.closest(".pdf-standalone-shell"))) ||
-      document.querySelector(".pdf-frame-wrap") ||
-      document.querySelector(".pdf-standalone-shell");
-    if (!wrap) return;
-    wrap.classList.add("is-iframe-fallback");
-    wrap.classList.remove("is-native-pdf");
-    document.body.classList.add("is-iframe-fallback");
-    var iframe = wrap.querySelector("iframe");
-    if (!iframe) return;
-    iframe.removeAttribute("hidden");
-    try {
-      iframe.src = pdfUrl;
-    } catch (e) {}
+  function restoreNativeIframe() {
+    /* Never put the PDF URL on iframe src. That starts a full download. */
   }
 
   function overlayPageLinks(page, slot, cssWidth) {
@@ -463,32 +450,55 @@
       });
   }
 
-  function openPdfDocument(pdfjsLib, pdfUrl) {
-    var streaming = {
-      url: pdfUrl,
-      disableAutoFetch: true,
-      disableStream: false,
-      disableRange: false,
-      rangeChunkSize: 262144,
-    };
-    function streamOnce() {
-      return pdfjsLib.getDocument(streaming).promise;
-    }
-    return streamOnce().catch(function () {
-      /* Retry streaming once. Do not fetch() the whole file on first error. */
-      return streamOnce();
-    }).catch(function () {
-      return fetch(pdfUrl, { credentials: "same-origin" }).then(function (res) {
-        if (!res.ok) throw new Error("PDF fetch " + res.status);
-        return res.arrayBuffer();
-      }).then(function (buf) {
-        return pdfjsLib.getDocument({
-          data: new Uint8Array(buf),
-          disableAutoFetch: true,
-          disableStream: true,
-          disableRange: true,
-        }).promise;
+  function pdfByteLength(pdfUrl) {
+    return fetch(pdfUrl, { method: "HEAD", credentials: "same-origin" }).then(function (res) {
+      var len = parseInt(res.headers.get("content-length") || "0", 10);
+      if (len > 0) return len;
+      return fetch(pdfUrl, {
+        credentials: "same-origin",
+        headers: { Range: "bytes=0-0" },
+      }).then(function (r) {
+        var cr = r.headers.get("content-range") || "";
+        var m = /\/(\d+)\s*$/.exec(cr);
+        if (m) return parseInt(m[1], 10);
+        throw new Error("PDF size unknown");
       });
+    });
+  }
+
+  function openPdfDocument(pdfjsLib, pdfUrl) {
+    /* Custom Range transport — never pass url to getDocument.
+       A url+disableStream still starts one un-ranged full GET (5.3 MB). */
+    var Transport = pdfjsLib.PDFDataRangeTransport;
+    if (!Transport) throw new Error("PDFDataRangeTransport missing");
+    return pdfByteLength(pdfUrl).then(function (length) {
+      var transport = new Transport(length, new Uint8Array(0));
+      transport.requestDataRange = function (begin, end) {
+        var self = this;
+        fetch(pdfUrl, {
+          credentials: "same-origin",
+          headers: { Range: "bytes=" + begin + "-" + (end - 1) },
+        })
+          .then(function (res) {
+            if (!res.ok && res.status !== 206) throw new Error("PDF range " + res.status);
+            return res.arrayBuffer();
+          })
+          .then(function (buf) {
+            self.onDataRange(begin, new Uint8Array(buf));
+          })
+          .catch(function (err) {
+            console.warn("PDF range chunk failed", begin, end, err);
+            throw err;
+          });
+      };
+      return pdfjsLib.getDocument({
+        range: transport,
+        length: length,
+        disableAutoFetch: true,
+        disableStream: true,
+        disableRange: false,
+        rangeChunkSize: 262144,
+      }).promise;
     });
   }
 
@@ -603,7 +613,7 @@
         console.warn("PDF.js failed", err);
         setStatus(host, "Could not show the PDF here. Use Open PDF or Download.", true);
         host.setAttribute("data-pdf-started", "0");
-        if (!isPhone()) restoreNativeIframe(host, pdfUrl);
+        restoreNativeIframe();
       });
   }
 
