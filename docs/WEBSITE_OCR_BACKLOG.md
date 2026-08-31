@@ -53,7 +53,9 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 
 ## Still open (do not pretend these are finished)
 
-- [ ] **doing** · 2026-08-30 · Keep the iframe box; stop the double PDF pull. Iframe stays; URL is `data-pdf-url` (no `src` on parse). Viewer `?v=20260830a`. Not live until Pages. Do not call fast until a new phone lab run. PageSpeed 30/08: LCP 28.0s. · `ocr/generate_bulletin_pages.py`, `docs/assets/pdf-inpage-viewer.js`
+- [ ] **doing** · 2026-08-31 · Stop the PDF.js **full-file stream** of the mega. PR [#158](https://github.com/Raphoe-Diocese/parish_harvester/pull/158) killed iframe `src` (live `data-pdf-url`, `?v=20260830a`). PageSpeed 30/08 still pulled **5,264 KiB** `/mega_pdf/raphoe_mega_bulletin.pdf` because `disableStream: false` starts a whole-file GET. This turn: Range chunks only (`disableStream: true`); no mega `arrayBuffer()`; never restore iframe `src`. Viewer `?v=20260831a`. Do **not** mark done until Frank’s phone after Ctrl+F5 (page 1 visible). Not live until Pages. Do not bring back PR #149. · `docs/assets/pdf-inpage-viewer.js`, `ocr/generate_bulletin_pages.py`, `docs/dioceses/{raphoe,derry,clogher,down-and-connor}/index.html`
+
+- [ ] **doing** · 2026-08-30 · Keep the iframe box; stop the double PDF pull. Iframe stays; URL is `data-pdf-url` (no `src` on parse). Viewer `?v=20260830a`. **Live** after PR [#158](https://github.com/Raphoe-Diocese/parish_harvester/pull/158). PageSpeed still downloaded the 5.26 MB mega (stream). Leave open until phone page-1 is acceptable. · `ocr/generate_bulletin_pages.py`, `docs/assets/pdf-inpage-viewer.js`
 
 - [ ] **doing** · 2026-08-27 · Fit in-page PDF to the box width. PR [#150](https://github.com/Raphoe-Diocese/parish_harvester/pull/150) (`?v=20260827g`) made phone `pageWidth()` `Math.max(boxWidth, 720)`, so a ~333px phone box painted a 720px page — sideways pan / clipped parish seal. Desktop can clip a few pixels vs scrollbar-gutter. This turn: `pageWidth()` is `clientWidth - 4` (no 720 min) on phone and desktop; phone `.pdf-inpage-pages { overflow-x: hidden }`; canvas `width:100%`; re-paint page 1 if the scrollbar changes the width; debounce resize/orientationchange ~150ms and re-paint visible pages. Keep PDF.js + Jump-to slots. Viewer `?v=20260827h`. Do not mark done — not live until Pages; not phone-tested. · `docs/assets/pdf-inpage-viewer.js`, `ocr/generate_bulletin_pages.py`
 
@@ -160,6 +162,6 @@ Spot-check generated CSS for:
 - `#ocr-search` comes **before** `class="az-row"` and `class="ocr-zoom-bar"` inside `<div id="panel-ocr"`, and the letters + text size sit in one `.ocr-controls-row` (Frank could not find the search box under them)
 - `scrollbar-gutter: stable` on `.pdf-inpage-pages` and `max-width: 100%` on `.pdf-inpage-page-slot`, or the first PDF page is sized before the scrollbar appears and the box grows a horizontal scrollbar
 - Desktop lock keeps `.pdf-inpage-pages { overflow-x: hidden !important }`. Phone/tablet (`max-width: 1024px`) is `overflow-x: auto !important` so a 720px page can pan. `overflow: hidden` on `.pdf-link-layer` still clips a stray annotation (Derry: `scrollWidth` 2988)
-- `/assets/pdf-inpage-viewer.js?v=20260827h` (cache-bust; Raphoe + Clogher diocese HTML pinned this turn — other dioceses still pin an older `?v=` but fetch the same `/assets/pdf-inpage-viewer.js` after cache)
+- `/assets/pdf-inpage-viewer.js?v=20260831a` (cache-bust; four live diocese pages pinned this turn — parish HTML may still pin an older `?v=` but fetches the same `/assets/pdf-inpage-viewer.js` after cache)
 - `ocr-parish-masthead` / `ocr-parish-name` in the OCR panel
 - `getAnnotations` + `target="_blank"` in `docs/assets/pdf-inpage-viewer.js`

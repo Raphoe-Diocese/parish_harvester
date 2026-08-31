@@ -4,7 +4,8 @@
  * Phone and desktop both run PDF.js so Jump-to can find
  * `.pdf-inpage-pages` / `[data-page]` slots and call
  * window.parishPressScrollPdfToPage. Self-hosted
- * /assets/pdf.min.js, stream/Range, rangeChunkSize 262144.
+ * /assets/pdf.min.js, Range chunks only, rangeChunkSize 262144.
+ * Do not start a full-file stream GET of the mega.
  * Pages fit the PDF box width (no 720px minimum).
  * Locked 850px desktop / 450px phone boxes. Keep fixMobilePdfLinks.
  * Do not restore a tap-to-load button, enlarge control,
@@ -372,22 +373,8 @@
     }
   }
 
-  function restoreNativeIframe(host, pdfUrl) {
-    if (isMobileView()) return;
-    var wrap =
-      (host && host.closest && (host.closest(".pdf-frame-wrap") || host.closest(".pdf-standalone-shell"))) ||
-      document.querySelector(".pdf-frame-wrap") ||
-      document.querySelector(".pdf-standalone-shell");
-    if (!wrap) return;
-    wrap.classList.add("is-iframe-fallback");
-    wrap.classList.remove("is-native-pdf");
-    document.body.classList.add("is-iframe-fallback");
-    var iframe = wrap.querySelector("iframe");
-    if (!iframe) return;
-    iframe.removeAttribute("hidden");
-    try {
-      iframe.src = pdfUrl;
-    } catch (e) {}
+  function restoreNativeIframe() {
+    /* Never put the PDF URL on iframe src. That starts a full download. */
   }
 
   function overlayPageLinks(page, slot, cssWidth) {
@@ -464,20 +451,23 @@
   }
 
   function openPdfDocument(pdfjsLib, pdfUrl) {
-    var streaming = {
+    /* Range chunks only. A streaming full-file GET is the ~30s phone wait. */
+    var ranged = {
       url: pdfUrl,
       disableAutoFetch: true,
-      disableStream: false,
+      disableStream: true,
       disableRange: false,
       rangeChunkSize: 262144,
     };
-    function streamOnce() {
-      return pdfjsLib.getDocument(streaming).promise;
+    function rangeOnce() {
+      return pdfjsLib.getDocument(ranged).promise;
     }
-    return streamOnce().catch(function () {
-      /* Retry streaming once. Do not fetch() the whole file on first error. */
-      return streamOnce();
+    return rangeOnce().catch(function () {
+      return rangeOnce();
     }).catch(function () {
+      if (/mega_bulletin\.pdf/i.test(pdfUrl) || isMobileView()) {
+        throw new Error("PDF range failed");
+      }
       return fetch(pdfUrl, { credentials: "same-origin" }).then(function (res) {
         if (!res.ok) throw new Error("PDF fetch " + res.status);
         return res.arrayBuffer();
@@ -603,7 +593,7 @@
         console.warn("PDF.js failed", err);
         setStatus(host, "Could not show the PDF here. Use Open PDF or Download.", true);
         host.setAttribute("data-pdf-started", "0");
-        if (!isPhone()) restoreNativeIframe(host, pdfUrl);
+        restoreNativeIframe();
       });
   }
 
