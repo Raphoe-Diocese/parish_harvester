@@ -53,6 +53,8 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 
 ## Still open (do not pretend these are finished)
 
+- [ ] **doing** · 2026-09-01 · Frank: Jump links broken again after lazy-mega (#162). Cause: `jumpPdf` waited for a `[data-page]` slot that does not exist until the mega loads, so Jump-to never called `parishPressScrollPdfToPage`. This turn: jump starts the mega even with no slot; viewer waits and scrolls. Viewer `?v=20260901c`. Same layout. No iframe `src`. Do **not** mark done until Frank Ctrl+F5s and Jump to works. · `ocr/generate_bulletin_pages.py`, `docs/assets/pdf-inpage-viewer.js`, `docs/dioceses/{raphoe,derry,clogher,down-and-connor}/index.html`
+
 - [ ] **doing** · 2026-09-01 · Frank: **20 seconds** after #161. He asked to lazy-load the mega in the iframe on mobile. Yes — lazy-load the mega. **No** `src` on the iframe (that is the 20s full download). Keep the page-1 picture; start PDF.js / Range mega only on Jump-to or a real scroll toward page 2 (not a tap). Viewer `?v=20260901b`. Do **not** mark done until Frank’s phone after Ctrl+F5. · `docs/assets/pdf-inpage-viewer.js`
 
 - [ ] **doing** · 2026-08-31 · Frank’s phone was **~12 seconds** for page 1 after #160. Merged PR [#161](https://github.com/Raphoe-Diocese/parish_harvester/pull/161) `4932c192` + Pages [33552054861](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/33552054861) success 01/09/2026. Live Raphoe HTML has `data-pdf-preview` + preload `raphoe_mega_bulletin_p1.jpg` (118,224 bytes, `Last-Modified: Tue, 01 Sep 2026 19:53:08 GMT`); iframe has `data-pdf-url` and **no** `src`. Lab on live (1.5 Mbps) first picture **0.75 s**; un-ranged mega GET **0**. Do **not** mark done until Frank’s phone after Ctrl+F5. · `harvester/pdf_compress.py` `write_first_page_preview`, `docs/assets/pdf-inpage-viewer.js`, `ocr/generate_bulletin_pages.py`
@@ -166,6 +168,6 @@ Spot-check generated CSS for:
 - `#ocr-search` comes **before** `class="az-row"` and `class="ocr-zoom-bar"` inside `<div id="panel-ocr"`, and the letters + text size sit in one `.ocr-controls-row` (Frank could not find the search box under them)
 - `scrollbar-gutter: stable` on `.pdf-inpage-pages` and `max-width: 100%` on `.pdf-inpage-page-slot`, or the first PDF page is sized before the scrollbar appears and the box grows a horizontal scrollbar
 - Desktop lock keeps `.pdf-inpage-pages { overflow-x: hidden !important }`. Phone/tablet (`max-width: 1024px`) is `overflow-x: auto !important` so a 720px page can pan. `overflow: hidden` on `.pdf-link-layer` still clips a stray annotation (Derry: `scrollWidth` 2988)
-- `/assets/pdf-inpage-viewer.js?v=20260901b` (cache-bust; four live diocese pages pinned this turn — parish HTML may still pin an older `?v=` but fetches the same `/assets/pdf-inpage-viewer.js` after cache)
+- `/assets/pdf-inpage-viewer.js?v=20260901c` (cache-bust; four live diocese pages pinned this turn — parish HTML may still pin an older `?v=` but fetches the same `/assets/pdf-inpage-viewer.js` after cache)
 - `ocr-parish-masthead` / `ocr-parish-name` in the OCR panel
 - `getAnnotations` + `target="_blank"` in `docs/assets/pdf-inpage-viewer.js`

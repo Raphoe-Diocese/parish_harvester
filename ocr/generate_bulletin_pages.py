@@ -1192,7 +1192,7 @@ def prefers_native_pdf_js() -> str:
 """
 
 
-PDF_INPAGE_VIEWER_VERSION = "20260901b"
+PDF_INPAGE_VIEWER_VERSION = "20260901c"
 PDF_INPAGE_VIEWER_SRC = f"/assets/pdf-inpage-viewer.js?v={PDF_INPAGE_VIEWER_VERSION}"
 
 
@@ -1847,11 +1847,16 @@ def az_jump_js() -> str:
         for (var i = 0; i < names.length; i++) {
           var page = pageFor(names[i]);
           if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
           var slot = pages.querySelector('[data-page="' + page + '"]');
           if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
+          scrollBoxTo(pages, slot);
           return true;
         }
         return false;
