@@ -214,6 +214,7 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertIn("Georgia", html_output)
             self.assertIn("Download PDF", html_output)
             self.assertIn("pdf-fullscreen-btn", html_output)
+            self.assertIn(".pdf-frame-wrap .fullscreen-btn { display: none !important; }", html_output)
             # Desktop + mobile: hide the raw-PDF iframe and show stacked PDF.js pages.
             self.assertIn("pdf-inpage-viewer", html_output)
             self.assertIn("/assets/pdf-inpage-viewer.js?v=20260901g", html_output)
@@ -641,6 +642,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("pdf-force-download", text)
         self.assertIn("savePdfBlob", text)
         self.assertIn("justify-content:flex-start", text.replace(" ", ""))
+        self.assertIn("fullscreen-btn{display:none!important}", text)
         self.assertIn("arrayBuffer", text)
         self.assertIn("openRangePdf", text)
         self.assertIn("function tryScroll", text)

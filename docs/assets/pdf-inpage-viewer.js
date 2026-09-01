@@ -81,7 +81,8 @@
     style.textContent =
       ".az-expand{display:none!important}" +
       ".pdf-inpage-viewer{display:flex!important;flex-direction:column;height:850px!important;min-height:850px!important;max-height:850px!important;overflow:hidden!important;flex:1 1 auto;background:#3a3f42;color:#e8eeed;border:1px solid #c9d4d3;box-sizing:border-box}" +
-      ".pdf-inpage-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:8px;padding:8px 52px 8px 10px;background:#14524f;color:#fff;flex:0 0 auto}" +
+      ".pdf-inpage-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:8px;padding:8px 10px;background:#14524f;color:#fff;flex:0 0 auto}" +
+      ".pdf-frame-wrap .fullscreen-btn{display:none!important}" +
       ".pdf-inpage-backup{display:flex;gap:8px;flex-wrap:wrap}" +
       ".pdf-inpage-backup a{color:#fff;font-weight:700;font-size:.85rem}" +
       ".pdf-inpage-status{padding:10px 12px;background:#1f3d3c;color:#d8f0ee;font-size:.9rem}" +

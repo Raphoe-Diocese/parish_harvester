@@ -1301,7 +1301,7 @@ def pdf_inpage_viewer_css() -> str:
       align-items: center;
       justify-content: flex-start;
       gap: 8px;
-      padding: 8px 52px 8px 10px;
+      padding: 8px 10px;
       background: {DEEP_TEAL};
       color: #fff;
       flex: 0 0 auto;
@@ -2100,6 +2100,7 @@ def render_bulletin_viewer_shell(
       cursor: pointer;
     }}
     .fullscreen-btn:hover {{ background: #fff; }}
+    .pdf-frame-wrap .fullscreen-btn {{ display: none !important; }}
     {pdf_inpage_viewer_css()}
 
     /* Search comes first in the OCR block and reads like the JUMP TO bar, so
