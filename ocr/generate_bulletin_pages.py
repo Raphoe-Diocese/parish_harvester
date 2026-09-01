@@ -2363,8 +2363,8 @@ def render_bulletin_viewer_shell(
     @media (max-width: 700px) {{
       .page {{ padding: 14px 12px 36px; }}
       .mobile-jump {{ display: block; }}
-      /* Phone only — desktop Jump-to stays. Too many letter buttons on a small screen. */
-      .az-row {{ display: none !important; }}
+      /* Phone only — hide PDF Jump-to. OCR letters / search / box stay. */
+      #panel-pdf .az-row {{ display: none !important; }}
       .download-link-top {{ display: none; }}
       .quiet-links {{ justify-content: center; }}
       ul.parish-grid {{ grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }}

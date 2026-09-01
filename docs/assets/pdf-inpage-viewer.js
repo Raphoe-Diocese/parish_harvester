@@ -56,7 +56,7 @@
 
   function hidePhoneJumpRows() {
     if (!isPhone()) return;
-    document.querySelectorAll(".az-row").forEach(function (row) {
+    document.querySelectorAll("#panel-pdf .az-row").forEach(function (row) {
       row.hidden = true;
     });
   }
@@ -103,7 +103,7 @@
       ".pdf-inpage-page-slot canvas{display:block;width:100%;height:auto;background:#fff}" +
       ".pdf-first-preview{display:block;width:100%;height:auto;background:#fff}" +
       ".pdf-phone-open{display:block;color:inherit;text-decoration:none;flex:1 1 auto;min-height:0;overflow:hidden}" +
-      "@media (max-width:700px){.az-row{display:none!important}}" +
+      "@media (max-width:700px){#panel-pdf .az-row{display:none!important}}" +
       ".pdf-link-layer{position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden;pointer-events:none}" +
       ".pdf-annot-link{position:absolute;z-index:2;pointer-events:auto;background:rgba(26,107,107,0.08);border-radius:2px}" +
       ".pdf-annot-link:focus{outline:2px solid #1a6b6b;outline-offset:1px}" +
