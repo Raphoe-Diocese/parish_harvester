@@ -592,9 +592,11 @@
       var n;
       for (n = 1; n <= pdfDoc.numPages; n++) ensureSlot(n);
       var boxBefore = pagesEl.clientWidth;
-      paint(1).then(function () {
+      var hasPreview = pagesEl.querySelector(".pdf-first-preview");
+      var firstPaint = hasPreview ? Promise.resolve() : paint(1);
+      firstPaint.then(function () {
         setStatus(host, "");
-        if (pagesEl.clientWidth && pagesEl.clientWidth !== boxBefore) {
+        if (!hasPreview && pagesEl.clientWidth && pagesEl.clientWidth !== boxBefore) {
           delete rendering[1];
           return paint(1);
         }
@@ -675,9 +677,17 @@
         beginMega();
         return;
       }
-      pagesEl.addEventListener("scroll", beginMega, { once: true, passive: true });
-      host.addEventListener("touchstart", beginMega, { once: true, passive: true });
-      host.addEventListener("pointerdown", beginMega, { once: true });
+      /* A tap on the picture must not start the 5.3 MB mega (that was ~20s).
+         Only Jump-to, or a real scroll toward page 2. */
+      pagesEl.addEventListener(
+        "scroll",
+        function onPdfScroll() {
+          if ((pagesEl.scrollTop || 0) < 80) return;
+          pagesEl.removeEventListener("scroll", onPdfScroll);
+          beginMega();
+        },
+        { passive: true }
+      );
     });
   }
 
