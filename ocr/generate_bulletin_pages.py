@@ -1192,7 +1192,7 @@ def prefers_native_pdf_js() -> str:
 """
 
 
-PDF_INPAGE_VIEWER_VERSION = "20260901c"
+PDF_INPAGE_VIEWER_VERSION = "20260901d"
 PDF_INPAGE_VIEWER_SRC = f"/assets/pdf-inpage-viewer.js?v={PDF_INPAGE_VIEWER_VERSION}"
 
 
@@ -2363,6 +2363,8 @@ def render_bulletin_viewer_shell(
     @media (max-width: 700px) {{
       .page {{ padding: 14px 12px 36px; }}
       .mobile-jump {{ display: block; }}
+      /* Phone only — desktop Jump-to stays. Too many letter buttons on a small screen. */
+      .az-row {{ display: none !important; }}
       .download-link-top {{ display: none; }}
       .quiet-links {{ justify-content: center; }}
       ul.parish-grid {{ grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }}
@@ -2404,7 +2406,7 @@ def render_bulletin_viewer_shell(
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="{html.escape(pdf_download_href, quote=True)}">Open PDF</a>
+      <a class="mobile-jump-download" href="{html.escape(pdf_download_href, quote=True)}" download>Download PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
