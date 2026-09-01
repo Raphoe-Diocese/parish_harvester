@@ -4,8 +4,11 @@
  * Phone and desktop both run PDF.js so Jump-to can find
  * `.pdf-inpage-pages` / `[data-page]` slots and call
  * window.parishPressScrollPdfToPage. Self-hosted
- * /assets/pdf.min.js, Range chunks only, rangeChunkSize 262144.
- * Do not start a full-file stream GET of the mega.
+ * /assets/pdf.min.js. Megas ≤ 8 MB (Raphoe ~5 MB) use one
+ * GET into getDocument({ data }) — Range-walking this
+ * Ghostscript file was 12–20s. Larger files keep Range.
+ * Never pass url to getDocument (that still full-GETs).
+ * Never put the mega on iframe src.
  * Pages fit the PDF box width (no 720px minimum).
  * Locked 850px desktop / 450px phone boxes. Keep fixMobilePdfLinks.
  * Do not restore a tap-to-load button, enlarge control,
@@ -493,12 +496,36 @@
     });
   }
 
-  function openPdfDocument(pdfjsLib, pdfUrl) {
+  var WHOLE_FILE_MAX = 8 * 1024 * 1024;
+
+  function fetchWholePdf(pdfjsLib, pdfUrl) {
+    return fetch(pdfUrl, { credentials: "same-origin", cache: "force-cache" }).then(function (res) {
+      if (!res.ok) throw new Error("PDF fetch " + res.status);
+      var len = parseInt(res.headers.get("content-length") || "0", 10);
+      if (len > WHOLE_FILE_MAX) {
+        if (res.body && typeof res.body.cancel === "function") {
+          try { res.body.cancel(); } catch (e) {}
+        }
+        throw new Error("PDF too large for whole-file");
+      }
+      return res.arrayBuffer();
+    }).then(function (buf) {
+      /* One arrayBuffer — never pass url to getDocument. */
+      return pdfjsLib.getDocument({
+        data: new Uint8Array(buf),
+        disableAutoFetch: true,
+        disableStream: true,
+      }).promise;
+    });
+  }
+
+  function openRangePdf(pdfjsLib, pdfUrl, knownLength) {
     /* Custom Range transport — never pass url to getDocument.
-       A url+disableStream still starts one un-ranged full GET (5.3 MB). */
+       A url+disableStream still starts one un-ranged full GET. */
     var Transport = pdfjsLib.PDFDataRangeTransport;
     if (!Transport) throw new Error("PDFDataRangeTransport missing");
-    return pdfByteLength(pdfUrl).then(function (length) {
+    var start = knownLength > 0 ? Promise.resolve(knownLength) : pdfByteLength(pdfUrl);
+    return start.then(function (length) {
       var transport = new Transport(length, new Uint8Array(0));
       transport.requestDataRange = function (begin, end) {
         var self = this;
@@ -526,6 +553,15 @@
         disableRange: false,
         rangeChunkSize: 262144,
       }).promise;
+    });
+  }
+
+  function openPdfDocument(pdfjsLib, pdfUrl) {
+    /* Raphoe is ~5 MB. One GET is seconds on normal 4G.
+       Range-walking this Ghostscript file was 12–20s. */
+    return fetchWholePdf(pdfjsLib, pdfUrl).catch(function (err) {
+      console.warn("Whole-file PDF failed, trying Range", err);
+      return openRangePdf(pdfjsLib, pdfUrl, 0);
     });
   }
 
@@ -674,26 +710,11 @@
         window.setTimeout(done, 4000);
       });
     }
-    /* Do not start the mega until jump or scroll. The page-1 picture
-       must keep the phone radio. Drive / 365 hosting is not used. */
+    /* Start the mega after the page-1 picture. One GET of ~5 MB
+       while he reads page 1 — Jump-to is then ready in seconds.
+       Drive / 365 hosting is not used. */
     waitPreview().then(function () {
-      if (!pagesEl.querySelector(".pdf-first-preview")) {
-        beginMega();
-        return;
-      }
-      /* Warm PDF.js only — do not pull the mega until Jump-to or scroll. */
-      loadPdfJs();
-      /* A tap on the picture must not start the 5.3 MB mega (that was ~20s).
-         Only Jump-to, or a real scroll toward page 2. */
-      pagesEl.addEventListener(
-        "scroll",
-        function onPdfScroll() {
-          if ((pagesEl.scrollTop || 0) < 80) return;
-          pagesEl.removeEventListener("scroll", onPdfScroll);
-          beginMega();
-        },
-        { passive: true }
-      );
+      beginMega();
     });
   }
 
