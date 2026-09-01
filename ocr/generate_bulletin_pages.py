@@ -1192,7 +1192,7 @@ def prefers_native_pdf_js() -> str:
 """
 
 
-PDF_INPAGE_VIEWER_VERSION = "20260901d"
+PDF_INPAGE_VIEWER_VERSION = "20260901e"
 PDF_INPAGE_VIEWER_SRC = f"/assets/pdf-inpage-viewer.js?v={PDF_INPAGE_VIEWER_VERSION}"
 
 
@@ -1445,7 +1445,7 @@ def pdf_inpage_viewer_html(pdf_href: str) -> str:
               <a href="{safe}" download>Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages">{preview_img}</div>
         </div>"""
 
@@ -2056,6 +2056,13 @@ def render_bulletin_viewer_shell(
       font-weight: 600;
     }}
     .quiet-links a {{ color: {TEAL}; }}
+    .pdf-wait-note {{
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }}
 
     .pdf-frame-wrap {{
       position: relative;
@@ -2363,8 +2370,7 @@ def render_bulletin_viewer_shell(
     @media (max-width: 700px) {{
       .page {{ padding: 14px 12px 36px; }}
       .mobile-jump {{ display: block; }}
-      /* Phone only — hide PDF Jump-to. OCR letters / search / box stay. */
-      #panel-pdf .az-row {{ display: none !important; }}
+      .pdf-wait-note {{ display: block; }}
       .download-link-top {{ display: none; }}
       .quiet-links {{ justify-content: center; }}
       ul.parish-grid {{ grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }}
@@ -2406,16 +2412,12 @@ def render_bulletin_viewer_shell(
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="{html.escape(pdf_download_href, quote=True)}" download>Download PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       {az_pdf_html}
-      <div class="quiet-links">
-        <a href="{html.escape(pdf_href, quote=True)}" {blank}>Open PDF</a>
-        <a href="{html.escape(pdf_standalone_href, quote=True)}" {blank}>Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
         {pdf_iframe_tag(pdf_href, title=display_name)}

@@ -110,6 +110,13 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
@@ -867,8 +874,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
-      /* Phone only — hide PDF Jump-to. OCR letters / search / box stay. */
-      #panel-pdf .az-row { display: none !important; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -895,7 +901,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260901d" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901e" defer></script>
 </head>
 <body>
   <div class="page">
@@ -915,16 +921,12 @@
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="/mega_pdf/down_and_connor_mega_bulletin.pdf" download>Download PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       <nav class="az-row" aria-label="Jump to a parish in the pdf viewer"><span class="az-row-label">Jump to</span><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Aghagallon and Ballinderry|Antrim" title="Aghagallon and Ballinderry, Antrim" aria-label="Jump to Aghagallon and Ballinderry">A</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Ballycastle|Ballyclare and Ballygowan|Ballymena|Ballymoney|Bangor|Bright" title="Ballycastle, Ballyclare and Ballygowan, Ballymena, Ballymoney, Bangor, Bright" aria-label="Jump to Ballycastle">B</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Carrickfergus|Carryduffsaintfield|Christ the Redeemer|Corpus Christi Belfast" title="Carrickfergus, Carryduffsaintfield, Christ the Redeemer, Corpus Christi Belfast" aria-label="Jump to Carrickfergus">C</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Derriaghy|Drumbo and Carryduff|Dundrum-and-tyrella-parish-dundrum|Dunsford and Ardglass" title="Derriaghy, Drumbo and Carryduff, Dundrum-and-tyrella-parish-dundrum, Dunsford and Ardglass" aria-label="Jump to Derriaghy">D</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Glenariffe|Glenavy and Killead" title="Glenariffe, Glenavy and Killead" aria-label="Jump to Glenariffe">G</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Hannahstown|Holy Cross Belfast|Holy Family|Holy Rosary Belfast|Holy Trinity Belfast" title="Hannahstown, Holy Cross Belfast, Holy Family, Holy Rosary Belfast, Holy Trinity Belfast" aria-label="Jump to Hannahstown">H</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Kilmore and Killyleagh" title="Kilmore and Killyleagh" aria-label="Jump to Kilmore and Killyleagh">K</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Lisburn|Loughshore" title="Lisburn, Loughshore" aria-label="Jump to Lisburn">L</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Maghera" title="Maghera" aria-label="Jump to Maghera">M</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Nativity" title="Nativity" aria-label="Jump to Nativity">N</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Our Lady Queen of Peace" title="Our Lady Queen of Peace" aria-label="Jump to Our Lady Queen of Peace">O</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Parish of Maghera|Parishofardkeen|Port Glenone (St Mary&#x27;s Portglenone)|Portaferry|Portstewart" title="Parish of Maghera, Parishofardkeen, Port Glenone (St Mary&#x27;s Portglenone), Portaferry, Portstewart" aria-label="Jump to Parish of Maghera">P</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Sacred Heart Belfast|Saint Annes|Saint Anthony|Saint Malachy&#x27;s|Saul and Ballee|St Agnes Belfast|St Bernadettes|St Brigids Belfast|St Colmcille&#x27;s Holywood|St Colmcilles|St Gerards|St Luke&#x27;s Belfast|St MacNissi Randalstown|St Mary&#x27;s Belfast|St Mary&#x27;s on the Hill|St Matthew&#x27;s|St Michael the Archangel|St Oliver Plunkett|St Patrick&#x27;s Downpatrick|St Patricks Belfast|St Teresas|St Vincent de Paul Belfast|St-patricks-loughguile" title="Sacred Heart Belfast, Saint Annes, Saint Anthony, Saint Malachy&#x27;s, Saul and Ballee, St Agnes Belfast, St Bernadettes, St Brigids Belfast, St Colmcille&#x27;s Holywood, St Colmcilles, St Gerards, St Luke&#x27;s Belfast, St MacNissi Randalstown, St Mary&#x27;s Belfast, St Mary&#x27;s on the Hill, St Matthew&#x27;s, St Michael the Archangel, St Oliver Plunkett, St Patrick&#x27;s Downpatrick, St Patricks Belfast, St Teresas, St Vincent de Paul Belfast, St-patricks-loughguile" aria-label="Jump to Sacred Heart Belfast">S</button></nav>
-      <div class="quiet-links">
-        <a href="/mega_pdf/down_and_connor_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="https://raphoe-diocese.github.io/parish_harvester/bulletins/down_and_connor-2026-08-30-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
         <iframe data-pdf-url="/mega_pdf/down_and_connor_mega_bulletin.pdf" title="Down and Connor bulletin PDF"></iframe>
@@ -936,7 +938,7 @@
               <a href="/mega_pdf/down_and_connor_mega_bulletin.pdf" download>Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"><div class="pdf-inpage-page-slot" data-page="1"><img class="pdf-first-preview" src="/mega_pdf/down_and_connor_mega_bulletin_p1.jpg" alt="" style="display:block;width:100%;height:auto"></div></div>
         </div>
       </div>

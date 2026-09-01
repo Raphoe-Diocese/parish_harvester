@@ -110,6 +110,13 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
@@ -867,8 +874,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
-      /* Phone only — hide PDF Jump-to. OCR letters / search / box stay. */
-      #panel-pdf .az-row { display: none !important; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -895,7 +901,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260901d" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901e" defer></script>
 </head>
 <body>
   <div class="page">
@@ -915,16 +921,12 @@
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="/mega_pdf/clogher_mega_bulletin.pdf" download>Download PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       <nav class="az-row" aria-label="Jump to a parish in the pdf viewer"><span class="az-row-label">Jump to</span><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Aughnamullen East" title="Aughnamullen East" aria-label="Jump to Aughnamullen East">A</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Ballybay (Tullycorbet)|Belleek-Garrison (Inis Muighe Samh)|Brookeboro-Fivemiletown (Aghavea-Aughintaine)|Bundoran (Magh Ene)" title="Ballybay (Tullycorbet), Belleek-Garrison (Inis Muighe Samh), Brookeboro-Fivemiletown (Aghavea-Aughintaine), Bundoran (Magh Ene)" aria-label="Jump to Ballybay (Tullycorbet)">B</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Carrickmacross (Machaire Rois)|Castleblayney (Muckno, includes Clontibret)|Cleenish (Arney)|Clogher|Clones|Clontibret (bulletin with Castleblayney / Muckno)|Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)" title="Carrickmacross (Machaire Rois), Castleblayney (Muckno, includes Clontibret), Cleenish (Arney), Clogher, Clones, Clontibret (bulletin with Castleblayney / Muckno), Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)" aria-label="Jump to Carrickmacross (Machaire Rois)">C</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Derrygonnelly (Botha)|Donagh|Donaghmoyne|Dromore" title="Derrygonnelly (Botha), Donagh, Donaghmoyne, Dromore" aria-label="Jump to Derrygonnelly (Botha)">D</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Ederney (Cúl Máine)|Enniskillen (St Michael&#x27;s Parish)|Errigal Truagh|Eskra" title="Ederney (Cúl Máine), Enniskillen (St Michael&#x27;s Parish), Errigal Truagh, Eskra" aria-label="Jump to Ederney (Cúl Máine)">E</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Fintona (Donacavey)" title="Fintona (Donacavey)" aria-label="Jump to Fintona (Donacavey)">F</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Galloonparish" title="Galloonparish" aria-label="Jump to Galloonparish">G</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Inniskeen (Inis Caoin Deagha)|Irvinestown (Devenish)" title="Inniskeen (Inis Caoin Deagha), Irvinestown (Devenish)" aria-label="Jump to Inniskeen (Inis Caoin Deagha)">I</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Killanny|Killeevan (Currin Killeevan &amp; Aghabog)" title="Killanny, Killeevan (Currin Killeevan &amp; Aghabog)" aria-label="Jump to Killanny">K</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Latton (Aughnamullen West)|Lisnaskea-Maguiresbridge (Aghalurcher)|Lisnaskeamaguiresbridgeparish" title="Latton (Aughnamullen West), Lisnaskea-Maguiresbridge (Aghalurcher), Lisnaskeamaguiresbridgeparish" aria-label="Jump to Latton (Aughnamullen West)">L</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Magheracloone|Monaghan &amp; Rackwallace (includes Tyholland)" title="Magheracloone, Monaghan &amp; Rackwallace (includes Tyholland)" aria-label="Jump to Magheracloone">M</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Newtownbutler (Galloon)" title="Newtownbutler (Galloon)" aria-label="Jump to Newtownbutler (Galloon)">N</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Pettigo" title="Pettigo" aria-label="Jump to Pettigo">P</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Rockcorry (Ematris)|Roslea" title="Rockcorry (Ematris), Roslea" aria-label="Jump to Rockcorry (Ematris)">R</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Tempo (Pobal)|Trillick (Kilskeery)|Tydavnet|Tyholland (bulletin with Monaghan &amp; Rackwallace)" title="Tempo (Pobal), Trillick (Kilskeery), Tydavnet, Tyholland (bulletin with Monaghan &amp; Rackwallace)" aria-label="Jump to Tempo (Pobal)">T</button></nav>
-      <div class="quiet-links">
-        <a href="/mega_pdf/clogher_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="https://raphoe-diocese.github.io/parish_harvester/bulletins/clogher-2026-08-30-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
         <iframe data-pdf-url="/mega_pdf/clogher_mega_bulletin.pdf" title="Clogher bulletin PDF"></iframe>
@@ -936,7 +938,7 @@
               <a href="/mega_pdf/clogher_mega_bulletin.pdf" download>Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"><div class="pdf-inpage-page-slot" data-page="1"><img class="pdf-first-preview" src="/mega_pdf/clogher_mega_bulletin_p1.jpg" alt="" style="display:block;width:100%;height:auto"></div></div>
         </div>
       </div>
@@ -2684,9 +2686,9 @@ Keep Free: Saturday 26th September 2026. Charity Auction 2.00 pm St Mary’s Com
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901d"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901e"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260901d';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901e';
         s.defer = true;
         document.head.appendChild(s);
       }
