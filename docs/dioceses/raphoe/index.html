@@ -110,6 +110,13 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
@@ -867,8 +874,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
-      /* Phone only — hide PDF Jump-to. OCR letters / search / box stay. */
-      #panel-pdf .az-row { display: none !important; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -895,7 +901,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260901d" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901e" defer></script>
 </head>
 <body>
   <div class="page">
@@ -915,16 +921,12 @@
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="/mega_pdf/raphoe_mega_bulletin.pdf" download>Download PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       <nav class="az-row" aria-label="Jump to a parish in the pdf viewer"><span class="az-row-label">Jump to</span><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Annagry|Ardara" title="Annagry, Ardara" aria-label="Jump to Annagry">A</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Bruckless" title="Bruckless" aria-label="Jump to Bruckless">B</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Cathedral" title="Cathedral" aria-label="Jump to Cathedral">C</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Drumholm (Ballintra)|Dunfanaghy" title="Drumholm (Ballintra), Dunfanaghy" aria-label="Jump to Drumholm (Ballintra)">D</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Falcarragh" title="Falcarragh" aria-label="Jump to Falcarragh">F</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Gartan/Termon (Kilmacrenan)|Glenfin|Glenties|Gortahork" title="Gartan/Termon (Kilmacrenan), Glenfin, Glenties, Gortahork" aria-label="Jump to Gartan/Termon (Kilmacrenan)">G</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Inver|Irish Martyrs" title="Inver, Irish Martyrs" aria-label="Jump to Inver">I</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Kilbarron|Kilcar|Killybegs|Kincasslagh" title="Kilbarron, Kilcar, Killybegs, Kincasslagh" aria-label="Jump to Kilbarron">K</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Mevagh|Milford Kilkeel" title="Mevagh, Milford Kilkeel" aria-label="Jump to Mevagh">M</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Newtown Killea" title="Newtown Killea" aria-label="Jump to Newtown Killea">N</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Raphoe|Rathmullan" title="Raphoe, Rathmullan" aria-label="Jump to Raphoe">R</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Stranolar" title="Stranolar" aria-label="Jump to Stranolar">S</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Tawnawilly|Templecrone" title="Tawnawilly, Templecrone" aria-label="Jump to Tawnawilly">T</button></nav>
-      <div class="quiet-links">
-        <a href="/mega_pdf/raphoe_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="https://raphoe-diocese.github.io/parish_harvester/bulletins/raphoe-2026-08-30-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
         <iframe data-pdf-url="/mega_pdf/raphoe_mega_bulletin.pdf" title="Raphoe bulletin PDF"></iframe>
@@ -936,7 +938,7 @@
               <a href="/mega_pdf/raphoe_mega_bulletin.pdf" download>Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"><div class="pdf-inpage-page-slot" data-page="1"><img class="pdf-first-preview" src="/mega_pdf/raphoe_mega_bulletin_p1.jpg" alt="" style="display:block;width:100%;height:auto"></div></div>
         </div>
       </div>
@@ -3619,9 +3621,9 @@ Cornelius Brennan Meenacross</p></div>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901d"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901e"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260901d';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901e';
         s.defer = true;
         document.head.appendChild(s);
       }

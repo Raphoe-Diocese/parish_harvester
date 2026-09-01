@@ -110,6 +110,13 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
@@ -867,8 +874,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
-      /* Phone only — hide PDF Jump-to. OCR letters / search / box stay. */
-      #panel-pdf .az-row { display: none !important; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -895,7 +901,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260901d" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901e" defer></script>
 </head>
 <body>
   <div class="page">
@@ -915,16 +921,12 @@
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="/mega_pdf/derry_mega_bulletin.pdf" download>Download PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       <nav class="az-row" aria-label="Jump to a parish in the pdf viewer"><span class="az-row-label">Jump to</span><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Aghyaran|Ardmore|Ardstraw East" title="Aghyaran, Ardmore, Ardstraw East" aria-label="Jump to Aghyaran">A</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Ballinascreen (&amp; Desertmartin amalgamated)|Banagher|Bellaghy|Buncrana|Buncrana Parish" title="Ballinascreen (&amp; Desertmartin amalgamated), Banagher, Bellaghy, Buncrana, Buncrana Parish" aria-label="Jump to Ballinascreen (&amp; Desertmartin amalgamated)">B</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Camus|Cappaghparish|Carndonagh|Castlederg|Claudy|Clonleigh (Strabane Pastoral Area)|Clonmany|Coleraine (St John)|Culdaff|Culmoe|Culmore Parish" title="Camus, Cappaghparish, Carndonagh, Castlederg, Claudy, Clonleigh (Strabane Pastoral Area), Clonmany, Coleraine (St John), Culdaff, Culmoe, Culmore Parish" aria-label="Jump to Camus">C</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Desertmartin|DMA Parish (Claudy area)|Drumquin|Drumragh|Dungiven" title="Desertmartin, DMA Parish (Claudy area), Drumquin, Drumragh, Dungiven" aria-label="Jump to Desertmartin">D</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Errigal" title="Errigal" aria-label="Jump to Errigal">E</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Fahan" title="Fahan" aria-label="Jump to Fahan">F</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Granaghan|Greencastle|Greenlough" title="Granaghan, Greencastle, Greenlough" aria-label="Jump to Granaghan">G</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Holy Family" title="Holy Family" aria-label="Jump to Holy Family">H</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Iskaheen" title="Iskaheen" aria-label="Jump to Iskaheen">I</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Kilrea" title="Kilrea" aria-label="Jump to Kilrea">K</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Lavey|Leckpatrick|Limavady|Long Tower" title="Lavey, Leckpatrick, Limavady, Long Tower" aria-label="Jump to Lavey">L</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Maghera (Derry)|Malin|Melmount (&amp; Camus)|Moville" title="Maghera (Derry), Malin, Melmount (&amp; Camus), Moville" aria-label="Jump to Maghera (Derry)">M</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Sion Mills|St Eugene&#x27;s Cathedral (Templemore)|St Mary&#x27;s Parish Creggan|Star of the Sea (Magilligan)|Steelstown" title="Sion Mills, St Eugene&#x27;s Cathedral (Templemore), St Mary&#x27;s Parish Creggan, Star of the Sea (Magilligan), Steelstown" aria-label="Jump to Sion Mills">S</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Three Patrons" title="Three Patrons" aria-label="Jump to Three Patrons">T</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Urney and Castlefin" title="Urney and Castlefin" aria-label="Jump to Urney and Castlefin">U</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Waterside (&amp; Strathfoyle amalgamated)" title="Waterside (&amp; Strathfoyle amalgamated)" aria-label="Jump to Waterside (&amp; Strathfoyle amalgamated)">W</button></nav>
-      <div class="quiet-links">
-        <a href="/mega_pdf/derry_mega_bulletin.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="https://raphoe-diocese.github.io/parish_harvester/bulletins/derry-2026-08-30-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
         <iframe data-pdf-url="/mega_pdf/derry_mega_bulletin.pdf" title="Derry bulletin PDF"></iframe>
@@ -936,7 +938,7 @@
               <a href="/mega_pdf/derry_mega_bulletin.pdf" download>Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"><div class="pdf-inpage-page-slot" data-page="1"><img class="pdf-first-preview" src="/mega_pdf/derry_mega_bulletin_p1.jpg" alt="" style="display:block;width:100%;height:auto"></div></div>
         </div>
       </div>
@@ -5791,9 +5793,9 @@ on the parish website and Church notice board.</p></div>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901d"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901e"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260901d';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901e';
         s.defer = true;
         document.head.appendChild(s);
       }

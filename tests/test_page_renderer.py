@@ -39,10 +39,9 @@ class PageRendererTests(unittest.TestCase):
             self.assertIn('id="ocr-search"', html)
             self.assertIn("Tap to go to plain text bulletin", html)
             self.assertIn("mobile-jump", html)
-            # Distraction-free full-page links for both PDF and OCR text.
-            self.assertIn("raphoe-2026-06-29-pdf.html", html)
             self.assertIn("raphoe-2026-06-29-ocr.html", html)
-            self.assertIn("Distraction-free view", html)
+            self.assertNotIn("Distraction-free view", html)
+            self.assertIn("pdf-wait-note", html)
             self.assertIn("A Parish", html)
             self.assertIn("Z Parish", html)
             self.assertLess(html.index("A Parish"), html.index("Z Parish"))
