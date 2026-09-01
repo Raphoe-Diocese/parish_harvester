@@ -1192,7 +1192,7 @@ def prefers_native_pdf_js() -> str:
 """
 
 
-PDF_INPAGE_VIEWER_VERSION = "20260901e"
+PDF_INPAGE_VIEWER_VERSION = "20260901g"
 PDF_INPAGE_VIEWER_SRC = f"/assets/pdf-inpage-viewer.js?v={PDF_INPAGE_VIEWER_VERSION}"
 
 
@@ -1201,6 +1201,11 @@ def pdf_first_page_preview_href(pdf_href: str) -> str:
     if "mega_bulletin.pdf" not in pdf_href:
         return ""
     return pdf_href.replace("mega_bulletin.pdf", "mega_bulletin_p1.jpg", 1)
+
+
+def pdf_download_filename(pdf_href: str) -> str:
+    name = (pdf_href or "").split("?", 1)[0].rstrip("/").rsplit("/", 1)[-1]
+    return name if name.lower().endswith(".pdf") else "bulletin.pdf"
 
 
 def pdf_first_page_preload_tag(pdf_href: str) -> str:
@@ -1294,7 +1299,7 @@ def pdf_inpage_viewer_css() -> str:
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: {DEEP_TEAL};
@@ -1442,7 +1447,7 @@ def pdf_inpage_viewer_html(pdf_href: str) -> str:
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
               <a href="{safe}">Open PDF</a>
-              <a href="{safe}" download>Download</a>
+              <a class="pdf-force-download" href="{safe}" download="{html.escape(pdf_download_filename(pdf_href), quote=True)}">Download</a>
             </div>
           </div>
           <div class="pdf-inpage-status">This file can take a few moments to open.</div>
@@ -2095,6 +2100,7 @@ def render_bulletin_viewer_shell(
       cursor: pointer;
     }}
     .fullscreen-btn:hover {{ background: #fff; }}
+    .pdf-frame-wrap .fullscreen-btn {{ display: none !important; }}
     {pdf_inpage_viewer_css()}
 
     /* Search comes first in the OCR block and reads like the JUMP TO bar, so
@@ -2406,7 +2412,7 @@ def render_bulletin_viewer_shell(
       <p class="diocese-label">{html.escape(diocese_label)}</p>
       <h1>{html.escape(headline)}</h1>
       <p class="meta">{html.escape(meta_line)}</p>
-      <a class="download-link-top" href="{html.escape(pdf_download_href, quote=True)}">Download PDF</a>
+      <a class="download-link-top pdf-force-download" href="{html.escape(pdf_download_href, quote=True)}" download="{html.escape(pdf_download_filename(pdf_download_href), quote=True)}">Download PDF</a>
     </header>
     {intro_html}
 
