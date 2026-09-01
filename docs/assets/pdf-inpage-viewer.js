@@ -261,7 +261,12 @@
     bindBoxes();
   }
 
+  var startMegaNow = null;
+  var pendingJumpPage = 0;
+
   window.parishPressScrollPdfToPage = function (pageNum) {
+    pendingJumpPage = pageNum;
+    if (typeof startMegaNow === "function") startMegaNow();
     if (typeof paintPdfPage === "function") {
       paintPdfPage(pageNum);
     }
@@ -619,7 +624,33 @@
     }
 
     setStatus(host, "Showing first page…");
-    var jsReady = loadPdfJs();
+    var megaPromise = null;
+    function beginMega() {
+      if (megaPromise) return megaPromise;
+      megaPromise = loadPdfJs()
+        .then(function (pdfjsLib) {
+          return openPdfDocument(pdfjsLib, pdfUrl);
+        })
+        .then(function (pdf) {
+          pdfDoc = pdf;
+          rendering = Object.create(null);
+          stackAllPages();
+          if (pendingJumpPage) {
+            paint(pendingJumpPage);
+            var jumpSlot = pagesEl.querySelector('[data-page="' + pendingJumpPage + '"]');
+            if (jumpSlot) pagesEl.scrollTop = jumpSlot.offsetTop;
+          }
+        })
+        .catch(function (err) {
+          console.warn("PDF.js failed", err);
+          setStatus(host, "Could not show the PDF here. Use Open PDF or Download.", true);
+          host.setAttribute("data-pdf-started", "0");
+          restoreNativeIframe();
+          megaPromise = null;
+        });
+      return megaPromise;
+    }
+    startMegaNow = beginMega;
     function waitPreview() {
       var img = pagesEl && pagesEl.querySelector(".pdf-first-preview");
       if (!img) return Promise.resolve();
@@ -637,23 +668,17 @@
         window.setTimeout(done, 4000);
       });
     }
-    waitPreview()
-      .then(function () {
-        return jsReady.then(function (pdfjsLib) {
-          return openPdfDocument(pdfjsLib, pdfUrl);
-        });
-      })
-      .then(function (pdf) {
-        pdfDoc = pdf;
-        rendering = Object.create(null);
-        stackAllPages();
-      })
-      .catch(function (err) {
-        console.warn("PDF.js failed", err);
-        setStatus(host, "Could not show the PDF here. Use Open PDF or Download.", true);
-        host.setAttribute("data-pdf-started", "0");
-        restoreNativeIframe();
-      });
+    /* Do not start the mega until jump or scroll. The page-1 picture
+       must keep the phone radio. Drive / 365 hosting is not used. */
+    waitPreview().then(function () {
+      if (!pagesEl.querySelector(".pdf-first-preview")) {
+        beginMega();
+        return;
+      }
+      pagesEl.addEventListener("scroll", beginMega, { once: true, passive: true });
+      host.addEventListener("touchstart", beginMega, { once: true, passive: true });
+      host.addEventListener("pointerdown", beginMega, { once: true });
+    });
   }
 
   function activateWrap(wrap, pdfUrl) {
@@ -679,7 +704,6 @@
     ensureScrollTop();
     fixMobilePdfLinks();
 
-    loadPdfJs();
     document.querySelectorAll(".pdf-frame-wrap").forEach(function (wrap) {
       activateWrap(wrap, resolvePdfUrl(wrap));
     });
