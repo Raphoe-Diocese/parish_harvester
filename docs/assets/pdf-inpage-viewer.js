@@ -81,7 +81,7 @@
     style.textContent =
       ".az-expand{display:none!important}" +
       ".pdf-inpage-viewer{display:flex!important;flex-direction:column;height:850px!important;min-height:850px!important;max-height:850px!important;overflow:hidden!important;flex:1 1 auto;background:#3a3f42;color:#e8eeed;border:1px solid #c9d4d3;box-sizing:border-box}" +
-      ".pdf-inpage-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-end;gap:8px;padding:8px 10px;background:#14524f;color:#fff;flex:0 0 auto}" +
+      ".pdf-inpage-toolbar{display:flex;flex-wrap:wrap;align-items:center;justify-content:flex-start;gap:8px;padding:8px 52px 8px 10px;background:#14524f;color:#fff;flex:0 0 auto}" +
       ".pdf-inpage-backup{display:flex;gap:8px;flex-wrap:wrap}" +
       ".pdf-inpage-backup a{color:#fff;font-weight:700;font-size:.85rem}" +
       ".pdf-inpage-status{padding:10px 12px;background:#1f3d3c;color:#d8f0ee;font-size:.9rem}" +
@@ -351,6 +351,62 @@
     el.style.background = isError ? "#7f1d1d" : "#1f3d3c";
   }
 
+  function pdfFilename(url) {
+    var path = String(url || "").split("?")[0].split("#")[0];
+    var name = path.split("/").pop() || "bulletin.pdf";
+    try {
+      name = decodeURIComponent(name);
+    } catch (e) {}
+    if (!/\.pdf$/i.test(name)) name = "bulletin.pdf";
+    return name;
+  }
+
+  var pdfBytesPromises = Object.create(null);
+  var pdfBlobCache = Object.create(null);
+
+  function savePdfBlob(blob, filename) {
+    var typed = new Blob([blob], {
+      type: isPhone() ? "application/octet-stream" : "application/pdf",
+    });
+    var obj = URL.createObjectURL(typed);
+    var tmp = document.createElement("a");
+    tmp.href = obj;
+    tmp.setAttribute("download", filename);
+    tmp.style.display = "none";
+    document.body.appendChild(tmp);
+    tmp.click();
+    document.body.removeChild(tmp);
+    window.setTimeout(function () {
+      URL.revokeObjectURL(obj);
+    }, 60000);
+  }
+
+  function bindForceDownload(root) {
+    var nodes = (root || document).querySelectorAll("a.pdf-force-download");
+    Array.prototype.forEach.call(nodes, function (a) {
+      if (!a || a.getAttribute("data-pp-dl") === "1") return;
+      a.setAttribute("data-pp-dl", "1");
+      a.addEventListener("click", function (ev) {
+        var url = a.getAttribute("href") || "";
+        var name = a.getAttribute("download") || pdfFilename(url);
+        if (!url) return;
+        ev.preventDefault();
+        ev.stopPropagation();
+        if (pdfBlobCache[url]) {
+          savePdfBlob(pdfBlobCache[url], name);
+          return;
+        }
+        prefetchPdfBytes(url)
+          .then(function () {
+            if (pdfBlobCache[url]) savePdfBlob(pdfBlobCache[url], name);
+          })
+          .catch(function () {
+            window.location.href = url;
+          });
+      });
+    });
+  }
+
   function previewMarkup(previewUrl) {
     if (!previewUrl) return "";
     return (
@@ -373,8 +429,10 @@
       '<a href="' +
       pdfUrl.replace(/"/g, "&quot;") +
       '">Open PDF</a>' +
-      '<a href="' +
+      '<a class="pdf-force-download" href="' +
       pdfUrl.replace(/"/g, "&quot;") +
+      '" download="' +
+      pdfFilename(pdfUrl).replace(/"/g, "") +
       '">Download</a>' +
       "</div></div>" +
       '<div class="pdf-inpage-status">This file can take a few moments to open.</div>' +
@@ -385,6 +443,7 @@
       window.parishPressBindScrollTopBoxes();
     }
     fixMobilePdfLinks();
+    bindForceDownload(host);
     return host;
   }
 
@@ -498,8 +557,13 @@
 
   var WHOLE_FILE_MAX = 8 * 1024 * 1024;
 
-  function fetchWholePdf(pdfjsLib, pdfUrl) {
-    return fetch(pdfUrl, { credentials: "same-origin", cache: "force-cache" }).then(function (res) {
+  function prefetchPdfBytes(pdfUrl) {
+    if (!pdfUrl) return Promise.reject(new Error("no pdf url"));
+    if (pdfBytesPromises[pdfUrl]) return pdfBytesPromises[pdfUrl];
+    pdfBytesPromises[pdfUrl] = fetch(pdfUrl, {
+      credentials: "same-origin",
+      cache: "force-cache",
+    }).then(function (res) {
       if (!res.ok) throw new Error("PDF fetch " + res.status);
       var len = parseInt(res.headers.get("content-length") || "0", 10);
       if (len > WHOLE_FILE_MAX) {
@@ -510,6 +574,14 @@
       }
       return res.arrayBuffer();
     }).then(function (buf) {
+      pdfBlobCache[pdfUrl] = new Blob([buf], { type: "application/pdf" });
+      return buf;
+    });
+    return pdfBytesPromises[pdfUrl];
+  }
+
+  function fetchWholePdf(pdfjsLib, pdfUrl) {
+    return prefetchPdfBytes(pdfUrl).then(function (buf) {
       /* One arrayBuffer — never pass url to getDocument. */
       return pdfjsLib.getDocument({
         data: new Uint8Array(buf),
@@ -710,16 +782,16 @@
         window.setTimeout(done, 4000);
       });
     }
-    /* Start the mega after the page-1 picture. One GET of ~5 MB
-       while he reads page 1 — Jump-to is then ready in seconds.
-       Drive / 365 hosting is not used. */
-    waitPreview().then(function () {
-      beginMega();
-    });
+    /* Start the mega GET immediately (prefetch + one arrayBuffer).
+       Page 1 stays the tiny JPEG. Jump-to is ready when the 4–5 MB
+       file is in. Drive / 365 hosting is not used. */
+    waitPreview();
+    beginMega();
   }
 
   function activateWrap(wrap, pdfUrl) {
     if (!wrap || !pdfUrl) return;
+    prefetchPdfBytes(pdfUrl);
     unloadIframe(wrap);
     var host =
       wrap.querySelector(".pdf-inpage-viewer") ||
@@ -740,6 +812,13 @@
     ensureOcrStickyChrome();
     ensureScrollTop();
     fixMobilePdfLinks();
+    document.querySelectorAll("a.download-link-top[href*='.pdf']").forEach(function (a) {
+      a.classList.add("pdf-force-download");
+      if (!a.getAttribute("download")) {
+        a.setAttribute("download", pdfFilename(a.getAttribute("href")));
+      }
+    });
+    bindForceDownload(document);
 
     document.querySelectorAll(".pdf-frame-wrap").forEach(function (wrap) {
       activateWrap(wrap, resolvePdfUrl(wrap));
@@ -771,6 +850,7 @@
         if (shell) shell.appendChild(host);
         else document.body.appendChild(host);
       }
+      prefetchPdfBytes(pdfUrl);
       host = buildViewer(host, pdfUrl);
       startViewer(host, pdfUrl);
     }
