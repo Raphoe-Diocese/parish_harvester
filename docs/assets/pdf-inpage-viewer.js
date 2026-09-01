@@ -265,16 +265,24 @@
   var pendingJumpPage = 0;
 
   window.parishPressScrollPdfToPage = function (pageNum) {
-    pendingJumpPage = pageNum;
-    if (typeof startMegaNow === "function") startMegaNow();
-    if (typeof paintPdfPage === "function") {
-      paintPdfPage(pageNum);
+    pendingJumpPage = parseInt(pageNum, 10) || 0;
+    function tryScroll() {
+      var pagesEl = document.querySelector(".pdf-inpage-pages");
+      if (!pagesEl || !pendingJumpPage) return false;
+      if (typeof paintPdfPage === "function") paintPdfPage(pendingJumpPage);
+      var slot = pagesEl.querySelector('[data-page="' + pendingJumpPage + '"]');
+      if (!slot) return false;
+      pagesEl.scrollTop = slot.offsetTop;
+      return true;
     }
-    var pagesEl = document.querySelector(".pdf-inpage-pages");
-    if (!pagesEl) return;
-    var slot = pagesEl.querySelector('[data-page="' + pageNum + '"]');
-    if (!slot) return;
-    pagesEl.scrollTop = slot.offsetTop;
+    if (typeof startMegaNow === "function") startMegaNow();
+    if (tryScroll()) return;
+    var tries = 0;
+    function again() {
+      if (tryScroll()) return;
+      if (tries++ < 80) window.setTimeout(again, 250);
+    }
+    again();
   };
 
   function loadScript(src) {
