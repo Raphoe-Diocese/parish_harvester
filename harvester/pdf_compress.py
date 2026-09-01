@@ -126,3 +126,41 @@ def compress_pdf_inplace(path: Path | str) -> bool:
         shutil.copy2(dest, path)
         print(f"     Compressed    : {before // 1024} KB → {after // 1024} KB")
         return True
+
+
+def first_page_preview_path(path: Path | str) -> Path:
+    path = Path(path)
+    return path.with_name(path.stem + "_p1.jpg")
+
+
+def write_first_page_preview(path: Path | str) -> Path | None:
+    """Write a phone-width JPEG of page 1 so the first paint is a tiny image."""
+    path = Path(path)
+    if not path.is_file() or not _is_pdf(path):
+        return None
+    dest = first_page_preview_path(path)
+    try:
+        import fitz
+
+        doc = fitz.open(path)
+        try:
+            if doc.page_count < 1:
+                return None
+            page = doc[0]
+            # 640px wide is enough to read on a phone; keep the file tiny.
+            zoom = min(2.0, 640.0 / max(float(page.rect.width), 1.0))
+            pix = page.get_pixmap(
+                matrix=fitz.Matrix(zoom, zoom),
+                colorspace=fitz.csRGB,
+                alpha=False,
+            )
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            pix.save(str(dest), jpg_quality=50)
+        finally:
+            doc.close()
+    except Exception:
+        return None
+    if not dest.is_file() or dest.stat().st_size < 32:
+        return None
+    print(f"     First page    : {dest.name} ({dest.stat().st_size // 1024} KB)")
+    return dest

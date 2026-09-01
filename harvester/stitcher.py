@@ -338,9 +338,10 @@ def stitch_mega_pdf(
         with output_path.open("wb") as fh:
             merger.write(fh)
         try:
-            from harvester.pdf_compress import compress_pdf_inplace
+            from harvester.pdf_compress import compress_pdf_inplace, write_first_page_preview
 
             compress_pdf_inplace(output_path)
+            write_first_page_preview(output_path)
         except Exception as exc:
             print(f"     ⚠️  Mega PDF compress skipped: {exc}")
         index_payload = {
@@ -376,5 +377,8 @@ def publish_mega_to_docs(pdf_path: Path, docs_mega_dir: Path | None = None) -> P
     index_src = pdf_path.with_name(pdf_path.stem + ".pages.json")
     if index_src.exists():
         shutil.copy2(index_src, dest_dir / index_src.name)
+    p1_src = pdf_path.with_name(pdf_path.stem + "_p1.jpg")
+    if p1_src.exists():
+        shutil.copy2(p1_src, dest_dir / p1_src.name)
     print(f"     Published     : {dest}")
     return dest

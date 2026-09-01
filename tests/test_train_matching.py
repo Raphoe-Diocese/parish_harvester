@@ -294,6 +294,7 @@ https://www.antrimparish.com
         self.assertIn("continue-on-error: true", workflow)
         self.assertIn("id: commit_harvest", workflow)
         self.assertIn("docs/mega_pdf/*_mega_bulletin.pdf", workflow)
+        self.assertIn("docs/mega_pdf/*_mega_bulletin_p1.jpg", workflow)
         self.assertIn("scripts/push_harvest_results.py", workflow)
         self.assertIn('HARVEST_MEGA_PDF: "1"', workflow)
         self.assertIn("cron: '0 9 * * 0'", workflow)
@@ -305,6 +306,7 @@ https://www.antrimparish.com
         self.assertIn("gs --version", workflow)
         stitcher = (repo_root / "harvester" / "stitcher.py").read_text(encoding="utf-8")
         self.assertIn("compress_pdf_inplace", stitcher)
+        self.assertIn("write_first_page_preview", stitcher)
         commit_step = workflow.split("- name: Commit bulletins back to repo", 1)[1]
         self.assertNotIn("continue-on-error: true", commit_step.split("- name:", 1)[0])
 
