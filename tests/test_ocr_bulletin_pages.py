@@ -116,6 +116,9 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertNotIn("Jump to OCR Text", html_output)
             self.assertIn("Tap to go to plain text bulletin", html_output)
             self.assertIn("mobile-jump", html_output)
+            self.assertIn("Download PDF", html_output)
+            self.assertIn('class="mobile-jump-download"', html_output)
+            self.assertIn("#panel-pdf .az-row { display: none !important; }", html_output)
             self.assertIn('href="#panel-ocr"', html_output)
             self.assertIn("test-2026-05-19-ocr.html", html_output)
             self.assertNotIn("Next page →", html_output)
@@ -211,7 +214,7 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertIn("pdf-fullscreen-btn", html_output)
             # Desktop + mobile: hide the raw-PDF iframe and show stacked PDF.js pages.
             self.assertIn("pdf-inpage-viewer", html_output)
-            self.assertIn("/assets/pdf-inpage-viewer.js?v=20260901c", html_output)
+            self.assertIn("/assets/pdf-inpage-viewer.js?v=20260901d", html_output)
             self.assertIn("data-pdf-src", html_output)
             self.assertIn("data-pdf-preview", html_output)
             self.assertIn("test_mega_bulletin_p1.jpg", html_output)
@@ -259,7 +262,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotRegex(html_output, r"<iframe[^>]+src=")
         self.assertIn("embed-mode", html_output)
         self.assertIn("pdf-inpage-viewer", html_output)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260901c", html_output)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260901d", html_output)
         self.assertIn("data-pdf-src", html_output)
         self.assertIn("data-pdf-preview", html_output)
         self.assertIn("test_mega_bulletin_p1.jpg", html_output)
@@ -297,7 +300,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("is-native-pdf", boot)
         self.assertIn("pdf-frame-wrap", boot)
         self.assertIn("removeAttribute('src')", boot)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260901c", boot)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260901d", boot)
         self.assertNotIn("prefersNativePdf", boot)
         self.assertNotIn("narrowViewport", boot)
         self.assertEqual(boot, pdf_mobile_fallback_boot_js())
@@ -467,7 +470,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn('id="scroll-top-btn"', html_output)
         self.assertIn("Georgia", html_output)
         self.assertIn("pdf-inpage-viewer", html_output)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260901c", html_output)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260901d", html_output)
         self.assertIn("block: 'start'", html_output)
         self.assertNotIn("block: 'center'", html_output)
         self.assertIn("is-native-pdf", html_output)
@@ -612,7 +615,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         assets = Path(__file__).resolve().parent.parent / "docs" / "assets"
         viewer = assets / "pdf-inpage-viewer.js"
         self.assertTrue(viewer.is_file(), "docs/assets/pdf-inpage-viewer.js must exist for live pages")
-        self.assertEqual(PDF_INPAGE_VIEWER_VERSION, "20260901c")
+        self.assertEqual(PDF_INPAGE_VIEWER_VERSION, "20260901d")
         text = viewer.read_text(encoding="utf-8")
         self.assertIn("pdfjs", text.lower())
         self.assertIn("disableAutoFetch", text)
@@ -700,6 +703,12 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotIn("is-phone-native", text)
         self.assertNotIn("This week's PDF", text)
         self.assertNotIn("PDF.js is desktop-only", text)
+        self.assertIn("armPhonePdfNewTab", text)
+        self.assertIn("hidePhoneJumpRows", text)
+        self.assertIn('#panel-pdf .az-row', text)
+        self.assertNotIn("@media (max-width:700px){.az-row{display:none!important}}", text)
+        self.assertIn("pdf-phone-open", text)
+        self.assertIn('data-pdf-phone-tab", "1"', text)
         self.assertIn("function run()", text)
         run_idx = text.find("function run()")
         run_end = text.find("if (document.readyState", run_idx)
@@ -795,7 +804,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotIn("prefersNativePdf", text)
         loader = assets / "pdf-mobile-fallback.js"
         self.assertTrue(loader.is_file())
-        self.assertIn("pdf-inpage-viewer.js?v=20260901c", loader.read_text(encoding="utf-8"))
+        self.assertIn("pdf-inpage-viewer.js?v=20260901d", loader.read_text(encoding="utf-8"))
         self.assertIn(".az-expand{display:none", text)
         self.assertIn(
             'document.querySelectorAll(".az-expand").forEach(function (btn) { btn.remove(); });',
@@ -843,7 +852,7 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertNotIn("85vh", diocese)
         self.assertIn("inner-2", diocese)
         self.assertIn("data-pp-scroll-top", diocese)
-        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260901c", diocese)
+        self.assertIn("/assets/pdf-inpage-viewer.js?v=20260901d", diocese)
 
     def test_live_diocese_html_ships_inpage_viewer(self) -> None:
         """Generator-only changes are invisible on parishpress.ie — live HTML must include PDF.js."""
@@ -892,6 +901,9 @@ class OcrBulletinPageTests(unittest.TestCase):
             self.assertIn("data-pdf-src", html_live, rel)
             self.assertIn("data-pdf-preview", html_live, rel)
             self.assertIn("slots after page 1 do not exist yet", html_live, rel)
+            self.assertIn("Download PDF", html_live, rel)
+            self.assertIn('class="mobile-jump-download"', html_live, rel)
+            self.assertIn("#panel-pdf .az-row { display: none !important; }", html_live, rel)
             self.assertIn("pdf-first-preview", html_live, rel)
             self.assertIn('rel="preload"', html_live, rel)
             self.assertIn('as="image"', html_live, rel)

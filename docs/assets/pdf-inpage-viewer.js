@@ -54,20 +54,30 @@
     return isPhone() || (window.matchMedia && window.matchMedia("(max-width: 1024px)").matches);
   }
 
+  function hidePhoneJumpRows() {
+    if (!isPhone()) return;
+    document.querySelectorAll("#panel-pdf .az-row").forEach(function (row) {
+      row.hidden = true;
+    });
+  }
+
   function fixMobilePdfLinks() {
     if (!isPhone()) return;
+    hidePhoneJumpRows();
+    var top = document.querySelector("a.mobile-jump-download");
+    if (top) {
+      top.textContent = "Download PDF";
+      top.setAttribute("download", "");
+    }
     var nodes = document.querySelectorAll(
-      'a[href*="mega_bulletin.pdf"], a.mobile-jump-download, a.download-link, a.download-link-top, .pdf-inpage-backup a, .quiet-links a[href*=".pdf"]'
+      'a[href*="mega_bulletin.pdf"], a.download-link, a.download-link-top, .pdf-inpage-backup a, .quiet-links a[href*=".pdf"]'
     );
     Array.prototype.forEach.call(nodes, function (a) {
       if (!a || (a.className && String(a.className).indexOf("pdf-annot-link") !== -1)) return;
+      if (a.classList && a.classList.contains("mobile-jump-download")) return;
       a.removeAttribute("download");
-      a.removeAttribute("target");
-      a.removeAttribute("rel");
-      var t = (a.textContent || "").replace(/\s+/g, " ").trim();
-      if (/^⬇?\s*Download(\s+PDF)?$/i.test(t)) {
-        a.textContent = "Open PDF";
-      }
+      a.target = "_blank";
+      a.rel = "noopener noreferrer";
     });
   }
 
@@ -92,6 +102,8 @@
       ".pdf-inpage-page-slot{margin:0 auto 10px;background:#3a3f42;min-height:180px;max-width:100%;position:relative}" +
       ".pdf-inpage-page-slot canvas{display:block;width:100%;height:auto;background:#fff}" +
       ".pdf-first-preview{display:block;width:100%;height:auto;background:#fff}" +
+      ".pdf-phone-open{display:block;color:inherit;text-decoration:none;flex:1 1 auto;min-height:0;overflow:hidden}" +
+      "@media (max-width:700px){#panel-pdf .az-row{display:none!important}}" +
       ".pdf-link-layer{position:absolute;left:0;top:0;width:100%;height:100%;overflow:hidden;pointer-events:none}" +
       ".pdf-annot-link{position:absolute;z-index:2;pointer-events:auto;background:rgba(26,107,107,0.08);border-radius:2px}" +
       ".pdf-annot-link:focus{outline:2px solid #1a6b6b;outline-offset:1px}" +
@@ -533,7 +545,32 @@
     });
   }
 
+  function armPhonePdfNewTab(host, pdfUrl) {
+    /* Phone only. PC keeps PDF.js + Jump-to. Do not start the mega here. */
+    if (!host || !pdfUrl) return;
+    host.setAttribute("data-pdf-phone-tab", "1");
+    setStatus(host, "Tap the page to open the PDF");
+    var pages = host.querySelector(".pdf-inpage-pages");
+    if (!pages) return;
+    if (pages.parentNode && pages.parentNode.classList.contains("pdf-phone-open")) {
+      pages.parentNode.setAttribute("href", pdfUrl);
+      return;
+    }
+    var a = document.createElement("a");
+    a.className = "pdf-phone-open";
+    a.href = pdfUrl;
+    a.target = "_blank";
+    a.rel = "noopener noreferrer";
+    a.setAttribute("aria-label", "Open the bulletin PDF in a new tab");
+    pages.parentNode.insertBefore(a, pages);
+    a.appendChild(pages);
+  }
+
   function startViewer(host, pdfUrl) {
+    if (isPhone()) {
+      armPhonePdfNewTab(host, pdfUrl);
+      return;
+    }
     if (host.getAttribute("data-pdf-started") === "1") return;
     host.setAttribute("data-pdf-started", "1");
     var pagesEl = host.querySelector(".pdf-inpage-pages");
