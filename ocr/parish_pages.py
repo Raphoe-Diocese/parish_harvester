@@ -27,6 +27,7 @@ import io
 import json
 import time
 from dataclasses import dataclass
+from html.parser import HTMLParser
 from pathlib import Path
 
 from PyPDF2 import PdfReader, PdfWriter
@@ -478,3 +479,198 @@ def write_parish_pages_for_diocese(
             continue
 
     return written
+
+
+class _VisibleHtmlText(HTMLParser):
+    """Plain text from an HTML article — skips script/style, does not invent words."""
+
+    def __init__(self) -> None:
+        super().__init__()
+        self.parts: list[str] = []
+        self._skip = 0
+
+    def handle_starttag(self, tag: str, attrs: list[tuple[str, str | None]]) -> None:
+        if tag in ("script", "style"):
+            self._skip += 1
+        if tag in ("p", "br", "div", "h1", "h2", "h3", "tr", "li"):
+            self.parts.append("\n")
+
+    def handle_endtag(self, tag: str) -> None:
+        if tag in ("script", "style") and self._skip:
+            self._skip -= 1
+        if tag in ("p", "div", "h1", "h2", "h3"):
+            self.parts.append("\n")
+
+    def handle_data(self, data: str) -> None:
+        if self._skip:
+            return
+        text = " ".join(data.replace("\xa0", " ").split())
+        if text:
+            self.parts.append(text + " ")
+
+
+def html_article_to_text(html_text: str) -> str:
+    """Visible text from a parish HTML bulletin. Empty if there is nothing to read."""
+    parser = _VisibleHtmlText()
+    parser.feed(str(html_text or ""))
+    lines = [line.strip() for line in "".join(parser.parts).splitlines()]
+    return "\n".join(line for line in lines if line)
+
+
+def bulletin_text_to_pdf(text: str) -> bytes:
+    """Born-digital PDF from already-extracted bulletin words (no invented text)."""
+    from reportlab.lib.pagesizes import A4
+    from reportlab.lib.styles import getSampleStyleSheet
+    from reportlab.lib.units import mm
+    from reportlab.platypus import Paragraph, SimpleDocTemplate, Spacer
+
+    body = str(text or "").strip()
+    if not body:
+        raise ValueError("bulletin_text_to_pdf needs the real article text")
+    buf = io.BytesIO()
+    doc = SimpleDocTemplate(
+        buf,
+        pagesize=A4,
+        leftMargin=18 * mm,
+        rightMargin=18 * mm,
+        topMargin=16 * mm,
+        bottomMargin=16 * mm,
+    )
+    styles = getSampleStyleSheet()
+    story: list = []
+    for raw_line in body.splitlines():
+        line = raw_line.strip()
+        if not line:
+            continue
+        story.append(Paragraph(html.escape(line), styles["Normal"]))
+        story.append(Spacer(1, 6))
+    doc.build(story)
+    return buf.getvalue()
+
+
+def load_parish_record(
+    diocese_key: str,
+    parish_key: str,
+    parish_status_path: Path | None = None,
+) -> OkParish | None:
+    """One parish row from parish_status (any outcome). None if missing."""
+    path = parish_status_path or PARISH_STATUS_PATH
+    if not path.exists():
+        return None
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    row = (data.get("parishes") or {}).get(parish_key)
+    if not isinstance(row, dict):
+        return None
+    target_diocese = DIOCESE_STATUS_NAMES.get(diocese_key, diocese_key)
+    if row.get("diocese") and row.get("diocese") != target_diocese:
+        return None
+    display_name = str(row.get("display_name") or parish_key).strip() or str(parish_key)
+    url = str(row.get("url") or "").strip()
+    return OkParish(key=str(parish_key), display_name=display_name, url=url)
+
+
+def write_standalone_parish_page(
+    diocese_key: str,
+    parish_key: str,
+    bulletin_date: str,
+    pdf_path: Path,
+    *,
+    stale: bool = False,
+    out_dir: Path | None = None,
+    parish_status_path: Path | None = None,
+) -> str:
+    """Write one parish viewer from a standalone PDF (not a mega slice).
+
+    For a stale capture, *bulletin_date* is the bulletin's own date. Do not
+    stamp the harvest Sunday.
+    """
+    from ocr.bulletin_layout import structure_ocr_html
+    from ocr.generate_bulletin_pages import (
+        DIOCESES,
+        DioceseConfig,
+        format_uk_date,
+        render_bulletin_viewer_shell,
+        render_ocr_standalone_page,
+        render_pdf_standalone_page,
+        tighten_ocr_paragraphs,
+    )
+
+    config = DIOCESES[diocese_key]
+    parish = load_parish_record(diocese_key, parish_key, parish_status_path)
+    if parish is None:
+        raise ValueError(f"No parish_status row for {parish_key} in {diocese_key}")
+    pdf = Path(pdf_path)
+    if not pdf.is_file():
+        raise FileNotFoundError(pdf)
+
+    uk_date = format_uk_date(bulletin_date)
+    if stale:
+        meta_line = (
+            f"Newest bulletin on the parish site is {uk_date}. "
+            f"Too old for this harvest week."
+        )
+    else:
+        meta_line = (
+            f"This week's bulletin for {parish.display_name} — {uk_date}. "
+            f"Part of the {config.display_name} collated bulletin."
+        )
+
+    embedded_html = ocr_html_from_embedded_pdf(pdf)
+    if not embedded_html:
+        raise ValueError(f"No readable text layer in {pdf}")
+    ocr_fragment = structure_ocr_html(
+        tighten_ocr_paragraphs(embedded_html),
+        bulletin_date=bulletin_date,
+        single_parish_name=parish.display_name,
+    )
+
+    out_root = out_dir or (PARISHES_OUT_DIR / diocese_key)
+    out_root.mkdir(parents=True, exist_ok=True)
+    dest_pdf = out_root / f"{parish.key}.pdf"
+    if dest_pdf.resolve() != pdf.resolve():
+        dest_pdf.write_bytes(pdf.read_bytes())
+
+    others = load_ok_parishes(diocese_key, parish_status_path)
+    diocese_label = config.display_name.replace(" Diocese", "").upper()
+    parish_config = DioceseConfig(
+        key=parish.key,
+        display_name=parish.display_name,
+        headline=f"{parish.display_name} Parish Bulletin",
+        evidence_path=config.evidence_path,
+        pdf_filename=f"{parish.key}.pdf",
+    )
+    pdf_href = f"{parish.key}.pdf"
+    viewer_filename = f"{parish.key}.html"
+    page_html = render_bulletin_viewer_shell(
+        page_title=f"{parish.display_name} Bulletin — {uk_date}",
+        diocese_label=diocese_label,
+        display_name=parish.display_name,
+        headline=f"{parish.display_name} Parish Bulletin",
+        meta_line=meta_line,
+        back_href=f"../../dioceses/{diocese_key}/index.html",
+        back_label=f"← Back to {config.display_name} bulletin",
+        pdf_href=pdf_href,
+        pdf_download_href=pdf_href,
+        pdf_standalone_href=f"{parish.key}-pdf.html",
+        ocr_standalone_href=f"{parish.key}-ocr.html",
+        ocr_fragment=ocr_fragment,
+        parish_section_heading=f"Other {diocese_label} Parishes",
+        parish_links_html=_render_other_parishes_grid(others, parish.key),
+    )
+    _write_text(out_root / viewer_filename, page_html)
+    _write_text(
+        out_root / f"{parish.key}-pdf.html",
+        render_pdf_standalone_page(
+            parish_config, bulletin_date, pdf_href=pdf_href, viewer_href=viewer_filename
+        ),
+    )
+    _write_text(
+        out_root / f"{parish.key}-ocr.html",
+        render_ocr_standalone_page(
+            parish_config, bulletin_date, ocr_fragment, viewer_href=viewer_filename
+        ),
+    )
+    return parish.key
