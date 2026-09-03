@@ -17,6 +17,22 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 03/09/2026 — Problems console (work-queue polish)
+
+**The real goal, in one sentence:** Frank can see the next parish to fix and the three clicks, without a Full harvest button on the main bar.
+
+Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `actionable_keys`. Extension does not invent parish health.
+
+**This turn:** tab and title say **Problems** (was Back room). How-to is 3 steps. First card says **Start here**. Full harvest lives in how-to only. Parish Trainer **1.61.16**. Reload at chrome://extensions.
+
+**Not live on parishpress.ie** — Chrome extension, not the website.
+
+**Next:** Frank Reloads and tries one card. More queue polish only if he says so. Do not start recipe success (item 3).
+
+**Parked:** none from this job.
+
+---
+
 ## 28/08/2026 — Ardstraw East harvested the parishioner form
 
 **The real goal, in one sentence:** stop treating `DataEntryFormPdf.pdf` as this week's bulletin.

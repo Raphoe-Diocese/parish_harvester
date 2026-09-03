@@ -46,7 +46,7 @@ class SendTestCommsTests(unittest.TestCase):
 
     def test_manifest_bumped_for_extension_js(self) -> None:
         text = MANIFEST.read_text(encoding="utf-8")
-        self.assertIn('"version": "1.61.15"', text)
+        self.assertIn('"version": "1.61.16"', text)
 
     def test_back_room_fetches_fresh_parish_status(self) -> None:
         push = PUSH_JS.read_text(encoding="utf-8")
@@ -63,6 +63,27 @@ class SendTestCommsTests(unittest.TestCase):
         self.assertIn("2 * 60 * 1000", sidepanel)
         self.assertIn("id=\"problems-refreshed\"", html)
         self.assertIn("id=\"problems-refresh-btn\"", html)
+
+    def test_problems_console_queue_labels(self) -> None:
+        html = (REPO / "extension" / "sidepanel.html").read_text(encoding="utf-8")
+        sidepanel = (REPO / "extension" / "sidepanel.js").read_text(encoding="utf-8")
+        self.assertIn(">Problems<", html)
+        self.assertNotIn("Back room", html)
+        self.assertIn("How to fix a parish (3 steps)", html)
+        self.assertIn("<li><strong>Open site</strong>", html)
+        self.assertIn("<li><strong>Refresh</strong>", html)
+        howto = html.find('id="problems-howto"')
+        harvest = html.find('id="problems-full-harvest-btn"')
+        warning = html.find('id="problems-warning"')
+        refresh = html.find('id="problems-refresh-btn"')
+        self.assertTrue(0 <= howto < harvest < warning < refresh)
+        self.assertEqual(
+            html.count("<li>", howto, html.find("Need every parish again?")),
+            3,
+        )
+        self.assertIn("Start here", sidepanel)
+        self.assertIn("problems-card-next", sidepanel)
+        self.assertIn("actionable_keys", sidepanel)
 
     def test_harvest_commits_parish_status_after_single_parish(self) -> None:
         yml = HARVEST_YML.read_text(encoding="utf-8")
