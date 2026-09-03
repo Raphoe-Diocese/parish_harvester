@@ -19,17 +19,19 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ## 03/09/2026 — Problems console (work-queue polish)
 
-**The real goal, in one sentence:** Frank can see the next parish to fix and the three clicks, without a Full harvest button on the main bar.
+**The real goal, in one sentence:** Frank can see the next parish, the three clicks, and what to do — without harvest jargon on the card.
 
 Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `actionable_keys`. Extension does not invent parish health.
 
-**This turn:** tab and title say **Problems** (was Back room). How-to is 3 steps. First card says **Start here**. Full harvest lives in how-to only. Parish Trainer **1.61.16**. Reload at chrome://extensions.
+**Merged 03/09/2026:** PR [#168](https://github.com/Raphoe-Diocese/parish_harvester/pull/168) squash `cda41c98` — tab **Problems**, **Start here**, 3-step how-to, Full harvest in how-to. Trainer **1.61.16**.
+
+**This turn:** each card shows the plain-English advice (`What to do`) already computed by `_problemsFailureAdvice`. Raw harvest error is hover-only when advice exists. Stale dates on that line are **DD/MM/YYYY**. Trainer **1.61.17**. Reload at chrome://extensions.
 
 **Not live on parishpress.ie** — Chrome extension, not the website.
 
-**Next:** Frank Reloads and tries one card. More queue polish only if he says so. Do not start recipe success (item 3).
+**Next:** Frank Reloads after this PR. Do not start recipe success (item 3) until he says the queue is clear enough.
 
-**Parked:** none from this job.
+**Parked:** fewer buttons; recipe success.
 
 ---
 

@@ -220,6 +220,7 @@ https://www.antrimparish.com
         )
         self.assertIn("Start here", sidepanel_js)
         self.assertIn("problems-card-next", sidepanel_js)
+        self.assertIn("problems-card-advice", sidepanel_js)
         self.assertIn('"Raphoe Diocese"', sidepanel_js)
         self.assertIn("parishes/recipes/raphoe/${key}.json", sidepanel_js)
         self.assertIn("_problemsPlainStatus", sidepanel_js)

@@ -1566,7 +1566,8 @@ function _problemsFailureAdvice(errorText, diagnosis) {
   const text = String(errorText || "");
   const diag = diagnosis && typeof diagnosis === "object" ? diagnosis : {};
   if (/Stale bulletin rejected/i.test(text)) {
-    const date = diag.bulletin_date || text.match(/bulletin date ([^,)]+)/i)?.[1];
+    const rawDate = String(diag.bulletin_date || text.match(/bulletin date\s+([^,)]+)/i)?.[1] || "").trim();
+    const date = rawDate.replace(/(\d{4})-(\d{2})-(\d{2})/, (_, y, m, d) => `${d}/${m}/${y}`);
     return date
       ? `Your recipe worked — harvest downloaded a ${date} bulletin but this week needs a newer one. Open this Sunday's newsletter and end with print_to_pdf.`
       : "Your recipe worked but the bulletin was too old for this harvest week.";
@@ -2404,7 +2405,14 @@ async function _problemsRenderRows(rows) {
     card.appendChild(meta);
 
     const diagnosisText = String(row.error_text || "").replace(/\s+/g, " ").trim();
-    if (diagnosisText) {
+    const adviceText = String(row.advice || "").replace(/\s+/g, " ").trim();
+    if (adviceText) {
+      const adviceEl = document.createElement("div");
+      adviceEl.className = "problems-card-advice";
+      adviceEl.textContent = adviceText;
+      if (diagnosisText) adviceEl.title = diagnosisText;
+      card.appendChild(adviceEl);
+    } else if (diagnosisText) {
       const errorEl = document.createElement("div");
       errorEl.className = "problems-card-error";
       errorEl.textContent = diagnosisText.length > 220 ? `${diagnosisText.slice(0, 217)}…` : diagnosisText;
