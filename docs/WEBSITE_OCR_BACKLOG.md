@@ -53,6 +53,8 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 
 ## Still open (do not pretend these are finished)
 
+- [ ] **doing** · 2026-09-03 · Frank: iframe **Download** still not a save; **Open PDF** must open in a new tab. Cause: click handler always `preventDefault` then waited for a blob (dead tap); `fixMobilePdfLinks` stripped `target` on the phone. This turn: native `download="…pdf"` (no preventDefault); Open PDF is `target="_blank"` `rel="noopener noreferrer"` and skipped by `fixMobilePdfLinks`. Viewer `?v=20260901h`. No iframe `src`. Do **not** mark done until Frank’s phone after Ctrl+F5. · `ocr/generate_bulletin_pages.py`, `docs/assets/pdf-inpage-viewer.js`, `docs/dioceses/{raphoe,derry,clogher,down-and-connor}/index.html`
+
 - [ ] **doing** · 2026-09-01 · Frank: Download on the iframe is covered by the ⛶ icon; Download only opens the PDF; Down & Connor (44 pages) still feels slow. Internet: Ghostscript flat page trees make PDF.js Range-walk the whole file (mozilla/pdf.js#21859). This turn: move Open/Download **left** (pad clear of ⛶); real save via cached blob + `download="…pdf"`; one GET of the 4–5 MB file starts immediately (`prefetchPdfBytes`). Viewer `?v=20260901g`. No iframe `src`. Do **not** mark done until Frank’s phone after Ctrl+F5. · `ocr/generate_bulletin_pages.py`, `docs/assets/pdf-inpage-viewer.js`, `docs/dioceses/{raphoe,derry,clogher,down-and-connor}/index.html`
 
 - [ ] **doing** · 2026-09-01 · Frank: Raphoe is only ~5 MB and should open in seconds, not 12–20s. Cause: Range-walking a Ghostscript “linearized” file (many 256 KB chunks) is slower than one GET. This turn: megas ≤ 8 MB use one `fetch` → `getDocument({ data })`; start that GET as soon as the page-1 picture is up. Range stays for bigger files. Viewer `?v=20260901f`. No iframe `src`. Do **not** mark done until Frank’s phone after Ctrl+F5 (seconds to read page 1, then Jump-to). · `ocr/generate_bulletin_pages.py`, `docs/assets/pdf-inpage-viewer.js`, `docs/dioceses/{raphoe,derry,clogher,down-and-connor}/index.html`
@@ -176,6 +178,6 @@ Spot-check generated CSS for:
 - `#ocr-search` comes **before** `class="az-row"` and `class="ocr-zoom-bar"` inside `<div id="panel-ocr"`, and the letters + text size sit in one `.ocr-controls-row` (Frank could not find the search box under them)
 - `scrollbar-gutter: stable` on `.pdf-inpage-pages` and `max-width: 100%` on `.pdf-inpage-page-slot`, or the first PDF page is sized before the scrollbar appears and the box grows a horizontal scrollbar
 - Desktop lock keeps `.pdf-inpage-pages { overflow-x: hidden !important }`. Phone/tablet (`max-width: 1024px`) is `overflow-x: auto !important` so a 720px page can pan. `overflow: hidden` on `.pdf-link-layer` still clips a stray annotation (Derry: `scrollWidth` 2988)
-- `/assets/pdf-inpage-viewer.js?v=20260901g` (cache-bust; four live diocese pages pinned this turn — parish HTML may still pin an older `?v=` but fetches the same `/assets/pdf-inpage-viewer.js` after cache)
+- `/assets/pdf-inpage-viewer.js?v=20260901h` (cache-bust; four live diocese pages pinned this turn — parish HTML may still pin an older `?v=` but fetches the same `/assets/pdf-inpage-viewer.js` after cache)
 - `ocr-parish-masthead` / `ocr-parish-name` in the OCR panel
 - `getAnnotations` + `target="_blank"` in `docs/assets/pdf-inpage-viewer.js`
