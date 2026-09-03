@@ -204,6 +204,22 @@ https://www.antrimparish.com
         self.assertIn('id="tab-problems"', sidepanel_html)
         self.assertIn('id="tab-trainer"', sidepanel_html)
         self.assertIn('id="problems-cards"', sidepanel_html)
+        self.assertIn(">Problems<", sidepanel_html)
+        self.assertNotIn("Back room", sidepanel_html)
+        self.assertIn("How to fix a parish (3 steps)", sidepanel_html)
+        self.assertIn("<li><strong>Open site</strong>", sidepanel_html)
+        self.assertIn("<li><strong>Refresh</strong>", sidepanel_html)
+        howto = sidepanel_html.find('id="problems-howto"')
+        harvest = sidepanel_html.find('id="problems-full-harvest-btn"')
+        warning = sidepanel_html.find('id="problems-warning"')
+        refresh = sidepanel_html.find('id="problems-refresh-btn"')
+        self.assertTrue(0 <= howto < harvest < warning < refresh)
+        self.assertEqual(
+            sidepanel_html.count("<li>", howto, sidepanel_html.find("Need every parish again?")),
+            3,
+        )
+        self.assertIn("Start here", sidepanel_js)
+        self.assertIn("problems-card-next", sidepanel_js)
         self.assertIn('"Raphoe Diocese"', sidepanel_js)
         self.assertIn("parishes/recipes/raphoe/${key}.json", sidepanel_js)
         self.assertIn("_problemsPlainStatus", sidepanel_js)

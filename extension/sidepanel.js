@@ -2362,9 +2362,16 @@ async function _problemsRenderRows(rows) {
   const visitedMap = await _problemsGetVisitedMap();
   const ghCfg = await _pdGetGithubConfig();
   const ghRepo = ghCfg?.ghRepo || "Raphoe-Diocese/parish_harvester";
-  for (const row of rows) {
+  rows.forEach((row, index) => {
     const card = document.createElement("article");
     card.className = "problems-card";
+    if (index === 0) {
+      card.classList.add("problems-card-next");
+      const nextBadge = document.createElement("div");
+      nextBadge.className = "problems-next-badge";
+      nextBadge.textContent = "Start here";
+      card.appendChild(nextBadge);
+    }
 
     const head = document.createElement("div");
     head.className = "problems-card-head";
@@ -2492,7 +2499,7 @@ async function _problemsRenderRows(rows) {
     actions.appendChild(removeBtn);
     card.appendChild(actions);
     list.appendChild(card);
-  }
+  });
 }
 
 async function loadProblemsDashboard() {
