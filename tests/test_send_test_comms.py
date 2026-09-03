@@ -46,7 +46,7 @@ class SendTestCommsTests(unittest.TestCase):
 
     def test_manifest_bumped_for_extension_js(self) -> None:
         text = MANIFEST.read_text(encoding="utf-8")
-        self.assertIn('"version": "1.61.16"', text)
+        self.assertIn('"version": "1.61.17"', text)
 
     def test_back_room_fetches_fresh_parish_status(self) -> None:
         push = PUSH_JS.read_text(encoding="utf-8")
@@ -84,6 +84,9 @@ class SendTestCommsTests(unittest.TestCase):
         self.assertIn("Start here", sidepanel)
         self.assertIn("problems-card-next", sidepanel)
         self.assertIn("actionable_keys", sidepanel)
+        self.assertIn("problems-card-advice", sidepanel)
+        self.assertIn("row.advice", sidepanel)
+        self.assertIn("${d}/${m}/${y}", sidepanel)
 
     def test_harvest_commits_parish_status_after_single_parish(self) -> None:
         yml = HARVEST_YML.read_text(encoding="utf-8")
