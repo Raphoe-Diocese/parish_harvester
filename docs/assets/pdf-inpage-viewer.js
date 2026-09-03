@@ -65,6 +65,7 @@
     Array.prototype.forEach.call(nodes, function (a) {
       if (!a || (a.className && String(a.className).indexOf("pdf-annot-link") !== -1)) return;
       if (a.hasAttribute("download")) return;
+      if (a.classList && a.classList.contains("pdf-open-newtab")) return;
       a.removeAttribute("target");
       a.removeAttribute("rel");
     });
@@ -383,28 +384,13 @@
   }
 
   function bindForceDownload(root) {
+    /* Same-origin download="file.pdf" is the save. Do not preventDefault —
+       that killed the browser download when the blob was not ready yet. */
     var nodes = (root || document).querySelectorAll("a.pdf-force-download");
     Array.prototype.forEach.call(nodes, function (a) {
-      if (!a || a.getAttribute("data-pp-dl") === "1") return;
-      a.setAttribute("data-pp-dl", "1");
-      a.addEventListener("click", function (ev) {
-        var url = a.getAttribute("href") || "";
-        var name = a.getAttribute("download") || pdfFilename(url);
-        if (!url) return;
-        ev.preventDefault();
-        ev.stopPropagation();
-        if (pdfBlobCache[url]) {
-          savePdfBlob(pdfBlobCache[url], name);
-          return;
-        }
-        prefetchPdfBytes(url)
-          .then(function () {
-            if (pdfBlobCache[url]) savePdfBlob(pdfBlobCache[url], name);
-          })
-          .catch(function () {
-            window.location.href = url;
-          });
-      });
+      if (!a) return;
+      var href = a.getAttribute("href") || "";
+      if (!a.getAttribute("download")) a.setAttribute("download", pdfFilename(href));
     });
   }
 
@@ -427,9 +413,9 @@
     host.innerHTML =
       '<div class="pdf-inpage-toolbar">' +
       '<div class="pdf-inpage-backup">' +
-      '<a href="' +
+      '<a class="pdf-open-newtab" href="' +
       pdfUrl.replace(/"/g, "&quot;") +
-      '">Open PDF</a>' +
+      '" target="_blank" rel="noopener noreferrer">Open PDF</a>' +
       '<a class="pdf-force-download" href="' +
       pdfUrl.replace(/"/g, "&quot;") +
       '" download="' +

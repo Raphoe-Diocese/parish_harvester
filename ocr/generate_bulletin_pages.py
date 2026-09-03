@@ -1192,7 +1192,7 @@ def prefers_native_pdf_js() -> str:
 """
 
 
-PDF_INPAGE_VIEWER_VERSION = "20260901g"
+PDF_INPAGE_VIEWER_VERSION = "20260901h"
 PDF_INPAGE_VIEWER_SRC = f"/assets/pdf-inpage-viewer.js?v={PDF_INPAGE_VIEWER_VERSION}"
 
 
@@ -1446,7 +1446,7 @@ def pdf_inpage_viewer_html(pdf_href: str) -> str:
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="{safe}"{preview_attr}>
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="{safe}">Open PDF</a>
+              <a class="pdf-open-newtab" href="{safe}" target="_blank" rel="noopener noreferrer">Open PDF</a>
               <a class="pdf-force-download" href="{safe}" download="{html.escape(pdf_download_filename(pdf_href), quote=True)}">Download</a>
             </div>
           </div>
