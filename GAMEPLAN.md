@@ -17,6 +17,22 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 03/09/2026 — Replace Ardstraw East leftover form page
+
+**The real goal, in one sentence:** the Ardstraw East parish page must show the newest real newsletter (Sunday 5 July 2026), not the New Parishioner form, and must not pretend it is this week.
+
+Frank said go replace. Harvest truth is still **stale** 05/07/2026 at `http://109.228.27.39/templates/?a=22826&z=19`. Fetched that HTML: 14th Sunday in Ordinary Time, real Mass/anniversary text, and a line that there is no printed bulletin for July and August. Form not in that article.
+
+**This turn:** `write_standalone_parish_page` writes one viewer from that article. Generated `docs/parishes/derry/parishofardstraweast.{html,ocr.html,pdf.html,pdf}` with **05/07/2026** and “Too old for this harvest week.” No 25/08 stamp. No full docs regenerate.
+
+**Not live on parishpress.ie yet** — wait for merge + Pages.
+
+**Next:** merge, then check the live URL. Do not tick the backlog row until that live check.
+
+**Parked:** other stale leftover pages; Ballinascreen; recipe success list.
+
+---
+
 ## 03/09/2026 — Problems console (work-queue polish)
 
 **The real goal, in one sentence:** Frank can see the next parish, the three clicks, and what to do — without harvest jargon on the card.

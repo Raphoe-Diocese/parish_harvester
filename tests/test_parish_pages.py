@@ -430,6 +430,68 @@ http://ardara.ie</p>
             self.assertIn("22nd", html_out)
             self.assertNotIn("Saturday 2nd August", html_out)
 
+    def test_standalone_stale_page_uses_bulletin_date_not_harvest_sunday(self) -> None:
+        html_src = (
+            "<html><head><script>ignore()</script><title>x</title></head><body>"
+            "<p>Sunday, 5th July 2026 - Ardstraw East Parish Newsletter</p>"
+            "<p>14th Sunday in Ordinary Time</p>"
+            "<p>CONTACTS AND CORRESPONDENCE</p>"
+            "<p>Rev. Roland Colhoun, CC, 41 Moyle Road, Newtownstewart</p>"
+            "<p>LITURGIES FOR THE WEEK Sunday Mass 11:30am Rosary 11:10am</p>"
+            "<p>REQUIESCANT IN PACE ANNIVERSARIES John McNamee Jean Hobbs</p>"
+            "<p>LAST BULLETIN OF THE SEASON no printed bulletin for July and August</p>"
+            "</body></html>"
+        )
+        text = parish_pages.html_article_to_text(html_src)
+        self.assertIn("5th July 2026", text)
+        self.assertIn("Ardstraw East Parish Newsletter", text)
+        self.assertNotIn("ignore()", text)
+        pdf_bytes = parish_pages.bulletin_text_to_pdf(text)
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            status_path = root / "parish_status.json"
+            status_path.write_text(
+                json.dumps(
+                    {
+                        "parishes": {
+                            "parishofardstraweast": {
+                                "outcome": "stale",
+                                "diocese": "Derry Diocese",
+                                "display_name": "Ardstraw East",
+                                "url": "http://109.228.27.39/templates/?a=22826&z=19",
+                            },
+                            "otherok": {
+                                "outcome": "ok",
+                                "diocese": "Derry Diocese",
+                                "display_name": "Other Ok",
+                            },
+                        }
+                    }
+                ),
+                encoding="utf-8",
+            )
+            pdf_path = root / "src.pdf"
+            pdf_path.write_bytes(pdf_bytes)
+            out_dir = root / "out"
+            written = parish_pages.write_standalone_parish_page(
+                "derry",
+                "parishofardstraweast",
+                "2026-07-05",
+                pdf_path,
+                stale=True,
+                out_dir=out_dir,
+                parish_status_path=status_path,
+            )
+            self.assertEqual(written, "parishofardstraweast")
+            page = (out_dir / "parishofardstraweast.html").read_text(encoding="utf-8")
+            self.assertIn("05/07/2026", page)
+            self.assertIn("Too old for this harvest week", page)
+            self.assertIn("Ardstraw East Parish Newsletter", page)
+            self.assertNotIn("25/08/2026", page)
+            self.assertNotIn("This week's bulletin", page)
+            self.assertNotIn("New Parishioner Form", page)
+            self.assertTrue((out_dir / "parishofardstraweast.pdf").stat().st_size > 500)
+
     def test_write_text_strips_nuls_and_leaves_no_tmp(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
             path = Path(tmpdir) / "note.html"
