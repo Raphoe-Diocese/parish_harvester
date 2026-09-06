@@ -31,9 +31,13 @@ Harvest **did run** 06/09 (target 2026-09-06, `generated_at` 10:05 UTC). Live me
 
 **Look-again 06/09 evening:** Fintona latest-bulletin now shows **6 September** (`Sunday-6th-September-2026.jpg` still under `/2026/01/`; `/2026/09/` is 404). Roslea homepage lists `Bulletin-Sunday-6th-Sept-2026.pdf` — predicted `…September-2026.pdf` is 404. Holy Cross / Waterside / Loughshore still 200.
 
-**This turn:** date parse + WordPress folder rewrite + liturgical Sunday rewrite + `dated_pdf_path` / wp-json predicted fallback + Sep/Sept/September filename variants. Not live until merge + full harvest + Pages.
+**Merged 06/09/2026 19:14 UTC:** PR [#173](https://github.com/Raphoe-Diocese/parish_harvester/pull/173) squash `f56ed169`. Pages re-deployed the same 06/09 megas (Last-Modified 19:14:32 GMT). Cloud agent **cannot** `workflow_dispatch` harvest.yml (HTTP 403). Frank must tap **▶ Full harvest** in Problems (or Actions → Harvest Parish Bulletins → Run workflow, diocese all, parish empty).
 
-**Next:** Frank Full harvest (or wait for the scheduled one). Then Ctrl+F5. Do not tick live until the mega on parishpress.ie drops Ardara/Inver 30/08.
+**Phone “23rd August all dioceses” 06/09 evening:** not a stale Open/Download URL. Live page-1 is 06/09. The 23rd is **23rd Sunday of Ordinary Time** (Annagry / Aghyaran / Tullycorbet / Aghagallon). Do not invent a 23/08 mega.
+
+**This turn:** date parse + WordPress folder rewrite + liturgical Sunday rewrite + `dated_pdf_path` / wp-json predicted fallback + Sep/Sept/September filename variants. Recipe fixes not on the live mega until Full harvest.
+
+**Next:** Frank Full harvest. Then Ctrl+F5. Do not tick live until the mega on parishpress.ie drops Ardara/Inver 30/08.
 
 **Parked:** WAF listings (Holywood / St Gerards / St Patricks); timeouts (Port Glenone / Three Patrons); Newtown Killea Cloudflare 403; Ederney 403 in harvest.
 
