@@ -17,6 +17,26 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 06/09/2026 — Parish Press Uploader missing Settings + “getting deleted”
+
+**The real goal, in one sentence:** Newtown Killea can open Parish Press Uploader from Plugins, and WordPress stops wiping the plugin files.
+
+This chat opened the **harvester** repo (`Raphoe-Diocese/parish_harvester`). The WordPress plugin is **not in this repo**. Screenshot 06/09/2026: plugin **active**, **v15.0.8.9**, only **Deactivate** (no Settings), no left-menu item. Wordfence shows a yellow **1**. Public site `newtownkilleaparish.ie` is Cloudflare-blocked from this agent (403). No wp-admin login from here.
+
+**This turn (follow-up):** Cursor shared store on this machine is **empty** (`/cursor/stores/user`). Plugin PHP still not here. Live bulletin file **is on the site** and was **not** touched: `https://newtownkilleaparish.ie/wp-content/uploads/parish-bulletins/unassigned/raphoe/newtown-killea/bulletin.pdf` HTTP 200, real PDF, 216,482 bytes, last-modified **04/09/2026**. Pretty path `/bulletin/raphoe/newtown-killea/` is Cloudflare **403** (so the side link has nothing working). Folder name `unassigned/` means the parish is not fully mapped in the plugin.
+
+**Cache clue 06/09/2026:** Frank: clearing cache makes the **side plugin item vanish**. He turned Wordfence **off** to test. That matches a leftover cached admin menu, not Wordfence eating the plugin. After purge, the real v15.0.8.9 code has **no** left-menu / Settings. WP Rocket is on this site (admin bar in the screenshot). Live PDF still HTTP 200, unchanged. Shared folder still empty.
+
+**Path Frank gave 06/09/2026:** `C:\Users\Digital Admin\Desktop\harvester compare repos.zip\harvester compare repos\Parish Uploader Final`
+
+**16_0 zip 06/09/2026:** `Parish-Press-Uploader-16_0.zip` is the **complete** plugin (side menu, REST, `/bulletin/` routes) but **not newer** — header still **15.0.8.9**, file date **26/02/2026**. The 15.0.8.9.1 zip is dated **21/08/2026** but cut off. Used 16_0 as the base. Added Plugins **Settings** → `ppu-dashboard`. Service worker no longer owns `/` or `wp-admin` (that was hiding the side menu after cache clear). Public bulletin now opens the file if it exists. Version **16.0.1**. Live PDF not touched.
+
+**Next:** Frank deactivates the old plugin only, uploads `parish-press-uploader-16.0.1.zip`, Permalinks → Save once, left menu **Parish Press**.
+
+**Parked:** none.
+
+---
+
 ## 03/09/2026 — Problems console (work-queue polish)
 
 **The real goal, in one sentence:** Frank can see the next parish, the three clicks, and what to do — without harvest jargon on the card.
