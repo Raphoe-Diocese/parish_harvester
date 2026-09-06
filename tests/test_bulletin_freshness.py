@@ -598,6 +598,83 @@ class SafetyNetUnknownUrlHeadingTests(unittest.TestCase):
             self.assertEqual(result.status, "ok")
             self.assertEqual(payload["rejected_from_mega"], [])
 
+    def test_html_article_slug_last_sunday_is_stale(self) -> None:
+        # Ardara printed last week's HTML into the 06/09 mega because
+        # sun-30th-august-26 was unknown (2-digit year refused by yearless).
+        url = (
+            "https://ardara.ie/news/"
+            "church-of-the-holy-family-newsletter-sun-30th-august-26/"
+        )
+        self.assertEqual(extract_bulletin_date(url), date(2026, 8, 30))
+        verdict = check_bulletin_freshness(url, date(2026, 9, 6))
+        self.assertEqual(verdict.status, "stale")
+        self.assertEqual(verdict.extracted_date, date(2026, 8, 30))
+
+    def test_weekend_range_double_underscore_slug_is_stale(self) -> None:
+        # Inver sat_29th__-_sun_30th__august_2026 — single-separator slug
+        # matcher missed the date and the last-week PDF stayed in the mega.
+        url = (
+            "https://www.inverparish.com/uploads/2/5/2/9/25295787/"
+            "inver_parish_newsletter_-_sat_29th__-_sun_30th__august_2026.pdf"
+        )
+        self.assertEqual(extract_bulletin_date(url), date(2026, 8, 30))
+        verdict = check_bulletin_freshness(url, date(2026, 9, 6))
+        self.assertEqual(verdict.status, "stale")
+
+    def test_plus_separated_yearless_september_is_fresh(self) -> None:
+        url = (
+            "https://static1.squarespace.com/static/abc/t/def/"
+            "6th+September.pdf"
+        )
+        verdict = check_bulletin_freshness(url, date(2026, 9, 6))
+        self.assertEqual(verdict.status, "fresh")
+        self.assertEqual(verdict.extracted_date, date(2026, 9, 6))
+
+    def test_uk_dotted_bulletin_prefers_dd_mm_yy_not_future_year(self) -> None:
+        url = (
+            "https://stbrigidsparishbelfast.org/assets/documents/"
+            "Parish-Bulletin-30.08.26-FOR-PRINTING-SOC.pdf"
+        )
+        self.assertEqual(extract_bulletin_date(url), date(2026, 8, 30))
+        verdict = check_bulletin_freshness(url, date(2026, 9, 6))
+        self.assertEqual(verdict.status, "stale")
+        self.assertEqual(verdict.extracted_date, date(2026, 8, 30))
+
+    def test_ddmmyy_rewrite_moves_wordpress_month_folder(self) -> None:
+        from harvester.utils import rewrite_date_url
+
+        example = (
+            "https://watersideparish.net/wp-content/uploads/2026/06/"
+            "newsletter_280626oo.pdf"
+        )
+        self.assertEqual(
+            rewrite_date_url(example, date(2026, 9, 6)),
+            "https://watersideparish.net/wp-content/uploads/2026/09/"
+            "newsletter_060926oo.pdf",
+        )
+
+    def test_ordinary_time_filename_rewrites_to_this_sunday(self) -> None:
+        from harvester.utils import (
+            predicted_dated_upload_urls,
+            rewrite_ordinary_time_upload_url,
+        )
+
+        example = (
+            "https://www.loughshoreparishes.org/app/uploads/2026/08/"
+            "21st-Sunday-in-Ordinary-Time.pdf"
+        )
+        self.assertEqual(
+            rewrite_ordinary_time_upload_url(example, date(2026, 9, 6)),
+            "https://www.loughshoreparishes.org/app/uploads/2026/09/"
+            "23rd-Sunday-in-Ordinary-Time.pdf",
+        )
+        urls = predicted_dated_upload_urls(example, date(2026, 9, 6), weeks_back=0)
+        self.assertEqual(
+            urls[0],
+            "https://www.loughshoreparishes.org/app/uploads/2026/09/"
+            "23rd-Sunday-in-Ordinary-Time.pdf",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

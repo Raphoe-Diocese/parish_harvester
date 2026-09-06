@@ -85,20 +85,23 @@ _MONTH_MAP: dict[str, int] = {
 # August 2026.pdf" (GoDaddy/wsimg CDN downloads — %20 unquotes to a literal
 # space, not a dash/underscore). The optional ordinal suffix
 # (?:st|nd|rd|th)? handles formats like "5th" or "12th".
-_SLUG_DATE_RE = re.compile(
-    r"(\d{1,2})(?:st|nd|rd|th)?[_\-\s]([a-z]+)[_\-\s](\d{4})",
-    re.IGNORECASE,
-)
-
 # Yearless "9th-August" / "5th July" slugs (Milford & Rathmullan overwrite
 # Parish-Newsletter-Sunday-9th-August.pdf each week with no year in the
 # filename). Negative lookahead refuses a following 2–4 digit year so
 # "9th-August-2026" stays with the dated slug matcher and Kincasslagh
 # archive "org_6-sep-15.pdf" is not read as 06/09/2026.
 _MONTH_ALT = "|".join(sorted(_MONTH_MAP.keys(), key=len, reverse=True))
+# Separators are one-or-more so Inver's "30th__august_2026" still matches.
+# Year may be 2026 or '26 (Ardara "sun-30th-august-26"). Month names only —
+# [a-z]+ used to eat "sun" + the "30" of "30th" and hide the real date.
+# (?<!\d) stops "2026-August-16" being read as 26 August 2016.
+_SLUG_DATE_RE = re.compile(
+    rf"(?<!\d)(\d{{1,2}})(?:st|nd|rd|th)?[_\-\s+]+({_MONTH_ALT})[_\-\s+]+(20\d{{2}}|\d{{2}})",
+    re.IGNORECASE,
+)
 _YEARLESS_SLUG_RE = re.compile(
-    rf"(?<!\d)(\d{{1,2}})(?:st|nd|rd|th)?[_\-\s]({_MONTH_ALT})"
-    rf"(?![a-z])(?![_\-\s]\d{{2,4}})",
+    rf"(?<!\d)(\d{{1,2}})(?:st|nd|rd|th)?[_\-\s+]({_MONTH_ALT})"
+    rf"(?![a-z])(?![_\-\s+]\d{{2,4}})",
     re.IGNORECASE,
 )
 
@@ -182,6 +185,38 @@ def _ordinal_suffix(day: int) -> str:
 
 def _slug_had_ordinal(slug_fragment: str) -> bool:
     return bool(re.search(r"\d{1,2}(?:st|nd|rd|th)\b", slug_fragment, re.IGNORECASE))
+
+
+def _year_from_slug_digits(raw: str) -> int | None:
+    """Turn a slug year group into a 4-digit year (26 → 2026)."""
+    text = (raw or "").strip()
+    if not text.isdigit():
+        return None
+    if len(text) == 2:
+        return 2000 + int(text)
+    return int(text)
+
+
+def _date_from_slug_match(match: re.Match[str]) -> date | None:
+    month = _MONTH_MAP.get(match.group(2).lower())
+    if not month:
+        return None
+    year = _year_from_slug_digits(match.group(3))
+    if year is None or not _is_plausible_bulletin_year(year):
+        return None
+    try:
+        return date(year, month, int(match.group(1)))
+    except ValueError:
+        return None
+
+
+def _first_slug_date_match(text: str) -> tuple[re.Match[str], date] | None:
+    """First slug date whose month name is real (skip 'sun' in weekend ranges)."""
+    for match in _SLUG_DATE_RE.finditer(text or ""):
+        parsed = _date_from_slug_match(match)
+        if parsed:
+            return match, parsed
+    return None
 
 
 def _is_plausible_bulletin_year(year: int) -> bool:
@@ -301,7 +336,12 @@ def extract_date_from_string(text: str) -> date | None:
         except ValueError:
             pass
         if candidates:
-            return max(candidates, key=lambda d: d.year)
+            # Prefer the reading nearer today. max(year) turned St Brigid's
+            # Parish-Bulletin-30.08.26 into 2030-08-26 (found 2026-09-06).
+            # Drive folder 26.06.14 → 2026-06-14 and 29.01.05 → 2029-01-05
+            # stay the nearer reading.
+            today = date.today()
+            return min(candidates, key=lambda d: abs((d - today).days))
 
     # Pattern B-dot with unpadded day/month (16.8.26 / 9.8.26). Same dual
     # year reading as the 2-digit dotted form above. Must run after that
@@ -320,7 +360,8 @@ def extract_date_from_string(text: str) -> date | None:
             pass
         plausible = [c for c in candidates if _is_plausible_bulletin_year(c.year)]
         if plausible:
-            return max(plausible, key=lambda d: d.year)
+            today = date.today()
+            return min(plausible, key=lambda d: abs((d - today).days))
 
     # Ordinal month-name slugs: 26th-July-2026, 5_april_2026
     slug_date = extract_date_from_slug(text)
@@ -471,6 +512,9 @@ def predicted_dated_upload_urls(
 
     for i in range(-weeks_ahead, weeks_back + 1):
         week = target - timedelta(days=7 * i)
+        ordinary = rewrite_ordinary_time_upload_url(example_url, week)
+        if ordinary:
+            _add(ordinary)
         rewritten = rewrite_date_url(example_url, week)
         _add(rewritten)
         if "onewebmedia" in rewritten.lower() and "newsletter" in rewritten.lower():
@@ -495,20 +539,16 @@ def extract_date_from_slug(slug: str) -> date | None:
     """
     Extract a date from a URL slug like '5_april_2026' or '15-february-2026'.
 
-    Returns None if no recognisable date pattern is found.
+    Weekend ranges such as ``sat_29th__-_sun_30th__august_2026`` keep the
+    later real month-name date (the Sunday). Returns None if no
+    recognisable date pattern is found.
     """
-    m = _SLUG_DATE_RE.search(slug)
-    if not m:
-        return None
-    try:
-        day = int(m.group(1))
-        month = _MONTH_MAP.get(m.group(2).lower())
-        year = int(m.group(3))
-        if month and _is_plausible_bulletin_year(year):
-            return date(year, month, day)
-    except ValueError:
-        pass
-    return None
+    found: list[date] = []
+    for match in _SLUG_DATE_RE.finditer(slug or ""):
+        parsed = _date_from_slug_match(match)
+        if parsed:
+            found.append(parsed)
+    return max(found) if found else None
 
 
 def rewrite_slug_url(url: str, target: date) -> str:
@@ -518,26 +558,20 @@ def rewrite_slug_url(url: str, target: date) -> str:
 
     Returns the original URL unchanged if no slug date is found.
     """
-    m = _SLUG_DATE_RE.search(url)
-    if not m:
+    first = _first_slug_date_match(url)
+    if not first:
         return url
-    try:
-        # Validate original date
-        old_month = _MONTH_MAP.get(m.group(2).lower())
-        if not old_month:
-            return url
-        date(int(m.group(3)), old_month, int(m.group(1)))  # raises ValueError if invalid
-    except ValueError:
-        return url
+    match, _orig = first
 
     # Determine the separator used in the original slug.
     # Use the character just before the month group (group 2) to correctly
     # handle ordinal suffixes like "5th-April-2026" where group 1 is "5".
-    sep_pos = m.start(2) - 1
+    sep_pos = match.start(2) - 1
     sep = url[sep_pos] if 0 <= sep_pos < len(url) else "_"
+    year_token = str(target.year) if len(match.group(3)) == 4 else f"{target.year % 100:02d}"
 
-    new_slug = f"{target.day}{sep}{_MONTH_NAMES[target.month]}{sep}{target.year}"
-    return url[: m.start()] + new_slug + url[m.end() :]
+    new_slug = f"{target.day}{sep}{_MONTH_NAMES[target.month]}{sep}{year_token}"
+    return url[: match.start()] + new_slug + url[match.end() :]
 
 
 _WIX_COPY_OF_PREFIX = "copy-of-"
@@ -630,9 +664,10 @@ def predicted_wordpress_dated_post_urls(
     if not parsed.scheme or not parsed.netloc:
         return []
     leaf = parsed.path.rstrip("/").rsplit("/", 1)[-1]
-    slug_m = _SLUG_DATE_RE.search(leaf)
-    if not slug_m:
+    first_slug = _first_slug_date_match(leaf)
+    if not first_slug:
         return []
+    slug_m, _slug_date = first_slug
     prefix = leaf[: slug_m.start()]
     suffix = leaf[slug_m.end() :]
     origin = f"{parsed.scheme}://{parsed.netloc}"
@@ -792,15 +827,10 @@ def generate_url_variants(original_url: str, target_date: date) -> list[str]:
     # Try DD-Month-YYYY slug — Pattern D
     if matched_token is None:
         for m in _SLUG_DATE_RE.finditer(path):
-            try:
-                old_month = _MONTH_MAP.get(m.group(2).lower())
-                if old_month:
-                    d = date(int(m.group(3)), old_month, int(m.group(1)))
-                    if abs((d - target_date).days) < 14:
-                        matched_token = m.group(0)
-                        break
-            except ValueError:
-                pass
+            d = _date_from_slug_match(m)
+            if d and abs((d - target_date).days) < 14:
+                matched_token = m.group(0)
+                break
 
     # Try [YYYY-M-D] bracketed — Pattern E
     if matched_token is None:
@@ -905,10 +935,15 @@ def rewrite_date_url(url: str, target: date) -> str:
     # ------------------------------------------------------------------
     # Pattern A: DDMMYYYY (8 consecutive digits)
     # ------------------------------------------------------------------
+    orig_ddmmyyyy: date | None = None
+
     def _replace_ddmmyyyy(m: re.Match) -> str:
+        nonlocal orig_ddmmyyyy
         try:
             orig = date(int(m.group(3)), int(m.group(2)), int(m.group(1)))
             if abs((orig - target).days) < 365:
+                if orig_ddmmyyyy is None:
+                    orig_ddmmyyyy = orig
                 return f"{target.day:02d}{target.month:02d}{target.year}"
         except ValueError:
             pass
@@ -916,14 +951,21 @@ def rewrite_date_url(url: str, target: date) -> str:
 
     new_path = _DDMMYYYY_RE.sub(_replace_ddmmyyyy, path)
     if new_path != path:
+        if orig_ddmmyyyy is not None:
+            new_path = _update_yyyymm_dir(orig_ddmmyyyy, new_path)
         return parsed._replace(path=new_path).geturl()
 
     # Pattern A: DDMMYY (6 consecutive digits)
+    orig_ddmmyy: date | None = None
+
     def _replace_ddmmyy(m: re.Match) -> str:
+        nonlocal orig_ddmmyy
         try:
             year = 2000 + int(m.group(3))
             orig = date(year, int(m.group(2)), int(m.group(1)))
             if abs((orig - target).days) < 365:
+                if orig_ddmmyy is None:
+                    orig_ddmmyy = orig
                 return f"{target.day:02d}{target.month:02d}{target.year % 100:02d}"
         except ValueError:
             pass
@@ -931,6 +973,8 @@ def rewrite_date_url(url: str, target: date) -> str:
 
     new_path = _DDMMYY_RE.sub(_replace_ddmmyy, path)
     if new_path != path:
+        if orig_ddmmyy is not None:
+            new_path = _update_yyyymm_dir(orig_ddmmyy, new_path)
         return parsed._replace(path=new_path).geturl()
 
     # ------------------------------------------------------------------
@@ -981,8 +1025,22 @@ def rewrite_date_url(url: str, target: date) -> str:
             pass
         return m.group(0)
 
-    new_path = _D_M_YY_RE.sub(_replace_d_m_yy, path)
+    orig_d_m_yy: date | None = None
+
+    def _replace_d_m_yy_tracked(m: re.Match) -> str:
+        nonlocal orig_d_m_yy
+        replaced = _replace_d_m_yy(m)
+        if replaced != m.group(0) and orig_d_m_yy is None:
+            try:
+                orig_d_m_yy = date(2000 + int(m.group(3)), int(m.group(2)), int(m.group(1)))
+            except ValueError:
+                pass
+        return replaced
+
+    new_path = _D_M_YY_RE.sub(_replace_d_m_yy_tracked, path)
     if new_path != path:
+        if orig_d_m_yy is not None:
+            new_path = _update_yyyymm_dir(orig_d_m_yy, new_path)
         return parsed._replace(path=new_path).geturl()
 
     def _replace_d_m_yy_dot(m: re.Match) -> str:
@@ -995,23 +1053,33 @@ def rewrite_date_url(url: str, target: date) -> str:
             pass
         return m.group(0)
 
-    new_path = _D_M_YY_DOT_RE.sub(_replace_d_m_yy_dot, path)
+    orig_d_m_yy_dot: date | None = None
+
+    def _replace_d_m_yy_dot_tracked(m: re.Match) -> str:
+        nonlocal orig_d_m_yy_dot
+        replaced = _replace_d_m_yy_dot(m)
+        if replaced != m.group(0) and orig_d_m_yy_dot is None:
+            try:
+                orig_d_m_yy_dot = date(
+                    2000 + int(m.group(3)), int(m.group(2)), int(m.group(1))
+                )
+            except ValueError:
+                pass
+        return replaced
+
+    new_path = _D_M_YY_DOT_RE.sub(_replace_d_m_yy_dot_tracked, path)
     if new_path != path:
+        if orig_d_m_yy_dot is not None:
+            new_path = _update_yyyymm_dir(orig_d_m_yy_dot, new_path)
         return parsed._replace(path=new_path).geturl()
 
     # ------------------------------------------------------------------
     # Pattern D: DD-Month-YYYY slug (also updates /YYYY/MM/ dir)
     # e.g. Newsletter-12-April-2026.pdf  ->  Newsletter-19-April-2026.pdf
     # ------------------------------------------------------------------
-    slug_m = _SLUG_DATE_RE.search(path)
-    orig_slug: "date | None" = None
-    if slug_m:
-        try:
-            old_month = _MONTH_MAP.get(slug_m.group(2).lower())
-            if old_month:
-                orig_slug = date(int(slug_m.group(3)), old_month, int(slug_m.group(1)))
-        except ValueError:
-            pass
+    first_slug = _first_slug_date_match(path)
+    slug_m = first_slug[0] if first_slug else None
+    orig_slug: date | None = first_slug[1] if first_slug else None
 
     slug_has_full_year = bool(slug_m and len(slug_m.group(3)) == 4)
     slug_in_range = bool(orig_slug and abs((orig_slug - target).days) < 365)
@@ -1025,7 +1093,10 @@ def rewrite_date_url(url: str, target: date) -> str:
                 old_month_num = _MONTH_MAP.get(m.group(2).lower())
                 if not old_month_num:
                     return m.group(0)
-                d = date(int(m.group(3)), old_month_num, int(m.group(1)))
+                year = _year_from_slug_digits(m.group(3))
+                if year is None:
+                    return m.group(0)
+                d = date(year, old_month_num, int(m.group(1)))
                 year_full = len(m.group(3)) == 4
                 if year_full or abs((d - target).days) < 365:
                     # Use the character just before group 2 as separator to
@@ -1347,6 +1418,41 @@ def safe_filename(prefix: str, suffix: str) -> str:
 # ---------------------------------------------------------------------------
 # Greenlough parish — liturgical name + date rewrite
 # ---------------------------------------------------------------------------
+
+_ORDINARY_TIME_LEAF_RE = re.compile(
+    r"(?i)^.+-Sunday-(?:in|of)-Ordinary-Time\.pdf$"
+)
+
+
+def rewrite_ordinary_time_upload_url(url: str, target: date) -> str | None:
+    """Rewrite Nth-Sunday-in-Ordinary-Time.pdf to this harvest Sunday's name.
+
+    Loughshore (and Holy Family) name the weekly file after the liturgical
+    Sunday and put it in /uploads/YYYY/MM/. Date-only rewrite left
+    21st-Sunday-in-Ordinary-Time.pdf in September and 404'd (found 2026-09-06).
+    """
+    parsed = urlparse(url)
+    path = unquote(parsed.path or "")
+    if "/" not in path:
+        return None
+    directory, leaf = path.rsplit("/", 1)
+    if not _ORDINARY_TIME_LEAF_RE.match(leaf):
+        return None
+    from .liturgical import get_liturgical_name
+
+    name = get_liturgical_name(target)
+    if not name or "Ordinary_Time" not in name:
+        return None
+    new_leaf = name.replace("_", "-") + ".pdf"
+    if re.search(r"(?i)-Sunday-of-Ordinary-Time\.pdf$", leaf):
+        new_leaf = new_leaf.replace("-Sunday-in-", "-Sunday-of-")
+    new_dir = re.sub(
+        r"/\d{4}/\d{2}$",
+        f"/{target.year}/{target.month:02d}",
+        directory,
+    )
+    return parsed._replace(path=f"{new_dir}/{new_leaf}").geturl()
+
 
 def rewrite_greenlough_url(url: str, target: date) -> str | None:
     """
