@@ -24,6 +24,7 @@ from harvester.parish_aliases import (
     name_lookup_keys,
 )
 from harvester.site_chrome import favicon_link_tags, scroll_top_css, scroll_top_html, scroll_top_js
+from ocr.generate_bulletin_pages import with_mega_pdf_week
 
 REPO_ROOT = Path(__file__).resolve().parent.parent
 DOCS_DIR = REPO_ROOT / "docs"
@@ -771,7 +772,7 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
             f"<p class=\"live-card-updated\">Updated {html.escape(row['updated'])}</p>"
             "<div class=\"live-card-actions\">"
             f"<a class=\"live-btn primary\" href=\"dioceses/{row['key']}/\">Open bulletin</a>"
-            f"<a class=\"live-btn secondary\" href=\"{html.escape(_mega_pdf_url(row['key'], same_origin=True), quote=True)}\">Mega PDF</a>"
+            f"<a class=\"live-btn secondary\" href=\"{html.escape(_mega_pdf_url(row['key'], same_origin=True, week=row.get('week') or ''), quote=True)}\">Mega PDF</a>"
             f"<a class=\"live-btn secondary\" href=\"{html.escape(_ocr_standalone_url(row['key']), quote=True)}\" target=\"_blank\" rel=\"noopener noreferrer\">Text</a>"
             "</div>"
             "</div>"
@@ -1032,15 +1033,19 @@ def _ocr_standalone_url(diocese_key: str) -> str:
     return f"{pages_base}/bulletins/index.html"
 
 
-def _mega_pdf_url(diocese_key: str, *, same_origin: bool = False) -> str:
+def _mega_pdf_url(diocese_key: str, *, same_origin: bool = False, week: str = "") -> str:
     stem = diocese_key.replace("-", "_")
     filename = f"{stem}_mega_bulletin.pdf"
     # Same-origin path avoids the github.io → parishpress.ie 301, which
     # breaks or delays HTTP Range requests on phones (14–20 MB mega PDFs).
     if same_origin:
-        return f"/mega_pdf/{filename}"
-    pages_base = "https://raphoe-diocese.github.io/parish_harvester"
-    return f"{pages_base}/mega_pdf/{filename}"
+        url = f"/mega_pdf/{filename}"
+    else:
+        pages_base = "https://raphoe-diocese.github.io/parish_harvester"
+        url = f"{pages_base}/mega_pdf/{filename}"
+    # Phones cache this URL. Stamp the harvest Sunday so Open/Download
+    # cannot keep last week's file (Frank 06/09/2026: Clogher still 23/08).
+    return with_mega_pdf_week(url, week)
 
 
 def _latest_pdf_standalone(diocese_key: str) -> Path | None:
@@ -1060,12 +1065,12 @@ def _latest_pdf_standalone(diocese_key: str) -> Path | None:
     return latest[0] if latest else None
 
 
-def _pdf_standalone_url(diocese_key: str) -> str:
+def _pdf_standalone_url(diocese_key: str, week: str = "") -> str:
     standalone = _latest_pdf_standalone(diocese_key)
     pages_base = "https://raphoe-diocese.github.io/parish_harvester"
     if standalone is not None:
         return f"{pages_base}/bulletins/{standalone.name}"
-    return _mega_pdf_url(diocese_key, same_origin=True)
+    return _mega_pdf_url(diocese_key, same_origin=True, week=week)
 
 
 def _parish_links_for_big_bulletin(diocese_key: str, report_path: Path) -> list[dict[str, str]]:
@@ -1118,9 +1123,9 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
             render_diocese_raphoe_page(
                 parish_links=parish_links,
                 out_path=out_path,
-                mega_pdf_url=_mega_pdf_url(diocese.key, same_origin=True),
+                mega_pdf_url=_mega_pdf_url(diocese.key, same_origin=True, week=target_date),
                 ocr_standalone_url=_ocr_standalone_url(diocese.key),
-                pdf_standalone_url=_pdf_standalone_url(diocese.key),
+                pdf_standalone_url=_pdf_standalone_url(diocese.key, week=target_date),
                 ocr_text=ocr_text,
                 ocr_is_html=ocr_is_html,
                 week_label=week_label if target_date else "",
@@ -1153,6 +1158,7 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
                 "dot": dot,
                 "status_label": status_label,
                 "updated": updated_label,
+                "week": target_date or "",
                 "ready_count": ready_count,
                 "total_count": total_count,
             }

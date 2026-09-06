@@ -8,6 +8,7 @@ from ocr.generate_bulletin_pages import (
     PDF_INPAGE_VIEWER_VERSION,
     DioceseConfig,
     _fragment_to_plain_text,
+    with_mega_pdf_week,
     build_az_parish_ocr_html,
     desktop_viewer_height_lock_css,
     extract_ocr_fragment,
@@ -33,6 +34,26 @@ class OcrBulletinPageTests(unittest.TestCase):
     def test_format_uk_date(self) -> None:
         self.assertEqual(format_uk_date("2026-05-21"), "21/05/2026")
         self.assertEqual(format_uk_date("bad-date"), "bad-date")
+
+    def test_mega_pdf_week_stamp_busts_phone_cache(self) -> None:
+        href = "/mega_pdf/clogher_mega_bulletin.pdf"
+        self.assertEqual(
+            with_mega_pdf_week(href, "2026-09-06"),
+            "/mega_pdf/clogher_mega_bulletin.pdf?d=2026-09-06",
+        )
+        self.assertEqual(
+            with_mega_pdf_week(href, "06/09/2026"),
+            "/mega_pdf/clogher_mega_bulletin.pdf?d=2026-09-06",
+        )
+        self.assertEqual(
+            with_mega_pdf_week(href + "?d=2026-09-06", "2026-09-06"),
+            href + "?d=2026-09-06",
+        )
+        self.assertEqual(with_mega_pdf_week(href, ""), href)
+        self.assertEqual(
+            with_mega_pdf_week("/parishes/foo.pdf", "2026-09-06"),
+            "/parishes/foo.pdf",
+        )
 
     def test_fragment_to_plain_text_unescapes_double_encoded_entities(self) -> None:
         plain = _fragment_to_plain_text("St. Mary&amp;#x27;s Church")
@@ -106,7 +127,7 @@ class OcrBulletinPageTests(unittest.TestCase):
             )
 
             self.assertIn("TEST COLLATED BULLETIN", html_output)
-            self.assertIn("../mega_pdf/test_mega_bulletin.pdf", html_output)
+            self.assertIn("../mega_pdf/test_mega_bulletin.pdf?d=2026-05-19", html_output)
             self.assertIn("PARISHES WITH WORKING BULLETIN LINKS", html_output.upper())
             self.assertIn("https://example.com/one", html_output)
             self.assertIn("Generated for 19/05/2026.", html_output)
