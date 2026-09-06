@@ -46,7 +46,7 @@ class SendTestCommsTests(unittest.TestCase):
 
     def test_manifest_bumped_for_extension_js(self) -> None:
         text = MANIFEST.read_text(encoding="utf-8")
-        self.assertIn('"version": "1.61.17"', text)
+        self.assertIn('"version": "1.61.18"', text)
 
     def test_back_room_fetches_fresh_parish_status(self) -> None:
         push = PUSH_JS.read_text(encoding="utf-8")
@@ -87,6 +87,15 @@ class SendTestCommsTests(unittest.TestCase):
         self.assertIn("problems-card-advice", sidepanel)
         self.assertIn("row.advice", sidepanel)
         self.assertIn("${d}/${m}/${y}", sidepanel)
+
+    def test_send_test_uses_saved_recipe_when_local_steps_incomplete(self) -> None:
+        content = CONTENT_JS.read_text(encoding="utf-8")
+        self.assertIn("const _recipeStepsAreComplete", content)
+        self.assertIn("Using the saved recipe — testing this parish only. No re-train.", content)
+        self.assertIn("This does not overwrite the recipe.", content)
+        self.assertIn("tap Send & test to run the saved recipe.", content)
+        self.assertIn("dataentry|parishioner|", content)
+        self.assertIn("dispatchHarvestTest", content)
 
     def test_harvest_commits_parish_status_after_single_parish(self) -> None:
         yml = HARVEST_YML.read_text(encoding="utf-8")

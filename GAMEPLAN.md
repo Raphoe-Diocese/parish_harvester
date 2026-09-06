@@ -17,6 +17,24 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 03/09/2026 — Ardstraw East: missing Step 2 + leftover form
+
+**The real goal, in one sentence:** harvest the latest Past Newsletter (Sunday 5 July 2026), not the New Parishioner form, and do not block Send & test when a saved recipe already works.
+
+Frank’s screenshot 03/09/2026: toolbar **v1.61.15** on parishnews.html, July 5 link highlighted, green “just Send & test”, red “Finish with PDF capture” and no Step 2 buttons. **1 step recorded** (the click). GitHub recipe already has 3 steps ending in `print_to_pdf`.
+
+Harvest truth (`parishes/parish_status.json`): **stale**, recipe worked, URL `http://109.228.27.39/templates/?a=22826&z=19`, bulletin date **2026-07-05**. Not the form.
+
+Live leftover (not this turn): https://www.parishpress.ie/parishes/derry/parishofardstraweast.html still shows **New Parishioner Form** dated 25/08/2026 — last false-ok harvest. Stale July file is rejected from the mega and does not overwrite that page. Written on the website backlog. Not live-fixed.
+
+**This turn:** if local steps are incomplete and GitHub already has a complete recipe, Send & test **runs the saved recipe** and does not overwrite it. Skip list also has `parishioner`. Trainer **1.61.18**. Reload at chrome://extensions.
+
+**Next:** Frank Reloads, then Send & test (or Problems → Test parish). Do not invent an August/September bulletin. Website form page only after he says go.
+
+**Parked:** replace the leftover form page; recipe success for other parishes.
+
+---
+
 ## 03/09/2026 — Problems console (work-queue polish)
 
 **The real goal, in one sentence:** Frank can see the next parish, the three clicks, and what to do — without harvest jargon on the card.
