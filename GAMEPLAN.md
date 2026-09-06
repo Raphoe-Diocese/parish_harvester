@@ -17,6 +17,28 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 06/09/2026 — Open PDF looks like last week; harvest missed this week
+
+**The real goal, in one sentence:** this week’s (06/09/2026) bulletins in Open PDF / Download / mega; last week out of the mega; this-week files the harvest skipped picked up.
+
+Harvest **did run** 06/09 (target 2026-09-06, `generated_at` 10:05 UTC). Live megas (HEAD 13:11 GMT) are this week’s files: Raphoe 4,879,457; Derry 6,566,557; Clogher 3,056,825; Down & Connor 5,687,566 at `/mega_pdf/down_and_connor_mega_bulletin.pdf` (underscores). Open PDF and Download are the same URL. Page-1 pictures are this week (Annagry / Aghyaran / Ballybay / Aghagallon). Last week is **inside** later pages.
+
+**Why last week is in the mega:** freshness already treats 30/08 as stale when it can read the date. Ardara `sun-30th-august-26` and Inver `sat_29th__-_sun_30th__august_2026` were **unknown**, so they stayed `ok`. Those sites still only have last week (Ardara news listing; Inver PDF). Bruckless Drive has no URL date.
+
+**This-week files that harvest missed (proved HTTP 200 this turn):** Holy Cross `pdf/060926.pdf`; Loughshore `…/2026/09/23rd-Sunday-in-Ordinary-Time.pdf`; Waterside `…/2026/09/newsletter_060926oo.pdf`. Waterside rewrite had left the file in `/2026/06/`. Loughshore liturgical name was not rewritten. Holy Cross `dated_pdf_path` never ran the HTTP predictor.
+
+**Not a miss (site has no 06/09 file):** Malin (newest April); Ardara; Inver; Saint Malachy’s `bulletin.pdf` still Feb 2025; **Tawnawilly** — newest live PDF is still `Sunday-30th-Aug.pdf` (HTTP 200, 819118 bytes). OCR title is **Sunday 30 August 2026 / 22nd Sunday**. The Mass table lists Sunday 6th Sept as next weekend, so the file looks like this week. Listing text “Sunday 6th Sept” — `Sunday-6th-Sept.pdf` / `Sep` / `September` all 404. Do not invent a 06/09 Tawnawilly bulletin.
+
+**Look-again 06/09 evening:** Fintona latest-bulletin now shows **6 September** (`Sunday-6th-September-2026.jpg` still under `/2026/01/`; `/2026/09/` is 404). Roslea homepage lists `Bulletin-Sunday-6th-Sept-2026.pdf` — predicted `…September-2026.pdf` is 404. Holy Cross / Waterside / Loughshore still 200.
+
+**This turn:** date parse + WordPress folder rewrite + liturgical Sunday rewrite + `dated_pdf_path` / wp-json predicted fallback + Sep/Sept/September filename variants. Not live until merge + full harvest + Pages.
+
+**Next:** Frank Full harvest (or wait for the scheduled one). Then Ctrl+F5. Do not tick live until the mega on parishpress.ie drops Ardara/Inver 30/08.
+
+**Parked:** WAF listings (Holywood / St Gerards / St Patricks); timeouts (Port Glenone / Three Patrons); Newtown Killea Cloudflare 403; Ederney 403 in harvest.
+
+---
+
 ## 03/09/2026 — Problems console (work-queue polish)
 
 **The real goal, in one sentence:** Frank can see the next parish, the three clicks, and what to do — without harvest jargon on the card.

@@ -198,6 +198,65 @@ class HttpScrapeScoreTests(unittest.TestCase):
         self.assertIn("Sunday-23rd-August", best_url)
         self.assertTrue(all("Order-of-Mass" not in url for _, url in scored))
 
+    def test_tawnawilly_yearless_sep_variants_from_aug_example(self) -> None:
+        from harvester.utils import yearless_month_name_variants
+
+        rewritten = rewrite_date_url(
+            "https://tawnawillyparish.ie/wp-content/uploads/Sunday-23rd-Aug.pdf",
+            date(2026, 9, 6),
+        )
+        self.assertEqual(
+            rewritten,
+            "https://tawnawillyparish.ie/wp-content/uploads/Sunday-6th-Sep.pdf",
+        )
+        variants = yearless_month_name_variants(rewritten)
+        self.assertIn(
+            "https://tawnawillyparish.ie/wp-content/uploads/Sunday-6th-Sept.pdf",
+            variants,
+        )
+        self.assertIn(
+            "https://tawnawillyparish.ie/wp-content/uploads/Sunday-6th-September.pdf",
+            variants,
+        )
+        predicted = predicted_dated_upload_urls(
+            "https://tawnawillyparish.ie/wp-content/uploads/Sunday-23rd-Aug.pdf",
+            date(2026, 9, 6),
+        )
+        self.assertIn(
+            "https://tawnawillyparish.ie/wp-content/uploads/Sunday-6th-Sept.pdf",
+            predicted,
+        )
+
+    def test_roslea_dated_september_also_tries_sept(self) -> None:
+        from harvester.utils import month_name_filename_variants
+
+        rewritten = rewrite_date_url(
+            "https://parishofroslea.com/wp-content/uploads/2026/08/"
+            "Bulletin-Sunday-23rd-August-2026.pdf",
+            date(2026, 9, 6),
+        )
+        self.assertEqual(
+            rewritten,
+            "https://parishofroslea.com/wp-content/uploads/2026/09/"
+            "Bulletin-Sunday-6th-September-2026.pdf",
+        )
+        variants = month_name_filename_variants(rewritten)
+        self.assertIn(
+            "https://parishofroslea.com/wp-content/uploads/2026/09/"
+            "Bulletin-Sunday-6th-Sept-2026.pdf",
+            variants,
+        )
+        predicted = predicted_dated_upload_urls(
+            "https://parishofroslea.com/wp-content/uploads/2026/08/"
+            "Bulletin-Sunday-23rd-August-2026.pdf",
+            date(2026, 9, 6),
+        )
+        self.assertIn(
+            "https://parishofroslea.com/wp-content/uploads/2026/09/"
+            "Bulletin-Sunday-6th-Sept-2026.pdf",
+            predicted,
+        )
+
     def test_tawnawilly_yearless_aug_beats_july_2026_and_skips_gdpr(self) -> None:
         hrefs = [
             "https://tawnawillyparish.ie/wp-content/uploads/GDPR-Parish-Bulletin.pdf",

@@ -233,6 +233,22 @@ def _looks_like_direct_document_url(url: str) -> bool:
     return path.endswith((".pdf", ".docx", ".doc")) or "/pdf/" in path
 
 
+def _recipe_example_document_url(recipe: dict) -> str:
+    """Direct PDF/DOCX example from recipe fields or a download/click step."""
+    for key in ("example_url", "start_url"):
+        raw = str(recipe.get(key) or "").strip()
+        if raw and _looks_like_direct_document_url(raw):
+            return raw
+    for step in recipe.get("steps") or []:
+        if not isinstance(step, dict):
+            continue
+        for key in ("url", "href"):
+            raw = str(step.get(key) or "").strip()
+            if raw and _looks_like_direct_document_url(raw):
+                return raw
+    return ""
+
+
 def _is_gdrive_usercontent_url(url: str) -> bool:
     return "drive.usercontent.google.com/download" in unquote((url or "").strip()).lower()
 
@@ -637,6 +653,14 @@ async def _wait_for_bulletin_content(page: Page, recipe: dict, timeout_ms: int) 
             [
                 "a[href*='/newsletter/'][href*='.pdf']",
                 "a[href*='churchmedia.tv/newsletter/']",
+            ]
+        )
+    if "wix" in playbook:
+        probes.extend(
+            [
+                'article[data-hook="post"]',
+                '[data-hook="post-title"]',
+                "article",
             ]
         )
     if not probes:
@@ -2058,7 +2082,7 @@ async def _try_wp_json_newest_media(
         return None
     api = (
         f"{parsed.scheme}://{parsed.netloc}/wp-json/wp/v2/media"
-        "?per_page=20&orderby=date&order=desc"
+        "?per_page=100&media_type=application&orderby=date&order=desc"
     )
     result = await asyncio.to_thread(
         _fetch_bytes_with_retries,
@@ -3250,6 +3274,17 @@ async def _prepare_page_for_html_print(
         )
         await asyncio.sleep(2.0)
         return
+    playbook = str(recipe.get("playbook_type") or recipe.get("site_type") or "").lower()
+    if "wix" in playbook:
+        try:
+            await page.wait_for_selector(
+                'article[data-hook="post"], [data-hook="post-title"], article',
+                timeout=min(max(step_timeout_ms, 20_000), 60_000),
+            )
+        except PlaywrightTimeoutError:
+            pass
+        await asyncio.sleep(1.5)
+        return
     try:
         await page.wait_for_load_state(
             "networkidle", timeout=min(step_timeout_ms, 15_000)
@@ -4045,15 +4080,11 @@ async def replay_recipe(
     # Listing/index is Cloudflare-challenged; dated wp-content/uploads files
     # are not. Predict this Sunday and a few previous Sundays and fetch
     # directly. Never navigate to the challenged HTML page.
-    if site_type == "predicted_dated_pdf" and target_date is not None:
-        example_url = ""
-        for step in steps:
-            if isinstance(step, dict) and (step.get("url") or "").strip():
-                example_url = str(step.get("url") or "").strip()
-                if _looks_like_direct_document_url(example_url):
-                    break
-        if not example_url:
-            example_url = start_url
+    if (
+        site_type in {"predicted_dated_pdf", "dated_pdf_path"}
+        and target_date is not None
+    ):
+        example_url = _recipe_example_document_url(recipe) or start_url
         weeks_back = int(recipe.get("weeks_back") or 8)
         weeks_ahead = int(recipe.get("weeks_ahead") or 0)
         found = await _try_predicted_dated_pdf(
@@ -4084,6 +4115,17 @@ async def replay_recipe(
         )
         if found:
             return dest, found[1], found[0]
+        example_url = _recipe_example_document_url(recipe)
+        if example_url:
+            predicted = await _try_predicted_dated_pdf(
+                example_url,
+                dest,
+                target_date,
+                weeks_back=int(recipe.get("weeks_back") or 8),
+                weeks_ahead=int(recipe.get("weeks_ahead") or 0),
+            )
+            if predicted:
+                return dest, predicted[1], predicted[0]
         raise RecipeReplayError(
             f"wp-json media at {start_url} — no dated bulletin PDF matching "
             f"{href_patterns} (listing page was not opened)"
