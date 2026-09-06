@@ -383,6 +383,59 @@ def extract_date_from_string(text: str) -> date | None:
     return None
 
 
+# Tawnawilly yearless Aug rewrites to Sep; listing says Sept (found 2026-09-06).
+# Roslea dated August rewrites to September; live file is Sept-2026.
+_MONTH_NAME_VARIANTS: dict[int, tuple[str, ...]] = {
+    1: ("Jan", "January"),
+    2: ("Feb", "February"),
+    3: ("Mar", "March"),
+    4: ("Apr", "April"),
+    5: ("May",),
+    6: ("Jun", "June"),
+    7: ("Jul", "July"),
+    8: ("Aug", "August"),
+    9: ("Sep", "Sept", "September"),
+    10: ("Oct", "October"),
+    11: ("Nov", "November"),
+    12: ("Dec", "December"),
+}
+
+
+def month_name_filename_variants(url: str) -> list[str]:
+    """Extra Sep/Sept/September (etc.) filenames after a month-name rewrite.
+
+    Covers yearless slugs (Sunday-6th-Sep.pdf) and dated slugs
+    (Bulletin-Sunday-6th-September-2026.pdf).
+    """
+    parsed = urlparse(url)
+    path = unquote(parsed.path or "")
+    match = _SLUG_DATE_RE.search(path) or _YEARLESS_SLUG_RE.search(path)
+    if not match:
+        return []
+    raw = match.group(2)
+    month = _MONTH_MAP.get(raw.lower())
+    if not month:
+        return []
+    out: list[str] = []
+    for name in _MONTH_NAME_VARIANTS.get(month, ()):
+        if name.lower() == raw.lower():
+            continue
+        if raw.isupper():
+            repl = name.upper()
+        elif raw[0].isupper():
+            repl = name[0].upper() + name[1:]
+        else:
+            repl = name.lower()
+        new_path = path[: match.start(2)] + repl + path[match.end(2) :]
+        out.append(parsed._replace(path=new_path).geturl())
+    return out
+
+
+def yearless_month_name_variants(url: str) -> list[str]:
+    """Alias kept for tests; same as month_name_filename_variants."""
+    return month_name_filename_variants(url)
+
+
 def yearless_slug_date(
     text: str,
     assume_year: int,
@@ -516,22 +569,24 @@ def predicted_dated_upload_urls(
         if ordinary:
             _add(ordinary)
         rewritten = rewrite_date_url(example_url, week)
-        _add(rewritten)
+        forms = [rewritten, *month_name_filename_variants(rewritten)]
+        for form in forms:
+            _add(form)
+            lower = form.lower()
+            if lower.endswith(".pdf"):
+                stem = form[:-4]
+                for ext in (".docx", ".jpg", ".jpeg", ".png"):
+                    _add(stem + ext)
+            elif lower.endswith(".docx"):
+                _add(form[:-5] + ".pdf")
+                parsed = urlparse(form)
+                quoted = parsed._replace(path=quote(unquote(parsed.path), safe="/")).geturl()
+                _add(quoted)
         if "onewebmedia" in rewritten.lower() and "newsletter" in rewritten.lower():
             for extra in oneweb_newsletter_download_urls(example_url, week):
                 _add(extra)
         for extra in antrim_doubled_month_pdf_urls(example_url, week):
             _add(extra)
-        lower = rewritten.lower()
-        if lower.endswith(".pdf"):
-            stem = rewritten[:-4]
-            for ext in (".docx", ".jpg", ".jpeg", ".png"):
-                _add(stem + ext)
-        elif lower.endswith(".docx"):
-            _add(rewritten[:-5] + ".pdf")
-            parsed = urlparse(rewritten)
-            quoted = parsed._replace(path=quote(unquote(parsed.path), safe="/")).geturl()
-            _add(quoted)
     return seen
 
 
