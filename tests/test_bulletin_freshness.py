@@ -630,6 +630,14 @@ class SafetyNetUnknownUrlHeadingTests(unittest.TestCase):
         self.assertEqual(verdict.status, "fresh")
         self.assertEqual(verdict.extracted_date, date(2026, 9, 6))
 
+    def test_month_first_sunday_sept_yy_is_fresh(self) -> None:
+        # Tawnawilly listing 06/09: Sunday-Sept-06-26.pdf (not Sunday-6th-Sept.pdf).
+        url = "https://tawnawillyparish.ie/wp-content/uploads/Sunday-Sept-06-26.pdf"
+        self.assertEqual(extract_bulletin_date(url), date(2026, 9, 6))
+        verdict = check_bulletin_freshness(url, date(2026, 9, 6))
+        self.assertEqual(verdict.status, "fresh")
+        self.assertEqual(verdict.extracted_date, date(2026, 9, 6))
+
     def test_uk_dotted_bulletin_prefers_dd_mm_yy_not_future_year(self) -> None:
         url = (
             "https://stbrigidsparishbelfast.org/assets/documents/"
