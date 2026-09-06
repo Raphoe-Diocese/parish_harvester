@@ -1165,8 +1165,32 @@ def render_ocr_standalone_page(
 """
 
 
-def _pdf_href(config: DioceseConfig) -> str:
-    return f"../mega_pdf/{config.pdf_filename}"
+def mega_pdf_week_query(week: str) -> str:
+    """ISO week stamp so phones do not keep last week's mega at the same URL."""
+    raw = (week or "").strip()
+    if re.fullmatch(r"\d{2}/\d{2}/\d{4}", raw):
+        day, month, year = raw.split("/")
+        raw = f"{year}-{month}-{day}"
+    if not re.fullmatch(r"\d{4}-\d{2}-\d{2}", raw):
+        return ""
+    return f"d={raw}"
+
+
+def with_mega_pdf_week(url: str, week: str) -> str:
+    """Append ?d=YYYY-MM-DD to a mega PDF href. Leaves other URLs unchanged."""
+    href = (url or "").strip()
+    query = mega_pdf_week_query(week)
+    if not href or not query:
+        return href
+    if "mega_bulletin.pdf" not in href.split("?", 1)[0]:
+        return href
+    if re.search(r"[?&]d=\d{4}-\d{2}-\d{2}(?:&|$)", href):
+        return href
+    return f"{href}{'&' if '?' in href else '?'}{query}"
+
+
+def _pdf_href(config: DioceseConfig, bulletin_date: str = "") -> str:
+    return with_mega_pdf_week(f"../mega_pdf/{config.pdf_filename}", bulletin_date)
 
 
 def _ocr_standalone_href(config: DioceseConfig, bulletin_date: str) -> str:
@@ -1521,8 +1545,8 @@ def render_viewer_page(config: DioceseConfig, bulletin_date: str, page_count: in
         meta_line=f"Generated for {uk_bulletin_date}.",
         back_href="index.html",
         back_label="← Back to bulletin archive",
-        pdf_href=_pdf_href(config),
-        pdf_download_href=_pdf_href(config),
+        pdf_href=_pdf_href(config, bulletin_date),
+        pdf_download_href=_pdf_href(config, bulletin_date),
         pdf_standalone_href=_pdf_standalone_href(config, bulletin_date),
         ocr_standalone_href=_ocr_standalone_href(config, bulletin_date),
         ocr_fragment=ocr_fragment,
@@ -2793,7 +2817,12 @@ def regenerate_viewer_from_existing(existing_path: Path) -> Path:
     )
     pdf_only_path = BULLETINS_DIR / f"{diocese}-{bulletin_date}-pdf.html"
     pdf_only_path.write_text(
-        render_pdf_standalone_page(config, bulletin_date, pdf_href=_pdf_href(config), viewer_href=output_path.name),
+        render_pdf_standalone_page(
+            config,
+            bulletin_date,
+            pdf_href=_pdf_href(config, bulletin_date),
+            viewer_href=output_path.name,
+        ),
         encoding="utf-8",
     )
     if pdf_candidate.exists():
@@ -2830,7 +2859,12 @@ def write_viewer_page(diocese: str, bulletin_date: str, pdf_path: Path, ocr_html
     )
     pdf_only_path = BULLETINS_DIR / f"{diocese}-{bulletin_date}-pdf.html"
     pdf_only_path.write_text(
-        render_pdf_standalone_page(config, bulletin_date, pdf_href=_pdf_href(config), viewer_href=output_path.name),
+        render_pdf_standalone_page(
+            config,
+            bulletin_date,
+            pdf_href=_pdf_href(config, bulletin_date),
+            viewer_href=output_path.name,
+        ),
         encoding="utf-8",
     )
     _write_parish_reader_outputs(diocese, bulletin_date, ocr_plain_text, parish_links)
@@ -2857,7 +2891,10 @@ def _write_parish_bulletin_pages(
             bulletin_date,
             pdf_path,
             raw_ocr_fragment,
-            diocese_pdf_href=f"../../mega_pdf/{config.pdf_filename}",
+            diocese_pdf_href=with_mega_pdf_week(
+                f"../../mega_pdf/{config.pdf_filename}",
+                bulletin_date,
+            ),
             preserve_existing_pdfs=preserve_existing_pdfs,
         )
         if written:
