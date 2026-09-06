@@ -111,6 +111,13 @@ _YEAR_MONTHNAME_DAY_RE = re.compile(
     re.IGNORECASE,
 )
 
+# Tawnawilly listing 2026-09-06: Sunday-Sept-06-26.pdf (Month-DD-YY),
+# not Sunday-6th-Sept.pdf (that name 404s).
+_MONTH_DAY_YY_RE = re.compile(
+    rf"(?<![A-Za-z])({_MONTH_ALT})[_\-\s+](\d{{1,2}})(?:st|nd|rd|th)?[_\-\s+](20\d{{2}}|\d{{2}})(?!\d)",
+    re.IGNORECASE,
+)
+
 _MONTH_NAMES: list[str] = [
     "", "january", "february", "march", "april", "may", "june",
     "july", "august", "september", "october", "november", "december",
@@ -195,6 +202,19 @@ def _year_from_slug_digits(raw: str) -> int | None:
     if len(text) == 2:
         return 2000 + int(text)
     return int(text)
+
+
+def _date_from_month_first_match(match: re.Match[str]) -> date | None:
+    month = _MONTH_MAP.get(match.group(1).lower())
+    if not month:
+        return None
+    year = _year_from_slug_digits(match.group(3))
+    if year is None or not _is_plausible_bulletin_year(year):
+        return None
+    try:
+        return date(year, month, int(match.group(2)))
+    except ValueError:
+        return None
 
 
 def _date_from_slug_match(match: re.Match[str]) -> date | None:
@@ -380,6 +400,13 @@ def extract_date_from_string(text: str) -> date | None:
             except ValueError:
                 pass
 
+    # Month-first: Sunday-Sept-06-26.pdf (Tawnawilly, found 2026-09-06)
+    m = _first_match_outside_hash(_MONTH_DAY_YY_RE, text, spans)
+    if m:
+        parsed = _date_from_month_first_match(m)
+        if parsed:
+            return parsed
+
     return None
 
 
@@ -434,6 +461,48 @@ def month_name_filename_variants(url: str) -> list[str]:
 def yearless_month_name_variants(url: str) -> list[str]:
     """Alias kept for tests; same as month_name_filename_variants."""
     return month_name_filename_variants(url)
+
+
+def month_first_sunday_upload_urls(example_url: str, week: date) -> list[str]:
+    """Guess Sunday-Sept-06-26.pdf from a yearless Sunday-23rd-Aug.pdf example.
+
+    Tawnawilly's 06/09/2026 listing uses Month-DD-YY. Sunday-6th-Sept.pdf 404s.
+    Only for yearless / month-first Sunday files with no /YYYY/MM/ folder.
+    """
+    raw = (example_url or "").strip()
+    if not raw:
+        return []
+    parsed = urlparse(raw)
+    path = unquote(parsed.path or "")
+    leaf = path.rsplit("/", 1)[-1]
+    if "sunday" not in leaf.lower():
+        return []
+    if re.search(r"/\d{4}/\d{2}/", path):
+        return []
+    if not (_YEARLESS_SLUG_RE.search(leaf) or _MONTH_DAY_YY_RE.search(leaf)):
+        return []
+    directory = path.rsplit("/", 1)[0]
+    yy = f"{week.year % 100:02d}"
+    day_pad = f"{week.day:02d}"
+    day_raw = str(week.day)
+    names: list[str] = []
+    # Listing uses Sept, not Sep / September.
+    month_names = _MONTH_NAME_VARIANTS.get(week.month, ())
+    if week.month == 9:
+        month_names = ("Sept", "Sep", "September")
+    for name in month_names:
+        cap = name[0].upper() + name[1:]
+        for day in (day_pad, day_raw):
+            names.append(f"Sunday-{cap}-{day}-{yy}.pdf")
+            names.append(f"Sunday-{cap}-{day}-{week.year}.pdf")
+    out: list[str] = []
+    seen: set[str] = set()
+    for name in names:
+        url = parsed._replace(path=f"{directory}/{name}").geturl()
+        if url not in seen:
+            seen.add(url)
+            out.append(url)
+    return out
 
 
 def yearless_slug_date(
@@ -570,6 +639,7 @@ def predicted_dated_upload_urls(
             _add(ordinary)
         rewritten = rewrite_date_url(example_url, week)
         forms = [rewritten, *month_name_filename_variants(rewritten)]
+        forms.extend(month_first_sunday_upload_urls(example_url, week))
         for form in forms:
             _add(form)
             lower = form.lower()
@@ -1243,6 +1313,30 @@ def rewrite_date_url(url: str, target: date) -> str:
             new_frag = f"{day_str}{sep}{month_str}"
             new_path = path[: yearless_m.start()] + new_frag + path[yearless_m.end() :]
             return parsed._replace(path=new_path).geturl()
+
+    # ------------------------------------------------------------------
+    # Pattern I: Month-DD-YY "Sunday-Sept-06-26.pdf" (Tawnawilly 2026-09-06)
+    # ------------------------------------------------------------------
+    month_first_m = _MONTH_DAY_YY_RE.search(path)
+    if month_first_m:
+        month_raw = month_first_m.group(1)
+        day_raw = month_first_m.group(2)
+        year_raw = month_first_m.group(3)
+        month_names = _MONTH_NAME_VARIANTS.get(target.month, ())
+        if target.month == 9:
+            month_names = ("Sept", "Sep", "September")
+        month_str = min(month_names, key=lambda n: abs(len(n) - len(month_raw))) if month_names else _MONTH_NAMES[target.month]
+        if month_raw.isupper():
+            month_str = month_str.upper()
+        elif month_raw[0].isupper():
+            month_str = month_str[0].upper() + month_str[1:]
+        else:
+            month_str = month_str.lower()
+        day_str = f"{target.day:02d}" if len(day_raw) == 2 else str(target.day)
+        year_str = f"{target.year % 100:02d}" if len(year_raw) == 2 else str(target.year)
+        new_frag = f"{month_str}-{day_str}-{year_str}"
+        new_path = path[: month_first_m.start()] + new_frag + path[month_first_m.end() :]
+        return parsed._replace(path=new_path).geturl()
 
     # ------------------------------------------------------------------
     # Pattern F: No date found - return URL unchanged (static files).

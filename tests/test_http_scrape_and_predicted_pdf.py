@@ -226,6 +226,17 @@ class HttpScrapeScoreTests(unittest.TestCase):
             "https://tawnawillyparish.ie/wp-content/uploads/Sunday-6th-Sept.pdf",
             predicted,
         )
+        self.assertIn(
+            "https://tawnawillyparish.ie/wp-content/uploads/Sunday-Sept-06-26.pdf",
+            predicted,
+        )
+        self.assertEqual(
+            rewrite_date_url(
+                "https://tawnawillyparish.ie/wp-content/uploads/Sunday-Sept-06-26.pdf",
+                date(2026, 9, 13),
+            ),
+            "https://tawnawillyparish.ie/wp-content/uploads/Sunday-Sept-13-26.pdf",
+        )
 
     def test_roslea_dated_september_also_tries_sept(self) -> None:
         from harvester.utils import month_name_filename_variants
