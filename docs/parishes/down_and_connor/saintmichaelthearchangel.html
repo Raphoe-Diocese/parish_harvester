@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>St Michael the Archangel Bulletin — 30/08/2026</title>
+  <title>St Michael the Archangel Bulletin — 06/09/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -109,6 +110,13 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
@@ -141,6 +149,7 @@
       cursor: pointer;
     }
     .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
     
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {
@@ -160,7 +169,7 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
@@ -203,6 +212,7 @@
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {
@@ -866,6 +876,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -892,7 +903,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -900,35 +911,31 @@
     <header class="header">
       <p class="diocese-label">DOWN &amp; CONNOR</p>
       <h1>St Michael the Archangel Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for St Michael the Archangel — 30/08/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
-      <a class="download-link-top" href="saintmichaelthearchangel.pdf">Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for St Michael the Archangel — 06/09/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
+      <a class="download-link-top pdf-force-download" href="saintmichaelthearchangel.pdf" download="saintmichaelthearchangel.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="saintmichaelthearchangel.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       
-      <div class="quiet-links">
-        <a href="saintmichaelthearchangel.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="saintmichaelthearchangel-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="saintmichaelthearchangel.pdf" title="St Michael the Archangel bulletin PDF"></iframe>
+        <iframe data-pdf-url="saintmichaelthearchangel.pdf" title="St Michael the Archangel bulletin PDF"></iframe>
         
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="saintmichaelthearchangel.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="saintmichaelthearchangel.pdf">Open PDF</a>
-              <a href="saintmichaelthearchangel.pdf" download>Download</a>
+              <a class="pdf-open-newtab" href="saintmichaelthearchangel.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="saintmichaelthearchangel.pdf" download="saintmichaelthearchangel.pdf">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>
       </div>
@@ -963,7 +970,7 @@
       <div class="quiet-links">
         <a href="saintmichaelthearchangel-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-st-michael-the-archangel" data-parish-name="St Michael the Archangel"><h2 class="ocr-parish-name">St Michael the Archangel</h2><p class="ocr-parish-date">30/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-st-michael-the-archangel" data-parish-name="St Michael the Archangel"><h2 class="ocr-parish-name">St Michael the Archangel</h2><p class="ocr-parish-date">06/09/2026</p></header>
 <p class="page-label">Page 1</p>
 <h3 class="b-head">Mass Times This Week</h3>
 <p>Monday 10.00am Eucharistic Prayer<br>
@@ -972,19 +979,19 @@ Tuesday – Friday 10.00am Mass<br>
 Wednesday 7.00pm Novena Mass<br>
 Saturday 5.00pm Vigil<br>
 Sunday 11.00am Mass<br>
-Please note the following updated<br>
-arrangements<br>
-Adoration of The Blessed Sacrament will<br>
-resume on Friday 4th September after the<br>
-10.00am Mass<br>
-Our Sunday Evening Hour of Prayer will<br>
-resume on Sunday 6th September at<br>
-6.00pm St Michael the Archangel<br>
+Adoration of The Blessed Sacrament will take<br>
+place after 10.00am Mass on Wednesday &amp;<br>
+Friday<br>
+Sunday evenings from 6.00-7.30pm, a time<br>
+of intercession for vocations, with a special<br>
+hour of prayer and reflection. Adoration of<br>
+the Blessed Sacrament throughout. All are<br>
+very welcome. St Michael the Archangel<br>
 Parish Bulletin<br>
-30th August 2026<br>
-Twenty-Second Sunday In Ordinary Times<br>
+6th September 2026<br>
+Twenty-Third Sunday In Ordinary Times<br>
 Sunday Cycle A, Weekday Cycle 2 Psalter<br>
-Week 2</p>
+Week 3</p>
 <h3 class="b-head">Parish Contact Options</h3>
 <p>CALL 02895 904304 To connect<br>
 and choose the option for the assistance you<br>
@@ -994,7 +1001,7 @@ IN THE CASE OF A SICK CALL Option 2<br>
 FUNERAL ARRANGEMENTS Option 3<br>
 MASS TIMES AND INFORMATION Option 4<br>
 FOR FATHER CIARAN FEENEY Option 5<br>
-The Parish Office will be open Tuesday - Thursday<br>
+The Parish Office will be open Monday - Thursday<br>
 9.30am-12.00pm<br>
 In the event of an emergency please call the<br>
 Vicariate Mobile on <a href="tel:+3537549209775" style="color:#1d4ed8;font-weight:600;">07549209775</a><br>
@@ -1005,26 +1012,25 @@ Email: <a href="mailto:stmichaels@downandconnor.org" target="_blank" rel="noopen
 We pray for all our deceased relatives and<br>
 friends and for those whose</p>
 <h3 class="b-head">anniversaries occur at this time</h3>
-<h3 class="b-head">Anniversaries: Eleanor Megahy, Bernadette &amp;</h3>
-<p>Francis Toner, Sheila Stockman, Kathleen<br>
-McMulkin, Moya Lynch, Thomas Bannon,<br>
-Paddy Kavanagh, Sean Martin, Mary Donnelly</p>
-<h3 class="b-head">Recently Deceased: Ted Rooney, Brenda</h3>
-<p>Corrigan, Bernadette Lavery<br>
-You can book an anniversary Mass or give an</p>
+<h3 class="b-head">Anniversaries: Agnes Wasson, Gerry McCann,</h3>
+<p>Kathleen Hill, Stephen Reynolds, Hugh<br>
+McConville, Catherine &amp; Thomas Doyle, Gerald<br>
+&amp; Bernard Rafferty, John &amp; Ellen McAlinden,<br>
+Bernard McNamee, Charlie O ’Donnell.</p>
+<h3 class="b-head">Months Mind: Joe Hunter</h3>
+<h3 class="b-head">Recently Deceased: Jacqueline Madden</h3>
+<p>You can book an anniversary Mass or give an</p>
 <h3 class="b-head">anniversary intention for this section of the</h3>
 <p>bulletin by calling or e-mailing the parish office<br>
 02895 904304 (Option 1)<br>
 Email: <a href="mailto:stmichaels@downandconnor.org" target="_blank" rel="noopener noreferrer">stmichaels@downandconnor.org</a><br>
-He made himself this Bread of Life to satisfy<br>
-our hunger for this love. And as if that were<br>
-not enough, he made himself the hungry one,<br>
-the naked one, the humblest one so that you<br>
-and I can satisfy his hunger for our human<br>
-love.<br>
--St Teresa of Calcutta<br>
-God is our rock of refuge: let us give thanks<br>
-and praise<br>
+When we look at the Cross, we know how<br>
+much Jesus loved us.<br>
+When we look at the tabernacle, we know how<br>
+much Jesus loves us now.<br>
+_ St. Teresa of Calcutta<br>
+Sacred Host, greatest aid to holiness, have<br>
+mercy on us!<br>
 St Michael the Archangel <a href="https://saintmichaelthearchangel.godaddysites.com" target="_blank" rel="noopener noreferrer">https://saintmichaelthearchangel.godaddysites.com</a></p>
 <hr>
 <p class="page-label">Page 2</p>
@@ -1058,8 +1064,8 @@ announced in due course.<br>
 Please keep these dates free and join us as we<br>
 give thanks for 50 years of parish life and look<br>
 forward with hope to the future!<br>
-The Offertory Collection for the 23rd<br>
-August amounted to £2044.80<br>
+The Offertory Collection for the 30th<br>
+August amounted to £2514.45<br>
 Thank you<br>
 TO MAKE A DONATION TO THE PARISH PLEASE<br>
 VISIT OUR WEBSITE<br>
@@ -1067,22 +1073,41 @@ stmichaelsbelfast.co.uk and click on the<br>
 DONATE BUTTON<br>
 Thank you for your continuous support and<br>
 Generosity<br>
-Parish Draw 2026/27<br>
-News<br>
+Parish Draw 2026/27 News<br>
 Promoter packs are available for collection<br>
 from the Committee Room beside the<br>
 Sacristy. Please contact Catherine if you have<br>
 any queries.<br>
 Thank you for your continued support.<br>
-ROSARY VIGIL FOR LIFE THIS<br>
-SUNDAY - outside Belfast City Hall on Sunday<br>
-30th August at 2.00pm. Join Precious Life in<br>
-prayer to uphold the sacredness and dignity of<br>
-unborn life, and pray that Belfast Council will<br>
-reject plans to illuminate the City Hall in<br>
-celebration of abortion. For more information,<br>
-contact <a href="tel:+442890278484" style="color:#1d4ed8;font-weight:600;">028 9027 8484</a> / 07592 280522 or<br>
-email <a href="mailto:info@preciouslife.com" target="_blank" rel="noopener noreferrer">info@preciouslife.com</a> .</p>
+This week the sanctuary lamp burns<br>
+this week in loving memory of Mary &amp; Tommy<br>
+McGrath THE WEST BELFAST HISTORICAL SOCIETY<br>
+The September meeting will take place on Friday<br>
+the 11th of September at 7.30pm in St.<br>
+Michael&#x27;s Parish Centre.<br>
+The September talk is entitled:<br>
+&quot;The Lusitania and the U Boat Campaign 1914<br>
+-1918&quot;<br>
+The guest speaker will be Mr Michael McConway<br>
+Refreshments will be provided.<br>
+(This Talk will be preceded at 7pm with the<br>
+Annual General Meeting of the Society. It is<br>
+important that all members of the society are in<br>
+attendance for this important meeting)<br>
+Beginning Experience is a peer ministry to the<br>
+bereaved, separated and divorced, based within<br>
+the Family Ministry of the Diocese of Down and<br>
+Connor. We are offering a support programme<br>
+over three Saturdays from September through<br>
+to November. The loss of a partner through<br>
+death, separation or divorce is devastating.<br>
+Beginning Experience is offering a programme of<br>
+bereavement support in St Bride’s Hall,<br>
+Derryvolgie Ave., Belfast on three Saturdays<br>
+(26th September 24th October and 21st<br>
+November) Booking essential.<br>
+To find out more contact Marie <a href="tel:+3537896119669" style="color:#1d4ed8;font-weight:600;">07896119669</a><br>
+or email <a href="mailto:belfastbe@yahoo.com" target="_blank" rel="noopener noreferrer">belfastbe@yahoo.com</a></p>
 <hr>
 <p class="page-label">Page 3</p>
 <p>MATT TALBOT – URBAN MYSTIC<br>
@@ -1115,7 +1140,31 @@ Quinn .<br>
 Open to men aged 18+. Cost: €65 (student €<br>
 55). Registration, accomodation and details:<br>
 <a href="https://www.dominicans.ie/events" target="_blank" rel="noopener noreferrer">www.dominicans.ie/events</a> . Enquiries:<br>
-<a href="mailto:op.evangelisation@gmail.com" target="_blank" rel="noopener noreferrer">op.evangelisation@gmail.com</a> .<br>
+<a href="mailto:op.evangelisation@gmail.com" target="_blank" rel="noopener noreferrer">op.evangelisation@gmail.com</a> . Catholic Men’s Retreat - Standing in the Breach<br>
+A Catholic Men’s Retreat will take place at<br>
+Portglenone Monastery on Saturday 19<br>
+September 2026, from 9am to 1pm .<br>
+The theme of the retreat is “It is no longer I who<br>
+live, but Christ who lives in me” (Galatians<br>
+2:20).<br>
+The morning will include prayer, teaching,<br>
+fellowship and men’s testimonies, with Fr Eddie<br>
+McGee as keynote speaker.<br>
+All men are very welcome.<br>
+For further information, contact Thomas Carey<br>
+on 07967 620435 or email<br>
+<a href="mailto:sean@catholicminute.co.uk" target="_blank" rel="noopener noreferrer">sean@catholicminute.co.uk</a> .<br>
+Congratulations to all our winners this<br>
+month!<br>
+Parish Draw for July 2026<br>
+1st Prize £500.00 Patrick McArdle<br>
+2nd Prize £100.00 Cliodhna Rooney<br>
+3rd Prize £100.00 Frances McMahon<br>
+4th Prize £100.00 Hugh McConville<br>
+5th Prize £100.00 Margaret Hollywood<br>
+Promoters Prize £50.00 Anne Duffy<br>
+Thank you to all who contribute to the<br>
+parish draw.<br>
 August &amp; September 2026 @ Lough Derg<br>
 A pilgrimage has a vital part to play in our life<br>
 of faith, for it removes us from our daily<br>
@@ -1143,18 +1192,10 @@ accommodation available on Station Island the<br>
 night before beginning a Retreat or Pilgrimage.<br>
 Lough Derg, Pettigo, Co Donegal. F94 PC60<br>
 <a href="https://www.loughderg.org" target="_blank" rel="noopener noreferrer">www.loughderg.org</a> email. <a href="mailto:info@loughderg.org" target="_blank" rel="noopener noreferrer">info@loughderg.org</a> Tel.<br>
-<a href="tel:+353719861518" style="color:#1d4ed8;font-weight:600;">0719861518</a> Congratulations to all our winners this<br>
-month!<br>
-Parish Draw for July 2026<br>
-1st Prize £500.00 Patrick McArdle<br>
-2nd Prize £100.00 Cliodhna Rooney<br>
-3rd Prize £100.00 Frances McMahon<br>
-4th Prize £100.00 Hugh McConville<br>
-5th Prize £100.00 Margaret Hollywood<br>
-Promoters Prize £50.00 Anne Duffy<br>
-Thank you to all who contribute to the<br>
-parish draw.<br>
-Abide in His Love Women’s Conference. The<br>
+<a href="tel:+353719861518" style="color:#1d4ed8;font-weight:600;">0719861518</a></p>
+<hr>
+<p class="page-label">Page 4</p>
+<p>Abide in His Love Women’s Conference. The<br>
 Great Northern Hotel, Bundoran, 20 –22<br>
 November 2026.<br>
 Join women from across Ireland for a faith-filled<br>
@@ -1165,10 +1206,8 @@ Sisters of Nashville, Bishop Fintan Gavin, and<br>
 more.<br>
 A conference not to be missed!<br>
 Register<br>
-now: <a href="https://abideinhislove.eventbrite.com" target="_blank" rel="noopener noreferrer">https://abideinhislove.eventbrite.com</a></p>
-<hr>
-<p class="page-label">Page 4</p>
-<p>Making your donations go further with no<br>
+now: <a href="https://abideinhislove.eventbrite.com" target="_blank" rel="noopener noreferrer">https://abideinhislove.eventbrite.com</a><br>
+Making your donations go further with no<br>
 extra cost to you!<br>
 Did you know you can GIFT AID your<br>
 collections to the Parish? Donating through<br>
@@ -1190,7 +1229,7 @@ declarations and return to the office.</p></div>
     <section class="parish-section">
       <h2 class="section-heading">Other DOWN &amp; CONNOR Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="ballymenaparish.html" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st colmcilles"><a class="parish-link" href="st-colmcilles.html" target="_blank" rel="noopener noreferrer">St Colmcilles</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="ballycastle"><a class="parish-link" href="ballycastleparish.html" target="_blank" rel="noopener noreferrer">Ballycastle</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="bangor"><a class="parish-link" href="bangorparish.html" target="_blank" rel="noopener noreferrer">Bangor</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="glenariffe"><a class="parish-link" href="glenariffeparish.html" target="_blank" rel="noopener noreferrer">Glenariffe</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="maghera"><a class="parish-link" href="parishofmaghera.html" target="_blank" rel="noopener noreferrer">Maghera</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="sacred heart belfast"><a class="parish-link" href="sacredheartparishbelfast.html" target="_blank" rel="noopener noreferrer">Sacred Heart Belfast</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st colmcilles"><a class="parish-link" href="st-colmcilles.html" target="_blank" rel="noopener noreferrer">St Colmcilles</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st oliver plunkett"><a class="parish-link" href="stoliverplunkettparish.html" target="_blank" rel="noopener noreferrer">St Oliver Plunkett</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1242,9 +1281,9 @@ declarations and return to the office.</p></div>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1698,11 +1737,16 @@ declarations and return to the office.</p></div>
         for (var i = 0; i < names.length; i++) {
           var page = pageFor(names[i]);
           if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
           var slot = pages.querySelector('[data-page="' + page + '"]');
           if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
+          scrollBoxTo(pages, slot);
           return true;
         }
         return false;

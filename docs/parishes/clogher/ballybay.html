@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Ballybay (Tullycorbet) Bulletin — 30/08/2026</title>
+  <title>Ballybay (Tullycorbet) Bulletin — 06/09/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -109,6 +110,13 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
@@ -141,6 +149,7 @@
       cursor: pointer;
     }
     .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
     
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {
@@ -160,7 +169,7 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
@@ -203,6 +212,7 @@
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {
@@ -866,6 +876,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -892,7 +903,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -900,35 +911,31 @@
     <header class="header">
       <p class="diocese-label">CLOGHER</p>
       <h1>Ballybay (Tullycorbet) Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Ballybay (Tullycorbet) — 30/08/2026. Part of the Clogher Diocese collated bulletin.</p>
-      <a class="download-link-top" href="ballybay.pdf">Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Ballybay (Tullycorbet) — 06/09/2026. Part of the Clogher Diocese collated bulletin.</p>
+      <a class="download-link-top pdf-force-download" href="ballybay.pdf" download="ballybay.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="ballybay.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       
-      <div class="quiet-links">
-        <a href="ballybay.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="ballybay-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="ballybay.pdf" title="Ballybay (Tullycorbet) bulletin PDF"></iframe>
+        <iframe data-pdf-url="ballybay.pdf" title="Ballybay (Tullycorbet) bulletin PDF"></iframe>
         
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="ballybay.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="ballybay.pdf">Open PDF</a>
-              <a href="ballybay.pdf" download>Download</a>
+              <a class="pdf-open-newtab" href="ballybay.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="ballybay.pdf" download="ballybay.pdf">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>
       </div>
@@ -963,7 +970,7 @@
       <div class="quiet-links">
         <a href="ballybay-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-ballybay-tullycorbet" data-parish-name="Ballybay (Tullycorbet)"><h2 class="ocr-parish-name">Ballybay (Tullycorbet)</h2><p class="ocr-parish-date">30/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-ballybay-tullycorbet" data-parish-name="Ballybay (Tullycorbet)"><h2 class="ocr-parish-name">Ballybay (Tullycorbet)</h2><p class="ocr-parish-date">06/09/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>Parish of Tullycorbet (Ballybay , Clogher Diocese) home</p>
 <h3 class="b-head">Parish News</h3>
@@ -974,9 +981,9 @@ Prayers &amp; Readings<br>
 Past News<br>
 Get In Touch<br>
 The Parish Newsletter<br>
-Sunday, 30th August 2026 - Tullycorbet Parish Newsletter<br>
+Sunday, 6th September 2026 - Tullycorbet Parish Newsletter<br>
 Parish of Tullycorbet Newsletter<br>
-Sunday 30th August 2026<br>
+Sunday 6th September 2026<br>
 Canon Patrick McGinn, P.P.<br>
 Mgr. G. McSorley, P.E. Fr. P.J. McGinnity, P.E.<br>
 Parish Office: <a href="tel:+353429741032" style="color:#1d4ed8;font-weight:600;">042 9741032</a><br>
@@ -985,62 +992,60 @@ Email: <a href="mailto:tullycorbet@clogherparishes.ie" target="_blank" rel="noop
 Website: <a href="https://www.tullycorbetparish.com" target="_blank" rel="noopener noreferrer">www.tullycorbetparish.com</a></p>
 <h3 class="b-head">Anniversary Masses for the Coming Week</h3>
 <p>St. Patrick’s, Ballybay - <a href="https://www.churchservices.tv/ball" target="_blank" rel="noopener noreferrer">www.churchservices.tv/ball</a> ybay<br>
-Saturday 29th August (6pm) • Months Memory Sr. Francoise O’ Sullivan &amp; Sr. Eliza beth O’ Brien, Daughters<br>
-of Our Lady of Our Sacred Heart Convent, Ballybay • Patrick &amp; Mary O’Brien &amp; their daughters Mary &amp; Eileen<br>
-Main St Ballybay • Michael Lynch Drumar &amp; Parents Mickey &amp; Lily Lynch Main St Ballybay &amp; Kathleen Lynch<br>
-&amp; Frankie Wallace, Pearse Place<br>
 Saturday 5th September (6pm) The Finn, The Cassidy, The Brennan &amp; The Harrity family C rossmaglen •<br>
-Fred &amp; Isobel Anderson Market House Brae &amp; Glasglow Ballybay (Tullycorbet) <a href="http://www.tullycorbetparish.com/" target="_blank" rel="noopener noreferrer">http://www.tullycorbetparish.com/</a></p>
+Fred &amp; Isobel Anderson Market House Brae &amp; Glasglow<br>
+Saturday 12th September (6pm) • Raymond, Teresa &amp; Bernard Linden Church St Ballybay • M artin Mc<br>
+Ginnity, Cornanure &amp; decd members of the Mc Ginnity family • Agnes Duffy Carrickanare • Phila &amp; Charlie Mc<br>
+Carthy Knocknamaddy &amp; decd members of the Mc Carthy family . Ballybay (Tullycorbet) <a href="http://www.tullycorbetparish.com/" target="_blank" rel="noopener noreferrer">http://www.tullycorbetparish.com/</a></p>
 <hr>
 <p class="page-label">Page 2</p>
 <p>Our Lady of Knock, Ballintra - <a href="https://www.churchservices.tv/ballintraballybay" target="_blank" rel="noopener noreferrer">www.churchservices.tv/ballintraballybay</a><br>
-Mass Sunday 30th August (11pm) • Hughie &amp; Rose Duffy, Cornahoe also remembering their s on<br>
-Brendan(Benny) • Peter &amp; Mary Mc Naughton Carrickanaire &amp; d ecd family members • John &amp; Mary O Neill<br>
-Clogher &amp; decd family members • Bernard, Maryann, Benny, P eter &amp; Dan Lennon &amp; decd family members<br>
-of the Lennon family Drumlane, also remembering Paul Le nnon who died in Thailand &amp; Noel Mc Mahon<br>
-who died in Liverpool during the week may they Rest in Pea ce<br>
 No Mass 6th September<br>
+Sunday 13th September(11pm) • 6th Anniversary Mass Anita Mc Elory Drumlongfield Ballyb ay • 4th<br>
+Anniversary Mary Duffy &amp; decd members of the Duffy family .<br>
 Most Holy Rosary, Tullycorbet - <a href="https://www.churchservices.tv/tullycorbet" target="_blank" rel="noopener noreferrer">www.churchservices.tv/tullycorbet</a><br>
-No Mass 30th August<br>
 Mass 6th September (9.30am) • Eddie Markey, Shanmullagh &amp; decd Family members • James &amp; Eddie<br>
-Hughes, Corvoy &amp; decd members of the Hughes family Legaco rry</p>
+Hughes, Corvoy &amp; decd members of the Hughes family Legaco rry<br>
+No Mass 13th September</p>
 <h3 class="b-head">Recently Deceased</h3>
-<p>Please keep in your prayer Kathleen Daniels (nee Duffy) , London formally Corvally<br>
-Braddox. May she Rest in Peace.<br>
+<p>Please keep in your prayers James Mc Donnell , Greagh, Loughmoure, Thomasina<br>
+Tobin (nee Mc Ardle) , Cabra &amp; Her husband Patrick Tobin , New Zealand, Sr Vera Mc Grath , Louis<br>
+Convent Monaghan/Ballybay &amp; Rev. Fr Jim (James Patrick) Moore , Co. Fermanagh, Former Deacon of<br>
+Ballybay &amp; Parish Priest Clones, Killeevan, Currin &amp; A ghabog. May they Rest in Peace.<br>
 Adoration of the Blessed Sacrament in St. Patrick’s every Monday from 2pm to 7.00pm Followed by<br>
 Mass.<br>
+Please Note the Parish office will be closed on Tuesday the 8th of September due to ESB Works.<br>
 Baptisms take place on the 1st &amp; 3rd Sunday of the month, please n ote Booking is essential.<br>
-Parish Office will be closed on Tuesday 1st of September.<br>
-Ballybay Cancer Society AGM will be held on; Wednesday 2nd September 2026 at 7.30pm Hall Street<br>
-Ballybay All Welcome .<br>
-A musical event entitled &quot;Praise God from whom all blessin gs flow&quot; will take place in St. Colman’s<br>
-Church, Clontibret, on Friday 4th September at 8 p.m. The organist will be Mr. Glenn Moore, while<br>
-Lorraine Vance, Alannah Blackburn, Joanna Moore and Vict oria Moore will also be performing. There will<br>
-be congregational hymn singing too. This event is free to a ttend, but donations will be gratefully received.<br>
-Come along and enjoy a wonderful evening of music and song!<br>
-SVP Church Gate Collection<br>
-Our SVP Church Gate Collection will be back on the 3rd Sun day of every month starting in September in<br>
-St. Patricks Ballybay, and alternative Sundays in Our Lady of Knock Ballintra and Most Holy Rosary<br>
-Tullycorbet.<br>
-Sadly, more families in our community are finding it hard to make ends meet. Every donation, big or small,<br>
-helps bring relief and hope to those who need it most.<br>
+Clogher don Óige will host the second series of – The Chosen – a groundbreaking drama for young<br>
+adults about the life of Jesus Christ, told through th e eyes of those who knew Him. It will take place each<br>
+Thursday, for 8 weeks, beginning 10th September from 7:30pm to 9:30pm in St. Joseph’s Pastoral Centre,<br>
+Monaghan. An opportunity for young adults aged 18-40 to watch the series, take part in discussions, group<br>
+sharing and prayer.  To register or for more information con tact <a href="mailto:info@clogherdonoige.org" target="_blank" rel="noopener noreferrer">info@clogherdonoige.org</a> or call <a href="tel:+3534772784" style="color:#1d4ed8;font-weight:600;">047<br>
+72784</a><br>
+Legion of Mary Pilgrimage to Knock – Sunday 27th September. Bus leaving car park behind Monaghan<br>
+Credit Union at 8am. €25 to be paid when booking in Win eways, Glaslough St. Contact Marian on <a href="tel:+353872709683" style="color:#1d4ed8;font-weight:600;">087<br>
+2709683</a>.<br>
+Dance Classes for Children in Tullycorbet Community Centre<br>
+Set Dancing — Resumes on Tuesday, 8th September from 5:30-6:30 p.m .<br>
+Irish Dancing — Resumes on Thursday, 10th September from 5:00-6:00 p.m.<br>
+Registration on the Night.<br>
+SVP Church Gate Collection Our SVP Church Gate Collection will be back on the 3rd Sunday of every<br>
+month starting in September in St. Patricks Ballybay, and alternative Sundays in Our Lady of Knock<br>
+Ballintra and Most Holy Rosary Tullycorbet. Sadly, more families in our community are finding it ha rd to<br>
+make ends meet. Every donation, big or small, helps brin g relief and hope to those who need it most.<br>
 Thank you for your kindness and generosity, may God bless you and your families for always standing by<br>
-those most in need.<br>
-Tullycorbet Community Centre Blood Donation Clinic Monday 31st August 2026 3.45pm-8.00pm book<br>
-on 1800 222111.</p>
+those most in need.</p>
 <hr>
 <p class="page-label">Page 3</p>
 <p>Annual Mass for families in St. Patrick’s Church Ba wn will take place Sunday September the 27Th<br>
 @11.30am. The celebrant will be Fr. Ben Hughes. Relics of St Theresa of Liseux and her Parents louis &amp;<br>
 Zelie Martinwill be present and a blessing from them wi ll be given directly after Mass. It is a great privilege<br>
 to have the Relics of the parents of St. Theresa, and th is the first time for their relics to visit Co.<br>
-Monaghan. All Welcome.<br>
-Blessing of the Graves Thank you to all that who helped in any way with the ble ssing of the graves it was<br>
-very much appreciated. Also, a word of thanks to the kindness &amp; generosity of the donations made on the<br>
-day towards the upkeep of our graveyards.<br>
-St Patricks Ballybay €2629.10<br>
-Most Holy Rosary, Tullycorbet €824.95<br>
-Our Lady of Knock, Ballintra €1240.55<br>
+Monaghan All Welcome.<br>
+ALONE Volunteers Needed Could you spare an hour a week to support an older person in your<br>
+community? ALONE is looking for volunteers to provide f riendship and companionship to older people who<br>
+may be experiencing loneliness or isolation. Full training a nd ongoing support are provided, and<br>
+volunteering can make a real difference in someone&#x27;s l ife.<br>
 Daily Readings<br>
 Sunday Readings<br>
 PARISH OF TULLYCORBET (BALLYBAY) : St. Patrick’s, Ballybay, Co. Monaghan. Tel/Fax <a href="tel:+353429741032" style="color:#1d4ed8;font-weight:600;">042-9741032</a></p></div>
@@ -1050,7 +1055,7 @@ PARISH OF TULLYCORBET (BALLYBAY) : St. Patrick’s, Ballybay, Co. Monaghan. Tel/
     <section class="parish-section">
       <h2 class="section-heading">Other CLOGHER Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="carrickmacross (machaire rois)"><a class="parish-link" href="carrickmacross.html" target="_blank" rel="noopener noreferrer">Carrickmacross (Machaire Rois)</a></li><li class="parish-item" data-name="castleblayney (muckno, includes clontibret)"><a class="parish-link" href="castleblayney.html" target="_blank" rel="noopener noreferrer">Castleblayney (Muckno, includes Clontibret)</a></li><li class="parish-item" data-name="clones"><a class="parish-link" href="clones.html" target="_blank" rel="noopener noreferrer">Clones</a></li><li class="parish-item" data-name="corcaghan-threemilehouse (kilmore &amp; drumsnatt)"><a class="parish-link" href="corcaghanthreemilehouse.html" target="_blank" rel="noopener noreferrer">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</a></li><li class="parish-item" data-name="derrygonnelly (botha)"><a class="parish-link" href="derrygonnelly.html" target="_blank" rel="noopener noreferrer">Derrygonnelly (Botha)</a></li><li class="parish-item" data-name="donagh"><a class="parish-link" href="donagh.html" target="_blank" rel="noopener noreferrer">Donagh</a></li><li class="parish-item" data-name="enniskillen (st michael&#x27;s parish)"><a class="parish-link" href="enniskillen.html" target="_blank" rel="noopener noreferrer">Enniskillen (St Michael&#x27;s Parish)</a></li><li class="parish-item" data-name="errigal truagh"><a class="parish-link" href="errigaltruagh.html" target="_blank" rel="noopener noreferrer">Errigal Truagh</a></li><li class="parish-item" data-name="irvinestown (devenish)"><a class="parish-link" href="irvinestown.html" target="_blank" rel="noopener noreferrer">Irvinestown (Devenish)</a></li><li class="parish-item" data-name="killanny"><a class="parish-link" href="killanny.html" target="_blank" rel="noopener noreferrer">Killanny</a></li><li class="parish-item" data-name="magheracloone"><a class="parish-link" href="magheracloone.html" target="_blank" rel="noopener noreferrer">Magheracloone</a></li><li class="parish-item" data-name="monaghan &amp; rackwallace (includes tyholland)"><a class="parish-link" href="monaghanrackwallace.html" target="_blank" rel="noopener noreferrer">Monaghan &amp; Rackwallace (includes Tyholland)</a></li><li class="parish-item" data-name="tempo (pobal)"><a class="parish-link" href="tempo.html" target="_blank" rel="noopener noreferrer">Tempo (Pobal)</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="carrickmacross (machaire rois)"><a class="parish-link" href="carrickmacross.html" target="_blank" rel="noopener noreferrer">Carrickmacross (Machaire Rois)</a></li><li class="parish-item" data-name="castleblayney (muckno, includes clontibret)"><a class="parish-link" href="castleblayney.html" target="_blank" rel="noopener noreferrer">Castleblayney (Muckno, includes Clontibret)</a></li><li class="parish-item" data-name="clones"><a class="parish-link" href="clones.html" target="_blank" rel="noopener noreferrer">Clones</a></li><li class="parish-item" data-name="corcaghan-threemilehouse (kilmore &amp; drumsnatt)"><a class="parish-link" href="corcaghanthreemilehouse.html" target="_blank" rel="noopener noreferrer">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</a></li><li class="parish-item" data-name="derrygonnelly (botha)"><a class="parish-link" href="derrygonnelly.html" target="_blank" rel="noopener noreferrer">Derrygonnelly (Botha)</a></li><li class="parish-item" data-name="donagh"><a class="parish-link" href="donagh.html" target="_blank" rel="noopener noreferrer">Donagh</a></li><li class="parish-item" data-name="enniskillen (st michael&#x27;s parish)"><a class="parish-link" href="enniskillen.html" target="_blank" rel="noopener noreferrer">Enniskillen (St Michael&#x27;s Parish)</a></li><li class="parish-item" data-name="errigal truagh"><a class="parish-link" href="errigaltruagh.html" target="_blank" rel="noopener noreferrer">Errigal Truagh</a></li><li class="parish-item" data-name="irvinestown (devenish)"><a class="parish-link" href="irvinestown.html" target="_blank" rel="noopener noreferrer">Irvinestown (Devenish)</a></li><li class="parish-item" data-name="killanny"><a class="parish-link" href="killanny.html" target="_blank" rel="noopener noreferrer">Killanny</a></li><li class="parish-item" data-name="lisnaskea-maguiresbridge (aghalurcher)"><a class="parish-link" href="lisnaskeamaguiresbridge.html" target="_blank" rel="noopener noreferrer">Lisnaskea-Maguiresbridge (Aghalurcher)</a></li><li class="parish-item" data-name="magheracloone"><a class="parish-link" href="magheracloone.html" target="_blank" rel="noopener noreferrer">Magheracloone</a></li><li class="parish-item" data-name="monaghan &amp; rackwallace (includes tyholland)"><a class="parish-link" href="monaghanrackwallace.html" target="_blank" rel="noopener noreferrer">Monaghan &amp; Rackwallace (includes Tyholland)</a></li><li class="parish-item" data-name="newtownbutler (galloon)"><a class="parish-link" href="newtownbutler.html" target="_blank" rel="noopener noreferrer">Newtownbutler (Galloon)</a></li><li class="parish-item" data-name="tempo (pobal)"><a class="parish-link" href="tempo.html" target="_blank" rel="noopener noreferrer">Tempo (Pobal)</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1102,9 +1107,9 @@ PARISH OF TULLYCORBET (BALLYBAY) : St. Patrick’s, Ballybay, Co. Monaghan. Tel/
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1558,11 +1563,16 @@ PARISH OF TULLYCORBET (BALLYBAY) : St. Patrick’s, Ballybay, Co. Monaghan. Tel/
         for (var i = 0; i < names.length; i++) {
           var page = pageFor(names[i]);
           if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
           var slot = pages.querySelector('[data-page="' + page + '"]');
           if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
+          scrollBoxTo(pages, slot);
           return true;
         }
         return false;

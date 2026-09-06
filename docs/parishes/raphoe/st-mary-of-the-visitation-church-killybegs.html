@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Killybegs Bulletin — 30/08/2026</title>
+  <title>Killybegs Bulletin — 06/09/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -109,6 +110,13 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
@@ -141,6 +149,7 @@
       cursor: pointer;
     }
     .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
     
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {
@@ -160,7 +169,7 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
@@ -203,6 +212,7 @@
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {
@@ -866,6 +876,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -892,7 +903,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -900,35 +911,31 @@
     <header class="header">
       <p class="diocese-label">RAPHOE</p>
       <h1>Killybegs Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Killybegs — 30/08/2026. Part of the Raphoe Diocese collated bulletin.</p>
-      <a class="download-link-top" href="st-mary-of-the-visitation-church-killybegs.pdf">Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Killybegs — 06/09/2026. Part of the Raphoe Diocese collated bulletin.</p>
+      <a class="download-link-top pdf-force-download" href="st-mary-of-the-visitation-church-killybegs.pdf" download="st-mary-of-the-visitation-church-killybegs.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="st-mary-of-the-visitation-church-killybegs.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       
-      <div class="quiet-links">
-        <a href="st-mary-of-the-visitation-church-killybegs.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="st-mary-of-the-visitation-church-killybegs-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="st-mary-of-the-visitation-church-killybegs.pdf" title="Killybegs bulletin PDF"></iframe>
+        <iframe data-pdf-url="st-mary-of-the-visitation-church-killybegs.pdf" title="Killybegs bulletin PDF"></iframe>
         
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="st-mary-of-the-visitation-church-killybegs.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="st-mary-of-the-visitation-church-killybegs.pdf">Open PDF</a>
-              <a href="st-mary-of-the-visitation-church-killybegs.pdf" download>Download</a>
+              <a class="pdf-open-newtab" href="st-mary-of-the-visitation-church-killybegs.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="st-mary-of-the-visitation-church-killybegs.pdf" download="st-mary-of-the-visitation-church-killybegs.pdf">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>
       </div>
@@ -963,7 +970,7 @@
       <div class="quiet-links">
         <a href="st-mary-of-the-visitation-church-killybegs-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-killybegs" data-parish-name="Killybegs"><h2 class="ocr-parish-name">Killybegs</h2><p class="ocr-parish-date">30/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-killybegs" data-parish-name="Killybegs"><h2 class="ocr-parish-name">Killybegs</h2><p class="ocr-parish-date">06/09/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>St. Mary of the Visitation Parish, Killybegs<br>
 Parish Office, Killybegs, Co. Donegal, F94 CY56 Tel: +353 (0)74 9731013<br>
@@ -971,93 +978,83 @@ Parish Secretary : Ann O ’Donnell ( Office Open: Mon to Fri. 9.45am to 2.45pm)
 Email : <a href="mailto:info@killybegsparish.com" target="_blank" rel="noopener noreferrer">info@killybegsparish.com</a> Website : killybegsparish.com<br>
 Parish Priest: Fr. Colm Ó Gallchóir : Tel: <a href="tel:+353749731013" style="color:#1d4ed8;font-weight:600;">074 9731013</a><br>
 Masses and Services: Live streaming <a href="https://www.mcn.live" target="_blank" rel="noopener noreferrer">www.mcn.live</a> (link on website)<br>
-Pray for: Teresa Kelly , whose funeral is in Donabate, Co Dublin Saturday (mother of John Ke lly, Fintra)<br>
-Lillian Sweeney, Donegal Town, whose funeral took place on Thursday (sister of Fr Ant hony Griffith)<br>
-John Gallagher , whose funeral took place in Cloghan on Wednesday (brother of Fr Eddie Gallagher)<br>
-Michael Melly , The Hill, Killybegs, whose funeral took place last Sunday. Suaimhneas Síoraí .<br>
+Pray for: Conor Sheridan, London, formerly of Main Street, Killybegs (brother of Irene Mc Nern);<br>
+Eileen Kennedy, whose funeral took place in Ardaghey on Friday (sister of the late Brendan O’Keeney)<br>
+Pray for: Mary Haughey (Croaghlin).<br>
+Suaimhneas Síoraí .<br>
 Mass for Expectant Families Tues 8th Sept 7pm<br>
-St Eunan ’s Cathedral, Letterkenny. Liturgy of the Word for Children<br>
-Next Sunday 6th September 11am;<br>
+St Eunan ’s Cathedral, Letterkenny. St. Vincent de Paul Contact No. <a href="tel:+353873507727" style="color:#1d4ed8;font-weight:600;">087 3507727</a><br>
+Liturgy of the Word for Children<br>
+This Sunday 6th September 11am;<br>
 Sunday 27th September 11am.<br>
 Parish Choir Practice Monday 7.15pm<br>
-Sunday Collection 23rd August €1,515.00<br>
-Maintenance Fund 23rd August €1,790.00<br>
-Donation € 585.00<br>
+Sunday Collection 30th August €1,195.00<br>
+Maintenance Fund 30th August €1,385.00<br>
 Thank you for your ongoing generosity.<br>
 Anam Cara, Parent Support Evening, Thurs 10th<br>
-September 7.30pm, Radisson Hotel, Letterkenny. Forester ’s Community Hall are exploring the idea<br>
-of setting up a new social group, bringing back the<br>
-old-school tradition of sitting down together,<br>
-having the chats, enjoying a bit of banter and<br>
-playing some good old -fashioned board games.<br>
+September 7.30pm, Radisson Hotel, Letterkenny.<br>
+Forester ’s Community Hall are exploring the<br>
+idea of setting up a new social group, bringing<br>
+back the old -school tradition of sitting down<br>
+together, having the chats, enjoying a bit of banter<br>
+and playing some good old -fashioned board games.<br>
 A relaxed space to meet people, make new friends,<br>
 have a cuppa and enjoy some fun each week. Drop<br>
 us a message - we ’d love to hear your thoughts.<br>
-Tel: <a href="tel:+353872505449" style="color:#1d4ed8;font-weight:600;">0872505449</a><br>
-Final Hymn: Faithful is the Lord our King<br>
-Faithful is the Lord, our King.<br>
-Let us all in glory sing,<br>
-Ever praise in song and word:<br>
-Holy, Holy, Holy Lord!<br>
-Holy Father, God of might,<br>
-Throned amid the hosts of light;<br>
-Take our life, our strength, our love;<br>
-King of earth and heav ’n above. (Chorus)<br>
-Christ, be near at either hand,<br>
-Christ, behind, before me stand;<br>
-Christ, with me where e ’er I go;<br>
-Christ, around, above, below. (Chorus) This plaque is located in the church, to the left of the<br>
-entrance to the Adoration/Liturgy Room.<br>
-We are grateful to Fr. David Crean OSA, New Ross,<br>
-Co. Wexford, for the translation.<br>
-In memory of<br>
-Reverend Willliam Drummond<br>
-who was Parish Priest of Killybegs and Killaghtee<br>
-for 30 years.<br>
-Died 1863, September 13. Age 61.<br>
-Buried in this church which,<br>
-for the greater glory of God, was built by him.<br>
-Stand, Christian reader. Stand. You seek a monument.<br>
-Look around you. And with your Christian charity,<br>
-pray for the soul of him.<br>
-Aso, in memory of<br>
-The Most Illustrious and Most Reverend Donald<br>
-Mac Gonigle, bishop of Raphoe, one of the group of<br>
-Irish bishops who were at various sessions of the most<br>
-holy Council of Trent, Pius IV was pope.<br>
-They buried (him). He died in 1585<br>
-In Killybegs, September 29.<br>
-In blessing will be the memory of him.<br>
-Erected by The Parishioners, 1866. Sunday Social in Dunkineely Community Centre<br>
-on Sunday 30th August 8 - 10pm. Music by<br>
-Country Traditions. Adm €10 Refreshments. Carrick Day Care Centre Doors re -opening 31st<br>
-August 2026 Monday to Thursday 9am - 5pm.<br>
+Tel: <a href="tel:+353872505449" style="color:#1d4ed8;font-weight:600;">0872505449</a> Final Hymn: Freely<br>
+God forgave my sin in Jesus ’ name<br>
+I’ve been born again in Jesus ’ name<br>
+And in Jesus ’ name I come to you<br>
+To share his love as he told me to.<br>
+Chorus:<br>
+He said freely, freely you have received;<br>
+Freely, freely give,<br>
+Go in my name and because you believe<br>
+Others will know that I live.<br>
+All power is given in Jesus ’ name<br>
+In earth and heaven in Jesus ’ name,<br>
+And in Jesus ’ name I come to you,<br>
+To share his power as he told me to. (Chorus) Prayer for the love of Creation<br>
+Creator God,<br>
+You show us what love is<br>
+through the beauty of the earth<br>
+and the gift of your Son.<br>
+For the love of<br>
+animal and plant<br>
+mountain and forest<br>
+sea and city<br>
+woman and man<br>
+friend and family<br>
+those who live far from us<br>
+and those yet to be born.<br>
+Move us to live more simply,<br>
+to protect the earth<br>
+and to speak up for those in need.<br>
+Amen.<br>
+Sarah Hagger -Holt/ CAFOD Carrick Day Care Centre Doors re -opened 31st<br>
+August, Monday to Thursday 9am - 5pm.<br>
 Wholesome freshly cooked 4 course meal available<br>
 daily €10 (booking advised). Enquiries 97 39354 or<br>
 Mobile <a href="tel:+353876419749" style="color:#1d4ed8;font-weight:600;">0876419749</a>. Chiropody Clinic 8th Sept.<br>
 Contact Bernie Boyle <a href="tel:+353872331438" style="color:#1d4ed8;font-weight:600;">0872331438</a>.<br>
-Killybegs Cruise Schedule 2026<br>
-Date Ship Arrive/Depart Passengers<br>
-29 Aug Hebridean Sky 8am / 10pm 91<br>
-03 Sept Vista 8am / 5pm 1,200<br>
-Physio Éireann this September in Killybegs<br>
-Something for everyone. Call <a href="tel:+353851707997" style="color:#1d4ed8;font-weight:600;">085 170 7997</a><br>
-Chair Pilates, Clinical Pilates, StrongHER.  Sunday 30th August 2026: Twenty Second Sunday in Ordinary Time Year A<br>
- Weekday Readings: Twenty Second Week in Ordinary Time Weekday 2<br>
+Thank You The family of Joe McCarthy R.I.P.<br>
+would like to thank everyone who helped Joe during<br>
+his illness, specially his carers: Phil, Peggy, Helen,<br>
+Hannah, Niamh, Bernie and Gary, the Doctor, local<br>
+nurses, L.U. H. and Donegal Hospice, Helen Watters,<br>
+Aiden Gallagher (Physio), Deborah (Dietitian), O.T.s,<br>
+the Neurologists at St Vincent ’s Hospital and local<br>
+GAA for parking during the wake.<br>
+A mention to Nessa and Cathy who really cared for<br>
+Joe throughout the years, they will never know the<br>
+extent of their help, Laurence Doherty and his men<br>
+who gave their own time to make the house<br>
+Accessible, Fr Colm for the lovely Mass and Denis<br>
+McSweeney who sang beautifully, the readers and<br>
+gift bearers and all who helped at the wake. A Mass<br>
+will be offered for you all. Anna, Ciara &amp; Luke  Sunday 6th September 2026: Twenty Third Sunday in Ordinary Time Year A<br>
+ Weekday Readings: Twenty Third Week in Ordinary Time Weekday 2<br>
 Masses will be relayed on the webcamera: go to killybegsp arish.com for a link to Online Services or mcn.live<br>
-Saturday 29th August : 12 Noon - Damien Mc Guinness (Month ’s Mind Mass)<br>
-07.00pm - Pat Rowan (4th Anniv) &amp; Dessie Rowan (2nd Anniv)<br>
-Maeve Murray (4th Anniversary)<br>
-Alan Raughter (10th Anniversary)<br>
-Sean McGuinness (25th Anniversary)<br>
-Michael Hamilton (29th Anniversary)<br>
-Terence Carry (37th Anniversary)<br>
-Sunday 30th August: 09.00am - Special Intentions<br>
-11.00am - Sylvia Murrin (Month ’s Mind Mass)<br>
-Monday 31st August: 10.00am - James Greenwood (7th Anniversary)<br>
-Tuesday 1st September: 10.00am - Fr. Eugene O ’Carroll (7th Anniversary)<br>
-Thursday 3rd September: 10.00am - Special Intention<br>
-Friday 4th September: 10.00am - Special Intentions<br>
 Saturday 5th September: 07.00pm - Joe McCarthy (Month ’s Mind Mass)<br>
 Patrick McCloskey (3rd Anniversary)<br>
 Sean Melly (20th Anniversar y)<br>
@@ -1065,41 +1062,58 @@ Packie (25th) &amp; Mary (40th) Boyle (A nniversaries)<br>
 John &amp; Margaret McTeague (Anniversaries)<br>
 Sunday 6th September: 09.00am - Special Intentions<br>
 11.00am - Ann Boyle (birthday remembrance)<br>
+Monday 7th September: 10.00am - James &amp; Mary Ann O ’Donnell (Anniversaries)<br>
+Tuesday 8th September: 10.00am - Special Intention<br>
+Thursday 10th September: 10.00am - Cahir &amp; Annie Kennedy (Anniversaries)<br>
+Friday 11th September: 10.00am - Deceased members of the Mulreany family<br>
+Saturday 12th September: 07.00pm - Una Cunningham (16th Anniversary) &amp; baby Linda<br>
+Sunday 13th September: 09.00am - Kathleen Boyle (19th Anniversary)<br>
+11.00am - Tommy &amp; Bridget Dorrian (Anniversaries) &amp;<br>
+deceased family members<br>
 Adoration of the Blessed Sacrament on Monday 11.00am - 7.00pm<br>
-Lannon ’s Pharmacy located at Supervalu beside<br>
-Post Office Tel: <a href="tel:+353749732252" style="color:#1d4ed8;font-weight:600;">074 97 32252</a><br>
-• Free delivery service • Prescription while you<br>
-wait •Free consultations<br>
-• Medication in weekly trays free of charge Adoration in the Adoration Room every Wednesday evening 6 -7pm. All welcome.<br>
-The Irish Handicapped Children&#x27;s Pilgrimage<br>
-Trust, celebrating 40 of taking young people with<br>
-special needs to Lourdes each Easter with a Mass<br>
-on Saturday 26th Sept. Church of the Irish Martyrs,<br>
-Letterkenny 12pm: all guests &amp; families &amp; helpers<br>
-who travelled with us over the years are welcome. Entrance Hymn: God ’s Spirit is in My Heart,<br>
-He has called me and set me apart,<br>
-This is what I have to do, what I have to do.<br>
-He sent me to bring the good news to the poor,<br>
-Tell prisoners that they are prisoners no more,<br>
-Tell blind people that they can see,<br>
-And set the downtrodden free.<br>
-And go tell everyone<br>
-The news that the kingdom of God has come,<br>
-And go tell everyone<br>
-The news that God ’s kingdom has come.<br>
-Just as the Father sent me,<br>
-So I ’m sending you out to be,<br>
-My witnesses throughout the world,<br>
-The whole of the world. (Chorus)<br>
+Cursillo There will be a Cursillo friendship night<br>
+in Donegal Town on Wednesday 9th September at<br>
+7:30pm in the Church of Ireland Hall. All Cursillo<br>
+members very welcome. Adoration in the Adoration Room every Wednesday evening 6 -7pm. All welcome.<br>
+Donegal Group 173 Rise and Shine Trust<br>
+(formerly The Irish Handicapped Children&#x27;s<br>
+Pilgrimage Trust and The Irish Pilgrimage Trust)<br>
+are celebrating 40 years of taking young people<br>
+with special needs to Lourdes each Easter, with a<br>
+Mass on Saturday 26th Sept. Church of the Irish<br>
+Martyrs, Letterkenny 12pm. We invite all guests<br>
+families &amp; helpers, who travelled with us over the<br>
+years, to this Mass of Our Lady of Lourdes. Entrance Hymn: Christ Be Our Light<br>
+Longing for light, we wait in darkness.<br>
+Longing for truth, we turn to you.<br>
+Make us your own, your holy people,<br>
+Light for the world to see.<br>
+Christ be our light! Shine in our hearts.<br>
+Shine through the darkness.<br>
+Christ be our light!<br>
+Shine in your church gathered today.<br>
+Longing for peace, our world is troubled.<br>
+Longing for hope, many despair.<br>
+Your word alone has pow ’r to save us.<br>
+Make us your living voice. (Chorus)<br>
 Áislann Chill Chartha: <a href="tel:+353749738376" style="color:#1d4ed8;font-weight:600;">0749738376</a><br>
 Onoir Friday 11th September<br>
 Enrolment for winter classes now also being taken<br>
-Golf Classic Friday 25th September<br>
-Halloween Camp 27th - 30th October Two thoughts from Dag Hammarskjold<br>
-‘For all that has been - thanks.<br>
-To all that will be - yes. ’<br>
-‘Do not seek death. Death will find you.<br>
-But seek the road which makes death a fulfilment. ’<br>
+Golf Classic Friday 25th September Irish Dancing Class resumes on Wednesday 9th<br>
+September in Foresters Hall at 4pm. Beginners<br>
+welcome. Marie B/Cannon &amp; Oran McNelis.<br>
+Living in the Present Moment<br>
+ensures we do not miss the present,<br>
+ensures we do not find the day has passed us by<br>
+before we have fully lived it,<br>
+helps us greet the night with gratitude,<br>
+helps us to welcome death<br>
+when its moment comes. Sister Stan<br>
+A Triduum in preparation for the Feast of St<br>
+Padre Pio at the Franciscan Friary, Rossnolwlagh,<br>
+Sunday 20th - Wed 23rd September.<br>
+Mass, Homily and Blessing with his mitten at<br>
+7.30pm each evening. All welcome.<br>
 Killybegs <a href="https://mcn.live/Camera/st-mary-of-the-visitation-church-killybegs" target="_blank" rel="noopener noreferrer">https://mcn.live/Camera/st-mary-of-the-visitation-church-killybegs</a></p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
@@ -1107,7 +1121,7 @@ Killybegs <a href="https://mcn.live/Camera/st-mary-of-the-visitation-church-kill
     <section class="parish-section">
       <h2 class="section-heading">Other RAPHOE Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="tawnawillyparish.html" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="kincasslagh"><a class="parish-link" href="kincasslagh.html" target="_blank" rel="noopener noreferrer">Kincasslagh</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1159,9 +1173,9 @@ Killybegs <a href="https://mcn.live/Camera/st-mary-of-the-visitation-church-kill
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1615,11 +1629,16 @@ Killybegs <a href="https://mcn.live/Camera/st-mary-of-the-visitation-church-kill
         for (var i = 0; i < names.length; i++) {
           var page = pageFor(names[i]);
           if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
           var slot = pages.querySelector('[data-page="' + page + '"]');
           if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
+          scrollBoxTo(pages, slot);
           return true;
         }
         return false;

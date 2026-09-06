@@ -1,0 +1,768 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Bangor Text Bulletin — 06/09/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #eef1f0;
+      color: #1a1f1e;
+      line-height: 1.65;
+      font-size: 1.125rem;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
+    }
+    a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
+    .page {
+      max-width: min(72ch, 100%);
+      margin: 0 auto;
+      padding: 14px 18px 40px;
+    }
+    .top {
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+      gap: 8px 14px;
+      margin-bottom: 12px;
+    }
+    .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+    .back-link {
+      font-size: 0.9rem; font-weight: 700;
+      color: #14524f; text-decoration: none;
+    }
+    .title-line {
+      font-size: 1rem; font-weight: 700; color: #1a1f1e;
+    }
+    .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 9999;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
+    .ocr-zoom-bar {
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
+    }
+    .ocr-zoom-bar button {
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+      line-height: 1;
+    }
+    .ocr-zoom-pct {
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 4px; } }
+    
+    .ocr-body {
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    .ocr-body h1, .ocr-body h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h2.b-title, .ocr-body .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    .ocr-body h3.b-head, .ocr-body .b-head {
+      font-size: 1.12em;
+      color: #134e9c;
+      margin: 1.1em 0 0.35em;
+    }
+    .ocr-body h4.b-sub, .ocr-body .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    .ocr-body h3, .ocr-body h4 {
+      color: #1a6b6b;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    .ocr-body h3.ocr-page-heading,
+    .ocr-body .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    .ocr-body hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    .ocr-body strong { color: #0f2b5b; }
+    .ocr-body a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .ocr-body mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    .ocr-body mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    .ocr-body table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ocr-body table.b-table td, .ocr-body table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .ocr-body table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    .ocr-body table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    .ocr-body img, .ocr-body iframe, .ocr-body video {
+      max-width: 100%;
+      height: auto;
+    }
+    .ocr-body > :first-child {
+      margin-top: 0;
+    }
+    
+    .ocr-body .ocr-parish-masthead {
+      margin: 2.1em 0 1.15em;
+      padding: 0.85em 0 0.7em;
+      border-top: 3px solid #14524f;
+      border-bottom: 1px solid #c5d0c9;
+    }
+    .ocr-body .ocr-parish-masthead:first-child {
+      margin-top: 0;
+    }
+    .ocr-body h2.ocr-parish-name,
+    .ocr-body .ocr-parish-name {
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #14524f;
+      margin: 0 0 0.2em;
+      line-height: 1.25;
+      border: 0;
+      padding: 0;
+      text-transform: none;
+    }
+    .ocr-body .ocr-parish-date {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body .ocr-parish-link {
+      margin: 0.25em 0 0;
+      font-size: 0.88rem;
+    }
+    .ocr-body h3.b-head {
+      margin-top: 1.45em;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.12em;
+      border-bottom: 1px solid #d4ddd9;
+    }
+
+
+    .ocr-body {
+      padding: 4px 2px 8px;
+    }
+    .search-panel {
+      margin: 0 0 12px;
+      border: 1px solid #d4ddd9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .search-panel .ocr-search-bar { margin-bottom: 6px; }
+    .ocr-search-bar { position: relative; margin-bottom: 6px; }
+    .search-input {
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: #1a1f1e; background: #fff;
+    }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 1px solid #1a6b6b; border-radius: 6px; background: #fff; color: #1a6b6b;
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { color: #999; border-color: #d4ddd9; cursor: not-allowed; }
+    .match-count { color: #5a6a68; font-size: 0.85rem; font-weight: 600; }
+    .note-box {
+      margin-top: 18px;
+      color: #5a6a68;
+      font-weight: 400;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      padding: 0;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 8px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    body.embed-mode .top { display: none !important; }
+    body.embed-mode .page { padding-top: 8px; }
+    @media (max-width: 600px) {
+      .page { padding: 12px 14px 32px; }
+      .ocr-search-tools button { min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top" id="ocr-top">
+      <div class="top-left">
+        <a class="back-link" href="bangorparish.html" target="_blank" rel="noopener noreferrer">← Viewer</a>
+        <span class="title-line">BANGOR Text Bulletin · 06/09/2026</span>
+      </div>
+    </div>
+    <div class="ocr-sticky-chrome">
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+      <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+      <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+      <span class="ocr-zoom-hint">or pinch to zoom</span>
+    </div>
+    <div class="search-panel" role="search">
+      <div class="ocr-search-bar">
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search text (mass, bingo, parish…)" aria-label="Search bulletin text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled>← Prev</button>
+          <button id="ocr-next" type="button" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead" id="ocr-parish-bangor" data-parish-name="Bangor"><h2 class="ocr-parish-name">Bangor</h2><p class="ocr-parish-date">06/09/2026</p></header>
+<p class="page-label">Page 1</p>
+<p>PARISH NEWSLETTER<br>
+Twenty-Third Sunday in Ordinary Time, Year A – 6th September 2026<br>
+Your prayers are requested for:</p>
+<h3 class="b-head">Recently Deceased</h3>
+<p>Desmond Donaghy<br>
+Frank Boyd (Downpatrick)</p>
+<h3 class="b-head">Anniversaries</h3>
+<p>Una Ferguson<br>
+Loretta Brennan<br>
+Patrick &amp; Caroline Duffy<br>
+Roseleen Gibson<br>
+Harry Shields<br>
+Emmanuel Shields<br>
+John Finlay<br>
+Angela Coan<br>
+Parish of Bangor, Member of Ards Family of Parishes<br>
+Parish Priest : Very Rev Joseph Gunn St Comgall’s Presbytery, 27 Brunswick Road, Bangor, Co Down, BT20 3DS<br>
+T: (028) 9146-5522 Permanent Deacon : Rev James McAllister T: 07751 851444<br>
+Email :<a href="mailto:bangor@downandconnor.org" target="_blank" rel="noopener noreferrer">bangor@downandconnor.org</a> Website :<a href="https://www.bangorparish.com" target="_blank" rel="noopener noreferrer">www.bangorparish.com</a> Office Hours : Mon-Fri 10am to 1pm.</p>
+<h3 class="b-head">MASS TIMES NEXT WEEK</h3>
+<h3 class="b-head">DAILY MASS</h3>
+<p>Monday 7th – Friday 11th September @ 9.30am<br>
+ST. COMGALL’S CHURCH DONAGHADEE<br>
+Sunday 13th September 2026 @ 9am<br>
+ST COMGALL’S CHURCH BRUNSWICK ROAD<br>
+Saturday 12th September @ 6.30pm<br>
+Sunday 13th September @ 10am &amp; 12noon<br>
+BAPTISMS<br>
+Please register online SIDE BAR under Baptism registration<br>
+Baptisms are celebrated on Sundays @ 1.15pm<br>
+‘Baptism<br>
+Registration’<br>
+TRŌCAIRE COFFEE<br>
+MORNING<br>
+In aid of disaster in Nepal<br>
+Sunday 20 September in Parish<br>
+Centre<br>
+Tea/coffee &amp; traybakes<br>
+Big ballot<br>
+Tombola<br>
+Please support our appeal<br>
+Bangor <a href="https://www.bangorparish.com" target="_blank" rel="noopener noreferrer">https://www.bangorparish.com</a></p>
+<hr>
+<p class="page-label">Page 2</p>
+<p>MONDAYS<br>
+TUESDAYS WEDNESDAYS THURSDAYS FRIDAYS<br>
+BRIDGE CLUB<br>
+at 7.15pm until 9.45pm<br>
+[Minor Hall]<br>
+LECTIO DIVINA GROUP<br>
+7.30pm – 8.30pm<br>
+[St Dympna’s Room]<br>
+BADMINTON<br>
+NOW WEEKLY at 8 to 9pm<br>
+[Main Hall]<br>
+FRIENDSHIP CLUB<br>
+at 10.30am<br>
+[Minor Hall]<br>
+IRISH DANCING<br>
+CLASSES<br>
+at 6.00pm to 8.30pm<br>
+[Main Hall]<br>
+SVP<br>
+at 7.30pm to 9.30pm<br>
+[St Dympna’s Room]<br>
+MEDITATION GROUP<br>
+at 12pm to 1.30pm<br>
+[St Dympna’s Room]<br>
+FOLK GROUP<br>
+AT 6.30 -7.30pm<br>
+[St Dympna’s Room]<br>
+SENIOR CHOIR<br>
+At 7.30pm<br>
+[St Dympna’s Room]<br>
+YOUTH CLUB<br>
+AT 6.30 -8.30pm<br>
+[Main Hall]<br>
+St Comgall’s Guide Unit<br>
+(Girls aged 6-18)<br>
+at 6.15pm to 8pm<br>
+[Main/Minor Hall]<br>
+IRISH LANGUAGE<br>
+CLASS<br>
+At 7pm to 8pm<br>
+[St Dympna’s Room]<br>
+CEILI DANCING<br>
+at 8.15pm to 9.30pm<br>
+[Minor Hall] Ju-Jitsu Club<br>
+(Juniors 5-15yrs)<br>
+6-7pm<br>
+[Main Hall]<br>
+Discussion Group<br>
+At 7.30pm – 9pm<br>
+[St. Dympna’s<br>
+Room]<br>
+Opening Mass for the Season of Creation<br>
+6.00 pm on Sunday, 6th September in St. Patrick’s Church, Donegall Street, Belfast<br>
+Celebrant: Fr Piaras Jackson SJ, with interfaith contributions.<br>
+This Mass marks the beginning of the Season of Creation (1 Sept –4 Oct), a time when Christians worldwide commit to<br>
+prayer and action for our common home under the theme “Living Water”.<br>
+1st September is the World Day of Prayer for the Care of Creation. In his message for the occasion, Pope Leo said, “ The<br>
+prophetic call to “beat swords into ploughshares” ( Is 2:4) is (.) not only a vision for nations, but a call to each person.<br>
+It invites us to transform harm into life. Yet this transformation cannot be achieved through external cha nge alone. It<br>
+requires, through cooperating with God’s grace, a deeper person al and collective conversion — a returning to God,<br>
+who will reorder our desires, heal our wounds and help us grow in virtue.”<br>
+<strong>*</strong><strong>*</strong><strong>*</strong><strong> </strong>**<br>
+Beginning Experience – Beginning Experience is a peer ministry to the bereaved, separated and divorced,<br>
+based within the Family Ministry of the Diocese of Down and Connor.<br>
+We are offering a support programme over three Saturdays from September through to November and<br>
+would be most grateful if you could include the following information in your Church Bulletin at your earliest<br>
+convenience.<br>
+The loss of a partner through death, separation or divorce is devastating. Beginning Experience is offering a<br>
+programme of bereavement support in St Bride’s Hall, Derryvolgie Ave., Belfast on three Saturdays (26th<br>
+September 24th October and 21st November) Booking essential. To find out more contact Marie<br>
+<a href="tel:+3537896119669" style="color:#1d4ed8;font-weight:600;">07896119669</a> or email <a href="mailto:belfastbe@yahoo.com" target="_blank" rel="noopener noreferrer">belfastbe@yahoo.com</a><br>
+<strong>*</strong><strong>*</strong>* <strong>*</strong>****<br>
+Children’s Liturgy<br>
+Children&#x27;s Liturgy will be starting on the 27th September. New forms have t o be filled in. Lisa will have them<br>
+at back of church before and after mass this week.<br>
+<strong>*</strong><strong>*</strong>* <strong>*</strong>**<br>
+Parishioners are kindly requested to submit notices for the ne wsletter and anniversary mass requests to the<br>
+parish office by Wednesday of each week (Mon to Fri 10am – 1pm) or via <a href="mailto:bangor@downandconnor.org" target="_blank" rel="noopener noreferrer">bangor@downandconnor.org</a><br>
+<strong>*</strong><strong>*</strong>* <strong>*</strong><strong>*</strong>* ***<br>
+ST VINCENT DE PAUL HELPLINES<br>
+Bangor Conference <a href="tel:+3537703679384" style="color:#1d4ed8;font-weight:600;">07703679384</a><br>
+(covering Bangor West, Clandeboye/Newtownards Road area, Kilcooley, Helens Bay and Crawfordsburn)<br>
+Ballyholme/Donaghadee Conference <a href="tel:+3537703679389" style="color:#1d4ed8;font-weight:600;">07703679389</a> . (covering Bangor city centre, Bangor East/Ballyholme, Balloo/Bloomfield<br>
+Road area, Groomsport, Donaghadee and Millisle<br>
+PARISH CENTRE – PARISH GROUPS 2025</p>
+<hr>
+<p class="page-label">Page 3</p>
+<p>PRAYERS AT HOLY COMMUNION<br>
+Spiritual Holy Communion Prayer<br>
+My Jesus, I believe that you are present<br>
+in the most Blessed Sacrament.<br>
+I love you above all things and<br>
+I desire to receive you into my soul.<br>
+Since I cannot now receive you sacramentally,<br>
+come at least spiritually into my heart.<br>
+I embrace you as if you have already come,<br>
+and unite myself wholly to you.<br>
+Never permit me to be separated from you.<br>
+Amen.<br>
+composed by Saint Alphonsus Liguori<br>
+ANIMA CHRISTI<br>
+Prayer to the Most Holy Redeemer<br>
+Soul of Christ, sanctify me.<br>
+Body of Christ, save me.<br>
+Blood of Christ, embolden me.<br>
+Water from the side of Christ, wash me.<br>
+Passion of Christ, strengthen me.<br>
+O good Jesus, hear me.<br>
+Within your wounds hide me.<br>
+Never permit me to be separated from you.<br>
+From the evil enemy defend me.<br>
+At the hour of my death call me<br>
+and bid me to come to you,<br>
+that with your Saints I may praise you<br>
+for age upon age. Amen<br>
+Prayer Online : Come and join us at… <a href="https://www.soulparemission.com" target="_blank" rel="noopener noreferrer">www.soulparemission.com</a> Who are we? We are a new interactive prayer<br>
+website created by Jacinta Crockford DipTH, Spiritual Director living in Down and Conno r. What’s on offer ? A variety of<br>
+PDF meditations on Scripture, Mother Teresa, Ignatius Spirituality to name but a few. Lots of content to Dive into!<br>
+There you will find - Podcasts on Faith, Friendship &amp; Knowledge; Rosaries, Prayers and Maria n Consecration, Videos of<br>
+Reflective Prayers during Adoration. Come and join us and be part of the local prayer movemen t online!<br>
+CALENDAR OF SAINTS DAYS<br>
+JANUARY 2024</p></div>
+    <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
+  </div>
+  <script>
+    (function () {
+      try {
+        if (new URLSearchParams(window.location.search).get('embed') === '1') {
+          document.body.classList.add('embed-mode');
+        }
+      } catch (e) {}
+    })();
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-text');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+    (function () {
+      const ocrRoot = document.getElementById('ocr-text');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      if (!ocrRoot || !ocrSearch) return;
+      const originalHtml = ocrRoot.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+      function escapeRegExp(text) {
+        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        ocrMatches[idx].classList.add('search-active');
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      function updateMatchUi() {
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} of ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+      function applySearch(query) {
+        ocrRoot.innerHTML = originalHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrRoot, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) nodes.push(node);
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) return;
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrRoot.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+      ocrSearch.addEventListener('input', (e) => applySearch(e.target.value.trim()));
+      clearSearch.addEventListener('click', () => { ocrSearch.value = ''; applySearch(''); ocrSearch.focus(); });
+      prevMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && ocrMatches.length) {
+          e.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+    })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      function boot() {
+        var btn = document.getElementById('scroll-top-btn');
+        if (!btn) {
+          if (!document.body) return;
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scroll-top-btn';
+          btn.id = 'scroll-top-btn';
+          btn.setAttribute('aria-label', 'Back to top');
+          btn.textContent = '↑';
+          document.body.appendChild(btn);
+        }
+        function innerBoxes() {
+          return Array.prototype.slice.call(
+            document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+          );
+        }
+        function maxInnerScroll() {
+          return innerBoxes().reduce(function (max, el) {
+            return Math.max(max, el.scrollTop || 0);
+          }, 0);
+        }
+        function shown() {
+          var y = window.scrollY || document.documentElement.scrollTop || 0;
+          btn.classList.toggle('is-visible', y > 80 || maxInnerScroll() > 16);
+        }
+        function shownSoon() {
+          shown();
+          if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+          else window.setTimeout(shown, 16);
+        }
+        function bindBox(el) {
+          if (!el || el.getAttribute('data-pp-scroll-top') === '1') return;
+          el.setAttribute('data-pp-scroll-top', '1');
+          el.addEventListener('scroll', shownSoon, { passive: true });
+        }
+        function bindBoxes() {
+          innerBoxes().forEach(bindBox);
+          shown();
+        }
+        window.parishPressBindScrollTopBoxes = bindBoxes;
+        if (btn.getAttribute('data-pp-bound') !== 'inner-2') {
+          btn.setAttribute('data-pp-bound', 'inner-2');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.addEventListener('scroll', shownSoon, { passive: true });
+          document.addEventListener('scroll', shownSoon, { capture: true, passive: true });
+          document.addEventListener('wheel', shownSoon, { capture: true, passive: true });
+          document.addEventListener('touchmove', shownSoon, { capture: true, passive: true });
+          if (window.MutationObserver && document.body) {
+            new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+          }
+          btn.addEventListener('click', function () {
+            var behavior = reduce ? 'auto' : 'smooth';
+            window.scrollTo({ top: 0, behavior: behavior });
+            innerBoxes().forEach(function (el) {
+              el.scrollTop = 0;
+              if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+            });
+            window.setTimeout(shown, reduce ? 0 : 400);
+          });
+        }
+        bindBoxes();
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
+    })();
+    
+  </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
+</body>
+</html>

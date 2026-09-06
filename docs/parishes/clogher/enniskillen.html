@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Enniskillen (St Michael&#x27;s Parish) Bulletin — 30/08/2026</title>
+  <title>Enniskillen (St Michael&#x27;s Parish) Bulletin — 06/09/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -109,6 +110,13 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
@@ -141,6 +149,7 @@
       cursor: pointer;
     }
     .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
     
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {
@@ -160,7 +169,7 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
@@ -203,6 +212,7 @@
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {
@@ -866,6 +876,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -892,7 +903,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -900,35 +911,31 @@
     <header class="header">
       <p class="diocese-label">CLOGHER</p>
       <h1>Enniskillen (St Michael&#x27;s Parish) Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Enniskillen (St Michael&#x27;s Parish) — 30/08/2026. Part of the Clogher Diocese collated bulletin.</p>
-      <a class="download-link-top" href="enniskillen.pdf">Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Enniskillen (St Michael&#x27;s Parish) — 06/09/2026. Part of the Clogher Diocese collated bulletin.</p>
+      <a class="download-link-top pdf-force-download" href="enniskillen.pdf" download="enniskillen.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="enniskillen.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       
-      <div class="quiet-links">
-        <a href="enniskillen.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="enniskillen-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="enniskillen.pdf" title="Enniskillen (St Michael&#x27;s Parish) bulletin PDF"></iframe>
+        <iframe data-pdf-url="enniskillen.pdf" title="Enniskillen (St Michael&#x27;s Parish) bulletin PDF"></iframe>
         
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="enniskillen.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="enniskillen.pdf">Open PDF</a>
-              <a href="enniskillen.pdf" download>Download</a>
+              <a class="pdf-open-newtab" href="enniskillen.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="enniskillen.pdf" download="enniskillen.pdf">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>
       </div>
@@ -963,13 +970,13 @@
       <div class="quiet-links">
         <a href="enniskillen-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-enniskillen-st-michael-s-parish" data-parish-name="Enniskillen (St Michael&#x27;s Parish)"><h2 class="ocr-parish-name">Enniskillen (St Michael&#x27;s Parish)</h2><p class="ocr-parish-date">30/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-enniskillen-st-michael-s-parish" data-parish-name="Enniskillen (St Michael&#x27;s Parish)"><h2 class="ocr-parish-name">Enniskillen (St Michael&#x27;s Parish)</h2><p class="ocr-parish-date">06/09/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>ST MICHAEL’S PARISH<br>
 Enniskillen &amp; Lisbellaw<br>
 Building Faith, Friendship, Community<br>
-Parish Messenger 30th August 2026<br>
-TWENTY -SECOND SUNDAY IN ORDINARY TIME<br>
+Parish Messenger 6th September 2026<br>
+TWENTY -THIRD SUNDAY IN ORDINARY TIME<br>
 Parish Priest: Mgr. Peter O ’Reilly<br>
 Parish Curate: Rev. Raymond Donnelly<br>
 Assistant Priest: Rev. Joseph McVeigh<br>
@@ -981,98 +988,101 @@ All emergency hospital calls for the Priest on Duty are made by the Staff Nurse 
 If you need to speak to a priest in an emergency, please phone the Switchboard on <a href="tel:+4428663820" style="color:#1d4ed8;font-weight:600;">028 663820</a> 00 and ask for the Priest on Duty.<br>
 MASSES FOR THE COMING WEEK<br>
 Available to watch online @ <a href="https://mcnmedia.tv/camera/st" target="_blank" rel="noopener noreferrer">https://mcnmedia.tv/camera/st</a> -michaels -parish -eniskillen<br>
-Sat 29th Aug 6.00pm (Vigil) (Month ’s Mind) Aidan Conlon, Algeo Drive.<br>
-(Month ’s Mind) Joann Drumm (nee Wheeler), Cavandale Park.<br>
-Sun 30th Aug 8.00am Donor ’s Intention<br>
-Sun 30th Aug 10.30am (First Anniversary) Margaret &amp; Terence Green, Ballylucas and their daughter<br>
-Anna Sheerin, Hillview<br>
-12pm Mass resumes in St Michael ’s on 13th September<br>
-9.30am Mass resumes in St Mary ’s, Lisbellaw on 13th September<br>
-Mon 31st Aug 22nd Week in Ordinary Time<br>
-10.00am Charlie &amp; Brigid Higgins, Hillview Road.<br>
-Tue 1st Sept 22nd Week in Ordinary Times<br>
-10.00am Donors ’ Intention<br>
-Wed 2nd Sept 22nd Week in Ordinary Time<br>
-10.00am Donors ’ Intention<br>
-Thurs 3rd Sept St Gregory the Great, pope and doctor of the Church<br>
-10.00am Donors ’ Intention<br>
-Fri 4th Sept 22nd week in Ordinary Time<br>
-10.00am Edward &amp; Kitty Quinn, Edward Quinn, Junior, Hillview Park and deceased members of<br>
-the Quinn family, Cornagrade Terrace.<br>
-Sat 5th Sept 22nd Week in Ordinary Time<br>
-10.00am Joe &amp; Mary McCaffrey, Riverside and deceased family members of the Magee and<br>
-Treacy families, Garrison and the Burns &amp; McCaffrey families, Cashel.<br>
-Anthony &amp; Maureen Curran, Aisling Crescent, Derrychara.<br>
-Charlie &amp; Elizabeth Tierney and Gerard Tierney, Woaghternerry, Enniskillen.<br>
-Jim Shannon, Meadow Lane.<br>
-6.00pm (Vigil) George &amp; Nellie Haggins and Annie Clarke, Yoan Road, Sheila Clarke, Corban Avenue<br>
+Sat 5th Sept 6.00pm (Vigil) George &amp; Nellie Haggins and Annie Clarke, Yoan Road, Sheila Clarke, Corban Avenue<br>
 and deceased members of the McDonagh family, Abbey Street.<br>
+Sun 6th Sept 8.00am Donor ’s Intention<br>
+Sun 6th Sept 10.30am (First Anniversary) Caroline Reilly, Derrin Road .<br>
+(First Anniversary) Glenn Parkes, Drumlin Heights.<br>
+12pm Mass resumes in St Michael ’s on 13th September<br>
+Lisbellaw Next Sunday 9.30am 13th September ( John Bannon &amp; Shane Bannon, Ballinatarson )<br>
+Mon 7th Sept 23rd Week in Ordinary Time<br>
+10.00am Donors ’ Intention<br>
+Tue 8th Sept The Nativity of the Blessed Virgin Mary<br>
+10.00am Donors ’ Intention<br>
+Wed 9th Sept St Ciaran, Abbot<br>
+10.00am Mary Morris, Ingleby Gardens.<br>
+Thurs 10th Sept St Peter Claver, Priest<br>
+10.00am Donors ’ Intention<br>
+Fri 11th Sept 23rd Week in Ordinary Time<br>
+10.00am Donors ’ Intention<br>
+Sat 12th Sept The Holy Name of Mary<br>
+10.00am Edmund &amp; Bridget Tierney, Galliagh Terrace.<br>
+Declan Swift, Anna &amp; Dessie Murphy, Derrin Road, Tommy &amp; Rita Swift, Hillview and<br>
+deceased members of the Swift family.<br>
+Annie, Redmond, Marius and Peter McBrien, Hillview Park and deceased members of<br>
+the Cassidy family, Teemore.<br>
+Pat &amp; Philomena Blake, The Limes.<br>
+Catherine Gunn, Old Rossorry Road.<br>
+6.00pm (Vigil) (Month ’s Mind) Bryan Gallagher, Drumclay Link.<br>
+Night Pray er will resume on Saturday 19th September at 10pm .<br>
 20p<br>
-Mary’s Me als - Please keep supporting this worthy cause, donations can be left into the Parish Office. Thanks so much<br>
-for your ongoing support. Contact Ann Curry on <a href="tel:+3537885438529" style="color:#1d4ed8;font-weight:600;">07885438529</a> for further information.<br>
-Lough Der g 2026: One Day Re treats : August: Saturday 29th, Monday 31st. September: Saturday 5th, Sunday<br>
-6th, Wednesday 9th, Saturday 12th, Tuesday 15th, Saturday 19th and Sunday 20th. Advance Registration is essential for<br>
-all events. Call 00353 71 9861518. Email <a href="mailto:info@loughderg.org" target="_blank" rel="noopener noreferrer">info@loughderg.org</a>.<br>
-OCIA (Order of Christian I nitiation of Adults) former ly known as RCI A Do you or someone you know wish<br>
-to become a Catholic or complete your Faith Journey in the Catholic Church? If so, the OCIA (Order of Christian<br>
-Initiation of Adults) program, is available in St Michael ’s Parish, Enniskillen. Our next program begins on the 2nd of<br>
-September 2026 . If you wish to find out more please contact <a href="tel:+442866322075" style="color:#1d4ed8;font-weight:600;">02866322075</a> or your local Priest for more information.<br>
-Parish Offi ce will be closed on Bank Holiday Monday 31st August reopening on Tuesday 1st September at 10.30am .<br>
-St Michael ’s Parish Shop and Library will reopen after the summer holidays on Tuesday 1st September at<br>
-10.30am.<br>
-Christmas Youth Choir for Chr istmas Carol Servic e Registration will take place on Friday 4th September<br>
-between 4pm - 5.15pm in St Michael ’s Community Centre. All children must be P4 and above and under 18. It is<br>
-important that the registration form is completed by a parent or legal guardian only.<br>
 Enniskill en VSOSJ Branch monthly Holy Hour Devotion and Benediction for Vocations will be held in St<br>
-Michael ’s Church on Friday 4th September at 7pm . Everyone is welcome to attend.<br>
-Five Satu rday Devotion to Our Lady Next devotion will take place on Saturday morning 5th September at 9am<br>
-in St Michael ’s Church. #<br>
-Poor Clare s Galway Half-day retreat for women 18 -40, with women ’s spirituality speaker Louise McGuinness. An<br>
-opportunity to encounter God ’s love and deepen your life of prayer and communion with God. The event will take place<br>
-from 2pm to 6pm on Sunday 6th September. For more info and to register: <a href="https://cherisheddaughters.eventbrite.ie" target="_blank" rel="noopener noreferrer">https://cherisheddaughters.eventbrite.ie</a><br>
+Michael ’s Church this Friday 4th September at 7pm . Everyone is welcome to attend.<br>
+Five Satu rday Devotion to Our Lady Next devotion will take place this Saturday morning 5th September at<br>
+9am in St Michael ’s Church.<br>
+St Michael ’s Parish Library As the Parish Library celebrates its 3rd birthday , everyone is invited to a Coffee<br>
+Morning on Tuesday 8th September from 10.30am to 12.30pm in the Library, upstairs from the Bookshop.<br>
+Lough Der g 2026: One Day Re treats : September: Saturday 5th, Sunday 6th, Wednesday 9th, Saturday 12th,<br>
+Tuesday 15th, Saturday 19th and Sunday 20th. Advance Registration is essential for all events. Call 00353 71 9861518.<br>
+Email <a href="mailto:info@loughderg.org" target="_blank" rel="noopener noreferrer">info@loughderg.org</a>.<br>
+Save Our Acute Services Publi c Meeting (SOAS): Our next meeting will take place on Monday 7th September<br>
+at 7pm in the Westville Hotel in Enniskillen. We need to talk to you and alert you as to what plans are being made for us<br>
+and how we must fight and resist them. This is a very important meeting. Your support is essential.<br>
+Padre Pio Prayer Group is taking place in St Michael ’s Parish Centre on Thursday 10th September at<br>
+6pm . Padre Pio said ‘Pray, Hope &amp; Don ’t Worry ’ Everyone welcome to join us in prayer.<br>
 Family Tree Healing Mass in St Mary ’s Church, Arney on Friday 11th September at 7.30pm . Celebrant Fr. Gerry<br>
 Campbell. Everyone welcome .<br>
+Enniskill en VSOSJ Branch 1st of the 2026/27 year new monthly meetings will be resuming on Monday 14th<br>
+September in St Michael ’s Parish Centre at 7pm . Present members and new members are invited to attend by offering<br>
+your support for an hour of your time at each monthly meeting.<br>
 Bishop Heb er MacMahon Remember Bishop Heber MacMahon on 17th September, killed on 17th September 1650.<br>
-The Seas on of Creation Sept 1 st - Oct 14th As we prepare to enter the Season of Creation, Pope Leo X1V offers<br>
-us a powerful Message for the World Day of Prayer for the Care of Creation. This year, as we follow the theme Living<br>
-Water , his words feel especially meaningful. Scripture reminds us to guard our hearts, because from them flows<br>
-everything we do (Prov 4:23). What is flowing from my heart into the world? Is it care or indifference? Hope or<br>
-discouragement? A desire for justice, peace and communion? Pope Leo reminds us that ecological conversion begins<br>
-within us - but it is meant to flow outward, transforming how we live, how we relate to others and how we care for our<br>
-common home. Before Living Water becomes a river that renews the world, it first renews us.<br>
-Young at Heart Group returns on Sunday 4th October at 3pm in St Michael ’s Community Centre. Sunday Collection<br>
-Sunday 23rd August - White Envelope - Weekly Offering to the Parish - £2498.84<br>
-- Pink Envelope - Repair and Maintenance - £1166.73<br>
-This Sunday 30th August - White Envelope - Weekly Offering to the Parish<br>
-Next Sunday 6th September - Blue Envelope - Monthly Offering to the Priests and Pastoral Care<br>
-ANNUAL BLESSING OF GR AVES<br>
-Sunday 6th September<br>
-Cross Cemetery at 2pm &amp;<br>
-The Convent &amp; Breandrum Cemeteries at 3.30pm<br>
-Remember to bring Holy Water and Rosary Beads Church De votion over the Pa rish Webcam<br>
-10.30am Monday to Saturday : Rosary (except when there is a funeral at 11am).<br>
-12.00pm Monday (only): Angelus &amp; Our Lady of the Miraculous Medal.<br>
-6.00pm Monday to Friday: Rosary &amp; Divine Mercy.<br>
-10.00am Friday morning Mass: Pioneer Prayer &amp; Matt Talbot (Venerable) Prayer for those with Addiction to<br>
-Alcohol.<br>
-7.00pm Sunday: Divine Mercy Holy Hour.<br>
-7.00pm Every First Friday: Holy Hour &amp; Benediction for Vocations.<br>
-10.00pm Daily: Night Prayer. Deaths: Gabriel “Gaby ” Traynor, Hillview Road; Thomas “Dermot ” Corrigan, Cornagrade Road. May they Rest in Peace .<br>
-Planning a Baptism<br>
-When presenting a child for Baptism, parents are encouraged to contact the Parish Office in good time so that the<br>
-preparation process can be explained and any questions answered. The Church asks that a child have either one sponsor<br>
-(Godparent) or, where two sponsors are chosen, one male and one female sponsor. Sponsors should normally be<br>
-practising Catholics, at least 16 years of age, who have received the Sacraments of Baptism, Confirmation and the<br>
-Eucharist, and who are willing to support the child in the practice of the faith. Where this is not possible, we will be<br>
-happy to explain the role of a Christian witness. Please speak to the Parish Office, who will be happy to advise.<br>
-Enniskillen (St Michael's Parish) <a href="https://www.saintmichaels-parish.com/" target="_blank" rel="noopener noreferrer">https://www.saintmichaels-parish.com/</a></p></div>
+Enniskill en VSOSJ Branch will run a bus to Knock Shrine on Wednesday 7th October on the Feast of Our Lady<br>
+of the Rosary. Early booking is advisable. To reserve a bus seat, send a text message or what&#x27;s app to Adrian Brophy<br>
+<a href="tel:+3537817451959" style="color:#1d4ed8;font-weight:600;">07817451959</a>, Dympna Clarke <a href="tel:+3537749411433" style="color:#1d4ed8;font-weight:600;">07749411433</a> or Pat Clarke <a href="tel:+3537788433683" style="color:#1d4ed8;font-weight:600;">07788433683</a>. Bus leaves St Michael ’s Parish Shop at<br>
+8.30am sharp.<br>
+Annual D awn Culicagh Trek Saturday 12th September to mark World Suicide Prevention Day. Book via<br>
+Eventbrite <a href="https://AC2026.eventbrite.co.uk" target="_blank" rel="noopener noreferrer">https://AC2026.eventbrite.co.uk</a> or contact Aisling Centre for information <a href="mailto:info@theailsingcentre.com" target="_blank" rel="noopener noreferrer">info@theailsingcentre.com</a><br>
+Young at Heart Group returns on Sunday 4th October at 3pm in St Michael ’s Community Centre.<br>
+St Michael ’s Scout Group Registration night will take place on Tuesday 8th September 7pm to 8pm in St<br>
+Michael ’s Scout Hall, Erne Road. Beavers: 6 -8 years, Cubs: 9 -11 years and Scouts:12 -15 years.<br>
+Padre Pio A Triduum in preparation for the Feast of Padre Pio will take place at the Franciscan Friary, Rossnowlagh<br>
+from Sunday 20th - Wednesday 23rd September (inclusive). Mass, Homily &amp; Blessing with Mitten at 7.30pm each<br>
+evening. Preacher Fr Pius McLaughlin OFM.<br>
+Foundati ons of Faith Starts on Wednesday 23rd September at 7pm in St Michael ’s Parish Centre . A clear and<br>
+engaging 20 part journey through the Catechism of the Catholic Church, featuring Dr Edward Sri, Dr Marcellino and Fr<br>
+Mike Schmitz. Ideal for anyone wishing to deepen their understanding of the Catholic Faith. All welcome, email:<br>
+<a href="mailto:smp.bible@outlook.com" target="_blank" rel="noopener noreferrer">smp.bible@outlook.com</a><br>
+OCIA (Order of Christian Initiation of Adults) formerly known as RCIA Do you or someone you know wish to become<br>
+a Catholic or complete your Faith Journey in the Catholic Church? If so, the OCIA (Order of Christian Initiation of Adults) program,<br>
+is available in St Michael ’s Parish, Enniskillen. Our next program began on 2nd of September 2026 . If you wish to find out more<br>
+please contact <a href="tel:+442866322075" style="color:#1d4ed8;font-weight:600;">02866322075</a> or your local Priest for more information.<br>
+November Service for the Dead will take place on Sunday 15th November 2026. Sunday Collection<br>
+Sunday 30th August - White Envelope - Weekly Offering to the Parish - £2729.03<br>
+This Sunday 6th September - Blue Envelope - Monthly Offering to the Priests and Pastoral Care<br>
+Next Sunday 13th September - White Envelope - Weekly Offering to the Parish<br>
+ANNUAL BLESSING OF GRAVES - This Sun day 6th September<br>
+Cross Cemetery at 2pm &amp; The Convent &amp; Breandrum Cemeteries at 3.30pm<br>
+Remember to bring Holy Water and Rosary Beads The Seas on of Creation Sept 1 st - Oct 14th<br>
+“We scientists don ’t know how to do that ” “I used to think the top environmental problems were<br>
+biodiversity loss, ecosystem collapse and climate change. I thought that with 30 years of good science we could<br>
+address those problems. But I was wrong. The top environmental problems are selfishness, greed and apathy ….<br>
+and to deal with those we need a spiritual and cultural transformation - and we scientists don ’t know how to do that ” Deaths: Adelaide Fiddis, Drumcor Hill; Anthony “Tony ” Gallinagh, The Bawn; Fr Jim Moore, PP, Clones.<br>
+May they Rest in Peace .<br>
+Parish Dr aw - Month 7<br>
+Will take place on Monday 7th September<br>
+Promoters please make your returns to the Upper Room at the Parish Shop between 7 - 8pm Planning a Baptism<br>
+When presenting a child for Baptism, parents are encouraged to contact the Parish Office in good time so that the preparation process can be explained<br>
+and any questions answered. The Church asks that a child have either one sponsor (Godparent) or, where two sponsors are chosen, one male and one<br>
+female sponsor. Sponsors should normally be practising Catholics, at least 16 year s of age, who have received the Sacraments of Baptism, Confirmation<br>
+and the Eucharist, and who are willing to support the child in the practice of the faith. Where this is not possible, we will be happy to explain the role of a<br>
+Christian witness. Please speak to the Parish Office, who will be happy to advise. Enniskillen (St Michael's Parish) <a href="https://www.saintmichaels-parish.com/" target="_blank" rel="noopener noreferrer">https://www.saintmichaels-parish.com/</a></p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other CLOGHER Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ballybay (tullycorbet)"><a class="parish-link" href="ballybay.html" target="_blank" rel="noopener noreferrer">Ballybay (Tullycorbet)</a></li><li class="parish-item" data-name="carrickmacross (machaire rois)"><a class="parish-link" href="carrickmacross.html" target="_blank" rel="noopener noreferrer">Carrickmacross (Machaire Rois)</a></li><li class="parish-item" data-name="castleblayney (muckno, includes clontibret)"><a class="parish-link" href="castleblayney.html" target="_blank" rel="noopener noreferrer">Castleblayney (Muckno, includes Clontibret)</a></li><li class="parish-item" data-name="clones"><a class="parish-link" href="clones.html" target="_blank" rel="noopener noreferrer">Clones</a></li><li class="parish-item" data-name="corcaghan-threemilehouse (kilmore &amp; drumsnatt)"><a class="parish-link" href="corcaghanthreemilehouse.html" target="_blank" rel="noopener noreferrer">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</a></li><li class="parish-item" data-name="derrygonnelly (botha)"><a class="parish-link" href="derrygonnelly.html" target="_blank" rel="noopener noreferrer">Derrygonnelly (Botha)</a></li><li class="parish-item" data-name="donagh"><a class="parish-link" href="donagh.html" target="_blank" rel="noopener noreferrer">Donagh</a></li><li class="parish-item" data-name="errigal truagh"><a class="parish-link" href="errigaltruagh.html" target="_blank" rel="noopener noreferrer">Errigal Truagh</a></li><li class="parish-item" data-name="irvinestown (devenish)"><a class="parish-link" href="irvinestown.html" target="_blank" rel="noopener noreferrer">Irvinestown (Devenish)</a></li><li class="parish-item" data-name="killanny"><a class="parish-link" href="killanny.html" target="_blank" rel="noopener noreferrer">Killanny</a></li><li class="parish-item" data-name="magheracloone"><a class="parish-link" href="magheracloone.html" target="_blank" rel="noopener noreferrer">Magheracloone</a></li><li class="parish-item" data-name="monaghan &amp; rackwallace (includes tyholland)"><a class="parish-link" href="monaghanrackwallace.html" target="_blank" rel="noopener noreferrer">Monaghan &amp; Rackwallace (includes Tyholland)</a></li><li class="parish-item" data-name="tempo (pobal)"><a class="parish-link" href="tempo.html" target="_blank" rel="noopener noreferrer">Tempo (Pobal)</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ballybay (tullycorbet)"><a class="parish-link" href="ballybay.html" target="_blank" rel="noopener noreferrer">Ballybay (Tullycorbet)</a></li><li class="parish-item" data-name="carrickmacross (machaire rois)"><a class="parish-link" href="carrickmacross.html" target="_blank" rel="noopener noreferrer">Carrickmacross (Machaire Rois)</a></li><li class="parish-item" data-name="castleblayney (muckno, includes clontibret)"><a class="parish-link" href="castleblayney.html" target="_blank" rel="noopener noreferrer">Castleblayney (Muckno, includes Clontibret)</a></li><li class="parish-item" data-name="clones"><a class="parish-link" href="clones.html" target="_blank" rel="noopener noreferrer">Clones</a></li><li class="parish-item" data-name="corcaghan-threemilehouse (kilmore &amp; drumsnatt)"><a class="parish-link" href="corcaghanthreemilehouse.html" target="_blank" rel="noopener noreferrer">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</a></li><li class="parish-item" data-name="derrygonnelly (botha)"><a class="parish-link" href="derrygonnelly.html" target="_blank" rel="noopener noreferrer">Derrygonnelly (Botha)</a></li><li class="parish-item" data-name="donagh"><a class="parish-link" href="donagh.html" target="_blank" rel="noopener noreferrer">Donagh</a></li><li class="parish-item" data-name="errigal truagh"><a class="parish-link" href="errigaltruagh.html" target="_blank" rel="noopener noreferrer">Errigal Truagh</a></li><li class="parish-item" data-name="irvinestown (devenish)"><a class="parish-link" href="irvinestown.html" target="_blank" rel="noopener noreferrer">Irvinestown (Devenish)</a></li><li class="parish-item" data-name="killanny"><a class="parish-link" href="killanny.html" target="_blank" rel="noopener noreferrer">Killanny</a></li><li class="parish-item" data-name="lisnaskea-maguiresbridge (aghalurcher)"><a class="parish-link" href="lisnaskeamaguiresbridge.html" target="_blank" rel="noopener noreferrer">Lisnaskea-Maguiresbridge (Aghalurcher)</a></li><li class="parish-item" data-name="magheracloone"><a class="parish-link" href="magheracloone.html" target="_blank" rel="noopener noreferrer">Magheracloone</a></li><li class="parish-item" data-name="monaghan &amp; rackwallace (includes tyholland)"><a class="parish-link" href="monaghanrackwallace.html" target="_blank" rel="noopener noreferrer">Monaghan &amp; Rackwallace (includes Tyholland)</a></li><li class="parish-item" data-name="newtownbutler (galloon)"><a class="parish-link" href="newtownbutler.html" target="_blank" rel="noopener noreferrer">Newtownbutler (Galloon)</a></li><li class="parish-item" data-name="tempo (pobal)"><a class="parish-link" href="tempo.html" target="_blank" rel="noopener noreferrer">Tempo (Pobal)</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1124,9 +1134,9 @@ Enniskillen (St Michael's Parish) <a href="https://www.saintmichaels-parish.com/
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1580,11 +1590,16 @@ Enniskillen (St Michael's Parish) <a href="https://www.saintmichaels-parish.com/
         for (var i = 0; i < names.length; i++) {
           var page = pageFor(names[i]);
           if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
           var slot = pages.querySelector('[data-page="' + page + '"]');
           if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
+          scrollBoxTo(pages, slot);
           return true;
         }
         return false;

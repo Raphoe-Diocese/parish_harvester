@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Drumquin Bulletin — 30/08/2026</title>
+  <title>Drumquin Bulletin — 06/09/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -109,6 +110,13 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
@@ -141,6 +149,7 @@
       cursor: pointer;
     }
     .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
     
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {
@@ -160,7 +169,7 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
@@ -203,6 +212,7 @@
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {
@@ -866,6 +876,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -892,7 +903,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -900,35 +911,31 @@
     <header class="header">
       <p class="diocese-label">DERRY</p>
       <h1>Drumquin Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Drumquin — 30/08/2026. Part of the Derry Diocese collated bulletin.</p>
-      <a class="download-link-top" href="drumquinparish.pdf">Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Drumquin — 06/09/2026. Part of the Derry Diocese collated bulletin.</p>
+      <a class="download-link-top pdf-force-download" href="drumquinparish.pdf" download="drumquinparish.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="drumquinparish.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       
-      <div class="quiet-links">
-        <a href="drumquinparish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="drumquinparish-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="drumquinparish.pdf" title="Drumquin bulletin PDF"></iframe>
+        <iframe data-pdf-url="drumquinparish.pdf" title="Drumquin bulletin PDF"></iframe>
         
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="drumquinparish.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="drumquinparish.pdf">Open PDF</a>
-              <a href="drumquinparish.pdf" download>Download</a>
+              <a class="pdf-open-newtab" href="drumquinparish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="drumquinparish.pdf" download="drumquinparish.pdf">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>
       </div>
@@ -963,10 +970,10 @@
       <div class="quiet-links">
         <a href="drumquinparish-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-drumquin" data-parish-name="Drumquin"><h2 class="ocr-parish-name">Drumquin</h2><p class="ocr-parish-date">30/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-drumquin" data-parish-name="Drumquin"><h2 class="ocr-parish-name">Drumquin</h2><p class="ocr-parish-date">06/09/2026</p></header>
 <p class="page-label">Page 1</p>
-<p>SUNDAY 30 AUGUST 2026<br>
-Twenty Second Sunday Ordinary Time<br>
+<p>SUNDAY 6 SEPTEMBER 2026<br>
+Twenty Third Sunday Ordinary Time<br>
 NEWSLETTER FOR THE PARISHES OF THE WEST TYRONE PASTORAL AREA:<br>
 Aghyaran ⬧ Ardstraw West &amp; Castlederg ⬧ Drumquin<br>
 REV PAUL FRASER PP, Tel:<a href="tel:+442881671393" style="color:#1d4ed8;font-weight:600;">028 816 71393</a>; REV THOMAS CANNING CC, Tel: <a href="tel:+442882831" style="color:#1d4ed8;font-weight:600;">028 82831</a> 2 25<br>
@@ -981,113 +988,118 @@ SCHEDULE FOR THIS WEEK:<br>
 DAY AGHYARAN ARDSTRAW WEST &amp;<br>
 CASTLEDERG DRUMQUIN<br>
 Monday<br>
-31 August<br>
+7 Sept<br>
 Mass, Castlederg: 7.30pm<br>
 Mass, 10.00am<br>
 Rosary, 8.00pm at Grotto<br>
 Tuesday<br>
-1 Sept Mass, 10.00am<br>
+8 Sept Mass, 10.00am<br>
 Wednesday<br>
-2 Sept Mass, 10.00am<br>
+9 Sept Liturgy of the Word,<br>
+With Holy Communion Liturgy of the Word,<br>
+With Holy Communion Mass, 10.00am<br>
 Thursday<br>
-3 Sept Mass, 10.00am, followed<br>
-by Adoration until<br>
-12.00noon<br>
+10 Sept Mass, 10.00am, followed by<br>
+Adoration until 12.00noon<br>
 Friday<br>
-4 Sept Mass, Castlederg: 10.00am,<br>
+11 Sept Mass, Castlederg: 10.00am,<br>
 followed by Adoration until<br>
 12.00noon<br>
 Saturday<br>
-5 Sept<br>
+12 Sept<br>
 Vigil Mass, 7.30pm<br>
 Vigil Mass, Castlederg,<br>
-6.15pm:<br>
-First Anniversary, Isobel Coyle<br>
+6.15pm<br>
 Vigil Mass: 5.00pm<br>
 Sunday<br>
-6 Sept<br>
-Mass, 11.00am<br>
+13 Sept<br>
+Mass on first and third Sunday<br>
 Mass: Dregish, 9.30am<br>
+Castlederg, 11.00am<br>
 Drumnabey,12.30pm<br>
-Mass in Castlederg on<br>
-13 &amp; 27 Sept<br>
-Mass, 11.00am<br>
-Please note that Adoration of the Blessed Sacrament resumes this week in Aghyar an and Castlederg, on 3 and<br>
-4 September respectively, as above. Liturgy of the Word will resume the following week.<br>
+Mass on first and third<br>
+Sunday<br>
 THANK YOU for your generosity in last week’s collection:<br>
-AGHYARAN: £865 &amp; €10. Church Restoration Fund: £809 &amp; €77.<br>
-ARDSTRAW WEST &amp; CASTLEDERG: £2,220 &amp; €136, made up of:<br>
-Castlederg £1,413 &amp; €80, Drumnabey £453 &amp; €36, Dregish £354. DRUMQUIN: £608.<br>
-ARDSTRAW WEST AND CASTLEDERG PARISH DRAW: The August draw will take place after Mass in Dregish this<br>
-Sunday. Good luck to everyone.<br>
+AGHYARAN: £877 &amp; €51. Church Restoration Fund: £773 &amp; €522.<br>
+ARDSTRAW WEST &amp; CASTLEDERG: £2,018 &amp; €79, made up of:<br>
+Castlederg £1,147 &amp; €46, Drumnabey £483 &amp; €36, Dregish £388 &amp; €10. DRUMQUIN: £877.<br>
+UNLOCKING THE MYSTERIES OF THE BIBLE: As published last week, we had intended to start<br>
+this eight-week course in the coming week. Unfortunately, the resources that we need for the<br>
+programme will not be available until the end of September. We will keep yo u posted with a new start-<br>
+date as soon as we have the materials. Apologies for the inconvenience.<br>
 †<br>
-We pray for the happy repose of the souls of Gerry O’Kane, Dooish Road , whose Funeral Mass took<br>
-place in Drumquin on Thursday, and Danny O’Donnell, Meenamullin Road, Killeter, whose Funeral<br>
-Mass took place in Aghyaran on Friday. We offer our sympathy and our prayerf ul support to their<br>
-families and to all who mourn their deaths. May they rest in peace.<br>
+We pray for the happy repose of the soul of Evelyn Baxter, Castlefin Park , whose Funeral Mass took<br>
+place in Castlederg on Thursday. We offer our sympathy and our prayerful support to Evelyn’s family<br>
+and to all who mourn her death. May she rest in peace.<br>
 Drumquin <a href="https://drumquinparish.com" target="_blank" rel="noopener noreferrer">https://drumquinparish.com</a></p>
 <hr>
 <p class="page-label">Page 2</p>
-<p>Please remember in prayer our young parishioners, family members and friends who are returning to<br>
-school this week or are starting school for the first time. We continue to remember in prayer all who<br>
-are preparing to commence third-level education at this time and those who are t aking up employment<br>
-for the first time. May Your love be upon them, O Lord, as they place all their trust in You.<br>
-⬧ HAVE YOU EVER lifted the Bible with the intention of reading it ….but maybe just managed a few pages,<br>
-before giving up in vain?<br>
-⬧ DID YOU KNOW that the Bible is not actually a book? It is a Library - of 73 books.<br>
-⬧ HAVE YOU EVER THOUGHT ABOUT how the books of the Bible fit together – move along a timeline - to<br>
-reveal God’s plan for our salvation?<br>
-⬧ WOULD YOU LIKE TO GAIN a deeper knowledge and understanding of the Bible so that, when reading<br>
-or listening to the Scripture readings at Mass on Sunday, you will have a much clearer understanding of them<br>
-and of how they apply to our everyday lives?<br>
-It is our aim over the next number of weeks to take the ‘mystery’ out of the Bible and to give us all a whole new<br>
-understanding and love of God’s Word . In St Patrick’s Hall, Castlederg , we are going to run an eight-week Bibe<br>
-Study course called “Unlocking the mysteries of the Bible .” It will take place over the course of eight<br>
-Wednesday evenings, commencing 9 September, from 7.30 – 9.00pm. This course is presented by renowned<br>
-Catholic speaker Jeff Cavins who, through engaging video presentations and his acclaimed Bible Timeline<br>
-approach, will literally unlock the mystery of the Bible for us.<br>
-There will be opportunity for small-group discussion, with the aid of a workbook, with w hich you will be provided.<br>
-There is a suggested donation of £15, which will include your workbook, a colour-coded Bi ble Timeline Card which<br>
-will be a useful tool as we move along the ‘timeline’ of the course. Refreshments will be provided.<br>
-You can book for the course in advance via Fr Paul / the Parish Office or just come along and enrol on Wednesday<br>
-9 September. Let us unlock the mystery of the Bible together. Everyone is welcome.<br>
+<p>CONGRATULATIONS to the winners in the Ardstraw West and Castlederg Monthly Draw for Parish Develop ment,<br>
+which took place in St Eugene’s Hall, Dregish , on Sunday 30 August:<br>
+£1,000 Eunan Carlin (1118) Promoter’s Prize: Sylvia McHugh<br>
+£500 Lynn Gallen (13)<br>
+£250 (x 3) May Browne (16); Michael Lynch (677); Alicia McCrory (220)<br>
+£100 (x 7) Mary McGlinchey (918); Eugene Carlin (557); Michael Gallen (194); Fran k &amp; Geraldine Gallen<br>
+(1027); Patrick McHugh (600); Michelle McDougall (832); Fr Patsy Arkinson (678 ).<br>
+As always, thanks to our wonderful team of promoters and to all who are supporting our Parish Appeal by taking part<br>
+in the draw. Returns for September ’s draw should be made to the Parochial House on Thursday 17 September between<br>
+6.00 and 7.30pm. The next draw will take place on Sunday 27 September 2026 in St Patrick’s Hall, Castlederg.<br>
+There is a small number of tickets left – if you are not in the draw but would like to join, talk to the promoter in your<br>
+area or contact Kathleen in the Parish Office . If you’re not in, you can’t win!<br>
 PASTORAL VISITATION OF THE HOUSEBOUND will take place this week as follows:<br>
-Monday 31 Aug: Dregish, commencing at 11.00am. Thursday 3 Sept: Corgary, Tullycar, Aghyaran, Killeter,<br>
-Scraghey, Coolcreaghy, Shanog Road, Laghel Road, commencing after 10.00am Mass – Fr Paul. Friday 4 Sept:<br>
-Garvagh, The Laghts, Lisnacloon, Magheranageeragh, Mullinabreen, Trienamongan, commencing 11. 00am – Fr Paul.<br>
-LORETO GRAMMAR SCHOOL, OMAGH: Arrangements for School Opening: Years 9, 10 &amp; 11 only – Tue 1 Sept;<br>
-Years 8 &amp; 12 only – Wed 2 Sept; Years 13 &amp; 14 only – Thurs 3 Sept; All pupils – Fri 4 Sept.<br>
+Monday 7 Sept – Drumquin - Rural Area only: Tattysallagh Road / Dooish Road / Glen Road / Bradan Road / Sloughan<br>
+Road / Drumscraw Road, commencing at 11.00am - Fr Thomas.<br>
+Wednesday 9 Sept – Castlederg Rural Area, Oakleigh Grove, Main Street and Derg Fold, commencing at 3.000pm -<br>
+Fr Thomas.<br>
+Thursday 10 Sept – Young Crescent and Drumnabey, commencing at 10.30am – Fr Paul.<br>
+Friday 11 Sept – Town Area – (excluding Oakleigh Grove, Derg Fold &amp; Main Street), commencing 10.30am – Fr Paul.<br>
+BLESSING OF STUDENTS: A special Mass to mark the beginning of the school year for both Primar y and Secondary<br>
+school pupils will be celebrated on Saturday 12 September at 7.30pm in St. Patrick’s Church Aghyaran.<br>
+Blessing of school bags for those starting school will take place at this Mass. We encourage families to com e along<br>
+and young children beginning school are asked to bring their school bag with them, as we ask God’s blessing on all of<br>
+them and their work in the new year ahead.<br>
+PRAYER:<br>
+Lord, we thank you for your goodness to all your children,<br>
+Be with these children throughout this new school year.<br>
+May your blessing be upon these school bags which the children will carry to and from scho ol each day.<br>
+Watch over the children in their coming and their going.<br>
+Keep them safe always; help them to be kind; bless their learning and their play.<br>
+Enfold them at all times in your love. We pray through Christ our Lord. AMEN<br>
+LEGION OF MARY Meetings will resume in Drumquin Parochial House this Thursday, 10 September, commenc ing<br>
+at 7.30pm. New members are very welcome to come along to this short time prayer and reflections.<br>
 RISE AND SHINE TRUST – Easter 2027 Pilgrimage: Applications are invited from young people with additional social,<br>
 emotional, physical and learning needs aged 11-30 who are interested in travelling as guests to Lourdes with Rise and<br>
 Shine Trust. The trip is free to Guests. Application form available on ri seandshine.ie. Closing date 15<br>
 October. Applications also sought for carers aged 18+ who would be interested in accompanyi ng guests. Applications<br>
 at riseandshine.ie Visit <a href="https://www.riseandshine.ie" target="_blank" rel="noopener noreferrer">www.riseandshine.ie</a> or contact Sian (<a href="tel:+35379602113" style="color:#1d4ed8;font-weight:600;">079602113</a> 52) or Maurice (<a href="tel:+3537711504821" style="color:#1d4ed8;font-weight:600;">07711504821</a>).<br>
-CATHOLIC MOTHERS IRELAND – FAMILY DAY: Annual National Mass, Sunday 6 September at Termonbacca<br>
-Retreat Centre, Derry. Mass at 2.00pm, celebrated by Bishop McKeown, followed by refreshments, c hildren&#x27;s activities,<br>
-and a talk for parents. For more information and booking details, email info@catholic mothers.ie. All are welcome.<br>
-ARANDERG CCÉ Irish Traditional Music Sessions start back next Friday,4 September, at 9.00pm in Killeter<br>
-Heritage. Everyone is welcome!<br>
-TEAM HOPE FUNDRAISING GARDEN PARTY – this Friday, 4 September, 2.00 – 7.00pm, 30 Lurganbuoy Road,<br>
-Castlederg. Live music with Macdara O&#x27;Dwyer. Tea, coffee, treats, raffle, garden ga mes, fun for children and families.<br>
-Deborah Lowry wishes you to know that everyone is welcome - drop in at any time during the afternoon or evening.<br>
+ARANDERG CCÉ Irish Traditional Music Sessions have started back on Friday nights at 9.00pm in Killeter Heritage.<br>
+Everyone is welcome! We are holding a registration night tomorrow, Mon 7 September, for parents to register their<br>
+child for upcoming music lessons, in Banjo, Fiddle, Accordion and Tin w histle. Lessons are £30 for 6 weeks, with<br>
+payment required on registration night. Call in any time between 7.00 – 8.00pm to register or if you have any questions.<br>
 IRISH DANCING resumes on Tuesday 8 September , at 6.00pm in Drumquin Community Youth Centre . New<br>
 beginners P1 and above are welcome to join. Text / call Dolores on <a href="tel:+3537739631478" style="color:#1d4ed8;font-weight:600;">07739631478</a>.<br>
-BLESSING OF BIKERS AND MOYORCYCLES will take place on Sunday 13 September in St Aengus’ Chapel, Burt,<br>
-Co Donegal, at 1:30. All are welcome to attend the brief service and blessing. Following t he blessing all are welcome<br>
-to join the run to Ned’s Point RNLI Station, to present the donation to the RNLI.<br>
+ZUMBA FITNESS with Vanessa is back for September – Tuesday 8 September at 7.00pm in Garvagh Hall and<br>
+Wednesday 9 September at 7.00 pm in St Patrick’s Hall, Castlederg. No experience needed, no perfect moves required,<br>
+no pressure. Any questions or queries, contact Vanessa on <a href="tel:+3537702355424" style="color:#1d4ed8;font-weight:600;">077 0235 5424</a><br>
+YOGA CLASS: Aghyaran Development Association in conjunction with HARC is commencing a 6-w eek Yogo class for<br>
+over 50’s in Aghyaran Centre, commencing Tues 15 September, 11.30am - 12.30pm. Contact Jerry on <a href="tel:+3537864929344" style="color:#1d4ed8;font-weight:600;">078 6492 9344</a>.<br>
+HOST FOR HOSPICE: October is officially Foyle Hospice Coffee Morning Month. We are callin g on supporters to help<br>
+us raise vital funds by hosting a Coffee Morning. Whether it’s at home, work or in y our local community, you can support<br>
+your local hospice by bringing your friends together and putting the kettle on - it’s a piece of cake! To request your<br>
+FREE host pack or for more info, please call Ailbhe McDaid on <a href="tel:+442871359888" style="color:#1d4ed8;font-weight:600;">028 7135 9888</a> or email: ailbh <a href="mailto:e@foylehospice.com" target="_blank" rel="noopener noreferrer">e@foylehospice.com</a><br>
 Season of Creation 2026: 1 September to 4 October<br>
-The annual celebration of Season of Creation aims to bring Christians throughout the world together<br>
-in prayer, reflection and action for the care of our common home. This year’s theme, Living Water ,<br>
-invites us to give thanks for the gift of water and renew our care for God’s creation. The theme is<br>
-inspired by the vision of hope and renewal found in the Book of Ezekiel, 47:9: &quot;Wherever the river<br>
-flows, every living creature that swarms will live… and everything will live where the rive r goes.&quot;</p></div>
+The annual celebration of Season of Creation aims to bring Christians throughout the world together in prayer,<br>
+reflection and action for the care of our common home. This year’s theme, Living Water , invites us to give thanks<br>
+for the gift of water and renew our care for God’s creation. The theme is inspired by the vision of hope and<br>
+renewal found in the Book of Ezekiel, 47:9: &quot;Wherever the river flows, every living creature that swarms will<br>
+live… and everything will live where the river goes.&quot;</p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other DERRY Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghyaran"><a class="parish-link" href="parishofaghyaran.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li class="parish-item" data-name="ardmore"><a class="parish-link" href="ardmoreparish.html" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li class="parish-item" data-name="banagher"><a class="parish-link" href="banagherparish.html" target="_blank" rel="noopener noreferrer">Banagher</a></li><li class="parish-item" data-name="buncrana"><a class="parish-link" href="buncranaparish.html" target="_blank" rel="noopener noreferrer">Buncrana</a></li><li class="parish-item" data-name="camus"><a class="parish-link" href="camusparish.html" target="_blank" rel="noopener noreferrer">Camus</a></li><li class="parish-item" data-name="carndonagh"><a class="parish-link" href="carndonaghparish.html" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li class="parish-item" data-name="castlederg"><a class="parish-link" href="castledergparish.html" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li class="parish-item" data-name="clonleigh (strabane pastoral area)"><a class="parish-link" href="clonleighparish.html" target="_blank" rel="noopener noreferrer">Clonleigh (Strabane Pastoral Area)</a></li><li class="parish-item" data-name="clonmany"><a class="parish-link" href="clonmanyparish.html" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li class="parish-item" data-name="culdaff"><a class="parish-link" href="culdaffparish.html" target="_blank" rel="noopener noreferrer">Culdaff</a></li><li class="parish-item" data-name="culmoe"><a class="parish-link" href="culmoreparish.html" target="_blank" rel="noopener noreferrer">Culmoe</a></li><li class="parish-item" data-name="dma parish (claudy area)"><a class="parish-link" href="dmaparish.html" target="_blank" rel="noopener noreferrer">DMA Parish (Claudy area)</a></li><li class="parish-item" data-name="drumragh"><a class="parish-link" href="drumraghparish.html" target="_blank" rel="noopener noreferrer">Drumragh</a></li><li class="parish-item" data-name="dungiven"><a class="parish-link" href="parishofdungiven.html" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li class="parish-item" data-name="errigal"><a class="parish-link" href="errigalparish.html" target="_blank" rel="noopener noreferrer">Errigal</a></li><li class="parish-item" data-name="fahan"><a class="parish-link" href="fahanparish.html" target="_blank" rel="noopener noreferrer">Fahan</a></li><li class="parish-item" data-name="granaghan"><a class="parish-link" href="granaghanparish.html" target="_blank" rel="noopener noreferrer">Granaghan</a></li><li class="parish-item" data-name="greenlough"><a class="parish-link" href="greenlough.html" target="_blank" rel="noopener noreferrer">Greenlough</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holyfamily-parish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="iskaheen"><a class="parish-link" href="iskaheenparish.html" target="_blank" rel="noopener noreferrer">Iskaheen</a></li><li class="parish-item" data-name="kilrea"><a class="parish-link" href="parishofkilrea.html" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li class="parish-item" data-name="lavey"><a class="parish-link" href="laveyparish.html" target="_blank" rel="noopener noreferrer">Lavey</a></li><li class="parish-item" data-name="leckpatrick"><a class="parish-link" href="leckpatrickparish.html" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li class="parish-item" data-name="maghera (derry)"><a class="parish-link" href="magheraparishderry.html" target="_blank" rel="noopener noreferrer">Maghera (Derry)</a></li><li class="parish-item" data-name="melmount (&amp; camus)"><a class="parish-link" href="melmountparish.html" target="_blank" rel="noopener noreferrer">Melmount (&amp; Camus)</a></li><li class="parish-item" data-name="moville"><a class="parish-link" href="movilleparish.html" target="_blank" rel="noopener noreferrer">Moville</a></li><li class="parish-item" data-name="sion mills"><a class="parish-link" href="parishofsionmills.html" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li class="parish-item" data-name="st eugene&#x27;s cathedral (templemore)"><a class="parish-link" href="steugenescathedral.html" target="_blank" rel="noopener noreferrer">St Eugene&#x27;s Cathedral (Templemore)</a></li><li class="parish-item" data-name="st mary&#x27;s parish creggan"><a class="parish-link" href="stmarysparishcreggan.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Parish Creggan</a></li><li class="parish-item" data-name="star of the sea (magilligan)"><a class="parish-link" href="staroftheseacatholic.html" target="_blank" rel="noopener noreferrer">Star of the Sea (Magilligan)</a></li><li class="parish-item" data-name="steelstown"><a class="parish-link" href="steelstownparish.html" target="_blank" rel="noopener noreferrer">Steelstown</a></li><li class="parish-item" data-name="waterside (&amp; strathfoyle amalgamated)"><a class="parish-link" href="watersideparish.html" target="_blank" rel="noopener noreferrer">Waterside (&amp; Strathfoyle amalgamated)</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghyaran"><a class="parish-link" href="parishofaghyaran.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li class="parish-item" data-name="ardmore"><a class="parish-link" href="ardmoreparish.html" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li class="parish-item" data-name="banagher"><a class="parish-link" href="banagherparish.html" target="_blank" rel="noopener noreferrer">Banagher</a></li><li class="parish-item" data-name="bellaghy"><a class="parish-link" href="bellaghyparish.html" target="_blank" rel="noopener noreferrer">Bellaghy</a></li><li class="parish-item" data-name="buncrana"><a class="parish-link" href="buncranaparish.html" target="_blank" rel="noopener noreferrer">Buncrana</a></li><li class="parish-item" data-name="camus"><a class="parish-link" href="camusparish.html" target="_blank" rel="noopener noreferrer">Camus</a></li><li class="parish-item" data-name="carndonagh"><a class="parish-link" href="carndonaghparish.html" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li class="parish-item" data-name="castlederg"><a class="parish-link" href="castledergparish.html" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li class="parish-item" data-name="claudy"><a class="parish-link" href="parishofclaudy.html" target="_blank" rel="noopener noreferrer">Claudy</a></li><li class="parish-item" data-name="clonleigh (strabane pastoral area)"><a class="parish-link" href="clonleighparish.html" target="_blank" rel="noopener noreferrer">Clonleigh (Strabane Pastoral Area)</a></li><li class="parish-item" data-name="clonmany"><a class="parish-link" href="clonmanyparish.html" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li class="parish-item" data-name="culdaff"><a class="parish-link" href="culdaffparish.html" target="_blank" rel="noopener noreferrer">Culdaff</a></li><li class="parish-item" data-name="culmoe"><a class="parish-link" href="culmoreparish.html" target="_blank" rel="noopener noreferrer">Culmoe</a></li><li class="parish-item" data-name="dma parish (claudy area)"><a class="parish-link" href="dmaparish.html" target="_blank" rel="noopener noreferrer">DMA Parish (Claudy area)</a></li><li class="parish-item" data-name="drumragh"><a class="parish-link" href="drumraghparish.html" target="_blank" rel="noopener noreferrer">Drumragh</a></li><li class="parish-item" data-name="dungiven"><a class="parish-link" href="parishofdungiven.html" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li class="parish-item" data-name="errigal"><a class="parish-link" href="errigalparish.html" target="_blank" rel="noopener noreferrer">Errigal</a></li><li class="parish-item" data-name="fahan"><a class="parish-link" href="fahanparish.html" target="_blank" rel="noopener noreferrer">Fahan</a></li><li class="parish-item" data-name="granaghan"><a class="parish-link" href="granaghanparish.html" target="_blank" rel="noopener noreferrer">Granaghan</a></li><li class="parish-item" data-name="greenlough"><a class="parish-link" href="greenlough.html" target="_blank" rel="noopener noreferrer">Greenlough</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holyfamily-parish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="iskaheen"><a class="parish-link" href="iskaheenparish.html" target="_blank" rel="noopener noreferrer">Iskaheen</a></li><li class="parish-item" data-name="kilrea"><a class="parish-link" href="parishofkilrea.html" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li class="parish-item" data-name="lavey"><a class="parish-link" href="laveyparish.html" target="_blank" rel="noopener noreferrer">Lavey</a></li><li class="parish-item" data-name="leckpatrick"><a class="parish-link" href="leckpatrickparish.html" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li class="parish-item" data-name="limavady"><a class="parish-link" href="limavadyparish.html" target="_blank" rel="noopener noreferrer">Limavady</a></li><li class="parish-item" data-name="maghera (derry)"><a class="parish-link" href="magheraparishderry.html" target="_blank" rel="noopener noreferrer">Maghera (Derry)</a></li><li class="parish-item" data-name="melmount (&amp; camus)"><a class="parish-link" href="melmountparish.html" target="_blank" rel="noopener noreferrer">Melmount (&amp; Camus)</a></li><li class="parish-item" data-name="moville"><a class="parish-link" href="movilleparish.html" target="_blank" rel="noopener noreferrer">Moville</a></li><li class="parish-item" data-name="sion mills"><a class="parish-link" href="parishofsionmills.html" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li class="parish-item" data-name="st eugene&#x27;s cathedral (templemore)"><a class="parish-link" href="steugenescathedral.html" target="_blank" rel="noopener noreferrer">St Eugene&#x27;s Cathedral (Templemore)</a></li><li class="parish-item" data-name="st mary&#x27;s parish creggan"><a class="parish-link" href="stmarysparishcreggan.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Parish Creggan</a></li><li class="parish-item" data-name="star of the sea (magilligan)"><a class="parish-link" href="staroftheseacatholic.html" target="_blank" rel="noopener noreferrer">Star of the Sea (Magilligan)</a></li><li class="parish-item" data-name="steelstown"><a class="parish-link" href="steelstownparish.html" target="_blank" rel="noopener noreferrer">Steelstown</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1139,9 +1151,9 @@ flows, every living creature that swarms will live… and everything will live w
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1595,11 +1607,16 @@ flows, every living creature that swarms will live… and everything will live w
         for (var i = 0; i < names.length; i++) {
           var page = pageFor(names[i]);
           if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
           var slot = pages.querySelector('[data-page="' + page + '"]');
           if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
+          scrollBoxTo(pages, slot);
           return true;
         }
         return false;

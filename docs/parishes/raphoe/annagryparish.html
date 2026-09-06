@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Annagry Bulletin — 30/08/2026</title>
+  <title>Annagry Bulletin — 06/09/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -109,6 +110,13 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
@@ -141,6 +149,7 @@
       cursor: pointer;
     }
     .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
     
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {
@@ -160,7 +169,7 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
@@ -203,6 +212,7 @@
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {
@@ -866,6 +876,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -892,7 +903,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -900,35 +911,31 @@
     <header class="header">
       <p class="diocese-label">RAPHOE</p>
       <h1>Annagry Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Annagry — 30/08/2026. Part of the Raphoe Diocese collated bulletin.</p>
-      <a class="download-link-top" href="annagryparish.pdf">Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Annagry — 06/09/2026. Part of the Raphoe Diocese collated bulletin.</p>
+      <a class="download-link-top pdf-force-download" href="annagryparish.pdf" download="annagryparish.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="annagryparish.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       
-      <div class="quiet-links">
-        <a href="annagryparish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="annagryparish-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="annagryparish.pdf" title="Annagry bulletin PDF"></iframe>
+        <iframe data-pdf-url="annagryparish.pdf" title="Annagry bulletin PDF"></iframe>
         
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="annagryparish.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="annagryparish.pdf">Open PDF</a>
-              <a href="annagryparish.pdf" download>Download</a>
+              <a class="pdf-open-newtab" href="annagryparish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="annagryparish.pdf" download="annagryparish.pdf">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>
       </div>
@@ -963,11 +970,12 @@
       <div class="quiet-links">
         <a href="annagryparish-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-annagry" data-parish-name="Annagry"><h2 class="ocr-parish-name">Annagry</h2><p class="ocr-parish-date">30/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-annagry" data-parish-name="Annagry"><h2 class="ocr-parish-name">Annagry</h2><p class="ocr-parish-date">06/09/2026</p></header>
 <p class="page-label">Page 1</p>
-<p>224 Sunday &amp;<br>
-BS Ordinary<br>
-= Time<br>
+<p>aly «<br>
+23&quot; Sunday &amp;<br>
+Ordinary<br>
+ix Time<br>
 Parish Office: <a href="tel:+353749548902" style="color:#1d4ed8;font-weight:600;">074-9548902</a><br>
 Web: <a href="https://www.annagryparish.ie" target="_blank" rel="noopener noreferrer">www.annagryparish.ie</a><br>
 Email: <a href="mailto:pp.annagry@gmail.com" target="_blank" rel="noopener noreferrer">pp.annagry@gmail.com</a><br>
@@ -981,7 +989,7 @@ Dr Tony Delap <a href="tel:+353749532445" style="color:#1d4ed8;font-weight:600;"
 Mary Logue <a href="tel:+353874164426" style="color:#1d4ed8;font-weight:600;">087-4164426</a><br>
 Brid Rodgers <a href="tel:+353876218327" style="color:#1d4ed8;font-weight:600;">087-6218327</a><br>
 Your Sunday gift to God and His<br>
-Church last week was €1,955<br>
+Church last week was €1,600<br>
 Mile buiochas<br>
 Mass Bookings: Anyone wishing to<br>
 book a Mass or Christening, can do so<br>
@@ -996,10 +1004,10 @@ assistance from the S.V.P. contact:<br>
 of the Church.<br>
 Safeguarding Children Diocese of<br>
 Raphoe: If you have a concern about<br>
-the welfare and safety of a child, please</p>
+the welfare and safety of a child, pleas¢</p>
 <h3 class="b-head">contact any of the following</h3>
 <p>Safeguarding Children Office, Diocesan<br>
-Pastoral Centre, Monastery Avenue,<br>
+Pastoral Centre, Monastery Avenue.<br>
 Letterkenny, Co. Donegal. Designated<br>
 Liaison Person: Margaret Northage<br>
 <a href="tel:+353862183011" style="color:#1d4ed8;font-weight:600;">0862183011</a> or <a href="tel:+353749125669" style="color:#1d4ed8;font-weight:600;">074 9125669</a><br>
@@ -1008,70 +1016,69 @@ Tusla: Child and Family Agency<br>
 <a href="tel:+353749123672" style="color:#1d4ed8;font-weight:600;">074 9123672</a> / 9123770.<br>
 Garda National Protective Services<br>
 Bureau 01-6663420<br>
-for is]<br>
+Paróiste is]<br>
 dui<br>
 Annagry Parish website<br>
-Teach Pobail Mhuire ye.<br>
+Teach Pobail Mhuire 3.<br>
 Réalt na Mara Anagaire<br>
-An (i, Nigel Ó Gallachéir SP =<br>
-bad<br>
-Sat 29&quot;Aug 6.30pm Annie Hamill née McGarvey Rann Na Feirsde &amp; Glasgow 1* Ann<br>
-Molly, John, Jackie &amp; Dinny McCafferty, Doire na Mainsear<br>
-Marie McGeever Cronly, Mullaghduff<br>
-Sun 30&quot;Aug 9.00am Missa Pro Populo<br>
-11.00am Eddie Neddie Eoin Gallagher, Annagry East &amp; Swords. MM<br>
-Mon 31&#x27;&quot;Aug No Mass<br>
-Tues 01&quot;Sept 10.00am Priest’s Intention<br>
-Wed 02™Sept 7.00pm Nellie &amp; Ned Gillespie, Annagry<br>
-Thurs 03&#x27;Sept 10.00am Parish Mass Card intentions<br>
-Fri 04&quot;Sept 7.00pm Fiona O’Donnell, Dundalk &amp; Rann na Feirsde<br>
-Sat 05&quot;Sept 6.30pm James Sweeney, Braade<br>
+An Ath Nigel Ó Gallachéir SP b ‘<br>
+eagal<br>
+Aifri Seachtai<br>
+Sat 05™Sept 6.30pm James Sweeney, Braade<br>
 John Mhici Boyle, Annagry West<br>
 Rosha Byrne, Annagry<br>
 Brigid &amp; Manus Gallagher, Carrickfinn &amp; Killybegs<br>
-Sun 06&quot; Sept 9.00am John Mary Mhicí Ó Gallachóir, Rann na Feirsde. 1“ Anniversary<br>
+Sun 06&quot; Sept 9.00am_ John Mary Mhicí Ó Gallachóir, Rann na Feirsde. 1” Ann<br>
 11.00am Dom McDevitt, Annagry West. Month’s Mind<br>
-Cuimhneacháin báis &amp; bas le gairid: Enda Bonner, Dungloe. Patricia McCafferty, Doire na<br>
-Mainsear &amp; Cambridge. John Gallagher, Gleann Fhinne. Neily Boyle, Direach &amp; Glasgow.<br>
+Mon 07&quot; Sept No Mass<br>
+Tues 08&quot; Sept No Mass<br>
+Wed 09&quot; Sept No Mass<br>
+Thurs 10 Sept No Mass<br>
+Fri 11 Sept No Mass<br>
+Sat 12&quot;Sept 6.30pm Sheila Pheadar Og McGarvey, Loch na nDeoran. 1” Ann<br>
+Kathleen Ann Hanlon, Braade<br>
+Hudai &amp; Eileen Greene, Loch an Iúir<br>
+Mary Gallagher, Doire na Mainsear &amp; London<br>
+Sun 13&quot;Sept 11.00am Kathleen Carson, Braade. Month’s Mind<br>
+Cuimhneacháin báis &amp; bas le gairid: Bridie Bonner, Doochary. Larry Brennan, Connecticut<br>
+USA. Susie Hartnett, Manchester. Ray Mac Conchoille, Doire na Mainséar. Mary O’ Donnell,<br>
+Mullaghduff. Ellen Gallagher, Annagry East.<br>
 The Holy Rosary is prayed before Mass: every Tuesday-Friday &amp; Sunday (11am).<br>
-Adoration of the Most Blessed Sacrament: Friday 5pm -7pm.<br>
+Adoration of the Most Blessed Sacrament: Friday Spm -7pm.<br>
 The Sacrament of Confession &amp; Reconciliation is available after Mass by request.<br>
-Holy Water is available from at the sacristy before or after Mass.<br>
-September Parish Visitation of the Sick &amp; Housebound: Fr Nigel will visit the sick and the<br>
-housebound of the parish with Holy Communion on Monday 31“ Aug: Mullaghduff, Carrickfinn,<br>
-Calhame, Bunaman, Annagry Day Centre, Min na Leice, Killindara, Direach. Wednesday 2™<br>
-Sept: Glen Rd., Loch an Iúir, Rann na Feirsde, Ranamona. If you would like anyone added to<br>
-the visitation list, please call the parish office 9548902.<br>
+Holy Water is available in the sacristy before or after Mass.<br>
+Annual Leave: Fr Nigel will be on annual leave from 7&quot; - 25&quot; Sept. Please note that there will be<br>
+no Sunday 9am Mass for the next two upcoming weekends 13&quot; &amp; 20&quot; Sept. If a priest is<br>
+needed urgently, please call 9548902.We thank our neighbouring parishes who will provide cover.<br>
 Rosses Lough Derg One Day Retreat: The Rosses Lough Derg one day Retreat will take place<br>
 at the Sanctuary of Saint Patrick, Lough Derg, on Saturday 19&quot; September. To book please contact<br>
-Rory on <a href="tel:+353868231717" style="color:#1d4ed8;font-weight:600;">0868231717</a> or Brid on <a href="tel:+353877705582" style="color:#1d4ed8;font-weight:600;">0877705582</a> Cost: €75. Closing date for names: Friday 11"<br>
-September 2026.<br>
-Donegal Downs Syndrome Society church gate collection: takes place this weekend 29&quot;/30&quot;<br>
-Clár Empower Cumasú: Programme: An bean tú ata i do chónaí sa Ghaeltacht agus ta tú ag<br>
-iarraidh gnó a thosú nó a fhás? Ma ta suim agat i ngnó bia, feirmeoreachta, ceardaíochta nó<br>
-seirbhíse, táimid ag iarraidh cloisteáil uait.<br>
-Are you a female living in the Gaeltacht looking to start or grow your own business? Whether it&#x27;s<br>
-food, farming, crafts or a service business, we want to hear from you. Apply now:<br>
-<a href="https://empowerprogramme.ie/" target="_blank" rel="noopener noreferrer">https://empowerprogramme.ie/</a> Places are limited. The closing date for applications is 5:00PM on<br>
-Friday 4" September. For more information contact: <a href="tel:+35391742851" style="color:#1d4ed8;font-weight:600;">091-742851</a> or <a href="mailto:michelle.lee@atu.ie" target="_blank" rel="noopener noreferrer">michelle.lee@atu.ie</a><br>
+Rory on <a href="tel:+353868231717" style="color:#1d4ed8;font-weight:600;">0868231717</a> or Bríd on <a href="tel:+353877705582" style="color:#1d4ed8;font-weight:600;">0877705582</a> Cost: €75. Closing date for names: Friday 11"<br>
+September.<br>
 Anam Cara Donegal, the organisation that supports bereaved parents, will hold its monthly Face<br>
 to Face Parent Support Evening for bereaved parents on Thursday 10&quot; September at 7.30pm in<br>
 the Radisson Blu Hotel, Letterkenny. This event is free and open to all bereaved parents<br>
 regardless of the age of their child, the circumstances of their death, or how recent their death<br>
 was. There is no need for registration, this is a walk in meeting. We also offer online support<br>
 group meetings. To find out more call 01 4045378 or email <a href="mailto:info@anamcara.ie" target="_blank" rel="noopener noreferrer">info@anamcara.ie</a><br>
-A Student’s Prayer at the Beginning of the New School Year: O God, we thank you for<br>
-everything that is new and beautiful, for everything which holds promise and brings us joy. Bless<br>
-all students &amp; pupils as they start this new school year with their friends, teachers and school<br>
-community. Help them to make the most of every chance they have to start afresh. May the new<br>
-beginning of this school year remind them that you give us chances to start over again and again.<br>
-Help them to be considerate of others and to learn and to work together. As students and pupils<br>
-we thank you for our friends. Help us to be good friends this year. Help us to be patient with<br>
-ourselves and with others. Bless our school and keep us safe. Be with us as we travel each day.<br>
-Help us to be aware of your love shown to us in the people around us. Bless all those who care for<br>
-us in school and at home. Help us show our care for them and to say sorry when we need to. May<br>
-our Mother Mary, Réalt na Mara protect us and help us to live as well as we can, giving thanks<br>
-and glory to God as she did. Amen.</p>
+Recent Down Syndrome Ireland&#x27;s Church gate collection: Chloe &amp; Noreen would like to<br>
+thank everyone who supported and generously contributed to the Down Syndrome Ireland&#x27;s<br>
+collection last weekend. The amount raised was €540.07.<br>
+The Irish Cancer Society is seeking compassionate volunteer drivers to join our pool of<br>
+drivers. As a volunteer driver you would be bringing patients undergoing chemotherapy to the<br>
+hospital and back home for their treatment. Gifting your time means that cancer patients will have<br>
+comfortable (one on one) transport to attend appointments for their lifesaving treatment. If you<br>
+can spare 2 days per month, have a valid driving licence, and a safe, reliable vehicle, you are the<br>
+perfect candidate to make a significant difference. The Irish Cancer Society will provide you with<br>
+training before you start as a driver for us. Your generosity not only eases the journey for many<br>
+during a challenging time but also offers comfort and support when it&#x27;s needed most. For more<br>
+information and to become a volunteer driver, please contact Monica or Emily at<br>
+<a href="mailto:volunteer@irishcancer.ie" target="_blank" rel="noopener noreferrer">volunteer@irishcancer.ie</a><br>
+Alcoholics Anonymous AA Local Meetings: Dungloe Community Hospital: Sundays &amp;<br>
+Wednesdays 8.30pm. Gweedore: Mabs Centre, Derrybeg F92KF82, Saturday 10.00am. Glenties:<br>
+The Hub, Main Street, F94 C8H7, Mondays &amp; Thursdays: 8.30pm. Ards Friary Creeslough:<br>
+Fridays 8.30pm; or visit <a href="https://www.alcoholicsanonymous.ie" target="_blank" rel="noopener noreferrer">www.alcoholicsanonymous.ie</a> or call <a href="tel:+35318420700" style="color:#1d4ed8;font-weight:600;">018420700</a>.<br>
+Al-Anon: Local meetings: Pastoral Centre: Letterkenny: Sundays at 8pm, Tuesdays at 8.30 pm,<br>
+Fridays at 10.30 am. <a href="tel:+353749121853" style="color:#1d4ed8;font-weight:600;">0749121853</a>. Email <a href="mailto:info@al-anon-ireland.org" target="_blank" rel="noopener noreferrer">info@al-anon-ireland.org</a></p>
 <hr></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
@@ -1079,7 +1086,7 @@ and glory to God as she did. Amen.</p>
     <section class="parish-section">
       <h2 class="section-heading">Other RAPHOE Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="tawnawillyparish.html" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="kincasslagh"><a class="parish-link" href="kincasslagh.html" target="_blank" rel="noopener noreferrer">Kincasslagh</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1131,9 +1138,9 @@ and glory to God as she did. Amen.</p>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1587,11 +1594,16 @@ and glory to God as she did. Amen.</p>
         for (var i = 0; i < names.length; i++) {
           var page = pageFor(names[i]);
           if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
           var slot = pages.querySelector('[data-page="' + page + '"]');
           if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
+          scrollBoxTo(pages, slot);
           return true;
         }
         return false;

@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>St Patrick&#x27;s Downpatrick Bulletin — 30/08/2026</title>
+  <title>St Patrick&#x27;s Downpatrick Bulletin — 06/09/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -109,6 +110,13 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
@@ -141,6 +149,7 @@
       cursor: pointer;
     }
     .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
     
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {
@@ -160,7 +169,7 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
@@ -203,6 +212,7 @@
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {
@@ -866,6 +876,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -892,7 +903,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -900,35 +911,31 @@
     <header class="header">
       <p class="diocese-label">DOWN &amp; CONNOR</p>
       <h1>St Patrick&#x27;s Downpatrick Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for St Patrick&#x27;s Downpatrick — 30/08/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
-      <a class="download-link-top" href="stpatricksdownpatrick.pdf">Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for St Patrick&#x27;s Downpatrick — 06/09/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
+      <a class="download-link-top pdf-force-download" href="stpatricksdownpatrick.pdf" download="stpatricksdownpatrick.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="stpatricksdownpatrick.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       
-      <div class="quiet-links">
-        <a href="stpatricksdownpatrick.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="stpatricksdownpatrick-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="stpatricksdownpatrick.pdf" title="St Patrick&#x27;s Downpatrick bulletin PDF"></iframe>
+        <iframe data-pdf-url="stpatricksdownpatrick.pdf" title="St Patrick&#x27;s Downpatrick bulletin PDF"></iframe>
         
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="stpatricksdownpatrick.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="stpatricksdownpatrick.pdf">Open PDF</a>
-              <a href="stpatricksdownpatrick.pdf" download>Download</a>
+              <a class="pdf-open-newtab" href="stpatricksdownpatrick.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="stpatricksdownpatrick.pdf" download="stpatricksdownpatrick.pdf">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>
       </div>
@@ -963,7 +970,7 @@
       <div class="quiet-links">
         <a href="stpatricksdownpatrick-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-st-patrick-s-downpatrick" data-parish-name="St Patrick&#x27;s Downpatrick"><h2 class="ocr-parish-name">St Patrick&#x27;s Downpatrick</h2><p class="ocr-parish-date">30/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-st-patrick-s-downpatrick" data-parish-name="St Patrick&#x27;s Downpatrick"><h2 class="ocr-parish-name">St Patrick&#x27;s Downpatrick</h2><p class="ocr-parish-date">06/09/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>PRIESTS: Fr Eugene O’Neill PP, Fr. Jim Conway CC</p>
 <h3 class="b-head">Contacts</h3>
@@ -984,29 +991,28 @@ Parish email: <a href="mailto:downpatrick@downandconnor.org" target="_blank" rel
 Website: <a href="https://www.stpatricksdownpatrick.com" target="_blank" rel="noopener noreferrer">www.stpatricksdownpatrick.com</a><br>
 downpatrickfamilyofparishes<br>
 MASS INTENTIONS:<br>
-Saturday 29 August, St. Patrick’s, 5pm:<br>
-Month’s Mind: Anne Robinson,<br>
-Month’s Mind: Pauline Houston,<br>
-1st Anniv: Kathleen Layden, Marie Tweedie,<br>
-Anniv: Patrick Stephen McEvoy, Mary Coughlin,<br>
-Sunday 30 August, St. Patrick’s, 10:30am:<br>
-1st Anniv: Gerard Denvir,<br>
-Monday 31 August, St. Patrick’s, 7:30pm:<br>
-Month’s Mind: Stephen Peters,<br>
-Anniv: Annie McKee, Mary Kelly, Edna Smyth,<br>
-Wednesday 02 September, St. Colmcille’s , 7:30pm:<br>
-Anniv: Jennifer Cunliffe,<br>
+Saturday 05 September , St. Patrick’s, 5pm:<br>
+Anniv: Dominic Mcilmail, Hubert Doyle,<br>
+Monday 07 September , St. Patrick’s, 7:30pm:<br>
+Anniv: Mary Ritchie,<br>
+Wednesday 09 September, St. Colmcille’s, 7:30pm:<br>
+Anniv: Michael Molloy,<br>
+Saturday 12 September, St. Patrick’s, 5pm:<br>
+Month’s Mind: Anthony Sturgess,<br>
+1st Anniv: Maudie Marks, John McCormick<br>
+Anniv: Mark McKee, Jackie Walsh, Josephine Torney,<br>
+Saturday 12 September, St. Brigid’s, 6:30pm:<br>
+Month’s Mind: Michael Miller,<br>
+Sunday 13 September, St. Patrick’s, 10:30am:<br>
+Month’s Mind: Dermot MacNabb,<br>
+Anniv: Rosaleen MacNabb,<br>
 If you would like a Mass booking, please drop into the<br>
 sacristy and make the booking directly with the priest.<br>
 Your Prayers are Requested for:</p>
-<h3 class="b-head">Recently Deceased: Briege Quail, Patricia Mary O’Farrell,</h3>
-<p>Jackie Kelly (England),<br>
-Anniv : Jim Donnelly, Annie McKee, Pat Vint, John<br>
-Williams, Raymond Galbraith, Mary Kelly, Edna Smyth,<br>
-Brigid Mary Casement &amp; Family, Ena Vaughan, James<br>
-McVeigh, Letitia McVeigh, Mary Coughlin, Joseph<br>
-McGrady, Tony Oakes, Matilda Rice, Jennifer Cunliffe,<br>
-Michael Scallon, Catherine McAlinden, Mass Schedule:<br>
+<h3 class="b-head">Recently Deceased: Frank Boyd, Oliver Cunningham,</h3>
+<p>Patrick Kearney, Joseph McEvoy,<br>
+Anniv : Andrew Diamond, James Breen, Dominic<br>
+Mcilmail, Mass Schedule:<br>
 Downpatrick Parish Mass Schedule:<br>
 Weekend Masses<br>
 Vigils<br>
@@ -1025,11 +1031,11 @@ month<br>
 Confession available in St Patrick’s, Saturdays 4.15pm<br>
 – 4.45pm<br>
 Parish of Downpatrick<br>
-Sunday 30 August 2026<br>
-22nd, Sunday in Ordinary Time<br>
+Sunday 06 September 2026<br>
+23rd, Sunday in Ordinary Time<br>
 PARISH COLLECTIONS:<br>
-23 August 2026<br>
-Offertory £1971<br>
+30 August 2026<br>
+Offertory £2169 Medical Missionaries £ 1370<br>
 To donate directly via Bank Transfer the parish bank details are: Account<br>
 Name: Parish of Downpatrick, Account Number: 80146471, Sort Cod e:<br>
 95-06-79 (please add an identifying name to your transaction) please</p>
@@ -1044,25 +1050,24 @@ Castlewellan – 6.30am, Downpatrick – 6.45am, Crossgar –<br>
 place your money in an envelope along with your name and<br>
 phone number and drop it into the Parish offices in Saul or<br>
 Downpatrick (Patrician Youth Centre) or you can phone<br>
-Geraldine on 07845 422723<br>
-ADVANCE NOTICE: The Parish Office will be closed on:<br>
-Bank Holiday Monday 31 August and will be closed on:<br>
-Tuesday 01 between 10am to 12noon and<br>
-Wednesday 02 September between 10am to 12noon for<br>
-training purposes.<br>
-The office will be open between 12noon and 1pm. The office<br>
-will resume opening hours from Thursday 03 Sept. NAME CHANGE<br>
+Geraldine on 07845 422723 NAME CHANGE<br>
 You will have noticed that the new title “PARISH SUPPORT<br>
 OFFICER ” is being used in the bulletin information section<br>
 and in the job advertisements in this weeks parish<br>
 bulletin. This is simply the new term for parish secretary<br>
 being used across the diocese.<br>
-Safeguarding: If you have a concern, suspicion, or wish to make an allegation of chil d abuse, or abuse in relation to an adult at risk, please<br>
-contact the Diocesan Safeguarding Office: Philip O&#x27;Hara, Designated Liaison Person, 120, Cliftonville Road, Belfast BT14 6LA.<br>
-Mobile: 07534 992124 or Telephone: 028 90 492798. Email: <a href="mailto:philip.ohara@soddc.org" target="_blank" rel="noopener noreferrer">philip.ohara@soddc.org</a> or visit <a href="https://downandconnorsafeguarding.com" target="_blank" rel="noopener noreferrer">https://downandconnorsafeguarding.com</a> MYMY is an accredited counselling service for adults based in New castle.<br>
-If you or someone you know could benefit from counselling ple ase give<br>
-us call on <a href="tel:+442843727549" style="color:#1d4ed8;font-weight:600;">028 4372 7549</a>, email <a href="mailto:hello@mymy.org.uk" target="_blank" rel="noopener noreferrer">hello@mymy.org.uk</a> or self-refer via our<br>
-website. <a href="https://www.mymy.org.uk" target="_blank" rel="noopener noreferrer">www.mymy.org.uk</a> RCIA 2026 / 2027: Thinking about becoming Catholic or<br>
+Safeguarding: If you have a concern, suspicion, or wish to make<br>
+an allegation of child abuse, or abuse in relation to an adult at risk,<br>
+please contact the Diocesan Safeguarding Office: Philip O&#x27;Hara,<br>
+Designated Liaison Person, 120, Cliftonville Road, Belfast BT14<br>
+6LA. Mobile: 07534 992124 or Telephone: 028 90<br>
+492798. Email: <a href="mailto:philip.ohara@soddc.org" target="_blank" rel="noopener noreferrer">philip.ohara@soddc.org</a> or visit<br>
+<a href="https://downandconnorsafeguarding.com" target="_blank" rel="noopener noreferrer">https://downandconnorsafeguarding.com</a> Assist us to live, not to die…<br>
+The Bill to allow assisted dying is being brought before the<br>
+WESTMINSTER PARLIAMENT on 11 September. The<br>
+consequences for the sick, vulnerable and old are terrible to<br>
+contemplate. Please take a card explaining the dangers and<br>
+consider sending to your MP. RCIA 2026 / 2027: Thinking about becoming Catholic or<br>
 want to deepen your understanding of the faith? The<br>
 Diocesan RCIA (Rite of Christian Initiation of Adults) is a<br>
 journey of faith, formation, and community for adults who<br>
@@ -1079,18 +1084,28 @@ whether you are exploring faith for the first time or<br>
 returning after some time away. To find out more, scan the<br>
 QR code or visit our information page, or email<br>
 <a href="mailto:rcia@downandconnor.org" target="_blank" rel="noopener noreferrer">rcia@downandconnor.org</a> to register.<br>
-Lectio Divina will resume on Wednesday 8th of September.<br>
-We will be using the small room in the church that is used on<br>
-Sundays for children’s liturgy. Lectio Divina is the practice of<br>
-reading scripture, meditation and prayer. New members are<br>
-very welcome. St Patrick's Downpatrick <a href="https://stpatricksdownpatrick.com" target="_blank" rel="noopener noreferrer">https://stpatricksdownpatrick.com</a></p></div>
+Lectio Divina will resume on Tuesday 8th September at<br>
+11 o’clock (please note the correct day). We will be using the<br>
+small room in the church that is used on Sundays for<br>
+children’s liturgy. Lectio Divina is the practice of reading<br>
+scripture, meditation and prayer. New members are very<br>
+welcome. Scouts will hold a registration evening on Monday 7th<br>
+September for Beavers from 7 to 8 pm. Tuesday 8th<br>
+September for Cubs from 7 to 8.30. Any queries contact<br>
+the scout hall on <a href="tel:+442844839841" style="color:#1d4ed8;font-weight:600;">02844839841</a>.<br>
+DAY RETREAT TO LOUGH DERG: Saturday 19th September<br>
+Leaving St Paul’s at 6.30am Returning to Paul’s at 7.30pm .<br>
+The day Includes bus, boat, tea &amp; scones on arrival then a<br>
+light lunch and retreat. Price for Retreat is £45 plus the<br>
+bus price determined on the uptake. Telephone St Paul’s<br>
+Parish Office on <a href="tel:+442890325034" style="color:#1d4ed8;font-weight:600;">028 90325034</a> Mon - Thurs. St Patrick's Downpatrick <a href="https://stpatricksdownpatrick.com" target="_blank" rel="noopener noreferrer">https://stpatricksdownpatrick.com</a></p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other DOWN &amp; CONNOR Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="ballymenaparish.html" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st colmcilles"><a class="parish-link" href="st-colmcilles.html" target="_blank" rel="noopener noreferrer">St Colmcilles</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="ballycastle"><a class="parish-link" href="ballycastleparish.html" target="_blank" rel="noopener noreferrer">Ballycastle</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="bangor"><a class="parish-link" href="bangorparish.html" target="_blank" rel="noopener noreferrer">Bangor</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="glenariffe"><a class="parish-link" href="glenariffeparish.html" target="_blank" rel="noopener noreferrer">Glenariffe</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="maghera"><a class="parish-link" href="parishofmaghera.html" target="_blank" rel="noopener noreferrer">Maghera</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="sacred heart belfast"><a class="parish-link" href="sacredheartparishbelfast.html" target="_blank" rel="noopener noreferrer">Sacred Heart Belfast</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st colmcilles"><a class="parish-link" href="st-colmcilles.html" target="_blank" rel="noopener noreferrer">St Colmcilles</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st oliver plunkett"><a class="parish-link" href="stoliverplunkettparish.html" target="_blank" rel="noopener noreferrer">St Oliver Plunkett</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1142,9 +1157,9 @@ very welcome. St Patrick's Downpatrick <a href="https://stpatricksdownpatrick.co
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1598,11 +1613,16 @@ very welcome. St Patrick's Downpatrick <a href="https://stpatricksdownpatrick.co
         for (var i = 0; i < names.length; i++) {
           var page = pageFor(names[i]);
           if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
           var slot = pages.querySelector('[data-page="' + page + '"]');
           if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
+          scrollBoxTo(pages, slot);
           return true;
         }
         return false;

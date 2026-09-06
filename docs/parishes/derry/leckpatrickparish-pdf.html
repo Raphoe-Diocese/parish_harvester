@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Leckpatrick PDF — 30/08/2026</title>
+  <title>Leckpatrick PDF — 06/09/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html, body { height: 100%; }
@@ -58,7 +59,7 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
@@ -101,6 +102,7 @@
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {
@@ -214,27 +216,27 @@
     body.is-native-pdf { background: #3a3f42; }
     body.is-native-pdf .pdf-standalone-shell { background: #3a3f42; }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901h" defer></script>
 </head>
 <body>
   <div class="top" id="pdf-top">
     <div class="top-left">
       <a class="back-link" href="leckpatrickparish.html" target="_blank" rel="noopener noreferrer">← Viewer</a>
-      <span class="title-line">LECKPATRICK · 30/08/2026</span>
+      <span class="title-line">LECKPATRICK · 06/09/2026</span>
     </div>
     <a class="download-link" href="leckpatrickparish.pdf">Open PDF</a>
   </div>
   <div class="pdf-standalone-shell">
-    <iframe class="pdf-frame" src="leckpatrickparish.pdf" title="Leckpatrick bulletin PDF"></iframe>
+    <iframe class="pdf-frame" data-pdf-url="leckpatrickparish.pdf" title="Leckpatrick bulletin PDF"></iframe>
     
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="leckpatrickparish.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="leckpatrickparish.pdf">Open PDF</a>
-              <a href="leckpatrickparish.pdf" download>Download</a>
+              <a class="pdf-open-newtab" href="leckpatrickparish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="leckpatrickparish.pdf" download="leckpatrickparish.pdf">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>
   </div>
@@ -267,9 +269,9 @@
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901h';
         s.defer = true;
         document.head.appendChild(s);
       }

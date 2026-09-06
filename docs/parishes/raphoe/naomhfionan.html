@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Falcarragh Bulletin — 30/08/2026</title>
+  <title>Falcarragh Bulletin — 06/09/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -109,6 +110,13 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
@@ -141,6 +149,7 @@
       cursor: pointer;
     }
     .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
     
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {
@@ -160,7 +169,7 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
@@ -203,6 +212,7 @@
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {
@@ -866,6 +876,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -892,7 +903,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -900,35 +911,31 @@
     <header class="header">
       <p class="diocese-label">RAPHOE</p>
       <h1>Falcarragh Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Falcarragh — 30/08/2026. Part of the Raphoe Diocese collated bulletin.</p>
-      <a class="download-link-top" href="naomhfionan.pdf">Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Falcarragh — 06/09/2026. Part of the Raphoe Diocese collated bulletin.</p>
+      <a class="download-link-top pdf-force-download" href="naomhfionan.pdf" download="naomhfionan.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="naomhfionan.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       
-      <div class="quiet-links">
-        <a href="naomhfionan.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="naomhfionan-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="naomhfionan.pdf" title="Falcarragh bulletin PDF"></iframe>
+        <iframe data-pdf-url="naomhfionan.pdf" title="Falcarragh bulletin PDF"></iframe>
         
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="naomhfionan.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="naomhfionan.pdf">Open PDF</a>
-              <a href="naomhfionan.pdf" download>Download</a>
+              <a class="pdf-open-newtab" href="naomhfionan.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="naomhfionan.pdf" download="naomhfionan.pdf">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>
       </div>
@@ -963,29 +970,27 @@
       <div class="quiet-links">
         <a href="naomhfionan-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-falcarragh" data-parish-name="Falcarragh"><h2 class="ocr-parish-name">Falcarragh</h2><p class="ocr-parish-date">30/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-falcarragh" data-parish-name="Falcarragh"><h2 class="ocr-parish-name">Falcarragh</h2><p class="ocr-parish-date">06/09/2026</p></header>
 <p class="page-label">Page 1</p>
 <p><a href="https://www.naomhfionan.com" target="_blank" rel="noopener noreferrer">www.naomhfionan.com</a> I Church Webcam: <a href="https://www.mcn.live" target="_blank" rel="noopener noreferrer">www.mcn.live</a> I Facebook: @falcarraghparish Fr. John Boyce P.P.<br>
 Parochial House, Falcarragh, Co. Donegal. F92 N6Y9.<br>
 <a href="tel:+353749135196" style="color:#1d4ed8;font-weight:600;">074 91 35196</a> I <a href="mailto:fionannewsletter@gmail.com" target="_blank" rel="noopener noreferrer">fionannewsletter@gmail.com</a> Please scan the QR code below to donate to either Falcarragh Church or Graveyard Collection<br>
 Church Collection Graveyard Collection</p>
 <h3 class="b-head">Mass Times and Intentions for the Week</h3>
-<p>Saturday 29th 7: 00 pm Harry Reid Month ’s Mind<br>
-Ned and Mary McGeady Anniversaries<br>
-Sunday 30th 9: 00 am Aifreann don Phobal<br>
-10: 30 am Philomena, James and Thomas GrifÏn<br>
-and deceased members of GrifÏn and<br>
-Sheerin families Anniversaries<br>
-Monday 31st 9: 30 am Private Intention<br>
-Tuesday 1st 9: 30 am Mary Murphy RIP<br>
-Wednesday 2nd 9: 30 am Deceased member McFadden Family Anniversaries<br>
-Thursday 3rd 9: 30 am Pat McClafferty 1st Anniversary<br>
-Friday 4th 7: 00 pm John Hannah Gallagher Month ’s Mind<br>
-Saturday 5th 11: 00 am Latin Mass<br>
-7: 00 pm Pat McClafferty and Mick McClafferty 1st Anniversaries<br>
-Bríd Gallagher Anniversary<br>
+<p>Saturday 5th 7: 00 pm Pat McClafferty and Mick McClafferty 1st Anniversaries<br>
+Brid Gallagher Anniversary<br>
 Sunday 6th 9: 00 am Aifreann don Phobal<br>
 10: 30 am Mary Ferry Anniversary<br>
+Monday 7th 9: 30 am Deceased members of Cannon<br>
+and Breslin Families Anniversaries<br>
+Tuesday 8th 9: 30 am Private Intention<br>
+Wednesday 9th 9: 30 am Private Intention<br>
+Thursday 10th 9: 30 am Private Intention<br>
+Friday 11th 7: 00 pm Private Intention<br>
+Saturday 12th 11: 00 am Latin Mass<br>
+7: 00 pm Mass<br>
+Sunday 13th 9: 00 am Aifreann don Phobal<br>
+10: 30 am Mass<br>
 Confessions<br>
 6:15pm— 6:45 pm<br>
 Saturdays<br>
@@ -1001,33 +1006,29 @@ All Masses are available live<br>
 on:<br>
 &amp; Parish Radio @ 106.5 FM<br>
 Reflection<br>
-Becoming disciples of Jesus means learning to think the way God thinks, rather than the<br>
-way we usually think. And that will be for us, as it was for Peter and his dis ciples, a<br>
-life-long process of ups and downs, successes and failures. There may be times when<br>
-we will feel a bit like Jeremiah in our first reading today. Chosen by God t o be his<br>
-‘prophet to the nations ’ (Jer 1:5), fidelity to his calling ‘made him a daily laughing -stock,<br>
-the butt of everyone ’s jokes, and brought him ‘insult and derision, all day long ’<br>
-(Jer 20:7 -8). Though tempted to stop being a spokesman for the Lord, he could not give<br>
-up because, as he states, ‘there seemed to be a fire burning in my heart, imprisoned in<br>
-my bones ’ (Jer 20:9). Jeremiah had been, as he states, ‘seduced ’ by God, and he had<br>
-let himself ‘be seduced ’ (cf. Jer 20: 7). In other words, he had fallen in love with God so that nothing could stop<br>
-him from doing God ’s will, no matter where this might lead him. The example of Jeremiah prom pts us to ask<br>
-ourselves the question: Have we let ourselves be seduced by Christ so that we persevere in fol lowing and serving<br>
-him, regardless of the consequences?</p>
+Today ’s gospel and first reading are at odds with the commonly held view that we shoul d<br>
+mind our own business, and let other people mind theirs; we are only responsibl e for our own<br>
+behaviour. It is, of course, true that each of us is responsible for his or her own behaviour.<br>
+But the Scripture readings today remind us that we have a responsibility for ot hers, one that<br>
+may, at times, include correction.<br>
+Often what inhibits us from speaking the truth in love to a brother or sist er is our fear of<br>
+rejection and conflict. We don ’t want to take the risk of endangering our relationship with those<br>
+we love. But a relationship built on the avoidance of all conflict rather than on truth is on a<br>
+very shaky foundation indeed. There is a healthy conflict that leads to growth just as ther e is an unhealthy peace<br>
+that is really another word for indifference. So, instead of tolerating all sorts of unchristian and destructive<br>
+behaviour, today ’s gospel challenges us to correct one another in love and with respect, so that the ent ire<br>
+Christian community, all members of the Church of Christ, may glorify the wonder and t he beauty of God who has<br>
+made each one of us in his image and who calls us to live as his children. Michael McCabe SMA</p>
 <h3 class="b-head">Cuimhneacháin Báis</h3>
-<p>Martina Rafferty nee McGee, Newtown, whose funeral took place here on Thursday.<br>
-Frances Gallagher, Lower Dore, whose funeral took place in Gweedore on Wednesday. (Sister of Theresa Sharkey, Station Rd.)<br>
-Michael Doogan, Upper Keeldrum, whose funeral took place in Gortahork on Thursday. Harry Reid, Ballintemple and Edinburgh whose<br>
-Month ’s Mind Mass is on Saturday. John Hannah Gallagher, Mansfield, Notti ngham and Upper Dunmore whose Month ’s Mind Mass is<br>
-on Friday. Mary Murphy, Falcarragh and California. USA.</p>
+<p>Eugene McFadden, Meenlaragh, whose funeral took place in Gortah ork on Wednesday.</p>
 <h3 class="b-head">Anniversaries</h3>
-<p>Ned and Mary McGeady, Errarooey. Philomena, James and Thomas Griffin and deceased members of Griffin and Sheerin families,<br>
-Balliness. Deceased members of McFadden family, Ballina. Pat McClafferty, Carrowcannon.<br>
+<p>Pat McClafferty, Carrowcannon, and Mick McClafferty, Dunmore and Glasgow. Bríd Gall agher, Clonbara. Mary Ferry, Moyra.<br>
+Deceased members of Cannon and Breslin Families, Ballina.<br>
 Falcarragh <a href="https://naomhfionan.com/nuachtlitir/" target="_blank" rel="noopener noreferrer">https://naomhfionan.com/nuachtlitir/</a></p>
 <hr>
 <p class="page-label">Page 2</p>
 <h3 class="b-head">Freagra an tSailm</h3>
-<p>Tá tart ar m ’anam duit -se, mo Thiarna agus mo Dhia.<br>
+<p>Á da n -éistfeadh sibh lena ghuth inniu: Ná cruaigí bhur gcroí.<br>
 HOW TO REPORT CLERICAL ABUSE<br>
 If you have a concern, or complaint of child abuse, either current or<br>
 historical, please contact:<br>
@@ -1048,8 +1049,6 @@ code is for the Sunday Collection and one QR code is for the<br>
 Graveyard Collection. You can also make donations by going to the parish<br>
 website and clicking on the DONATE button. All donations are gratef ully<br>
 accepted.<br>
-Sick and Housebound<br>
-Thursday 3rd Sept : Station Rd, Rocktown, Ballintemple and Clonbara.<br>
 September Rota for Ministers of The Word and Holy Communion<br>
 Ministers of the Word Saturday 7 pm Alan Lavender<br>
 Sund ay 9 am Bríd Doohan<br>
@@ -1057,14 +1056,6 @@ Sund ay 9 am Bríd Doohan<br>
 Ministers of Holy Communion: Saturday 7 pm Wiinnie McFadden and<br>
 Stephanie Green<br>
 Sunday 10:30 am Rose Anne Rodgers<br>
-If you are unable to cover your specified Mass, please make<br>
-arrangements for a replacement minister.<br>
-1st Saturday Devotions<br>
-Prayers will be recited at 10:40 am prior to 11am Mass.<br>
-Donegal Down Syndrome<br>
-Annual Church Gate Collection next weekend 29th and 30th August.<br>
-Every contribution helps provide vital support, services and opportunities<br>
-for individuals with Down Syndrome and their families in Donegal.<br>
 Celebration Mass<br>
 Donegal Group 173 Rise and Shine Trust (formerly The Irish Handicapped<br>
 Children&#x27;s Pilgrimage Trust and The Irish Pilgrimage Trust) are celebrating<br>
@@ -1076,80 +1067,94 @@ Derry and many of the priests who travelled to Lourdes with us over t he<br>
 years. We invite all the guests and their families and all the helpers who<br>
 travelled with us over the years to our Mass to celebrate the work of t he<br>
 Donegal Group over these forty years.<br>
-COME &amp; SEE<br>
-Have you heard about the Encounter School of Ministry Course but aren ’t<br>
-sure what it ’s about or if it ’s for you? We invite you to ‘Come &amp; see ’ what it&#x27;s<br>
-about before you make your decision. Class will take place on Thursdays<br>
-from 6.30pm (first half hour is prayer and worship) to 9.00pm beginning on<br>
-3rd September at All Saints Church, Newtowncunningham. Participants can<br>
-attend up to 3 classes without committing to pay for the course. If a<br>
-participant decides to enrol before the application deadline of October 1st,<br>
-tuition fees will then be applied. If a participant decides not to cont inue, there<br>
-is no obligation. More info or register here: <a href="https://encounterschool.org/" target="_blank" rel="noopener noreferrer">https://encounterschool.org/</a><br>
-donegal/ or email <a href="mailto:donegal@encounterschool.org" target="_blank" rel="noopener noreferrer">donegal@encounterschool.org</a> for more information.<br>
 Mass for Expectant Families<br>
 Tuesday 8th September 2026 at 7pm in St Eunan ’s Cathedral.<br>
 Celebrated by Bishop Niall Coll.<br>
 Lough Derg<br>
 One Day Retreats – Guided Days of Prayer and Reflection - places available<br>
 September 5th, 6th, 9th, 12th, 15th, 19th and 20th. A dmission €50.<br>
+Donegal Down Syndrome<br>
+The Church Gate Collection taken up last weekend amounted to €95 5. most<br>
+sincere thanks to everyone who contributed so generously. Míle buíochas<br>
+dóibh uilig.<br>
+Dioplóma sa Ghaeilge<br>
+Beidh &quot;An Dioplóma sa Ghaeilge / B2&quot; ag toiseacht i gCloich Cheann Fhaola<br>
+an mhí seo. Seo cúrsa dhá bhliain d&#x27;Acadamh na hOllscolaíochta, Ollscoil na<br>
+hÉireann Gaillimh do dhaoine fásta. Is cúrsaí páirtaimseartha é, tráthnóna<br>
+amháin sa tseachtain. Reáchtáladh an cúrsa seo deich mbliana ó shin i<br>
+gCloich Cheann Fhaola. Tá roinnt spásanna fágtha. Tá fearadh na fáilte<br>
+roimh mhuintir na Gaeltachta iarratas a dhéanamh a bheith páirteach agus tá<br>
+lascaine speisialta ann do dhaoine a chláraíonn don chúrsa a bheas sa<br>
+Ghaeltacht. Tá an cúrsa céanna ar fáil an mhí seo san ATU i Leitir Ceanainn.<br>
+Déan teagmháil le Caitlín Ní Bhroin, teagascóir an dá chúrsa<br>
+<a href="mailto:cnibhroin39@gmail.com" target="_blank" rel="noopener noreferrer">cnibhroin39@gmail.com</a> <a href="tel:+353870517597" style="color:#1d4ed8;font-weight:600;">0870517597</a>.<br>
+Ri-Oga Dance Academy<br>
+Irish Dance Classes with Maureen. Introduce your child to the joy of dancing<br>
+while also developing confidence, coordination and social skills. Classes<br>
+resume on Monday 7th September in Aras Begley Hall at 4pm.<br>
+Alison Quigley Irish Dance<br>
+Classes will resume on Thursday 11th September at 4.30pm in Aras Begley.<br>
+Classes for all levels provided, new pupils welcome. For further info contact<br>
+Alison on <a href="tel:+3538621535003" style="color:#1d4ed8;font-weight:600;">086 21535003</a>.<br>
 Food Bank Appeal<br>
 The Food Bank is in dire straits at the moment, very low on supplies, so non<br>
 perishable goods are very urgently required. Food bins have been left in the<br>
 4 porches for any goods donated. If anyone needs help please cont act us<br>
 on <a href="tel:+353857560177" style="color:#1d4ed8;font-weight:600;">085 7560177</a> or call on Thursday mornings between 10am and 12pm.<br>
+Cloughaneely Junior Band<br>
+Lotto Results 27th August: Uimhreacha na seachtaine: 3 -8-9-12-14-20.<br>
+Match 5 winner Peadar O Brien (R) €100. €3,650 sa phota óir. Tarraingt<br>
+gach Déardaoin<br>
+Ionad Naomh Fionnán<br>
+Congratulations to Willie Haughey who was this week ’s lucky winner of our<br>
+50/50 Draw. Enjoy your winnings of €1070.<br>
+Over 35’s Astro every Tuesday night at 8pm. New members welcome.<br>
+Ladies Astro, come along and sign up this Wednesday at 7p.m.<br>
+Pilates Wednesdays at 7:30p.m. Suitable for all levels and abilities.<br>
+Bookings can be made directly with Victoria by contacting <a href="tel:+353873297169" style="color:#1d4ed8;font-weight:600;">087 3297169</a><br>
+Children&#x27;s Yoga class starts Thursday 10th September at 6:10p.m. Bookings<br>
+direct on the Little Loftus Yoga social media page.<br>
+Ballet class every Friday, beginning Friday 11th September. 3:15p.m - 4p.m.<br>
+For enquiries or bookings contact Deirdre at <a href="tel:+353872632486" style="color:#1d4ed8;font-weight:600;">087 263 2486</a><br>
+Gymnastics Classes resume on Wednesday 9th September from 4 -5p.m.<br>
+and 5 -6p.m. Bookings can be made online on our website or by contacting<br>
+us at <a href="tel:+353877063018" style="color:#1d4ed8;font-weight:600;">087 -7063018</a> or by email at <a href="mailto:ionadnf@gmail.com" target="_blank" rel="noopener noreferrer">ionadnf@gmail.com</a><br>
+Cloughaneely Bowls Club Taster Night this Saturday, 5th September at 8p.m.<br>
+Come along to Ionad Naomh Fionnán and try a new social sport.<br>
+Let us know if there are any classes you&#x27;d like us to hold at Ionad Na omh<br>
+Fionnán over the Autumn/Winter months,<br>
+Pobail Le Chéile CDP<br>
+Growing together at OURganic Gardens Gortahork -Over 60s -come grow<br>
+with us! Fully funded 4 session Bi -weekly Intergenerational Project. Discover<br>
+traditional and contemporary gardening techniques. Share, learn, grow and<br>
+connect. Contact Anne at DLDC on <a href="tel:+353861938960" style="color:#1d4ed8;font-weight:600;">086 193 8960</a>.<br>
+Balance Healthy &amp; affordable Cookery course. Free six -week course at Ionad<br>
+Garradh Cholmcille. Learn low -cost recipes ideas, smart meal planning and<br>
+Food Labels. Contact Laura at DLDC on <a href="tel:+353868339548" style="color:#1d4ed8;font-weight:600;">086 833 9548</a><br>
+Fáilte Isteach English Conversation group: The group meets at Ionad<br>
+Garradh Cholmcille on Monday from 11am -12pm. Beginners welcome.<br>
+Páistí Le Chéile: The Parent and Toddler Group resumes on Thursday 10th<br>
+September at Ionad Garradh Cholm Cille from 11am -12pm. A fun, friendly<br>
+space for little ones to play and parents to connect.<br>
+CLG Chloich Cheann Fhaola<br>
+The numbers drawn were 19,3,21,20,11,17! We had 14 match 4 winn ers.<br>
+Congratulations to Anthony Sharkey who wins €100.<br>
+The jackpot is now €3,150.Tickets are available in various outlets throughout<br>
+the parish and online at the following link<br>
+<a href="https://clubforce.com/clubs/gaa" target="_blank" rel="noopener noreferrer">https://clubforce.com/clubs/gaa</a> -clg-chloich -cheann -fhaola/<br>
 Breast Cancer Awareness Month 2026 takes place Thursday, Oct 1st, 2026 –<br>
 Saturday, Oct 31st, 2026. For more information, please visit<br>
 breastcancerresearch.ie or <a href="https://www.breastcancerireland.com" target="_blank" rel="noopener noreferrer">www.breastcancerireland.com</a>.<br>
 International Coffee Day 2026 takes place on Thursday, October 1st, 2026 .<br>
 Please see <a href="https://www.internationalcoffeeday.org" target="_blank" rel="noopener noreferrer">www.internationalcoffeeday.org</a> for further details.<br>
-Ri-Oga Dance Academy<br>
-Irish Dance Classes with Maureen. Introduce your child to the joy of dancing<br>
-while also developing confidence, coordination and social skills. Classes<br>
-resume on Monday 7th September in Aras Begley Hall at 4pm.<br>
-Ionad Naomh Fionnán<br>
-Congratulations to Denis who was this weeks lucky winner of our 50/50<br>
-Draw. Enjoy your winnings of €1095.<br>
-Classes are starting back in September and we look forward to welcoming<br>
-you all back.<br>
-Pilates Wednesdays at 7:30p.m.starting 2nd September.<a href="tel:+353873297169" style="color:#1d4ed8;font-weight:600;">087 3297169</a><br>
-Ballet class with The Forristal School of Dance returns Fridays,<br>
-beginning11th September, from babies ballet to Grade 2 ballet.<br>
-For enquiries or bookings contact Deirdre at <a href="tel:+353872632486" style="color:#1d4ed8;font-weight:600;">087 263 2486</a><br>
-Gymnastics Classes resume on Wednesday 9th of September. from 4 -5p.m.<br>
-and 5 -6p.m. Bookings can be made online on our website or by contact us at<br>
-<a href="tel:+353877063018" style="color:#1d4ed8;font-weight:600;">087-7063018</a> or by email at <a href="mailto:ionadnf@gmail.com" target="_blank" rel="noopener noreferrer">ionadnf@gmail.com</a><br>
-We have an opening for a part time Administrative assistant in our office. T he<br>
-position is a 19.5hour week with flexible working hours. If I ’m this is of inter-<br>
-est to you please forward your CV to <a href="mailto:managerionadnf@gmail.com" target="_blank" rel="noopener noreferrer">managerionadnf@gmail.com</a> or contact<br>
-us if you have any questions on the position. Closing date for applicants is<br>
-31st August.<br>
-Pobal Eascarrach<br>
-Dúchas na nDaoine - Nature, growing vegetables, conversation and craic -<br>
-every Saturday 10 -1pm.<br>
-Astro pitch available. Contact and register at <a href="mailto:pobaleas@gmail.com" target="_blank" rel="noopener noreferrer">pobaleas@gmail.com</a><br>
-or <a href="tel:+353749180571" style="color:#1d4ed8;font-weight:600;">074 9180571</a> / <a href="tel:+353858670762" style="color:#1d4ed8;font-weight:600;">085 8670762</a><br>
-Pobail Le Chéile CDP<br>
-DLDC FREE 6 week Healthy Eating Course<br>
-Learn how to cook delicious, healthy meals on a budget! Starts on Tuesday<br>
-8th September 11am -1.30pm at Ionad Garradh Cholmcille F92 W2H7. Places<br>
-are limited, get in touch with Laura McGoran at DLDC <a href="tel:+353868339548" style="color:#1d4ed8;font-weight:600;">086 833 9548</a><br>
-The Natural Family Planning Teachers Association of Ireland<br>
-An overview of the evidence -based symptom -thermal double check<br>
-method of natural family planning for healthcare professionals,<br>
-teachers and others interested in learning about fertility appreciation<br>
-and care.<br>
-Venue: Ely House, 8 Ely Place, Dublin 2<br>
-19th September 2026 10am -4pm. Cost €50.<br>
-To book your place or for further details contact deirdregleeson<br>
-@medvise.ie/ <a href="tel:+35345854022" style="color:#1d4ed8;font-weight:600;">045 854022</a>.<br>
 EMPOWER Cumasú Programme<br>
 Applications are now open.<br>
 Are you a female living in the Gaeltacht looking to start or grow your own<br>
 business? Whether it ’s food, farming, crafts or a service business, we want to<br>
 hear from you. Apply now: <a href="https://empowerprogramme.ie/" target="_blank" rel="noopener noreferrer">https://empowerprogramme.ie/</a><br>
 Places are limited. The closing date for applications is 5:00PM on Friday,<br>
-4th September 2026. Further information: <a href="tel:+35391742851" style="color:#1d4ed8;font-weight:600;">091 742851</a> / michelle.lee@ atu.ie Fógra í<br>
+4th September 2026. Further information: <a href="tel:+35391742851" style="color:#1d4ed8;font-weight:600;">091 742851</a> / michelle.lee@ atu.ie<br>
+Fógra í<br>
 St. Vincent de Paul: Local number: <a href="tel:+353871443464" style="color:#1d4ed8;font-weight:600;">087 1443464</a><br>
 Cloughaneely Food Bank: <a href="tel:+353857560177" style="color:#1d4ed8;font-weight:600;">085 7560177</a><br>
 MABS Gweedore: 0818 072650</p></div>
@@ -1159,7 +1164,7 @@ MABS Gweedore: 0818 072650</p></div>
     <section class="parish-section">
       <h2 class="section-heading">Other RAPHOE Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="tawnawillyparish.html" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="kincasslagh"><a class="parish-link" href="kincasslagh.html" target="_blank" rel="noopener noreferrer">Kincasslagh</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1211,9 +1216,9 @@ MABS Gweedore: 0818 072650</p></div>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1667,11 +1672,16 @@ MABS Gweedore: 0818 072650</p></div>
         for (var i = 0; i < names.length; i++) {
           var page = pageFor(names[i]);
           if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
           var slot = pages.querySelector('[data-page="' + page + '"]');
           if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
+          scrollBoxTo(pages, slot);
           return true;
         }
         return false;

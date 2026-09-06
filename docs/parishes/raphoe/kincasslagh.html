@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Kincasslagh Bulletin — 25/08/2026</title>
+  <title>Kincasslagh Bulletin — 06/09/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -109,10 +110,20 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -138,21 +149,27 @@
       cursor: pointer;
     }
     .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
     
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
@@ -179,6 +196,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -187,6 +212,7 @@
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {
@@ -201,6 +227,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +247,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +259,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +285,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +300,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +482,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +832,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +846,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -837,6 +876,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -863,7 +903,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,35 +911,31 @@
     <header class="header">
       <p class="diocese-label">RAPHOE</p>
       <h1>Kincasslagh Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Kincasslagh — 25/08/2026. Part of the Raphoe Diocese collated bulletin.</p>
-      <a class="download-link-top" href="kincasslagh.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Kincasslagh — 06/09/2026. Part of the Raphoe Diocese collated bulletin.</p>
+      <a class="download-link-top pdf-force-download" href="kincasslagh.pdf" download="kincasslagh.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="kincasslagh.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       
-      <div class="quiet-links">
-        <a href="kincasslagh.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="kincasslagh-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="kincasslagh.pdf" title="Kincasslagh bulletin PDF"></iframe>
+        <iframe data-pdf-url="kincasslagh.pdf" title="Kincasslagh bulletin PDF"></iframe>
         
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="kincasslagh.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="kincasslagh.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-              <a href="kincasslagh.pdf" download>Download</a>
+              <a class="pdf-open-newtab" href="kincasslagh.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="kincasslagh.pdf" download="kincasslagh.pdf">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>
       </div>
@@ -934,141 +970,149 @@
       <div class="quiet-links">
         <a href="kincasslagh-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-kincasslagh" data-parish-name="Kincasslagh"><h2 class="ocr-parish-name">Kincasslagh</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-kincasslagh" data-parish-name="Kincasslagh"><h2 class="ocr-parish-name">Kincasslagh</h2><p class="ocr-parish-date">06/09/2026</p></header>
 <p class="page-label">Page 1</p>
-<p>Mass Time Aug -22nd Aug -30th ADORATION<br>
+<p>Mass Time Sept 6th- Sept 13th<br>
+ADORATION<br>
 St. Mary’s Church Kincasslagh<br>
-Day Time Masses This Week<br>
-Sat 22nd 6.30pm<br>
-Sheila Mc Farlane<br>
-Wed 26th<br>
-St Anthony 7pm Special intention<br>
-Fri 28th 10am<br>
-Sat 29th Aug 6.30pm Owenie Teague<br>
-O’ Donnell,<br>
-Hugh Boyle,<br>
-Kathleen Richard,<br>
-John Mullholland<br>
+Day<br>
+Time<br>
+Masses This<br>
+Week<br>
+Sun 6th<br>
+10am<br>
+Ellen &amp; James<br>
+Gallagher<br>
+(Owey)<br>
+Wed 9th<br>
+St.<br>
+Anthony<br>
+7pm<br>
+Bridget &amp; John<br>
+Sweeney<br>
+Kincasslagh<br>
+Fri 11th<br>
+10am<br>
+Sun 13th<br>
+10am<br>
 St Columba’s Church Burtonport<br>
-Day Time Masses This Week<br>
-Sun 23rd 10am Mass Offered for the<br>
-People of the Parish<br>
-Mon 24th 10am<br>
-Special Intention<br>
-Tues 25th 10am Tom Healy<br>
-Thurs 27th 10am James O Donnell (Get<br>
-Well)<br>
-Fri 28th 10am Maggie Gallagher<br>
-Sun 30th 10am Stephen Bonner (1st</p>
-<h3 class="b-head">anniversary)</h3>
-<p>Bridie Boyle (Months<br>
-Mind)<br>
-Anton Bán Sweeney<br>
+Day<br>
+Time<br>
+Masses This<br>
+Week<br>
+Sat 5th<br>
+10am<br>
+6.30pm<br>
+Our Lady<br>
+Packity Boyle<br>
+(Lower Keadue)<br>
+Mon 7th<br>
+10am<br>
+Special<br>
+Intention<br>
+Tues 8th<br>
+10am<br>
+Thurs<br>
+10th<br>
+10am<br>
+Mary Houston<br>
+(Birthday Mass)<br>
+Fri 11th<br>
+10am<br>
+Philip Mc<br>
+Cafferty<br>
+(Arranmore)<br>
+Sat 12th<br>
+6.30pm<br>
+Madge<br>
+Mc Hugh<br>
+(Months Mind)<br>
+Pat, Mary &amp;<br>
+Doalty Forker<br>
+(Glenahilt)<br>
 St. Crone’s Church Arranmore<br>
-Day Time Masses This Week<br>
-Sun 23rd 12.30 Bridget Boyle (Con)<br>
-John Boyle (Con)<br>
-Norah Boyle (Con)<br>
-Francie Ward (Galway<br>
-And Arranmore)<br>
-Tues 25th<br>
+Day<br>
+Time<br>
+Masses This<br>
+Week<br>
+Sun 6th<br>
+12.30<br>
+4pm<br>
+Mass Rock<br>
+Tues 8th<br>
 10:00<br>
-Sun 30th<br>
 12:30<br>
-Mass offered for the<br>
-People of the Parish</p>
-<h3 class="b-head">Anniversaries</h3>
-<p>Hughie Ward The Glen/London<br>
-Maria Mc Hugh London</p>
+Church<br>
+Day Centre<br>
+Sun 13th<br>
+12:30</p>
 <h3 class="b-head">Recent Deaths</h3>
-<p>Madge McHugh<br>
-Don Breslin<br>
+<p>Mary Campbell, Meenmore<br>
+If you would like to volunteer to help in<br>
+any number of ministries within our<br>
+Church’s please see Fr Vincent, and<br>
+thanks to those who already do!<br>
 Eucharistic Adoration in<br>
 St. Columba’s on Monday after<br>
 10am Mass for an hour, &amp; in<br>
-St. Mary’s on Wednesday 11 -12<br>
-noon.<br>
+St.<br>
+Mary’s on Wednesday<br>
+11-12 noon.<br>
 PARISH BAPTISMS on request. Please see<br>
 Fr. Vincent to arrange a date and<br>
 time.<br>
-MARYS MEALS<br>
-If you have any old notes or coins that<br>
-you wish to donate to Marys Meals they<br>
-can be dropped off at<br>
-The Cope, Annagry, on Fri 28th August,<br>
-or The Cope Supermarket, Dungloe, on<br>
-Friday 4th September, between 9.30am<br>
-- 5pm. Otherwise collection can be<br>
-arranged by contacting Eilis Conneely<br>
-on <a href="tel:+353877060457" style="color:#1d4ed8;font-weight:600;">087 7060457</a>"<br>
-Thought for the Week<br>
-When Jesus asks, “Who do you<br>
-say I am?” , he is asking more<br>
-than a question of Peter — he<br>
-asks it of each one of us. Faith is<br>
-not simply knowing about<br>
-Jesus; it is knowing him,<br>
-trusting him, and allowing him<br>
-to shape the way we live.<br>
-Perhaps the most important<br>
-answer we give to Jesus is not<br>
-with our lips, but with our<br>
-lives. If you would like to donate<br>
-to the Kincasslagh Parish<br>
-Graveyards please use your phone<br>
-camera to scan the code and follow<br>
-the instructions.<br>
-Many thanks.<br>
-BURTONPORT COMMUNITY CENTRE<br>
-NEW BEGINNINGS COMMUNITY SHOP<br>
-The New Beginnings shop is open Monday -<br>
-Thursday 9am -1.30pm. A great selection of<br>
-items at very reasonable prices.<br>
-CAR BOOT SALE on Sunday 30th August from 10 -<br>
-3pm in the Cope car park main street Dungloe .<br>
-Vintage items, antiques, clothes, bargains galore.<br>
-All proceeds to the Cope community trust<br>
+ST COLUMBA’S COMMUNITY CENTRE<br>
+Starting Monday 7th of September until Thursday<br>
+10th of September. We are having a fill a bag for<br>
+€5 sale on all Ladies, Gents and children&#x27;s<br>
+clothing. Bags will be provided.<br>
+Move to the beat: Move to the beat is starting on<br>
+Tuesday 15th September at 10.30 am.<br>
+to book a place send your name and mobile<br>
+number to <a href="mailto:burtonportcc@gmail.com" target="_blank" rel="noopener noreferrer">burtonportcc@gmail.com</a> or text<br>
+Margaret <a href="tel:+353876317683" style="color:#1d4ed8;font-weight:600;">087 6317683</a>.<br>
 DATE FOR YOUR DIARY<br>
 Annual Halloween Spooktacular walk on Friday<br>
-23rd October commencing at 7pm. Join us for<br>
-one of the big social events of the year.<br>
-MASS CARDS<br>
-Signed Mass Cards are available from the<br>
-Sacristy.<br>
-WATCH FROM HOME<br>
-Live -Streamed Masses from<br>
-St. Columba’s, go to mcn.live and<br>
-scroll through Donegal util you reach<br>
-St Columba’s Burtonport.<br>
-St. Mary’s is livestreamed on<br>
-Facebook.<br>
+23rd October commencing at 7pm. Join us for one<br>
+of the big social events of the year.<br>
+If you would like to donate to<br>
+the Kincasslagh Parish Graveyards<br>
+please use your phone camera to scan<br>
+the code and follow the instructions.<br>
+Many thanks.<br>
+Keadue Rovers Bingo Results –<br>
+28/08/2026<br>
+€100 House Jackpots: Marian Davison,<br>
+Crickamore (Game 6) and Paul<br>
+O&#x27;Donnell, Burtonport (Game 12).<br>
+No Snowball winners. Current prizes:<br>
+€1,000 and €550 (52 numbers).<br>
+50/50 Draw: Congratulations to Kate<br>
+Gallagher, Burtonport, tonight’s<br>
+winner. Next Bingo: Friday 04/09/2026.<br>
 St Anthony Devotions<br>
-Mass every Wednesday in<br>
-St. Mary’s Church<br>
-Kincasslagh at 7:00pm with<br>
-devotions. The Relic of St<br>
-Anthony will be available for<br>
-veneration. Confessions<br>
-available before the Mass.<br>
-CONFESSIONS: Sat 12:00 -<br>
-12:30pm Acres . Sat 5:45 -6:15pm<br>
-(Before Vigil Mass)<br>
-Confession is not about dwelling on<br>
-our failures; it is about experiencing<br>
-the mercy of God and beginning<br>
-again. Come as you are, leave the past<br>
-with God, and go away with a lighter<br>
-heart and a fresh start. HOUSE CALLS : If you would like<br>
-Fr. Vincent to visit or bless your house,<br>
-your family, visit the sick at home or<br>
-hospital please get in touch. <a href="tel:+353877031366" style="color:#1d4ed8;font-weight:600;">0877031366</a> Kincasslagh</p></div>
+Mass every Wednesday in St. Mary’s<br>
+Church Kincasslagh at 7:00pm with<br>
+devotions. The Relic of St Anthony will<br>
+be available for veneration.<br>
+Confessions available before the Mass.<br>
+CONFESSIONS<br>
+=====<br>
+Saturday: 12:00- 12:30pm<br>
+St. Columba’s.<br>
+Saturday: 5:45-6:15pm<br>
+(Before<br>
+Vigil Mass)<br>
+&amp; before St. Anthony’s Mass on<br>
+Wednesday in St. Mary’s<br>
+Kincasslagh</p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other RAPHOE Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="raphoe"><a class="parish-link" href="drive-1jmslbrliw.html" target="_blank" rel="noopener noreferrer">Raphoe</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="tawnawillyparish.html" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1120,9 +1164,9 @@ hospital please get in touch. <a href="tel:+353877031366" style="color:#1d4ed8;f
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1576,11 +1620,16 @@ hospital please get in touch. <a href="tel:+353877031366" style="color:#1d4ed8;f
         for (var i = 0; i < names.length; i++) {
           var page = pageFor(names[i]);
           if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
           var slot = pages.querySelector('[data-page="' + page + '"]');
           if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
+          scrollBoxTo(pages, slot);
           return true;
         }
         return false;
@@ -1614,23 +1663,8 @@ hospital please get in touch. <a href="tel:+353877031366" style="color:#1d4ed8;f
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

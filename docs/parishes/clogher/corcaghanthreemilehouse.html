@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt) Bulletin — 30/08/2026</title>
+  <title>Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt) Bulletin — 06/09/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -109,6 +110,13 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
@@ -141,6 +149,7 @@
       cursor: pointer;
     }
     .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
     
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {
@@ -160,7 +169,7 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
@@ -203,6 +212,7 @@
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {
@@ -866,6 +876,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -892,7 +903,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -900,35 +911,31 @@
     <header class="header">
       <p class="diocese-label">CLOGHER</p>
       <h1>Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt) Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt) — 30/08/2026. Part of the Clogher Diocese collated bulletin.</p>
-      <a class="download-link-top" href="corcaghanthreemilehouse.pdf">Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt) — 06/09/2026. Part of the Clogher Diocese collated bulletin.</p>
+      <a class="download-link-top pdf-force-download" href="corcaghanthreemilehouse.pdf" download="corcaghanthreemilehouse.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="corcaghanthreemilehouse.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       
-      <div class="quiet-links">
-        <a href="corcaghanthreemilehouse.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="corcaghanthreemilehouse-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="corcaghanthreemilehouse.pdf" title="Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt) bulletin PDF"></iframe>
+        <iframe data-pdf-url="corcaghanthreemilehouse.pdf" title="Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt) bulletin PDF"></iframe>
         
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="corcaghanthreemilehouse.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="corcaghanthreemilehouse.pdf">Open PDF</a>
-              <a href="corcaghanthreemilehouse.pdf" download>Download</a>
+              <a class="pdf-open-newtab" href="corcaghanthreemilehouse.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="corcaghanthreemilehouse.pdf" download="corcaghanthreemilehouse.pdf">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>
       </div>
@@ -963,9 +970,9 @@
       <div class="quiet-links">
         <a href="corcaghanthreemilehouse-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-corcaghan-threemilehouse-kilmore-drumsnatt" data-parish-name="Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)"><h2 class="ocr-parish-name">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</h2><p class="ocr-parish-date">30/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-corcaghan-threemilehouse-kilmore-drumsnatt" data-parish-name="Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)"><h2 class="ocr-parish-name">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</h2><p class="ocr-parish-date">06/09/2026</p></header>
 <p class="page-label">Page 1</p>
-<p>Sunday 30th August 2026<br>
+<p>Sunday 6th September 2026<br>
 Parish of Kilmore &amp; Drumsnatt<br>
 Monaghan Priests = <a href="tel:+3534781220" style="color:#1d4ed8;font-weight:600;">047 -81220</a>.<br>
 Fr Macartan Mc Quaid<br>
@@ -973,74 +980,73 @@ Fr Thomas Coffey<br>
 Parish OfÏce = <a href="tel:+3534757867" style="color:#1d4ed8;font-weight:600;">047 -57867</a><br>
 Email: <a href="mailto:kilmoredrumsnatt@clogherparishes.ie" target="_blank" rel="noopener noreferrer">kilmoredrumsnatt@clogherparishes.ie</a><br>
 ST. MARY ’S CHURCH MASS INTENTIONS<br>
-Sunday 30th August 10.00am People of the parish<br>
-Saturday 5th Sept 10.00am Mass - no intention booked<br>
 Sunday 6th Sept 10.00am Mona Lambe, Cooldarragh, Smithborough<br>
 Saturday 12th Sept 10.00am Stevie Kelly , Kilnaclay, 1st anniversary<br>
-Sunday 13th Sept 10.00am Mass - no intention booked<br>
+Sunday 13th Sept 10.00am Pat &amp; Lizzie McAleer, The Point, Ballinode &amp; DM<br>
+Saturday 19th Sept 10.00am John &amp; Bridget McGuinness , Aughnamallagh, their son Patrick,<br>
+Grand -daughter Annmarie &amp; their son -in-law Benny<br>
+Brian Sheridan , Gortmore &amp; DM; Mary Clarke, Gortmore &amp; DM<br>
+John &amp; Margaret Clerkin &amp; Edward Coyle, Rooskey &amp; DM<br>
+Sunday 20th Sept 10.00am Mass - no intention booked<br>
 <a href="https://mcnmedia.tv/camera/st" target="_blank" rel="noopener noreferrer">https://mcnmedia.tv/camera/st</a> -marys -church -2<br>
 ST. MICHAEL ’S CHURCH MASS INTENTIONS<br>
-Saturday 29th Aug 7.30pm Frank &amp; Rose McConnon , Slieveroe, their daughter Annemarie Islam<br>
-née McConnon, London; &amp; John &amp; Annie McConnon &amp; DM<br>
 Saturday 5th Sept 7.30pm Peter &amp; Marie Keenan, Corcaghan<br>
 Thomas Staunton , Cavanagarvan; Michael Staunton, Annaghdown,<br>
 Co. Galway &amp; DM<br>
-Seamus Ward &amp; his parents James &amp; Sarah Ward, Greagh<br>
 Saturday 12th Sept 7.30pm Jennifer Kelly, Corcaghan - Month ’s Mind<br>
 Karen Higgins, Annaglough, Stranooden, 1st anniversary<br>
 Mary -Jane &amp; Patrick Murphy &amp; daughters Maura &amp; Bebe,<br>
 Lisnashannagh<br>
+Saturday 19th Sept 7.30pm Hughie McElvaney , Corcaghan, 1st anniversary<br>
+Betty Clerkin , Ballagh, 1st anniversary<br>
+Gerard Hackett , Drummuck, 3rd anniversary<br>
+Patrick, Rose, Eddie Joe, Maureen &amp; John Pat Murphy, Corcaghan<br>
 <a href="https://mcnmedia.tv/camera/st" target="_blank" rel="noopener noreferrer">https://mcnmedia.tv/camera/st</a> -michaels -church -1<br>
-AMOUNT RECEIVED FOR WEEK ENDING 23rd AUGUST €1576.18 Thank you Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt) <a href="https://kilmoredrumsnatt.com/" target="_blank" rel="noopener noreferrer">https://kilmoredrumsnatt.com/</a></p>
+AMOUNT RECEIVED FOR WEEK ENDING 30th AUGUST €3090.39 Thank you Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt) <a href="https://kilmoredrumsnatt.com/" target="_blank" rel="noopener noreferrer">https://kilmoredrumsnatt.com/</a></p>
 <hr>
 <p class="page-label">Page 2</p>
-<p>Eucharistic Minister in St Mary ’s Church for September: Paul Breslin<br>
-Reader in St Mary ’s Church for September: Michael Duffy<br>
-Sunday leaflets can be obtained in advance from the parish ofÏce. Families who are celebrating an</p>
-<h3 class="b-head">anniversary</h3>
-<p>Month ’s Mind and who wish to read, please contact the parish ofÏce in advance to make<br>
-arrangements for this. (The reader organised for that month will be inf ormed of any change)<br>
+<p>We pray for the happy repose of the soul of Rev. Fr. Jim Moore who<br>
+passed away on Tuesday 1st September. His funeral Mass took p lace on<br>
+Friday 4th September in the Sacred Heart Church, Clones foll owed by buri-<br>
+al in St. Macartan ’s Cemetery, Aghadrumsee. May God grant eternal rest<br>
+upon his soul.<br>
 Parish OfÏce Opening Hours:<br>
 Monday 10am – 2pm; Tuesday 10am – 12; Closed Wednesday;<br>
 Thursday 10am – 12; Friday 10am – 2 pm<br>
-Tel: <a href="tel:+3534757867" style="color:#1d4ed8;font-weight:600;">047 57867</a> Clogher don Óige will host the second series of – The Chosen – a groundbreaking drama for young<br>
+Tel: <a href="tel:+3534757867" style="color:#1d4ed8;font-weight:600;">047 57867</a> Friday 18 September, 8pm , - at Cahans Meeting House (H18 E7N1) an evening of song and storytell-<br>
+ing with the inimitable Colum Sands . Admission €15 - all welcome<br>
+There will be an anniversary mass for Seamus McCormick on Fr iday 25th September at 7.30pm in St<br>
+Michael ’s Church, Corcaghan. Country Fusion Adult Line Dancing Classes take place every Tuesday evening from 8pm to 9pm in the<br>
+Carn Resource Centre, Aghabog, H18 YW40. Admission is €7. C ontact Pamela on <a href="tel:+353831881887" style="color:#1d4ed8;font-weight:600;">083 1881887</a> for<br>
+more information. New and existing line dancers welcome.<br>
+The Season of Creation from 1 September until 4 October is the annual Christian celebration to pray<br>
+and respond together to the cry of Creation: the ecumenical f amily around the world unites to con-<br>
+template and care for our common home. This year, we will unite around the theme “Living Water ”,<br>
+inspired by Ezekiel 47:9 - a powerful biblical vision of hope and ecological h ealing. Set amid exile and<br>
+loss, the image of living water flowing from God ’s sanctuary reveals divine healing that renews land,<br>
+water, biodiversity, and human responsibility towards the whole creation. For further information,<br>
+including prayers and reflections, visit Season of Creation 2026 | Irish Catholic Bishops&#x27; Conference<br>
+Clogher don Óige will host the second series of – The Chosen – a groundbreaking drama for young<br>
 adults about the life of Jesus Christ, told through the eyes of those who knew Him. It will take place<br>
-each Thursday , for 8 weeks, beginning 10th September from 7:30pm to 9:30pm in St. Joseph ’s Pasto-<br>
-ral Centre, Monaghan. An opportunity for young adults aged 18 -40 to watch the series, take part in<br>
-discussions, group sharing and prayer. To register or for more information contact in-<br>
+each Thursday, for 8 weeks, beginning 10th September from 7:30pm to 9:30pm in St. Joseph ’s Pastoral<br>
+Centre, Monaghan. An opportunity for young adults aged 18 -40 to watch the series, take part in dis-<br>
+cussions, group sharing and prayer. To register or for more information contact in-<br>
 <a href="mailto:fo@clogherdonoige.org" target="_blank" rel="noopener noreferrer">fo@clogherdonoige.org</a> or call <a href="tel:+3534772784" style="color:#1d4ed8;font-weight:600;">047 72784</a><br>
-The Bowling Club would like to welcome new members both Male and Femal e. The club meets every<br>
-Thursday night in the Sean&#x27;s Complex at 8pm.This is a very relaxing and enjoyab le pastime. We hope<br>
-to see you there commencing on Thursday the 3rd of September 2026.<br>
-Country Fusion Adult Line Dancing Classes take place every Tuesday evening from 8pm to 9pm in th e<br>
-Carn Resource Centre, Aghabog, H18 YW40. Admission is €7. Contact Pamela on <a href="tel:+353831881887" style="color:#1d4ed8;font-weight:600;">083 1881 887</a> for<br>
-more information.<br>
-Monaghan Charismatic Prayer Group are organising a bus to Lough Derg on Sunday 6th Sept a spe-<br>
-cial day in honour of Carlo Acutis. Bus leaving Carrickmacross at 7am via Castleblayney /Clontibret/<br>
-Monaghan. The island is €50 and bus fare €25. Booking essential and ASAP with : Rosaleen<br>
-<a href="tel:+353879717447" style="color:#1d4ed8;font-weight:600;">0879717447</a>/ Philip <a href="tel:+353872508043" style="color:#1d4ed8;font-weight:600;">0872508043</a><br>
-St. Mary&#x27;s Parents&#x27; Association are holding a Cash for Clobber this week. Clean clothes, shoes and<br>
-bed clothes are accepted, please bag them and drop to the Complex during on e of the following<br>
-times: Sunday 30th Aug 9:30 -11am, Tuesday 1st Sept 6 -7:30pm or Thursday 3rd Sept 6 -7:30pm.<br>
-Radio Maria Ireland is an Irish -run Catholic Talk -Radio Station who enjoy commercial free broad-<br>
-casting – Prayer, Catechesis, Uplifting music, Talks, Interviews and Testimonies. Visit<br>
-<a href="https://www.radiomaria.ie" target="_blank" rel="noopener noreferrer">www.radiomaria.ie</a> for more information and how you can listen.<br>
+The parish ofÏce will be closed 15th September to 23rd Se ptember inclusive for annual leave. Reo-<br>
+pening Thursday 24th September at 10am. For urgent enq uiries contact Monaghan parish ofÏce on<br>
+<a href="tel:+3534781220" style="color:#1d4ed8;font-weight:600;">047 81220</a> during ofÏce hours. Legion of Mary Pilgrimage to Knock – Sunday 27th September. Bus leaving car park behind Monaghan<br>
+Credit Union at 8am. €25 to be paid when booking in Wineway s, Glaslough St. Contact Marian on <a href="tel:+353872709683" style="color:#1d4ed8;font-weight:600;">087<br>
+2709683</a>.<br>
 Employability Monaghan Cavan offers a Free &amp; Confidential service for people with Disabilities,<br>
-health conditions and mental health difÏculties who are looking for work. C all <a href="tel:+353877977093" style="color:#1d4ed8;font-weight:600;">087 7977093</a> or visit<br>
-<a href="https://www.mcses.ie" target="_blank" rel="noopener noreferrer">www.mcses.ie</a> .<br>
-ALONE Volunteers Needed: Could you spare an hour a week to support an older person in your com-<br>
-munity? ALONE is looking for volunteers to provide friendship and companion ship to older people<br>
-who may be experiencing loneliness or isolation. Full training and ongoin g support are provided, and<br>
-volunteering can make a real difference in someone&#x27;s life.<br>
-Sequence dance classes resume in St Joseph ’s Pastoral Centre, Monaghan on Friday 4th September<br>
-7pm - 8.30pm. Admission €10. New -comers welcome.</p></div>
+health conditions and mental health difÏculties who are look ing for work. Call <a href="tel:+353877977093" style="color:#1d4ed8;font-weight:600;">087 7977093</a> or visit<br>
+<a href="https://www.mcses.ie" target="_blank" rel="noopener noreferrer">www.mcses.ie</a> .</p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other CLOGHER Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ballybay (tullycorbet)"><a class="parish-link" href="ballybay.html" target="_blank" rel="noopener noreferrer">Ballybay (Tullycorbet)</a></li><li class="parish-item" data-name="carrickmacross (machaire rois)"><a class="parish-link" href="carrickmacross.html" target="_blank" rel="noopener noreferrer">Carrickmacross (Machaire Rois)</a></li><li class="parish-item" data-name="castleblayney (muckno, includes clontibret)"><a class="parish-link" href="castleblayney.html" target="_blank" rel="noopener noreferrer">Castleblayney (Muckno, includes Clontibret)</a></li><li class="parish-item" data-name="clones"><a class="parish-link" href="clones.html" target="_blank" rel="noopener noreferrer">Clones</a></li><li class="parish-item" data-name="derrygonnelly (botha)"><a class="parish-link" href="derrygonnelly.html" target="_blank" rel="noopener noreferrer">Derrygonnelly (Botha)</a></li><li class="parish-item" data-name="donagh"><a class="parish-link" href="donagh.html" target="_blank" rel="noopener noreferrer">Donagh</a></li><li class="parish-item" data-name="enniskillen (st michael&#x27;s parish)"><a class="parish-link" href="enniskillen.html" target="_blank" rel="noopener noreferrer">Enniskillen (St Michael&#x27;s Parish)</a></li><li class="parish-item" data-name="errigal truagh"><a class="parish-link" href="errigaltruagh.html" target="_blank" rel="noopener noreferrer">Errigal Truagh</a></li><li class="parish-item" data-name="irvinestown (devenish)"><a class="parish-link" href="irvinestown.html" target="_blank" rel="noopener noreferrer">Irvinestown (Devenish)</a></li><li class="parish-item" data-name="killanny"><a class="parish-link" href="killanny.html" target="_blank" rel="noopener noreferrer">Killanny</a></li><li class="parish-item" data-name="magheracloone"><a class="parish-link" href="magheracloone.html" target="_blank" rel="noopener noreferrer">Magheracloone</a></li><li class="parish-item" data-name="monaghan &amp; rackwallace (includes tyholland)"><a class="parish-link" href="monaghanrackwallace.html" target="_blank" rel="noopener noreferrer">Monaghan &amp; Rackwallace (includes Tyholland)</a></li><li class="parish-item" data-name="tempo (pobal)"><a class="parish-link" href="tempo.html" target="_blank" rel="noopener noreferrer">Tempo (Pobal)</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ballybay (tullycorbet)"><a class="parish-link" href="ballybay.html" target="_blank" rel="noopener noreferrer">Ballybay (Tullycorbet)</a></li><li class="parish-item" data-name="carrickmacross (machaire rois)"><a class="parish-link" href="carrickmacross.html" target="_blank" rel="noopener noreferrer">Carrickmacross (Machaire Rois)</a></li><li class="parish-item" data-name="castleblayney (muckno, includes clontibret)"><a class="parish-link" href="castleblayney.html" target="_blank" rel="noopener noreferrer">Castleblayney (Muckno, includes Clontibret)</a></li><li class="parish-item" data-name="clones"><a class="parish-link" href="clones.html" target="_blank" rel="noopener noreferrer">Clones</a></li><li class="parish-item" data-name="derrygonnelly (botha)"><a class="parish-link" href="derrygonnelly.html" target="_blank" rel="noopener noreferrer">Derrygonnelly (Botha)</a></li><li class="parish-item" data-name="donagh"><a class="parish-link" href="donagh.html" target="_blank" rel="noopener noreferrer">Donagh</a></li><li class="parish-item" data-name="enniskillen (st michael&#x27;s parish)"><a class="parish-link" href="enniskillen.html" target="_blank" rel="noopener noreferrer">Enniskillen (St Michael&#x27;s Parish)</a></li><li class="parish-item" data-name="errigal truagh"><a class="parish-link" href="errigaltruagh.html" target="_blank" rel="noopener noreferrer">Errigal Truagh</a></li><li class="parish-item" data-name="irvinestown (devenish)"><a class="parish-link" href="irvinestown.html" target="_blank" rel="noopener noreferrer">Irvinestown (Devenish)</a></li><li class="parish-item" data-name="killanny"><a class="parish-link" href="killanny.html" target="_blank" rel="noopener noreferrer">Killanny</a></li><li class="parish-item" data-name="lisnaskea-maguiresbridge (aghalurcher)"><a class="parish-link" href="lisnaskeamaguiresbridge.html" target="_blank" rel="noopener noreferrer">Lisnaskea-Maguiresbridge (Aghalurcher)</a></li><li class="parish-item" data-name="magheracloone"><a class="parish-link" href="magheracloone.html" target="_blank" rel="noopener noreferrer">Magheracloone</a></li><li class="parish-item" data-name="monaghan &amp; rackwallace (includes tyholland)"><a class="parish-link" href="monaghanrackwallace.html" target="_blank" rel="noopener noreferrer">Monaghan &amp; Rackwallace (includes Tyholland)</a></li><li class="parish-item" data-name="newtownbutler (galloon)"><a class="parish-link" href="newtownbutler.html" target="_blank" rel="noopener noreferrer">Newtownbutler (Galloon)</a></li><li class="parish-item" data-name="tempo (pobal)"><a class="parish-link" href="tempo.html" target="_blank" rel="noopener noreferrer">Tempo (Pobal)</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1092,9 +1098,9 @@ Sequence dance classes resume in St Joseph ’s Pastoral Centre, Monaghan on Fri
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1548,11 +1554,16 @@ Sequence dance classes resume in St Joseph ’s Pastoral Centre, Monaghan on Fri
         for (var i = 0; i < names.length; i++) {
           var page = pageFor(names[i]);
           if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
           var slot = pages.querySelector('[data-page="' + page + '"]');
           if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
+          scrollBoxTo(pages, slot);
           return true;
         }
         return false;

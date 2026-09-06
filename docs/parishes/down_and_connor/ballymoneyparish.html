@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Ballymoney Bulletin — 30/08/2026</title>
+  <title>Ballymoney Bulletin — 06/09/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -109,6 +110,13 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
@@ -141,6 +149,7 @@
       cursor: pointer;
     }
     .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
     
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {
@@ -160,7 +169,7 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
@@ -203,6 +212,7 @@
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {
@@ -866,6 +876,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -892,7 +903,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -900,35 +911,31 @@
     <header class="header">
       <p class="diocese-label">DOWN &amp; CONNOR</p>
       <h1>Ballymoney Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Ballymoney — 30/08/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
-      <a class="download-link-top" href="ballymoneyparish.pdf">Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Ballymoney — 06/09/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
+      <a class="download-link-top pdf-force-download" href="ballymoneyparish.pdf" download="ballymoneyparish.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="ballymoneyparish.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       
-      <div class="quiet-links">
-        <a href="ballymoneyparish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="ballymoneyparish-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="ballymoneyparish.pdf" title="Ballymoney bulletin PDF"></iframe>
+        <iframe data-pdf-url="ballymoneyparish.pdf" title="Ballymoney bulletin PDF"></iframe>
         
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="ballymoneyparish.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="ballymoneyparish.pdf">Open PDF</a>
-              <a href="ballymoneyparish.pdf" download>Download</a>
+              <a class="pdf-open-newtab" href="ballymoneyparish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="ballymoneyparish.pdf" download="ballymoneyparish.pdf">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>
       </div>
@@ -963,19 +970,18 @@
       <div class="quiet-links">
         <a href="ballymoneyparish-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-ballymoney" data-parish-name="Ballymoney"><h2 class="ocr-parish-name">Ballymoney</h2><p class="ocr-parish-date">30/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-ballymoney" data-parish-name="Ballymoney"><h2 class="ocr-parish-name">Ballymoney</h2><p class="ocr-parish-date">06/09/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>THIS WEEK<br>
 Parish webcam can be viewed on our YouTube channel<br>
 (search for Ballymoney Parish)<br>
-SUNDAY 30th 9.30am Mass<br>
-MONDAY 31st 10am Mass<br>
-TUESDAY 1st 7pm Novena to the Holy Face<br>
-WEDNESDAY 2nd 10am Mass<br>
+SUNDAY 6th 9.30am Mass<br>
+MONDAY 7th 10am Mass<br>
+WEDNESDAY 9th 10am Mass<br>
 7pm Rosary<br>
-FRIDAY 4th 6pm Adoration &amp; Confessions<br>
+FRIDAY 11th 6pm Adoration &amp; Confessions<br>
 7pm Mass<br>
-SATURDAY 5th 5.30-5.50pm Confessions<br>
+SATURDAY 12th 5.30-5.50pm Confessions<br>
 6pm Mass<br>
 Our Lady &amp; St PatrickÕs church is open every day<br>
 for private prayer - usually from 10am to 7pm.<br>
@@ -984,24 +990,14 @@ Saturday 4.30pm - Portstewart<br>
 Sunday 10am - Portstewart<br>
 Sunday 11.30am - St MalachyÕs, Coleraine<br>
 Sunday 12noon - Portrush<br>
-Sunday 5pm - St MalachyÕs, Coleraine<br>
-CONGRATULATIONS<br>
-to Clare Finnerty &amp; William Morton-Hooper<br>
-and Karen Dinsmore &amp; Ross Boyce<br>
-who celebrated their marriages this week<br>
-and to the family of Luke Douglas<br>
-who was baptised.WE PRAY FOR THE FAITHFUL DEPARTED</p>
-<h3 class="b-head">Recently Deceased</h3>
-<p>Fr Michael McConville, Belfast<br>
-MonthÕs Mind<br>
-Margaret McErlean</p>
+Sunday 5pm - St MalachyÕs, Coleraine</p>
+<h3 class="b-head">WE PRAY FOR THE FAITHFUL DEPARTED</h3>
+<p>MonthÕs Mind<br>
+Frankie McEldowney</p>
 <h3 class="b-head">Anniversaries</h3>
-<p>Eileen Devlin, Archie Elliott, Pat Fleming, John Gillan,<br>
-Patsy Lynch, Rose Lynch, Patsy McAleese, Therese Mc Conville,<br>
-Mary McLaughlin, Terry McQuaid, Mai &amp; Paddy Porteous,<br>
-Brian &amp; Audrey Savage</p>
-<h3 class="b-head">REQUIESCAT IN PACE</h3>
-<h3 class="b-head">PARISH FINANCES</h3>
+<p>Danny Coyles, Michael Coyles, James Douglas,<br>
+John &amp; Florence Kirgan, Florena Moore</p>
+<h3 class="b-head">REQUIESCAT IN PACE PARISH FINANCES</h3>
 <p>Thank you to everyone who supports the parish through our<br>
 collections. If you want to request a box of envelopes there is<br>
 a purple form at the back of the church. Remember that you<br>
@@ -1013,32 +1009,36 @@ Sort code: 95-06-79<br>
 Account No: 10020192.<br>
 If you want to give by cheque please make payable to:<br>
 Parish of Ballymoney &amp; Derrykeighan .<br>
-NOVENA TO THE HOLY FACE<br>
-Our monthly novena dedicated to the Holy Face<br>
-of Jesus takes place on T uesday evening at 7pm .<br>
-PRAYING THROUGH ART<br>
-Our summer art group will be meeting on Wednesday this<br>
-week at 7.30pm in the CanonÕs house. Materials are<br>
-provided. All welcome.OLD &amp; NEW@No.5<br>
-We have lots of nice pictures in our parish shop this week<br>
-including two Rooney prints and some still lifes. Check out<br>
-our selection of lamps including a superb period standard<br>
-lamp, two old vintage cameras, nice large dinner set and<br>
-wicker chair.<br>
-Visit us at 5 Gate End, Ballymoney, open Wednesday to<br>
-Saturday , 10am - 4.30pm . To keep in touch with our offers<br>
-and to see pictures of our stock donÕt forget our Facebook<br>
-page @oldandnewatno5<br>
-ST VINCENT DE PAUL<br>
-Our parish SVP conference is here to support our local<br>
-community, and we do this in the strictest conÞdence. If you<br>
+SEASON OF CREATION<br>
+The ChurchÕs Season of Creation runs throughout September<br>
+and on until the feast of St Francis of Assisi on October 4th.<br>
+Bishop Alan McGuckian writes ÒI warmly encourage our<br>
+parishes, schools, families and communities throughout the<br>
+diocese to participate in the Season of Creation. May we be<br>
+inspired to take practical steps, however small, to care for<br>
+God&#x27;s creation and to work for environmental justice.<br>
+ÒMay this Season of Creation deepen our gratitude for the<br>
+gift of creation, strengthen our commitment to environmental<br>
+justice, and inspire us to become faithful stewards of the earth<br>
+entrusted to our care.Ó<br>
+BLESSING OF PETS<br>
+Once again we will be marking the Season of Creation with a<br>
+blessing of animals inspired by the ministry of St Francis of<br>
+Assisi. Our pets and animals remind us of the beauty and<br>
+diversity God has given us in the natural world. This year<br>
+the blessing service takes place here in Ballymoney in the<br>
+grounds of the church on Sunday 27th September at 2pm .<br>
+All welcome to attend and bring along your animals to be<br>
+blessed. ST VINCENT DE PAUL<br>
+Our parish SVP conference is here to<br>
+support our local community, and we<br>
+do this in the strictest conÞdence. If you<br>
 are in need and would like our help please do not hesitate<br>
 to get in touch on <a href="tel:+3537860455" style="color:#1d4ed8;font-weight:600;">07860 455</a> 549 .<br>
 SVP ANNUAL OUTING<br>
-The Society of St Vincent de Paul,<br>
-Ballymoney, are hosting their annual<br>
-outing for senior citizens and those living<br>
-alone on Sunday 20th September.<br>
+The Society of St Vincent de Paul, Ballymoney, are hosting<br>
+their annual outing for senior citizens and those living alone<br>
+on Sunday 20th September.<br>
 This year&#x27;s event will offer a shopping trip followed by an<br>
 evening meal. Transport is being organised for those<br>
 wishing to attend with number limited to 48. Anyone with<br>
@@ -1048,23 +1048,34 @@ appreciated.<br>
 Anyone interested in attending should call the SVP number<br>
 (<a href="tel:+3537860455" style="color:#1d4ed8;font-weight:600;">07860 455</a> 549 ) and leave their name and contact number, or<br>
 speak to an SVP representative.<br>
-BLESSING OF PETS<br>
-This year it takes place here in Ballymoney on Sunday 27th<br>
-September at 2pm . All welcome to attend and bring along<br>
-your animals to be blessed. Parish of Ballymoney<br>
+EUCHARISTIC ADORATION<br>
+A new committee to promote Eucharistic Adoration in our<br>
+diocese is being set up. They are looking for people who<br>
+would be interested in supporting their work through<br>
+promotion, speaking in parishes, organisation or prayer.<br>
+If youÕre interested in getting involved please speak to<br>
+Fr Damian for more information.<br>
+CAUSEWAY COAST PEACE GROUP<br>
+The group invite you to the Þrst in their 25th Anniversary<br>
+series of meetings for 2026-27 on T uesday 8th September at<br>
+10am in Ballintoy Parish Church Hall . The speaker will be<br>
+Shona McCarthy who is speaking on Peace Through a<br>
+Creative Lens . A warm welcome will be extended to all who<br>
+come along.Parish of Ballymoney<br>
 &amp; Derrykeighan<br>
-CAUSEWAY FAMILY OF PARISHES30th August 2026<br>
-Twenty Second Sunday of Ordinary Time<br>
-GET BEHIND ME!<br>
-Last week Peter declared Jesus the Son of God and was named the rock of the Church.<br>
-This week, hearing Jesus speak of his coming suffering and death, Peter takes him<br>
-aside to object Ñ and is met with those startling words: &quot;Get behind me, Satan.&quot;<br>
-Peter isn&#x27;t evil; he simply prefers an easier path - popularity over sacriÞce. That&#x27;s<br>
-exactly what the Devil wants Ñ not dramatic wickedness, but a quiet nudging away<br>
-from God&#x27;s way toward what&#x27;s comfortable and acceptable. We hear the same voice<br>
-today, telling us God&#x27;s standards are old-fashioned, that sacriÞce isn&#x27;t really necessary.<br>
-True love, though, is always tested by sacriÞce. As we take up our crosses this week, may we choose Christ&#x27;s<br>
-way over our own.<br>
+CAUSEWAY FAMILY OF PARISHES6th September 2026<br>
+Twenty Third Sunday of Ordinary Time<br>
+HOW TO DEAL WITH COMPLAINTS<br>
+This Sunday&#x27;s readings tackle a subject we all Þnd awkward: how to give<br>
+and receive criticism. In the Þrst reading, Ezekiel is called by God to speak<br>
+out against sin, even though he cannot guarantee people will listen. In the<br>
+Gospel, Jesus gives practical advice for confronting someone who has<br>
+wronged us Ñ Þrst privately, then with a friend, always seeking<br>
+reconciliation rather than revenge.<br>
+The lesson is one of patient love. We shouldn&#x27;t gossip or hold grudges, but<br>
+speak honestly and calmly, wanting the relationship restored rather than &quot;winning.&quot; Sometimes the wisest<br>
+course is to wait until we can speak without anger. And when we ourselves feel let down, even by God, we&#x27;re<br>
+free to bring him our complaints too Ñ he can bear them.<br>
 PARISH OF BALLYMONEY<br>
 &amp; DERRYKEIGHAN<br>
 Diocese of Down &amp; Connor<br>
@@ -1078,64 +1089,61 @@ BT53 6JT<br>
 T el: <a href="tel:+442827662003" style="color:#1d4ed8;font-weight:600;">028 2766 2003</a><br>
 Email : <a href="mailto:ballymoney@downandconnor.org" target="_blank" rel="noopener noreferrer">ballymoney@downandconnor.org</a><br>
 W ebsite : www .ballymoneyparish.com<br>
-Facebook : @ballymoneycatholicROSARY VIGIL FOR LIFE<br>
-The rosary will be prayed outside Belfast City Hall on Sunday<br>
-30th August at 2pm. Join Precious Life in prayer to uphold the<br>
-sacredness and dignity of unborn life, and pray that Belfast<br>
-Council will reject plans to illuminate the City Hall in<br>
-celebration of abortion. For more information, contact <a href="tel:+442890278484" style="color:#1d4ed8;font-weight:600;">028 9027<br>
-8484</a> / 07592 280522 or email <a href="mailto:info@preciouslife.com" target="_blank" rel="noopener noreferrer">info@preciouslife.com</a><br>
-FAMILY DAY<br>
-Catholic Mothers Ireland will hold its Annual National Mass<br>
-on Sunday 6th September at Termonbacca Retreat Centre,<br>
-Derry city. The day will begin with Mass at 2pm , celebrated by<br>
-Bishop Donal McKeown, followed by refreshments, children&#x27;s<br>
-activities, and a talk for parents. All are welcome.<br>
-For more information and booking details, please email<br>
-<a href="mailto:info@catholicmothers.ie" target="_blank" rel="noopener noreferrer">info@catholicmothers.ie</a><br>
-LOUGH DERG<br>
-The traditional three day retreat season has Þnished for the<br>
-year, but Lough Derg offers a number of other opportunities to<br>
-come on pilgrimage during the next few months:<br>
-One Day Retreats Ð Guided Days of Prayer and Reßection -<br>
-places available on September 5th, 6th, 9th, 12th, 15th, 19th<br>
-and 20th Admission €50. Group discounts available. Advance<br>
-Booking Essential.<br>
-Lough Derg is situated near Pettigo, Co. Donegal. For more<br>
-information check <a href="https://www.loughderg.org" target="_blank" rel="noopener noreferrer">www.loughderg.org</a> or email<br>
-<a href="mailto:info@loughderg.org" target="_blank" rel="noopener noreferrer">info@loughderg.org</a><br>
-CAUSEWAY COAST PEACE GROUP<br>
-The group invite you to the Þrst in their 25th Anniversary<br>
-series of meetings on T uesday 8th September at 10am in<br>
-Ballintoy Parish Church Hall . The speaker will be Shona<br>
-McCarthy who is speaking on Peace Through a Creative Lens . A<br>
-warm welcome will be extended to all who come along.<br>
+Facebook : @ballymoneycatholicOLD &amp; NEW@No.5<br>
+There&#x27;s lots of new stock again this week from an old vintage<br>
+sewing machine to a large pair of two handled vases, nice pairs<br>
+of candlesticks, jug and basin sets, and much more.<br>
+Visit us at 5 Gate End, Ballymoney, open Wednesday to<br>
+Saturday , 10am - 4.30pm . To keep in touch with our offers<br>
+and to see pictures of our stock donÕt forget our Facebook page<br>
+@oldandnewatno5<br>
+MENÕS RETREAT<br>
+A Catholic menÕs retreat will take place at Portglenone<br>
+Monastery on Saturday 19th September , from 9am to 1pm .<br>
+The theme of the retreat is ÒIt is no longer I who live, but Christ<br>
+who lives in meÓ (Galatians 2:20). The morning will include<br>
+prayer, teaching, fellowship and menÕs testimonies, with Fr<br>
+Eddie McGee as keynote speaker. All men are very welcome.<br>
+For further information, contact Thomas Carey on 07967<br>
+620435 or email <a href="mailto:sean@catholicminute.co.uk" target="_blank" rel="noopener noreferrer">sean@catholicminute.co.uk</a><br>
+CAUSEWAY PARISHES PILGRIMAGE TO KNOCK<br>
+There will be a pilgrimage to Knock Shrine for our Causeway<br>
+Family of Parishes on Saturday 3rd October led by Fr Kevin<br>
+McGuckien . The bus will make pickups from Portrush,<br>
+Portstewart, Coleraine and Ballymoney leaving at<br>
+approximately 7am and returning around 10.30pm. The cost is<br>
+£35 for adults and £10 for children . You can book a place by<br>
+phoning 07724 092063 .<br>
+OTHER TRIPS TO KNOCK<br>
+The Legion of Mary Annual Pilgrimage to Knock Shrine will<br>
+take place on Sunday 27th September . A coach will leave<br>
+Dunloy Parish Centre at 7am, returning by 9.30pm.<br>
+Information/booking: <a href="tel:+3537471537051" style="color:#1d4ed8;font-weight:600;">07471537051</a><br>
+There will be another trip to Knock on Saturday 3rd October .<br>
+A bus will be leaving St PatrickÕs Church Loughguile at 6am.<br>
+Contact Patricia Campbell on <a href="tel:+442827641120" style="color:#1d4ed8;font-weight:600;">02827641120</a> or <a href="tel:+3537871626940" style="color:#1d4ed8;font-weight:600;">07871626940</a> .<br>
 HYMNS FOR MASS<br>
-Christ be beside me, Christ be before me,<br>
-Christ be behind me, King of my heart.<br>
-Christ be within me, Christ be below me,<br>
-Christ be above me, never to part.<br>
-Christ on my right hand, Christ on my left hand,<br>
-Christ all around me, shield in the strife.<br>
-Christ in my sleeping, Christ in my sitting,<br>
-Christ in my rising, Light of my life.<br>
-Christ be in all hearts thinking about me,<br>
-Christ be on all tongues telling of me.<br>
-Christ be the vision in eyes that see me,<br>
-In ears that hear me, Christ ever be.Praise, my soul, the King of heaven;<br>
-To His feet thy tribute bring.<br>
-Ransomed, healed, restored, forgiven,<br>
-Who like me His praise should sing?<br>
-Praise Him, praise Him,<br>
-praise Him, praise Him,<br>
-Praise the everlasting King.<br>
-Praise Him for His grace and favour<br>
-To our fathers in distress.<br>
-Praise Him still the same forever,<br>
-Slow to chide, and swift to bless.<br>
-Praise Him, praise Him,<br>
-praise Him, praise Him,<br>
-Glorious in His faithfulness.<br>
+Soul of my Saviour sanctify my breast,<br>
+Body of Christ, be thou my saving guest,<br>
+Blood of my Saviour, bathe me in thy tide,<br>
+wash me with water ßowing from thy side.<br>
+Strength and protection may thy passion be,<br>
+O blessed Jesus, hear and answer me;<br>
+deep in thy wounds, Lord, hide and shelter me,<br>
+so shall I never, never part from thee.O Lord, my God,<br>
+when I, in awesome wonder<br>
+Consider all<br>
+the worlds Thy hands have made<br>
+I see the stars,<br>
+I hear the rolling thunder<br>
+Thy power throughout<br>
+the universe displayed<br>
+Then sings my soul,<br>
+my Saviour God to Thee,<br>
+How great Thou art, how great Thou art.<br>
+Then sings my soul,<br>
+my Saviour God to Thee,<br>
+How great Thou art, how great Thou art.<br>
 Ballymoney <a href="https://www.ballymoneyparish.com" target="_blank" rel="noopener noreferrer">https://www.ballymoneyparish.com</a></p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
@@ -1143,7 +1151,7 @@ Ballymoney <a href="https://www.ballymoneyparish.com" target="_blank" rel="noope
     <section class="parish-section">
       <h2 class="section-heading">Other DOWN &amp; CONNOR Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="ballymenaparish.html" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st colmcilles"><a class="parish-link" href="st-colmcilles.html" target="_blank" rel="noopener noreferrer">St Colmcilles</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="ballycastle"><a class="parish-link" href="ballycastleparish.html" target="_blank" rel="noopener noreferrer">Ballycastle</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="bangor"><a class="parish-link" href="bangorparish.html" target="_blank" rel="noopener noreferrer">Bangor</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="glenariffe"><a class="parish-link" href="glenariffeparish.html" target="_blank" rel="noopener noreferrer">Glenariffe</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="maghera"><a class="parish-link" href="parishofmaghera.html" target="_blank" rel="noopener noreferrer">Maghera</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="sacred heart belfast"><a class="parish-link" href="sacredheartparishbelfast.html" target="_blank" rel="noopener noreferrer">Sacred Heart Belfast</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st colmcilles"><a class="parish-link" href="st-colmcilles.html" target="_blank" rel="noopener noreferrer">St Colmcilles</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st oliver plunkett"><a class="parish-link" href="stoliverplunkettparish.html" target="_blank" rel="noopener noreferrer">St Oliver Plunkett</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1195,9 +1203,9 @@ Ballymoney <a href="https://www.ballymoneyparish.com" target="_blank" rel="noope
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1651,11 +1659,16 @@ Ballymoney <a href="https://www.ballymoneyparish.com" target="_blank" rel="noope
         for (var i = 0; i < names.length; i++) {
           var page = pageFor(names[i]);
           if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
           var slot = pages.querySelector('[data-page="' + page + '"]');
           if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
+          scrollBoxTo(pages, slot);
           return true;
         }
         return false;

@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Carrickfergus Bulletin — 30/08/2026</title>
+  <title>Carrickfergus Bulletin — 06/09/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -109,6 +110,13 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
@@ -141,6 +149,7 @@
       cursor: pointer;
     }
     .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
     
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {
@@ -160,7 +169,7 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
@@ -203,6 +212,7 @@
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {
@@ -866,6 +876,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -892,7 +903,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -900,35 +911,31 @@
     <header class="header">
       <p class="diocese-label">DOWN &amp; CONNOR</p>
       <h1>Carrickfergus Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Carrickfergus — 30/08/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
-      <a class="download-link-top" href="carrickparish.pdf">Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Carrickfergus — 06/09/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
+      <a class="download-link-top pdf-force-download" href="carrickparish.pdf" download="carrickparish.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="carrickparish.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       
-      <div class="quiet-links">
-        <a href="carrickparish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="carrickparish-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="carrickparish.pdf" title="Carrickfergus bulletin PDF"></iframe>
+        <iframe data-pdf-url="carrickparish.pdf" title="Carrickfergus bulletin PDF"></iframe>
         
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="carrickparish.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="carrickparish.pdf">Open PDF</a>
-              <a href="carrickparish.pdf" download>Download</a>
+              <a class="pdf-open-newtab" href="carrickparish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="carrickparish.pdf" download="carrickparish.pdf">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>
       </div>
@@ -963,29 +970,195 @@
       <div class="quiet-links">
         <a href="carrickparish-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-carrickfergus" data-parish-name="Carrickfergus"><h2 class="ocr-parish-name">Carrickfergus</h2><p class="ocr-parish-date">30/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-carrickfergus" data-parish-name="Carrickfergus"><h2 class="ocr-parish-name">Carrickfergus</h2><p class="ocr-parish-date">06/09/2026</p></header>
 <p class="page-label">Page 1</p>
-<p>Mass Timings for the weekdays and weekends<br>
-(17th August onwards)</p>
-<h3 class="b-head">Mass Times</h3>
-<p>Monday - 7pm St Nicholas<br>
-Tuesday - 10am St Nicholas<br>
-Thursday - 7pm Our Lady of Lourdes<br>
-Friday - 10am Our Lady of Lourdes<br>
-Sunday - 9.30 Our Lady of Lourdes<br>
-- 11.30 St Nicholas<br>
-Confessions<br>
-Monday - 6.15 to 6.50 - St Nicholas<br>
-Thursday - 6.15 to 6.50 - Our Lady of Lourdes<br>
-Sunday - 9am to 9.20am - Our Lady of Lourdes<br>
-Sunday - 11am to 11.20am - St Nicholas Carrickfergus <a href="https://www.carrickparish.org" target="_blank" rel="noopener noreferrer">https://www.carrickparish.org</a></p></div>
+<p>Saint Nicholas’<br>
+6th Sept 2026 23rd Sunday of the Year Cycle A Week 3 Parish of Carrickfergus<br>
+&amp; Whitehead<br>
+Our L ady of L ourdes Follow us on -line at<br>
+Fr. Joe Davis<br>
+Tel: <a href="tel:+442893363269" style="color:#1d4ed8;font-weight:600;">028 9336 3269</a></p>
+<h3 class="b-head">Parochial House,</h3>
+<p>8 Minorca Place,<br>
+Mount St. Nicholas, Carrickfergus,<br>
+Co. Antrim, BT38 8AU<br>
+Parish Email:<br>
+<a href="mailto:carrickfergus@downandconnor.org" target="_blank" rel="noopener noreferrer">carrickfergus@downandconnor.org</a><br>
+Website: <a href="https://www.carrickparish.org" target="_blank" rel="noopener noreferrer">www.carrickparish.org</a><br>
+Office Hours<br>
+Mon to Wed 1pm to 4.30pm</p>
+<h3 class="b-head">Recently Deceased</h3>
+<p>Jaxon (Jax) Cummings<br>
+Winifred Cahill<br>
+John Weatherhead</p>
+<h3 class="b-head">Anniversaries</h3>
+<p>Sean Callaghan<br>
+Seamus Stewart<br>
+Eternal rest grant unto them,<br>
+O Lord, and let perpetual light shine<br>
+upon them. May they rest in peace.<br>
+Amen<br>
+Baptisms<br>
+(one month ’s notice)<br>
+Whitehead - 1st Sun of the month<br>
+C’fergus - 2nd Sun of the month<br>
+By arrangement with the Parish Office<br>
+Eucharistic Adoration<br>
+Our Lady of Lourdes Monday evening 6.15pm - 6.50pm.<br>
+St. Nicholas&#x27; Church Thursday evening 6.15pm - 6.50pm.<br>
+St. Nicholas&#x27; Church Saturday morning 11.00am - 12.00 noon. Mass Times &amp; Confessions this coming week<br>
+(** Streamed Mass - see parish website for link)<br>
+Weekday<br>
+Or Lady of Lourdes Whitehead<br>
+Mon 7.00pm (with confessions 6.15pm to 6.50pm)<br>
+St. Nicholas Carrickfergus<br>
+Tues 10am<br>
+St. Nicholas Carrickfergus<br>
+Wed 10am ( Funeral for John Weatherhead )<br>
+St. Nicholas Carrickfergus<br>
+Thurs 7.00pm (with confessions 6.15pm to 6.50pm)<br>
+St. Nicholas Carrickfergus<br>
+Fri 10am ( Funeral for Winifred Cahill )<br>
+Weekend<br>
+Or Lady of Lourdes Whitehead<br>
+Sun 9.30am (with confessions 9.00am to 9.20am)<br>
+St. Nicholas Carrickfergus<br>
+** Sun 11.30am (with confessions 11.00 am to 11.20am)<br>
+Holy Days : As announced.<br>
+The second collection today<br>
+is for the<br>
+Monthly Stipend.<br>
+PARISH RETREAT<br>
+Saturday 3rd October 5pm to<br>
+Sunday 5pm 2026.<br>
+To book your place please<br>
+phone Ruth Bates<br>
+on 0787 64208 67. Weddings<br>
+(three month ’s notice)<br>
+By arrangement<br>
+Funerals<br>
+By arrangement<br>
+Children ’s Liturgy<br>
+resumes today Sunday 6th Sept. Sacramental Preparation<br>
+If you have a child in P3, P4 or P7 who is not attending St. Nicholas ’ Primary<br>
+School or Acorn Integrated Primary School and you wish your child to be<br>
+prepared for First Confession, First Communion or Confirmation<br>
+please contact the Parish Office or Mary Muir (<a href="tel:+3537971003405" style="color:#1d4ed8;font-weight:600;">07971003405</a>). Books from Fr Peter has kindly left a selection of books for Parishioners to take.<br>
+It has been suggested that this is a good opportunity to raise some money for a<br>
+worthy cause. To this end we would invite Parishioners to make a donation of<br>
+perhaps 50p per book (or whatever they can afford) and all proceeds will be going<br>
+towards the Northern Ireland Hospice and Children ’s Hospice.<br>
+The books have been set out on tables in the Gathering space in St Nicholas ’<br>
+for after mass today Sun 6th and next Sun 13th Sept.<br>
+Thank you. Carrickfergus <a href="https://www.carrickparish.org" target="_blank" rel="noopener noreferrer">https://www.carrickparish.org</a></p>
+<hr>
+<p class="page-label">Page 2</p>
+<p>Contact details for the ‘Stella Maris ’ Family of Parishes<br>
+Parish Website Priests Telephone No.<br>
+Carrickfergus <a href="https://www.carrickparish.org" target="_blank" rel="noopener noreferrer">www.carrickparish.org</a> Rev Joe Davis Adm (028) 9336 3269<br>
+Glengormley <a href="https://www.stmarysonthehill.online" target="_blank" rel="noopener noreferrer">www.stmarysonthehill.online</a> Very Rev. Pat Sheehan PP<br>
+Very Rev. Canon Aidan Kerr PE PM (028) 9083 2979<br>
+(028) 9083 2488<br>
+Loughshore <a href="https://www.loughshoreparishes.org" target="_blank" rel="noopener noreferrer">www.loughshoreparishes.org</a> Very Rev. David Delargy PP (028) 9037 0845 This Coming Week<br>
+7th Sep – 13th Sep<br>
+Tues<br>
+Birthday of the Blessed<br>
+Virgin Mary<br>
+Wed<br>
+St. Ciaran<br>
+Fri<br>
+St. Deiniol<br>
+Sat<br>
+The Holy Name of Mary<br>
+St. Ailbe<br>
+Sun<br>
+Twenty Fourth Sunday of<br>
+the year<br>
+Readings for<br>
+Sun 13th Sep<br>
+Sirach 27: 30 -28:7<br>
+Romans: 14:7 -9<br>
+Parish Shop<br>
+The Parish Shop has now reopened<br>
+after recent changes.<br>
+Please feel free to call in.<br>
+Cards &amp; Gifts<br>
+available from the Church Shop<br>
+Open each Sunday.<br>
+See parish website for more information<br>
+Angel Gifts. Baptismal &amp; Wedding, etc.<br>
+Catholic Men ’s Retreat - Standing in the Breach<br>
+A Catholic Men ’s Retreat will take place at Portglenone Monastery on Saturday 19 Sept 2026,<br>
+from 9am to 1pm.<br>
+The theme of the retreat is “It is no longer I who live, but Christ who lives in me ” (Galatians<br>
+2:20). The morning will include prayer, teaching, fellowship and men ’s testimonies, with Fr Eddie<br>
+McGee as keynote speaker. All men are very welcome.<br>
+For further information, contact Thomas Carey on 07967 620435 or email<br>
+<a href="mailto:sean@catholicminute.co.uk" target="_blank" rel="noopener noreferrer">sean@catholicminute.co.uk</a>.<br>
+A Year of Ignatian Prayer 2026 -2027 – Belfast Jesuit Centre<br>
+There are a few places remaining on our immersive programme in Ignatian Spirituality,<br>
+which returns on Saturday 26th September; offering ten in‑person Saturdays (10am– 4pm)<br>
+in the BJC and seven online Integrative Practice Pause Points to support prayer,<br>
+discernment and reflective living. Open to those new to Ignatian Spirituality and those<br>
+seeking to deepen their practice. Suggested donation: £200–£280. Bursaries available.<br>
+For dates and registration, please visit: <a href="https://belfastjesuitcentre.co.uk/a" target="_blank" rel="noopener noreferrer">https://belfastjesuitcentre.co.uk/a</a> -year-of-ignatian -<br>
+prayer -2026 -2027/<br>
+The Chosen – Season 2 at the Belfast Jesuit Centre<br>
+Weekly screenings of The Chosen: Season 2 will take place each Friday at the Belfast<br>
+Jesuit Centre. Tea/coffee at 10.45am, episode at 11.00am, followed by a reflective<br>
+Examen and discussion. All are welcome; no registration required.<br>
+Episode dates: 4 Sept, 11 Sept, 18 Sept, 25 Sept, 2 Oct, 9 Oct, 16 Oct, 23rd October.<br>
+Contact: <a href="mailto:bjc@jesuit.ie" target="_blank" rel="noopener noreferrer">bjc@jesuit.ie</a> | 07955 282371 | belfastjesuitcentre.co.uk Beginning Experience is a peer ministry to the bereaved,<br>
+separated and divorced, based within the Family Ministry<br>
+of the Diocese of Down and Connor. We are offering a<br>
+support programme over three Saturdays from September<br>
+through to November and would be most grateful if you<br>
+could include the following information in your Church<br>
+Bulletin at your earliest convenience. The loss of a partner<br>
+through death, separation or divorce is devastating.<br>
+Beginning Experience is offering a programme of<br>
+bereavement support in St Bride ’s Hall, Derryvolgie Ave.,<br>
+Belfast on three Saturdays (26th September 24th October<br>
+and 21st November) Booking essential. Contact Marie<br>
+<a href="tel:+3537896119669" style="color:#1d4ed8;font-weight:600;">07896119669</a> or email <a href="mailto:belfastbe@yahoo.com" target="_blank" rel="noopener noreferrer">belfastbe@yahoo.com</a> Anam Cara, the organisation that supports bereaved<br>
+parents, will hold its monthly Parent Support Evening<br>
+on Mon 14th Sept at 7.30pm in the Crowne Plaza, Shaws<br>
+Bridge, Belfast. This event is free and open to all bereaved<br>
+parents regardless of the age their child died or the<br>
+circumstances of their death. You do not need to register in<br>
+advance. We also offer an online support group meeting.<br>
+To find out more call <a href="tel:+442895213120" style="color:#1d4ed8;font-weight:600;">028 95213120</a> or email<br>
+<a href="mailto:info@anamcara.ie" target="_blank" rel="noopener noreferrer">info@anamcara.ie</a> <a href="https://www.anamcarani.co.uk" target="_blank" rel="noopener noreferrer">www.anamcarani.co.uk</a> DAY RETREAT TO LOUGH DERG<br>
+Saturday 19th September<br>
+Leaving St Paul ’s at 6.30am Returning to Paul ’s at<br>
+7.30pm. The day Includes bus, boat, tea &amp; scones on<br>
+arrival then a light lunch and retreat. Price for Retreat is<br>
+£45 plus the bus price determined on the<br>
+uptake. Telephone St Paul ’s Parish Office on <a href="tel:+442890325034" style="color:#1d4ed8;font-weight:600;">028<br>
+90325034</a> Mon - Thurs.<br>
+Opening Mass for the Season of Creation<br>
+6.00 pm on Sunday, 6th September in St. Patrick ’s Church,<br>
+Donegall Street, Belfast<br>
+Celebrant: Fr Piaras Jackson SJ.<br>
+This Mass marks the beginning of the Season of Creation (1<br>
+Sept– 4 Oct), a time when Christians worldwide commit to<br>
+prayer and action for our common home under the theme<br>
+“Living Water ”. 1st September was the World Day of Prayer<br>
+for the Care of Creation. In his message for the occasion, Pope<br>
+Leo said, “The prophetic call to “beat swords into<br>
+ploughshares ” (Is 2:4) is (.) not only a vision for nations, but a call<br>
+to each person. It invites us to transform harm into life. Yet this<br>
+transformation cannot be achieved through external change alone. It<br>
+requires, through cooperating with God ’s grace, a deeper personal<br>
+and collective conversion — a returning to God, who will reorder<br>
+our desires, heal our wounds and help us grow in virtue. ”</p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other DOWN &amp; CONNOR Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="ballymenaparish.html" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st colmcilles"><a class="parish-link" href="st-colmcilles.html" target="_blank" rel="noopener noreferrer">St Colmcilles</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="ballycastle"><a class="parish-link" href="ballycastleparish.html" target="_blank" rel="noopener noreferrer">Ballycastle</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="bangor"><a class="parish-link" href="bangorparish.html" target="_blank" rel="noopener noreferrer">Bangor</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="glenariffe"><a class="parish-link" href="glenariffeparish.html" target="_blank" rel="noopener noreferrer">Glenariffe</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="maghera"><a class="parish-link" href="parishofmaghera.html" target="_blank" rel="noopener noreferrer">Maghera</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="sacred heart belfast"><a class="parish-link" href="sacredheartparishbelfast.html" target="_blank" rel="noopener noreferrer">Sacred Heart Belfast</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st colmcilles"><a class="parish-link" href="st-colmcilles.html" target="_blank" rel="noopener noreferrer">St Colmcilles</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st oliver plunkett"><a class="parish-link" href="stoliverplunkettparish.html" target="_blank" rel="noopener noreferrer">St Oliver Plunkett</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1037,9 +1210,9 @@ Sunday - 11am to 11.20am - St Nicholas Carrickfergus <a href="https://www.carric
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1493,11 +1666,16 @@ Sunday - 11am to 11.20am - St Nicholas Carrickfergus <a href="https://www.carric
         for (var i = 0; i < names.length; i++) {
           var page = pageFor(names[i]);
           if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
           var slot = pages.querySelector('[data-page="' + page + '"]');
           if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
+          scrollBoxTo(pages, slot);
           return true;
         }
         return false;

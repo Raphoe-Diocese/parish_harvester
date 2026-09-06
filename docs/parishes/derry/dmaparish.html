@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>DMA Parish (Claudy area) Bulletin — 30/08/2026</title>
+  <title>DMA Parish (Claudy area) Bulletin — 06/09/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -109,6 +110,13 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
@@ -141,6 +149,7 @@
       cursor: pointer;
     }
     .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
     
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {
@@ -160,7 +169,7 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
@@ -203,6 +212,7 @@
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {
@@ -866,6 +876,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -892,7 +903,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -900,35 +911,31 @@
     <header class="header">
       <p class="diocese-label">DERRY</p>
       <h1>DMA Parish (Claudy area) Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for DMA Parish (Claudy area) — 30/08/2026. Part of the Derry Diocese collated bulletin.</p>
-      <a class="download-link-top" href="dmaparish.pdf">Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for DMA Parish (Claudy area) — 06/09/2026. Part of the Derry Diocese collated bulletin.</p>
+      <a class="download-link-top pdf-force-download" href="dmaparish.pdf" download="dmaparish.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="dmaparish.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       
-      <div class="quiet-links">
-        <a href="dmaparish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="dmaparish-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="dmaparish.pdf" title="DMA Parish (Claudy area) bulletin PDF"></iframe>
+        <iframe data-pdf-url="dmaparish.pdf" title="DMA Parish (Claudy area) bulletin PDF"></iframe>
         
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="dmaparish.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="dmaparish.pdf">Open PDF</a>
-              <a href="dmaparish.pdf" download>Download</a>
+              <a class="pdf-open-newtab" href="dmaparish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="dmaparish.pdf" download="dmaparish.pdf">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>
       </div>
@@ -963,18 +970,19 @@
       <div class="quiet-links">
         <a href="dmaparish-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-dma-parish-claudy-area" data-parish-name="DMA Parish (Claudy area)"><h2 class="ocr-parish-name">DMA Parish (Claudy area)</h2><p class="ocr-parish-date">30/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-dma-parish-claudy-area" data-parish-name="DMA Parish (Claudy area)"><h2 class="ocr-parish-name">DMA Parish (Claudy area)</h2><p class="ocr-parish-date">06/09/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>Parish of Dunboe, Macosquin and<br>
 Aghadowey<br>
-Sunday 30th August 2026<br>
-Year A Psalter Week II<br>
+Sunday 5th September 2026<br>
+Year A Psalter Week III<br>
 Rev Neil Farren PP. Chapelfield, 59 Laurel Hill<br>
 Road, Coleraine BT51 3PY Tele: <a href="tel:+442870343130" style="color:#1d4ed8;font-weight:600;">028 7034 3130</a><br>
 Parish Secretary: Clare White at Chapelfield<br>
 Office hours This week:<br>
-Tuesday 1st September – 09.30 – 1.30pm<br>
-Friday 4th September – 09.30 – 1.30pm<br>
+Monday 7th September – 10.30 – 1.30pm<br>
+Tuesday 8th September – 09.30 – 1.30pm<br>
+Thursday 10th September – 09.30 – 1.30pm<br>
 Parish Email: <a href="mailto:cpdma@btinternet.com" target="_blank" rel="noopener noreferrer">cpdma@btinternet.com</a><br>
 Parish Website: <a href="https://www.dmaparish.com" target="_blank" rel="noopener noreferrer">www.dmaparish.com</a><br>
 SVP Helpline: Tel: <a href="tel:+3537752017340" style="color:#1d4ed8;font-weight:600;">07752017340</a><br>
@@ -992,27 +1000,30 @@ Tele <a href="tel:+44282766990" style="color:#1d4ed8;font-weight:600;">028276699
 Onus – Men &amp; Women affected by domestic or<br>
 sexual abuse in NI – 0808 802 1414 (Freephone 24hr)</p>
 <h3 class="b-head">Recently Deceased</h3>
-<p>David (Mansy) McDaid</p>
+<p>Patrick Duddy Jr (Kent)<br>
+Rosemary Price (Burial of Ashes, Aghadowey<br>
+Sunday 6th Sept 2pm)</p>
 <h3 class="b-head">Months Mind</h3>
-<p>Liam Moran (Mass 11am Mass St John’s Sunday)</p>
+<p>Laurene Moore Saturday 5th Sept Dunboe Vigil</p>
 <h3 class="b-head">Anniversaries</h3>
-<p>Adrienne Lafferty (3rd anniversary Mass Saturday<br>
-Vigil St John’s), Mary Lynn, Charlie Booth, Annie<br>
-Conway, Sean McAfee, Patricia McNally, George<br>
-Crawford, William McLaughlin<br>
-Parish Collections 22nd &amp; 23rd August 2026<br>
+<p>Vera Boyle, James Crawford, Siobhan Mc Kee,<br>
+Patrick Duddy Snr. Judith King, Ryan Lundy,<br>
+Michael O’Kane, Patrick McWilliams, John<br>
+Mulgrew, John Millar, Ryan Lundy, Michael Okane,<br>
+James Crawford<br>
+Parish Collections 29th &amp; 30th August 2026<br>
 St Johns Aghadowey Dunboe<br>
-Weekly: £656.19 £307.00 £180.00<br>
-Loose: £294.31 £126.52 £18.00<br>
-Total: £1582.02<br>
-Masses - week commencing 31st August<br>
-Eucharistic Adoration will recommence every<br>
-Wednesday from 6pm – 7pm before evening<br>
-Mass Church St Johns Dunboe Aghadowey<br>
+Weekly: £653.90 £215.00 £349.00<br>
+Loose: £295.69 £51.51 £100.20<br>
+Total: £1665.30<br>
+Masses - week commencing 7th September<br>
+Adoration of the Blessed Sacrament every<br>
+Wednesday from 6pm – 7pm, Confession<br>
+available during adoration. Church St Johns Dunboe Aghadowey<br>
 Monday<br>
 10am<br>
 Tuesday<br>
-10am 12pm<br>
+10am<br>
 Wednesday 7pm<br>
 Thursday 10am 12pm<br>
 Friday<br>
@@ -1021,54 +1032,94 @@ Saturday<br>
 6pm 7.30pm<br>
 Sunday 11am 9.45am<br>
 Dunboe Reader/ Offertory Rota<br>
-Saturday 29th August – Catherine / Offertory – Seamus<br>
-&amp; Linda<br>
 Saturday 5th September – Philomena / Offertory –<br>
 Alice &amp; Michael<br>
 Saturday 12th September – Marie / Offertory – Martin<br>
 &amp; Martina<br>
+Saturday 19th September – Ann / Offertory – Peter &amp;<br>
+Geraldine<br>
 Dunboe Eucharistic Minister Rota<br>
-Saturday 29th August – Maggie<br>
 Saturday 5th September – Vincent<br>
 Saturday 12th September – Linda<br>
-Saturday 19th September - Karen<br>
+Saturday 19th September – Karen<br>
+Saturday 26th September - Maggie<br>
 Dunboe Cleaning &amp; Flowers Rota<br>
 September – Philomena McAlister<br>
 St Johns Eucharistic Minister<br>
-Saturday 5th September – Felicity Ferris<br>
-Sunday 6th September – Peter Devlin<br>
+Saturday 12th September – Sharon Boorman<br>
+Sunday 13th September –Marie Therese Fleming<br>
 St Johns Minister of the Word September<br>
 Vigil: Diana</p>
 <h3 class="b-head">Sunday Mass: Sean</h3>
 <p>Aghadowey Offertory<br>
-Sunday 30th August – Paddy &amp; Violet Dempsey<br>
 Sunday 6th September – Don &amp; Mary McNicholl<br>
-Sunday 13th September – Sean &amp; Martin Kelly We Pray<br>
-That the men called to priesthood will be filled with courage<br>
-and hope as they hear Jesus calling them to follow Him by<br>
-renouncing themselves, taking up their cross every day, and<br>
-finding life in Him and in the service of His people.<br>
+Sunday 13th September – Sean &amp; Martin Kelly<br>
+Sunday 20th September – McCamphill Family<br>
+We Pray for the men called to priesthood, to the ministry of<br>
+teaching and preaching in the name of Jesus and<br>
+encouraging their brothers and sisters to turn away from<br>
+sin and live as followers of Christ in today&#x27;s world.<br>
 BABY MASSAGE &amp; REFLEXOLOGY CLASSES<br>
 6-week course starting 9th September in Ballerin .<br>
-For more information or to book: <a href="mailto:diane@groundedsoles.org" target="_blank" rel="noopener noreferrer">diane@groundedsoles.org</a> |<br>
-07761 054666<br>
-Encyclical Letter<br>
-Magnifica Humanitas – On safeguarding the<br>
-Human Person in the time of Artificial<br>
-intelligence.<br>
-Cop ies of Pope Leo XIV’s book are still available to<br>
-purchase in the sacristy at a cost of £8 per copy.<br>
-Pastoral Council Meeting<br>
-Thurs day 3rd September 7.30pm – Chapelfield<br>
+For more information or to book:<br>
+<a href="mailto:diane@groundedsoles.org" target="_blank" rel="noopener noreferrer">diane@groundedsoles.org</a> | 07761 054666<br>
+Parish Draw<br>
+August Winners<br>
+Callum McVeigh - £500<br>
+Liam Hollinger - £100<br>
+Christine Moore - £100<br>
+Liam Toner - £100<br>
+Gary Laverty - £100<br>
+Pauline Templeton - £50<br>
+Ciara McCusker - £50<br>
+Congratulations to all!<br>
 Liturgy Committee Meeting<br>
-Monday 7th September – 10.30am – St Johns Sacristy Parish Trip<br>
-A special thanks to Father Farren for facilitating our<br>
-Parish Day trip to Glenveagh National Park &amp; Ards<br>
-Friary. After a brief showery spell, the weather cleared<br>
-up for a great day out which was much enjoyed by all.<br>
-Wishing Stephen Doherty (Articlave) a very happy 90th<br>
-Birthday for Tuesday 1st September. Many<br>
-Congratulations !<br>
+Monday 7th September – 10.30am – St Johns Sacristy<br>
+Season of creation 2026<br>
+Theme: Living Water<br>
+The 1st September, marked the beginning of the Season<br>
+of Creation 2026, which concludes on 4th October 2026,<br>
+the Feast of Saint Francis of Assisi.<br>
+This year’s theme, “Living Water”, explores Ezekiel 47:9<br>
+and 12 as a powerful biblical vision of hope and<br>
+ecological healing. Set amid exile and loss, the image of<br>
+living water flowing from God’s sanctuary reveals divine<br>
+healing that renews land, water, biodiversity, and<br>
+human responsibility towards the whole creation.<br>
+This year we hope to have a parish walk along the Trim<br>
+Trail in Coleraine, to mark the conclusion of the season<br>
+of creation. More details will follow in due course.<br>
+‘We are called to allow our hearts to be renewed, so<br>
+that we might seek peace and care for creation.<br>
+Scripture tells us to guard our hearts, for everything we<br>
+do flows from them (cf. Prov 4:23). If we take up this<br>
+task with humility and faith, we will become<br>
+collaborators in God’s work of renewal. We will move,<br>
+slowly but surely, from desert to garden, from division<br>
+to communion, and from violence to peace.’ – Pope Leo<br>
+XIV, for the 11th World Day of Prayer for the Care of<br>
+Creation 2026 Rosary on the Coast<br>
+Today, Sunday 6th September on Lisfannon beach at 3pm<br>
+Everyone Welcome<br>
+Sick Visitation<br>
+Friday 11th September – Height’s area<br>
+Pope Leo XIV prayer intention - September<br>
+Pope Leo XIV’s prayer intention for the month of<br>
+September is for the care of water.<br>
+“Imagine a hot summer day, after hard work or a long<br>
+walk, you finally take a sip of cool water. Feel how<br>
+relief and energy flow through your body,” the Holy<br>
+Father said in a video released Sept. 1 on X.<br>
+He added: “Moments like these remind us of what a<br>
+blessing clean water is yet, 1 in 4 people worldwide still<br>
+lack safe drinking water. Entire communities and<br>
+nations need our action and our prayer for the care of<br>
+water for the blessed relief.” Choir Practice<br>
+Choir will resume on Saturday 12th September at the Vigil<br>
+Mass in st Johns Church.<br>
+All existing members are welcome back and we appeal<br>
+for new members to join in<br>
+Everyone welcome!<br>
 DMA Parish (Claudy area) <a href="https://dmaparish.com" target="_blank" rel="noopener noreferrer">https://dmaparish.com</a></p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
@@ -1076,7 +1127,7 @@ DMA Parish (Claudy area) <a href="https://dmaparish.com" target="_blank" rel="no
     <section class="parish-section">
       <h2 class="section-heading">Other DERRY Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghyaran"><a class="parish-link" href="parishofaghyaran.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li class="parish-item" data-name="ardmore"><a class="parish-link" href="ardmoreparish.html" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li class="parish-item" data-name="banagher"><a class="parish-link" href="banagherparish.html" target="_blank" rel="noopener noreferrer">Banagher</a></li><li class="parish-item" data-name="buncrana"><a class="parish-link" href="buncranaparish.html" target="_blank" rel="noopener noreferrer">Buncrana</a></li><li class="parish-item" data-name="camus"><a class="parish-link" href="camusparish.html" target="_blank" rel="noopener noreferrer">Camus</a></li><li class="parish-item" data-name="carndonagh"><a class="parish-link" href="carndonaghparish.html" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li class="parish-item" data-name="castlederg"><a class="parish-link" href="castledergparish.html" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li class="parish-item" data-name="clonleigh (strabane pastoral area)"><a class="parish-link" href="clonleighparish.html" target="_blank" rel="noopener noreferrer">Clonleigh (Strabane Pastoral Area)</a></li><li class="parish-item" data-name="clonmany"><a class="parish-link" href="clonmanyparish.html" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li class="parish-item" data-name="culdaff"><a class="parish-link" href="culdaffparish.html" target="_blank" rel="noopener noreferrer">Culdaff</a></li><li class="parish-item" data-name="culmoe"><a class="parish-link" href="culmoreparish.html" target="_blank" rel="noopener noreferrer">Culmoe</a></li><li class="parish-item" data-name="drumquin"><a class="parish-link" href="drumquinparish.html" target="_blank" rel="noopener noreferrer">Drumquin</a></li><li class="parish-item" data-name="drumragh"><a class="parish-link" href="drumraghparish.html" target="_blank" rel="noopener noreferrer">Drumragh</a></li><li class="parish-item" data-name="dungiven"><a class="parish-link" href="parishofdungiven.html" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li class="parish-item" data-name="errigal"><a class="parish-link" href="errigalparish.html" target="_blank" rel="noopener noreferrer">Errigal</a></li><li class="parish-item" data-name="fahan"><a class="parish-link" href="fahanparish.html" target="_blank" rel="noopener noreferrer">Fahan</a></li><li class="parish-item" data-name="granaghan"><a class="parish-link" href="granaghanparish.html" target="_blank" rel="noopener noreferrer">Granaghan</a></li><li class="parish-item" data-name="greenlough"><a class="parish-link" href="greenlough.html" target="_blank" rel="noopener noreferrer">Greenlough</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holyfamily-parish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="iskaheen"><a class="parish-link" href="iskaheenparish.html" target="_blank" rel="noopener noreferrer">Iskaheen</a></li><li class="parish-item" data-name="kilrea"><a class="parish-link" href="parishofkilrea.html" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li class="parish-item" data-name="lavey"><a class="parish-link" href="laveyparish.html" target="_blank" rel="noopener noreferrer">Lavey</a></li><li class="parish-item" data-name="leckpatrick"><a class="parish-link" href="leckpatrickparish.html" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li class="parish-item" data-name="maghera (derry)"><a class="parish-link" href="magheraparishderry.html" target="_blank" rel="noopener noreferrer">Maghera (Derry)</a></li><li class="parish-item" data-name="melmount (&amp; camus)"><a class="parish-link" href="melmountparish.html" target="_blank" rel="noopener noreferrer">Melmount (&amp; Camus)</a></li><li class="parish-item" data-name="moville"><a class="parish-link" href="movilleparish.html" target="_blank" rel="noopener noreferrer">Moville</a></li><li class="parish-item" data-name="sion mills"><a class="parish-link" href="parishofsionmills.html" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li class="parish-item" data-name="st eugene&#x27;s cathedral (templemore)"><a class="parish-link" href="steugenescathedral.html" target="_blank" rel="noopener noreferrer">St Eugene&#x27;s Cathedral (Templemore)</a></li><li class="parish-item" data-name="st mary&#x27;s parish creggan"><a class="parish-link" href="stmarysparishcreggan.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Parish Creggan</a></li><li class="parish-item" data-name="star of the sea (magilligan)"><a class="parish-link" href="staroftheseacatholic.html" target="_blank" rel="noopener noreferrer">Star of the Sea (Magilligan)</a></li><li class="parish-item" data-name="steelstown"><a class="parish-link" href="steelstownparish.html" target="_blank" rel="noopener noreferrer">Steelstown</a></li><li class="parish-item" data-name="waterside (&amp; strathfoyle amalgamated)"><a class="parish-link" href="watersideparish.html" target="_blank" rel="noopener noreferrer">Waterside (&amp; Strathfoyle amalgamated)</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghyaran"><a class="parish-link" href="parishofaghyaran.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li class="parish-item" data-name="ardmore"><a class="parish-link" href="ardmoreparish.html" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li class="parish-item" data-name="banagher"><a class="parish-link" href="banagherparish.html" target="_blank" rel="noopener noreferrer">Banagher</a></li><li class="parish-item" data-name="bellaghy"><a class="parish-link" href="bellaghyparish.html" target="_blank" rel="noopener noreferrer">Bellaghy</a></li><li class="parish-item" data-name="buncrana"><a class="parish-link" href="buncranaparish.html" target="_blank" rel="noopener noreferrer">Buncrana</a></li><li class="parish-item" data-name="camus"><a class="parish-link" href="camusparish.html" target="_blank" rel="noopener noreferrer">Camus</a></li><li class="parish-item" data-name="carndonagh"><a class="parish-link" href="carndonaghparish.html" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li class="parish-item" data-name="castlederg"><a class="parish-link" href="castledergparish.html" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li class="parish-item" data-name="claudy"><a class="parish-link" href="parishofclaudy.html" target="_blank" rel="noopener noreferrer">Claudy</a></li><li class="parish-item" data-name="clonleigh (strabane pastoral area)"><a class="parish-link" href="clonleighparish.html" target="_blank" rel="noopener noreferrer">Clonleigh (Strabane Pastoral Area)</a></li><li class="parish-item" data-name="clonmany"><a class="parish-link" href="clonmanyparish.html" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li class="parish-item" data-name="culdaff"><a class="parish-link" href="culdaffparish.html" target="_blank" rel="noopener noreferrer">Culdaff</a></li><li class="parish-item" data-name="culmoe"><a class="parish-link" href="culmoreparish.html" target="_blank" rel="noopener noreferrer">Culmoe</a></li><li class="parish-item" data-name="drumquin"><a class="parish-link" href="drumquinparish.html" target="_blank" rel="noopener noreferrer">Drumquin</a></li><li class="parish-item" data-name="drumragh"><a class="parish-link" href="drumraghparish.html" target="_blank" rel="noopener noreferrer">Drumragh</a></li><li class="parish-item" data-name="dungiven"><a class="parish-link" href="parishofdungiven.html" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li class="parish-item" data-name="errigal"><a class="parish-link" href="errigalparish.html" target="_blank" rel="noopener noreferrer">Errigal</a></li><li class="parish-item" data-name="fahan"><a class="parish-link" href="fahanparish.html" target="_blank" rel="noopener noreferrer">Fahan</a></li><li class="parish-item" data-name="granaghan"><a class="parish-link" href="granaghanparish.html" target="_blank" rel="noopener noreferrer">Granaghan</a></li><li class="parish-item" data-name="greenlough"><a class="parish-link" href="greenlough.html" target="_blank" rel="noopener noreferrer">Greenlough</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holyfamily-parish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="iskaheen"><a class="parish-link" href="iskaheenparish.html" target="_blank" rel="noopener noreferrer">Iskaheen</a></li><li class="parish-item" data-name="kilrea"><a class="parish-link" href="parishofkilrea.html" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li class="parish-item" data-name="lavey"><a class="parish-link" href="laveyparish.html" target="_blank" rel="noopener noreferrer">Lavey</a></li><li class="parish-item" data-name="leckpatrick"><a class="parish-link" href="leckpatrickparish.html" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li class="parish-item" data-name="limavady"><a class="parish-link" href="limavadyparish.html" target="_blank" rel="noopener noreferrer">Limavady</a></li><li class="parish-item" data-name="maghera (derry)"><a class="parish-link" href="magheraparishderry.html" target="_blank" rel="noopener noreferrer">Maghera (Derry)</a></li><li class="parish-item" data-name="melmount (&amp; camus)"><a class="parish-link" href="melmountparish.html" target="_blank" rel="noopener noreferrer">Melmount (&amp; Camus)</a></li><li class="parish-item" data-name="moville"><a class="parish-link" href="movilleparish.html" target="_blank" rel="noopener noreferrer">Moville</a></li><li class="parish-item" data-name="sion mills"><a class="parish-link" href="parishofsionmills.html" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li class="parish-item" data-name="st eugene&#x27;s cathedral (templemore)"><a class="parish-link" href="steugenescathedral.html" target="_blank" rel="noopener noreferrer">St Eugene&#x27;s Cathedral (Templemore)</a></li><li class="parish-item" data-name="st mary&#x27;s parish creggan"><a class="parish-link" href="stmarysparishcreggan.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Parish Creggan</a></li><li class="parish-item" data-name="star of the sea (magilligan)"><a class="parish-link" href="staroftheseacatholic.html" target="_blank" rel="noopener noreferrer">Star of the Sea (Magilligan)</a></li><li class="parish-item" data-name="steelstown"><a class="parish-link" href="steelstownparish.html" target="_blank" rel="noopener noreferrer">Steelstown</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1128,9 +1179,9 @@ DMA Parish (Claudy area) <a href="https://dmaparish.com" target="_blank" rel="no
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1584,11 +1635,16 @@ DMA Parish (Claudy area) <a href="https://dmaparish.com" target="_blank" rel="no
         for (var i = 0; i < names.length; i++) {
           var page = pageFor(names[i]);
           if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
           var slot = pages.querySelector('[data-page="' + page + '"]');
           if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
+          scrollBoxTo(pages, slot);
           return true;
         }
         return false;

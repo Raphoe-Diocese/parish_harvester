@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Clones Bulletin — 30/08/2026</title>
+  <title>Clones Bulletin — 06/09/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -109,6 +110,13 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
@@ -141,6 +149,7 @@
       cursor: pointer;
     }
     .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
     
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {
@@ -160,7 +169,7 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
@@ -203,6 +212,7 @@
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {
@@ -866,6 +876,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -892,7 +903,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -900,35 +911,31 @@
     <header class="header">
       <p class="diocese-label">CLOGHER</p>
       <h1>Clones Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Clones — 30/08/2026. Part of the Clogher Diocese collated bulletin.</p>
-      <a class="download-link-top" href="clones.pdf">Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Clones — 06/09/2026. Part of the Clogher Diocese collated bulletin.</p>
+      <a class="download-link-top pdf-force-download" href="clones.pdf" download="clones.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="clones.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       
-      <div class="quiet-links">
-        <a href="clones.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="clones-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="clones.pdf" title="Clones bulletin PDF"></iframe>
+        <iframe data-pdf-url="clones.pdf" title="Clones bulletin PDF"></iframe>
         
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="clones.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="clones.pdf">Open PDF</a>
-              <a href="clones.pdf" download>Download</a>
+              <a class="pdf-open-newtab" href="clones.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="clones.pdf" download="clones.pdf">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>
       </div>
@@ -963,63 +970,49 @@
       <div class="quiet-links">
         <a href="clones-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-clones" data-parish-name="Clones"><h2 class="ocr-parish-name">Clones</h2><p class="ocr-parish-date">30/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-clones" data-parish-name="Clones"><h2 class="ocr-parish-name">Clones</h2><p class="ocr-parish-date">06/09/2026</p></header>
 <p class="page-label">Page 1</p>
-<p>Sacred Heart Church, Clones, Saturday 5th &amp; Sunday 6th September:<br>
-Readers Vigil Ann O ’Harte 11.30am Joe Kirke<br>
-Eucharistic Ministers Vigil Joanne Reihill, Bridget Bray<br>
-11.30am Pauline Quigley, Evangeline Mbakwe<br>
-Collectors Sept Vigil Anthony Keogh, Sean Slowey, Liam Doherty<br>
-11.30am Brian Coogan, Ann Adamson<br>
-Altar Society Sept Eileen Maguire, Dympna Colgan<br>
-St Macartan ’s, Aghadrumsee, Sunday 6th September:<br>
-Reader Geraldine Beggan Eucharistic Minister Eileen Maguire<br>
-Collectors September Darren O ’Hara, Angela McCarville<br>
-Altar Society September Marie O ’Neill, Joanne O ’Neill, Paula O ’Hara<br>
-St Alphonsus, Connons, Sunday 6th September:<br>
-Reader Leeanne Slowey Eucharistic Minister Eileen Gavin<br>
-Collectors September Ann McAdam, Paul McCaffrey<br>
-Altar Society September Catherine Connolly, Margaret Connolly<br>
-Wedding: We wish God ’s blessings on Karolina Lukoseviciute &amp; Robert Copas<br>
-Death: We pray for Brendan Kelly, Carn Gardens<br>
-Clones Parish Bingo in St. Joseph ’s Hall, Friday 28th August at 8.00pm. Jackpot<br>
-€1500, (subject to no winner on 28th August).<br>
-Clones Parish Draw A gentle reminder for members and promoters to bring their<br>
-September payment for the draw to the Parish Office by Thursday 3rd September<br>
-please. Next draw on Sunday 6th September in the Parish Office.<br>
-Tractor Run in Aid of Parkinsons Fermanagh Branch on Sunday 6th September.<br>
-Assemble at Dernawilt Shop at 3.00pm to start at 3.30pm travelling to Lacky Bridge,<br>
-Magheraveely, Ballagh Cross and back to Dernawilt where there will be a BBQ &amp;<br>
-Refreshments. Entry fee is £20 per tractor but donations are also welcome to support<br>
-this local charity and can be dropped into the donation bucket in Dernawilt Shop.<br>
-Clones GAA Annual Breakfast Morning on Sunday 6th September in The Creighton<br>
-Hotel from 9.30am until 12.30pm. Monies raised will support their Juvenile and Senior<br>
-Teams. Adults €12, U16&#x27;s €6. There will also be a Bake Sale on the morning.<br>
-Clones Faith and Light Regional Pilgrimage to Lough Derg on Sunday 13th<br>
-September, everyone welcome. Bus leaving The Diamond at 9.30am. To book a seat<br>
-contact Patricia <a href="tel:+353862148243" style="color:#1d4ed8;font-weight:600;">086 2148 243</a> or Mary <a href="tel:+3534751745" style="color:#1d4ed8;font-weight:600;">047 51745</a>.<br>
-St Padre Pio Day Bus to Knock leaving The Diamond, Clones, on Sunday 20th Sep-<br>
-tember at 8.00am. Fare is €25. To book a seat, phone John Conlon on <a href="tel:+353868095662" style="color:#1d4ed8;font-weight:600;">086 809 5662</a>.<br>
-Sequence Dance Class resume in St Joseph ’s Pastoral Centre, Monaghan, on Friday<br>
-4th September from 7.00pm until 8.30pm. Admission €10. Newcomers welcome. 30th August 2026 Twenty - Second Week in Ordinary Time<br>
+<p>Masses and Intentions for the Week<br>
+Twenty -Fourth Sunday in Ordinary Time<br>
+Sat 12th 7.30pm Francis McDonald, Derrygoas;<br>
+Jimmy &amp; Patricia O ’Reilly, Carn;<br>
+Eugene McMahon, Cara Street;<br>
+Helen Cunningham, Legar Cresent;<br>
+Trudy &amp; Mena Kierans, O ’Neill Park;<br>
+Liam Rooney, Clonkeencole &amp; Andrea Zeraffo -Rooney,<br>
+Kathleen &amp; Michael McCarney &amp; Woods Family, Cara St.<br>
+Sun 13th 10.00am Sean Carey, Tully (1st Anniversary);<br>
+Mary Mulligan, Lisnaskea &amp; Lawrence &amp; John O ’Hara;<br>
+Frank &amp; Richard Kearns, Drumma;<br>
+Mickey &amp; Maggie Lynch &amp; Eddie Quigley, Drumerwinter<br>
+11.30am Madge Duffy, O ’Neill Park (Month ’s Memory)<br>
+Ina Gleeson, Cara Street;<br>
+Pope ’s Intention for September<br>
+Let us pray for a just and sustainable management of water, a vital resource, so that<br>
+everyone may have equal access to it.<br>
+Sacred Heart Church, Clones, Saturday 12th &amp; Sunday 13th September:<br>
+Readers Vigil Mary Kirke 11.30am Tom Treanor<br>
+Eucharistic Ministers Vigil Elizabeth McDonald, Deirdre Kelly<br>
+11.30am Amy O ’Harte, Rita Cooke<br>
+St Macartan ’s, Aghadrumsee, Sunday 13th September:<br>
+Reader Caolan Faux Eucharistic Minister Blaithin Manley<br>
+Death: We pray for Fr Jim Moore, Killylacky and formerly Tirkeenan<br>
+Clones Parish Bingo in St. Joseph ’s Hall, Friday 11th Sept at 8.00pm. Jackpot €1500.<br>
+(subject to no winner on 4th September).<br>
+Clones Faith and Light Regional Pilgrimage to Lough Derg on Sunday 13th September,<br>
+everyone welcome. Bus leaving The Diamond at 9.30am. To book a seat contact Patricia<br>
+<a href="tel:+353862148243" style="color:#1d4ed8;font-weight:600;">086 2148 243</a> or Mary <a href="tel:+3534751745" style="color:#1d4ed8;font-weight:600;">047 51745</a>.<br>
+St Padre Pio Day Bus to Knock leaving The Diamond, Clones, on Sunday 20th September<br>
+at 8.00am. Fare is €25. To book a seat, phone John Conlon on <a href="tel:+353868095662" style="color:#1d4ed8;font-weight:600;">086 809 5662</a>.<br>
+St Peregrine 3 -Day Novena To mark the 300th year of St. Peregrine ’s canonization a<br>
+3-day Novena to the Patron Saint of those who have Cancer will take place in Holy Cross<br>
+Church Lisnaskea from Monday 5th until Wednesday 7th October at 7.00pm, guest speaker<br>
+each night.<br>
+Save Our Acute Services next meeting will take place on Monday 7th September at<br>
+7.00pm in the Westville Hotel, Enniskillen. They will be discussing plans that are being<br>
+made for us and how we must fight and resist them. This is a very important meeting. 6th September 2026 Twenty - Third Week in Ordinary<br>
 Masses and Intentions for the Week<br>
-Twenty -Second Sunday in Ordinary Time<br>
-Sat 29th 7.30pm Noreen O ’Dowd, Cherry Park &amp;<br>
-Sonya, Peggy, Denny &amp; Mary O ’Dowd;<br>
-Dermot, Patrick, Sharon &amp; Nika McGuigan, The Diamond;<br>
-Anne &amp; Bernie Brady, O ’Neill Park<br>
-Sun 30th 9.00am Hugh, Josie &amp; Robert Moore &amp; Pat McCabe, Teerhill;<br>
-Frank &amp; Pat Conlon, Drumsloe<br>
-10.00am Geraldine Breslin &amp; McDermott Family, Doon;<br>
-John -Pat, Kathleen &amp; Bridie McMahon, Tonitybog<br>
-11.30am People of the Parish</p>
-<hr>
-<p>Tues 1st 10.00am World Day of Prayer for the Care of Creation<br>
-Thurs 3rd 10.00am Mass of the Day<br>
-(Adoration 10.30am - 6.00pm, Sacred Heart Church)<br>
-Fri 4th 10.00am Lay Led Liturgy and Eucharist</p>
-<hr>
-<p>Twenty -Third Sunday in Ordinary Time<br>
+Twenty -Third Sunday in Ordinary Time<br>
 Sat 5th 7.30pm Eileen Donnelly (1st Anniversary) &amp;<br>
 Donnelly Family, McCurtain Street &amp; Dublin;<br>
 Angela McDermott, Carn Heights;<br>
@@ -1037,7 +1030,17 @@ John, Bridget, Paddy, Paul &amp; John McPhillips, Kathleen &amp;<br>
 Jim McCarney, Kilrid &amp; Michael Mooney, Enniskillen;<br>
 James &amp; Patricia Toye, Kilgarrett<br>
 11.30am Michael &amp; Iris Murphy, Analore Street;<br>
-Mary &amp; Paddy McGorman, Legnakelly<br>
+Mary &amp; Paddy McGorman, Legnakelly</p>
+<hr>
+<p>Tues 8th 10.00am The Nativity of the Blessed Virgin Mary<br>
+Thurs 10th 10.00am Thomas, Mary, Denis &amp; Larry McGonnell, O ’Neill Park,<br>
+Marie McGonnell, Cherry Park, Monica Toal, Drogheda &amp;<br>
+Noel O ’Toole, Dublin<br>
+(Adoration 10.30am - 6.00pm, Sacred Heart Church)<br>
+Fri 11th 10.00am Lay Led Liturgy and Eucharist</p>
+<hr>
+<p>We remember with them their deceased relatives,<br>
+ancestors and friends .<br>
 Clones <a href="https://www.clonesparish.com/" target="_blank" rel="noopener noreferrer">https://www.clonesparish.com/</a></p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
@@ -1045,7 +1048,7 @@ Clones <a href="https://www.clonesparish.com/" target="_blank" rel="noopener nor
     <section class="parish-section">
       <h2 class="section-heading">Other CLOGHER Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ballybay (tullycorbet)"><a class="parish-link" href="ballybay.html" target="_blank" rel="noopener noreferrer">Ballybay (Tullycorbet)</a></li><li class="parish-item" data-name="carrickmacross (machaire rois)"><a class="parish-link" href="carrickmacross.html" target="_blank" rel="noopener noreferrer">Carrickmacross (Machaire Rois)</a></li><li class="parish-item" data-name="castleblayney (muckno, includes clontibret)"><a class="parish-link" href="castleblayney.html" target="_blank" rel="noopener noreferrer">Castleblayney (Muckno, includes Clontibret)</a></li><li class="parish-item" data-name="corcaghan-threemilehouse (kilmore &amp; drumsnatt)"><a class="parish-link" href="corcaghanthreemilehouse.html" target="_blank" rel="noopener noreferrer">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</a></li><li class="parish-item" data-name="derrygonnelly (botha)"><a class="parish-link" href="derrygonnelly.html" target="_blank" rel="noopener noreferrer">Derrygonnelly (Botha)</a></li><li class="parish-item" data-name="donagh"><a class="parish-link" href="donagh.html" target="_blank" rel="noopener noreferrer">Donagh</a></li><li class="parish-item" data-name="enniskillen (st michael&#x27;s parish)"><a class="parish-link" href="enniskillen.html" target="_blank" rel="noopener noreferrer">Enniskillen (St Michael&#x27;s Parish)</a></li><li class="parish-item" data-name="errigal truagh"><a class="parish-link" href="errigaltruagh.html" target="_blank" rel="noopener noreferrer">Errigal Truagh</a></li><li class="parish-item" data-name="irvinestown (devenish)"><a class="parish-link" href="irvinestown.html" target="_blank" rel="noopener noreferrer">Irvinestown (Devenish)</a></li><li class="parish-item" data-name="killanny"><a class="parish-link" href="killanny.html" target="_blank" rel="noopener noreferrer">Killanny</a></li><li class="parish-item" data-name="magheracloone"><a class="parish-link" href="magheracloone.html" target="_blank" rel="noopener noreferrer">Magheracloone</a></li><li class="parish-item" data-name="monaghan &amp; rackwallace (includes tyholland)"><a class="parish-link" href="monaghanrackwallace.html" target="_blank" rel="noopener noreferrer">Monaghan &amp; Rackwallace (includes Tyholland)</a></li><li class="parish-item" data-name="tempo (pobal)"><a class="parish-link" href="tempo.html" target="_blank" rel="noopener noreferrer">Tempo (Pobal)</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ballybay (tullycorbet)"><a class="parish-link" href="ballybay.html" target="_blank" rel="noopener noreferrer">Ballybay (Tullycorbet)</a></li><li class="parish-item" data-name="carrickmacross (machaire rois)"><a class="parish-link" href="carrickmacross.html" target="_blank" rel="noopener noreferrer">Carrickmacross (Machaire Rois)</a></li><li class="parish-item" data-name="castleblayney (muckno, includes clontibret)"><a class="parish-link" href="castleblayney.html" target="_blank" rel="noopener noreferrer">Castleblayney (Muckno, includes Clontibret)</a></li><li class="parish-item" data-name="corcaghan-threemilehouse (kilmore &amp; drumsnatt)"><a class="parish-link" href="corcaghanthreemilehouse.html" target="_blank" rel="noopener noreferrer">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</a></li><li class="parish-item" data-name="derrygonnelly (botha)"><a class="parish-link" href="derrygonnelly.html" target="_blank" rel="noopener noreferrer">Derrygonnelly (Botha)</a></li><li class="parish-item" data-name="donagh"><a class="parish-link" href="donagh.html" target="_blank" rel="noopener noreferrer">Donagh</a></li><li class="parish-item" data-name="enniskillen (st michael&#x27;s parish)"><a class="parish-link" href="enniskillen.html" target="_blank" rel="noopener noreferrer">Enniskillen (St Michael&#x27;s Parish)</a></li><li class="parish-item" data-name="errigal truagh"><a class="parish-link" href="errigaltruagh.html" target="_blank" rel="noopener noreferrer">Errigal Truagh</a></li><li class="parish-item" data-name="irvinestown (devenish)"><a class="parish-link" href="irvinestown.html" target="_blank" rel="noopener noreferrer">Irvinestown (Devenish)</a></li><li class="parish-item" data-name="killanny"><a class="parish-link" href="killanny.html" target="_blank" rel="noopener noreferrer">Killanny</a></li><li class="parish-item" data-name="lisnaskea-maguiresbridge (aghalurcher)"><a class="parish-link" href="lisnaskeamaguiresbridge.html" target="_blank" rel="noopener noreferrer">Lisnaskea-Maguiresbridge (Aghalurcher)</a></li><li class="parish-item" data-name="magheracloone"><a class="parish-link" href="magheracloone.html" target="_blank" rel="noopener noreferrer">Magheracloone</a></li><li class="parish-item" data-name="monaghan &amp; rackwallace (includes tyholland)"><a class="parish-link" href="monaghanrackwallace.html" target="_blank" rel="noopener noreferrer">Monaghan &amp; Rackwallace (includes Tyholland)</a></li><li class="parish-item" data-name="newtownbutler (galloon)"><a class="parish-link" href="newtownbutler.html" target="_blank" rel="noopener noreferrer">Newtownbutler (Galloon)</a></li><li class="parish-item" data-name="tempo (pobal)"><a class="parish-link" href="tempo.html" target="_blank" rel="noopener noreferrer">Tempo (Pobal)</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1097,9 +1100,9 @@ Clones <a href="https://www.clonesparish.com/" target="_blank" rel="noopener nor
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1553,11 +1556,16 @@ Clones <a href="https://www.clonesparish.com/" target="_blank" rel="noopener nor
         for (var i = 0; i < names.length; i++) {
           var page = pageFor(names[i]);
           if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
           var slot = pages.querySelector('[data-page="' + page + '"]');
           if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
+          scrollBoxTo(pages, slot);
           return true;
         }
         return false;

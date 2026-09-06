@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Glenties Bulletin — 30/08/2026</title>
+  <title>Glenties Bulletin — 06/09/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -109,6 +110,13 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
@@ -141,6 +149,7 @@
       cursor: pointer;
     }
     .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
     
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {
@@ -160,7 +169,7 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
@@ -203,6 +212,7 @@
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {
@@ -866,6 +876,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -892,7 +903,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -900,35 +911,31 @@
     <header class="header">
       <p class="diocese-label">RAPHOE</p>
       <h1>Glenties Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Glenties — 30/08/2026. Part of the Raphoe Diocese collated bulletin.</p>
-      <a class="download-link-top" href="drive-14alaxt4mv.pdf">Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Glenties — 06/09/2026. Part of the Raphoe Diocese collated bulletin.</p>
+      <a class="download-link-top pdf-force-download" href="drive-14alaxt4mv.pdf" download="drive-14alaxt4mv.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="drive-14alaxt4mv.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       
-      <div class="quiet-links">
-        <a href="drive-14alaxt4mv.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="drive-14alaxt4mv-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="drive-14alaxt4mv.pdf" title="Glenties bulletin PDF"></iframe>
+        <iframe data-pdf-url="drive-14alaxt4mv.pdf" title="Glenties bulletin PDF"></iframe>
         
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="drive-14alaxt4mv.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="drive-14alaxt4mv.pdf">Open PDF</a>
-              <a href="drive-14alaxt4mv.pdf" download>Download</a>
+              <a class="pdf-open-newtab" href="drive-14alaxt4mv.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="drive-14alaxt4mv.pdf" download="drive-14alaxt4mv.pdf">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>
       </div>
@@ -963,7 +970,7 @@
       <div class="quiet-links">
         <a href="drive-14alaxt4mv-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-glenties" data-parish-name="Glenties"><h2 class="ocr-parish-name">Glenties</h2><p class="ocr-parish-date">30/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-glenties" data-parish-name="Glenties"><h2 class="ocr-parish-name">Glenties</h2><p class="ocr-parish-date">06/09/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>Email: <a href="mailto:parishofiniskeel@gmail.com" target="_blank" rel="noopener noreferrer">parishofiniskeel@gmail.com</a> Parish of Inisk eel/P aróiste In ís Cao l Telephone: <a href="tel:+353749551117" style="color:#1d4ed8;font-weight:600;">074 9551117</a><br>
 Webpage:<a href="https://www.parishpress.net/parishofiniskeel" target="_blank" rel="noopener noreferrer">www.parishpress.net/parishofiniskeel</a> Fr Gerard Cunningham Facebook: Parish of Iniskeel<br>
@@ -971,32 +978,6 @@ Please note that Glenties and Fintown Church webcams are live at al l times. Rec
 NOTICES FOR PARISH NEWSLETTER TO BE RECEIVED BY 5pm ON THURSDAY BY EMAIL TO <a href="mailto:parishofiniskeel@gmail.com" target="_blank" rel="noopener noreferrer">parishofiniskeel@gmail.com</a> OR IN WRITING TO THE PAROCHIAL HOUSE.<br>
 ITEMS FOR THE NEWSLETTER MAY BE EDITED OR OMITTED DEPENDING ON SPACE AVAIL ABLE. PLEASE KEEP NOTICES TO A MINIMUM. St Connell’s Church, Glenti es<br>
 Webcam: <a href="https://www.churchservices.tv/glenties" target="_blank" rel="noopener noreferrer">www.churchservices.tv/glenties</a><br>
-Saturday<br>
-29th August 6:00pm Rosie McLoone R.I.P.<br>
-Glen Road<br>
-James Greenwood R.I.P.<br>
-Mulnamina &amp; Killybegs<br>
-7th Anniversary<br>
-Seamus Byrne R.I.P.<br>
-The Rock</p>
-<h3 class="b-head">Months Mind Mass</h3>
-<p>Sunday<br>
-30th August 11:00am Michael McDermott R.I.P.<br>
-Dr McCloskey Crescent<br>
-Stella Quinn R.I.P.<br>
-Mullantyboyle<br>
-2nd Anniversary<br>
-Tuesday<br>
-1st September 7:30pm<br>
-Wednesday<br>
-2nd September 6:15pm<br>
-7:30pm Adoration (1 Hour)<br>
-Thursday<br>
-3rd September 9:30am<br>
-Friday<br>
-4th September 7:30pm<br>
-Packie Gallagher R.I.P.<br>
-Straoughter, 20th Anniversary<br>
 Saturday<br>
 5th September 6:00pm Peter Gavigan R.I.P. &amp;<br>
 Deceased Gavigan Family<br>
@@ -1006,8 +987,7 @@ Maas, 1st Anniversary<br>
 Packie Boyle R.I.P.<br>
 Derries<br>
 Sunday<br>
-6th September 11:00am<br>
-Niall, Alice &amp; Pat McDermott<br>
+6th September 11:00am Niall, Alice &amp; Pat McDermott<br>
 R.I.P., Glassghmore, Cloghan<br>
 Frank &amp; Nadine Connaghan<br>
 R.I.P. &amp; Deceased members of<br>
@@ -1015,46 +995,52 @@ Connaghan &amp; Boyle Families<br>
 Main Street<br>
 Peter Gallagher R.I.P.<br>
 Main Street, 10th Anniversary<br>
+Tuesday<br>
+8th September 7:30pm<br>
+Wednesday<br>
+9th September 6:15pm<br>
+7:30pm Adoration (1 Hour)<br>
+Thursday<br>
+10th September 9:30am<br>
+Patrick &amp; Ann Jane Gallagher<br>
+R.I.P., Dibbin &amp; Donegal Town<br>
+Friday<br>
+11th September 7:30pm<br>
+Nora Jack O’Donnell R.I.P.</p>
+<h3 class="b-head">Months Mind Mass</h3>
+<p>Saturday<br>
+12th September NO VIGIL MASS IN GLENTIES<br>
+Sunday<br>
+13th September 11:00am<br>
+John &amp; Maura Gildea R.I.P.<br>
+Stranaglough<br>
 Teach Pobail an T eaghlaigh Nao fa,<br>
 Éadan Fhionn Fraoich<br>
 Sunday<br>
-30th August 9:30r.n.<br>
-Sunday<br>
 6th September 9:30r.n.<br>
-Sunday Collection<br>
-Glenties €1,910<br>
-Fintown €530<br>
-Edeninfagh € 415.<br>
-Thank you Teach Pobail Cholmcille Na ofa,<br>
+Sunday<br>
+13th September 9:30r.n.<br>
+Bridget McDermott R.I.P.<br>
+Edeninfagh<br>
+Teach Pobail Cholmcille Na ofa,<br>
 Baile na Finne<br>
 Webcam: <a href="https://www.churchservices.tv/fintown" target="_blank" rel="noopener noreferrer">www.churchservices.tv/fintown</a><br>
 Saturday<br>
-29th August 7:30i.n.<br>
-Private Intention<br>
-Monday 7-9i.n. Adhradh na Naomh Shracaminte<br>
-Tuesday<br>
-1st September 6:00i.n.<br>
-Saturday<br>
-5th September 7:30i.n. Mary Gallagher R.I.P.<br>
+5th September 7:30i.n.<br>
+Mary Gallagher R.I.P.<br>
 Adderwell<br>
-Bingo every Tuesday night in the Market Hall.<br>
+Tuesday<br>
+8th September 6:00i.n.<br>
+Saturday<br>
+12th September 7:30i.n.<br>
+There will be No Adoration in Fintown on<br>
+Monday 7th September.<br>
+Sunday Collection<br>
+Glenties €2,480 , Fintown €620<br>
+Edeninfagh € 310. Thank you Bingo every Tuesday night in the Market Hall.<br>
 STARTING TIME OF 8.30PM.<br>
 Snowball on 45 numbers or less, if not won €200<br>
 will be paid out. We appreciate your support<br>
-Beidh Club Bricfeasta agus Club larscoil ag<br>
-oscailt i S.N Colmcille, Baile na Finne ar an 27ú<br>
-Lúnasa. Osclóidh an Club Bricfeasta ón 8 r.n.<br>
-agus an Club larscoil ón 2 go dtí a 6i.n, ó De<br>
-Luain go dtí De hAoine. Tá seo oscailte do páistí<br>
-ar bith at ag freastal ar bunscoil. Tá tuilleadh<br>
-eolas le fáil ó <a href="mailto:Kiddlywinkscc@gmail.com" target="_blank" rel="noopener noreferrer">Kiddlywinkscc@gmail.com</a>.<br>
-A Breakfast and Afterschools Club will open in<br>
-Fintown National School from the 27th of August.<br>
-The breakfast club will open at 8 a.m with the<br>
-Afterschools club opening from 2pm until 6pm,<br>
-Monday to Friday. This is open to all children<br>
-who attend primary school. More information can<br>
-be got by e-mailing <a href="mailto:Kiddlywinkscc@gmail.com" target="_blank" rel="noopener noreferrer">Kiddlywinkscc@gmail.com</a><br>
 GLENTIES HORTICULTURAL SHOW 2026<br>
 Our Horticultural Show takes place on Sunday<br>
 13th September in The Market Hall, Glenties and<br>
@@ -1068,25 +1054,52 @@ Friday 11th September | 7pm –9pm<br>
 OR Sunday 13th September | 9am –11am<br>
 Judging: Sunday 11am –12pm<br>
 Open to the public: Sunday 12pm –6pm<br>
-Breast Cancer Awareness Month 2026 takes<br>
-place Thursday, Oct 1st, 2026 – Saturday, Oct<br>
-31st, 2026. For more information, please visit<br>
-breastcancerrsearch.ie or<br>
-<a href="https://www.breastcancerireland.com" target="_blank" rel="noopener noreferrer">www.breastcancerireland.com</a>.<br>
-International Coffee Day 2026 takes place on<br>
-Thursday, October 1st, 2026. Please see<br>
-<a href="https://www.internationalcoffeeday.org" target="_blank" rel="noopener noreferrer">www.internationalcoffeeday.org</a> for further<br>
-details.<br>
+Poultry and Carboot sale will be held in The<br>
+Railway Inn’s car park , Fintown on Sunday 13th<br>
+Sept 11am-3pm<br>
+Entry Fee for Sellers is €10<br>
+Everyone is welcome<br>
+Fireside Fleadh all types of music is being held<br>
+in The Railway Inn, Fintown on Sunday 13th Sept<br>
+7pm. Everyone welcome<br>
+Oiche Ceoil Tuesday 15th 8.30pm<br>
+Musicians, dancers, singers and story tellers<br>
+welcome. Donegal Dancers will also be attending<br>
+on the night for a great display of Irish dancing<br>
+Refreshments served on the night<br>
+Pilates with Martina will starting back in the<br>
+Fintown Parish hall on Friday 18th Sept 7pm.<br>
+All levels welcome. Please contact Martina<br>
+on <a href="tel:+353863846302" style="color:#1d4ed8;font-weight:600;">086 384 6302</a> to book your place<br>
+Coiste Forbartha Éadan Fhionn Fraoich<br>
+Social Dance in Edeninfagh Hall F94 HT 2X on<br>
+Friday 18th September 2026<br>
+8.30 p.m. to 10.30p.m.<br>
+Music by Alex &amp; Sinead Black<br>
+Admission €10<br>
+Refreshments served. Raffle will take place.<br>
+EDENINFAGH CHURCH /<br>
+HALL FUNDRAISER<br>
+Congratulations to Teresa Molloy,<br>
+Fintown on winning €1, 110 in the August<br>
+50/50 draw. Thank you to all who<br>
+contributed to the draw. Next draw takes<br>
+place on Friday 25th September.<br>
+Envelopes available in the three local<br>
+churches and in local businesses or from<br>
+any committee member. Entries also via<br>
+Revolut:Frankie <a href="tel:+353879186261" style="color:#1d4ed8;font-weight:600;">087-9186261</a><br>
+(€10 per entry)<br>
 Fr Gerard will visit the sick and<br>
-housebound in the Glenties area on<br>
-Tuesday 1st September and<br>
-Wednesday 2nd September<br>
+housebound in the Edeninfagh area on<br>
+Tuesday 8th September and the Fintown<br>
+area on Wednesday 9th September<br>
 Áras Sheáin Bháin<br>
 Tá na ranganna seo leanas ag toiseacht in Áras<br>
-Sheagháin Bháin (Leabharlann Bhaile na Finne )<br>
-gan mhoill.<br>
-The following classes will be starting in Áras<br>
-Sheaghain Bháin (Fintown Library )<br>
+Sheagháin Bháin (Leabharlann Bhaile na Finne ) gan<br>
+mhoill.<br>
+The following classes will be starting in Áras Sheaghain<br>
+Bháin (Fintown Library )<br>
 Fidil / Fiddle<br>
 Feadóg stáin /Tin whistle<br>
 Giotár / Guitar Bunleibhéal agus Ardleibhéal<br>
@@ -1096,82 +1109,94 @@ Gaeilge / Irish - Bunleibhéal agus Ardleibhéal<br>
 (beginners and advanced)<br>
 Fáilte roimh achan nduine. Everyone Welcome<br>
 Tuilleadh eolais / For more information<br>
-<a href="tel:+353872431910" style="color:#1d4ed8;font-weight:600;">087 243 1910</a>. Le tacaíocht ó Phleanáil Teanga<br>
-na Gaeltachta Láir.<br>
-Ceardlann Chopair in Áras Sheáin<br>
-Bháin, Baile na Finne F94 X77V le Niall Ó<br>
-Fearraigh ar an Satharn 19ú Meán Fómhair<br>
-10.00r.n. - 2.00 i.n. Tuilleadh eolais ag <a href="tel:+353876365481" style="color:#1d4ed8;font-weight:600;">087<br>
-6365481</a>. Ta spásanna teoranta mar sin tá sé<br>
-riachtanach d&#x27;áit a chlarú riomh ré. Bí linn don lá<br>
-chruthaitheach seo. Tá an chúrsa seo le<br>
-Cheardaíocht Chopair Dhún na nGall arna<br>
-pháirtchistiú ag Clár Tacaíochta do Oideachas<br>
+<a href="tel:+353872431910" style="color:#1d4ed8;font-weight:600;">087 243 1910</a>. Le tacaíocht ó Phleanáil Teanga na<br>
+Gaeltachta Láir.<br>
+Ceardlann Chopair in Áras Sheáin Bháin, Baile na<br>
+Finne F94 X77V le Niall Ó<br>
+Fearraigh ar an Satharn 19ú Meán Fómhair 10.00r.n. -<br>
+2.00 i.n. Tuilleadh eolais ag <a href="tel:+353876365481" style="color:#1d4ed8;font-weight:600;">087 6365481</a>. Ta<br>
+spásanna teoranta mar sin tá sé riachtanach d&#x27;áit a<br>
+chlarú riomh ré. Bí linn don lá chruthaitheach seo. Tá<br>
+an chúrsa seo le Cheardaíocht Chopair Dhún na nGall<br>
+arna pháirtchistiú ag Clár Tacaíochta do Oideachas<br>
 Pobail de Bhord Oideachais agus Oiliúna Dhún na<br>
 nGall.<br>
-Niall Ferry from Donegal Copper Craft is leading a<br>
-Copper rubbing workshop in Áras Sheáin Bháin,<br>
-Fintown Library. F94 X77V on Saturday 19th<br>
-September 10.00am - 2.00pm. Spaces are<br>
-limited. Please contact <a href="tel:+353876365481" style="color:#1d4ed8;font-weight:600;">087 6365481</a> for further<br>
-information or to reserve your place. Previous<br>
-experience isn&#x27;t necessary.<br>
-This course from Donegal Cooper Craft is part<br>
-funded by Donegal ETB&#x27;s Community Education<br>
-Support Programme.<br>
-Annual Donegal Down Syndrome Association<br>
-Church Gate Collection will take place outside<br>
-church gates on Saturday 29th and Sunday 30th<br>
-August 2026.<br>
-The next Sunday Social in Dunkineely Community<br>
-Centre will be on Sunday 30th August from 8pm to<br>
-10pm. Music by Country Traditions.<br>
-Admission €10 which includes refreshments<br>
-St Connell’s Church, Glenties<br>
-September Rota<br>
-Ministers of the Eucharist<br>
-Saturday Sunday<br>
-James McDyre Brigid Kee<br>
-Martin Doherty Jean Campbell<br>
-Anne Bonner Niamh Brennan<br>
-Patsy Gallagher<br>
-Readers<br>
-Saturday Sunday<br>
-Anne Mannering Anne Breslin<br>
-Church Collectors<br>
-Saturday Sunday<br>
-Patsy Gallagher John McSwiggan<br>
-Angela Griffin Joseph Kennedy<br>
-Carmel Gallagher Angela Greenwood<br>
-Connie Doherty Patrick Browne<br>
-Altar Society Team C<br>
+Club Bollaí Bhaile na Finne<br>
+Tá an spórt Bollaí ag toiseacht arais i halla<br>
+paróiste Cholmcille oíche Luan 7ú Meán Fómhair<br>
+2026 ón 8 a chlog go dtí an10 a chlog san oíche.<br>
+Tá fáilte roimh baill úra i gcónaí.<br>
+Bowls are starting again in Fintown parish hall on<br>
+Monday 7th September 2026 from 8pm - 10pm<br>
+nightly. New members always welcome.<br>
+Le tacaíocht ó Choiste Pleanála Teanga na<br>
+Gaeltachta Láir.<br>
+GLENTIES TOWN TEAM - MONTHLY MEETING<br>
+Our next meeting takes place on Monday, 7th<br>
+September at 7pm in the Community Centre,<br>
+Glenties. Whether you&#x27;re part of a local club,<br>
+business, organisation, community group, or<br>
+simply someone who cares about Glenties, your<br>
+ideas, input and support are always welcome.<br>
+Everyone welcome! … new faces especially en-<br>
+couraged to come along.<br>
+Coiste Forbartha Éadan Fhionn Fraoich<br>
+Jiving, waltzing and líne- dancing classes in<br>
+Edeninfagh Hall, Wednesday nights, beginning<br>
+Wednesday , 9th September at 8.30 p.m.<br>
+Due to the Harvest Fair Day falling on<br>
+a Saturday this year, there will no<br>
+Vigil Mass at 6pm on<br>
+Saturday 12th September in<br>
+St Connell’s Church, Glenties.<br>
+For those wishing to avail of Vigil Mass,<br>
+the Vigil Mass in Fintown, as usual, will<br>
+take place at 7:30pm on that evening.<br>
+A meeting of the Fintown Hall<br>
+Committee will take place in Fintown<br>
+Hall on Wednesday 16th September at<br>
+8:30pm. A good attendance would be<br>
+appreciated.<br>
 Note Re: Baptisms normally take place at 2pm on<br>
-Saturday. In order to bring cohesion,<br>
-should a family book a Baptism of their child<br>
-on a Saturday in any particular Church then<br>
-all subsequent Baptisms on that day will<br>
-take place in the same Church.<br>
+Saturday. In order to bring cohesion, should a<br>
+family book a Baptism of their child on a<br>
+Saturday in any particular Church then all<br>
+subsequent Baptisms on that day will take place<br>
+in the same Church.<br>
 TO BOOK A BAPTISM PLEASE CONTACT THE<br>
 PARISH OFFICE ON <a href="tel:+353749551117" style="color:#1d4ed8;font-weight:600;">074 9551117</a>.<br>
 PLEASE NOTE THAT A COPY OF THE CHILD’S<br>
 BIRTH CERTIFICATE IS REQUIRED TO<br>
 ENSURE ACCURATE DETAILS.<br>
-Anam Cara Donegal , the organisation that<br>
-supports bereaved parents, will hold it&#x27;s monthly<br>
-Face to Face Parent Support Evening for<br>
-bereaved parents on Thursday 10th September<br>
-2026 at 7.30pm in the Raddison Blu Hotel,<br>
-Letterkenny F92 FK15.<br>
-This event is free and open to all bereaved<br>
-parents regardless of the age of their child, the<br>
-circumstances of their death, or how recent their<br>
-death was. There is no need for registration, this<br>
-is a walk in meeting.<br>
-We also offer online support group meetings.<br>
-To find out more call 01 4045378 or<br>
-email <a href="mailto:info@anamcara.ie" target="_blank" rel="noopener noreferrer">info@anamcara.ie</a><br>
-Contact: <a href="tel:+353873969890" style="color:#1d4ed8;font-weight:600;">087 3969890</a> or<br>
-Email: <a href="mailto:glentiesvp@gmail.com" target="_blank" rel="noopener noreferrer">glentiesvp@gmail.com</a><br>
+Donegal Group 173 Rise and Shine Trust (formerly<br>
+The Irish Handicapped Children ’s Pilgrimage Trust and<br>
+The Irish Pilgrimage Trust) are celebrating forty years<br>
+of taking young people with special needs to Lourdes<br>
+each Easter. We are celebrating with a special Mass<br>
+on Saturday 26th September in the Church of the Irish<br>
+Martyrs, Letterkenny at 12 noon. The Mass will be<br>
+concelebrated by Bishop Niall Coll and Bishop Donal Mc<br>
+Keowan, Bishop of Derry and many of the priests who<br>
+travelled to Lourdes with us over the years. We invite<br>
+all the guests and their families and all the helpers<br>
+who travelled with us over the years to our Mass to<br>
+celebrate the work of the Donegal Group over these<br>
+forty years.<br>
+Irish Dancing class resumes on, Tuesday 8th.<br>
+September in Glenties Market Hall at 4.30pm.<br>
+Beginners welcome. Marie Bonner-Cannon.<br>
+There will be a Cursillo friendship night in<br>
+Donegal Town on Wednesday 9th September at<br>
+7:30pm in the Church of Ireland hall.<br>
+All Cursillo members very welcome.<br>
+Harvest Fair Junior Kids Tractor Run in<br>
+association with Scoil Mhuire takes place this<br>
+Sunday 6th September at 12:00. Register for<br>
+your driver&#x27;s licence at the Health Centre Car<br>
+Park before we travel down the Main Street. We&#x27;ll<br>
+finish up at Roddy&#x27;s for some goodies. If you&#x27;ve<br>
+no tractor then bicycles, tricycles, ride-ons etc.<br>
+are all welcome!<br>
 Glenties <a href="https://drive.google.com/file/d/14aLAxt4mv7eYBvYx2GGthpsQnLrsysmK/view" target="_blank" rel="noopener noreferrer">https://drive.google.com/file/d/14aLAxt4mv7eYBvYx2GGthpsQnLrsysmK/view</a></p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
@@ -1179,7 +1204,7 @@ Glenties <a href="https://drive.google.com/file/d/14aLAxt4mv7eYBvYx2GGthpsQnLrsy
     <section class="parish-section">
       <h2 class="section-heading">Other RAPHOE Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="tawnawillyparish.html" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="kincasslagh"><a class="parish-link" href="kincasslagh.html" target="_blank" rel="noopener noreferrer">Kincasslagh</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1231,9 +1256,9 @@ Glenties <a href="https://drive.google.com/file/d/14aLAxt4mv7eYBvYx2GGthpsQnLrsy
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1687,11 +1712,16 @@ Glenties <a href="https://drive.google.com/file/d/14aLAxt4mv7eYBvYx2GGthpsQnLrsy
         for (var i = 0; i < names.length; i++) {
           var page = pageFor(names[i]);
           if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
           var slot = pages.querySelector('[data-page="' + page + '"]');
           if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
+          scrollBoxTo(pages, slot);
           return true;
         }
         return false;

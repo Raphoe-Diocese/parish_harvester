@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Claudy Bulletin — 23/08/2026</title>
+  <title>Claudy Bulletin — 06/09/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -109,10 +110,20 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -138,21 +149,27 @@
       cursor: pointer;
     }
     .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
     
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
@@ -170,17 +187,38 @@
       max-height: 850px;
       overflow: auto;
       overflow-y: auto;
+      overflow-x: hidden;
+      /* Reserve the scrollbar gutter from the first paint. Without it the
+         first page is sized to the full width, the vertical scrollbar then
+         appears, and the page is suddenly ~16px too wide — a horizontal
+         scrollbar under a strip of the bulletin. */
+      scrollbar-gutter: stable;
       background: #525659;
       padding: 8px 0 16px;
+    }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
     }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
       min-height: 180px;
+      max-width: 100%;
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
-    .pdf-link-layer { position: absolute; left: 0; top: 0; width: 100%; height: 100%; pointer-events: none; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
+    /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
+       page — one of those used to stretch the box's scrollWidth to 2988px. */
+    .pdf-link-layer {
+      position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+      overflow: hidden; pointer-events: none;
+    }
     .pdf-annot-link {
       position: absolute; z-index: 2; pointer-events: auto;
       background: rgba(26, 107, 107, 0.08); border-radius: 2px;
@@ -189,6 +227,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -203,7 +247,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -212,16 +259,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -230,6 +284,8 @@
         overflow: auto !important;
         overflow-y: auto !important;
       }
+      .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -244,7 +300,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -256,22 +315,48 @@
         overflow: auto !important;
         overflow-y: auto !important;
       }
+      /* `overflow: auto` above resets both axes, so re-hide the horizontal one:
+         a single stray PDF link annotation off the right edge of a page used to
+         give the whole box a horizontal scrollbar. */
+      .pdf-inpage-pages { overflow-x: hidden !important; }
       /* Nothing to enlarge — the box is already the locked 850px. */
       .az-expand { display: none; }
     }
 
 
-    .ocr-search-bar { position: relative; margin-bottom: 10px; }
+    /* Search comes first in the OCR block and reads like the JUMP TO bar, so
+       a reader cannot scroll past it looking for "where is the search". */
+    .ocr-search-bar {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 8px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-search-label {
+      flex: 0 0 auto;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
+    }
     .search-input {
-      width: 100%;
-      border: 1px solid #c9d4d3;
+      flex: 1 1 auto;
+      min-width: 0;
+      width: auto;
+      border: 1px solid #1a6b6b;
       border-radius: 4px;
       padding: 11px 42px 11px 14px;
       font-size: 1rem;
+      background: #fff;
     }
     .search-clear {
       position: absolute;
-      right: 10px;
+      right: 16px;
       top: 50%;
       transform: translateY(-50%);
       width: 32px;
@@ -397,9 +482,19 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
+    /* A letter jump scrolls inside a locked box, so nothing moves on screen
+       except the text. Flag the parish the reader landed on. */
+    .az-landed {
+      background: #fff6da;
+      box-shadow: 0 0 0 3px #f0d089;
+      border-radius: 3px;
+      transition: background 400ms ease, box-shadow 400ms ease;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .az-landed { transition: none; }
+    }
     .diocese-intro {
       margin: 0 0 22px;
       padding: 18px 18px 16px;
@@ -421,18 +516,48 @@
     }
     .diocese-intro .intro-names li { margin: 0 0 4px; }
     
+    /* Letters and text size share ONE bar, so neither hides the other and
+       neither pushes the search box off a short screen. The wrapper draws the
+       box; the letter row and zoom group go transparent inside it. */
+    .ocr-controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 12px;
+      margin: 0 0 10px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-controls-row .az-row,
+    .ocr-controls-row .ocr-zoom-bar {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      border: 0;
+    }
+    .ocr-controls-row .az-row { flex: 1 1 auto; }
+    .ocr-controls-row .ocr-zoom-bar { flex: 0 0 auto; margin-left: auto; }
     .ocr-zoom-bar {
-      display: flex; justify-content: center; align-items: center; gap: 10px;
-      margin: 0 0 10px; padding: 6px 10px;
-      background: rgba(255, 255, 255, 0.94);
-      border: 1px solid #d4ddd9; border-radius: 4px;
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-zoom-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
     }
     .ocr-zoom-bar button {
-      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 4px;
-      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.15rem; cursor: pointer;
+      min-width: 34px; height: 30px; border: 1px solid #cfdedd; border-radius: 4px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.05rem; line-height: 1; cursor: pointer;
     }
+    .ocr-zoom-bar button:hover { background: #1a6b6b; border-color: #1a6b6b; color: #fff; }
     .ocr-zoom-pct {
-      min-width: 3.5rem; text-align: center; font-weight: 700; font-size: 0.95rem; color: #14524f;
+      min-width: 3.2rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
     }
     .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
     @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 6px; } }
@@ -707,7 +832,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -718,22 +846,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand {
+      .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -756,6 +876,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -763,13 +884,26 @@
         padding: 16px 14px 28px;
       }
       .ocr-search-tools { flex-direction: column; }
+      .ocr-search-tools > div {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+      }
       .ocr-search-tools button {
         min-height: 44px;
         width: 100%;
       }
+      /* One column on a phone: letters, then text size. Neither covers the
+         search box above them. */
+      .ocr-controls-row { flex-direction: column; }
+      .ocr-controls-row .az-row,
+      .ocr-controls-row .ocr-zoom-bar { flex: 1 1 auto; }
+      .ocr-search-bar { flex-wrap: wrap; }
+      .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260823v" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -777,35 +911,31 @@
     <header class="header">
       <p class="diocese-label">DERRY</p>
       <h1>Claudy Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Claudy — 23/08/2026. Part of the Derry Diocese collated bulletin.</p>
-      <a class="download-link-top" href="parishofclaudy.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Claudy — 06/09/2026. Part of the Derry Diocese collated bulletin.</p>
+      <a class="download-link-top pdf-force-download" href="parishofclaudy.pdf" download="parishofclaudy.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="parishofclaudy.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       
-      <div class="quiet-links">
-        <a href="parishofclaudy.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="parishofclaudy-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="parishofclaudy.pdf" title="Claudy bulletin PDF"></iframe>
+        <iframe data-pdf-url="parishofclaudy.pdf" title="Claudy bulletin PDF"></iframe>
         
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="parishofclaudy.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="parishofclaudy.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-              <a href="parishofclaudy.pdf" download>Download</a>
+              <a class="pdf-open-newtab" href="parishofclaudy.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="parishofclaudy.pdf" download="parishofclaudy.pdf">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>
       </div>
@@ -813,19 +943,10 @@
 
     <h2 class="section-heading">Bulletin — OCR Extracted Plain Text</h2>
     <div id="panel-ocr" class="viewer-block">
-      
-      <div class="quiet-links">
-        <a href="parishofclaudy-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
-      </div>
       <div class="ocr-sticky-chrome">
-      <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
-        <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
-        <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
-        <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
-        <span class="ocr-zoom-hint">or pinch to zoom</span>
-      </div>
       <div class="ocr-search-bar">
-        <input id="ocr-search" class="search-input" type="search" placeholder="Search OCR text..." aria-label="Search OCR text" />
+        <label class="ocr-search-label" for="ocr-search">Search</label>
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search OCR text — a parish, a name, a Mass time" aria-label="Search OCR text" />
         <button id="clear-search" class="search-clear" type="button" aria-label="Clear OCR search" hidden>×</button>
       </div>
       <div class="ocr-search-tools">
@@ -836,93 +957,195 @@
         </div>
       </div>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-claudy" data-parish-name="Claudy"><h2 class="ocr-parish-name">Claudy</h2><p class="ocr-parish-date">23/08/2026</p></header>
+      <div class="ocr-controls-row">
+        
+        <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+          <span class="ocr-zoom-label">Text size</span>
+          <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+          <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+          <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+          <span class="ocr-zoom-hint">or pinch to zoom</span>
+        </div>
+      </div>
+      <div class="quiet-links">
+        <a href="parishofclaudy-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
+      </div>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-claudy" data-parish-name="Claudy"><h2 class="ocr-parish-name">Claudy</h2><p class="ocr-parish-date">06/09/2026</p></header>
 <p class="page-label">Page 1</p>
-<p>Parish of Claudy<br>
-Income &amp; Expenditure Account for year ended 31<br>
-December 2025<br>
-Income<br>
-£<br>
-£<br>
-Other Recurring Income<br>
-2,156.31<br>
-Weekly Collection<br>
-111,758.<br>
-00<br>
-Gift Aid Returns<br>
-18,437.3<br>
-8<br>
-Profit from shrine candles / bookstall<br>
-etc<br>
-6,352.75<br>
-Profit from entertainments, draws<br>
-etc<br>
-1,580.00<br>
-Other non-recurring income and<br>
-gains<br>
-6,415.00<br>
-146,69<br>
-9.44<br>
-Expenditure<br>
-Priests Stipends including payments<br>
-to supply priests<br>
-15,092.<br>
-00<br>
-Heating and Lighting<br>
-16,457.<br>
-73<br>
-Maintenance and Repairs<br>
-12,539.<br>
-26<br>
-Parish Supplies and Consumables<br>
-10,937.<br>
-20<br>
-Church Furnishings and Equipment<br>
-707.73<br>
-Insurance Premiums<br>
-7,797.1<br>
-2<br>
-Rates and Rents<br>
-3,483.0<br>
-9<br>
-Office (Telephone, postage,<br>
-stationery IT, Internet)<br>
-3,926.3<br>
-6<br>
-Pastoral and Catechetical<br>
-Programmes/Activities<br>
-1,300.0<br>
-0<br>
-Other Pastoral Expenses<br>
-650<br>
-Accountancy Fees<br>
-1,234.0<br>
-0<br>
-Legal and Professional Fees and<br>
-Licences<br>
-1,434.8<br>
-0<br>
-Diocesan Assessment/Levy<br>
-17,706.<br>
-00<br>
-Other Expenditure<br>
-395<br>
-Bank Charges<br>
-2,178.8<br>
-0<br>
-Employees wages x 5<br>
-36,636.<br>
-60<br>
-132,47<br>
-5.69<br>
-Claudy</p></div>
+<p>NEWSLETTER 6/9/26<br>
+CRAIGBANE NO 10AM MASS ON SUNDAY . Fr O Kane&#x27;s Retirement Event.<br>
+Craigbane’s event to mark Fr O Kane&#x27;s retirement will be held on Sunday<br>
+6th September in Craigbane at 4pm. Mass will be celebrated in Craigbane Ch apel<br>
+followed by a salad tea and concert in Craigbane Hall. Admission to the Hall<br>
+event will be by ticket only.<br>
+SICK IN CLAUDY WILL BE VISITED Monday 7 th and Tuesday 8 th<br>
+September.<br>
+FR O’KANE’S RETIREMENT MASS – Fr O’Kane wishes to thank all<br>
+parishioners who attended his retirement Mass and celebration<br>
+refreshments. Thank you to all the Claudy Committee members for their<br>
+work in organising the event. Thank you most sincerely to everyone w ho<br>
+contributed towards the very generous gifts which I received and fo r<br>
+helping me celebrate this very special occasion with my family.<br>
+THANK YOU We would like to thank all the local businesses and all thos e<br>
+parishioners who contributed so generously to Fr O’Kane’s Retirement<br>
+Celebration. A special word of thanks to all who helped with the ca tering<br>
+and organisation of the event, on this joyous yet heart rendering o ccasion<br>
+Fr. O’Kane’s Retirement Committee. The Mass has been recorded and is<br>
+available to view online please go to<br>
+<a href="https://www.mcn.live/Camera/saint-patricks" target="_blank" rel="noopener noreferrer">https://www.mcn.live/Camera/saint-patricks</a> -claudy scroll down to<br>
+the bottom of the page to “recordings of past events” and click on Su nday<br>
+30/8/26<br>
+SINGLE KEY found in Craigbane Chapel. Is available for collection in<br>
+the sacristy in Craigbane.<br>
+ST PATRICKS CHURCH CLAUDY ; The Rosary will be prayed on parish<br>
+webcam from Monday - Thursday at 6pm. Divine mercy chaplet and Div ine<br>
+OfÏce ( Midday Prayer ) will be prayed from Monday - Friday at 3pm.<br>
+Devotion to the Holy Face of Jesus &amp; Divine OfÏce ( Evening Prayer ) wi ll<br>
+be prayed every Friday at 6pm.<br>
+The Children’s Rosary will be prayed on Saturday 12th September<br>
+at 2pm, new Families welcome.<br>
+ST PATRICKS CHURCH CLAUDY; Experience the power of Sacred<br>
+reading every Thursday at 7pm. Come join our weekly Scripture group a s<br>
+we prayerfully read, meditate on and reflect on the upcoming Sunday<br>
+Gospel. All Are Welcome.<br>
+CHURCH GATE COLLECTION WILL BE HELD IN BOTH CHURCHES ON<br>
+Saturday 26 th and Sunday 27 th September for Rise and Shine trust,<br>
+(Formerly Known as Irish Pilgrimage Trust,) The Trust takes young<br>
+people with Additional needs to Lourdes every Easter for a week<br>
+of ,Prayer, Fun Laughter and making great friendships and memoriesClaudy <a href="http://parishofclaudy.com" target="_blank" rel="noopener noreferrer">http://parishofclaudy.com</a></p>
+<hr>
+<p class="page-label">Page 2</p>
+<p>ROSARY ON THE COAST Sunday 6th September at 3pm on Lisfannon<br>
+Beach.<br>
+LEARMOUNT COMMUNITY DEVELOPMENT GROUP (PARK): Week<br>
+commencing Monday 7th September: Monday 7th Sept : Dementia<br>
+Social Group: (11 am - 1 pm); Tuesday 8th Sept: Men&#x27;s Hobby Workshop<br>
+(10.30 am - 12.30 pm); Advice NW (2 - 4 pm); Funky Feet Kids dance class<br>
+(5 - 6 pm); Slow Sewing (7 - 9 pm); Thursday 10th Sept: Post OfÏce<br>
+Outreach Service (9 am - 12 pm); Painting for Pleasure (10.30 am - 12.30<br>
+pm); Park 60+ Club (12 - 2 pm); Friday 11th Sept : Learmount Walking<br>
+Group (10.30 am).<br>
+Dates for your diary: The following classes resume on Monday<br>
+14th September: Ladies &amp; Men&#x27;s Yoga Classes in Park Hall; Time for Me<br>
+Ladies (10.30 - 12.30 pm), Evening Art Class (7.30 - 9.30 pm). Saturday<br>
+19th September: Family Fun afternoon in Park with In Your Space Circus.<br>
+Tai Chi sessions: Wednesday 23rd September. Booking is essential for<br>
+classes: Tel <a href="tel:+442877781881" style="color:#1d4ed8;font-weight:600;">02877781881</a> / WhatsApp <a href="tel:+3537751118656" style="color:#1d4ed8;font-weight:600;">07751118656</a> / DM / email:<br>
+<a href="mailto:admin@learmountgroup.org" target="_blank" rel="noopener noreferrer">admin@learmountgroup.org</a><br>
+VOLUNTEERS FOR SEPTEMBER Claudy Sat vigil 6.30pm<br>
+Eucharistic Ministers: Pauline McAlinden FB, John O’Hagan Ft, Elaine<br>
+McKenna GB, Donna McNicholl GT. Sunday 11.30am Una Kelly FB,<br>
+Pauline O’Neill Ft, Gerard Smyth GB, Erin Donaghy GT. Readers Claudy<br>
+Sat vigil 6.30pm Rosemary O’Kane. Sunday 11.30am Sophie Holmes.<br>
+Readers Craigbane – Shauna Mullan. Eucharistic Ministers<br>
+Craigbane Anne Cooke, Leanne Caldwell<br>
+Blessing of Bikers and Motorcycles will take place on Sunday 13<br>
+September in St Aengus’ Chapel, Burt, Co Donegal, at 1:30. All are<br>
+welcome to attend the brief service and blessing. Following the blessin g<br>
+all are welcome to join the run to Ned’s Point RNLI Station, to present the<br>
+donation to the RNLI.<br>
+Please note, Mass will be celebrated on Sunday 13 September in St<br>
+Patrick’s Chapel, DUNGIVEN, at 11:30am for deceased bikers, especially<br>
+those who have died in past year.<br>
+JOB OPPORTUNITY: Derry Diocesan Trust - Granaghan (Swatragh)<br>
+Parish: Sacristan, hours of work: 12 hours per week. Place of work: St<br>
+John the Baptist Church. Rate of Pay : £12.88 per hour. For application<br>
+packs please email: <a href="mailto:recruitment@derrydiocese.org" target="_blank" rel="noopener noreferrer">recruitment@derrydiocese.org</a> or telephone <a href="tel:+442871262302" style="color:#1d4ed8;font-weight:600;">028 7126<br>
+2302</a>.   Completed applications must be returned to Personnel, Bishop’s<br>
+House, St Eugene’s Cathedral, Francis Street, Derry, BT48 9AP or via email<br>
+to <a href="mailto:recruitment@derrydiocese.org" target="_blank" rel="noopener noreferrer">recruitment@derrydiocese.org</a> no later than 12noon on Tuesday 15<br>
+September 2026. Derry Diocesan Trust is an Equal Opportunities<br>
+Employer. We welcome applications from all men and women and from<br>
+members of all communities.<br>
+Anam Cara Donegal, the organisation that supports bereaved<br>
+parents, will hold it&#x27;s monthly Face to Face Parent Support</p>
+<hr>
+<p class="page-label">Page 3</p>
+<p>Evening for bereaved parents on Thursday 10th September<br>
+2026 at 7.30pm in the Raddison Blu Hotel, Letterkenny F92<br>
+FK15 . This event is free and open to all bereaved parents regardless of<br>
+the age of their child, the circumstances of their death, or how recent<br>
+their death was. There is no need for registration, this is a walk in<br>
+meeting.<br>
+We also offer online support group meetings. To find out more call<br>
+01 4045378 or email  <a href="mailto:info@anamcara.ie" target="_blank" rel="noopener noreferrer">info@anamcara.ie</a><br>
+Donegal Group 173 Rise and Shine Trust (formerly The Irish<br>
+Handicapped Children&#x27;s Pilgrimage Trust and The Irish Pilgrimage<br>
+Trust) are celebrating 40 years of taking young people with special needs<br>
+to Lourdes each Easter. We are celebrating with a special Mass on<br>
+Saturday 26th September in the Church of the Irish Martyr&#x27;s Letterkenny<br>
+at 12 noon. The Mass will be concelebrated by Bishop Niall Coll and Bishop<br>
+Donal Mc Keown Diocese of Derry and many of the priests who travelled<br>
+to Lourdes with us over the years. We invite all the guests and their<br>
+families and all the helpers who travelled with us over the years to ou r<br>
+mass to celebrate Our Lady of Lourdes.<br>
+HOST FOR HOSPICE: October is officially Foyle Hospice Coffee Morning Month. We are<br>
+calling on supporters to help us raise vital funds by hosting a Coffee Morning. Whether it’s at<br>
+home, work or in your local community, you can support your local hospice by bringing your<br>
+friends together and putting the kettle on - it’s a piece of cake! To request your FREE host<br>
+pack or for more info, please call Ailbhe McDaid, Community Fundraiser, Foyle Hospice, on<br>
+<a href="tel:+442871359888" style="color:#1d4ed8;font-weight:600;">028 7135 9888</a> or email: <a href="mailto:ailbhe@foylehospice.com" target="_blank" rel="noopener noreferrer">ailbhe@foylehospice.com</a><br>
+VOCATIONS We pray for the men called to priesthood, to the ministry of teaching and preaching<br>
+in the name of Jesus, and encouraging their brothers and sisters to turn away from sin and live<br>
+as followers of Christ in today&#x27;s world.<br>
+MICHAEL ENGLISH CHURCH CONCERT: An evening of Faith, Hope and<br>
+Inspiration. The concert takes place on Friday 2 October at 7.15pm, in St<br>
+Patrick&#x27;s Church, Keenaught, Desertmartin. Tickets are £30, and available<br>
+to buy at Herons Gift Shop, Draperstown, Moneyneena Post OfÏce,<br>
+Ballinascreen and Desertmartin Parish ofÏces, or online with Eventbrite:<br>
+<a href="https://www.eventbrite.co.uk/e/michael-english-band-fundraising-c" target="_blank" rel="noopener noreferrer">https://www.eventbrite.co.uk/e/michael-english-band-fundraising-c</a> oncert-<br>
+tickets-1996641829460<br>
+Season of Creation 2026: The Season of Creation takes place from 1<br>
+September to 4 October, bringing Christians throughout the world<br>
+together in prayer, reflection and action for the care of our common<br>
+home. This year’s theme, Living Water , invites us to give thanks for the<br>
+gift of water and renew our care for God’s creation.<br>
+WEEKLY COLLECTION was: £2,237 thank you for your continuing<br>
+contribution.</p>
+<hr>
+<p class="page-label">Page 4</p>
+<p>PRAY FOR THE ANNIVERSARY OF Christine McIvor, Elizabeth Devine,<br>
+T ommy Nicholas, Jeannie Woods, Sean Burke, Philip Crossan, Mary<br>
+Dempsey<br>
+PRAY FOR THE SOUL OF John Mullan buried in Craigbane on Tuesday.<br>
+We pray for the Mullan family at this time. May he Rest in Peace.</p>
+<h3 class="b-head">Anniversary</h3>
+<p>Month’s Mind Masses Sunday 13th September at 10am<br>
+in Craigbane for Annie McQuillan. Sunday 13th September at 11.30am in<br>
+Claudy for John Devine. Sunday 20th September at 10am in Craigbane for<br>
+Willie John Gormley. Friday 25th September at 7.30pm in Craigbane for Month’s<br>
+Mind Mass for John Mullan . Sunday 27th September at 10am in Craigbane for<br>
+James Cartin. Sunday 27th September at 11.30am in Claudy for James<br>
+Devine.<br>
+ROSARY FOR 1 ST ANNIVERSARIES SEPTEMBER – held in St<br>
+Patrick’s Church, Claudy at 6pm Thursday 17th September for Fr<br>
+Michael Keaveney. Thursday 24th September for Patrick Enright.<br>
+Safeguarding Notice : If you have any concerns with regard to the<br>
+Safeguarding of children or adults at Risk of Harm within the Chu rch<br>
+please contact Marie O’Kane<br>
+the Diocesan Designated Liaison Person (DLP) at <a href="tel:+3537596500793" style="color:#1d4ed8;font-weight:600;">07596500793</a> or email<br>
+<a href="mailto:dlp@derrydiocese.org" target="_blank" rel="noopener noreferrer">dlp@derrydiocese.org</a>. or ring PSNI on 101 or Social Services: Gatew ay<br>
+Services, Western HSC Trust on <a href="tel:+442871314090" style="color:#1d4ed8;font-weight:600;">028 71314090</a> and ask for the Duty<br>
+Social Worker or Gateway Services, Northern HSC Trust on <a href="tel:+442894424459" style="color:#1d4ed8;font-weight:600;">028 9442 4459</a><br>
+or the Regional Emergency Social Work Services on 0800 1979 995<br>
+Saint Vincent De Paul Helpline Telephone Number: 0751 820<br>
+8132<br>
+PLEASE NOTE THERE IS A NEW LINK TO MCN MEDIA –Our live<br>
+streaming web address has been updated. T o access MCN Media, please<br>
+go to <a href="https://www.mcn.live/Camera/saint-patricks" target="_blank" rel="noopener noreferrer">https://www.mcn.live/Camera/saint-patricks</a> -claudy  on your<br>
+web browser. T o watch Mass on our Parish website there will b e no change<br>
+everything remains the same. please note the first 2 seats in the<br>
+centre aisle are visible on the webcam. St Patrick’s Church,<br>
+Claudy is now monitored by CCTV cameras inside and outside the<br>
+Church. The Diocese of Derry Privacy Notice is displayed on the<br>
+Parish Website and Church notice board</p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other DERRY Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghyaran"><a class="parish-link" href="parishofaghyaran.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li class="parish-item" data-name="ardmore"><a class="parish-link" href="ardmoreparish.html" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li class="parish-item" data-name="ardstraw east"><a class="parish-link" href="parishofardstraweast.html" target="_blank" rel="noopener noreferrer">Ardstraw East</a></li><li class="parish-item" data-name="ballinascreen (&amp; desertmartin amalgamated)"><a class="parish-link" href="parishofballinascreen.html" target="_blank" rel="noopener noreferrer">Ballinascreen (&amp; Desertmartin amalgamated)</a></li><li class="parish-item" data-name="banagher"><a class="parish-link" href="banagherparish.html" target="_blank" rel="noopener noreferrer">Banagher</a></li><li class="parish-item" data-name="bellaghy"><a class="parish-link" href="bellaghyparish.html" target="_blank" rel="noopener noreferrer">Bellaghy</a></li><li class="parish-item" data-name="buncrana"><a class="parish-link" href="buncranaparish.html" target="_blank" rel="noopener noreferrer">Buncrana</a></li><li class="parish-item" data-name="camus"><a class="parish-link" href="camusparish.html" target="_blank" rel="noopener noreferrer">Camus</a></li><li class="parish-item" data-name="carndonagh"><a class="parish-link" href="carndonaghparish.html" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li class="parish-item" data-name="castlederg"><a class="parish-link" href="castledergparish.html" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li class="parish-item" data-name="clonleigh (strabane pastoral area)"><a class="parish-link" href="clonleighparish.html" target="_blank" rel="noopener noreferrer">Clonleigh (Strabane Pastoral Area)</a></li><li class="parish-item" data-name="clonmany"><a class="parish-link" href="clonmanyparish.html" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li class="parish-item" data-name="culdaff"><a class="parish-link" href="culdaffparish.html" target="_blank" rel="noopener noreferrer">Culdaff</a></li><li class="parish-item" data-name="culmoe"><a class="parish-link" href="culmoreparish.html" target="_blank" rel="noopener noreferrer">Culmoe</a></li><li class="parish-item" data-name="dma parish (claudy area)"><a class="parish-link" href="dmaparish.html" target="_blank" rel="noopener noreferrer">DMA Parish (Claudy area)</a></li><li class="parish-item" data-name="drumquin"><a class="parish-link" href="drumquinparish.html" target="_blank" rel="noopener noreferrer">Drumquin</a></li><li class="parish-item" data-name="drumragh"><a class="parish-link" href="drumraghparish.html" target="_blank" rel="noopener noreferrer">Drumragh</a></li><li class="parish-item" data-name="dungiven"><a class="parish-link" href="parishofdungiven.html" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li class="parish-item" data-name="errigal"><a class="parish-link" href="errigalparish.html" target="_blank" rel="noopener noreferrer">Errigal</a></li><li class="parish-item" data-name="fahan"><a class="parish-link" href="fahanparish.html" target="_blank" rel="noopener noreferrer">Fahan</a></li><li class="parish-item" data-name="granaghan"><a class="parish-link" href="granaghanparish.html" target="_blank" rel="noopener noreferrer">Granaghan</a></li><li class="parish-item" data-name="greenlough"><a class="parish-link" href="greenlough.html" target="_blank" rel="noopener noreferrer">Greenlough</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holyfamily-parish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="iskaheen"><a class="parish-link" href="iskaheenparish.html" target="_blank" rel="noopener noreferrer">Iskaheen</a></li><li class="parish-item" data-name="kilrea"><a class="parish-link" href="parishofkilrea.html" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li class="parish-item" data-name="lavey"><a class="parish-link" href="laveyparish.html" target="_blank" rel="noopener noreferrer">Lavey</a></li><li class="parish-item" data-name="leckpatrick"><a class="parish-link" href="leckpatrickparish.html" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li class="parish-item" data-name="limavady"><a class="parish-link" href="limavadyparish.html" target="_blank" rel="noopener noreferrer">Limavady</a></li><li class="parish-item" data-name="maghera (derry)"><a class="parish-link" href="magheraparishderry.html" target="_blank" rel="noopener noreferrer">Maghera (Derry)</a></li><li class="parish-item" data-name="melmount (&amp; camus)"><a class="parish-link" href="melmountparish.html" target="_blank" rel="noopener noreferrer">Melmount (&amp; Camus)</a></li><li class="parish-item" data-name="moville"><a class="parish-link" href="movilleparish.html" target="_blank" rel="noopener noreferrer">Moville</a></li><li class="parish-item" data-name="sion mills"><a class="parish-link" href="parishofsionmills.html" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li class="parish-item" data-name="st eugene&#x27;s cathedral (templemore)"><a class="parish-link" href="steugenescathedral.html" target="_blank" rel="noopener noreferrer">St Eugene&#x27;s Cathedral (Templemore)</a></li><li class="parish-item" data-name="st mary&#x27;s parish creggan"><a class="parish-link" href="stmarysparishcreggan.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Parish Creggan</a></li><li class="parish-item" data-name="star of the sea (magilligan)"><a class="parish-link" href="staroftheseacatholic.html" target="_blank" rel="noopener noreferrer">Star of the Sea (Magilligan)</a></li><li class="parish-item" data-name="steelstown"><a class="parish-link" href="steelstownparish.html" target="_blank" rel="noopener noreferrer">Steelstown</a></li><li class="parish-item" data-name="three patrons"><a class="parish-link" href="threepatrons.html" target="_blank" rel="noopener noreferrer">Three Patrons</a></li><li class="parish-item" data-name="waterside (&amp; strathfoyle amalgamated)"><a class="parish-link" href="watersideparish.html" target="_blank" rel="noopener noreferrer">Waterside (&amp; Strathfoyle amalgamated)</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghyaran"><a class="parish-link" href="parishofaghyaran.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li class="parish-item" data-name="ardmore"><a class="parish-link" href="ardmoreparish.html" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li class="parish-item" data-name="banagher"><a class="parish-link" href="banagherparish.html" target="_blank" rel="noopener noreferrer">Banagher</a></li><li class="parish-item" data-name="bellaghy"><a class="parish-link" href="bellaghyparish.html" target="_blank" rel="noopener noreferrer">Bellaghy</a></li><li class="parish-item" data-name="buncrana"><a class="parish-link" href="buncranaparish.html" target="_blank" rel="noopener noreferrer">Buncrana</a></li><li class="parish-item" data-name="camus"><a class="parish-link" href="camusparish.html" target="_blank" rel="noopener noreferrer">Camus</a></li><li class="parish-item" data-name="carndonagh"><a class="parish-link" href="carndonaghparish.html" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li class="parish-item" data-name="castlederg"><a class="parish-link" href="castledergparish.html" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li class="parish-item" data-name="clonleigh (strabane pastoral area)"><a class="parish-link" href="clonleighparish.html" target="_blank" rel="noopener noreferrer">Clonleigh (Strabane Pastoral Area)</a></li><li class="parish-item" data-name="clonmany"><a class="parish-link" href="clonmanyparish.html" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li class="parish-item" data-name="culdaff"><a class="parish-link" href="culdaffparish.html" target="_blank" rel="noopener noreferrer">Culdaff</a></li><li class="parish-item" data-name="culmoe"><a class="parish-link" href="culmoreparish.html" target="_blank" rel="noopener noreferrer">Culmoe</a></li><li class="parish-item" data-name="dma parish (claudy area)"><a class="parish-link" href="dmaparish.html" target="_blank" rel="noopener noreferrer">DMA Parish (Claudy area)</a></li><li class="parish-item" data-name="drumquin"><a class="parish-link" href="drumquinparish.html" target="_blank" rel="noopener noreferrer">Drumquin</a></li><li class="parish-item" data-name="drumragh"><a class="parish-link" href="drumraghparish.html" target="_blank" rel="noopener noreferrer">Drumragh</a></li><li class="parish-item" data-name="dungiven"><a class="parish-link" href="parishofdungiven.html" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li class="parish-item" data-name="errigal"><a class="parish-link" href="errigalparish.html" target="_blank" rel="noopener noreferrer">Errigal</a></li><li class="parish-item" data-name="fahan"><a class="parish-link" href="fahanparish.html" target="_blank" rel="noopener noreferrer">Fahan</a></li><li class="parish-item" data-name="granaghan"><a class="parish-link" href="granaghanparish.html" target="_blank" rel="noopener noreferrer">Granaghan</a></li><li class="parish-item" data-name="greenlough"><a class="parish-link" href="greenlough.html" target="_blank" rel="noopener noreferrer">Greenlough</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holyfamily-parish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="iskaheen"><a class="parish-link" href="iskaheenparish.html" target="_blank" rel="noopener noreferrer">Iskaheen</a></li><li class="parish-item" data-name="kilrea"><a class="parish-link" href="parishofkilrea.html" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li class="parish-item" data-name="lavey"><a class="parish-link" href="laveyparish.html" target="_blank" rel="noopener noreferrer">Lavey</a></li><li class="parish-item" data-name="leckpatrick"><a class="parish-link" href="leckpatrickparish.html" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li class="parish-item" data-name="limavady"><a class="parish-link" href="limavadyparish.html" target="_blank" rel="noopener noreferrer">Limavady</a></li><li class="parish-item" data-name="maghera (derry)"><a class="parish-link" href="magheraparishderry.html" target="_blank" rel="noopener noreferrer">Maghera (Derry)</a></li><li class="parish-item" data-name="melmount (&amp; camus)"><a class="parish-link" href="melmountparish.html" target="_blank" rel="noopener noreferrer">Melmount (&amp; Camus)</a></li><li class="parish-item" data-name="moville"><a class="parish-link" href="movilleparish.html" target="_blank" rel="noopener noreferrer">Moville</a></li><li class="parish-item" data-name="sion mills"><a class="parish-link" href="parishofsionmills.html" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li class="parish-item" data-name="st eugene&#x27;s cathedral (templemore)"><a class="parish-link" href="steugenescathedral.html" target="_blank" rel="noopener noreferrer">St Eugene&#x27;s Cathedral (Templemore)</a></li><li class="parish-item" data-name="st mary&#x27;s parish creggan"><a class="parish-link" href="stmarysparishcreggan.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Parish Creggan</a></li><li class="parish-item" data-name="star of the sea (magilligan)"><a class="parish-link" href="staroftheseacatholic.html" target="_blank" rel="noopener noreferrer">Star of the Sea (Magilligan)</a></li><li class="parish-item" data-name="steelstown"><a class="parish-link" href="steelstownparish.html" target="_blank" rel="noopener noreferrer">Steelstown</a></li></ul>
     </section>
   </div>
   <footer>
@@ -974,9 +1197,9 @@ Claudy</p></div>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260823v"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260823v';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1348,6 +1571,9 @@ Claudy</p></div>
         }
         return true;
       }
+      function slugOf(s) {
+        return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      }
       function findOcr(box, name) {
         if (!box) return null;
         var wanted = [norm(name), norm(coreName(name))];
@@ -1358,7 +1584,38 @@ Claudy</p></div>
           var got = norm(label);
           if (wanted.indexOf(got) >= 0 || wanted.indexOf(norm(coreName(label))) >= 0) return el;
         }
-        return null;
+        // The search box rebuilds #ocr-panel innerHTML, so fall back to the
+        // masthead id the layout writes (ocr-parish-<slug>).
+        var byId = box.querySelector('#ocr-parish-' + slugOf(name))
+          || box.querySelector('#ocr-parish-' + slugOf(coreName(name)));
+        return byId || null;
+      }
+      function flashLanding(el) {
+        if (!el || !el.classList) return;
+        el.classList.remove('az-landed');
+        void el.offsetWidth;
+        el.classList.add('az-landed');
+        window.setTimeout(function () { el.classList.remove('az-landed'); }, 1800);
+      }
+      function landInBox(box, el) {
+        // Move the box instantly (one smooth animation only — a second one on
+        // the same scroll chain used to be cancelled halfway, which left the
+        // reader in the middle of another parish), then bring the box itself
+        // on screen, then re-check because zoom/fonts can reflow the text.
+        var br = box.getBoundingClientRect();
+        var er = el.getBoundingClientRect();
+        box.scrollTop = Math.max(0, box.scrollTop + (er.top - br.top) - 8);
+        showBox(box);
+        var tries = 0;
+        (function settle() {
+          if (tries++ > 6) return;
+          var b2 = box.getBoundingClientRect();
+          var e2 = el.getBoundingClientRect();
+          var off = Math.round(e2.top - b2.top - 8);
+          if (Math.abs(off) > 3) box.scrollTop = Math.max(0, box.scrollTop + off);
+          window.setTimeout(settle, 150);
+        })();
+        flashLanding(el);
       }
       function pageFor(name) {
         var map = pageIndex();
@@ -1375,14 +1632,19 @@ Claudy</p></div>
       }
       function showBox(box) {
         // The jump happens inside the locked box, so make sure the box itself
-        // is on screen first or a phone reader sees nothing move.
+        // is on screen first or a phone reader sees nothing move. Leave room
+        // for the sticky search bar when a term is typed, otherwise it covers
+        // the parish header the reader just asked for.
         if (!box || !box.getBoundingClientRect) return;
         var r = box.getBoundingClientRect();
         var h = window.innerHeight || document.documentElement.clientHeight || 0;
-        if (r.top < 0 || r.top > h - 120) {
-          if (box.scrollIntoView) {
-            box.scrollIntoView({ block: 'start', behavior: reduceMotion() ? 'auto' : 'smooth' });
-          }
+        var sticky = document.querySelector('.ocr-sticky-chrome.is-searching');
+        var pad = sticky ? Math.round(sticky.getBoundingClientRect().height) + 8 : 0;
+        if (r.top < pad || r.top > h - 120) {
+          window.scrollTo({
+            top: Math.max(0, (window.scrollY || window.pageYOffset || 0) + r.top - pad),
+            behavior: reduceMotion() ? 'auto' : 'smooth',
+          });
         }
       }
       function jumpPdf(names) {
@@ -1391,23 +1653,27 @@ Claudy</p></div>
         for (var i = 0; i < names.length; i++) {
           var page = pageFor(names[i]);
           if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
           var slot = pages.querySelector('[data-page="' + page + '"]');
           if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
+          scrollBoxTo(pages, slot);
           return true;
         }
         return false;
       }
       function jumpOcr(names) {
-        var ocr = document.getElementById('ocr-panel');
+        var ocr = document.getElementById('ocr-panel') || document.getElementById('ocr-text');
         if (!ocr) return false;
         for (var i = 0; i < names.length; i++) {
           var hit = findOcr(ocr, names[i]);
           if (!hit) continue;
-          showBox(ocr);
-          scrollBoxTo(ocr, hit);
+          landInBox(ocr, hit);
           return true;
         }
         return false;
@@ -1415,8 +1681,9 @@ Claudy</p></div>
       function jump(target, names, tries) {
         var done = target === 'pdf' ? jumpPdf(names) : jumpOcr(names);
         // PDF.js paints page slots as it streams, so the slot may not exist
-        // for a second or two after load. Retry briefly instead of failing.
-        if (!done && target === 'pdf' && (tries || 0) < 12) {
+        // for a second or two after load; the OCR panel is rebuilt whenever a
+        // search is cleared. Retry briefly instead of failing silently.
+        if (!done && (tries || 0) < 12) {
           window.setTimeout(function () { jump(target, names, (tries || 0) + 1); }, 400);
         }
       }
@@ -1429,23 +1696,8 @@ Claudy</p></div>
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

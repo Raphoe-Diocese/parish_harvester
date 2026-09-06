@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Clonleigh (Strabane Pastoral Area) Bulletin — 30/08/2026</title>
+  <title>Clonleigh (Strabane Pastoral Area) Bulletin — 06/09/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -109,6 +110,13 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
@@ -141,6 +149,7 @@
       cursor: pointer;
     }
     .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
     
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {
@@ -160,7 +169,7 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
@@ -203,6 +212,7 @@
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {
@@ -866,6 +876,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -892,7 +903,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -900,35 +911,31 @@
     <header class="header">
       <p class="diocese-label">DERRY</p>
       <h1>Clonleigh (Strabane Pastoral Area) Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Clonleigh (Strabane Pastoral Area) — 30/08/2026. Part of the Derry Diocese collated bulletin.</p>
-      <a class="download-link-top" href="clonleighparish.pdf">Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Clonleigh (Strabane Pastoral Area) — 06/09/2026. Part of the Derry Diocese collated bulletin.</p>
+      <a class="download-link-top pdf-force-download" href="clonleighparish.pdf" download="clonleighparish.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="clonleighparish.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       
-      <div class="quiet-links">
-        <a href="clonleighparish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="clonleighparish-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="clonleighparish.pdf" title="Clonleigh (Strabane Pastoral Area) bulletin PDF"></iframe>
+        <iframe data-pdf-url="clonleighparish.pdf" title="Clonleigh (Strabane Pastoral Area) bulletin PDF"></iframe>
         
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="clonleighparish.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="clonleighparish.pdf">Open PDF</a>
-              <a href="clonleighparish.pdf" download>Download</a>
+              <a class="pdf-open-newtab" href="clonleighparish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="clonleighparish.pdf" download="clonleighparish.pdf">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>
       </div>
@@ -963,187 +970,199 @@
       <div class="quiet-links">
         <a href="clonleighparish-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-clonleigh-strabane-pastoral-area" data-parish-name="Clonleigh (Strabane Pastoral Area)"><h2 class="ocr-parish-name">Clonleigh (Strabane Pastoral Area)</h2><p class="ocr-parish-date">30/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-clonleigh-strabane-pastoral-area" data-parish-name="Clonleigh (Strabane Pastoral Area)"><h2 class="ocr-parish-name">Clonleigh (Strabane Pastoral Area)</h2><p class="ocr-parish-date">06/09/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>Parishes of Camus, Clonleigh and Leckpatrick<br>
-Twenty-Second Sunday in Ordinary Time – Year A – 30 August 2026<br>
+Twenty-Third Sunday in Ordinary Time – Year A – 6 September 2026<br>
 Parish Clergy<br>
 Fr Michael McCaughey, PP: (028) 71882274 / (028) 71882215<br>
 Fr Declan Boland (priest in residence)<br>
 Email : <a href="mailto:leckpatrickparish@derrydiocese.org" target="_blank" rel="noopener noreferrer">leckpatrickparish@derrydiocese.org</a>; Website : <a href="https://www.leckpatrickparish.com" target="_blank" rel="noopener noreferrer">www.leckpatrickparish.com</a><br>
 Email : <a href="mailto:strabaneparish@derrydiocese.org" target="_blank" rel="noopener noreferrer">strabaneparish@derrydiocese.org</a>; Website: <a href="https://www.camusparish.com" target="_blank" rel="noopener noreferrer">www.camusparish.com</a><br>
 Email: <a href="mailto:clonleighparish@derrydiocese.org" target="_blank" rel="noopener noreferrer">clonleighparish@derrydiocese.org</a>; Website : <a href="https://www.clonleighparish.com" target="_blank" rel="noopener noreferrer">www.clonleighparish.com</a><br>
-Thoughts on the Gospel (Matthew 16:21-27)<br>
-The Gospel today teaches us that following Jesus is not alway s a journey toward<br>
-comfort, popularity, or worldly success. It is a journey of s urrender, sacrifice, and<br>
-faithful love. Jesus showed His disciples that His mission w ould involve suering<br>
-and death before victory could come. Peter resisted this di icult truth because he<br>
-wanted a safer path. Like Peter, we sometimes want Godʼs bles sings without lifeʼs<br>
-burdens, a crown without a cross, and victory without sacrif ice. Yet Jesus teaches us<br>
-that the greatest profit is not found in gaining more but in be coming more like<br>
-Him.<br>
-Let the word PROFIT guide our reflection.<br>
-True PROFIT is not having everything while losing ourselves . It is Pursuing Godʼs<br>
-purpose, Rejecting empty paths, Oering our lives, Following faithfully, Investing in<br>
-what lasts, and Treasuring our souls. When we choose Christ above everything else,<br>
-even our sacrifices become seeds of renewal. We may lose temp orary comforts, but<br>
-we gain a life filled with meaning, peace, and eternal hope.<br>
-May the Father of our Lord Jesus Christ enlighten the eyes of o ur mind,<br>
-so that we can see what hope his call holds for us.thClonleigh (Strabane Pastoral Area) <a href="https://clonleighparish.com" target="_blank" rel="noopener noreferrer">https://clonleighparish.com</a></p>
+Thoughts on the Gospel (Matthew 18:15-20 )<br>
+In todayʼs gospel, Jesus teaches that reconciliation is a sa cred responsibility rooted<br>
+in love, humility and a desire for restored relationship. Wh en conflict or hurt arises,<br>
+the first response should not be anger, gossip, avoidance or revenge, but a quiet<br>
+and honest conversation with the person involved. This priv ate dialogue gives<br>
+space for listening, understanding and healing. If the conf lict cannot be resolved<br>
+alone, Jesus encourages the involvement of trusted witness es, not to shame or<br>
+accuse, but to help guide the conversation with wisdom, fair ness and care. When<br>
+diiculties continue, the wider community has a role in enco uraging accountability,<br>
+unity and peace.<br>
+This message can be remembered through the word LOVE :<br>
+Listen with humility,<br>
+Oer reconciliation,<br>
+Value community, and<br>
+Embrace divine presence.thClonleigh (Strabane Pastoral Area) <a href="https://clonleighparish.com" target="_blank" rel="noopener noreferrer">https://clonleighparish.com</a></p>
 <hr>
 <p class="page-label">Page 2</p>
-<p>Monthly Mass in Honour of St Pio will be celebrated on Wednesday 2nd September<br>
-at 7.00 pm in Immaculate Conception Church, Strabane. We ask Godʼs blessing on<br>
-all through the intercession of St Pio. Everyone welcome.<br>
-Feast of St Pio – Wednesday 23rd September To celebrate the feast of St Pio, a<br>
-triduum of prayer will take place in the parishes of our pasto ral area on days<br>
-beforehand – more details next week. Mass to celebrate the fe ast day will take<br>
-place on Wednesday 23rd September at 7 pm in St Patrickʼs Chur ch, Murlog.<br>
-Eucharistic Adoration takes place on Wednesday from 8.30 am – 5.30 pm in Sacred<br>
-Heart Church, Derry Rd . Eucharistic Adoration will resume in St Patrickʼs, Murlog on<br>
-Monday 7th September from 10.30 am – 1.00 pm . Everyone welcome.<br>
-We wish every blessing on all the students, teachers and scho ol sta of our parish<br>
-pastoral area, as they return to school. God bless for the yea r ahead.<br>
-Prayer for a New School Year We thank you Lord, for all that was good during the<br>
-summer. For the love of family and friends, and for the sunshi ne and warm days.<br>
-As we begin a new school year we ask for your help and pray your b lessing on all<br>
-our school communities. Show us how to work together for the g ood of all.<br>
-May we share our talents and abilities to the full and grow in k nowledge, wisdom<br>
-and happiness. Give us the grace to become more like Jesus in t he ways we think<br>
-and behave. During this school year, let us become builders o f your ways and<br>
-instruments of your peace. Be with us all as we embark on this n ew year. We ask this<br>
-prayer through Jesus Christ, Our Lord. Amen.<br>
-Requiescat in Pace Martin Gallagher, Bingley, Yorkshire (formerly of Laurel D rive)</p>
+<p>Love calls us to hear one another deeply, choose restoration over pride, protect<br>
+unity, and trust that God is present wherever people gather i n faith, prayer,<br>
+forgiveness, and harmony. Overall, Jesus reminds us that lo ve is more than a<br>
+feeling; it is a way of living. Through patience, courage, hu mility, and faith, conflict<br>
+can become an opportunity for healing, forgiveness, and ren ewed fellowship.<br>
+May the peace of Christ guide our hearts, strengthen our unit y, and<br>
+fill our community with love, forgiveness and grace. Amen.<br>
+A Time of Prayer and Reflection in Honour of St Pio will take place<br>
+in our pastoral area from Saturday 19th September until Wedn esday<br>
+23rd September. At this time we invite people to simply take t ime<br>
+aside from their busy schedules to invoke the intercession o f St Pio<br>
+on individuals, families, and parish community. At this tim e of year<br>
+when schools / colleges reopen and many people return to work,<br>
+it is good to think about our own faith commitment.<br>
+At our Masses on the weekend of 19/20th September, a reflectio n on the life of St<br>
+Pio will be oered. Mon 21st / Tues 22nd / Wed 23rd, we will celebr ate together an<br>
+early morning Mass in each of our churches and again, Mass at 1 0.00 am with an<br>
+evening devotion at 7.00 pm. So too, an opportunity for refle ction. Specific times<br>
+and places will be confirmed next week.<br>
+On Wednesday 23rd September , the Feast Day of St Pio, Bishop Michael Router will<br>
+celebrate Mass at 7.00 pm in St Patrickʼs Church, Murlog. This is a prayerful<br>
+opportunity to welcome Bishop Michael to our diocese and to o ur pastoral area.</p>
 <hr>
 <p class="page-label">Page 3</p>
-<p>Anniversaries Margaret Connolly, Dympna Coyle, Edward Crawford, Wilma Do lan,<br>
-John Gallagher, Philomena Gallagher, Pat Gillespie, Patri ck Holland, John Kelly,<br>
-Robert McClay Jnr, Mary McDaid, Anne McElhinney, Hughie McE lhinney, George<br>
-McGilloway, Teresa McGonagle, Anna Patton, Hannah Patton, Harry Patton,<br>
-Margaret Tighe. May they rest in peace.<br>
-9.45am Mass on Sundays in Murlog Chapel is live on Finn Valley Community R adio.<br>
-Thank You for your generosity to recent collections:<br>
-Leckpatrick: £1,307.14 (23/8/26), £1,306.96 (9/8/26), £1,507.68 (2/8/26)<br>
-Clonleigh : €1,561.34 (23/8/26), €1,455.84 (9/8/26), €1,593.41 (2/8/26)<br>
-Camus: £1,508.47 (23/8/26), £1,727.60 (9/8/26), £1,731. 47 (2/8/26)<br>
-Thanks also to those who pay by standing order.<br>
-Readings for Sunday 6th September:<br>
-1st Reading : Ezekiel 33:7-9<br>
-Psalm: 95:1-2, 6-7, 8-92nd Reading : Romans 13:8-10<br>
-Gospel: Matthew 18:15-20<br>
-Saints of The Coming Week:<br>
-Wednesday: St Gregory the Great, pope and doctor of the Church<br>
-Thursday : St Mac Nissi, bishop<br>
-Friday: St Teresa of Calcutta, virgin</p>
+<p>Eucharistic Adoration takes place on Wednesday from 8.30 am – 5.30 pm in<br>
+Sacred Heart Church, Derry Road .<br>
+Eucharistic Adoration will resume in St Patrickʼs, Murlog on Monday 7th September<br>
+from 10.30 am – 1.00 pm . Everyone welcome.<br>
+Sick and Housebound Fr McCaughey hopes to visit the sick and housebound<br>
+through the coming week as follows:<br>
+Monday and Wednesday: Leckpatrick and Strabane<br>
+Tuesday : Liord.<br>
+We pray for all who are sick and housebound at this time and for those who<br>
+accompany them.<br>
+Requiescant in Pace We oer our sympathy to the family and friends of Eamonn<br>
+McNulty, Ballydu Pk, Liord<br>
+Conor Woods, Lisnafin Pk, Strabane<br>
+Teresa Madden, Glenview Pk, Strabane<br>
+Aiden Dunne, Townsend St, Strabane<br>
+Anniversaries Jackie Bjourson, Margaret Crotty, Anthony Diver, Hugh Dunc an, Sarah<br>
+Huston-Richmond, Gerard Kearney, Billy Kelly, Lena Kelly, Patrick Joseph Kelly,<br>
+Patrick McAleer, Bobby McBride, Robert McClay Jnr, Reece Mc Colgan, Danny<br>
+McDaid, Mariah McElwee, Frances McElwee-Gallagher, Simse y McFarland, Detta<br>
+McKane, Betty Montague, Johnnie Montague, Patrick Murray, Robert Porter, Mary<br>
+Anne McCloskey.<br>
+May they rest in peace.</p>
 <hr>
 <p class="page-label">Page 4</p>
-<p>Donegal Downʼs Syndrome Assoc Annual Church Gate Collectio n this weekend at St<br>
-Patrickʼs Murlog. Your support for this important fundrais ing event is greatly<br>
-appreciated and will help in continuing to provide vital ser vices and supports to<br>
-children and adults with Downʼs syndrome and their families across Donegal.<br>
-The Season of Creation takes place from 1st September – 4th October, bringing<br>
-Christians throughout the world together in prayer, reflec tion and action for the<br>
-care of our common home. This yearʼs theme, ʻLiving Waterʼ , i nvites us to give<br>
-thanks for the gi of water and renew our care for Godʼs creati on. You are warmly<br>
-invited to the streaming of World Council of Churches online service marking the<br>
-World Day of Prayer for the Care of Creation on Tuesday 1st Sep tember from 1.45 –<br>
-3.00 pm at The Conference Room, Steelstown Church, Derry, BT 48 8EU. For<br>
-information, please contact <a href="mailto:laudatosiderry@gmail.com" target="_blank" rel="noopener noreferrer">laudatosiderry@gmail.com</a> RS VP: <a href="tel:+3537711900420" style="color:#1d4ed8;font-weight:600;">07711900420</a>.<br>
-A Prayer for our Earth (Pope Francis, Laudato Si, 246)<br>
-(Tuesday 1st September – World Day of Prayer for the Care of Cr eation)<br>
-All-powerful God, you are present in the whole universe and i n the smallest of your<br>
-creatures. You embrace with your tenderness all that exists . Pour out upon us the<br>
-power of your love, that we may protect life and beauty. Fill u s with peace, that we<br>
-may live as brothers and sisters, harming no one. O God of the p oor, help us to<br>
-rescue the abandoned and forgotten of this earth, so preciou s in your eyes. Bring<br>
-healing to our lives, that we may protect the world and not pre y on it, that we may<br>
-sow beauty, not pollution and destruction. Touch the hearts of those who look<br>
-only for gain at the expense of the poor and the earth. Teach us to discover the<br>
-worth of each thing, to be filled with awe and contemplation, to recognise that we<br>
-are profoundly united with every creature as we journey towa rds your infinite light.<br>
-We thank you for being with us each day. Encourage us, we pray, in our struggle for<br>
-justice, love, and peace.</p>
+<p>9.45am Mass on Sundays in Murlog Chapel is live on Finn Valley Community R adio.<br>
+Thank You for your generosity to last weekʼs collections:<br>
+Leckpatrick: £949.28(oertory), £453.55 (renovation)<br>
+Clonleigh : €1,558.64<br>
+Camus: £1,653.65 (oertory), £738 (restoration).<br>
+Thanks also to those who pay by standing order.<br>
+Readings for Sunday 13th September:<br>
+1st Reading : Sirach 27:30-28:7<br>
+Psalm: 102:1-4, 9-12<br>
+2nd Reading : Romans 14:7-9<br>
+Gospel: Matthew 18:21-35<br>
+Saints of The Coming Week:<br>
+Tuesday: Nativity of the Blessed Virgin Mary<br>
+Wednesday: St Ciaran of Clonmacnoise<br>
+Thursday : St Peter Claver<br>
+Saturday: St Ailbe, The Most Holy Name of Mary<br>
+St Patrickʼs Hall, Strabane We wish to acknowledge all those who continue to use<br>
+the facilities at St Patrickʼs Hall. The hall serves our comm unity and creates<br>
+opportunity for so many people. Throughout the years the hal l has been used for<br>
+various purposes including celebrations to mark special oc casions and also reflects<br>
+so much talent from all age groups. Sadly too, in circumstanc es of death, the hall</p>
 <hr>
 <p class="page-label">Page 5</p>
-<p>Come and See Have you heard about the Encounter School of Ministry Course but<br>
-arenʼt sure what itʼs about or if itʼs for you? We invite you to ʻCome and seeʼ before<br>
-you make your decision. Classes will take place on Thursdays from 6.30 – 9.00 pm<br>
-beginning on 3rd September in All Saints Church, Newtowncun ningham. First half<br>
-hour is prayer and worship. Participants can attend up to 3 cl asses without<br>
-committing to pay for the course. Application deadline: Oct ober 1st. Tuition fees<br>
-will then be applied. More information or register at<br>
-<a href="https://encounterschool.org/donegal/" target="_blank" rel="noopener noreferrer">https://encounterschool.org/donegal/</a> or email donegal@en counterschool.org for<br>
-more information.<br>
-Porter School of Irish Dancing Classes resume on Monday 7th Sept at Liord<br>
-Resource Centre. Registration is now open. Classes availab le for 4 year olds and<br>
-over. Teachers fully qualified and garda vetted. To registe r your interest, please call<br>
-0044 7515525499 or visit facebook page: Porter School of Iri sh Dance.<br>
-Blessing of Bikers &amp; Motorcycles on Sun 13th Sept at 1.30 pm in St Aengusʼ Chapel,<br>
-Burt. All welcome. Following the blessing all are welcome to join the run to Nedʼs<br>
-Point RNLI Station, to present the donation to the RNLI. Plea se note, Mass will be<br>
-celebrated on 13th Sept at 11.30 am in St Patrickʼs Chapel, DU NGIVEN for deceased<br>
-bikers, especially those who have died in the past year. All w elcome.<br>
-Padre Pio Prayer Group, Holy Family Chapel, Ballymagroarty, Derry on Tuesday 1st<br>
-September starting with Rosary at 6.45 pm, celebration of Ma ss at 7.15 pm<br>
-followed by closing prayer and blessing with a first class re lic of St Pio. All<br>
+<p>has oered hospitality to families. Many of these events hav e been supported by<br>
+our local caterers. We thank everyone for their ongoing supp ort. The hall is an<br>
+important community facility. However, in terms of insuran ce and safeguarding,<br>
+proper booking procedures need to be in place so as to ensure t he safety of all<br>
+those who use this facility. We ask that those who wish to use t he hall for any<br>
+planned event to please contact Sinead (Parish Administrat or) at the pastoral<br>
+oice, or speak with Brian (Caretaker) at the hall so as to com plete the necessary<br>
+documentation for insurance and safeguarding requirement s, and to clarify any<br>
+queries. We thank everyone for their cooperation and unders tanding in regard to<br>
+these matters. It is important to maintain good practices fo r the continuing safe<br>
+use of the hall as it is a valuable community facility. We than k people for their<br>
+support through the years.<br>
+Legion of Mary An urgent appeal for new members to join us. Role includes<br>
+visitation of nursing homes, promotion of the rosary with th e pilgrim statue and<br>
+weekly meetings. Time commitment of approx 3 hrs per week. Me eting on<br>
+Thursday mornings at 11 am in St Patʼs Hall. Please contact Ma rgaret Harte: <a href="tel:+442871883159" style="color:#1d4ed8;font-weight:600;">028<br>
+71883159</a>.<br>
+Blessing of Bikers &amp; Motorcycles on Sunday 13th September at 1.30 pm in St<br>
+Aengusʼ Chapel, Burt. Following blessing all are welcome to join the run to Nedʼs<br>
+Point RNLI Station, to present a donation to RNLI. Mass will b e celebrated on 13th<br>
+September at 11.30 am in St Patrickʼs Chapel, DUNGIVEN for de ceased bikers. All<br>
 welcome.<br>
-Pray for Vocations That the men called to priesthood will be filled with courage<br>
-and hope as they hear Jesus calling them to follow Him by renou ncing themselves,<br>
-taking up their cross every day, and finding life in Him and in the service of His<br>
-people. Visit: <a href="https://derryvocations.org" target="_blank" rel="noopener noreferrer">https://derryvocations.org</a></p>
+The Contemplative Prayer Group meetings resume on Monday 7th September at<br>
+8.00 pm in the Pastoral Oice, 27 Butcher Street, Strabane. E veryone welcome.</p>
 <hr>
 <p class="page-label">Page 6</p>
-<p>Donegal Group 173 Rise and Shine Trust (formerly Irish Handicapped Childrenʼs<br>
-Pilgrimage Trust and The Irish Pilgrimage Trust) are celebr ating 40 years of taking<br>
-young people with special needs to Lourdes each Easter. We ar e celebrating with a<br>
-special Mass on Saturday 26th September at 12 noon in the Chur ch of the Irish<br>
-Martyrs, Letterkenny. Mass will be concelebrated by Bishop Niall Coll, Bishop<br>
-Donal Mc Keown and many of the priests who travelled to Lourde s with us over the<br>
-years. We invite all guests, their families and all helpers w ho travelled with us over<br>
-the years to our Mass to celebrate Our Lady of Lourdes.<br>
-Lough Derg Day Retreats August 31; September 5, 6, 9, 12, 15, 19, 20 – a day of<br>
-prayer, reflection and spiritual renewal. Visit <a href="https://www.loughderg.org" target="_blank" rel="noopener noreferrer">www.loughderg.org</a> All welcome.<br>
+<p>Vocations Society of St Joseph St John Vianney branch meets on Tues 8th<br>
+September in Immaculate Conception Church with rosary aer 10am Mass. All<br>
+welcome.<br>
+Pray for Vocations We pray for the men called to priesthood, to the ministry of<br>
+teaching and preaching in the name of Jesus, and encouraging their brothers and<br>
+sisters to turn away from sin and live as followers of Christ i n todayʼs world. Visit:<br>
 St Josephʼs Menʼs Camino A Day of pilgrimage, prayer, brotherhood and renewal on<br>
-Sat 12th Sept. Step away from the demands of everyday life and spend a day<br>
-walking with Christ and other Catholic men. Inspired by the a ncient tradition of<br>
-pilgrimage, the 25km guided pilgrimage along the beautiful Boyne Valley is open<br>
-to all men aged 18+. Cost €65/€55 (incl lunch/dinner). Visit <a href="https://www.dominicans.ie" target="_blank" rel="noopener noreferrer">www.dominicans.ie</a><br>
-Coee Morning in Aid of Foyle Hospice Join us on Friday 25th September from 9.30<br>
-am – 12.30 pm at Murphyʼs on the Green. Prize draw: £1 per line. All welcome.<br>
-Catholic Mothers Ireland Family Day : Sun 6 September at Termonbacca, Derry,<br>
+Sat 12th Sept. Inspired by the ancient tradition of pilgrima ge, the 25km guided<br>
+pilgrimage along the beautiful Boyne Valley is open to all me n aged 18+. Cost<br>
+€65/€55 (incl lunch/dinner). Visit <a href="https://www.dominicans.ie" target="_blank" rel="noopener noreferrer">www.dominicans.ie</a><br>
+Catholic Mothers Ireland Family Day today (Sunday)at Termonbacca, Derry,<br>
 beginning with the National Mass at 2.00 pm, celebrated by Bi shop McKeown,<br>
 followed by refreshments, childrenʼs activities, and a tal k for parents. This<br>
-promises to be a lovely day for the whole family. Email info@c atholicmothers.ie</p>
+promises to be a lovely day for the whole family. Email info@c atholicmothers.ie<br>
+Host for Hospice October is Foyle Hospice Coee Morning Month. We are calling on<br>
+supporters to help us raise vital funds by hosting a Coee Mor ning. Whether itʼs at<br>
+home, work or in your local community, you can support your lo cal hospice by<br>
+bringing your friends together and putting the kettle on – it ʼs a piece of cake! To<br>
+request your FREE host pack or for more info, please contact A ilbhe, Community<br>
+Fundraiser, Foyle Hospice: <a href="tel:+442871359888" style="color:#1d4ed8;font-weight:600;">028 71359888</a> or <a href="mailto:ailbhe@foylehospice.com" target="_blank" rel="noopener noreferrer">ailbhe@foylehospice.com</a></p>
 <hr>
 <p class="page-label">Page 7</p>
 <p>Job Opportunity Derry Diocesan Trust invites applications for the post of sa cristan<br>
-at Granaghan (Swatragh) parish. 12 hours per week. Rate of pa y: £12.88 per hour.<br>
-For application pack, please contact recruitment@derrydi ocese.org or <a href="tel:+442871262302" style="color:#1d4ed8;font-weight:600;">028<br>
-71262302</a>. Closing date: 12 noon on Tuesday 15th September 20 26.<br>
-September Menʼs Rosary will take place on Saturday 5th September at 1.00 pm at<br>
-Market Square, Letterkenny. Everyone welcome.<br>
-Blood Cancer Awareness Month Strabane Fundraising Branch will hold a sponsored<br>
-walk on Friday 4th September at 7.00 pm starting from MKʼs Bar on the Derry<br>
-Road. Suitable for all. Please join us.<br>
-Popeʼs Prayer Intention for September You are invited to answer the Holy Fatherʼs<br>
-request and join many people worldwide in praying for the fol lowing intention: For<br>
-the care of water . Let us pray for a just and sustainable management of water, a<br>
-vital resource, so that everyone may have equal access to it.<br>
-The Contemplative Prayer Group meets on Mondays at 8 pm in the Prayer Room<br>
-in the Parochial House, Barrack St. All welcome.<br>
-Reflections Through Poetry book by Fr John P Forbes available in Pastoral Oice.<br>
-Cost: £10. Proceeds to Children in Crossfire and Cause for Sr Clareʼs Canonisation.<br>
-Cancer Focus NI – Pink Colour Fun Run takes place at Ebrington Square, Derry on<br>
-18th October. Details available at <a href="https://www.cancerfocusni.org" target="_blank" rel="noopener noreferrer">www.cancerfocusni.org</a> /foyle-pink-run</p>
+at Granaghan (Swatragh) parish. 12 hrs per week. Rate of pay: £12.88 per hour.<br>
+Contact <a href="mailto:recruitment@derrydiocese.org" target="_blank" rel="noopener noreferrer">recruitment@derrydiocese.org</a> / <a href="tel:+442871262302" style="color:#1d4ed8;font-weight:600;">028 71262302</a>. Clos ing 15/ 9/26.<br>
+Human Life International Ireland Fr L Carney (USA), international speaker and<br>
+popular author, Provincial Tour of Ireland. Join us for the U lster event at Canal<br>
+Court Hotel, Newry on 29th Sept at 6:45pm with 1st class relic of St Thérèse.<br>
+Season of Creation During this Season of Creation, Pope Leo invites us to turn ou r<br>
+attention to one of the most essential gis for life: water. L et us pray that we may<br>
+learn to manage water with justice and responsibility, prot ecting it as a common<br>
+good and ensuring that everyone has equitable access to it.<br>
+Strabane / Leckpatrick Draw August 2026<br>
+Prize Winner Promoter<br>
+£2,000 Robert Coyle Marian Cooke<br>
+£1,000 Jacqueline Donaghey Sadie Kerlin<br>
+£500 Sean Devine Maisie Boggs<br>
+£500 Bernie &amp; Joan Nuala Kerr<br>
+£250 Ryan Clarke Maura Coyle<br>
+£250 Pat Timoney John Devine<br>
+£100 Eileen Devine Gabrielle Dooher<br>
+£100 Margaret Kavanagh Paul Mullen<br>
+£100 Martina Murray Fr Michael<br>
+£100 Colm Clarke Maura Coyle</p>
 <hr>
 <p class="page-label">Page 8</p>
-<p>Weekend Mass Schedule<br>
-Immaculate Conception: Saturday Vigil: 4.30 pm ; Sunday: 11.00 am<br>
-Sacred Heart, Derry Road: Sunday: 12.15 pm<br>
+<p>£100 Celine Ward Ann McCrory<br>
+Congratulations to all the winners. Thank you for your support.<br>
+Parish Bingo and Lucky Four in St Patʼs Hall on Thursdays at 8 pm.<br>
+Some fun, excitement and slight competition.<br>
+ACCORD Derry Marriage Preparation Course The next course is on 20th/21st<br>
+November at Ebrington Hotel, Derry. Booking online <a href="https://www.accordni.com" target="_blank" rel="noopener noreferrer">www.accordni.com</a><br>
+Lough Derg Day Retreats September 9, 12, 15, 19, 20 – a day of prayer, reflection<br>
+and spiritual renewal. Visit <a href="https://www.loughderg.org" target="_blank" rel="noopener noreferrer">www.loughderg.org</a> All welcome.<br>
+Porter School of Irish Dancing Classes resume on Monday 7th Sept at<br>
+Liord Resource Centre. Registration is now open. Classes a vailable for 4 year olds<br>
+and over. Teachers fully qualified and garda vetted. To regi ster your interest, please<br>
+call 0044 7515525499 or visit facebook page: Porter School o f Irish Dance.<br>
+Rosary on the Coast takes place today (Sunday) at 3.00 pm at Lisfannon Beach,<br>
+praying for peace, Ireland and our unborn babies. Everyone w elcome.<br>
+Weekend Mass Schedule<br>
+Immaculate Conception: Saturday Vigil: 4.30 pm ; Sunday: 11.00 am</p>
+<hr>
+<p class="page-label">Page 9</p>
+<p>Sacred Heart, Derry Road: Sunday: 12.15 pm<br>
 St Patrickʼs, Clonleigh: Saturday Vigil: 6.30 pm ; Sunday: 9.45 am<br>
-St Josephʼs, Glenmornan: Sunday: 8.30 am (30th Aug – alternate Sundays – 13th<br>
-Sept)<br>
-St Maryʼs, Cloughcor: Sunday: 8.30 am (6 Sept – alternate Sundays – 20 Sept)</p>
+St Maryʼs, Cloughcor: Sunday: 8.30 am (6th Sept – alternate Sundays – 20th Sept)<br>
+St Josephʼs, Glenmornan: Sunday: 8.30 am (13th Sept – alternate Sundays – 27th<br>
+Sept)</p>
 <h3 class="b-head">Weekday Mass Schedule</h3>
 <p>Monday: 8.00 am: Sacred Heart Church, Derry Road<br>
 10.00 am: St Patrickʼs Church, Liord<br>
@@ -1156,14 +1175,13 @@ Friday: 8.00 am: Sacred Heart Church, Derry Road<br>
 10.00 am: Immaculate Conception Church, Strabane<br>
 Weddings Please contact the parish oice. At least 6 monthsʼ notice re quired.<br>
 Baptisms: Parent(s) are asked to contact the parish oice.<br>
-th</p>
+The Parish Pastoral Area Oice , 27 Butcher St, Strabane covers all 3 parishes .<br>
+Oice hours: Monday – Thursday: 9.30 am – 4.30 pm; Friday: 9.30 am<br>
+– 12.30 pm. Please feel free to call in or phone on <a href="tel:+442871882215" style="color:#1d4ed8;font-weight:600;">028 7188 2215</a> .<br>
+Reminder that the deadline for parish bulletin notices is 2 pm on Wedne sdays.</p>
 <hr>
-<p class="page-label">Page 9</p>
-<p>The Parish Pastoral Area Oice , 27 Butcher St, Strabane covers all 3 parishes . Oice<br>
-hours: Monday – Thursday: 9.30 am – 4.30 pm; Friday: 9.30 am – 12.30 pm . Please<br>
-feel free to call in or phone on <a href="tel:+442871882215" style="color:#1d4ed8;font-weight:600;">028 7188 2215</a>.<br>
-Reminder that the deadline for parish bulletin notices is 2 pm on Wedne sdays.<br>
-A Small Collection of Candles is available for purchase at the Pastoral Oice.<br>
+<p class="page-label">Page 10</p>
+<p>A Small Collection of Candles is available for purchase at the Pastoral Oice.<br>
 A gentle reminder that we can only accept cash or cheque payme nts. Thank you.<br>
 Safeguarding (Northern Ireland) If you have any concerns with regard to the<br>
 Safeguarding of Children or Adult at risk of harm or Adult in n eed of protection<br>
@@ -1187,7 +1205,7 @@ Safeguarding, Donegal on <a href="tel:+353719834660" style="color:#1d4ed8;font-w
     <section class="parish-section">
       <h2 class="section-heading">Other DERRY Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghyaran"><a class="parish-link" href="parishofaghyaran.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li class="parish-item" data-name="ardmore"><a class="parish-link" href="ardmoreparish.html" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li class="parish-item" data-name="banagher"><a class="parish-link" href="banagherparish.html" target="_blank" rel="noopener noreferrer">Banagher</a></li><li class="parish-item" data-name="buncrana"><a class="parish-link" href="buncranaparish.html" target="_blank" rel="noopener noreferrer">Buncrana</a></li><li class="parish-item" data-name="camus"><a class="parish-link" href="camusparish.html" target="_blank" rel="noopener noreferrer">Camus</a></li><li class="parish-item" data-name="carndonagh"><a class="parish-link" href="carndonaghparish.html" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li class="parish-item" data-name="castlederg"><a class="parish-link" href="castledergparish.html" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li class="parish-item" data-name="clonmany"><a class="parish-link" href="clonmanyparish.html" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li class="parish-item" data-name="culdaff"><a class="parish-link" href="culdaffparish.html" target="_blank" rel="noopener noreferrer">Culdaff</a></li><li class="parish-item" data-name="culmoe"><a class="parish-link" href="culmoreparish.html" target="_blank" rel="noopener noreferrer">Culmoe</a></li><li class="parish-item" data-name="dma parish (claudy area)"><a class="parish-link" href="dmaparish.html" target="_blank" rel="noopener noreferrer">DMA Parish (Claudy area)</a></li><li class="parish-item" data-name="drumquin"><a class="parish-link" href="drumquinparish.html" target="_blank" rel="noopener noreferrer">Drumquin</a></li><li class="parish-item" data-name="drumragh"><a class="parish-link" href="drumraghparish.html" target="_blank" rel="noopener noreferrer">Drumragh</a></li><li class="parish-item" data-name="dungiven"><a class="parish-link" href="parishofdungiven.html" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li class="parish-item" data-name="errigal"><a class="parish-link" href="errigalparish.html" target="_blank" rel="noopener noreferrer">Errigal</a></li><li class="parish-item" data-name="fahan"><a class="parish-link" href="fahanparish.html" target="_blank" rel="noopener noreferrer">Fahan</a></li><li class="parish-item" data-name="granaghan"><a class="parish-link" href="granaghanparish.html" target="_blank" rel="noopener noreferrer">Granaghan</a></li><li class="parish-item" data-name="greenlough"><a class="parish-link" href="greenlough.html" target="_blank" rel="noopener noreferrer">Greenlough</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holyfamily-parish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="iskaheen"><a class="parish-link" href="iskaheenparish.html" target="_blank" rel="noopener noreferrer">Iskaheen</a></li><li class="parish-item" data-name="kilrea"><a class="parish-link" href="parishofkilrea.html" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li class="parish-item" data-name="lavey"><a class="parish-link" href="laveyparish.html" target="_blank" rel="noopener noreferrer">Lavey</a></li><li class="parish-item" data-name="leckpatrick"><a class="parish-link" href="leckpatrickparish.html" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li class="parish-item" data-name="maghera (derry)"><a class="parish-link" href="magheraparishderry.html" target="_blank" rel="noopener noreferrer">Maghera (Derry)</a></li><li class="parish-item" data-name="melmount (&amp; camus)"><a class="parish-link" href="melmountparish.html" target="_blank" rel="noopener noreferrer">Melmount (&amp; Camus)</a></li><li class="parish-item" data-name="moville"><a class="parish-link" href="movilleparish.html" target="_blank" rel="noopener noreferrer">Moville</a></li><li class="parish-item" data-name="sion mills"><a class="parish-link" href="parishofsionmills.html" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li class="parish-item" data-name="st eugene&#x27;s cathedral (templemore)"><a class="parish-link" href="steugenescathedral.html" target="_blank" rel="noopener noreferrer">St Eugene&#x27;s Cathedral (Templemore)</a></li><li class="parish-item" data-name="st mary&#x27;s parish creggan"><a class="parish-link" href="stmarysparishcreggan.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Parish Creggan</a></li><li class="parish-item" data-name="star of the sea (magilligan)"><a class="parish-link" href="staroftheseacatholic.html" target="_blank" rel="noopener noreferrer">Star of the Sea (Magilligan)</a></li><li class="parish-item" data-name="steelstown"><a class="parish-link" href="steelstownparish.html" target="_blank" rel="noopener noreferrer">Steelstown</a></li><li class="parish-item" data-name="waterside (&amp; strathfoyle amalgamated)"><a class="parish-link" href="watersideparish.html" target="_blank" rel="noopener noreferrer">Waterside (&amp; Strathfoyle amalgamated)</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghyaran"><a class="parish-link" href="parishofaghyaran.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li class="parish-item" data-name="ardmore"><a class="parish-link" href="ardmoreparish.html" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li class="parish-item" data-name="banagher"><a class="parish-link" href="banagherparish.html" target="_blank" rel="noopener noreferrer">Banagher</a></li><li class="parish-item" data-name="bellaghy"><a class="parish-link" href="bellaghyparish.html" target="_blank" rel="noopener noreferrer">Bellaghy</a></li><li class="parish-item" data-name="buncrana"><a class="parish-link" href="buncranaparish.html" target="_blank" rel="noopener noreferrer">Buncrana</a></li><li class="parish-item" data-name="camus"><a class="parish-link" href="camusparish.html" target="_blank" rel="noopener noreferrer">Camus</a></li><li class="parish-item" data-name="carndonagh"><a class="parish-link" href="carndonaghparish.html" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li class="parish-item" data-name="castlederg"><a class="parish-link" href="castledergparish.html" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li class="parish-item" data-name="claudy"><a class="parish-link" href="parishofclaudy.html" target="_blank" rel="noopener noreferrer">Claudy</a></li><li class="parish-item" data-name="clonmany"><a class="parish-link" href="clonmanyparish.html" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li class="parish-item" data-name="culdaff"><a class="parish-link" href="culdaffparish.html" target="_blank" rel="noopener noreferrer">Culdaff</a></li><li class="parish-item" data-name="culmoe"><a class="parish-link" href="culmoreparish.html" target="_blank" rel="noopener noreferrer">Culmoe</a></li><li class="parish-item" data-name="dma parish (claudy area)"><a class="parish-link" href="dmaparish.html" target="_blank" rel="noopener noreferrer">DMA Parish (Claudy area)</a></li><li class="parish-item" data-name="drumquin"><a class="parish-link" href="drumquinparish.html" target="_blank" rel="noopener noreferrer">Drumquin</a></li><li class="parish-item" data-name="drumragh"><a class="parish-link" href="drumraghparish.html" target="_blank" rel="noopener noreferrer">Drumragh</a></li><li class="parish-item" data-name="dungiven"><a class="parish-link" href="parishofdungiven.html" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li class="parish-item" data-name="errigal"><a class="parish-link" href="errigalparish.html" target="_blank" rel="noopener noreferrer">Errigal</a></li><li class="parish-item" data-name="fahan"><a class="parish-link" href="fahanparish.html" target="_blank" rel="noopener noreferrer">Fahan</a></li><li class="parish-item" data-name="granaghan"><a class="parish-link" href="granaghanparish.html" target="_blank" rel="noopener noreferrer">Granaghan</a></li><li class="parish-item" data-name="greenlough"><a class="parish-link" href="greenlough.html" target="_blank" rel="noopener noreferrer">Greenlough</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holyfamily-parish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="iskaheen"><a class="parish-link" href="iskaheenparish.html" target="_blank" rel="noopener noreferrer">Iskaheen</a></li><li class="parish-item" data-name="kilrea"><a class="parish-link" href="parishofkilrea.html" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li class="parish-item" data-name="lavey"><a class="parish-link" href="laveyparish.html" target="_blank" rel="noopener noreferrer">Lavey</a></li><li class="parish-item" data-name="leckpatrick"><a class="parish-link" href="leckpatrickparish.html" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li class="parish-item" data-name="limavady"><a class="parish-link" href="limavadyparish.html" target="_blank" rel="noopener noreferrer">Limavady</a></li><li class="parish-item" data-name="maghera (derry)"><a class="parish-link" href="magheraparishderry.html" target="_blank" rel="noopener noreferrer">Maghera (Derry)</a></li><li class="parish-item" data-name="melmount (&amp; camus)"><a class="parish-link" href="melmountparish.html" target="_blank" rel="noopener noreferrer">Melmount (&amp; Camus)</a></li><li class="parish-item" data-name="moville"><a class="parish-link" href="movilleparish.html" target="_blank" rel="noopener noreferrer">Moville</a></li><li class="parish-item" data-name="sion mills"><a class="parish-link" href="parishofsionmills.html" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li class="parish-item" data-name="st eugene&#x27;s cathedral (templemore)"><a class="parish-link" href="steugenescathedral.html" target="_blank" rel="noopener noreferrer">St Eugene&#x27;s Cathedral (Templemore)</a></li><li class="parish-item" data-name="st mary&#x27;s parish creggan"><a class="parish-link" href="stmarysparishcreggan.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Parish Creggan</a></li><li class="parish-item" data-name="star of the sea (magilligan)"><a class="parish-link" href="staroftheseacatholic.html" target="_blank" rel="noopener noreferrer">Star of the Sea (Magilligan)</a></li><li class="parish-item" data-name="steelstown"><a class="parish-link" href="steelstownparish.html" target="_blank" rel="noopener noreferrer">Steelstown</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1239,9 +1257,9 @@ Safeguarding, Donegal on <a href="tel:+353719834660" style="color:#1d4ed8;font-w
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1695,11 +1713,16 @@ Safeguarding, Donegal on <a href="tel:+353719834660" style="color:#1d4ed8;font-w
         for (var i = 0; i < names.length; i++) {
           var page = pageFor(names[i]);
           if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
           var slot = pages.querySelector('[data-page="' + page + '"]');
           if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
+          scrollBoxTo(pages, slot);
           return true;
         }
         return false;

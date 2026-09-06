@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Drumragh Bulletin — 30/08/2026</title>
+  <title>Drumragh Bulletin — 06/09/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -109,6 +110,13 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
@@ -141,6 +149,7 @@
       cursor: pointer;
     }
     .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
     
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {
@@ -160,7 +169,7 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
@@ -203,6 +212,7 @@
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {
@@ -866,6 +876,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -892,7 +903,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -900,35 +911,31 @@
     <header class="header">
       <p class="diocese-label">DERRY</p>
       <h1>Drumragh Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Drumragh — 30/08/2026. Part of the Derry Diocese collated bulletin.</p>
-      <a class="download-link-top" href="drumraghparish.pdf">Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Drumragh — 06/09/2026. Part of the Derry Diocese collated bulletin.</p>
+      <a class="download-link-top pdf-force-download" href="drumraghparish.pdf" download="drumraghparish.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="drumraghparish.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       
-      <div class="quiet-links">
-        <a href="drumraghparish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="drumraghparish-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="drumraghparish.pdf" title="Drumragh bulletin PDF"></iframe>
+        <iframe data-pdf-url="drumraghparish.pdf" title="Drumragh bulletin PDF"></iframe>
         
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="drumraghparish.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="drumraghparish.pdf">Open PDF</a>
-              <a href="drumraghparish.pdf" download>Download</a>
+              <a class="pdf-open-newtab" href="drumraghparish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="drumraghparish.pdf" download="drumraghparish.pdf">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>
       </div>
@@ -963,12 +970,12 @@
       <div class="quiet-links">
         <a href="drumraghparish-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-drumragh" data-parish-name="Drumragh"><h2 class="ocr-parish-name">Drumragh</h2><p class="ocr-parish-date">30/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-drumragh" data-parish-name="Drumragh"><h2 class="ocr-parish-name">Drumragh</h2><p class="ocr-parish-date">06/09/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>Feast of the<br>
-Twenty -Second Sunday<br>
-in Ordinary Time<br>
-30th August 2026<br>
+Twenty -Third Sunday in<br>
+Ordinary Time<br>
+6th September 2026<br>
 Parish of Drumragh<br>
 Sacred Heart Church, Omagh<br>
 St Mary’s Church, Drumragh<br>
@@ -986,73 +993,71 @@ Eucharistic Adoration on<br>
 Wednesday from 10am until<br>
 6.45pm St. Mary’s Church, Drumragh<br>
 Sunday Mass: 10.30am Weekend Mass Schedule<br>
-Confessions:<br>
+Fr Kevin McElhennon P.P: <a href="tel:+442882258108" style="color:#1d4ed8;font-weight:600;">028 8225 8108</a> / k.mcelhenn <a href="mailto:on@derrydiocese.org" target="_blank" rel="noopener noreferrer">on@derrydiocese.org</a><br>
+Fr Malachy Gallagher C.C: <a href="tel:+442882251055" style="color:#1d4ed8;font-weight:600;">028 8225 1055</a> / malachy.g <a href="mailto:allagher@derrydiocese.org" target="_blank" rel="noopener noreferrer">allagher@derrydiocese.org</a><br>
+Parish Office, Omagh <a href="tel:+442882242092" style="color:#1d4ed8;font-weight:600;">028 8224 2092</a> / info@ drumraghparish.com Confessions:<br>
 Sacred Heart Church : Saturday’s after<br>
 morning Mass unless there is a funeral.<br>
 Christ the King, Strathroy:<br>
 Saturday 6.15pm -6.45pm<br>
-PARISH ACCOUNTS<br>
-The Administrator and Committees of the Parish of D rumragh would like to thank<br>
-the Parishioners for their support this year especi ally in the light of the great loss to<br>
-the Parish of Father Eugene Hassan PP, our Parish P riest.<br>
-The maintenance and upkeep of the Sacred Heart Chur ch has been and remains a<br>
-very significant financial commitment. The Parish h as been proactive in seeking<br>
-grant support and has secured lottery funding for t he significant external and internal<br>
-works. These works which are due to commence in ear ly 2027 are expected to cost<br>
-in the region of £1,644,000.00 and the Parish will be obliged to contribute 23% of<br>
-the value.<br>
-In real terms the Parish will have an outlay of £38 0,000 payable at appointed stages<br>
-of construction. These works represent a significan t and recurring financial<br>
-commitment and we are privileged to be able to faci litate these works thanks to the<br>
-generosity of Drumragh Parish Parishioners.<br>
-We will have to rely on that generosity into the fu ture, and we trust, without<br>
-reservation, and with gratitude, that your weekly e nvelope will continue to be a<br>
-priority.<br>
-A summary of the accounts are on page 4<br>
-Loreto Grammar School, Omagh -<br>
-Arrangements for School Opening September 2026<br>
-Year 9,10,11 only Tuesday 1st September 2026<br>
-Year 8,12 only Wednesday 2nd September 2026<br>
-Year 13,14 only Thursday 3rd September 2026<br>
-School Open: All pupils Friday 4th September 2026 Drumragh <a href="https://www.drumraghparish.com" target="_blank" rel="noopener noreferrer">https://www.drumraghparish.com</a></p>
+Heritage Open Day<br>
+Guided Tour of Sacred Heart Church on 12th &amp; 13th September<br>
+for approximately 1 hour Time: 2pm &amp; 3.30pm<br>
+Free Admission. All Welcome.<br>
+Fr Stephen Baxter - Our new temporary Curate<br>
+My name is Stephen Baxter and I was ordained for the Diocese<br>
+of Derry on Sunday 14th June in St Columb’s in the Waterside<br>
+in Derry City.<br>
+I started studying for the priesthood in 2019 by attending the Scot s College<br>
+seminary in Salamanca, followed by studying Philosophy for two ye ars in<br>
+Maynooth then Theology for four years in Rome. Before entering<br>
+seminary, I attended St Columb’s College in Derry, working for six years<br>
+in Stewarts and Tesco supermarkets then I worked for nineteen y ears as a<br>
+bus driver and Inspector for Translink.<br>
+Since ordination I have been based in the Waterside helping out a s required<br>
+and I am now delighted to have received my first appointment to Omagh<br>
+and I am looking forward to my time in your parishes and I thank Fathe r<br>
+Kevin and Father Malachy for the welcome they have given me to the<br>
+parishes.<br>
+Drumragh <a href="https://www.drumraghparish.com" target="_blank" rel="noopener noreferrer">https://www.drumraghparish.com</a></p>
 <hr>
 <p class="page-label">Page 2</p>
 <h3 class="b-head">Recently Deceased</h3>
-<p>Paul McCanny<br>
-Aiden McGrath<br>
-Josephine Murphy<br>
-May they rest in peace<br>
+<p>Kathleen McCartan<br>
+Marie Conway<br>
+David Mullan May they rest in peace<br>
 Parish Office Open Mon/Tues/Thursday 9 -2pm <a href="tel:+442882242092" style="color:#1d4ed8;font-weight:600;">02882242092</a><br>
 Parish email: <a href="mailto:info@drumraghparish.com" target="_blank" rel="noopener noreferrer">info@drumraghparish.com</a><br>
 Recent Weddings<br>
-We congratulate the following couple<br>
-who were married<br>
+We congratulate the following<br>
+couples who were married<br>
 here recently<br>
-Louise O’Neill &amp; Brendan Mullan<br>
+Laura McBride &amp; Brandon Parke<br>
+Danielle Darcy &amp; Ruari Haughey<br>
 May the grace of the sacrament<br>
-remain with them all their lives. Sacrament of Baptism<br>
-We welcome new members of<br>
-our Parish Community who<br>
-received the<br>
-Sacrament of Baptism:<br>
-Hannah Grace O’Sullivan<br>
-Caiden Lee McCausland<br>
-Darri Ronan O’Neill<br>
-Eire Rois Barbour<br>
-Eirinn Eileen O’Kane Sacred Heart Church Mass Intentions<br>
-Wednesday 2nd September 7.30pm Francis Darlin gton Month Mind<br>
-Saturday 5th September 5.30pm Gerard Drum m - 2nd Anniversary<br>
-Sunday 6th September 12.30pm Pat Turbett - 2nd Anniversary<br>
-ST. MARY’S, DRUMRAGH Mass Intentions<br>
-Sunday 6th September 10.30am Rose O’Neill - 10th Anniversary<br>
+remain with them all their lives.<br>
+Eucharistic Ministers will bring<br>
+Holy Communion to the sick and<br>
+housebound next<br>
+Sunday 13th September Sacred Heart Church Mass Intentions<br>
+Wednesday 9th September 7.30pm Carrie Anne Bro wne - Month Mind<br>
+Brendan Rodgers - 1st Anniversary<br>
+Saturday 12th September 5.30pm Arthur Quinn - 1st Anniversary<br>
+Sunday 13th September 10.00pm Patricia (Pa t) Daly Month Mind<br>
 VOCATIONS<br>
-That the men called to priesthood will be<br>
-filled with courage and hope as they hear<br>
-Jesus calling them to follow Him by<br>
-renouncing themselves, taking up their<br>
-cross every day, and finding life in Him and<br>
-in the service of His people.<br>
-Blessing of Bikers and Motorcycles will<br>
+We pray for the men called to priesthood, to<br>
+the ministry of teaching and preaching in<br>
+the name of Jesus, and encouraging their<br>
+brothers and sisters to turn away from sin<br>
+and live as followers of Christ in today&#x27;s<br>
+world.<br>
+Catholic Mothers Ireland – Family Day:<br>
+Catholic Mothers Ireland will hold its<br>
+Annual National Mass on Sunday, 6th<br>
+September at Termonbacca Retreat Centre,<br>
+Derry. The day will begin with Mass at<br>
+2.00pm, celebrated by Bishop Donal<br>
+McKeown, All are welcome Blessing of Bikers and Motorcycles will<br>
 take place on Sunday 13th September in<br>
 St Aengus’ Chapel, Burt, Co Donegal, at<br>
 1:30. All are welcome to attend the brief<br>
@@ -1064,70 +1069,70 @@ Please note, Mass will be celebrated on<br>
 Sunday 13th September in St Patrick’s<br>
 Chapel, DUNGIVEN, at 11:30am for<br>
 deceased bikers, especially those who<br>
-have died in past year. The Padre Pio Prayer Group,<br>
-Holy Family Chapel, Ballymagroarty will<br>
-take place on Tuesday 1st September<br>
-2026. Starting with Rosary at 6.45pm<br>
-before Mass, celebration of Holy Mass at<br>
-7.15pm, then the priest will bless everyone<br>
-with a first class relic of St. Pio, while<br>
-closing prayers are recited.<br>
-EVERYONE WELCOME. Prayer Group - Commencing Thursday<br>
-3rd September<br>
-A quiet time of prayer and reflection<br>
-Christ the King Church<br>
-Strathroy 7pm Thurs 3rd September<br>
-Join us for an hour of prayer for the Souls<br>
-in Purgatory and Our Own Intentions.<br>
-First Thursday of every month in Christ the<br>
-King Church, Strathroy at 7pm.<br>
-Season of Creation 2026: The Season of<br>
-Creation takes place from 1st September to<br>
-4th October, bringing Christians throughout<br>
-the world together in prayer, reflection and<br>
-action for the care of our common<br>
-home. This year’s theme, Living Water ,<br>
-invites us to give thanks for the gift of<br>
-water and renew our care for God’s<br>
-creation.</p>
+have died in past year. Season of Creation 2026: The Season of<br>
+Creation takes place from 1st September<br>
+to 4th October, bringing Christians<br>
+throughout the world together in prayer,<br>
+reflection and action for the care of our<br>
+common home. This year’s theme, Living<br>
+Water , invites us to give thanks for the gift<br>
+of water and renew our care for God’s<br>
+creation. The monthly novena devotion through the<br>
+intercession of Saint Padre Pio, starts on<br>
+Tuesday the 8th September, in Christ<br>
+the King Chapel in Omagh.<br>
+Rosary at 7pm followed by Holy Mass at<br>
+7.30pm.<br>
+Veneration and blessing with a relic of<br>
+Saint Padre Pio.<br>
+Pray, Hope and Don&#x27;t Worry<br>
+Legion of Mary Annual Pilgrimage to<br>
+Knock on Sunday 27th September ,<br>
+departing main st Dromore at830am, fare<br>
+£25,contact Lucia on <a href="tel:+3537548870901" style="color:#1d4ed8;font-weight:600;">07548870901</a> or call<br>
+into Top News George&#x27;s street and book a<br>
+seat, please book early</p>
 <hr>
 <p class="page-label">Page 3</p>
-<p>BINGO in St. Joseph’s Hall Tuesday 1st September a t 8.30pm<br>
-Parish Draw<br>
-The September draw takes place this week. Promoters are asked to please make their<br>
-returns before 7.30pm on Tuesday 1st September. Please note, the deadline of 7.30pm is<br>
-strict and late returns may not be accepted.<br>
+<p>BINGO in St. Joseph’s Hall Tuesday 8th September a t 8.30pm<br>
+Drumragh Parish Draw Winners September<br>
+Winner Promoter<br>
+£2,000 Margaret &amp; Mairead McKenna Brian McKenna<br>
+£1,000 Martin Kirk John Baxter<br>
+£500 Sally McGranaghan Babs Barrett<br>
+£250 Carmel Reid Attracta Kelly<br>
+£100 Terence &amp; Ruth O’Gara Kevin O’Gara<br>
+£100 Aoife Quinn Raymond McNally<br>
+£100 Micky Mullan Maggie Quinn<br>
+£100 Sinead Duncan Gerard Lilly<br>
+£100 Patsy Grugan Mary Quinn<br>
+£100 Michael Mallon Raymond McNally<br>
+£100 Rosemary McCourt Kevin Moore<br>
+£100 Paddy Nicholas Gerard Lilly<br>
+£100 Ronald Oddy<br>
+£100 Shane O’Neill Gerard Lilly<br>
+£100 Promoter’s Prize: Geraldine Gallagher<br>
+Next Draw<br>
+6th October<br>
 SONGS FROM HOME<br>
 Come together with Harmonise and fellow local singers as we share Songs from Hom e.<br>
 Participants must attend FREE five week choir pract ice followed by the Final Song Trail<br>
 10th October at Ulster American Folk Park. Refreshmen ts provided.<br>
 EVERYONE WELCOME - Contact Claire Sharkey for more details <a href="tel:+3537751371800" style="color:#1d4ed8;font-weight:600;">07751371800</a><br>
 Dates<br>
-August 30th 1pm -4pm – Dromore Sports Complex<br>
 September 23rd 7.30 -10pm – Silverbirch Hotel<br>
 September 30th 7.30 -10pm – Dromore Sports Complex<br>
 October 7th 7.30pm -9.30pm – Silverbirch Hotel Alzheimer’s society is running a Carers Information Support<br>
 Programme (CRISP) for family, carers and friends of people living with Dementia in<br>
 Omagh area. The programme is run over 2 sessions; a ttendees should attend both<br>
-afternoons. Dates are 7th and 8th SeaIDEN mCgRATHtember 2026 3 -5pm In the Confer-<br>
-ence Room, Silver Birch Hotel, 5 Gortin Road, Omagh, Co Tyrone. To register please con-<br>
-tact Julie -Anne, Senior Dementia Adviser. M:07889 604702. Reg istration is required prior Killyclogher Over 50’s Club<br>
-Re -Opens on Thursday 3rd September / 2pm / Killyclogher Hall<br>
-Fun, Friendship &amp; Food! If you enjoy company in a c omfortable setting, you are welcome<br>
-to join the Over 50’s Club. Club activities include Bingo, Knitting, Crocheting, Armchair<br>
-Exercises, Monthly Tea Dances; with occasional outi ngs and enjoyable hot meals.<br>
-Come along and see for yourself - you will be very welcome!<br>
-The Club welcomes people, over 50, from neighbourin g parishes. The more – the merrier Important Notice for Wedding Parties Confetti must not be used inside the church or in<br>
-the surrounding grounds. Unfortunately, confetti wa s recently scattered on the altar and in<br>
-the church aisles, creating a considerable mess.<br>
-Please remember that our cleaners are volunteers , generously giving their time to care for<br>
-the church. We ask for your cooperation in keeping the church respectful and welcoming<br>
-for everyone.<br>
+afternoons. Dates are 7th and 8th 2026 3 -5pm In the Conference Room, Silver Birch<br>
+Hotel, 5 Gortin Road, Omagh, Co Tyrone. To register please contact Julie -Anne, Senior<br>
+Dementia Adviser. M:07889 604702. Registration is r equired prior to attendance.<br>
 Loreto 170 Hyrox<br>
-Loreto Grammar School, Omagh, will host a special L oreto 170 Hyrox on Sunday 6th<br>
-September, celebrating 170 years of Loreto Educatio n, while raising funds for Dementia NI<br>
-and the new Loreto Oratory. This inclusive, fully s caled and non‑timed Hyrox event will<br>
-take place on school grounds and warmly welcomes cu rrent and past pupils and staff,<br>
+Loreto Grammar School, Omagh, will host a special L oreto 170 Hyrox today Sunday<br>
+celebrating 170 years of Loreto Education, while ra ising funds for Dementia NI and the<br>
+new Loreto Oratory. This inclusive, fully scaled an d non‑timed Hyrox event will take place<br>
+on school grounds and warmly welcomes current and p ast pupils and staff,<br>
 families, friends, and the wider community to come together, reconnect, and enjoy a day<br>
 centred on participation and togetherness. Anyone w ishing to take part can register using<br>
 the sign‑up link on the Schools Facebook or Instagr am. Anyone who may not be able to<br>
@@ -1137,46 +1142,55 @@ meaningful causes.</p>
 <p class="page-label">Page 4</p>
 <p>St Joseph’s Hall<br>
 Mon 4.30 pm - Groogan O’ Doherty School of Dancing<br>
-Monday 7:05pm - St Joseph’s Ceili Club for retired Irish dancers.<br>
 Tues 2.30 - 4.30pm - Colmcille Club RESUMES ON 8TH SEPTEMBER<br>
 Tues 8.30pm - Bingo<br>
 Wed 5.45 pm - Baxter School of Dancing<br>
 Thurs 8 pm - Bowls<br>
 Sat 2 pm - Groogan O’Doherty School of Dancing<br>
 Booking forms and hall rates are available to<br>
-download at <a href="https://www.drumraghparish.com/st.joseph’s" target="_blank" rel="noopener noreferrer">www.drumraghparish.com/st.joseph’s</a> hall Parish email: <a href="mailto:info@drumraghparish.com" target="_blank" rel="noopener noreferrer">info@drumraghparish.com</a><br>
-Drumragh Parish<br>
-Summary of Accounts 31.12.25 2025 2024<br>
-£ £<br>
-Recurrent income<br>
-Envelope Collections 224,722 229,579<br>
-Gift Aid 46,916 49,219<br>
-Other income 112,603 122,446<br>
-Total Recurrent income 384,241 401,244<br>
-Other non recurrent parish income 331,724 261,321<br>
-Total income 715,965 662,565<br>
-Recurrent Expenditure<br>
-Priests Salaries 22,306 28,871<br>
-Employee Salaries 106,918 93,576<br>
-Church &amp; Pastoral Care 16,323 16,300<br>
-Premises Costs 174,584 224,818<br>
-Operating Costs 60,878 61,734<br>
-Diocesan Levy 52,162 48,653<br>
-Exceptional parish expenditure 7,871 108,152<br>
-Total expenditure 441,042 582,104<br>
-Final Surplus for the Year 274,923 80,461<br>
-West Tyrone Feis / AGM / St. Joseph’s Hall, Omagh (Upstairs) Tues 8th Sept 7pm<br>
+download at <a href="https://www.drumraghparish.com/st.joseph’s" target="_blank" rel="noopener noreferrer">www.drumraghparish.com/st.joseph’s</a> hall<br>
+DIOCESAN SAFEGUARDING<br>
+REPRESENTATIVE<br>
+Marie O’Kane DLP <a href="tel:+3537596500793" style="color:#1d4ed8;font-weight:600;">07596500793</a><br>
+<a href="mailto:dlp@derrydiocese.org" target="_blank" rel="noopener noreferrer">dlp@derrydiocese.org</a> Parish email: <a href="mailto:info@drumraghparish.com" target="_blank" rel="noopener noreferrer">info@drumraghparish.com</a><br>
+Donegal Group 173 Rise and Shine Trust (formerly The Irish Handicapped Children&#x27;s<br>
+Pilgrimage Trust and The Irish Pilgrimage Trust) ar e celebrating 40 years of taking young<br>
+people with special needs to Lourdes each Easter. We are celebrating with a special Mass<br>
+on Saturday 26th September in the Church of the Iri sh Martyr&#x27;s Letterkenny at 12 noon.<br>
+The Mass will be concelebrated by Bishop Niall Coll and Bishop Donal Mc Keown<br>
+Diocese of Derry and many of the priests who travel led to Lourdes with us over the<br>
+years. We invite all the guests and their families and al l the helpers who travelled with us<br>
+over the years to our mass to celebrate Our Lady of Lourdes. Killyclogher Over 50’s Club<br>
+Re -Opens on Thursday 3rd September / 2pm / Killyclogher Hall<br>
+Fun, Friendship &amp; Food! If you enjoy company in a c omfortable setting, you are welcome<br>
+to join the Over 50’s Club. Club activities include Bingo, Knitting, Crocheting, Armchair<br>
+Exercises, Monthly Tea Dances; with occasional outi ngs and enjoyable hot meals.<br>
+Come along and see for yourself - you will be very welcome!<br>
+The Club welcomes people, over 50, from neighbourin g parishes. The more – the merrier<br>
+GAMBLERS ANONYMOUS:<br>
+Is gambling affecting your life? We<br>
+would like to help. Pick up the phone and<br>
+ring <a href="tel:+442871351329" style="color:#1d4ed8;font-weight:600;">028 7135 1329</a>. West Tyrone Feis / AGM / St. Joseph’s Hall, Omagh (Upstairs) Tues 8th Sept 7pm<br>
 Welcome new volunteers to join the committee and he lp support the running of the Feis.<br>
 If you would be interested in any section of the Fe is, please come along to the A.G.M.<br>
 We would particularly welcome those with an interes t in the Irish Dancing Section, as the<br>
-previous secretary for this section has retired.</p></div>
+previous secretary for this section has retired.<br>
+Rise and Shine Trust -Easter 2027 Pilgrimage: Applications are invited fr om young people<br>
+with additional social, emotional, physical and lea rning needs aged 11 -30 who are<br>
+interested in travelling as guests to Lourdes with the Rise and Shine Trust. The trip is free<br>
+to Guests travelling with the Group. The application form is available online<br>
+on riseandshine.ie . Closing date for applications 15th October 2026.<br>
+Applications are also sought for carers aged 18+ wh o would be interested in accompanying<br>
+guests on the trip. Carers applications at riseandshine.ie<br>
+For more information, visit <a href="https://www.riseandshine.ie" target="_blank" rel="noopener noreferrer">www.riseandshine.ie</a> or Please feel free to contact<br>
+Sian (<a href="tel:+3537960211352" style="color:#1d4ed8;font-weight:600;">07960211352</a>) or Maurice (<a href="tel:+3537711504821" style="color:#1d4ed8;font-weight:600;">07711504821</a>)</p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other DERRY Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghyaran"><a class="parish-link" href="parishofaghyaran.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li class="parish-item" data-name="ardmore"><a class="parish-link" href="ardmoreparish.html" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li class="parish-item" data-name="banagher"><a class="parish-link" href="banagherparish.html" target="_blank" rel="noopener noreferrer">Banagher</a></li><li class="parish-item" data-name="buncrana"><a class="parish-link" href="buncranaparish.html" target="_blank" rel="noopener noreferrer">Buncrana</a></li><li class="parish-item" data-name="camus"><a class="parish-link" href="camusparish.html" target="_blank" rel="noopener noreferrer">Camus</a></li><li class="parish-item" data-name="carndonagh"><a class="parish-link" href="carndonaghparish.html" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li class="parish-item" data-name="castlederg"><a class="parish-link" href="castledergparish.html" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li class="parish-item" data-name="clonleigh (strabane pastoral area)"><a class="parish-link" href="clonleighparish.html" target="_blank" rel="noopener noreferrer">Clonleigh (Strabane Pastoral Area)</a></li><li class="parish-item" data-name="clonmany"><a class="parish-link" href="clonmanyparish.html" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li class="parish-item" data-name="culdaff"><a class="parish-link" href="culdaffparish.html" target="_blank" rel="noopener noreferrer">Culdaff</a></li><li class="parish-item" data-name="culmoe"><a class="parish-link" href="culmoreparish.html" target="_blank" rel="noopener noreferrer">Culmoe</a></li><li class="parish-item" data-name="dma parish (claudy area)"><a class="parish-link" href="dmaparish.html" target="_blank" rel="noopener noreferrer">DMA Parish (Claudy area)</a></li><li class="parish-item" data-name="drumquin"><a class="parish-link" href="drumquinparish.html" target="_blank" rel="noopener noreferrer">Drumquin</a></li><li class="parish-item" data-name="dungiven"><a class="parish-link" href="parishofdungiven.html" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li class="parish-item" data-name="errigal"><a class="parish-link" href="errigalparish.html" target="_blank" rel="noopener noreferrer">Errigal</a></li><li class="parish-item" data-name="fahan"><a class="parish-link" href="fahanparish.html" target="_blank" rel="noopener noreferrer">Fahan</a></li><li class="parish-item" data-name="granaghan"><a class="parish-link" href="granaghanparish.html" target="_blank" rel="noopener noreferrer">Granaghan</a></li><li class="parish-item" data-name="greenlough"><a class="parish-link" href="greenlough.html" target="_blank" rel="noopener noreferrer">Greenlough</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holyfamily-parish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="iskaheen"><a class="parish-link" href="iskaheenparish.html" target="_blank" rel="noopener noreferrer">Iskaheen</a></li><li class="parish-item" data-name="kilrea"><a class="parish-link" href="parishofkilrea.html" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li class="parish-item" data-name="lavey"><a class="parish-link" href="laveyparish.html" target="_blank" rel="noopener noreferrer">Lavey</a></li><li class="parish-item" data-name="leckpatrick"><a class="parish-link" href="leckpatrickparish.html" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li class="parish-item" data-name="maghera (derry)"><a class="parish-link" href="magheraparishderry.html" target="_blank" rel="noopener noreferrer">Maghera (Derry)</a></li><li class="parish-item" data-name="melmount (&amp; camus)"><a class="parish-link" href="melmountparish.html" target="_blank" rel="noopener noreferrer">Melmount (&amp; Camus)</a></li><li class="parish-item" data-name="moville"><a class="parish-link" href="movilleparish.html" target="_blank" rel="noopener noreferrer">Moville</a></li><li class="parish-item" data-name="sion mills"><a class="parish-link" href="parishofsionmills.html" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li class="parish-item" data-name="st eugene&#x27;s cathedral (templemore)"><a class="parish-link" href="steugenescathedral.html" target="_blank" rel="noopener noreferrer">St Eugene&#x27;s Cathedral (Templemore)</a></li><li class="parish-item" data-name="st mary&#x27;s parish creggan"><a class="parish-link" href="stmarysparishcreggan.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Parish Creggan</a></li><li class="parish-item" data-name="star of the sea (magilligan)"><a class="parish-link" href="staroftheseacatholic.html" target="_blank" rel="noopener noreferrer">Star of the Sea (Magilligan)</a></li><li class="parish-item" data-name="steelstown"><a class="parish-link" href="steelstownparish.html" target="_blank" rel="noopener noreferrer">Steelstown</a></li><li class="parish-item" data-name="waterside (&amp; strathfoyle amalgamated)"><a class="parish-link" href="watersideparish.html" target="_blank" rel="noopener noreferrer">Waterside (&amp; Strathfoyle amalgamated)</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghyaran"><a class="parish-link" href="parishofaghyaran.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li class="parish-item" data-name="ardmore"><a class="parish-link" href="ardmoreparish.html" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li class="parish-item" data-name="banagher"><a class="parish-link" href="banagherparish.html" target="_blank" rel="noopener noreferrer">Banagher</a></li><li class="parish-item" data-name="bellaghy"><a class="parish-link" href="bellaghyparish.html" target="_blank" rel="noopener noreferrer">Bellaghy</a></li><li class="parish-item" data-name="buncrana"><a class="parish-link" href="buncranaparish.html" target="_blank" rel="noopener noreferrer">Buncrana</a></li><li class="parish-item" data-name="camus"><a class="parish-link" href="camusparish.html" target="_blank" rel="noopener noreferrer">Camus</a></li><li class="parish-item" data-name="carndonagh"><a class="parish-link" href="carndonaghparish.html" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li class="parish-item" data-name="castlederg"><a class="parish-link" href="castledergparish.html" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li class="parish-item" data-name="claudy"><a class="parish-link" href="parishofclaudy.html" target="_blank" rel="noopener noreferrer">Claudy</a></li><li class="parish-item" data-name="clonleigh (strabane pastoral area)"><a class="parish-link" href="clonleighparish.html" target="_blank" rel="noopener noreferrer">Clonleigh (Strabane Pastoral Area)</a></li><li class="parish-item" data-name="clonmany"><a class="parish-link" href="clonmanyparish.html" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li class="parish-item" data-name="culdaff"><a class="parish-link" href="culdaffparish.html" target="_blank" rel="noopener noreferrer">Culdaff</a></li><li class="parish-item" data-name="culmoe"><a class="parish-link" href="culmoreparish.html" target="_blank" rel="noopener noreferrer">Culmoe</a></li><li class="parish-item" data-name="dma parish (claudy area)"><a class="parish-link" href="dmaparish.html" target="_blank" rel="noopener noreferrer">DMA Parish (Claudy area)</a></li><li class="parish-item" data-name="drumquin"><a class="parish-link" href="drumquinparish.html" target="_blank" rel="noopener noreferrer">Drumquin</a></li><li class="parish-item" data-name="dungiven"><a class="parish-link" href="parishofdungiven.html" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li class="parish-item" data-name="errigal"><a class="parish-link" href="errigalparish.html" target="_blank" rel="noopener noreferrer">Errigal</a></li><li class="parish-item" data-name="fahan"><a class="parish-link" href="fahanparish.html" target="_blank" rel="noopener noreferrer">Fahan</a></li><li class="parish-item" data-name="granaghan"><a class="parish-link" href="granaghanparish.html" target="_blank" rel="noopener noreferrer">Granaghan</a></li><li class="parish-item" data-name="greenlough"><a class="parish-link" href="greenlough.html" target="_blank" rel="noopener noreferrer">Greenlough</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holyfamily-parish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="iskaheen"><a class="parish-link" href="iskaheenparish.html" target="_blank" rel="noopener noreferrer">Iskaheen</a></li><li class="parish-item" data-name="kilrea"><a class="parish-link" href="parishofkilrea.html" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li class="parish-item" data-name="lavey"><a class="parish-link" href="laveyparish.html" target="_blank" rel="noopener noreferrer">Lavey</a></li><li class="parish-item" data-name="leckpatrick"><a class="parish-link" href="leckpatrickparish.html" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li class="parish-item" data-name="limavady"><a class="parish-link" href="limavadyparish.html" target="_blank" rel="noopener noreferrer">Limavady</a></li><li class="parish-item" data-name="maghera (derry)"><a class="parish-link" href="magheraparishderry.html" target="_blank" rel="noopener noreferrer">Maghera (Derry)</a></li><li class="parish-item" data-name="melmount (&amp; camus)"><a class="parish-link" href="melmountparish.html" target="_blank" rel="noopener noreferrer">Melmount (&amp; Camus)</a></li><li class="parish-item" data-name="moville"><a class="parish-link" href="movilleparish.html" target="_blank" rel="noopener noreferrer">Moville</a></li><li class="parish-item" data-name="sion mills"><a class="parish-link" href="parishofsionmills.html" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li class="parish-item" data-name="st eugene&#x27;s cathedral (templemore)"><a class="parish-link" href="steugenescathedral.html" target="_blank" rel="noopener noreferrer">St Eugene&#x27;s Cathedral (Templemore)</a></li><li class="parish-item" data-name="st mary&#x27;s parish creggan"><a class="parish-link" href="stmarysparishcreggan.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Parish Creggan</a></li><li class="parish-item" data-name="star of the sea (magilligan)"><a class="parish-link" href="staroftheseacatholic.html" target="_blank" rel="noopener noreferrer">Star of the Sea (Magilligan)</a></li><li class="parish-item" data-name="steelstown"><a class="parish-link" href="steelstownparish.html" target="_blank" rel="noopener noreferrer">Steelstown</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1228,9 +1242,9 @@ previous secretary for this section has retired.</p></div>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1684,11 +1698,16 @@ previous secretary for this section has retired.</p></div>
         for (var i = 0; i < names.length; i++) {
           var page = pageFor(names[i]);
           if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
           var slot = pages.querySelector('[data-page="' + page + '"]');
           if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
+          scrollBoxTo(pages, slot);
           return true;
         }
         return false;

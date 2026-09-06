@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Kilcar Bulletin — 30/08/2026</title>
+  <title>Kilcar Bulletin — 06/09/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -109,6 +110,13 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
@@ -141,6 +149,7 @@
       cursor: pointer;
     }
     .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
     
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {
@@ -160,7 +169,7 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
@@ -203,6 +212,7 @@
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {
@@ -866,6 +876,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -892,7 +903,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -900,35 +911,31 @@
     <header class="header">
       <p class="diocese-label">RAPHOE</p>
       <h1>Kilcar Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Kilcar — 30/08/2026. Part of the Raphoe Diocese collated bulletin.</p>
-      <a class="download-link-top" href="st-carthas-church-kilcar-f94-h2y5.pdf">Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Kilcar — 06/09/2026. Part of the Raphoe Diocese collated bulletin.</p>
+      <a class="download-link-top pdf-force-download" href="st-carthas-church-kilcar-f94-h2y5.pdf" download="st-carthas-church-kilcar-f94-h2y5.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="st-carthas-church-kilcar-f94-h2y5.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       
-      <div class="quiet-links">
-        <a href="st-carthas-church-kilcar-f94-h2y5.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="st-carthas-church-kilcar-f94-h2y5-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="st-carthas-church-kilcar-f94-h2y5.pdf" title="Kilcar bulletin PDF"></iframe>
+        <iframe data-pdf-url="st-carthas-church-kilcar-f94-h2y5.pdf" title="Kilcar bulletin PDF"></iframe>
         
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="st-carthas-church-kilcar-f94-h2y5.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="st-carthas-church-kilcar-f94-h2y5.pdf">Open PDF</a>
-              <a href="st-carthas-church-kilcar-f94-h2y5.pdf" download>Download</a>
+              <a class="pdf-open-newtab" href="st-carthas-church-kilcar-f94-h2y5.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="st-carthas-church-kilcar-f94-h2y5.pdf" download="st-carthas-church-kilcar-f94-h2y5.pdf">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>
       </div>
@@ -963,92 +970,99 @@
       <div class="quiet-links">
         <a href="st-carthas-church-kilcar-f94-h2y5-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-kilcar" data-parish-name="Kilcar"><h2 class="ocr-parish-name">Kilcar</h2><p class="ocr-parish-date">30/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-kilcar" data-parish-name="Kilcar"><h2 class="ocr-parish-name">Kilcar</h2><p class="ocr-parish-date">06/09/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>M<br>
 ass Times<br>
-Saturday 29th 6pm<br>
-Sunday 30th 11am<br>
-Monday 31st NO MASS<br>
-Tuesday 1st 10am<br>
-Wednesday 2nd 10am<br>
-Thursday 3rd 10am<br>
-Friday 4th 10am<br>
 Saturday 5th 6pm Mabel Byrne, née McNelis, Cougish – Months<br>
 Mind<br>
 Sunday 6th 11am John P &amp; Teresa Campbell, Castlecarn –</p>
 <h3 class="b-head">Anniversaries</h3>
-<p>St Carthas Church, Kilcar<br>
+<p>Monday 7th NO MASS<br>
+Tuesday 8th 10am Nativity Of The Blessed Virgin<br>
+Wednesday 9th 10am<br>
+Thursday 10th 10am Sally &amp; Con Byrne – Anniversaries<br>
+Friday 11th 10am<br>
+Saturday 12th 6pm Nora Shovlin – Months Mind<br>
+Peter Shovlin – Anniversary<br>
+Sunday 13th 11am Noreen &amp; James McHugh – Months Mind<br>
+St Carthas Church, Kilcar<br>
 Fr Willie Peoples P.P<br>
 <a href="tel:+353749738007" style="color:#1d4ed8;font-weight:600;">074 9738007</a> / <a href="tel:+353877449461" style="color:#1d4ed8;font-weight:600;">087 7449461</a> <a href="mailto:stcarthaschurch@gmail.com" target="_blank" rel="noopener noreferrer">stcarthaschurch@gmail.com</a><br>
-Sunday 30th August 2026<br>
+Sunday 6th September 2026<br>
 Live Streaming: <a href="https://www.mcn.live" target="_blank" rel="noopener noreferrer">www.mcn.live</a><br>
 St Peregrine<br>
-A blessing with the relic of St Peregrine can be obtained after Mass every Fri day at 10am.<br>
+A blessing with the relic of St Peregrine can be obtained after Mass every Frid ay at 10am.<br>
 This kindly Saint, born in Italy in 1260, is the Patron Saint of cancer patients.<br>
 Áislann Chill Chartha<br>
 Friday 11th September Onoir &amp; Friday 25th<br>
-September Frankie Gavan &amp; Catherine Mc Hugh.<br>
-All tickets available at reception.<br>
-Enrolment for our winter classes are now being<br>
-taken for: adult &amp; children ’s art 🎨, knitting &amp;<br>
-crochet, photography, computer &amp;<br>
-accounts &amp; Irish classes for all levels (these classes<br>
-are subject to numbers)<br>
+September Frankie Gavan &amp; Catherine Mc<br>
+Hugh. All tickets available at reception.<br>
+Enrolment for our winter classes are now<br>
+being taken for: adult &amp; children ’s art 🎨,<br>
+knitting &amp; crochet, photography, computer &amp;<br>
+accounts &amp; Irish classes for all levels (these<br>
+classes are subject to numbers)<br>
 Our Golf Classic is on Friday 25th September</p>
 <h3 class="b-head">contact Aislann reception to book your team</h3>
-<p>Halloween Camo from 27th-30th October, check<br>
-social media for details.<br>
-Exercise with Physio Éireann this September in<br>
-Kilcar and Meenaneary.<br>
+<p>Halloween Camo from 27th-30th October,<br>
+check social media for details.<br>
+Exercise with Physio Éireann this September<br>
+in Kilcar and Meenaneary.<br>
 Something for everyone…<br>
-Chair Pilates – movement and falls prevention for<br>
-all abilities with tea after.<br>
+Chair Pilates – movement and falls<br>
+prevention for all abilities with tea after.<br>
 Clinical Pilates – great for back pain<br>
 StrongHER – ladies’ weights to build strength<br>
-&amp;amp; support bone health. Call <a href="tel:+353851707997" style="color:#1d4ed8;font-weight:600;">085 1707997</a><br>
-A History of Textiles (Scéal na dTeicstílí) is now<br>
-available at Áislann Chill Chartha reception!<br>
-This beautifully crafted book explores the rich<br>
-textile heritage of all our local parishes.<br>
-Overseas postage available - pop in or contact us to<br>
-order.<br>
+&amp;amp; support bone health. Call <a href="tel:+353851707997" style="color:#1d4ed8;font-weight:600;">085<br>
+1707997</a><br>
+A History of Textiles (Scéal na dTeicstílí) is<br>
+now available at Áislann Chill Chartha<br>
+reception!<br>
+This beautifully crafted book explores the<br>
+rich textile heritage of all our local parishes.<br>
+Overseas postage available - pop in or contact<br>
+us to order.<br>
 Áislann Chill Chartha also has office space<br>
-available at competitive rates &amp; of various sizes.<br>
-Viewing can be arranged.<br>
+available at competitive rates &amp; of various<br>
+sizes. Viewing can be arranged.<br>
 For all info call <a href="tel:+353749738376" style="color:#1d4ed8;font-weight:600;">074 9738376</a> or message our<br>
 media pages.<br>
+Parish Collection - € 1720<br>
+Confessions will be heard after all Masses during the week Cursillo<br>
+There will be a Cursillo friendship<br>
+night in Donegal Town on Wednesday<br>
+9th September at 7:30pm in the<br>
+Church of Ireland hall.<br>
+All Cursillo members very welcome.<br>
+Church Renovation Committee<br>
+There was a meeting held this week with<br>
+the Church Renovation Committee<br>
+regarding fundraising.<br>
+So much work has been carried out on the<br>
+main body of St Carthas, with more work<br>
+to do.<br>
+The gable of the Church has to be sealed,<br>
+with emphasis on the bell tower, where<br>
+dampness is occurring.<br>
+The sacristy needs similar attention &amp; a<br>
+store room &amp; outside toilets are necessary.<br>
+Fundraising will be done over a 3 year<br>
+period. You will be well informed prior to<br>
+any fundraising events.<br>
+Thank you for your generous donations<br>
+towards this project. Gravedigger<br>
+There is a gravedigger required for the<br>
+new graveyard.<br>
+Any interested parties can contact the</p>
+<h3 class="b-head">parish office for an application form</h3>
+<p>Deadline is Friday 11th September.<br>
 Carrick Day Care Centre<br>
-We welcome everyone who wishes to<br>
-connect, engage &amp; support our local<br>
-community.<br>
-Doors re-opening 31st August. Monday<br>
-to Thursday 9am –5pm.<br>
-Wholesome freshly cooked 4 course<br>
-meal available daily for a nominal fee of<br>
-€10 per person (booking advised).<br>
-Enquiries <a href="tel:+353749739354" style="color:#1d4ed8;font-weight:600;">074 9739354</a> or Mobile <a href="tel:+353876419749" style="color:#1d4ed8;font-weight:600;">087<br>
-6419749</a><br>
-Chiropody Clinic forthcoming dates 8th<br>
-September, 13th October, 10th<br>
+Chiropody Clinic forthcoming dates<br>
+8th September, 13th October, 10th<br>
 November, 8th December 2026.<br>
-Contact Bernie Boyle <a href="tel:+353872331438" style="color:#1d4ed8;font-weight:600;">087 2331438</a> Parish Collection 16th August - € 1670<br>
-Parish Collection 23rd August - € 1695<br>
-We Remember:</p>
-<h3 class="b-head">Recently Deceased –</h3>
-<p>Mary McNelis<br>
-Michael Melly, Killybegs<br>
-Sally Gayton, née<br>
-Campbell<br>
-California &amp; Chapel Gate<br>
-Suaimhneas Síoraí<br>
-Confessions will be heard after all Masses during the week Church Gate Collection<br>
-Concern will be having their<br>
-annual Church gate collection<br>
-on Saturday 12th &amp; Sunday 13th<br>
-of September.<br>
-All support welcome, thank<br>
-you. Lannons Pharmacy<br>
+Contact Bernie Boyle <a href="tel:+353872331438" style="color:#1d4ed8;font-weight:600;">087 2331438</a><br>
+Lannons Pharmacy<br>
 * Free delivery<br>
 * Free advice<br>
 * Prescriptions while you wait<br>
@@ -1058,24 +1072,14 @@ Located at Supervalu, Killybegs.<br>
 Beside the Post Office.<br>
 Call: <a href="tel:+353749732252" style="color:#1d4ed8;font-weight:600;">074 9732252</a><br>
 Here To Help<br>
-Eucharistic Adoration Wednesday from<br>
-10.30am – 2.30pm<br>
-Gravedigger<br>
-There is a gravedigger<br>
-required for the new<br>
-graveyard.<br>
-Any interested parties can</p>
-<h3 class="b-head">contact the parish office for</h3>
-<p>an application form.<br>
-Deadline is Friday 11th<br>
-September. Kilcar <a href="https://www.mcn.live/Camera/st-carthas-church-kilcar,-f94-h2y5" target="_blank" rel="noopener noreferrer">https://www.mcn.live/Camera/st-carthas-church-kilcar,-f94-h2y5</a></p></div>
+Kilcar <a href="https://www.mcn.live/Camera/st-carthas-church-kilcar,-f94-h2y5" target="_blank" rel="noopener noreferrer">https://www.mcn.live/Camera/st-carthas-church-kilcar,-f94-h2y5</a></p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other RAPHOE Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="tawnawillyparish.html" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="kincasslagh"><a class="parish-link" href="kincasslagh.html" target="_blank" rel="noopener noreferrer">Kincasslagh</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1127,9 +1131,9 @@ September. Kilcar <a href="https://www.mcn.live/Camera/st-carthas-church-kilcar,
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1583,11 +1587,16 @@ September. Kilcar <a href="https://www.mcn.live/Camera/st-carthas-church-kilcar,
         for (var i = 0; i < names.length; i++) {
           var page = pageFor(names[i]);
           if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
           var slot = pages.querySelector('[data-page="' + page + '"]');
           if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
+          scrollBoxTo(pages, slot);
           return true;
         }
         return false;
