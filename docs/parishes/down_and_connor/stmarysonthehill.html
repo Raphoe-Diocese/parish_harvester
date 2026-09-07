@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>St Mary&#x27;s on the Hill Bulletin — 25/08/2026</title>
+  <title>St Mary&#x27;s on the Hill Bulletin — 07/09/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -109,10 +110,20 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -138,21 +149,27 @@
       cursor: pointer;
     }
     .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
     
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
@@ -179,6 +196,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -187,6 +212,7 @@
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {
@@ -201,6 +227,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +247,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +259,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +285,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +300,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +482,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +832,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +846,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -837,6 +876,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -863,7 +903,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,35 +911,31 @@
     <header class="header">
       <p class="diocese-label">DOWN &amp; CONNOR</p>
       <h1>St Mary&#x27;s on the Hill Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for St Mary&#x27;s on the Hill — 25/08/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
-      <a class="download-link-top" href="stmarysonthehill.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for St Mary&#x27;s on the Hill — 07/09/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
+      <a class="download-link-top pdf-force-download" href="stmarysonthehill.pdf" download="stmarysonthehill.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="stmarysonthehill.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       
-      <div class="quiet-links">
-        <a href="stmarysonthehill.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="stmarysonthehill-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="stmarysonthehill.pdf" title="St Mary&#x27;s on the Hill bulletin PDF"></iframe>
+        <iframe data-pdf-url="stmarysonthehill.pdf" title="St Mary&#x27;s on the Hill bulletin PDF"></iframe>
         
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="stmarysonthehill.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="stmarysonthehill.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-              <a href="stmarysonthehill.pdf" download>Download</a>
+              <a class="pdf-open-newtab" href="stmarysonthehill.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="stmarysonthehill.pdf" download="stmarysonthehill.pdf">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>
       </div>
@@ -934,7 +970,7 @@
       <div class="quiet-links">
         <a href="stmarysonthehill-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-st-mary-s-on-the-hill" data-parish-name="St Mary&#x27;s on the Hill"><h2 class="ocr-parish-name">St Mary&#x27;s on the Hill</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-st-mary-s-on-the-hill" data-parish-name="St Mary&#x27;s on the Hill"><h2 class="ocr-parish-name">St Mary&#x27;s on the Hill</h2><p class="ocr-parish-date">07/09/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>.<br>
 PRIESTS OF THE PARISH<br>
@@ -947,78 +983,78 @@ e-mail : <a href="mailto:stmarysoth@downandconnor.org" target="_blank" rel="noop
 website: <a href="https://www.stmarysonthehill.online" target="_blank" rel="noopener noreferrer">www.stmarysonthehill.online</a></p>
 <h3 class="b-head">RECENTLY DECEASED</h3>
 <p>Liz Dearlove, Harmin Pk<br>
+Alicia Devine, Tobar Glen Crescent<br>
 Catherine Mooney, Moyola Manor<br>
-Kevin Donnelly, Tobar Glen Cres<br>
-Jimmy Beatty, Church Drive</p>
+MONTH’S MIND<br>
+Raymond Hassan, Michael McCorry</p>
 <h3 class="b-head">ANNIVERSARIES</h3>
-<p>Thomas &amp; Maureen Gourley, Margaret Copeland,<br>
-Eugene Cummings, Patrick Fennell, Brendan Doolan,<br>
-Bridget &amp; Edward Neill, Thomas O’Reilly,<br>
-Mary Keenan nee Rice, Anthony V.P . Hugh McNally,<br>
-Baby Michael McKee.<br>
+<p>Patrick Hughes, Martin Brogan, Billy Moran,<br>
+William McCotter, Angela McClelland, Jim Curran,<br>
+Veroncia Mulholland, Sarah Convery, William Burns,<br>
+Baby Michael McKee, May O’Toole, Charlotte<br>
+Fletcher, Patrick O’Neill, Kathleen McAuley,<br>
+Rita Smyth, Mary Horan, Mathai Mani.<br>
 MASS INTENTIONS THIS WEEK<br>
-Sat 22nd 6.00pm Maureen &amp; Thomas<br>
-Gourley<br>
-Sun 23rd 9.00am Patrick Fennell<br>
-11.00am Margaret Copeland<br>
-Mon 24th 9.45am Special Intention<br>
-Tues 25th 9.45am Hugh McNally<br>
-Wed 26th 9.45am Thomas O’Reilly<br>
-Thur 27th 9.45am Bridget &amp; Edward Neill<br>
-Fri 28th 9.45am Eugene Cummings &amp;<br>
-Baby Michael McKee<br>
-Sat 29th 9.45am Brendan Doolan<br>
+Sat 15th<br>
+6.00pm Billy Moran<br>
+M/M Michael McCorry<br>
+Sun 16th<br>
+9.00am Angela McClelland &amp;<br>
+Jim Curran<br>
+11.00am Martin Brogan<br>
+M/Mind Raymond Hassan<br>
+Mon 17th 9.45am William Burns<br>
+Tues 18th 9.45am Mary Horan<br>
+Wed 19th 9.45am Patrick Hughes<br>
+Thur 20th 9.45am Veronica Mulholland<br>
+Fri 21st 9.45am Baby Michael McKee<br>
+Sat 22nd 9.45am William McCotter<br>
 We welcome<br>
-Saoirse Hughes<br>
-Grace Hughes<br>
+Alivia O’Neill<br>
 recently baptised in the parish.<br>
-CARNMONEY CEMETERY SUNDAY<br>
-5th/6th SEPTEMBER<br>
-See details online<br>
-First Saturday Devotions<br>
-Will take place in Holy Family Church,<br>
-Limestone Road, on 5th Sept 2026<br>
-10.00a.m. Adoration of the Blessed Sacrament,<br>
-Confessions and Act of Consecration, Rosary and<br>
-Divine Mercy Chaplet.<br>
-11.00 a.m. Holy Sacrifice of the Mass<br>
-6th Antrim Scout Group<br>
-will be holding their annual group recruitment and<br>
-registration on 1st and 2nd September between 7.30<br>
-and 8.30pm, in Scout Den behind st Bernard’s Parish<br>
-hall. For more information go<br>
-to <a href="https://www.6thAntrimscouts.co.uk" target="_blank" rel="noopener noreferrer">www.6thAntrimscouts.co.uk</a> or phone Michael on<br>
-<a href="tel:+3537545382120" style="color:#1d4ed8;font-weight:600;">07545382120</a> or Peter on <a href="tel:+3537921801038" style="color:#1d4ed8;font-weight:600;">07921801038</a>. Adult<br>
-Volunteers needed, spaces are limited for kids,<br>
-preference given where parents are willing to<br>
-volunteer.<br>
+NO Divine Mercy in JULY &amp; AUGUST<br>
+Back to normal for September.<br>
+Baptisms on a Sunday will be at<br>
+12.30pm.<br>
+ST BERNARD’S SITE RE -OPENS<br>
+FEAST OF THE ASSUMPTION Mass on the 15TH<br>
+August at 12.00 noon in St. Bernard’s Church<br>
+Sunday masses will resume in St Bernard’s Church<br>
+Saturday 15th August vigil 6pm, Sunday 16th August<br>
+9am &amp; 11am and baptisms at 12.30pm. No 12.30pm<br>
+mass as we are still in the Summer Schedule.<br>
+However, there will be only limited parking in the<br>
+top carpark at S t Bernard’s . While the tarmac will be<br>
+finished the lining of the top carpark will not take<br>
+place until Tuesday 19th August. Some of the top<br>
+carpark will not be available for parking; the area<br>
+nearest the steps leading to the Church will NOT BE<br>
+OPEN and the GREEN GATES WILL REMAIN CLOSED.<br>
+The rest of the top carpark is usable but will not be<br>
+lined.<br>
+To help with parking we have permission to use the<br>
+school carpark, on the right of the laneway leading to<br>
+the church, until the lining in the top carpark is<br>
+completed.<br>
+Weekday masses will remain in St Marys on the Hill<br>
+Monday 17th &amp; Tuesday 18th August and resume in<br>
+St Bernard’s on Wednesday 19th August 9.45am.<br>
 SUMMER SCHEDULE JULY &amp; AUGUST<br>
-THINGS BACK TO NORMAL TIMES FROM THE<br>
-WEEKEND 5th/6th SEPTEMBER.<br>
-St Bernard’s Saturday vigil 6pm<br>
-Sunday 9am, 11am 12.30pm<br>
-St Mary’s on the Hill Sunday 10am<br>
-Divine Mercy resumes on Fridays at 7pm.<br>
-Also Cemetery Sunday<br>
 St Bernard’s Vigil 6.00pm<br>
 St Bernard’s 9.00am<br>
 St Mary’s on the Hill 10.00am<br>
 St Bernard’s 11.00am<br>
 St Bernard’s 12.30pm<br>
-NO Divine Mercy in<br>
-JULY &amp; AUGUST<br>
-Baptisms on a Sunday will<br>
-be at 12.30pm.<br>
-Parish of S t MARY’S on the HILL 23rd Aug 2026<br>
+Parish of St MARY’S on the HILL 16th Aug 2026<br>
 Churches: St Mary’s on the Hill &amp; St Bernard’s<br>
-St Mary&#x27;s on the Hill</p></div>
+St Mary's on the Hill <a href="https://www.stmarysonthehill.online" target="_blank" rel="noopener noreferrer">https://www.stmarysonthehill.online</a></p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other DOWN &amp; CONNOR Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="ballycastle"><a class="parish-link" href="ballycastleparish.html" target="_blank" rel="noopener noreferrer">Ballycastle</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="ballymenaparish.html" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="glenariffe"><a class="parish-link" href="glenariffeparish.html" target="_blank" rel="noopener noreferrer">Glenariffe</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="kilmore and killyleagh"><a class="parish-link" href="kilmoreandkillyleagh.html" target="_blank" rel="noopener noreferrer">Kilmore and Killyleagh</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="port glenone (st mary&#x27;s portglenone)"><a class="parish-link" href="stmarysportglenone.html" target="_blank" rel="noopener noreferrer">Port Glenone (St Mary&#x27;s Portglenone)</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="sacred heart belfast"><a class="parish-link" href="sacredheartparishbelfast.html" target="_blank" rel="noopener noreferrer">Sacred Heart Belfast</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st brigids belfast"><a class="parish-link" href="stbrigidsparishbelfast.html" target="_blank" rel="noopener noreferrer">St Brigids Belfast</a></li><li class="parish-item" data-name="st gerards"><a class="parish-link" href="stgerardsparish.html" target="_blank" rel="noopener noreferrer">St Gerards</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="antrim"><a class="parish-link" href="antrimparish.html" target="_blank" rel="noopener noreferrer">Antrim</a></li><li class="parish-item" data-name="ballycastle"><a class="parish-link" href="ballycastleparish.html" target="_blank" rel="noopener noreferrer">Ballycastle</a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="ballymenaparish.html" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="loughshore"><a class="parish-link" href="loughshoreparishes.html" target="_blank" rel="noopener noreferrer">Loughshore</a></li><li class="parish-item" data-name="maghera"><a class="parish-link" href="parishofmaghera.html" target="_blank" rel="noopener noreferrer">Maghera</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="st brigids belfast"><a class="parish-link" href="stbrigidsparishbelfast.html" target="_blank" rel="noopener noreferrer">St Brigids Belfast</a></li><li class="parish-item" data-name="st gerards"><a class="parish-link" href="stgerardsparish.html" target="_blank" rel="noopener noreferrer">St Gerards</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st patricks belfast"><a class="parish-link" href="stpatricksbelfast.html" target="_blank" rel="noopener noreferrer">St Patricks Belfast</a></li><li class="parish-item" data-name="st teresas"><a class="parish-link" href="stteresasparish.html" target="_blank" rel="noopener noreferrer">St Teresas</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1070,9 +1106,9 @@ St Mary&#x27;s on the Hill</p></div>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1526,11 +1562,16 @@ St Mary&#x27;s on the Hill</p></div>
         for (var i = 0; i < names.length; i++) {
           var page = pageFor(names[i]);
           if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
           var slot = pages.querySelector('[data-page="' + page + '"]');
           if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
+          scrollBoxTo(pages, slot);
           return true;
         }
         return false;
@@ -1564,23 +1605,8 @@ St Mary&#x27;s on the Hill</p></div>
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();

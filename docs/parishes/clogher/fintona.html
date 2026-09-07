@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Fintona (Donacavey) Bulletin — 25/08/2026</title>
+  <title>Fintona (Donacavey) Bulletin — 07/09/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -109,10 +110,20 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -138,21 +149,27 @@
       cursor: pointer;
     }
     .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
     
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
@@ -179,6 +196,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -187,6 +212,7 @@
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {
@@ -201,6 +227,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +247,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +259,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +285,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +300,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +482,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +832,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +846,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -837,6 +876,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -863,7 +903,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,35 +911,31 @@
     <header class="header">
       <p class="diocese-label">CLOGHER</p>
       <h1>Fintona (Donacavey) Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Fintona (Donacavey) — 25/08/2026. Part of the Clogher Diocese collated bulletin.</p>
-      <a class="download-link-top" href="fintona.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Fintona (Donacavey) — 07/09/2026. Part of the Clogher Diocese collated bulletin.</p>
+      <a class="download-link-top pdf-force-download" href="fintona.pdf" download="fintona.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="fintona.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       
-      <div class="quiet-links">
-        <a href="fintona.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="fintona-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="fintona.pdf" title="Fintona (Donacavey) bulletin PDF"></iframe>
+        <iframe data-pdf-url="fintona.pdf" title="Fintona (Donacavey) bulletin PDF"></iframe>
         
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="fintona.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="fintona.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-              <a href="fintona.pdf" download>Download</a>
+              <a class="pdf-open-newtab" href="fintona.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="fintona.pdf" download="fintona.pdf">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>
       </div>
@@ -934,88 +970,90 @@
       <div class="quiet-links">
         <a href="fintona-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-fintona-donacavey" data-parish-name="Fintona (Donacavey)"><h2 class="ocr-parish-name">Fintona (Donacavey)</h2><p class="ocr-parish-date">25/08/2026</p></header>
-<p class="page-label">Page 27</p>
-<p>Blessing of the Graves:<br>
-‘The Annual Blessing of both cemeteries will take place next Sunday 30th August 2026 at 2.00pm. This<br>
-year Fr Seán will lead the Blessing of the Graves from St Peter&#x27;s &amp; St Paul&#x27;s Cemetery. At 1.00pm Fr<br>
-Seán will individually bless all the graves in St Lawrence&#x27;s and then do St Peter&#x27;s &amp; St Paul&#x27;s after the<br>
-rosary and ceremony finishes. Please bring a bottle of holy water so that you can also sprinkle your own<br>
-family plots and any unattended plots beside you, When preparing to clean up your grave please use the<br>
-bins provided and the specified dumping areas that are available in the graveyard, Parking at the top of<br>
-the new graveyard is strictly reserved for those with mobility issues. Please cooperate with the stewards<br>
-who are organising the parking and use the car parks at the Church and at St Peter and St Paul&#x27;s cemetery,<br>
-The road needs to be kept free to enable traffic to pass freely in case of an emergency. There will be a<br>
-Church Renovation Update:<br>
-We are absolutely delighted to report that, at the beginning of August, the Church Renovation Fund has<br>
-now reached £200,000. As we have said previously, this reflects the continued extreme generosity of our<br>
-Parishioners to this project for which we are so grateful. The second collection (the yellow envelope)<br>
-continues to bring in approximately £2000 every week. In addition to the money from the second<br>
-envelope collection, there have also been quite a number of sizeable individual donations to the project.<br>
-Building Fund Envelopes:<br>
-Our building fund envelopes are currently being prepared and hopefully we will have them ready for<br>
-delivery very soon. The first collection date is 11&quot; October 2026. We would appreciate that anyone who<br>
-helped with delivery last year would come forward to help this year again. Contact Anne in the parish<br>
-office for more details.<br>
-Kevin&#x27;s Old Times Sports Day: Join us on Sunday 13th September 2026 from 2-Spm at St<br>
-Lawrence&#x27;s GAA pitch for a nostalgic aftemoon packed with all your favourite events from Fintona’s<br>
-Sports Days of years gone by! All proceeds from the event will go towards the St. Lawrence&#x27;s Church<br>
-Renovation Fund. Check out our Facebook page for updates,<br>
-Run Fintona Run: Couch to Sk - You can still join us next Tuesday 25th August, at the Ecclesville<br>
-Centre. Registration opens from 6:00pm, with the programme starting promptly at 6:30pm. Bring a<br>
-friend, bring your enthusiasm, and let&#x27;s keep our community moving together!<br>
-Radio Maria Ireland: Radio Maria Ireland is an Irish-run Catholic Talk-Radio Station who enjoy<br>
-commercial free broadcasting — Prayer, Catechesis, Uplifting music, Talks, Interviews and Testimonies,<br>
-Visit www mdiomaria. ie for more information and how you can listen.<br>
-GAA Corner:<br>
-This week&#x27;s Lotto numbers were 8,12,18,25. Congratulations to our Jackpot winner! Six people matched<br>
-three numbers and shared £100, The Jackpot for next week is £1000 and the next Lotto draw will take<br>
-place on Thursday 27” August 2026 in the Beeches Pastoral Centre.<br>
-Supporting Your Parish by Internet Banking Account _Name CATHOLIC PARISH OF<br>
-DONACAVEY NO. | ACCOUNT 8 High St, Omagh, Co. Tyrone, BT78 1BH Account No: <a href="tel:+3532134007" style="color:#1d4ed8;font-weight:600;">02134-007</a><br>
-Branch Sort Code: 93-80-41 BIC: FTBKGB2B IBAN: GB26. If you are making a payment by cheque,<br>
-please make cheque payable to ‘Catholic Parish of Donacavey.<br>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-fintona-donacavey" data-parish-name="Fintona (Donacavey)"><h2 class="ocr-parish-name">Fintona (Donacavey)</h2><p class="ocr-parish-date">07/09/2026</p></header>
+<p class="page-label">Page 20</p>
+<p>Building Fund Envelopes: Our building fund envelopes are now prepared and ready for<br>
+delivery. The first collection date is 11” October 2026. We would appreciate that anyone<br>
+who helped with delivery last year would come forward to help this year again. Contact<br>
+Anne in the parish office. (Office hours: Tuesday, Wednesday &amp; Friday 9.30am — 3.30pm)<br>
+Kevin&#x27;s Old Times Sports Day: Keep free Sunday 13th September 2026 from 2-5pm at St<br>
+Lawrence&#x27;s GAA pitch for a fun packed day with all your favourite events from Fintona&#x27;s Sports<br>
+Days of years gone by! Check out our Facebook page for updates.<br>
+Adoration of The Blessed Sacrament: Adoration of The Blessed Sacrament - Wednesday<br>
+9” September in the Oratory 10.30am to 5.00pm.<br>
+Dromore Legion of Mary: annual pilgrimage to Knock, Sunday 27th September, departing<br>
+main St Dromore at 8.30am, fare £25. Contact Lucia on <a href="tel:+3537548870901" style="color:#1d4ed8;font-weight:600;">07548870901</a> or vera on<br>
+<a href="tel:+442882898629" style="color:#1d4ed8;font-weight:600;">02882898629</a>, please book early<br>
+A note of thanks: The family of Patsy and Vera Breen, the Marie Curie Charity and the<br>
+organisers of the recent fundraising Céilí in Dooneen CEC would like to thank everyone who<br>
+attended the Centre on the night, those who gave donations. Thanks to all who brought food<br>
+and helped to serve it. A great night was had by all. A very generous total of £2057 was<br>
+presented to a representative of the Charity, Also thanks to the Dooneen Committee for the<br>
+use of the lovely premises.<br>
+Harmonise: Tickets are now available for Harmonise&#x27;s new show, Songs by the Strule, which<br>
+takes place on Friday 18” September at 7.30pm in Strule Arts Centre, Omagh. Tickets<br>
+available from the Strule Box office or choir member. It&#x27;s a night, full of fun - come along &amp;<br>
+bring a friend!<br>
+Rise and Shine Trust-Easter 2027 Pilgrimage: Applications are invited from young people<br>
+with additional social, emotional, physical and leaming needs aged 11-30 who are interested<br>
+in travelling as guests to Lourdes with the Rise and Shine Trust. The trip is free to Guests<br>
+travelling with the Group. The application form is available online on riseandshine.te. Closing<br>
+date for applications 15th October 2026. Applications are also sought for carers aged 18+ who<br>
+would be interested in accompanying guests on the trip. Carers applications<br>
+at riseandshine.ie For more information, visit <a href="https://www.riseandshine.ie" target="_blank" rel="noopener noreferrer">www.riseandshine.ie</a> or Please fee! free to<br>
+contact Sian (<a href="tel:+3537960211352" style="color:#1d4ed8;font-weight:600;">07960211352</a>) or Maurice (<a href="tel:+3537711504821" style="color:#1d4ed8;font-weight:600;">07711504821</a>)<br>
+GAA Comer:<br>
+The next Lotto draw will take place on Thursday 10&quot; September 2026 in the Beeches Pastoral<br>
+Centre.<br>
+‘Supporting Your Parish by Internet Banking Account Name CATHOLIC PARISH OF<br>
+DONACAVEY NO. 1 ACCOUNT 8 High St., Omagh, Co. Tyrone, BT78 1BH Account No:<br>
+<a href="tel:+3532134007" style="color:#1d4ed8;font-weight:600;">02134-007</a> Branch_Sort Code: 93-80-41 BIC: FTBKGB2B IBAN: GB26. If you are making a<br>
+payment by cheque, please make cheque payable to ‘Catholic Parish of Donacavey.<br>
 Donating to the Church Renovation Fund: Anyone using the online banking for the Church<br>
-Renovation Fund, please use the following bank account details: Sort Code 93-80-41 Account No.<br>
-<a href="tel:+3532134197" style="color:#1d4ed8;font-weight:600;">02134-197</a> payable to ‘Catholic Parish of Donacavey. We thank you for your continued support.<br>
+Renovation Fund, please use the following bank account details: Sort Code 93-80-41 Account<br>
+No. <a href="tel:+3532134197" style="color:#1d4ed8;font-weight:600;">02134-197</a> payable to ‘Catholic Parish of Donacavey’. We thank you for your continued<br>
+support.<br>
 St. Vincent de Paul Helpline <a href="tel:+3537803551793" style="color:#1d4ed8;font-weight:600;">07803551793</a><br>
 DONACAVEY PARISH BULLETIN<br>
-TWENTV-FIRST SUNDAY IN ORDINARY TIME.<br>
-23rd AUGUST 2026<br>
-Fr. Seán Mulligan PP Tel: <a href="tel:+442882848037" style="color:#1d4ed8;font-weight:600;">028 82848037</a>.<br>
-Mobile <a href="tel:+3537979823653" style="color:#1d4ed8;font-weight:600;">07979823653</a>.<br>
-(Urgent calls only)<br>
-Parish Secretary; Anne Monteith i ‘Telephone <a href="tel:+442882841244" style="color:#1d4ed8;font-weight:600;">028 82841244</a><br>
-Parish Caretakcr: Kevin Wilson SS Telephone <a href="tel:+3537856159448" style="color:#1d4ed8;font-weight:600;">07856159448</a><br>
-Parish Choir: Contact No: ) sti ‘Telephone <a href="tel:+3537749149833" style="color:#1d4ed8;font-weight:600;">07749149833</a><br>
-Access to the Parish Website: www. fintonaparish.com<br>
-Our email address: <a href="mailto:fintona@clogherparishes.ic" target="_blank" rel="noopener noreferrer">fintona@clogherparishes.ic</a></p>
+TWENTY-THIRD SUNDAY IN ORDINARY TIME<br>
+6™ SEPTEMBER 2026<br>
+Fr. Seán Mulligan PP Tel: <a href="tel:+442882848037" style="color:#1d4ed8;font-weight:600;">028 82848037</a><br>
+Mobile <a href="tel:+3537979823653" style="color:#1d4ed8;font-weight:600;">07979823653</a><br>
+h (Urgent calls only)<br>
+Parish Secretary: Anne Monteith = Telephone <a href="tel:+442882841244" style="color:#1d4ed8;font-weight:600;">028 82841244</a><br>
+Parish Caretaker: Kevin Wilson “— ;. Telephone <a href="tel:+3537856159448" style="color:#1d4ed8;font-weight:600;">07856159448</a><br>
+Parish Choir: Contact No: r ivi Telephone <a href="tel:+3537749149833" style="color:#1d4ed8;font-weight:600;">07749149833</a><br>
+Access to the Parish Website: — \wwew.fintonaparish.com<br>
+Our email address: _ <a href="mailto:fintona@clogherparishes.ie" target="_blank" rel="noopener noreferrer">fintona@clogherparishes.ie</a></p>
 <h3 class="b-head">MASS TIMES AND INTENTIONS FOR NEXT WEEK</h3>
-<p>Sun = 8.30am First Mass<br>
+<p>Sun 8.30am First Mass<br>
 Sun 11.30am Sunday Mass<br>
-Mon 10.,00am No Mass<br>
-Tues 10.004am Private Intention<br>
-Wed — 10,00am Private Intention<br>
-Thurs 10.00am_ Private Intention<br>
-Fa 10.00am No Mass<br>
-7.30pm Pat Owens (Month&#x27;s Mind)<br>
-Sat —10.00am No Mass<br>
-12.00pm Wedding Mass<br>
-6.00pm — Vigil Mass<br>
-Sun = 8.30am — First Mass<br>
+Mon 10.00am No Mass<br>
+Tues 10.00am Hugh &amp; Roseanne McCamey, their daughter Sue and son Johnny<br>
+Wed 10.00am Private Intention<br>
+Thurs 10.00am__ Private Intention<br>
+Fri 10.00am No Mass<br>
+7.30pm Mary Martin (1* Anniversary)<br>
+Sat 10,00am William &amp; Laura Cullinan<br>
+6.00pm Vigil Mass<br>
+Sun —8.30am First Mass<br>
 Sun 11.30am Sunday Mass</p>
 <h3 class="b-head">Recently deceased: You are asked to pray for</h3>
-<p>Kieran Reid, Sixmilecross<br>
-Desmond O&#x27;Hagan, Carnalea rd, Fintona<br>
-Etemal rest grant unto them, O Lord, and let perpetual light shine upon them. May their souls and the<br>
-souls of all the faithful, departed, through the merey of God, Rest in peace. Amen.<br>
-Baptism: We welcome into our Christian faith community the following who were baptised recently:<br>
-Dearbhail Quinn Ruairi Conway Cathair McCann<br>
-Adoration of The Blessed Sacrament:<br>
-Adoration of The Blessed Sacrament - Wednesday 26th August in the Oratory 10.30am to 5.00pm.<br>
-Reflection:<br>
-Yesterday is history, tomorrow is a mystery, but today is a gift, which is why it is called the present, Let<br>
-us receive it with gratitude and use it well.<br>
+<p>Fr. Jim Moore, Clones, Monaghan<br>
+Eternal rest grant unto him, O Lord, and let perpetual light shine upon him. May his soul and<br>
+the souls of all the faithful, departed, through the mercy of God, Rest in peace. Amen.</p>
+<h3 class="b-head">Rest in peace</h3>
+<p>Fr. Jim:<br>
+Fr. Jim was a wonderful priest serving our parish faithfully for 18 years, giving so generously of<br>
+his time, kindness and pastoral care. He became a much-loved and respected member of our<br>
+parish community. His warmth, humor and dedication will be remembered with great affection<br>
+by all who had the privilege of knowing him. We keep in our thoughts and prayers his mother<br>
+Winnie, his siblings Ethena, Marina, Niamh, Barry and Christopher, his nieces, nephews and<br>
+extended family and friends. May his gentle soul rest in peace.<br>
+Marriage:<br>
+We congratulate Emma McCann, Fintona and Patrick Rodgers, Clanabogan, who were married<br>
+in St. Lawrence’s Church Fintona on Saturday 29th August 2026. May the Lord grant them the<br>
+blessing of a long-life, good health and happiness together.<br>
 All notices for the bulletin should be with Anne before Wed each week</p>
 <hr></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
@@ -1024,7 +1062,7 @@ All notices for the bulletin should be with Anne before Wed each week</p>
     <section class="parish-section">
       <h2 class="section-heading">Other CLOGHER Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ballybay (tullycorbet)"><a class="parish-link" href="ballybay.html" target="_blank" rel="noopener noreferrer">Ballybay (Tullycorbet)</a></li><li class="parish-item" data-name="carrickmacross (machaire rois)"><a class="parish-link" href="carrickmacross.html" target="_blank" rel="noopener noreferrer">Carrickmacross (Machaire Rois)</a></li><li class="parish-item" data-name="castleblayney (muckno, includes clontibret)"><a class="parish-link" href="castleblayney.html" target="_blank" rel="noopener noreferrer">Castleblayney (Muckno, includes Clontibret)</a></li><li class="parish-item" data-name="clones"><a class="parish-link" href="clones.html" target="_blank" rel="noopener noreferrer">Clones</a></li><li class="parish-item" data-name="corcaghan-threemilehouse (kilmore &amp; drumsnatt)"><a class="parish-link" href="corcaghanthreemilehouse.html" target="_blank" rel="noopener noreferrer">Corcaghan-Threemilehouse (Kilmore &amp; Drumsnatt)</a></li><li class="parish-item" data-name="derrygonnelly (botha)"><a class="parish-link" href="derrygonnelly.html" target="_blank" rel="noopener noreferrer">Derrygonnelly (Botha)</a></li><li class="parish-item" data-name="donagh"><a class="parish-link" href="donagh.html" target="_blank" rel="noopener noreferrer">Donagh</a></li><li class="parish-item" data-name="donaghmoyne"><a class="parish-link" href="donaghmoyne.html" target="_blank" rel="noopener noreferrer">Donaghmoyne</a></li><li class="parish-item" data-name="enniskillen (st michael&#x27;s parish)"><a class="parish-link" href="enniskillen.html" target="_blank" rel="noopener noreferrer">Enniskillen (St Michael&#x27;s Parish)</a></li><li class="parish-item" data-name="errigal truagh"><a class="parish-link" href="errigaltruagh.html" target="_blank" rel="noopener noreferrer">Errigal Truagh</a></li><li class="parish-item" data-name="irvinestown (devenish)"><a class="parish-link" href="irvinestown.html" target="_blank" rel="noopener noreferrer">Irvinestown (Devenish)</a></li><li class="parish-item" data-name="killanny"><a class="parish-link" href="killanny.html" target="_blank" rel="noopener noreferrer">Killanny</a></li><li class="parish-item" data-name="magheracloone"><a class="parish-link" href="magheracloone.html" target="_blank" rel="noopener noreferrer">Magheracloone</a></li><li class="parish-item" data-name="monaghan &amp; rackwallace (includes tyholland)"><a class="parish-link" href="monaghanrackwallace.html" target="_blank" rel="noopener noreferrer">Monaghan &amp; Rackwallace (includes Tyholland)</a></li><li class="parish-item" data-name="roslea"><a class="parish-link" href="roslea.html" target="_blank" rel="noopener noreferrer">Roslea</a></li><li class="parish-item" data-name="tempo (pobal)"><a class="parish-link" href="tempo.html" target="_blank" rel="noopener noreferrer">Tempo (Pobal)</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ballybay (tullycorbet)"><a class="parish-link" href="ballybay.html" target="_blank" rel="noopener noreferrer">Ballybay (Tullycorbet)</a></li><li class="parish-item" data-name="carrickmacross (machaire rois)"><a class="parish-link" href="carrickmacross.html" target="_blank" rel="noopener noreferrer">Carrickmacross (Machaire Rois)</a></li><li class="parish-item" data-name="castleblayney (muckno, includes clontibret)"><a class="parish-link" href="castleblayney.html" target="_blank" rel="noopener noreferrer">Castleblayney (Muckno, includes Clontibret)</a></li><li class="parish-item" data-name="clones"><a class="parish-link" href="clones.html" target="_blank" rel="noopener noreferrer">Clones</a></li><li class="parish-item" data-name="derrygonnelly (botha)"><a class="parish-link" href="derrygonnelly.html" target="_blank" rel="noopener noreferrer">Derrygonnelly (Botha)</a></li><li class="parish-item" data-name="donaghmoyne"><a class="parish-link" href="donaghmoyne.html" target="_blank" rel="noopener noreferrer">Donaghmoyne</a></li><li class="parish-item" data-name="enniskillen (st michael&#x27;s parish)"><a class="parish-link" href="enniskillen.html" target="_blank" rel="noopener noreferrer">Enniskillen (St Michael&#x27;s Parish)</a></li><li class="parish-item" data-name="errigal truagh"><a class="parish-link" href="errigaltruagh.html" target="_blank" rel="noopener noreferrer">Errigal Truagh</a></li><li class="parish-item" data-name="irvinestown (devenish)"><a class="parish-link" href="irvinestown.html" target="_blank" rel="noopener noreferrer">Irvinestown (Devenish)</a></li><li class="parish-item" data-name="killanny"><a class="parish-link" href="killanny.html" target="_blank" rel="noopener noreferrer">Killanny</a></li><li class="parish-item" data-name="lisnaskea-maguiresbridge (aghalurcher)"><a class="parish-link" href="lisnaskeamaguiresbridge.html" target="_blank" rel="noopener noreferrer">Lisnaskea-Maguiresbridge (Aghalurcher)</a></li><li class="parish-item" data-name="magheracloone"><a class="parish-link" href="magheracloone.html" target="_blank" rel="noopener noreferrer">Magheracloone</a></li><li class="parish-item" data-name="newtownbutler (galloon)"><a class="parish-link" href="newtownbutler.html" target="_blank" rel="noopener noreferrer">Newtownbutler (Galloon)</a></li><li class="parish-item" data-name="tempo (pobal)"><a class="parish-link" href="tempo.html" target="_blank" rel="noopener noreferrer">Tempo (Pobal)</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1076,9 +1114,9 @@ All notices for the bulletin should be with Anne before Wed each week</p>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1532,11 +1570,16 @@ All notices for the bulletin should be with Anne before Wed each week</p>
         for (var i = 0; i < names.length; i++) {
           var page = pageFor(names[i]);
           if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
           var slot = pages.querySelector('[data-page="' + page + '"]');
           if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
+          scrollBoxTo(pages, slot);
           return true;
         }
         return false;
@@ -1570,23 +1613,8 @@ All notices for the bulletin should be with Anne before Wed each week</p>
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();
