@@ -1,28 +1,30 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "tawnawillyparish",
   "display_name": "Tawnawilly",
   "diocese": "raphoe",
-  "start_url": "https://tawnawillyparish.ie/bulletin/",
+  "start_url": "https://tawnawillyparish.ie/",
+  "site_type": "wp_json_newest_media",
+  "href_patterns": ["sunday"],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-09-07",
+  "example_url": "https://tawnawillyparish.ie/wp-content/uploads/Sunday-Sept-06-26.pdf",
   "steps": [
     {
       "action": "download",
       "url": "https://tawnawillyparish.ie/wp-content/uploads/Sunday-Sept-06-26.pdf"
     }
   ],
-  "observed_load_ms": 7353.10009765625,
-  "timeout_ms": 55000,
-  "total_timeout_s": 190,
-  "playbook_type": "pdf_download_list",
-  "site_type": "pdf_link_list",
   "operator_notes": [
-    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
-    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-    "Do not worry if the filename or date in the link text changes every week."
+    "Frank 07/09/2026: site is not blocking. Harvest said blocked because it opened /bulletin/ (Cloudflare 403 for Actions). The PDF is open.",
+    "2026-09-06 evening: listing Sunday 6th Sept href is Sunday-Sept-06-26.pdf (HTTP 200, printed Sunday 6th Sept 2026). Sunday-6th-Sept.pdf 404s. Predicted harvest tries Month-DD-YY.",
+    "site_type:wp_json_newest_media with href_patterns [sunday]. Replay also HTTP-fetches the recorded Sunday PDF before any listing.",
+    "Never open /bulletin/."
   ],
   "do_not": [
-    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
-    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
-  ],
-  "recorded_date": "2026-09-07"
+    "Do not set start_url to https://tawnawillyparish.ie/bulletin/ — harvest 403s that listing and reports a false block.",
+    "Do not set use_captured_url on a dated Sunday-*.pdf.",
+    "Do not download GDPR, privacy, wedding, or Order of Mass."
+  ]
 }

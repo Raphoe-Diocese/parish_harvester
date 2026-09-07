@@ -55,6 +55,7 @@ from .utils import (
     extract_mcn_church_id,
     extract_newsletter_number,
     looks_like_permanent_bulletin_url,
+    parishpress_weekly_upload_url,
     mcn_newsletter_url_from_profile,
     mcn_profile_data_url,
     oneweb_newsletter_download_urls,
@@ -231,6 +232,35 @@ def _looks_like_direct_document_url(url: str) -> bool:
         return True
     path = urlparse(lower).path
     return path.endswith((".pdf", ".docx", ".doc")) or "/pdf/" in path
+
+
+def _looks_like_uploaded_file_url(url: str) -> bool:
+    """True for a real PDF/DOCX path — not a ParishPress HTML permanent link."""
+    lower = unquote((url or "").strip()).lower()
+    if not _looks_like_http_url(lower):
+        return False
+    if "drive.usercontent.google.com/download" in lower:
+        return True
+    path = urlparse(lower).path
+    return path.endswith((".pdf", ".docx", ".doc")) or "/pdf/" in path
+
+
+def _recipe_recorded_file_urls(recipe: dict) -> list[str]:
+    """PDF/DOCX URLs already on the recipe — try these before a listing 403."""
+    seen: list[str] = []
+
+    def _add(raw: str) -> None:
+        url = (raw or "").strip()
+        if url and _looks_like_uploaded_file_url(url) and url not in seen:
+            seen.append(url)
+
+    _add(str(recipe.get("example_url") or ""))
+    for step in recipe.get("steps") or []:
+        if not isinstance(step, dict):
+            continue
+        _add(str(step.get("url") or ""))
+        _add(str(step.get("href") or ""))
+    return seen
 
 
 def _recipe_example_document_url(recipe: dict) -> str:
@@ -3928,16 +3958,31 @@ async def replay_recipe(
     dropfiles_example = _dropfiles_example_href_from_recipe(recipe)
 
     # Permanent ParishPress path (Newtown Killea): /bulletin/raphoe/slug/
-    # redirects to this week's PDF. Never open /bulletin/ — that 403s bots.
+    # is the public weekly link. Harvest often gets Cloudflare 403 on that
+    # HTML path; the same file is .../parish-bulletins/unassigned/.../bulletin.pdf.
+    # Never open listing /bulletin/.
     if site_type == "permanent_redirect_document" or looks_like_permanent_bulletin_url(start_url):
         download_url = start_url
         for step in steps:
             if isinstance(step, dict) and str(step.get("url") or "").strip():
                 download_url = str(step.get("url") or "").strip()
                 break
-        found = await _try_http_document_url(download_url, dest)
-        if found:
-            return dest, found[1], found[0]
+        candidates: list[str] = []
+        for raw in (download_url, start_url):
+            url = (raw or "").strip()
+            if url and url not in candidates:
+                candidates.append(url)
+            mapped = parishpress_weekly_upload_url(url)
+            if mapped and mapped not in candidates:
+                candidates.append(mapped)
+        for extra in recipe.get("fallback_document_urls") or []:
+            url = str(extra or "").strip()
+            if url and url not in candidates:
+                candidates.append(url)
+        for url in candidates:
+            found = await _try_http_document_url(url, dest)
+            if found:
+                return dest, found[1], found[0]
         if site_type == "permanent_redirect_document":
             raise RecipeReplayError(
                 f"Permanent bulletin URL {download_url} did not return a PDF/DOCX "
@@ -4188,6 +4233,15 @@ async def replay_recipe(
             f"HTTP-scrape images {start_url} — no bulletin page images matching "
             f"{href_patterns or ['wp-content/uploads']} (browser was not opened)"
         )
+
+    # Recorded PDF/DOCX (Tawnawilly Sunday-Sept-06-26.pdf): fetch over HTTP
+    # before opening /bulletin/. That listing is fine in Chrome; harvest gets
+    # Cloudflare 403 and used to report "site blocking" even though the file
+    # itself is open.
+    for url in _recipe_recorded_file_urls(recipe):
+        found = await _try_http_document_url(url, dest)
+        if found:
+            return dest, found[1], found[0]
 
     context_opts: dict = {"accept_downloads": True}
     if host_profile.get("ignore_https_errors"):

@@ -1808,6 +1808,32 @@ def looks_like_permanent_bulletin_url(url: str) -> bool:
     return "/parish-bulletins/" in lower_path and lower_path.endswith("bulletin.pdf")
 
 
+def parishpress_weekly_upload_url(url: str) -> str:
+    """Map /bulletin/{diocese}/{slug}/ to the weekly bulletin.pdf upload.
+
+    Newtown Killea: the public permanent link is
+    /bulletin/raphoe/newtown-killea. Harvest often gets Cloudflare 403 on
+    that HTML path; the same week's file is
+    /wp-content/uploads/parish-bulletins/unassigned/raphoe/newtown-killea/bulletin.pdf.
+    Listing /bulletin/ is not mapped.
+    """
+    raw = unquote((url or "").strip())
+    if not raw.lower().startswith(("http://", "https://")):
+        return ""
+    parsed = urlparse(raw)
+    path = (parsed.path or "").rstrip("/") + "/"
+    if not _PERMANENT_BULLETIN_PATH_RE.match(path):
+        return ""
+    parts = [part for part in path.strip("/").split("/") if part]
+    if len(parts) < 3:
+        return ""
+    diocese, slug = parts[1], parts[2]
+    new_path = (
+        f"/wp-content/uploads/parish-bulletins/unassigned/{diocese}/{slug}/bulletin.pdf"
+    )
+    return parsed._replace(path=new_path, query="", fragment="").geturl()
+
+
 def extract_mcn_church_id(html: str) -> str | None:
     """Read hidden ``hfChurchId`` from an MCN.live camera page."""
     match = _MCN_CHURCH_ID_RE.search(html or "")

@@ -11,6 +11,7 @@ import pytest
 from harvester.bulletin_freshness import check_bulletin_freshness
 from harvester.replay import (
     _best_scored_link_index,
+    _recipe_recorded_file_urls,
     _decode_pdfemb_data_url,
     _extract_matching_hrefs,
     _extract_matching_href_texts,
@@ -39,6 +40,7 @@ from harvester.utils import (
     dropfiles_task_download_url,
     extract_mcn_church_id,
     looks_like_permanent_bulletin_url,
+    parishpress_weekly_upload_url,
     mcn_newsletter_url_from_profile,
     mcn_profile_data_url,
     predicted_dated_upload_urls,
@@ -427,14 +429,30 @@ class PermanentBulletinUrlTests(unittest.TestCase):
             [url],
         )
 
-    def test_newtown_recipe_downloads_weekly_upload_not_listing(self) -> None:
-        recipe = json.loads(
-            Path("parishes/recipes/raphoe/newtownkilleaparish.json").read_text()
-        )
-        url = (
+    def test_newtown_permanent_path_maps_to_weekly_upload(self) -> None:
+        permanent = "https://newtownkilleaparish.ie/bulletin/raphoe/newtown-killea"
+        mapped = (
             "https://newtownkilleaparish.ie/wp-content/uploads/"
             "parish-bulletins/unassigned/raphoe/newtown-killea/bulletin.pdf"
         )
+        self.assertTrue(looks_like_permanent_bulletin_url(permanent))
+        self.assertEqual(parishpress_weekly_upload_url(permanent), mapped)
+        self.assertEqual(
+            parishpress_weekly_upload_url(permanent + "/"),
+            mapped,
+        )
+        self.assertEqual(
+            parishpress_weekly_upload_url(
+                "https://newtownkilleaparish.ie/bulletin/"
+            ),
+            "",
+        )
+
+    def test_newtown_recipe_uses_permanent_weekly_link(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/raphoe/newtownkilleaparish.json").read_text()
+        )
+        url = "https://newtownkilleaparish.ie/bulletin/raphoe/newtown-killea"
         self.assertEqual(recipe["start_url"], url)
         self.assertEqual(recipe["site_type"], "permanent_redirect_document")
         self.assertEqual(recipe["steps"][0]["url"], url)
@@ -444,6 +462,19 @@ class PermanentBulletinUrlTests(unittest.TestCase):
             "https://newtownkilleaparish.ie/bulletin/",
         )
         self.assertNotIn("2024/06", json.dumps(recipe["steps"]))
+        self.assertEqual(parishpress_weekly_upload_url(recipe["start_url"]).endswith("bulletin.pdf"), True)
+
+    def test_tawnawilly_recipe_does_not_open_listing(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/raphoe/tawnawillyparish.json").read_text()
+        )
+        pdf = "https://tawnawillyparish.ie/wp-content/uploads/Sunday-Sept-06-26.pdf"
+        self.assertNotEqual(recipe["start_url"], "https://tawnawillyparish.ie/bulletin/")
+        self.assertEqual(recipe["site_type"], "wp_json_newest_media")
+        self.assertIn("sunday", recipe["href_patterns"])
+        self.assertEqual(recipe["example_url"], pdf)
+        self.assertEqual(recipe["steps"][0]["url"], pdf)
+        self.assertEqual(_recipe_recorded_file_urls(recipe), [pdf])
 
     def test_predicted_august_filename_is_not_used_for_permanent_path(self) -> None:
         guessed = predicted_dated_upload_urls(

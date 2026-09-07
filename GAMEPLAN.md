@@ -53,6 +53,18 @@ Browser (07/09): site works. Weekly file is `…/parish-bulletins/unassigned/rap
 
 ---
 
+## 07/09/2026 afternoon — Newtown permanent link + Tawnawilly is not blocked
+
+**The real goal, in one sentence:** Newtown uses Frank’s weekly link; Tawnawilly harvest must fetch the PDF, not call `/bulletin/` “blocked”.
+
+Newtown harvest 13:24 UTC was **ok** on the upload `bulletin.pdf`. Frank’s permanent link is `https://newtownkilleaparish.ie/bulletin/raphoe/newtown-killea`. Recipe start_url is that. If harvest 403s the HTML, it fetches `…/parish-bulletins/unassigned/raphoe/newtown-killea/bulletin.pdf`.
+
+Tawnawilly Send & test 13:32 UTC failed: `HTTP 403` on `/bulletin/` → category “site blocking”. Frank runs that site; the recorded file `Sunday-Sept-06-26.pdf` is open. Harvest opened the listing first. Recipe back to homepage + wp-json; replay HTTP-fetches the recorded Sunday PDF before any listing.
+
+**Next:** ▶ Test parish on both (not trainer Send & test if the tab is `/bulletin/`).
+
+---
+
 ## 03/09/2026 — Problems console (work-queue polish)
 
 **The real goal, in one sentence:** Frank can see the next parish, the three clicks, and what to do — without harvest jargon on the card.
