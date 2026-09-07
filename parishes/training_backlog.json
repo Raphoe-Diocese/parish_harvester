@@ -2,16 +2,16 @@
   "generated_at": "2026-09-07",
   "target_date": "2026-09-06",
   "summary": {
-    "downloaded": 94,
+    "downloaded": 95,
     "html_links": 0,
     "skipped": 30,
-    "failed": 19,
+    "failed": 18,
     "stale_rejected": 16
   },
   "action_counts": {
     "skip": 33,
-    "ok": 113,
-    "investigate": 17,
+    "ok": 114,
+    "investigate": 16,
     "verify_autofix": 1
   },
   "parishes": [
@@ -4122,9 +4122,9 @@
       "diocese": "raphoe",
       "recipe_file": "parishes/recipes/raphoe/newtownkilleaparish.json",
       "recipe": {
-        "start_url": "https://newtownkilleaparish.ie/bulletin/",
-        "site_type": "pdf_link_list",
-        "playbook_type": "pdf_download_list",
+        "start_url": "https://newtownkilleaparish.ie/wp-content/uploads/parish-bulletins/unassigned/raphoe/newtown-killea/bulletin.pdf",
+        "site_type": "permanent_redirect_document",
+        "playbook_type": "direct_download",
         "status": "",
         "skip": false,
         "placeholder": false,
@@ -4132,13 +4132,14 @@
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
-          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-          "Do not worry if the filename or date in the link text changes every week."
+          "2026-09-07: site is up in a browser. Harvest still gets Cloudflare 403 on /bulletin/ and /bulletin/raphoe/newtown-killea/. The weekly file is .../parish-bulletins/unassigned/raphoe/newtown-killea/bulletin.pdf (HTTP 200, application/pdf, 216482 bytes, Last-Modified 04/09/2026, printed 6th September 2026 / Twenty-third Sunday). Same path every week.",
+          "Trainer Send & test 07/09/2026 wrote start_url /bulletin/ plus Newsletter-23rd-June-2024.pdf. Harvest then 403'd on /bulletin/. Do not restore that.",
+          "Do not add ?t= on bulletin.pdf. use_target_url keeps this path as-is (no date rewrite)."
         ],
         "do_not": [
-          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
-          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+          "Do not set start_url to https://newtownkilleaparish.ie/bulletin/",
+          "Do not pin Newsletter-23rd-June-2024.pdf or any dated wp-content/uploads/YYYY/MM/ filename.",
+          "Do not add a ?t= cache-buster on bulletin.pdf."
         ],
         "recorded_date": "2026-09-07"
       },
@@ -4146,10 +4147,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP 403 for https://newtownkilleaparish.ie/bulletin/ \u2014 site may be blocking automated access (not a recipe/selector problem); headful fallback: Recipe replay failed: HTTP 403 for https://newtownkilleaparish.ie/bulleti",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP 403 for https://newtownkilleaparish.ie/bulletin/ \u2014 site may be blocking automated access (not a recipe/selector problem); headful fal"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "newtownbutler",
