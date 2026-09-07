@@ -37,7 +37,19 @@ Harvest **did run** 06/09 (target 2026-09-06, `generated_at` 10:05 UTC). Live me
 
 **Next:** Frank Full harvest (or wait for the scheduled one). Then Ctrl+F5. Do not tick live until the mega on parishpress.ie drops Ardara/Inver 30/08.
 
-**Parked:** WAF listings (Holywood / St Gerards / St Patricks); timeouts (Port Glenone / Three Patrons); Newtown Killea Cloudflare 403; Ederney 403 in harvest.
+**Parked:** WAF listings (Holywood / St Gerards / St Patricks); timeouts (Port Glenone / Three Patrons); Ederney 403 in harvest.
+
+---
+
+## 07/09/2026 — Newtown Killea is up; harvest still 403s /bulletin/
+
+**The real goal, in one sentence:** pick this week’s Newtown Killea PDF without opening the Cloudflare listing.
+
+Send & test 07/09 11:57 UTC failed: `HTTP 403` on `https://newtownkilleaparish.ie/bulletin/` (run 34119159286). Recipe had been overwritten to that listing plus `Newsletter-23rd-June-2024.pdf`.
+
+Browser (07/09): site works. Weekly file is `…/parish-bulletins/unassigned/raphoe/newtown-killea/bulletin.pdf` — HTTP 200, 216482 bytes, printed **6th September 2026**. `/bulletin/` stays 403 for harvest.
+
+**Next:** merge + Send & test `newtownkilleaparish`. Not in the mega until that harvest (or Full harvest) is `ok`.
 
 ---
 
