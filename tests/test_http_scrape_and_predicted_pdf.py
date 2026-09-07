@@ -415,6 +415,36 @@ class PermanentBulletinUrlTests(unittest.TestCase):
             looks_like_permanent_bulletin_url("https://newtownkilleaparish.ie/bulletin/")
         )
 
+    def test_newtown_weekly_upload_pdf_is_permanent(self) -> None:
+        url = (
+            "https://newtownkilleaparish.ie/wp-content/uploads/"
+            "parish-bulletins/unassigned/raphoe/newtown-killea/bulletin.pdf"
+        )
+        self.assertTrue(looks_like_permanent_bulletin_url(url))
+        self.assertEqual(rewrite_date_url(url, date(2026, 9, 6)), url)
+        self.assertEqual(
+            _resolve_download_candidates(url, target_date=date(2026, 9, 6)),
+            [url],
+        )
+
+    def test_newtown_recipe_downloads_weekly_upload_not_listing(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/raphoe/newtownkilleaparish.json").read_text()
+        )
+        url = (
+            "https://newtownkilleaparish.ie/wp-content/uploads/"
+            "parish-bulletins/unassigned/raphoe/newtown-killea/bulletin.pdf"
+        )
+        self.assertEqual(recipe["start_url"], url)
+        self.assertEqual(recipe["site_type"], "permanent_redirect_document")
+        self.assertEqual(recipe["steps"][0]["url"], url)
+        self.assertTrue(recipe["steps"][0].get("use_target_url"))
+        self.assertNotEqual(
+            recipe["start_url"],
+            "https://newtownkilleaparish.ie/bulletin/",
+        )
+        self.assertNotIn("2024/06", json.dumps(recipe["steps"]))
+
     def test_predicted_august_filename_is_not_used_for_permanent_path(self) -> None:
         guessed = predicted_dated_upload_urls(
             "https://newtownkilleaparish.ie/wp-content/uploads/2026/07/Newsletter-12th-July-2026.pdf",
