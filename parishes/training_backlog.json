@@ -1,5 +1,5 @@
 {
-  "generated_at": "2026-09-06",
+  "generated_at": "2026-09-07",
   "target_date": "2026-09-06",
   "summary": {
     "downloaded": 94,
@@ -1814,7 +1814,8 @@
         "has_terminal": false,
         "operator_notes": [
           "wp-json newest on 22/08/2026 is 21st-of-Ordinary-Time-Sunday-23rd-August-2026.pdf (HTTP 200, 264145 bytes with a normal browser UA).",
-          "Some bare bots get HTTP 403 on the PDF. site_type:wp_json_newest_media uses the harvest UA."
+          "Some bare bots get HTTP 403 on the PDF. site_type:wp_json_newest_media uses the harvest UA.",
+          "2026-09-06: this-week file is 21st-of-Ordinary-Time-Sunday-6th-September-2026.pdf. wp-json can miss it; example_url predicted fallback rewrites the August slug + /YYYY/MM/. Do not pin the September filename."
         ],
         "do_not": [
           "Do not pin a dated filename.",
@@ -2420,7 +2421,7 @@
         "operator_notes": [
           "Latest Bulletin page shows one Sunday-Dth-Month-YYYY scan. Files live under /uploads/2026/01/ \u2014 score the filename, not the folder.",
           "Newest on 22/08/2026 is Sunday-23rd-August-2026.jpg (HTTP 200, 1362245 bytes).",
-          "image_stack the visible Sunday- image. Do not pin a dated filename."
+          "2026-09-06 evening: latest-bulletin shows Sunday-6th-September-2026.jpg still under /uploads/2026/01/ (HTTP 200). /2026/09/ of that name is 404. Harvest 09:10 UTC still had 30 August. image_stack the visible Sunday- image. Do not pin a dated filename."
         ],
         "do_not": [
           "Do not pin a dated Sunday- image URL.",
@@ -4104,7 +4105,7 @@
         "has_terminal": false,
         "operator_notes": [],
         "do_not": [],
-        "recorded_date": "2026-09-06"
+        "recorded_date": "2026-06-26"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -4121,9 +4122,9 @@
       "diocese": "raphoe",
       "recipe_file": "parishes/recipes/raphoe/newtownkilleaparish.json",
       "recipe": {
-        "start_url": "https://newtownkilleaparish.ie/bulletin/raphoe/newtown-killea/",
-        "site_type": "permanent_redirect_document",
-        "playbook_type": "direct_download",
+        "start_url": "https://newtownkilleaparish.ie/bulletin/",
+        "site_type": "pdf_link_list",
+        "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
@@ -4131,26 +4132,24 @@
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "Permanent ParishPress path /bulletin/raphoe/newtown-killea/ redirects to this week's PDF (confirmed 19/08/2026: HTTP 200, application/pdf, 206KB, last-modified 15/08/2026 \u2192 .../parish-bulletins/unassigned/raphoe/newtown-killea/bulletin.pdf).",
-          "Do not use predicted Newsletter-16th-August-2026.pdf \u2014 that filename 404s.",
-          "Do not start at /bulletin/ \u2014 that listing is a Cloudflare 403 for bots and only shows a June 2024 leftover.",
-          "use_target_url keeps this path as-is (no date rewrite). DOCX conversion runs if the redirect ever serves Word."
+          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
+          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+          "Do not worry if the filename or date in the link text changes every week."
         ],
         "do_not": [
-          "Do not set start_url to https://newtownkilleaparish.ie/bulletin/",
-          "Do not use site_type predicted_dated_pdf or Newsletter-Dth-Month-YYYY.pdf guesses.",
-          "Do not pin a dated wp-content/uploads/2026/07/ filename."
+          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
+          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
         ],
-        "recorded_date": "2026-08-19"
+        "recorded_date": "2026-09-07"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Recipe replay failed: Permanent bulletin URL https://newtownkilleaparish.ie/bulletin/raphoe/newtown-killea/ did not return a PDF/DOCX (listing page was not opened)",
+      "last_error": "Recipe replay failed: HTTP 403 for https://newtownkilleaparish.ie/bulletin/ \u2014 site may be blocking automated access (not a recipe/selector problem); headful fallback: Recipe replay failed: HTTP 403 for https://newtownkilleaparish.ie/bulleti",
       "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: Permanent bulletin URL https://newtownkilleaparish.ie/bulletin/raphoe/newtown-killea/ did not return a PDF/DOCX (listing page was not open"
+      "suggested_reason": "Recipe replay failed: HTTP 403 for https://newtownkilleaparish.ie/bulletin/ \u2014 site may be blocking automated access (not a recipe/selector problem); headful fal"
     },
     {
       "parish_key": "newtownbutler",
@@ -4519,7 +4518,8 @@
         "has_terminal": false,
         "operator_notes": [
           "Newest on 22/08/2026 is Bulletin-Sunday-23rd-August-2026.pdf (HTTP 200, 148359 bytes).",
-          "site_type:wp_json_newest_media with href_patterns [bulletin-sunday]."
+          "site_type:wp_json_newest_media with href_patterns [bulletin-sunday].",
+          "2026-09-06: homepage lists Bulletin-Sunday-6th-Sept-2026.pdf (Sept, not September). Full-month September filename is 404. Predicted harvest must try Sept. Do not pin the September filename."
         ],
         "do_not": [
           "Do not pin a dated filename.",
@@ -4732,7 +4732,7 @@
         "has_terminal": false,
         "operator_notes": [],
         "do_not": [],
-        "recorded_date": "2026-09-06"
+        "recorded_date": "2026-06-26"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -5408,7 +5408,8 @@
         "has_terminal": true,
         "operator_notes": [
           "2026-08-21 FIX: GitHub harvest got HTTP 403 on https://tawnawillyparish.ie/bulletin/. wp-json/wp/v2/media is unchallenged (HTTP 200). Newest Sunday 23 Aug 2026 is /wp-content/uploads/Sunday-23rd-Aug.pdf (HTTP 200, application/pdf). Sunday-16th-Aug.pdf is also live.",
-          "August files use Aug not August \u2014 Sunday-16th-August.pdf and Sunday-23rd-August.pdf 404. Do not predict full-month names from the old Sunday-28th-June.pdf pin.",
+          "August files use Aug not August \u2014 Sunday-16th-August.pdf and Sunday-23rd-August.pdf 404. Do not pin Sunday-Nth-August.pdf from the old June recipe.",
+          "2026-09-06 evening: listing Sunday 6th Sept href is Sunday-Sept-06-26.pdf (HTTP 200, printed Sunday 6th Sept 2026). Sunday-6th-Sept.pdf 404s. Predicted harvest tries Month-DD-YY. Do not pin that filename.",
           "Trainer Guess was highlighting Sunday-26-July-2026.pdf (Sunday 26th) because yearless Sunday-16th-Aug.pdf had no parsed date. Listing also has a huge PARISH BULLETIN 2025 archive.",
           "site_type:wp_json_newest_media with href_patterns [sunday]. Never open /bulletin/. Never pin use_captured_url. Do not download GDPR."
         ],
@@ -5661,7 +5662,7 @@
       "recipe_file": "parishes/recipes/derry/watersideparish.json",
       "recipe": {
         "start_url": "https://watersideparish.net/parish-bulletin/",
-        "site_type": "pdf_link_list",
+        "site_type": "predicted_dated_pdf",
         "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
