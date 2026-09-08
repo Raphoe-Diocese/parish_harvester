@@ -232,18 +232,18 @@ def _looks_like_direct_document_url(url: str) -> bool:
     if looks_like_permanent_bulletin_url(url):
         return True
     path = urlparse(lower).path
-    return path.endswith((".pdf", ".docx", ".doc")) or "/pdf/" in path
+    return path.endswith((".pdf", ".docx", ".doc", ".png", ".jpg", ".jpeg")) or "/pdf/" in path
 
 
 def _looks_like_uploaded_file_url(url: str) -> bool:
-    """True for a real PDF/DOCX path — not a ParishPress HTML permanent link."""
+    """True for a real PDF/DOCX/image path — not a ParishPress HTML permanent link."""
     lower = unquote((url or "").strip()).lower()
     if not _looks_like_http_url(lower):
         return False
     if "drive.usercontent.google.com/download" in lower:
         return True
     path = urlparse(lower).path
-    return path.endswith((".pdf", ".docx", ".doc")) or "/pdf/" in path
+    return path.endswith((".pdf", ".docx", ".doc", ".png", ".jpg", ".jpeg")) or "/pdf/" in path
 
 
 def _recipe_recorded_file_urls(recipe: dict) -> list[str]:

@@ -1823,6 +1823,29 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertFalse(recipe["steps"][0].get("use_captured_url"))
         self.assertTrue(recipe["start_url"].endswith("bulletin.pdf"))
 
+    def test_proved_dc_this_week_examples(self) -> None:
+        cases = {
+            "down_and_connor/bangorparish.json": "06-SEPT-2026-bulletin.pdf",
+            "down_and_connor/glenariffeparish.json": "Twenty-Third-Sunday-of-Ordinary-Time.pdf",
+            "down_and_connor/parishofbright.json": "Bulletin-6-09-2026-.pdf",
+            "down_and_connor/stoliverplunkettparish.json": "Sun-6th-September-26.pdf",
+            "down_and_connor/stpatricksdownpatrick.json": "06-September-2026.pdf",
+            "down_and_connor/glenavyandkilleadparish.json": "2026-September-6-Twenty-Third-Sunday-in-Ordinary-Time-1.pdf",
+            "down_and_connor/st-colmcilles.json": "Parish-Bulletin-06092026.pdf",
+            "down_and_connor/derriaghycatholicparish.json": "Bulletin_23rd_Sun_OT_A.png",
+            "down_and_connor/holyrosaryparishbelfast.json": "a46a59_3a22af7b525a4c7bb2b1b2f0a3c706b2.pdf",
+        }
+        for rel, needle in cases.items():
+            recipe = json.loads((Path("parishes/recipes") / rel).read_text())
+            blob = " ".join(
+                [
+                    recipe.get("example_url") or "",
+                    *(recipe.get("fallback_document_urls") or []),
+                    *(str(step.get("url") or "") for step in recipe.get("steps") or []),
+                ]
+            )
+            self.assertIn(needle, blob, rel)
+
     def test_kincasslagh_does_not_pin_august(self) -> None:
         recipe = json.loads(
             Path("parishes/recipes/raphoe/kincasslagh.json").read_text()
