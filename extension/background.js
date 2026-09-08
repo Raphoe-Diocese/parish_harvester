@@ -2186,8 +2186,13 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 });
 
 const _recordingTabIds = new Set();
+let _pdfDownloadGuardUntil = 0;
 
 chrome.runtime.onMessage.addListener((message, sender) => {
+  if (message?.type === "ph_guard_pdf_download") {
+    _pdfDownloadGuardUntil = Date.now() + 12000;
+    return;
+  }
   if (message?.type === "recording_tab_active") {
     const tabId = sender?.tab?.id;
     if (tabId) _recordingTabIds.add(tabId);
@@ -2201,15 +2206,24 @@ chrome.runtime.onMessage.addListener((message, sender) => {
 });
 
 chrome.downloads.onCreated.addListener((downloadItem) => {
-  const tabId = downloadItem.tabId;
-  if (!tabId || tabId < 0 || !_recordingTabIds.has(tabId)) return;
   const mime = String(downloadItem.mime || "").toLowerCase();
   const url = String(downloadItem.url || downloadItem.finalUrl || "").trim();
-  if (!url) return;
   const looksPdf =
     mime.includes("pdf") ||
     url.toLowerCase().includes(".pdf") ||
     /weekly-bulletins/i.test(url);
+  if (
+    looksPdf
+    && Date.now() < _pdfDownloadGuardUntil
+    && Number.isFinite(downloadItem.id)
+  ) {
+    chrome.downloads.cancel(downloadItem.id);
+    chrome.downloads.erase({ id: downloadItem.id }).catch(() => {});
+    return;
+  }
+  const tabId = downloadItem.tabId;
+  if (!tabId || tabId < 0 || !_recordingTabIds.has(tabId)) return;
+  if (!url) return;
   if (!looksPdf) return;
   chrome.tabs.sendMessage(tabId, { type: "auto_download_detected", url }).catch(() => {});
 });

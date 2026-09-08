@@ -1779,15 +1779,22 @@ function _problemsGithubBlobTabUrl(repo, path) {
   return `https://github.com/${repo}/blob/main/${clean}`;
 }
 
-function _problemsPdfTabUrl(url) {
-  const raw = String(url || "").trim();
-  const m = raw.match(
-    /^https:\/\/raw\.githubusercontent\.com\/([^/]+\/[^/]+)\/(?:main|master|[0-9a-f]{7,40})\/(.+?)(?:\?|$)/i
-  );
-  if (m && /\.pdf$/i.test(m[2].split("?")[0])) {
-    return `https://github.com/${m[1]}/blob/main/${m[2]}`;
+function _problemsPdfViewerTabUrl({ repo, path, url, title }) {
+  const q = new URLSearchParams();
+  if (repo) q.set("repo", repo);
+  if (path) q.set("path", path);
+  if (url) q.set("url", url);
+  if (title) q.set("title", title);
+  return `${chrome.runtime.getURL("pdf_tab.html")}?${q.toString()}`;
+}
+
+function _problemsOpenPdfViewerTab(opts) {
+  try {
+    chrome.runtime.sendMessage({ type: "ph_guard_pdf_download" });
+  } catch (_e) {
+    /* ignore */
   }
-  return raw;
+  chrome.tabs.create({ url: _problemsPdfViewerTabUrl(opts), active: true });
 }
 
 function _problemsHarvestPdfCandidates(repo, row) {
@@ -1896,14 +1903,22 @@ async function _problemsOpenHarvestedPdf(row, repo) {
   for (const path of apiPaths) {
     const download = await _problemsGithubProofDownloadUrl(repo, path, pat);
     if (download) {
-      chrome.tabs.create({ url: _problemsGithubBlobTabUrl(repo, path), active: true });
+      _problemsOpenPdfViewerTab({
+        repo,
+        path,
+        title: row.display_name || key,
+      });
       setStatus(`Opened harvest PDF: ${path}`, "ok");
       return;
     }
   }
   for (const item of _problemsHarvestPdfCandidates(repo, row)) {
     if (await _problemsUrlIsOpenablePdf(item.url, item.minBytes)) {
-      chrome.tabs.create({ url: _problemsPdfTabUrl(item.url), active: true });
+      _problemsOpenPdfViewerTab({
+        repo,
+        url: item.url,
+        title: row.display_name || key,
+      });
       setStatus(`Opened harvest PDF for ${row.display_name || key}.`, "ok");
       return;
     }
@@ -1918,7 +1933,11 @@ function _problemsShowVerifyResult(payload) {
   const box = document.getElementById("problems-verify-result");
   if (!box) return;
   const links = _problemsGithubLinks(payload.repo);
-  const parishPdf = _problemsGithubBlobTabUrl(payload.repo, `Bulletins/${payload.parishKey}.pdf`);
+  const parishPdf = _problemsPdfViewerTabUrl({
+    repo: payload.repo,
+    path: `Bulletins/${payload.parishKey}.pdf`,
+    title: payload.displayName || payload.parishKey,
+  });
   const runLink = payload.runUrl || links.actions;
   const lines = [];
   if (payload.timedOut) {
@@ -2452,7 +2471,7 @@ async function _problemsRenderRows(rows) {
     viewBtn.type = "button";
     viewBtn.className = "problems-view-btn";
     viewBtn.textContent = "View bulletin";
-    viewBtn.title = "Open the harvest PDF in a new tab (GitHub preview — does not download)";
+    viewBtn.title = "Open the harvest PDF in a new tab (on-screen pages — does not download)";
     viewBtn.addEventListener("click", () => {
       void _problemsOpenHarvestedPdf(row, ghRepo);
     });
