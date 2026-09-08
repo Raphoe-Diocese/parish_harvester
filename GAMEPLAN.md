@@ -29,7 +29,9 @@ Frank is right. He already ran Full harvest 07/09 19:31 UTC. ok went **93 → 81
 - Engine also rewrites `DD-MM-YYYY` (Saul) and `DD.MM.YYYY` (Corcaghan) in the filename, not only the `/YYYY/MM/` folder.
 - Not a miss (site has no 06/09 file): Bundoran, Stranorlar, Ardara, Inver, Gortahork, Dromore. Do not invent files.
 
-**Next:** merge this PR. Then ▶ Test parish on Tawnawilly / Newtown. Full harvest only *after* merge — not before. Not live on parishpress.ie until that later harvest + Pages.
+**CI (08/09 night):** `test_live_gortahork_ocr_has_mega_body_and_visible_850` failed because it required `AIFRINN NA SEACHTAINE` on `docs/dioceses/raphoe/index.html`. That file is now a viewer shell (850px boxes, jump/search). Irish stays on `docs/parishes/raphoe/gort-a-choirce.html`. Test updated; no `docs/` regenerate.
+
+**Next:** merge this PR when CI is green. Then ▶ Test parish on Tawnawilly / Newtown. Full harvest only *after* merge — not before. Not live on parishpress.ie until that later harvest + Pages.
 
 **Parked:** Donagh / Ederney HTML 403 (no PDF). Roslea StackProtect 403 from this IP (Sept/September both). WAF listings.
 
