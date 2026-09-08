@@ -17,6 +17,22 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 08/09/2026 night — View bulletin was downloading; Raphoe list is last harvest
+
+**The real goal, in one sentence:** View bulletin opens a new tab (no save dialog); the Problems list is harvest truth, not “the site right now”.
+
+Frank’s Back room (Raphoe, 14/46, week 06/09): Annagry too old 26/07, Ardara too old 30/08, Drumholm failed. Green bar: `Opened harvest PDF: Bulletins/rathmullan.pdf`.
+
+**Why the list looks “false”:** `parish_status.json` is the last harvest write. Rathmullan went `ok` 08/09 22:12 UTC after a one-parish run. Annagry’s **06/09** file is live (`…/2026/09/060926.pdf` HTTP 200 tonight); harvest still has July. Ardara really has no 06/09 post (newest 30/08). Gortahork `bulletin.pdf` Last-Modified 14/08. Refresh does not re-scrape.
+
+**Why View bulletin downloads:** it opened GitHub `download_url` / raw PDF. Brave saves `application/octet-stream`. Fix: open `https://github.com/…/blob/main/Bulletins/<key>.pdf` (HTML preview tab). Trainer **1.61.18**.
+
+**Next:** Reload extension. View bulletin on Rathmullan should be a tab. ▶ Test parish Annagry / Tawnawilly / Newtown / Drumholm — not Full harvest.
+
+**Parked:** sites with no 06/09 file (Ardara, Inver, Gortahork, Stranorlar, Drive July/30-08).
+
+---
+
 ## 08/09/2026 — Do not run another full harvest until this miss-fix is merged
 
 **The real goal, in one sentence:** yesterday’s harvest (07/09/2026, run 34155882078, target 06/09) is the truth; stop asking Frank to harvest again; merge the miss-fix so the *next* harvest can use it.
