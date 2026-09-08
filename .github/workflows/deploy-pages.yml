@@ -231,9 +231,17 @@ jobs:
           fi
 
           mkdir -p _site/extension
-          zip -qr _site/extension/parish_trainer.zip extension
+          # Zip the files inside extension/, not the folder itself.
+          # Brave Update needs manifest.json at the zip root. Packing
+          # `extension` produced extension/manifest.json and Update failed.
+          ( cd extension && zip -qr ../_site/extension/parish_trainer.zip . )
           if [ ! -s _site/extension/parish_trainer.zip ]; then
             echo "Error: extension package was not generated or is empty."
+            exit 1
+          fi
+          if ! python3 -c "import zipfile,sys; z=zipfile.ZipFile('_site/extension/parish_trainer.zip'); sys.exit(0 if 'manifest.json' in z.namelist() else 1)"; then
+            echo "Error: parish_trainer.zip must have manifest.json at the zip root."
+            python3 -c "import zipfile; print('\n'.join(zipfile.ZipFile('_site/extension/parish_trainer.zip').namelist()[:20]))"
             exit 1
           fi
 
@@ -259,8 +267,11 @@ jobs:
           fi
 
           PAGES_BASE="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}"
+          # Custom domain — no 301. Chrome's updater often will not follow a
+          # github.io → parishpress.ie redirect on the zip.
+          CODEBASE_BASE="https://www.parishpress.ie"
 
-          python3 -c "import sys; a,b,v=sys.argv[1],sys.argv[2],sys.argv[3]; open('_site/updates.xml','w').write('<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<gupdate xmlns=\"http://www.google.com/update2/response\" protocol=\"2.0\">\n  <app appid=\"'+a+'\">\n    <updatecheck codebase=\"'+b+'/extension/parish_trainer.zip\" version=\"'+v+'\" />\n  </app>\n</gupdate>\n')" "${APP_ID}" "${PAGES_BASE}" "${VERSION}"
+          python3 -c "import sys; a,b,v=sys.argv[1],sys.argv[2],sys.argv[3]; open('_site/updates.xml','w').write('<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<gupdate xmlns=\"http://www.google.com/update2/response\" protocol=\"2.0\">\n  <app appid=\"'+a+'\">\n    <updatecheck codebase=\"'+b+'/extension/parish_trainer.zip\" version=\"'+v+'\" />\n  </app>\n</gupdate>\n')" "${APP_ID}" "${CODEBASE_BASE}" "${VERSION}"
 
           if ! grep -Fq "version=\"${VERSION}\"" _site/updates.xml; then
             echo "Error: generated updates.xml does not contain extension version ${VERSION}."
