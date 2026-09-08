@@ -17,6 +17,23 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 08/09/2026 — Do not run another full harvest until this miss-fix is merged
+
+**The real goal, in one sentence:** yesterday’s harvest (07/09/2026, run 34155882078, target 06/09) is the truth; stop asking Frank to harvest again; merge the miss-fix so the *next* harvest can use it.
+
+Frank is right. He already ran Full harvest 07/09 19:31 UTC. ok went **93 → 81**. The engine had this-week PDFs on the recipes and **raised** (wp-json / scrape / predict) before HTTP-fetching them.
+
+**This turn (not live until merge + a later harvest):**
+- Replay now tries the recipe PDF (predicted, then a *fresh* recorded file) before every early site_type raise. Last-month pins (Annagry `260726.pdf`) are skipped.
+- Recipes pointed at proved this-week files: Newtown `bulletin.pdf` fallback, Tawnawilly predicted `Sunday-Sept-06-26.pdf`, Annagry / Monaghan / Corcaghan / Kincasslagh / Milford / Rathmullan / Waterside (page cap 8) / Holy Cross (page cap 16; 13-page `060926.pdf` is this week) / Drumholm HTTP `bulletin.pdf` / Sacred Heart recipe created.
+- Not a miss (site has no 06/09 file): Bundoran, Stranorlar, Ardara, Inver, Gortahork, Dromore. Do not invent files.
+
+**Next:** merge this PR. Then ▶ Test parish on Tawnawilly / Newtown. Full harvest only *after* merge — not before. Not live on parishpress.ie until that later harvest + Pages.
+
+**Parked:** Donagh / Ederney HTML 403 (no PDF). Roslea StackProtect 403 from this IP (Sept/September both). WAF listings.
+
+---
+
 ## 06/09/2026 — Open PDF looks like last week; harvest missed this week
 
 **The real goal, in one sentence:** this week’s (06/09/2026) bulletins in Open PDF / Download / mega; last week out of the mega; this-week files the harvest skipped picked up.
