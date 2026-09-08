@@ -29,6 +29,8 @@ Frank’s Back room (Raphoe, 14/46, week 06/09): Annagry too old 26/07, Ardara t
 
 **Update button (08/09 23:56):** Frank is right — Update used to work. Live `https://www.parishpress.ie/updates.xml` already says **1.61.19** (Pages after #182). Brave ignores it because `appid` is `REPLACE_WITH_EXTENSION_ID` (`CHROME_EXTENSION_APP_ID` repo variable empty). Installed id is `aohmhajdfdmhjjjoddleaikdfajgdjok`. Fix deploy-pages default to that id. Not done until live XML has the real appid.
 
+**Update still failed (08/09 24:07):** Live zip had `extension/manifest.json` (nested folder). Brave Update needs `manifest.json` at the zip root. Codebase also 301’d github.io → parishpress.ie. Fix: zip from inside `extension/`; codebase `https://www.parishpress.ie/extension/parish_trainer.zip`. Proved live zip was nested before this fix.
+
 **Parked:** sites with no 06/09 file (Ardara, Inver, Gortahork, Stranorlar, Drive July/30-08).
 
 ---
