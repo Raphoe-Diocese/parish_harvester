@@ -185,8 +185,8 @@ class RecipeMaxBulletinPagesTests(unittest.TestCase):
         self.assertEqual(recipe_max_bulletin_pages({"max_bulletin_pages": 0}), MAX_BULLETIN_PAGES)
         self.assertEqual(recipe_max_bulletin_pages({"max_bulletin_pages": "nope"}), MAX_BULLETIN_PAGES)
 
-    def test_holycross_recipe_keeps_default_page_cap(self) -> None:
-        """Holy Cross 13-page July file must stay rejected (global default 4)."""
+    def test_holycross_recipe_allows_this_week_thirteen_pages(self) -> None:
+        """06/09/2026 pdf/060926.pdf is this week and is 13 pages (max 4 discarded it)."""
         recipe_path = (
             Path(__file__).resolve().parent.parent
             / "parishes"
@@ -195,8 +195,8 @@ class RecipeMaxBulletinPagesTests(unittest.TestCase):
             / "holycrossparishbelfast.json"
         )
         recipe = json.loads(recipe_path.read_text(encoding="utf-8"))
-        self.assertNotIn("max_bulletin_pages", recipe)
-        self.assertEqual(recipe_max_bulletin_pages(recipe), MAX_BULLETIN_PAGES)
+        self.assertGreaterEqual(int(recipe["max_bulletin_pages"]), 13)
+        self.assertGreaterEqual(recipe_max_bulletin_pages(recipe), 13)
         self.assertEqual(MAX_BULLETIN_PAGES, 4)
 
 

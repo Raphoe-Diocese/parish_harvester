@@ -875,7 +875,11 @@ class OcrBulletinPageTests(unittest.TestCase):
         self.assertIn("height: 450px", html_live)
         self.assertIn("max-height: 450px", html_live)
         diocese = (docs / "dioceses" / "raphoe" / "index.html").read_text(encoding="utf-8")
-        self.assertIn("AIFRINN NA SEACHTAINE", diocese)
+        # After 07/09 OCR, the Raphoe diocese index is a viewer shell
+        # (jump/search + locked 850px boxes). Irish OCR is on the parish
+        # page above — do not require AIFRINN inlined here.
+        self.assertIn("Gortahork", diocese)
+        self.assertIn("gort-a-choirce", diocese)
         self.assertRegex(diocese, r"\.pdf-inpage-pages\s*\{[^}]*height:\s*850px")
         self.assertRegex(diocese, r"\.pdf-inpage-pages\s*\{[^}]*max-height:\s*850px")
         self.assertRegex(diocese, r"#ocr-panel\s*\{[^}]*overflow:\s*auto")

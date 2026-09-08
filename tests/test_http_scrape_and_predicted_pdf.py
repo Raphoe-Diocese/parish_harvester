@@ -11,6 +11,7 @@ import pytest
 from harvester.bulletin_freshness import check_bulletin_freshness
 from harvester.replay import (
     _best_scored_link_index,
+    _recipe_fresh_recorded_file_urls,
     _recipe_recorded_file_urls,
     _decode_pdfemb_data_url,
     _extract_matching_hrefs,
@@ -463,6 +464,12 @@ class PermanentBulletinUrlTests(unittest.TestCase):
         )
         self.assertNotIn("2024/06", json.dumps(recipe["steps"]))
         self.assertEqual(parishpress_weekly_upload_url(recipe["start_url"]).endswith("bulletin.pdf"), True)
+        weekly = (
+            "https://newtownkilleaparish.ie/wp-content/uploads/"
+            "parish-bulletins/unassigned/raphoe/newtown-killea/bulletin.pdf"
+        )
+        self.assertIn(weekly, recipe.get("fallback_document_urls") or [])
+        self.assertIn(weekly, _recipe_recorded_file_urls(recipe))
 
     def test_tawnawilly_recipe_does_not_open_listing(self) -> None:
         recipe = json.loads(
@@ -470,11 +477,32 @@ class PermanentBulletinUrlTests(unittest.TestCase):
         )
         pdf = "https://tawnawillyparish.ie/wp-content/uploads/Sunday-Sept-06-26.pdf"
         self.assertNotEqual(recipe["start_url"], "https://tawnawillyparish.ie/bulletin/")
-        self.assertEqual(recipe["site_type"], "wp_json_newest_media")
+        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
         self.assertIn("sunday", recipe["href_patterns"])
         self.assertEqual(recipe["example_url"], pdf)
         self.assertEqual(recipe["steps"][0]["url"], pdf)
         self.assertEqual(_recipe_recorded_file_urls(recipe), [pdf])
+        self.assertEqual(
+            _recipe_fresh_recorded_file_urls(recipe, date(2026, 9, 6)),
+            [pdf],
+        )
+
+    def test_recorded_july_pin_is_not_used_for_september(self) -> None:
+        recipe = {
+            "example_url": "https://annagryparish.ie/wp-content/uploads/2026/07/260726.pdf",
+            "steps": [
+                {
+                    "action": "download",
+                    "url": "https://annagryparish.ie/wp-content/uploads/2026/07/260726.pdf",
+                }
+            ],
+        }
+        july = "https://annagryparish.ie/wp-content/uploads/2026/07/260726.pdf"
+        self.assertEqual(_recipe_recorded_file_urls(recipe), [july])
+        self.assertEqual(
+            _recipe_fresh_recorded_file_urls(recipe, date(2026, 9, 6)),
+            [],
+        )
 
     def test_predicted_august_filename_is_not_used_for_permanent_path(self) -> None:
         guessed = predicted_dated_upload_urls(
@@ -1682,6 +1710,154 @@ class LoughshoreRecipeTests(unittest.TestCase):
         best_date, best_url = max(scored)
         self.assertEqual(best_date, date(2026, 8, 23))
         self.assertEqual(best_url, self.THIS_WEEK)
+
+
+    def test_saul_dd_mm_yyyy_rewrites_filename_and_folder(self) -> None:
+        example = (
+            "https://www.saulandballeeparish.com/app/uploads/"
+            "2026/08/Bulletin-16-08-2026.pdf"
+        )
+        self.assertEqual(
+            rewrite_date_url(example, date(2026, 9, 6)),
+            "https://www.saulandballeeparish.com/app/uploads/"
+            "2026/09/Bulletin-06-09-2026.pdf",
+        )
+        recipe = json.loads(
+            Path("parishes/recipes/down_and_connor/saulandballeeparish.json").read_text()
+        )
+        self.assertEqual(recipe["site_type"], "dated_pdf_path")
+        self.assertEqual(recipe["example_url"], example)
+
+    def test_corcaghan_dotted_yyyy_rewrites_filename(self) -> None:
+        example = (
+            "https://kilmoredrumsnatt.com/wp-content/uploads/"
+            "2026/08/Newsletter-23.08.2026.pdf"
+        )
+        self.assertEqual(
+            rewrite_date_url(example, date(2026, 9, 6)),
+            "https://kilmoredrumsnatt.com/wp-content/uploads/"
+            "2026/09/Newsletter-06.09.2026.pdf",
+        )
+
+    def test_st_bernadettes_predicts_september_from_august(self) -> None:
+        recipe = json.loads(
+            Path(
+                "parishes/recipes/down_and_connor/stbernadettesparish.json"
+            ).read_text()
+        )
+        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
+        predicted = predicted_dated_upload_urls(
+            recipe["example_url"], date(2026, 9, 6), weeks_back=0
+        )
+        self.assertTrue(
+            any("6th" in u and "September" in u for u in predicted),
+            predicted[:6],
+        )
+
+
+class HarvestMissRecipeTests(unittest.TestCase):
+    """Recipes for this-week files the 07/09/2026 harvest raised away."""
+
+    def test_annagry_predicts_september_from_july_example(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/raphoe/annagryparish.json").read_text()
+        )
+        example = recipe["example_url"]
+        self.assertIn("260726.pdf", example)
+        self.assertEqual(recipe["site_type"], "dated_pdf_path")
+        predicted = predicted_dated_upload_urls(example, date(2026, 9, 6), weeks_back=0)
+        self.assertTrue(
+            any(u.endswith("/2026/09/060926.pdf") for u in predicted),
+            predicted[:8],
+        )
+        self.assertEqual(
+            _recipe_fresh_recorded_file_urls(recipe, date(2026, 9, 6)),
+            [],
+        )
+
+    def test_waterside_allows_five_page_weekly(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/derry/watersideparish.json").read_text()
+        )
+        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertGreaterEqual(int(recipe["max_bulletin_pages"]), 8)
+        self.assertIn("newsletter_060926oo.pdf", recipe["example_url"])
+
+    def test_monaghan_has_dated_example(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/clogher/monaghanrackwallace.json").read_text()
+        )
+        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertIn("23082026.pdf", recipe["example_url"])
+        predicted = predicted_dated_upload_urls(
+            recipe["example_url"], date(2026, 9, 6), weeks_back=0
+        )
+        self.assertTrue(any("06092026.pdf" in u for u in predicted), predicted[:8])
+
+    def test_sacred_heart_recipe_uses_encoded_gallery_pdf(self) -> None:
+        recipe = json.loads(
+            Path(
+                "parishes/recipes/down_and_connor/sacredheartparishbelfast.json"
+            ).read_text()
+        )
+        pdf = (
+            "https://www.sacredheartparishbelfast.com/gallery/"
+            "Parish%20Bulletin%206th%20September%202026.pdf"
+        )
+        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
+        self.assertEqual(recipe["example_url"], pdf)
+        self.assertEqual(recipe["steps"][0]["url"], pdf)
+        self.assertNotIn(" ", recipe["example_url"])
+        predicted = predicted_dated_upload_urls(pdf, date(2026, 9, 13), weeks_back=0)
+        self.assertTrue(
+            any("13th" in u and "September" in u for u in predicted),
+            predicted[:8],
+        )
+
+    def test_drumholm_has_no_cache_buster(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/raphoe/drumholm-parish.json").read_text()
+        )
+        self.assertNotIn("?t=", recipe["start_url"])
+        self.assertNotIn("?t=", recipe["steps"][0].get("url") or "")
+        self.assertFalse(recipe["steps"][0].get("use_captured_url"))
+        self.assertTrue(recipe["start_url"].endswith("bulletin.pdf"))
+
+    def test_proved_dc_this_week_examples(self) -> None:
+        cases = {
+            "down_and_connor/bangorparish.json": "06-SEPT-2026-bulletin.pdf",
+            "down_and_connor/glenariffeparish.json": "Twenty-Third-Sunday-of-Ordinary-Time.pdf",
+            "down_and_connor/parishofbright.json": "Bulletin-6-09-2026-.pdf",
+            "down_and_connor/stoliverplunkettparish.json": "Sun-6th-September-26.pdf",
+            "down_and_connor/stpatricksdownpatrick.json": "06-September-2026.pdf",
+            "down_and_connor/glenavyandkilleadparish.json": "2026-September-6-Twenty-Third-Sunday-in-Ordinary-Time-1.pdf",
+            "down_and_connor/st-colmcilles.json": "Parish-Bulletin-06092026.pdf",
+            "down_and_connor/derriaghycatholicparish.json": "Bulletin_23rd_Sun_OT_A.png",
+            "down_and_connor/holyrosaryparishbelfast.json": "a46a59_3a22af7b525a4c7bb2b1b2f0a3c706b2.pdf",
+        }
+        for rel, needle in cases.items():
+            recipe = json.loads((Path("parishes/recipes") / rel).read_text())
+            blob = " ".join(
+                [
+                    recipe.get("example_url") or "",
+                    *(recipe.get("fallback_document_urls") or []),
+                    *(str(step.get("url") or "") for step in recipe.get("steps") or []),
+                ]
+            )
+            self.assertIn(needle, blob, rel)
+
+    def test_kincasslagh_does_not_pin_august(self) -> None:
+        recipe = json.loads(
+            Path("parishes/recipes/raphoe/kincasslagh.json").read_text()
+        )
+        download_urls = [
+            recipe.get("example_url") or "",
+            *(str(step.get("url") or "") for step in recipe.get("steps") or []),
+            *(str(step.get("href") or "") for step in recipe.get("steps") or []),
+        ]
+        self.assertFalse(any("Newsletter-21st-Aug.pdf" in url for url in download_urls))
+        self.assertEqual(recipe["site_type"], "http_scrape_newest_pdf")
+        self.assertIn("Newsletter-sept-6th-3-2.pdf", recipe["example_url"])
 
 
 if __name__ == "__main__":

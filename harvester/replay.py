@@ -26,6 +26,7 @@ from playwright.async_api import (
 )
 from PyPDF2 import PdfReader
 
+from .bulletin_freshness import check_bulletin_freshness
 from .cloud_folders import (
     is_cloud_folder_click_step,
     is_year_folder_click_step,
@@ -231,18 +232,18 @@ def _looks_like_direct_document_url(url: str) -> bool:
     if looks_like_permanent_bulletin_url(url):
         return True
     path = urlparse(lower).path
-    return path.endswith((".pdf", ".docx", ".doc")) or "/pdf/" in path
+    return path.endswith((".pdf", ".docx", ".doc", ".png", ".jpg", ".jpeg")) or "/pdf/" in path
 
 
 def _looks_like_uploaded_file_url(url: str) -> bool:
-    """True for a real PDF/DOCX path — not a ParishPress HTML permanent link."""
+    """True for a real PDF/DOCX/image path — not a ParishPress HTML permanent link."""
     lower = unquote((url or "").strip()).lower()
     if not _looks_like_http_url(lower):
         return False
     if "drive.usercontent.google.com/download" in lower:
         return True
     path = urlparse(lower).path
-    return path.endswith((".pdf", ".docx", ".doc")) or "/pdf/" in path
+    return path.endswith((".pdf", ".docx", ".doc", ".png", ".jpg", ".jpeg")) or "/pdf/" in path
 
 
 def _recipe_recorded_file_urls(recipe: dict) -> list[str]:
@@ -255,12 +256,27 @@ def _recipe_recorded_file_urls(recipe: dict) -> list[str]:
             seen.append(url)
 
     _add(str(recipe.get("example_url") or ""))
+    for extra in recipe.get("fallback_document_urls") or []:
+        _add(str(extra or ""))
     for step in recipe.get("steps") or []:
         if not isinstance(step, dict):
             continue
         _add(str(step.get("url") or ""))
         _add(str(step.get("href") or ""))
     return seen
+
+
+def _recipe_fresh_recorded_file_urls(
+    recipe: dict,
+    target_date: date | None,
+) -> list[str]:
+    """Recorded PDF/DOCX URLs that are not obviously last-month pins."""
+    out: list[str] = []
+    for url in _recipe_recorded_file_urls(recipe):
+        if target_date is not None and check_bulletin_freshness(url, target_date).status == "stale":
+            continue
+        out.append(url)
+    return out
 
 
 def _recipe_example_document_url(recipe: dict) -> str:
@@ -2078,6 +2094,35 @@ async def _try_predicted_dated_pdf(
             )
             if found:
                 return found
+    return None
+
+
+async def _try_http_recipe_document_fallbacks(
+    recipe: dict,
+    dest: Path,
+    target_date: date | None,
+) -> tuple[str, str] | None:
+    """After a listing/wp-json/predict strategy fails, still try the recipe PDF.
+
+    Harvest 07/09/2026 raised on Tawnawilly wp-json and never fetched
+    Sunday-Sept-06-26.pdf which was already on the recipe.
+    """
+    if target_date is not None:
+        example_url = _recipe_example_document_url(recipe)
+        if example_url:
+            predicted = await _try_predicted_dated_pdf(
+                example_url,
+                dest,
+                target_date,
+                weeks_back=int(recipe.get("weeks_back") or 8),
+                weeks_ahead=int(recipe.get("weeks_ahead") or 0),
+            )
+            if predicted:
+                return predicted
+    for url in _recipe_fresh_recorded_file_urls(recipe, target_date):
+        found = await _try_http_document_url(url, dest)
+        if found:
+            return found
     return None
 
 
@@ -3984,6 +4029,11 @@ async def replay_recipe(
             if found:
                 return dest, found[1], found[0]
         if site_type == "permanent_redirect_document":
+            fallback = await _try_http_recipe_document_fallbacks(
+                recipe, dest, target_date
+            )
+            if fallback:
+                return dest, fallback[1], fallback[0]
             raise RecipeReplayError(
                 f"Permanent bulletin URL {download_url} did not return a PDF/DOCX "
                 "(listing page was not opened)"
@@ -4049,6 +4099,9 @@ async def replay_recipe(
         )
         if found:
             return dest, found[1], found[0]
+        fallback = await _try_http_recipe_document_fallbacks(recipe, dest, target_date)
+        if fallback:
+            return dest, fallback[1], fallback[0]
         raise RecipeReplayError(
             f"WAF-flaky site {start_url} — could not fetch listing/post via "
             "plain-HTTP retries within budget (not a permanent block; retry later)"
@@ -4063,6 +4116,9 @@ async def replay_recipe(
         found = await _try_naomhfionan_predicted_pdf(dest, target_date)
         if found:
             return dest, found[1], found[0]
+        fallback = await _try_http_recipe_document_fallbacks(recipe, dest, target_date)
+        if fallback:
+            return dest, fallback[1], fallback[0]
         raise RecipeReplayError(
             f"naomhfionan.com predicted PDF URL(s) for {target_date} did not "
             "resolve to a real PDF (not the listing-page block; retry later "
@@ -4092,31 +4148,9 @@ async def replay_recipe(
         )
         if found:
             return dest, found[1], found[0]
-        example_url = str(recipe.get("example_url") or "").strip()
-        if not example_url:
-            for step in steps:
-                if not isinstance(step, dict):
-                    continue
-                step_url = str(step.get("url") or "").strip()
-                if step_url and _looks_like_direct_document_url(step_url):
-                    example_url = step_url
-                    break
-        playbook = str(recipe.get("playbook_type") or "").strip().lower()
-        if example_url and (
-            playbook == "oneweb_docx"
-            or (
-                "onewebmedia" in example_url.lower()
-                and "newsletter" in example_url.lower()
-            )
-        ):
-            predicted = await _try_predicted_dated_pdf(
-                example_url,
-                dest,
-                target_date,
-                weeks_back=int(recipe.get("weeks_back") or 8),
-            )
-            if predicted:
-                return dest, predicted[1], predicted[0]
+        fallback = await _try_http_recipe_document_fallbacks(recipe, dest, target_date)
+        if fallback:
+            return dest, fallback[1], fallback[0]
         raise RecipeReplayError(
             f"HTTP-scrape listing {start_url} — no dated bulletin PDF matching "
             f"{href_patterns} (not a selector problem; parish may not have posted)"
@@ -4141,6 +4175,9 @@ async def replay_recipe(
         )
         if found:
             return dest, found[1], found[0]
+        fallback = await _try_http_recipe_document_fallbacks(recipe, dest, target_date)
+        if fallback:
+            return dest, fallback[1], fallback[0]
         raise RecipeReplayError(
             f"Predicted dated PDF URL(s) from {example_url} for {target_date} "
             "did not resolve to a real file (listing page was not opened)"
@@ -4171,6 +4208,9 @@ async def replay_recipe(
             )
             if predicted:
                 return dest, predicted[1], predicted[0]
+        fallback = await _try_http_recipe_document_fallbacks(recipe, dest, target_date)
+        if fallback:
+            return dest, fallback[1], fallback[0]
         raise RecipeReplayError(
             f"wp-json media at {start_url} — no dated bulletin PDF matching "
             f"{href_patterns} (listing page was not opened)"
@@ -4201,6 +4241,9 @@ async def replay_recipe(
         )
         if found:
             return dest, found[1], found[0]
+        fallback = await _try_http_recipe_document_fallbacks(recipe, dest, target_date)
+        if fallback:
+            return dest, fallback[1], fallback[0]
         raise RecipeReplayError(
             f"wp-json/RSS/predicted post images at {start_url} — no Sunday "
             "bulletin post with enough page images (browser was not opened)"
@@ -4229,6 +4272,9 @@ async def replay_recipe(
         )
         if found:
             return dest, found[1], found[0]
+        fallback = await _try_http_recipe_document_fallbacks(recipe, dest, target_date)
+        if fallback:
+            return dest, fallback[1], fallback[0]
         raise RecipeReplayError(
             f"HTTP-scrape images {start_url} — no bulletin page images matching "
             f"{href_patterns or ['wp-content/uploads']} (browser was not opened)"
@@ -4237,8 +4283,8 @@ async def replay_recipe(
     # Recorded PDF/DOCX (Tawnawilly Sunday-Sept-06-26.pdf): fetch over HTTP
     # before opening /bulletin/. That listing is fine in Chrome; harvest gets
     # Cloudflare 403 and used to report "site blocking" even though the file
-    # itself is open.
-    for url in _recipe_recorded_file_urls(recipe):
+    # itself is open. Skip last-month pins (Annagry 260726.pdf).
+    for url in _recipe_fresh_recorded_file_urls(recipe, target_date):
         found = await _try_http_document_url(url, dest)
         if found:
             return dest, found[1], found[0]
