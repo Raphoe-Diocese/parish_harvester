@@ -377,6 +377,9 @@ https://www.antrimparish.com
         self.assertIn("Keep smaller committed", workflow)
         self.assertIn("parish_trainer.zip", workflow)
         self.assertIn("_site/updates.xml", workflow)
+        self.assertIn('DEFAULT_APP_ID="aohmhajdfdmhjjjoddleaikdfajgdjok"', workflow)
+        self.assertIn('APP_ID="${DEFAULT_APP_ID}"', workflow)
+        self.assertNotIn('APP_ID="REPLACE_WITH_EXTENSION_ID"', workflow)
 
     def test_ocr_bulletin_workflow_configuration(self) -> None:
         workflow = (REPO_ROOT / ".github" / "workflows" / "ocr-bulletin.yml").read_text(encoding="utf-8")
