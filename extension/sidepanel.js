@@ -1774,6 +1774,22 @@ function _problemsParishBulletinPdf(repo, parishKey, folder) {
   return `https://raw.githubusercontent.com/${repo}/main/Bulletins/${key}.pdf`;
 }
 
+function _problemsGithubBlobTabUrl(repo, path) {
+  const clean = String(path || "").replace(/^\/+/, "");
+  return `https://github.com/${repo}/blob/main/${clean}`;
+}
+
+function _problemsPdfTabUrl(url) {
+  const raw = String(url || "").trim();
+  const m = raw.match(
+    /^https:\/\/raw\.githubusercontent\.com\/([^/]+\/[^/]+)\/(?:main|master|[0-9a-f]{7,40})\/(.+?)(?:\?|$)/i
+  );
+  if (m && /\.pdf$/i.test(m[2].split("?")[0])) {
+    return `https://github.com/${m[1]}/blob/main/${m[2]}`;
+  }
+  return raw;
+}
+
 function _problemsHarvestPdfCandidates(repo, row) {
   const key = String(row?.parish || "").trim();
   const slug = _pdDioceseSlug(row?.diocese || "");
@@ -1880,14 +1896,14 @@ async function _problemsOpenHarvestedPdf(row, repo) {
   for (const path of apiPaths) {
     const download = await _problemsGithubProofDownloadUrl(repo, path, pat);
     if (download) {
-      chrome.tabs.create({ url: download, active: true });
+      chrome.tabs.create({ url: _problemsGithubBlobTabUrl(repo, path), active: true });
       setStatus(`Opened harvest PDF: ${path}`, "ok");
       return;
     }
   }
   for (const item of _problemsHarvestPdfCandidates(repo, row)) {
     if (await _problemsUrlIsOpenablePdf(item.url, item.minBytes)) {
-      chrome.tabs.create({ url: item.url, active: true });
+      chrome.tabs.create({ url: _problemsPdfTabUrl(item.url), active: true });
       setStatus(`Opened harvest PDF for ${row.display_name || key}.`, "ok");
       return;
     }
@@ -1902,7 +1918,7 @@ function _problemsShowVerifyResult(payload) {
   const box = document.getElementById("problems-verify-result");
   if (!box) return;
   const links = _problemsGithubLinks(payload.repo);
-  const parishPdf = _problemsParishBulletinPdf(payload.repo, payload.parishKey);
+  const parishPdf = _problemsGithubBlobTabUrl(payload.repo, `Bulletins/${payload.parishKey}.pdf`);
   const runLink = payload.runUrl || links.actions;
   const lines = [];
   if (payload.timedOut) {
@@ -2436,7 +2452,7 @@ async function _problemsRenderRows(rows) {
     viewBtn.type = "button";
     viewBtn.className = "problems-view-btn";
     viewBtn.textContent = "View bulletin";
-    viewBtn.title = "Open the PDF harvest scraped this week (Bulletins/<key>.pdf, parishpress slice, or harvest proof)";
+    viewBtn.title = "Open the harvest PDF in a new tab (GitHub preview — does not download)";
     viewBtn.addEventListener("click", () => {
       void _problemsOpenHarvestedPdf(row, ghRepo);
     });
