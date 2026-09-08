@@ -39,6 +39,9 @@ _YY_MM_DD_RE = re.compile(r"(?<!\d)(\d{2})\.(\d{2})\.(\d{2})(?!\d)")  # 26.06.14
 # DD.MM.YYYY — Kilmore Newsletter-23.08.2026.pdf. Must be tried before the
 # 2-digit-year dotted forms so "23.08.2026" is not read as 08.20.26.
 _D_M_YYYY_DOT_RE = re.compile(r"(?<!\d)(\d{1,2})\.(\d{1,2})\.(20\d{2})(?!\d)")
+# Saul Bulletin-16-08-2026.pdf. Must be tried before D-M-YY so 16-08-2026
+# is not read as 16-08-20.
+_D_M_YYYY_DASH_RE = re.compile(r"(?<!\d)(\d{1,2})-(\d{1,2})-(20\d{2})(?!\d)")
 _ISO_RE = re.compile(r"(\d{4})-(\d{2})-(\d{2})")                     # 2025-08-31
 _ISO_NODASH_RE = re.compile(r"(?<!\d)(\d{4})(\d{2})(\d{2})(?!\d)")  # 20250831
 _WP_YEAR_MONTH_RE = re.compile(r"/(\d{4})/(\d{2})/")                 # /2026/04/
@@ -302,6 +305,16 @@ def extract_date_from_string(text: str) -> date | None:
 
     # DD.MM.YYYY (4-digit year is unambiguous UK dots).
     m = _first_match_outside_hash(_D_M_YYYY_DOT_RE, text, spans)
+    if m:
+        try:
+            candidate = date(int(m.group(3)), int(m.group(2)), int(m.group(1)))
+            if _is_plausible_bulletin_year(candidate.year):
+                return candidate
+        except ValueError:
+            pass
+
+    # DD-MM-YYYY (Saul Bulletin-16-08-2026.pdf).
+    m = _first_match_outside_hash(_D_M_YYYY_DASH_RE, text, spans)
     if m:
         try:
             candidate = date(int(m.group(3)), int(m.group(2)), int(m.group(1)))
@@ -1196,6 +1209,39 @@ def rewrite_date_url(url: str, target: date) -> str:
     if new_path != path:
         if orig_d_m_yy_dot is not None:
             new_path = _update_yyyymm_dir(orig_d_m_yy_dot, new_path)
+        return parsed._replace(path=new_path).geturl()
+
+    # DD.MM.YYYY (Corcaghan Newsletter-23.08.2026.pdf) and
+    # DD-MM-YYYY (Saul Bulletin-16-08-2026.pdf). Harvest 07/09/2026 only
+    # rewrote the WordPress folder and left last week's day-month in the name.
+    orig_d_m_yyyy: date | None = None
+
+    def _replace_d_m_yyyy(m: re.Match, sep: str) -> str:
+        nonlocal orig_d_m_yyyy
+        try:
+            orig = date(int(m.group(3)), int(m.group(2)), int(m.group(1)))
+            if abs((orig - target).days) < 365:
+                if orig_d_m_yyyy is None:
+                    orig_d_m_yyyy = orig
+                day_s, month_s = m.group(1), m.group(2)
+                padded = len(day_s) == 2 and len(month_s) == 2
+                day_fmt = f"{target.day:02d}" if padded else str(target.day)
+                month_fmt = f"{target.month:02d}" if padded else str(target.month)
+                return f"{day_fmt}{sep}{month_fmt}{sep}{target.year}"
+        except ValueError:
+            pass
+        return m.group(0)
+
+    new_path = _D_M_YYYY_DOT_RE.sub(lambda m: _replace_d_m_yyyy(m, "."), path)
+    if new_path != path:
+        if orig_d_m_yyyy is not None:
+            new_path = _update_yyyymm_dir(orig_d_m_yyyy, new_path)
+        return parsed._replace(path=new_path).geturl()
+
+    new_path = _D_M_YYYY_DASH_RE.sub(lambda m: _replace_d_m_yyyy(m, "-"), path)
+    if new_path != path:
+        if orig_d_m_yyyy is not None:
+            new_path = _update_yyyymm_dir(orig_d_m_yyyy, new_path)
         return parsed._replace(path=new_path).geturl()
 
     # ------------------------------------------------------------------

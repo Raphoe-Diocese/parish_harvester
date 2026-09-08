@@ -1712,6 +1712,49 @@ class LoughshoreRecipeTests(unittest.TestCase):
         self.assertEqual(best_url, self.THIS_WEEK)
 
 
+    def test_saul_dd_mm_yyyy_rewrites_filename_and_folder(self) -> None:
+        example = (
+            "https://www.saulandballeeparish.com/app/uploads/"
+            "2026/08/Bulletin-16-08-2026.pdf"
+        )
+        self.assertEqual(
+            rewrite_date_url(example, date(2026, 9, 6)),
+            "https://www.saulandballeeparish.com/app/uploads/"
+            "2026/09/Bulletin-06-09-2026.pdf",
+        )
+        recipe = json.loads(
+            Path("parishes/recipes/down_and_connor/saulandballeeparish.json").read_text()
+        )
+        self.assertEqual(recipe["site_type"], "dated_pdf_path")
+        self.assertEqual(recipe["example_url"], example)
+
+    def test_corcaghan_dotted_yyyy_rewrites_filename(self) -> None:
+        example = (
+            "https://kilmoredrumsnatt.com/wp-content/uploads/"
+            "2026/08/Newsletter-23.08.2026.pdf"
+        )
+        self.assertEqual(
+            rewrite_date_url(example, date(2026, 9, 6)),
+            "https://kilmoredrumsnatt.com/wp-content/uploads/"
+            "2026/09/Newsletter-06.09.2026.pdf",
+        )
+
+    def test_st_bernadettes_predicts_september_from_august(self) -> None:
+        recipe = json.loads(
+            Path(
+                "parishes/recipes/down_and_connor/stbernadettesparish.json"
+            ).read_text()
+        )
+        self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
+        predicted = predicted_dated_upload_urls(
+            recipe["example_url"], date(2026, 9, 6), weeks_back=0
+        )
+        self.assertTrue(
+            any("6th" in u and "September" in u for u in predicted),
+            predicted[:6],
+        )
+
+
 class HarvestMissRecipeTests(unittest.TestCase):
     """Recipes for this-week files the 07/09/2026 harvest raised away."""
 

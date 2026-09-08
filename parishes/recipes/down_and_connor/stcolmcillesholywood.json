@@ -14,6 +14,7 @@
   "site_type": "waf_retry_wordpress",
   "post_slug_patterns": ["bulletin-notice-sunday-", "bulletin-notice-"],
   "weeks_back": 8,
+  "max_bulletin_pages": 8,
   "timeout_ms": 45000,
   "total_timeout_s": 190,
   "recorded_date": "2026-08-20",
@@ -22,7 +23,8 @@
     "Stable slug: /bulletins/bulletin-notice-sunday-{Dth}-{month}-{YYYY}/. Confirmed live 20/08/2026: 16th August 2026 exists; 23rd August 2026 is HTTP 404. Do not invent next Sunday.",
     "Iframe target for 16 Aug 2026: https://www.stcolmcillesholywood.org/wp-content/uploads/2026/08/Bulletin-Notice-16th-August-2026.pdf (HTTP 200, application/pdf, 380331 bytes, 3 pages, body text '16th August' + Holywood).",
     "Listing /weekly-bulletins/ also lists the same posts, but can look stale in search snippets. site_type:waf_retry_wordpress scrapes that listing first, then predicts rewrite_date_url Sundays and skips 404s.",
-    "Origin is SiteGround-style 403-flaky (curl often 403; plain urllib retries get 200). Skip Playwright."
+    "Origin is SiteGround-style 403-flaky (curl often 403; plain urllib retries get 200). Skip Playwright.",
+    "Harvest 07/09/2026 downloaded a real 5-page weekly then discarded Too many pages: 5 (max 4). max_bulletin_pages=8."
   ],
   "do_not": [
     "Do not hardcode /bulletin-notice-sunday-23rd-august-2026/ — that slug 404s until the parish posts it.",

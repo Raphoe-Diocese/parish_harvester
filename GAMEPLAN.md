@@ -25,7 +25,8 @@ Frank is right. He already ran Full harvest 07/09 19:31 UTC. ok went **93 → 81
 
 **This turn (not live until merge + a later harvest):**
 - Replay now tries the recipe PDF (predicted, then a *fresh* recorded file) before every early site_type raise. Last-month pins (Annagry `260726.pdf`) are skipped.
-- Recipes pointed at proved this-week files: Newtown `bulletin.pdf` fallback, Tawnawilly predicted `Sunday-Sept-06-26.pdf`, Annagry / Monaghan / Corcaghan / Kincasslagh / Milford / Rathmullan / Waterside (page cap 8) / Holy Cross (page cap 16; 13-page `060926.pdf` is this week) / Drumholm HTTP `bulletin.pdf` / Sacred Heart recipe created.
+- Recipes pointed at proved this-week files: Newtown `bulletin.pdf` fallback, Tawnawilly predicted `Sunday-Sept-06-26.pdf`, Annagry / Monaghan / Corcaghan / Kincasslagh / Milford / Rathmullan / Waterside (page cap 8) / Holy Cross (page cap 16; 13-page `060926.pdf` is this week) / Drumholm HTTP `bulletin.pdf` / Sacred Heart recipe created / Saul `Bulletin-06-09-2026.pdf` / St Bernadette’s encoded September PDF / Holywood page cap 8.
+- Engine also rewrites `DD-MM-YYYY` (Saul) and `DD.MM.YYYY` (Corcaghan) in the filename, not only the `/YYYY/MM/` folder.
 - Not a miss (site has no 06/09 file): Bundoran, Stranorlar, Ardara, Inver, Gortahork, Dromore. Do not invent files.
 
 **Next:** merge this PR. Then ▶ Test parish on Tawnawilly / Newtown. Full harvest only *after* merge — not before. Not live on parishpress.ie until that later harvest + Pages.
