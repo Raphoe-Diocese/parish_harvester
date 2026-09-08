@@ -247,9 +247,13 @@ jobs:
             fi
           fi
 
-          if [ -z "${CHROME_EXTENSION_APP_ID:-}" ]; then
-            echo "Warning: CHROME_EXTENSION_APP_ID not set, using placeholder." >&2
-            APP_ID="REPLACE_WITH_EXTENSION_ID"
+          # Brave Update matches this id to the installed Trainer.
+          # A missing repo variable used to write REPLACE_WITH_EXTENSION_ID,
+          # so Update found no match and Frank stayed on the old version.
+          DEFAULT_APP_ID="aohmhajdfdmhjjjoddleaikdfajgdjok"
+          if [ -z "${CHROME_EXTENSION_APP_ID:-}" ] || [ "${CHROME_EXTENSION_APP_ID}" = "REPLACE_WITH_EXTENSION_ID" ]; then
+            echo "CHROME_EXTENSION_APP_ID unset or placeholder — using ${DEFAULT_APP_ID}" >&2
+            APP_ID="${DEFAULT_APP_ID}"
           else
             APP_ID="${CHROME_EXTENSION_APP_ID}"
           fi

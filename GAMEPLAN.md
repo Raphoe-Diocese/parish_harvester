@@ -27,7 +27,7 @@ Frank’s Back room (Raphoe, 14/46, week 06/09): Annagry too old 26/07, Ardara t
 
 **Why View bulletin still downloads (08/09 night 2):** Brave is already **Open PDFs in Brave** (Frank’s settings screenshot). GitHub’s raw/`download_url` still sends a save (`Content-Disposition` / octet-stream). The `.pdf` GitHub blob URL does the same. Fix: open `chrome-extension://…/pdf_tab.html` and paint pages with PDF.js. Never `tabs.create` a `.pdf` URL. Trainer **1.61.19**. Cancel any PDF download that starts in the next 12s after View bulletin.
 
-**Next:** Merge the HTML-viewer PR. Reload. View bulletin must show pages in a tab. Then Test parish Annagry / Drumholm / Tawnawilly / Newtown.
+**Update button (08/09 23:56):** Frank is right — Update used to work. Live `https://www.parishpress.ie/updates.xml` already says **1.61.19** (Pages after #182). Brave ignores it because `appid` is `REPLACE_WITH_EXTENSION_ID` (`CHROME_EXTENSION_APP_ID` repo variable empty). Installed id is `aohmhajdfdmhjjjoddleaikdfajgdjok`. Fix deploy-pages default to that id. Not done until live XML has the real appid.
 
 **Parked:** sites with no 06/09 file (Ardara, Inver, Gortahork, Stranorlar, Drive July/30-08).
 
