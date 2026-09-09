@@ -1576,7 +1576,7 @@
     if (_ALWAYS_SKIP_BULLETIN_RE.test(text)) return true;
     if (/\b(bulletin|newsletter)\b/i.test(text)) return false;
     return (
-      /dataentry|giftaid|standingorder|donation|prayer|safeguarding|privacy|gdpr|diocese|sitemap|application|registration|volunteer|finances|financial|parishdraw|mcn\s*media/i.test(
+      /dataentry|parishioner|giftaid|standingorder|donation|prayer|safeguarding|privacy|gdpr|diocese|sitemap|application|registration|volunteer|finances|financial|parishdraw|mcn\s*media/i.test(
         text
       )
     );
@@ -4275,6 +4275,16 @@
       if (!step || String(step.action || "").toLowerCase() !== "click") return false;
       const blob = `${step.selector || ""} ${step.href || ""}`;
       return /mod_downloadlink|mdocs-file|mdocs-download|table\.mdocs/i.test(blob);
+    };
+
+    const _recipeStepsAreComplete = (steps) => {
+      const list = Array.isArray(steps) ? steps : [];
+      const last = list[list.length - 1];
+      if (!last) return false;
+      return (
+        _pdfTerminalActions.has(String(last.action || "").toLowerCase()) ||
+        _isHarvestClickTerminal(last)
+      );
     };
 
     const _ensureTerminalPdfStep = () => {
@@ -7864,7 +7874,7 @@
             readyBanner.textContent =
               `✓ You already have a working recipe for ${dn} — ${stepCount} step${stepCount === 1 ? "" : "s"}` +
               (when ? `, saved ${when}` : "") +
-              `. No need to re-train — just press “Send & test on GitHub”.`;
+              `. No need to re-train — tap Send & test to run the saved recipe.`;
             readyBanner.style.display = "block";
           } else {
             readyBanner.style.display = "none";
@@ -7966,6 +7976,77 @@
           );
           return;
         }
+        if (!_recipeStepsAreComplete(_standaloneRecipeSteps())) {
+          const loadedSaved = await loadRecipeFromRawGithub(key, diocese);
+          if (_recipeStepsAreComplete(loadedSaved?.recipe?.steps)) {
+            const settings = await _storageGet(["gh_pat", "gh_repo"]);
+            if (!settings.gh_pat) {
+              showStatus("❌ GitHub PAT not configured. Open extension popup → Settings.", "error");
+              return;
+            }
+            const pushMod = globalThis.phGithubRecipePush;
+            if (!pushMod?.dispatchHarvestTest) {
+              showStatus("❌ Reload extension (chrome://extensions) then refresh this page.", "error");
+              return;
+            }
+            pushBtn.disabled = true;
+            pushBtn.textContent = "⏳ Testing saved recipe…";
+            showStatus("⏳ Using the saved recipe — testing this parish only. No re-train.", "info");
+            try {
+              const dispatchAt = Date.now();
+              let previousTestedAt = "";
+              try {
+                const statusDoc = await pushMod.fetchParishStatusJson({
+                  gh_pat: settings.gh_pat,
+                  gh_repo: settings.gh_repo,
+                });
+                previousTestedAt = String(statusDoc?.parishes?.[key]?.last_tested_at || "").trim();
+              } catch (_e) {
+                previousTestedAt = "";
+              }
+              const dispatchResult = await pushMod.dispatchHarvestTest({
+                gh_pat: settings.gh_pat,
+                gh_repo: settings.gh_repo,
+                parish_key: key,
+                diocese: loadedSaved.recipe.diocese || diocese,
+              });
+              if (!dispatchResult.ok) {
+                showStatus(`❌ ${dispatchResult.error}`, "error");
+                return;
+              }
+              showStatus(
+                "✅ Saved recipe — single-parish test started (1–3 min). Watch Problems. This does not overwrite the recipe.",
+                "ok"
+              );
+              try {
+                chrome.runtime.sendMessage({
+                  type: "problems_refresh",
+                  parish_key: key,
+                  display_name: name || key,
+                  dispatch_at: dispatchAt,
+                });
+              } catch (_e) {
+                // Side panel may be closed.
+              }
+              if (typeof _startPostPushHarvestWatch === "function") {
+                _startPostPushHarvestWatch(
+                  key,
+                  name || key,
+                  { filePath: loadedSaved.filePath || "" },
+                  dispatchAt,
+                  previousTestedAt
+                );
+              }
+            } catch (err) {
+              showStatus(`❌ ${err.message || err}`, "error");
+            } finally {
+              pushBtn.disabled = false;
+              pushBtn.textContent = "🚀 Send & test on GitHub";
+            }
+            return;
+          }
+        }
+
         const ensuredTerminal = _ensureTerminalPdfStep();
         if (_standaloneRecipeSteps().length === 0) {
           showStatus(
