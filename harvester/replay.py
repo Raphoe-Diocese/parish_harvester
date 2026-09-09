@@ -1709,10 +1709,23 @@ _PDFEMB_IFRAME_SRC_RE = re.compile(
     re.IGNORECASE,
 )
 _WP_UPLOAD_IMAGE_RE = re.compile(
-    r"wp-content/uploads/(20\d{2})/(0[1-9]|1[0-2])/([A-Za-z0-9_.%-]+\.(?:png|jpe?g))",
+    r"(?:(?P<origin>https?://[^\s\"'<>]+?)/)?wp-content/uploads/"
+    r"(?P<year>20\d{2})/(?P<month>0[1-9]|1[0-2])/"
+    r"(?P<name>[A-Za-z0-9_.%-]+\.(?:png|jpe?g))",
     re.IGNORECASE,
 )
 _RESIZED_IMAGE_SUFFIX_RE = re.compile(r"-\d+x\d+\.(?:png|jpe?g)$", re.IGNORECASE)
+
+
+def _wp_upload_abs_url(match: re.Match[str], base_url: str) -> str:
+    """Keep Jetpack/CDN hosts from the page. Do not rewrite i0.wp.com to origin."""
+    year = int(match.group("year"))
+    month = int(match.group("month"))
+    name = match.group("name")
+    origin = match.group("origin")
+    if origin:
+        return f"{origin}/wp-content/uploads/{year:04d}/{month:02d}/{name}"
+    return urljoin(base_url, f"/wp-content/uploads/{year:04d}/{month:02d}/{name}")
 
 
 def _href_match_blob(url: str) -> str:
@@ -2360,14 +2373,14 @@ def _extract_post_page_images(html: str, base_url: str) -> list[str]:
     out: list[str] = []
     seen: set[str] = set()
     for match in _WP_UPLOAD_IMAGE_RE.finditer(html or ""):
-        year, month, name = int(match.group(1)), int(match.group(2)), match.group(3)
+        name = match.group("name")
         if _SKIP_IMAGE_NAME_RE.search(name) or _RESIZED_IMAGE_SUFFIX_RE.search(name):
             continue
         key = name.lower()
         if key in seen:
             continue
         seen.add(key)
-        out.append(urljoin(base_url, f"/wp-content/uploads/{year}/{month:02d}/{name}"))
+        out.append(_wp_upload_abs_url(match, base_url))
     return out
 
 
@@ -2526,10 +2539,10 @@ def _extract_scored_upload_images(
     scored: list[tuple[date, str]] = []
     seen: set[str] = set()
     for match in _WP_UPLOAD_IMAGE_RE.finditer(html):
-        year, month, name = int(match.group(1)), int(match.group(2)), match.group(3)
+        year, month, name = int(match.group("year")), int(match.group("month")), match.group("name")
         if _RESIZED_IMAGE_SUFFIX_RE.search(name) or _SKIP_IMAGE_NAME_RE.search(name):
             continue
-        url = urljoin(base_url, f"/wp-content/uploads/{year}/{month:02d}/{name}")
+        url = _wp_upload_abs_url(match, base_url)
         if url in seen:
             continue
         seen.add(url)
@@ -2705,14 +2718,14 @@ def _extract_wp_upload_images(html: str, year: int, month: int, base_url: str) -
     out: list[str] = []
     seen: set[str] = set()
     for match in _WP_UPLOAD_IMAGE_RE.finditer(html):
-        y, mo, name = int(match.group(1)), int(match.group(2)), match.group(3)
+        y, mo, name = int(match.group("year")), int(match.group("month")), match.group("name")
         if y != year or mo != month or _RESIZED_IMAGE_SUFFIX_RE.search(name):
             continue
         key = name.lower()
         if key in seen:
             continue
         seen.add(key)
-        out.append(urljoin(base_url, f"/wp-content/uploads/{y}/{mo:02d}/{name}"))
+        out.append(_wp_upload_abs_url(match, base_url))
     return out
 
 

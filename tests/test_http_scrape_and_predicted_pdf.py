@@ -21,6 +21,7 @@ from harvester.replay import (
     _extract_mdocs_dated_downloads,
     _extract_pdfembed_target_url,
     _extract_post_page_images,
+    _extract_scored_upload_images,
     _extract_wp_upload_images,
     _is_non_bulletin_url,
     _mdocs_listing_url_candidates,
@@ -806,6 +807,43 @@ class StGerardsListingImageTests(unittest.TestCase):
             urls,
             ["https://stgerardsparish.org/wp-content/uploads/2026/08/16th_1.png"],
         )
+
+
+class IskaheenJetpackImageTests(unittest.TestCase):
+    """Harvest 09/09 missed Iskaheen after rewriting i0.wp.com back to origin."""
+
+    LISTING = "https://www.iskaheenparish.com/bulletin"
+    PAGE1 = (
+        "https://i0.wp.com/www.iskaheenparish.com/wp-content/uploads/2026/09/"
+        "92ce9636-71b1-4f86-8fc5-83a83c53d2c8-1-rotated.jpg"
+    )
+    PAGE2 = (
+        "https://i0.wp.com/www.iskaheenparish.com/wp-content/uploads/2026/09/"
+        "673fdfa4-4f71-4a21-a830-833779b45dac-1-rotated.jpg"
+    )
+
+    def test_keeps_jetpack_host_and_scores_september_folder(self) -> None:
+        html = f"""
+        <img src="{self.PAGE1}?fit=1024%2C768&amp;ssl=1" />
+        <img src="{self.PAGE2}?fit=1024%2C768&amp;ssl=1" />
+        <img src="/wp-content/uploads/2026/04/1.jpg" />
+        """
+        scored = _extract_scored_upload_images(
+            html,
+            self.LISTING,
+            href_patterns=[],
+            target_date=date(2026, 9, 6),
+        )
+        urls = [url for _found, url in scored]
+        self.assertIn(self.PAGE1, urls)
+        self.assertIn(self.PAGE2, urls)
+        self.assertNotIn(
+            "https://www.iskaheenparish.com/wp-content/uploads/2026/09/"
+            "92ce9636-71b1-4f86-8fc5-83a83c53d2c8-1-rotated.jpg",
+            urls,
+        )
+        best = max(item[0] for item in scored)
+        self.assertEqual(best, date(2026, 9, 1))
 
 
 class PdfembedIframeTests(unittest.TestCase):
