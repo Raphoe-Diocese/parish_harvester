@@ -260,7 +260,9 @@ jobs:
           # Brave Update matches this id to the installed Trainer.
           # A missing repo variable used to write REPLACE_WITH_EXTENSION_ID,
           # so Update found no match and Frank stayed on the old version.
-          DEFAULT_APP_ID="aohmhajdfdmhjjjoddleaikdfajgdjok"
+          # Packed CRX id (manifest key). Load unpacked path-id cannot Update.
+          DEFAULT_APP_ID="jicahhhkajpojkjjihbeihkhcadijnkc"
+          LEGACY_UNPACKED_ID="aohmhajdfdmhjjjoddleaikdfajgdjok"
           if [ -z "${CHROME_EXTENSION_APP_ID:-}" ] || [ "${CHROME_EXTENSION_APP_ID}" = "REPLACE_WITH_EXTENSION_ID" ]; then
             echo "CHROME_EXTENSION_APP_ID unset or placeholder — using ${DEFAULT_APP_ID}" >&2
             APP_ID="${DEFAULT_APP_ID}"
@@ -272,8 +274,30 @@ jobs:
           # Custom domain — no 301. Chrome's updater often will not follow a
           # github.io → parishpress.ie redirect on the zip.
           CODEBASE_BASE="https://www.parishpress.ie"
-
-          python3 -c "import sys; a,b,v=sys.argv[1],sys.argv[2],sys.argv[3]; open('_site/updates.xml','w').write('<?xml version=\"1.0\" encoding=\"UTF-8\"?>\n<gupdate xmlns=\"http://www.google.com/update2/response\" protocol=\"2.0\">\n  <app appid=\"'+a+'\">\n    <updatecheck codebase=\"'+b+'/extension/parish_trainer.zip\" version=\"'+v+'\" />\n  </app>\n</gupdate>\n')" "${APP_ID}" "${CODEBASE_BASE}" "${VERSION}"
+          if [ -f docs/extension/parish_trainer.crx ]; then
+            cp -f docs/extension/parish_trainer.crx _site/extension/parish_trainer.crx
+          fi
+          if [ ! -s _site/extension/parish_trainer.crx ]; then
+            echo "Error: parish_trainer.crx missing — Brave Update needs a packed CRX, not only a zip."
+            exit 1
+          fi
+          python3 -c "
+import sys
+packed, legacy, base, version = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
+crx = base + '/extension/parish_trainer.crx'
+zip_url = base + '/extension/parish_trainer.zip'
+body = '''<?xml version=\"1.0\" encoding=\"UTF-8\"?>
+<gupdate xmlns=\"http://www.google.com/update2/response\" protocol=\"2.0\">
+  <app appid=\"%s\">
+    <updatecheck codebase=\"%s\" version=\"%s\" />
+  </app>
+  <app appid=\"%s\">
+    <updatecheck codebase=\"%s\" version=\"%s\" />
+  </app>
+</gupdate>
+''' % (packed, crx, version, legacy, zip_url, version)
+open('_site/updates.xml','w').write(body)
+" "${APP_ID}" "${LEGACY_UNPACKED_ID}" "${CODEBASE_BASE}" "${VERSION}"
 
           if ! grep -Fq "version=\"${VERSION}\"" _site/updates.xml; then
             echo "Error: generated updates.xml does not contain extension version ${VERSION}."

@@ -180,6 +180,10 @@ https://www.antrimparish.com
             manifest.get("update_url"),
             "https://www.parishpress.ie/updates.xml",
         )
+        self.assertTrue(str(manifest.get("key") or "").startswith("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A"))
+        crx = repo_root / "docs" / "extension" / "parish_trainer.crx"
+        self.assertTrue(crx.is_file())
+        self.assertEqual(crx.read_bytes()[:4], b"Cr24")
         self.assertIn('id="ext-version"', popup_html)
         self.assertIn('id="gh-pat"', popup_html)
         self.assertIn('id="gh-repo"', popup_html)
@@ -378,8 +382,10 @@ https://www.antrimparish.com
         self.assertIn("Keep smaller committed", workflow)
         self.assertIn("parish_trainer.zip", workflow)
         self.assertIn("_site/updates.xml", workflow)
-        self.assertIn('DEFAULT_APP_ID="aohmhajdfdmhjjjoddleaikdfajgdjok"', workflow)
+        self.assertIn('DEFAULT_APP_ID="jicahhhkajpojkjjihbeihkhcadijnkc"', workflow)
+        self.assertIn('LEGACY_UNPACKED_ID="aohmhajdfdmhjjjoddleaikdfajgdjok"', workflow)
         self.assertIn('APP_ID="${DEFAULT_APP_ID}"', workflow)
+        self.assertIn("parish_trainer.crx", workflow)
         self.assertNotIn('APP_ID="REPLACE_WITH_EXTENSION_ID"', workflow)
         self.assertIn(
             "( cd extension && zip -qr ../_site/extension/parish_trainer.zip . )",
