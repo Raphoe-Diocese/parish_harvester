@@ -17,6 +17,21 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 09/09/2026 night — Full harvest 34293288559 then recipe hunt
+
+Harvest run [34293288559](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34293288559) **completed** and committed `6e71e06a`. Truth: `parishes/parish_status.json` `generated_at` 2026-09-09T01:07:23Z, `target_date` **2026-09-06**, **ok 104**, **actionable 23**. Do not Full harvest again.
+
+**This-week miss (proved live file, harvest failed):**
+- **iskaheenparish** — `/bulletin` has two `/wp-content/uploads/2026/09/` rotated scans on `i0.wp.com` (HTTP 200 JPEG). Recipe already `http_scrape_newest_images`. Scraper was rewriting Jetpack URLs to origin.
+
+**No 06/09 file (skip):** Ardara (newest ~16/08 HTML), Inver (29–30/08), Bundoran (09/02/2025), Stranorlar (28/06 PDF), Kilmore (23/08), Dunsford (05/07), Ardstraw (05/07), Hannahstown (07/06 docx), Malin (05/04), Dromore (June gallery), Raphoe Drive `1jmslbrliw` (19/07), Irish Martyrs Drive `1m6sogz3de` (30/08).
+
+**Blocked / unproved this network (skip):** Ederney (this-week HTML *is* on culmaine.co.uk; harvest 403 — recipe already print_to_pdf), Donaghmoyne / Roslea (harvest named 06/09 PDFs; I got 202/403, not a PDF), Saint Anthony 403, Holywood / St Gerard / St Patrick / Portglenone / Three Patrons WAF 202, Saint Malachy’s `bulletin.pdf` 404 from here (do not raise the page cap).
+
+**This turn:** keep Iskaheen Jetpack image hosts in `replay.py`. Not ok until a later harvest or Send & test writes parish_status.
+
+---
+
 ## 09/09/2026 night — Trainer Errors: Service worker status 15
 
 Brave loaded Parish Trainer, then showed **Service worker registration failed. Status code: 15**. That is a script crash, not a wrong folder.
