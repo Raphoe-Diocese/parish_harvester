@@ -17,6 +17,16 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 09/09/2026 night — Trainer Errors: Service worker status 15
+
+Brave loaded Parish Trainer, then showed **Service worker registration failed. Status code: 15**. That is a script crash, not a wrong folder.
+
+**Cause:** `extension/background.js` had a leftover `_fetchGithubTextFile` body with top-level `await` (function header missing). A service worker is not a module, so Brave dies.
+
+**This turn:** restore `async function _fetchGithubTextFile`, bump Trainer **1.61.24**, syntax-check the worker in tests. Not on his card until he Remove + Load unpacked a **new** zip after Pages. Do not tell him Update will pull it.
+
+---
+
 ## 09/09/2026 night — Update from Load unpacked does not work
 
 I was wrong: **Update does not fetch parishpress.ie while Parish Trainer is Load unpacked.** Frank stayed on 1.61.21/22. Live zip was newer; Brave never applied it.

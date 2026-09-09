@@ -1992,6 +1992,7 @@ async function _pushDeadRecipeFile(gh_pat, gh_repo, parishKey, recipe) {
   return { ok: true, url: htmlUrl };
 }
 
+async function _fetchGithubTextFile(gh_pat, gh_repo, filePath) {
   const apiUrl = `https://api.github.com/repos/${gh_repo}/contents/${filePath}`;
   const headers = {
     Authorization: `token ${gh_pat}`,

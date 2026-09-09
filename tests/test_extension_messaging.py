@@ -1,6 +1,8 @@
 from __future__ import annotations
 
 import json
+import shutil
+import subprocess
 import unittest
 from pathlib import Path
 
@@ -142,7 +144,7 @@ class ExtensionMessagingTests(unittest.TestCase):
         content = CONTENT_JS.read_text(encoding="utf-8")
         html = SIDEPANEL_HTML.read_text(encoding="utf-8")
         manifest = json.loads(MANIFEST_JSON.read_text(encoding="utf-8"))
-        self.assertEqual(manifest.get("version"), "1.61.23")
+        self.assertEqual(manifest.get("version"), "1.61.24")
         self.assertIn("ph-long-bulletin-cb", content)
         self.assertIn("max_bulletin_pages", content)
         self.assertIn("Long bulletin — allow extra pages", content)
@@ -179,6 +181,24 @@ class ExtensionMessagingTests(unittest.TestCase):
             )
         all_urls_entries = [e for e in content_scripts if "<all_urls>" in e.get("matches", [])]
         self.assertGreaterEqual(len(all_urls_entries), 1)
+
+    def test_service_worker_parses_as_classic_script(self) -> None:
+        """Brave status 15 = script evaluate failed. SW is not a module, so top-level await dies."""
+        node = shutil.which("node")
+        self.assertTrue(node, "node is required to syntax-check the service worker")
+        files = [
+            "background.js",
+            "github_defaults.js",
+            "github_recipe_push.js",
+            "trainer_inject.js",
+            "parish_dead_sites.js",
+        ]
+        for name in files:
+            path = REPO_ROOT / "extension" / name
+            proc = subprocess.run([node, "--check", str(path)], capture_output=True, text=True)
+            self.assertEqual(proc.returncode, 0, f"{name}: {proc.stderr}")
+        bg = (REPO_ROOT / "extension" / "background.js").read_text(encoding="utf-8")
+        self.assertIn("async function _fetchGithubTextFile", bg)
 
 
 if __name__ == "__main__":
