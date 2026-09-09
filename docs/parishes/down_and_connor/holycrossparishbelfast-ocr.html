@@ -1,0 +1,769 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Holy Cross Belfast Text Bulletin — 09/09/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #eef1f0;
+      color: #1a1f1e;
+      line-height: 1.65;
+      font-size: 1.125rem;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
+    }
+    a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
+    .page {
+      max-width: min(72ch, 100%);
+      margin: 0 auto;
+      padding: 14px 18px 40px;
+    }
+    .top {
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+      gap: 8px 14px;
+      margin-bottom: 12px;
+    }
+    .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+    .back-link {
+      font-size: 0.9rem; font-weight: 700;
+      color: #14524f; text-decoration: none;
+    }
+    .title-line {
+      font-size: 1rem; font-weight: 700; color: #1a1f1e;
+    }
+    .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 9999;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
+    .ocr-zoom-bar {
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
+    }
+    .ocr-zoom-bar button {
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+      line-height: 1;
+    }
+    .ocr-zoom-pct {
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 4px; } }
+    
+    .ocr-body {
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    .ocr-body h1, .ocr-body h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h2.b-title, .ocr-body .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    .ocr-body h3.b-head, .ocr-body .b-head {
+      font-size: 1.12em;
+      color: #134e9c;
+      margin: 1.1em 0 0.35em;
+    }
+    .ocr-body h4.b-sub, .ocr-body .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    .ocr-body h3, .ocr-body h4 {
+      color: #1a6b6b;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    .ocr-body h3.ocr-page-heading,
+    .ocr-body .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    .ocr-body hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    .ocr-body strong { color: #0f2b5b; }
+    .ocr-body a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .ocr-body mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    .ocr-body mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    .ocr-body table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ocr-body table.b-table td, .ocr-body table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .ocr-body table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    .ocr-body table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    .ocr-body img, .ocr-body iframe, .ocr-body video {
+      max-width: 100%;
+      height: auto;
+    }
+    .ocr-body > :first-child {
+      margin-top: 0;
+    }
+    
+    .ocr-body .ocr-parish-masthead {
+      margin: 2.1em 0 1.15em;
+      padding: 0.85em 0 0.7em;
+      border-top: 3px solid #14524f;
+      border-bottom: 1px solid #c5d0c9;
+    }
+    .ocr-body .ocr-parish-masthead:first-child {
+      margin-top: 0;
+    }
+    .ocr-body h2.ocr-parish-name,
+    .ocr-body .ocr-parish-name {
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #14524f;
+      margin: 0 0 0.2em;
+      line-height: 1.25;
+      border: 0;
+      padding: 0;
+      text-transform: none;
+    }
+    .ocr-body .ocr-parish-date {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body .ocr-parish-link {
+      margin: 0.25em 0 0;
+      font-size: 0.88rem;
+    }
+    .ocr-body h3.b-head {
+      margin-top: 1.45em;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.12em;
+      border-bottom: 1px solid #d4ddd9;
+    }
+
+
+    .ocr-body {
+      padding: 4px 2px 8px;
+    }
+    .search-panel {
+      margin: 0 0 12px;
+      border: 1px solid #d4ddd9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .search-panel .ocr-search-bar { margin-bottom: 6px; }
+    .ocr-search-bar { position: relative; margin-bottom: 6px; }
+    .search-input {
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: #1a1f1e; background: #fff;
+    }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 1px solid #1a6b6b; border-radius: 6px; background: #fff; color: #1a6b6b;
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { color: #999; border-color: #d4ddd9; cursor: not-allowed; }
+    .match-count { color: #5a6a68; font-size: 0.85rem; font-weight: 600; }
+    .note-box {
+      margin-top: 18px;
+      color: #5a6a68;
+      font-weight: 400;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      padding: 0;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 8px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    body.embed-mode .top { display: none !important; }
+    body.embed-mode .page { padding-top: 8px; }
+    @media (max-width: 600px) {
+      .page { padding: 12px 14px 32px; }
+      .ocr-search-tools button { min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top" id="ocr-top">
+      <div class="top-left">
+        <a class="back-link" href="holycrossparishbelfast.html" target="_blank" rel="noopener noreferrer">← Viewer</a>
+        <span class="title-line">HOLY CROSS BELFAST Text Bulletin · 09/09/2026</span>
+      </div>
+    </div>
+    <div class="ocr-sticky-chrome">
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+      <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+      <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+      <span class="ocr-zoom-hint">or pinch to zoom</span>
+    </div>
+    <div class="search-panel" role="search">
+      <div class="ocr-search-bar">
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search text (mass, bingo, parish…)" aria-label="Search bulletin text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled>← Prev</button>
+          <button id="ocr-next" type="button" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead" id="ocr-parish-holy-cross-belfast" data-parish-name="Holy Cross Belfast"><h2 class="ocr-parish-name">Holy Cross Belfast</h2><p class="ocr-parish-date">09/09/2026</p></header>
+<p class="page-label">Page 1</p>
+<h3 class="b-head">Anniversaries</h3>
+<p>August: Joseph Corr, Alice Murphy, Mary Ellen Connor,<br>
+Patrick O’Hara, Mary Braniff, Tony Wilkinson, Martin Jones,<br>
+Patrycya Wyrebek, Mary McGowan, Gerry Gibson, Gabriel McErlean,<br>
+Mary Meenan, Sheila Donaghy, Lena Rice, Terence Lynch,<br>
+Frank McLaughlin, Peter McGrath, Innocentia McMullan, Marion McCabe,<br>
+Joseph Monaghan, Monaghan &amp; McGrath Families, Christine Murphy,<br>
+Desi Turner, Harry Brady, Hugh Smyth, Margaret Rice, Brian McCormick,<br>
+Bridie, Jim, &amp; Joseph McAllister, Annie Konrad, Eilish Doherty,<br>
+Rose McMullan, Cedric Veitch, Alice &amp; Alec O’Reilly, Tony Graham,<br>
+Gabriel Sheridan, Kathleen Shields, David O’Neill, Shelia Doran,<br>
+Hugh Smith, Kevin &amp; Harry Wylie, Sadie Brown, Kathleen O’Neill,<br>
+Samuel McGreevey, James Fox, Irene &amp; Brian Edwards, Carole Maho od,<br>
+Tommy &amp; May Dempsey, William, Mary, Seán &amp; Bernard Colligan,<br>
+Lily Quinn, Sinead Brady, Leanne Brady, Delia Wasson, Philip G ary,<br>
+Richard (Ricky) Patterson, Rosemary McRoberts, Helen McKeown.<br>
+Finn &amp; Shea Whelan.<br>
+Months Mind: John McGuinness, Daniel Mailey, Eammon Kerr,<br>
+James Faulkner, Gerald O’Neill, William Begley, Matt McCarthy.<br>
+Recently Deceased: Matthew McCarthy, Kathleen Teresa (Kate) Devlin,<br>
+Bridie Lynch, Ann Beattie, Patrick Wade, Mary (May) Flood,<br>
+Francis Loughran, Bernard Tolan.<br>
++++++++++++++++<br>
+Baptism Lines, Marriage Lines etc; will be copied from our register and we will<br>
+telephone when they are ready. Identification is needed for all Certif icates.<br>
+Funerals: If you would like your loved one’s funeral recorded, please l et us<br>
+know when we are taking the details or let the undertaker know. We need to<br>
+know beforehand if it has to be recorded.<br>
+Marriages: If you want your Marriage to be recorded please inform us when<br>
+booking the wedding. It is not automatically recorded on the day.<br>
+Readers: David Wasson, Brian Lundy, Kathleen Osbourne, Arthur Kealey.<br>
+Chris McMullan, Paul Currie, Michael Stevenson, Betty Magee.<br>
+James Baker, Michelle McCullogh, John McParland, Wilma Lynch, Kat e Lynch,<br>
+Jinno Carlloe, Daniel, Rose Kilmartin, Sr. Kathleen Savage, Joseph Be nnett.<br>
++++++++++++++++<br>
+Stella Maris, the Catholic seafarer&#x27;s charity is looking for volunteers<br>
+to help with ship visiting, knitting woolly hats and make appeals at<br>
+Christmas and Easter for eggs and toiletries, For further information<br>
+please contact <a href="mailto:peter.mullen@stellamarismail.org" target="_blank" rel="noopener noreferrer">peter.mullen@stellamarismail.org</a> or <a href="tel:+3537745543959" style="color:#1d4ed8;font-weight:600;">07745543959</a> HOLY CROSS CHURCH ARDOYNE<br>
+432 CRUMLIN ROAD BT14 7GE<br>
+TEL: 90748231 FAX: 90740340<br>
+<a href="mailto:Emailpassionistshc@ukgateway.net" target="_blank" rel="noopener noreferrer">Emailpassionistshc@ukgateway.net</a><br>
+{Church Services TV}<br>
+Office Hours: Weekdays 9am – 5pm<br>
+Mon, Tues, Wed, Thur 6 – 8 Houben<br>
+CLOSED 1-2, SUNDAYS 9.30AM -1.30.<br>
+6-8 PM, SICK CALLS 24/7<br>
+Sunday 6th September 2026 23rd Sunday in Ordinary Time.<br>
+Passionists Community: Fr. Charles Cross CP Superior<br>
+&amp; Parish Priest, Fr. Aidan Troy CP. <a href="tel:+3537517889434" style="color:#1d4ed8;font-weight:600;">07517889434</a> (24/7) Assistant,<br>
+Bro. Conor Quinn CP</p>
+<h3 class="b-head">Weekday Masses</h3>
+<p>Monday – Saturday 10am.<br>
+Weekend Masses: Sat. Vigil 7pm, Sun. 10, 12, &amp; 7pm, Novena to Our<br>
+Lady of Sorrows Monday 7pm, First Friday: Healing Mass of<br>
+St. Charles &amp; Penance Service 7pm.<br>
+Confessions: 20 Minutes before each mass by the celebrant of the mass.<br>
+Sick Calls: are normally covered by the Priest on duty<br>
+Tel: 90748231 pastoral care of sick in hospital is covered by<br>
+The Hospital Chaplain.<br>
+Baptisms: From September onwards 2nd Saturday of the month 12noon<br>
+Baptism Meeting first Sunday of the month 1pm.<br>
+Funerals: are celebrated at 10am mass (unless there is more than one<br>
+funeral or because of time due at the cemetery).<br>
+Wedding Bookings: Please contact Parish office <a href="tel:+442890748231" style="color:#1d4ed8;font-weight:600;">028 90748231</a>.<br>
+Pre Marriage-Courses: Wilma <a href="tel:+3537791148340" style="color:#1d4ed8;font-weight:600;">07791148340</a> after 6pm.<br>
+City Hall forms <a href="https://www.groni.gov.uk" target="_blank" rel="noopener noreferrer">www.groni.gov.uk</a>.<br>
+Relic of St. Charles: available at Chapel of Passionist saints.<br>
+Requests for Home Blessings: Can be made with any of the priests.<br>
+Please phone Parish office <a href="tel:+442890748231" style="color:#1d4ed8;font-weight:600;">028 90748231</a>.<br>
+Children’s liturgy: Sunday 12 noon.<br>
+Music Sunday: 7pm Vigil Tanya and Anne, 10am Mass Betty &amp; James,<br>
+12 noon Mass Organist Mark P. Laverty &amp; Holy Cross Choir.<br>
+7pm folk Group. Holy Cross Belfast <a href="http://www.holycrossparishbelfast.com" target="_blank" rel="noopener noreferrer">http://www.holycrossparishbelfast.com</a></p>
+<hr>
+<p class="page-label">Page 2</p>
+<p>Welcome to all the new pupils back in our three parish primary schools. It is not<br>
+easy to leave the gentle, bright, warm days of summer behind and enter back<br>
+into the routine of learning and study. I love the line from the Book of<br>
+Ecclesiastes 3:1 “There is a season for everything……a time to keep and a time to<br>
+discard, a time to tear and a time to sew, a time to keep silent and time to speak,<br>
+a time to love and a time to hate, a time for war and for peace….”<br>
+May our new time together in our various occupations be one of love and<br>
+respect for each other . In the second reading today at Mass on this<br>
+Sunday (Romans 13:8-10) in the last sentence, St. Paul says : “Love is the one<br>
+thing that cannot hurt your neighbour; that is why it is the answer to every one<br>
+of the commandments” The Gospel (Matthew 18:15-20) however speaks about<br>
+the reality of conflict within the Christian community. It gives some guidelines in<br>
+how to resolve our difficulties with each other. Forgiveness and love must be<br>
+always to the fore in the Christian community. We cannot simply turn a blind ey e<br>
+to one or more members who consistently, either knowingly or unknowingly, act<br>
+or live contrary to the values that is central to its identity. Today’s Gospel speaks<br>
+of a structure of reconciliation that both deals with moral deviance and the<br>
+injuries that come about when people live together in common. The purpose of<br>
+the exercise is to “win back your brother/sister” (Matthew 18:15). The response<br>
+in our Responsorial Psalm 94 states: “O that today you would listen to his voice!<br>
+Harden not your hearts” . The psalm goes on to mention two geographical areas<br>
+where the chosen people who were fleeing from the Egyptians through the Red<br>
+Sea turned against God. The places are called Meribah and Massah ! (Exodus<br>
+17:7) . It was there that they quarrelled and fought against God - it was the place<br>
+where they hardened their hearts against His plans. We also have the ability to<br>
+“harden our hearts” against each other. The prophet Ezekiel in today’s first<br>
+reading (Ezekiel 33:7-9) is reminded by the Lord of his pastoral responsibility<br>
+towards those who stray from His ways. The Gospel ends with the assurance<br>
+that Jesus is with the community in all their struggles. “I tell you solemnly once<br>
+again, if two of you on earth agree to ask anything at all, it will be granted to you<br>
+by my Father in heaven. For where two or three meet in my name I shall be there<br>
+with them” (Matthew 18:20). Matthew’s Gospel begins and ends with the<br>
+assurance of Jesus presence within the Christian community. At the beginning of<br>
+the Gospel he writes “Behold, a virgin shall conceive and bear a son and his<br>
+name shall be called Emmanuel (which means, God with us)” (Matthew 1:23). At<br>
+the end of his Gospel - “ Go therefore and make disciples of all nations, baptising<br>
+them in the name of the Father and of the Son and of the Holy Spirit, teaching<br>
+them to observe all that I have commanded you; and lo, I am with you always to<br>
+the end of the age” (Matthew 28:19-20). Have a blessed academic year!<br>
+Father Charles C.P. S.V.D.P: Meeting Wednesday night at 7pm in the Houben Centre.<br>
+Holy Cross Choir: 7:30pm Wednesday. In the Houben Centre<br>
+AA: Wednesday 7pm – 8:00, Saturday 11 – 1pm Houben Centre<br>
+NA: Sunday 7:30 – 8:30pm in the Houben Centre<br>
+Prayer Group: 8pm Sunday in the Houben Centre<br>
+Legion of Mary: 7pm Thursday in the Houben Centre.<br>
+First Friday Film: 8pm in The Houben Centre.<br>
+Old School Café: 9:30am – 1:30pm. Monday – Friday<br>
+We Welcome new volunteers<br>
+Weekly Bingo each Tuesday: From 7pm Flax Room<br>
++++++++++++++<br>
+Ardoyne Shankill Health Partnership:<br>
+Monday: Gentle Exercise &amp; Relaxation 10:30 – 11:30am<br>
+Tuesday: Dancing Sessions/Tea &amp; coffee 10:30 – 12noon<br>
+Wednesday: Sewing 10:30 – 12:30, Relaxation Stress Management<br>
+-2-3pm. Thursday: Art/Painting class 12:30 – 2:30pm.<br>
+Friday: Crochet/knitting class 10am – 12noon. Tel: <a href="tel:+442890756638" style="color:#1d4ed8;font-weight:600;">028 90756638</a>.<br>
+Legion of Mary Auxiliary Membership: The Legion invites you to become an<br>
+auxiliary member. There are no meetings to attend. You simply pray the<br>
+Legion prayers at home every day. This is a great support to the mission of the<br>
+Church. Contact the Parish office, if you feel called to be and auxiliary<br>
+Legionary. Contact Conor <a href="tel:+3537798865887" style="color:#1d4ed8;font-weight:600;">07798865887</a>.<br>
++++++++<br>
+Church Collections July:<br>
+5th 1st coll. £2,584.78, 2nd Coll. £430 = £3014.78.<br>
+12th 1st Coll. £2,241.28, 2nd Coll. £350 = £2,591.28.<br>
+19th 1st Coll. £2,217.62, 2nd Coll. £480 = £2,697.62.<br>
+26th 1st Coll. £2,703.34, 2nd Coll. £415 = £3118.34.<br>
+Church Collections August:<br>
+2nd 1st Coll. £2,715.40, 2nd Coll. £400 = £3,115.40.<br>
+9th 1st Coll. £2,500.34, 2nd Coll. £410 = £2,910.34.<br>
+15th Feast of The Assumption = £530.<br>
+16th 1st Coll. £2665.47, 2nd Coll. £465 = £3,130.47<br>
+23rd 1st Coll. £2,496.04, 2nd Coll. £415 = £2,911.04.<br>
+30th 1st Coll. £2,621.97, 2nd Coll. £360 = £2,981.97.<br>
+Feast Days this Week: 8th the Nativity of The Blessed Virgin Mary, 9th St. Ciaran<br>
+10th St. Peter Clever, 12th the Holy Name of Mary, St. Ailbe.<br>
+We thank everyone who contributed to all our collections.<br>
+your support for Holy Cross is much appreciated. ‘The Parish Team’</p>
+<hr>
+<p class="page-label">Page 3</p>
+<p>Additional Masses during Lent: Monday Novena Mass as usual 7pm,<br>
+Wednesday 7pm.<br>
+Confessions: 15 Minutes before each mass by the celebrant of the<br>
+mass.<br>
+Music Sunday: 7pm Vigil Tanya and Anne, 10am Mass Betty &amp; James,<br>
+12 noon Mass Organist Mark P. Laverty &amp; Holy Cross Choir. 7pm folk<br>
+Group.<br>
+Readers: Sr. Kathleen, Wilma Lynch, Arthur Kealey, Michelle<br>
+McCullagh, Brian Lundy, Chris McMullan, John McParland<br>
+Kate Lynch, Michael Stevenson, Kathleen Osbourne, Rose Kilmartin,<br>
+Betty Magee.</p></div>
+    <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
+  </div>
+  <script>
+    (function () {
+      try {
+        if (new URLSearchParams(window.location.search).get('embed') === '1') {
+          document.body.classList.add('embed-mode');
+        }
+      } catch (e) {}
+    })();
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-text');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+    (function () {
+      const ocrRoot = document.getElementById('ocr-text');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      if (!ocrRoot || !ocrSearch) return;
+      const originalHtml = ocrRoot.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+      function escapeRegExp(text) {
+        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        ocrMatches[idx].classList.add('search-active');
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      function updateMatchUi() {
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} of ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+      function applySearch(query) {
+        ocrRoot.innerHTML = originalHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrRoot, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) nodes.push(node);
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) return;
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrRoot.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+      ocrSearch.addEventListener('input', (e) => applySearch(e.target.value.trim()));
+      clearSearch.addEventListener('click', () => { ocrSearch.value = ''; applySearch(''); ocrSearch.focus(); });
+      prevMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && ocrMatches.length) {
+          e.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+    })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      function boot() {
+        var btn = document.getElementById('scroll-top-btn');
+        if (!btn) {
+          if (!document.body) return;
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scroll-top-btn';
+          btn.id = 'scroll-top-btn';
+          btn.setAttribute('aria-label', 'Back to top');
+          btn.textContent = '↑';
+          document.body.appendChild(btn);
+        }
+        function innerBoxes() {
+          return Array.prototype.slice.call(
+            document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+          );
+        }
+        function maxInnerScroll() {
+          return innerBoxes().reduce(function (max, el) {
+            return Math.max(max, el.scrollTop || 0);
+          }, 0);
+        }
+        function shown() {
+          var y = window.scrollY || document.documentElement.scrollTop || 0;
+          btn.classList.toggle('is-visible', y > 80 || maxInnerScroll() > 16);
+        }
+        function shownSoon() {
+          shown();
+          if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+          else window.setTimeout(shown, 16);
+        }
+        function bindBox(el) {
+          if (!el || el.getAttribute('data-pp-scroll-top') === '1') return;
+          el.setAttribute('data-pp-scroll-top', '1');
+          el.addEventListener('scroll', shownSoon, { passive: true });
+        }
+        function bindBoxes() {
+          innerBoxes().forEach(bindBox);
+          shown();
+        }
+        window.parishPressBindScrollTopBoxes = bindBoxes;
+        if (btn.getAttribute('data-pp-bound') !== 'inner-2') {
+          btn.setAttribute('data-pp-bound', 'inner-2');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.addEventListener('scroll', shownSoon, { passive: true });
+          document.addEventListener('scroll', shownSoon, { capture: true, passive: true });
+          document.addEventListener('wheel', shownSoon, { capture: true, passive: true });
+          document.addEventListener('touchmove', shownSoon, { capture: true, passive: true });
+          if (window.MutationObserver && document.body) {
+            new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+          }
+          btn.addEventListener('click', function () {
+            var behavior = reduce ? 'auto' : 'smooth';
+            window.scrollTo({ top: 0, behavior: behavior });
+            innerBoxes().forEach(function (el) {
+              el.scrollTop = 0;
+              if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+            });
+            window.setTimeout(shown, reduce ? 0 : 400);
+          });
+        }
+        bindBoxes();
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
+    })();
+    
+  </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
+</body>
+</html>

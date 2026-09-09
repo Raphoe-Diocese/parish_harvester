@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Waterside (&amp; Strathfoyle amalgamated) Bulletin — 30/08/2026</title>
+  <title>Waterside (&amp; Strathfoyle amalgamated) Bulletin — 09/09/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -109,6 +110,13 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
@@ -141,6 +149,7 @@
       cursor: pointer;
     }
     .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
     
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {
@@ -160,7 +169,7 @@
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
@@ -203,6 +212,7 @@
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {
@@ -866,6 +876,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -892,7 +903,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260827h" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -900,35 +911,31 @@
     <header class="header">
       <p class="diocese-label">DERRY</p>
       <h1>Waterside (&amp; Strathfoyle amalgamated) Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Waterside (&amp; Strathfoyle amalgamated) — 30/08/2026. Part of the Derry Diocese collated bulletin.</p>
-      <a class="download-link-top" href="watersideparish.pdf">Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Waterside (&amp; Strathfoyle amalgamated) — 09/09/2026. Part of the Derry Diocese collated bulletin.</p>
+      <a class="download-link-top pdf-force-download" href="watersideparish.pdf" download="watersideparish.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="watersideparish.pdf">Open PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       
-      <div class="quiet-links">
-        <a href="watersideparish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="watersideparish-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="watersideparish.pdf" title="Waterside (&amp; Strathfoyle amalgamated) bulletin PDF"></iframe>
+        <iframe data-pdf-url="watersideparish.pdf" title="Waterside (&amp; Strathfoyle amalgamated) bulletin PDF"></iframe>
         
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="watersideparish.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="watersideparish.pdf">Open PDF</a>
-              <a href="watersideparish.pdf" download>Download</a>
+              <a class="pdf-open-newtab" href="watersideparish.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="watersideparish.pdf" download="watersideparish.pdf">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>
       </div>
@@ -963,67 +970,71 @@
       <div class="quiet-links">
         <a href="watersideparish-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-waterside-strathfoyle-amalgamated" data-parish-name="Waterside (&amp; Strathfoyle amalgamated)"><h2 class="ocr-parish-name">Waterside (&amp; Strathfoyle amalgamated)</h2><p class="ocr-parish-date">30/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-waterside-strathfoyle-amalgamated" data-parish-name="Waterside (&amp; Strathfoyle amalgamated)"><h2 class="ocr-parish-name">Waterside (&amp; Strathfoyle amalgamated)</h2><p class="ocr-parish-date">09/09/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>Parishes of<br>
 Glendermott &amp; Strathfoyle<br>
-Sunday 30th August 2026<br>
-Twenty-second Sunday in Ordinary Time<br>
-Are your ways God’s ways?<br>
-In a major shift from last week, Peter learns how difficult it can be to accept<br>
-God’s way. The previous few lines on St. Matthew’s Gospel show Peter<br>
-recognising Jesus as the Christ, while now he cannot bear to hear that the<br>
-Lord must suffer, die, and rise again. To us as modern-day listeners, Jesus’<br>
-reply is abrupt: Peter is thinking “not as God does, but as human beings<br>
-do.” It is a reminder that faith is not simply agreeing with pleasant truths;<br>
-it is learning to trust God even when the road ahead includes sacrifice. Even<br>
-Peter took time to realise this.<br>
-Jeremiah understands this struggle. God’s word burns within him like fire,<br>
-yet speaking it brings mockery and rejection and many of us know<br>
-something of that tension. We want to follow Christ, but understandably<br>
-we also want comfort, approval, and an easier path. We may be tempted<br>
-to keep quiet, avoid difficult choices, or shape our lives around what the<br>
-world expects.<br>
-Paul’s letter to the Romans offers us a practical answer: “Do not conform<br>
-yourselves to this age but be transformed by the renewal of your mind.”<br>
-Christian discipleship begins in the daily offering of ourselves to God: our<br>
-time, work, relationships, worries, and hopes. This is not dramatic for most<br>
-of us. It is found in forgiving someone, serving without being noticed,<br>
-choosing honesty, praying when tired, or standing beside someone in our<br>
-lives who is struggling.<br>
-Jesus does not ask us to take up the cross because suffering is good in itself.<br>
-He asks it because love is costly, and true life is found when we give<br>
-ourselves away as anyone who is married could testify. This week, let us<br>
-ask for the courage to see with God’s eyes and to follow Christ in one<br>
-concrete choice. The cross we carry with him is never the end of the story;<br>
-it is the path that leads to resurrection and life.<br>
+Sunday 6 September 2026<br>
+Twenty-third Sunday in Ordinary Time<br>
+Shared responsibility for ourselves<br>
+and our neighbour<br>
+The readings for this week ask us and indeed challenge us to embrace our shared<br>
+responsibility for one another. In the first reading, God appoints Ezekiel as a<br>
+watchman for the house of Israel. This role which Ezekiel gains is not about<br>
+showing authority over others, but about a deep spiritual attentiveness to others.<br>
+God reminds us that we are complicit if we remain silent while a brother or sister<br>
+walks a path of self-destruction. True community requires us to care about the<br>
+spiritual well-being as well as the physical well-being of our neighbour.<br>
+This call to look out for one another is grounded entirely in Christian charity. As<br>
+Saint Paul reminds us in his letter to the Romans, our only standing debt is to love<br>
+one another. When we are called to offer guidance or accountability, it must never<br>
+flow from a place of pride, judgment, or self-righteousness. Love does no evil to a<br>
+neighbour, which means our corrections must be gentle, private, and always have<br>
+a motivation or desire for the other person’s ultimate good and healing.<br>
+In the Gospel of Matthew, Jesus provides a practical method for resolving conflict<br>
+and seeking reconciliation within the Church. Instead of resorting to destructive<br>
+gossip, Christ commands us to speak directly and privately to the person who has<br>
+offended us. The primary goal is always restoration or to &quot;win over&quot; our brother<br>
+or sister. In doing so, this protects the dignity of the individual while preserving<br>
+the harmony of the entire community.<br>
+Jesus seals this teaching with a beautiful promise of His divine presence: &quot;Where<br>
+two or three are gathered in my name, there am I in the midst of them.&quot; This<br>
+reminds us that reconciliation is not merely a human effort, but a sacramental<br>
+reality. When we gather in humility to heal fractured relationships, Christ is<br>
+actively present among us, offering the grace needed to bind wounds and loosen<br>
+the bonds of sin.<br>
 Waterside (&amp; Strathfoyle amalgamated)</p>
 <hr>
 <p class="page-label">Page 2</p>
-<p>Baptisms We welcome members of God’s family in Baptism, Broía Ferry-<br>
-Buchanan, Old Fort, Aidah Teresa Elizabeth Callan, Old Fort and Darragh<br>
-Adrian Devlin, Summer Meadows<br>
-Anniversaries – We are asked to remember in prayer: Ann Frazer, Joan<br>
-Walker, Norman Walker, Rose Henry, Joseph Sebastian, Reuven Simon,<br>
-Patrick McGrath, Molly Moran, Bridget Killen, Teresa McAtamney, James<br>
-O’Connell, Angela Hampsey, Eileen Quinn, Harry McClay and Maureen<br>
-O’Neill<br>
-Vocations – That the men called to priesthood will be filled with courage<br>
-and hope as they hear Jesus calling them to follow Him by renouncing<br>
-themselves, taking up their cross every day, and finding life in Him and in<br>
-the service of His people. For those interested or even wish to enquire<br>
-about a call to diocesan priesthood, please contact Fr. Pat O’Hagan,<br>
-Vocations Director for the Diocese of Derry at <a href="mailto:pgoh2111@gmail.com" target="_blank" rel="noopener noreferrer">pgoh2111@gmail.com</a><br>
+<p>Baptisms We welcome members of God’s family in Baptism, Rosie Florence<br>
+Dunlop, The Hawthorns, Jonathan Christopher Bradley, Lismore Grove,<br>
+Kobi Patrick Santos Burke, The Old Fort.<br>
+Deaths – We remember in our prayers Mark Oakley, Rosses Gate, Gloria<br>
+Hampsey, Foyle Fold &amp; Lonappan Parokkaran, father of Fr Joshi, who died<br>
+in India.<br>
+Anniversaries – We are asked to remember in prayer: Paul Crossan, Annie<br>
+Doherty, John Doherty, George McCarron, Conor Norris, Pat McGee, Nellie<br>
+Ward, Agnes Hegarty, Phyliss O’Neill, John McLaughlin, Isobel Higgins,<br>
+David Murray, Micky McNaught, Joe Dunlop, Kathleen Green &amp; Tommy<br>
+Kerrigan, Father Aidan Mullan, Kathleen Green and Isobel &amp; Patrick Moore<br>
+Vocations – We pray for the men called to priesthood, to the ministry of<br>
+teaching and preaching in the name of Jesus and encouraging their brothers<br>
+and sisters to turn away from sin and live as followers of Christ in today&#x27;s<br>
+world. For those interested or even wish to enquire about a call to diocesan<br>
+priesthood, please contact Fr. Pat O’Hagan, Vocations Director for the<br>
+Diocese of Derry at <a href="mailto:pgoh2111@gmail.com" target="_blank" rel="noopener noreferrer">pgoh2111@gmail.com</a><br>
 Vocations Society of St Joseph (Waterside Parish) We continue to pray for<br>
 priests, vocations to priesthood and religious life and support seminarians.<br>
-The Rosary on Thursday mornings at 9.30am offered for this intention and<br>
-everyone welcome.<br>
+The Rosary on Thursday mornings at 9.30am offered for this intention. The<br>
+next meeting will be held on Wednesday 09 September after 10.00 am<br>
+Mass. The Society wishes to acknowledge with thanks anonymous<br>
+donations of £100, £40, £40, £20, £20, £20, £10 &amp; £5.<br>
 Lectio Divina – Join us on Thursday evenings at 8:00pm in St Columb’s<br>
 Church for our weekly praying of the Sacred Scriptures.<br>
 Centring Prayer Group – Join us on Wednesday at 8:00pm in the St<br>
 Columb’s Church (Parish Hall)<br>
-Offertory Collections: Glendermott: £4,150.00<br>
-Strathfoyle: £490.00<br>
+Offertory Collections: Glendermott: £4,285.00<br>
+Strathfoyle: £555.00<br>
 Thank you for your generosity to the parish collections.<br>
 Are you interested in volunteering to help children and adults in our parish<br>
 to prepare to receive the Sacraments? If you have a basic knowledge of<br>
@@ -1031,51 +1042,57 @@ Catholic teaching and some teaching experience (not essential), please<br>
 contact the Parish Office Tel. 02871 342303. You will join a small parish<br>
 team and be supported in preparing and delivering sessions. The time<br>
 commitment would be around 2 hours per week from end of September to<br>
-May. Safeguarding checks will be carried out.<br>
-Waterside Half Marathon takes place on Sunday 6 September and there<br>
-will be various lane restrictions on Limavady Road, Duke Street, Clooney<br>
-Road and Temple Road from appoximately 7.30am until 1.00pm</p>
+May. Safeguarding checks will be carried out.</p>
 <hr>
 <p class="page-label">Page 3</p>
-<p>“He who sings, prays twice.” (St Augustine) – St Columb’s Church will resume<br>
-next weekend. We are constantly looking for new singers, maybe you would<br>
-consider joining, just come along and give it a try or talk to Markus or any choir<br>
-members.<br>
-Season of Creation 2026:<br>
-The Season of Creation takes place from 1<br>
-September to 4 October, bringing Christians throughout the world together in<br>
-prayer, reflection and action for the care of our common home. This year’s<br>
-theme, Living Water, invites us to give thanks for the gift of water and renew<br>
-our care for God’s creation.<br>
-Accord Derry - Marriage Preparation Workshops - September and November<br>
-2026. Sept. 25th/26th 2026 – Nov. 20th/21st 2026. These courses are now online<br>
-for booking at <a href="https://www.accordni.com" target="_blank" rel="noopener noreferrer">www.accordni.com</a> Please note that Accord Derry will NOT be<br>
-facilitating courses during October or December 2026.<br>
-Padre Pio Prayer Group, Holy Family Chapel, Ballymagroarty will take place on<br>
-Tuesday 1 September 2026. Starting with Rosary at 6.45pm before Mass,<br>
-celebration of holy mass at 7.15pm, then the priest will bless everyone with a<br>
-first-class relic of St. Pio, while closing prayers are recited.<br>
-Blessing of Bikers and Motorcycles will take place on Sunday 13 September in<br>
-St Aengus’ Chapel, Burt, Co Donegal, at 1:30. All are welcome to attend the<br>
-brief service and blessing. Following the blessing all are welcome to join the<br>
-run to Ned’s Point RNLI Station, to present the donation to the RNLI.<br>
+<p>Season of Creation 2026: The Season of Creation takes place from 1<br>
+September to 4 October. Creation is God’s sacred gift, entrusted to our<br>
+care. Christians are called to protect and nurture Creation working in<br>
+partnership with others and passing this responsibility onto future<br>
+generations. Pope Francis’ words challenge us: ‘What is the goal of our<br>
+work? What need does the Earth have of us? Leaving an inhabitable planet<br>
+to future generations is up to us’ (Laudato Si’, 160)<br>
+Accord Derry - Marriage Preparation Workshops - September and<br>
+November 2026. Sept. 25th/26th 2026 – Nov. 20th/21st 2026. These courses<br>
+are now online for booking at <a href="https://www.accordni.com" target="_blank" rel="noopener noreferrer">www.accordni.com</a> Please note that Accord<br>
+Derry will NOT be facilitating courses during October or December 2026.<br>
+Blessing of Bikers and Motorcycles will take place on Sunday 13 September<br>
+in St Aengus’ Chapel, Burt, Co Donegal, at 1:30. All are welcome to attend<br>
+the brief service and blessing. Following the blessing all are welcome to<br>
+join the run to Ned’s Point RNLI Station, to present the donation to the<br>
+RNLI.<br>
 Michael English Concert An evening of Faith, Hope and Inspiration. The<br>
 concert takes place on Friday 2 October at 7.15pm, in St Patrick&#x27;s Church,<br>
-Keenaught, Desertmartin. Tickets are £30, and available to buy at online with<br>
-Eventbrite:<br>
+Keenaught, Desertmartin. Tickets are £30, and available to buy at online<br>
+with<br>
+Eventbrite: <a href="https://www.eventbrite.co.uk/e/michael-english-band-" target="_blank" rel="noopener noreferrer">https://www.eventbrite.co.uk/e/michael-english-band-</a><br>
 fundraising-concert-tickets-1996641829460<br>
-Encounter School of Ministry Course but aren’t sure what it’s about or if it’s<br>
-for you? Class will take place on Thursdays from 6.30 to 9.00pm beginning on<br>
-3rd September at All Saints Church, Newtowncunningham, Co. Donegal. More<br>
-info or register here: <a href="https://encounterschool.org/donegal/" target="_blank" rel="noopener noreferrer">https://encounterschool.org/donegal/</a> or email<br>
-<a href="mailto:donegal@encounterschool.org" target="_blank" rel="noopener noreferrer">donegal@encounterschool.org</a> for more information.<br>
-Job Opportunity: Derry Diocesan Trust - Granaghan (Swatragh)<br>
-Parish: Sacristan, hours of work: 12 hours per week. Place of work: St John<br>
-the Baptist Church. Rate of Pay : £12.88 per hour. For application packs<br>
-please email: <a href="mailto:recruitment@derrydiocese.org" target="_blank" rel="noopener noreferrer">recruitment@derrydiocese.org</a> or telephone <a href="tel:+442871262302" style="color:#1d4ed8;font-weight:600;">028 7126 2302</a>.</p>
+Fr. Joseph K. Bill Retreat: At the Allingham Arms Hotel, Bundoran – 28th<br>
+September to 2nd October, given by Fr. Anthony Saji V.C. Contact: Roisin on<br>
+00353868937399 for details.<br>
+Rosary on the Coast: will take place on Lisfannon Beach, this Sunday 6th<br>
+September at 3pm.<br>
+Host for Hospice: October is officially Foyle Hospice Coffee Morning<br>
+Month. We are calling on supporters to help us raise vital funds by hosting<br>
+a Coffee Morning. Whether it’s at home, work or in your local community,<br>
+you can support your local hospice by bringing your friends together and<br>
+putting the kettle on - it’s a piece of cake! To request your FREE host pack<br>
+or for more info, please call Ailbhe McDaid, Community Fundraiser, Foyle<br>
+Hospice, on <a href="tel:+442871359888" style="color:#1d4ed8;font-weight:600;">028 7135 9888</a> or email: <a href="mailto:ailbhe@foylehospice.com" target="_blank" rel="noopener noreferrer">ailbhe@foylehospice.com</a><br>
+Job<br>
+Opportunity:<br>
+Derry<br>
+Diocesan<br>
+Trust<br>
+-<br>
+Granaghan<br>
+(Swatragh)<br>
+Parish: Sacristan, hours of work: 12 hours per week. Place of work: St John</p>
 <hr>
 <p class="page-label">Page 4</p>
-<p>Mass &amp; Confession Times<br>
+<p>the Baptist Church. Rate of Pay: £12.88 per hour. For application packs<br>
+please email: <a href="mailto:recruitment@derrydiocese.org" target="_blank" rel="noopener noreferrer">recruitment@derrydiocese.org</a> or telephone <a href="tel:+442871262302" style="color:#1d4ed8;font-weight:600;">028 7126 2302</a>.<br>
+Mass &amp; Confession Times<br>
 Sunday<br>
 St Columb’s Church<br>
 10.00am, 12.30pm &amp; 6.00pm<br>
@@ -1120,8 +1137,10 @@ Rev. Patrick Lagan CC<br>
 Rev Joshy Parokkaran CC <a href="tel:+442871342303" style="color:#1d4ed8;font-weight:600;">02871342303</a> <a href="mailto:secretary@watersideparish.net" target="_blank" rel="noopener noreferrer">secretary@watersideparish.net</a><br>
 SAFEGUARDING CHILDREN AND VULNERABLE ADULTS – If you are concerned about<br>
 the welfare and safety of children or a vulnerable adult contact: Designated Diocesan Person Ms<br>
-Marie Gormley at <a href="tel:+3537596500793" style="color:#1d4ed8;font-weight:600;">07596500793</a> or <a href="mailto:marie.gormley@derrydiocese.org" target="_blank" rel="noopener noreferrer">marie.gormley@derrydiocese.org</a> or PSNI 101.<br>
-Our Churches are monitored by CCTV cameras and by live streaming. Live streaming can<br>
+Marie Gormley at <a href="tel:+3537596500793" style="color:#1d4ed8;font-weight:600;">07596500793</a> or <a href="mailto:marie.gormley@derrydiocese.org" target="_blank" rel="noopener noreferrer">marie.gormley@derrydiocese.org</a> or PSNI 101.</p>
+<hr>
+<p class="page-label">Page 5</p>
+<p>Our Churches are monitored by CCTV cameras and by live streaming. Live streaming can<br>
 be viewed online at the parish website. The Diocese of Derry Privacy Notice is displayed<br>
 on the parish website and Church notice board.</p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
@@ -1130,7 +1149,7 @@ on the parish website and Church notice board.</p></div>
     <section class="parish-section">
       <h2 class="section-heading">Other DERRY Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghyaran"><a class="parish-link" href="parishofaghyaran.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li class="parish-item" data-name="ardmore"><a class="parish-link" href="ardmoreparish.html" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li class="parish-item" data-name="banagher"><a class="parish-link" href="banagherparish.html" target="_blank" rel="noopener noreferrer">Banagher</a></li><li class="parish-item" data-name="buncrana"><a class="parish-link" href="buncranaparish.html" target="_blank" rel="noopener noreferrer">Buncrana</a></li><li class="parish-item" data-name="camus"><a class="parish-link" href="camusparish.html" target="_blank" rel="noopener noreferrer">Camus</a></li><li class="parish-item" data-name="carndonagh"><a class="parish-link" href="carndonaghparish.html" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li class="parish-item" data-name="castlederg"><a class="parish-link" href="castledergparish.html" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li class="parish-item" data-name="clonleigh (strabane pastoral area)"><a class="parish-link" href="clonleighparish.html" target="_blank" rel="noopener noreferrer">Clonleigh (Strabane Pastoral Area)</a></li><li class="parish-item" data-name="clonmany"><a class="parish-link" href="clonmanyparish.html" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li class="parish-item" data-name="culdaff"><a class="parish-link" href="culdaffparish.html" target="_blank" rel="noopener noreferrer">Culdaff</a></li><li class="parish-item" data-name="culmoe"><a class="parish-link" href="culmoreparish.html" target="_blank" rel="noopener noreferrer">Culmoe</a></li><li class="parish-item" data-name="dma parish (claudy area)"><a class="parish-link" href="dmaparish.html" target="_blank" rel="noopener noreferrer">DMA Parish (Claudy area)</a></li><li class="parish-item" data-name="drumquin"><a class="parish-link" href="drumquinparish.html" target="_blank" rel="noopener noreferrer">Drumquin</a></li><li class="parish-item" data-name="drumragh"><a class="parish-link" href="drumraghparish.html" target="_blank" rel="noopener noreferrer">Drumragh</a></li><li class="parish-item" data-name="dungiven"><a class="parish-link" href="parishofdungiven.html" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li class="parish-item" data-name="errigal"><a class="parish-link" href="errigalparish.html" target="_blank" rel="noopener noreferrer">Errigal</a></li><li class="parish-item" data-name="fahan"><a class="parish-link" href="fahanparish.html" target="_blank" rel="noopener noreferrer">Fahan</a></li><li class="parish-item" data-name="granaghan"><a class="parish-link" href="granaghanparish.html" target="_blank" rel="noopener noreferrer">Granaghan</a></li><li class="parish-item" data-name="greenlough"><a class="parish-link" href="greenlough.html" target="_blank" rel="noopener noreferrer">Greenlough</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holyfamily-parish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="iskaheen"><a class="parish-link" href="iskaheenparish.html" target="_blank" rel="noopener noreferrer">Iskaheen</a></li><li class="parish-item" data-name="kilrea"><a class="parish-link" href="parishofkilrea.html" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li class="parish-item" data-name="lavey"><a class="parish-link" href="laveyparish.html" target="_blank" rel="noopener noreferrer">Lavey</a></li><li class="parish-item" data-name="leckpatrick"><a class="parish-link" href="leckpatrickparish.html" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li class="parish-item" data-name="maghera (derry)"><a class="parish-link" href="magheraparishderry.html" target="_blank" rel="noopener noreferrer">Maghera (Derry)</a></li><li class="parish-item" data-name="melmount (&amp; camus)"><a class="parish-link" href="melmountparish.html" target="_blank" rel="noopener noreferrer">Melmount (&amp; Camus)</a></li><li class="parish-item" data-name="moville"><a class="parish-link" href="movilleparish.html" target="_blank" rel="noopener noreferrer">Moville</a></li><li class="parish-item" data-name="sion mills"><a class="parish-link" href="parishofsionmills.html" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li class="parish-item" data-name="st eugene&#x27;s cathedral (templemore)"><a class="parish-link" href="steugenescathedral.html" target="_blank" rel="noopener noreferrer">St Eugene&#x27;s Cathedral (Templemore)</a></li><li class="parish-item" data-name="st mary&#x27;s parish creggan"><a class="parish-link" href="stmarysparishcreggan.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Parish Creggan</a></li><li class="parish-item" data-name="star of the sea (magilligan)"><a class="parish-link" href="staroftheseacatholic.html" target="_blank" rel="noopener noreferrer">Star of the Sea (Magilligan)</a></li><li class="parish-item" data-name="steelstown"><a class="parish-link" href="steelstownparish.html" target="_blank" rel="noopener noreferrer">Steelstown</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghyaran"><a class="parish-link" href="parishofaghyaran.html" target="_blank" rel="noopener noreferrer">Aghyaran</a></li><li class="parish-item" data-name="ardmore"><a class="parish-link" href="ardmoreparish.html" target="_blank" rel="noopener noreferrer">Ardmore</a></li><li class="parish-item" data-name="ballinascreen (&amp; desertmartin amalgamated)"><a class="parish-link" href="parishofballinascreen.html" target="_blank" rel="noopener noreferrer">Ballinascreen (&amp; Desertmartin amalgamated)</a></li><li class="parish-item" data-name="banagher"><a class="parish-link" href="banagherparish.html" target="_blank" rel="noopener noreferrer">Banagher</a></li><li class="parish-item" data-name="bellaghy"><a class="parish-link" href="bellaghyparish.html" target="_blank" rel="noopener noreferrer">Bellaghy</a></li><li class="parish-item" data-name="buncrana"><a class="parish-link" href="buncranaparish.html" target="_blank" rel="noopener noreferrer">Buncrana</a></li><li class="parish-item" data-name="camus"><a class="parish-link" href="camusparish.html" target="_blank" rel="noopener noreferrer">Camus</a></li><li class="parish-item" data-name="carndonagh"><a class="parish-link" href="carndonaghparish.html" target="_blank" rel="noopener noreferrer">Carndonagh</a></li><li class="parish-item" data-name="castlederg"><a class="parish-link" href="castledergparish.html" target="_blank" rel="noopener noreferrer">Castlederg</a></li><li class="parish-item" data-name="claudy"><a class="parish-link" href="parishofclaudy.html" target="_blank" rel="noopener noreferrer">Claudy</a></li><li class="parish-item" data-name="clonleigh (strabane pastoral area)"><a class="parish-link" href="clonleighparish.html" target="_blank" rel="noopener noreferrer">Clonleigh (Strabane Pastoral Area)</a></li><li class="parish-item" data-name="clonmany"><a class="parish-link" href="clonmanyparish.html" target="_blank" rel="noopener noreferrer">Clonmany</a></li><li class="parish-item" data-name="culdaff"><a class="parish-link" href="culdaffparish.html" target="_blank" rel="noopener noreferrer">Culdaff</a></li><li class="parish-item" data-name="culmoe"><a class="parish-link" href="culmoreparish.html" target="_blank" rel="noopener noreferrer">Culmoe</a></li><li class="parish-item" data-name="dma parish (claudy area)"><a class="parish-link" href="dmaparish.html" target="_blank" rel="noopener noreferrer">DMA Parish (Claudy area)</a></li><li class="parish-item" data-name="drumquin"><a class="parish-link" href="drumquinparish.html" target="_blank" rel="noopener noreferrer">Drumquin</a></li><li class="parish-item" data-name="drumragh"><a class="parish-link" href="drumraghparish.html" target="_blank" rel="noopener noreferrer">Drumragh</a></li><li class="parish-item" data-name="dungiven"><a class="parish-link" href="parishofdungiven.html" target="_blank" rel="noopener noreferrer">Dungiven</a></li><li class="parish-item" data-name="errigal"><a class="parish-link" href="errigalparish.html" target="_blank" rel="noopener noreferrer">Errigal</a></li><li class="parish-item" data-name="fahan"><a class="parish-link" href="fahanparish.html" target="_blank" rel="noopener noreferrer">Fahan</a></li><li class="parish-item" data-name="granaghan"><a class="parish-link" href="granaghanparish.html" target="_blank" rel="noopener noreferrer">Granaghan</a></li><li class="parish-item" data-name="greenlough"><a class="parish-link" href="greenlough.html" target="_blank" rel="noopener noreferrer">Greenlough</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holyfamily-parish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="kilrea"><a class="parish-link" href="parishofkilrea.html" target="_blank" rel="noopener noreferrer">Kilrea</a></li><li class="parish-item" data-name="lavey"><a class="parish-link" href="laveyparish.html" target="_blank" rel="noopener noreferrer">Lavey</a></li><li class="parish-item" data-name="leckpatrick"><a class="parish-link" href="leckpatrickparish.html" target="_blank" rel="noopener noreferrer">Leckpatrick</a></li><li class="parish-item" data-name="limavady"><a class="parish-link" href="limavadyparish.html" target="_blank" rel="noopener noreferrer">Limavady</a></li><li class="parish-item" data-name="maghera (derry)"><a class="parish-link" href="magheraparishderry.html" target="_blank" rel="noopener noreferrer">Maghera (Derry)</a></li><li class="parish-item" data-name="melmount (&amp; camus)"><a class="parish-link" href="melmountparish.html" target="_blank" rel="noopener noreferrer">Melmount (&amp; Camus)</a></li><li class="parish-item" data-name="moville"><a class="parish-link" href="movilleparish.html" target="_blank" rel="noopener noreferrer">Moville</a></li><li class="parish-item" data-name="sion mills"><a class="parish-link" href="parishofsionmills.html" target="_blank" rel="noopener noreferrer">Sion Mills</a></li><li class="parish-item" data-name="st eugene&#x27;s cathedral (templemore)"><a class="parish-link" href="steugenescathedral.html" target="_blank" rel="noopener noreferrer">St Eugene&#x27;s Cathedral (Templemore)</a></li><li class="parish-item" data-name="st mary&#x27;s parish creggan"><a class="parish-link" href="stmarysparishcreggan.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s Parish Creggan</a></li><li class="parish-item" data-name="star of the sea (magilligan)"><a class="parish-link" href="staroftheseacatholic.html" target="_blank" rel="noopener noreferrer">Star of the Sea (Magilligan)</a></li><li class="parish-item" data-name="steelstown"><a class="parish-link" href="steelstownparish.html" target="_blank" rel="noopener noreferrer">Steelstown</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1182,9 +1201,9 @@ on the parish website and Church notice board.</p></div>
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260827h"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260827h';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1638,11 +1657,16 @@ on the parish website and Church notice board.</p></div>
         for (var i = 0; i < names.length; i++) {
           var page = pageFor(names[i]);
           if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
           var slot = pages.querySelector('[data-page="' + page + '"]');
           if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
+          scrollBoxTo(pages, slot);
           return true;
         }
         return false;
