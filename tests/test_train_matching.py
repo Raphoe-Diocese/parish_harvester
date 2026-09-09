@@ -178,7 +178,7 @@ https://www.antrimparish.com
         self.assertRegex(manifest.get("version", ""), r"^\d+\.\d+\.\d+$")
         self.assertEqual(
             manifest.get("update_url"),
-            "https://raphoe-diocese.github.io/parish_harvester/updates.xml",
+            "https://www.parishpress.ie/updates.xml",
         )
         self.assertIn('id="ext-version"', popup_html)
         self.assertIn('id="gh-pat"', popup_html)
@@ -331,7 +331,8 @@ https://www.antrimparish.com
         workflow = (REPO_ROOT / ".github" / "workflows" / "deploy-pages.yml").read_text(encoding="utf-8")
         self.assertIn("push:", workflow)
         self.assertIn("docs/**", workflow)
-        self.assertNotIn("extension/**", workflow)
+        self.assertIn("extension/**", workflow)
+        self.assertIn("updates.xml", workflow)
         self.assertIn("mega_pdf/**", workflow)
         self.assertIn("Generate OCR bulletin viewers", workflow)
         self.assertIn("Harvest Parish Bulletins", workflow)
