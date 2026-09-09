@@ -17,6 +17,18 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 09/09/2026 night — Trainer still 1.61.20 after #185
+
+**The real goal, in one sentence:** chrome://extensions shows 1.61.21 after Update, because the live zip/XML must match `main`.
+
+`main` already has Trainer **1.61.21** (#185). Live `https://www.parishpress.ie/updates.xml` still says **1.61.20**. Pages did not run: deploy-pages only watched `docs/`, not `extension/`. The Trainer `update_url` also 301s github.io → parishpress.ie, which Brave Update often skips.
+
+**This turn:** Pages now deploys when `extension/` changes. `update_url` is `https://www.parishpress.ie/updates.xml` (no 301). Not live until this merges and Pages finishes. Then Update.
+
+**Parked:** Load unpacked from an old folder still ignores the website until that folder is replaced.
+
+---
+
 ## 09/09/2026 — Merge the useful leftover drafts
 
 **The real goal, in one sentence:** pull the two leftover drafts that still do real work; do not bring July Ardstraw or the phone-note PR.
