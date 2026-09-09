@@ -281,23 +281,12 @@ jobs:
             echo "Error: parish_trainer.crx missing — Brave Update needs a packed CRX, not only a zip."
             exit 1
           fi
-          python3 -c "
-import sys
-packed, legacy, base, version = sys.argv[1], sys.argv[2], sys.argv[3], sys.argv[4]
-crx = base + '/extension/parish_trainer.crx'
-zip_url = base + '/extension/parish_trainer.zip'
-body = '''<?xml version=\"1.0\" encoding=\"UTF-8\"?>
-<gupdate xmlns=\"http://www.google.com/update2/response\" protocol=\"2.0\">
-  <app appid=\"%s\">
-    <updatecheck codebase=\"%s\" version=\"%s\" />
-  </app>
-  <app appid=\"%s\">
-    <updatecheck codebase=\"%s\" version=\"%s\" />
-  </app>
-</gupdate>
-''' % (packed, crx, version, legacy, zip_url, version)
-open('_site/updates.xml','w').write(body)
-" "${APP_ID}" "${LEGACY_UNPACKED_ID}" "${CODEBASE_BASE}" "${VERSION}"
+          python3 scripts/write_updates_xml.py \
+            --packed-id "${APP_ID}" \
+            --legacy-id "${LEGACY_UNPACKED_ID}" \
+            --base "${CODEBASE_BASE}" \
+            --version "${VERSION}" \
+            --out _site/updates.xml
 
           if ! grep -Fq "version=\"${VERSION}\"" _site/updates.xml; then
             echo "Error: generated updates.xml does not contain extension version ${VERSION}."
