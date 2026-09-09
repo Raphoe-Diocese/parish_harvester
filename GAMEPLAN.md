@@ -17,6 +17,12 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 09/09/2026 night — Prove Update from 1.61.21
+
+Frank is on **1.61.21**. That build’s `update_url` is parishpress.ie (no 301). Bump live feed to **1.61.22** so he can click Update and prove the wire. Not proved until his card says 1.61.22.
+
+---
+
 ## 09/09/2026 night — Trainer still 1.61.20 after #185
 
 **The real goal, in one sentence:** chrome://extensions shows 1.61.21 after Update, because the live zip/XML must match `main`.
