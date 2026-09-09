@@ -386,6 +386,7 @@ https://www.antrimparish.com
         self.assertIn('LEGACY_UNPACKED_ID="aohmhajdfdmhjjjoddleaikdfajgdjok"', workflow)
         self.assertIn('APP_ID="${DEFAULT_APP_ID}"', workflow)
         self.assertIn("parish_trainer.crx", workflow)
+        self.assertIn("scripts/write_updates_xml.py", workflow)
         self.assertNotIn('APP_ID="REPLACE_WITH_EXTENSION_ID"', workflow)
         self.assertIn(
             "( cd extension && zip -qr ../_site/extension/parish_trainer.zip . )",
