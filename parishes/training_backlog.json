@@ -1,208 +1,19 @@
 {
-  "generated_at": "2026-09-08",
+  "generated_at": "2026-09-09",
   "target_date": "2026-09-06",
   "summary": {
-    "downloaded": 82,
+    "downloaded": 104,
     "html_links": 0,
     "skipped": 30,
-    "failed": 32,
-    "stale_rejected": 15
+    "failed": 16,
+    "stale_rejected": 9
   },
   "action_counts": {
     "skip": 33,
-    "ok": 102,
-    "investigate": 25,
-    "retrain": 5
+    "ok": 118,
+    "investigate": 14
   },
   "parishes": [
-    {
-      "parish_key": "bangorparish",
-      "display_name": "Bangor",
-      "diocese": "down_and_connor",
-      "recipe_file": "parishes/recipes/down_and_connor/bangorparish.json",
-      "recipe": {
-        "start_url": "https://www.bangorparish.com/parish-bulletin/",
-        "site_type": "http_scrape_newest_pdf",
-        "playbook_type": "pdf_download_list",
-        "status": "",
-        "skip": false,
-        "placeholder": false,
-        "step_count": 3,
-        "click_count": 1,
-        "has_terminal": true,
-        "operator_notes": [
-          "SUPERSEDES the 2026-06-27 version \u2014 that recipe had a goto step",
-          "hardcoded to the literal 14-June-2026-NEWSLETTER.pdf with NO",
-          "use_target_url, plus a download step with use_captured_url:true",
-          "returning that same literal URL unmodified \u2014 bug pattern #1, it would",
-          "have downloaded the 14 June 2026 PDF forever even after the site",
-          "posted newer newsletters.",
-          "This page (/parish-bulletin/) lists two PDFs per week \u2014 'Download",
-          "Parish Newsletter' (the actual bulletin) and 'Download Missalette'",
-          "(a separate weekly Mass-readings booklet, same date, NOT the bulletin).",
-          "pick_strategy:newest_dated + the newsletter/bulletin keyword bonus in",
-          "_score_bulletin_link correctly prefers the Newsletter link over the",
-          "Missalette one when both share the same date score.",
-          "CONFIRMED 2026-08-10: the site itself has not posted anything newer",
-          "than 14 June 2026 on this page (checked full listing, newest-first,",
-          "nothing from July/August present) \u2014 genuinely stale, not a scraper",
-          "bug. This recipe will now pick up whatever is newest automatically",
-          "once the parish resumes posting; re-check manually if it persists at",
-          "outcome=stale for many more weeks."
-        ],
-        "do_not": [
-          "Do not pin a dated filename in the selector \u2014 it breaks every week.",
-          "Do not pick 'Download Missalette' links \u2014 that's a different weekly document."
-        ],
-        "recorded_date": "2026-08-10"
-      },
-      "bulletin_format": "download",
-      "learned_pattern": "",
-      "host_profile": null,
-      "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe for Bangor is outdated \u2014 the website may have changed. Re-train with: python main.py --train \"Bangor\" (detail: Recipe outdated \u2014 re-train with --train (all selectors failed: a[href$='.pdf']: Locator.get_attribute: Timeout 30000ms exc",
-      "suggested_action": "retrain",
-      "suggested_reason": "outdated selectors"
-    },
-    {
-      "parish_key": "glenariffeparish",
-      "display_name": "Glenariffe",
-      "diocese": "down_and_connor",
-      "recipe_file": "parishes/recipes/down_and_connor/glenariffeparish.json",
-      "recipe": {
-        "start_url": "https://glenariffeparish.org/whats-on",
-        "site_type": "predicted_dated_pdf",
-        "playbook_type": "pdf_download_list",
-        "status": "",
-        "skip": false,
-        "placeholder": false,
-        "step_count": 2,
-        "click_count": 1,
-        "has_terminal": true,
-        "operator_notes": [
-          "whats-on lists feast-named PDFs under /wp-content/uploads/YYYY/MM/.",
-          "Pick newest dated / liturgical PDF. Do not pin Easter or a named Sunday."
-        ],
-        "do_not": [
-          "Do not pin Sixteenth-Sunday-of-Ordinary-Time.pdf or Easter-Sunday-20th-April-2025.pdf.",
-          "Do not pick GDPR, Gift Aid, or Novena-Prayers PDFs over the weekly bulletin."
-        ],
-        "recorded_date": "2026-08-23"
-      },
-      "bulletin_format": "download",
-      "learned_pattern": "",
-      "host_profile": null,
-      "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe for Glenariffe is outdated \u2014 the website may have changed. Re-train with: python main.py --train \"Glenariffe\" (detail: Recipe outdated \u2014 re-train with --train (all selectors failed: a[href$='.pdf']: Locator.get_attribute: Timeout 300",
-      "suggested_action": "retrain",
-      "suggested_reason": "outdated selectors"
-    },
-    {
-      "parish_key": "stbernadettesparish",
-      "display_name": "St Bernadettes",
-      "diocese": "down_and_connor",
-      "recipe_file": "parishes/recipes/down_and_connor/stbernadettesparish.json",
-      "recipe": {
-        "start_url": "https://www.stbernadettesparish.org/?page_id=672",
-        "site_type": "predicted_dated_pdf",
-        "playbook_type": "pdf_download_list",
-        "status": "",
-        "skip": false,
-        "placeholder": false,
-        "step_count": 2,
-        "click_count": 1,
-        "has_terminal": true,
-        "operator_notes": [
-          "Weekly file is /bulletin/uploaded/Parish Bulletin Dth Month YYYY.pdf (spaces encoded).",
-          "08/09/2026: Parish%20Bulletin%206th%20September%202026.pdf is HTTP 200, 480135. Harvest 07/09 timed out on a[href$='.pdf'].",
-          "site_type:predicted_dated_pdf rewrites the Sunday. Do not pin only September."
-        ],
-        "do_not": [
-          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
-          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
-        ],
-        "recorded_date": "2026-08-19"
-      },
-      "bulletin_format": "download",
-      "learned_pattern": "",
-      "host_profile": null,
-      "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe for St Bernadettes is outdated \u2014 the website may have changed. Re-train with: python main.py --train \"St Bernadettes\" (detail: Recipe outdated \u2014 re-train with --train (all selectors failed: a[href$='.pdf']: Locator.get_attribute: Tim",
-      "suggested_action": "retrain",
-      "suggested_reason": "outdated selectors"
-    },
-    {
-      "parish_key": "stoliverplunkettparish",
-      "display_name": "St Oliver Plunkett",
-      "diocese": "down_and_connor",
-      "recipe_file": "parishes/recipes/down_and_connor/stoliverplunkettparish.json",
-      "recipe": {
-        "start_url": "https://stoliverplunkettparish.ie/bulletins/",
-        "site_type": "predicted_dated_pdf",
-        "playbook_type": "pdf_download_list",
-        "status": "",
-        "skip": false,
-        "placeholder": false,
-        "step_count": 3,
-        "click_count": 1,
-        "has_terminal": true,
-        "operator_notes": [
-          "Bulletin list at /bulletins/. Newest dated Sun-Nth-Month-26.pdf.",
-          "Do not pin a June download URL \u2014 harvest rewrote the folder to /2026/08/ and 404'd."
-        ],
-        "do_not": [
-          "Do not pin Sun-28th-June-26.pdf or any dated filename.",
-          "Do not pick Ministers-of-the-Word / Eucharist rota .docx files."
-        ],
-        "recorded_date": "2026-08-23"
-      },
-      "bulletin_format": "download",
-      "learned_pattern": "",
-      "host_profile": null,
-      "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe for St Oliver Plunkett is outdated \u2014 the website may have changed. Re-train with: python main.py --train \"St Oliver Plunkett\" (detail: Recipe outdated \u2014 re-train with --train (all selectors failed: a[href$='.pdf']: Locator.get_attrib",
-      "suggested_action": "retrain",
-      "suggested_reason": "outdated selectors"
-    },
-    {
-      "parish_key": "stpatricksdownpatrick",
-      "display_name": "St Patrick's Downpatrick",
-      "diocese": "down_and_connor",
-      "recipe_file": "parishes/recipes/down_and_connor/stpatricksdownpatrick.json",
-      "recipe": {
-        "start_url": "https://stpatricksdownpatrick.com/parish-bulletins/",
-        "site_type": "predicted_dated_pdf",
-        "playbook_type": "pdf_download_list",
-        "status": "",
-        "skip": false,
-        "placeholder": false,
-        "step_count": 2,
-        "click_count": 1,
-        "has_terminal": true,
-        "operator_notes": [
-          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
-          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-          "Do not worry if the filename or date in the link text changes every week."
-        ],
-        "do_not": [
-          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
-          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
-        ],
-        "recorded_date": "2026-08-19"
-      },
-      "bulletin_format": "download",
-      "learned_pattern": "",
-      "host_profile": null,
-      "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe for St Patrick's Downpatrick is outdated \u2014 the website may have changed. Re-train with: python main.py --train \"St Patrick's Downpatrick\" (detail: Recipe outdated \u2014 re-train with --train (all selectors failed: a[href$='.pdf']: Locato",
-      "suggested_action": "retrain",
-      "suggested_reason": "outdated selectors"
-    },
     {
       "parish_key": "aghagallonandballinderryparish",
       "display_name": "Aghagallon and Ballinderry",
@@ -648,10 +459,10 @@
         "max_retries": 3
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "No valid content found",
-      "suggested_action": "investigate",
-      "suggested_reason": "No valid content found"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "ballymenaparish",
@@ -760,6 +571,56 @@
       "suggested_reason": "downloaded or not in failure list"
     },
     {
+      "parish_key": "bangorparish",
+      "display_name": "Bangor",
+      "diocese": "down_and_connor",
+      "recipe_file": "parishes/recipes/down_and_connor/bangorparish.json",
+      "recipe": {
+        "start_url": "https://www.bangorparish.com/parish-bulletin/",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "pdf_download_list",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 3,
+        "click_count": 1,
+        "has_terminal": true,
+        "operator_notes": [
+          "SUPERSEDES the 2026-06-27 version \u2014 that recipe had a goto step",
+          "hardcoded to the literal 14-June-2026-NEWSLETTER.pdf with NO",
+          "use_target_url, plus a download step with use_captured_url:true",
+          "returning that same literal URL unmodified \u2014 bug pattern #1, it would",
+          "have downloaded the 14 June 2026 PDF forever even after the site",
+          "posted newer newsletters.",
+          "This page (/parish-bulletin/) lists two PDFs per week \u2014 'Download",
+          "Parish Newsletter' (the actual bulletin) and 'Download Missalette'",
+          "(a separate weekly Mass-readings booklet, same date, NOT the bulletin).",
+          "pick_strategy:newest_dated + the newsletter/bulletin keyword bonus in",
+          "_score_bulletin_link correctly prefers the Newsletter link over the",
+          "Missalette one when both share the same date score.",
+          "CONFIRMED 2026-08-10: the site itself has not posted anything newer",
+          "than 14 June 2026 on this page (checked full listing, newest-first,",
+          "nothing from July/August present) \u2014 genuinely stale, not a scraper",
+          "bug. This recipe will now pick up whatever is newest automatically",
+          "once the parish resumes posting; re-check manually if it persists at",
+          "outcome=stale for many more weeks."
+        ],
+        "do_not": [
+          "Do not pin a dated filename in the selector \u2014 it breaks every week.",
+          "Do not pick 'Download Missalette' links \u2014 that's a different weekly document."
+        ],
+        "recorded_date": "2026-08-10"
+      },
+      "bulletin_format": "download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
       "parish_key": "bellaghyparish",
       "display_name": "Bellaghy",
       "diocese": "derry",
@@ -849,10 +710,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: Recipe download step did not find a matching document URL",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: Recipe download step did not find a matching document URL"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "brookeborofivemiletown",
@@ -984,9 +845,9 @@
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP-scrape listing https://magheneparish.ie/newsletter/ \u2014 no dated bulletin PDF matching ['parish_newsletter'] (not a selector problem; parish may not have posted)",
+      "last_error": "Page.goto: net::ERR_ABORTED at https://magheneparish.ie/wp-content/uploads/2025/02/Parish_Newsletter_09.02.2025.pdf\nCall log:\n  - navigating to \"https://magheneparish.ie/wp-content/uploads/2025/02/Parish_Newsletter_09.02.2025.pdf\", waiting ",
       "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP-scrape listing https://magheneparish.ie/newsletter/ \u2014 no dated bulletin PDF matching ['parish_newsletter'] (not a selector problem; p"
+      "suggested_reason": "Page.goto: net::ERR_ABORTED at https://magheneparish.ie/wp-content/uploads/2025/02/Parish_Newsletter_09.02.2025.pdf\nCall log:\n  - navigating to \"https://maghene"
     },
     {
       "parish_key": "camusparish",
@@ -1653,10 +1514,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP-scrape listing https://kilmoredrumsnatt.com/past-newsletters/ \u2014 no dated bulletin PDF matching ['newsletter-'] (not a selector problem; parish may not have posted)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP-scrape listing https://kilmoredrumsnatt.com/past-newsletters/ \u2014 no dated bulletin PDF matching ['newsletter-'] (not a selector proble"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "corpuschristiparishbelfast",
@@ -1792,10 +1653,10 @@
         "notes": "One.com WordPress \u2014 TLS ~0.6s but domcontentloaded often exceeds 60s; harvest uses commit navigation. Plan ~2\u20133 min per run."
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP-scrape images https://derriaghycatholicparish.com/?page_id=262 \u2014 no bulletin page images matching ['suday', 'ordinary-time', 'bulletin'] (browser was not opened); headful fallback: Recipe replay failed: HTTP-scrap",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP-scrape images https://derriaghycatholicparish.com/?page_id=262 \u2014 no bulletin page images matching ['suday', 'ordinary-time', 'bulleti"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "derrygonnelly",
@@ -1937,10 +1798,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "No valid content found",
-      "suggested_action": "investigate",
-      "suggested_reason": "No valid content found"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "donaghmoyne",
@@ -1973,10 +1834,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "dromore",
@@ -2103,10 +1964,10 @@
         "total_timeout_s": 180
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: APIRequestContext.get: certificate has expired\nCall log:\n  - \u2192 GET https://www.parishpress.net/wp-content/uploads/parish-bulletins/donegal/raphoe/drumholm-parish/bulletin.pdf?t=1788809638\n  -     - user-agent: Mozilla/",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: APIRequestContext.get: certificate has expired\nCall log:\n  - \u2192 GET https://www.parishpress.net/wp-content/uploads/parish-bulletins/donegal"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "drumquinparish",
@@ -2551,10 +2412,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: naomhfionan.com predicted PDF URL(s) for 2026-09-06 did not resolve to a real PDF (not the listing-page block; retry later or re-check the number/letter prediction)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: naomhfionan.com predicted PDF URL(s) for 2026-09-06 did not resolve to a real PDF (not the listing-page block; retry later or re-check the"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "fintona",
@@ -2679,6 +2540,40 @@
         "operator_notes": [],
         "do_not": [],
         "recorded_date": "2026-06-27"
+      },
+      "bulletin_format": "download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "glenariffeparish",
+      "display_name": "Glenariffe",
+      "diocese": "down_and_connor",
+      "recipe_file": "parishes/recipes/down_and_connor/glenariffeparish.json",
+      "recipe": {
+        "start_url": "https://glenariffeparish.org/whats-on",
+        "site_type": "predicted_dated_pdf",
+        "playbook_type": "pdf_download_list",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 2,
+        "click_count": 1,
+        "has_terminal": true,
+        "operator_notes": [
+          "whats-on lists feast-named PDFs under /wp-content/uploads/YYYY/MM/.",
+          "Pick newest dated / liturgical PDF. Do not pin Easter or a named Sunday."
+        ],
+        "do_not": [
+          "Do not pin Sixteenth-Sunday-of-Ordinary-Time.pdf or Easter-Sunday-20th-April-2025.pdf.",
+          "Do not pick GDPR, Gift Aid, or Novena-Prayers PDFs over the weekly bulletin."
+        ],
+        "recorded_date": "2026-08-23"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
@@ -2858,10 +2753,10 @@
         "total_timeout_s": 180
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: APIRequestContext.get: certificate has expired\nCall log:\n  - \u2192 GET https://www.parishpress.net/wp-content/uploads/parish-bulletins/donegal/raphoe/gort-a-choirce/bulletin.pdf?t=1788809648\n  -     - user-agent: Mozilla/5",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: APIRequestContext.get: certificate has expired\nCall log:\n  - \u2192 GET https://www.parishpress.net/wp-content/uploads/parish-bulletins/donegal"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "granaghanparish",
@@ -3003,10 +2898,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Too many pages: 13 pages (max 4)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Too many pages: 13 pages (max 4)"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "holyfamily-parish",
@@ -3108,10 +3003,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: Recipe download step did not find a matching document URL",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: Recipe download step did not find a matching document URL"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "holytrinityparishbelfast",
@@ -4179,10 +4074,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP-scrape listing https://milfordrathmullanparishes.ie/bulletins/ \u2014 no dated bulletin PDF matching ['parish-newsletter'] (not a selector problem; parish may not have posted)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP-scrape listing https://milfordrathmullanparishes.ie/bulletins/ \u2014 no dated bulletin PDF matching ['parish-newsletter'] (not a selector"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "monaghanrackwallace",
@@ -4218,10 +4113,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: wp-json media at https://monaghan-rackwallace.com/ \u2014 no dated bulletin PDF matching ['.pdf'] (listing page was not opened)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: wp-json media at https://monaghan-rackwallace.com/ \u2014 no dated bulletin PDF matching ['.pdf'] (listing page was not opened)"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "nativityparish",
@@ -4240,7 +4135,7 @@
         "has_terminal": false,
         "operator_notes": [],
         "do_not": [],
-        "recorded_date": "2026-06-26"
+        "recorded_date": "2026-09-09"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -4283,10 +4178,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: Permanent bulletin URL https://newtownkilleaparish.ie/bulletin/raphoe/newtown-killea did not return a PDF/DOCX (listing page was not opened)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: Permanent bulletin URL https://newtownkilleaparish.ie/bulletin/raphoe/newtown-killea did not return a PDF/DOCX (listing page was not opene"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "newtownbutler",
@@ -4448,10 +4343,10 @@
         "notes": "Joomla Dropfiles \u2014 click a.mod_downloadlink; harvest converts .docx to PDF."
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded; headful fallback: Headful fallback timed out",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded; headful fallback: Headful fallback timed out"
     },
     {
       "parish_key": "portaferryparish",
@@ -4665,9 +4560,9 @@
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Recipe replay failed: wp-json media at https://parishofroslea.com/ \u2014 no dated bulletin PDF matching ['bulletin-sunday'] (listing page was not opened)",
+      "last_error": "Total timeout exceeded",
       "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: wp-json media at https://parishofroslea.com/ \u2014 no dated bulletin PDF matching ['bulletin-sunday'] (listing page was not opened)"
+      "suggested_reason": "Total timeout exceeded"
     },
     {
       "parish_key": "sacredheartparishbelfast",
@@ -4700,10 +4595,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "No downloadable bulletin links found",
-      "suggested_action": "investigate",
-      "suggested_reason": "No downloadable bulletin links found"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "saintannesparish",
@@ -4811,9 +4706,9 @@
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Recipe replay failed: Recipe download step did not find a matching document URL",
+      "last_error": "Too many pages: 7 pages (max 4)",
       "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: Recipe download step did not find a matching document URL"
+      "suggested_reason": "Too many pages: 7 pages (max 4)"
     },
     {
       "parish_key": "saulandballeeparish",
@@ -4900,7 +4795,7 @@
         "has_terminal": false,
         "operator_notes": [],
         "do_not": [],
-        "recorded_date": "2026-06-26"
+        "recorded_date": "2026-09-09"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -4910,6 +4805,41 @@
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Bulletin page gone \u2014 no PDF on stagnesbelfast.com (stub since April)."
+    },
+    {
+      "parish_key": "stbernadettesparish",
+      "display_name": "St Bernadettes",
+      "diocese": "down_and_connor",
+      "recipe_file": "parishes/recipes/down_and_connor/stbernadettesparish.json",
+      "recipe": {
+        "start_url": "https://www.stbernadettesparish.org/?page_id=672",
+        "site_type": "predicted_dated_pdf",
+        "playbook_type": "pdf_download_list",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 2,
+        "click_count": 1,
+        "has_terminal": true,
+        "operator_notes": [
+          "Weekly file is /bulletin/uploaded/Parish Bulletin Dth Month YYYY.pdf (spaces encoded).",
+          "08/09/2026: Parish%20Bulletin%206th%20September%202026.pdf is HTTP 200, 480135. Harvest 07/09 timed out on a[href$='.pdf'].",
+          "site_type:predicted_dated_pdf rewrites the Sunday. Do not pin only September."
+        ],
+        "do_not": [
+          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
+          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+        ],
+        "recorded_date": "2026-08-19"
+      },
+      "bulletin_format": "download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "stbrigidsparishbelfast",
@@ -4974,9 +4904,9 @@
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Too many pages: 5 pages (max 4)",
+      "last_error": "Recipe replay failed: WAF-flaky site https://www.stcolmcillesholywood.org/weekly-bulletins/ \u2014 could not fetch listing/post via plain-HTTP retries within budget (not a permanent block; retry later)",
       "suggested_action": "investigate",
-      "suggested_reason": "Too many pages: 5 pages (max 4)"
+      "suggested_reason": "Recipe replay failed: WAF-flaky site https://www.stcolmcillesholywood.org/weekly-bulletins/ \u2014 could not fetch listing/post via plain-HTTP retries within budget "
     },
     {
       "parish_key": "st-colmcilles",
@@ -5043,10 +4973,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: WAF-flaky site https://stgerardsparish.org/parish-news-events/ \u2014 could not fetch listing/post via plain-HTTP retries within budget (not a permanent block; retry later)",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: WAF-flaky site https://stgerardsparish.org/parish-news-events/ \u2014 could not fetch listing/post via plain-HTTP retries within budget (not a "
     },
     {
       "parish_key": "stlukesparishbelfast",
@@ -5231,6 +5161,75 @@
       "suggested_reason": "downloaded or not in failure list"
     },
     {
+      "parish_key": "stoliverplunkettparish",
+      "display_name": "St Oliver Plunkett",
+      "diocese": "down_and_connor",
+      "recipe_file": "parishes/recipes/down_and_connor/stoliverplunkettparish.json",
+      "recipe": {
+        "start_url": "https://stoliverplunkettparish.ie/bulletins/",
+        "site_type": "predicted_dated_pdf",
+        "playbook_type": "pdf_download_list",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 3,
+        "click_count": 1,
+        "has_terminal": true,
+        "operator_notes": [
+          "Bulletin list at /bulletins/. Newest dated Sun-Nth-Month-26.pdf.",
+          "Do not pin a June download URL \u2014 harvest rewrote the folder to /2026/08/ and 404'd."
+        ],
+        "do_not": [
+          "Do not pin Sun-28th-June-26.pdf or any dated filename.",
+          "Do not pick Ministers-of-the-Word / Eucharist rota .docx files."
+        ],
+        "recorded_date": "2026-08-23"
+      },
+      "bulletin_format": "download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "stpatricksdownpatrick",
+      "display_name": "St Patrick's Downpatrick",
+      "diocese": "down_and_connor",
+      "recipe_file": "parishes/recipes/down_and_connor/stpatricksdownpatrick.json",
+      "recipe": {
+        "start_url": "https://stpatricksdownpatrick.com/parish-bulletins/",
+        "site_type": "predicted_dated_pdf",
+        "playbook_type": "pdf_download_list",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 2,
+        "click_count": 1,
+        "has_terminal": true,
+        "operator_notes": [
+          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
+          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+          "Do not worry if the filename or date in the link text changes every week."
+        ],
+        "do_not": [
+          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
+          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+        ],
+        "recorded_date": "2026-08-19"
+      },
+      "bulletin_format": "download",
+      "learned_pattern": "",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
       "parish_key": "stpatricksbelfast",
       "display_name": "St Patricks Belfast",
       "diocese": "down_and_connor",
@@ -5258,10 +5257,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: WAF-flaky site https://www.stpatricksbelfast.org/category/weekly-bulletins \u2014 could not fetch listing/post via plain-HTTP retries within budget (not a permanent block; retry later)",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: WAF-flaky site https://www.stpatricksbelfast.org/category/weekly-bulletins \u2014 could not fetch listing/post via plain-HTTP retries within bu"
     },
     {
       "parish_key": "stteresasparish",
@@ -5488,10 +5487,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: wp-json media at https://tawnawillyparish.ie/ \u2014 no dated bulletin PDF matching ['sunday'] (listing page was not opened)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: wp-json media at https://tawnawillyparish.ie/ \u2014 no dated bulletin PDF matching ['sunday'] (listing page was not opened)"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "drive-1hh7w-ew0v",
@@ -5601,10 +5600,10 @@
         "notes": "Joomla Dropfiles \u2014 cloud \u2193 icon (a.mod_downloadlink) serves Word .docx. Click the cloud on this Sunday's row \u2014 harvester converts docx \u2192 PDF automatically. Do not record diocese GDPR/Privacy PDFs \u2014 only mod_downloadlink on the parish host."
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Total timeout exceeded; headful fallback: Headful fallback timed out",
+      "suggested_action": "investigate",
+      "suggested_reason": "Total timeout exceeded; headful fallback: Headful fallback timed out"
     },
     {
       "parish_key": "trillick",
@@ -5748,10 +5747,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Too many pages: 5 pages (max 4)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Too many pages: 5 pages (max 4)"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     }
   ]
 }
