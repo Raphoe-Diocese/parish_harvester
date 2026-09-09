@@ -17,6 +17,21 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 09/09/2026 — Merge the useful leftover drafts
+
+**The real goal, in one sentence:** pull the two leftover drafts that still do real work; do not bring July Ardstraw or the phone-note PR.
+
+**This turn:**
+- **#170** ported onto current Trainer: Send & test runs the saved GitHub recipe when local Step 2 is missing; skip `parishioner` forms. Trainer **1.61.21**.
+- **#177** ported: Parish Press Uploader **16.0.1** (Settings + side menu). Not live on a parish site until Frank uploads the zip in WordPress.
+- Closed earlier: #174 (note only), #171 (July page worse than live 25/08 form).
+
+**Next:** harvest run 34293288559 is still the recipe-fix source. Reload Trainer at chrome://extensions after this merge.
+
+**Parked:** installing the Uploader zip on newtownkilleaparish.ie (Frank does that).
+
+---
+
 ## 08/09/2026 night — View bulletin was downloading; Raphoe list is last harvest
 
 **The real goal, in one sentence:** View bulletin opens a new tab (no save dialog); the Problems list is harvest truth, not “the site right now”.
