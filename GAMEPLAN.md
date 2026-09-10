@@ -27,7 +27,8 @@ that is already a card.
 
 ### Audit cards — ticked only with PR + proof
 
-_(none yet)_
+- **A2** — [PR #193](https://github.com/Raphoe-Diocese/parish_harvester/pull/193) (code landed). Harvest proof not yet: next Sunday `parish_status.json` on `main` must have zero empty/`null` `last_tested_at`.
+
 
 ---
 

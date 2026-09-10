@@ -49,6 +49,61 @@ class ParishStatusTests(unittest.TestCase):
         self.assertNotIn("okparish", status["actionable_keys"])
         self.assertEqual(status["parishes"]["staleparish"]["category"], "bulletin too old (recipe worked)")
         self.assertEqual(status["parishes"]["failparish"]["consecutive_failures"], 3)
+        # A2: every row, including disabled, has a non-empty last_tested_at.
+        for key, row in status["parishes"].items():
+            self.assertTrue(
+                str(row.get("last_tested_at") or "").strip(),
+                f"{key} last_tested_at empty",
+            )
+        self.assertEqual(
+            status["parishes"]["failparish"]["last_tested_at"],
+            "2026-06-27T12:00:00+00:00",
+        )
+        # H4: last_patched_at is another parish's stamp — must not leak.
+        self.assertNotEqual(
+            status["parishes"]["okparish"]["last_tested_at"],
+            report["last_patched_at"],
+        )
+        self.assertEqual(status["parishes"]["okparish"]["last_tested_at"], status["generated_at"])
+        self.assertEqual(status["parishes"]["disabledparish"]["last_tested_at"], status["generated_at"])
+
+    def test_last_tested_at_keeps_previous_row_when_item_has_no_stamp(self) -> None:
+        report = {
+            "target_date": "2026-09-06",
+            "last_patched_at": "2026-09-10T12:00:00+00:00",
+            "downloaded": [{"parish": "okparish", "display_name": "OK", "url": "https://x.com"}],
+            "failed": [
+                {
+                    "parish": "failparish",
+                    "display_name": "Fail",
+                    "url": "https://fail.com",
+                    "error": "timeout",
+                    "last_tested_at": "2026-09-10T12:00:00+00:00",
+                }
+            ],
+            "stale_rejected": [],
+            "html_links": [],
+            "skipped": [],
+        }
+        previous = {
+            "parishes": {
+                "okparish": {"last_tested_at": "2026-09-09T01:07:23+00:00"},
+            }
+        }
+        status = build_parish_status(
+            report,
+            consecutive_failures={},
+            disabled_keys=set(),
+            previous_status=previous,
+        )
+        self.assertEqual(
+            status["parishes"]["okparish"]["last_tested_at"],
+            "2026-09-09T01:07:23+00:00",
+        )
+        self.assertEqual(
+            status["parishes"]["failparish"]["last_tested_at"],
+            "2026-09-10T12:00:00+00:00",
+        )
 
     def test_write_after_patch(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
@@ -83,6 +138,7 @@ class ParishStatusTests(unittest.TestCase):
             self.assertIn("xparish", status["actionable_keys"])
             on_disk = json.loads((parishes_dir / "parish_status.json").read_text(encoding="utf-8"))
             self.assertEqual(on_disk["parishes"]["xparish"]["outcome"], "failed")
+            self.assertTrue(str(on_disk["parishes"]["xparish"].get("last_tested_at") or "").strip())
 
 
 if __name__ == "__main__":

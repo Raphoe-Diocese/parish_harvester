@@ -112,6 +112,27 @@ def _failure_category(error_text: str, diagnosis: dict | None = None) -> str:
     return "other"
 
 
+def _row_last_tested_at(
+    item: dict,
+    *,
+    generated_at: str,
+    previous_row: dict | None = None,
+) -> str:
+    """Stamp this harvest (or this parish's Send & test), never another parish's patch.
+
+    ``report.last_patched_at`` is one parish's rebuild time. Using it as a
+    fallback made 158 rows share Castleblayney's stamp (GAMEPLAN H4) so the
+    Trainer treated a neighbour's finish as this parish's result.
+    """
+    item_ts = str(item.get("last_tested_at") or "").strip()
+    if item_ts:
+        return item_ts
+    prev_ts = str((previous_row or {}).get("last_tested_at") or "").strip()
+    if prev_ts:
+        return prev_ts
+    return generated_at
+
+
 def _outcome_from_report_item(section: str, item: dict) -> str:
     if section == "downloaded":
         return "ok"
@@ -151,6 +172,7 @@ def build_parish_status(
     parishes_dir: Path | None = None,
     consecutive_failures: dict | None = None,
     disabled_keys: set[str] | None = None,
+    previous_status: dict | None = None,
 ) -> dict:
     """
     Merge report buckets into one parish_status.json document.
@@ -161,9 +183,16 @@ def build_parish_status(
     )
     disabled_keys = disabled_keys if disabled_keys is not None else _parse_disabled_keys(parishes_dir)
     parish_index = _build_parish_index(parishes_dir)
+    previous_parishes = (
+        previous_status.get("parishes")
+        if isinstance(previous_status, dict) and isinstance(previous_status.get("parishes"), dict)
+        else {}
+    )
 
     target_date = str(report.get("target_date") or "")
-    generated_at = datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    generated_at = str(report.get("generated_at") or "").strip() or (
+        datetime.now(timezone.utc).replace(microsecond=0).isoformat()
+    )
     parishes: dict[str, dict] = {}
 
     def _upsert(key: str, payload: dict) -> None:
@@ -220,7 +249,11 @@ def build_parish_status(
                     "category": category,
                     "error": error_text or None,
                     "url": str(item.get("url") or item.get("start_url") or ""),
-                    "last_tested_at": item.get("last_tested_at") or report.get("last_patched_at"),
+                    "last_tested_at": _row_last_tested_at(
+                        item,
+                        generated_at=generated_at,
+                        previous_row=previous_parishes.get(key),
+                    ),
                     "consecutive_failures": int(consecutive_failures.get(key) or 0),
                     "diagnosis": diagnosis,
                     "actionable": actionable,
@@ -249,6 +282,11 @@ def build_parish_status(
                 "consecutive_failures": int(consecutive_failures.get(key) or 0),
                 "display_name": meta.get("display_name") or key,
                 "diocese": meta.get("diocese") or "",
+                "last_tested_at": _row_last_tested_at(
+                    {},
+                    generated_at=generated_at,
+                    previous_row=previous_parishes.get(key),
+                ),
             },
         )
 
@@ -289,7 +327,13 @@ def write_parish_status(
         report = {}
 
     consecutive = _load_json(parishes_dir / "consecutive_failures.json", {})
-    status = build_parish_status(report, parishes_dir=parishes_dir, consecutive_failures=consecutive)
+    previous = _load_json(output_path, {}) if output_path.exists() else {}
+    status = build_parish_status(
+        report,
+        parishes_dir=parishes_dir,
+        consecutive_failures=consecutive,
+        previous_status=previous if isinstance(previous, dict) else {},
+    )
     output_path.parent.mkdir(parents=True, exist_ok=True)
     output_path.write_text(json.dumps(status, indent=2), encoding="utf-8")
     return status
