@@ -175,6 +175,35 @@ def reconcile_report_with_recipes(report: dict, parishes_dir: Path | None = None
     return report
 
 
+def _bulletin_date_fields(
+    url: str,
+    *,
+    error: str | None = None,
+    diagnosis: dict | None = None,
+) -> dict[str, str]:
+    """ISO + UK bulletin date from diagnosis, stale-error text, or the URL. Never invent."""
+    iso = ""
+    if isinstance(diagnosis, dict):
+        raw = str(diagnosis.get("bulletin_date") or "").strip()
+        if raw and raw != "unknown":
+            iso = raw
+    if not iso and error:
+        match = re.search(r"bulletin date (\d{4}-\d{2}-\d{2})", str(error))
+        if match:
+            iso = match.group(1)
+    if not iso and url:
+        from .bulletin_freshness import extract_bulletin_date
+
+        extracted = extract_bulletin_date(url)
+        if extracted is not None:
+            iso = extracted.isoformat()
+    if not iso:
+        return {}
+    from .utils import format_uk_date
+
+    return {"bulletin_date": iso, "bulletin_date_uk": format_uk_date(iso)}
+
+
 def generate_report(
     results: list["FetchResult"],
     raw_dir: Path,
@@ -222,6 +251,11 @@ def generate_report(
                 "retry_strategy": r.retry_strategy,
                 "error": r.error,
                 **({"file": kept.name} if kept else {}),
+                **_bulletin_date_fields(
+                    r.url,
+                    error=r.error,
+                    diagnosis=r.diagnosis if isinstance(getattr(r, "diagnosis", None), dict) else None,
+                ),
             })
             continue
         error_reason = (
@@ -244,6 +278,7 @@ def generate_report(
                 "url": r.url,
                 "file": dest.name if dest else f"{r.key}.pdf",
                 "file_type": r.file_type,
+                **_bulletin_date_fields(r.url),
             }
             downloaded.append(entry)
         elif r.status == "html_link":
@@ -345,6 +380,11 @@ def _result_to_report_entry(r: "FetchResult", current_dir: Path) -> tuple[str, d
             "retry_strategy": r.retry_strategy,
             "error": r.error,
             **({"file": kept.name} if kept else {}),
+            **_bulletin_date_fields(
+                r.url,
+                error=r.error,
+                diagnosis=r.diagnosis if isinstance(getattr(r, "diagnosis", None), dict) else None,
+            ),
         }
     if r.status == "ok" and r.file_path and r.file_path.exists():
         error_reason = _pdf_error_page_reason(r.file_path)
@@ -362,6 +402,7 @@ def _result_to_report_entry(r: "FetchResult", current_dir: Path) -> tuple[str, d
             "url": r.url,
             "file": dest.name if dest else f"{r.key}.pdf",
             "file_type": r.file_type,
+            **_bulletin_date_fields(r.url),
         }
     if r.status == "html_link":
         return "html_links", {
