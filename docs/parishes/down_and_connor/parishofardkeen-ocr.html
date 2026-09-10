@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Ardkeen Text Bulletin — 10/09/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #eef1f0;
+      color: #1a1f1e;
+      line-height: 1.65;
+      font-size: 1.125rem;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
+    }
+    a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
+    .page {
+      max-width: min(72ch, 100%);
+      margin: 0 auto;
+      padding: 14px 18px 40px;
+    }
+    .top {
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+      gap: 8px 14px;
+      margin-bottom: 12px;
+    }
+    .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+    .back-link {
+      font-size: 0.9rem; font-weight: 700;
+      color: #14524f; text-decoration: none;
+    }
+    .title-line {
+      font-size: 1rem; font-weight: 700; color: #1a1f1e;
+    }
+    .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 9999;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
+    .ocr-zoom-bar {
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
+    }
+    .ocr-zoom-bar button {
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+      line-height: 1;
+    }
+    .ocr-zoom-pct {
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 4px; } }
+    
+    .ocr-body {
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    .ocr-body h1, .ocr-body h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h2.b-title, .ocr-body .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    .ocr-body h3.b-head, .ocr-body .b-head {
+      font-size: 1.12em;
+      color: #134e9c;
+      margin: 1.1em 0 0.35em;
+    }
+    .ocr-body h4.b-sub, .ocr-body .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    .ocr-body h3, .ocr-body h4 {
+      color: #1a6b6b;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    .ocr-body h3.ocr-page-heading,
+    .ocr-body .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    .ocr-body hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    .ocr-body strong { color: #0f2b5b; }
+    .ocr-body a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .ocr-body mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    .ocr-body mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    .ocr-body table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ocr-body table.b-table td, .ocr-body table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .ocr-body table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    .ocr-body table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    .ocr-body img, .ocr-body iframe, .ocr-body video {
+      max-width: 100%;
+      height: auto;
+    }
+    .ocr-body > :first-child {
+      margin-top: 0;
+    }
+    
+    .ocr-body .ocr-parish-masthead {
+      margin: 2.1em 0 1.15em;
+      padding: 0.85em 0 0.7em;
+      border-top: 3px solid #14524f;
+      border-bottom: 1px solid #c5d0c9;
+    }
+    .ocr-body .ocr-parish-masthead:first-child {
+      margin-top: 0;
+    }
+    .ocr-body h2.ocr-parish-name,
+    .ocr-body .ocr-parish-name {
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #14524f;
+      margin: 0 0 0.2em;
+      line-height: 1.25;
+      border: 0;
+      padding: 0;
+      text-transform: none;
+    }
+    .ocr-body .ocr-parish-date {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body .ocr-parish-link {
+      margin: 0.25em 0 0;
+      font-size: 0.88rem;
+    }
+    .ocr-body h3.b-head {
+      margin-top: 1.45em;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.12em;
+      border-bottom: 1px solid #d4ddd9;
+    }
+
+
+    .ocr-body {
+      padding: 4px 2px 8px;
+    }
+    .search-panel {
+      margin: 0 0 12px;
+      border: 1px solid #d4ddd9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .search-panel .ocr-search-bar { margin-bottom: 6px; }
+    .ocr-search-bar { position: relative; margin-bottom: 6px; }
+    .search-input {
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: #1a1f1e; background: #fff;
+    }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 1px solid #1a6b6b; border-radius: 6px; background: #fff; color: #1a6b6b;
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { color: #999; border-color: #d4ddd9; cursor: not-allowed; }
+    .match-count { color: #5a6a68; font-size: 0.85rem; font-weight: 600; }
+    .note-box {
+      margin-top: 18px;
+      color: #5a6a68;
+      font-weight: 400;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      padding: 0;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 8px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    body.embed-mode .top { display: none !important; }
+    body.embed-mode .page { padding-top: 8px; }
+    @media (max-width: 600px) {
+      .page { padding: 12px 14px 32px; }
+      .ocr-search-tools button { min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top" id="ocr-top">
+      <div class="top-left">
+        <a class="back-link" href="parishofardkeen.html" target="_blank" rel="noopener noreferrer">← Viewer</a>
+        <span class="title-line">ARDKEEN Text Bulletin · 10/09/2026</span>
+      </div>
+    </div>
+    <div class="ocr-sticky-chrome">
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+      <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+      <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+      <span class="ocr-zoom-hint">or pinch to zoom</span>
+    </div>
+    <div class="search-panel" role="search">
+      <div class="ocr-search-bar">
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search text (mass, bingo, parish…)" aria-label="Search bulletin text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled>← Prev</button>
+          <button id="ocr-next" type="button" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead" id="ocr-parish-ardkeen" data-parish-name="Ardkeen"><h2 class="ocr-parish-name">Ardkeen</h2><p class="ocr-parish-date">10/09/2026</p></header>
+<p class="page-label">Page 5</p>
+<p>III B SIE IER BE<br>
+PARISH SCHEDULE<br>
+DATE |ST MARY STAR OF THE SEA ST JOSEPH<br>
+Mon? | 10am: MASS 10am-7pm: Private Prayer<br>
+10am-7pm: Private Prayer<br>
+Tue 8 10am-7pm: Private Prayer 10am-7pm: Private Prayer<br>
+7pm: NOVENA MASS: Mother<br>
+of Perpetual Help<br>
+Wed 9 | 10am-7pm: Private Prayer 10am: MASS<br>
+10.30am-7pm: ADORATION<br>
+(Evening Prayer at 6:45pm)<br>
+Sat 12 4.15pm: Confessions 10am: MASS &amp; Confessions<br>
+5pm: VIGIL MASS 10am-7pm: Private Prayer<br>
+Sun 13 | 10am-7pm: Private Prayer 10am MASS<br>
+11am- pm: Private Prayer<br>
+AAA CIO IITMTAIT Ty 1CY4 ae)<br>
+MASS INTENTIONS a |<br>
+Mon 7: Samuel Doherty &gt;&gt; : © .<br>
+Tue 8: Sean Masterson &amp; Peekie Kearney &quot; at 3 a<br>
+Wed 9: Helen Caldwell i. Ly , IA !<br>
+Sat 12 (10am): For the Parish soe<br>
+Sat 12 (5pm): — Brendan Braniff (MM)<br>
+Sun 13: Joe Bailie (MM), Fr Eamon Fitzgerald, Phyllis &amp; Harry Reid<br>
+Mass Intention Envelopes are available in the Churches and can be<br>
+left in Offertory baskets during Mass, the Parish Office or directly with Fr Robert.</p>
+<h3 class="b-head">REST IN PEACE</h3>
+<p>‘ FI SS L ja 4</p>
+<h3 class="b-head">RECENTLY DECEASED</h3>
+<p>Fr Michael McConville<br>
+(Ballycastle)</p>
+<h3 class="b-head">MONTHS MIND: Martin Quinn</h3>
+<p>ANNIVESARIES: Bobby &amp; Vera Adair, Chris McGrattan,<br>
+~ John &amp; Mary McMullan, Vi Dorrian<br>
+| Eternal rest grant unto them, O Lord!<br>
+This week’s Sanctuary Candle will burn for:<br>
+St Joseph&#x27;s: For all our families<br>
+St Mary Star of the Sea: For the sick and housebound<br>
+Sanctuary candle intentions are requested through the Office.<br>
+&quot; A suggested offering of £5.<br>
+Parish Priest: Very Rev Robert Sloan PP VF __<br>
+Parish Office Tel: <a href="tel:+442842738294" style="color:#1d4ed8;font-weight:600;">028 42738294</a> (Parish Support Officer: Mairead)<br>
+Parish Office Hours: Monday 9am-4pm, Tuesday 1.30-4pm,<br>
+Wednesday 9.am-3pm, Thursday 9am-4pm, Friday Closed. :<br>
+Address: 46 Blackstaff Road, Ballycranbeg, Kircubbin, BT22 1AG<br>
+EEE 00005 .0080&amp;@&amp; 8. 05809 sy Q65=_<br>
+150&quot; Anniversary of St Joseph&#x27;s Church, Ardkeen, opened on Sunday 8th October 1876. This<br>
+year will mark 150 years of worship, community and faith at this<br>
+beloved Church on Mount St Joseph. To celebrate this milestone, a<br>
+series of events is proposed around the theme “The Goodness of God”<br>
+- a time to give thanks for a century and a half of grace, prayer and<br>
+parish life. Further details to follow. The week of celebrations will<br>
+rete October - Feast of St Thérése of Lisieux: Floral Exhibition<br>
+conclu ng with Evening Prayer. | i<br>
+Friday 2nd °C ctober - Feast of the Guardian Angels: Pupils from St<br>
+Mary’s Primary School will visit the floral exhibition. First Friday<br>
+Evening Mass. Nt<br>
+Saturday 3rd October - Celebratory Lunch at Ki rkistown Castle GC. — .<br>
+Sunday 4th October - 800th Anniversary of St Francis of Assisi: Harvest<br>
+Mass &amp; Farm Animals display for the kids and the young at heart. .<br>
+Wednesday 7th October - Family Rosary followed by 24 hours of<br>
+Adoration for the Lord.<br>
+Thursday 8th October - Evening Prayer &amp; Solemn Benediction.<br>
+SAINTS OF THE WEEK<br>
+Tues: NAVTIVITY OF MARY IA anis een nose CA \<br>
+Wed 9: St Ciaran, Abbot he Wipes re<br>
+Thu 10: St Peter Claver, Priest cé a =<br>
+Sat12: The Holy Name of Mary TI<br>
+“She is the flower of the field rom whom I —a I. ia<br>
+bloomed the precious Lily of the Valley ha ce ec<br>
+-St Augustine | il “MR MC fe<br>
+The Birth of the Virgin<br>
+by Giotto (1266-1337)<br>
+A WA Our Vision:<br>
+Lesser’ A vibrant and welcoming Catholic Parish<br>
+Sn aes witnessing Christian prayerfulness and<br>
+FARISH OF ADDREEN joyful service in the broader Community.</p>
+<h3 class="b-head">PARISH NEWS AND EVENTS</h3>
+<p>WEEKLY OFFERING: The Weekly Offering on last Sunday amounted to<br>
+£1,575. Thank you for your continued generosity and support.<br>
+ST VINCENT DE PAUL: Thank you for your continuing support of the work<br>
+of SVP. Last week&#x27;s collection amounted to £260. If you require assistance<br>
+then please call our confidential helpline number: <a href="tel:+3537895835215" style="color:#1d4ed8;font-weight:600;">07895835215</a>,<br>
+SILVER CIRCLE PARISH DRAW: fads ales to our August winners:<br>
+Declan Kelly (£250), Brian &amp; Margaret Caughey (£200), Margaret &amp; Patrick<br>
+Lennon (£150), Eugene Byers (£50). Thanks to all who support our Parish<br>
+Draw.<br>
+BINGO IN AID OF AIR AMBULANCES. St Patrick’s Community Centre,<br>
+Portaferry, Sunday 13&quot; September at 3pm. All welcome.<br>
+ST MARY’S LITTLE STARS Parent/Grandparent, Baby and Toddler Group,<br>
+a new parish initiative, will hold an information morning on Thursday 17&quot;<br>
+September from 10.30am-12.30pm at the Nunsquarter Room, St Mary Star<br>
+of the Sea Church. It aims to create a warm and welcoming space to meet,<br>
+chat, play and make new friends. All parents, grandparents with their<br>
+babies and toddlers welcome. See posters or webpage for more info.<br>
+CATHOLIC MENS RETREAT - Standing in the Breach, will take place at<br>
+Portglenone Monastery on Saturday, 19 September 2026, from 9am to<br>
+ipm. The theme of the retreat is “It is no longer | who live, but Christ who<br>
+lives in me” (Galatians 2:20). The morning will include prayer, teaching,<br>
+fellowship and men’s testimonies, with Fr Eddie McGee as keynote<br>
+speaker. All men are very welcome. For further information, contact<br>
+Thomas Carey on 07967 620435 or email <a href="mailto:sean@catholicminute.co.uk" target="_blank" rel="noopener noreferrer">sean@catholicminute.co.uk</a>.<br>
+FAITH, HERITAGE &amp; COMMUNITY DAY OUT for Ballygalget, Portaferry<br>
+&amp; Ardkeen Parishes: A fully guided tour of the shepherd’s life at<br>
+Glenshane Country Farm, the Gorta Experience at Friels, with a 3-course<br>
+Dinner at Friels Bar &amp; Restaurant, Swatragh. Thursday 24 September,<br>
+9am-6pm, £60 pp all included. Contact Seamus Dorrian <a href="tel:+3537813968171" style="color:#1d4ed8;font-weight:600;">07813968171</a>. All<br>
+welcome. See webpage for more information.<br>
+MARRIAGE ENRICHMENT WEEKEND. Marriage Encounter Ireland invites<br>
+married couples to a residential Weekend from Friday 2nd to auneey 4th<br>
+October 2026 at the Focolare Centre, Curryhills, Prosperous, Co. Kildare.<br>
+Step away from daily distractions to deepen your communication, renew<br>
+your love, and rediscover the joy of your marriage. For more details:<br>
+BALLYCRAN GAA LOTTO RESULTS 30&quot; August. No jackpot winner. Next<br>
+week&#x27;s jackpot is £3050. Draw winners: Rory Gordon, Philip McCarthy,<br>
+Michael McKenna,<br>
+ALTAR SERVERS: There will be a meeting of Altar Servers on<br>
+Monday 28&quot; September at 7.00 pm in the Nunsquarter Room<br>
+at St Mary Star of the Sea. Anyone interested in becoming an<br>
+altar server should contact the Parish Office or Grainne<br>
+Lá. McNamara for an Application Form. It is open to children who<br>
+have made their First Holy Communion. Training will be<br>
+| a provided, and new teams will be established.<br>
+oS. . POPE&#x27;S INTENTION FOR SEPTEMBER 2026<br>
+a“ For the care of water - Let us pray for a just and sustainable<br>
+é “w.s Management of water, a vital resource, so that everyone may<br>
+is have access to it.<br>
+SA oca<br>
+Upcoming Parish Committee Meetings =. Wy,<br>
+elebrations Committee: 8&#x27;&quot; September at 7.30pm ». 2<br>
+Pastoral Council: 22&quot; September at 7.30pm<br>
+Finance Committee: 29&quot; September at 7.30pm<br>
+Liturgy Committee: 6&quot; October at 7.30pm<br>
+= RENIN, For more information please see:<br>
+Lb Website: <a href="https://www.parishofardkeen.co.uk" target="_blank" rel="noopener noreferrer">www.parishofardkeen.co.uk</a><br>
+“we of __. nA<br>
+“op ene Facebook: Parish of Ardkeen</p>
+<hr></div>
+    <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
+  </div>
+  <script>
+    (function () {
+      try {
+        if (new URLSearchParams(window.location.search).get('embed') === '1') {
+          document.body.classList.add('embed-mode');
+        }
+      } catch (e) {}
+    })();
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-text');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+    (function () {
+      const ocrRoot = document.getElementById('ocr-text');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      if (!ocrRoot || !ocrSearch) return;
+      const originalHtml = ocrRoot.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+      function escapeRegExp(text) {
+        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        ocrMatches[idx].classList.add('search-active');
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      function updateMatchUi() {
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} of ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+      function applySearch(query) {
+        ocrRoot.innerHTML = originalHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrRoot, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) nodes.push(node);
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) return;
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrRoot.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+      ocrSearch.addEventListener('input', (e) => applySearch(e.target.value.trim()));
+      clearSearch.addEventListener('click', () => { ocrSearch.value = ''; applySearch(''); ocrSearch.focus(); });
+      prevMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && ocrMatches.length) {
+          e.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+    })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      function boot() {
+        var btn = document.getElementById('scroll-top-btn');
+        if (!btn) {
+          if (!document.body) return;
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scroll-top-btn';
+          btn.id = 'scroll-top-btn';
+          btn.setAttribute('aria-label', 'Back to top');
+          btn.textContent = '↑';
+          document.body.appendChild(btn);
+        }
+        function innerBoxes() {
+          return Array.prototype.slice.call(
+            document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+          );
+        }
+        function maxInnerScroll() {
+          return innerBoxes().reduce(function (max, el) {
+            return Math.max(max, el.scrollTop || 0);
+          }, 0);
+        }
+        function shown() {
+          var y = window.scrollY || document.documentElement.scrollTop || 0;
+          btn.classList.toggle('is-visible', y > 80 || maxInnerScroll() > 16);
+        }
+        function shownSoon() {
+          shown();
+          if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+          else window.setTimeout(shown, 16);
+        }
+        function bindBox(el) {
+          if (!el || el.getAttribute('data-pp-scroll-top') === '1') return;
+          el.setAttribute('data-pp-scroll-top', '1');
+          el.addEventListener('scroll', shownSoon, { passive: true });
+        }
+        function bindBoxes() {
+          innerBoxes().forEach(bindBox);
+          shown();
+        }
+        window.parishPressBindScrollTopBoxes = bindBoxes;
+        if (btn.getAttribute('data-pp-bound') !== 'inner-2') {
+          btn.setAttribute('data-pp-bound', 'inner-2');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.addEventListener('scroll', shownSoon, { passive: true });
+          document.addEventListener('scroll', shownSoon, { capture: true, passive: true });
+          document.addEventListener('wheel', shownSoon, { capture: true, passive: true });
+          document.addEventListener('touchmove', shownSoon, { capture: true, passive: true });
+          if (window.MutationObserver && document.body) {
+            new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+          }
+          btn.addEventListener('click', function () {
+            var behavior = reduce ? 'auto' : 'smooth';
+            window.scrollTo({ top: 0, behavior: behavior });
+            innerBoxes().forEach(function (el) {
+              el.scrollTop = 0;
+              if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+            });
+            window.setTimeout(shown, reduce ? 0 : 400);
+          });
+        }
+        bindBoxes();
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
+    })();
+    
+  </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
+</body>
+</html>
