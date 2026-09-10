@@ -29,10 +29,13 @@ from PyPDF2 import PdfReader
 from .bulletin_freshness import check_bulletin_freshness
 from .cloud_folders import (
     is_cloud_folder_click_step,
+    is_cloud_folder_url,
     is_year_folder_click_step,
+    listing_looks_like_year_folders,
     newest_yy_mm_dd_label,
     rewrite_cloud_folder_click_step,
     rewrite_year_folder_click_step,
+    recipe_uses_cloud_folder,
 )
 from .cloud_urls import (
     gdrive_confirm_token,
@@ -3108,6 +3111,8 @@ async def _try_download_page_url(
     url = (raw_url or page.url or "").strip()
     if not url or url.startswith(("about:", "chrome:", "blob:", "data:")):
         return None
+    if is_cloud_folder_url(url):
+        return None
     try:
         return await _download_document_url(page, url, dest, timeout_ms=timeout_ms)
     except RecipeReplayError:
@@ -3755,10 +3760,21 @@ async def _replay_click_by_strategy(
 async def _drive_folder_rows(page: Page) -> list[dict]:
     try:
         rows = await page.evaluate(
-            """() => Array.from(document.querySelectorAll('[role="row"]')).map((row) => ({
-              text: ((row.innerText || row.textContent || '') + '').replace(/\\s+/g, ' ').trim().slice(0, 300),
-              id: row.getAttribute('data-id')
-            }))"""
+            """() => Array.from(document.querySelectorAll('[role="row"], [data-id]')).map((row) => {
+              const text = ((row.innerText || row.textContent || '') + '').replace(/\\s+/g, ' ').trim().slice(0, 300);
+              let id = (row.getAttribute('data-id') || '').trim();
+              if (!id) {
+                const child = row.querySelector('[data-id]');
+                if (child) id = (child.getAttribute('data-id') || '').trim();
+              }
+              if (!id) {
+                const link = row.querySelector('a[href*="/folders/"], a[href*="/file/d/"]');
+                const href = link ? (link.getAttribute('href') || link.href || '') : '';
+                const match = href.match(/\\/(?:folders|file\\/d)\\/([^/?#]+)/);
+                if (match) id = match[1];
+              }
+              return { text, id };
+            })"""
         )
     except Exception:
         return []
@@ -3798,6 +3814,16 @@ async def _open_drive_year_folder(page: Page, year: int, timeout_ms: int) -> Non
             break
         await page.wait_for_timeout(500)
     if not folder_id:
+        before = page.url or ""
+        try:
+            locator = page.locator(f'[role="row"]:has-text("{year_label}")').first
+            await locator.wait_for(state="visible", timeout=min(timeout_ms, 8_000))
+            await locator.dblclick(timeout=min(timeout_ms, 8_000))
+            await page.wait_for_timeout(1500)
+            if "/folders/" in (page.url or "") and (page.url or "") != before:
+                return
+        except Exception:
+            pass
         raise RecipeReplayError(
             f"Cloud year folder {year_label} not found on Drive listing — "
             "check the parent folder URL / sharing"
@@ -3866,6 +3892,8 @@ async def _click_newest_cloud_pdf_row(page: Page, timeout_ms: int) -> bool:
     """Download the Drive row with the newest YY.MM.DD.pdf filename via data-id."""
     rows = await _drive_folder_rows(page)
     if not rows:
+        return False
+    if listing_looks_like_year_folders([row.get("text") or "" for row in rows]):
         return False
     label = newest_yy_mm_dd_label([row.get("text") or "" for row in rows])
     if not label:
@@ -4542,6 +4570,12 @@ async def replay_recipe(
                     )
                     if tried:
                         return dest, tried[1], tried[0]
+
+                if recipe_uses_cloud_folder(steps) and is_cloud_folder_url(page.url or ""):
+                    raise RecipeReplayError(
+                        "Still on a Drive folder listing — open the year folder "
+                        "and the dated PDF before download"
+                    )
 
                 if _is_document_url(page.url):
                     source_url, file_type = await _download_document_url(

@@ -8,6 +8,7 @@ from harvester.cloud_folders import (
     detect_cloud_date_format,
     format_cloud_folder_label,
     is_cloud_folder_url,
+    listing_looks_like_year_folders,
     newest_yy_mm_dd_label,
     parse_yy_mm_dd,
     recipe_uses_cloud_folder,
@@ -177,6 +178,23 @@ class CloudFolderTests(unittest.TestCase):
             "26.08.16.pdf",
         )
         self.assertIsNone(newest_yy_mm_dd_label(["README", "notes.txt"]))
+
+    def test_listing_looks_like_year_folders(self) -> None:
+        self.assertTrue(
+            listing_looks_like_year_folders(
+                [
+                    "Name Owner Date modified File size",
+                    "2021 Owner hidden January 2, 2021 —",
+                    "2022 Owner hidden December 23, 2021 —",
+                    "2026 Owner hidden January 8, 2026 —",
+                ]
+            )
+        )
+        self.assertFalse(
+            listing_looks_like_year_folders(
+                ["26.08.16.pdf", "26.09.06.pdf", "README"]
+            )
+        )
 
 
 if __name__ == "__main__":

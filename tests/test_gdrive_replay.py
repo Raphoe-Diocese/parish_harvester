@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import unittest
+from pathlib import Path
 
 from harvester.replay import (
     _gdrive_download_url_from_recipe,
@@ -51,6 +52,15 @@ class GdriveReplayTests(unittest.TestCase):
     def test_gdrive_helpers_are_importable(self) -> None:
         self.assertTrue(callable(_goto_or_download))
         self.assertTrue(callable(_try_download_page_url))
+
+
+class GdriveFolderDownloadTests(unittest.IsolatedAsyncioTestCase):
+    async def test_try_download_page_url_refuses_drive_folder(self) -> None:
+        class _Page:
+            url = "https://drive.google.com/drive/folders/1jPOi4GRU22vAxeKNe5Y_doBJ3riPh7ZK"
+
+        result = await _try_download_page_url(_Page(), Path("bruckless.pdf"))
+        self.assertIsNone(result)
 
 
 if __name__ == "__main__":
