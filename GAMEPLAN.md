@@ -33,7 +33,21 @@ that is already a card.
 - **B2** — merged [PR #195](https://github.com/Raphoe-Diocese/parish_harvester/pull/195). Proof: `commit_ocr` has no `continue-on-error` on `main`.
 - **A3** — merged [PR #197](https://github.com/Raphoe-Diocese/parish_harvester/pull/197). 7 live recipes with no evidence row are `no_evidence` + actionable. 9 Derry recipes moved `unknown/` → `derry/`. `parishpress.json` skipped: Drumholm and Gortahork are both Raphoe; that file mixed Gortahork’s name with the Drumholm PDF.
 - **Fix the 7 `no_evidence` parishes** — merged [PR #198](https://github.com/Raphoe-Diocese/parish_harvester/pull/198) `792e6329`.
-- **A4** — this turn. `harvest_note` on 9 WAF/403 recipes + Saint Malachy’s page-cap note. Copied into `diagnosis.harvest_note` and the visible error. No `skip`, no URL changes. Proof: Ederney row in `parish_status.json` starts with the blocked-network note. Problems screenshot needs Frank after merge (filter Clogher / All dioceses).
+- **A4** — merged [PR #199](https://github.com/Raphoe-Diocese/parish_harvester/pull/199) `d19fe5ae`. Ederney `error` starts with the WAF note. Problems screenshot still needs Frank (All dioceses / Clogher).
+
+### Now — new Trainer zip → replace Load unpacked folder (do not start until Frank says go)
+
+When a **new** `parish_trainer.zip` is on https://www.parishpress.ie/extension/parish_trainer.zip (manifest version newer than the folder):
+
+1. Download that zip.
+2. **Delete the old files** in the Load unpacked folder (do not leave a nested `extension\extension`).
+3. Extract the zip so `manifest.json` sits **in the folder root**.
+4. Folder (locked): `C:\Users\Digital Admin\Desktop\harvester compare repos\parish_harvester-main raphoe\parish_harvester\extension`
+5. Then chrome://extensions → Parish Trainer → Reload.
+
+This is **not** Chrome Update. Load unpacked never fetches the website. Audit card **C2** still removes the fake Update plumbing — do not mix that with this folder replace.
+
+Not built. No new zip from A4 (Trainer still 1.61.24). Copy this file to Dropbox `Cursor gameplans\Harvester\GAMEPLAN.md` yourself.
 
 
 ---
