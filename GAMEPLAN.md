@@ -17,6 +17,20 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 10/09/2026 — Audit and finish plan (read this first)
+
+Full read-only audit of repo, every `.md`, extension and live site:
+[`docs/AUDIT_2026-09-10.md`](docs/AUDIT_2026-09-10.md). Overall **66/100**.
+It holds the ordered agent cards (A2 → B1 → B2 → A1 …) for Grok 4.6, one card
+per chat, each with a proof line. Run cards from there; do not add work here
+that is already a card.
+
+### Audit cards — ticked only with PR + proof
+
+_(none yet)_
+
+---
+
 ## 09/09/2026 night — Full harvest 34293288559 then recipe hunt
 
 Harvest run [34293288559](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34293288559) **completed** and committed `6e71e06a`. Truth: `parishes/parish_status.json` `generated_at` 2026-09-09T01:07:23Z, `target_date` **2026-09-06**, **ok 104**, **actionable 23**. Do not Full harvest again.
