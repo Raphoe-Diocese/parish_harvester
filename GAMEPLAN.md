@@ -35,7 +35,21 @@ that is already a card.
 - **Fix the 7 `no_evidence` parishes** — merged [PR #198](https://github.com/Raphoe-Diocese/parish_harvester/pull/198) `792e6329`.
 - **A4** — merged [PR #199](https://github.com/Raphoe-Diocese/parish_harvester/pull/199) `d19fe5ae`. Ederney `error` starts with the WAF note. Problems screenshot still needs Frank (All dioceses / Clogher).
 
-### Now — new Trainer zip → replace Load unpacked folder (do not start until Frank says go)
+### Now — Bruckless Drive folder (Raphoe mega page 2)
+
+Frank 10/09/2026 screenshot: Raphoe mega page 2 is the Google Drive year list (2021–2026), not a bulletin. That row is **Bruckless** (`drive-1rjeey-ayy`). Recipe already says parent folder → click **2026** → newest `YY.MM.DD.pdf`. Harvest marked it **ok** with the parent folder URL because it printed the listing.
+
+This turn: open the year folder (data-id on the row or a child, else double-click). Never download or html-render a Drive folder listing as a bulletin. Pick this Sunday’s PDF, else the newest `YY.MM.DD.pdf` in that year. **Not live yet** until merge + a harvest. Do not Full harvest on this PC.
+
+### Done this turn — Homepage zoom
+
+Frank: Ctrl+0 fixed the huge writing. Not a CSS bug. Site-look rewrite stays parked.
+
+### Parked mid-chat — A5 stale parish caption
+
+Started locally, **not live yet**. Do not tick. Resume after Bruckless if Frank says.
+
+### Next — new Trainer zip → replace Load unpacked folder
 
 When a **new** `parish_trainer.zip` is on https://www.parishpress.ie/extension/parish_trainer.zip (manifest version newer than the folder):
 

@@ -195,6 +195,25 @@ def rewrite_cloud_folder_click_step(step: dict, target: date) -> dict:
     return rewritten
 
 
+_YEAR_ROW_RE = re.compile(r"^(19|20)\d{2}(?:\D|$)")
+
+
+def listing_looks_like_year_folders(texts: list[str]) -> bool:
+    """True when a Drive listing is year folders (2021…2026) and has no dated PDFs."""
+    years = 0
+    dated_pdfs = 0
+    for text in texts:
+        raw = (text or "").strip()
+        if not raw:
+            continue
+        if parse_yy_mm_dd(raw):
+            dated_pdfs += 1
+            continue
+        if _YEAR_ROW_RE.match(raw):
+            years += 1
+    return years >= 2 and dated_pdfs == 0
+
+
 def newest_yy_mm_dd_label(texts: list[str]) -> str | None:
     """Return the newest ``YY.MM.DD.pdf`` label among Drive row texts."""
     best_date: date | None = None
