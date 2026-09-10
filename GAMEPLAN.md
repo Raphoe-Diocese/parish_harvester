@@ -35,7 +35,9 @@ that is already a card.
 - **Fix the 7 `no_evidence` parishes** — merged [PR #198](https://github.com/Raphoe-Diocese/parish_harvester/pull/198) `792e6329`.
 - **A4** — merged [PR #199](https://github.com/Raphoe-Diocese/parish_harvester/pull/199) `d19fe5ae`. Ederney `error` starts with the WAF note. Problems screenshot still needs Frank (All dioceses / Clogher).
 
-### Now — Trainer folder refresh (this PC)
+### Now — Trainer folder refresh (merged)
+
+Merged [PR #201](https://github.com/Raphoe-Diocese/parish_harvester/pull/201). Script is on main. Zip is still 1.61.24 — no newer zip, so do not run the script until a new zip is on parishpress.ie.
 
 Script: `scripts/refresh_local_trainer.ps1`. Downloads https://www.parishpress.ie/extension/parish_trainer.zip, deletes old files in `extension\`, extracts so `manifest.json` is at that folder root. Frank only Reloads at chrome://extensions. Not Chrome Update. Work dir is `%TEMP%`, never `_tmp_*` in the repo.
 
@@ -43,7 +45,11 @@ Folder (locked): `C:\Users\Digital Admin\Desktop\harvester compare repos\parish_
 
 ### Bruckless Drive folder (merged, not live)
 
-Merged [PR #202](https://github.com/Raphoe-Diocese/parish_harvester/pull/202). Harvest used to print the year list and mark **ok**. **Not live yet** until a harvest of `drive-1rjeey-ayy` + Pages. Do not Full harvest on this PC.
+Merged [PR #202](https://github.com/Raphoe-Diocese/parish_harvester/pull/202). Harvest used to print the year list and mark **ok**.
+
+Harvest run [34530626218](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34530626218) **failed** because the input was `bruckless`. The recipe key is `drive-1rjeey-ayy`. Frank is right: nobody should have to know that. Harvest [34532128834](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34532128834) **succeeded**. `drive-1rjeey-ayy` is **ok**, URL is a Drive **file** download (not the year-folder list). `bulletin_date` still empty. Not on Problems. Mega page 2 not updated (single-parish skip). Next code: accept the name Bruckless. Do not Full harvest on this PC.
+
+Problems will not show Bruckless while `parish_status` says **ok**. That is why Frank cannot see it in the back room. After a harvest with the real key, #202 should mark a Drive folder listing as **failed** so it appears. Optional later rule: **ok** + Drive `/folders/` URL is never ok (show on Problems now). Wait for go.
 
 Homepage huge writing was Chrome zoom (Ctrl+0). Site-look rewrite stays parked.
 
@@ -55,11 +61,9 @@ Planned in [`AGENTS.md`](AGENTS.md). **No date.** Do not start until recipe succ
 
 Started locally, **not live yet**. Do not tick.
 
-### Next — blurry collated / mega PDFs (cloud agent only)
+### Now — blurry diocese PDFs (code this turn, not live)
 
-Frank 10/09/2026: collated bulletins are unreadable, resolution too low. Cause is `harvester/pdf_compress.py`: Ghostscript `/ebook` at **100 dpi**. Do **not** start on this 16GB laptop. Do **not** download mega PDFs here. Do **not** launch a second local agent.
-
-Cloud-agent card: raise mega compress to a readable setting (try `/printer` or 150 dpi, keep linearize / FastWebView). Touch `harvester/pdf_compress.py` + `tests/test_pdf_compress.py` only. Do not Full harvest. Proof = one diocese mega after the next Sunday harvest looks sharp on phone and desktop. Mega PDF stays on.
+Frank 10/09/2026 **fix**: Ghostscript `/ebook` 100 dpi made diocese megas unreadable. Raised to `/printer` + **150 dpi**, keep linearize. **Not live yet** until merge + a harvest writes new megas. Do not Full harvest or download megas on this PC. Mega PDF stays on.
 
 
 ---

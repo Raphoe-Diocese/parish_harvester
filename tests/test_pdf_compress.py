@@ -13,8 +13,11 @@ class PdfCompressTests(unittest.TestCase):
 
         cmd = " ".join(_ghostscript_cmd("gs", Path("in.pdf"), Path("out.pdf")))
         self.assertIn("-dFastWebView=true", cmd)
-        self.assertIn("-dColorImageResolution=100", cmd)
-        self.assertIn("-dGrayImageResolution=100", cmd)
+        self.assertIn("-dPDFSETTINGS=/printer", cmd)
+        self.assertIn("-dColorImageResolution=150", cmd)
+        self.assertIn("-dGrayImageResolution=150", cmd)
+        self.assertNotIn("-dPDFSETTINGS=/ebook", cmd)
+        self.assertNotIn("-dColorImageResolution=100", cmd)
 
     def test_missing_file_returns_false(self) -> None:
         self.assertFalse(compress_pdf_inplace("/tmp/does-not-exist-pp-mega.pdf"))

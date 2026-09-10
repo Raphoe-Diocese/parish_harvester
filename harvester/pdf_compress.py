@@ -1,6 +1,6 @@
 """Shrink mega-PDFs for phones and linearize so page 1 can stream first.
 
-Keeps the same page count. Prefers Ghostscript ``/ebook`` at ~100 dpi with
+Keeps the same page count. Prefers Ghostscript ``/printer`` at ~150 dpi with
 ``-dFastWebView=true`` (linearize) when ``gs`` is installed (GitHub Actions).
 Falls back to PyMuPDF deflate + JPEG recompress of large images. Never
 replaces the file if the result is bigger, invalid, or a different number
@@ -46,13 +46,15 @@ def _ghostscript_cmd(bin_name: str, src: Path, dest: Path) -> list[str]:
         bin_name,
         "-sDEVICE=pdfwrite",
         "-dCompatibilityLevel=1.4",
-        "-dPDFSETTINGS=/ebook",
+        "-dPDFSETTINGS=/printer",
         "-dDownsampleColorImages=true",
         "-dDownsampleGrayImages=true",
+        "-dDownsampleMonoImages=true",
         "-dColorImageDownsampleType=/Bicubic",
         "-dGrayImageDownsampleType=/Bicubic",
-        "-dColorImageResolution=100",
-        "-dGrayImageResolution=100",
+        "-dColorImageResolution=150",
+        "-dGrayImageResolution=150",
+        "-dMonoImageResolution=150",
         "-dFastWebView=true",
         "-dNOPAUSE",
         "-dQUIET",
