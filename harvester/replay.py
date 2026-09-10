@@ -1916,7 +1916,9 @@ def _score_http_scrape_pdf_hrefs(
         if _is_non_bulletin_url(href):
             continue
         path = urlparse(href).path.lower()
-        if not path.endswith((".pdf", ".docx", ".doc", ".rtf")):
+        # Cappagh /b/13 is a PDF with no .pdf suffix (GET application/pdf).
+        extensionless_ok = bool(re.search(r"/b/\d+/?$", path))
+        if not path.endswith((".pdf", ".docx", ".doc", ".rtf")) and not extensionless_ok:
             continue
         found = _http_scrape_item_date(href, target_date)
         if not found and labels:

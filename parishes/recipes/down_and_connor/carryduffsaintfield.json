@@ -1,44 +1,28 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "carryduffsaintfield",
-  "display_name": "Carryduffsaintfield",
+  "display_name": "Carryduff and Saintfield",
   "diocese": "down_and_connor",
   "start_url": "https://www.carryduffsaintfield.co.uk/bulletin/",
-  "steps": [
-    {
-      "action": "click",
-      "selector": "a:has-text(\"Latest Bulletin\")",
-      "href": "https://www.carryduffsaintfield.co.uk/app/uploads/2026/08/2026-No-33-16th-August-2026.pdf",
-      "text": "LATEST BULLETIN Mary Mother of the Church, Saintfield Bullet",
-      "pick_strategy": "newest_dated",
-      "bulletin_position": "top",
-      "fallback_selectors": [
-        "a[href$='.pdf']",
-        "a[href*='.pdf']"
-      ]
-    },
-    {
-      "action": "download",
-      "url": "https://www.carryduffsaintfield.co.uk/app/uploads/2026/08/2026-No-33-16th-August-2026.pdf"
-    }
-  ],
-  "observed_load_ms": 18880,
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [".docx", ".pdf", "app/uploads"],
+  "href_skip_patterns": ["screenshot", "canva"],
+  "playbook_type": "pdf_download_list",
   "timeout_ms": 55000,
   "total_timeout_s": 250,
-  "playbook_type": "pdf_download_list",
-  "site_type": "pdf_link_list",
+  "recorded_date": "2026-09-10",
+  "steps": [
+    {
+      "action": "goto",
+      "url": "https://www.carryduffsaintfield.co.uk/bulletin/"
+    }
+  ],
   "operator_notes": [
-    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
-    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-    "Do not worry if the filename or date in the link text changes every week."
+    "Listing /bulletin/. Proved 10/09/2026: newest this-week file is /app/uploads/2026/09/2026-No-36-6th-September-2026.docx (HTTP 200, 329832, Word). Older weeks are PDFs.",
+    "http_scrape_newest_pdf scores the listing and converts docx to PDF. Do not pin a dated filename. Skip Canva screenshot JPEGs."
   ],
   "do_not": [
-    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
-    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
-  ],
-  "bulletin_layout": {
-    "strategy": "newest_dated",
-    "position": "top"
-  },
-  "recorded_date": "2026-08-19"
+    "Do not pin 16th-August-2026.pdf or any dated filename.",
+    "Do not pick Canva screenshot JPEGs."
+  ]
 }
