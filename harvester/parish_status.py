@@ -133,6 +133,46 @@ def _row_last_tested_at(
     return generated_at
 
 
+_BULLETIN_DATE_IN_ERROR_RE = re.compile(r"bulletin date (\d{4}-\d{2}-\d{2})")
+
+
+def _row_bulletin_dates(item: dict) -> tuple[str | None, str | None]:
+    """Record a proved bulletin date. Return (ISO, DD/MM/YYYY) or (None, None).
+
+    Never invent a Sunday. Read the report field, diagnosis, stale-error text,
+    then the URL — in that order.
+    """
+    iso = str(item.get("bulletin_date") or "").strip()
+    if iso == "unknown":
+        iso = ""
+    if not iso:
+        diagnosis = item.get("diagnosis")
+        if isinstance(diagnosis, dict):
+            iso = str(diagnosis.get("bulletin_date") or "").strip()
+            if iso == "unknown":
+                iso = ""
+    if not iso:
+        blob = " ".join(
+            str(item.get(k) or "") for k in ("error", "reason")
+        )
+        match = _BULLETIN_DATE_IN_ERROR_RE.search(blob)
+        if match:
+            iso = match.group(1)
+    if not iso:
+        url = str(item.get("url") or item.get("start_url") or "")
+        if url:
+            from .bulletin_freshness import extract_bulletin_date
+
+            extracted = extract_bulletin_date(url)
+            if extracted is not None:
+                iso = extracted.isoformat()
+    if not iso:
+        return None, None
+    from .utils import format_uk_date
+
+    return iso, format_uk_date(iso)
+
+
 def _outcome_from_report_item(section: str, item: dict) -> str:
     if section == "downloaded":
         return "ok"
@@ -242,6 +282,7 @@ def build_parish_status(
                 if outcome == "failed":
                     outcome = "skipped"
 
+            bulletin_date, bulletin_date_uk = _row_bulletin_dates(item)
             _upsert(
                 key,
                 {
@@ -249,6 +290,8 @@ def build_parish_status(
                     "category": category,
                     "error": error_text or None,
                     "url": str(item.get("url") or item.get("start_url") or ""),
+                    "bulletin_date": bulletin_date,
+                    "bulletin_date_uk": bulletin_date_uk,
                     "last_tested_at": _row_last_tested_at(
                         item,
                         generated_at=generated_at,

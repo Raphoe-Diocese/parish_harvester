@@ -67,6 +67,46 @@ class ParishStatusTests(unittest.TestCase):
         self.assertEqual(status["parishes"]["okparish"]["last_tested_at"], status["generated_at"])
         self.assertEqual(status["parishes"]["disabledparish"]["last_tested_at"], status["generated_at"])
 
+    def test_ok_and_stale_rows_record_bulletin_date(self) -> None:
+        report = {
+            "target_date": "2026-09-06",
+            "downloaded": [
+                {
+                    "parish": "annagryparish",
+                    "display_name": "Annagry",
+                    "url": "https://annagryparish.ie/wp-content/uploads/2026/09/060926.pdf",
+                }
+            ],
+            "stale_rejected": [
+                {
+                    "parish": "staleparish",
+                    "display_name": "Stale",
+                    "url": "https://stale.example/old.pdf",
+                    "error": "Stale bulletin rejected for mega PDF (bulletin date 2026-08-30, too_old)",
+                }
+            ],
+            "failed": [
+                {
+                    "parish": "failparish",
+                    "display_name": "Fail",
+                    "url": "https://fail.example/",
+                    "error": "timeout",
+                }
+            ],
+            "html_links": [],
+            "skipped": [],
+        }
+        status = build_parish_status(report, consecutive_failures={}, disabled_keys=set())
+        annagry = status["parishes"]["annagryparish"]
+        self.assertEqual(annagry["outcome"], "ok")
+        self.assertEqual(annagry["bulletin_date"], "2026-09-06")
+        self.assertEqual(annagry["bulletin_date_uk"], "06/09/2026")
+        stale = status["parishes"]["staleparish"]
+        self.assertEqual(stale["outcome"], "stale")
+        self.assertEqual(stale["bulletin_date"], "2026-08-30")
+        self.assertEqual(stale["bulletin_date_uk"], "30/08/2026")
+        self.assertIsNone(status["parishes"]["failparish"].get("bulletin_date"))
+
     def test_last_tested_at_keeps_previous_row_when_item_has_no_stamp(self) -> None:
         report = {
             "target_date": "2026-09-06",

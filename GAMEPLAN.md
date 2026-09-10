@@ -27,7 +27,10 @@ that is already a card.
 
 ### Audit cards — ticked only with PR + proof
 
-- **A2** — [PR #193](https://github.com/Raphoe-Diocese/parish_harvester/pull/193) (code landed). Harvest proof not yet: next Sunday `parish_status.json` on `main` must have zero empty/`null` `last_tested_at`.
+- **A2** — merged [PR #193](https://github.com/Raphoe-Diocese/parish_harvester/pull/193). Harvest proof not yet: next Sunday `parish_status.json` on `main` must have zero empty/`null` `last_tested_at`.
+- **A1** — [PR #196](https://github.com/Raphoe-Diocese/parish_harvester/pull/196) (rebasing onto main this turn). Harvest proof not yet: Annagry row after next Sunday harvest.
+- **B1** — merged [PR #194](https://github.com/Raphoe-Diocese/parish_harvester/pull/194). Proof: green `node --check` on that PR (run 34476745298).
+- **B2** — merged [PR #195](https://github.com/Raphoe-Diocese/parish_harvester/pull/195). Proof: `commit_ocr` has no `continue-on-error` on `main`.
 
 
 ---
