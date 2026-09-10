@@ -1,16 +1,16 @@
 {
-  "generated_at": "2026-09-09",
+  "generated_at": "2026-09-10",
   "target_date": "2026-09-06",
   "summary": {
-    "downloaded": 104,
+    "downloaded": 109,
     "html_links": 0,
     "skipped": 30,
     "failed": 16,
     "stale_rejected": 9
   },
   "action_counts": {
-    "skip": 33,
-    "ok": 118,
+    "skip": 36,
+    "ok": 115,
     "investigate": 14
   },
   "parishes": [
@@ -192,6 +192,40 @@
       },
       "bulletin_format": "html",
       "learned_pattern": "iframe_viewer",
+      "host_profile": null,
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "parishofardkeen",
+      "display_name": "Ardkeen",
+      "diocese": "down_and_connor",
+      "recipe_file": "parishes/recipes/down_and_connor/parishofardkeen.json",
+      "recipe": {
+        "start_url": "https://parishofardkeen.co.uk/parish-bulletin/",
+        "site_type": "http_scrape_newest_images",
+        "playbook_type": "stacked_image_bulletin",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [
+          "Proved 10/09/2026: this week is /uploads/2026/09/23-Sunday-OT-A.png (HTTP 200, 1794945, image/png). Older weeks are JPGs in /2026/08/.",
+          "http_scrape_newest_images. Do not pin 19th-Sunday or 20th-Sunday filenames."
+        ],
+        "do_not": [
+          "Do not pin a liturgical-Sunday filename.",
+          "Do not download the parish logo JPEG."
+        ],
+        "recorded_date": "2026-09-10"
+      },
+      "bulletin_format": "image_stack",
+      "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
@@ -897,22 +931,30 @@
     },
     {
       "parish_key": "cappaghparish",
-      "display_name": "Cappaghparish",
+      "display_name": "Cappagh",
       "diocese": "derry",
       "recipe_file": "parishes/recipes/derry/cappaghparish.json",
       "recipe": {
-        "start_url": "https://www.cappaghparish.com/index.html",
-        "site_type": "",
-        "playbook_type": "",
+        "start_url": "https://cappaghparish.com/bulletins",
+        "site_type": "http_scrape_newest_pdf",
+        "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 2,
         "click_count": 1,
         "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-05-10"
+        "operator_notes": [
+          "Site rebuilt. Old /index.html and /pdf/120426.pdf are 404.",
+          "Listing https://cappaghparish.com/bulletins. Cards are /b/13, /b/12\u2026 GET /b/13 is a PDF (proved 10/09/2026).",
+          "Newest card on 10/09/2026 is CPN 30th August 2026 \u2014 no 06/09 file yet. Harvest should mark stale until they post this week.",
+          "http_scrape scores /b/N from the card date text. Click newest a.bulletin-card is fallback only."
+        ],
+        "do_not": [
+          "Do not use www.cappaghparish.com/index.html.",
+          "Do not pin /b/13 \u2014 the number increments."
+        ],
+        "recorded_date": "2026-09-10"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -1028,31 +1070,30 @@
     },
     {
       "parish_key": "carryduffsaintfield",
-      "display_name": "Carryduffsaintfield",
+      "display_name": "Carryduff and Saintfield",
       "diocese": "down_and_connor",
       "recipe_file": "parishes/recipes/down_and_connor/carryduffsaintfield.json",
       "recipe": {
         "start_url": "https://www.carryduffsaintfield.co.uk/bulletin/",
-        "site_type": "pdf_link_list",
+        "site_type": "http_scrape_newest_pdf",
         "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 2,
-        "click_count": 1,
-        "has_terminal": true,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
         "operator_notes": [
-          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
-          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-          "Do not worry if the filename or date in the link text changes every week."
+          "Listing /bulletin/. Proved 10/09/2026: newest this-week file is /app/uploads/2026/09/2026-No-36-6th-September-2026.docx (HTTP 200, 329832, Word). Older weeks are PDFs.",
+          "http_scrape_newest_pdf scores the listing and converts docx to PDF. Do not pin a dated filename. Skip Canva screenshot JPEGs."
         ],
         "do_not": [
-          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
-          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+          "Do not pin 16th-August-2026.pdf or any dated filename.",
+          "Do not pick Canva screenshot JPEGs."
         ],
-        "recorded_date": "2026-08-19"
+        "recorded_date": "2026-09-10"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
@@ -1550,8 +1591,8 @@
     {
       "parish_key": "culdaffparish",
       "display_name": "Culdaffparish",
-      "diocese": "unknown",
-      "recipe_file": "parishes/recipes/unknown/culdaffparish.json",
+      "diocese": "derry",
+      "recipe_file": "parishes/recipes/derry/culdaffparish.json",
       "recipe": {
         "start_url": "http://www.culdaffparish.com/news.html",
         "site_type": "",
@@ -1729,7 +1770,7 @@
       "parish_key": "dmaparish",
       "display_name": "DMA Parish (Claudy area)",
       "diocese": "unknown",
-      "recipe_file": "parishes/recipes/unknown/dmaparish.json",
+      "recipe_file": "parishes/recipes/derry/dmaparish.json",
       "recipe": {
         "start_url": "https://dmaparish.com/parishnews.html",
         "site_type": "dated_pdf_path",
@@ -1972,8 +2013,8 @@
     {
       "parish_key": "drumquinparish",
       "display_name": "Drumquin Parish",
-      "diocese": "unknown",
-      "recipe_file": "parishes/recipes/unknown/drumquinparish.json",
+      "diocese": "derry",
+      "recipe_file": "parishes/recipes/derry/drumquinparish.json",
       "recipe": {
         "start_url": "https://drumquinparish.com/",
         "site_type": "",
@@ -2036,31 +2077,31 @@
     },
     {
       "parish_key": "dundrum-and-tyrella-parish-dundrum",
-      "display_name": "Dundrum-and-tyrella-parish-dundrum",
+      "display_name": "Dundrum and Tyrella",
       "diocese": "down_and_connor",
       "recipe_file": "parishes/recipes/down_and_connor/dundrum-and-tyrella-parish-dundrum.json",
       "recipe": {
         "start_url": "https://mcn.live/Camera/dundrum-and-tyrella-parish-dundrum",
-        "site_type": "pdf_link_list",
-        "playbook_type": "pdf_download_list",
+        "site_type": "mcn_live_parish_page",
+        "playbook_type": "mcn_pdf_near_camera",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
-          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-          "Do not worry if the filename or date in the link text changes every week."
+          "MCN camera page. Weekly newsletter is JSON, not the webcam.",
+          "Proved 10/09/2026: church id 465 \u2192 CloudFront NewsLetter PDF (HTTP 200, 916795, application/pdf).",
+          "Do not pin the CloudFront UUID."
         ],
         "do_not": [
-          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
-          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+          "Do not screenshot the camera feed.",
+          "Do not pin a CloudFront UUID PDF."
         ],
-        "recorded_date": "2026-08-19"
+        "recorded_date": "2026-09-10"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": {
         "navigation_timeout_ms": 90000,
@@ -2254,7 +2295,7 @@
       "parish_key": "errigalparish",
       "display_name": "Errigal",
       "diocese": "derry",
-      "recipe_file": "parishes/recipes/unknown/errigalparish.json",
+      "recipe_file": "parishes/recipes/derry/errigalparish.json",
       "recipe": {
         "start_url": "https://www.errigalparish.com/pdf/160826.pdf",
         "site_type": "predicted_dated_pdf",
@@ -2356,8 +2397,8 @@
     {
       "parish_key": "fahanparish",
       "display_name": "Fahan Parish",
-      "diocese": "unknown",
-      "recipe_file": "parishes/recipes/unknown/fahanparish.json",
+      "diocese": "derry",
+      "recipe_file": "parishes/recipes/derry/fahanparish.json",
       "recipe": {
         "start_url": "http://www.fahanparish.com/parishnews.htm",
         "site_type": "",
@@ -2447,45 +2488,6 @@
       "bulletin_format": "image_stack",
       "learned_pattern": "",
       "host_profile": null,
-      "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
-    },
-    {
-      "parish_key": "galloonparish",
-      "display_name": "Galloonparish",
-      "diocese": "clogher",
-      "recipe_file": "parishes/recipes/clogher/galloonparish.json",
-      "recipe": {
-        "start_url": "https://www.galloonparish.com/bulletin-1.html",
-        "site_type": "pdf_link_list",
-        "playbook_type": "pdf_download_list",
-        "status": "",
-        "skip": false,
-        "placeholder": false,
-        "step_count": 2,
-        "click_count": 0,
-        "has_terminal": true,
-        "operator_notes": [
-          "onewebmedia/*.pdf \u2014 newest row is usually a DDMMYYYY name or hashed S25C with dated link text.",
-          "If the HTTPS certificate is expired, harvest must ignore TLS errors (Playwright).",
-          "Do not pin a dated or hashed filename."
-        ],
-        "do_not": [
-          "Do not pin a dated or hashed onewebmedia filename.",
-          "Do not use plain HTTP scrape when the certificate is expired."
-        ],
-        "recorded_date": "2026-08-28"
-      },
-      "bulletin_format": "download",
-      "learned_pattern": "",
-      "host_profile": {
-        "navigation_timeout_ms": 45000,
-        "ignore_https_errors": true,
-        "total_timeout_s": 180
-      },
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
       "last_error": "",
@@ -2701,12 +2703,14 @@
         "site_type": "",
         "playbook_type": "",
         "status": "",
-        "skip": false,
+        "skip": true,
         "placeholder": false,
         "step_count": 2,
         "click_count": 0,
         "has_terminal": true,
-        "operator_notes": [],
+        "operator_notes": [
+          "Skipped 10/09/2026 audit A3: not a parish. display_name is Gortahork; URL is the Drumholm PDF. Both are Raphoe. Real recipes: raphoe/gort-a-choirce.json and raphoe/drumholm-parish.json. Ballintra is the same parish as Drumholm."
+        ],
         "do_not": [],
         "recorded_date": "2026-06-14"
       },
@@ -2720,8 +2724,8 @@
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "suggested_action": "skip",
+      "suggested_reason": "marked skip"
     },
     {
       "parish_key": "gort-a-choirce",
@@ -2799,7 +2803,7 @@
       "parish_key": "greenlough",
       "display_name": "Greenlough",
       "diocese": "unknown",
-      "recipe_file": "parishes/recipes/unknown/greenlough.json",
+      "recipe_file": "parishes/recipes/derry/greenlough.json",
       "recipe": {
         "start_url": "https://www.greenlough.com/newsletter/",
         "site_type": "pdf_link_list",
@@ -3170,7 +3174,7 @@
       "parish_key": "iskaheenparish",
       "display_name": "Iskaheen",
       "diocese": "unknown",
-      "recipe_file": "parishes/recipes/unknown/iskaheenparish.json",
+      "recipe_file": "parishes/recipes/derry/iskaheenparish.json",
       "recipe": {
         "start_url": "https://www.iskaheenparish.com/bulletin",
         "site_type": "http_scrape_newest_images",
@@ -3185,7 +3189,8 @@
           "Bulletins are two stacked page scans on /bulletin. Newest week is at the top.",
           "18/08/2026 live page has /wp-content/uploads/2026/08/ UUID-rotated.jpg pair (i0.wp.com). Last harvest used leftover /2026/04/1.jpg.",
           "site_type:http_scrape_newest_images takes the newest upload-month images (count=2) via plain HTTP. Hashed filenames have no day \u2014 freshness treats same-month UUID scans as current-month, not folder day=1.",
-          "The June urls[] field from training is leftover and is not used."
+          "The June urls[] field from training is leftover and is not used.",
+          "09/09/2026 listing has /wp-content/uploads/2026/09/ UUID-rotated.jpg pair on i0.wp.com (HTTP 200). Harvest 34293288559 reported no matching images. Keep the Jetpack URL \u2014 do not rewrite to origin and do not pin the UUID filenames."
         ],
         "do_not": [
           "Do not hardcode one image URL \u2014 it goes stale every week.",
@@ -3548,8 +3553,8 @@
     {
       "parish_key": "laveyparish",
       "display_name": "Lavey Parish",
-      "diocese": "unknown",
-      "recipe_file": "parishes/recipes/unknown/laveyparish.json",
+      "diocese": "derry",
+      "recipe_file": "parishes/recipes/derry/laveyparish.json",
       "recipe": {
         "start_url": "https://www.laveyparish.com/",
         "site_type": "",
@@ -3732,31 +3737,24 @@
     },
     {
       "parish_key": "lisnaskeamaguiresbridgeparish",
-      "display_name": "Lisnaskeamaguiresbridgeparish",
+      "display_name": "Lisnaskea-Maguiresbridge (Aghalurcher)",
       "diocese": "clogher",
       "recipe_file": "parishes/recipes/clogher/lisnaskeamaguiresbridgeparish.json",
       "recipe": {
         "start_url": "https://www.lisnaskeamaguiresbridgeparish.com/bulletin.html",
-        "site_type": "pdf_link_list",
-        "playbook_type": "pdf_download_list",
-        "status": "",
-        "skip": false,
+        "site_type": "",
+        "playbook_type": "",
+        "status": "inactive",
+        "skip": true,
         "placeholder": false,
-        "step_count": 2,
+        "step_count": 1,
         "click_count": 0,
-        "has_terminal": true,
-        "operator_notes": [
-          "onewebmedia/*.pdf \u2014 newest row is usually a DDMMYYYY name or hashed S25C with dated link text.",
-          "If the HTTPS certificate is expired, harvest must ignore TLS errors (Playwright).",
-          "Do not pin a dated or hashed filename."
-        ],
-        "do_not": [
-          "Do not pin a dated or hashed onewebmedia filename.",
-          "Do not use plain HTTP scrape when the certificate is expired."
-        ],
-        "recorded_date": "2026-08-28"
+        "has_terminal": false,
+        "operator_notes": [],
+        "do_not": [],
+        "recorded_date": ""
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": {
         "navigation_timeout_ms": 45000,
@@ -3766,8 +3764,8 @@
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "suggested_action": "skip",
+      "suggested_reason": "Same parish as lisnaskeamaguiresbridge. Weekly PDF is harvested via that key from lisnaskeamaguiresbridgeparish.com/bulletin.html."
     },
     {
       "parish_key": "loughshoreparishes",
@@ -3918,8 +3916,8 @@
     {
       "parish_key": "magheraparishderry",
       "display_name": "Magheraparishderry",
-      "diocese": "unknown",
-      "recipe_file": "parishes/recipes/unknown/magheraparishderry.json",
+      "diocese": "derry",
+      "recipe_file": "parishes/recipes/derry/magheraparishderry.json",
       "recipe": {
         "start_url": "http://www.magheraparishderry.com/parishnews.php",
         "site_type": "",
@@ -4135,7 +4133,7 @@
         "has_terminal": false,
         "operator_notes": [],
         "do_not": [],
-        "recorded_date": "2026-09-09"
+        "recorded_date": "2026-06-26"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -4182,6 +4180,38 @@
       "last_error": "",
       "suggested_action": "ok",
       "suggested_reason": "downloaded or not in failure list"
+    },
+    {
+      "parish_key": "galloonparish",
+      "display_name": "Newtownbutler (Galloon)",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/galloonparish.json",
+      "recipe": {
+        "start_url": "https://www.galloonparish.com/bulletin-1.html",
+        "site_type": "",
+        "playbook_type": "",
+        "status": "inactive",
+        "skip": true,
+        "placeholder": false,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
+        "operator_notes": [],
+        "do_not": [],
+        "recorded_date": ""
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": {
+        "navigation_timeout_ms": 45000,
+        "ignore_https_errors": true,
+        "total_timeout_s": 180
+      },
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "skip",
+      "suggested_reason": "Same parish as Newtownbutler (Galloon). Weekly PDF is harvested via newtownbutler from galloonparish.com/bulletin-1.html."
     },
     {
       "parish_key": "newtownbutler",
@@ -4240,34 +4270,6 @@
         "operator_notes": [],
         "do_not": [],
         "recorded_date": "2026-04-30"
-      },
-      "bulletin_format": "download",
-      "learned_pattern": "",
-      "host_profile": null,
-      "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
-    },
-    {
-      "parish_key": "parishofardkeen",
-      "display_name": "Parishofardkeen",
-      "diocese": "down_and_connor",
-      "recipe_file": "parishes/recipes/down_and_connor/parishofardkeen.json",
-      "recipe": {
-        "start_url": "https://parishofardkeen.co.uk/parish-bulletin/",
-        "site_type": "",
-        "playbook_type": "",
-        "status": "",
-        "skip": false,
-        "placeholder": false,
-        "step_count": 3,
-        "click_count": 2,
-        "has_terminal": true,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-08-19"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
@@ -4795,7 +4797,7 @@
         "has_terminal": false,
         "operator_notes": [],
         "do_not": [],
-        "recorded_date": "2026-09-09"
+        "recorded_date": "2026-06-26"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -5230,6 +5232,47 @@
       "suggested_reason": "downloaded or not in failure list"
     },
     {
+      "parish_key": "st-patricks-loughguile",
+      "display_name": "St Patrick's Loughguile",
+      "diocese": "down_and_connor",
+      "recipe_file": "parishes/recipes/down_and_connor/st-patricks-loughguile.json",
+      "recipe": {
+        "start_url": "https://mcn.live/Camera/st-patricks-loughguile",
+        "site_type": "mcn_live_parish_page",
+        "playbook_type": "mcn_pdf_near_camera",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 2,
+        "click_count": 0,
+        "has_terminal": true,
+        "operator_notes": [
+          "MCN camera page. Weekly newsletter is JSON, not the webcam.",
+          "Proved 10/09/2026: church id 317 \u2192 CloudFront NewsLetter PDF (HTTP 200, 209421, application/pdf).",
+          "Do not pin the CloudFront UUID (old recipe pinned 16 Aug 2026)."
+        ],
+        "do_not": [
+          "Do not screenshot the camera feed.",
+          "Do not pin a CloudFront UUID PDF."
+        ],
+        "recorded_date": "2026-09-10"
+      },
+      "bulletin_format": "pdf_download",
+      "learned_pattern": "",
+      "host_profile": {
+        "navigation_timeout_ms": 90000,
+        "wait_after_load_ms": 8000,
+        "total_timeout_s": 180,
+        "navigation_wait_until": "commit",
+        "notes": "MCN.live parish page \u2014 bulletin PDF link renders in JS beside the camera panel; scrape a[href*='.pdf'] after load."
+      },
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
       "parish_key": "stpatricksbelfast",
       "display_name": "St Patricks Belfast",
       "diocese": "down_and_connor",
@@ -5344,47 +5387,6 @@
       "suggested_reason": "Website DNS no longer resolves (stvincentdepaulparishbelfast.com)."
     },
     {
-      "parish_key": "st-patricks-loughguile",
-      "display_name": "St-patricks-loughguile",
-      "diocese": "down_and_connor",
-      "recipe_file": "parishes/recipes/down_and_connor/st-patricks-loughguile.json",
-      "recipe": {
-        "start_url": "https://mcn.live/Camera/st-patricks-loughguile",
-        "site_type": "pdf_link_list",
-        "playbook_type": "pdf_download_list",
-        "status": "",
-        "skip": false,
-        "placeholder": false,
-        "step_count": 2,
-        "click_count": 1,
-        "has_terminal": true,
-        "operator_notes": [
-          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
-          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-          "Do not worry if the filename or date in the link text changes every week."
-        ],
-        "do_not": [
-          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
-          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
-        ],
-        "recorded_date": "2026-08-19"
-      },
-      "bulletin_format": "download",
-      "learned_pattern": "",
-      "host_profile": {
-        "navigation_timeout_ms": 90000,
-        "wait_after_load_ms": 8000,
-        "total_timeout_s": 180,
-        "navigation_wait_until": "commit",
-        "notes": "MCN.live parish page \u2014 bulletin PDF link renders in JS beside the camera panel; scrape a[href*='.pdf'] after load."
-      },
-      "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
-    },
-    {
       "parish_key": "steelstownparish",
       "display_name": "Steelstown",
       "diocese": "derry",
@@ -5428,32 +5430,33 @@
       "recipe_file": "parishes/recipes/raphoe/stranorlarparish.json",
       "recipe": {
         "start_url": "https://www.stranorlarparish.ie/newsletter/",
-        "site_type": "dated_pdf_path",
-        "playbook_type": "dated_pdf_bulletin",
+        "site_type": "pdf_link_list",
+        "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 3,
-        "click_count": 1,
+        "step_count": 1,
+        "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "PDF archive at /newsletter/ \u2014 pick newest dated PDF (better for OCR than HTML current issue).",
-          "Current HTML issue is at /current-newsletter/ \u2014 parish may pause in July/August.",
-          "Do not start on /our-parish/ \u2014 no bulletin link in page body."
+          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
+          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+          "Do not worry if the filename or date in the link text changes every week."
         ],
         "do_not": [
-          "Do not use /our-parish/ as start URL \u2014 bulletin is only in sidebar or /newsletter/."
+          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
+          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
         ],
-        "recorded_date": "2026-07-05"
+        "recorded_date": "2026-09-10"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Recipe replay failed: Predicted dated PDF URL(s) from https://www.stranorlarparish.ie/wp-content/uploads/2026/06/28th-June-2026.pdf for 2026-09-06 did not resolve to a real file (listing page was not opened)",
+      "last_error": "Recipe replay failed: HTTP 404 for https://www.stranorlarparish.ie/wp-content/uploads/2026/09/6th-September-2026.pdf",
       "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: Predicted dated PDF URL(s) from https://www.stranorlarparish.ie/wp-content/uploads/2026/06/28th-June-2026.pdf for 2026-09-06 did not resol"
+      "suggested_reason": "Recipe replay failed: HTTP 404 for https://www.stranorlarparish.ie/wp-content/uploads/2026/09/6th-September-2026.pdf"
     },
     {
       "parish_key": "tawnawillyparish",
