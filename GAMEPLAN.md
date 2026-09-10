@@ -27,10 +27,11 @@ that is already a card.
 
 ### Audit cards — ticked only with PR + proof
 
-- **A2** — merged [PR #193](https://github.com/Raphoe-Diocese/parish_harvester/pull/193). Harvest proof not yet: next Sunday `parish_status.json` on `main` must have zero empty/`null` `last_tested_at`.
-- **A1** — [PR #196](https://github.com/Raphoe-Diocese/parish_harvester/pull/196) (rebasing onto main this turn). Harvest proof not yet: Annagry row after next Sunday harvest.
+- **A2** — merged [PR #193](https://github.com/Raphoe-Diocese/parish_harvester/pull/193). This A3 rewrite also stamped `last_tested_at` on every current row.
+- **A1** — merged [PR #196](https://github.com/Raphoe-Diocese/parish_harvester/pull/196). This A3 rewrite also filled `bulletin_date` where the URL/error proved one.
 - **B1** — merged [PR #194](https://github.com/Raphoe-Diocese/parish_harvester/pull/194). Proof: green `node --check` on that PR (run 34476745298).
 - **B2** — merged [PR #195](https://github.com/Raphoe-Diocese/parish_harvester/pull/195). Proof: `commit_ocr` has no `continue-on-error` on `main`.
+- **A3** — [PR #197](https://github.com/Raphoe-Diocese/parish_harvester/pull/197). 7 live recipes with no evidence row are `no_evidence` + actionable. 9 Derry recipes moved `unknown/` → `derry/`. `parishpress.json` skipped: Drumholm and Gortahork are both Raphoe; that file mixed Gortahork’s name with the Drumholm PDF.
 
 
 ---

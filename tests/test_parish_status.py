@@ -180,6 +180,59 @@ class ParishStatusTests(unittest.TestCase):
             self.assertEqual(on_disk["parishes"]["xparish"]["outcome"], "failed")
             self.assertTrue(str(on_disk["parishes"]["xparish"].get("last_tested_at") or "").strip())
 
+    def test_live_recipe_without_evidence_row_is_no_evidence(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            tmp_path = Path(tmp)
+            parishes_dir = tmp_path / "parishes"
+            recipe_dir = parishes_dir / "recipes" / "derry"
+            recipe_dir.mkdir(parents=True)
+            (recipe_dir / "cappaghparish.json").write_text(
+                json.dumps(
+                    {
+                        "parish_key": "cappaghparish",
+                        "display_name": "Cappagh",
+                        "start_url": "https://www.cappaghparish.com/index.html",
+                        "steps": [{"action": "goto", "url": "https://www.cappaghparish.com/index.html"}],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (parishes_dir / "recipes" / "raphoe").mkdir()
+            (parishes_dir / "recipes" / "raphoe" / "ballintra.json").write_text(
+                json.dumps(
+                    {
+                        "parish_key": "ballintra",
+                        "display_name": "Ballintra",
+                        "skip": True,
+                        "steps": [{"action": "goto", "url": "https://example.com/skip"}],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            report = {
+                "target_date": "2026-09-06",
+                "downloaded": [
+                    {"parish": "okparish", "display_name": "OK", "url": "https://ok.example/x.pdf"}
+                ],
+                "failed": [],
+                "stale_rejected": [],
+                "html_links": [],
+                "skipped": [],
+            }
+            status = build_parish_status(
+                report,
+                parishes_dir=parishes_dir,
+                consecutive_failures={},
+                disabled_keys=set(),
+            )
+            self.assertEqual(status["parishes"]["cappaghparish"]["outcome"], "no_evidence")
+            self.assertTrue(status["parishes"]["cappaghparish"]["actionable"])
+            self.assertIn("cappaghparish", status["actionable_keys"])
+            self.assertEqual(status["parishes"]["cappaghparish"]["diocese"], "Derry Diocese")
+            self.assertNotIn("ballintra", status["parishes"])
+            self.assertEqual(status["parishes"]["okparish"]["outcome"], "ok")
+            self.assertNotIn("okparish", status["actionable_keys"])
+
 
 if __name__ == "__main__":
     unittest.main()

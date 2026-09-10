@@ -29,13 +29,11 @@ To move a recipe from `unknown/` to the correct diocese folder:
 
 ## Current Contents
 
-As of last cleanup (June 2, 2026), this folder contains training recipes that need diocese assignment:
+As of 10/09/2026 (audit A3): nine Derry recipes were moved to `derry/`.
 
-- Recipes without clear diocese affiliation
-- Parishes that may span multiple dioceses
-- Training sessions where diocese was not specified
+Left here on purpose:
 
-**Action needed**: Review each recipe and move to the correct diocese folder.
+- `parishpress.json` — **skipped**. Not a parish. Display name is Gortahork; URL is the Drumholm PDF. Both of those are Raphoe and already harvested (`raphoe/gort-a-choirce.json`, `raphoe/drumholm-parish.json`). Ballintra is the same parish as Drumholm.
 
 ---
 
