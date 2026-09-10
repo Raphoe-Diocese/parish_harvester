@@ -233,6 +233,54 @@ class ParishStatusTests(unittest.TestCase):
             self.assertEqual(status["parishes"]["okparish"]["outcome"], "ok")
             self.assertNotIn("okparish", status["actionable_keys"])
 
+    def test_harvest_note_copies_into_diagnosis_and_error(self) -> None:
+        with tempfile.TemporaryDirectory() as tmp:
+            parishes_dir = Path(tmp) / "parishes"
+            recipe_dir = parishes_dir / "recipes" / "clogher"
+            recipe_dir.mkdir(parents=True)
+            note = (
+                "Blocked from GitHub runners (WAF/403). Needs a different "
+                "network. Do not re-hunt weekly."
+            )
+            (recipe_dir / "ederney.json").write_text(
+                json.dumps(
+                    {
+                        "parish_key": "ederney",
+                        "display_name": "Ederney",
+                        "harvest_note": note,
+                        "start_url": "https://culmaine.co.uk/newsletter",
+                        "steps": [{"action": "print_to_pdf"}],
+                    }
+                ),
+                encoding="utf-8",
+            )
+            status = build_parish_status(
+                {
+                    "target_date": "2026-09-06",
+                    "downloaded": [],
+                    "failed": [
+                        {
+                            "parish": "ederney",
+                            "display_name": "Ederney",
+                            "url": "https://culmaine.co.uk/newsletter",
+                            "error": "HTTP 403",
+                        }
+                    ],
+                    "stale_rejected": [],
+                    "html_links": [],
+                    "skipped": [],
+                },
+                parishes_dir=parishes_dir,
+                consecutive_failures={},
+                disabled_keys=set(),
+            )
+            row = status["parishes"]["ederney"]
+            self.assertEqual(row["diagnosis"]["harvest_note"], note)
+            self.assertTrue(str(row["error"]).startswith(note))
+            self.assertIn("HTTP 403", row["error"])
+            self.assertTrue(row["actionable"])
+            self.assertNotEqual(row.get("skip"), True)
+
 
 if __name__ == "__main__":
     unittest.main()
