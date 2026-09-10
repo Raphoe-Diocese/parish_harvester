@@ -28,7 +28,7 @@ that is already a card.
 ### Audit cards — ticked only with PR + proof
 
 - **A2** — [PR #193](https://github.com/Raphoe-Diocese/parish_harvester/pull/193) (code landed). Harvest proof not yet: next Sunday `parish_status.json` on `main` must have zero empty/`null` `last_tested_at`.
-- **A1** — PR pending this turn (code: `bulletin_date` / `bulletin_date_uk` on ok/stale rows). Harvest proof not yet: Annagry row after next Sunday harvest.
+- **A1** — [PR #196](https://github.com/Raphoe-Diocese/parish_harvester/pull/196) (code landed; stacks on #193). Harvest proof not yet: Annagry row after next Sunday harvest.
 - **B1** — [PR #194](https://github.com/Raphoe-Diocese/parish_harvester/pull/194). Proof: green `node --check` step on that PR.
 - **B2** — [PR #195](https://github.com/Raphoe-Diocese/parish_harvester/pull/195). Proof: `commit_ocr` has no `continue-on-error` on `main`.
 
