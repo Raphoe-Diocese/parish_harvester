@@ -1,26 +1,34 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "cappaghparish",
-  "display_name": "Cappaghparish",
+  "display_name": "Cappagh",
   "diocese": "derry",
-  "start_url": "https://www.cappaghparish.com/index.html",
+  "start_url": "https://cappaghparish.com/bulletins",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": ["/b/"],
+  "playbook_type": "pdf_download_list",
+  "timeout_ms": 55000,
+  "total_timeout_s": 190,
+  "recorded_date": "2026-09-10",
   "steps": [
     {
       "action": "goto",
-      "url": "https://www.cappaghparish.com/index.html"
+      "url": "https://cappaghparish.com/bulletins"
     },
     {
       "action": "click",
-      "selector": "a[href$='.pdf']",
-      "pick_strategy": "newest_dated",
-      "fallback_selectors": [
-        "div#banner > div > section > a:nth-of-type(3)",
-        "a:has-text(\"Parish News - Sunday, 10th May 2026\")"
-      ]
+      "selector": "a.bulletin-card",
+      "pick_strategy": "newest_dated"
     }
   ],
-  "operator_notes_2026_08_09": [
-    "2026-08-09 fix: primary selector was pinned to the literal trained-week text 'Parish News - Sunday, 10th May 2026' with no pick_strategy — will never match again after that date. Generalised to a[href$='.pdf'] + newest_dated (same class of bug found in watersideparish/drumquinparish). Not currently in parish_status.json (untested this pass) — flag for a live test next sweep."
+  "operator_notes": [
+    "Site rebuilt. Old /index.html and /pdf/120426.pdf are 404.",
+    "Listing https://cappaghparish.com/bulletins. Cards are /b/13, /b/12… GET /b/13 is a PDF (proved 10/09/2026).",
+    "Newest card on 10/09/2026 is CPN 30th August 2026 — no 06/09 file yet. Harvest should mark stale until they post this week.",
+    "http_scrape scores /b/N from the card date text. Click newest a.bulletin-card is fallback only."
   ],
-  "recorded_date": "2026-05-10"
+  "do_not": [
+    "Do not use www.cappaghparish.com/index.html.",
+    "Do not pin /b/13 — the number increments."
+  ]
 }

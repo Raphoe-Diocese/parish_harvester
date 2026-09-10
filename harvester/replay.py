@@ -1711,7 +1711,7 @@ _PDFEMB_IFRAME_SRC_RE = re.compile(
 _WP_UPLOAD_IMAGE_RE = re.compile(
     r"(?:(?P<origin>https?://[^\s\"'<>]+?)/)?wp-content/uploads/"
     r"(?P<year>20\d{2})/(?P<month>0[1-9]|1[0-2])/"
-    r"(?P<name>[A-Za-z0-9_.%-]+\.(?:png|jpe?g))",
+    r"(?P<name>[A-Za-z0-9_.%\-]+\.(?:png|jpe?g))",
     re.IGNORECASE,
 )
 _RESIZED_IMAGE_SUFFIX_RE = re.compile(r"-\d+x\d+\.(?:png|jpe?g)$", re.IGNORECASE)
@@ -1916,7 +1916,9 @@ def _score_http_scrape_pdf_hrefs(
         if _is_non_bulletin_url(href):
             continue
         path = urlparse(href).path.lower()
-        if not path.endswith((".pdf", ".docx", ".doc", ".rtf")):
+        # Cappagh /b/13 is a PDF with no .pdf suffix (GET application/pdf).
+        extensionless_ok = bool(re.search(r"/b/\d+/?$", path))
+        if not path.endswith((".pdf", ".docx", ".doc", ".rtf")) and not extensionless_ok:
             continue
         found = _http_scrape_item_date(href, target_date)
         if not found and labels:

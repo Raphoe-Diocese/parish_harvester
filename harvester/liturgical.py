@@ -233,6 +233,16 @@ def liturgical_date_from_text(text: str, year: int) -> date | None:
     if len(needle) < 8:
         return None
 
+    compact_ot = re.search(
+        r"\b(\d{1,2})(?:st|nd|rd|th)? sunday(?: in)?(?: ordinary time| ot)\b",
+        needle,
+    )
+    if compact_ot:
+        want = normalize_liturgical_phrase(_ordinary_time_name(int(compact_ot.group(1))))
+        for sunday, name in get_liturgical_sundays(year).items():
+            if normalize_liturgical_phrase(name) == want:
+                return sunday
+
     def _best_in_year(lookup_year: int) -> date | None:
         best_date: date | None = None
         best_len = 0

@@ -1,32 +1,28 @@
 {
-  "version": 1,
+  "version": 2,
   "parish_key": "parishofardkeen",
-  "display_name": "Parishofardkeen",
+  "display_name": "Ardkeen",
   "diocese": "down_and_connor",
   "start_url": "https://parishofardkeen.co.uk/parish-bulletin/",
+  "site_type": "http_scrape_newest_images",
+  "href_patterns": ["sunday", "OT"],
+  "image_count": 1,
+  "playbook_type": "stacked_image_bulletin",
+  "timeout_ms": 55000,
+  "total_timeout_s": 190,
+  "recorded_date": "2026-09-10",
   "steps": [
     {
-      "action": "click",
-      "selector": "[role=\"main\"]:has-text(\"Parish Bulletin Please see this week’s bulletin below: Click\")",
-      "href": "",
-      "text": "Parish Bulletin\n\nPlease see this week’s bulletin below:\n\nClick here to download this week’s bulletin\nPrevious Bulletins\n\n9 August 2026\n\n2 August 2026\n\n26 July 2026\n\n19 July 2026\n\n12 July 2026",
-      "fallback_selectors": [
-        "main#site-content"
-      ]
-    },
-    {
-      "action": "click",
-      "selector": "a:has-text(\"Click here to download this week’s bulletin\")",
-      "href": "https://parishofardkeen.co.uk/wp-content/uploads/2026/08/20th-Sunday-in-OT-A.jpg",
-      "text": "Please see this week’s bulletin below: Click here to downloa"
-    },
-    {
-      "action": "download",
-      "url": "https://parishofardkeen.co.uk/wp-content/uploads/2026/08/19th-Sunday-in-OT-A.jpg"
+      "action": "goto",
+      "url": "https://parishofardkeen.co.uk/parish-bulletin/"
     }
   ],
-  "observed_load_ms": 26165.5,
-  "timeout_ms": 62331,
-  "total_timeout_s": 370,
-  "recorded_date": "2026-08-19"
+  "operator_notes": [
+    "Proved 10/09/2026: this week is /uploads/2026/09/23-Sunday-OT-A.png (HTTP 200, 1794945, image/png). Older weeks are JPGs in /2026/08/.",
+    "http_scrape_newest_images. Do not pin 19th-Sunday or 20th-Sunday filenames."
+  ],
+  "do_not": [
+    "Do not pin a liturgical-Sunday filename.",
+    "Do not download the parish logo JPEG."
+  ]
 }

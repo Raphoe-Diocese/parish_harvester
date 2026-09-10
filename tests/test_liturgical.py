@@ -107,6 +107,14 @@ class LiturgicalCalendarTests(unittest.TestCase):
             date(2026, 8, 16),
         )
         self.assertIsNone(liturgical_date_from_text("ordinary-time.pdf", 2026))
+        self.assertEqual(
+            liturgical_date_from_text("23-Sunday-OT-A.png", 2026),
+            date(2026, 9, 6),
+        )
+        self.assertEqual(
+            liturgical_date_from_text("22nd-Sunday-in-OT-A.jpg", 2026),
+            date(2026, 8, 30),
+        )
 
     def test_rewrite_greenlough_url_uses_dynamic_liturgical_name(self) -> None:
         original = "http://www.greenlough.com/publications/newsletter/Easter_Sunday_2026_[2026-4-5].pdf"

@@ -846,6 +846,36 @@ class IskaheenJetpackImageTests(unittest.TestCase):
         self.assertEqual(best, date(2026, 9, 1))
 
 
+class ArdkeenLiturgicalImageTests(unittest.TestCase):
+    LISTING = "https://parishofardkeen.co.uk/parish-bulletin/"
+    THIS_WEEK = (
+        "https://parishofardkeen.co.uk/wp-content/uploads/2026/09/"
+        "23-Sunday-OT-A.png"
+    )
+    LAST_WEEK = (
+        "https://parishofardkeen.co.uk/wp-content/uploads/2026/08/"
+        "22nd-Sunday-in-OT-A.jpg"
+    )
+
+    def test_hyphenated_sunday_ot_filename_is_this_week(self) -> None:
+        html = f"""
+        <a href="{self.THIS_WEEK}">Click here to download this week’s bulletin</a>
+        <a href="{self.LAST_WEEK}">30 August 2026</a>
+        """
+        scored = _extract_scored_upload_images(
+            html,
+            self.LISTING,
+            href_patterns=["sunday", "OT"],
+            target_date=date(2026, 9, 6),
+        )
+        urls = [url for _found, url in scored]
+        self.assertIn(self.THIS_WEEK, urls)
+        self.assertIn(self.LAST_WEEK, urls)
+        best_date, best_url = max(scored)
+        self.assertEqual(best_url, self.THIS_WEEK)
+        self.assertEqual(best_date, date(2026, 9, 6))
+
+
 class PdfembedIframeTests(unittest.TestCase):
     PDF = (
         "https://www.stcolmcillesholywood.org/wp-content/uploads/2026/08/"
@@ -1896,6 +1926,42 @@ class HarvestMissRecipeTests(unittest.TestCase):
         self.assertFalse(any("Newsletter-21st-Aug.pdf" in url for url in download_urls))
         self.assertEqual(recipe["site_type"], "http_scrape_newest_pdf")
         self.assertIn("Newsletter-sept-6th-3-2.pdf", recipe["example_url"])
+
+
+class CappaghExtensionlessBulletinTests(unittest.TestCase):
+    LISTING = "https://cappaghparish.com/bulletins"
+    THIS_WEEK = "https://cappaghparish.com/b/13"
+    OLDER = "https://cappaghparish.com/b/12"
+
+    def test_b_paths_score_from_card_date_text(self) -> None:
+        hrefs = [self.THIS_WEEK, self.OLDER]
+        labels = {
+            self.THIS_WEEK: "CPN 30th August 2026",
+            self.OLDER: "CPN 16th & 23rd August",
+        }
+        self.assertFalse(_score_http_scrape_pdf_hrefs(hrefs, date(2026, 9, 6)))
+        scored = _score_http_scrape_pdf_hrefs(
+            hrefs, date(2026, 9, 6), labels=labels
+        )
+        self.assertTrue(scored)
+        best_date, best_url = max(scored)
+        self.assertEqual(best_date, date(2026, 8, 30))
+        self.assertEqual(best_url, self.THIS_WEEK)
+
+    def test_listing_html_pairs_card_text_with_b_path(self) -> None:
+        html = (
+            '<a class="bulletin-card" href="/b/13">CPN 30th August 2026</a>'
+            '<a class="bulletin-card" href="/b/12">CPN 16th & 23rd August</a>'
+        )
+        pairs = _extract_matching_href_texts(html, self.LISTING, ["/b/"])
+        labels = {href: text for href, text in pairs}
+        self.assertEqual(labels[self.THIS_WEEK], "CPN 30th August 2026")
+        scored = _score_http_scrape_pdf_hrefs(
+            [href for href, _text in pairs],
+            date(2026, 9, 6),
+            labels=labels,
+        )
+        self.assertEqual(max(scored)[1], self.THIS_WEEK)
 
 
 if __name__ == "__main__":

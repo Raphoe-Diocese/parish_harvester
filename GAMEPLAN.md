@@ -31,7 +31,8 @@ that is already a card.
 - **A1** — merged [PR #196](https://github.com/Raphoe-Diocese/parish_harvester/pull/196). This A3 rewrite also filled `bulletin_date` where the URL/error proved one.
 - **B1** — merged [PR #194](https://github.com/Raphoe-Diocese/parish_harvester/pull/194). Proof: green `node --check` on that PR (run 34476745298).
 - **B2** — merged [PR #195](https://github.com/Raphoe-Diocese/parish_harvester/pull/195). Proof: `commit_ocr` has no `continue-on-error` on `main`.
-- **A3** — [PR #197](https://github.com/Raphoe-Diocese/parish_harvester/pull/197). 7 live recipes with no evidence row are `no_evidence` + actionable. 9 Derry recipes moved `unknown/` → `derry/`. `parishpress.json` skipped: Drumholm and Gortahork are both Raphoe; that file mixed Gortahork’s name with the Drumholm PDF.
+- **A3** — merged [PR #197](https://github.com/Raphoe-Diocese/parish_harvester/pull/197). 7 live recipes with no evidence row are `no_evidence` + actionable. 9 Derry recipes moved `unknown/` → `derry/`. `parishpress.json` skipped: Drumholm and Gortahork are both Raphoe; that file mixed Gortahork’s name with the Drumholm PDF.
+- **Fix the 7 `no_evidence` parishes (this turn)** — [PR #198](https://github.com/Raphoe-Diocese/parish_harvester/pull/198). Live lookup + single-parish harvest 10/09/2026 (target 06/09). Galloon + Lisnaskea-Maguiresbridge skipped as aliases of already-ok Clogher rows. Carryduff **ok** (Word 06/09). Ardkeen **ok** (`23-Sunday-OT-A.png`). Dundrum (MCN 465) and Loughguile (MCN 317) **ok**. Cappagh recipe works (`/b/13`); newest card text is 30/08 — no `bulletin_date` in status. `parish_status` after harvest: total 164, ok 109, actionable 23. Problems filter still defaults to Raphoe — pick **All dioceses** to see non-Raphoe rows. Not live on parishpress.ie until merge + harvest/Pages.
 
 
 ---

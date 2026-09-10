@@ -114,6 +114,39 @@ https://www.antrimparish.com
                 match = _match_parish(name, None, parishes_dir)
                 self.assertEqual(match.entry.display_name, name)
 
+    def test_seven_orphan_evidence_keys_and_alias_skips(self) -> None:
+        parishes_dir = REPO_ROOT / "parishes"
+        derry = {e.key: e for e in parse_evidence_file("derry_diocese", parishes_dir)}
+        down = {e.key: e for e in parse_evidence_file("down_and_connor", parishes_dir)}
+        clogher = {e.key: e for e in parse_evidence_file("clogher_diocese", parishes_dir)}
+        self.assertIn("cappaghparish", derry)
+        self.assertIn("bulletins", derry["cappaghparish"].example_url)
+        self.assertIn("carryduffsaintfield", down)
+        self.assertIn("parishofardkeen", down)
+        self.assertIn("dundrum-and-tyrella-parish-dundrum", down)
+        self.assertIn("st-patricks-loughguile", down)
+        self.assertIn("newtownbutler", clogher)
+        self.assertIn("lisnaskeamaguiresbridge", clogher)
+        self.assertNotIn("galloonparish", clogher)
+        self.assertNotIn("lisnaskeamaguiresbridgeparish", clogher)
+        galloon = json.loads(
+            (parishes_dir / "recipes" / "clogher" / "galloonparish.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        lisnaskea = json.loads(
+            (
+                parishes_dir
+                / "recipes"
+                / "clogher"
+                / "lisnaskeamaguiresbridgeparish.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertTrue(galloon.get("skip"))
+        self.assertEqual(galloon.get("alias_of"), "newtownbutler")
+        self.assertTrue(lisnaskea.get("skip"))
+        self.assertEqual(lisnaskea.get("alias_of"), "lisnaskeamaguiresbridge")
+
     def test_build_mark_step_validates_http_and_supported_actions(self) -> None:
         self.assertEqual(
             _build_mark_step("image", "https://example.org/bulletin.png"),
