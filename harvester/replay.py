@@ -1711,7 +1711,7 @@ _PDFEMB_IFRAME_SRC_RE = re.compile(
 _WP_UPLOAD_IMAGE_RE = re.compile(
     r"(?:(?P<origin>https?://[^\s\"'<>]+?)/)?wp-content/uploads/"
     r"(?P<year>20\d{2})/(?P<month>0[1-9]|1[0-2])/"
-    r"(?P<name>[A-Za-z0-9_.%-]+\.(?:png|jpe?g))",
+    r"(?P<name>[A-Za-z0-9_.%\-]+\.(?:png|jpe?g))",
     re.IGNORECASE,
 )
 _RESIZED_IMAGE_SUFFIX_RE = re.compile(r"-\d+x\d+\.(?:png|jpe?g)$", re.IGNORECASE)

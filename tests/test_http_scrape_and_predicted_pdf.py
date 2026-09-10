@@ -846,6 +846,36 @@ class IskaheenJetpackImageTests(unittest.TestCase):
         self.assertEqual(best, date(2026, 9, 1))
 
 
+class ArdkeenLiturgicalImageTests(unittest.TestCase):
+    LISTING = "https://parishofardkeen.co.uk/parish-bulletin/"
+    THIS_WEEK = (
+        "https://parishofardkeen.co.uk/wp-content/uploads/2026/09/"
+        "23-Sunday-OT-A.png"
+    )
+    LAST_WEEK = (
+        "https://parishofardkeen.co.uk/wp-content/uploads/2026/08/"
+        "22nd-Sunday-in-OT-A.jpg"
+    )
+
+    def test_hyphenated_sunday_ot_filename_is_this_week(self) -> None:
+        html = f"""
+        <a href="{self.THIS_WEEK}">Click here to download this week’s bulletin</a>
+        <a href="{self.LAST_WEEK}">30 August 2026</a>
+        """
+        scored = _extract_scored_upload_images(
+            html,
+            self.LISTING,
+            href_patterns=["sunday", "OT"],
+            target_date=date(2026, 9, 6),
+        )
+        urls = [url for _found, url in scored]
+        self.assertIn(self.THIS_WEEK, urls)
+        self.assertIn(self.LAST_WEEK, urls)
+        best_date, best_url = max(scored)
+        self.assertEqual(best_url, self.THIS_WEEK)
+        self.assertEqual(best_date, date(2026, 9, 6))
+
+
 class PdfembedIframeTests(unittest.TestCase):
     PDF = (
         "https://www.stcolmcillesholywood.org/wp-content/uploads/2026/08/"
