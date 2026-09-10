@@ -27,7 +27,9 @@ that is already a card.
 
 ### Audit cards — ticked only with PR + proof
 
-_(none yet)_
+- **A2** — PR pending this turn (code: per-row `last_tested_at`, no `last_patched_at` leak). Harvest proof not yet: next Sunday `parish_status.json` must have zero empty `last_tested_at`.
+
+
 
 ---
 
