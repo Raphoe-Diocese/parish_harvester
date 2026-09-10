@@ -35,19 +35,17 @@ that is already a card.
 - **Fix the 7 `no_evidence` parishes** — merged [PR #198](https://github.com/Raphoe-Diocese/parish_harvester/pull/198) `792e6329`.
 - **A4** — merged [PR #199](https://github.com/Raphoe-Diocese/parish_harvester/pull/199) `d19fe5ae`. Ederney `error` starts with the WAF note. Problems screenshot still needs Frank (All dioceses / Clogher).
 
-### Now — new Trainer zip → replace Load unpacked folder (do not start until Frank says go)
+### Now — Trainer folder refresh (this PC)
 
-When a **new** `parish_trainer.zip` is on https://www.parishpress.ie/extension/parish_trainer.zip (manifest version newer than the folder):
+Script: `scripts/refresh_local_trainer.ps1`. Downloads https://www.parishpress.ie/extension/parish_trainer.zip, deletes old files in `extension\`, extracts so `manifest.json` is at that folder root. Frank only Reloads at chrome://extensions. Not Chrome Update. Work dir is `%TEMP%`, never `_tmp_*` in the repo.
 
-1. Download that zip.
-2. **Delete the old files** in the Load unpacked folder (do not leave a nested `extension\extension`).
-3. Extract the zip so `manifest.json` sits **in the folder root**.
-4. Folder (locked): `C:\Users\Digital Admin\Desktop\harvester compare repos\parish_harvester-main raphoe\parish_harvester\extension`
-5. Then chrome://extensions → Parish Trainer → Reload.
+Folder (locked): `C:\Users\Digital Admin\Desktop\harvester compare repos\parish_harvester-main raphoe\parish_harvester\extension`
 
-This is **not** Chrome Update. Load unpacked never fetches the website. Audit card **C2** still removes the fake Update plumbing — do not mix that with this folder replace.
+### Next — blurry collated / mega PDFs (cloud agent only)
 
-Not built. No new zip from A4 (Trainer still 1.61.24). Copy this file to Dropbox `Cursor gameplans\Harvester\GAMEPLAN.md` yourself.
+Frank 10/09/2026: collated bulletins are unreadable, resolution too low. Cause is `harvester/pdf_compress.py`: Ghostscript `/ebook` at **100 dpi**. Do **not** start on this 16GB laptop. Do **not** download mega PDFs here. Do **not** launch a second local agent.
+
+Cloud-agent card: raise mega compress to a readable setting (try `/printer` or 150 dpi, keep linearize / FastWebView). Touch `harvester/pdf_compress.py` + `tests/test_pdf_compress.py` only. Do not Full harvest. Proof = one diocese mega after the next Sunday harvest looks sharp on phone and desktop. Mega PDF stays on.
 
 
 ---
