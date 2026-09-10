@@ -18,6 +18,24 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Check extension and viewer JavaScript
+        run: |
+          set -euo pipefail
+          shopt -s nullglob
+          files=(extension/*.js docs/assets/*.js)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "::error::No JS files matched extension/*.js or docs/assets/*.js"
+            exit 1
+          fi
+          for f in "${files[@]}"; do
+            echo "node --check ${f}"
+            node --check "${f}"
+          done
+
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
