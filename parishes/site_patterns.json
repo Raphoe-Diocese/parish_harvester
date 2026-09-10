@@ -6,12 +6,27 @@
       "page_type": "pdf_link_list",
       "recipe_flow": "click_then_pdf",
       "label": "News page with PDF links",
-      "advice": "Click Find bulletin → Pick newest, or Follow a link to the latest PDF.",
+      "advice": "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom. Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday. Do not worry if the filename or date in the link text changes every week.",
+      "operator_notes": [
+        "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
+        "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+        "Do not worry if the filename or date in the link text changes every week."
+      ],
+      "do_not": [
+        "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
+        "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+      ],
+      "html_fingerprint": "wp_uploads_pdf_list",
+      "html_markers": [
+        "wp-content PDF uploads",
+        "WordPress signals"
+      ],
       "example_parishes": [
         "parishofaghyaran",
-        "buncrana"
+        "buncrana",
+        "stranorlarparish"
       ],
-      "success_count": 2
+      "success_count": 3
     },
     "wp_pdfemb_list+click_then_pdf": {
       "page_type": "wp_pdfemb_list",
@@ -879,7 +894,10 @@
       "label": "One.com weekly PDF list (onewebmedia)",
       "advice": "Click the newest dated onewebmedia row. Ignore expired HTTPS. Do not pin hashed S25C names.",
       "html_fingerprint": "onewebmedia_pdf_list",
-      "example_parishes": ["lisnaskeamaguiresbridge", "newtownbutler"],
+      "example_parishes": [
+        "lisnaskeamaguiresbridge",
+        "newtownbutler"
+      ],
       "success_count": 2
     },
     "wix_ugd_dated_pdf+click_then_pdf": {
@@ -888,7 +906,10 @@
       "label": "Wix hashed PDF with dated link text",
       "advice": "Date is in the link text, not the /_files/ugd/ hash. Click newest_dated.",
       "html_fingerprint": "wix_ugd_dated_pdf",
-      "example_parishes": ["irvinestown", "errigaltruagh"],
+      "example_parishes": [
+        "irvinestown",
+        "errigaltruagh"
+      ],
       "success_count": 2
     },
     "office_rtf_newsletter+direct_download": {
@@ -897,7 +918,9 @@
       "label": "Weekly RTF newsletter",
       "advice": "Newest dated .rtf — harvester converts with LibreOffice.",
       "html_fingerprint": "office_rtf_newsletter",
-      "example_parishes": ["magheracloone"],
+      "example_parishes": [
+        "magheracloone"
+      ],
       "success_count": 1
     },
     "js_dated_pdf_list+direct_download": {
@@ -906,7 +929,10 @@
       "label": "JS-rendered /pdf/DDMMYY.pdf list",
       "advice": "news.html scrape looks empty. Weekly file is /pdf/DDMMYY.pdf. Use predicted_dated_pdf on HTTP.",
       "html_fingerprint": "js_dated_pdf_list",
-      "example_parishes": ["tempo", "enniskillen"],
+      "example_parishes": [
+        "tempo",
+        "enniskillen"
+      ],
       "success_count": 2
     },
     "js_overwritten_html_newsletter+html_capture": {
@@ -915,8 +941,34 @@
       "label": "JS-injected HTML newsletter (overwritten weekly)",
       "advice": "Wait for JS, then print_to_pdf. Do not pin 109.228 article ids.",
       "html_fingerprint": "js_overwritten_html_newsletter",
-      "example_parishes": ["ballybay"],
+      "example_parishes": [
+        "ballybay"
+      ],
       "success_count": 1
+    },
+    "stranorlarparish": {
+      "page_type": "pdf_link_list",
+      "recipe_flow": "click_then_pdf",
+      "combined_key": "pdf_link_list+click_then_pdf",
+      "display_name": "Stranolar",
+      "start_url_host": "www.stranorlarparish.ie",
+      "updated": "2026-09-10",
+      "step_count": 1,
+      "playbook_type": "pdf_download_list",
+      "operator_notes": [
+        "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
+        "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+        "Do not worry if the filename or date in the link text changes every week."
+      ],
+      "do_not": [
+        "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
+        "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+      ],
+      "html_fingerprint": "wp_uploads_pdf_list",
+      "html_markers": [
+        "wp-content PDF uploads",
+        "WordPress signals"
+      ]
     }
   }
 }

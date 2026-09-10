@@ -69,14 +69,18 @@ from .cloud_folders import (
     cloud_folder_selector_candidates,
     format_cloud_folder_label,
     is_cloud_folder_url,
+    listing_looks_like_year_folders,
+    newest_yy_mm_dd_label,
     recipe_uses_cloud_folder,
 )
 from .html_capture import capture_html_page_as_pdf
 from .replay import (
     RecipeReplayError,
+    _drive_folder_rows,
     _fetch_bytes_with_retries,
     _find_iframe_pdf_url,
     _is_non_bulletin_url,
+    _open_drive_year_folder,
     _print_page_to_pdf,
     _try_joomla_dropfiles_click_download,
     recipe_path_for,
@@ -1216,29 +1220,51 @@ async def _try_cloud_folder_pick(
     """Click the dated YY.MM.DD row on a Drive/OneDrive folder listing."""
     if not is_cloud_folder_url(page.url):
         return None
+    try:
+        row_texts = [str(row.get("text") or "") for row in await _drive_folder_rows(page)]
+        if listing_looks_like_year_folders(row_texts):
+            await _open_drive_year_folder(page, target.year, navigation_timeout_ms)
+    except Exception as exc:
+        print(f"  ↩️  Cloud year folder {target.year} not opened: {exc}")
+        return None
     label = format_cloud_folder_label(target, with_pdf=True)
     last_err = ""
-    for sel in cloud_folder_selector_candidates(target):
-        try:
-            locator = page.locator(sel).first
-            await locator.wait_for(state="visible", timeout=min(navigation_timeout_ms, 12_000))
-            await locator.click(timeout=navigation_timeout_ms)
+    pick_labels = [label]
+    newest = newest_yy_mm_dd_label(
+        [str(row.get("text") or "") for row in await _drive_folder_rows(page)]
+    )
+    if newest and newest not in pick_labels:
+        pick_labels.append(newest)
+    for pick_label in pick_labels:
+        selectors = (
+            cloud_folder_selector_candidates(target)
+            if pick_label == label
+            else [
+                f'[role="row"]:has-text("{pick_label}")',
+                f'[role="gridcell"]:has-text("{pick_label}")',
+            ]
+        )
+        for sel in selectors:
             try:
-                await page.wait_for_load_state("domcontentloaded", timeout=3_000)
-            except PlaywrightTimeoutError:
-                pass
-            await _page_wait(page, 1500)
-            file_type = await _download_candidate(
-                page.url,
-                dest,
-                browser,
-                navigation_timeout_ms=navigation_timeout_ms,
-            )
-            if dest.exists() and _is_real_pdf(dest, ""):
-                return page.url, file_type
-        except Exception as exc:
-            last_err = str(exc)
-            continue
+                locator = page.locator(sel).first
+                await locator.wait_for(state="visible", timeout=min(navigation_timeout_ms, 12_000))
+                await locator.click(timeout=navigation_timeout_ms)
+                try:
+                    await page.wait_for_load_state("domcontentloaded", timeout=3_000)
+                except PlaywrightTimeoutError:
+                    pass
+                await _page_wait(page, 1500)
+                file_type = await _download_candidate(
+                    page.url,
+                    dest,
+                    browser,
+                    navigation_timeout_ms=navigation_timeout_ms,
+                )
+                if dest.exists() and _is_real_pdf(dest, ""):
+                    return page.url, file_type
+            except Exception as exc:
+                last_err = str(exc)
+                continue
     if last_err:
         print(f"  ↩️  Cloud folder pick failed for {label}: {last_err}")
     return None
@@ -1550,6 +1576,18 @@ async def _scrape_and_download(
                     "treat the listing page itself as the bulletin"
                     if has_dated
                     else "Only the bare homepage was reachable — refusing to treat it as the bulletin"
+                ),
+            )
+
+        if is_cloud_folder_url(page.url or scrape_url):
+            return FetchResult(
+                key=key,
+                display_name=entry.display_name,
+                status="error",
+                url=page.url or scrape_url,
+                error=(
+                    "Cloud folder listing is not a bulletin — open the year "
+                    "folder and download the dated PDF"
                 ),
             )
 

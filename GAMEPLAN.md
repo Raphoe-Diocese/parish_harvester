@@ -41,6 +41,20 @@ Script: `scripts/refresh_local_trainer.ps1`. Downloads https://www.parishpress.i
 
 Folder (locked): `C:\Users\Digital Admin\Desktop\harvester compare repos\parish_harvester-main raphoe\parish_harvester\extension`
 
+### Bruckless Drive folder (merged, not live)
+
+Merged [PR #202](https://github.com/Raphoe-Diocese/parish_harvester/pull/202). Harvest used to print the year list and mark **ok**. **Not live yet** until a harvest of `drive-1rjeey-ayy` + Pages. Do not Full harvest on this PC.
+
+Homepage huge writing was Chrome zoom (Ctrl+0). Site-look rewrite stays parked.
+
+### Parked — Recipe Brain / Referee (Phase 4)
+
+Planned in [`AGENTS.md`](AGENTS.md). **No date.** Do not start until recipe success (locked item 3). First slice is PR #202.
+
+### Parked mid-chat — A5 stale parish caption
+
+Started locally, **not live yet**. Do not tick.
+
 ### Next — blurry collated / mega PDFs (cloud agent only)
 
 Frank 10/09/2026: collated bulletins are unreadable, resolution too low. Cause is `harvester/pdf_compress.py`: Ghostscript `/ebook` at **100 dpi**. Do **not** start on this 16GB laptop. Do **not** download mega PDFs here. Do **not** launch a second local agent.
