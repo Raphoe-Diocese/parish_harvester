@@ -283,7 +283,6 @@ jobs:
       - name: Commit generated bulletin pages
         if: steps.ocr_generate.outputs.processed != '0'
         id: commit_ocr
-        continue-on-error: true
         run: |
           set -euo pipefail
           git config user.name "github-actions[bot]"
@@ -312,6 +311,6 @@ jobs:
           exit 1
 
       - name: Warn if OCR git commit failed
-        if: steps.ocr_generate.outputs.processed != '0' && steps.commit_ocr.outcome == 'failure'
+        if: failure() && steps.ocr_generate.outputs.processed != '0'
         run: |
           echo "::warning::OCR viewers were generated but could not push to main — ocr-docs artifact was uploaded for Pages deploy."
