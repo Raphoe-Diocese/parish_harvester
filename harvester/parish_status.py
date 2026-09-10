@@ -38,6 +38,27 @@ NO_EVIDENCE_ERROR = (
     "Recipe on GitHub but no evidence-file row — harvest never sees this parish."
 )
 
+
+def _recipe_harvest_note(recipe_meta: dict | None) -> str:
+    if not isinstance(recipe_meta, dict):
+        return ""
+    return str(recipe_meta.get("harvest_note") or "").strip()
+
+
+def _with_harvest_note(
+    diagnosis: dict | None,
+    recipe_meta: dict | None,
+    error_text: str = "",
+) -> tuple[dict | None, str]:
+    """Copy recipe harvest_note into diagnosis and the visible error line."""
+    note = _recipe_harvest_note(recipe_meta)
+    if not note:
+        return diagnosis, error_text
+    diag = dict(diagnosis) if isinstance(diagnosis, dict) else {}
+    diag["harvest_note"] = note
+    visible = f"{note} {error_text}".strip() if error_text else note
+    return diag, visible
+
 _HEADER_RE = re.compile(r"^#\s*-{2,}\s*(.+?)\s*-{2,}\s*$", re.IGNORECASE)
 
 
@@ -312,6 +333,7 @@ def build_parish_status(
                 if outcome == "failed":
                     outcome = "skipped"
 
+            diagnosis, error_text = _with_harvest_note(diagnosis, recipe_meta, error_text)
             bulletin_date, bulletin_date_uk = _row_bulletin_dates(item)
             _upsert(
                 key,
@@ -366,18 +388,23 @@ def build_parish_status(
     for key, meta, diocese in _iter_recipe_files(parishes_dir):
         if key in parishes or _recipe_is_inactive(meta):
             continue
+        diagnosis, error_text = _with_harvest_note(
+            {"reason": "no_evidence", "detail": NO_EVIDENCE_ERROR},
+            meta,
+            NO_EVIDENCE_ERROR,
+        )
         _upsert(
             key,
             {
                 "outcome": "no_evidence",
                 "category": "no_evidence",
-                "error": NO_EVIDENCE_ERROR,
+                "error": error_text or NO_EVIDENCE_ERROR,
                 "url": str(meta.get("start_url") or ""),
                 "bulletin_date": None,
                 "bulletin_date_uk": None,
                 "last_tested_at": generated_at,
                 "consecutive_failures": int(consecutive_failures.get(key) or 0),
-                "diagnosis": {"reason": "no_evidence", "detail": NO_EVIDENCE_ERROR},
+                "diagnosis": diagnosis,
                 "actionable": True,
                 "display_name": str(meta.get("display_name") or key),
                 "diocese": diocese,
