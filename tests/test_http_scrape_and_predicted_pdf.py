@@ -944,7 +944,7 @@ class HolywoodNoticePageTests(unittest.TestCase):
 class ErrigalAndMalinRecipeTests(unittest.TestCase):
     def test_errigal_allows_eight_page_weekly(self) -> None:
         data = json.loads(
-            Path("parishes/recipes/unknown/errigalparish.json").read_text(
+            Path("parishes/recipes/derry/errigalparish.json").read_text(
                 encoding="utf-8"
             )
         )

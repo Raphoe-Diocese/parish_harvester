@@ -27,6 +27,17 @@ _DIOCESE_LABELS: dict[str, str] = {
     "raphoe_diocese": "Raphoe Diocese",
 }
 
+_RECIPE_FOLDER_DIOCESE: dict[str, str] = {
+    "clogher": "Clogher Diocese",
+    "derry": "Derry Diocese",
+    "down_and_connor": "Down & Connor Diocese",
+    "raphoe": "Raphoe Diocese",
+}
+
+NO_EVIDENCE_ERROR = (
+    "Recipe on GitHub but no evidence-file row — harvest never sees this parish."
+)
+
 _HEADER_RE = re.compile(r"^#\s*-{2,}\s*(.+?)\s*-{2,}\s*$", re.IGNORECASE)
 
 
@@ -188,6 +199,25 @@ def _outcome_from_report_item(section: str, item: dict) -> str:
     return "failed"
 
 
+def _iter_recipe_files(parishes_dir: Path) -> list[tuple[str, dict, str]]:
+    """Return (parish_key, recipe dict, diocese label) for each recipe JSON."""
+    recipes_dir = parishes_dir / "recipes"
+    if not recipes_dir.is_dir():
+        return []
+    found: list[tuple[str, dict, str]] = []
+    for path in sorted(recipes_dir.glob("*/*.json")):
+        data = _load_json(path, {})
+        if not isinstance(data, dict):
+            continue
+        key = str(data.get("parish_key") or path.stem).strip()
+        if not key:
+            continue
+        folder = path.parent.name
+        diocese = _RECIPE_FOLDER_DIOCESE.get(folder, "")
+        found.append((key, data, diocese))
+    return found
+
+
 def _build_parish_index(parishes_dir: Path) -> dict[str, dict[str, str]]:
     """Map parish key → {display_name, diocese}."""
     index: dict[str, dict[str, str]] = {}
@@ -330,6 +360,28 @@ def build_parish_status(
                     generated_at=generated_at,
                     previous_row=previous_parishes.get(key),
                 ),
+            },
+        )
+
+    for key, meta, diocese in _iter_recipe_files(parishes_dir):
+        if key in parishes or _recipe_is_inactive(meta):
+            continue
+        _upsert(
+            key,
+            {
+                "outcome": "no_evidence",
+                "category": "no_evidence",
+                "error": NO_EVIDENCE_ERROR,
+                "url": str(meta.get("start_url") or ""),
+                "bulletin_date": None,
+                "bulletin_date_uk": None,
+                "last_tested_at": generated_at,
+                "consecutive_failures": int(consecutive_failures.get(key) or 0),
+                "diagnosis": {"reason": "no_evidence", "detail": NO_EVIDENCE_ERROR},
+                "actionable": True,
+                "display_name": str(meta.get("display_name") or key),
+                "diocese": diocese,
+                "recipe_steps": len(meta.get("steps") or []),
             },
         )
 
