@@ -54,6 +54,28 @@ class OcrBulletinPageTests(unittest.TestCase):
             with_mega_pdf_week("/parishes/foo.pdf", "2026-09-06"),
             "/parishes/foo.pdf",
         )
+        self.assertEqual(
+            with_mega_pdf_week(
+                href, "2026-09-06", harvested_at="2026-09-10T23:24:25Z"
+            ),
+            "/mega_pdf/clogher_mega_bulletin.pdf?d=2026-09-06&h=20260910T2324",
+        )
+        self.assertEqual(
+            with_mega_pdf_week(
+                href + "?d=2026-09-06",
+                "2026-09-06",
+                harvested_at="2026-09-10T21:27:16+00:00",
+            ),
+            href + "?d=2026-09-06&h=20260910T2127",
+        )
+        self.assertEqual(
+            with_mega_pdf_week(
+                href + "?d=2026-09-06&h=20260910T2127",
+                "2026-09-06",
+                harvested_at="2026-09-10T23:24:25Z",
+            ),
+            href + "?d=2026-09-06&h=20260910T2324",
+        )
 
     def test_fragment_to_plain_text_unescapes_double_encoded_entities(self) -> None:
         plain = _fragment_to_plain_text("St. Mary&amp;#x27;s Church")

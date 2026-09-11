@@ -1176,21 +1176,52 @@ def mega_pdf_week_query(week: str) -> str:
     return f"d={raw}"
 
 
-def with_mega_pdf_week(url: str, week: str) -> str:
-    """Append ?d=YYYY-MM-DD to a mega PDF href. Leaves other URLs unchanged."""
+def mega_pdf_harvest_query(harvested_at: str) -> str:
+    """Harvest clock stamp so a same-week re-run is a new URL on phones."""
+    raw = (harvested_at or "").strip()
+    match = re.match(r"^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})", raw)
+    if not match:
+        return ""
+    return (
+        f"h={match.group(1)}{match.group(2)}{match.group(3)}"
+        f"T{match.group(4)}{match.group(5)}"
+    )
+
+
+def with_mega_pdf_week(url: str, week: str, harvested_at: str = "") -> str:
+    """Append ?d=YYYY-MM-DD and ?h=harvest-time to a mega PDF href."""
     href = (url or "").strip()
-    query = mega_pdf_week_query(week)
-    if not href or not query:
+    if not href or "mega_bulletin.pdf" not in href.split("?", 1)[0]:
         return href
-    if "mega_bulletin.pdf" not in href.split("?", 1)[0]:
-        return href
-    if re.search(r"[?&]d=\d{4}-\d{2}-\d{2}(?:&|$)", href):
-        return href
-    return f"{href}{'&' if '?' in href else '?'}{query}"
+    week_q = mega_pdf_week_query(week)
+    harvest_q = mega_pdf_harvest_query(harvested_at)
+    if week_q and not re.search(r"[?&]d=\d{4}-\d{2}-\d{2}(?:&|$)", href):
+        href = f"{href}{'&' if '?' in href else '?'}{week_q}"
+    if harvest_q:
+        if re.search(r"[?&]h=\d{8}T\d{4}(?:&|$)", href):
+            href = re.sub(r"([?&])h=\d{8}T\d{4}", rf"\1{harvest_q}", href, count=1)
+        else:
+            href = f"{href}{'&' if '?' in href else '?'}{harvest_q}"
+    return href
+
+
+def parish_status_generated_at() -> str:
+    path = REPO_ROOT / "parishes" / "parish_status.json"
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return ""
+    if not isinstance(payload, dict):
+        return ""
+    return str(payload.get("generated_at") or "")
 
 
 def _pdf_href(config: DioceseConfig, bulletin_date: str = "") -> str:
-    return with_mega_pdf_week(f"../mega_pdf/{config.pdf_filename}", bulletin_date)
+    return with_mega_pdf_week(
+        f"../mega_pdf/{config.pdf_filename}",
+        bulletin_date,
+        harvested_at=parish_status_generated_at(),
+    )
 
 
 def _ocr_standalone_href(config: DioceseConfig, bulletin_date: str) -> str:
@@ -2894,6 +2925,7 @@ def _write_parish_bulletin_pages(
             diocese_pdf_href=with_mega_pdf_week(
                 f"../../mega_pdf/{config.pdf_filename}",
                 bulletin_date,
+                harvested_at=parish_status_generated_at(),
             ),
             preserve_existing_pdfs=preserve_existing_pdfs,
         )
