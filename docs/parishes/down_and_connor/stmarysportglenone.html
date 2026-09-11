@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Port Glenone (St Mary&#x27;s Portglenone) Bulletin — 25/08/2026</title>
+  <title>Port Glenone (St Mary&#x27;s Portglenone) Bulletin — 11/09/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -109,10 +110,20 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -138,21 +149,27 @@
       cursor: pointer;
     }
     .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
     
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
@@ -179,6 +196,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -187,6 +212,7 @@
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {
@@ -201,6 +227,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -215,7 +247,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -224,16 +259,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -243,6 +285,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -257,7 +300,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -436,8 +482,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -787,7 +832,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -798,23 +846,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -837,6 +876,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -863,7 +903,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260901h" defer></script>
 </head>
 <body>
   <div class="page">
@@ -871,35 +911,31 @@
     <header class="header">
       <p class="diocese-label">DOWN &amp; CONNOR</p>
       <h1>Port Glenone (St Mary&#x27;s Portglenone) Parish Bulletin</h1>
-      <p class="meta">This week&#x27;s bulletin for Port Glenone (St Mary&#x27;s Portglenone) — 25/08/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
-      <a class="download-link-top" href="stmarysportglenone.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      <p class="meta">This week&#x27;s bulletin for Port Glenone (St Mary&#x27;s Portglenone) — 11/09/2026. Part of the Down &amp; Connor Diocese collated bulletin.</p>
+      <a class="download-link-top pdf-force-download" href="stmarysportglenone.pdf" download="stmarysportglenone.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="stmarysportglenone.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       
-      <div class="quiet-links">
-        <a href="stmarysportglenone.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="stmarysportglenone-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="stmarysportglenone.pdf" title="Port Glenone (St Mary&#x27;s Portglenone) bulletin PDF"></iframe>
+        <iframe data-pdf-url="stmarysportglenone.pdf" title="Port Glenone (St Mary&#x27;s Portglenone) bulletin PDF"></iframe>
         
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="stmarysportglenone.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="stmarysportglenone.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-              <a href="stmarysportglenone.pdf" download>Download</a>
+              <a class="pdf-open-newtab" href="stmarysportglenone.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="stmarysportglenone.pdf" download="stmarysportglenone.pdf">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>
       </div>
@@ -934,106 +970,108 @@
       <div class="quiet-links">
         <a href="stmarysportglenone-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-port-glenone-st-mary-s-portglenone" data-parish-name="Port Glenone (St Mary&#x27;s Portglenone)"><h2 class="ocr-parish-name">Port Glenone (St Mary&#x27;s Portglenone)</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-port-glenone-st-mary-s-portglenone" data-parish-name="Port Glenone (St Mary&#x27;s Portglenone)"><h2 class="ocr-parish-name">Port Glenone (St Mary&#x27;s Portglenone)</h2><p class="ocr-parish-date">11/09/2026</p></header>
 <p class="page-label">Page 1</p>
-<p>Parish Away Day<br>
-We still require payment from 20<br>
-people who have put their names<br>
-forward for the trip. Please<br>
-forward the payment to the Parish<br>
-office by Wednesday 26th August.<br>
-Thank you.<br>
-Society of St Vincent de Paul<br>
-The parish conference of the<br>
-Society of St Vincent de Paul will<br>
-hold its monthly meeting at<br>
-7.30pm on Wednesday, 26 August<br>
-2026 in the Parish Office.<br>
-Vocations Society of St Joseph<br>
-The Vocations Society of St Joseph<br>
-will hold their meeting in the<br>
-Parish office on Friday 28th<br>
-August after the 7pm Mass.<br>
-Extract from Pope Leo’s Homily<br>
-for the Solemnity of the<br>
-Assumption of Our Lady<br>
-If we truly wish to discover and<br>
-nurture the divine beauty that<br>
-surrounds us and for which we<br>
-were made, and to share it with<br>
-those around us, we must learn to<br>
-see it in the wrinkles of an elderly<br>
-person as in the tender face of a<br>
-child as well, in the maturity of an<br>
-adult as in the liveliness of a young<br>
-person as well, in work clothes and<br>
-tools as well as in festive<br>
-decorations. We must listen to the<br>
+<p>Family Mass<br>
+We plan to continue the Family<br>
+Mass on the last Sunday of each<br>
+month. A few of our younger<br>
+readers and Eucharistic Ministers<br>
+have now moved away to third-<br>
+level education or to jobs<br>
+elsewhere. So, we need new young<br>
+volunteers to read or to do the<br>
+Offertory procession etc. Anyone<br>
+interested, please come and give<br>
+your details to any PPC member or<br>
+to the Parish OfÏce.<br>
+The Revived Assisted-Suicide Bill<br>
+The revived assisted suicide Bill<br>
+brought back by Lauren Edwards<br>
+MP faces its second reading on<br>
+Friday 11th September. The vote<br>
+on this date can be won. Several<br>
+MPs have already expressed<br>
+reservations about bringing it back<br>
+or forcing it through Parliament.<br>
+The Prime Minister has now said<br>
+the debate should wait until<br>
+palliative and social care are<br>
+properly funded. MPs from<br>
+Northern Ireland will have the<br>
+opportunity to vote on this Bill. If<br>
+assisted suicide is legalised in<br>
+England and Wales, this would<br>
+again put pressure on NI to follow<br>
+suit. One of the most effective<br>
 MINISTERS OF THE WORD<br>
-SATURDAY 29TH AUG PATRICIA<br>
-FRIEL<br>
-SUNDAY 30TH AUG BIBIANA MC<br>
-CAVERA<br>
-SATURDAY 5TH SEPT AIDAN<br>
-KEARNEY<br>
-SUNDAY 6TH SEPT JAMES<br>
-O’BOYLE<br>
+SATURDAY 12TH SEPT CARMEL<br>
+CLARKE<br>
+SUNDAY 13TH SEPT ANTOINETTE<br>
+CUSHNAHAN<br>
+SATURDAY 19TH SEPT BRIGID<br>
+McDONNELL<br>
+SUNDAY 20TH SEPT DAMIAN<br>
+McALLISTER<br>
 MINISTERS OF THE EUCHARIST<br>
 SATURDAY<br>
-29TH AUG<br>
-SUNDAY 30TH<br>
-AUG<br>
-SATURDAY 5TH<br>
-SEPT SIOBHAN<br>
-DOHERTY,<br>
-NOREEN<br>
-GRAHAM, MM<br>
-DUFFIN<br>
-CIARAN MC<br>
-KENNA, SHAUNA<br>
-BROOKMAN,<br>
-SEAN CAREY<br>
-ANNE TOTTEN,<br>
-PAULINE MC PARISH OF PORTGLENONE<br>
-TWENTY-FIRST SUNDAY IN<br>
+12TH SEPT<br>
+SUNDAY 13TH<br>
+SEPT<br>
+SATURDAY 19TH<br>
+SEPT BERNIE<br>
+McKENNA,<br>
+SHAUNA<br>
+O’BOYLE,<br>
+CATHERINE<br>
+McILFATRICK<br>
+GED KING,<br>
+PATRICK CAREY,<br>
+PATRICK ROGERS<br>
+MM DUFFIN,<br>
+CAROLINE PARISH OF PORTGLENONE<br>
+TWENTY-THIRD SUNDAY IN<br>
 ORDINARY TIME MAY THEY REST IN PEACE<br>
 We remember those whose</p>
 <h3 class="b-head">anniversaries occur at this time</h3>
-<p>James Doherty, Maura Cushnahan,<br>
-Margaret Walter,Patrick Cassidy.<br>
-May they rest in peace.Mass Times<br>
+<p>Tracey McGerr (Month’s Mind Mass,<br>
+Saturday, 5th September 6pm),<br>
+Seamus Mc Carry (Anniversary Mass,<br>
+Saturday 12th September 6pm),<br>
+Frank Mc Groggan, Kathleen<br>
+McAleese, Annie McAteer, Rose<br>
+McTaggart.Mass Times<br>
 There will be Mass on Monday to Thursday at 9.30am.<br>
 There will be Mass on Friday evening 7.00pm. A period of<br>
 Eucharistic Adoration from 6.00pm until 6.50pm will<br>
 precede Friday’s Evening Mass.<br>
 Parish Collections<br>
-The Weekly Offering amounted to £1311.14.<br>
+The Weekly Offering amounted to £1315.90. The Building<br>
+Fund account for the month of August amounted to<br>
+£1782.00<br>
 Collectors for September<br>
 VIGIL MASS: Cheryl-Ann Storey, Richard Convery,<br>
 Brendan Graham, Patsy Boyd<br>
-11.00AM: Kieran Loughlin, Seamus Mc Erlean, Malachy<br>
-Graham, Damian Mc Allister<br>
-Carer required in the Portglenone Area<br>
-A carer is required for a kind and quiet gentleman with<br>
-learning difficulties, who enjoys outings, visiting friends and<br>
-family. Approximately 18 hours per week (May be split into<br>
-two posts – usually Wednesday, Friday, Saturday and Sunday<br>
-hours) with potential to increase hours. Holiday cover also<br>
-required.<br>
-Essential criteria include Experience in a caring role, support<br>
-with aspects of personal care, outings, light housework,<br>
-including preparation of meals. Excellent<br>
-opportunity/experience for student nurse or those in a caring<br>
-profession. References required. Salary paid through Direct<br>
-Payment.<br>
-Contact Tel. No. <a href="tel:+3537967653" style="color:#1d4ed8;font-weight:600;">07967 653</a> 006Port Glenone (St Mary's Portglenone)</p></div>
+11.00AM: Kieran Loughlin, Seamus McErlean, Malachy<br>
+Graham, Damian McAllister<br>
+Rotas for September<br>
+The rota for the month of September for Eucharistic Ministers<br>
+and Ministers of the Word is displayed on the notice board at<br>
+the back of the Church. If you are not available, please contact<br>
+the Parish OfÏce.<br>
+St Vincent de Paul Helpline: <a href="tel:+3537521034424" style="color:#1d4ed8;font-weight:600;">07521034424</a><br>
+Father Rooney’s Contact No: <a href="tel:+3537739223" style="color:#1d4ed8;font-weight:600;">07739 223</a> 313<br>
+Portglenone CCE will have a Registration and Open Evening<br>
+for their Traditional Music Classes on Monday, 7th September<br>
+2026 from 7.00pm until 8.00pm. Classes commence on<br>
+Monday, 14th September. For further information, flyers are Port Glenone (St Mary's Portglenone) <a href="https://stmarysportglenone.org/?page_id=40" target="_blank" rel="noopener noreferrer">https://stmarysportglenone.org/?page_id=40</a></p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other DOWN &amp; CONNOR Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="ballycastle"><a class="parish-link" href="ballycastleparish.html" target="_blank" rel="noopener noreferrer">Ballycastle</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="ballymenaparish.html" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="glenariffe"><a class="parish-link" href="glenariffeparish.html" target="_blank" rel="noopener noreferrer">Glenariffe</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="kilmore and killyleagh"><a class="parish-link" href="kilmoreandkillyleagh.html" target="_blank" rel="noopener noreferrer">Kilmore and Killyleagh</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="sacred heart belfast"><a class="parish-link" href="sacredheartparishbelfast.html" target="_blank" rel="noopener noreferrer">Sacred Heart Belfast</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st brigids belfast"><a class="parish-link" href="stbrigidsparishbelfast.html" target="_blank" rel="noopener noreferrer">St Brigids Belfast</a></li><li class="parish-item" data-name="st gerards"><a class="parish-link" href="stgerardsparish.html" target="_blank" rel="noopener noreferrer">St Gerards</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st mary&#x27;s on the hill"><a class="parish-link" href="stmarysonthehill.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s on the Hill</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="aghagallon and ballinderry"><a class="parish-link" href="aghagallonandballinderryparish.html" target="_blank" rel="noopener noreferrer">Aghagallon and Ballinderry</a></li><li class="parish-item" data-name="antrim"><a class="parish-link" href="antrimparish.html" target="_blank" rel="noopener noreferrer">Antrim</a></li><li class="parish-item" data-name="ardkeen"><a class="parish-link" href="parishofardkeen.html" target="_blank" rel="noopener noreferrer">Ardkeen</a></li><li class="parish-item" data-name="ballycastle"><a class="parish-link" href="ballycastleparish.html" target="_blank" rel="noopener noreferrer">Ballycastle</a></li><li class="parish-item" data-name="ballyclare and ballygowan"><a class="parish-link" href="ballyclareballygowan.html" target="_blank" rel="noopener noreferrer">Ballyclare and Ballygowan</a></li><li class="parish-item" data-name="ballymena"><a class="parish-link" href="ballymenaparish.html" target="_blank" rel="noopener noreferrer">Ballymena</a></li><li class="parish-item" data-name="ballymoney"><a class="parish-link" href="ballymoneyparish.html" target="_blank" rel="noopener noreferrer">Ballymoney</a></li><li class="parish-item" data-name="bangor"><a class="parish-link" href="bangorparish.html" target="_blank" rel="noopener noreferrer">Bangor</a></li><li class="parish-item" data-name="bright"><a class="parish-link" href="parishofbright.html" target="_blank" rel="noopener noreferrer">Bright</a></li><li class="parish-item" data-name="carrickfergus"><a class="parish-link" href="carrickparish.html" target="_blank" rel="noopener noreferrer">Carrickfergus</a></li><li class="parish-item" data-name="carryduff and saintfield"><a class="parish-link" href="carryduffsaintfield.html" target="_blank" rel="noopener noreferrer">Carryduff and Saintfield</a></li><li class="parish-item" data-name="derriaghy"><a class="parish-link" href="derriaghycatholicparish.html" target="_blank" rel="noopener noreferrer">Derriaghy</a></li><li class="parish-item" data-name="dundrum and tyrella"><a class="parish-link" href="dundrum-and-tyrella-parish-dundrum.html" target="_blank" rel="noopener noreferrer">Dundrum and Tyrella</a></li><li class="parish-item" data-name="glenariffe"><a class="parish-link" href="glenariffeparish.html" target="_blank" rel="noopener noreferrer">Glenariffe</a></li><li class="parish-item" data-name="glenavy and killead"><a class="parish-link" href="glenavyandkilleadparish.html" target="_blank" rel="noopener noreferrer">Glenavy and Killead</a></li><li class="parish-item" data-name="holy cross belfast"><a class="parish-link" href="holycrossparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Cross Belfast</a></li><li class="parish-item" data-name="holy family"><a class="parish-link" href="holy-familyparish.html" target="_blank" rel="noopener noreferrer">Holy Family</a></li><li class="parish-item" data-name="holy rosary belfast"><a class="parish-link" href="holyrosaryparishbelfast.html" target="_blank" rel="noopener noreferrer">Holy Rosary Belfast</a></li><li class="parish-item" data-name="lisburn"><a class="parish-link" href="parishoflisburn.html" target="_blank" rel="noopener noreferrer">Lisburn</a></li><li class="parish-item" data-name="loughshore"><a class="parish-link" href="loughshoreparishes.html" target="_blank" rel="noopener noreferrer">Loughshore</a></li><li class="parish-item" data-name="maghera"><a class="parish-link" href="parishofmaghera.html" target="_blank" rel="noopener noreferrer">Maghera</a></li><li class="parish-item" data-name="our lady queen of peace"><a class="parish-link" href="ourladyqueenofpeacekilwee.html" target="_blank" rel="noopener noreferrer">Our Lady Queen of Peace</a></li><li class="parish-item" data-name="portaferry"><a class="parish-link" href="portaferryparish.html" target="_blank" rel="noopener noreferrer">Portaferry</a></li><li class="parish-item" data-name="portstewart"><a class="parish-link" href="portstewartparish.html" target="_blank" rel="noopener noreferrer">Portstewart</a></li><li class="parish-item" data-name="sacred heart belfast"><a class="parish-link" href="sacredheartparishbelfast.html" target="_blank" rel="noopener noreferrer">Sacred Heart Belfast</a></li><li class="parish-item" data-name="saint annes"><a class="parish-link" href="saintannesparish.html" target="_blank" rel="noopener noreferrer">Saint Annes</a></li><li class="parish-item" data-name="saul and ballee"><a class="parish-link" href="saulandballeeparish.html" target="_blank" rel="noopener noreferrer">Saul and Ballee</a></li><li class="parish-item" data-name="st bernadettes"><a class="parish-link" href="stbernadettesparish.html" target="_blank" rel="noopener noreferrer">St Bernadettes</a></li><li class="parish-item" data-name="st brigids belfast"><a class="parish-link" href="stbrigidsparishbelfast.html" target="_blank" rel="noopener noreferrer">St Brigids Belfast</a></li><li class="parish-item" data-name="st colmcille&#x27;s holywood"><a class="parish-link" href="stcolmcillesholywood.html" target="_blank" rel="noopener noreferrer">St Colmcille&#x27;s Holywood</a></li><li class="parish-item" data-name="st colmcilles"><a class="parish-link" href="st-colmcilles.html" target="_blank" rel="noopener noreferrer">St Colmcilles</a></li><li class="parish-item" data-name="st gerards"><a class="parish-link" href="stgerardsparish.html" target="_blank" rel="noopener noreferrer">St Gerards</a></li><li class="parish-item" data-name="st macnissi randalstown"><a class="parish-link" href="stmacnissirandalstown.html" target="_blank" rel="noopener noreferrer">St MacNissi Randalstown</a></li><li class="parish-item" data-name="st mary&#x27;s on the hill"><a class="parish-link" href="stmarysonthehill.html" target="_blank" rel="noopener noreferrer">St Mary&#x27;s on the Hill</a></li><li class="parish-item" data-name="st michael the archangel"><a class="parish-link" href="saintmichaelthearchangel.html" target="_blank" rel="noopener noreferrer">St Michael the Archangel</a></li><li class="parish-item" data-name="st oliver plunkett"><a class="parish-link" href="stoliverplunkettparish.html" target="_blank" rel="noopener noreferrer">St Oliver Plunkett</a></li><li class="parish-item" data-name="st patrick&#x27;s downpatrick"><a class="parish-link" href="stpatricksdownpatrick.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Downpatrick</a></li><li class="parish-item" data-name="st patrick&#x27;s loughguile"><a class="parish-link" href="st-patricks-loughguile.html" target="_blank" rel="noopener noreferrer">St Patrick&#x27;s Loughguile</a></li><li class="parish-item" data-name="st patricks belfast"><a class="parish-link" href="stpatricksbelfast.html" target="_blank" rel="noopener noreferrer">St Patricks Belfast</a></li><li class="parish-item" data-name="st teresas"><a class="parish-link" href="stteresasparish.html" target="_blank" rel="noopener noreferrer">St Teresas</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1085,9 +1123,9 @@ Contact Tel. No. <a href="tel:+3537967653" style="color:#1d4ed8;font-weight:600;
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260901h"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260901h';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1541,11 +1579,16 @@ Contact Tel. No. <a href="tel:+3537967653" style="color:#1d4ed8;font-weight:600;
         for (var i = 0; i < names.length; i++) {
           var page = pageFor(names[i]);
           if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
           var slot = pages.querySelector('[data-page="' + page + '"]');
           if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
+          scrollBoxTo(pages, slot);
           return true;
         }
         return false;
@@ -1579,23 +1622,8 @@ Contact Tel. No. <a href="tel:+3537967653" style="color:#1d4ed8;font-weight:600;
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();
