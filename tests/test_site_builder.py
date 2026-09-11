@@ -129,6 +129,17 @@ class SiteBuilderTests(unittest.TestCase):
             self.assertIn('rel="preload"', derry_page)
             self.assertIn("/mega_pdf/derry_mega_bulletin_p1.jpg", derry_page)
 
+    def test_mega_pdf_url_stamps_harvest_clock(self) -> None:
+        self.assertEqual(
+            site_builder._mega_pdf_url(
+                "raphoe",
+                same_origin=True,
+                week="2026-09-06",
+                harvested_at="2026-09-10T23:24:25+00:00",
+            ),
+            "/mega_pdf/raphoe_mega_bulletin.pdf?d=2026-09-06&h=20260910T2324",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

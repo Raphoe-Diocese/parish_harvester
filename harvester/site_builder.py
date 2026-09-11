@@ -772,7 +772,7 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
             f"<p class=\"live-card-updated\">Updated {html.escape(row['updated'])}</p>"
             "<div class=\"live-card-actions\">"
             f"<a class=\"live-btn primary\" href=\"dioceses/{row['key']}/\">Open bulletin</a>"
-            f"<a class=\"live-btn secondary\" href=\"{html.escape(_mega_pdf_url(row['key'], same_origin=True, week=row.get('week') or ''), quote=True)}\">Mega PDF</a>"
+            f"<a class=\"live-btn secondary\" href=\"{html.escape(_mega_pdf_url(row['key'], same_origin=True, week=row.get('week') or '', harvested_at=row.get('harvested_at') or ''), quote=True)}\">Mega PDF</a>"
             f"<a class=\"live-btn secondary\" href=\"{html.escape(_ocr_standalone_url(row['key']), quote=True)}\" target=\"_blank\" rel=\"noopener noreferrer\">Text</a>"
             "</div>"
             "</div>"
@@ -1033,7 +1033,13 @@ def _ocr_standalone_url(diocese_key: str) -> str:
     return f"{pages_base}/bulletins/index.html"
 
 
-def _mega_pdf_url(diocese_key: str, *, same_origin: bool = False, week: str = "") -> str:
+def _mega_pdf_url(
+    diocese_key: str,
+    *,
+    same_origin: bool = False,
+    week: str = "",
+    harvested_at: str = "",
+) -> str:
     stem = diocese_key.replace("-", "_")
     filename = f"{stem}_mega_bulletin.pdf"
     # Same-origin path avoids the github.io → parishpress.ie 301, which
@@ -1045,7 +1051,7 @@ def _mega_pdf_url(diocese_key: str, *, same_origin: bool = False, week: str = ""
         url = f"{pages_base}/mega_pdf/{filename}"
     # Phones cache this URL. Stamp the harvest Sunday so Open/Download
     # cannot keep last week's file (Frank 06/09/2026: Clogher still 23/08).
-    return with_mega_pdf_week(url, week)
+    return with_mega_pdf_week(url, week, harvested_at=harvested_at)
 
 
 def _latest_pdf_standalone(diocese_key: str) -> Path | None:
@@ -1065,12 +1071,14 @@ def _latest_pdf_standalone(diocese_key: str) -> Path | None:
     return latest[0] if latest else None
 
 
-def _pdf_standalone_url(diocese_key: str, week: str = "") -> str:
+def _pdf_standalone_url(diocese_key: str, week: str = "", harvested_at: str = "") -> str:
     standalone = _latest_pdf_standalone(diocese_key)
     pages_base = "https://raphoe-diocese.github.io/parish_harvester"
     if standalone is not None:
         return f"{pages_base}/bulletins/{standalone.name}"
-    return _mega_pdf_url(diocese_key, same_origin=True, week=week)
+    return _mega_pdf_url(
+        diocese_key, same_origin=True, week=week, harvested_at=harvested_at
+    )
 
 
 def _parish_links_for_big_bulletin(diocese_key: str, report_path: Path) -> list[dict[str, str]]:
@@ -1098,6 +1106,14 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
     from harvester.utils import format_uk_date
 
     week_label = format_uk_date(target_date) or target_date or "this Sunday"
+    harvested_at = ""
+    status_path = REPO_ROOT / "parishes" / "parish_status.json"
+    try:
+        status_payload = json.loads(status_path.read_text(encoding="utf-8"))
+        if isinstance(status_payload, dict):
+            harvested_at = str(status_payload.get("generated_at") or "")
+    except (OSError, json.JSONDecodeError):
+        harvested_at = ""
 
     rows: list[dict[str, str]] = []
     for diocese in dioceses:
@@ -1123,9 +1139,16 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
             render_diocese_raphoe_page(
                 parish_links=parish_links,
                 out_path=out_path,
-                mega_pdf_url=_mega_pdf_url(diocese.key, same_origin=True, week=target_date),
+                mega_pdf_url=_mega_pdf_url(
+                    diocese.key,
+                    same_origin=True,
+                    week=target_date,
+                    harvested_at=harvested_at,
+                ),
                 ocr_standalone_url=_ocr_standalone_url(diocese.key),
-                pdf_standalone_url=_pdf_standalone_url(diocese.key, week=target_date),
+                pdf_standalone_url=_pdf_standalone_url(
+                    diocese.key, week=target_date, harvested_at=harvested_at
+                ),
                 ocr_text=ocr_text,
                 ocr_is_html=ocr_is_html,
                 week_label=week_label if target_date else "",
@@ -1159,6 +1182,7 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
                 "status_label": status_label,
                 "updated": updated_label,
                 "week": target_date or "",
+                "harvested_at": harvested_at,
                 "ready_count": ready_count,
                 "total_count": total_count,
             }

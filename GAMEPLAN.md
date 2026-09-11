@@ -17,6 +17,29 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 11/09/2026 — Full harvest last night (check)
+
+Run [34536265400](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34536265400) **Harvest full** succeeded. Truth: `parishes/parish_status.json` `generated_at` 2026-09-10T23:24:25Z, week **06/09/2026**, **ok 108 / 164**, **actionable 24** (stale 11, failed 13, skipped 27, disabled 5). Commit `5187fe63` then OCR `e2a67f08`. Do not Full harvest again.
+
+**Raphoe still wrong (Problems):** Ardara + Inver + Irish Martyrs stale 30/08; Raphoe Drive stale 19/07; **Stranorlar failed** (404 on `…/2026/09/6th-Se…`). Bruckless is **ok** (real Drive file) — will not show on Problems.
+
+**Other failed:** Iskaheen (scrape found April images); Maghera Derry (only GDPR/privacy links). WAF/blocked unchanged: Ederney, Donaghmoyne, Roslea, Three Patrons, Saint Anthony, Holywood, St Gerard, St Patrick, Portglenone.
+
+**150 dpi megas:** PR #203 not live until merge + a later harvest. Last night’s megas are still the old 100 dpi compress. Do not Full harvest on this PC.
+
+**Phone cache (11/09, this turn):** PC showed last night’s harvest; phone still showed the previous file after refresh. Cause: URL only had `?d=2026-09-06` (same week), so the phone reused the old mega. Code now also stamps `?h=20260910T2324` from `parish_status` `generated_at`. **Not live yet** until merge + Pages. Do not tick done until Frank’s phone after Pages.
+
+---
+
+## 11/09/2026 — Phone cache + blurry mega
+
+Frank: parishpress.ie on the PC is last night’s harvest; the phone is the previous one after refresh. Also still low-res (Annagry 06/09 screenshot).
+
+- Cache: harvest URLs now get `?h=` as well as `?d=` so a same-week re-run is a new file on phones.
+- Sharpness: still waiting on PR #203 merge + a later harvest. Last night is 100 dpi.
+
+---
+
 ## 10/09/2026 — Audit and finish plan (read this first)
 
 Full read-only audit of repo, every `.md`, extension and live site:
