@@ -1247,7 +1247,7 @@ def prefers_native_pdf_js() -> str:
 """
 
 
-PDF_INPAGE_VIEWER_VERSION = "20260901h"
+PDF_INPAGE_VIEWER_VERSION = "20260912a"
 PDF_INPAGE_VIEWER_SRC = f"/assets/pdf-inpage-viewer.js?v={PDF_INPAGE_VIEWER_VERSION}"
 
 
@@ -1505,7 +1505,7 @@ def pdf_inpage_viewer_html(pdf_href: str) -> str:
               <a class="pdf-force-download" href="{safe}" download="{html.escape(pdf_download_filename(pdf_href), quote=True)}">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">This file can take a few moments to open.</div>
+          <div class="pdf-inpage-status">Loading PDF… This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages">{preview_img}</div>
         </div>"""
 
@@ -2478,7 +2478,7 @@ def render_bulletin_viewer_shell(
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       {az_pdf_html}
-      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open.</p>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open. The box above shows how much has downloaded and says “PDF fully loaded” when it is ready.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
         {pdf_iframe_tag(pdf_href, title=display_name)}

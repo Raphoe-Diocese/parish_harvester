@@ -4,9 +4,11 @@
  * Phone and desktop both run PDF.js so Jump-to can find
  * `.pdf-inpage-pages` / `[data-page]` slots and call
  * window.parishPressScrollPdfToPage. Self-hosted
- * /assets/pdf.min.js. Megas ≤ 8 MB (Raphoe ~5 MB) use one
- * GET into getDocument({ data }) — Range-walking this
- * Ghostscript file was 12–20s. Larger files keep Range.
+ * /assets/pdf.min.js. Megas ≤ 24 MB (Raphoe ~7 MB, Down &
+ * Connor ~16.5 MB at 150 dpi) use one streamed GET into
+ * getDocument({ data }) with a live "Loading PDF… X of Y MB"
+ * status, then "PDF fully loaded". Range-walking this
+ * Ghostscript file was 12–20s. Only bigger files keep Range.
  * Never pass url to getDocument (that still full-GETs).
  * Never put the mega on iframe src.
  * Pages fit the PDF box width (no 720px minimum).
@@ -542,7 +544,64 @@
     });
   }
 
-  var WHOLE_FILE_MAX = 8 * 1024 * 1024;
+  /* 150 dpi megas: Raphoe ~7 MB, Down & Connor ~16.5 MB. One GET with a
+     progress line beats Range-walking (12–20s). Only very large files
+     fall back to Range. */
+  var WHOLE_FILE_MAX = 24 * 1024 * 1024;
+
+  var pdfProgressListeners = Object.create(null);
+
+  function onPdfProgress(pdfUrl, fn) {
+    if (!pdfUrl || typeof fn !== "function") return;
+    (pdfProgressListeners[pdfUrl] = pdfProgressListeners[pdfUrl] || []).push(fn);
+  }
+
+  function emitPdfProgress(pdfUrl, loaded, total) {
+    (pdfProgressListeners[pdfUrl] || []).forEach(function (fn) {
+      try { fn(loaded, total); } catch (e) {}
+    });
+  }
+
+  function formatMb(bytes) {
+    var mb = (bytes || 0) / (1024 * 1024);
+    return (mb >= 10 ? Math.round(mb) : Math.round(mb * 10) / 10) + " MB";
+  }
+
+  function readWithProgress(res, pdfUrl, total) {
+    if (!res.body || typeof res.body.getReader !== "function") {
+      return res.arrayBuffer().then(function (buf) {
+        emitPdfProgress(pdfUrl, buf.byteLength, total || buf.byteLength);
+        return buf;
+      });
+    }
+    var reader = res.body.getReader();
+    var chunks = [];
+    var loaded = 0;
+    var lastTick = 0;
+    function pump() {
+      return reader.read().then(function (step) {
+        if (step.done) {
+          var out = new Uint8Array(loaded);
+          var offset = 0;
+          chunks.forEach(function (c) {
+            out.set(c, offset);
+            offset += c.byteLength;
+          });
+          emitPdfProgress(pdfUrl, loaded, total || loaded);
+          return out.buffer;
+        }
+        chunks.push(step.value);
+        loaded += step.value.byteLength;
+        var now = Date.now();
+        if (now - lastTick > 150) {
+          lastTick = now;
+          emitPdfProgress(pdfUrl, loaded, total);
+        }
+        return pump();
+      });
+    }
+    return pump();
+  }
 
   function prefetchPdfBytes(pdfUrl) {
     if (!pdfUrl) return Promise.reject(new Error("no pdf url"));
@@ -559,7 +618,7 @@
         }
         throw new Error("PDF too large for whole-file");
       }
-      return res.arrayBuffer();
+      return readWithProgress(res, pdfUrl, len);
     }).then(function (buf) {
       pdfBlobCache[pdfUrl] = new Blob([buf], { type: "application/pdf" });
       return buf;
@@ -694,7 +753,10 @@
       var hasPreview = pagesEl.querySelector(".pdf-first-preview");
       var firstPaint = hasPreview ? Promise.resolve() : paint(1);
       firstPaint.then(function () {
-        setStatus(host, "");
+        setStatus(
+          host,
+          "\u2705 PDF fully loaded \u2014 " + pdfDoc.numPages + " pages. Scroll or use Jump to."
+        );
         if (!hasPreview && pagesEl.clientWidth && pagesEl.clientWidth !== boxBefore) {
           delete rendering[1];
           return paint(1);
@@ -724,7 +786,20 @@
       });
     }
 
-    setStatus(host, "This file can take a few moments to open.");
+    setStatus(host, "Loading PDF\u2026 This file can take a few moments to open.");
+    var loadedAll = false;
+    onPdfProgress(pdfUrl, function (loaded, total) {
+      if (loadedAll) return;
+      if (total > 0) {
+        var pct = Math.min(100, Math.floor((loaded / total) * 100));
+        setStatus(
+          host,
+          "Loading PDF\u2026 " + formatMb(loaded) + " of " + formatMb(total) + " (" + pct + "%)"
+        );
+      } else {
+        setStatus(host, "Loading PDF\u2026 " + formatMb(loaded) + " so far");
+      }
+    });
     var megaPromise = null;
     function beginMega() {
       if (megaPromise) return megaPromise;
@@ -734,6 +809,7 @@
         })
         .then(function (pdf) {
           pdfDoc = pdf;
+          loadedAll = true;
           rendering = Object.create(null);
           stackAllPages();
           if (pendingJumpPage) {
@@ -753,15 +829,15 @@
     }
     startMegaNow = beginMega;
     function waitPreview() {
+      /* Page 1 is a tiny JPEG. Keep the Loading line up until the whole
+         PDF is in — Frank 12/09: people need to know it is still coming. */
       var img = pagesEl && pagesEl.querySelector(".pdf-first-preview");
       if (!img) return Promise.resolve();
       if (img.complete && img.naturalWidth > 0) {
-        setStatus(host, "");
         return Promise.resolve();
       }
       return new Promise(function (resolve) {
         var done = function () {
-          setStatus(host, "");
           resolve();
         };
         img.addEventListener("load", done, { once: true });
