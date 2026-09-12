@@ -1980,6 +1980,7 @@ def render_bulletin_viewer_shell(
     intro_html: str = "",
     az_names: list[str] | None = None,
     parish_page_index: dict[str, int] | None = None,
+    stale_note: str = "",
 ) -> str:
     """The single canonical PDF + Text Bulletin viewer design for this project.
 
@@ -2052,6 +2053,12 @@ def render_bulletin_viewer_shell(
       line-height: 1.25;
     }}
     .meta {{ color: #6b7280; font-size: 0.92rem; margin-bottom: 10px; }}
+    .stale-note {{
+      color: #7a3b00;
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0.35rem 0 0.7rem;
+    }}
     .download-link-top {{
       display: inline-block;
       margin-top: 4px;
@@ -2466,6 +2473,7 @@ def render_bulletin_viewer_shell(
     <header class="header">
       <p class="diocese-label">{html.escape(diocese_label)}</p>
       <h1>{html.escape(headline)}</h1>
+      {f'<p class="stale-note">{html.escape(stale_note)}</p>' if stale_note else ""}
       <p class="meta">{html.escape(meta_line)}</p>
       <a class="download-link-top pdf-force-download" href="{html.escape(pdf_download_href, quote=True)}" download="{html.escape(pdf_download_filename(pdf_download_href), quote=True)}">Download PDF</a>
     </header>

@@ -438,5 +438,71 @@ http://ardara.ie</p>
             self.assertEqual(list(Path(tmpdir).glob("*.tmp")), [])
 
 
+class StaleParishCaptionTests(unittest.TestCase):
+    def test_caption_uses_real_date_not_harvest_sunday(self) -> None:
+        meta, note = parish_pages.stale_parish_caption("2026-08-30")
+        self.assertEqual(note, "Latest bulletin we have: 30/08/2026 (not this week)")
+        self.assertEqual(meta, "Latest bulletin we have: 30/08/2026 (not this week).")
+        self.assertNotIn("06/09/2026", meta)
+        self.assertNotIn("This week's bulletin", meta)
+
+    def test_caption_without_date_does_not_invent_one(self) -> None:
+        meta, note = parish_pages.stale_parish_caption("")
+        self.assertEqual(note, "Latest bulletin we have is not from this week")
+        self.assertNotRegex(meta, r"\d{2}/\d{2}/\d{4}")
+
+    def test_leftover_page_loses_this_week_caption(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            out_dir = Path(tmpdir) / "parishes"
+            out_dir.mkdir()
+            status_path = Path(tmpdir) / "parish_status.json"
+            status_path.write_text(
+                json.dumps(
+                    {
+                        "parishes": {
+                            "ardara": {
+                                "outcome": "stale",
+                                "diocese": "Raphoe Diocese",
+                                "display_name": "Ardara",
+                                "bulletin_date": "2026-08-30",
+                            },
+                            "annagryparish": {
+                                "outcome": "ok",
+                                "diocese": "Raphoe Diocese",
+                                "display_name": "Annagry",
+                            },
+                        }
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (out_dir / "ardara.html").write_text(
+                "<html><head><style>\n    .meta { color: #6b7280; }\n    </style></head>"
+                "<body><h1>Ardara Parish Bulletin</h1>"
+                '<p class="meta">This week&#x27;s bulletin for Ardara — 06/09/2026. '
+                "Part of the Raphoe Diocese collated bulletin.</p></body></html>",
+                encoding="utf-8",
+            )
+            (out_dir / "annagryparish.html").write_text(
+                "<html><body><h1>Annagry Parish Bulletin</h1>"
+                '<p class="meta">This week&#x27;s bulletin for Annagry — 06/09/2026.</p>'
+                "</body></html>",
+                encoding="utf-8",
+            )
+            relabelled = parish_pages.relabel_leftover_parish_pages(
+                out_dir,
+                parish_status_path=status_path,
+                ok_keys={"annagryparish"},
+            )
+            self.assertEqual(relabelled, ["ardara"])
+            ardara = (out_dir / "ardara.html").read_text(encoding="utf-8")
+            self.assertIn("Latest bulletin we have: 30/08/2026 (not this week)", ardara)
+            self.assertIn('class="stale-note"', ardara)
+            self.assertNotIn("This week's bulletin", ardara)
+            self.assertNotIn("This week&#x27;s bulletin", ardara)
+            keep = (out_dir / "annagryparish.html").read_text(encoding="utf-8")
+            self.assertIn("This week&#x27;s bulletin for Annagry", keep)
+
+
 if __name__ == "__main__":
     unittest.main()

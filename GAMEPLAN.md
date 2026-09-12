@@ -17,17 +17,15 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
-## 12/09/2026 — Diocese PDF counter (PR #205) + Grok run plan
+## 12/09/2026 night — P1 done; A5 (#204) next
 
-**Now — [PR #205](https://github.com/Raphoe-Diocese/parish_harvester/pull/205) CI green, waiting for Frank to say merge.** Diocese PDF box now streams the mega with "Loading PDF… X of Y MB (N%)" then "✅ PDF fully loaded — N pages"; single-GET cap 8 → 24 MB so Down & Connor (16.5 MB) stops Range-walking; viewer `?v=20260912a` pinned on the four live diocese pages. Sizes proved by HEAD 12/09: Raphoe 6,981,692 B, Down & Connor 16,530,602 B. 150 dpi stays. **Not live** until merge + Pages; proof = live Raphoe HTML `?v=20260912a` and Frank's phone.
+**P1 done (Frank 12/09 23:50):** [PR #205](https://github.com/Raphoe-Diocese/parish_harvester/pull/205) merged `437b4c0c` + Pages [34721204022](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34721204022). Live `?v=20260912a`. Phone: yes.
 
-Also in #205: Gortahork live test no longer pins `16ú Lúnasa 2026` (changes every harvest); Tyholland and Galloon tests follow Frank's 12/09 Trainer retrain (both live recipes now, not skipped).
+**Now — P2 A5:** leftover Ardara still says this week. Cherry-picked onto main as [PR #204](https://github.com/Raphoe-Diocese/parish_harvester/pull/204). **Not live** until merge + next harvest/OCR. Do not regenerate `docs/parishes`.
 
-**Grok 4.6 run plan:** [`docs/GROK_PLAN_2026-09-12.md`](docs/GROK_PLAN_2026-09-12.md). Self-contained: rules, current state, ordered cards P1 → P2 → B3 → C1 → F1 → H1 → H2 → H3 → C2 → B4 → C3 → C4 → S1 → S2 → S3 → D1 → D2 → E1 → E2 → F2 → F3 → C5 (M1 only if still slow). One card per chat.
+**Next after #204 merge:** B3 (viewer 850/450 guard test). Then C1.
 
-**Local repo:** the OneDrive Desktop folder lost its `.git` on 12/09 19:28 (the sibling `parish_harvester-main` is a stale 30/08 clone). Agents now use `C:\Users\Digital Admin\repos\parish_harvester` (sparse, blobless clone of `main`). Do not use the Desktop folders for git.
-
-**Next:** Frank says **merge** on #205 → P2 rebase/merge #204 → B3.
+**Grok plan:** [`docs/GROK_PLAN_2026-09-12.md`](docs/GROK_PLAN_2026-09-12.md). Agents use `C:\Users\Digital Admin\repos\parish_harvester`.
 
 ---
 
@@ -39,9 +37,9 @@ Run [34536265400](https://github.com/Raphoe-Diocese/parish_harvester/actions/run
 
 **Other failed:** Iskaheen (scrape found April images); Maghera Derry (only GDPR/privacy links). WAF/blocked unchanged: Ederney, Donaghmoyne, Roslea, Three Patrons, Saint Anthony, Holywood, St Gerard, St Patrick, Portglenone.
 
-**150 dpi megas:** PR #203 not live until merge + a later harvest. Last night’s megas are still the old 100 dpi compress. Do not Full harvest on this PC.
+**150 dpi + phone cache:** PR #203 merged. Frank 12/09: sharper megas + phone cache working. Ticked on the backlog.
 
-**Phone cache (11/09, this turn):** PC showed last night’s harvest; phone still showed the previous file after refresh. Cause: URL only had `?d=2026-09-06` (same week), so the phone reused the old mega. Code now also stamps `?h=20260910T2324` from `parish_status` `generated_at`. **Not live yet** until merge + Pages. Do not tick done until Frank’s phone after Pages.
+**Now — A5 stale parish caption (this turn):** leftover Ardara page still says “this week — 06/09/2026” while status is stale 30/08. Code relabels leftovers. **Not live yet** until merge + next harvest/OCR. Do not Full harvest on this PC.
 
 ---
 
@@ -71,6 +69,7 @@ that is already a card.
 - **A3** — merged [PR #197](https://github.com/Raphoe-Diocese/parish_harvester/pull/197). 7 live recipes with no evidence row are `no_evidence` + actionable. 9 Derry recipes moved `unknown/` → `derry/`. `parishpress.json` skipped: Drumholm and Gortahork are both Raphoe; that file mixed Gortahork’s name with the Drumholm PDF.
 - **Fix the 7 `no_evidence` parishes** — merged [PR #198](https://github.com/Raphoe-Diocese/parish_harvester/pull/198) `792e6329`.
 - **A4** — merged [PR #199](https://github.com/Raphoe-Diocese/parish_harvester/pull/199) `d19fe5ae`. Ederney `error` starts with the WAF note. Problems screenshot still needs Frank (All dioceses / Clogher).
+- **A5** — doing this turn. Leftover parish pages relabelled in the generator. **Not live yet.**
 
 ### Now — Trainer folder refresh (merged)
 
@@ -94,9 +93,9 @@ Homepage huge writing was Chrome zoom (Ctrl+0). Site-look rewrite stays parked.
 
 Planned in [`AGENTS.md`](AGENTS.md). **No date.** Do not start until recipe success (locked item 3). First slice is PR #202.
 
-### Parked mid-chat — A5 stale parish caption
+### Now — A5 stale parish caption (not live)
 
-Started locally, **not live yet**. Do not tick.
+Code this turn. **Not live yet.** Do not tick until live Ardara shows the stale note.
 
 ### Now — blurry diocese PDFs (code this turn, not live)
 

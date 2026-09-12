@@ -25,6 +25,7 @@ here is hardcoded to a fixed parish roster.
 import html
 import io
 import json
+import re
 import time
 from dataclasses import dataclass
 from pathlib import Path
@@ -56,6 +57,87 @@ DIOCESE_STATUS_NAMES = {
 # Leave Holy Cross / Dunfanaghy failing — July fake dates (do not slice
 # a stale bulletin onto a "this week" parish page).
 SKIP_OK_PARISH_KEYS = frozenset({"holy-cross-church"})
+
+_THIS_WEEK_META = re.compile(
+    r'(<p class="meta">)\s*This week(?:&#x27;|\'|&apos;)s bulletin for [^<]+</p>',
+    re.IGNORECASE,
+)
+_STALE_NOTE_RE = re.compile(r'<p class="stale-note">')
+_H1_RE = re.compile(r"(<h1>[^<]*</h1>)", re.IGNORECASE)
+_META_CSS_RE = re.compile(r"(\.meta \{[^}]*\}\s*)")
+
+
+def stale_parish_caption(bulletin_date: str = "") -> tuple[str, str]:
+    """Honest leftover caption. Never uses the harvest Sunday as the date."""
+    from harvester.utils import format_uk_date
+
+    raw = (bulletin_date or "").strip()
+    uk = format_uk_date(raw) if raw else ""
+    if uk and re.match(r"^\d{2}/\d{2}/\d{4}$", uk):
+        note = f"Latest bulletin we have: {uk} (not this week)"
+    else:
+        note = "Latest bulletin we have is not from this week"
+    return f"{note}.", note
+
+
+def apply_stale_caption_to_html(page_html: str, meta_line: str, stale_note: str) -> str:
+    """Rewrite a leftover parish page so it cannot say this week."""
+    text = page_html or ""
+    if not text:
+        return text
+    meta_html = f'<p class="meta">{html.escape(meta_line)}</p>'
+    if _THIS_WEEK_META.search(text):
+        text = _THIS_WEEK_META.sub(meta_html, text, count=1)
+    else:
+        text = re.sub(r'<p class="meta">[^<]*</p>', meta_html, text, count=1)
+    if stale_note and not _STALE_NOTE_RE.search(text):
+        note_html = f'<p class="stale-note">{html.escape(stale_note)}</p>'
+        text = _H1_RE.sub(rf"\1\n      {note_html}", text, count=1)
+    if ".stale-note" not in text and _META_CSS_RE.search(text):
+        extra = (
+            ".stale-note { color: #7a3b00; font-size: 1rem; "
+            "font-weight: 600; margin: 0.35rem 0 0.7rem; }\n    "
+        )
+        text = _META_CSS_RE.sub(rf"\1{extra}", text, count=1)
+    return text
+
+
+def relabel_leftover_parish_pages(
+    out_root: Path,
+    parish_status_path: Path | None = None,
+    ok_keys: set[str] | None = None,
+) -> list[str]:
+    """Fix leftover parish HTML that is no longer ok this week."""
+    keep = ok_keys or set()
+    path = parish_status_path or PARISH_STATUS_PATH
+    rows: dict = {}
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+        if isinstance(payload, dict) and isinstance(payload.get("parishes"), dict):
+            rows = payload["parishes"]
+    except (OSError, json.JSONDecodeError):
+        rows = {}
+    if not out_root.exists():
+        return []
+    relabelled: list[str] = []
+    for html_path in sorted(out_root.glob("*.html")):
+        name = html_path.name
+        if name.endswith("-ocr.html") or name.endswith("-pdf.html"):
+            continue
+        key = html_path.stem
+        if key in keep:
+            continue
+        row = rows.get(key)
+        iso = ""
+        if isinstance(row, dict):
+            iso = str(row.get("bulletin_date") or "").strip()
+        meta_line, note = stale_parish_caption(iso)
+        original = html_path.read_text(encoding="utf-8")
+        updated = apply_stale_caption_to_html(original, meta_line, note)
+        if updated != original:
+            _write_text(html_path, updated)
+            relabelled.append(key)
+    return relabelled
 
 
 def _write_text(path: Path, text: str) -> None:
@@ -311,7 +393,13 @@ def write_parish_pages_for_diocese(
 
     config = DIOCESES[diocese_key]
     parishes = load_ok_parishes(diocese_key, parish_status_path)
+    out_root = out_dir or (PARISHES_OUT_DIR / diocese_key)
     if not parishes:
+        relabel_leftover_parish_pages(
+            out_root,
+            parish_status_path=parish_status_path,
+            ok_keys=set(),
+        )
         return []
 
     entries = [(p.key, p.display_name) for p in parishes]
@@ -477,4 +565,11 @@ def write_parish_pages_for_diocese(
             print(f"Skipped {parish.key} ({type(exc).__name__}: {exc})")
             continue
 
+    leftover = relabel_leftover_parish_pages(
+        out_root,
+        parish_status_path=parish_status_path,
+        ok_keys={p.key for p in parishes},
+    )
+    if leftover:
+        print(f"  Relabelled {len(leftover)} leftover parish page(s) as not this week")
     return written
