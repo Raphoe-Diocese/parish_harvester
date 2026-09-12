@@ -17,17 +17,15 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
-## 12/09/2026 — Diocese PDF counter (PR #205) + Grok run plan
+## 12/09/2026 night — P1 done; A5 (#204) next
 
-**Now — [PR #205](https://github.com/Raphoe-Diocese/parish_harvester/pull/205) CI green, waiting for Frank to say merge.** Diocese PDF box now streams the mega with "Loading PDF… X of Y MB (N%)" then "✅ PDF fully loaded — N pages"; single-GET cap 8 → 24 MB so Down & Connor (16.5 MB) stops Range-walking; viewer `?v=20260912a` pinned on the four live diocese pages. Sizes proved by HEAD 12/09: Raphoe 6,981,692 B, Down & Connor 16,530,602 B. 150 dpi stays. **Not live** until merge + Pages; proof = live Raphoe HTML `?v=20260912a` and Frank's phone.
+**P1 done (Frank 12/09 23:50):** [PR #205](https://github.com/Raphoe-Diocese/parish_harvester/pull/205) merged `437b4c0c` + Pages [34721204022](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34721204022). Live `?v=20260912a`. Phone: yes.
 
-Also in #205: Gortahork live test no longer pins `16ú Lúnasa 2026` (changes every harvest); Tyholland and Galloon tests follow Frank's 12/09 Trainer retrain (both live recipes now, not skipped).
+**Now — P2 A5:** leftover Ardara still says this week. Cherry-picked onto main as [PR #204](https://github.com/Raphoe-Diocese/parish_harvester/pull/204). **Not live** until merge + next harvest/OCR. Do not regenerate `docs/parishes`.
 
-**Grok 4.6 run plan:** [`docs/GROK_PLAN_2026-09-12.md`](docs/GROK_PLAN_2026-09-12.md). Self-contained: rules, current state, ordered cards P1 → P2 → B3 → C1 → F1 → H1 → H2 → H3 → C2 → B4 → C3 → C4 → S1 → S2 → S3 → D1 → D2 → E1 → E2 → F2 → F3 → C5 (M1 only if still slow). One card per chat.
+**Next after #204 merge:** B3 (viewer 850/450 guard test). Then C1.
 
-**Local repo:** the OneDrive Desktop folder lost its `.git` on 12/09 19:28 (the sibling `parish_harvester-main` is a stale 30/08 clone). Agents now use `C:\Users\Digital Admin\repos\parish_harvester` (sparse, blobless clone of `main`). Do not use the Desktop folders for git.
-
-**Next:** Frank says **merge** on #205 → P2 rebase/merge #204 → B3.
+**Grok plan:** [`docs/GROK_PLAN_2026-09-12.md`](docs/GROK_PLAN_2026-09-12.md). Agents use `C:\Users\Digital Admin\repos\parish_harvester`.
 
 ---
 
