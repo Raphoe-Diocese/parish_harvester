@@ -1,16 +1,16 @@
 {
-  "generated_at": "2026-09-11",
+  "generated_at": "2026-09-12",
   "target_date": "2026-09-06",
   "summary": {
-    "downloaded": 117,
+    "downloaded": 118,
     "html_links": 0,
-    "skipped": 30,
+    "skipped": 29,
     "failed": 11,
     "stale_rejected": 6
   },
   "action_counts": {
-    "skip": 36,
-    "ok": 119,
+    "skip": 34,
+    "ok": 121,
     "investigate": 10
   },
   "parishes": [
@@ -2495,6 +2495,45 @@
       "suggested_reason": "downloaded or not in failure list"
     },
     {
+      "parish_key": "galloonparish",
+      "display_name": "galloon",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/galloonparish.json",
+      "recipe": {
+        "start_url": "https://www.galloonparish.com/bulletin-1.html",
+        "site_type": "pdf_link_list",
+        "playbook_type": "pdf_download_list",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 2,
+        "click_count": 1,
+        "has_terminal": true,
+        "operator_notes": [
+          "onewebmedia/*.pdf \u2014 newest row is usually a DDMMYYYY name or hashed S25C with dated link text.",
+          "If the HTTPS certificate is expired, harvest must ignore TLS errors (Playwright).",
+          "Do not pin a dated or hashed filename."
+        ],
+        "do_not": [
+          "Do not pin a dated or hashed onewebmedia filename.",
+          "Do not use plain HTTP scrape when the certificate is expired."
+        ],
+        "recorded_date": "2026-09-12"
+      },
+      "bulletin_format": "download",
+      "learned_pattern": "News page with PDF links",
+      "host_profile": {
+        "navigation_timeout_ms": 45000,
+        "ignore_https_errors": true,
+        "total_timeout_s": 180
+      },
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
+    },
+    {
       "parish_key": "gaoth-dobhair",
       "display_name": "Gaoth Dobhair (Gweedore)",
       "diocese": "raphoe",
@@ -4133,7 +4172,7 @@
         "has_terminal": false,
         "operator_notes": [],
         "do_not": [],
-        "recorded_date": "2026-09-11"
+        "recorded_date": "2026-06-26"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -4180,38 +4219,6 @@
       "last_error": "",
       "suggested_action": "ok",
       "suggested_reason": "downloaded or not in failure list"
-    },
-    {
-      "parish_key": "galloonparish",
-      "display_name": "Newtownbutler (Galloon)",
-      "diocese": "clogher",
-      "recipe_file": "parishes/recipes/clogher/galloonparish.json",
-      "recipe": {
-        "start_url": "https://www.galloonparish.com/bulletin-1.html",
-        "site_type": "",
-        "playbook_type": "",
-        "status": "inactive",
-        "skip": true,
-        "placeholder": false,
-        "step_count": 1,
-        "click_count": 0,
-        "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": ""
-      },
-      "bulletin_format": "pdf_download",
-      "learned_pattern": "",
-      "host_profile": {
-        "navigation_timeout_ms": 45000,
-        "ignore_https_errors": true,
-        "total_timeout_s": 180
-      },
-      "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Same parish as Newtownbutler (Galloon). Weekly PDF is harvested via newtownbutler from galloonparish.com/bulletin-1.html."
     },
     {
       "parish_key": "newtownbutler",
@@ -4797,7 +4804,7 @@
         "has_terminal": false,
         "operator_notes": [],
         "do_not": [],
-        "recorded_date": "2026-09-11"
+        "recorded_date": "2026-06-26"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -5671,26 +5678,33 @@
       "recipe_file": "parishes/recipes/clogher/tyholland.json",
       "recipe": {
         "start_url": "https://monaghan-rackwallace.com/past-newsletters/",
-        "site_type": "link_only",
-        "playbook_type": "link_only",
-        "status": "inactive",
-        "skip": true,
+        "site_type": "pdf_link_list",
+        "playbook_type": "pdf_download_list",
+        "status": "",
+        "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-08-22"
+        "has_terminal": true,
+        "operator_notes": [
+          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
+          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+          "Do not worry if the filename or date in the link text changes every week."
+        ],
+        "do_not": [
+          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
+          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+        ],
+        "recorded_date": "2026-09-12"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
-      "suggested_action": "skip",
-      "suggested_reason": "Shared bulletin with Monaghan & Rackwallace \u2014 harvest once under monaghanrackwallace"
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "urneyandcastlefinparish",
