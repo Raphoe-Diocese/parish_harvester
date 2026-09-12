@@ -6,20 +6,20 @@
       "page_type": "pdf_link_list",
       "recipe_flow": "click_then_pdf",
       "label": "News page with PDF links",
-      "advice": "onewebmedia/*.pdf — newest row is usually a DDMMYYYY name or hashed S25C with dated link text. If the HTTPS certificate is expired, harvest must ignore TLS errors (Playwright). Do not pin a dated or hashed filename.",
+      "advice": "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom. Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday. Do not worry if the filename or date in the link text changes every week.",
       "operator_notes": [
-        "onewebmedia/*.pdf — newest row is usually a DDMMYYYY name or hashed S25C with dated link text.",
-        "If the HTTPS certificate is expired, harvest must ignore TLS errors (Playwright).",
-        "Do not pin a dated or hashed filename."
+        "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
+        "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+        "Do not worry if the filename or date in the link text changes every week."
       ],
       "do_not": [
-        "Do not pin a dated or hashed onewebmedia filename.",
-        "Do not use plain HTTP scrape when the certificate is expired."
+        "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
+        "Do not pick GDPR, Gift Aid, or financial statement PDFs."
       ],
-      "html_fingerprint": "onewebmedia_pdf_list",
+      "html_fingerprint": "wp_uploads_pdf_list",
       "html_markers": [
-        "onewebmedia PDF",
-        "bulletin.html listing"
+        "wp-content PDF uploads",
+        "WordPress signals"
       ],
       "bulletin_layout": {
         "strategy": "newest_dated",
@@ -29,9 +29,10 @@
         "parishofaghyaran",
         "buncrana",
         "stranorlarparish",
-        "galloonparish"
+        "galloonparish",
+        "tyholland"
       ],
-      "success_count": 4
+      "success_count": 5
     },
     "wp_pdfemb_list+click_then_pdf": {
       "page_type": "wp_pdfemb_list",
@@ -1002,6 +1003,30 @@
         "strategy": "newest_dated",
         "position": "top"
       }
+    },
+    "tyholland": {
+      "page_type": "pdf_link_list",
+      "recipe_flow": "click_then_pdf",
+      "combined_key": "pdf_link_list+click_then_pdf",
+      "display_name": "Tyholland (bulletin with Monaghan & Rackwallace)",
+      "start_url_host": "monaghan-rackwallace.com",
+      "updated": "2026-09-12",
+      "step_count": 1,
+      "playbook_type": "pdf_download_list",
+      "operator_notes": [
+        "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
+        "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+        "Do not worry if the filename or date in the link text changes every week."
+      ],
+      "do_not": [
+        "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
+        "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+      ],
+      "html_fingerprint": "wp_uploads_pdf_list",
+      "html_markers": [
+        "wp-content PDF uploads",
+        "WordPress signals"
+      ]
     }
   }
 }
