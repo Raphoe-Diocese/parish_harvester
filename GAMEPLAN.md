@@ -39,9 +39,9 @@ Run [34536265400](https://github.com/Raphoe-Diocese/parish_harvester/actions/run
 
 **Other failed:** Iskaheen (scrape found April images); Maghera Derry (only GDPR/privacy links). WAF/blocked unchanged: Ederney, Donaghmoyne, Roslea, Three Patrons, Saint Anthony, Holywood, St Gerard, St Patrick, Portglenone.
 
-**150 dpi megas:** PR #203 not live until merge + a later harvest. Last night’s megas are still the old 100 dpi compress. Do not Full harvest on this PC.
+**150 dpi + phone cache:** PR #203 merged. Frank 12/09: sharper megas + phone cache working. Ticked on the backlog.
 
-**Phone cache (11/09, this turn):** PC showed last night’s harvest; phone still showed the previous file after refresh. Cause: URL only had `?d=2026-09-06` (same week), so the phone reused the old mega. Code now also stamps `?h=20260910T2324` from `parish_status` `generated_at`. **Not live yet** until merge + Pages. Do not tick done until Frank’s phone after Pages.
+**Now — A5 stale parish caption (this turn):** leftover Ardara page still says “this week — 06/09/2026” while status is stale 30/08. Code relabels leftovers. **Not live yet** until merge + next harvest/OCR. Do not Full harvest on this PC.
 
 ---
 
@@ -71,6 +71,7 @@ that is already a card.
 - **A3** — merged [PR #197](https://github.com/Raphoe-Diocese/parish_harvester/pull/197). 7 live recipes with no evidence row are `no_evidence` + actionable. 9 Derry recipes moved `unknown/` → `derry/`. `parishpress.json` skipped: Drumholm and Gortahork are both Raphoe; that file mixed Gortahork’s name with the Drumholm PDF.
 - **Fix the 7 `no_evidence` parishes** — merged [PR #198](https://github.com/Raphoe-Diocese/parish_harvester/pull/198) `792e6329`.
 - **A4** — merged [PR #199](https://github.com/Raphoe-Diocese/parish_harvester/pull/199) `d19fe5ae`. Ederney `error` starts with the WAF note. Problems screenshot still needs Frank (All dioceses / Clogher).
+- **A5** — doing this turn. Leftover parish pages relabelled in the generator. **Not live yet.**
 
 ### Now — Trainer folder refresh (merged)
 
@@ -94,9 +95,9 @@ Homepage huge writing was Chrome zoom (Ctrl+0). Site-look rewrite stays parked.
 
 Planned in [`AGENTS.md`](AGENTS.md). **No date.** Do not start until recipe success (locked item 3). First slice is PR #202.
 
-### Parked mid-chat — A5 stale parish caption
+### Now — A5 stale parish caption (not live)
 
-Started locally, **not live yet**. Do not tick.
+Code this turn. **Not live yet.** Do not tick until live Ardara shows the stale note.
 
 ### Now — blurry diocese PDFs (code this turn, not live)
 
