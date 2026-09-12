@@ -62,8 +62,10 @@ class ClogherDioceseTests(unittest.TestCase):
         clontibret = load_recipe(recipe_path_for("clontibret", PARISHES))
         self.assertTrue(_recipe_is_inactive(clontibret))
         self.assertIn("mucknoparish.ie", clontibret["start_url"])
+        # Frank retrained Tyholland in the Trainer 12/09/2026 (push_recipe):
+        # it is live again, pointed at the shared Monaghan & Rackwallace page.
         tyholland = load_recipe(recipe_path_for("tyholland", PARISHES))
-        self.assertTrue(_recipe_is_inactive(tyholland))
+        self.assertFalse(_recipe_is_inactive(tyholland))
         self.assertIn("past-newsletters", tyholland["start_url"])
         self.assertNotIn("23082026.pdf", json.dumps(tyholland))
         clones = load_recipe(recipe_path_for("clones", PARISHES))
