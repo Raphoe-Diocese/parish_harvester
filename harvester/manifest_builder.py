@@ -510,6 +510,4 @@ def build_manifest(report_path: Path, dioceses_in_run: list[str], output_path: P
 
     _write_atomic_json(output_path, payload)
     _write_atomic_json(docs_dir / "reliability.json", _build_reliability(repo_root, generated_at))
-    _write_rss_feeds(docs_dir, dioceses, target_date, generated_at_dt)
-    _write_search_index(repo_root, docs_dir, generated_at)
-    _write_ics_calendars(docs_dir, repo_root / "Bulletins" / "events", generated_at_dt)
+    # S3: do not publish /feeds/, /search/, or /calendars/. Helpers stay for unit tests.

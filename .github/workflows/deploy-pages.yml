@@ -1,5 +1,5 @@
 name: Deploy Parish Press to GitHub Pages
-# Publishes docs/ (diocese pages, OCR archive, search) on every deploy.
+# Publishes docs/ (diocese pages, OCR archive) on every deploy.
 # Mega PDFs are included when available; missing PDFs must not block the static site.
 
 on:
@@ -277,7 +277,8 @@ jobs:
           fi
 
           PAGES_BASE="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}"
-          rm -f _site/updates.xml _site/extension/parish_trainer.crx
+          rm -f _site/updates.xml _site/extension/parish_trainer.crx _site/search-index.json
+          rm -rf _site/search _site/calendars _site/feeds _site/badges _site/subscribe _site/bulletins/raphoe
           {
             echo "EXTENSION_PREV_VERSION=${PREV_VERSION}"
             echo "EXTENSION_NEW_VERSION=${VERSION}"

@@ -1044,30 +1044,6 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
 """
 
 
-def _subscribe_page(dioceses: list[DioceseCard]) -> str:
-    items = "".join(
-        f'<li><a href="../dioceses/{d.key}/" target="_blank" rel="noopener noreferrer">{d.name}</a></li>' for d in dioceses
-    )
-    return f"""<!DOCTYPE html>
-<html lang=\"en\">
-<head>
-  <meta charset=\"utf-8\" />
-  <meta name=\"viewport\" content=\"width=device-width, initial-scale=1\" />
-  <title>Subscribe — Parish Press</title>
-  {favicon_link_tags()}
-  <link rel=\"stylesheet\" href=\"../assets/site.css\" />
-</head>
-<body>
-  <main style=\"max-width:900px;margin:0 auto;padding:20px 16px;font-family:Arial,Helvetica,sans-serif;\">
-    <h1>📬 Subscribe for reminders</h1>
-    <p>Pick your diocese page below and use the RSS/calendar links from the footer.</p>
-    <ul style=\"columns:2;\">{items}</ul>
-  </main>
-</body>
-</html>
-"""
-
-
 def _ocr_standalone_url(diocese_key: str) -> str:
     standalone = _latest_ocr_standalone(diocese_key)
     pages_base = "https://raphoe-diocese.github.io/parish_harvester"
@@ -1242,6 +1218,4 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
 
     docs_dir.mkdir(parents=True, exist_ok=True)
     (docs_dir / "index.html").write_text(_landing_page(rows), encoding="utf-8")
-    subscribe_dir = docs_dir / "subscribe"
-    subscribe_dir.mkdir(parents=True, exist_ok=True)
-    (subscribe_dir / "index.html").write_text(_subscribe_page(dioceses), encoding="utf-8")
+    # S3: do not publish /subscribe/.

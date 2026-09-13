@@ -4,8 +4,6 @@ import json
 import tempfile
 import unittest
 from pathlib import Path
-from xml.etree import ElementTree as ET
-
 from harvester.manifest_builder import build_manifest
 
 
@@ -73,7 +71,7 @@ class ManifestBuilderTests(unittest.TestCase):
             self.assertEqual(dac["mega_pdf"], dac["parish_page"])
             self.assertNotIn("ocr_viewer", dac)
 
-    def test_build_manifest_writes_reliability_tiers_and_rss_feed(self) -> None:
+    def test_build_manifest_writes_reliability_tiers_without_rss_feed(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:
             root = Path(tmp)
             (root / "Bulletins").mkdir(parents=True, exist_ok=True)
@@ -142,27 +140,9 @@ class ManifestBuilderTests(unittest.TestCase):
             self.assertEqual("grey", parishes["parish_grey"]["tier"])
             self.assertIsNone(parishes["parish_grey"]["success_rate"])
 
-            feed_path = root / "docs" / "feeds" / "derry_diocese.xml"
-            xml_root = ET.fromstring(feed_path.read_text(encoding="utf-8"))
-            self.assertEqual("rss", xml_root.tag)
-            self.assertEqual("2.0", xml_root.attrib.get("version"))
-            channel = xml_root.find("channel")
-            self.assertIsNotNone(channel)
-            if channel is None:
-                self.fail("channel missing")
-            self.assertEqual("Derry Diocese Bulletins", channel.findtext("title"))
-            item = channel.find("item")
-            self.assertIsNotNone(item)
-            if item is None:
-                self.fail("item missing")
-            self.assertEqual(
-                "Derry Diocese bulletin for 2026-05-22",
-                item.findtext("title"),
-            )
-            self.assertEqual(
-                "https://raphoe-diocese.github.io/parish_harvester/mega_pdf/derry_mega_bulletin.pdf",
-                item.findtext("link"),
-            )
+            self.assertFalse((root / "docs" / "feeds").exists())
+            self.assertFalse((root / "docs" / "search-index.json").exists())
+            self.assertFalse((root / "docs" / "calendars").exists())
 
 
 if __name__ == "__main__":
