@@ -17,7 +17,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
-## 13/09/2026 — E2 OCR stub must not look like success (this turn)
+## 13/09/2026 — F2/F3 backlog pages (this turn)
+
+**E2 merged:** [PR #223](https://github.com/Raphoe-Diocese/parish_harvester/pull/223) `80567a7`. **Not live** until next OCR is green or red with `::error`.
+
+**Now — F2 + F3:** standalone `-ocr.html` exempt from 850/450. Phone-PDF `doing` rows from 26/08–06/09: ticked only where the 10/09 audit or this session’s live homepage proves it; the rest say **needs Frank's phone**. Next: C5.
+
+## 13/09/2026 — E2 OCR stub must not look like success
 
 **E1 merged:** [PR #222](https://github.com/Raphoe-Diocese/parish_harvester/pull/222) `25eaa6a`. **Not live** until next OCR. Do not tick done until the log shows `N sparse pages sent to vision` with N < total and Gortahork Irish is still Irish.
 
