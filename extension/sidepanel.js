@@ -373,7 +373,6 @@ function _pdUpdatePrimaryBulletinUrl(fileText, parishName, newUrl) {
   return lines.join("\n");
 }
 
-let _pdHarvestReport = null;
 let _pdParishStatusDoc = null;
 let _problemsAllRows = [];
 let _problemsAutoRefreshTimer = null;
@@ -402,28 +401,6 @@ async function _pdLoadParishStatusDoc(force = false) {
   return null;
 }
 
-async function _pdLoadHarvestReport() {
-  if (_pdHarvestReport) return _pdHarvestReport;
-  try {
-    const cfg = await _pdGetGithubConfig();
-    if (!cfg) return null;
-    const report = await _problemsFetchLiveReport(cfg.ghRepo, cfg.ghPat);
-    if (report) {
-      _pdHarvestReport = report;
-      return _pdHarvestReport;
-    }
-    const resp = await fetch(
-      `https://raw.githubusercontent.com/${cfg.ghRepo}/main/Bulletins/report.json?t=${Date.now()}`,
-      { cache: "no-store" }
-    );
-    if (!resp.ok) return null;
-    _pdHarvestReport = await resp.json();
-    return _pdHarvestReport;
-  } catch (_e) {
-    return null;
-  }
-}
-
 function _pdHarvestStatusForKey(parishKey) {
   if (!parishKey) return "";
   const key = String(parishKey).trim().toLowerCase();
@@ -443,18 +420,6 @@ function _pdHarvestStatusForKey(parishKey) {
     if (outcome && outcome !== "ok") {
       return `❌ Last harvest: ${String(statusItem.error || statusItem.category || outcome).slice(0, 80)}`;
     }
-  }
-  if (!_pdHarvestReport) return "";
-  const downloaded = (_pdHarvestReport.downloaded || []).find((r) => r.parish === key);
-  if (downloaded) {
-    const url = String(downloaded.url || "").trim();
-    return url
-      ? `✅ Last harvest (${formatUkDate(_pdHarvestReport.target_date) || "—"}): OK — ${url}`
-      : `✅ Last harvest (${formatUkDate(_pdHarvestReport.target_date) || "—"}): OK`;
-  }
-  const failed = (_pdHarvestReport.failed || []).find((r) => r.parish === key);
-  if (failed) {
-    return `❌ Last harvest: ${String(failed.reason || failed.error || "failed").slice(0, 80)}`;
   }
   return "";
 }
@@ -1022,7 +987,6 @@ async function _pdBuildParishDetails(parish) {
   const { recipe, path: recipePath } = await _pdLoadRecipeForParish(parish);
   const terminal = _pdRecipeTerminalUrl(recipe);
   await _pdLoadParishStatusDoc();
-  await _pdLoadHarvestReport();
   const statusUrl = String(_pdParishStatusDoc?.parishes?.[parish.key]?.url || "").trim();
   const currentUrl = (override?.url || statusUrl || terminal.url || parish.bulletinUrls[0] || parish.pageUrl || "").trim();
   const changes = _pdConfirmedChangesList(parish, override, recipe, recipePath);
@@ -1415,111 +1379,6 @@ function _problemsRowsFromStatus(status, retrainedMap) {
   return rows;
 }
 
-async function _problemsFilterActionableRows(report, consecutiveFailures, retrainedMap) {
-  const targetDate = String(report?.target_date || "");
-  const defaultLastSeen = formatUkDate(targetDate);
-  const downloadedKeys = new Set(
-    (Array.isArray(report?.downloaded) ? report.downloaded : [])
-      .map((item) => String(item?.parish || "").trim())
-      .filter(Boolean)
-  );
-  const failed = Array.isArray(report?.failed) ? report.failed : [];
-  const staleRejected = Array.isArray(report?.stale_rejected) ? report.stale_rejected : [];
-  const htmlLinks = Array.isArray(report?.html_links) ? report.html_links : [];
-  const problemItems = [
-    ...failed.filter((item) => !/Stale bulletin rejected/i.test(String(item?.error || ""))),
-    ...staleRejected,
-    ...failed.filter((item) => /Stale bulletin rejected/i.test(String(item?.error || ""))),
-  ];
-  const recipeStatuses = await Promise.all(
-    [...problemItems, ...htmlLinks].map((item) => _pdCheckRecipe(String(item?.parish || "").trim()))
-  );
-
-  let hiddenDead = 0;
-  let hiddenFixed = 0;
-  const rows = [];
-  const seen = new Set();
-
-  const pushRow = (item, statusIdx, defaults = {}) => {
-    const parish = String(item?.parish || "").trim();
-    if (!parish || seen.has(parish)) return;
-    if (downloadedKeys.has(parish)) {
-      hiddenFixed += 1;
-      return;
-    }
-    if (recipeStatuses[statusIdx] === "dead") {
-      hiddenDead += 1;
-      return;
-    }
-    const parishMeta = _pdAllParishes.find((p) => p.key === parish);
-    if (parishMeta?.disabled) {
-      hiddenDead += 1;
-      return;
-    }
-    seen.add(parish);
-    const retrainedPending = _problemsIsRetrainedPending(parish, targetDate, retrainedMap);
-    const errorText = String(item?.error || item?.reason || defaults.error_text || "");
-    const diagnosis = item?.diagnosis && typeof item.diagnosis === "object" ? item.diagnosis : null;
-    rows.push({
-      parish,
-      display_name: String(item?.display_name || item?.parish || ""),
-      diocese: _pdDioceseForKey(parish),
-      start_url: String(item?.start_url || item?.url || ""),
-      url: String(item?.url || ""),
-      error_text: errorText,
-      diagnosis,
-      outcome: String(defaults.outcome || item?.outcome || ""),
-      bulletin_date: _problemsBulletinDateFromStatus(item),
-      advice: _problemsFailureAdvice(errorText, diagnosis),
-      category: defaults.category || _problemsCategory(errorText, { retrainedPending, diagnosis }),
-      last_seen: _problemsFormatLastSeen(item, report) || defaultLastSeen,
-      consecutive_failures: Number(consecutiveFailures[parish] || 0),
-      retrainedPending,
-    });
-  };
-
-  problemItems.forEach((item, idx) => {
-    const isStale = /Stale bulletin rejected/i.test(String(item?.error || ""));
-    pushRow(item, idx, { outcome: isStale ? "stale" : "failed" });
-  });
-
-  htmlLinks.forEach((item, offset) => {
-    const parish = String(item?.parish || "").trim();
-    if (!parish || seen.has(parish)) return;
-    const statusIdx = problemItems.length + offset;
-    if (downloadedKeys.has(parish)) {
-      hiddenFixed += 1;
-      return;
-    }
-    if (recipeStatuses[statusIdx] === "dead") {
-      hiddenDead += 1;
-      return;
-    }
-    const parishMeta = _pdAllParishes.find((p) => p.key === parish);
-    if (parishMeta?.disabled) {
-      hiddenDead += 1;
-      return;
-    }
-    seen.add(parish);
-    rows.push({
-      parish,
-      display_name: String(item?.display_name || item?.parish || ""),
-      diocese: _pdDioceseForKey(parish),
-      start_url: String(item?.start_url || item?.url || ""),
-      url: String(item?.url || ""),
-      outcome: "html_only",
-      bulletin_date: _problemsBulletinDateFromStatus(item),
-      error_text: String(item?.error || item?.reason || ""),
-      category: "no_pdf",
-      last_seen: _problemsFormatLastSeen(item, report) || defaultLastSeen,
-      consecutive_failures: Number(consecutiveFailures[parish] || 0),
-      retrainedPending: false,
-    });
-  });
-
-  return { rows, hiddenDead, hiddenFixed, lastSeen: defaultLastSeen };
-}
-
 // ── Rendering ─────────────────────────────────────────────────────────────
 
 let _pdAllParishes  = [];
@@ -1676,84 +1535,6 @@ function _problemsGithubLinks(repo) {
   };
 }
 
-function _problemsMegaPdfForParish(repo, parishKey) {
-  const links = _problemsGithubLinks(repo);
-  const match = _pdAllParishes.find((p) => p.key === parishKey);
-  const diocese = String(match?.diocese || "").toLowerCase();
-  if (diocese.includes("down") || diocese.includes("connor")) return links.megaDac;
-  return links.megaDerry;
-}
-
-async function _problemsFindLatestWorkflowRun(ghPat, ghRepo, afterMs) {
-  try {
-    const resp = await fetch(
-      `https://api.github.com/repos/${ghRepo}/actions/workflows/harvest.yml/runs?per_page=20&event=workflow_dispatch`,
-      {
-        headers: {
-          Authorization: (globalThis.phGithubRecipePush?.authHeaderValue
-            ? globalThis.phGithubRecipePush.authHeaderValue(ghPat)
-            : (String(ghPat || "").startsWith("github_pat_") ? `Bearer ${ghPat}` : `token ${ghPat}`)),
-          Accept: "application/vnd.github+json",
-          "X-GitHub-Api-Version": "2022-11-28",
-        },
-      }
-    );
-    if (!resp.ok) return null;
-    const data = await resp.json();
-    const runs = Array.isArray(data.workflow_runs) ? data.workflow_runs : [];
-    const cutoff = afterMs - 30_000;
-    const recent = runs.filter((run) => new Date(run.created_at).getTime() >= cutoff);
-    return recent[0] || null;
-  } catch (_e) {
-    return null;
-  }
-}
-
-async function _problemsFetchLiveReport(repo, ghPat) {
-  const mod = globalThis.phGithubRecipePush;
-  if (mod?.fetchReportJson && ghPat) {
-    try {
-      const report = await mod.fetchReportJson({ gh_pat: ghPat, gh_repo: repo });
-      if (report && typeof report === "object") return report;
-    } catch (_e) {
-      // Fall through to raw CDN.
-    }
-  }
-  try {
-    const resp = await fetch(
-      `https://raw.githubusercontent.com/${repo}/main/Bulletins/report.json?t=${Date.now()}`,
-      { cache: "no-store" }
-    );
-    if (!resp.ok) return null;
-    return resp.json();
-  } catch (_e) {
-    return null;
-  }
-}
-
-function _problemsParishHarvestStatus(report, parishKey) {
-  const mod = globalThis.phGithubRecipePush;
-  if (mod?.parishHarvestStatus) {
-    return mod.parishHarvestStatus(report, parishKey);
-  }
-  const key = String(parishKey || "").trim().toLowerCase();
-  const find = (rows) => (rows || []).find(
-    (row) => String(row?.parish || "").trim().toLowerCase() === key
-  );
-  const downloaded = find(report?.downloaded);
-  if (downloaded) return { status: "ok", item: downloaded };
-  const stale = find(report?.stale_rejected);
-  if (stale) return { status: "stale", item: stale };
-  const failed = find(report?.failed);
-  if (failed) {
-    if (/Stale bulletin rejected/i.test(String(failed.error || ""))) {
-      return { status: "stale", item: failed };
-    }
-    return { status: "failed", item: failed };
-  }
-  return { status: "unknown", item: null };
-}
-
 async function _problemsClearRetrained(parishKey) {
   const data = await _spStorageGet([PROBLEMS_RECIPE_RETRAINED_KEY]);
   const retrained = (data[PROBLEMS_RECIPE_RETRAINED_KEY] && typeof data[PROBLEMS_RECIPE_RETRAINED_KEY] === "object")
@@ -1772,11 +1553,6 @@ function _problemsParishBulletinPdf(repo, parishKey, folder) {
     return `https://raw.githubusercontent.com/${repo}/main/Bulletins/current/${key}.pdf`;
   }
   return `https://raw.githubusercontent.com/${repo}/main/Bulletins/${key}.pdf`;
-}
-
-function _problemsGithubBlobTabUrl(repo, path) {
-  const clean = String(path || "").replace(/^\/+/, "");
-  return `https://github.com/${repo}/blob/main/${clean}`;
 }
 
 function _problemsPdfViewerTabUrl({ repo, path, url, title }) {
@@ -2088,7 +1864,6 @@ async function _problemsPollHarvestResult({
   });
   if (result?.runUrl) runUrl = result.runUrl;
   _pdParishStatusDoc = null;
-  _pdHarvestReport = null;
   if (result?.timedOut) {
     _problemsShowVerifyResult({
       timedOut: true,
@@ -2553,7 +2328,6 @@ async function loadProblemsDashboard() {
   if (empty) empty.textContent = "Loading…";
   for (const key of Object.keys(_pdRecipeCache)) delete _pdRecipeCache[key];
   for (const key of Object.keys(_pdParishDetailsCache)) delete _pdParishDetailsCache[key];
-  _pdHarvestReport = null;
   _pdParishStatusDoc = null;
   try {
     await _pdEnsureParishesLoaded();
@@ -3415,10 +3189,8 @@ async function loadParishDirectory() {
       _pdAllParishes.push(..._pdParseEvidence(r.content, r.diocese));
     }
     _pdConsecutiveFailures = consecutiveFailures || {};
-    _pdHarvestReport = null;
     _pdParishStatusDoc = null;
     await _pdLoadParishStatusDoc(true);
-    await _pdLoadHarvestReport();
 
     if (Object.keys(PD_EVIDENCE_FILES).length === 0 || Object.keys(_pdDioceseTexts).length === 0) {
       loadingEl.style.display = "none";
@@ -3467,7 +3239,6 @@ if (_pdDetailsEl) {
 document.getElementById("pd-refresh").addEventListener("click", () => {
   Object.keys(_pdRecipeCache).forEach((k) => delete _pdRecipeCache[k]);
   Object.keys(_pdParishDetailsCache).forEach((k) => delete _pdParishDetailsCache[k]);
-  _pdHarvestReport = null;
   _pdParishStatusDoc = null;
   _pdExcludes = null;
   _pdOverrides = null;

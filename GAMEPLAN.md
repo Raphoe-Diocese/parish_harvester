@@ -17,6 +17,14 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 13/09/2026 — C4 dead Trainer code (this turn)
+
+**C3 merged:** [PR #215](https://github.com/Raphoe-Diocese/parish_harvester/pull/215) `1f810f8`. Trainer **1.61.27**. Zip not live until Pages + `scripts/refresh_local_trainer.ps1` + Reload.
+
+**Now — C4:** delete unused Trainer handlers. Trainer **1.61.28**. Not live until merge + Pages. Then refresh script + Reload. Do not tick done until Frank Reloads and Problems still lists parishes.
+
+**Still open:** H2 [#211](https://github.com/Raphoe-Diocese/parish_harvester/pull/211), B4 [#214](https://github.com/Raphoe-Diocese/parish_harvester/pull/214). Say **merge** for those. Next after C4 merge: S1.
+
 ## 13/09/2026 — C2 remove Trainer auto-update (this turn)
 
 **H3 done:** #212 merged. Harvest [34758064936](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34758064936) — Stranorlar **ok**, 13/09/2026.
