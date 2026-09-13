@@ -1,0 +1,210 @@
+#!/usr/bin/env node
+/**
+ * C5 — executable extension JS tests (no browser).
+ * 1) pollHarvestUntilDone is ok only when last_tested_at changes.
+ * 2) every chrome.runtime.sendMessage({type}) in content.js / sidepanel.js
+ *    has a listener (background.js, or sidepanel.js for broadcasts).
+ */
+import fs from "fs";
+import path from "path";
+import vm from "vm";
+import assert from "assert";
+import { fileURLToPath } from "url";
+
+const ROOT = path.resolve(path.dirname(fileURLToPath(import.meta.url)), "..", "..");
+
+function loadGithubRecipePush(fetchImpl) {
+  const code = fs.readFileSync(
+    path.join(ROOT, "extension", "github_recipe_push.js"),
+    "utf8"
+  );
+  const sandbox = {
+    fetch: fetchImpl,
+    Date,
+    setTimeout,
+    clearTimeout,
+    AbortController,
+    atob,
+    btoa,
+    encodeURIComponent,
+    decodeURIComponent,
+    console,
+  };
+  sandbox.globalThis = sandbox;
+  sandbox.self = sandbox;
+  vm.createContext(sandbox);
+  vm.runInContext(code, sandbox);
+  if (!sandbox.phGithubRecipePush?.pollHarvestUntilDone) {
+    throw new Error("phGithubRecipePush.pollHarvestUntilDone missing after load");
+  }
+  return sandbox.phGithubRecipePush;
+}
+
+function jsonResponse(body, status = 200) {
+  return {
+    ok: status >= 200 && status < 300,
+    status,
+    headers: { get: () => "" },
+    json: async () => body,
+    text: async () => JSON.stringify(body),
+  };
+}
+
+function statusPayload(lastTestedAt, outcome = "ok") {
+  return {
+    parishes: {
+      bangorparish: {
+        outcome,
+        last_tested_at: lastTestedAt,
+        display_name: "Bangor",
+      },
+    },
+  };
+}
+
+function makeFetch({ lastTestedAt, runCreatedAt, outcome = "ok" }) {
+  const statusJson = statusPayload(lastTestedAt, outcome);
+  const encoded = Buffer.from(JSON.stringify(statusJson), "utf8").toString("base64");
+  return async (url) => {
+    const href = String(url);
+    if (href.includes("/actions/workflows/harvest.yml/runs")) {
+      return jsonResponse({
+        workflow_runs: [
+          {
+            id: 99,
+            html_url: "https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/99",
+            created_at: runCreatedAt,
+            display_title: "Harvest bangorparish",
+            name: "Harvest",
+            status: "completed",
+            conclusion: "success",
+          },
+        ],
+      });
+    }
+    if (href.includes("/commits?path=")) {
+      return jsonResponse([
+        {
+          sha: "deadbeef",
+          commit: { committer: { date: lastTestedAt } },
+        },
+      ]);
+    }
+    if (href.includes("/contents/parishes/parish_status.json")) {
+      return jsonResponse({ content: encoded });
+    }
+    throw new Error(`unexpected fetch ${href}`);
+  };
+}
+
+async function testPollHarvestUntilDone() {
+  const oldAt = "2026-09-01T10:00:00.000Z";
+  const newAt = "2026-09-13T22:00:00.000Z";
+
+  const apiChanged = loadGithubRecipePush(
+    makeFetch({
+      lastTestedAt: newAt,
+      runCreatedAt: new Date(Date.now() - 20000).toISOString(),
+    })
+  );
+  const changed = await apiChanged.pollHarvestUntilDone({
+    gh_pat: "test-pat",
+    gh_repo: "Raphoe-Diocese/parish_harvester",
+    parish_key: "bangorparish",
+    startedAt: Date.now() - 1000,
+    previousTestedAt: oldAt,
+    maxWaitMs: 8000,
+  });
+  assert.strictEqual(changed.ok, true, "ok when last_tested_at changed");
+
+  const startedLong = Date.now() - 95_000;
+  const runAt = new Date(Date.now() - 60_000).toISOString();
+  const apiSame = loadGithubRecipePush(
+    makeFetch({ lastTestedAt: oldAt, runCreatedAt: runAt })
+  );
+  const same = await apiSame.pollHarvestUntilDone({
+    gh_pat: "test-pat",
+    gh_repo: "Raphoe-Diocese/parish_harvester",
+    parish_key: "bangorparish",
+    startedAt: startedLong,
+    previousTestedAt: oldAt,
+    maxWaitMs: 120_000,
+  });
+  assert.strictEqual(same.ok, false, "not ok when last_tested_at is unchanged");
+
+  const apiLeftover = loadGithubRecipePush(
+    makeFetch({ lastTestedAt: oldAt, runCreatedAt: runAt })
+  );
+  const leftover = await apiLeftover.pollHarvestUntilDone({
+    gh_pat: "test-pat",
+    gh_repo: "Raphoe-Diocese/parish_harvester",
+    parish_key: "bangorparish",
+    startedAt: startedLong,
+    previousTestedAt: "",
+    maxWaitMs: 120_000,
+  });
+  assert.strictEqual(
+    leftover.ok,
+    false,
+    "not ok when leftover last_tested_at is older than this test"
+  );
+  console.log("ok: pollHarvestUntilDone requires last_tested_at change");
+}
+
+function extractSendMessageTypes(src) {
+  const types = new Set();
+  const re = /sendMessage\(\s*\{[\s\S]{0,120}?type:\s*["']([a-z0-9_]+)["']/g;
+  let match;
+  while ((match = re.exec(src))) {
+    types.add(match[1]);
+  }
+  return types;
+}
+
+function extractHandlerTypes(src) {
+  const types = new Set();
+  const re =
+    /(?:message\??\.type|type)\s*(?:===|!==)\s*["']([a-z0-9_]+)["']/g;
+  let match;
+  while ((match = re.exec(src))) {
+    types.add(match[1]);
+  }
+  return types;
+}
+
+function testMessageHandlers() {
+  const content = fs.readFileSync(path.join(ROOT, "extension", "content.js"), "utf8");
+  const sidepanel = fs.readFileSync(path.join(ROOT, "extension", "sidepanel.js"), "utf8");
+  const background = fs.readFileSync(path.join(ROOT, "extension", "background.js"), "utf8");
+
+  const sent = new Set([
+    ...extractSendMessageTypes(content),
+    ...extractSendMessageTypes(sidepanel),
+  ]);
+  // problems_refresh is a broadcast the Problems tab listens for; Chrome
+  // delivers runtime messages to the side panel as well as the worker.
+  const handled = new Set([
+    ...extractHandlerTypes(background),
+    ...extractHandlerTypes(sidepanel),
+  ]);
+
+  assert.ok(sent.size > 0, "expected sendMessage types in content.js / sidepanel.js");
+  const missing = [...sent].filter((type) => !handled.has(type)).sort();
+  assert.deepStrictEqual(
+    missing,
+    [],
+    `sendMessage types with no handler: ${missing.join(", ")}`
+  );
+  console.log(`ok: ${sent.size} sendMessage types have handlers (${[...sent].sort().join(", ")})`);
+}
+
+async function main() {
+  testMessageHandlers();
+  await testPollHarvestUntilDone();
+  console.log("C5 extension JS tests passed");
+}
+
+main().catch((err) => {
+  console.error(err);
+  process.exit(1);
+});

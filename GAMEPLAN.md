@@ -17,11 +17,15 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
-## 13/09/2026 — F2/F3 backlog pages (this turn)
+## 13/09/2026 — C5 executable JS test (this turn)
 
-**E2 merged:** [PR #223](https://github.com/Raphoe-Diocese/parish_harvester/pull/223) `80567a7`. **Not live** until next OCR is green or red with `::error`.
+**F2/F3 merged:** [PR #224](https://github.com/Raphoe-Diocese/parish_harvester/pull/224) `ea70713`. Standalone `-ocr.html` exempt from 850/450. Phone-PDF rows ticked only where the 10/09 audit or live homepage proved them. Docs only — no live page change.
 
-**Now — F2 + F3:** standalone `-ocr.html` exempt from 850/450. Phone-PDF `doing` rows from 26/08–06/09: ticked only where the 10/09 audit or this session’s live homepage proves it; the rest say **needs Frank's phone**. Next: C5.
+**Now — C5:** Node test in `test.yml` — `pollHarvestUntilDone` is ok only when `last_tested_at` changes; every `sendMessage({type})` in content/sidepanel has a handler. Proof: green `test.yml` with that Node step.
+
+## 13/09/2026 — F2/F3 backlog pages
+
+**F2/F3 merged:** [PR #224](https://github.com/Raphoe-Diocese/parish_harvester/pull/224) `ea70713`. Docs only.
 
 ## 13/09/2026 — E2 OCR stub must not look like success
 
