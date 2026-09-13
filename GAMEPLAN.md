@@ -17,6 +17,14 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 13/09/2026 — C2 remove Trainer auto-update (this turn)
+
+**H3 done:** #212 merged. Harvest [34758064936](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34758064936) — Stranorlar **ok**, 13/09/2026.
+
+**H2:** [PR #211](https://github.com/Raphoe-Diocese/parish_harvester/pull/211) still open.
+
+**Now — C2:** drop `update_url`, CRX, `updates.xml`, context-menu Update. Zip + `key` stay. Trainer **1.61.26**. Not live until merge + Pages. Then `scripts/refresh_local_trainer.ps1` and Reload at chrome://extensions.
+
 ## 12/09/2026 night — P1 done; A5 (#204) next
 
 **P1 done (Frank 12/09 23:50):** [PR #205](https://github.com/Raphoe-Diocese/parish_harvester/pull/205) merged `437b4c0c` + Pages [34721204022](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34721204022). Live `?v=20260912a`. Phone: yes.
