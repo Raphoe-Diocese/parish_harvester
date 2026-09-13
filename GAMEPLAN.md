@@ -17,11 +17,17 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
-## 13/09/2026 — D1 one truth in markdown (this turn)
+## 13/09/2026 — D2 README and WHAT_IS_THIS (this turn)
+
+**D1 merged:** [PR #220](https://github.com/Raphoe-Diocese/parish_harvester/pull/220) `2411a2f`. Markdown count 20. Docs only.
+
+**Now — D2:** README + WHAT_IS_THIS match what exists (4 live dioceses, parishpress.ie, Sunday 09:00 UTC, zip Trainer). Delete stale CHANGELOG. Next after D2 merge: E1.
+
+## 13/09/2026 — D1 one truth in markdown
 
 **S3 live:** [PR #219](https://github.com/Raphoe-Diocese/parish_harvester/pull/219) merged `e58ed97` + Pages [34778374344](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34778374344). Opened https://www.parishpress.ie/search/ — GitHub Pages **404**. Homepage HTML has no `/search/` or `/subscribe/` href.
 
-**Now — D1:** delete competing markdown lists; one `docs/DOMAIN.md`; owner `Raphoe-Diocese`; `SECURITY.md` public-key wording. **Not live** (docs only). Next after D1 merge: D2.
+**D1 merged:** [PR #220](https://github.com/Raphoe-Diocese/parish_harvester/pull/220) `2411a2f`.
 
 **P0 from May deep-audit (closed, do not reopen):** toolbar “ok” / “marked as dead” / “saved” lies — superseded by C1 / C3 / C4. Harvest truth stays `parishes/parish_status.json`.
 
