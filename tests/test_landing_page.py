@@ -139,6 +139,12 @@ class LandingPageTests(unittest.TestCase):
             self.assertNotIn("hero-slide-credit", index_html)
             self.assertNotIn("COST_DASHBOARD", index_html)
             self.assertNotIn("Browse the full OCR bulletin archive", index_html)
+            self.assertNotIn("/search/", index_html)
+            self.assertNotIn("/calendars/", index_html)
+            self.assertNotIn("/feeds/", index_html)
+            self.assertNotIn("/badges/", index_html)
+            self.assertNotIn("/subscribe/", index_html)
+            self.assertFalse((docs / "subscribe" / "index.html").exists())
 
             # The other dioceses collapse into one small expandable list.
             self.assertIn("More dioceses — coming soon (22)", index_html)

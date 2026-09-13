@@ -17,11 +17,19 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
-## 13/09/2026 — S2 disabled A-Z links (this turn)
+## 13/09/2026 — S3 stop publishing search/calendars (this turn)
+
+**S2 merged:** [PR #218](https://github.com/Raphoe-Diocese/parish_harvester/pull/218) `d2aca0f`. **Not live** until next harvest. Do not regenerate `docs/dioceses` on this PC.
+
+**Now — S3:** stop publishing `/search/`, `/calendars/`, `/feeds/`, `/badges/`, `/subscribe/`. Delete dead `write_root_index()` and stub `docs/bulletins/raphoe/index.html`. Keep `docs/bulletins/index.html`. **Not live** until merge + Pages. Do not tick done until https://www.parishpress.ie/search/ is 404 and the homepage has no inbound search link.
+
+**Still open:** H2 [#211](https://github.com/Raphoe-Diocese/parish_harvester/pull/211), B4 [#214](https://github.com/Raphoe-Diocese/parish_harvester/pull/214). Next after S3 merge: D1.
+
+## 13/09/2026 — S2 disabled A-Z links
 
 **S1 merged:** [PR #217](https://github.com/Raphoe-Diocese/parish_harvester/pull/217) `b76fac7`. **Not live** until next OCR. Do not regenerate `docs/parishes` on this PC.
 
-**Now — S2:** A–Z grid drops disabled parishes so Greencastle / Coleraine / Long Tower get no external href. **Not live** until merge + next harvest. Do not regenerate `docs/dioceses` on this PC.
+**S2 merged:** [PR #218](https://github.com/Raphoe-Diocese/parish_harvester/pull/218) `d2aca0f`. **Not live** until next harvest.
 
 ## 13/09/2026 — S1 slice_missing (this turn)
 
