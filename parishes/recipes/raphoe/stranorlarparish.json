@@ -6,8 +6,12 @@
   "start_url": "https://www.stranorlarparish.ie/newsletter/",
   "steps": [
     {
-      "action": "download",
-      "url": "https://www.stranorlarparish.ie/wp-content/uploads/2026/06/28th-June-2026.pdf"
+      "action": "click",
+      "pick_strategy": "newest_dated",
+      "selector": "a[href$=\".pdf\"], a[href*=\".pdf\"]"
+    },
+    {
+      "action": "download"
     }
   ],
   "observed_load_ms": 381737,
@@ -16,14 +20,19 @@
   "navigation_wait_until": "commit",
   "playbook_type": "pdf_download_list",
   "site_type": "pdf_link_list",
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  },
   "operator_notes": [
-    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
-    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-    "Do not worry if the filename or date in the link text changes every week."
+    "Listing https://www.stranorlarparish.ie/newsletter/ — newest dated PDF is at the top.",
+    "Proved 13/09/2026: 13th-September-2026.pdf HTTP 200, application/pdf, %PDF-1.7, 237615 bytes.",
+    "Do not pin a dated filename on the download step — harvest predicted …/2026/09/6th-Se… and 404'd.",
+    "Harvester picks the newest dated PDF each Sunday."
   ],
   "do_not": [
-    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
+    "Do not pin a dated filename in the selector or download url (e.g. 28th-June-2026.pdf or 13th-September-2026.pdf) — it breaks next week.",
     "Do not pick GDPR, Gift Aid, or financial statement PDFs."
   ],
-  "recorded_date": "2026-09-10"
+  "recorded_date": "2026-09-13"
 }
