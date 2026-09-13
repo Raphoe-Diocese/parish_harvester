@@ -623,3 +623,52 @@ def polish_ocr_html_from_pdf(fragment: str, pdf_path: str | Path) -> str:
     """Born-digital pages keep PDF text; smashed image pages get column OCR."""
     polished = prefer_embedded_pages_in_ocr_html(fragment, pdf_path)
     return repair_image_pages_in_ocr_html(polished, pdf_path)
+
+
+def choose_vision_page_indexes(native_pages: list[list[str]] | None) -> list[int] | None:
+    """Which 0-based pages need vision.
+
+    ``[]`` — every page has embedded text; send none.
+    A list — mixed mega; send only those sparse/image pages.
+    ``None`` — no usable native text (or every page is sparse); send the whole PDF.
+    """
+    pages = list(native_pages or [])
+    if not pages:
+        return None
+    sparse = [i for i, lines in enumerate(pages) if page_is_sparse(lines)]
+    if not sparse:
+        return []
+    if len(sparse) == len(pages):
+        return None
+    return sparse
+
+
+def merge_vision_into_pages(
+    seeded: list[list[str]],
+    sparse_indexes: list[int],
+    vision_pages: list[list[str]],
+) -> list[list[str]]:
+    """Put vision line-lists onto the sparse slots; leave embedded pages as-is."""
+    out = [list(lines or []) for lines in seeded]
+    for idx, vis in zip(sparse_indexes, vision_pages):
+        if 0 <= idx < len(out):
+            out[idx] = list(vis or [])
+    return out
+
+
+def apply_ocr_tiers(
+    native_pages: list[list[str]] | None,
+    vision_provider,
+) -> tuple[list[list[str]], str, int]:
+    """Embedded text first; vision only on sparse pages. *vision_provider(indexes)*."""
+    seeded = [list(lines or []) for lines in (native_pages or [])]
+    indexes = choose_vision_page_indexes(native_pages)
+    if indexes == []:
+        return seeded, "Tier0-text", 0
+    if indexes is None:
+        all_idx = list(range(len(seeded)))
+        vision = list(vision_provider(all_idx) or [])
+        return [list(p or []) for p in vision], "vision", len(all_idx)
+    vision = list(vision_provider(indexes) or [])
+    merged = merge_vision_into_pages(seeded, indexes, vision)
+    return merged, "Tier0+vision", len(indexes)

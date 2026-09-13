@@ -8,11 +8,10 @@ import html as html_utils
 import sys
 
 from ocr.bulletin_layout import split_heading_prefix
+from ocr.sparse_page_ocr import choose_vision_page_indexes, merge_vision_into_pages
 from ocr.text_extract import (
-    all_pages_have_embedded_text,
     extract_all_page_lines,
     extract_text_pages,
-    page_is_sparse,
     prefer_embedded_page_text,
 )
 
@@ -227,6 +226,43 @@ def pdf_to_images(pdf_path):
     from pdf2image import convert_from_path
 
     return convert_from_path(pdf_path, dpi=150)
+
+
+def pdf_images_for_pages(pdf_path, indexes_0based):
+    from pdf2image import convert_from_path
+
+    images = []
+    for index in indexes_0based:
+        images.extend(
+            convert_from_path(pdf_path, dpi=150, first_page=index + 1, last_page=index + 1)
+        )
+    return images
+
+
+def ocr_selected_images_with_fallbacks(images):
+    """Gemini, then GitHub Models, then OpenAI — sparse pages only."""
+    gemini_api_key = os.environ.get("GEMINI_API_KEY")
+    github_token = os.environ.get("GITHUB_TOKEN")
+    openai_api_key = os.environ.get("OPENAI_API_KEY")
+    if gemini_api_key:
+        print("Sparse-page image OCR via Gemini ...")
+        try:
+            return ocr_images_with_gemini(images)
+        except Exception as e:
+            print(f"  Gemini OCR failed ({type(e).__name__}: {e}).")
+    if github_token:
+        print("Sparse-page image OCR via GitHub Models ...")
+        try:
+            return ocr_images_with_github_models(images)
+        except Exception as e:
+            print(f"  GitHub Models OCR failed ({type(e).__name__}: {e}).")
+    if openai_api_key:
+        print("Sparse-page image OCR via OpenAI ...")
+        try:
+            return ocr_images_with_openai(images)
+        except Exception as e:
+            print(f"  OpenAI OCR failed ({type(e).__name__}: {e}).")
+    return None, None
 
 
 def ocr_with_mistral(pdf_path):
@@ -667,16 +703,24 @@ def main():
     pages_text = None
     provider_used = None
     images = None
+    native_all = None
+    vision_indexes = None
 
     try:
         native_all = extract_all_page_lines(pdf_file)
-        if all_pages_have_embedded_text(native_all) and not any(
-            page_is_sparse(p) for p in (native_all or [])
-        ):
+        vision_indexes = choose_vision_page_indexes(native_all)
+        if vision_indexes == []:
             pages_text = native_all
             provider_used = "Tier0-text"
             print(
                 f"  Embedded PDF text on all {len(native_all)} page(s) — skipping vision OCR."
+            )
+            print("0 sparse pages sent to vision")
+        elif vision_indexes is not None:
+            pages_text = [list(lines or []) for lines in native_all]
+            provider_used = "Tier0-text"
+            print(
+                f"{len(vision_indexes)} sparse pages sent to vision"
             )
     except Exception as e:
         print(f"  Embedded-text check failed ({type(e).__name__}: {e}).")
@@ -709,6 +753,18 @@ def main():
             f.write(html)
         print(f"Stub output saved to: {output_filename}")
         return
+
+    if pages_text is not None and vision_indexes and has_vision_keys:
+        try:
+            sparse_images = pdf_images_for_pages(pdf_file, vision_indexes)
+            vision_pages, sparse_provider = ocr_selected_images_with_fallbacks(sparse_images)
+            if vision_pages:
+                pages_text = merge_vision_into_pages(pages_text, vision_indexes, vision_pages)
+                provider_used = f"Tier0+{sparse_provider}"
+        except Exception as e:
+            print(f"  Sparse-page vision failed ({type(e).__name__}: {e}).")
+    elif pages_text is None and native_all:
+        print(f"{len(native_all)} sparse pages sent to vision")
 
     if pages_text is None and mistral_api_key:
         for attempt in (1, 2):
