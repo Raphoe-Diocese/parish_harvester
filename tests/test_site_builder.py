@@ -129,6 +129,75 @@ class SiteBuilderTests(unittest.TestCase):
             self.assertIn('rel="preload"', derry_page)
             self.assertIn("/mega_pdf/derry_mega_bulletin_p1.jpg", derry_page)
 
+    def test_disabled_parishes_have_no_external_az_href(self) -> None:
+        with tempfile.TemporaryDirectory() as tmpdir:
+            root = Path(tmpdir)
+            recipes = root / "parishes" / "recipes" / "derry"
+            recipes.mkdir(parents=True)
+            (recipes / "greencastleparish.json").write_text(
+                json.dumps(
+                    {
+                        "parish_key": "greencastleparish",
+                        "display_name": "Greencastle",
+                        "start_url": "https://greencastleparish.com/",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (recipes / "ardmoreparish.json").write_text(
+                json.dumps(
+                    {
+                        "parish_key": "ardmoreparish",
+                        "display_name": "Ardmore",
+                        "start_url": "https://example.com/ardmore",
+                    }
+                ),
+                encoding="utf-8",
+            )
+            (root / "parishes" / "parish_status.json").write_text(
+                json.dumps(
+                    {
+                        "parishes": {
+                            "greencastleparish": {
+                                "outcome": "disabled",
+                                "display_name": "Greencastle",
+                            },
+                            "ardmoreparish": {
+                                "outcome": "ok",
+                                "display_name": "Ardmore",
+                            },
+                        }
+                    }
+                ),
+                encoding="utf-8",
+            )
+            report = root / "Bulletins" / "report.json"
+            report.parent.mkdir(parents=True)
+            report.write_text(
+                json.dumps({"downloaded": [{"parish": "ardmoreparish"}]}),
+                encoding="utf-8",
+            )
+            old_root = site_builder.REPO_ROOT
+            old_recipes = site_builder.RECIPES_DIR
+            site_builder.REPO_ROOT = root
+            site_builder.RECIPES_DIR = root / "parishes" / "recipes"
+            try:
+                self.assertEqual(
+                    site_builder._disabled_status_keys(),
+                    {"greencastleparish"},
+                )
+                urls = [item["url"] for item in site_builder._parish_links("derry")]
+                self.assertNotIn("https://greencastleparish.com/", urls)
+                self.assertIn("https://example.com/ardmore", urls)
+                merged, _stats = site_builder._parish_links_with_harvest("derry", report)
+                self.assertNotIn(
+                    "https://greencastleparish.com/",
+                    [item["url"] for item in merged],
+                )
+            finally:
+                site_builder.REPO_ROOT = old_root
+                site_builder.RECIPES_DIR = old_recipes
+
     def test_mega_pdf_url_stamps_harvest_clock(self) -> None:
         self.assertEqual(
             site_builder._mega_pdf_url(
