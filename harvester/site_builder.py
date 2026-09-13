@@ -665,13 +665,38 @@ def _ready_count_text(ready: int | None, total: int | None) -> str:
     return f"{ready}/{total}"
 
 
+def _slice_missing_count(status: dict | None, diocese_name: str = "") -> int:
+    """ok rows flagged slice_missing for this diocese card. Does not change ok."""
+    parishes = status.get("parishes") if isinstance(status, dict) else None
+    if not isinstance(parishes, dict):
+        return 0
+    card = re.sub(r"[^a-z]+", "", (diocese_name or "").lower())
+    n = 0
+    for row in parishes.values():
+        if not isinstance(row, dict):
+            continue
+        if row.get("outcome") != "ok" or not row.get("slice_missing"):
+            continue
+        row_name = re.sub(r"[^a-z]+", "", str(row.get("diocese") or "").lower())
+        if card and row_name and card not in row_name and row_name not in card:
+            continue
+        n += 1
+    return n
+
+
 def _card_counts_from_summary(
     summary: DioceseWeekSummary | None,
+    *,
+    parish_status: dict | None = None,
+    diocese_name: str = "",
 ) -> tuple[int | None, int | None]:
     """Use the same week summary as the diocese intro. total==0 stays unknown."""
     if summary is None or summary.total <= 0:
         return None, None
-    return summary.found, summary.total
+    ready = int(summary.found) - _slice_missing_count(
+        parish_status, diocese_name or summary.diocese_display_name
+    )
+    return max(0, ready), summary.total
 
 
 def _count_dot(ready: int | None, total: int | None) -> str:
@@ -1107,10 +1132,12 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
 
     week_label = format_uk_date(target_date) or target_date or "this Sunday"
     harvested_at = ""
+    status_payload: dict = {}
     status_path = REPO_ROOT / "parishes" / "parish_status.json"
     try:
-        status_payload = json.loads(status_path.read_text(encoding="utf-8"))
-        if isinstance(status_payload, dict):
+        loaded = json.loads(status_path.read_text(encoding="utf-8"))
+        if isinstance(loaded, dict):
+            status_payload = loaded
             harvested_at = str(status_payload.get("generated_at") or "")
     except (OSError, json.JSONDecodeError):
         harvested_at = ""
@@ -1173,7 +1200,11 @@ def run(report_path: Path = REPORT_PATH, docs_dir: Path = DOCS_DIR) -> None:
         avg = (sum(rates) / len(rates)) if rates else None
         dot = _status_dot(avg)
         status_label = _status_label(avg)
-        ready_count, total_count = _card_counts_from_summary(week_summary)
+        ready_count, total_count = _card_counts_from_summary(
+            week_summary,
+            parish_status=status_payload,
+            diocese_name=diocese.name,
+        )
         rows.append(
             {
                 "key": diocese.key,
