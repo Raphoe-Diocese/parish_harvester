@@ -281,6 +281,38 @@ class ParishStatusTests(unittest.TestCase):
             self.assertTrue(row["actionable"])
             self.assertNotEqual(row.get("skip"), True)
 
+    def test_drive_folder_listing_is_failed_not_ok(self) -> None:
+        status = build_parish_status(
+            {
+                "target_date": "2026-09-06",
+                "downloaded": [
+                    {
+                        "parish": "drive-1rjeey-ayy",
+                        "display_name": "Bruckless",
+                        "url": "https://drive.google.com/drive/folders/1jPOi4GRU22vAxeKNe5Y_doBJ3riPh7ZK",
+                    },
+                    {
+                        "parish": "okfile",
+                        "display_name": "OK File",
+                        "url": "https://drive.usercontent.google.com/download?id=abc&export=download",
+                    },
+                ],
+                "failed": [],
+                "stale_rejected": [],
+                "html_links": [],
+                "skipped": [],
+            },
+            consecutive_failures={},
+            disabled_keys=set(),
+        )
+        row = status["parishes"]["drive-1rjeey-ayy"]
+        self.assertEqual(row["outcome"], "failed")
+        self.assertEqual(row["error"], "Drive folder listing, not a file")
+        self.assertTrue(row["actionable"])
+        self.assertIn("drive-1rjeey-ayy", status["actionable_keys"])
+        self.assertEqual(status["parishes"]["okfile"]["outcome"], "ok")
+        self.assertNotIn("okfile", status["actionable_keys"])
+
 
 if __name__ == "__main__":
     unittest.main()

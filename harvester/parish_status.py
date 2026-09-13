@@ -15,6 +15,7 @@ from typing import Any
 
 from .config import PARISHES_DIR, REPORT_JSON
 from .fetcher import parse_evidence_file
+from .parish_aliases import DRIVE_FOLDER_LISTING_ERROR, is_drive_folder_listing
 from .report import _load_recipe_meta_for_key, _recipe_is_inactive
 
 SCHEMA_VERSION = 1
@@ -315,6 +316,11 @@ def build_parish_status(
                 continue
             outcome = _outcome_from_report_item(section, item)
             error_text = str(item.get("error") or item.get("reason") or "")
+            row_url = str(item.get("url") or item.get("start_url") or "")
+            if outcome == "ok" and is_drive_folder_listing(row_url):
+                outcome = "failed"
+                error_text = DRIVE_FOLDER_LISTING_ERROR
+                downloaded_keys.discard(key)
             diagnosis = item.get("diagnosis") if isinstance(item.get("diagnosis"), dict) else None
             category = _failure_category(error_text, diagnosis)
             if outcome == "html_only":
@@ -341,7 +347,7 @@ def build_parish_status(
                     "outcome": outcome,
                     "category": category,
                     "error": error_text or None,
-                    "url": str(item.get("url") or item.get("start_url") or ""),
+                    "url": row_url,
                     "bulletin_date": bulletin_date,
                     "bulletin_date_uk": bulletin_date_uk,
                     "last_tested_at": _row_last_tested_at(
