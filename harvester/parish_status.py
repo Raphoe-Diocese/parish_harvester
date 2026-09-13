@@ -335,12 +335,19 @@ def build_parish_status(
 
             diagnosis, error_text = _with_harvest_note(diagnosis, recipe_meta, error_text)
             bulletin_date, bulletin_date_uk = _row_bulletin_dates(item)
+            prev_row = previous_parishes.get(key)
+            slice_missing = (
+                outcome == "ok"
+                and isinstance(prev_row, dict)
+                and bool(prev_row.get("slice_missing"))
+            )
             _upsert(
                 key,
                 {
                     "outcome": outcome,
                     "category": category,
                     "error": error_text or None,
+                    "slice_missing": slice_missing,
                     "url": str(item.get("url") or item.get("start_url") or ""),
                     "bulletin_date": bulletin_date,
                     "bulletin_date_uk": bulletin_date_uk,
@@ -431,6 +438,39 @@ def build_parish_status(
         "parishes": parishes,
         "actionable_keys": actionable_keys,
     }
+
+
+def apply_slice_missing(
+    *,
+    sliced_keys: set[str] | list[str],
+    missing_keys: set[str] | list[str],
+    status_path: Path | None = None,
+) -> dict:
+    """Set ``slice_missing`` on parish_status rows. Does not change ``outcome``."""
+    path = status_path or PARISH_STATUS_PATH
+    data = _load_json(path, {})
+    if not isinstance(data, dict):
+        data = {}
+    parishes = data.get("parishes")
+    if not isinstance(parishes, dict):
+        return data
+    sliced = {str(key).strip() for key in sliced_keys if str(key).strip()}
+    missing = {str(key).strip() for key in missing_keys if str(key).strip()}
+    changed = False
+    for key, row in parishes.items():
+        if not isinstance(row, dict):
+            continue
+        if key in missing:
+            if row.get("slice_missing") is not True:
+                row["slice_missing"] = True
+                changed = True
+        elif key in sliced and row.get("slice_missing"):
+            row["slice_missing"] = False
+            changed = True
+    if changed:
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text(json.dumps(data, indent=2), encoding="utf-8")
+    return data
 
 
 def write_parish_status(

@@ -45,6 +45,10 @@ DOCS_DIR = REPO_ROOT / "docs"
 PARISHES_OUT_DIR = DOCS_DIR / "parishes"
 PARISH_STATUS_PATH = REPO_ROOT / "parishes" / "parish_status.json"
 
+SLICE_MISSING_LINE = (
+    "This week's PDF page for {name} could not be cut from the collated bulletin"
+)
+
 # parish_status.json's `diocese` field uses the full display name; map the
 # short config keys used everywhere else in ocr/generate_bulletin_pages.py.
 DIOCESE_STATUS_NAMES = {
@@ -430,6 +434,8 @@ def write_parish_pages_for_diocese(
     diocese_label = config.display_name.replace(" Diocese", "").upper()
     uk_date = format_uk_date(bulletin_date)
     written: list[str] = []
+    sliced_keys: list[str] = []
+    missing_keys: list[str] = []
 
     for parish in parishes:
         try:
@@ -462,27 +468,15 @@ def write_parish_pages_for_diocese(
                 pdf_href = f"{parish.key}.pdf"
                 meta_line = base_meta
                 fail_reason = ""
+                sliced_keys.append(parish.key)
             else:
-                if not mega_exists:
-                    fail_reason = (
-                        "The diocese mega PDF is missing from the repository, so this parish's "
-                        "pages could not be sliced."
-                    )
-                elif not has_range:
-                    fail_reason = (
-                        "This parish is marked OK, but its page range could not be found in this "
-                        "week's mega OCR (no stitcher page index and no name-banner match)."
-                    )
-                else:
-                    fail_reason = (
-                        "This parish is marked OK and a page range was found, but slicing those "
-                        "pages from the mega PDF failed."
-                    )
-                (out_root / f"{parish.key}.pdf").write_bytes(
-                    write_missing_slice_pdf(parish.display_name, fail_reason)
-                )
-                pdf_href = f"{parish.key}.pdf"
-                meta_line = f"{base_meta} {fail_reason}"
+                fail_reason = SLICE_MISSING_LINE.format(name=parish.display_name)
+                stub = out_root / f"{parish.key}.pdf"
+                if stub.exists():
+                    stub.unlink()
+                pdf_href = ""
+                meta_line = f"{base_meta} {fail_reason}."
+                missing_keys.append(parish.key)
 
             slice_pdf = out_root / f"{parish.key}.pdf"
             embedded_html = None
@@ -546,6 +540,7 @@ def write_parish_pages_for_diocese(
                 ocr_fragment=ocr_fragment,
                 parish_section_heading=f"Other {diocese_label} Parishes",
                 parish_links_html=_render_other_parishes_grid(parishes, parish.key),
+                stale_note=fail_reason,
             )
             _write_text(out_root / viewer_filename, page_html)
             _write_text(
@@ -564,6 +559,14 @@ def write_parish_pages_for_diocese(
         except Exception as exc:
             print(f"Skipped {parish.key} ({type(exc).__name__}: {exc})")
             continue
+
+    from harvester.parish_status import apply_slice_missing
+
+    apply_slice_missing(
+        sliced_keys=sliced_keys,
+        missing_keys=missing_keys,
+        status_path=parish_status_path or PARISH_STATUS_PATH,
+    )
 
     leftover = relabel_leftover_parish_pages(
         out_root,

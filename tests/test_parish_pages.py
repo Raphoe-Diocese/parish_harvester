@@ -272,15 +272,17 @@ class WriteParishPagesForDioceseTests(unittest.TestCase):
             )
             self.assertEqual(written, ["unmatched-parish"])
             html_out = (out_dir / "unmatched-parish.html").read_text(encoding="utf-8")
-            self.assertIn("page range could not be found", html_out)
+            self.assertIn("could not be cut from the collated bulletin", html_out)
+            self.assertIn("Totally Unmatched Parish Name", html_out)
+            self.assertIn('class="stale-note"', html_out)
             self.assertNotIn(
                 "Exact PDF pages for this parish could not be auto-detected this week, so this links to the full diocese bulletin instead.",
                 html_out,
             )
-            # Always write a local PDF so the viewer does not 404.
-            self.assertTrue((out_dir / "unmatched-parish.pdf").exists())
-            self.assertIn('href="unmatched-parish.pdf"', html_out)
-            self.assertGreater((out_dir / "unmatched-parish.pdf").stat().st_size, 32)
+            self.assertFalse((out_dir / "unmatched-parish.pdf").exists())
+            status = json.loads(status_path.read_text(encoding="utf-8"))
+            self.assertTrue(status["parishes"]["unmatched-parish"]["slice_missing"])
+            self.assertEqual(status["parishes"]["unmatched-parish"]["outcome"], "ok")
 
     def test_skips_holy_cross_even_when_marked_ok(self) -> None:
         with tempfile.TemporaryDirectory() as tmpdir:
@@ -502,6 +504,68 @@ class StaleParishCaptionTests(unittest.TestCase):
             self.assertNotIn("This week&#x27;s bulletin", ardara)
             keep = (out_dir / "annagryparish.html").read_text(encoding="utf-8")
             self.assertIn("This week&#x27;s bulletin for Annagry", keep)
+
+
+class SliceMissingTests(unittest.TestCase):
+    def test_apply_preserves_ok_and_homepage_ready_excludes_flag(self) -> None:
+        from harvester.parish_status import apply_slice_missing, build_parish_status
+        from harvester.site_builder import DioceseWeekSummary, _card_counts_from_summary
+
+        with tempfile.TemporaryDirectory() as tmpdir:
+            status_path = Path(tmpdir) / "parish_status.json"
+            status_path.write_text(
+                json.dumps(
+                    {
+                        "parishes": {
+                            "kincasslagh": {
+                                "outcome": "ok",
+                                "diocese": "Raphoe Diocese",
+                                "display_name": "Kincasslagh",
+                                "slice_missing": True,
+                            },
+                            "ardara": {
+                                "outcome": "ok",
+                                "diocese": "Raphoe Diocese",
+                                "display_name": "Ardara",
+                                "slice_missing": True,
+                            },
+                        }
+                    }
+                ),
+                encoding="utf-8",
+            )
+            apply_slice_missing(
+                sliced_keys={"ardara"},
+                missing_keys={"kincasslagh"},
+                status_path=status_path,
+            )
+            data = json.loads(status_path.read_text(encoding="utf-8"))
+            self.assertTrue(data["parishes"]["kincasslagh"]["slice_missing"])
+            self.assertFalse(data["parishes"]["ardara"]["slice_missing"])
+
+            rebuilt = build_parish_status(
+                {
+                    "target_date": "2026-09-13",
+                    "downloaded": [
+                        {"parish": "kincasslagh", "display_name": "Kincasslagh", "url": "https://k.ie"},
+                        {"parish": "ardara", "display_name": "Ardara", "url": "https://a.ie"},
+                    ],
+                },
+                parishes_dir=Path(tmpdir),
+                previous_status=data,
+                consecutive_failures={},
+                disabled_keys=set(),
+            )
+            self.assertEqual(rebuilt["parishes"]["kincasslagh"]["outcome"], "ok")
+            self.assertTrue(rebuilt["parishes"]["kincasslagh"]["slice_missing"])
+            self.assertFalse(rebuilt["parishes"]["ardara"]["slice_missing"])
+
+            ready, total = _card_counts_from_summary(
+                DioceseWeekSummary(diocese_display_name="Raphoe", found=12, total=32),
+                parish_status=rebuilt,
+                diocese_name="Raphoe",
+            )
+            self.assertEqual((ready, total), (11, 32))
 
 
 if __name__ == "__main__":

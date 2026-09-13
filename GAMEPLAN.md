@@ -17,11 +17,17 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 13/09/2026 — S1 slice_missing (this turn)
+
+**C4 merged:** [PR #216](https://github.com/Raphoe-Diocese/parish_harvester/pull/216) `31a0ac9`. Trainer **1.61.28**. Not live until Pages + `scripts/refresh_local_trainer.ps1` + Reload.
+
+**Now — S1:** missing mega slices get `slice_missing: true`. Parish page says the honest cut-failed line. Homepage ready count excludes those rows. **Not live** until merge + next OCR. Do not regenerate `docs/parishes` on this PC.
+
 ## 13/09/2026 — C4 dead Trainer code (this turn)
 
 **C3 merged:** [PR #215](https://github.com/Raphoe-Diocese/parish_harvester/pull/215) `1f810f8`. Trainer **1.61.27**. Zip not live until Pages + `scripts/refresh_local_trainer.ps1` + Reload.
 
-**Now — C4:** delete unused Trainer handlers. Trainer **1.61.28**. Not live until merge + Pages. Then refresh script + Reload. Do not tick done until Frank Reloads and Problems still lists parishes.
+**C4 merged:** [PR #216](https://github.com/Raphoe-Diocese/parish_harvester/pull/216). Trainer **1.61.28**. Not live until Pages + Reload.
 
 **Still open:** H2 [#211](https://github.com/Raphoe-Diocese/parish_harvester/pull/211), B4 [#214](https://github.com/Raphoe-Diocese/parish_harvester/pull/214). Say **merge** for those. Next after C4 merge: S1.
 
