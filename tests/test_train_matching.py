@@ -344,6 +344,13 @@ https://www.antrimparish.com
             workflow.index("Upload harvest docs snapshot"),
         )
         self.assertIn("continue-on-error: true", workflow)
+        test_step = workflow.split("- name: Run tests", 1)[1].split("- name:", 1)[0]
+        self.assertNotIn("continue-on-error: true", test_step)
+        self.assertNotIn("Note test failures (harvest continues)", workflow)
+        self.assertIn("[skip ci]", workflow)
+        test_yml = (repo_root / ".github" / "workflows" / "test.yml").read_text(encoding="utf-8")
+        self.assertIn('pymupdf>=1.24.0', test_yml)
+        self.assertIn("[skip ci]", test_yml)
         self.assertIn("id: commit_harvest", workflow)
         self.assertIn("docs/mega_pdf/*_mega_bulletin.pdf", workflow)
         self.assertIn("docs/mega_pdf/*_mega_bulletin_p1.jpg", workflow)
