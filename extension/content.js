@@ -8023,7 +8023,6 @@
                   type: "problems_refresh",
                   parish_key: key,
                   display_name: name || key,
-                  dispatch_at: dispatchAt,
                 });
               } catch (_e) {
                 // Side panel may be closed.
@@ -8164,7 +8163,6 @@
                 type: "problems_refresh",
                 parish_key: key,
                 display_name: name || key,
-                dispatch_at: dispatchAt,
               });
             } catch (_e) {
               // Side panel may be closed.

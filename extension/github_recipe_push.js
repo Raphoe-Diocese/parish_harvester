@@ -74,7 +74,19 @@
     }
   };
 
+  const githubRateLimitMessage = (resp) => {
+    if (!resp || resp.status !== 403) return "";
+    const remaining = String(resp.headers?.get?.("X-RateLimit-Remaining") || "").trim();
+    if (remaining !== "0") return "";
+    const reset = Number(resp.headers.get("X-RateLimit-Reset") || 0);
+    const now = Math.floor(Date.now() / 1000);
+    const mins = reset > now ? Math.max(1, Math.ceil((reset - now) / 60)) : 1;
+    return `GitHub rate limit — try again in ${mins} min`;
+  };
+
   const githubApiError = async (resp) => {
+    const rate = githubRateLimitMessage(resp);
+    if (rate) return rate;
     try {
       const data = await resp.json();
       return data?.message || `GitHub API ${resp.status}`;
@@ -136,20 +148,24 @@
     };
 
     if (preferred) {
-      try {
-        const hit = await tryPath(preferred, 8000);
-        if (hit) return hit;
-      } catch (err) {
-        console.warn("phGithubRecipePush: preferred path failed", err);
-      }
+      const hit = await tryPath(preferred, 8000);
+      if (hit) return hit;
     }
 
     const others = DIOCESE_FOLDERS.filter((d) => d !== preferred);
-    const probes = await Promise.all(
-      others.map((dio) => tryPath(dio, 5000).catch(() => null))
+    const settled = await Promise.all(
+      others.map(async (dio) => {
+        try {
+          return { hit: await tryPath(dio, 5000), err: null };
+        } catch (err) {
+          return { hit: null, err };
+        }
+      })
     );
-    const found = probes.find(Boolean);
+    const found = settled.find((row) => row.hit)?.hit;
     if (found) return found;
+    const hard = settled.find((row) => row.err);
+    if (hard) throw hard.err;
 
     const dio = preferred || "unknown";
     const filePath = `parishes/recipes/${dio}/${key}.json`;
@@ -173,7 +189,12 @@
 
     const incoming = recipe && typeof recipe === "object" ? { ...recipe } : {};
     const recipeDioceseRaw = String(incoming.diocese || "").trim();
-    const located = await locateRecipe(gh_pat_clean, gh_repo, key, recipeDioceseRaw);
+    let located;
+    try {
+      located = await locateRecipe(gh_pat_clean, gh_repo, key, recipeDioceseRaw);
+    } catch (err) {
+      return { ok: false, error: String(err?.message || err) };
+    }
     const existingRecipe = located.existingRecipe;
     const existingSha = located.existingSha;
     const stepsReplaced = Array.isArray(incoming.steps) && incoming.steps.length > 0;
@@ -279,6 +300,8 @@
     );
     if (resp.status === 204) return { ok: true };
     if (resp.status === 403) {
+      const rate = githubRateLimitMessage(resp);
+      if (rate) return { ok: false, error: rate };
       return { ok: false, error: "PAT missing 'workflow' scope — regenerate token with workflow checked." };
     }
     if (resp.status === 404) {
@@ -783,6 +806,8 @@
     canonicalDioceseSlug,
     harvestWorkflowDiocese,
     resolveGhRepo,
+    githubRateLimitMessage,
+    githubApiError,
     locateRecipe,
     pushRecipe,
     verifyRecipe,
