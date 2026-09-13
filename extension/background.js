@@ -396,60 +396,6 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 });
 
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message?.type !== "lookup_parish_for_url") return false;
-  (async () => {
-    try {
-      const url = String(message.url || "").trim();
-      const hostname = (() => {
-        try {
-          return new URL(url).hostname.toLowerCase();
-        } catch (_e) {
-          return "";
-        }
-      })();
-      if (!hostname) {
-        sendResponse({ ok: false });
-        return;
-      }
-      const { ph_hostname_map } = await chrome.storage.local.get(["ph_hostname_map"]);
-      const parish = ph_hostname_map && typeof ph_hostname_map === "object"
-        ? ph_hostname_map[hostname]
-        : null;
-      if (!parish) {
-        sendResponse({ ok: false });
-        return;
-      }
-      const parishKey = String(parish.parish_key || parish.key || "")
-        .trim()
-        .toLowerCase()
-        .replace(/\s+/g, "_");
-      const inferredKey = (() => {
-        try {
-          const hostSeg = hostname.replace(/^www\d*\./, "").split(".")[0] || "";
-          return hostSeg;
-        } catch (_e) {
-          return "";
-        }
-      })();
-      if (parishKey && inferredKey && parishKey !== inferredKey) {
-        const matches =
-          parishKey === inferredKey ||
-          inferredKey.includes(parishKey) ||
-          parishKey.includes(inferredKey);
-        if (!matches) {
-          sendResponse({ ok: false, reason: "stale_hostname_map" });
-          return;
-        }
-      }
-      sendResponse({ ok: true, parish });
-    } catch (_e) {
-      sendResponse({ ok: false });
-    }
-  })();
-  return true;
-});
-
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type !== "ph_save_diagnosis") return false;
   (async () => {
     try {
@@ -959,51 +905,6 @@ chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
 //   { ok: true,  url: string }   — on success
 //   { ok: false, error: string } — on failure
 
-// ── Generic GitHub file fetch ─────────────────────────────────────────────
-//
-// Message shape: { type: "fetch_github_file", path: string }
-// Reply:         { ok: true, content: string } | { ok: false, error: string }
-
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
-  if (message?.type !== "fetch_github_file") return false;
-
-  (async () => {
-    try {
-      const { gh_pat, gh_repo: storedGhRepo } = await chrome.storage.local.get(["gh_pat", "gh_repo"]);
-      const gh_repo = phResolveGhRepo(storedGhRepo);
-      if (!gh_pat) {
-        sendResponse({ ok: false, error: "GitHub PAT not configured." });
-        return;
-      }
-      const apiUrl = `https://api.github.com/repos/${gh_repo}/contents/${message.path}`;
-      const resp = await fetch(apiUrl, {
-        headers: {
-          Authorization: `token ${gh_pat}`,
-          Accept: "application/vnd.github+json",
-          "X-GitHub-Api-Version": "2022-11-28",
-        },
-      });
-      if (!resp.ok) {
-        sendResponse({ ok: false, error: `GitHub ${resp.status}: ${resp.statusText}` });
-        return;
-      }
-      const data = await resp.json();
-      // content is base64-encoded by GitHub API
-      const decoded = decodeURIComponent(
-        atob(data.content.replace(/\n/g, ""))
-          .split("")
-          .map((c) => "%" + ("00" + c.charCodeAt(0).toString(16)).slice(-2))
-          .join("")
-      );
-      sendResponse({ ok: true, content: decoded, sha: data.sha });
-    } catch (err) {
-      sendResponse({ ok: false, error: String(err) });
-    }
-  })();
-
-  return true;
-});
-
 // ── Generic GitHub file push ──────────────────────────────────────────────
 //
 // Message shape:
@@ -1286,69 +1187,6 @@ async function _fetchGithubJson(url, headers, timeoutMs = 45000, init = {}) {
   }
 }
 
-/** Find an existing recipe file across diocese folders (fixes wrong-folder pushes). */
-async function _locateRecipeOnGithub(gh_pat, gh_repo, key, preferredDiocese) {
-  const headers = {
-    Authorization: `token ${gh_pat}`,
-    Accept: "application/vnd.github+json",
-    "X-GitHub-Api-Version": "2022-11-28",
-  };
-  const preferred = _canonicalDioceseSlug(preferredDiocese) || "";
-
-  const tryPath = async (dio, timeoutMs = 10000) => {
-    const filePath = `parishes/recipes/${dio}/${key}.json`;
-    const apiBase = `https://api.github.com/repos/${gh_repo}/contents/${filePath}`;
-    const getResp = await _fetchGithubJson(apiBase, headers, timeoutMs);
-    if (getResp.status === 404) return null;
-    if (!getResp.ok) {
-      throw new Error(`GitHub ${getResp.status} reading ${filePath}`);
-    }
-    const existing = await getResp.json();
-    let existingRecipe = null;
-    try {
-      existingRecipe = JSON.parse(_decodeGithubFileContent(existing.content) || "{}");
-    } catch (_parseErr) {
-      existingRecipe = null;
-    }
-    return {
-      filePath,
-      apiBase,
-      diocese: dio,
-      existingSha: existing.sha || null,
-      existingRecipe,
-    };
-  };
-
-  if (preferred) {
-    try {
-      const hit = await tryPath(preferred, 12000);
-      if (hit) return hit;
-    } catch (err) {
-      console.warn(`Parish Trainer: preferred recipe path failed (${preferred}):`, err);
-    }
-  }
-
-  const others = _RECIPE_DIOCESE_FOLDERS.filter((d) => d !== preferred);
-  const probes = await Promise.all(
-    others.map((dio) => tryPath(dio, 8000).catch((err) => {
-      console.warn(`Parish Trainer: locate recipe failed for ${dio}:`, err);
-      return null;
-    }))
-  );
-  const found = probes.find(Boolean);
-  if (found) return found;
-
-  const dio = preferred || "unknown";
-  const filePath = `parishes/recipes/${dio}/${key}.json`;
-  return {
-    filePath,
-    apiBase: `https://api.github.com/repos/${gh_repo}/contents/${filePath}`,
-    diocese: dio,
-    existingSha: null,
-    existingRecipe: null,
-  };
-}
-
 chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
   if (message?.type !== "sanitize_recipe") return false;
   try {
@@ -1588,9 +1426,16 @@ chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
 
       // Locate existing recipe across diocese folders (user may have picked wrong diocese).
       const recipeDioceseRaw = ((message.recipe || {}).diocese || "").trim();
-      const located = globalThis.phGithubRecipePush
-        ? await globalThis.phGithubRecipePush.locateRecipe(gh_pat, gh_repo, key, recipeDioceseRaw)
-        : await _locateRecipeOnGithub(gh_pat, gh_repo, key, recipeDioceseRaw);
+      if (!globalThis.phGithubRecipePush?.locateRecipe) {
+        reply({ ok: false, error: "Reload Parish Trainer — recipe locator missing." });
+        return;
+      }
+      const located = await globalThis.phGithubRecipePush.locateRecipe(
+        gh_pat,
+        gh_repo,
+        key,
+        recipeDioceseRaw
+      );
       const filePath = located.filePath;
       const apiBase = located.apiBase;
       const existingSha = located.existingSha;
@@ -2178,11 +2023,6 @@ chrome.runtime.onMessage.addListener((message, sender) => {
   if (message?.type === "recording_tab_active") {
     const tabId = sender?.tab?.id;
     if (tabId) _recordingTabIds.add(tabId);
-    return;
-  }
-  if (message?.type === "recording_tab_inactive") {
-    const tabId = sender?.tab?.id;
-    if (tabId) _recordingTabIds.delete(tabId);
     return;
   }
 });

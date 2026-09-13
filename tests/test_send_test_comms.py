@@ -46,7 +46,7 @@ class SendTestCommsTests(unittest.TestCase):
 
     def test_manifest_bumped_for_extension_js(self) -> None:
         text = MANIFEST.read_text(encoding="utf-8")
-        self.assertIn('"version": "1.61.27"', text)
+        self.assertIn('"version": "1.61.28"', text)
         content = (REPO / "extension" / "content.js").read_text(encoding="utf-8")
         self.assertIn("Noted — refresh Problems to check GitHub", content)
         self.assertNotIn("you confirmed the PDF. Recorded on GitHub", content)
@@ -147,6 +147,29 @@ class SendTestCommsTests(unittest.TestCase):
         self.assertIn('return { ok: false, error: String(err?.message || err) };', push)
         self.assertNotIn("dispatch_at: dispatchAt", content)
         self.assertIn("Math.abs(Number(stored.at) - at) < 8000", sidepanel)
+
+    def test_c4_dead_extension_symbols_removed(self) -> None:
+        bg = (REPO / "extension" / "background.js").read_text(encoding="utf-8")
+        sidepanel = (REPO / "extension" / "sidepanel.js").read_text(encoding="utf-8")
+        content = CONTENT_JS.read_text(encoding="utf-8")
+        for needle in (
+            "fetch_github_file",
+            "lookup_parish_for_url",
+            "recording_tab_inactive",
+            "_locateRecipeOnGithub",
+        ):
+            self.assertNotIn(needle, bg)
+        for needle in (
+            "_problemsFilterActionableRows",
+            "_problemsParishHarvestStatus",
+            "_problemsFindLatestWorkflowRun",
+            "_problemsMegaPdfForParish",
+            "_problemsGithubBlobTabUrl",
+            "_pdLoadHarvestReport",
+        ):
+            self.assertNotIn(needle, sidepanel)
+        self.assertNotIn('recipe.site_type === "parish_messenger"', content)
+        self.assertIn("actionable_keys", sidepanel)
 
 
 if __name__ == "__main__":
