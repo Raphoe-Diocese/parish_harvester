@@ -885,15 +885,10 @@ class DeadUrlTests(unittest.TestCase):
         self.content_js = (repo_root / "extension" / "content.js").read_text(encoding="utf-8")
         self.train_py = (repo_root / "train.py").read_text(encoding="utf-8")
 
-    def test_dead_page_overlay_exists(self):
-        self.assertIn("ph-dead-page-overlay", self.content_js)
-
-    def test_dead_overlay_shown_on_chrome_error(self):
-        self.assertIn("main-frame-error", self.content_js)
-        self.assertIn("_detectAndShowDeadOverlay", self.content_js)
-
-    def test_dead_url_button_in_overlay(self):
-        self.assertIn("Mark as Dead Website", self.content_js)
+    def test_dead_page_overlay_removed(self):
+        self.assertNotIn("ph-dead-page-overlay", self.content_js)
+        self.assertNotIn("Mark as Dead Website", self.content_js)
+        self.assertNotIn("_detectAndShowDeadOverlay", self.content_js)
 
     def test_train_writes_dead_recipe(self):
         self.assertIn("_write_dead_recipe", self.train_py)
