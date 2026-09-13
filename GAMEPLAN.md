@@ -17,11 +17,17 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
-## 13/09/2026 — D2 README and WHAT_IS_THIS (this turn)
+## 13/09/2026 — E1 vision only on sparse OCR pages (this turn)
+
+**D2 merged:** [PR #221](https://github.com/Raphoe-Diocese/parish_harvester/pull/221) `586446b`. Docs only.
+
+**Now — E1:** mixed megas keep embedded text; only sparse/image pages go to vision. Log `N sparse pages sent to vision`. **Not live** until the next `ocr-bulletin.yml` run. Do not tick done until that log shows N < total and Gortahork Irish is still Irish.
+
+## 13/09/2026 — D2 README and WHAT_IS_THIS
 
 **D1 merged:** [PR #220](https://github.com/Raphoe-Diocese/parish_harvester/pull/220) `2411a2f`. Markdown count 20. Docs only.
 
-**Now — D2:** README + WHAT_IS_THIS match what exists (4 live dioceses, parishpress.ie, Sunday 09:00 UTC, zip Trainer). Delete stale CHANGELOG. Next after D2 merge: E1.
+**D2 merged:** [PR #221](https://github.com/Raphoe-Diocese/parish_harvester/pull/221) `586446b`.
 
 ## 13/09/2026 — D1 one truth in markdown
 

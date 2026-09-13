@@ -261,5 +261,55 @@ class SparsePageOcrHtmlTests(unittest.TestCase):
         self.assertEqual(out[0], good)
 
 
+class OcrTierOrderTests(unittest.TestCase):
+    def test_mixed_mega_sends_only_sparse_pages_to_vision(self) -> None:
+        from ocr.sparse_page_ocr import apply_ocr_tiers, choose_vision_page_indexes
+
+        irish = [
+            "POBAL CHRÍOST RÍ GORT A’ CHOIRCE AIFRINN NA SEACHTAINE",
+            "16ú Lúnasa 2026 An tAth. Donnchadh Ó Baoill paróiste",
+            "Nora O'Donnell, An Bhealtaine agus Eamon Mc Ginley Inis Bó Finne",
+            "Tógadh €1,530 an tseachtain s'chuaigh thart. Buíochas don phobal uile.",
+            "Seo mar a deir an Tiarna: Coinnígí an ceart, cleachtaígí an fhíréanacht.",
+        ]
+        banner = ["Parish of Example", "https://example.com/bulletin.pdf"]
+        native = [irish, banner]
+        self.assertEqual(choose_vision_page_indexes(native), [1])
+
+        seen: list[list[int]] = []
+
+        def fake_vision(indexes: list[int]) -> list[list[str]]:
+            seen.append(list(indexes))
+            return [["VISION-ONLY-PAGE"]]
+
+        pages, provider, sent = apply_ocr_tiers(native, fake_vision)
+        self.assertEqual(seen, [[1]])
+        self.assertEqual(sent, 1)
+        self.assertLess(sent, len(native))
+        self.assertEqual(provider, "Tier0+vision")
+        self.assertEqual(pages[0], irish)
+        self.assertIn("AIFRINN NA SEACHTAINE", " ".join(pages[0]))
+        self.assertEqual(pages[1], ["VISION-ONLY-PAGE"])
+
+    def test_all_embedded_sends_zero_pages_to_vision(self) -> None:
+        from ocr.sparse_page_ocr import apply_ocr_tiers
+
+        rich = [
+            "Weekend Mass Times Saturday Vigil 6.30pm Sunday 10.00am and 12.00noon.",
+            "Please do not park in the Church Car Park during funerals this week.",
+            "Recently deceased: please keep the family in your prayers this Sunday.",
+            "Community notices continue below with weekday Masses and contacts.",
+            "Coffee morning Saturday 22nd August in the crypt after morning Mass.",
+        ]
+
+        def fake_vision(_indexes: list[int]) -> list[list[str]]:
+            raise AssertionError("vision must not run when every page has embedded text")
+
+        pages, provider, sent = apply_ocr_tiers([rich, rich], fake_vision)
+        self.assertEqual(sent, 0)
+        self.assertEqual(provider, "Tier0-text")
+        self.assertEqual(pages[0], rich)
+
+
 if __name__ == "__main__":
     unittest.main()
