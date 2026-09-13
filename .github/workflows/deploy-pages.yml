@@ -111,19 +111,41 @@ jobs:
           fi
           if [ -d _ocr_docs/docs/mega_pdf ]; then
             mkdir -p docs/mega_pdf
+            mega_pages_date() {
+              local pdf="$1"
+              local idx="${pdf%.pdf}.pages.json"
+              if [ ! -f "${idx}" ]; then
+                echo ""
+                return
+              fi
+              python3 -c "import json,sys; print(json.load(open(sys.argv[1],encoding='utf-8')).get('date') or '')" "${idx}" 2>/dev/null || echo ""
+            }
             while IFS= read -r -d '' pdf; do
               dest="docs/mega_pdf/$(basename "${pdf}")"
+              src_idx="${pdf%.pdf}.pages.json"
+              dest_idx="${dest%.pdf}.pages.json"
               if [ -f "${dest}" ]; then
+                src_date="$(mega_pages_date "${pdf}")"
+                dest_date="$(mega_pages_date "${dest}")"
                 src_sz=$(stat -c%s "${pdf}")
                 dest_sz=$(stat -c%s "${dest}")
-                if [ "${src_sz}" -gt "${dest_sz}" ]; then
-                  echo "Keep smaller committed ${dest} (${dest_sz}) — skip larger OCR snapshot ${src_sz}"
+                if [ -n "${dest_date}" ] && [ -n "${src_date}" ] && [ "${dest_date}" \> "${src_date}" ]; then
+                  echo "Keep newer committed ${dest} (date ${dest_date}) — skip older OCR snapshot ${src_date}"
+                  continue
+                fi
+                if [ -n "${dest_date}" ] && [ -n "${src_date}" ] && [ "${src_date}" \> "${dest_date}" ]; then
+                  echo "Take newer OCR snapshot ${pdf} (date ${src_date}) over committed ${dest_date}"
+                elif [ "${src_sz}" -gt "${dest_sz}" ]; then
+                  echo "Keep smaller committed ${dest} (${dest_sz}) — skip larger OCR snapshot ${src_sz} (same or unknown date)"
                   continue
                 fi
               fi
               cp "${pdf}" "${dest}"
+              if [ -f "${src_idx}" ]; then
+                cp "${src_idx}" "${dest_idx}"
+              fi
             done < <(find _ocr_docs/docs/mega_pdf -maxdepth 1 -type f -name '*_mega_bulletin.pdf' -print0)
-            echo "Applied OCR docs/mega_pdf snapshot (kept smaller files)"
+            echo "Applied OCR docs/mega_pdf snapshot (newer .pages.json date wins; size is tie-break)"
             applied=true
           fi
           if [ "${applied}" = "false" ]; then
