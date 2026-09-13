@@ -25,7 +25,7 @@ Thank you for your interest in contributing! This guide will help you set up you
 
 1. **Clone the repository:**
    ```bash
-   git clone https://github.com/Frankytyrone/parish_harvester.git
+   git clone https://github.com/Raphoe-Diocese/parish_harvester.git
    cd parish_harvester
    ```
 
@@ -313,7 +313,7 @@ await browser.new_context(
 
 ## Need Help?
 
-- Check existing issues: https://github.com/Frankytyrone/parish_harvester/issues
+- Check existing issues: https://github.com/Raphoe-Diocese/parish_harvester/issues
 - Review conversation logs: `ai_conversations/`
 - Read the deep audit: `docs/audit/2026-05-22-deep-audit.md`
 

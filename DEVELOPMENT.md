@@ -9,7 +9,7 @@ Quick reference for developers working on Parish Bulletin Harvester.
 ### 1. Clone & Install
 
 ```bash
-git clone https://github.com/Frankytyrone/parish_harvester.git
+git clone https://github.com/Raphoe-Diocese/parish_harvester.git
 cd parish_harvester
 python -m venv .venv
 .venv\Scripts\activate  # Windows

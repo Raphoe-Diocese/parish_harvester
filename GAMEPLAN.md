@@ -17,13 +17,21 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
-## 13/09/2026 — S3 stop publishing search/calendars (this turn)
+## 13/09/2026 — D1 one truth in markdown (this turn)
+
+**S3 live:** [PR #219](https://github.com/Raphoe-Diocese/parish_harvester/pull/219) merged `e58ed97` + Pages [34778374344](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34778374344). Opened https://www.parishpress.ie/search/ — GitHub Pages **404**. Homepage HTML has no `/search/` or `/subscribe/` href.
+
+**Now — D1:** delete competing markdown lists; one `docs/DOMAIN.md`; owner `Raphoe-Diocese`; `SECURITY.md` public-key wording. **Not live** (docs only). Next after D1 merge: D2.
+
+**P0 from May deep-audit (closed, do not reopen):** toolbar “ok” / “marked as dead” / “saved” lies — superseded by C1 / C3 / C4. Harvest truth stays `parishes/parish_status.json`.
+
+**Still open:** H2 [#211](https://github.com/Raphoe-Diocese/parish_harvester/pull/211), B4 [#214](https://github.com/Raphoe-Diocese/parish_harvester/pull/214).
+
+## 13/09/2026 — S3 stop publishing search/calendars
 
 **S2 merged:** [PR #218](https://github.com/Raphoe-Diocese/parish_harvester/pull/218) `d2aca0f`. **Not live** until next harvest. Do not regenerate `docs/dioceses` on this PC.
 
-**Now — S3:** stop publishing `/search/`, `/calendars/`, `/feeds/`, `/badges/`, `/subscribe/`. Delete dead `write_root_index()` and stub `docs/bulletins/raphoe/index.html`. Keep `docs/bulletins/index.html`. **Not live** until merge + Pages. Do not tick done until https://www.parishpress.ie/search/ is 404 and the homepage has no inbound search link.
-
-**Still open:** H2 [#211](https://github.com/Raphoe-Diocese/parish_harvester/pull/211), B4 [#214](https://github.com/Raphoe-Diocese/parish_harvester/pull/214). Next after S3 merge: D1.
+**S3 live:** [PR #219](https://github.com/Raphoe-Diocese/parish_harvester/pull/219) `e58ed97`. https://www.parishpress.ie/search/ is 404. Homepage has no inbound search link.
 
 ## 13/09/2026 — S2 disabled A-Z links
 

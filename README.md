@@ -82,13 +82,13 @@ The extension now opens a popup by default, and you can launch the full operator
 ### Optional: self-hosted auto-update channel (no reinstall)
 
 The repo now publishes:
-- `https://frankytyrone.github.io/parish_harvester/extension/parish_trainer.zip`
-- `https://frankytyrone.github.io/parish_harvester/updates.xml`
+- `https://www.parishpress.ie/extension/parish_trainer.zip`
+- `https://www.parishpress.ie/updates.xml` (removed; 404)
 
 and `extension/manifest.json` includes:
 
 ```json
-"update_url": "https://frankytyrone.github.io/parish_harvester/updates.xml"
+"update_url": "(removed in C2)"
 ```
 
 `deploy-pages.yml` rebuilds and republishes these on every `main` push that changes `extension/**`.
@@ -106,7 +106,7 @@ Set repository variable `CHROME_EXTENSION_APP_ID` to your extension ID so `updat
 2. Click **Open Operator Console**.
 3. In **GitHub Settings**, enter:
    - Personal Access Token (`repo` scope)
-   - Repository in `owner/repo` format (for example `Frankytyrone/parish_harvester`)
+   - Repository in `owner/repo` format (for example `Raphoe-Diocese/parish_harvester`)
 4. Save settings.
 
 ### Manual on-the-fly bulletin / mega-PDF override

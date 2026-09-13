@@ -3,7 +3,7 @@
 If you want a weekly email when bulletins update, follow these 6 steps:
 
 1. Open repository secrets:  
-   https://github.com/Frankytyrone/parish_harvester/settings/secrets/actions
+   https://github.com/Raphoe-Diocese/parish_harvester/settings/secrets/actions
 2. Add these six secrets exactly:
    - `SMTP_SERVER`
    - `SMTP_PORT`
