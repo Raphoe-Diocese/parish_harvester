@@ -46,7 +46,7 @@ class SendTestCommsTests(unittest.TestCase):
 
     def test_manifest_bumped_for_extension_js(self) -> None:
         text = MANIFEST.read_text(encoding="utf-8")
-        self.assertIn('"version": "1.61.26"', text)
+        self.assertIn('"version": "1.61.27"', text)
         content = (REPO / "extension" / "content.js").read_text(encoding="utf-8")
         self.assertIn("Noted — refresh Problems to check GitHub", content)
         self.assertNotIn("you confirmed the PDF. Recorded on GitHub", content)
@@ -135,6 +135,18 @@ class SendTestCommsTests(unittest.TestCase):
         self.assertIn("image_stack", recipe)
         self.assertIn('"count": 2', recipe)
         self.assertNotIn('"action": "print_to_pdf"', recipe)
+
+    def test_c3_rate_limit_one_poller_locate_errors(self) -> None:
+        push = PUSH_JS.read_text(encoding="utf-8")
+        content = CONTENT_JS.read_text(encoding="utf-8")
+        sidepanel = (REPO / "extension" / "sidepanel.js").read_text(encoding="utf-8")
+        self.assertIn("GitHub rate limit — try again in", push)
+        self.assertIn("X-RateLimit-Remaining", push)
+        self.assertIn("githubRateLimitMessage", push)
+        self.assertIn("if (hard) throw hard.err;", push)
+        self.assertIn('return { ok: false, error: String(err?.message || err) };', push)
+        self.assertNotIn("dispatch_at: dispatchAt", content)
+        self.assertIn("Math.abs(Number(stored.at) - at) < 8000", sidepanel)
 
 
 if __name__ == "__main__":

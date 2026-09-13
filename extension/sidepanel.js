@@ -3579,11 +3579,17 @@ chrome.runtime.onMessage.addListener((message) => {
     _spShowPanel("problems");
     void loadProblemsDashboard().then(() => {
       if (message.parish_key && message.dispatch_at) {
-        void _problemsWatchParishHarvest(
-          message.parish_key,
-          message.display_name || message.parish_key,
-          message.dispatch_at
-        );
+        const at = Number(message.dispatch_at);
+        void _problemsGetLastDispatch(message.parish_key).then((stored) => {
+          if (at && stored?.at && Math.abs(Number(stored.at) - at) < 8000) {
+            return;
+          }
+          void _problemsWatchParishHarvest(
+            message.parish_key,
+            message.display_name || message.parish_key,
+            message.dispatch_at
+          );
+        });
       }
     });
     return;
