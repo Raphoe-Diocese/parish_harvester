@@ -49,6 +49,17 @@ CSS = """
   .page-label:first-child {
     margin-top: 0;
   }
+  .ocr-failed-banner {
+    margin: 12px 0;
+    padding: 12px 14px;
+    background: #fff4df;
+    border: 1px solid #f5d08d;
+    border-radius: 8px;
+    color: #713f12;
+    font-weight: 600;
+    font-size: 0.9rem;
+    line-height: 1.45;
+  }
   p {
     margin: 0 0 0.9em;
   }
@@ -681,10 +692,25 @@ def build_html_content(pages_text):
 def build_stub_html_content(reason: str) -> str:
     safe = html_utils.escape(reason)
     return (
+        '<div class="ocr-failed-banner" role="alert">'
+        "⚠️ OCR failed this week — use the original PDF above for the full text."
+        "</div>\n"
         '<p class="page-label">Page 1</p>\n'
         f"<p><strong>OCR text is temporarily unavailable.</strong> {safe}</p>\n"
         "<p>Please use the original PDF until the next harvest run completes.</p>"
     )
+
+
+def write_stub_and_fail(date: str, reason: str) -> None:
+    """Write a failed-OCR page and exit so CI cannot treat the stub as success."""
+    content = build_stub_html_content(reason)
+    output_filename = f"bulletin-{date}.html"
+    html = HTML_TEMPLATE.format(date=date, css=CSS, content=content)
+    with open(output_filename, "w", encoding="utf-8") as f:
+        f.write(html)
+    print(f"Stub output saved to: {output_filename}")
+    print(f"::error::OCR stub written — {reason}")
+    sys.exit(1)
 
 
 def main():
@@ -745,14 +771,8 @@ def main():
             print(f"  Tier 0 failed ({type(e).__name__}: {e}).")
 
     if pages_text is None and not has_vision_keys:
-        print("Warning: No OCR API keys set and Tier 0 did not apply — writing stub HTML.")
-        content = build_stub_html_content("No OCR provider configured for this run.")
-        output_filename = f"bulletin-{date}.html"
-        html = HTML_TEMPLATE.format(date=date, css=CSS, content=content)
-        with open(output_filename, "w", encoding="utf-8") as f:
-            f.write(html)
-        print(f"Stub output saved to: {output_filename}")
-        return
+        print("No OCR API keys set and Tier 0 did not apply — writing stub HTML.")
+        write_stub_and_fail(date, "No OCR provider configured for this run.")
 
     if pages_text is not None and vision_indexes and has_vision_keys:
         try:
@@ -842,14 +862,8 @@ def main():
             print(f"  Tier 0 fallback failed ({type(e).__name__}: {e}).")
 
     if pages_text is None:
-        print("Warning: All OCR providers failed — writing stub HTML.")
-        content = build_stub_html_content("Vision OCR failed and no embedded PDF text was found.")
-        output_filename = f"bulletin-{date}.html"
-        html = HTML_TEMPLATE.format(date=date, css=CSS, content=content)
-        with open(output_filename, "w", encoding="utf-8") as f:
-            f.write(html)
-        print(f"Stub output saved to: {output_filename}")
-        return
+        print("All OCR providers failed — writing stub HTML.")
+        write_stub_and_fail(date, "Vision OCR failed and no embedded PDF text was found.")
 
     from ocr.sparse_page_ocr import fill_sparse_ocr_pages, repair_image_page_ocr
 
