@@ -14,36 +14,11 @@ We will respond within 48 hours and work with you to address the issue.
 
 ## Known Security Issues
 
-### ⚠️ CRITICAL: Chrome Extension Private Key Exposed
+### Chrome extension `key` field (public, not private)
 
-**Issue**: The Chrome extension private key is currently embedded in `extension/manifest.json` (line 35+).
+`extension/manifest.json` holds the **public** extension key. That keeps the unpacked extension ID stable when Frank loads the zip. It is **not** the private `.pem` used to sign a Chrome Web Store package.
 
-**Risk**: Anyone with access to this key can publish malicious updates to the extension under the same extension ID.
-
-**Status**: Known issue. Private repositories only.
-
-**Mitigation Steps Required**:
-
-1. **Remove the `"key"` field** from `extension/manifest.json`
-2. **Store the key securely**:
-   - Save the private key file (`.pem`) to a secure location outside the repository
-   - Add the key file to `.gitignore` (already done)
-   - For GitHub Actions, store the key in GitHub Secrets as `CHROME_EXTENSION_KEY`
-3. **Update the release workflow** to inject the key at build time:
-   ```yaml
-   - name: Add extension key
-     run: |
-       echo '${{ secrets.CHROME_EXTENSION_KEY }}' > extension.pem
-       # Update manifest.json to include key reference
-   ```
-4. **Rotate the extension ID** if this key has been compromised (requires republishing to Chrome Web Store)
-
-### Temporary Workaround
-
-Until the above steps are completed:
-- Keep the repository **private**
-- Do not share the extension package publicly
-- Audit repository access regularly
+C2 dropped auto-update. The public `key` stays on purpose. Do not remove it, and do not treat it as a leaked private key.
 
 ---
 
@@ -107,6 +82,6 @@ Workflows use principle of least privilege:
 
 ## Contact
 
-For security concerns, contact [@Frankytyrone](https://github.com/Frankytyrone) via GitHub.
+For security concerns, contact the [Raphoe-Diocese](https://github.com/Raphoe-Diocese) org on GitHub. Do not open a public issue.
 
-Last updated: June 2, 2026
+Last updated: 13/09/2026

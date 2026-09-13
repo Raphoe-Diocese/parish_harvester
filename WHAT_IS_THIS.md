@@ -90,7 +90,7 @@ Every URL below is free and publicly accessible at no cost.
 
 | URL | What it is |
 |-----|------------|
-| `https://frankytyrone.github.io/parish_harvester/` | Home page / dashboard |
+| `https://www.parishpress.ie/` | Home page / dashboard |
 | `.../mega_pdf/derry_mega_bulletin.pdf` | Derry Diocese mega PDF |
 | `.../mega_pdf/down_and_connor_mega_bulletin.pdf` | Down & Connor mega PDF |
 | `.../bulletins/index.html` | OCR bulletin archive index |

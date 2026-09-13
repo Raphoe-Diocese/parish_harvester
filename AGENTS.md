@@ -11,6 +11,15 @@ Collated Bulletin (mega PDF) stitching is **core production behaviour, not optio
 
 **Mega PDF is core.** The whole product depends on: harvest parish bulletins → collated mega PDF → OCR → searchable diocesan viewer.
 
+## Locked decisions (do not re-argue)
+
+- Harvest in **diocese-sized** batches first. Full `all` runs are allowed but slow.
+- Prefer OCR of the diocesan mega PDF. Parish OCR pages are **split from** that mega OCR, not a second full OCR per parish.
+- Recipe repair needs a proof pack (source page, chosen URL, HTTP/PDF, date) before commit.
+- The extension may propose a recipe. The repo is the source of truth (`parishes/parish_status.json`).
+- No site-look / UI polish until capture, OCR, and recipes are reliable (Phase 6).
+- Live public site is **https://www.parishpress.ie/** — see [`docs/DOMAIN.md`](docs/DOMAIN.md).
+
 **Website / OCR backlog:** before any viewer, OCR, or `docs/` page work, read and update [`docs/WEBSITE_OCR_BACKLOG.md`](docs/WEBSITE_OCR_BACKLOG.md). That file is the living checklist (850px desktop / 450px mobile, parish OCR headers, new-tab links, mega PDF stays on). Do not start a second competing list.
 
 **Everything else** (repo cleanup, workflow fixes, dead code) goes in [`GAMEPLAN.md`](GAMEPLAN.md). Three lists only: this file for product order, the backlog for website/OCR, `GAMEPLAN.md` for the rest.
@@ -117,7 +126,7 @@ Until this list is finished, do **not** start other work. Park new ideas for a l
 1. **OCR reader** — prefer embedded PDF text on born-digital pages; vision only for image/banner pages; one pass per diocese (max ~26) then split. Reader UI live.
 2. **Problems console** — full work-queue polish
 3. **Recipe success** — one parish at a time
-4. **parishpress.ie** — live DNS/Pages when user is ready
+4. **parishpress.ie** — live at https://www.parishpress.ie/
 5. **Site look** — modern pages after OCR
 
 ## Parked (later list — do not start yet)
