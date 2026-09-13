@@ -17,6 +17,14 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 13/09/2026 — H2 Bruckless by name (this turn)
+
+**Merged already:** #205 P1, #206 A5 (not live until harvest), #207 B3, #208 C1, #210 F1. H1 date parse already on main.
+
+**Now — H2:** `bruckless` harvest input → `drive-1rjeey-ayy`. Drive `/folders/` URL never stays `ok` (`Drive folder listing, not a file`). Not a skip-alias. **Not harvested** until Frank says go (`gh workflow run harvest.yml -f target_parish=bruckless -f diocese=raphoe`). Do not Full harvest on this PC.
+
+**Next after H2 merge:** H3 Stranorlar — only if a this-week file exists.
+
 ## 12/09/2026 night — P1 done; A5 (#204) next
 
 **P1 done (Frank 12/09 23:50):** [PR #205](https://github.com/Raphoe-Diocese/parish_harvester/pull/205) merged `437b4c0c` + Pages [34721204022](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34721204022). Live `?v=20260912a`. Phone: yes.
@@ -83,9 +91,7 @@ Folder (locked): `C:\Users\Digital Admin\Desktop\harvester compare repos\parish_
 
 Merged [PR #202](https://github.com/Raphoe-Diocese/parish_harvester/pull/202). Harvest used to print the year list and mark **ok**.
 
-Harvest run [34530626218](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34530626218) **failed** because the input was `bruckless`. The recipe key is `drive-1rjeey-ayy`. Frank is right: nobody should have to know that. Harvest [34532128834](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34532128834) **succeeded**. `drive-1rjeey-ayy` is **ok**, URL is a Drive **file** download (not the year-folder list). `bulletin_date` still empty. Not on Problems. Mega page 2 not updated (single-parish skip). Next code: accept the name Bruckless. Do not Full harvest on this PC.
-
-Problems will not show Bruckless while `parish_status` says **ok**. That is why Frank cannot see it in the back room. After a harvest with the real key, #202 should mark a Drive folder listing as **failed** so it appears. Optional later rule: **ok** + Drive `/folders/` URL is never ok (show on Problems now). Wait for go.
+Harvest run [34530626218](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34530626218) **failed** because the input was `bruckless`. The recipe key is `drive-1rjeey-ayy`. Harvest [34532128834](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34532128834) **succeeded** with the real key. H2 (this turn) accepts the name `bruckless` and marks a leftover Drive `/folders/` URL as **failed**. Do not Full harvest on this PC.
 
 Homepage huge writing was Chrome zoom (Ctrl+0). Site-look rewrite stays parked.
 

@@ -4,12 +4,18 @@ import json
 import unittest
 from pathlib import Path
 
+from harvester.fetcher import FetchResult
 from harvester.parish_aliases import (
     ALIAS_TO_CANONICAL,
+    DRIVE_FOLDER_LISTING_ERROR,
+    HARVEST_INPUT_ALIASES,
     canonical_key,
     collapse_named_links,
     combined_display_name,
     is_alias_key,
+    is_drive_folder_listing,
+    reject_drive_folder_listing,
+    resolve_harvest_key,
 )
 from ocr.generate_bulletin_pages import render_parish_link_grid
 
@@ -101,6 +107,40 @@ class ParishAliasTests(unittest.TestCase):
         self.assertTrue(ballintra.get("skip"))
         self.assertIn("drumholm-parish/bulletin.pdf", drumholm.get("start_url", ""))
         self.assertNotEqual(drumholm.get("skip"), True)
+
+    def test_bruckless_harvest_input_is_not_a_skip_alias(self) -> None:
+        self.assertEqual(HARVEST_INPUT_ALIASES["bruckless"], "drive-1rjeey-ayy")
+        self.assertNotIn("bruckless", ALIAS_TO_CANONICAL)
+        self.assertEqual(resolve_harvest_key("bruckless"), "drive-1rjeey-ayy")
+        self.assertEqual(resolve_harvest_key("Bruckless"), "drive-1rjeey-ayy")
+        self.assertEqual(resolve_harvest_key("drive-1rjeey-ayy"), "drive-1rjeey-ayy")
+        self.assertEqual(resolve_harvest_key("ballintra"), "ballintra")
+        recipe = json.loads(
+            (REPO_ROOT / "parishes" / "recipes" / "raphoe" / "drive-1rjeey-ayy.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(recipe.get("display_name"), "Bruckless")
+        self.assertFalse(recipe.get("skip"))
+
+    def test_drive_folder_listing_never_stays_ok(self) -> None:
+        folder = "https://drive.google.com/drive/folders/1jPOi4GRU22vAxeKNe5Y_doBJ3riPh7ZK"
+        file_url = "https://drive.usercontent.google.com/download?id=1fiUdWkLFOaVNqaStLuM6Doqynx59_ss-&export=download"
+        self.assertTrue(is_drive_folder_listing(folder))
+        self.assertFalse(is_drive_folder_listing(file_url))
+        self.assertFalse(
+            is_drive_folder_listing("https://drive.google.com/file/d/1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa/view")
+        )
+        bad = reject_drive_folder_listing(
+            FetchResult(key="drive-1rjeey-ayy", display_name="Bruckless", status="ok", url=folder)
+        )
+        self.assertEqual(bad.status, "error")
+        self.assertEqual(bad.error, DRIVE_FOLDER_LISTING_ERROR)
+        good = reject_drive_folder_listing(
+            FetchResult(key="drive-1rjeey-ayy", display_name="Bruckless", status="ok", url=file_url)
+        )
+        self.assertEqual(good.status, "ok")
+        self.assertEqual(good.error, "")
 
 
 if __name__ == "__main__":
