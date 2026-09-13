@@ -7526,11 +7526,11 @@
         yesBtn.addEventListener("click", () => {
           showPostPushBanner(
             pushResponse,
-            `✅ <strong>${displayName}</strong> — you confirmed the PDF. Recorded on GitHub. ` +
+            `Noted — refresh Problems to check GitHub. ` +
               `<a href="${pdfUrl}" target="_blank" rel="noopener noreferrer">Open PDF</a>`,
             "ok"
           );
-          showStatus(`✅ ${displayName} — PDF confirmed.`, "ok");
+          showStatus(`Noted — refresh Problems to check GitHub.`, "ok");
           try {
             chrome.runtime.sendMessage({
               type: "problems_refresh",
@@ -9320,149 +9320,8 @@
     true
   );
 
-  // ── Dead page overlay ────────────────────────────────────────────────────────
-  const _showDeadPageOverlay = () => {
-    // Already shown?
-    if (document.getElementById("ph-dead-page-overlay")) return;
-
-    const overlay = document.createElement("div");
-    overlay.id = "ph-dead-page-overlay";
-    Object.assign(overlay.style, {
-      position: "fixed",
-      top: "20px",
-      left: "50%",
-      transform: "translateX(-50%)",
-      zIndex: "2147483647",
-      background: "#1f2937",
-      color: "#f9fafb",
-      fontFamily: "system-ui, -apple-system, sans-serif",
-      fontSize: "13px",
-      borderRadius: "10px",
-      boxShadow: "0 4px 24px rgba(0,0,0,0.7)",
-      padding: "16px 20px",
-      maxWidth: "420px",
-      width: "90vw",
-      textAlign: "center",
-      border: "2px solid #dc2626",
-    });
-
-    const icon = document.createElement("div");
-    icon.textContent = "🔴";
-    icon.style.cssText = "font-size:28px;margin-bottom:8px;";
-    overlay.appendChild(icon);
-
-    const heading = document.createElement("div");
-    heading.textContent = "This website appears to be dead or unreachable.";
-    heading.style.cssText = "font-weight:700;font-size:14px;margin-bottom:6px;color:#fca5a5;";
-    overlay.appendChild(heading);
-
-    const sub = document.createElement("div");
-    sub.textContent = "You can mark it as dead in the terminal window — press D then Enter.";
-    sub.style.cssText = "color:#9ca3af;font-size:11px;margin-bottom:12px;line-height:1.5;";
-    overlay.appendChild(sub);
-
-    const markBtn = document.createElement("button");
-    markBtn.textContent = "🗑️ Mark as Dead Website";
-    markBtn.type = "button";
-    Object.assign(markBtn.style, {
-      border: "none",
-      borderRadius: "6px",
-      padding: "10px 20px",
-      background: "#dc2626",
-      color: "#fff",
-      cursor: "pointer",
-      fontSize: "13px",
-      fontWeight: "600",
-      fontFamily: "inherit",
-      width: "100%",
-      marginBottom: "8px",
-    });
-    markBtn.addEventListener("click", () => {
-      heading.textContent = "⏳ Marking as dead…";
-      heading.style.color = "#fde68a";
-      markBtn.disabled = true;
-      markBtn.style.opacity = "0.5";
-
-      let settled = false;
-      const fail = (reason) => {
-        heading.textContent = `❌ Mark as dead failed: ${reason}`;
-        heading.style.color = "#fca5a5";
-        sub.textContent = "No changes were confirmed. Please retry.";
-        markBtn.disabled = false;
-        markBtn.style.opacity = "1";
-      };
-
-      const timeout = setTimeout(() => {
-        if (settled) return;
-        settled = true;
-        fail("timeout_waiting_for_confirmation_5s");
-      }, 5000);
-
-      _safeSendMessage({ type: "mark_dead_url" }, (response, error) => {
-        if (settled) return;
-        settled = true;
-        clearTimeout(timeout);
-        if (error) {
-          fail(error);
-          return;
-        }
-        if (response && typeof response === "object" && response.ok === true) {
-          heading.textContent = "✅ Marked as dead. You can close this tab.";
-          heading.style.color = "#86efac";
-          sub.textContent = "The harvester will skip this parish in future runs.";
-          markBtn.disabled = true;
-          markBtn.style.opacity = "0.5";
-          return;
-        }
-        fail(
-          (response && typeof response === "object" && (response.reason || response.error)) ||
-          "no_explicit_ok_from_page"
-        );
-      });
-    });
-    overlay.appendChild(markBtn);
-
-    const dismissBtn = document.createElement("button");
-    dismissBtn.textContent = "Dismiss";
-    dismissBtn.type = "button";
-    Object.assign(dismissBtn.style, {
-      border: "1px solid #374151",
-      borderRadius: "6px",
-      padding: "6px 14px",
-      background: "transparent",
-      color: "#9ca3af",
-      cursor: "pointer",
-      fontSize: "11px",
-      fontFamily: "inherit",
-    });
-    dismissBtn.addEventListener("click", () => {
-      if (overlay.parentNode) overlay.parentNode.removeChild(overlay);
-    });
-    overlay.appendChild(dismissBtn);
-
-    document.documentElement.appendChild(overlay);
-  };
-
-  // Detect Chrome net-error pages and show the dead overlay
-  const _detectAndShowDeadOverlay = () => {
-    const isDeadPage = (
-      document.getElementById("main-frame-error") !== null ||
-      window.location.href.startsWith("chrome-error://") ||
-      (document.title && (
-        document.title.toLowerCase().includes("err_name_not_resolved") ||
-        document.title.toLowerCase().includes("err_connection_refused") ||
-        document.title.toLowerCase().includes("err_connection_timed_out") ||
-        document.title.toLowerCase().includes("this site can't be reached") ||
-        document.title.toLowerCase().includes("this webpage is not available")
-      ))
-    );
-    if (isDeadPage) _showDeadPageOverlay();
-  };
-
-  // Run on load and after short delays (Chrome error pages may render slowly)
-  _detectAndShowDeadOverlay();
-  setTimeout(_detectAndShowDeadOverlay, 500);
-  setTimeout(_detectAndShowDeadOverlay, 1500);
+  // Dead-site overlay removed (C1). Mark dead from the Problems tab
+  // (mark_parish_dead). Do not bring the overlay button back here.
 
   // ── Auto-show toolbar when Playwright training bindings are detected ──────
 

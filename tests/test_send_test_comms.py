@@ -46,7 +46,11 @@ class SendTestCommsTests(unittest.TestCase):
 
     def test_manifest_bumped_for_extension_js(self) -> None:
         text = MANIFEST.read_text(encoding="utf-8")
-        self.assertIn('"version": "1.61.24"', text)
+        self.assertIn('"version": "1.61.25"', text)
+        content = (REPO / "extension" / "content.js").read_text(encoding="utf-8")
+        self.assertIn("Noted — refresh Problems to check GitHub", content)
+        self.assertNotIn("you confirmed the PDF. Recorded on GitHub", content)
+        self.assertNotIn("Mark as Dead Website", content)
 
     def test_back_room_fetches_fresh_parish_status(self) -> None:
         push = PUSH_JS.read_text(encoding="utf-8")
