@@ -17,11 +17,17 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 13/09/2026 — S2 disabled A-Z links (this turn)
+
+**S1 merged:** [PR #217](https://github.com/Raphoe-Diocese/parish_harvester/pull/217) `b76fac7`. **Not live** until next OCR. Do not regenerate `docs/parishes` on this PC.
+
+**Now — S2:** A–Z grid drops disabled parishes so Greencastle / Coleraine / Long Tower get no external href. **Not live** until merge + next harvest. Do not regenerate `docs/dioceses` on this PC.
+
 ## 13/09/2026 — S1 slice_missing (this turn)
 
 **C4 merged:** [PR #216](https://github.com/Raphoe-Diocese/parish_harvester/pull/216) `31a0ac9`. Trainer **1.61.28**. Not live until Pages + `scripts/refresh_local_trainer.ps1` + Reload.
 
-**Now — S1:** missing mega slices get `slice_missing: true`. Parish page says the honest cut-failed line. Homepage ready count excludes those rows. **Not live** until merge + next OCR. Do not regenerate `docs/parishes` on this PC.
+**S1 merged:** [PR #217](https://github.com/Raphoe-Diocese/parish_harvester/pull/217). **Not live** until next OCR.
 
 ## 13/09/2026 — C4 dead Trainer code (this turn)
 

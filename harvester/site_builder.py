@@ -254,6 +254,23 @@ def _recipe_files(diocese_key: str) -> list[Path]:
     return files
 
 
+def _disabled_status_keys(status_path: Path | None = None) -> set[str]:
+    """Parish keys whose parish_status outcome is disabled. Do not invent names."""
+    path = status_path or (REPO_ROOT / "parishes" / "parish_status.json")
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return set()
+    parishes = payload.get("parishes") if isinstance(payload, dict) else None
+    if not isinstance(parishes, dict):
+        return set()
+    return {
+        str(key)
+        for key, row in parishes.items()
+        if isinstance(row, dict) and str(row.get("outcome") or "").strip().lower() == "disabled"
+    }
+
+
 def _parish_links(diocese_key: str) -> list[dict[str, str]]:
     evidence_key = EVIDENCE_DIOCESE_KEYS.get(diocese_key)
     if evidence_key:
@@ -262,17 +279,20 @@ def _parish_links(diocese_key: str) -> list[dict[str, str]]:
         except Exception:
             entries = []
         if entries:
+            disabled = _disabled_status_keys()
             collapsed = collapse_named_links(
                 [
                     (entry.display_name, entry.bulletin_page or entry.example_url)
                     for entry in entries
                     if (entry.bulletin_page or entry.example_url)
                     and not is_alias_key(entry.key)
+                    and entry.key not in disabled
                 ]
             )
             return [{"name": name, "url": url} for name, url in collapsed]
 
     links: list[dict[str, str]] = []
+    disabled = _disabled_status_keys()
     for path in _recipe_files(diocese_key):
         try:
             payload = json.loads(path.read_text(encoding="utf-8"))
@@ -281,7 +301,7 @@ def _parish_links(diocese_key: str) -> list[dict[str, str]]:
         if not isinstance(payload, dict):
             continue
         key = str(payload.get("parish_key") or path.stem).strip()
-        if is_alias_key(key):
+        if is_alias_key(key) or key in disabled:
             continue
         name = (
             combined_display_name(key)
@@ -349,12 +369,13 @@ def _parish_links_with_harvest(diocese_key: str, report_path: Path) -> tuple[lis
     base_links = _parish_links(diocese_key)
     downloaded, _failed, skipped, _target_date = _load_report_sections(report_path)
     recipe_keys = _recipe_keys(diocese_key)
+    disabled = _disabled_status_keys()
     stats = {"ok": 0, "skip": 0, "fail": 0}
     merged: list[dict[str, str]] = []
     seen: set[str] = set()
 
     def _append(name: str, key: str, fallback_url: str) -> None:
-        if is_alias_key(key) or key in seen:
+        if is_alias_key(key) or key in seen or key in disabled:
             return
         seen.add(key)
         name = combined_display_name(key) or name
