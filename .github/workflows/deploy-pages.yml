@@ -15,7 +15,6 @@ on:
       - docs/**
       - mega_pdf/**
       - extension/**
-      - updates.xml
       - .github/workflows/deploy-pages.yml
   workflow_dispatch:
 
@@ -233,9 +232,7 @@ jobs:
 
           echo "HAD_NEW_ARTIFACTS=${HAD_NEW_ARTIFACTS}" >> "$GITHUB_ENV"
 
-      - name: Build Pages site (mega PDFs + extension updates)
-        env:
-          CHROME_EXTENSION_APP_ID: ${{ vars.CHROME_EXTENSION_APP_ID }}
+      - name: Build Pages site (mega PDFs + extension zip)
         run: |
           set -euo pipefail
           if [ ! -f docs/index.html ]; then
@@ -279,48 +276,13 @@ jobs:
             fi
           fi
 
-          # Brave Update matches this id to the installed Trainer.
-          # A missing repo variable used to write REPLACE_WITH_EXTENSION_ID,
-          # so Update found no match and Frank stayed on the old version.
-          # Packed CRX id (manifest key). Load unpacked path-id cannot Update.
-          DEFAULT_APP_ID="jicahhhkajpojkjjihbeihkhcadijnkc"
-          LEGACY_UNPACKED_ID="aohmhajdfdmhjjjoddleaikdfajgdjok"
-          if [ -z "${CHROME_EXTENSION_APP_ID:-}" ] || [ "${CHROME_EXTENSION_APP_ID}" = "REPLACE_WITH_EXTENSION_ID" ]; then
-            echo "CHROME_EXTENSION_APP_ID unset or placeholder — using ${DEFAULT_APP_ID}" >&2
-            APP_ID="${DEFAULT_APP_ID}"
-          else
-            APP_ID="${CHROME_EXTENSION_APP_ID}"
-          fi
-
           PAGES_BASE="https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}"
-          # Custom domain — no 301. Chrome's updater often will not follow a
-          # github.io → parishpress.ie redirect on the zip.
-          CODEBASE_BASE="https://www.parishpress.ie"
-          if [ -f docs/extension/parish_trainer.crx ]; then
-            cp -f docs/extension/parish_trainer.crx _site/extension/parish_trainer.crx
-          fi
-          if [ ! -s _site/extension/parish_trainer.crx ]; then
-            echo "Error: parish_trainer.crx missing — Brave Update needs a packed CRX, not only a zip."
-            exit 1
-          fi
-          python3 scripts/write_updates_xml.py \
-            --packed-id "${APP_ID}" \
-            --legacy-id "${LEGACY_UNPACKED_ID}" \
-            --base "${CODEBASE_BASE}" \
-            --version "${VERSION}" \
-            --out _site/updates.xml
-
-          if ! grep -Fq "version=\"${VERSION}\"" _site/updates.xml; then
-            echo "Error: generated updates.xml does not contain extension version ${VERSION}."
-            exit 1
-          fi
-
+          rm -f _site/updates.xml _site/extension/parish_trainer.crx
           {
             echo "EXTENSION_PREV_VERSION=${PREV_VERSION}"
             echo "EXTENSION_NEW_VERSION=${VERSION}"
             echo "EXTENSION_MANIFEST_BUMPED=${MANIFEST_BUMPED}"
             echo "EXTENSION_PACKAGE_URL=${PAGES_BASE}/extension/parish_trainer.zip"
-            echo "EXTENSION_UPDATES_URL=${PAGES_BASE}/updates.xml"
             echo "PAGES_BASE_URL=${PAGES_BASE}"
           } >> "$GITHUB_ENV"
 
@@ -347,7 +309,6 @@ jobs:
             echo "| Raphoe diocese | ${PAGES_BASE_URL:-not-set}/dioceses/raphoe/ |"
             echo "| OCR archive | ${PAGES_BASE_URL:-not-set}/bulletins/ |"
             echo "| Extension package | ${EXTENSION_PACKAGE_URL:-not-set} |"
-            echo "| Extension updates | ${EXTENSION_UPDATES_URL:-not-set} |"
             echo "| Deployed Pages URL | ${{ steps.deployment.outputs.page_url }} |"
           } >> "$GITHUB_STEP_SUMMARY"
 

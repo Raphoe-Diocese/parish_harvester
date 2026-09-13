@@ -178,7 +178,7 @@ https://www.antrimparish.com
         self.assertEqual(manifest["manifest_version"], 3)
         self.assertEqual(
             manifest["permissions"],
-            ["activeTab", "tabs", "scripting", "contextMenus", "storage", "downloads"],
+            ["activeTab", "tabs", "scripting", "storage", "downloads"],
         )
         self.assertEqual(manifest.get("host_permissions"), ["<all_urls>"])
         self.assertNotIn("sidePanel", manifest.get("permissions", []))
@@ -195,8 +195,8 @@ https://www.antrimparish.com
         self.assertIn('type === "mark_image"', content_js)
         self.assertIn('type === "start_crop"', content_js)
         self.assertIn('window.ph_mark_crop', content_js)
-        self.assertIn("chrome.contextMenus.create", background_js)
-        self.assertIn('id: "mark-bulletin-image"', background_js)
+        self.assertNotIn("chrome.contextMenus", background_js)
+        self.assertNotIn("mark-bulletin-image", background_js)
         self.assertIn("toggle_toolbar", background_js)
         self.assertIn("dispatch_to_tab", background_js)
         self.assertIn("chrome.scripting.executeScript", background_js)
@@ -211,14 +211,10 @@ https://www.antrimparish.com
 
         self.assertIn("version", manifest)
         self.assertRegex(manifest.get("version", ""), r"^\d+\.\d+\.\d+$")
-        self.assertEqual(
-            manifest.get("update_url"),
-            "https://www.parishpress.ie/updates.xml",
-        )
+        self.assertNotIn("update_url", manifest)
         self.assertTrue(str(manifest.get("key") or "").startswith("MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8A"))
         crx = repo_root / "docs" / "extension" / "parish_trainer.crx"
-        self.assertTrue(crx.is_file())
-        self.assertEqual(crx.read_bytes()[:4], b"Cr24")
+        self.assertFalse(crx.is_file())
         self.assertIn('id="ext-version"', popup_html)
         self.assertIn('id="gh-pat"', popup_html)
         self.assertIn('id="gh-repo"', popup_html)
@@ -371,7 +367,7 @@ https://www.antrimparish.com
         self.assertIn("push:", workflow)
         self.assertIn("docs/**", workflow)
         self.assertIn("extension/**", workflow)
-        self.assertIn("updates.xml", workflow)
+        self.assertNotIn("- updates.xml", workflow)
         self.assertIn("mega_pdf/**", workflow)
         self.assertIn("Generate OCR bulletin viewers", workflow)
         self.assertIn("Harvest Parish Bulletins", workflow)
@@ -404,7 +400,7 @@ https://www.antrimparish.com
         self.assertIn("Error: file does not look like a PDF:", workflow)
         self.assertIn('if [ ! -s "${pdf}" ]; then', workflow)
         self.assertIn("exit 1", workflow)
-        self.assertIn("Build Pages site (mega PDFs + extension updates)", workflow)
+        self.assertIn("Build Pages site (mega PDFs + extension zip)", workflow)
         self.assertIn("EXTENSION_PREV_VERSION", workflow)
         self.assertIn("Publish deploy summary", workflow)
         self.assertIn("cp -a docs/. _site/", workflow)
@@ -416,20 +412,17 @@ https://www.antrimparish.com
         self.assertIn("Using committed docs/mega_pdf — skip stale harvest artifacts", workflow)
         self.assertIn("Keep smaller committed", workflow)
         self.assertIn("parish_trainer.zip", workflow)
-        self.assertIn("_site/updates.xml", workflow)
-        self.assertIn('DEFAULT_APP_ID="jicahhhkajpojkjjihbeihkhcadijnkc"', workflow)
-        self.assertIn('LEGACY_UNPACKED_ID="aohmhajdfdmhjjjoddleaikdfajgdjok"', workflow)
-        self.assertIn('APP_ID="${DEFAULT_APP_ID}"', workflow)
-        self.assertIn("parish_trainer.crx", workflow)
-        self.assertIn("scripts/write_updates_xml.py", workflow)
-        self.assertNotIn('APP_ID="REPLACE_WITH_EXTENSION_ID"', workflow)
+        self.assertIn("rm -f _site/updates.xml _site/extension/parish_trainer.crx", workflow)
+        self.assertNotIn("scripts/write_updates_xml.py", workflow)
+        self.assertNotIn("scripts/pack_extension_crx.py", workflow)
         self.assertIn(
             "( cd extension && zip -qr ../_site/extension/parish_trainer.zip . )",
             workflow,
         )
         self.assertNotIn("zip -qr _site/extension/parish_trainer.zip extension\n", workflow)
         self.assertIn("manifest.json at the zip root", workflow)
-        self.assertIn('CODEBASE_BASE="https://www.parishpress.ie"', workflow)
+        self.assertNotIn('CODEBASE_BASE="https://www.parishpress.ie"', workflow)
+        self.assertNotIn("EXTENSION_UPDATES_URL", workflow)
 
     def test_ocr_bulletin_workflow_configuration(self) -> None:
         workflow = (REPO_ROOT / ".github" / "workflows" / "ocr-bulletin.yml").read_text(encoding="utf-8")
