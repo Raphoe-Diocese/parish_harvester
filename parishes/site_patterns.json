@@ -33,9 +33,10 @@
         "tyholland",
         "donaghmoyne",
         "parishofroslea",
-        "glenavyandkilleadparish"
+        "glenavyandkilleadparish",
+        "stoliverplunkettparish"
       ],
-      "success_count": 8
+      "success_count": 9
     },
     "wp_pdfemb_list+click_then_pdf": {
       "page_type": "wp_pdfemb_list",
@@ -70,9 +71,10 @@
       "example_parishes": [
         "ballinascreen",
         "clonleighparish",
-        "stteresasparish"
+        "stteresasparish",
+        "stcolmcillesholywood"
       ],
-      "success_count": 3
+      "success_count": 4
     },
     "html_click_chain+click_chain": {
       "page_type": "html_click_chain",
@@ -377,6 +379,31 @@
       ],
       "example_parishes": [
         "iskaheenparish"
+      ],
+      "success_count": 1
+    },
+    "image_bulletin+click_then_pdf": {
+      "page_type": "image_bulletin",
+      "recipe_flow": "click_then_pdf",
+      "label": "image_bulletin",
+      "advice": "Click Get an image or Pick an image on this page.",
+      "html_fingerprint": "image_bulletin_wp",
+      "html_markers": [
+        "WP uploaded images in body",
+        "bulletin keywords"
+      ],
+      "example_parishes": [
+        "parishofardkeen"
+      ],
+      "success_count": 1
+    },
+    "iframe_viewer+click_then_pdf": {
+      "page_type": "iframe_viewer",
+      "recipe_flow": "click_then_pdf",
+      "label": "iframe_viewer",
+      "advice": "Click It's in a frame / viewer and choose the bulletin frame.",
+      "example_parishes": [
+        "stpatricksbelfast"
       ],
       "success_count": 1
     }
@@ -1206,6 +1233,78 @@
         "file embed/button",
         "bulletin page"
       ]
+    },
+    "stoliverplunkettparish": {
+      "page_type": "pdf_link_list",
+      "recipe_flow": "click_then_pdf",
+      "combined_key": "pdf_link_list+click_then_pdf",
+      "display_name": "St Oliver Plunkett",
+      "start_url_host": "stoliverplunkettparish.ie",
+      "updated": "2026-09-14",
+      "step_count": 1,
+      "playbook_type": "pdf_download_list",
+      "operator_notes": [
+        "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
+        "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+        "Do not worry if the filename or date in the link text changes every week."
+      ],
+      "do_not": [
+        "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
+        "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+      ],
+      "html_fingerprint": "wp_uploads_pdf_list",
+      "html_markers": [
+        "wp-content PDF uploads",
+        "WordPress signals"
+      ]
+    },
+    "parishofardkeen": {
+      "page_type": "image_bulletin",
+      "recipe_flow": "click_then_pdf",
+      "combined_key": "image_bulletin+click_then_pdf",
+      "display_name": "Ardkeen",
+      "start_url_host": "parishofardkeen.co.uk",
+      "updated": "2026-09-14",
+      "step_count": 2,
+      "html_fingerprint": "image_bulletin_wp",
+      "html_markers": [
+        "WP uploaded images in body",
+        "bulletin keywords"
+      ]
+    },
+    "stcolmcillesholywood": {
+      "page_type": "wix_html",
+      "recipe_flow": "html_capture",
+      "combined_key": "wix_html+html_capture",
+      "display_name": "St Colmcille's Holywood",
+      "start_url_host": "www.stcolmcillesholywood.org",
+      "updated": "2026-09-14",
+      "step_count": 2,
+      "playbook_type": "wix_html",
+      "operator_notes": [
+        "Bulletin text is on the web page — not a downloadable PDF file.",
+        "Use Save page as PDF on the newsletter article page.",
+        "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
+      ],
+      "do_not": [
+        "Do not use Pick bulletin image when the page is mostly text paragraphs.",
+        "Do not stop at click-only — need print_to_pdf as the final step."
+      ],
+      "html_fingerprint": "wordpress_html_post",
+      "html_markers": [
+        "WP entry content blocks",
+        "WordPress signals",
+        "newsletter in title/slug"
+      ]
+    },
+    "stpatricksbelfast": {
+      "page_type": "iframe_viewer",
+      "recipe_flow": "click_then_pdf",
+      "combined_key": "iframe_viewer+click_then_pdf",
+      "display_name": "St Patricks Belfast",
+      "start_url_host": "www.stpatricksbelfast.org",
+      "updated": "2026-09-14",
+      "step_count": 3
     }
   }
 }

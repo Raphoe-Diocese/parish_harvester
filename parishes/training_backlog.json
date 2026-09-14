@@ -2,11 +2,11 @@
   "generated_at": "2026-09-14",
   "target_date": "2026-09-13",
   "summary": {
-    "downloaded": 104,
+    "downloaded": 105,
     "html_links": 0,
     "skipped": 29,
     "failed": 18,
-    "stale_rejected": 13
+    "stale_rejected": 12
   },
   "action_counts": {
     "skip": 34,
@@ -206,27 +206,24 @@
       "recipe_file": "parishes/recipes/down_and_connor/parishofardkeen.json",
       "recipe": {
         "start_url": "https://parishofardkeen.co.uk/parish-bulletin/",
-        "site_type": "http_scrape_newest_images",
-        "playbook_type": "stacked_image_bulletin",
+        "site_type": "",
+        "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
-        "click_count": 0,
-        "has_terminal": false,
-        "operator_notes": [
-          "Proved 10/09/2026: this week is /uploads/2026/09/23-Sunday-OT-A.png (HTTP 200, 1794945, image/png). Older weeks are JPGs in /2026/08/.",
-          "http_scrape_newest_images. Do not pin 19th-Sunday or 20th-Sunday filenames."
-        ],
-        "do_not": [
-          "Do not pin a liturgical-Sunday filename.",
-          "Do not download the parish logo JPEG."
-        ],
-        "recorded_date": "2026-09-10"
+        "step_count": 2,
+        "click_count": 1,
+        "has_terminal": true,
+        "operator_notes": [],
+        "do_not": [],
+        "recorded_date": "2026-09-14"
       },
-      "bulletin_format": "image_stack",
-      "learned_pattern": "",
-      "host_profile": null,
+      "bulletin_format": "download",
+      "learned_pattern": "image_bulletin",
+      "host_profile": {
+        "total_timeout_s": 250,
+        "navigation_timeout_ms": 55000
+      },
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
       "last_error": "Downloaded file looks like a website error/security page, not a bulletin PDF",
@@ -4355,10 +4352,10 @@
         "notes": "Joomla Dropfiles \u2014 click a.mod_downloadlink; harvest converts .docx to PDF."
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Total timeout exceeded; headful fallback: Headful fallback timed out",
-      "suggested_action": "investigate",
-      "suggested_reason": "Total timeout exceeded; headful fallback: Headful fallback timed out"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "portaferryparish",
@@ -4892,33 +4889,29 @@
       "recipe_file": "parishes/recipes/down_and_connor/stcolmcillesholywood.json",
       "recipe": {
         "start_url": "https://www.stcolmcillesholywood.org/weekly-bulletins/",
-        "site_type": "waf_retry_wordpress",
-        "playbook_type": "",
+        "site_type": "html_text_bulletin",
+        "playbook_type": "wix_html",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "St Colmcille's Holywood \u2014 dated notice pages, PDF hidden in a PDF Embedder Premium iframe (class pdfembed-iframe, src=?pdfemb-data=<base64 json {url:...}>), not a public a.pdfemb-viewer href.",
-          "Stable slug: /bulletins/bulletin-notice-sunday-{Dth}-{month}-{YYYY}/. Confirmed live 20/08/2026: 16th August 2026 exists; 23rd August 2026 is HTTP 404. Do not invent next Sunday.",
-          "Iframe target for 16 Aug 2026: https://www.stcolmcillesholywood.org/wp-content/uploads/2026/08/Bulletin-Notice-16th-August-2026.pdf (HTTP 200, application/pdf, 380331 bytes, 3 pages, body text '16th August' + Holywood).",
-          "Listing /weekly-bulletins/ also lists the same posts, but can look stale in search snippets. site_type:waf_retry_wordpress scrapes that listing first, then predicts rewrite_date_url Sundays and skips 404s.",
-          "Origin is SiteGround-style 403-flaky (curl often 403; plain urllib retries get 200). Skip Playwright.",
-          "Harvest 07/09/2026 downloaded a real 5-page weekly then discarded Too many pages: 5 (max 4). max_bulletin_pages=8."
+          "Bulletin text is on the web page \u2014 not a downloadable PDF file.",
+          "Use Save page as PDF on the newsletter article page.",
+          "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
         ],
         "do_not": [
-          "Do not hardcode /bulletin-notice-sunday-23rd-august-2026/ \u2014 that slug 404s until the parish posts it.",
-          "Do not treat the listing as a direct PDF page \u2014 the PDF is only inside the notice-page iframe.",
-          "Do not switch this to a Playwright click recipe \u2014 the origin 403s browsers more often than plain HTTP."
+          "Do not use Pick bulletin image when the page is mostly text paragraphs.",
+          "Do not stop at click-only \u2014 need print_to_pdf as the final step."
         ],
-        "recorded_date": "2026-08-20"
+        "recorded_date": "2026-09-14"
       },
-      "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "bulletin_format": "html",
+      "learned_pattern": "Wix HTML bulletin",
       "host_profile": null,
-      "has_extension_diagnosis": false,
+      "has_extension_diagnosis": true,
       "harvest_status": "failed",
       "last_error": "Recipe replay failed: WAF-flaky site https://www.stcolmcillesholywood.org/weekly-bulletins/ \u2014 could not fetch listing/post via plain-HTTP retries within budget (not a permanent block; retry later)",
       "suggested_action": "investigate",
@@ -4931,13 +4924,13 @@
       "recipe_file": "parishes/recipes/down_and_connor/st-colmcilles.json",
       "recipe": {
         "start_url": "https://st-colmcilles.net/weekly-bulletins/past-weeks-bulletins/",
-        "site_type": "predicted_dated_pdf",
+        "site_type": "wp_block_file_bulletin",
         "playbook_type": "permanent_bulletin_page",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 2,
-        "click_count": 1,
+        "step_count": 1,
+        "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
           "Permanent /parish-bulletin/ URL \u2014 PDF filename changes weekly under /wp-content/uploads/YYYY/MM/.",
@@ -4948,16 +4941,22 @@
           "Do not train on the homepage \u2014 use the dedicated bulletin page only.",
           "Do not pin saintanthony.co.uk if the parish moved to saintanthonys.uk."
         ],
-        "recorded_date": "2026-08-19"
+        "recorded_date": "2026-09-14"
       },
       "bulletin_format": "download",
-      "learned_pattern": "",
-      "host_profile": null,
+      "learned_pattern": "WordPress permanent bulletin page (wp-block-file)",
+      "host_profile": {
+        "navigation_wait_until": "commit",
+        "total_timeout_s": 600,
+        "navigation_timeout_ms": 300000,
+        "wait_after_load_ms": 45060,
+        "notes": "Permanent /parish-bulletin/ URL \u2014 PDF filename changes weekly under /wp-content/uploads/YYYY/MM/. On the bulletin page: tap the green Save bulletin PDF (from embed) button. Use url_pattern *bulletin*.pdf \u2014 never pin a dated filename."
+      },
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Too many pages: 8 pages (max 4)",
+      "suggested_action": "investigate",
+      "suggested_reason": "Too many pages: 8 pages (max 4)"
     },
     {
       "parish_key": "stgerardsparish",
@@ -5183,28 +5182,33 @@
       "recipe_file": "parishes/recipes/down_and_connor/stoliverplunkettparish.json",
       "recipe": {
         "start_url": "https://stoliverplunkettparish.ie/bulletins/",
-        "site_type": "predicted_dated_pdf",
+        "site_type": "pdf_link_list",
         "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 3,
-        "click_count": 1,
+        "step_count": 1,
+        "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "Bulletin list at /bulletins/. Newest dated Sun-Nth-Month-26.pdf.",
-          "Do not pin a June download URL \u2014 harvest rewrote the folder to /2026/08/ and 404'd."
+          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
+          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+          "Do not worry if the filename or date in the link text changes every week."
         ],
         "do_not": [
-          "Do not pin Sun-28th-June-26.pdf or any dated filename.",
-          "Do not pick Ministers-of-the-Word / Eucharist rota .docx files."
+          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
+          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
         ],
-        "recorded_date": "2026-08-23"
+        "recorded_date": "2026-09-14"
       },
       "bulletin_format": "download",
-      "learned_pattern": "",
-      "host_profile": null,
-      "has_extension_diagnosis": false,
+      "learned_pattern": "News page with PDF links",
+      "host_profile": {
+        "total_timeout_s": 190,
+        "navigation_timeout_ms": 55000,
+        "notes": "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom. Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday. Do not worry if the filename or date in the link text chan"
+      },
+      "has_extension_diagnosis": true,
       "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "ok",
@@ -5292,26 +5296,21 @@
       "diocese": "down_and_connor",
       "recipe_file": "parishes/recipes/down_and_connor/stpatricksbelfast.json",
       "recipe": {
-        "start_url": "https://www.stpatricksbelfast.org/category/weekly-bulletins",
-        "site_type": "waf_retry_wordpress",
+        "start_url": "https://www.stpatricksbelfast.org/category/weekly-bulletins/",
+        "site_type": "",
         "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
-        "click_count": 0,
-        "has_terminal": false,
+        "step_count": 3,
+        "click_count": 2,
+        "has_terminal": true,
         "operator_notes": [],
-        "do_not": [
-          "Do not guess/hardcode next week's post slug \u2014 this parish skips weeks;",
-          "always scrape the real category archive for the newest real post.",
-          "Do not switch this back to a Playwright goto/click recipe \u2014 a full browser",
-          "was measurably less reliable than plain HTTP retries against this WAF."
-        ],
-        "recorded_date": "2026-08-10"
+        "do_not": [],
+        "recorded_date": "2026-09-14"
       },
-      "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "bulletin_format": "download",
+      "learned_pattern": "iframe_viewer",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
