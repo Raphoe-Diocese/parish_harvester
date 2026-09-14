@@ -15,6 +15,12 @@ ALIAS_TO_CANONICAL: dict[str, str] = {
     "kilmacrenan": "drive-1kna8f6t54",
 }
 
+# Harvest / workflow input names that are not skip-aliases. Bruckless is the
+# real recipe ``drive-1rjeey-ayy`` — Frank should not have to type the Drive id.
+HARVEST_INPUT_ALIASES: dict[str, str] = {
+    "bruckless": "drive-1rjeey-ayy",
+}
+
 # One A–Z name for the canonical parish (includes the alias in brackets).
 COMBINED_DISPLAY_NAMES: dict[str, str] = {
     "drumholm-parish": "Drumholm (Ballintra)",
@@ -38,6 +44,32 @@ _NAME_TO_CANONICAL_NORM: dict[str, str] = {
 
 _FACEBOOK_HOST = "facebook.com"
 _NORM_RE = re.compile(r"[^a-z0-9]+")
+
+
+DRIVE_FOLDER_LISTING_ERROR = "Drive folder listing, not a file"
+
+
+def resolve_harvest_key(value: str) -> str:
+    """Map a harvest input (``bruckless``) to the recipe key."""
+    key = (value or "").strip().lower()
+    if not key:
+        return ""
+    return HARVEST_INPUT_ALIASES.get(key, key)
+
+
+def is_drive_folder_listing(url: str) -> bool:
+    lower = (url or "").lower()
+    return "drive.google.com" in lower and "/folders/" in lower
+
+
+def reject_drive_folder_listing(result: object) -> object:
+    """If an ok result still points at a Drive folder, mark it failed."""
+    status = getattr(result, "status", "")
+    url = getattr(result, "url", "") or ""
+    if status == "ok" and is_drive_folder_listing(url):
+        result.status = "error"
+        result.error = DRIVE_FOLDER_LISTING_ERROR
+    return result
 
 
 def canonical_key(parish_key: str) -> str:

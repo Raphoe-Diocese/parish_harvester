@@ -17,11 +17,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
-## 14/09/2026 — Full harvest running; tick live page rows while we wait
+## 14/09/2026 — H2 reapply (this turn)
 
-**Harvest:** [Harvest full 34822202023](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34822202023) still on **Run Bulletin Harvester** (started 09:20 Irish). Do not run harvest on this laptop. OCR starts by itself after **Harvest full**. S1/S2/A5/E1/E2 stay **not live** until that + Pages.
+**Now — H2:** clean branch from today’s `main` (old #211 conflicted after harvest). `bruckless` → `drive-1rjeey-ayy`. Drive `/folders/` never stays `ok`. B4 stays open until harvest tests use `python -m pytest`.
 
-**This turn while waiting:** backlog ticks only where live URLs were opened — Tap to enlarge gone, Show PDF gone, pageWidth no 720, Drumholm (Ballintra), Gortahork has no trailing Inver header, Clogher page exists, Derry search sticky after typing Waterside. Phone PDF rows still need Frank. Do not merge H2 #211 or B4 #214 until this harvest commit lands. H1 Ardara/Inver date parse is already on `main` (tests in `test_bulletin_freshness.py`).
+## 14/09/2026 — Full harvest finished
+
+**Harvest finished:** [Harvest full 34822202023](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34822202023) **success**. OCR [34828244862](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34828244862) + Pages [34828802964](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34828802964). Week **13/09/2026**.
 
 ## 13/09/2026 — C5 executable JS test
 
