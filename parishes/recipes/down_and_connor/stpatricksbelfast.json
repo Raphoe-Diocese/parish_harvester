@@ -1,60 +1,31 @@
 {
-  "version": 2,
+  "version": 1,
   "parish_key": "stpatricksbelfast",
-  "harvest_note": "Blocked from GitHub runners (WAF/403). Needs a different network. Do not re-hunt weekly.",
   "display_name": "St Patricks Belfast",
   "diocese": "down_and_connor",
-  "start_url": "https://www.stpatricksbelfast.org/category/weekly-bulletins",
+  "start_url": "https://www.stpatricksbelfast.org/category/weekly-bulletins/",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.stpatricksbelfast.org/category/weekly-bulletins"
+      "action": "click",
+      "href": "https://www.stpatricksbelfast.org/weekly-bulletins/weekly-bulletin-for-sunday-13-september-2026/",
+      "selector": "article#post-1308 > header > h2 > a",
+      "text": "Weekly Bulletin for Sunday 13 September 2026 | Weekly Bullet"
+    },
+    {
+      "action": "click",
+      "href": "https://www.stpatricksbelfast.org/weekly-bulletins/weekly-bulletin-for-sunday-13-september-2026/",
+      "selector": "html > body > a:nth-of-type(2)",
+      "text": ""
+    },
+    {
+      "action": "download",
+      "url": "https://www.stpatricksbelfast.org?url=https%3A%2F%2Fwww.stpatricksbelfast.org%2Fwp-content%2Fuploads%2F2026%2F09%2FBulletin-New-Paula-Sunday-13-September-2026.pdf&title=Bulletin-New-Paula-Sunday-13-September-2026.pdf&pdfID=2&index=2",
+      "use_captured_url": true
     }
   ],
-  "site_type": "waf_retry_wordpress",
-  "post_slug_patterns": ["weekly-bulletin-for-sunday-"],
-  "timeout_ms": 45000,
-  "total_timeout_s": 190,
-  "recorded_date": "2026-08-10",
-  "operator_notes_2026_08_10": [
-    "NOT a genuine dead-end — the earlier 'bot-blocked, no unprotected path'",
-    "verdict (needs_retraining/placeholder) was WRONG and is superseded. Same",
-    "SiteGround 'sg-captcha' challenge and shared-hosting fingerprint (host-",
-    "header: 8441280...) as threepatrons.org/stmarysportglenone.org/",
-    "stgerardsparish.org — PROBABILISTIC, not a hard block: plain HTTP retries",
-    "(curl/urllib) got through with real content in a handful of attempts,",
-    "while a full Playwright browser navigation to the same URL failed far more",
-    "consistently in testing.",
-    "Site structure: the .../category/weekly-bulletins archive lists each week's",
-    "post via a stable, predictable slug",
-    "'weekly-bulletin-for-sunday-D-month-YYYY' (no inconsistent prefix, unlike",
-    "stgerardsparish) — but the parish does NOT reliably post every week, so",
-    "still scrape the real archive rather than guess the slug. Each post embeds",
-    "the actual bulletin via the PDF Embedder plugin",
-    "(<iframe class=\"pdfembed-iframe\" src=\"...?url=<urlencoded pdf>&...\">),",
-    "pointing at a wp-content/uploads/YYYY/MM/*.pdf.",
-    "site_type:waf_retry_wordpress (harvester/replay.py) skips Playwright/the",
-    "browser entirely for this recipe: fetches the category archive via plain-",
-    "HTTP retries, regex-extracts the newest post link matching",
-    "post_slug_patterns with a real date <= target, fetches that post, decodes",
-    "the pdfembed-iframe's url= query param, and downloads the actual PDF.",
-    "IMPORTANT — confirmed genuinely stale via the site's own wp-sitemap.xml",
-    "<lastmod> timestamps (authoritative, not a guess) as of 2026-08-10: the",
-    "newest post is still 'weekly-bulletin-for-sunday-5-july-2026' (lastmod",
-    "2026-07-03) — 5 weeks stale against the 9 August 2026 target, nothing",
-    "posted since. Expect this recipe to legitimately report outcome=stale/",
-    "failed some weeks purely because the parish stopped posting, same as any",
-    "other genuinely-stale parish; do not re-open the WAF-block investigation",
-    "unless even that 5 July 2026 PDF stops being downloadable at all."
-  ],
-  "operator_notes_2026_08_18": [
-    "Recheck: category archive newest post is still weekly-bulletin-for-sunday-5-july-2026. Recipe already waf_retry_wordpress. Content gap.",
-    "2026-08-19: 12 plain-HTTP retries of the category archive and predicted 16/9/2 August slugs all 403 from this network. Recipe already waf_retry_wordpress — leave it; do not reopen as a selector bug unless the 5 July post itself disappears."
-  ],
-  "do_not": [
-    "Do not guess/hardcode next week's post slug — this parish skips weeks;",
-    "always scrape the real category archive for the newest real post.",
-    "Do not switch this back to a Playwright goto/click recipe — a full browser",
-    "was measurably less reliable than plain HTTP retries against this WAF."
-  ]
+  "observed_load_ms": 328300,
+  "timeout_ms": 300000,
+  "total_timeout_s": 900,
+  "navigation_wait_until": "commit",
+  "recorded_date": "2026-09-14"
 }
