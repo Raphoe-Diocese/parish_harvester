@@ -2,16 +2,16 @@
   "generated_at": "2026-09-14",
   "target_date": "2026-09-13",
   "summary": {
-    "downloaded": 102,
+    "downloaded": 103,
     "html_links": 0,
     "skipped": 29,
-    "failed": 20,
+    "failed": 19,
     "stale_rejected": 13
   },
   "action_counts": {
     "skip": 34,
     "ok": 114,
-    "investigate": 18
+    "investigate": 17
   },
   "parishes": [
     {
@@ -3242,11 +3242,11 @@
     {
       "parish_key": "iskaheenparish",
       "display_name": "Iskaheen",
-      "diocese": "unknown",
+      "diocese": "derry",
       "recipe_file": "parishes/recipes/derry/iskaheenparish.json",
       "recipe": {
         "start_url": "https://www.iskaheenparish.com/bulletin",
-        "site_type": "http_scrape_newest_images",
+        "site_type": "stacked_image_bulletin",
         "playbook_type": "stacked_image_bulletin",
         "status": "",
         "skip": false,
@@ -3255,26 +3255,24 @@
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "Bulletins are two stacked page scans on /bulletin. Newest week is at the top.",
-          "18/08/2026 live page has /wp-content/uploads/2026/08/ UUID-rotated.jpg pair (i0.wp.com). Last harvest used leftover /2026/04/1.jpg.",
-          "site_type:http_scrape_newest_images takes the newest upload-month images (count=2) via plain HTTP. Hashed filenames have no day \u2014 freshness treats same-month UUID scans as current-month, not folder day=1.",
-          "The June urls[] field from training is leftover and is not used.",
-          "09/09/2026 listing has /wp-content/uploads/2026/09/ UUID-rotated.jpg pair on i0.wp.com (HTTP 200). Harvest 34293288559 reported no matching images. Keep the Jetpack URL \u2014 do not rewrite to origin and do not pin the UUID filenames."
+          "Bulletins are full-page images stacked on one page \u2014 newest week at the top.",
+          "Pick the first two images, or use Pick another image too after the first.",
+          "Harvester grabs the top N large images automatically each Sunday \u2014 no dated URLs."
         ],
         "do_not": [
           "Do not hardcode one image URL \u2014 it goes stale every week.",
           "Do not Save page as PDF \u2014 that captures every old bulletin on the page."
         ],
-        "recorded_date": "2026-08-18"
+        "recorded_date": "2026-09-14"
       },
       "bulletin_format": "image_stack",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP-scrape images https://www.iskaheenparish.com/bulletin \u2014 no bulletin page images matching ['wp-content/uploads'] (browser was not opened)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP-scrape images https://www.iskaheenparish.com/bulletin \u2014 no bulletin page images matching ['wp-content/uploads'] (browser was not open"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "kilbarron",
@@ -3874,34 +3872,6 @@
       "suggested_reason": "downloaded or not in failure list"
     },
     {
-      "parish_key": "magheraparishderry",
-      "display_name": "Maghera",
-      "diocese": "down_and_connor",
-      "recipe_file": "parishes/recipes/down_and_connor/magheraparishderry.json",
-      "recipe": {
-        "start_url": "http://www.magheraparishderry.com/parishnews.php",
-        "site_type": "",
-        "playbook_type": "",
-        "status": "",
-        "skip": false,
-        "placeholder": false,
-        "step_count": 3,
-        "click_count": 1,
-        "has_terminal": true,
-        "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-06-15"
-      },
-      "bulletin_format": "download",
-      "learned_pattern": "",
-      "host_profile": null,
-      "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
-    },
-    {
       "parish_key": "parishofmaghera",
       "display_name": "Maghera",
       "diocese": "down_and_connor",
@@ -3976,7 +3946,7 @@
         "recorded_date": "2026-09-14"
       },
       "bulletin_format": "download",
-      "learned_pattern": "",
+      "learned_pattern": "direct_pdf",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
