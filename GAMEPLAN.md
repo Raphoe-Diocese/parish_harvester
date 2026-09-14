@@ -17,6 +17,26 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 14/09/2026 (evening) — T1+T2+T3 built; Frank’s new asks written down
+
+**The real goal, in one sentence:** the best bulletin website for parishes — every fix Frank makes stays on GitHub, and the plan scales to 26 dioceses without breaking the budget or the repo.
+
+**Done this turn (evidence):** [PR #232](https://github.com/Raphoe-Diocese/parish_harvester/pull/232) now carries **Trainer 1.61.33** = T1 (single-parish push merges only its own row — test replays the 16:18/16:26 St Patrick’s/Bright overlap), T2 (`pushRecipe` keeps every recipe field; never buries a plain-HTTP recipe under browser clicks — Node test), T3 (1.61.32 work, St Gerard slug, St Michael dates), restored `stpatricksbelfast` + `stcolmcillesholywood`. Local: `test_mega_pdf_git` 16/16, JS tests 4/4, 103/103 recipe tests. **Not live** until Frank merges #232 and Reloads (card must say 1.61.33).
+
+**Proved for Frank:** st-colmcilles — he clicked the right link. The parish uploaded the 13 Sept bulletin as `2026/09/Parish-Bulletin-30082026-3.pdf`. Not a trainer bug.
+
+**Frank’s questions, straight answers (14/09):**
+- *Can several harvests run at once?* Not today. One job writes `report.json`/`parish_status.json` (workflow comment says no diocese matrix). T1’s row-merge is the first brick; a per-diocese matrix + merge step is card **S1** below.
+- *How long will 26 dioceses take?* Today 166 parishes = 33–73 min (runs 34749664034, 34023901973, 33303385922). ~1,000 parishes in one job ≈ 4–7 h; job limit is 6 h. So S1 (matrix) is needed **before** the 22 dioceses, not after.
+- *Enough room?* Repo is **1.08 GB on GitHub** (working tree ~170 MB). Every Sunday adds ~70 MB of PDFs to history; ×6 dioceses = ~400 MB/week. GitHub gets slow past ~5 GB. Card **S2**: stop committing PDFs (artifacts/Pages), keep only `parish_status.json`/`report.json`/OCR text in git. History rewrite stays parked.
+- *Enough free OCR API?* **I don’t know.** OCR runs 6–7 min today and holds Mistral/Gemini/OpenAI keys; I have not seen the quota numbers. Card **S3**: cost dashboard shows pages/month per key vs free ceiling before any diocese is added.
+- *Self-learning algorithm?* What exists: `extension/site_memory.js` + `parishes/site_patterns.json` (“learn site pattern” commits) and the diag kit “Pattern hints (learned from repo)”. Recipe Brain/Referee (Phase 4) is **parked**. Your “other ideas” are not in any gameplan — chats forget; list them once and they go in here.
+- *Rubbish to clean?* Duplicate mega PDFs (`mega_pdf/` and `docs/mega_pdf/`, 28.7 MB each, every week), `Bulletins/*.pdf` proof copies (one 9.8 MB), 47 stale branches, `content.js` 9,500 lines. **S2** covers the binaries; branches are `cleanup_branches.yml`.
+
+**Next (in order):** Frank merges #232 → Reload → one Send & test on `stgerardsparish` → row on main moves (T1 proof). Then T4–T8 in Grok plan, then **S1–S4**.
+
+**Parked:** UI rejig of trainer + backend (card **U1**, needs Frank’s screenshots and a 30-min “what confuses me” list first), Recipe Brain, 22 dioceses hunt, history rewrite.
+
 ## 14/09/2026 — Trainer audit: why Frank’s fixes “vanish” (proved on GitHub)
 
 **The real goal, in one sentence:** when Frank fixes a parish in the trainer, the fix and its result stay on GitHub.
