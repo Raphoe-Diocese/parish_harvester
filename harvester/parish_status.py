@@ -446,6 +446,50 @@ def build_parish_status(
     }
 
 
+def merge_single_parish_status(base: dict, mine: dict, parish_key: str) -> dict:
+    """Return *base* (origin/main) with only *parish_key*'s row taken from *mine*.
+
+    Two Send & tests that overlap each write a whole parish_status.json. The
+    later push used to copy its entire file over the earlier one, so the
+    earlier parish's row silently went back to last week (14/09/2026: eight
+    rows lost in one afternoon). A single-parish run must only ever move its
+    own row.
+    """
+    key = str(parish_key or "").strip()
+    out = json.loads(json.dumps(base)) if isinstance(base, dict) else {}
+    src = mine if isinstance(mine, dict) else {}
+    parishes = out.setdefault("parishes", {})
+    if not isinstance(parishes, dict):
+        parishes = {}
+        out["parishes"] = parishes
+    mine_rows = src.get("parishes") if isinstance(src.get("parishes"), dict) else {}
+    if key:
+        if key in mine_rows:
+            parishes[key] = mine_rows[key]
+        else:
+            parishes.pop(key, None)
+    for field in ("schema_version", "target_date"):
+        if src.get(field) is not None:
+            out[field] = src[field]
+    for field in ("generated_at", "last_patched_at"):
+        candidates = [v for v in (out.get(field), src.get(field)) if isinstance(v, str) and v]
+        if candidates:
+            out[field] = max(candidates)
+    actionable_keys = sorted(
+        k for k, row in parishes.items() if isinstance(row, dict) and row.get("actionable") is True
+    )
+    out["actionable_keys"] = actionable_keys
+    out["summary"] = {
+        "total": len(parishes),
+        "ok": sum(1 for row in parishes.values() if isinstance(row, dict) and row.get("outcome") == "ok"),
+        "actionable": len(actionable_keys),
+        "disabled": sum(
+            1 for row in parishes.values() if isinstance(row, dict) and row.get("outcome") == "disabled"
+        ),
+    }
+    return out
+
+
 def apply_slice_missing(
     *,
     sliced_keys: set[str] | list[str],

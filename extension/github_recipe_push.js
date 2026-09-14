@@ -178,6 +178,44 @@
     };
   };
 
+  // site_type values the harvester fetches with plain HTTP (no browser).
+  // A Playwright click recipe pushed over one of these breaks the parish.
+  const ENGINE_SITE_TYPES = new Set([
+    "waf_retry_wordpress",
+    "predicted_dated_pdf",
+    "http_scrape_newest_pdf",
+    "http_scrape_newest_images",
+    "wp_json_newest_media",
+    "dated_pdf_path",
+  ]);
+
+  const isEngineSiteType = (siteType) =>
+    ENGINE_SITE_TYPES.has(String(siteType || "").trim().toLowerCase());
+
+  // Steps a plain-HTTP recipe can still use: a direct file download or an
+  // image stack. Click / goto / print_to_pdf need a browser.
+  const recipeStepsAreHttpSafe = (steps) =>
+    Array.isArray(steps) &&
+    steps.length > 0 &&
+    steps.every((s) => {
+      const action = String(s?.action || "").toLowerCase();
+      if (action === "image_stack" || action === "image") return true;
+      if (action === "download") return /^https?:\/\//i.test(String(s?.url || ""));
+      return false;
+    });
+
+  const examplePostUrlFromSteps = (steps, explicit) => {
+    const direct = String(explicit || "").trim();
+    if (/^https?:\/\//i.test(direct)) return direct;
+    for (const step of Array.isArray(steps) ? steps : []) {
+      const href = String(step?.href || step?.url || "").trim();
+      if (!/^https?:\/\//i.test(href)) continue;
+      if (/\.(pdf|docx?|jpe?g|png|webp)(?:$|[?#])/i.test(href)) continue;
+      if (/\d{1,2}(?:st|nd|rd|th)?[-_/].*20\d{2}|20\d{2}/i.test(href)) return href;
+    }
+    return "";
+  };
+
   const pushRecipe = async ({ gh_pat, gh_repo: storedRepo, parish_key, recipe }) => {
     const gh_pat_clean = String(gh_pat || "").trim();
     if (!gh_pat_clean) {
@@ -199,20 +237,37 @@
     const existingSha = located.existingSha;
     const stepsReplaced = Array.isArray(incoming.steps) && incoming.steps.length > 0;
 
-    const merged = existingRecipe && !stepsReplaced
-      ? {
-          ...existingRecipe,
-          ...incoming,
-          steps: existingRecipe.steps,
-          start_url: incoming.start_url?.trim() ? incoming.start_url : existingRecipe.start_url,
-          display_name: incoming.display_name?.trim() || existingRecipe.display_name,
-          diocese: incoming.diocese?.trim() || existingRecipe.diocese,
-        }
-      : {
-          ...(stepsReplaced ? {} : existingRecipe || {}),
-          ...incoming,
-          steps: stepsReplaced ? incoming.steps : (existingRecipe?.steps || incoming.steps),
-        };
+    // 14/09/2026: a trainer push used to spread `{}` when steps changed, so
+    // site_type / harvest_note / example_post_url / post_slug_patterns / do_not
+    // vanished (St Patrick's Belfast, Holywood). The harvester needs those.
+    // Keep every existing key; the trainer only overrides what it sets.
+    let merged = {
+      ...(existingRecipe || {}),
+      ...incoming,
+      steps: stepsReplaced ? incoming.steps : (existingRecipe?.steps || incoming.steps || []),
+    };
+    if (existingRecipe) {
+      merged.start_url = incoming.start_url?.trim() ? incoming.start_url : existingRecipe.start_url;
+      merged.display_name = incoming.display_name?.trim() || existingRecipe.display_name;
+      merged.diocese = incoming.diocese?.trim() || existingRecipe.diocese;
+    }
+    let keptEngineRecipe = false;
+    if (
+      stepsReplaced &&
+      existingRecipe &&
+      isEngineSiteType(existingRecipe.site_type) &&
+      !recipeStepsAreHttpSafe(incoming.steps)
+    ) {
+      // Plain-HTTP recipe (browsers are blocked on this host). Do not bury it
+      // under Playwright clicks. Keep the engine recipe and remember the
+      // page Frank picked as this week's post shape.
+      merged = { ...existingRecipe };
+      const picked = examplePostUrlFromSteps(incoming.steps, incoming.example_post_url);
+      if (picked) merged.example_post_url = picked;
+      merged.display_name = incoming.display_name?.trim() || existingRecipe.display_name;
+      merged.diocese = incoming.diocese?.trim() || existingRecipe.diocese;
+      keptEngineRecipe = true;
+    }
 
     merged.recorded_date = new Date().toISOString().slice(0, 10);
     merged.parish_key = key;
@@ -276,6 +331,7 @@
       filePath: located.filePath,
       updated: Boolean(existingSha),
       recipe: merged,
+      keptEngineRecipe,
     };
   };
 
@@ -810,6 +866,9 @@
     githubApiError,
     locateRecipe,
     pushRecipe,
+    isEngineSiteType,
+    recipeStepsAreHttpSafe,
+    examplePostUrlFromSteps,
     verifyRecipe,
     dispatchHarvestTest,
     fetchReportJson,

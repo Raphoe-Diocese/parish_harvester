@@ -446,6 +446,37 @@ def _recompute_summary(report: dict) -> None:
     }
 
 
+def merge_single_parish_report(base: dict, mine: dict, parish_key: str) -> dict:
+    """Return *base* report with only *parish_key*'s entry taken from *mine*.
+
+    Companion of ``parish_status.merge_single_parish_status`` for overlapping
+    single-parish harvest runs: the later run must not wipe the earlier run's
+    bucket entry.
+    """
+    key = str(parish_key or "").strip()
+    out = json.loads(json.dumps(base)) if isinstance(base, dict) else {}
+    src = mine if isinstance(mine, dict) else {}
+    for section in ("downloaded", "html_links", "skipped", "failed", "stale_rejected"):
+        if not isinstance(out.get(section), list):
+            out[section] = []
+    if key:
+        _remove_parish_from_sections(out, key)
+        for section in ("downloaded", "html_links", "skipped", "failed", "stale_rejected"):
+            for item in src.get(section) or []:
+                if isinstance(item, dict) and item.get("parish") == key:
+                    out[section].append(item)
+    if src.get("target_date"):
+        out["target_date"] = src["target_date"]
+    stamps = [
+        v for v in (out.get("last_patched_at"), src.get("last_patched_at"))
+        if isinstance(v, str) and v
+    ]
+    if stamps:
+        out["last_patched_at"] = max(stamps)
+    _recompute_summary(out)
+    return out
+
+
 def patch_report_for_parishes(
     results: list["FetchResult"],
     report_json: Path,

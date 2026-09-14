@@ -17,6 +17,68 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 14/09/2026 (evening) — T1+T2+T3 built; Frank’s new asks written down
+
+**The real goal, in one sentence:** the best bulletin website for parishes — every fix Frank makes stays on GitHub, and the plan scales to 26 dioceses without breaking the budget or the repo.
+
+**Done this turn (evidence):** [PR #232](https://github.com/Raphoe-Diocese/parish_harvester/pull/232) now carries **Trainer 1.61.33** = T1 (single-parish push merges only its own row — test replays the 16:18/16:26 St Patrick’s/Bright overlap), T2 (`pushRecipe` keeps every recipe field; never buries a plain-HTTP recipe under browser clicks — Node test), T3 (1.61.32 work, St Gerard slug, St Michael dates), restored `stpatricksbelfast` + `stcolmcillesholywood`. Local: `test_mega_pdf_git` 16/16, JS tests 4/4, 103/103 recipe tests. **Not live** until Frank merges #232 and Reloads (card must say 1.61.33).
+
+**Proved for Frank:** st-colmcilles — he clicked the right link. The parish uploaded the 13 Sept bulletin as `2026/09/Parish-Bulletin-30082026-3.pdf`. Not a trainer bug.
+
+**Frank’s questions, straight answers (14/09):**
+- *Can several harvests run at once?* Not today. One job writes `report.json`/`parish_status.json` (workflow comment says no diocese matrix). T1’s row-merge is the first brick; a per-diocese matrix + merge step is card **S1** below.
+- *How long will 26 dioceses take?* Today 166 parishes = 33–73 min (runs 34749664034, 34023901973, 33303385922). ~1,000 parishes in one job ≈ 4–7 h; job limit is 6 h. So S1 (matrix) is needed **before** the 22 dioceses, not after.
+- *Enough room?* Repo is **1.08 GB on GitHub** (working tree ~170 MB). Every Sunday adds ~70 MB of PDFs to history; ×6 dioceses = ~400 MB/week. GitHub gets slow past ~5 GB. Card **S2**: stop committing PDFs (artifacts/Pages), keep only `parish_status.json`/`report.json`/OCR text in git. History rewrite stays parked.
+- *Enough free OCR API?* **I don’t know.** OCR runs 6–7 min today and holds Mistral/Gemini/OpenAI keys; I have not seen the quota numbers. Card **S3**: cost dashboard shows pages/month per key vs free ceiling before any diocese is added.
+- *Self-learning algorithm?* What exists: `extension/site_memory.js` + `parishes/site_patterns.json` (“learn site pattern” commits) and the diag kit “Pattern hints (learned from repo)”. Recipe Brain/Referee (Phase 4) is **parked**. Your “other ideas” are not in any gameplan — chats forget; list them once and they go in here.
+- *Rubbish to clean?* Duplicate mega PDFs (`mega_pdf/` and `docs/mega_pdf/`, 28.7 MB each, every week), `Bulletins/*.pdf` proof copies (one 9.8 MB), 47 stale branches, `content.js` 9,500 lines. **S2** covers the binaries; branches are `cleanup_branches.yml`.
+
+**Next (in order):** Frank merges #232 → Reload → one Send & test on `stgerardsparish` → row on main moves (T1 proof). Then T4–T8 in Grok plan, then **S1–S4**.
+
+**Parked:** UI rejig of trainer + backend (card **U1**, needs Frank’s screenshots and a 30-min “what confuses me” list first), Recipe Brain, 22 dioceses hunt, history rewrite.
+
+## 14/09/2026 — Trainer audit: why Frank’s fixes “vanish” (proved on GitHub)
+
+**The real goal, in one sentence:** when Frank fixes a parish in the trainer, the fix and its result stay on GitHub.
+
+**Proof (GitHub API 14/09 ~17:50):** 13 recipe commits by Frankytyrone 15:19–16:16 UTC and 30 single-parish runs today. His pushes **did** land. But 8 runs that ended **success** (St Patrick’s 34867602696, Holywood, Ardkeen, St Oliver, Glenavy, Iskaheen, Ballycastle, St Anne’s) left their `parish_status.json` row at **10/09** — the next overlapping run’s whole-file conflict copy (`harvester/mega_pdf_git.py`) overwrote them. And his 16:16 St Patrick’s push wiped `site_type: waf_retry_wordpress`, `harvest_note`, `post_slug_patterns`, `do_not` (`pushRecipe` spreads `{}` when steps change). Holywood lost `example_post_url` the same way; two repo tests now read broken data.
+
+**Written:** Grok cards **T1–T8** in [`docs/GROK_PLAN_2026-09-12.md`](docs/GROK_PLAN_2026-09-12.md) §7. Order: T1 (rows must not overwrite each other) → T2 (push keeps engine fields + restore St Patrick/Holywood) → T3 (land 1.61.32 + #232) → T4 version banner → T5 honest Check result → T6 no dated start_url → T7 kit one-line → T8 toolbar.
+
+**Next:** Frank pastes T1 to Grok and says go. Nothing on GitHub from this turn yet.
+
+## 14/09/2026 — Trainer: Yes must reach GitHub
+
+**The real goal, in one sentence:** Frank finds this week’s bulletin, taps Yes then Send & test, and that find is on GitHub — the trainer does the save, not a later agent patch.
+
+**Why it felt ignored:** Yes on a picture-post recorded a click. Send & test then either blocked him or tested the old recipe and threw the find away. Agent files on this PC are not GitHub.
+
+**This turn:** Trainer **1.61.32**. Yes on a dated HTML post saves `example_post_url`. Send & test writes it to GitHub and starts harvest. WAF recipes can test without a fake PDF step. Diagnosis says Send & test, not “open the image in a new tab.”
+
+**Next:** Frank Reloads so the card says **1.61.32**. On St Gerard: Find bulletin → Yes → Send & test. Watch Problems. Say **PR** so 1.61.32 is on GitHub.
+
+**Parked:** me fixing every problem parish by hand; Recipe Brain; 22 dioceses; rewriting the whole trainer.
+
+## 14/09/2026 — St Gerard’s (Sunday Message image)
+
+**The real goal, in one sentence:** harvest this week’s Sunday Message scan, without training a new-tab image click.
+
+Live post (opened 14/09/2026): https://stgerardsparish.org/sunday-message-13th-sept-2026/ — title **Sunday Message: 13th Sept 2026**. The bulletin is a PNG on that page, not a PDF. Trainer cannot follow “image opens in a new tab.”
+
+**This turn:** diagnosis saved. Recipe keeps `waf_retry_wordpress` and listing start_url. Added `sunday-message-` to slug patterns and `example_post_url` (shape only). Do not Send & test the click.
+
+**Next:** say **PR** if this should go to GitHub. Do not re-hunt weekly. GitHub harvest can still WAF-fail.
+
+## 14/09/2026 — St Michael the Archangel (GoDaddy date)
+
+**The real goal, in one sentence:** harvest this week’s Parish Bulletin, not 7 June, and do not read “13th September 2 2026” as 02/09/2026.
+
+Live page (opened 14/09/2026): newest row is **Parish Bulletin 13th September 2 2026**. Wix splits the year. Old recipe was `*.pdf`.
+
+**This turn:** date parse + picker read the split year as 13/09/2026. Recipe is newest_dated on wsimg downloads. Trainer **1.61.31**. Diagnosis saved.
+
+**Next:** Frank Reloads 1.61.31, Find bulletin, confirm 13 Sept, Send & test. Or say merge then GitHub harvest `saintmichaelthearchangel`.
+
 ## 14/09/2026 — Toolbar ✕ stays closed
 
 **The real goal, in one sentence:** when Frank hits ✕ on the recipe toolbar, it does not pop back.

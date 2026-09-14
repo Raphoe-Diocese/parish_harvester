@@ -672,6 +672,22 @@ class UrlDateParsingAndScoringTests(unittest.TestCase):
         self.assertEqual(extract_date_from_slug("1st-January-2026"), _date(2026, 1, 1))
         self.assertEqual(extract_date_from_slug("22nd-November-2026"), _date(2026, 11, 22))
 
+    def test_extract_date_wix_split_year(self) -> None:
+        from harvester.utils import extract_date_from_string
+        from datetime import date as _date
+        self.assertEqual(
+            extract_date_from_string("Parish Bulletin 13th September 2 2026.pdf"),
+            _date(2026, 9, 13),
+        )
+        self.assertEqual(
+            extract_date_from_string("Parish Bulletin 6th September 2 2026.pdf"),
+            _date(2026, 9, 6),
+        )
+        self.assertEqual(
+            extract_date_from_string("Parish Bulletin 7th June 2026.pdf"),
+            _date(2026, 6, 7),
+        )
+
     def test_extract_date_slug_plain_dash(self) -> None:
         from harvester.utils import extract_date_from_slug
         from datetime import date as _date

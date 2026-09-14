@@ -68,7 +68,20 @@
     const actions = list.map((s) => String(s?.action || "").trim().toLowerCase());
     const pageType = String(pageCtx.page_type?.type || pageCtx.page_type || "").trim();
 
-    if (list.length === 0) {
+    const examplePost = String(pageCtx.example_post_url || "").trim();
+    if (examplePost) {
+      issues.push(
+        _issue(
+          "example_post_ready",
+          "ok",
+          "This week's post is saved — tap Send & test",
+          examplePost,
+          "Send & test writes this URL to GitHub and runs harvest. Do not open the picture in a new tab."
+        )
+      );
+    }
+
+    if (list.length === 0 && !examplePost) {
       issues.push(
         _issue(
           "no_steps",
@@ -84,7 +97,7 @@
     const clickCount = actions.filter((a) => a === "click").length;
     const hasTerminal = actions.some((a) => TERMINAL_ACTIONS.has(a));
 
-    if (clickCount > 0 && !hasTerminal) {
+    if (clickCount > 0 && !hasTerminal && !examplePost) {
       issues.push(
         _issue(
           "click_only",

@@ -1,0 +1,60 @@
+{
+  "parish_key": "stpatricksbelfast",
+  "collected_at": "2026-09-14T16:15:46.748Z",
+  "extension_version": "1.61.30",
+  "source": "frank_paste",
+  "page_url": "https://www.stpatricksbelfast.org/weekly-bulletins/weekly-bulletin-for-sunday-13-september-2026/",
+  "page_type": "iframe_maybe",
+  "page_archetype": "iframe_viewer",
+  "recipe_steps_local": 2,
+  "session_ui_steps": 2,
+  "issues": [
+    {
+      "id": "push_wiped_engine_recipe",
+      "severity": "error",
+      "title": "Send & test at 16:16 replaced the waf_retry_wordpress recipe",
+      "detail": "Recipe on main now has 3 Playwright steps and no site_type, harvest_note, post_slug_patterns or do_not. Harvest run 34867602696 then 403'd on the listing. This parish is blocked from GitHub runners; plain-HTTP retries are the only path.",
+      "fix": "Grok card T2: pushRecipe must keep engine fields; restore the waf_retry_wordpress recipe and add example_post_url = this 13/09 post."
+    },
+    {
+      "id": "result_row_lost",
+      "severity": "error",
+      "title": "Test ran but parish_status row still says 10/09",
+      "detail": "Run 34867602696 logged Wrote parishes/parish_status.json and Pushed on attempt 2, yet the row on main kept last_tested_at 2026-09-10 — the overlapping parishofbright run copied its whole file over it.",
+      "fix": "Grok card T1: single-parish runs merge only their own row."
+    },
+    {
+      "id": "click_only",
+      "severity": "warn",
+      "title": "Recipe stops at click — missing save/download step",
+      "detail": "2 click step(s) recorded on the dated post. Not a real error for a WAF parish; the harvester reads the PDF Embedder iframe url= itself.",
+      "fix": "Do not Send & test click steps here. Yes on the dated post should save example_post_url (Trainer 1.61.33)."
+    },
+    {
+      "id": "start_url_drift",
+      "severity": "warn",
+      "title": "GitHub recipe start_url differs from this page",
+      "detail": "Recipe listing /category/weekly-bulletins vs dated post /weekly-bulletins/weekly-bulletin-for-sunday-13-september-2026/. The listing is correct; the dated post breaks next week.",
+      "fix": "Never offer Update start_url on a dated URL (Grok card T6)."
+    },
+    {
+      "id": "toolbar_missing",
+      "severity": "warn",
+      "title": "Floating toolbar not in the page DOM",
+      "detail": "Toolbar hidden for this host after an earlier close.",
+      "fix": "Extension popup → Show floating toolbar (Grok card T8)."
+    }
+  ],
+  "counts": {
+    "error": 2,
+    "warn": 3,
+    "info": 0,
+    "ok": 0
+  },
+  "github": {
+    "recipe": true,
+    "consecutive_failures": 1,
+    "last_failure_reason": "WAF-flaky site https://www.stpatricksbelfast.org/category/weekly-bulletins — could not fetch listing/post via plain-HTTP retries within budget",
+    "live_post_2026_09_13": "https://www.stpatricksbelfast.org/weekly-bulletins/weekly-bulletin-for-sunday-13-september-2026/"
+  }
+}

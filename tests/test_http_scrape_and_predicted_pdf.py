@@ -758,9 +758,15 @@ class StGerardsListingImageTests(unittest.TestCase):
     """stgerardsparish.org — listing scrape then one full-page scan to PDF."""
 
     LISTING = "https://stgerardsparish.org/parish-news-events/"
+    POST_13 = "https://stgerardsparish.org/sunday-message-13th-sept-2026/"
     POST_16 = "https://stgerardsparish.org/sunday-bulletin-16th-august-2026/"
     POST_9 = "https://stgerardsparish.org/parish-bulletin-9th-august-2026/"
-    PATTERNS = ["parish-bulletin-", "sunday-bulletin-", "bulletin"]
+    PATTERNS = [
+        "sunday-message-",
+        "parish-bulletin-",
+        "sunday-bulletin-",
+        "bulletin",
+    ]
 
     def test_recipe_scrapes_news_listing_not_a_hardcoded_post(self) -> None:
         import json
@@ -771,25 +777,30 @@ class StGerardsListingImageTests(unittest.TestCase):
         )
         self.assertEqual(recipe["start_url"], self.LISTING)
         self.assertEqual(recipe["site_type"], "waf_retry_wordpress")
+        self.assertEqual(recipe["example_post_url"], self.POST_13)
         self.assertNotIn("sunday-bulletin-16th-august-2026", json.dumps(recipe["steps"]))
+        self.assertNotIn("Sunday-message-13th-September_", json.dumps(recipe["steps"]))
+        self.assertTrue(
+            any("sunday-message-" in p for p in recipe["post_slug_patterns"])
+        )
         self.assertTrue(
             any("sunday-bulletin-" in p for p in recipe["post_slug_patterns"])
         )
 
-    def test_listing_picks_newest_sunday_bulletin_not_older_parish_bulletin(self) -> None:
+    def test_listing_picks_sunday_message_over_older_bulletins(self) -> None:
         html = f"""
+        <a href="{self.POST_13}">Sunday Message: 13th Sept 2026</a>
         <a href="{self.POST_16}">Sunday Bulletin: 16th August 2026</a>
         <a href="{self.POST_9}">Parish Bulletin: 9th August 2026</a>
         <a href="https://stgerardsparish.org/sunday-bulletin-2nd-august-2026/">2nd August</a>
-        <a href="https://stgerardsparish.org/sunday-message-16th-august-2026/">Sunday Message</a>
         """
         hrefs = _extract_matching_hrefs(html, self.LISTING, self.PATTERNS)
+        self.assertIn(self.POST_13, hrefs)
         self.assertIn(self.POST_16, hrefs)
         self.assertIn(self.POST_9, hrefs)
-        self.assertTrue(all("sunday-message" not in href for href in hrefs))
-        scored = _score_wordpress_post_hrefs(hrefs, date(2026, 8, 16))
-        self.assertEqual(max(scored)[1], self.POST_16)
-        self.assertEqual(max(scored)[0], date(2026, 8, 16))
+        scored = _score_wordpress_post_hrefs(hrefs, date(2026, 9, 13))
+        self.assertEqual(max(scored)[1], self.POST_13)
+        self.assertEqual(max(scored)[0], date(2026, 9, 13))
 
     def test_extracts_full_size_scan_and_skips_wp_thumbnails(self) -> None:
         html = """
@@ -938,15 +949,19 @@ class HolywoodNoticePageTests(unittest.TestCase):
         self.assertEqual(recipe["parish_key"], "stcolmcillesholywood")
         self.assertEqual(recipe["start_url"], self.LISTING)
         self.assertEqual(recipe["site_type"], "waf_retry_wordpress")
-        self.assertEqual(recipe["example_post_url"], self.POST_16)
+        # 14/09/2026: trainer push had pinned this as a goto + html_text_bulletin.
+        self.assertEqual(
+            recipe["example_post_url"],
+            "https://www.stcolmcillesholywood.org/bulletins/"
+            "bulletin-notice-sunday-13th-september-2026/",
+        )
         self.assertTrue(
             any("bulletin-notice-sunday-" in p for p in recipe["post_slug_patterns"])
         )
+        self.assertEqual([s.get("action") for s in recipe["steps"]], ["goto"])
+        self.assertEqual(recipe["steps"][0]["url"], self.LISTING)
         self.assertNotIn("Bulletin-Notice-16th-August-2026.pdf", json.dumps(recipe["steps"]))
-        self.assertNotIn(
-            "bulletin-notice-sunday-23rd-august-2026",
-            recipe.get("example_post_url", ""),
-        )
+        self.assertNotIn("13th-september-2026", json.dumps(recipe["steps"]))
 
     def test_rewrite_skips_unposted_next_sunday(self) -> None:
         self.assertEqual(rewrite_date_url(self.POST_16, date(2026, 8, 23)), self.POST_23)
@@ -1896,11 +1911,15 @@ class HarvestMissRecipeTests(unittest.TestCase):
             "down_and_connor/bangorparish.json": "06-SEPT-2026-bulletin.pdf",
             "down_and_connor/glenariffeparish.json": "Twenty-Third-Sunday-of-Ordinary-Time.pdf",
             "down_and_connor/parishofbright.json": "Bulletin-6-09-2026-.pdf",
-            "down_and_connor/stoliverplunkettparish.json": "Sun-6th-September-26.pdf",
+            "down_and_connor/stoliverplunkettparish.json": "Sun-13th-September-26.pdf",
             "down_and_connor/stpatricksdownpatrick.json": "06-September-2026.pdf",
-            "down_and_connor/glenavyandkilleadparish.json": "2026-September-6-Twenty-Third-Sunday-in-Ordinary-Time-1.pdf",
-            "down_and_connor/st-colmcilles.json": "Parish-Bulletin-06092026.pdf",
-            "down_and_connor/derriaghycatholicparish.json": "Bulletin_23rd_Sun_OT_A.png",
+            "down_and_connor/glenavyandkilleadparish.json": "2026-September-13-Twenty-Fourth-Sunday-in-Ordinary-Time.pdf",
+            # 14/09/2026 live: the "13th September 2026" row links to
+            # uploads/2026/09/Parish-Bulletin-30082026-3.pdf (parish misnamed
+            # the file). Frank's click was right.
+            "down_and_connor/st-colmcilles.json": "2026/09/Parish-Bulletin-30082026-3.pdf",
+            # 14/09 trainer push pinned the -724x1024 thumbnail of this file.
+            "down_and_connor/derriaghycatholicparish.json": "Bulletin_23rd_Sun_OT_A",
             "down_and_connor/holyrosaryparishbelfast.json": "a46a59_3a22af7b525a4c7bb2b1b2f0a3c706b2.pdf",
         }
         for rel, needle in cases.items():

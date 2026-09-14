@@ -12,7 +12,13 @@
     }
   ],
   "site_type": "waf_retry_wordpress",
-  "post_slug_patterns": ["parish-bulletin-", "sunday-bulletin-", "bulletin"],
+  "post_slug_patterns": [
+    "sunday-message-",
+    "parish-bulletin-",
+    "sunday-bulletin-",
+    "bulletin"
+  ],
+  "example_post_url": "https://stgerardsparish.org/sunday-message-13th-sept-2026/",
   "timeout_ms": 45000,
   "total_timeout_s": 190,
   "recorded_date": "2026-08-20",
@@ -44,12 +50,23 @@
     "with wp-content/uploads/2026/08/16th_1.png (1588x1123 PNG). No 23 Aug",
     "bulletin was posted yet — do not invent one."
   ],
+  "operator_notes_2026_09_14": [
+    "Live post opened 14/09/2026: Sunday Message: 13th Sept 2026 at",
+    "/sunday-message-13th-sept-2026/ (not sunday-bulletin- / parish-bulletin-).",
+    "The scan is a PNG on the post",
+    "(wp-content/uploads/2026/09/Sunday-message-13th-September_260911_142009_1.png),",
+    "not a PDF. Trainer cannot follow 'image opens in a new tab' — do not record",
+    "that click or Send & test. example_post_url is the slug shape only; do not",
+    "pin next week's PNG name. Keep start_url as /parish-news-events/."
+  ],
   "do_not": [
-    "Do not hardcode the post URL or prefix ('parish-bulletin-' vs",
-    "'sunday-bulletin-') — it changes week to week; always scrape",
-    "/parish-news-events/ for the newest real dated post.",
+    "Do not hardcode the post URL or prefix ('sunday-message-' vs",
+    "'parish-bulletin-' vs 'sunday-bulletin-') — it changes week to week; always",
+    "scrape /parish-news-events/ for the newest real dated post.",
     "Do not start from the homepage — that listing is incomplete.",
     "Do not switch this back to a Playwright goto/click recipe — a full browser",
-    "was measurably less reliable than plain HTTP retries against this WAF."
+    "was measurably less reliable than plain HTTP retries against this WAF.",
+    "Do not train a new-tab image click or Save-this-PDF on the scan — harvest",
+    "already converts the post PNG."
   ]
 }

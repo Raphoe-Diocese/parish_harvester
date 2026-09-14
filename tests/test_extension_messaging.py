@@ -148,7 +148,7 @@ class ExtensionMessagingTests(unittest.TestCase):
         content = CONTENT_JS.read_text(encoding="utf-8")
         html = SIDEPANEL_HTML.read_text(encoding="utf-8")
         manifest = json.loads(MANIFEST_JSON.read_text(encoding="utf-8"))
-        self.assertEqual(manifest.get("version"), "1.61.30")
+        self.assertEqual(manifest.get("version"), "1.61.33")
         bg_js = (REPO_ROOT / "extension" / "background.js").read_text(encoding="utf-8")
         self.assertIn('message?.type === "dismiss_toolbar"', bg_js)
         self.assertIn("_isFixNowCancelled", bg_js)

@@ -438,7 +438,9 @@ jobs:
           # Generated harvest outputs (mega PDFs, diocese pages, report/status)
           # cannot always merge. On add/add or content conflict during rebase,
           # keep the files this harvest just generated and continue.
-          python scripts/push_harvest_results.py --remote origin --branch main
+          # Single-parish tests overlap (per-parish concurrency groups): merge
+          # only TARGET_PARISH's row so one Send & test never erases another.
+          python scripts/push_harvest_results.py --remote origin --branch main --target-parish "${TARGET_PARISH}"
 
       - name: Warn if git commit failed
         if: failure() && steps.harvest_run.outcome == 'success' && steps.commit_harvest.outcome == 'failure'
