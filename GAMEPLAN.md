@@ -17,9 +17,19 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
-## 14/09/2026 — H2 reapply (this turn)
+## 14/09/2026 — #214 closed; H2 + B4 proved on GitHub
 
-**Now — H2:** clean branch from today’s `main` (old #211 conflicted after harvest). `bruckless` → `drive-1rjeey-ayy`. Drive `/folders/` never stays `ok`. B4 stays open until harvest tests use `python -m pytest`.
+**#214 closed** 14/09/2026 13:57 UTC (superseded by [PR #228](https://github.com/Raphoe-Diocese/parish_harvester/pull/228) `bf5d072`). Do not merge #214 if it reappears.
+
+**B4 proved on harvest:** [Harvest bruckless 34852575666](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34852575666) **success**. Step Run tests ran `python -m pytest -v --tb=short` — **681 passed, 1 xfailed** in 28s. The test step is required (no `continue-on-error`).
+
+**H2 proved:** input `bruckless` harvested `drive-1rjeey-ayy`. `parish_status.json` row `outcome: ok`, `last_tested_at` 14/09/2026 14:01 UTC, URL is a Drive **file** (`drive.usercontent.google.com/download?id=…`), not `/folders/`. Commit `604dca3`. Old #211 stays closed.
+
+**S2 live:** https://www.parishpress.ie/dioceses/derry/ has 0 × `greencastleparish.com`. **E1 live:** OCR [34828244862](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34828244862) logged 2/3/4/3 sparse pages to vision; Gortahork Irish still Irish.
+
+**Next:** grok cards through C5 are on `main` and proved. Do not start M1. Do not start Recipe Brain or the 22 dioceses. Phone PDF / Download / Open PDF rows need Frank’s phone. S1 honest “could not be cut” line is **not** on this week’s pages (`slice_missing` 0).
+
+**Parked:** M1, Recipe Brain, 22 dioceses, archive-nav delete.
 
 ## 14/09/2026 — Full harvest finished
 
@@ -27,7 +37,7 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ## 13/09/2026 — C5 executable JS test
 
-**C5 merged:** [PR #225](https://github.com/Raphoe-Diocese/parish_harvester/pull/225) `9720d9c`. Proof: [test.yml run 34786329017](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34786329017) — step **Run extension JavaScript tests** succeeded. Grok plan cards through C5 are on `main`. Do not start M1 unless megas are still slow. Do not merge H2 #211 or B4 #214 unless Frank names them.
+**C5 merged:** [PR #225](https://github.com/Raphoe-Diocese/parish_harvester/pull/225) `9720d9c`. Proof: [test.yml run 34786329017](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34786329017) — step **Run extension JavaScript tests** succeeded. Grok plan cards through C5 are on `main`. Do not start M1 unless megas are still slow. H2 is #227 (`80bfc66`); B4 is #228 (`bf5d072`). #211 and #214 are closed.
 
 **F2/F3 merged:** [PR #224](https://github.com/Raphoe-Diocese/parish_harvester/pull/224) `ea70713`. Docs only.
 
@@ -37,7 +47,7 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ## 13/09/2026 — E2 OCR stub must not look like success
 
-**E1 merged:** [PR #222](https://github.com/Raphoe-Diocese/parish_harvester/pull/222) `25eaa6a`. **Not live** until next OCR. Do not tick done until the log shows `N sparse pages sent to vision` with N < total and Gortahork Irish is still Irish.
+**E1 live 14/09/2026:** [PR #222](https://github.com/Raphoe-Diocese/parish_harvester/pull/222) `25eaa6a`. OCR [34828244862](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34828244862) logged 2/3/4/3 sparse pages to vision. Gortahork Irish still Irish.
 
 **Now — E2:** stub HTML has `ocr-failed-banner`, prints `::error::`, exits 1 so the workflow does not commit a silent stub. **Not live** until the next OCR run is green, or red with a visible `::error`.
 
@@ -61,11 +71,11 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **P0 from May deep-audit (closed, do not reopen):** toolbar “ok” / “marked as dead” / “saved” lies — superseded by C1 / C3 / C4. Harvest truth stays `parishes/parish_status.json`.
 
-**Still open:** H2 [#211](https://github.com/Raphoe-Diocese/parish_harvester/pull/211), B4 [#214](https://github.com/Raphoe-Diocese/parish_harvester/pull/214).
+**Closed leftover PRs:** H2 [#211](https://github.com/Raphoe-Diocese/parish_harvester/pull/211) superseded by [#227](https://github.com/Raphoe-Diocese/parish_harvester/pull/227); B4 [#214](https://github.com/Raphoe-Diocese/parish_harvester/pull/214) superseded by [#228](https://github.com/Raphoe-Diocese/parish_harvester/pull/228).
 
 ## 13/09/2026 — S3 stop publishing search/calendars
 
-**S2 merged:** [PR #218](https://github.com/Raphoe-Diocese/parish_harvester/pull/218) `d2aca0f`. **Not live** until next harvest. Do not regenerate `docs/dioceses` on this PC.
+**S2 live 14/09/2026:** [PR #218](https://github.com/Raphoe-Diocese/parish_harvester/pull/218) `d2aca0f`. https://www.parishpress.ie/dioceses/derry/ has 0 × `greencastleparish.com`.
 
 **S3 live:** [PR #219](https://github.com/Raphoe-Diocese/parish_harvester/pull/219) `e58ed97`. https://www.parishpress.ie/search/ is 404. Homepage has no inbound search link.
 
@@ -73,7 +83,7 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **S1 merged:** [PR #217](https://github.com/Raphoe-Diocese/parish_harvester/pull/217) `b76fac7`. **Not live** until next OCR. Do not regenerate `docs/parishes` on this PC.
 
-**S2 merged:** [PR #218](https://github.com/Raphoe-Diocese/parish_harvester/pull/218) `d2aca0f`. **Not live** until next harvest.
+**S2 live 14/09/2026:** [PR #218](https://github.com/Raphoe-Diocese/parish_harvester/pull/218) `d2aca0f`.
 
 ## 13/09/2026 — S1 slice_missing (this turn)
 
@@ -87,7 +97,7 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **C4 merged:** [PR #216](https://github.com/Raphoe-Diocese/parish_harvester/pull/216). Trainer **1.61.28**. Not live until Pages + Reload.
 
-**Still open:** H2 [#211](https://github.com/Raphoe-Diocese/parish_harvester/pull/211), B4 [#214](https://github.com/Raphoe-Diocese/parish_harvester/pull/214). Say **merge** for those. Next after C4 merge: S1.
+**Closed leftover PRs:** H2 is [#227](https://github.com/Raphoe-Diocese/parish_harvester/pull/227); B4 is [#228](https://github.com/Raphoe-Diocese/parish_harvester/pull/228). #211 and #214 stay closed.
 
 ## 13/09/2026 — C2 remove Trainer auto-update (this turn)
 
