@@ -291,10 +291,10 @@
       "page_type": "wp_block_file_bulletin",
       "recipe_flow": "direct_download",
       "label": "WordPress permanent bulletin page (wp-block-file)",
-      "advice": "Permanent /parish-bulletin/ URL — PDF filename changes weekly under /wp-content/uploads/YYYY/MM/. PDF is in object.wp-block-file__embed[data] — harvest scrapes the embed URL. Use url_pattern *bulletin*.pdf — never pin a dated filename.",
+      "advice": "Permanent /parish-bulletin/ URL — PDF filename changes weekly under /wp-content/uploads/YYYY/MM/. On the bulletin page: tap the green Save bulletin PDF (from embed) button. Use url_pattern *bulletin*.pdf — never pin a dated filename.",
       "operator_notes": [
         "Permanent /parish-bulletin/ URL — PDF filename changes weekly under /wp-content/uploads/YYYY/MM/.",
-        "PDF is in object.wp-block-file__embed[data] — harvest scrapes the embed URL.",
+        "On the bulletin page: tap the green Save bulletin PDF (from embed) button.",
         "Use url_pattern *bulletin*.pdf — never pin a dated filename."
       ],
       "do_not": [
@@ -304,14 +304,16 @@
       "html_fingerprint": "wp_block_file_bulletin",
       "html_markers": [
         "wp-block-file block",
-        "file embed/button"
+        "file embed/button",
+        "bulletin page"
       ],
       "example_parishes": [
         "clonmanyparish",
         "clonleighparish",
-        "derriaghycatholicparish"
+        "derriaghycatholicparish",
+        "st-colmcilles"
       ],
-      "success_count": 3
+      "success_count": 4
     },
     "weekly_bulletin_download+click_then_download": {
       "page_type": "weekly_bulletin_download",
@@ -1179,6 +1181,31 @@
         "strategy": "newest_dated",
         "position": "top"
       }
+    },
+    "st-colmcilles": {
+      "page_type": "wp_block_file_bulletin",
+      "recipe_flow": "direct_download",
+      "combined_key": "wp_block_file_bulletin+direct_download",
+      "display_name": "St Colmcilles",
+      "start_url_host": "st-colmcilles.net",
+      "updated": "2026-09-14",
+      "step_count": 1,
+      "playbook_type": "permanent_bulletin_page",
+      "operator_notes": [
+        "Permanent /parish-bulletin/ URL — PDF filename changes weekly under /wp-content/uploads/YYYY/MM/.",
+        "On the bulletin page: tap the green Save bulletin PDF (from embed) button.",
+        "Use url_pattern *bulletin*.pdf — never pin a dated filename."
+      ],
+      "do_not": [
+        "Do not train on the homepage — use the dedicated bulletin page only.",
+        "Do not pin saintanthony.co.uk if the parish moved to saintanthonys.uk."
+      ],
+      "html_fingerprint": "wp_block_file_bulletin",
+      "html_markers": [
+        "wp-block-file block",
+        "file embed/button",
+        "bulletin page"
+      ]
     }
   }
 }
