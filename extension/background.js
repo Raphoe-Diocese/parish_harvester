@@ -125,9 +125,27 @@ async function _injectTrainerFiles(tabId, files) {
   }
 }
 
+function _fixNowCancelKey(tabId) {
+  return `ph_fix_now_cancelled_${tabId}`;
+}
+
+async function _isFixNowCancelled(tabId) {
+  if (!tabId || !chrome.storage?.session?.get) return false;
+  const stored = await chrome.storage.session.get(_fixNowCancelKey(tabId));
+  return Boolean(stored[_fixNowCancelKey(tabId)]);
+}
+
+async function _cancelFixNowTab(tabId) {
+  if (!tabId || !chrome.storage?.session) return;
+  const sessionKey = `ph_fix_now_tab_${tabId}`;
+  await chrome.storage.session.remove(sessionKey);
+  await chrome.storage.session.set({ [_fixNowCancelKey(tabId)]: Date.now() });
+}
+
 async function _rememberFixNowTab(tabId, { parish_key, nav_started_at, url }) {
   if (!tabId || !chrome.storage?.session?.set) return;
   const sessionKey = `ph_fix_now_tab_${tabId}`;
+  await chrome.storage.session.remove(_fixNowCancelKey(tabId));
   await chrome.storage.session.set({
     [sessionKey]: {
       parish_key: parish_key || "",
@@ -142,6 +160,20 @@ async function _rememberFixNowTab(tabId, { parish_key, nav_started_at, url }) {
 
 async function _scheduleFixNowToolbar(tabId, parishKey, navStartedAt, startUrl) {
   if (!tabId) return;
+  try {
+    const host = new URL(String(startUrl || "")).hostname.toLowerCase().replace(/^www\d*\./, "");
+    if (host && chrome.storage?.session) {
+      const data = await chrome.storage.session.get("ph_toolbar_hidden_hosts");
+      const map =
+        data.ph_toolbar_hidden_hosts && typeof data.ph_toolbar_hidden_hosts === "object"
+          ? { ...data.ph_toolbar_hidden_hosts }
+          : {};
+      delete map[host];
+      await chrome.storage.session.set({ ph_toolbar_hidden_hosts: map });
+    }
+  } catch (_e) {
+    // URL may be empty on first schedule.
+  }
   const payload = {
     type: "ph_show_toolbar",
     reason: "fix_now",
@@ -155,7 +187,10 @@ async function _scheduleFixNowToolbar(tabId, parishKey, navStartedAt, startUrl) 
   });
   for (const delay of FIX_NOW_TOOLBAR_DELAYS_MS) {
     setTimeout(() => {
-      void sendToTab(tabId, payload, { allowInject: true });
+      void (async () => {
+        if (await _isFixNowCancelled(tabId)) return;
+        await sendToTab(tabId, payload, { allowInject: true });
+      })();
     }, delay);
   }
 }
@@ -306,7 +341,7 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
       const fixKey = `ph_fix_now_tab_${tabId}`;
       const fixStored = await chrome.storage.session.get(fixKey);
       const fixNow = fixStored[fixKey];
-      if (fixNow) {
+      if (fixNow && !(await _isFixNowCancelled(tabId))) {
         await sendToTab(
           tabId,
           {
@@ -356,7 +391,12 @@ chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
   })();
 });
 
-chrome.runtime.onMessage.addListener((message, _sender, sendResponse) => {
+chrome.runtime.onMessage.addListener((message, sender, sendResponse) => {
+  if (message?.type === "dismiss_toolbar") {
+    const tabId = Number(sender?.tab?.id || message.tabId || 0);
+    void _cancelFixNowTab(tabId).then(() => sendResponse({ ok: true }));
+    return true;
+  }
   if (message?.type !== "schedule_fix_now_toolbar") return false;
   (async () => {
     const tabId = Number(message.tabId || 0);

@@ -92,6 +92,49 @@
       return false;
     }
   };
+  const TOOLBAR_HIDDEN_HOSTS_KEY = "ph_toolbar_hidden_hosts";
+
+  const _currentToolbarHost = () => _hostnameFromUrl(_pageUrlForParishDetection());
+
+  const _setToolbarHiddenForHost = async (hidden) => {
+    const host = _currentToolbarHost();
+    if (!host || typeof chrome === "undefined" || !chrome.storage?.session) return;
+    const data = await new Promise((resolve) => {
+      try {
+        chrome.storage.session.get([TOOLBAR_HIDDEN_HOSTS_KEY], (r) => resolve(r || {}));
+      } catch (_e) {
+        resolve({});
+      }
+    });
+    const map =
+      data[TOOLBAR_HIDDEN_HOSTS_KEY] && typeof data[TOOLBAR_HIDDEN_HOSTS_KEY] === "object"
+        ? { ...data[TOOLBAR_HIDDEN_HOSTS_KEY] }
+        : {};
+    if (hidden) map[host] = Date.now();
+    else delete map[host];
+    await new Promise((resolve) => {
+      try {
+        chrome.storage.session.set({ [TOOLBAR_HIDDEN_HOSTS_KEY]: map }, () => resolve());
+      } catch (_e) {
+        resolve();
+      }
+    });
+  };
+
+  const _isToolbarHiddenForHost = async () => {
+    const host = _currentToolbarHost();
+    if (!host || typeof chrome === "undefined" || !chrome.storage?.session) return false;
+    const data = await new Promise((resolve) => {
+      try {
+        chrome.storage.session.get([TOOLBAR_HIDDEN_HOSTS_KEY], (r) => resolve(r || {}));
+      } catch (_e) {
+        resolve({});
+      }
+    });
+    const map = data[TOOLBAR_HIDDEN_HOSTS_KEY];
+    return Boolean(host && map && typeof map === "object" && map[host]);
+  };
+
   const _dismissToolbar = (clearSession = false) => {
     const bar = _getToolbarNode();
     if (bar) {
@@ -100,6 +143,19 @@
     }
     stopPickLinkMode?.();
     stopPickImageMode?.();
+    if (_persistDebounceTimer) {
+      clearTimeout(_persistDebounceTimer);
+      _persistDebounceTimer = null;
+    }
+    _persistPendingExtra = {};
+    void _setToolbarHiddenForHost(true);
+    try {
+      chrome.runtime.sendMessage({ type: "dismiss_toolbar" }, () => {
+        void chrome.runtime.lastError;
+      });
+    } catch (_e) {
+      // Background may be asleep — session hide still sticks.
+    }
     if (clearSession || _isEditorPageUrl()) {
       void _clearRecordingSession();
     }
@@ -288,6 +344,7 @@
   };
 
   const _applyFixNowToolbar = async (message) => {
+    if (await _isToolbarHiddenForHost()) return;
     const navAt = Number(message?.nav_started_at);
     if (Number.isFinite(navAt) && navAt > 0) {
       _markNavigationStart(window.location.href, navAt);
@@ -580,6 +637,15 @@
       return false;
     }
     const currentHost = _hostnameFromUrl(pageUrl);
+    if (await _isToolbarHiddenForHost()) {
+      await _clearRecordingSession();
+      const bar = _getToolbarNode();
+      if (bar) {
+        bar.dataset.phHidden = "true";
+        bar.style.display = "none";
+      }
+      return false;
+    }
     const session = await _getRecordingSessionForCurrentHost();
     if (!session?.active) {
       standaloneStartUrl = pageUrl;
@@ -8595,8 +8661,10 @@
       try {
         const bar = _getToolbarNode();
         if (!bar) {
+          void _setToolbarHiddenForHost(false);
           _ensureToolbar(true);
         } else if (bar.dataset.phHidden === "true" || bar.style.display === "none") {
+          void _setToolbarHiddenForHost(false);
           _ensureToolbar(true);
         } else {
           bar.dataset.phHidden = "true";
@@ -8610,6 +8678,7 @@
 
     if (message.type === "show_toolbar") {
       try {
+        void _setToolbarHiddenForHost(false);
         _ensureToolbar(true);
         void _markRecordingActive();
         return { ok: true };
@@ -8623,6 +8692,7 @@
           void _applyFixNowToolbar(message);
           return { ok: true };
         }
+        void _setToolbarHiddenForHost(false);
         const bar = _ensureToolbar(true);
         delete bar?.dataset?.phFixNow;
         delete bar?.dataset?.phParishName;
@@ -9316,9 +9386,12 @@
 
   const _tryAutoShowToolbar = () => {
     if (_isEditorPageUrl()) return;
-    if (_TRAINING_BINDINGS.some((b) => typeof window[b] === "function")) {
-      _ensureToolbar(true);
-    }
+    void _isToolbarHiddenForHost().then((hidden) => {
+      if (hidden) return;
+      if (_TRAINING_BINDINGS.some((b) => typeof window[b] === "function")) {
+        _ensureToolbar(true);
+      }
+    });
   };
 
   _AUTO_SHOW_DELAYS_MS.forEach((delay) => setTimeout(_tryAutoShowToolbar, delay));
