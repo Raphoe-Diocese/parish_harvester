@@ -1911,14 +1911,15 @@ class HarvestMissRecipeTests(unittest.TestCase):
             "down_and_connor/bangorparish.json": "06-SEPT-2026-bulletin.pdf",
             "down_and_connor/glenariffeparish.json": "Twenty-Third-Sunday-of-Ordinary-Time.pdf",
             "down_and_connor/parishofbright.json": "Bulletin-6-09-2026-.pdf",
-            "down_and_connor/stoliverplunkettparish.json": "Sun-6th-September-26.pdf",
+            "down_and_connor/stoliverplunkettparish.json": "Sun-13th-September-26.pdf",
             "down_and_connor/stpatricksdownpatrick.json": "06-September-2026.pdf",
             "down_and_connor/glenavyandkilleadparish.json": "2026-September-13-Twenty-Fourth-Sunday-in-Ordinary-Time.pdf",
             # 14/09/2026 live: the "13th September 2026" row links to
             # uploads/2026/09/Parish-Bulletin-30082026-3.pdf (parish misnamed
             # the file). Frank's click was right.
             "down_and_connor/st-colmcilles.json": "2026/09/Parish-Bulletin-30082026-3.pdf",
-            "down_and_connor/derriaghycatholicparish.json": "Bulletin_23rd_Sun_OT_A.png",
+            # 14/09 trainer push pinned the -724x1024 thumbnail of this file.
+            "down_and_connor/derriaghycatholicparish.json": "Bulletin_23rd_Sun_OT_A",
             "down_and_connor/holyrosaryparishbelfast.json": "a46a59_3a22af7b525a4c7bb2b1b2f0a3c706b2.pdf",
         }
         for rel, needle in cases.items():
