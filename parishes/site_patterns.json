@@ -406,6 +406,31 @@
         "stpatricksbelfast"
       ],
       "success_count": 1
+    },
+    "wp_pdfemb_list+image_capture": {
+      "page_type": "wp_pdfemb_list",
+      "recipe_flow": "image_capture",
+      "label": "wp_pdfemb_list",
+      "advice": "Click Follow a link → pick the newest dated bulletin → then Get a PDF.",
+      "do_not": [
+        "Do not hardcode the post URL or prefix ('sunday-message-' vs",
+        "'parish-bulletin-' vs 'sunday-bulletin-') — it changes week to week; always",
+        "scrape /parish-news-events/ for the newest real dated post.",
+        "Do not start from the homepage — that listing is incomplete.",
+        "Do not switch this back to a Playwright goto/click recipe — a full browser",
+        "was measurably less reliable than plain HTTP retries against this WAF.",
+        "Do not train a new-tab image click or Save-this-PDF on the scan — harvest",
+        "already converts the post PNG."
+      ],
+      "html_fingerprint": "wordpress_pdfemb",
+      "html_markers": [
+        "PDF Embedder plugin",
+        "pdf-embedder plugin path"
+      ],
+      "example_parishes": [
+        "stgerardsparish"
+      ],
+      "success_count": 1
     }
   },
   "parishes": {
@@ -1305,6 +1330,30 @@
       "start_url_host": "www.stpatricksbelfast.org",
       "updated": "2026-09-14",
       "step_count": 3
+    },
+    "stgerardsparish": {
+      "page_type": "wp_pdfemb_list",
+      "recipe_flow": "image_capture",
+      "combined_key": "wp_pdfemb_list+image_capture",
+      "display_name": "St Gerards",
+      "start_url_host": "stgerardsparish.org",
+      "updated": "2026-09-14",
+      "step_count": 2,
+      "do_not": [
+        "Do not hardcode the post URL or prefix ('sunday-message-' vs",
+        "'parish-bulletin-' vs 'sunday-bulletin-') — it changes week to week; always",
+        "scrape /parish-news-events/ for the newest real dated post.",
+        "Do not start from the homepage — that listing is incomplete.",
+        "Do not switch this back to a Playwright goto/click recipe — a full browser",
+        "was measurably less reliable than plain HTTP retries against this WAF.",
+        "Do not train a new-tab image click or Save-this-PDF on the scan — harvest",
+        "already converts the post PNG."
+      ],
+      "html_fingerprint": "wordpress_pdfemb",
+      "html_markers": [
+        "PDF Embedder plugin",
+        "pdf-embedder plugin path"
+      ]
     }
   }
 }
