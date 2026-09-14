@@ -3,9 +3,10 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
-  <title>Raphoe Bulletin — 25/08/2026</title>
+  <title>Raphoe Bulletin — 14/09/2026</title>
   <link rel="icon" type="image/png" href="/favicon.png" />
   <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
   <style>
     * { box-sizing: border-box; margin: 0; padding: 0; }
     html { scroll-behavior: smooth; }
@@ -45,7 +46,12 @@
       line-height: 1.25;
     }
     .meta { color: #6b7280; font-size: 0.92rem; margin-bottom: 10px; }
-    .stale-note { color: #7a3b00; font-size: 1rem; font-weight: 600; margin: 0.35rem 0 0.7rem; }
+    .stale-note {
+      color: #7a3b00;
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0.35rem 0 0.7rem;
+    }
     .download-link-top {
       display: inline-block;
       margin-top: 4px;
@@ -110,10 +116,20 @@
       font-weight: 600;
     }
     .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
 
     .pdf-frame-wrap {
       position: relative;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       border: 1px solid #c9d4d3;
       background: #3a3f42;
     }
@@ -139,21 +155,27 @@
       cursor: pointer;
     }
     .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
     
     .pdf-inpage-viewer,
     .pdf-mobile-fallback {
       display: flex !important;
       flex-direction: column;
+      height: 850px;
       min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
       flex: 1 1 auto;
       background: #3a3f42;
       color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-inpage-toolbar {
       display: flex;
       flex-wrap: wrap;
       align-items: center;
-      justify-content: flex-end;
+      justify-content: flex-start;
       gap: 8px;
       padding: 8px 10px;
       background: #14524f;
@@ -180,6 +202,14 @@
       background: #525659;
       padding: 8px 0 16px;
     }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
     .pdf-inpage-page-slot {
       margin: 0 auto 10px;
       background: #3a3f42;
@@ -188,6 +218,7 @@
       position: relative;
     }
     .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
     /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
        page — one of those used to stretch the box's scrollWidth to 2988px. */
     .pdf-link-layer {
@@ -202,6 +233,12 @@
     .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
     }
     .pdf-frame-wrap iframe,
     .pdf-standalone-shell iframe.pdf-frame,
@@ -216,7 +253,10 @@
     body.is-native-pdf .pdf-standalone-shell {
       display: flex;
       flex-direction: column;
+      height: 850px !important;
       min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
       background: #3a3f42;
     }
     @media (max-width: 1024px) {
@@ -225,16 +265,23 @@
       .pdf-frame-wrap.is-native-pdf,
       .pdf-standalone-shell.is-native-pdf,
       body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
         display: flex;
         flex-direction: column;
         background: #3a3f42;
       }
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 450px !important;
         min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
+      #ocr-panel,
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         height: 450px !important;
@@ -244,6 +291,7 @@
         overflow-y: auto !important;
       }
       .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
       .pdf-frame-wrap iframe,
       .pdf-standalone-shell iframe.pdf-frame {
         display: none !important;
@@ -258,7 +306,10 @@
       body.is-native-pdf .pdf-standalone-shell,
       .pdf-inpage-viewer,
       .pdf-mobile-fallback {
+        height: 850px !important;
         min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
       }
       .pdf-inpage-pages,
       #ocr-panel,
@@ -437,8 +488,7 @@
       border-color: #1a6b6b;
       color: #fff;
     }
-    /* Desktop boxes are already the locked 850px, so there is nothing to
-       enlarge — the button only appears on tablet/phone. */
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
     .az-expand { display: none; }
     /* A letter jump scrolls inside a locked box, so nothing moves on screen
        except the text. Flag the parish the reader landed on. */
@@ -788,7 +838,10 @@
          Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
       .pdf-frame-wrap,
       .pdf-inpage-viewer {
+        height: 450px;
         min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
       }
       .pdf-frame-wrap iframe,
       .pdf-inpage-pages,
@@ -799,23 +852,14 @@
         overflow: auto;
         overflow-y: auto;
       }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
       /* Tap targets big enough for a thumb. */
-      .az-expand { display: inline-block; }
       .az-letter,
-      .az-expand,
       .ocr-zoom-bar button {
         min-width: 40px;
         height: 40px;
         font-size: 0.95rem;
-      }
-      .az-expand {
-        padding: 0 12px;
-        background: #fff;
-        border: 1px solid #1a6b6b;
-        border-radius: 4px;
-        color: #1a6b6b;
-        font-weight: 700;
-        cursor: pointer;
       }
       /* Only the panel the reader tapped grows — the other one stays 450px.
          Scoped to that panel's id so a phone never ends up with two 850px
@@ -838,6 +882,7 @@
     @media (max-width: 700px) {
       .page { padding: 14px 12px 36px; }
       .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
       .download-link-top { display: none; }
       .quiet-links { justify-content: center; }
       ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
@@ -864,7 +909,7 @@
       .ocr-search-bar .search-input { flex: 1 1 100%; }
     }
   </style>
-  <script src="/assets/pdf-inpage-viewer.js?v=20260824a" defer></script>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260912a" defer></script>
 </head>
 <body>
   <div class="page">
@@ -872,36 +917,32 @@
     <header class="header">
       <p class="diocese-label">RAPHOE</p>
       <h1>Raphoe Parish Bulletin</h1>
-      <p class="stale-note">Latest bulletin we have: 19/07/2026 (not this week)</p>
-      <p class="meta">Latest bulletin we have: 19/07/2026 (not this week).</p>
-      <a class="download-link-top" href="drive-1jmslbrliw.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
+      
+      <p class="meta">This week&#x27;s bulletin for Raphoe — 14/09/2026. Part of the Raphoe Diocese collated bulletin.</p>
+      <a class="download-link-top pdf-force-download" href="drive-1jmslbrliw.pdf" download="drive-1jmslbrliw.pdf">Download PDF</a>
     </header>
     
 
     <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
       <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
-      <a class="mobile-jump-download" href="drive-1jmslbrliw.pdf" target="_blank" rel="noopener noreferrer" download>Download PDF</a>
     </div>
 
     <h2 class="section-heading">Bulletin — Original PDF Version</h2>
     <div id="panel-pdf" class="viewer-block">
       
-      <div class="quiet-links">
-        <a href="drive-1jmslbrliw.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-        <a href="drive-1jmslbrliw-pdf.html" target="_blank" rel="noopener noreferrer">Distraction-free view</a>
-      </div>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open. The box above shows how much has downloaded and says “PDF fully loaded” when it is ready.</p>
       <div class="pdf-frame-wrap" id="pdf-frame-wrap">
         <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
-        <iframe src="drive-1jmslbrliw.pdf" title="Raphoe bulletin PDF"></iframe>
+        <iframe data-pdf-url="drive-1jmslbrliw.pdf" title="Raphoe bulletin PDF"></iframe>
         
         <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="drive-1jmslbrliw.pdf">
           <div class="pdf-inpage-toolbar">
             <div class="pdf-inpage-backup">
-              <a href="drive-1jmslbrliw.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
-              <a href="drive-1jmslbrliw.pdf" download>Download</a>
+              <a class="pdf-open-newtab" href="drive-1jmslbrliw.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="drive-1jmslbrliw.pdf" download="drive-1jmslbrliw.pdf">Download</a>
             </div>
           </div>
-          <div class="pdf-inpage-status">Showing first page…</div>
+          <div class="pdf-inpage-status">Loading PDF… This file can take a few moments to open.</div>
           <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
         </div>
       </div>
@@ -936,26 +977,24 @@
       <div class="quiet-links">
         <a href="drive-1jmslbrliw-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
       </div>
-      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-raphoe" data-parish-name="Raphoe"><h2 class="ocr-parish-name">Raphoe</h2><p class="ocr-parish-date">25/08/2026</p></header>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-raphoe" data-parish-name="Raphoe"><h2 class="ocr-parish-name">Raphoe</h2><p class="ocr-parish-date">14/09/2026</p></header>
 <p class="page-label">Page 1</p>
 <p>WEBSITE parishofraphoe.ie EMAIL: <a href="mailto:raphoeparish@gmail.com" target="_blank" rel="noopener noreferrer">raphoeparish@gmail.com</a><br>
-Fr Kelly: <a href="tel:+353879077985" style="color:#1d4ed8;font-weight:600;">087 9077985</a> Office Phone <a href="tel:+353873338714" style="color:#1d4ed8;font-weight:600;">0873338714</a> Sunday 19 July 2026<br>
+Fr Kelly: <a href="tel:+353879077985" style="color:#1d4ed8;font-weight:600;">087 9077985</a> Office Phone <a href="tel:+353873338714" style="color:#1d4ed8;font-weight:600;">0873338714</a> Sunday 13 September 2026<br>
 RAPHOE PARISH NEWSLETTER<br>
 St. Eunan ’s Church,<br>
 Raphoe St. Patrick ’s Church,<br>
 Drumkeen St. Mary ’s Church,<br>
 Convoy<br>
-Monday 20 July<br>
+Monday The Exaltation of the Holy Cross<br>
 Raphoe: 7.30am: Office of Readings, Morning Prayer,<br>
 Rosary, Divine Mercy Chaplet and Benediction.<br>
 Raphoe: 9am: Mass<br>
-Convoy: 2pm: Rosary<br>
-Raphoe: 7pm: Holy Hour on Divine Mercy<br>
-Raphoe: 8pm Holy Hour for Mary&#x27;s Meals<br>
-Tuesday<br>
+Raphoe: 7pm: Holy Hour<br>
+Tuesday Our Lady of Sorrows<br>
 Raphoe: 7.30am: Office of Readings, Morning Prayer,<br>
 Rosary, Divine Mercy Chaplet and Benediction.<br>
-Drumkeen: 9am: Mass<br>
+Drumkeen: 10am: Mass<br>
 Drumkeen: Adoration Noon – 9pm<br>
 Wednesday<br>
 7.30am: Office of Readings, Morning Prayer, Rosary,<br>
@@ -965,98 +1004,101 @@ Raphoe: 9.30am - 8pm: Adoration<br>
 Thursday<br>
 Raphoe: 7.30am: Office of Readings, Morning Prayer,<br>
 Rosary, Divine Mercy Chaplet and Benediction.<br>
-Raphoe: 9am: Mass (Barry and Kathleen Power RIP)<br>
+Raphoe: 9am: Mass<br>
 Convoy: Noon – 6pm: Adoration<br>
-Convoy: Parochial House: 8pm: Legion of Mary<br>
-Friday:<br>
+Convoy: Parochial House: 8pm: Legion of Mary Friday:<br>
 Raphoe: 7.30am: Office of Readings, Morning Prayer,<br>
 Rosary, Divine Mercy Chaplet and Benediction.<br>
 Convoy: 9am: Mass<br>
 Saturday<br>
 Raphoe: 8am: Office of Readings, Morning Prayer,<br>
 Rosary, Divine Mercy Chaplet and Benediction.<br>
-Convoy: 9.30am: Prayer Time in the Divine Mercy<br>
-Alcove. Chaplet, Morning Prayer, etc All welcome for<br>
-part of it or all of it.<br>
-Convoy: Noon: Baptism<br>
-Convoy: 6pm: Mass<br>
-Drumkeen: 7.30pm: Mass (Brendan and Bridie 50th<br>
-Wedding Anniversary), (John Reid, Colm Bonner RIP)<br>
+Convoy: 9.30am: Divine Mercy Devotions<br>
+Convoy: 5pm Confessions<br>
+Convoy: 6pm: Mass (Paddy Kelly MMM, Eddie Kelly,<br>
+Kathleen Lester, The Kelly Family, RIP)<br>
+Drumkeen: 7.30pm: Mass (Johnny, Nora and Peter<br>
+McMenamin, Mairín Patton, Grace Browne RIP)<br>
 After Mass: Confessions<br>
 Sunday:<br>
 Raphoe: 8am: Office of Readings, Morning Prayer,<br>
-Rosary, Divine Mercy Chaplet and Benediction.<br>
+Rosary and Benediction.<br>
 Convoy: 9.30am: Mass<br>
-Raphoe: 11am: Mass<br>
-Convoy: 12.15pm: Baptism<br>
+Raphoe: 11am: Mass (Majorie Kelly, Rosemary Martin RIP)<br>
+Raphoe: Noon: Baptism<br>
 Drumkeen: 1.30pm: Latin Mass<br>
-The 16th Sunday in Ordinary Time focuses on God ’s patience, mercy, and the<br>
-growth of His kingdom. The readings show how God gives people time to<br>
-change and how His kingdom grows in unexpected ways. Let us pray the<br>
-following prayer this week:<br>
-Lord Jesus, plant your Word in our hearts and make it fruitful in our lives. Keep<br>
-us free from sin and make us a fertile place where your love can grow. Let the<br>
-Word which you have planted in our hearts not return to you void, but may it<br>
-provide a rich harvest, a hundred, or fifty, or thirty -fold. Amen<br>
-Raphoe</p>
+Triumph of the Holy Cross Prayer<br>
+Lord Jesus Christ, today we honour the Triumph<br>
+of Your Holy Cross, the sign of Your great love<br>
+and victory over sin and death.<br>
+Thank You for embracing the Cross to save us.<br>
+Help us to carry our own crosses with faith, to<br>
+follow You with courage, and to find hope even in<br>
+suffering. May Your Cross always remind us that<br>
+love conquers all, and that through You, even<br>
+death has been defeated. Amen.<br>
+It&#x27;s a joyful day to remember that the cross, through Jesus&#x27; love and<br>
+sacrifice, is a powerful symbol of hope, victory, and new life for all of us.<br>
+Let&#x27;s carry this hope in our hearts.<br>
+Raphoe <a href="https://drive.google.com/file/d/1jmslbrliw1BTtdrxHbqpUbhQEf6wXHy5/view" target="_blank" rel="noopener noreferrer">https://drive.google.com/file/d/1jmslbrliw1BTtdrxHbqpUbhQEf6wXHy5/view</a></p>
 <hr>
 <p class="page-label">Page 2</p>
-<p>What do we live for, if it is not to make life less difficult for each other?<br>
-Anytime we step out boldly to make changes, we take a chance that we might fail. But the only way to get better<br>
-is to try.</p>
+<p>A little reminder to us all: as there will be no Saturday evening Mass in Raphoe or Sunday morning Mas in<br>
+Drumkeen, all intentions booked for these Masses will be transferred to the nearest Mass in the particular Church.</p>
 <hr>
-<p>NATIONAL GRANDPARENTS PILGRIMAGE will take place at Knock Shrine on Sunday 26 July celebrating<br>
-the sixth World Day for Grandparents and the Elderly. For many Grandparents and elderly people, this<br>
-pilgrimage is one of the most important and joyful days of the year – a day when they feel honoured,<br>
-remembered, loved and welcomed.</p>
+<p>The Annual Legion of Mary Pilgrimage to Knock will take place on Sunday, 27 September. It will cost around<br>
+€20. Confessions, Mass in Basilica, and Rosary procession. Contact either Sean Friel on <a href="tel:+353872269221" style="color:#1d4ed8;font-weight:600;">087 226 9221</a> or Bridie<br>
+Boyle on <a href="tel:+353861752023" style="color:#1d4ed8;font-weight:600;">086 175 2023</a> for more information.</p>
 <hr>
-<p>The National Pilgrimage to Croagh Patrick ‘REEK SUNDAY ’ takes place on Sunday 26 July. This pilgrimage<br>
-has been carried out uninterrupted for over 1500 years. The Sacrament of Reconciliation will be available on the<br>
-mountain from 7.30am and will conclude at 2.00pm. The first Mass on the summit will be celebrated at 8.00am<br>
-and every half hour after that until the final Mass of the day at 2.00pm. Find full event schedules and safety<br>
-advisories directly on the Westport Parish website or check updates via the Irish Catholic Bishops&#x27; Conference.</p>
+<p>A St Faustina Weekend will take place in St Mary ’s Church, Convoy Co Donegal F93FX66 on 3 and 4 October.<br>
+It will consist of prayer and reflection on Divine Mercy Devotions. Led by Fr Eamonn Kelly, the weekend will<br>
+invite all to come to know the Person of Divine Mercy. You are invited to come to all or part of the weekend.<br>
+Please see the notice on the notice board for further details.</p>
 <hr>
-<p>Are you feeling overwhelmed, have a query or simply want to discuss your caring role? Family Carers Ireland are<br>
-running support clinics remotely every Tuesday for the months of July and August. These clinics offer you a<br>
-space and time talk over the phone in the comfort of your own home. To Book Call/text <a href="tel:+353868363842" style="color:#1d4ed8;font-weight:600;">0868363842</a> or<br>
-email <a href="mailto:Donegalcs@familycarers.ie" target="_blank" rel="noopener noreferrer">Donegalcs@familycarers.ie</a></p>
+<p>St Mary ’s Youth Choir will meet on Wednesday, 16 September from 5.30 to 6.30. We welcome new children<br>
+over the age of 8 and anyone who can play an instrument would be particularly welcomed. St Mary ’s Adult Choir<br>
+will meet on Thursday, 24 September at 8pm and again new members and musicians are very welcome. For any<br>
+queries, contact Gerard on <a href="tel:+353868812535" style="color:#1d4ed8;font-weight:600;">086 8812535</a> or on the members what ’s app.</p>
 <hr>
-<p>CONSECRATE YOURSELF TO THE EUCHARIST ON THE FEAST OF OUR LADY OF KNOCK:<br>
-Human Life International Ireland will be leading a 33 Day Consecration to the Eucharist online with videos<br>
-uploaded each day. Starting: 19th July - 20th August, on the HLI Ireland YouTube Channel. You can participate<br>
-by watching the videos, or get the book “How to Be His ” by Fr. Jesse Maingot OP online at https://</p>
+<p>Donegal Pro Life would like to thank all those who supported the recent Church gate collection. Money raised<br>
+€308.33. Please text <a href="tel:+353892469599" style="color:#1d4ed8;font-weight:600;">089 2469599</a>, if you are interested in becoming involved with Donegal Pro Life,</p>
 <hr>
-<p>The Raphoe Diocesan Pilgrimage to Knock will take place on Saturday 15th of August 2026. The main celebrant<br>
-is Bishop Niall Coll. For parishioners who cannot join the pilgrimage in person, all the Masses and talks of the<br>
-Annual Knock Novena will be livestreamed on the Knock Shrine website or on YouTube: https://</p>
+<p>A Marriage Enrichment Weekend: Take time out for just the two of you. Whether newly married or many years<br>
+together, rediscover the love that brought you together. The weekend will take place from 2 to 4 October at<br>
+Focolare Centre, Prosperous, Co. Kildare. Apply online: <a href="https://www.marriageencounter.ie" target="_blank" rel="noopener noreferrer">www.marriageencounter.ie</a> or Phone: <a href="tel:+353876299153" style="color:#1d4ed8;font-weight:600;">0876299153</a>.<br>
+Places are limited.</p>
 <hr>
-<p>Encounter School of Ministry Donegal is launching in All Saints Church, Newtowncunningham in September.<br>
-This course draws from the richness of our Catholic heritage as we seek to teach, equip, and activate disciples to<br>
-demonstrate the love of God through the power of the Holy Spirit in their spheres of influence. If you would like<br>
-to know more, we are hosting a Zoom Q&amp;A session on Thursday 6th August from 8 - 9pm. If you wish to attend<br>
-this session, please email <a href="mailto:donegal@encounterschool.org" target="_blank" rel="noopener noreferrer">donegal@encounterschool.org</a>. You can also get more information on the course at</p>
+<p>There will be a clearance sale of gifts, bric -a-brac and lots more on Saturday, 10 October in St Mary ’s Hall,<br>
+Convoy from 11am to 3pm. All are welcome. All proceeds are to help Mary&#x27;s Meals feed more children.</p>
 <hr>
-<p>YOUTH 2000 SUMMER FESTIVAL: 13th - 16th August. Calling all young people aged 16–35! Join the<br>
-Youth 2000 Summer Festival in Newbridge College, Co. Kildare. This is a donation -only event, with free buses<br>
-available across the country and all meals included. Expect inspiring talks and workshops, Youth Mass, music,<br>
-prayer, and plenty of opportunities to chill out and meet other young Catholics. Whether you are new to the faith<br>
-or looking to be refreshed, all are welcome. To register or to find out more please visit: youth2000.ie or follow<br>
-@Youth2000Ireland.</p>
+<p>Convoy Céilí Club: A Céilí in memory of Bill Meehan, Deceased, will be held on St. Mary&#x27;s Hall Convoy on<br>
+Sunday, 20 September. Dancing is from 8pm to 11pm. Music by Martin Duggan. Admission including supper<br>
+€10. Proceeds to The Friends of Letterkenny Hospital.</p>
 <hr>
-<p>The Lough Derg Three -Day Pilgrimage runs until 15 August. Booking is advised. The one -day retreats and<br>
-guided Pilgrim Path experience has the following dates available in August: 18, 22, 23, 29 and 31; and in<br>
-September: 5, 6, 9, 12, 15, 19, and 20. Booking is essential. All of us are invited to consider going to Lough Derg<br>
-this summer. <a href="https://www.loughderg.org" target="_blank" rel="noopener noreferrer">www.loughderg.org</a> , email <a href="mailto:info@loughderg.org" target="_blank" rel="noopener noreferrer">info@loughderg.org</a> or telephone 0(0353) 71 9861518.</p>
+<p>Convoy Community and Environmental Committee invite everyone to their first over 60&#x27;s social club meeting in<br>
+St Mary&#x27;s Hall on Friday, 18 September from 12pm -2pm. There will be refreshments and music. It is a free event.<br>
+All are welcome. ***<br>
+ABIDE WOMEN&#x27;S CONFERENCE will take place from 20 to 22 November at the Great Northern Hotel,<br>
+Bundoran. Speakers include: Fr. Barry Braum, Fr. Mark Wharton, Nashville Dominicans. Mass will be<br>
+celebrated by Bishop Fintan Gavin, from Cork and Ross Diocese. Please visit: Abide in His Love at<br>
+eventbrite.ieRegistration link: <a href="https://abideinhislove.eventbrite.com" target="_blank" rel="noopener noreferrer">https://abideinhislove.eventbrite.com</a></p>
 <hr>
-<p>We are always on the lookout for interesting articles for the newsletter. If you have one you might like to share it.<br>
-If you would like a notice in the newsletter, please email the notice to <a href="mailto:raphoeparish@gmail.com" target="_blank" rel="noopener noreferrer">raphoeparish@gmail.com</a></p></div>
+<p>A Church Gate Collection for the Re-Development of Ards Friary will take place on Saturday 26 and Sunday<br>
+27 September. Your support would be greatly appreciated.</p>
+<hr>
+<p>WE INVITE YOU TO COME &amp; SEE what the Encounter School of Ministry Course is all about. Join us on<br>
+Thursday 17th September from 6.30pm (first half hour is prayer and worship) to 9.00pm at All Saints Church,<br>
+Newtowncunningham. Participants can attend up to 3 classes without committing to pay for the course. If a<br>
+participant decides to enrol before the application deadline of October 1st, tuition fees will then be applied. If a<br>
+participant decides not to continue, there is no obligation. More information or register here: https://<br>
+encounterschool.org/ donegal/ or email <a href="mailto:donegal@encounterschool.org" target="_blank" rel="noopener noreferrer">donegal@encounterschool.org</a>.</p></div>
       <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
     </div>
 
     <section class="parish-section">
       <h2 class="section-heading">Other RAPHOE Parishes</h2>
       <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
-      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="annagryparish.html" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="kincasslagh"><a class="parish-link" href="kincasslagh.html" target="_blank" rel="noopener noreferrer">Kincasslagh</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="newtownkilleaparish.html" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="tawnawillyparish.html" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="ardara"><a class="parish-link" href="ardara.html" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="drive-1rjeey-ayy.html" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="steunanscathedral.html" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="drumholm-parish.html" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="naomhfionan.html" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="drive-1kna8f6t54.html" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="glenfin-parish.html" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="drive-14alaxt4mv.html" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="gort-a-choirce.html" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="inverparish.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="drive-1m6sogz3de.html" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="st-carthas-church-kilcar-f94-h2y5.html" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="st-mary-of-the-visitation-church-killybegs.html" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="kincasslagh"><a class="parish-link" href="kincasslagh.html" target="_blank" rel="noopener noreferrer">Kincasslagh</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="milfordrathmullanparishes.html" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="rathmullan.html" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="stranolar"><a class="parish-link" href="stranorlarparish.html" target="_blank" rel="noopener noreferrer">Stranolar</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="drive-1hh7w-ew0v.html" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
     </section>
   </div>
   <footer>
@@ -1108,9 +1150,9 @@ If you would like a notice in the newsletter, please email the notice to <a href
         try { standalone.removeAttribute('src'); } catch (e) {}
       }
 
-      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260824a"]')) {
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260912a"]')) {
         var s = document.createElement('script');
-        s.src = '/assets/pdf-inpage-viewer.js?v=20260824a';
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260912a';
         s.defer = true;
         document.head.appendChild(s);
       }
@@ -1564,11 +1606,16 @@ If you would like a notice in the newsletter, please email the notice to <a href
         for (var i = 0; i < names.length; i++) {
           var page = pageFor(names[i]);
           if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
           var slot = pages.querySelector('[data-page="' + page + '"]');
           if (!slot) continue;
-          showBox(pages);
-          if (window.parishPressScrollPdfToPage) window.parishPressScrollPdfToPage(page);
-          else scrollBoxTo(pages, slot);
+          scrollBoxTo(pages, slot);
           return true;
         }
         return false;
@@ -1602,23 +1649,8 @@ If you would like a notice in the newsletter, please email the notice to <a href
         });
         return out;
       }
-      function toggleExpand(btn) {
-        var panel = document.getElementById('panel-' + (btn.getAttribute('data-az-expand') || 'ocr'));
-        if (!panel) return;
-        var open = panel.classList.toggle('az-expanded');
-        btn.setAttribute('aria-expanded', open ? 'true' : 'false');
-        btn.textContent = open ? 'Tap to shrink' : 'Tap to enlarge';
-        // Box heights changed, so re-measure for the Back to Top button.
-        if (window.parishPressBindScrollTopBoxes) window.parishPressBindScrollTopBoxes();
-      }
       document.addEventListener('click', function (ev) {
         if (!ev.target || !ev.target.closest) return;
-        var expand = ev.target.closest('.az-expand');
-        if (expand) {
-          ev.preventDefault();
-          toggleExpand(expand);
-          return;
-        }
         var btn = ev.target.closest('.az-letter');
         if (!btn) return;
         ev.preventDefault();
