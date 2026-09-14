@@ -4889,33 +4889,29 @@
       "recipe_file": "parishes/recipes/down_and_connor/stcolmcillesholywood.json",
       "recipe": {
         "start_url": "https://www.stcolmcillesholywood.org/weekly-bulletins/",
-        "site_type": "waf_retry_wordpress",
-        "playbook_type": "",
+        "site_type": "html_text_bulletin",
+        "playbook_type": "wix_html",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
+        "step_count": 2,
         "click_count": 0,
-        "has_terminal": false,
+        "has_terminal": true,
         "operator_notes": [
-          "St Colmcille's Holywood \u2014 dated notice pages, PDF hidden in a PDF Embedder Premium iframe (class pdfembed-iframe, src=?pdfemb-data=<base64 json {url:...}>), not a public a.pdfemb-viewer href.",
-          "Stable slug: /bulletins/bulletin-notice-sunday-{Dth}-{month}-{YYYY}/. Confirmed live 20/08/2026: 16th August 2026 exists; 23rd August 2026 is HTTP 404. Do not invent next Sunday.",
-          "Iframe target for 16 Aug 2026: https://www.stcolmcillesholywood.org/wp-content/uploads/2026/08/Bulletin-Notice-16th-August-2026.pdf (HTTP 200, application/pdf, 380331 bytes, 3 pages, body text '16th August' + Holywood).",
-          "Listing /weekly-bulletins/ also lists the same posts, but can look stale in search snippets. site_type:waf_retry_wordpress scrapes that listing first, then predicts rewrite_date_url Sundays and skips 404s.",
-          "Origin is SiteGround-style 403-flaky (curl often 403; plain urllib retries get 200). Skip Playwright.",
-          "Harvest 07/09/2026 downloaded a real 5-page weekly then discarded Too many pages: 5 (max 4). max_bulletin_pages=8."
+          "Bulletin text is on the web page \u2014 not a downloadable PDF file.",
+          "Use Save page as PDF on the newsletter article page.",
+          "Harvester prints the page to PDF each Sunday (Pattern clonleigh uses predicted WP post URLs)."
         ],
         "do_not": [
-          "Do not hardcode /bulletin-notice-sunday-23rd-august-2026/ \u2014 that slug 404s until the parish posts it.",
-          "Do not treat the listing as a direct PDF page \u2014 the PDF is only inside the notice-page iframe.",
-          "Do not switch this to a Playwright click recipe \u2014 the origin 403s browsers more often than plain HTTP."
+          "Do not use Pick bulletin image when the page is mostly text paragraphs.",
+          "Do not stop at click-only \u2014 need print_to_pdf as the final step."
         ],
-        "recorded_date": "2026-08-20"
+        "recorded_date": "2026-09-14"
       },
-      "bulletin_format": "pdf_download",
-      "learned_pattern": "",
+      "bulletin_format": "html",
+      "learned_pattern": "Wix HTML bulletin",
       "host_profile": null,
-      "has_extension_diagnosis": false,
+      "has_extension_diagnosis": true,
       "harvest_status": "failed",
       "last_error": "Recipe replay failed: WAF-flaky site https://www.stcolmcillesholywood.org/weekly-bulletins/ \u2014 could not fetch listing/post via plain-HTTP retries within budget (not a permanent block; retry later)",
       "suggested_action": "investigate",
@@ -5300,32 +5296,27 @@
       "diocese": "down_and_connor",
       "recipe_file": "parishes/recipes/down_and_connor/stpatricksbelfast.json",
       "recipe": {
-        "start_url": "https://www.stpatricksbelfast.org/category/weekly-bulletins",
-        "site_type": "waf_retry_wordpress",
+        "start_url": "https://www.stpatricksbelfast.org/category/weekly-bulletins/",
+        "site_type": "",
         "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 1,
-        "click_count": 0,
-        "has_terminal": false,
+        "step_count": 3,
+        "click_count": 2,
+        "has_terminal": true,
         "operator_notes": [],
-        "do_not": [
-          "Do not guess/hardcode next week's post slug \u2014 this parish skips weeks;",
-          "always scrape the real category archive for the newest real post.",
-          "Do not switch this back to a Playwright goto/click recipe \u2014 a full browser",
-          "was measurably less reliable than plain HTTP retries against this WAF."
-        ],
-        "recorded_date": "2026-08-10"
+        "do_not": [],
+        "recorded_date": "2026-09-14"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Recipe replay failed: WAF-flaky site https://www.stpatricksbelfast.org/category/weekly-bulletins \u2014 could not fetch listing/post via plain-HTTP retries within budget (not a permanent block; retry later)",
+      "last_error": "Recipe replay failed: HTTP 403 for https://www.stpatricksbelfast.org/category/weekly-bulletins/ \u2014 site may be blocking automated access (not a recipe/selector problem); headful fallback: Recipe replay failed: HTTP 403 for https://www.stpatr",
       "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: WAF-flaky site https://www.stpatricksbelfast.org/category/weekly-bulletins \u2014 could not fetch listing/post via plain-HTTP retries within bu"
+      "suggested_reason": "Recipe replay failed: HTTP 403 for https://www.stpatricksbelfast.org/category/weekly-bulletins/ \u2014 site may be blocking automated access (not a recipe/selector p"
     },
     {
       "parish_key": "stteresasparish",
