@@ -1914,7 +1914,10 @@ class HarvestMissRecipeTests(unittest.TestCase):
             "down_and_connor/stoliverplunkettparish.json": "Sun-6th-September-26.pdf",
             "down_and_connor/stpatricksdownpatrick.json": "06-September-2026.pdf",
             "down_and_connor/glenavyandkilleadparish.json": "2026-September-13-Twenty-Fourth-Sunday-in-Ordinary-Time.pdf",
-            "down_and_connor/st-colmcilles.json": "Parish-Bulletin-06092026.pdf",
+            # 14/09/2026 live: the "13th September 2026" row links to
+            # uploads/2026/09/Parish-Bulletin-30082026-3.pdf (parish misnamed
+            # the file). Frank's click was right.
+            "down_and_connor/st-colmcilles.json": "2026/09/Parish-Bulletin-30082026-3.pdf",
             "down_and_connor/derriaghycatholicparish.json": "Bulletin_23rd_Sun_OT_A.png",
             "down_and_connor/holyrosaryparishbelfast.json": "a46a59_3a22af7b525a4c7bb2b1b2f0a3c706b2.pdf",
         }
