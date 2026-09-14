@@ -10,7 +10,7 @@
   },
   "action_counts": {
     "skip": 34,
-    "ok": 111,
+    "ok": 112,
     "investigate": 20
   },
   "parishes": [
@@ -1257,31 +1257,19 @@
       "recipe_file": "parishes/recipes/derry/parishofclaudy.json",
       "recipe": {
         "start_url": "https://www.parishofclaudy.com/welcome/weekly-bulletin.html",
-        "site_type": "http_scrape_newest_pdf",
-        "playbook_type": "oneweb_docx",
+        "site_type": "",
+        "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
         "step_count": 1,
         "click_count": 0,
-        "has_terminal": false,
-        "operator_notes": [
-          "CONTENT GAP 28/08/2026 for harvest Sunday 23/08/2026: listing and onewebmedia have no 23-8-26 or 16-8-26 file. Newest real newsletter is NEWSLETTER 9-8-26.docx.",
-          "Kitchen sink: HTTP GET weekly-bulletin.html only (no Playwright). Unwrap Google Docs viewer iframe src / url= to the onewebmedia file. Skip GDPR, Privacy, financial statement, Gift Aid, DataEntry, Income & Expenditure.",
-          "Proved 28/08/2026: listing HTTPS 200 in 1.2s (51042 bytes HTML). Iframe url= newest NEWSLETTER 9-8-26.docx. Direct IPv4 GET of that file HTTP 200, 25820 bytes, PK/docx, heading NEWSLETTER 9 / 8 /26. NEWSLETTER 23-8-26.docx and 16-8-26.docx HTTP 404. onewebmedia/ directory 403. wp-json 404.",
-          "site_type:http_scrape_newest_pdf \u2014 never wait for Google viewer iframes (2\u20134 min). If the listing HTML has no newsletter iframe, fall back to predicted_dated rewrite of example_url (weeks_back 8). Long wait is only the file GET + docx\u2192PDF, not the listing.",
-          "Do not stamp a 23/08 URL. When the parish posts NEWSLETTER 23-8-26.docx the listing scrape will pick it."
-        ],
-        "do_not": [
-          "Do not open weekly-bulletin.html in Playwright \u2014 Google Docs viewer iframes take 2\u20134 minutes and burn the parish timeout.",
-          "Do not wait for iframe previews to load. The file URL is in the HTML url= param immediately.",
-          "Do not pick GDPR, Privacy, financial statement, Gift Aid, DataEntry, or Income & Expenditure documents.",
-          "Do not pin NEWSLETTER 23-8-26.docx \u2014 that file is 404 (content gap).",
-          "Do not set use_captured_url."
-        ],
-        "recorded_date": "2026-08-28"
+        "has_terminal": true,
+        "operator_notes": [],
+        "do_not": [],
+        "recorded_date": "2026-09-14"
       },
-      "bulletin_format": "pdf_download",
+      "bulletin_format": "download",
       "learned_pattern": "One.com Word bulletin (Google preview iframes)",
       "host_profile": {
         "total_timeout_s": 90,
@@ -1349,6 +1337,45 @@
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "No parish website on the official Clogher directory \u2014 diocese card link only"
+    },
+    {
+      "parish_key": "parishofroslea",
+      "display_name": "clogher",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/parishofroslea.json",
+      "recipe": {
+        "start_url": "https://parishofroslea.com/category/parish-bulletin/",
+        "site_type": "pdf_link_list",
+        "playbook_type": "pdf_download_list",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 4,
+        "click_count": 3,
+        "has_terminal": true,
+        "operator_notes": [
+          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
+          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+          "Do not worry if the filename or date in the link text changes every week."
+        ],
+        "do_not": [
+          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
+          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+        ],
+        "recorded_date": "2026-09-14"
+      },
+      "bulletin_format": "download",
+      "learned_pattern": "News page with PDF links",
+      "host_profile": {
+        "total_timeout_s": 490,
+        "navigation_timeout_ms": 55000,
+        "notes": "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom. Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday. Do not worry if the filename or date in the link text chan"
+      },
+      "has_extension_diagnosis": false,
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "clones",
@@ -4573,7 +4600,11 @@
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
-      "host_profile": null,
+      "host_profile": {
+        "total_timeout_s": 490,
+        "navigation_timeout_ms": 55000,
+        "notes": "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom. Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday. Do not worry if the filename or date in the link text chan"
+      },
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
       "last_error": "Total timeout exceeded",
