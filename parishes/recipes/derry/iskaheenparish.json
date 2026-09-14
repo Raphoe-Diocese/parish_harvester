@@ -2,29 +2,28 @@
   "version": 1,
   "parish_key": "iskaheenparish",
   "display_name": "Iskaheen",
-  "diocese": "unknown",
+  "diocese": "derry",
   "start_url": "https://www.iskaheenparish.com/bulletin",
-  "site_type": "http_scrape_newest_images",
-  "image_count": 2,
-  "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "playbook_type": "stacked_image_bulletin",
   "steps": [
     {
       "action": "image_stack",
       "count": 2
     }
   ],
+  "observed_load_ms": 45046,
+  "timeout_ms": 300000,
+  "total_timeout_s": 600,
+  "navigation_wait_until": "commit",
+  "playbook_type": "stacked_image_bulletin",
+  "site_type": "stacked_image_bulletin",
   "operator_notes": [
-    "Bulletins are two stacked page scans on /bulletin. Newest week is at the top.",
-    "18/08/2026 live page has /wp-content/uploads/2026/08/ UUID-rotated.jpg pair (i0.wp.com). Last harvest used leftover /2026/04/1.jpg.",
-    "site_type:http_scrape_newest_images takes the newest upload-month images (count=2) via plain HTTP. Hashed filenames have no day — freshness treats same-month UUID scans as current-month, not folder day=1.",
-    "The June urls[] field from training is leftover and is not used.",
-    "09/09/2026 listing has /wp-content/uploads/2026/09/ UUID-rotated.jpg pair on i0.wp.com (HTTP 200). Harvest 34293288559 reported no matching images. Keep the Jetpack URL — do not rewrite to origin and do not pin the UUID filenames."
+    "Bulletins are full-page images stacked on one page — newest week at the top.",
+    "Pick the first two images, or use Pick another image too after the first.",
+    "Harvester grabs the top N large images automatically each Sunday — no dated URLs."
   ],
   "do_not": [
     "Do not hardcode one image URL — it goes stale every week.",
     "Do not Save page as PDF — that captures every old bulletin on the page."
   ],
-  "recorded_date": "2026-08-18"
+  "recorded_date": "2026-09-14"
 }
