@@ -1,45 +1,78 @@
 {
   "parish_key": "stgerardsparish",
-  "collected_at": "2026-09-14T16:26:11.658Z",
-  "extension_version": "1.61.30",
-  "source": "frank_paste",
-  "page_url": "https://stgerardsparish.org/parish-news-events/",
-  "opened_post_url": "https://stgerardsparish.org/sunday-message-13th-sept-2026/",
+  "collected_at": "2026-09-14T18:48:30.354Z",
+  "extension_version": "1.61.34",
+  "source": "push_recipe",
+  "page_url": "https://stgerardsparish.org/sunday-message-13th-sept-2026/",
   "page_type": "pdfemb",
-  "page_archetype": "wp_pdfemb_list",
-  "recipe_steps_local": 1,
-  "session_ui_steps": 1,
+  "page_archetype": "",
+  "html_fingerprint": {
+    "id": "wordpress_pdfemb",
+    "label": "WordPress PDF Embedder list",
+    "score": 37,
+    "pageType": "wp_pdfemb_list",
+    "captureMethod": "click_then_pdf",
+    "bestDownloadUrl": "",
+    "advice": "WordPress PDF Embedder — pick the newest dated bulletin card, then Save PDF.",
+    "doNot": [],
+    "downloadUrlCount": 0
+  },
+  "recipe_steps_local": 0,
+  "session_ui_steps": 0,
   "issues": [
     {
-      "id": "click_without_download",
-      "severity": "error",
-      "title": "Recipe stops at click — missing save/download step",
-      "detail": "Trainer recorded newest_dated click on Sunday Message: 13th Sept 2026. The bulletin is a PNG on the post (Sunday-message-13th-September_260911_142009_1.png), not a PDF. Opening the picture in a new tab is expected to fail in the trainer.",
-      "fix": "Do not Send & test the click. Keep site_type waf_retry_wordpress. Harvest fetches the post and converts the scan. Do not retrain a Playwright new-tab image click."
+      "id": "example_post_ready",
+      "severity": "ok",
+      "title": "This week's post is saved — tap Send & test",
+      "detail": "https://stgerardsparish.org/sunday-message-13th-sept-2026/",
+      "fix": "Send & test writes this URL to GitHub and runs harvest. Do not open the picture in a new tab."
     },
     {
-      "id": "slug_renamed",
+      "id": "pdfemb_needs_download_step",
       "severity": "warn",
-      "title": "This week’s slug is sunday-message-, not sunday-bulletin-",
-      "detail": "Live post 14/09/2026: https://stgerardsparish.org/sunday-message-13th-sept-2026/ title Sunday Message: 13th Sept 2026. Old post_slug_patterns would miss it (no 'bulletin' in the slug).",
-      "fix": "Add sunday-message- to post_slug_patterns. example_post_url is the 13 Sept post shape, not a pinned PNG."
+      "title": "PDF Embedder — clicks recorded but no download step",
+      "detail": "After picking the bulletin link, tap Save this PDF.",
+      "fix": "Harvester reads a.pdfemb-viewer hrefs — recipe must end with download."
     },
     {
       "id": "harvest_recent_fail",
       "severity": "warn",
       "title": "Last harvest failed (2 streak)",
-      "detail": "WAF-flaky site https://stgerardsparish.org/parish-news-events/ — could not fetch listing/post via plain-HTTP retries within budget.",
-      "fix": "Do not re-hunt weekly. harvest_note already says blocked from GitHub runners."
+      "detail": "Recipe replay failed: WAF-flaky site https://stgerardsparish.org/parish-news-events/ — could not fetch listing/post via plain-HTTP retries within budget (not a permanent block; retry later)",
+      "fix": "Open Problems tab or retrain if bulletin layout changed."
+    },
+    {
+      "id": "start_url_drift",
+      "severity": "warn",
+      "title": "GitHub recipe start_url differs from this page",
+      "detail": "Recipe: https://stgerardsparish.org/parish-news-events/\nNow: https://stgerardsparish.org/sunday-message-13th-sept-2026/",
+      "fix": "Update start_url if the bulletin moved, or train on the recipe start page."
     }
   ],
   "counts": {
-    "error": 1,
-    "warn": 2,
+    "error": 0,
+    "warn": 3,
     "info": 0,
-    "ok": 0
+    "ok": 1
   },
-  "github": {
-    "recipe": true,
-    "consecutive_failures": 2
-  }
+  "pattern_hints": [],
+  "site_intake": {
+    "bulletin_format": "pdf_download",
+    "suggested_terminal_step": "download",
+    "page_type": "pdfemb",
+    "fingerprint_id": "wordpress_pdfemb",
+    "best_download_url": "",
+    "operator_confirm": {
+      "bulletin_format": null,
+      "notes": ""
+    }
+  },
+  "github": null,
+  "history": [
+    {
+      "collected_at": "2026-09-14T16:26:11.658Z",
+      "issue_count": 3,
+      "source": "frank_paste"
+    }
+  ]
 }
