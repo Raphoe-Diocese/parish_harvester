@@ -41,6 +41,7 @@ from harvester.harvest_log import (
 from harvester.manifest_builder import build_manifest
 from harvester.priority_queue import prioritise
 from harvester.report import generate_report, patch_report_for_parishes
+from harvester.parish_aliases import reject_drive_folder_listing, resolve_harvest_key
 from harvester.parish_status import write_parish_status
 from harvester.recipe_health import apply_dns_inactive_flags
 from harvester.site_builder import run as run_site_builder
@@ -189,7 +190,8 @@ def main() -> int:
     all_entries_by_key: dict[str, ParishEntry] = {}
     # Track results per diocese for per-diocese mega PDFs
     diocese_results: dict[str, list] = {}
-    target_parish_key = (args.target_parish or "").strip().lower()
+    raw_target_parish = (args.target_parish or "").strip().lower()
+    target_parish_key = resolve_harvest_key(raw_target_parish)
 
     if not target_parish_key:
         dns_summary = apply_dns_inactive_flags(parishes_dir=PARISHES_DIR)
@@ -215,13 +217,21 @@ def main() -> int:
 
         # When --target-parish is set, only fetch that one parish.
         if target_parish_key:
-            entries = [e for e in entries if e.key == target_parish_key]
-            if not entries:
+            matched = [e for e in entries if e.key == target_parish_key]
+            if not matched and raw_target_parish:
+                matched = [
+                    e
+                    for e in entries
+                    if (e.display_name or "").strip().lower() == raw_target_parish
+                ]
+            if not matched:
                 print(
-                    f"⚠️  Parish key '{target_parish_key}' not found in {diocese}.",
+                    f"⚠️  Parish key '{raw_target_parish or target_parish_key}' not found in {diocese}.",
                     file=sys.stderr,
                 )
                 continue
+            target_parish_key = matched[0].key
+            entries = matched
 
         entries = _prioritise_entries(entries)
         for entry in entries:
@@ -236,6 +246,7 @@ def main() -> int:
             results = loop.run_until_complete(fetch_all(entries, RAW_DIR, target))
         finally:
             loop.close()
+        results = [reject_drive_folder_listing(r) for r in results]
 
         ok_count = sum(1 for r in results if r.status == "ok")
         html_count = sum(1 for r in results if r.status == "html_link")
