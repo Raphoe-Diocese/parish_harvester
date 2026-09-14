@@ -2,11 +2,11 @@
   "generated_at": "2026-09-14",
   "target_date": "2026-09-13",
   "summary": {
-    "downloaded": 103,
+    "downloaded": 104,
     "html_links": 0,
     "skipped": 29,
     "failed": 20,
-    "stale_rejected": 12
+    "stale_rejected": 11
   },
   "action_counts": {
     "skip": 34,
@@ -1699,11 +1699,11 @@
         "recorded_date": "2026-09-14"
       },
       "bulletin_format": "image",
-      "learned_pattern": "WordPress permanent bulletin page (wp-block-file)",
+      "learned_pattern": "image_bulletin",
       "host_profile": {
-        "navigation_timeout_ms": 180000,
-        "wait_after_load_ms": 8000,
-        "total_timeout_s": 300,
+        "navigation_timeout_ms": 300000,
+        "wait_after_load_ms": 45055,
+        "total_timeout_s": 600,
         "max_retries": 3,
         "prefer_headful": true,
         "navigation_wait_until": "commit",
@@ -2651,7 +2651,7 @@
       "recipe_file": "parishes/recipes/down_and_connor/glenavyandkilleadparish.json",
       "recipe": {
         "start_url": "https://www.glenavyandkilleadparish.com/bulletins/",
-        "site_type": "predicted_dated_pdf",
+        "site_type": "pdf_link_list",
         "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
@@ -2668,12 +2668,12 @@
           "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
           "Do not pick GDPR, Gift Aid, or financial statement PDFs."
         ],
-        "recorded_date": "2026-08-19"
+        "recorded_date": "2026-09-14"
       },
       "bulletin_format": "download",
-      "learned_pattern": "",
+      "learned_pattern": "News page with PDF links",
       "host_profile": null,
-      "has_extension_diagnosis": false,
+      "has_extension_diagnosis": true,
       "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "ok",
@@ -4931,13 +4931,13 @@
       "recipe_file": "parishes/recipes/down_and_connor/st-colmcilles.json",
       "recipe": {
         "start_url": "https://st-colmcilles.net/weekly-bulletins/past-weeks-bulletins/",
-        "site_type": "predicted_dated_pdf",
+        "site_type": "wp_block_file_bulletin",
         "playbook_type": "permanent_bulletin_page",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 2,
-        "click_count": 1,
+        "step_count": 1,
+        "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
           "Permanent /parish-bulletin/ URL \u2014 PDF filename changes weekly under /wp-content/uploads/YYYY/MM/.",
@@ -4948,11 +4948,17 @@
           "Do not train on the homepage \u2014 use the dedicated bulletin page only.",
           "Do not pin saintanthony.co.uk if the parish moved to saintanthonys.uk."
         ],
-        "recorded_date": "2026-08-19"
+        "recorded_date": "2026-09-14"
       },
       "bulletin_format": "download",
-      "learned_pattern": "",
-      "host_profile": null,
+      "learned_pattern": "WordPress permanent bulletin page (wp-block-file)",
+      "host_profile": {
+        "navigation_wait_until": "commit",
+        "total_timeout_s": 600,
+        "navigation_timeout_ms": 300000,
+        "wait_after_load_ms": 45060,
+        "notes": "Permanent /parish-bulletin/ URL \u2014 PDF filename changes weekly under /wp-content/uploads/YYYY/MM/. On the bulletin page: tap the green Save bulletin PDF (from embed) button. Use url_pattern *bulletin*.pdf \u2014 never pin a dated filename."
+      },
       "has_extension_diagnosis": false,
       "harvest_status": "unknown",
       "last_error": "",
@@ -5183,23 +5189,24 @@
       "recipe_file": "parishes/recipes/down_and_connor/stoliverplunkettparish.json",
       "recipe": {
         "start_url": "https://stoliverplunkettparish.ie/bulletins/",
-        "site_type": "predicted_dated_pdf",
+        "site_type": "pdf_link_list",
         "playbook_type": "pdf_download_list",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 3,
-        "click_count": 1,
+        "step_count": 1,
+        "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "Bulletin list at /bulletins/. Newest dated Sun-Nth-Month-26.pdf.",
-          "Do not pin a June download URL \u2014 harvest rewrote the folder to /2026/08/ and 404'd."
+          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
+          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+          "Do not worry if the filename or date in the link text changes every week."
         ],
         "do_not": [
-          "Do not pin Sun-28th-June-26.pdf or any dated filename.",
-          "Do not pick Ministers-of-the-Word / Eucharist rota .docx files."
+          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
+          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
         ],
-        "recorded_date": "2026-08-23"
+        "recorded_date": "2026-09-14"
       },
       "bulletin_format": "download",
       "learned_pattern": "",
