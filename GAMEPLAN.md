@@ -17,6 +17,16 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 14/09/2026 — St Michael the Archangel (GoDaddy date)
+
+**The real goal, in one sentence:** harvest this week’s Parish Bulletin, not 7 June, and do not read “13th September 2 2026” as 02/09/2026.
+
+Live page (opened 14/09/2026): newest row is **Parish Bulletin 13th September 2 2026**. Wix splits the year. Old recipe was `*.pdf`.
+
+**This turn:** date parse + picker read the split year as 13/09/2026. Recipe is newest_dated on wsimg downloads. Trainer **1.61.31**. Diagnosis saved.
+
+**Next:** Frank Reloads 1.61.31, Find bulletin, confirm 13 Sept, Send & test. Or say merge then GitHub harvest `saintmichaelthearchangel`.
+
 ## 14/09/2026 — Toolbar ✕ stays closed
 
 **The real goal, in one sentence:** when Frank hits ✕ on the recipe toolbar, it does not pop back.

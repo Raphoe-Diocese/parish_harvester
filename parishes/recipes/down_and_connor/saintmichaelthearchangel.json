@@ -1,7 +1,8 @@
 {
+  "version": 1,
   "parish_key": "saintmichaelthearchangel",
   "display_name": "St Michael the Archangel",
-  "recorded_date": "2026-06-26",
+  "diocese": "down_and_connor",
   "start_url": "https://saintmichaelthearchangel.godaddysites.com/",
   "steps": [
     {
@@ -9,10 +10,35 @@
       "url": "https://saintmichaelthearchangel.godaddysites.com/"
     },
     {
+      "action": "click",
+      "selector": "a[href*='wsimg.com'][href*='downloads']",
+      "href": "https://img1.wsimg.com/blobby/go/e73a69df-356f-43e2-b8ea-e6260e39aad7/downloads/ba8084b8-2a60-4a94-813d-a6fcb44692c7/Parish%20Bulletin%2013th%20September%202%202026.pdf?ver=1789135221034",
+      "text": "Parish Bulletin 13th September 2 2026",
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "bottom",
+      "fallback_selectors": [
+        "a[href*='wsimg.com'][href*='.pdf']",
+        "a[href*='downloads'][href*='.pdf']"
+      ]
+    },
+    {
       "action": "download",
-      "url_pattern": "*.pdf"
+      "url": "https://img1.wsimg.com/blobby/go/e73a69df-356f-43e2-b8ea-e6260e39aad7/downloads/ba8084b8-2a60-4a94-813d-a6fcb44692c7/Parish%20Bulletin%2013th%20September%202%202026.pdf?ver=1789135221034"
     }
   ],
-  "diocese": "down_and_connor",
-  "auto_fixed": true
+  "playbook_type": "pdf_download_list",
+  "site_type": "pdf_link_list",
+  "operator_notes": [
+    "GoDaddy/Wix list. Filenames say '13th September 2 2026' — the extra 2 is a broken 2026, not 2 September.",
+    "Harvester picks the newest dated Parish Bulletin PDF each Sunday. Do not pin the blob hash."
+  ],
+  "do_not": [
+    "Do not use url_pattern *.pdf — that grabbed June or a mis-dated September file.",
+    "Do not treat 'September 2 2026' in the filename as 02/09/2026."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "bottom"
+  },
+  "recorded_date": "2026-09-14"
 }

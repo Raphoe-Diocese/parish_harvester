@@ -673,6 +673,29 @@ def predicted_dated_upload_urls(
     return seen
 
 
+_WIX_SPLIT_YEAR_RE = re.compile(
+    rf"(?<!\d)(\d{{1,2}})(?:st|nd|rd|th)?[_\-\s+]+({_MONTH_ALT})[_\-\s+]+(\d)[_\-\s+]+(20\d{{2}})",
+    re.IGNORECASE,
+)
+
+
+def _dates_from_wix_split_year(text: str) -> list[date]:
+    """GoDaddy/Wix filenames split 2026 as '2 2026' (St Michael the Archangel)."""
+    found: list[date] = []
+    for match in _WIX_SPLIT_YEAR_RE.finditer(text or ""):
+        year = int(match.group(4))
+        if str(year)[0] != match.group(3):
+            continue
+        month = _MONTH_MAP.get(match.group(2).lower())
+        if not month or not _is_plausible_bulletin_year(year):
+            continue
+        try:
+            found.append(date(year, month, int(match.group(1))))
+        except ValueError:
+            continue
+    return found
+
+
 def extract_date_from_slug(slug: str) -> date | None:
     """
     Extract a date from a URL slug like '5_april_2026' or '15-february-2026'.
@@ -681,6 +704,9 @@ def extract_date_from_slug(slug: str) -> date | None:
     later real month-name date (the Sunday). Returns None if no
     recognisable date pattern is found.
     """
+    split_year = _dates_from_wix_split_year(slug)
+    if split_year:
+        return max(split_year)
     found: list[date] = []
     for match in _SLUG_DATE_RE.finditer(slug or ""):
         parsed = _date_from_slug_match(match)

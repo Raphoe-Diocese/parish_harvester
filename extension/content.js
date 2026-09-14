@@ -1380,7 +1380,7 @@
     for (let depth = 0; depth < 6 && node; depth++) {
       const block = (node.innerText || node.textContent || "").trim().replace(/\s+/g, " ");
       if (
-        /\b\d{1,2}(?:st|nd|rd|th)?\s+(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+20\d{2}\b/i.test(
+        /\b\d{1,2}(?:st|nd|rd|th)?\s+(?:jan|feb|mar|apr|may|jun|jul|aug|sep|oct|nov|dec)[a-z]*\s+(?:\d\s+)?20\d{2}\b/i.test(
           block
         )
       ) {
@@ -1539,6 +1539,13 @@
     if (m) {
       const mo = _MONTH_ABBR_MAP[m[2].slice(0, 3)];
       if (mo) return { year: +m[3], month: mo, day: +m[1] };
+    }
+
+    // GoDaddy/Wix split year: 13th september 2 2026 (2026 broken as "2 2026")
+    m = s.match(/\b(\d{1,2})(?:st|nd|rd|th)?\s+([a-z]{3,9})\s+(\d)\s+(20\d{2})\b/);
+    if (m && m[3] === String(m[4])[0]) {
+      const mo = _MONTH_ABBR_MAP[m[2].slice(0, 3)];
+      if (mo) return { year: +m[4], month: mo, day: +m[1] };
     }
 
     // Ordinal with spaces: 24th may 2026, sunday 24th may 2026
