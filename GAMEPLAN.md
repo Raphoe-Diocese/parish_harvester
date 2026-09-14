@@ -17,6 +17,14 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 14/09/2026 — Toolbar ✕ stays closed
+
+**The real goal, in one sentence:** when Frank hits ✕ on the recipe toolbar, it does not pop back.
+
+**This turn:** ✕ clears the recording session and cancels the Open-site “keep showing” timers (they used to fire for 45s). Trainer **1.61.30**. Reload at chrome://extensions.
+
+**Next:** Frank Reloads and X’s the toolbar once. It must stay gone until he taps Show toolbar or Open site.
+
 ## 14/09/2026 — Problems console (fewer buttons)
 
 **The real goal, in one sentence:** Frank sees the next parish, two buttons, and what to do — extras stay under More.
