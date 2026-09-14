@@ -1,33 +1,56 @@
 {
-  "version": 2,
+  "version": 1,
   "parish_key": "donaghmoyne",
-  "harvest_note": "Blocked from GitHub runners (WAF/403). Needs a different network. Do not re-hunt weekly.",
   "display_name": "Donaghmoyne",
   "diocese": "clogher",
-  "start_url": "https://donaghmoyne.com/",
-  "site_type": "wp_json_newest_media",
-  "href_patterns": [
-    "sunday"
-  ],
-  "example_url": "https://donaghmoyne.com/wp-content/uploads/2026/08/21st-of-Ordinary-Time-Sunday-23rd-August-2026.pdf",
-  "playbook_type": "pdf_download_list",
-  "timeout_ms": 45000,
-  "total_timeout_s": 180,
-  "recorded_date": "2026-08-22",
+  "start_url": "https://donaghmoyne.com/category/parish-bulletin/",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://donaghmoyne.com/"
+      "action": "click",
+      "href": "https://donaghmoyne.com/13th-september-2026/",
+      "selector": "article#post-3143 > header > h2 > a",
+      "text": "13th September 2026 | 13th September 2026"
+    },
+    {
+      "action": "click",
+      "href": "https://donaghmoyne.com/13th-september-2026/",
+      "selector": "html > body > a:nth-of-type(2)",
+      "text": ""
+    },
+    {
+      "action": "click",
+      "selector": "a[href$='.pdf']",
+      "href": "https://donaghmoyne.com/wp-content/uploads/2026/09/24th-of-Ordinary-Time-Sunday-13th-September-2026.pdf",
+      "text": "24th of Ordinary Time Sunday 13th September 2026 | 24th of O",
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "a[href$='.pdf']",
+        "a[href*='.pdf']"
+      ]
+    },
+    {
+      "action": "download",
+      "url": "https://donaghmoyne.com/wp-content/uploads/2026/09/24th-of-Ordinary-Time-Sunday-13th-September-2026.pdf"
     }
   ],
+  "observed_load_ms": 1558.300048828125,
+  "timeout_ms": 55000,
+  "total_timeout_s": 490,
+  "playbook_type": "pdf_download_list",
+  "site_type": "pdf_link_list",
   "operator_notes": [
-    "wp-json newest on 22/08/2026 is 21st-of-Ordinary-Time-Sunday-23rd-August-2026.pdf (HTTP 200, 264145 bytes with a normal browser UA).",
-    "Some bare bots get HTTP 403 on the PDF. site_type:wp_json_newest_media uses the harvest UA.",
-    "2026-09-06: this-week file is 21st-of-Ordinary-Time-Sunday-6th-September-2026.pdf. wp-json can miss it; example_url predicted fallback rewrites the August slug + /YYYY/MM/. Do not pin the September filename."
+    "This page lists bulletin PDFs — the newest is usually at the top, but some parishes put it at the bottom.",
+    "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+    "Do not worry if the filename or date in the link text changes every week."
   ],
   "do_not": [
-    "Do not pin a dated filename.",
-    "Do not download wedding / GDPR / Order of Mass / parish-draw posters.",
-    "Do not harvest the shared Clontibret-Muckno file twice under clontibret."
-  ]
+    "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) — it breaks next week.",
+    "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  },
+  "recorded_date": "2026-09-14"
 }
