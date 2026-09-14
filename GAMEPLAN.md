@@ -17,6 +17,20 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 14/09/2026 — Problems console (fewer buttons)
+
+**The real goal, in one sentence:** Frank sees the next parish, two buttons, and what to do — extras stay under More.
+
+Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `actionable_keys`.
+
+**This turn:** card shows **Open site** + **Send & test** (and **Check result** only after Send & test). View bulletin / Test parish / GitHub / Remove sit under **More**. Harvest `harvest_note` is the What-to-do line. Filter reasons use plain English. Trainer **1.61.29**. Reload at chrome://extensions.
+
+**Not live on parishpress.ie** until merge + Pages zip + `scripts/refresh_local_trainer.ps1` + Reload.
+
+**Next:** Frank Reloads and says if the queue is clear enough. Do not start recipe success until he says so.
+
+**Parked:** recipe success (item 3); M1; Recipe Brain; 22 dioceses.
+
 ## 14/09/2026 — #214 closed; H2 + B4 proved on GitHub
 
 **#214 closed** 14/09/2026 13:57 UTC (superseded by [PR #228](https://github.com/Raphoe-Diocese/parish_harvester/pull/228) `bf5d072`). Do not merge #214 if it reappears.
