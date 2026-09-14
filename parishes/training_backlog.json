@@ -4909,13 +4909,13 @@
         "recorded_date": "2026-09-14"
       },
       "bulletin_format": "html",
-      "learned_pattern": "Wix HTML bulletin",
+      "learned_pattern": "",
       "host_profile": null,
-      "has_extension_diagnosis": true,
+      "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Recipe replay failed: WAF-flaky site https://www.stcolmcillesholywood.org/weekly-bulletins/ \u2014 could not fetch listing/post via plain-HTTP retries within budget (not a permanent block; retry later)",
+      "last_error": "Recipe replay failed: Recipe download step did not find a matching document URL",
       "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: WAF-flaky site https://www.stcolmcillesholywood.org/weekly-bulletins/ \u2014 could not fetch listing/post via plain-HTTP retries within budget "
+      "suggested_reason": "Recipe replay failed: Recipe download step did not find a matching document URL"
     },
     {
       "parish_key": "st-colmcilles",
@@ -5296,27 +5296,32 @@
       "diocese": "down_and_connor",
       "recipe_file": "parishes/recipes/down_and_connor/stpatricksbelfast.json",
       "recipe": {
-        "start_url": "https://www.stpatricksbelfast.org/category/weekly-bulletins/",
-        "site_type": "",
+        "start_url": "https://www.stpatricksbelfast.org/category/weekly-bulletins",
+        "site_type": "waf_retry_wordpress",
         "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 3,
-        "click_count": 2,
-        "has_terminal": true,
+        "step_count": 1,
+        "click_count": 0,
+        "has_terminal": false,
         "operator_notes": [],
-        "do_not": [],
-        "recorded_date": "2026-09-14"
+        "do_not": [
+          "Do not guess/hardcode next week's post slug \u2014 this parish skips weeks;",
+          "always scrape the real category archive for the newest real post.",
+          "Do not switch this back to a Playwright goto/click recipe \u2014 a full browser",
+          "was measurably less reliable than plain HTTP retries against this WAF."
+        ],
+        "recorded_date": "2026-08-10"
       },
-      "bulletin_format": "download",
+      "bulletin_format": "pdf_download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP 403 for https://www.stpatricksbelfast.org/category/weekly-bulletins/ \u2014 site may be blocking automated access (not a recipe/selector problem); headful fallback: Recipe replay failed: HTTP 403 for https://www.stpatr",
+      "last_error": "Recipe replay failed: WAF-flaky site https://www.stpatricksbelfast.org/category/weekly-bulletins \u2014 could not fetch listing/post via plain-HTTP retries within budget (not a permanent block; retry later)",
       "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP 403 for https://www.stpatricksbelfast.org/category/weekly-bulletins/ \u2014 site may be blocking automated access (not a recipe/selector p"
+      "suggested_reason": "Recipe replay failed: WAF-flaky site https://www.stpatricksbelfast.org/category/weekly-bulletins \u2014 could not fetch listing/post via plain-HTTP retries within bu"
     },
     {
       "parish_key": "stteresasparish",
