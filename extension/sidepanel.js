@@ -1275,7 +1275,30 @@ function _problemsBulletinDateFromStatus(item) {
   return match ? formatUkDate(match[1]) : "";
 }
 
+function _problemsCategoryLabel(category) {
+  const raw = String(category || "").replace(/^retrained — /i, "").trim();
+  const map = {
+    "bulletin too old (recipe worked)": "too old",
+    stale: "too old",
+    "recipe outdated": "recipe outdated",
+    "no recipe — wrong scrape": "no recipe",
+    "wrong file scraped": "wrong file",
+    "recipe replay failed": "recipe failed",
+    "recipe blocked": "blocked",
+    "no recipe on GitHub": "no recipe",
+    dns: "site not found",
+    ssl: "site certificate",
+    timeout: "timed out",
+    recipe_drift: "recipe missed the file",
+    no_pdf: "no PDF",
+    other: "other",
+    failed: "failed",
+  };
+  return map[raw] || raw.replace(/_/g, " ") || "other";
+}
+
 function _problemsPlainStatus(row) {
+  if (row?.retrainedPending) return "waiting for test";
   const outcome = String(row?.outcome || "").toLowerCase();
   const category = String(row?.category || "").toLowerCase();
   if (outcome === "stale" || category.includes("too old")) return "too old";
@@ -1288,6 +1311,7 @@ function _problemsPlainStatus(row) {
 
 function _problemsStatusClass(label) {
   const key = String(label || "").toLowerCase().replace(/\s+/g, "-");
+  if (key === "waiting-for-test") return "waiting";
   if (key === "too-old") return "too-old";
   if (key === "html-only") return "html-only";
   if (key === "no-pdf") return "no-pdf";
@@ -1368,9 +1392,7 @@ function _problemsRowsFromStatus(status, retrainedMap) {
       outcome: String(item.outcome || ""),
       bulletin_date: _problemsBulletinDateFromStatus(item),
       advice: _problemsFailureAdvice(errorText, diagnosis),
-      category: retrainedPending
-        ? `retrained — ${item.category || _problemsCategory(errorText, { retrainedPending, diagnosis })}`
-        : (item.category || _problemsCategory(errorText, { retrainedPending, diagnosis })),
+      category: item.category || _problemsCategory(errorText, { diagnosis }),
       last_seen: _problemsFormatLastSeen(item, status) || defaultLastSeen,
       consecutive_failures: Number(item.consecutive_failures || 0),
       retrainedPending,
@@ -1424,6 +1446,8 @@ function _pdStatusDot(parish) {
 function _problemsFailureAdvice(errorText, diagnosis) {
   const text = String(errorText || "");
   const diag = diagnosis && typeof diagnosis === "object" ? diagnosis : {};
+  const harvestNote = String(diag.harvest_note || "").trim();
+  if (harvestNote) return harvestNote;
   if (/Stale bulletin rejected/i.test(text)) {
     const rawDate = String(diag.bulletin_date || text.match(/bulletin date\s+([^,)]+)/i)?.[1] || "").trim();
     const date = rawDate.replace(/(\d{4})-(\d{2})-(\d{2})/, (_, y, m, d) => `${d}/${m}/${y}`);
@@ -2034,7 +2058,7 @@ function _problemsPopulateFilters(rows, prefs = {}) {
   for (const c of categories) {
     const opt = document.createElement("option");
     opt.value = c;
-    opt.textContent = c;
+    opt.textContent = _problemsCategoryLabel(c);
     categorySel.appendChild(opt);
   }
   const preferredDiocese = hasSavedDiocese
@@ -2242,16 +2266,6 @@ async function _problemsRenderRows(rows) {
     });
     actions.appendChild(openBtn);
 
-    const viewBtn = document.createElement("button");
-    viewBtn.type = "button";
-    viewBtn.className = "problems-view-btn";
-    viewBtn.textContent = "View bulletin";
-    viewBtn.title = "Open the harvest PDF in a new tab (on-screen pages — does not download)";
-    viewBtn.addEventListener("click", () => {
-      void _problemsOpenHarvestedPdf(row, ghRepo);
-    });
-    actions.appendChild(viewBtn);
-
     const sendBtn = document.createElement("button");
     sendBtn.type = "button";
     sendBtn.className = "problems-send-btn";
@@ -2272,7 +2286,26 @@ async function _problemsRenderRows(rows) {
     testBtn.addEventListener("click", () => {
       void _problemsVerifyHarvest(row, testBtn, { forceDispatch: !row.retrainedPending });
     });
-    actions.appendChild(testBtn);
+    if (row.retrainedPending) actions.appendChild(testBtn);
+
+    const more = document.createElement("details");
+    more.className = "problems-more";
+    const moreSum = document.createElement("summary");
+    moreSum.textContent = "More";
+    more.appendChild(moreSum);
+    const moreInner = document.createElement("div");
+    moreInner.className = "problems-more-actions";
+
+    const viewBtn = document.createElement("button");
+    viewBtn.type = "button";
+    viewBtn.className = "problems-view-btn";
+    viewBtn.textContent = "View bulletin";
+    viewBtn.title = "Open the harvest PDF in a new tab (on-screen pages — does not download)";
+    viewBtn.addEventListener("click", () => {
+      void _problemsOpenHarvestedPdf(row, ghRepo);
+    });
+    moreInner.appendChild(viewBtn);
+    if (!row.retrainedPending) moreInner.appendChild(testBtn);
 
     const recipeSlug = _pdDioceseSlug(row.diocese || "");
     if (recipeSlug && row.parish) {
@@ -2283,7 +2316,7 @@ async function _problemsRenderRows(rows) {
       ghLink.rel = "noopener noreferrer";
       ghLink.textContent = "GitHub";
       ghLink.title = "Open recipe JSON on GitHub";
-      actions.appendChild(ghLink);
+      moreInner.appendChild(ghLink);
     }
 
     const removeBtn = document.createElement("button");
@@ -2314,7 +2347,9 @@ async function _problemsRenderRows(rows) {
         }
       })();
     });
-    actions.appendChild(removeBtn);
+    moreInner.appendChild(removeBtn);
+    more.appendChild(moreInner);
+    actions.appendChild(more);
     card.appendChild(actions);
     list.appendChild(card);
   });
