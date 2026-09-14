@@ -335,7 +335,7 @@ https://www.antrimparish.com
         self.assertIn("run_tests:", workflow)
         self.assertIn("pip install pytest", workflow)
         self.assertIn("- name: Run tests", workflow)
-        self.assertIn("pytest -v --tb=short", workflow)
+        self.assertIn("python -m pytest -v --tb=short", workflow)
         self.assertIn("Upload harvest docs snapshot", workflow)
         self.assertIn("Rebuild diocese pages from latest main templates", workflow)
         self.assertIn("ocr/bulletin_layout.py", workflow)
@@ -343,6 +343,13 @@ https://www.antrimparish.com
             workflow.index("Rebuild diocese pages from latest main templates"),
             workflow.index("Upload harvest docs snapshot"),
         )
+        test_step = workflow.split("- name: Run tests", 1)[1].split("- name:", 1)[0]
+        self.assertNotIn("continue-on-error: true", test_step)
+        self.assertNotIn("Note test failures (harvest continues)", workflow)
+        self.assertIn("[skip ci]", workflow)
+        test_yml = (repo_root / ".github" / "workflows" / "test.yml").read_text(encoding="utf-8")
+        self.assertIn('pymupdf>=1.24.0', test_yml)
+        self.assertIn("[skip ci]", test_yml)
         self.assertIn("continue-on-error: true", workflow)
         self.assertIn("id: commit_harvest", workflow)
         self.assertIn("docs/mega_pdf/*_mega_bulletin.pdf", workflow)

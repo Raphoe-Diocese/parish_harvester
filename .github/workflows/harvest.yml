@@ -97,16 +97,10 @@ jobs:
 
       - name: Run tests
         if: github.event_name != 'workflow_dispatch' || github.event.inputs.run_tests == 'true'
-        continue-on-error: true
         id: tests
         run: |
           set -euo pipefail
-          pytest -v --tb=short
-
-      - name: Note test failures (harvest continues)
-        if: steps.tests.outcome == 'failure'
-        run: |
-          echo "::warning::Tests failed — harvest will still run. Fix tests soon; see test.yml on push."
+          python -m pytest -v --tb=short
 
       - name: Autofix recipes before harvest
         if: github.event_name != 'workflow_dispatch' || github.event.inputs.target_parish == ''
