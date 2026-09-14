@@ -17,11 +17,17 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
-## 13/09/2026 — C5 executable JS test (this turn)
+## 14/09/2026 — Full harvest running; tick live page rows while we wait
 
-**F2/F3 merged:** [PR #224](https://github.com/Raphoe-Diocese/parish_harvester/pull/224) `ea70713`. Standalone `-ocr.html` exempt from 850/450. Phone-PDF rows ticked only where the 10/09 audit or live homepage proved them. Docs only — no live page change.
+**Harvest:** [Harvest full 34822202023](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34822202023) still on **Run Bulletin Harvester** (started 09:20 Irish). Do not run harvest on this laptop. OCR starts by itself after **Harvest full**. S1/S2/A5/E1/E2 stay **not live** until that + Pages.
 
-**Now — C5:** Node test in `test.yml` — `pollHarvestUntilDone` is ok only when `last_tested_at` changes; every `sendMessage({type})` in content/sidepanel has a handler. Proof: green `test.yml` with that Node step.
+**This turn while waiting:** backlog ticks only where live URLs were opened — Tap to enlarge gone, Show PDF gone, pageWidth no 720, Drumholm (Ballintra), Gortahork has no trailing Inver header, Clogher page exists, Derry search sticky after typing Waterside. Phone PDF rows still need Frank. Do not merge H2 #211 or B4 #214 until this harvest commit lands. H1 Ardara/Inver date parse is already on `main` (tests in `test_bulletin_freshness.py`).
+
+## 13/09/2026 — C5 executable JS test
+
+**C5 merged:** [PR #225](https://github.com/Raphoe-Diocese/parish_harvester/pull/225) `9720d9c`. Proof: [test.yml run 34786329017](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34786329017) — step **Run extension JavaScript tests** succeeded. Grok plan cards through C5 are on `main`. Do not start M1 unless megas are still slow. Do not merge H2 #211 or B4 #214 unless Frank names them.
+
+**F2/F3 merged:** [PR #224](https://github.com/Raphoe-Diocese/parish_harvester/pull/224) `ea70713`. Docs only.
 
 ## 13/09/2026 — F2/F3 backlog pages
 
