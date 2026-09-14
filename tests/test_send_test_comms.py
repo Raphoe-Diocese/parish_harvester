@@ -46,7 +46,7 @@ class SendTestCommsTests(unittest.TestCase):
 
     def test_manifest_bumped_for_extension_js(self) -> None:
         text = MANIFEST.read_text(encoding="utf-8")
-        self.assertIn('"version": "1.61.31"', text)
+        self.assertIn('"version": "1.61.33"', text)
         content = (REPO / "extension" / "content.js").read_text(encoding="utf-8")
         self.assertIn("Noted — refresh Problems to check GitHub", content)
         self.assertNotIn("you confirmed the PDF. Recorded on GitHub", content)
@@ -95,6 +95,9 @@ class SendTestCommsTests(unittest.TestCase):
     def test_send_test_uses_saved_recipe_when_local_steps_incomplete(self) -> None:
         content = CONTENT_JS.read_text(encoding="utf-8")
         self.assertIn("const _recipeStepsAreComplete", content)
+        self.assertIn("const _mergeWafExamplePostUrl", content)
+        self.assertIn("const _githubRecipeIsHarvestReady", content)
+        self.assertIn("This week's post is on GitHub", content)
         self.assertIn("Using the saved recipe — testing this parish only. No re-train.", content)
         self.assertIn("This does not overwrite the recipe.", content)
         self.assertIn("tap Send & test to run the saved recipe.", content)

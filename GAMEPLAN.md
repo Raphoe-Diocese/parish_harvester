@@ -17,6 +17,38 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 14/09/2026 — Trainer audit: why Frank’s fixes “vanish” (proved on GitHub)
+
+**The real goal, in one sentence:** when Frank fixes a parish in the trainer, the fix and its result stay on GitHub.
+
+**Proof (GitHub API 14/09 ~17:50):** 13 recipe commits by Frankytyrone 15:19–16:16 UTC and 30 single-parish runs today. His pushes **did** land. But 8 runs that ended **success** (St Patrick’s 34867602696, Holywood, Ardkeen, St Oliver, Glenavy, Iskaheen, Ballycastle, St Anne’s) left their `parish_status.json` row at **10/09** — the next overlapping run’s whole-file conflict copy (`harvester/mega_pdf_git.py`) overwrote them. And his 16:16 St Patrick’s push wiped `site_type: waf_retry_wordpress`, `harvest_note`, `post_slug_patterns`, `do_not` (`pushRecipe` spreads `{}` when steps change). Holywood lost `example_post_url` the same way; two repo tests now read broken data.
+
+**Written:** Grok cards **T1–T8** in [`docs/GROK_PLAN_2026-09-12.md`](docs/GROK_PLAN_2026-09-12.md) §7. Order: T1 (rows must not overwrite each other) → T2 (push keeps engine fields + restore St Patrick/Holywood) → T3 (land 1.61.32 + #232) → T4 version banner → T5 honest Check result → T6 no dated start_url → T7 kit one-line → T8 toolbar.
+
+**Next:** Frank pastes T1 to Grok and says go. Nothing on GitHub from this turn yet.
+
+## 14/09/2026 — Trainer: Yes must reach GitHub
+
+**The real goal, in one sentence:** Frank finds this week’s bulletin, taps Yes then Send & test, and that find is on GitHub — the trainer does the save, not a later agent patch.
+
+**Why it felt ignored:** Yes on a picture-post recorded a click. Send & test then either blocked him or tested the old recipe and threw the find away. Agent files on this PC are not GitHub.
+
+**This turn:** Trainer **1.61.32**. Yes on a dated HTML post saves `example_post_url`. Send & test writes it to GitHub and starts harvest. WAF recipes can test without a fake PDF step. Diagnosis says Send & test, not “open the image in a new tab.”
+
+**Next:** Frank Reloads so the card says **1.61.32**. On St Gerard: Find bulletin → Yes → Send & test. Watch Problems. Say **PR** so 1.61.32 is on GitHub.
+
+**Parked:** me fixing every problem parish by hand; Recipe Brain; 22 dioceses; rewriting the whole trainer.
+
+## 14/09/2026 — St Gerard’s (Sunday Message image)
+
+**The real goal, in one sentence:** harvest this week’s Sunday Message scan, without training a new-tab image click.
+
+Live post (opened 14/09/2026): https://stgerardsparish.org/sunday-message-13th-sept-2026/ — title **Sunday Message: 13th Sept 2026**. The bulletin is a PNG on that page, not a PDF. Trainer cannot follow “image opens in a new tab.”
+
+**This turn:** diagnosis saved. Recipe keeps `waf_retry_wordpress` and listing start_url. Added `sunday-message-` to slug patterns and `example_post_url` (shape only). Do not Send & test the click.
+
+**Next:** say **PR** if this should go to GitHub. Do not re-hunt weekly. GitHub harvest can still WAF-fail.
+
 ## 14/09/2026 — St Michael the Archangel (GoDaddy date)
 
 **The real goal, in one sentence:** harvest this week’s Parish Bulletin, not 7 June, and do not read “13th September 2 2026” as 02/09/2026.

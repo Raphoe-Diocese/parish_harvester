@@ -134,6 +134,148 @@ class MegaPdfGitConflictTests(unittest.TestCase):
         self.assertNotIn(b"MAIN-OLD", derry)
         self.assertIn(b"HARVEST-NEW", docs_derry)
 
+    def _commit_status(self, rows: dict, message: str, *, patched_at: str) -> None:
+        """Write parish_status.json + report.json the way one harvest run would."""
+        import json
+
+        status = self.root / "parishes" / "parish_status.json"
+        status.parent.mkdir(parents=True, exist_ok=True)
+        parishes = {
+            key: {
+                "outcome": outcome,
+                "last_tested_at": tested,
+                "actionable": outcome != "ok",
+            }
+            for key, (outcome, tested) in rows.items()
+        }
+        status.write_text(
+            json.dumps(
+                {
+                    "schema_version": 1,
+                    "target_date": "2026-09-13",
+                    "generated_at": patched_at,
+                    "last_patched_at": patched_at,
+                    "summary": {},
+                    "parishes": parishes,
+                    "actionable_keys": sorted(k for k, r in parishes.items() if r["actionable"]),
+                },
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        report = self.root / "Bulletins" / "report.json"
+        report.parent.mkdir(parents=True, exist_ok=True)
+        downloaded = [
+            {"parish": key, "last_tested_at": tested}
+            for key, (outcome, tested) in rows.items()
+            if outcome == "ok"
+        ]
+        failed = [
+            {"parish": key, "last_tested_at": tested, "error": "x"}
+            for key, (outcome, tested) in rows.items()
+            if outcome != "ok"
+        ]
+        report.write_text(
+            json.dumps(
+                {
+                    "target_date": "2026-09-13",
+                    "last_patched_at": patched_at,
+                    "downloaded": downloaded,
+                    "html_links": [],
+                    "skipped": [],
+                    "failed": failed,
+                    "stale_rejected": [],
+                },
+                indent=2,
+            )
+            + "\n",
+            encoding="utf-8",
+        )
+        failures = self.root / "parishes" / "consecutive_failures.json"
+        failures.write_text(
+            json.dumps({k: (0 if o == "ok" else 1) for k, (o, _t) in rows.items()}, indent=2),
+            encoding="utf-8",
+        )
+        _git(self.root, "add", "-A")
+        _git(self.root, "commit", "-m", message)
+
+    def test_single_parish_rebase_keeps_the_other_tests_row(self) -> None:
+        """14/09/2026: stpatricksbelfast pushed 16:18, parishofbright (older
+        checkout) pushed 16:26 and copied its whole file over it. Rows for
+        eight Send & tests went back to 10/09. Row merge must stop that."""
+        import json
+
+        old = "2026-09-10T12:53:56+00:00"
+        self._commit_status(
+            {"stpatricksbelfast": ("failed", old), "parishofbright": ("failed", old)},
+            "shared status",
+            patched_at=old,
+        )
+        # Bright's run starts from the shared checkout.
+        _git(self.root, "checkout", "-b", "bright")
+        self._commit_status(
+            {
+                "stpatricksbelfast": ("failed", old),
+                "parishofbright": ("failed", "2026-09-14T16:26:00+00:00"),
+            },
+            "bright test",
+            patched_at="2026-09-14T16:26:00+00:00",
+        )
+        # Meanwhile St Patrick's run already landed on main.
+        _git(self.root, "checkout", "main")
+        self._commit_status(
+            {
+                "stpatricksbelfast": ("ok", "2026-09-14T16:18:00+00:00"),
+                "parishofbright": ("failed", old),
+            },
+            "stpatricks test",
+            patched_at="2026-09-14T16:18:00+00:00",
+        )
+
+        _git(self.root, "checkout", "bright")
+        rebase_keeping_harvest_megas(self.root, "main", target_parish="parishofbright")
+
+        status = json.loads(
+            (self.root / "parishes" / "parish_status.json").read_text(encoding="utf-8")
+        )
+        rows = status["parishes"]
+        self.assertEqual(rows["stpatricksbelfast"]["last_tested_at"], "2026-09-14T16:18:00+00:00")
+        self.assertEqual(rows["stpatricksbelfast"]["outcome"], "ok")
+        self.assertEqual(rows["parishofbright"]["last_tested_at"], "2026-09-14T16:26:00+00:00")
+        self.assertEqual(status["last_patched_at"], "2026-09-14T16:26:00+00:00")
+        self.assertEqual(status["summary"]["ok"], 1)
+        self.assertEqual(status["actionable_keys"], ["parishofbright"])
+
+        report = json.loads(
+            (self.root / "Bulletins" / "report.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual([i["parish"] for i in report["downloaded"]], ["stpatricksbelfast"])
+        self.assertEqual([i["parish"] for i in report["failed"]], ["parishofbright"])
+        self.assertEqual(report["failed"][0]["last_tested_at"], "2026-09-14T16:26:00+00:00")
+
+        failures = json.loads(
+            (self.root / "parishes" / "consecutive_failures.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(failures, {"stpatricksbelfast": 0, "parishofbright": 1})
+        self.assertEqual(_git(self.root, "status", "--porcelain").stdout.strip(), "")
+
+    def test_full_harvest_rebase_still_keeps_whole_file(self) -> None:
+        old = "2026-09-10T12:53:56+00:00"
+        self._commit_status({"a": ("failed", old)}, "shared", patched_at=old)
+        _git(self.root, "checkout", "-b", "harvest")
+        self._commit_status({"a": ("ok", "2026-09-14T08:00:00+00:00")}, "full", patched_at="2026-09-14T08:00:00+00:00")
+        _git(self.root, "checkout", "main")
+        self._commit_status({"a": ("failed", "2026-09-14T07:00:00+00:00")}, "single", patched_at="2026-09-14T07:00:00+00:00")
+        _git(self.root, "checkout", "harvest")
+        rebase_keeping_harvest_megas(self.root, "main")
+        import json
+
+        status = json.loads(
+            (self.root / "parishes" / "parish_status.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(status["parishes"]["a"]["outcome"], "ok")
+
     def test_rebase_helper_restores_snapshot_on_add_add(self) -> None:
         _git(self.root, "checkout", "-b", "harvest")
         self._commit_pdfs(b"HARVEST-NEW", "harvest megas")

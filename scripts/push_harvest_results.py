@@ -14,6 +14,7 @@ Usage:
 from __future__ import annotations
 
 import argparse
+import os
 import sys
 from pathlib import Path
 
@@ -29,12 +30,18 @@ def main() -> None:
     parser.add_argument("--remote", default="origin")
     parser.add_argument("--branch", default="main")
     parser.add_argument("--attempts", type=int, default=5)
+    parser.add_argument(
+        "--target-parish",
+        default=os.environ.get("TARGET_PARISH", ""),
+        help="Single-parish test key: merge only this parish's status row.",
+    )
     args = parser.parse_args()
     push_with_mega_conflict_retry(
         REPO,
         remote=args.remote,
         branch=args.branch,
         attempts=args.attempts,
+        target_parish=(args.target_parish or "").strip().lower() or None,
     )
 
 

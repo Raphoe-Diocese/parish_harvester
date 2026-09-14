@@ -19,6 +19,7 @@
   let recipeSteps = []; // single source of truth for both UI preview and standalone recipe push
   const LONG_BULLETIN_MAX_PAGES = 16;
   let allowLongBulletin = false;
+  let _pendingExamplePostUrl = "";
 
   const _setAllowLongBulletin = (on) => {
     allowLongBulletin = Boolean(on);
@@ -257,6 +258,7 @@
       steps: _serializeRecipeSteps(),
       updatedAt: Date.now(),
       allowLongBulletin: Boolean(allowLongBulletin),
+      examplePostUrl: _pendingExamplePostUrl || prev.examplePostUrl || "",
       ...extra,
     };
     await _storageSet({
@@ -291,6 +293,7 @@
   };
 
   const _clearRecordingSession = async () => {
+    _pendingExamplePostUrl = "";
     const host = _hostnameFromUrl(_pageUrlForParishDetection());
     const map = await _getRecordingSessionsMap();
     if (host) delete map[host];
@@ -668,6 +671,7 @@
     standaloneStartUrl =
       session.startUrl && _hostsMatch(session.startUrl, pageUrl) ? session.startUrl : pageUrl;
     allowLongBulletin = Boolean(session.allowLongBulletin);
+    _pendingExamplePostUrl = String(session.examplePostUrl || "").trim();
 
     if (session.fixNow) {
       await _applyFixNowToolbar({
@@ -1994,6 +1998,56 @@
     if (isDocumentUrl(url)) return true;
     if (/\.pdf(\?|$)/i.test(url)) return true;
     return false;
+  };
+
+  const _absoluteHttpUrl = (href) => {
+    const raw = String(href || "").trim();
+    if (!raw) return "";
+    try {
+      return new URL(raw, window.location.href).href;
+    } catch (_e) {
+      return raw;
+    }
+  };
+
+  const _slugPrefixFromDatedPostUrl = (url) => {
+    try {
+      const leaf = new URL(url).pathname.replace(/\/+$/, "").split("/").pop() || "";
+      const stripped = leaf.replace(/-?\d{1,2}(?:st|nd|rd|th)?-.*$/i, "-");
+      return /^[a-z0-9]+(?:-[a-z0-9]+)*-$/i.test(stripped) ? stripped.toLowerCase() : "";
+    } catch (_e) {
+      return "";
+    }
+  };
+
+  const _urlLooksLikeDatedHtmlPost = (url) => {
+    const abs = _absoluteHttpUrl(url);
+    if (!abs || _urlLooksLikeDirectPdf(abs)) return false;
+    if (/\.(pdf|docx?|jpe?g|png|webp)(?:$|[?#])/i.test(abs)) return false;
+    try {
+      const parsed = new URL(abs);
+      if (_hostnameFromUrl(parsed.href) !== _hostnameFromUrl(window.location.href)) return false;
+    } catch (_e) {
+      return false;
+    }
+    return /\d{1,2}(?:st|nd|rd|th)?[-_/].*20\d{2}|20\d{2}/i.test(abs);
+  };
+
+  const _mergeWafExamplePostUrl = (recipe, postUrl) => {
+    const href = String(postUrl || "").trim();
+    if (!recipe || typeof recipe !== "object" || !href) return recipe;
+    const next = { ...recipe, example_post_url: href };
+    const prefix = _slugPrefixFromDatedPostUrl(href);
+    const patterns = Array.isArray(next.post_slug_patterns)
+      ? next.post_slug_patterns.map((p) => String(p || "").trim()).filter(Boolean)
+      : [];
+    if (
+      prefix &&
+      !patterns.some((p) => prefix === p || prefix.startsWith(p) || p.startsWith(prefix))
+    ) {
+      next.post_slug_patterns = [prefix, ...patterns];
+    }
+    return next;
   };
 
   const _CLOUD_DATE_YY_MM_DD_RE = /(?<!\d)(\d{2})\.(\d{2})\.(\d{2})(?:\.pdf)?(?!\d)/i;
@@ -4348,6 +4402,13 @@
       );
     };
 
+    const _githubRecipeIsHarvestReady = (recipe) => {
+      if (!recipe || typeof recipe !== "object") return false;
+      const site = String(recipe.site_type || "").toLowerCase();
+      if (site === "waf_retry_wordpress") return true;
+      return _recipeStepsAreComplete(recipe.steps);
+    };
+
     const _ensureTerminalPdfStep = () => {
       const recorded = _standaloneRecipeSteps();
       const last = recorded[recorded.length - 1];
@@ -4792,6 +4853,19 @@
         { action: "click", selector, href, text },
         selectedEl
       );
+      const absHref = _absoluteHttpUrl(href);
+      const htmlPostPick = _urlLooksLikeDatedHtmlPost(absHref);
+      if (!openAfter && htmlPostPick) {
+        _pendingExamplePostUrl = absHref;
+        void _persistRecordingSession({ examplePostUrl: absHref });
+        showStatus(
+          "✅ This week's post saved. Tap Send & test — it goes to GitHub. No new tab.",
+          "ok"
+        );
+        resetGuidedPanel();
+        return true;
+      }
+
       const autoHarvestDownload =
         Boolean(clickStep.pick_strategy) ||
         _looksLikeBulletinDownloadUrl(href, text);
@@ -8039,7 +8113,88 @@
         }
         if (!_recipeStepsAreComplete(_standaloneRecipeSteps())) {
           const loadedSaved = await loadRecipeFromRawGithub(key, diocese);
-          if (_recipeStepsAreComplete(loadedSaved?.recipe?.steps)) {
+          const sessionNow = await _getRecordingSessionForCurrentHost();
+          const pendingPost = String(
+            _pendingExamplePostUrl || sessionNow?.examplePostUrl || ""
+          ).trim();
+          if (pendingPost && loadedSaved?.recipe) {
+            const settings = await _storageGet(["gh_pat", "gh_repo"]);
+            if (!settings.gh_pat) {
+              showStatus("❌ GitHub PAT not configured. Open extension popup → Settings.", "error");
+              return;
+            }
+            const pushMod = globalThis.phGithubRecipePush;
+            if (!pushMod?.pushRecipe || !pushMod?.dispatchHarvestTest) {
+              showStatus("❌ Reload extension (chrome://extensions) then refresh this page.", "error");
+              return;
+            }
+            pushBtn.disabled = true;
+            pushBtn.textContent = "⏳ Saving this week's post…";
+            showStatus("⏳ Writing this week's post to GitHub, then testing…", "info");
+            try {
+              const merged = _mergeWafExamplePostUrl(loadedSaved.recipe, pendingPost);
+              const pushResult = await pushMod.pushRecipe({
+                gh_pat: settings.gh_pat,
+                gh_repo: settings.gh_repo,
+                parish_key: key,
+                recipe: merged,
+              });
+              if (!pushResult.ok) {
+                showStatus(`❌ ${pushResult.error || "GitHub did not save this week's post."}`, "error");
+                return;
+              }
+              const dispatchAt = Date.now();
+              let previousTestedAt = "";
+              try {
+                const statusDoc = await pushMod.fetchParishStatusJson({
+                  gh_pat: settings.gh_pat,
+                  gh_repo: settings.gh_repo,
+                });
+                previousTestedAt = String(statusDoc?.parishes?.[key]?.last_tested_at || "").trim();
+              } catch (_e) {
+                previousTestedAt = "";
+              }
+              const dispatchResult = await pushMod.dispatchHarvestTest({
+                gh_pat: settings.gh_pat,
+                gh_repo: settings.gh_repo,
+                parish_key: key,
+                diocese: merged.diocese || loadedSaved.recipe.diocese || diocese,
+              });
+              if (!dispatchResult.ok) {
+                showStatus(`❌ Post saved on GitHub, but test did not start: ${dispatchResult.error}`, "error");
+                return;
+              }
+              showStatus(
+                "✅ This week's post is on GitHub. Test started (1–3 min). Watch Problems.",
+                "ok"
+              );
+              try {
+                chrome.runtime.sendMessage({
+                  type: "problems_refresh",
+                  parish_key: key,
+                  display_name: name || key,
+                });
+              } catch (_e) {
+                // Side panel may be closed.
+              }
+              if (typeof _startPostPushHarvestWatch === "function") {
+                _startPostPushHarvestWatch(
+                  key,
+                  name || key,
+                  { filePath: pushResult.filePath || loadedSaved.filePath || "" },
+                  dispatchAt,
+                  previousTestedAt
+                );
+              }
+            } catch (err) {
+              showStatus(`❌ ${err.message || err}`, "error");
+            } finally {
+              pushBtn.disabled = false;
+              pushBtn.textContent = "🚀 Send & test on GitHub";
+            }
+            return;
+          }
+          if (_githubRecipeIsHarvestReady(loadedSaved?.recipe)) {
             const settings = await _storageGet(["gh_pat", "gh_repo"]);
             if (!settings.gh_pat) {
               showStatus("❌ GitHub PAT not configured. Open extension popup → Settings.", "error");
@@ -8211,7 +8366,9 @@
           if (response.dispatchOk) {
             dispatchErrorBanner.style.display = "none";
             showStatus(
-              `✅ Recipe ${verb}! Saved — test on GitHub (usually 1–3 min, not the mega PDF).`,
+              response.keptEngineRecipe
+                ? "✅ Saved this week's post to GitHub. Browsers are blocked on this site, so the plain-HTTP recipe was kept — test running."
+                : `✅ Recipe ${verb}! Saved — test on GitHub (usually 1–3 min, not the mega PDF).`,
               "ok"
             );
             showPostPushBanner(
@@ -8423,6 +8580,7 @@
               dispatchPending: false,
               stepsPushed: Array.isArray(recipeToPush.steps) ? recipeToPush.steps.length : 0,
               stepsPreservedFromOld: false,
+              keptEngineRecipe: Boolean(pushResult.keptEngineRecipe),
             };
             _logSaveCycle("push_recipe", { parish_key: key, recipe: recipeToPush }, response);
             _finishPushUi(response, { isFollowup: false });
@@ -9291,6 +9449,7 @@
       in_standalone_mode: _inStandaloneMode(),
       toolbar_visible: Boolean(_getToolbarNode() && _getToolbarNode().style.display !== "none"),
       last_auto_terminal: globalThis.__phLastAutoTerminal || null,
+      example_post_url: _pendingExamplePostUrl || "",
     };
   };
 

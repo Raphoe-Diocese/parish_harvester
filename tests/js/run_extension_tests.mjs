@@ -28,6 +28,8 @@ function loadGithubRecipePush(fetchImpl) {
     btoa,
     encodeURIComponent,
     decodeURIComponent,
+    TextEncoder,
+    TextDecoder,
     console,
   };
   sandbox.globalThis = sandbox;
@@ -198,9 +200,114 @@ function testMessageHandlers() {
   console.log(`ok: ${sent.size} sendMessage types have handlers (${[...sent].sort().join(", ")})`);
 }
 
+// 14/09/2026: Send & test on St Patrick's Belfast replaced the whole
+// waf_retry_wordpress recipe with 3 Playwright clicks and no site_type.
+// The harvester then 403'd. pushRecipe must keep engine fields.
+function makePushFetch(existingRecipe, putLog) {
+  const encoded = Buffer.from(JSON.stringify(existingRecipe), "utf8").toString("base64");
+  return async (url, init = {}) => {
+    const href = String(url);
+    const method = String(init.method || "GET").toUpperCase();
+    if (href.includes("/contents/parishes/recipes/down_and_connor/stpatricksbelfast.json")) {
+      if (method === "GET") {
+        return jsonResponse({ sha: "abc123", content: encoded, encoding: "base64" });
+      }
+      if (method === "PUT") {
+        const body = JSON.parse(init.body);
+        putLog.push(JSON.parse(Buffer.from(body.content, "base64").toString("utf8")));
+        return jsonResponse({ content: { html_url: "https://github.com/x/y/blob/main/r.json" } });
+      }
+    }
+    if (href.includes("/contents/parishes/recipes/")) {
+      return jsonResponse({ message: "Not Found" }, 404);
+    }
+    return jsonResponse({}, 404);
+  };
+}
+
+async function testPushKeepsEngineRecipe() {
+  const existing = {
+    parish_key: "stpatricksbelfast",
+    display_name: "St Patrick's, Belfast",
+    diocese: "down_and_connor",
+    start_url: "https://www.stpatricksbelfast.org/category/weekly-bulletins",
+    steps: [{ action: "goto", url: "https://www.stpatricksbelfast.org/category/weekly-bulletins" }],
+    site_type: "waf_retry_wordpress",
+    post_slug_patterns: ["weekly-bulletin-for-sunday-"],
+    harvest_note: "WAF blocks browsers; plain HTTP only.",
+    do_not: ["Do not switch to Playwright clicks."],
+  };
+  const putLog = [];
+  const mod = loadGithubRecipePush(makePushFetch(existing, putLog));
+  const clickRecipe = {
+    parish_key: "stpatricksbelfast",
+    display_name: "St Patrick's, Belfast",
+    diocese: "down_and_connor",
+    start_url:
+      "https://www.stpatricksbelfast.org/weekly-bulletins/weekly-bulletin-for-sunday-13-september-2026/",
+    steps: [
+      {
+        action: "click",
+        href: "https://www.stpatricksbelfast.org/weekly-bulletins/weekly-bulletin-for-sunday-13-september-2026/",
+        selector: "a",
+      },
+      { action: "print_to_pdf" },
+    ],
+  };
+  const res = await mod.pushRecipe({
+    gh_pat: "ghp_test",
+    gh_repo: "Raphoe-Diocese/parish_harvester",
+    parish_key: "stpatricksbelfast",
+    recipe: clickRecipe,
+  });
+  assert.strictEqual(res.ok, true, res.error);
+  assert.strictEqual(res.keptEngineRecipe, true, "engine recipe should be kept");
+  assert.strictEqual(putLog.length, 1, "one PUT expected");
+  const pushed = putLog[0];
+  assert.strictEqual(pushed.site_type, "waf_retry_wordpress");
+  assert.deepStrictEqual(pushed.post_slug_patterns, ["weekly-bulletin-for-sunday-"]);
+  assert.strictEqual(pushed.harvest_note, existing.harvest_note);
+  assert.deepStrictEqual(pushed.do_not, existing.do_not);
+  assert.strictEqual(pushed.start_url, existing.start_url, "start_url must stay the listing");
+  assert.deepStrictEqual(pushed.steps, existing.steps, "Playwright clicks must not replace the engine steps");
+  assert.strictEqual(pushed.example_post_url, clickRecipe.steps[0].href);
+  console.log("ok: pushRecipe keeps waf_retry_wordpress recipe and saves example_post_url");
+
+  // Plain recipe (no engine site_type): new steps win, other fields survive.
+  const plain = {
+    parish_key: "stpatricksbelfast",
+    display_name: "St Patrick's, Belfast",
+    diocese: "down_and_connor",
+    start_url: "https://example.org/bulletins",
+    steps: [{ action: "goto", url: "https://example.org/bulletins" }],
+    timeout_ms: 45000,
+    harvest_note: "Keep me.",
+  };
+  const putLog2 = [];
+  const mod2 = loadGithubRecipePush(makePushFetch(plain, putLog2));
+  const res2 = await mod2.pushRecipe({
+    gh_pat: "ghp_test",
+    gh_repo: "Raphoe-Diocese/parish_harvester",
+    parish_key: "stpatricksbelfast",
+    recipe: {
+      parish_key: "stpatricksbelfast",
+      start_url: "https://example.org/bulletins",
+      steps: [{ action: "click", selector: "a.pdf" }, { action: "download" }],
+    },
+  });
+  assert.strictEqual(res2.ok, true, res2.error);
+  assert.strictEqual(res2.keptEngineRecipe, false);
+  assert.strictEqual(putLog2[0].steps.length, 2);
+  assert.strictEqual(putLog2[0].timeout_ms, 45000, "timeout_ms must survive a steps push");
+  assert.strictEqual(putLog2[0].harvest_note, "Keep me.");
+  assert.strictEqual(putLog2[0].display_name, plain.display_name);
+  console.log("ok: pushRecipe replaces steps but keeps the other recipe fields");
+}
+
 async function main() {
   testMessageHandlers();
   await testPollHarvestUntilDone();
+  await testPushKeepsEngineRecipe();
   console.log("C5 extension JS tests passed");
 }
 

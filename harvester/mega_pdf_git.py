@@ -23,12 +23,22 @@ Rebase vs merge (git's ours/theirs is reversed):
 
 from __future__ import annotations
 
+import json
 import os
 import shutil
 import subprocess
 import tempfile
 from collections.abc import Callable
 from pathlib import Path
+
+# Status files a single-parish run may only patch row-by-row (never whole-file).
+SINGLE_PARISH_ROW_FILES = frozenset(
+    {
+        "parishes/parish_status.json",
+        "Bulletins/report.json",
+        "parishes/consecutive_failures.json",
+    }
+)
 
 MEGA_PDF_DIR_NAMES = ("mega_pdf", "docs/mega_pdf")
 MEGA_PDF_PREFIXES = tuple(f"{name}/" for name in MEGA_PDF_DIR_NAMES)
@@ -142,6 +152,40 @@ def harvest_side_flag(repo: Path) -> str:
     return "--ours"
 
 
+def upstream_side_flag(repo: Path) -> str:
+    """Checkout flag that selects the remote (already pushed) version."""
+    return "--ours" if harvest_side_flag(repo) == "--theirs" else "--theirs"
+
+
+def _load_json_file(path: Path) -> dict:
+    try:
+        data = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, ValueError):
+        return {}
+    return data if isinstance(data, dict) else {}
+
+
+def merge_single_parish_row_file(rel_path: str, upstream: dict, mine: dict, parish_key: str) -> dict:
+    """Merge one status file so only *parish_key* changes relative to *upstream*."""
+    normalized = _normalize_repo_path(rel_path)
+    if normalized == "parishes/parish_status.json":
+        from harvester.parish_status import merge_single_parish_status
+
+        return merge_single_parish_status(upstream, mine, parish_key)
+    if normalized == "Bulletins/report.json":
+        from harvester.report import merge_single_parish_report
+
+        return merge_single_parish_report(upstream, mine, parish_key)
+    out = dict(upstream) if isinstance(upstream, dict) else {}
+    key = str(parish_key or "").strip()
+    if key:
+        if key in mine:
+            out[key] = mine[key]
+        else:
+            out.pop(key, None)
+    return out
+
+
 def unmerged_paths(repo: Path) -> list[str]:
     out = _run_git(repo, ["diff", "--name-only", "--diff-filter=U"]).stdout
     return [line.strip().replace("\\", "/") for line in out.splitlines() if line.strip()]
@@ -230,6 +274,7 @@ def _resolve_conflicts_for(
     *,
     snapshot: Path | None,
     keep: Callable[[str], bool],
+    target_parish: str | None = None,
 ) -> tuple[list[str], list[str]]:
     unresolved = unmerged_paths(repo)
     matched = [path for path in unresolved if keep(path)]
@@ -238,10 +283,21 @@ def _resolve_conflicts_for(
         return [], leftover
 
     flag = harvest_side_flag(repo)
+    parish = str(target_parish or "").strip().lower()
     for path in matched:
         dest = repo / path
         snap_file = (snapshot / path) if snapshot is not None else None
-        if snap_file is not None and snap_file.is_file():
+        if parish and _normalize_repo_path(path) in SINGLE_PARISH_ROW_FILES:
+            # Single-parish test: keep everything already on main and move
+            # only this parish's row. Whole-file copies erased other tests.
+            _run_git(repo, ["checkout", upstream_side_flag(repo), "--", path])
+            upstream = _load_json_file(dest)
+            mine_path = snap_file if (snap_file is not None and snap_file.is_file()) else None
+            mine = _load_json_file(mine_path) if mine_path else {}
+            merged = merge_single_parish_row_file(path, upstream, mine, parish)
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.write_text(json.dumps(merged, indent=2), encoding="utf-8")
+        elif snap_file is not None and snap_file.is_file():
             dest.parent.mkdir(parents=True, exist_ok=True)
             shutil.copy2(snap_file, dest)
         else:
@@ -264,13 +320,19 @@ def resolve_mega_pdf_conflicts(
 def resolve_harvest_output_conflicts(
     repo: Path,
     snapshot: Path | None = None,
+    *,
+    target_parish: str | None = None,
 ) -> tuple[list[str], list[str]]:
     """Resolve generated harvest-output conflicts so this job's files win.
 
-    Recipes, harvester code, and other source files stay in leftover.
+    Recipes, harvester code, and other source files stay in leftover. With
+    *target_parish*, status JSON is merged row-by-row instead of copied.
     """
     return _resolve_conflicts_for(
-        repo, snapshot=snapshot, keep=is_generated_harvest_output
+        repo,
+        snapshot=snapshot,
+        keep=is_generated_harvest_output,
+        target_parish=target_parish,
     )
 
 
@@ -299,7 +361,12 @@ def abort_git_integration(repo: Path) -> None:
         _run_git(repo, ["merge", "--abort"], check=False)
 
 
-def rebase_keeping_harvest_megas(repo: Path, remote_ref: str = "origin/main") -> None:
+def rebase_keeping_harvest_megas(
+    repo: Path,
+    remote_ref: str = "origin/main",
+    *,
+    target_parish: str | None = None,
+) -> None:
     """Rebase onto ``remote_ref``, keeping this harvest's generated outputs."""
     snapshot_dir = Path(tempfile.mkdtemp(prefix="harvest-outputs-"))
     try:
@@ -315,7 +382,9 @@ def rebase_keeping_harvest_megas(repo: Path, remote_ref: str = "origin/main") ->
             print(result.stdout, end="")
         if result.stderr:
             print(result.stderr, end="")
-        resolved, leftover = resolve_harvest_output_conflicts(repo, snapshot_dir)
+        resolved, leftover = resolve_harvest_output_conflicts(
+            repo, snapshot_dir, target_parish=target_parish
+        )
         if leftover:
             abort_git_integration(repo)
             raise RuntimeError(
@@ -342,8 +411,13 @@ def push_with_mega_conflict_retry(
     remote: str = "origin",
     branch: str = "main",
     attempts: int = 5,
+    target_parish: str | None = None,
 ) -> None:
-    """Push HEAD to ``remote/branch``, rebasing and keeping this harvest's files."""
+    """Push HEAD to ``remote/branch``, rebasing and keeping this harvest's files.
+
+    *target_parish* (single-parish Send & test) merges status JSON row-by-row
+    so overlapping tests never erase each other's result.
+    """
     for attempt in range(1, attempts + 1):
         push = _run_git(repo, ["push", remote, f"HEAD:{branch}"], check=False)
         if push.returncode == 0:
@@ -359,7 +433,9 @@ def push_with_mega_conflict_retry(
             print(fetch.stderr or fetch.stdout)
             raise SystemExit(1)
         try:
-            rebase_keeping_harvest_megas(repo, f"{remote}/{branch}")
+            rebase_keeping_harvest_megas(
+                repo, f"{remote}/{branch}", target_parish=target_parish
+            )
         except Exception as exc:
             print(f"❌ Rebase failed; aborting. {exc}")
             abort_git_integration(repo)
