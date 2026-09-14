@@ -1,21 +1,48 @@
 {
   "version": 1,
   "parish_key": "magheraparishderry",
-  "display_name": "Magheraparishderry",
-  "diocese": "",
+  "display_name": "Maghera Parish",
+  "diocese": "derry",
   "start_url": "http://www.magheraparishderry.com/parishnews.php",
   "steps": [
     {
-      "action": "goto",
-      "url": "http://www.magheraparishderry.com/parishnews.php"
+      "action": "click",
+      "selector": "a[href$='.pdf']",
+      "href": "http://www.magheraparishderry.com/pdf/130926.pdf",
+      "text": "Sunday, 13th September 2026 - 24th Sunday Ordinary Time Curr",
+      "pick_strategy": "newest_dated",
+      "bulletin_position": "top",
+      "fallback_selectors": [
+        "a[href$='.pdf']",
+        "a[href*='.pdf']"
+      ]
     },
     {
-      "action": "click",
-      "selector": "a[href*=\"/pdf/\"]",
-      "text": "Current Newsletter - Click to view",
-      "pick_strategy": "newest_dated"
+      "action": "download",
+      "url": "http://www.magheraparishderry.com/pdf/130926.pdf"
     }
   ],
-  "recorded_date": "2026-05-21",
-  "auto_fixed": true
+  "observed_load_ms": 45051,
+  "timeout_ms": 300000,
+  "total_timeout_s": 600,
+  "navigation_wait_until": "commit",
+  "playbook_type": "dated_pdf_bulletin",
+  "site_type": "dated_pdf_path",
+  "operator_notes": [
+    "Bulletin is a real PDF (often made in Microsoft Word → Print to PDF).",
+    "Tab title may say .docx or .jpg — ignore that; check the address bar ends in .pdf.",
+    "On the PDF page: tap Save this PDF — saves the full https://… address for Sunday harvest.",
+    "Or start on parishnews.html → point at this week's link → Yes → Save this PDF.",
+    "Harvester rewrites DDMMYY in the URL each Sunday (e.g. 140626 → 210626)."
+  ],
+  "do_not": [
+    "Do not use use_page_url only — GitHub cannot read Chrome's internal PDF viewer address.",
+    "Do not worry if Document Properties title mentions Microsoft Word.",
+    "Do not skip a news.html page because view-source is empty — the /pdf/DDMMYY.pdf links are often JavaScript."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  },
+  "recorded_date": "2026-09-14"
 }
