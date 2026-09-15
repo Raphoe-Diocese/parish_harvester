@@ -23,9 +23,9 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Proof (raw GitHub 14/09 ~20:05):** `stgerardsparish` on main is **ok**, `bulletin_date` 13/09/2026, `last_tested_at` 2026-09-14T19:00:43+00:00, not in `actionable_keys`. Run [34884130007](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34884130007) success. The 1.61.36 red line (“parish_status.json did not update”) was the poller (5s skew + 90s give-up), not a failed harvest.
 
-**This turn:** Trainer **1.61.37** — if the row is already **ok** from this test, the card says pass. Tests: JS poller + 27 pytest. Folder: Desktop **latest ext**. Frank Reloaded 15/09 (card **1.61.37**). PR opening so GitHub matches this PC.
+**This turn:** Trainer **1.61.37** — if the row is already **ok** from this test, the card says pass. Tests: JS poller + 27 pytest. Folder: Desktop **latest ext**. Frank Reloaded 15/09 (card **1.61.37**). PR: https://github.com/Raphoe-Diocese/parish_harvester/pull/233 — **not on main** until Frank merges.
 
-**Next:** Frank merges the 1.61.37 PR → Problems → Refresh. Do not Send & test again unless he wants — GitHub already has 13/09.
+**Next:** Frank merges [#233](https://github.com/Raphoe-Diocese/parish_harvester/pull/233) → Problems → Refresh. Do not Send & test again unless he wants — GitHub already has 13/09.
 
 ## 14/09/2026 (evening 4) — Why it looked unsaved
 
