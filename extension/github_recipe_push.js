@@ -204,6 +204,11 @@
       return false;
     });
 
+  const urlLooksLikeDatedPost = (url) =>
+    /\d{1,2}(?:st|nd|rd|th)?[-_/].*20\d{2}|\/20\d{2}\/\d{1,2}\/|20\d{2}/i.test(
+      String(url || "")
+    );
+
   const examplePostUrlFromSteps = (steps, explicit) => {
     const direct = String(explicit || "").trim();
     if (/^https?:\/\//i.test(direct)) return direct;
@@ -247,7 +252,14 @@
       steps: stepsReplaced ? incoming.steps : (existingRecipe?.steps || incoming.steps || []),
     };
     if (existingRecipe) {
-      merged.start_url = incoming.start_url?.trim() ? incoming.start_url : existingRecipe.start_url;
+      const incomingStart = String(incoming.start_url || "").trim();
+      if (incomingStart && urlLooksLikeDatedPost(incomingStart) && existingRecipe.start_url) {
+        merged.start_url = existingRecipe.start_url;
+        merged.example_post_url =
+          incoming.example_post_url || incomingStart || existingRecipe.example_post_url;
+      } else {
+        merged.start_url = incomingStart || existingRecipe.start_url;
+      }
       merged.display_name = incoming.display_name?.trim() || existingRecipe.display_name;
       merged.diocese = incoming.diocese?.trim() || existingRecipe.diocese;
     }

@@ -98,7 +98,8 @@
   };
   const TOOLBAR_HIDDEN_HOSTS_KEY = "ph_toolbar_hidden_hosts";
 
-  const _currentToolbarHost = () => _hostnameFromUrl(_pageUrlForParishDetection());
+  const _currentToolbarHost = () =>
+    _hostnameFromUrl(_pageUrlForParishDetection()).replace(/^www\d*\./, "");
 
   const _setToolbarHiddenForHost = async (hidden) => {
     const host = _currentToolbarHost();
@@ -362,7 +363,7 @@
   };
 
   const _applyFixNowToolbar = async (message) => {
-    if (await _isToolbarHiddenForHost()) return;
+    await _setToolbarHiddenForHost(false);
     const navAt = Number(message?.nav_started_at);
     if (Number.isFinite(navAt) && navAt > 0) {
       _markNavigationStart(window.location.href, navAt);
@@ -995,6 +996,14 @@
     const hasClick = recorded.some(
       (step) => String(step?.action || "").trim().toLowerCase() === "click"
     );
+    // T6: a dated bulletin page is this week's post, never the harvest start_url.
+    if (
+      _urlLooksLikeDatedHtmlPost(pageUrl) &&
+      standaloneStartUrl &&
+      !_urlLooksLikeDatedHtmlPost(standaloneStartUrl)
+    ) {
+      return standaloneStartUrl;
+    }
     if (!hasClick) {
       return pageUrl;
     }
@@ -1050,7 +1059,15 @@
 
   const buildStandaloneRecipe = (parishKey, displayName, diocese) => {
     const steps = [];
-    const startUrl = _resolveRecipeStartUrl();
+    let startUrl = _resolveRecipeStartUrl();
+    const pageUrl = _pageUrlForParishDetection();
+    if (
+      _urlLooksLikeDatedHtmlPost(startUrl) &&
+      standaloneStartUrl &&
+      !_urlLooksLikeDatedHtmlPost(standaloneStartUrl)
+    ) {
+      startUrl = standaloneStartUrl;
+    }
     // Harvester opens start_url before replaying steps — keep UI step count = JSON steps.
     steps.push(..._standaloneRecipeSteps());
     const usesCloudFolder = steps.some(
@@ -1065,6 +1082,9 @@
       steps,
       ...(usesCloudFolder ? { cloud_folder: true, date_format: "YY.MM.DD" } : {}),
     };
+    if (_urlLooksLikeDatedHtmlPost(pageUrl)) {
+      recipe.example_post_url = String(_pendingExamplePostUrl || pageUrl).trim();
+    }
     const loadTimeouts = _recipeTimeoutsFromLoadMs(_getObservedLoadMsForRecipe(), steps.length);
     if (loadTimeouts) {
       Object.assign(recipe, loadTimeouts);
@@ -2051,8 +2071,9 @@
   const _urlLooksLikeDatedHtmlPost = (url) => {
     const abs = _absoluteHttpUrl(url);
     if (!_urlLooksLikeOpenablePage(abs)) return false;
-    return /\d{1,2}(?:st|nd|rd|th)?[-_/].*20\d{2}|20\d{2}/i.test(abs);
+    return /\d{1,2}(?:st|nd|rd|th)?[-_/].*20\d{2}|\/20\d{2}\/\d{1,2}\/|20\d{2}/i.test(abs);
   };
+  globalThis.__phUrlLooksLikeDatedHtmlPost = _urlLooksLikeDatedHtmlPost;
 
   const _sameHttpUrl = (a, b) => {
     const left = _absoluteHttpUrl(a).replace(/\/+$/, "").toLowerCase();
@@ -8305,6 +8326,10 @@
 
       const checkStartUrlDrift = async () => {
         const pageUrl = _pageUrlForParishDetection();
+        if (_urlLooksLikeDatedHtmlPost(pageUrl)) {
+          if (!_pendingExamplePostUrl) _pendingExamplePostUrl = pageUrl;
+          driftBanner.style.display = "none";
+        }
         const hostname = _hostnameFromUrl(pageUrl);
         if (!hostname) return;
         const storageData = await _storageGet(["ph_hostname_map"]);
@@ -8325,7 +8350,7 @@
         } catch (_e) {
           return;
         }
-        if (savedHost && savedHost !== hostname) {
+        if (savedHost && savedHost !== hostname && !_urlLooksLikeDatedHtmlPost(pageUrl)) {
           driftRecipeKey = key;
           driftRecipeObject = loaded.recipe;
           driftRecipePath = loaded.filePath;
@@ -8992,6 +9017,14 @@
 
       updateStartUrlBtn.addEventListener("click", async () => {
         if (!driftRecipeKey || !driftRecipePath) return;
+        if (_urlLooksLikeDatedHtmlPost(window.location.href)) {
+          showStatus(
+            "This page is this week's bulletin. start_url stays the listing — tap Send & test to save it as this week's post.",
+            "info"
+          );
+          driftBanner.style.display = "none";
+          return;
+        }
         updateStartUrlBtn.disabled = true;
         updateStartUrlBtn.textContent = "⏳ Updating…";
         try {
@@ -9738,6 +9771,7 @@
   }
 
   globalThis.__phShowToolbar = () => {
+    void _setToolbarHiddenForHost(false);
     _ensureToolbar(true);
     void _markRecordingActive();
   };
