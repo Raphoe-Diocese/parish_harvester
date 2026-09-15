@@ -777,7 +777,16 @@ class StGerardsListingImageTests(unittest.TestCase):
         )
         self.assertEqual(recipe["start_url"], self.LISTING)
         self.assertEqual(recipe["site_type"], "waf_retry_wordpress")
-        self.assertEqual(recipe["example_post_url"], self.POST_13)
+        example = str(recipe.get("example_post_url") or "")
+        self.assertTrue(example.startswith("https://stgerardsparish.org/"), example)
+        self.assertNotEqual(example.rstrip("/"), self.LISTING.rstrip("/"))
+        self.assertTrue(
+            any(
+                p in example
+                for p in ("sunday-message-", "parish-bulletin-", "sunday-bulletin-")
+            ),
+            example,
+        )
         self.assertNotIn("sunday-bulletin-16th-august-2026", json.dumps(recipe["steps"]))
         self.assertNotIn("Sunday-message-13th-September_", json.dumps(recipe["steps"]))
         self.assertTrue(

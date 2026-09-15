@@ -17,6 +17,14 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 15/09/2026 — Confetti cannon in the agent must-read
+
+**The real goal, in one sentence:** agents celebrate hard wins, not every click.
+
+**This turn:** wrote **Confetti cannon (hard wins only)** into [`AGENTS.md`](AGENTS.md). Once per milestone. Not on GitHub until the next commit/PR.
+
+**Next:** merge [#233](https://github.com/Raphoe-Diocese/parish_harvester/pull/233) when CI is green (St Gerard test no longer pins one example URL).
+
 ## 14/09/2026 (evening 5) — Send & test red line was a watcher lie
 
 **The real goal, in one sentence:** Send & test tells the truth when GitHub already has this week’s bulletin.
