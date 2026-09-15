@@ -21,9 +21,9 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **The real goal, in one sentence:** Sunday harvests four dioceses at once, then writes GitHub once.
 
-**This turn:** Frank said 1.61.39 is working. S1: matrix (max 4) + stitch merge. Send & test unchanged. **Not proved** until a Sunday/all run ID. No harvest on this PC.
+**This turn:** Frank said 1.61.39 is working. S1: matrix (max 4) + stitch merge. Send & test unchanged. PR: https://github.com/Raphoe-Diocese/parish_harvester/pull/236 — **not on main** until merge. **Not proved** until a Sunday/all run ID. No harvest on this PC.
 
-**Next:** merge the S1 PR when CI is green. Proof is the next full harvest run.
+**Next:** merge [#236](https://github.com/Raphoe-Diocese/parish_harvester/pull/236) when CI is green. Proof is the next full harvest run.
 
 ## 15/09/2026 (evening) — T6 + T7 + T8 on one PR
 
