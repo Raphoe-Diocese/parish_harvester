@@ -311,12 +311,19 @@ def ocr_with_mistral(pdf_path):
     return pages
 
 
-def _image_to_base64_png(image):
+def _image_png_bytes(image) -> bytes:
+    """pdf2image often yields PPM. Gemini rejects image/x-portable-pixmap."""
     buffer = io.BytesIO()
-    image.save(buffer, format="PNG")
-    encoded = base64.b64encode(buffer.getvalue()).decode("utf-8")
-    buffer.close()
-    return encoded
+    to_save = image
+    mode = getattr(image, "mode", None)
+    if mode not in ("RGB", "RGBA", "L"):
+        to_save = image.convert("RGB")
+    to_save.save(buffer, format="PNG")
+    return buffer.getvalue()
+
+
+def _image_to_base64_png(image):
+    return base64.b64encode(_image_png_bytes(image)).decode("utf-8")
 
 
 def ocr_images_with_gemini(images):
@@ -332,7 +339,9 @@ def ocr_images_with_gemini(images):
     pages_text = []
     for i, image in enumerate(images, start=1):
         print(f"  OCR on page {i}/{len(images)} via Gemini ...", flush=True)
-        response = model.generate_content([OCR_PROMPT, image])
+        response = model.generate_content(
+            [OCR_PROMPT, {"mime_type": "image/png", "data": _image_png_bytes(image)}]
+        )
         text = getattr(response, "text", "") or ""
         lines = [
             line for line in text.splitlines()

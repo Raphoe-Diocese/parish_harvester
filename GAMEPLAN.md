@@ -17,13 +17,109 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 15/09/2026 (evening 12) — Fix Gemini PPM so picture pages work
+
+**The real goal, in one sentence:** Sunday picture pages go to free Gemini as PNG, not PPM.
+
+**This turn:** `ocr_images_with_gemini` now sends `image/png` bytes. Last Sunday’s fail was `Unsupported MIME type: image/x-portable-pixmap` ([34828244862](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34828244862)). Tests in `tests/test_gemini_png.py`. **Not live** until merge + next OCR run. Do not tick done on a Sunday log.
+
+**Next:** merge, then next Sunday OCR must show Gemini pages, not that MIME error.
+
+## 15/09/2026 (evening 11) — If Gemini is fixed, is the free API enough?
+
+**The real goal, in one sentence:** $0 Sunday OCR that still fits Gemini’s free pot.
+
+**This turn:** Yes for the real Sunday path. Last week only **12 picture pages** needed vision (2+3+4+3). That is 12 Gemini calls for 4 dioceses, about **78 a week / 300 a month** at 26 dioceses. Google does not publish one public free daily number (look in AI Studio). Any normal free pot covers that. Not a sure yes if we send every mega page as an image (26 dioceses ≈ 1,430 calls on one Sunday). Keep text-first. Gemini fix still not started.
+
+**Next:** say go to fix Gemini MIME.
+
+## 15/09/2026 (evening 10) — Totally free OCR APIs vs Mistral
+
+**The real goal, in one sentence:** Sunday OCR stays $0. Nobody is putting a card in. Community project.
+
+**This turn (opened official pages 15/09/2026):** nothing free and public is **better** than Mistral OCR on Mistral’s own document scores. Closest free API already in the harvest is **Gemini** (Google AI Studio, no card, ongoing free tier). Last Sunday Gemini failed on a PPM image type — not on quota. Other “free OCR” APIs do not fit a diocese mega: OCR.space free is 1 MB / 3 pages; Azure Document Intelligence free is 500 pages/month and only the first 2 pages of a file. Tesseract stays parked (Frank: crap reader). Do not add a paid API.
+
+**Next:** say go to fix Gemini so picture pages work. Do not start a new OCR vendor.
+
+## 15/09/2026 (evening 9) — Would a second Mistral key suffice?
+
+**The real goal, in one sentence:** 26 Sunday megas on a community project, no one taking money.
+
+**This turn:** two Free pots = $20 ≈ **5,000 pages / month**. Last week’s size scaled to 26 = **5,720 pages / month**. So a second key is **close, not a sure yes** if every mega page is sent to Mistral. A five-Sunday month is about 7,150 — two keys are short. If Sunday stays text-first (last week 12 picture pages), one key is already enough and a second is spare. Dual-key wire still parked until Frank says go.
+
+**Next:** S3 or wire key 2 only if Frank says go.
+
+## 15/09/2026 (evening 8) — Free Mistral per month, then the sums
+
+**The real goal, in one sentence:** use the published Free pot, not a made-up page cap, and see if 26 Sunday megas fit.
+
+**Published (opened 15/09/2026):**
+- Free plan: **$10 / month API credits** — https://mistral.ai/pricing
+- OCR list price: **$4 / 1,000 pages** — https://mistral.ai/pricing/api/
+- That is **2,500 OCR pages / month** if those credits pay for OCR. Mistral does not publish a public “free pages” number.
+
+**Worked from last week’s four megas (OCR 34828244862: 33 + 106 + 57 + 24 = 220 pages):**
+- Today 4 dioceses × 4 Sundays ≈ **880 pages / month** — fits $10.
+- 26 dioceses at the same size ≈ 1,430 pages / week ≈ **5,720 pages / month** — over 2,500. About **$23 / month** at list price, or about **$13** on top of the $10 credits.
+- Last week only 12 sparse image pages needed vision. If Sunday stays “text first, vision only on pictures”, 26 dioceses stay tiny and one Free key is enough.
+
+**Next:** one Free key is enough for the current 4. For 26 full megas, one $10 pot is not enough. Say go for S3 to print 2,500 as the working ceiling with that source.
+
+## 15/09/2026 (evening 7) — Is the current Mistral key enough?
+
+**The real goal, in one sentence:** know if Sunday OCR will run out of Mistral, or if something else is broken.
+
+**Proof (GitHub logs, not the Mistral console):**
+- Last good OCR [34828244862](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34828244862) 14/09: **Mistral OCR was not called.** Four megas used embedded text (33 + 106 + 57 + 24 pages). Sparse vision 2/3/4/3. Gemini MIME fail. OpenAI 429 billing_not_active. Result: `Tier0-text`.
+- OCR [34758788989](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34758788989) 13/09: Mistral **was** tried on all four megas and failed instantly: `AttributeError: 'Mistral' object has no attribute 'ocr'`. That is a broken client, not a quota 429. Zero Mistral pages billed.
+- Remaining free pages on Frank’s key: **unknown** (only on his Mistral Limits page). No extra account needed for last week.
+
+**Next:** Frank opens Mistral Limits if he wants the leftover number. Say go to fix the Mistral client so Sunday actually uses the key.
+
+## 15/09/2026 (evening 6) — Second Mistral account for extra free quota
+
+**The real goal, in one sentence:** if Mistral runs out, keep Sunday OCR going.
+
+**This turn:** Frank is right — he **can** open as many Mistral accounts as he likes. I mixed that up with “I will not build it unless you say go.” Gemini is still the fallback already in the harvest. A second Mistral key (only if the first 429s) stays **parked** until he says go.
+
+**Next:** finish S3 when Frank says go.
+
+**Parked:** second Mistral GitHub secret as fallback. One warning only: Mistral can still shut keys that look like stacked free accounts. His choice.
+
+## 15/09/2026 (evening 5) — Free OCR ceilings vs 26 diocese runs
+
+**The real goal, in one sentence:** one OCR job per diocese mega (max 26 a week), then split onto parish pages — do not OCR every parish.
+
+**Proved from official docs (15/09/2026), not invented:**
+- Jobs: Sunday OCR already loops dioceses, not parishes. 4 jobs today. 26 jobs later. That is the run cap.
+- Mistral: one API call per mega PDF. They still **bill pages inside that PDF**. Paid list price is **$4 / 1,000 pages** (https://mistral.ai/pricing/api/). Free mode has “included monthly usage” — the page number is only on Frank’s Mistral Limits page, not in public docs. File cap 512 MB.
+- Gemini: free tier exists. Official rate-limits page (updated 02/09/2026) says RPM/RPD are **per project, view in AI Studio** — Google no longer publishes one public free-RPD number. If we fall back to Gemini we send **one request per image page**, not one per diocese.
+- OpenAI gpt-4o-mini: official model page says **Free tier not supported**. Need paid usage tier 1. Not a free ceiling.
+- GitHub Models: official docs say **retired 30/07/2026**. Dead fallback.
+
+**This turn:** research only. Ceilings for *his* keys stay **unknown** until he opens the two consoles. S3 must count diocese runs (max 26/week) and billed pages — not parish count. Do not put a fake 1,500 or 26 on the dashboard.
+
+**Next:** finish S3 when Frank says go. Optional: he pastes Mistral Limits + Gemini AI Studio numbers and those become the only printed ceilings.
+
+**Parked:** rip tesseract. Do not start 22 dioceses until S3 exists.
+
+## 15/09/2026 (evening 4) — Free OCR APIs; tesseract is not a reader
+
+**The real goal, in one sentence:** read bulletins with the free vision APIs we already have, not tesseract.
+
+**This turn:** Frank asked if we have a free API. Yes — harvest OCR already uses **Mistral**, **Gemini**, and **OpenAI** (plus GitHub Models in Actions). I have **not** seen their free-page ceilings. Tesseract is local and a crap bulletin reader — do not count it, do not treat it as the reader. [#237](https://github.com/Raphoe-Diocese/parish_harvester/pull/237) is on main (`173e5a6`). S3 dashboard is started on `scale-s3-ocr-quota`, **not on main**.
+
+**Next:** finish S3 so Frank can read three pages-this-month numbers (ceilings stay **unknown** unless a real number is written down).
+
+**Parked:** rip tesseract out of `fill_sparse` / column repair. Do not start until Frank says go.
+
 ## 15/09/2026 (evening 3) — S2 no PDF commits
 
 **The real goal, in one sentence:** Sunday still makes mega PDFs, but git stops growing by 70 MB.
 
-**This turn:** [#236](https://github.com/Raphoe-Diocese/parish_harvester/pull/236) merged. S2 PR: https://github.com/Raphoe-Diocese/parish_harvester/pull/237 — **not on main** until merge. Mega generation stays on. History rewrite still parked.
+**This turn:** [#237](https://github.com/Raphoe-Diocese/parish_harvester/pull/237) merged `173e5a6` 15/09 18:21 UTC. Mega generation stays on. History rewrite still parked. **Not live-proved** until the next Sunday harvest: repo grow small, mega still opens on parishpress.ie.
 
-**Next:** merge [#237](https://github.com/Raphoe-Diocese/parish_harvester/pull/237) when CI is green.
+**Next:** S3 OCR quota dashboard.
 
 ## 15/09/2026 (evening 2) — S1 diocese matrix
 

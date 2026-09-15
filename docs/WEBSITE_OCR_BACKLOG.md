@@ -54,6 +54,10 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 
 ## Still open (do not pretend these are finished)
 
+- [ ] **doing** · 2026-09-15 · Gemini picture OCR: send PNG, not pdf2image PPM (`image/x-portable-pixmap`). Proved fail on OCR [34828244862](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34828244862). **Not live** until merge + next Sunday OCR log shows Gemini pages. · `ocr/convert_bulletin.py`
+
+- [ ] **parked** · 2026-09-15 · Frank: tesseract is a crap bulletin reader. Do not use it as the reader. Locked path stays embedded PDF text, then Mistral / Gemini / OpenAI vision on image/banner pages. Rip tesseract out of `fill_sparse_ocr_pages` / `repair_image_page_ocr` only when Frank says go. · `ocr/sparse_page_ocr.py`
+
 - [x] **done** · 2026-09-10 · Frank: diocese-page PDFs are too low-res. Ghostscript `/ebook` 100 dpi → `/printer` + 150 dpi. PR [#203](https://github.com/Raphoe-Diocese/parish_harvester/pull/203) merged `6b9ded1c`. Harvest [34638190737](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34638190737) + Pages [34641404016](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34641404016). Frank 12/09: sharper megas working. · `harvester/pdf_compress.py`
 
 - [x] **done** · 2026-09-12 · Frank: diocese-page PDF takes ages; needs a “how long” / **PDF fully loaded** message. [PR #205](https://github.com/Raphoe-Diocese/parish_harvester/pull/205) merged `437b4c0c` + Pages [34721204022](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34721204022). Live Raphoe HTML `?v=20260912a`. Frank 12/09 23:50: yes on the phone. · `docs/assets/pdf-inpage-viewer.js`
