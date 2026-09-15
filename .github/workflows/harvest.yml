@@ -395,6 +395,8 @@ jobs:
       - name: Commit bulletins back to repo
         if: steps.harvest_run.outcome == 'success'
         id: commit_harvest
+        env:
+          TARGET_PARISH: ${{ github.event.inputs.target_parish }}
         run: |
           set -euo pipefail
           if [ ! -f Bulletins/report.json ]; then
@@ -405,32 +407,9 @@ jobs:
           git config user.email "github-actions[bot]@users.noreply.github.com"
           # Partial harvests are normal — always commit OK parishes + parish_status for the extension.
           git add -f Bulletins/report.json Bulletins/report.txt Bulletins/dashboard.html docs/manifest.json docs/index.html docs/dioceses/ 2>/dev/null || true
-          git add -f Bulletins/current/*.pdf 2>/dev/null || true
-          git add -f Bulletins/stale/*.pdf 2>/dev/null || true
-          git add -f mega_pdf/*_mega_bulletin.pdf mega_pdf/*_mega_bulletin_p1.jpg 2>/dev/null || true
-          git add -f docs/mega_pdf/*_mega_bulletin.pdf docs/mega_pdf/*_mega_bulletin_p1.jpg docs/mega_pdf/*.pages.json 2>/dev/null || true
+          # S2: do not commit PDFs — artifacts + GitHub Release carry the binaries.
+          git add -f docs/mega_pdf/*.pages.json 2>/dev/null || true
           git add -f parishes/consecutive_failures.json parishes/stale_bulletins.json parishes/retry_queue.json parishes/parish_status.json parishes/training_backlog.json 2>/dev/null || true
-          TARGET_PARISH="${{ github.event.inputs.target_parish }}"
-          if [ -n "${TARGET_PARISH}" ] && [ -f "Bulletins/current/${TARGET_PARISH}.pdf" ]; then
-            git add -f "Bulletins/current/${TARGET_PARISH}.pdf"
-            echo "Including test PDF: Bulletins/current/${TARGET_PARISH}.pdf"
-          fi
-          if [ -n "${TARGET_PARISH}" ] && [ -f "Bulletins/stale/${TARGET_PARISH}.pdf" ]; then
-            git add -f "Bulletins/stale/${TARGET_PARISH}.pdf"
-            echo "Including stale PDF: Bulletins/stale/${TARGET_PARISH}.pdf"
-          fi
-          # Current-week proof copies at Bulletins/<key>.pdf — never zip archives.
-          if [ -n "${TARGET_PARISH}" ] && [ -f "Bulletins/${TARGET_PARISH}.pdf" ]; then
-            git add -f "Bulletins/${TARGET_PARISH}.pdf"
-            echo "Including proof PDF: Bulletins/${TARGET_PARISH}.pdf"
-          fi
-          shopt -s nullglob
-          for proof in Bulletins/*.pdf; do
-            case "$(basename "$proof")" in
-              all_bulletins_*) ;;
-              *) git add -f "$proof" ;;
-            esac
-          done
           if git diff --cached --quiet; then
             echo "ℹ️  No staged changes — skipping commit."
             exit 0
@@ -442,6 +421,24 @@ jobs:
           # Single-parish tests overlap (per-parish concurrency groups): merge
           # only TARGET_PARISH's row so one Send & test never erases another.
           python scripts/push_harvest_results.py --remote origin --branch main --target-parish "${TARGET_PARISH}"
+
+      - name: Publish week bulletin Release
+        if: steps.harvest_run.outcome == 'success' && github.event.inputs.target_parish == ''
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          DATE=$(python -c "import json; print(json.load(open('Bulletins/report.json')).get('target_date','unknown'))")
+          TAG="bulletins-${DATE}"
+          shopt -s nullglob
+          files=(mega_pdf/*_mega_bulletin.pdf)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No mega PDFs to release"
+            exit 0
+          fi
+          gh release delete "${TAG}" -y || true
+          gh release create "${TAG}" "${files[@]}" --title "Bulletins ${DATE}" --notes "Mega PDFs for harvest week ${DATE}. Generated on, not committed to git (S2)."
 
       - name: Warn if git commit failed
         if: failure() && steps.harvest_run.outcome == 'success' && steps.commit_harvest.outcome == 'failure'
@@ -599,20 +596,29 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git add -f Bulletins/report.json Bulletins/report.txt Bulletins/dashboard.html docs/manifest.json docs/index.html docs/dioceses/ 2>/dev/null || true
-          git add -f Bulletins/current/*.pdf 2>/dev/null || true
-          git add -f mega_pdf/*_mega_bulletin.pdf mega_pdf/*_mega_bulletin_p1.jpg 2>/dev/null || true
-          git add -f docs/mega_pdf/*_mega_bulletin.pdf docs/mega_pdf/*_mega_bulletin_p1.jpg docs/mega_pdf/*.pages.json 2>/dev/null || true
+          # S2: do not commit PDFs — artifacts + GitHub Release carry the binaries.
+          git add -f docs/mega_pdf/*.pages.json 2>/dev/null || true
           git add -f parishes/consecutive_failures.json parishes/stale_bulletins.json parishes/retry_queue.json parishes/parish_status.json parishes/training_backlog.json 2>/dev/null || true
-          shopt -s nullglob
-          for proof in Bulletins/*.pdf; do
-            case "$(basename "$proof")" in
-              all_bulletins_*) ;;
-              *) git add -f "$proof" ;;
-            esac
-          done
           if git diff --cached --quiet; then
             echo "ℹ️  No staged changes — skipping commit."
             exit 0
           fi
           git commit -m "chore: add harvested bulletins for $(date +%Y-%m-%d) [skip ci]"
           python scripts/push_harvest_results.py --remote origin --branch main --target-parish ""
+
+      - name: Publish week bulletin Release
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          DATE=$(python -c "import json; print(json.load(open('Bulletins/report.json')).get('target_date','unknown'))")
+          TAG="bulletins-${DATE}"
+          shopt -s nullglob
+          files=(mega_pdf/*_mega_bulletin.pdf)
+          if [ ${#files[@]} -eq 0 ]; then
+            echo "No mega PDFs to release"
+            exit 0
+          fi
+          gh release delete "${TAG}" -y || true
+          gh release create "${TAG}" "${files[@]}" --title "Bulletins ${DATE}" --notes "Mega PDFs for harvest week ${DATE}. Generated on, not committed to git (S2)."

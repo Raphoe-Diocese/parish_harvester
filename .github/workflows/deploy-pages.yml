@@ -161,10 +161,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p _harvest_artifacts
-          if find docs/mega_pdf -maxdepth 1 -type f -name '*_mega_bulletin.pdf' 2>/dev/null | grep -q .; then
-            echo "Using committed docs/mega_pdf — skip stale harvest artifacts"
-            exit 0
-          fi
+          # S2: harvest artifacts win. Committed docs/mega_pdf may be last week's file.
           if find _harvest_artifacts -type f -name '*_mega_bulletin.pdf' | grep -q .; then
             echo "Mega PDFs already present from the triggering harvest run"
             exit 0

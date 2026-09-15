@@ -131,8 +131,7 @@ class SendTestCommsTests(unittest.TestCase):
         self.assertIn("parishes/parish_status.json", yml)
         self.assertIn("Partial harvests are normal", yml)
         self.assertIn("git commit -m", yml)
-        self.assertIn('Including proof PDF: Bulletins/${TARGET_PARISH}.pdf', yml)
-        self.assertIn("all_bulletins_*)", yml)
+        self.assertIn("S2: do not commit PDFs", yml)
         self.assertNotIn("zip old", yml.lower())
 
     def test_ballinascreen_uses_wix_predictor_then_print_to_pdf(self) -> None:

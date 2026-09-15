@@ -17,6 +17,14 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 15/09/2026 (evening 3) — S2 no PDF commits
+
+**The real goal, in one sentence:** Sunday still makes mega PDFs, but git stops growing by 70 MB.
+
+**This turn:** [#236](https://github.com/Raphoe-Diocese/parish_harvester/pull/236) merged. S2 PR: https://github.com/Raphoe-Diocese/parish_harvester/pull/237 — **not on main** until merge. Mega generation stays on. History rewrite still parked.
+
+**Next:** merge [#237](https://github.com/Raphoe-Diocese/parish_harvester/pull/237) when CI is green.
+
 ## 15/09/2026 (evening 2) — S1 diocese matrix
 
 **The real goal, in one sentence:** Sunday harvests four dioceses at once, then writes GitHub once.
