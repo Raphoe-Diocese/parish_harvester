@@ -669,12 +669,20 @@
       const fromStatus = statusDoc ? parishStatusFromDoc(statusDoc, key) : null;
       const testedAt = String(fromStatus?.item?.last_tested_at || "").trim();
       const prevTested = String(previousTestedAt || "").trim();
+      // 14/09/2026: 5s skew + 90s give-up called St Gerard a miss after
+      // harvest 34884130007 wrote ok at 19:00:43. Allow 3 minutes of GitHub
+      // cache lag; an ok row from this test is never a miss.
       const freshResult = Boolean(testedAt) && (
         (prevTested && testedAt !== prevTested) ||
-        isFreshHarvestTimestamp(testedAt, started, 5000)
+        isFreshHarvestTimestamp(testedAt, started, 180000)
       );
       let parishStatus = { status: "unknown", item: null };
       if (freshResult && fromStatus) {
+        parishStatus = fromStatus;
+      } else if (
+        fromStatus?.status === "ok" &&
+        isFreshHarvestTimestamp(testedAt, started, 15 * 60 * 1000)
+      ) {
         parishStatus = fromStatus;
       }
 
@@ -717,11 +725,26 @@
           reason: parishStatus.item?.reason || parishStatus.item?.error || "GitHub Actions run failed",
         };
       }
-      if (workflowDone && !freshResult && elapsed > 90) {
+      if (
+        workflowSucceeded &&
+        fromStatus?.status === "ok" &&
+        isFreshHarvestTimestamp(testedAt, started, 180000)
+      ) {
+        const recentOk = outcomeFromFreshStatus(fromStatus, runUrl, elapsed);
+        if (recentOk) return recentOk;
+      }
+      if (workflowDone && !freshResult && elapsed > 240) {
+        if (
+          fromStatus?.status === "ok" &&
+          isFreshHarvestTimestamp(testedAt, started, 15 * 60 * 1000)
+        ) {
+          const lateOk = outcomeFromFreshStatus(fromStatus, runUrl, elapsed);
+          if (lateOk) return lateOk;
+        }
         return {
           ok: false,
           runUrl,
-          item: parishStatus.item,
+          item: parishStatus.item || fromStatus?.item || null,
           elapsed,
           reason:
             "Harvest finished but parish_status.json did not update. Open Actions, then refresh Problems.",
@@ -745,9 +768,12 @@
     const fromStatus = statusDoc ? parishStatusFromDoc(statusDoc, key) : null;
     const testedAt = String(fromStatus?.item?.last_tested_at || "").trim();
     const when = formatUkDateFromIso(testedAt);
-    const fileOutcome = fromStatus && fromStatus.status !== "unknown"
-      ? outcomeFromFreshStatus(fromStatus, runUrl, elapsed)
-      : null;
+    const fileOutcome =
+      fromStatus &&
+      fromStatus.status !== "unknown" &&
+      isFreshHarvestTimestamp(testedAt, started, 180000)
+        ? outcomeFromFreshStatus(fromStatus, runUrl, elapsed)
+        : null;
     const timeoutNote = fromStatus && fromStatus.status !== "unknown"
       ? `Timed out after 15 min. GitHub currently says ${fromStatus.status}${when ? ` as of ${when}` : ""}.`
       : (listError

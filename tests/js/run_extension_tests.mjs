@@ -150,6 +150,26 @@ async function testPollHarvestUntilDone() {
     false,
     "not ok when leftover last_tested_at is older than this test"
   );
+
+  // 14/09/2026 St Gerard: row already ok from this harvest; Send & test
+  // again must not say "parish_status.json did not update".
+  const recentOkAt = new Date(Date.now() - 30_000).toISOString();
+  const apiRecentOk = loadGithubRecipePush(
+    makeFetch({ lastTestedAt: recentOkAt, runCreatedAt: recentOkAt, outcome: "ok" })
+  );
+  const recentOk = await apiRecentOk.pollHarvestUntilDone({
+    gh_pat: "test-pat",
+    gh_repo: "Raphoe-Diocese/parish_harvester",
+    parish_key: "bangorparish",
+    startedAt: Date.now() - 95_000,
+    previousTestedAt: recentOkAt,
+    maxWaitMs: 120_000,
+  });
+  assert.strictEqual(
+    recentOk.ok,
+    true,
+    "ok when this harvest already wrote an ok row"
+  );
   console.log("ok: pollHarvestUntilDone requires last_tested_at change");
 }
 

@@ -20,6 +20,9 @@
   const LONG_BULLETIN_MAX_PAGES = 16;
   let allowLongBulletin = false;
   let _pendingExamplePostUrl = "";
+  let _pendingOpenPageUrl = "";
+  let _pendingAwaitImageOnPost = false;
+  let _pendingAwaitMarkKind = "";
 
   const _setAllowLongBulletin = (on) => {
     allowLongBulletin = Boolean(on);
@@ -259,6 +262,15 @@
       updatedAt: Date.now(),
       allowLongBulletin: Boolean(allowLongBulletin),
       examplePostUrl: _pendingExamplePostUrl || prev.examplePostUrl || "",
+      openPageUrl: _pendingOpenPageUrl || prev.openPageUrl || "",
+      awaitImageOnPost:
+        extra.awaitImageOnPost !== undefined
+          ? Boolean(extra.awaitImageOnPost)
+          : _pendingAwaitImageOnPost || Boolean(prev.awaitImageOnPost),
+      awaitMarkKind:
+        extra.awaitMarkKind !== undefined
+          ? String(extra.awaitMarkKind || "")
+          : _pendingAwaitMarkKind || prev.awaitMarkKind || "",
       ...extra,
     };
     await _storageSet({
@@ -294,6 +306,9 @@
 
   const _clearRecordingSession = async () => {
     _pendingExamplePostUrl = "";
+    _pendingOpenPageUrl = "";
+    _pendingAwaitImageOnPost = false;
+    _pendingAwaitMarkKind = "";
     const host = _hostnameFromUrl(_pageUrlForParishDetection());
     const map = await _getRecordingSessionsMap();
     if (host) delete map[host];
@@ -672,6 +687,11 @@
       session.startUrl && _hostsMatch(session.startUrl, pageUrl) ? session.startUrl : pageUrl;
     allowLongBulletin = Boolean(session.allowLongBulletin);
     _pendingExamplePostUrl = String(session.examplePostUrl || "").trim();
+    _pendingOpenPageUrl = String(session.openPageUrl || session.examplePostUrl || "").trim();
+    _pendingAwaitImageOnPost = Boolean(session.awaitImageOnPost);
+    _pendingAwaitMarkKind = String(
+      session.awaitMarkKind || (session.awaitImageOnPost ? "image" : "")
+    ).trim();
 
     if (session.fixNow) {
       await _applyFixNowToolbar({
@@ -2020,17 +2040,41 @@
     }
   };
 
+  const _urlLooksLikeOpenablePage = (url) => {
+    const abs = _absoluteHttpUrl(url);
+    if (!abs || !/^https?:\/\//i.test(abs)) return false;
+    if (_urlLooksLikeDirectPdf(abs)) return false;
+    if (/\.(pdf|docx?|jpe?g|png|webp|gif)(?:$|[?#])/i.test(abs)) return false;
+    return true;
+  };
+
   const _urlLooksLikeDatedHtmlPost = (url) => {
     const abs = _absoluteHttpUrl(url);
-    if (!abs || _urlLooksLikeDirectPdf(abs)) return false;
-    if (/\.(pdf|docx?|jpe?g|png|webp)(?:$|[?#])/i.test(abs)) return false;
-    try {
-      const parsed = new URL(abs);
-      if (_hostnameFromUrl(parsed.href) !== _hostnameFromUrl(window.location.href)) return false;
-    } catch (_e) {
-      return false;
-    }
+    if (!_urlLooksLikeOpenablePage(abs)) return false;
     return /\d{1,2}(?:st|nd|rd|th)?[-_/].*20\d{2}|20\d{2}/i.test(abs);
+  };
+
+  const _sameHttpUrl = (a, b) => {
+    const left = _absoluteHttpUrl(a).replace(/\/+$/, "").toLowerCase();
+    const right = _absoluteHttpUrl(b).replace(/\/+$/, "").toLowerCase();
+    return Boolean(left && right && left === right);
+  };
+
+  const _savedOpenPageUrl = () =>
+    String(_pendingOpenPageUrl || _pendingExamplePostUrl || "").trim();
+
+  const _pageIsOpenedBulletinPost = () => {
+    const page = window.location.href;
+    const saved = _savedOpenPageUrl();
+    if (saved && _sameHttpUrl(page, saved)) return true;
+    if (
+      (_pendingAwaitImageOnPost || _pendingAwaitMarkKind) &&
+      standaloneStartUrl &&
+      !_sameHttpUrl(page, standaloneStartUrl)
+    ) {
+      return true;
+    }
+    return _urlLooksLikeDatedHtmlPost(page);
   };
 
   const _mergeWafExamplePostUrl = (recipe, postUrl) => {
@@ -2890,8 +2934,15 @@
     _clearElement(_stepsListEl);
     if (recipeSteps.length === 0) {
       const empty = document.createElement("div");
-      empty.style.cssText = "opacity:0.55;font-size:10px;padding:2px 0;";
-      empty.textContent = lastPushedRecipeNote || "No steps recorded yet — tap Step 2 Save on a PDF page, or Step 1 on a news page.";
+      empty.style.cssText = "opacity:0.85;font-size:10px;padding:2px 0;line-height:1.4;";
+      const saved = _savedOpenPageUrl();
+      if (saved) {
+        empty.textContent = `Saved this week's page (not 0): ${saved}`;
+      } else {
+        empty.textContent =
+          lastPushedRecipeNote ||
+          "No steps recorded yet — tap Step 2 Save on a PDF page, or Step 1 on a news page.";
+      }
       _stepsListEl.appendChild(empty);
       return;
     }
@@ -4737,6 +4788,7 @@
       // Sort the wheat from the chaff: when the site type is a confident
       // "link/file → PDF" flow, hide the HTML-text and image buttons so the
       // user only sees the one action that fits this page.
+      const onOpenedPost = _pageIsOpenedBulletinPost();
       const pdfFlowType =
         onDirectPdf ||
         wpBlockPage ||
@@ -4751,18 +4803,35 @@
         pageCtx.type === "iframe_maybe" ||
         pageCtx.type === "wix_viewer";
       if (savePagePdfBtn) {
-        savePagePdfBtn.style.display =
-          pdfFlowType || (htmlCapturePage && stepCount === 0) ? "none" : "block";
+        savePagePdfBtn.style.display = onDirectPdf ? "none" : "block";
+        savePagePdfBtn.textContent = "Mark as HTML on this page";
       }
       if (pickImageBtn) {
-        pickImageBtn.style.display = pdfFlowType ? "none" : "block";
-        pickImageBtn.style.background = pageCtx.type === "image" ? "#16a34a" : "#2563eb";
+        pickImageBtn.style.display = onDirectPdf ? "none" : "block";
+        pickImageBtn.style.background =
+          pageCtx.type === "image" || onOpenedPost ? "#16a34a" : "#2563eb";
+        pickImageBtn.textContent = "Mark as picture on this page";
       }
       if (imageCropBtn) {
-        imageCropBtn.style.display = pdfFlowType ? "none" : "block";
+        imageCropBtn.style.display = onDirectPdf ? "none" : "block";
+      }
+      if (onOpenedPost && nextStepBanner) {
+        nextStepBanner.style.display = "block";
+        nextStepBanner.textContent =
+          "This week's page is open. Mark it as a picture, HTML, or PDF.";
+      }
+      const pendingKind = String(
+        _pendingAwaitMarkKind || (_pendingAwaitImageOnPost ? "image" : "")
+      ).toLowerCase();
+      if (pendingKind && onOpenedPost) {
+        _pendingAwaitImageOnPost = false;
+        _pendingAwaitMarkKind = "";
+        void _persistRecordingSession({ awaitImageOnPost: false, awaitMarkKind: "" });
+        _startMarkKindOnThisPage(pendingKind);
       }
       if (getPdfBtn) {
-        getPdfBtn.style.display = wpBlockPage || mdocsPdfPage ? "none" : "block";
+        getPdfBtn.style.display = "block";
+        getPdfBtn.textContent = "Mark as PDF on this page";
       }
 
       if (playbookPanel && window.ph_playbook?.render) {
@@ -4803,6 +4872,11 @@
         // hidden after every refresh, so the control only flashed briefly.
         pinLinkBtn.style.display = onDirectPdf ? "none" : "block";
       }
+      if (openSavedPostBtn) {
+        const haveSavedPost = Boolean(_savedOpenPageUrl());
+        openSavedPostBtn.style.display =
+          haveSavedPost && !onOpenedPost && !onDirectPdf ? "block" : "none";
+      }
       } catch (guidedErr) {
         console.error("[Parish Trainer] guided context refresh failed:", guidedErr);
         if (globalThis.ph_toolbar_diag?.setError) {
@@ -4841,7 +4915,196 @@
       return { pool, ambiguous, hasAnyDate };
     };
 
-    const _recordBulletinListPick = (selectedEl, { openAfter = false } = {}) => {
+    const _normalizeMarkKind = (kind) => {
+      const k = String(kind || "").toLowerCase();
+      if (k === "html" || k === "print_to_pdf") return "html";
+      if (k === "pdf" || k === "download") return "pdf";
+      if (k === "image" || k === "picture") return "image";
+      return "";
+    };
+
+    const _startMarkPictureOnThisPage = () => {
+      pickedImages = [];
+      showStatus("Click the bulletin picture on this page.", "info");
+      startPickImageMode(showPickImageConfirmation, showStatus);
+    };
+
+    const _startMarkKindOnThisPage = (kind) => {
+      const k = _normalizeMarkKind(kind);
+      if (k === "html") {
+        standaloneAddStep({ action: "print_to_pdf" }, "print_to_pdf", "📰 Save page as PDF");
+        showStatus(
+          "✅ Recorded: this page is HTML — harvest prints it to PDF. Tap Send & test.",
+          "ok"
+        );
+        resetGuidedPanel();
+        return;
+      }
+      if (k === "pdf") {
+        const result = _ensureTerminalPdfStep();
+        if (result?.ok) {
+          showStatus(
+            result.added
+              ? "✅ Recorded: this page is a PDF. Tap Send & test."
+              : "✅ PDF step already recorded. Tap Send & test.",
+            "ok"
+          );
+          resetGuidedPanel();
+          return;
+        }
+        markDownloadUrlSafe(window.location.href, showStatus, false);
+        return;
+      }
+      _startMarkPictureOnThisPage();
+    };
+
+    const _openSavedPostThenMark = (postUrl, selectedEl, kind) => {
+      const absHref = _absoluteHttpUrl(postUrl);
+      if (!absHref) {
+        showStatus("❌ That page has no URL to open.", "error");
+        return;
+      }
+      _pendingOpenPageUrl = absHref;
+      if (_urlLooksLikeDatedHtmlPost(absHref)) _pendingExamplePostUrl = absHref;
+      const markKind = _normalizeMarkKind(kind);
+      _pendingAwaitMarkKind = markKind;
+      _pendingAwaitImageOnPost = markKind === "image";
+      const opening =
+        markKind === "html"
+          ? "Opening the page — then mark it as HTML."
+          : markKind === "pdf"
+            ? "Opening the page — then mark it as a PDF."
+            : markKind === "image"
+              ? "Opening the page — then tap the bulletin picture."
+              : "Opening the page — then choose picture, HTML, or PDF.";
+      showStatus(opening, "info");
+      void (async () => {
+        await _flushRecordingSession({
+          openPageUrl: absHref,
+          examplePostUrl: _pendingExamplePostUrl || "",
+          awaitImageOnPost: markKind === "image",
+          awaitMarkKind: markKind,
+        });
+        await _navigateRecordingToUrl(absHref, selectedEl, showStatus);
+      })();
+    };
+
+    const _openSavedPostThenMarkImage = (postUrl, selectedEl) =>
+      _openSavedPostThenMark(postUrl, selectedEl, "image");
+
+    const _fullWidthBtn = (btn) => {
+      btn.style.width = "100%";
+      btn.style.padding = "8px 10px";
+      btn.style.fontSize = "11px";
+      return btn;
+    };
+
+    const _appendFormatChoiceButtons = (btnRow, { absHref, selectedEl, alreadyOpen }) => {
+      const specs = [
+        {
+          kind: "image",
+          color: "#2563eb",
+          open: "Open — bulletin is a picture",
+          mark: "Mark as picture on this page",
+        },
+        {
+          kind: "html",
+          color: "#7c3aed",
+          open: "Open — bulletin is HTML (text)",
+          mark: "Mark as HTML on this page",
+        },
+        {
+          kind: "pdf",
+          color: "#0f766e",
+          open: "Open — bulletin is a PDF",
+          mark: "Mark as PDF on this page",
+        },
+      ];
+      for (const spec of specs) {
+        btnRow.appendChild(
+          _fullWidthBtn(
+            makeSmallBtn(
+              alreadyOpen ? spec.mark : spec.open,
+              spec.color,
+              () => {
+                if (alreadyOpen || _sameHttpUrl(window.location.href, absHref)) {
+                  _pendingOpenPageUrl = absHref;
+                  if (_urlLooksLikeDatedHtmlPost(absHref)) _pendingExamplePostUrl = absHref;
+                  void _persistRecordingSession({
+                    openPageUrl: absHref,
+                    examplePostUrl: _pendingExamplePostUrl || "",
+                  });
+                  _startMarkKindOnThisPage(spec.kind);
+                  return;
+                }
+                if (
+                  selectedEl &&
+                  _recordBulletinListPick(selectedEl, {
+                    openAfter: true,
+                    markKind: spec.kind,
+                  })
+                ) {
+                  return;
+                }
+                _openSavedPostThenMark(absHref, selectedEl, spec.kind);
+              },
+              "Works on any parish site — picture, HTML text, or PDF"
+            )
+          )
+        );
+      }
+    };
+
+    const _showHtmlPostNextStep = (postUrl, selectedEl) => {
+      const absHref = _absoluteHttpUrl(postUrl);
+      const alreadyOpen = _sameHttpUrl(window.location.href, absHref);
+      _clearElement(guidedPanel);
+      if (patternHintWrap) guidedPanel.appendChild(patternHintWrap);
+      if (parishRecordingLine) guidedPanel.appendChild(parishRecordingLine);
+      if (pageLoadTimerLine) guidedPanel.appendChild(pageLoadTimerLine);
+
+      const heading = document.createElement("div");
+      heading.style.cssText =
+        "font-weight:700;color:#93c5fd;margin-bottom:6px;font-size:12px;";
+      heading.textContent = alreadyOpen
+        ? "What is the bulletin on this page?"
+        : "Link saved. What is the bulletin?";
+      guidedPanel.appendChild(heading);
+
+      const note = document.createElement("div");
+      note.style.cssText =
+        "font-size:10px;color:#e2e8f0;line-height:1.45;background:#0f172a;border-radius:4px;padding:8px;margin-bottom:8px;border:1px solid #334155;";
+      note.textContent =
+        "Any parish site. Picture, HTML text, or PDF — pick the one you see.";
+      guidedPanel.appendChild(note);
+
+      const btnRow = document.createElement("div");
+      btnRow.style.cssText = "display:flex;flex-direction:column;gap:6px;";
+      _appendFormatChoiceButtons(btnRow, { absHref, selectedEl, alreadyOpen });
+
+      const laterBtn = _fullWidthBtn(
+        makeSmallBtn(
+          "Keep the link only",
+          "#374151",
+          () => {
+            showStatus(
+              "✅ Link saved. Open it later and mark picture, HTML, or PDF — or Send & test.",
+              "ok"
+            );
+            resetGuidedPanel();
+          },
+          "Stay here — Open this week's post stays on the toolbar"
+        )
+      );
+      laterBtn.style.fontSize = "10px";
+      btnRow.appendChild(laterBtn);
+      guidedPanel.appendChild(btnRow);
+    };
+
+    const _recordBulletinListPick = (
+      selectedEl,
+      { openAfter = false, markKind = "" } = {}
+    ) => {
       const selector = buildStableLinkSelector(selectedEl);
       const href =
         _hrefFromBulletinClick(selectedEl) ||
@@ -4854,15 +5117,34 @@
         selectedEl
       );
       const absHref = _absoluteHttpUrl(href);
+      const openablePage = _urlLooksLikeOpenablePage(absHref);
       const htmlPostPick = _urlLooksLikeDatedHtmlPost(absHref);
-      if (!openAfter && htmlPostPick) {
-        _pendingExamplePostUrl = absHref;
-        void _persistRecordingSession({ examplePostUrl: absHref });
+      if (openablePage) {
+        _pendingOpenPageUrl = absHref;
+        if (htmlPostPick) _pendingExamplePostUrl = absHref;
+        if (openAfter) {
+          const kind = _normalizeMarkKind(markKind);
+          _pendingAwaitMarkKind = kind;
+          _pendingAwaitImageOnPost = kind === "image";
+          void _flushRecordingSession({
+            openPageUrl: absHref,
+            examplePostUrl: _pendingExamplePostUrl || "",
+            awaitImageOnPost: kind === "image",
+            awaitMarkKind: kind,
+          });
+          return false;
+        }
+        void _persistRecordingSession({
+          openPageUrl: absHref,
+          examplePostUrl: _pendingExamplePostUrl || "",
+        });
         showStatus(
-          "✅ This week's post saved. Tap Send & test — it goes to GitHub. No new tab.",
+          "✅ Link saved (see Recipe Preview). Mark it as a picture, HTML, or PDF — or Send & test.",
           "ok"
         );
-        resetGuidedPanel();
+        if (_refreshRecipeCount) _refreshRecipeCount();
+        if (_stepsListEl) _renderSessionSteps();
+        _showHtmlPostNextStep(absHref, selectedEl);
         return true;
       }
 
@@ -4937,6 +5219,13 @@
       yesBtn.style.padding = "8px 10px";
       yesBtn.style.fontSize = "11px";
 
+      const hrefNow =
+        _hrefFromBulletinClick(selectedEl) ||
+        selectedEl.getAttribute("href") ||
+        href;
+      const absNow = _absoluteHttpUrl(hrefNow);
+      const alreadyHere = _sameHttpUrl(window.location.href, absNow);
+
       const wrongBtn = makeSmallBtn(
         "❌ Wrong — let me point at the right link",
         "#b91c1c",
@@ -4970,6 +5259,11 @@
       pickListBtn.style.fontSize = "9px";
 
       btnRow.appendChild(yesBtn);
+      _appendFormatChoiceButtons(btnRow, {
+        absHref: absNow,
+        selectedEl,
+        alreadyOpen: alreadyHere,
+      });
       btnRow.appendChild(wrongBtn);
       btnRow.appendChild(pickListBtn);
       guidedPanel.appendChild(btnRow);
@@ -5230,6 +5524,20 @@
       pickAgainBtn.style.fontSize = "9px";
 
       btnRow.appendChild(recordOnlyBtn);
+      _appendFormatChoiceButtons(btnRow, {
+        absHref: _absoluteHttpUrl(
+          _hrefFromBulletinClick(selectedEl) ||
+            selectedEl.getAttribute("href") ||
+            href
+        ),
+        selectedEl,
+        alreadyOpen: _sameHttpUrl(
+          window.location.href,
+          _absoluteHttpUrl(
+            _hrefFromBulletinClick(selectedEl) || selectedEl.getAttribute("href") || href
+          )
+        ),
+      });
       btnRow.appendChild(yesOpenBtn);
       btnRow.appendChild(stayBtn);
       btnRow.appendChild(pickAgainBtn);
@@ -5773,6 +6081,7 @@
     let imageCropBtn = null;
     let pinLinkBtn = null;
     let getPdfBtn = null;
+    let openSavedPostBtn = null;
 
     const _isStaticOneStepPage = (pageCtx = detectPageType()) =>
       pageCtx.type === "wp_block_file_bulletin" ||
@@ -5926,23 +6235,37 @@
     wizardBtns.appendChild(pinLinkBtn);
     wizardBtns.appendChild(contextPrimaryBtn);
 
+    openSavedPostBtn = makeSmallBtn(
+      "Open this week's post — then mark the picture",
+      "#16a34a",
+      () => {
+        const saved = _savedOpenPageUrl();
+        if (!saved) {
+          showStatus("❌ No page saved yet — Pick newest first.", "error");
+          return;
+        }
+        _openSavedPostThenMarkImage(saved, null);
+      },
+      "Opens the saved page on any parish site so you can mark the image"
+    );
+    openSavedPostBtn.style.display = "none";
+    wizardBtns.appendChild(openSavedPostBtn);
+
     savePagePdfBtn = makeSmallBtn(
-      "📰 Save page as PDF (HTML text bulletin)",
+      "Mark as HTML on this page",
       "#7c3aed",
       () => {
-        standaloneAddStep({ action: "print_to_pdf" }, "print_to_pdf", "📰 Save page as PDF");
-        showStatus("✅ Recorded: this page will be printed into the mega bulletin on Sunday.", "ok");
+        _startMarkKindOnThisPage("html");
       },
-      "Bulletin is text on the page (WordPress/Wix/HTML notice board) — harvester prints it to PDF"
+      "Bulletin is text on the page — harvest prints it to PDF"
     );
     pickImageBtn = makeSmallBtn(
-      "🖼️ Pick bulletin image on this page",
+      "Mark as picture on this page",
       "#2563eb",
       () => {
-        pickedImages = [];
-        startPickImageMode(showPickImageConfirmation, showStatus);
+        _startMarkPictureOnThisPage();
       },
-      "The bulletin is a picture on the page — click to select it"
+      "The bulletin is a picture on this page — works on any parish site"
     );
     imageCropBtn = makeSmallBtn(
       "✂️ Crop bulletin from screen",
@@ -5968,12 +6291,13 @@
     moreOptionsBody.appendChild(manualPickLinkBtn);
 
     const pdfBtn = makeSmallBtn(
-      "📄 Get a PDF",
-      "#374151",
-      () => markDownloadUrlSafe(window.location.href, showStatus, false),
-      "Advanced: save PDF when you are already on the raw PDF file (not needed on embed bulletin pages)"
+      "Mark as PDF on this page",
+      "#0f766e",
+      () => _startMarkKindOnThisPage("pdf"),
+      "Bulletin is a PDF on this page — works on any parish site"
     );
     getPdfBtn = pdfBtn;
+    wizardBtns.appendChild(pdfBtn);
     const noBulletinBtn = makeSmallBtn(
       "🚫 No bulletin here (skip)",
       "#6b7280",
@@ -5996,7 +6320,6 @@
       "Record that this parish has no bulletin and skip it"
     );
 
-    moreOptionsBody.appendChild(pdfBtn);
     moreOptionsBody.appendChild(noBulletinBtn);
 
     parishRecordingLine = document.createElement("div");
@@ -6428,9 +6751,12 @@
     // Wire up the recipe count refresh callback
     _refreshRecipeCount = () => {
       const sentCount = _standaloneRecipeSteps().length;
+      const savedPage = _savedOpenPageUrl();
       if (sentCount > 0) {
         lastPushedRecipeNote = "";
         recipeTitleEl.textContent = `📋 Recipe Preview (${sentCount} step${sentCount !== 1 ? "s" : ""})`;
+      } else if (savedPage) {
+        recipeTitleEl.textContent = "📋 Recipe Preview — this week's page saved";
       } else if (lastPushedRecipeNote) {
         recipeTitleEl.textContent = "📋 Recipe Preview — sent to GitHub";
       } else {
@@ -6441,7 +6767,7 @@
         ? `Sunday start URL: ${startPreview}`
         : "Sunday start URL: (record a step)";
       _scheduleRefreshGuidedContext();
-      if (_standaloneRecipeSteps().length > 0 && !recipeOpen) {
+      if ((_standaloneRecipeSteps().length > 0 || savedPage) && !recipeOpen) {
         recipeOpen = true;
         recipeBodyEl.style.display = "block";
         recipeToggleEl.textContent = "▼";
