@@ -17,6 +17,14 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 15/09/2026 (evening) — T6 no dated start_url
+
+**The real goal, in one sentence:** Send & test from this week’s page keeps the listing as `start_url`.
+
+**This turn:** Trainer **1.61.39**. Dated page → save as `example_post_url`. No “Update start_url” / kit warning on a dated post. [#234](https://github.com/Raphoe-Diocese/parish_harvester/pull/234) merged. **Not live** until Reload (card **1.61.39**).
+
+**Next:** Reload 1.61.39, then T7 (kit one fix line).
+
 ## 15/09/2026 (afternoon) — T4 version banner
 
 **The real goal, in one sentence:** if this PC is on an old Trainer, the card says so.

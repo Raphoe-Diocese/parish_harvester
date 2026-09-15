@@ -324,10 +324,43 @@ async function testPushKeepsEngineRecipe() {
   console.log("ok: pushRecipe replaces steps but keeps the other recipe fields");
 }
 
+async function testPushKeepsListingStartUrl() {
+  const existing = {
+    parish_key: "stpatricksbelfast",
+    display_name: "St Patrick's, Belfast",
+    diocese: "down_and_connor",
+    start_url: "https://www.stpatricksbelfast.org/category/weekly-bulletins",
+    steps: [{ action: "goto", url: "https://www.stpatricksbelfast.org/category/weekly-bulletins" }],
+  };
+  const putLog = [];
+  const mod = loadGithubRecipePush(makePushFetch(existing, putLog));
+  const dated =
+    "https://www.stpatricksbelfast.org/weekly-bulletins/weekly-bulletin-for-sunday-13-september-2026/";
+  const res = await mod.pushRecipe({
+    gh_pat: "ghp_test",
+    gh_repo: "Raphoe-Diocese/parish_harvester",
+    parish_key: "stpatricksbelfast",
+    recipe: {
+      parish_key: "stpatricksbelfast",
+      start_url: dated,
+      steps: [{ action: "goto", url: dated }],
+    },
+  });
+  assert.strictEqual(res.ok, true, res.error);
+  assert.strictEqual(
+    putLog[0].start_url,
+    existing.start_url,
+    "dated post must not become start_url"
+  );
+  assert.strictEqual(putLog[0].example_post_url, dated);
+  console.log("ok: pushRecipe keeps listing start_url when the page is dated");
+}
+
 async function main() {
   testMessageHandlers();
   await testPollHarvestUntilDone();
   await testPushKeepsEngineRecipe();
+  await testPushKeepsListingStartUrl();
   console.log("C5 extension JS tests passed");
 }
 

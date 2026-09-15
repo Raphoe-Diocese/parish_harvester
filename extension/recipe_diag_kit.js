@@ -476,7 +476,17 @@
       const pageHost = _hostname(pageCtx.page_url || "");
       if (recHost && pageHost && recHost === pageHost && pageCtx.page_url) {
         const norm = (u) => String(u || "").replace(/\/+$/, "");
-        if (norm(recipe.start_url) !== norm(pageCtx.page_url) && !norm(pageCtx.page_url).includes("/newsletter")) {
+        const pageLooksDated =
+          typeof globalThis.__phUrlLooksLikeDatedHtmlPost === "function"
+            ? globalThis.__phUrlLooksLikeDatedHtmlPost(pageCtx.page_url)
+            : /\/20\d{2}\/\d{1,2}\/|\d{1,2}(?:st|nd|rd|th)?[-_/].*20\d{2}|20\d{2}/i.test(
+                String(pageCtx.page_url || "")
+              );
+        if (
+          norm(recipe.start_url) !== norm(pageCtx.page_url) &&
+          !norm(pageCtx.page_url).includes("/newsletter") &&
+          !pageLooksDated
+        ) {
           issues.push(
             _issue(
               "start_url_drift",
