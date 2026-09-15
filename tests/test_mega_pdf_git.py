@@ -513,4 +513,6 @@ class HarvestWorkflowMegaPushTests(unittest.TestCase):
         self.assertIn("git add -f docs/mega_pdf/*_mega_bulletin.pdf docs/mega_pdf/*_mega_bulletin_p1.jpg", workflow)
         self.assertIn("docs/dioceses/", workflow)
         self.assertIn("cron: '0 9 * * 0'", workflow)
-        self.assertNotIn("HARVEST_MEGA_PDF: \"0\"", workflow)
+        # S1 diocese slices skip mega; the stitch job builds it once.
+        self.assertIn("merge_diocese_harvests.py --slices-dir _slices --mega", workflow)
+        self.assertGreaterEqual(workflow.count('HARVEST_MEGA_PDF: "1"'), 1)

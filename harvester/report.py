@@ -446,6 +446,51 @@ def _recompute_summary(report: dict) -> None:
     }
 
 
+def merge_diocese_reports(reports: list[dict]) -> dict:
+    """Union parish rows from per-diocese harvest reports into one report.
+
+    Later reports win when the same parish key appears twice. Used by the S1
+    stitch job so four parallel diocese runs become one ``Bulletins/report.json``.
+    """
+    out: dict = {
+        "target_date": "",
+        "downloaded": [],
+        "html_links": [],
+        "skipped": [],
+        "failed": [],
+        "stale_rejected": [],
+    }
+    for src in reports:
+        if not isinstance(src, dict):
+            continue
+        src_date = str(src.get("target_date") or "").strip()
+        if src_date and (not out["target_date"] or src_date > str(out["target_date"])):
+            out["target_date"] = src_date
+        keys: list[str] = []
+        for section in ("downloaded", "html_links", "skipped", "failed", "stale_rejected"):
+            for item in src.get(section) or []:
+                if isinstance(item, dict) and item.get("parish"):
+                    keys.append(str(item["parish"]))
+        for key in keys:
+            _remove_parish_from_sections(out, key)
+        for section in ("downloaded", "html_links", "skipped", "failed", "stale_rejected"):
+            if not isinstance(out.get(section), list):
+                out[section] = []
+            for item in src.get(section) or []:
+                if isinstance(item, dict) and item.get("parish"):
+                    out[section].append(item)
+        if src.get("last_patched_at"):
+            stamps = [
+                v
+                for v in (out.get("last_patched_at"), src.get("last_patched_at"))
+                if isinstance(v, str) and v
+            ]
+            if stamps:
+                out["last_patched_at"] = max(stamps)
+    _recompute_summary(out)
+    return out
+
+
 def merge_single_parish_report(base: dict, mine: dict, parish_key: str) -> dict:
     """Return *base* report with only *parish_key*'s entry taken from *mine*.
 

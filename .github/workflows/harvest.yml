@@ -39,16 +39,17 @@ permissions:
 
 # Full harvest and single-parish tests must not share one queue — otherwise
 # "Send & test" waits 30–60+ min behind a running full harvest.
-# Do not add a diocese matrix: one job writes report.json, parish_status.json,
-# mega PDFs, and commits to main. Parallel diocese jobs would race on git push
-# and overwrite shared status. Future (26 dioceses): one job per diocese writes
-# its own artifact; a final stitch job builds megas + parish_status + pages.
+# S1: Sunday / all-diocese runs use a matrix (one job per diocese, no git
+# push) plus a stitch job that merges report.json + parish_status.json,
+# builds mega PDFs, and commits once. Single-parish Send & test and a
+# one-diocese dispatch still use the harvest job below.
 concurrency:
   group: harvest-${{ github.event.inputs.target_parish || 'full' }}
   cancel-in-progress: ${{ github.event.inputs.target_parish != '' }}
 
 jobs:
   harvest:
+    if: ${{ github.event_name == 'workflow_dispatch' && ((github.event.inputs.target_parish || '') != '' || ((github.event.inputs.diocese || 'all') != 'all')) }}
     runs-on: ubuntu-latest
     # Public-repo Actions minutes are free — allow slow parishes (up to ~15 min each).
     timeout-minutes: 360
@@ -457,3 +458,161 @@ jobs:
           from harvester.cost_tracker import update_dashboard
           update_dashboard(Path('.'))
           " || echo "⚠️  Cost dashboard update failed — harvest continues."
+
+  diocese:
+    if: ${{ github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.target_parish || '') == '' && (github.event.inputs.diocese || 'all') == 'all') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    strategy:
+      fail-fast: false
+      max-parallel: 4
+      matrix:
+        diocese:
+          - clogher_diocese
+          - derry_diocese
+          - down_and_connor
+          - raphoe_diocese
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: requirements.txt
+
+      - name: Install Python dependencies
+        run: |
+          set -euo pipefail
+          pip install -r requirements.txt
+
+      - name: Cache Playwright browsers
+        uses: actions/cache@v4
+        with:
+          path: ~/.cache/ms-playwright
+          key: playwright-chromium-${{ runner.os }}-py312
+
+      - name: Install Playwright browsers
+        run: |
+          set -euo pipefail
+          python -m playwright install --with-deps chromium
+
+      - name: Install LibreOffice (DOCX → PDF conversion)
+        run: |
+          set -euo pipefail
+          sudo apt-get update -y
+          sudo apt-get install -y --no-install-recommends libreoffice-writer ghostscript
+
+      - name: Harvest one diocese
+        id: harvest_run
+        run: |
+          set -euo pipefail
+          xvfb-run -a python main.py --diocese ${{ matrix.diocese }}
+        env:
+          HARVEST_MEGA_PDF: "0"
+          HARVEST_SKIP_STATUS: "1"
+          MISTRAL_API_KEY: ${{ secrets.MISTRAL_API_KEY }}
+          GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+
+      - name: Upload diocese slice
+        if: steps.harvest_run.outcome == 'success'
+        uses: actions/upload-artifact@v4
+        with:
+          name: harvest-slice-${{ matrix.diocese }}
+          path: |
+            Bulletins/report.json
+            Bulletins/report.txt
+            Bulletins/current/
+            parishes/consecutive_failures.json
+          if-no-files-found: error
+          retention-days: 14
+
+  stitch:
+    needs: diocese
+    if: ${{ always() && !cancelled() && (github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && (github.event.inputs.target_parish || '') == '' && (github.event.inputs.diocese || 'all') == 'all')) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+          cache: 'pip'
+          cache-dependency-path: requirements.txt
+
+      - name: Install Python dependencies
+        run: |
+          set -euo pipefail
+          pip install -r requirements.txt
+          pip install pytest
+
+      - name: Run tests
+        run: |
+          set -euo pipefail
+          python -m pytest -v --tb=short
+
+      - name: Download diocese slices
+        uses: actions/download-artifact@v4
+        with:
+          pattern: harvest-slice-*
+          path: _slices
+          merge-multiple: false
+
+      - name: Merge slices, status, mega PDFs
+        env:
+          HARVEST_MEGA_PDF: "1"
+        run: |
+          set -euo pipefail
+          python scripts/merge_diocese_harvests.py --slices-dir _slices --mega
+          python -c "from pathlib import Path; from harvester.site_builder import run; run(report_path=Path('Bulletins/report.json'), docs_dir=Path('docs'))"
+
+      - name: Upload mega PDF artifacts
+        continue-on-error: true
+        uses: actions/upload-artifact@v4
+        with:
+          name: all-mega-bulletin-pdf
+          path: mega_pdf/*_mega_bulletin.pdf
+          if-no-files-found: warn
+          retention-days: 30
+
+      - name: Upload Bulletins artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: bulletins-${{ github.run_id }}
+          path: Bulletins/
+          retention-days: 30
+
+      - name: Commit merged harvest
+        id: commit_harvest
+        run: |
+          set -euo pipefail
+          if [ ! -f Bulletins/report.json ]; then
+            echo "Error: stitch finished but Bulletins/report.json is missing."
+            exit 1
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add -f Bulletins/report.json Bulletins/report.txt Bulletins/dashboard.html docs/manifest.json docs/index.html docs/dioceses/ 2>/dev/null || true
+          git add -f Bulletins/current/*.pdf 2>/dev/null || true
+          git add -f mega_pdf/*_mega_bulletin.pdf mega_pdf/*_mega_bulletin_p1.jpg 2>/dev/null || true
+          git add -f docs/mega_pdf/*_mega_bulletin.pdf docs/mega_pdf/*_mega_bulletin_p1.jpg docs/mega_pdf/*.pages.json 2>/dev/null || true
+          git add -f parishes/consecutive_failures.json parishes/stale_bulletins.json parishes/retry_queue.json parishes/parish_status.json parishes/training_backlog.json 2>/dev/null || true
+          shopt -s nullglob
+          for proof in Bulletins/*.pdf; do
+            case "$(basename "$proof")" in
+              all_bulletins_*) ;;
+              *) git add -f "$proof" ;;
+            esac
+          done
+          if git diff --cached --quiet; then
+            echo "ℹ️  No staged changes — skipping commit."
+            exit 0
+          fi
+          git commit -m "chore: add harvested bulletins for $(date +%Y-%m-%d) [skip ci]"
+          python scripts/push_harvest_results.py --remote origin --branch main --target-parish ""

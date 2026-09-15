@@ -43,6 +43,9 @@ class SendTestCommsTests(unittest.TestCase):
             yml,
         )
         self.assertIn("Cache Playwright browsers", yml)
+        self.assertIn("max-parallel: 4", yml)
+        self.assertIn("HARVEST_SKIP_STATUS", yml)
+        self.assertIn("merge_diocese_harvests.py", yml)
 
     def test_manifest_bumped_for_extension_js(self) -> None:
         text = MANIFEST.read_text(encoding="utf-8")

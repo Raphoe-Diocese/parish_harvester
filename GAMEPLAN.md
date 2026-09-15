@@ -17,6 +17,14 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 15/09/2026 (evening 2) — S1 diocese matrix
+
+**The real goal, in one sentence:** Sunday harvests four dioceses at once, then writes GitHub once.
+
+**This turn:** Frank said 1.61.39 is working. S1: matrix (max 4) + stitch merge. Send & test unchanged. PR: https://github.com/Raphoe-Diocese/parish_harvester/pull/236 — **not on main** until merge. **Not proved** until a Sunday/all run ID. No harvest on this PC.
+
+**Next:** merge [#236](https://github.com/Raphoe-Diocese/parish_harvester/pull/236) when CI is green. Proof is the next full harvest run.
+
 ## 15/09/2026 (evening) — T6 + T7 + T8 on one PR
 
 **The real goal, in one sentence:** dated pages stay listings, the kit tells one truth, Open site always shows the toolbar.
