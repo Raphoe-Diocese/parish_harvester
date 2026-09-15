@@ -380,9 +380,17 @@ def main() -> int:
         print(f"  📄 Report TXT  : {REPORT_TXT}")
 
     print("\n── Parish status ───────────────────────────────────────────")
+    skip_status = os.environ.get("HARVEST_SKIP_STATUS", "0").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+    }
     try:
-        write_parish_status()
-        print("  📄 Wrote       : parishes/parish_status.json")
+        if skip_status:
+            print("  ⏭️  Skipped (HARVEST_SKIP_STATUS — stitch job writes the full file)")
+        else:
+            write_parish_status()
+            print("  📄 Wrote       : parishes/parish_status.json")
     except Exception as exc:
         # parishes/parish_status.json is the single source of truth for the
         # Problems tab (see AGENTS.md). A silent failure here would let the
