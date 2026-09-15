@@ -26,6 +26,14 @@ Collated Bulletin (mega PDF) stitching is **core production behaviour, not optio
 
 **Do not lie about done.** Never tell Frank a website/OCR/viewer job is finished unless you have checked the **generated files that GitHub Pages deploys** (`docs/index.html`, `docs/dioceses/`, `docs/parishes/`) AND, after merge+Pages, the **live URL** (e.g. https://www.parishpress.ie/). Tests or Python-only edits are not enough. If it is not on the live page, say “not live yet”. Do not tick backlog items done without the live check.
 
+## Confetti cannon (hard wins only)
+
+When a **major** step is proved — not routine work — fire the Cursor confetti cannon (`show_confetti` on `cursor-app-control`). Once per milestone. Skip silently if the tool is missing.
+
+**Fire after:** a hard multi-turn fix lands; a PR opens after a long fight; CI goes green after repeated fails; Frank’s harvest/trainer result is proved on GitHub; a locked-list level is actually done (live URL or run ID).
+
+**Do not fire** for ordinary edits, version bumps, “written down”, Reload reminders, or the first try that just works. Do not spam.
+
 ## PHASE PLAN
 
 ### Phase 1: Core capture reliability

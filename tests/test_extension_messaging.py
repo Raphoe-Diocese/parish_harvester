@@ -95,9 +95,9 @@ class ExtensionMessagingTests(unittest.TestCase):
     def test_toolbar_core_controls_and_advanced_fold_exist(self) -> None:
         content = CONTENT_JS.read_text(encoding="utf-8")
         for label in (
-            "📄 Get a PDF",
+            "Mark as PDF on this page",
             "🔗 1. Follow a link",
-            "🖼️ Pick bulletin image on this page",
+            "Mark as picture on this page",
             "📐 It's in a frame / viewer",
             "🔍 Find bulletin on this page",
             "📋 Recipe Preview",
@@ -148,7 +148,7 @@ class ExtensionMessagingTests(unittest.TestCase):
         content = CONTENT_JS.read_text(encoding="utf-8")
         html = SIDEPANEL_HTML.read_text(encoding="utf-8")
         manifest = json.loads(MANIFEST_JSON.read_text(encoding="utf-8"))
-        self.assertEqual(manifest.get("version"), "1.61.33")
+        self.assertEqual(manifest.get("version"), "1.61.37")
         bg_js = (REPO_ROOT / "extension" / "background.js").read_text(encoding="utf-8")
         self.assertIn('message?.type === "dismiss_toolbar"', bg_js)
         self.assertIn("_isFixNowCancelled", bg_js)

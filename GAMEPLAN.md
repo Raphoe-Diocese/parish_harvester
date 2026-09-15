@@ -17,6 +17,48 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 15/09/2026 — Confetti cannon in the agent must-read
+
+**The real goal, in one sentence:** agents celebrate hard wins, not every click.
+
+**This turn:** wrote **Confetti cannon (hard wins only)** into [`AGENTS.md`](AGENTS.md). Once per milestone. Not on GitHub until the next commit/PR.
+
+**Next:** merge [#233](https://github.com/Raphoe-Diocese/parish_harvester/pull/233) when CI is green (St Gerard test no longer pins one example URL).
+
+## 14/09/2026 (evening 5) — Send & test red line was a watcher lie
+
+**The real goal, in one sentence:** Send & test tells the truth when GitHub already has this week’s bulletin.
+
+**Proof (raw GitHub 14/09 ~20:05):** `stgerardsparish` on main is **ok**, `bulletin_date` 13/09/2026, `last_tested_at` 2026-09-14T19:00:43+00:00, not in `actionable_keys`. Run [34884130007](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34884130007) success. The 1.61.36 red line (“parish_status.json did not update”) was the poller (5s skew + 90s give-up), not a failed harvest.
+
+**This turn:** Trainer **1.61.37** — if the row is already **ok** from this test, the card says pass. Tests: JS poller + 27 pytest. Folder: Desktop **latest ext**. Frank Reloaded 15/09 (card **1.61.37**). PR: https://github.com/Raphoe-Diocese/parish_harvester/pull/233 — **not on main** until Frank merges.
+
+**Next:** Frank merges [#233](https://github.com/Raphoe-Diocese/parish_harvester/pull/233) → Problems → Refresh. Do not Send & test again unless he wants — GitHub already has 13/09.
+
+## 14/09/2026 (evening 4) — Why it looked unsaved
+
+**The real goal, in one sentence:** when Frank taps Yes, he can see the save.
+
+**Why the screenshot looked empty:** card was still **1.61.34** (HTML/PDF is 1.61.35+). Yes saved the page URL but Recipe Preview still said **0 steps**.
+
+**This turn:** Trainer **1.61.36** — Preview says “this week's page saved” and shows the URL. Reload until the card says **1.61.36**. Folder: Desktop **latest ext**.
+
+## 14/09/2026 (evening 3) — Picture, HTML, or PDF
+
+**The real goal, in one sentence:** after Frank picks a bulletin link, he can mark it as a picture, HTML text, or PDF — on any parish site.
+
+**This turn:** Trainer **1.61.35**. Confirm screen has three choices. Same three stay on the opened page. **Not live** until Reload (card **1.61.35**).
+
+**Next:** Reload → pick the Sunday Message → tap the matching one (picture / HTML / PDF).
+
+## 14/09/2026 (evening 2) — Open any post, then mark the picture (any site)
+
+**The real goal, in one sentence:** on every parish website, Frank can open the bulletin page and mark the picture — not only St Gerard’s.
+
+**This turn:** Trainer **1.61.34**. Any page-link (not a PDF file) offers **Open this post — then mark the picture**. After it opens, **Mark as picture on this page** is always on the toolbar. Not St Gerard-only. **Not live** until Reload — card must say 1.61.34. Not on GitHub until Frank says PR.
+
+**Next:** Reload → on St Gerard (or any other problem site) Pick newest → Open this post — bulletin is a picture → click the picture → Yes.
+
 ## 14/09/2026 (evening) — T1+T2+T3 built; Frank’s new asks written down
 
 **The real goal, in one sentence:** the best bulletin website for parishes — every fix Frank makes stays on GitHub, and the plan scales to 26 dioceses without breaking the budget or the repo.
