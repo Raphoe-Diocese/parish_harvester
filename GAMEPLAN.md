@@ -21,9 +21,9 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **The real goal, in one sentence:** Sunday still makes mega PDFs, but git stops growing by 70 MB.
 
-**This turn:** [#236](https://github.com/Raphoe-Diocese/parish_harvester/pull/236) merged. S2: harvest/stitch do not `git add` PDFs. Mega generation stays on. Pages prefers harvest artifacts. Week Release `bulletins-YYYY-MM-DD`. History rewrite still parked. **Not proved** until a harvest run adds little to git and parishpress still opens the mega PDF.
+**This turn:** [#236](https://github.com/Raphoe-Diocese/parish_harvester/pull/236) merged. S2 PR: https://github.com/Raphoe-Diocese/parish_harvester/pull/237 — **not on main** until merge. Mega generation stays on. History rewrite still parked.
 
-**Next:** merge the S2 PR when CI is green.
+**Next:** merge [#237](https://github.com/Raphoe-Diocese/parish_harvester/pull/237) when CI is green.
 
 ## 15/09/2026 (evening 2) — S1 diocese matrix
 
