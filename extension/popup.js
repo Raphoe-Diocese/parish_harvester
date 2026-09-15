@@ -1,6 +1,10 @@
 const manifest = chrome.runtime.getManifest();
 const versionEl = document.getElementById("ext-version");
-if (versionEl) versionEl.textContent = `v${manifest.version}`;
+if (typeof globalThis.phPaintTrainerVersion === "function") {
+  globalThis.phPaintTrainerVersion(versionEl, manifest.version);
+} else if (versionEl) {
+  versionEl.textContent = `v${manifest.version}`;
+}
 
 const statusEl = document.getElementById("status");
 const TRAINER_BRIDGE_FILES = globalThis.PH_TRAINER_BRIDGE_FILES || ["bridge_boot.js", "toolbar_diag.js"];

@@ -17,6 +17,14 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 15/09/2026 (afternoon) — T4 version banner
+
+**The real goal, in one sentence:** if this PC is on an old Trainer, the card says so.
+
+**This turn:** Trainer **1.61.38**. Popup and toolbar compare to GitHub `main` (10 min cache). Behind: “Installed X · newest Y — Reload / Load unpacked from Desktop latest ext”. Current: just `v1.61.38`. [#233](https://github.com/Raphoe-Diocese/parish_harvester/pull/233) merged 15/09 16:52 UTC. PR: https://github.com/Raphoe-Diocese/parish_harvester/pull/234 — **not on main** until merge. Banner stays hidden while this PC matches or is newer than `main`. Chrome had Desktop **latest ext** locked; Reload may still show 1.61.37 until those files copy.
+
+**Next:** Reload → card **1.61.38**. Then T6 (don’t push a dated post as start_url). T5 is already in 1.61.37.
+
 ## 15/09/2026 — Confetti cannon in the agent must-read
 
 **The real goal, in one sentence:** agents celebrate hard wins, not every click.
