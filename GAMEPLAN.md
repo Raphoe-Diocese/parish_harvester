@@ -17,13 +17,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
-## 15/09/2026 (evening) — T6 no dated start_url
+## 15/09/2026 (evening) — T6 + T7 + T8 on one PR
 
-**The real goal, in one sentence:** Send & test from this week’s page keeps the listing as `start_url`.
+**The real goal, in one sentence:** dated pages stay listings, the kit tells one truth, Open site always shows the toolbar.
 
-**This turn:** Trainer **1.61.39**. Dated page → save as `example_post_url`. No “Update start_url” / kit warning on a dated post. [#234](https://github.com/Raphoe-Diocese/parish_harvester/pull/234) merged. **Not live** until Reload (card **1.61.39**).
+**This turn:** one PR only — [#235](https://github.com/Raphoe-Diocese/parish_harvester/pull/235), Trainer **1.61.39**. No more split PRs. T6 dated `start_url`, T7 kit “Do this” + no WAF false errors, T8 Open site unhides the toolbar. **Not live** until Reload (card **1.61.39**).
 
-**Next:** Reload 1.61.39, then T7 (kit one fix line).
+**Next:** I merge #235 when green. Then Reload.
 
 ## 15/09/2026 (afternoon) — T4 version banner
 

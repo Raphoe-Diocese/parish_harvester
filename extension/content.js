@@ -98,7 +98,8 @@
   };
   const TOOLBAR_HIDDEN_HOSTS_KEY = "ph_toolbar_hidden_hosts";
 
-  const _currentToolbarHost = () => _hostnameFromUrl(_pageUrlForParishDetection());
+  const _currentToolbarHost = () =>
+    _hostnameFromUrl(_pageUrlForParishDetection()).replace(/^www\d*\./, "");
 
   const _setToolbarHiddenForHost = async (hidden) => {
     const host = _currentToolbarHost();
@@ -362,7 +363,7 @@
   };
 
   const _applyFixNowToolbar = async (message) => {
-    if (await _isToolbarHiddenForHost()) return;
+    await _setToolbarHiddenForHost(false);
     const navAt = Number(message?.nav_started_at);
     if (Number.isFinite(navAt) && navAt > 0) {
       _markNavigationStart(window.location.href, navAt);
@@ -9770,6 +9771,7 @@
   }
 
   globalThis.__phShowToolbar = () => {
+    void _setToolbarHiddenForHost(false);
     _ensureToolbar(true);
     void _markRecordingActive();
   };

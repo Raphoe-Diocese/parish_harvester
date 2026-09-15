@@ -62,11 +62,24 @@
     return {};
   };
 
+  const HTTP_ENGINE_SITE_TYPES = new Set([
+    "waf_retry_wordpress",
+    "predicted_dated_pdf",
+    "http_scrape_newest_pdf",
+    "http_scrape_newest_images",
+    "wp_json_newest_media",
+    "dated_pdf_path",
+  ]);
+
+  const _isHttpEngineSite = (siteType) =>
+    HTTP_ENGINE_SITE_TYPES.has(String(siteType || "").trim().toLowerCase());
+
   const _analyzeSteps = (steps, pageCtx = {}) => {
     const issues = [];
     const list = Array.isArray(steps) ? steps : [];
     const actions = list.map((s) => String(s?.action || "").trim().toLowerCase());
     const pageType = String(pageCtx.page_type?.type || pageCtx.page_type || "").trim();
+    const engineSite = _isHttpEngineSite(pageCtx.site_type);
 
     const examplePost = String(pageCtx.example_post_url || "").trim();
     if (examplePost) {
@@ -97,7 +110,7 @@
     const clickCount = actions.filter((a) => a === "click").length;
     const hasTerminal = actions.some((a) => TERMINAL_ACTIONS.has(a));
 
-    if (clickCount > 0 && !hasTerminal && !examplePost) {
+    if (clickCount > 0 && !hasTerminal && !examplePost && !engineSite) {
       issues.push(
         _issue(
           "click_only",
@@ -213,7 +226,7 @@
       );
     }
 
-    if (pageType === "pdfemb" && clickCount > 0 && !actions.includes("download")) {
+    if (pageType === "pdfemb" && clickCount > 0 && !actions.includes("download") && !engineSite) {
       issues.push(
         _issue(
           "pdfemb_needs_download_step",
@@ -391,15 +404,7 @@
     if (session?.active) {
       const stepCount = Array.isArray(session.steps) ? session.steps.length : 0;
       if (stepCount === 0) {
-        issues.push(
-          _issue(
-            "empty_session",
-            "info",
-            "Recording session active with 0 saved steps",
-            `Host: ${pageHost}`,
-            "Continue training or clear session from a fresh start."
-          )
-        );
+        // T7: 0 saved steps is normal before Yes — do not put it in the paste.
       }
     }
 
@@ -470,7 +475,14 @@
     if (gh.recipe) {
       const recipe = gh.recipe;
       const ghSteps = Array.isArray(recipe.steps) ? recipe.steps : [];
-      issues.push(..._analyzeSteps(ghSteps, { ...pageCtx, page_url: recipe.start_url || pageCtx.page_url }));
+      issues.push(
+        ..._analyzeSteps(ghSteps, {
+          ...pageCtx,
+          page_url: recipe.start_url || pageCtx.page_url,
+          site_type: recipe.site_type,
+          example_post_url: recipe.example_post_url || pageCtx.example_post_url,
+        })
+      );
 
       const recHost = _hostname(recipe.start_url || "");
       const pageHost = _hostname(pageCtx.page_url || "");
@@ -861,20 +873,25 @@
 
     const toolbar = await _checkToolbar();
     const mismatch = _analyzePageRecipeMismatch(pageCtx, pageCtx.recipe_steps || []);
+    const gh = await _fetchGithubContext(pageCtx.page_url || window.location.href, parishKey);
+    const ctx = {
+      ...pageCtx,
+      site_type: gh?.recipe?.site_type || pageCtx.site_type || "",
+      example_post_url: pageCtx.example_post_url || gh?.recipe?.example_post_url || "",
+    };
     let issues = [
       ..._checkExtensionStack(),
       ...toolbar.issues,
       ...(await _checkRecordingSession(pageHost)),
-      ..._analyzeSteps(pageCtx.recipe_steps || [], pageCtx),
-      ..._analyzeSessionDrift(pageCtx),
+      ..._analyzeSteps(ctx.recipe_steps || [], ctx),
+      ..._analyzeSessionDrift(ctx),
       ...mismatch.issues,
     ];
 
-    const pattern_hints = await _getPatternHints(pageCtx, parishKey || "");
+    const pattern_hints = await _getPatternHints(ctx, parishKey || "");
 
-    const gh = await _fetchGithubContext(pageCtx.page_url || window.location.href, parishKey);
     if (gh) {
-      issues.push(..._analyzeGithub(gh, pageCtx));
+      issues.push(..._analyzeGithub(gh, ctx));
     }
 
     issues = _dedupeIssues(issues);
@@ -933,11 +950,23 @@
     return "🟢";
   };
 
+  const _oneFixLine = (report) => {
+    const list = Array.isArray(report?.issues) ? report.issues : [];
+    const rank = { error: 0, warn: 1, ok: 2, info: 3 };
+    const sorted = [...list].sort(
+      (a, b) => (rank[a.severity] ?? 9) - (rank[b.severity] ?? 9)
+    );
+    const pick = sorted.find((item) => String(item.fix || "").trim());
+    return pick ? String(pick.fix).trim() : "";
+  };
+
   const formatReport = (report) => {
     const r = report || {};
+    const doThis = _oneFixLine(r);
     const lines = [
       "Parish Trainer — full diagnosis kit",
       "=================================",
+      doThis ? `Do this: ${doThis}` : "Do this: nothing — no errors.",
       `Time: ${r.collected_at || "n/a"}`,
       `Extension: ${r.extension_version || "n/a"}`,
       `Page: ${r.page_url || "n/a"}`,
