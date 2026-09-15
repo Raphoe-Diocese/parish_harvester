@@ -4130,9 +4130,14 @@
     header.appendChild(title);
 
     const versionBadge = document.createElement("span");
-    versionBadge.style.cssText = "color:#93c5fd;font-size:10px;white-space:nowrap;";
+    versionBadge.style.cssText =
+      "color:#93c5fd;font-size:10px;white-space:normal;max-width:220px;line-height:1.25;";
     try {
-      versionBadge.textContent = `v${chrome.runtime.getManifest().version}`;
+      const installed = chrome.runtime.getManifest().version;
+      versionBadge.textContent = `v${installed}`;
+      if (typeof globalThis.phPaintTrainerVersion === "function") {
+        globalThis.phPaintTrainerVersion(versionBadge, installed);
+      }
     } catch (_e) {
       versionBadge.textContent = "";
     }
