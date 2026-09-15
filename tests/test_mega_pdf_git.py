@@ -509,8 +509,10 @@ class HarvestWorkflowMegaPushTests(unittest.TestCase):
         ).read_text(encoding="utf-8")
         self.assertIn("scripts/push_harvest_results.py", workflow)
         self.assertIn('HARVEST_MEGA_PDF: "1"', workflow)
-        self.assertIn("git add -f mega_pdf/*_mega_bulletin.pdf mega_pdf/*_mega_bulletin_p1.jpg", workflow)
-        self.assertIn("git add -f docs/mega_pdf/*_mega_bulletin.pdf docs/mega_pdf/*_mega_bulletin_p1.jpg", workflow)
+        self.assertNotIn("git add -f mega_pdf/*_mega_bulletin.pdf", workflow)
+        self.assertNotIn("git add -f docs/mega_pdf/*_mega_bulletin.pdf", workflow)
+        self.assertIn("gh release create", workflow)
+        self.assertIn("S2: do not commit PDFs", workflow)
         self.assertIn("docs/dioceses/", workflow)
         self.assertIn("cron: '0 9 * * 0'", workflow)
         # S1 diocese slices skip mega; the stitch job builds it once.
