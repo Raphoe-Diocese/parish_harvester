@@ -256,6 +256,18 @@ jobs:
             echo "::error::OCR completed with ${FAILURES} diocese failure(s) — other dioceses still committed."
           fi
 
+      - name: Update OCR quota dashboard
+        if: always()
+        env:
+          GITHUB_TOKEN: ${{ github.token }}
+          PYTHONPATH: ${{ github.workspace }}
+        run: |
+          python -c "
+          from pathlib import Path
+          from harvester.cost_tracker import update_dashboard
+          update_dashboard(Path('.'))
+          " || echo "Cost dashboard update failed — OCR continues."
+
       - name: Rebuild diocese pages (embed OCR on Raphoe page)
         if: steps.ocr_generate.outputs.processed != '0'
         run: |

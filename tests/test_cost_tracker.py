@@ -47,10 +47,16 @@ class UpdateDashboardTests(unittest.TestCase):
             content = out.read_text(encoding="utf-8")
             # Must contain all required sections
             self.assertIn("# 💷 Cost Dashboard", content)
-            self.assertIn("What's free forever", content)
+            self.assertIn("What does not need a card today", content)
+            self.assertNotIn("What's free forever and won't change", content)
+            self.assertNotIn("1,500 free requests/day", content)
             self.assertIn("What could start costing money", content)
             self.assertIn("Repository storage", content)
             self.assertIn("What to do if a 🔴 appears", content)
+            self.assertIn("OCR pages this month", content)
+            self.assertIn("| Mistral |", content)
+            self.assertIn("| Gemini |", content)
+            self.assertIn("| OpenAI |", content)
 
     def test_dashboard_contains_traffic_lights(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

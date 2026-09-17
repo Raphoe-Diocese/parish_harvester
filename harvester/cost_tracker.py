@@ -141,6 +141,12 @@ def _section_repo_size(repo_root: Path) -> str:
     return "\n".join(lines)
 
 
+def _section_ocr_quota(repo_root: Path) -> str:
+    from ocr.quota_log import markdown_section
+
+    return markdown_section(repo_root)
+
+
 def _section_ai_calls(repo_root: Path) -> str:
     state = _load_ai_state(repo_root)
     lines = [
@@ -194,14 +200,16 @@ def _section_actions_minutes() -> str:
 
 def _section_free_forever() -> str:
     return "\n".join([
-        "## ✅ What's free forever and won't change",
+        "## What does not need a card today",
         "",
-        "- **GitHub Actions** — public repos get unlimited minutes.",
-        "- **GitHub Pages** — 100 GB/month bandwidth, no cost.",
-        "- **Gemini API** — 1,500 free requests/day (no credit card).",
-        "- **Groq API** — 30 free requests/min (no credit card).",
-        "- **Mistral free tier** — ~1 request/sec (no credit card).",
-        "- **Repository storage** — 5 GB hard cap (zip archives disabled; current-week + mega PDFs stay).",
+        "- **GitHub Actions** — this public repo gets free minutes.",
+        "- **GitHub Pages** — free hosting, 100 GB/month bandwidth.",
+        "- **Gemini** — free tier, no card. The daily cap is in AI Studio. It is **not** a forever 1,500.",
+        "- **Mistral** — Free plan is **$10 / month** API credits (about 2,500 OCR pages at $4 / 1,000). Not unlimited.",
+        "- **Groq** — not used to read bulletins.",
+        "- **Repository storage** — 5 GB hard cap. Zip archives stay off.",
+        "",
+        "_Providers can change free tiers. Read the OCR table above for this month’s pages._",
         "",
     ])
 
@@ -255,7 +263,8 @@ def _write_dashboard(repo_root: Path) -> None:
 
     sections = [
         f"# 💷 Cost Dashboard\n\n_Auto-generated at {generated_at} UTC._\n",
-        "_This file is rewritten on every harvest run. Do not edit manually._\n",
+        "_This file is rewritten on every harvest and OCR run. Do not edit manually._\n",
+        _section_ocr_quota(repo_root),
         _section_free_forever(),
         _section_could_cost(),
         _section_repo_size(repo_root),

@@ -17,6 +17,22 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 17/09/2026 — “Free forever” block was too sure
+
+**The real goal, in one sentence:** do not tell Frank Gemini 1,500/day or Mistral will never change.
+
+**This turn:** that list is the old cost dashboard. GitHub Actions/Pages are still free on this public repo. Gemini 15/min and 1,500/day is **not** a forever number. Mistral is **$10 / month**, not unlimited. Groq and zipfile are not the bulletin reader. Rewrote the block on [#240](https://github.com/Raphoe-Diocese/parish_harvester/pull/240). Desktop `COST_DASHBOARD.md` is the stale clone.
+
+**Next:** merge #240.
+
+## 17/09/2026 — S3 OCR quota dashboard
+
+**The real goal, in one sentence:** Frank opens one file and reads three pages-this-month numbers before adding dioceses.
+
+**This turn:** [#239](https://github.com/Raphoe-Diocese/parish_harvester/pull/239) merged `2cff674`. S3 logs Mistral / Gemini / OpenAI pages. Mistral ceiling 2,500 from Free $10. Gemini and OpenAI unknown. Tesseract not counted. **Not live** until this PR merges and an OCR run writes `docs/COST_DASHBOARD.md`.
+
+**Next:** merge the S3 PR. Then open `docs/COST_DASHBOARD.md` and read the three numbers.
+
 ## 17/09/2026 — Picture download still makes a PDF
 
 **The real goal, in one sentence:** if harvest gets a JPEG/PNG, it wraps it into a PDF even when the recipe was never marked as picture.
