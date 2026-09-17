@@ -52,6 +52,67 @@ Facebook / no live weekly file on 22/08/2026: Aughnamullen East, Belleek-Garriso
 - Do not mark the public diocese page done until harvest writes `docs/dioceses/<key>/`.
 - Do not disable `HARVEST_MEGA_PDF`.
 
+## Onboarding pack (one day)
+
+Do **not** start until Frank names the diocese. Kitchen-sink search is the command above. This pack is how that diocese becomes a folder harvest can see.
+
+Today’s four: `clogher`, `derry`, `down_and_connor`, `raphoe`. Harvest `--diocese` uses the **evidence stem**, not the folder name: `clogher_diocese`, `derry_diocese`, `raphoe_diocese`, `down_and_connor`.
+
+### 1. Parish list
+
+1. Write the official directory URL (Expand all / parish-details). Keep Irish names. Skip schools. Facebook is a clickable link only.
+2. Create `parishes/recipes/<folder>/` — lowercase, underscores, same style as `down_and_connor`.
+3. Create the evidence file `parishes/<stem>_bulletin_urls.txt` (copy the Clogher header style). Every parish harvest should see needs a `# --- Name ---` block with `# key:`, `# page:`, then the URL.
+4. Create `parishes/<stem>_contacts.json` (or `parishes/down_and_connor_contacts.json` — match today’s four). Each key: `display_name`, `website`, `facebook`.
+5. A recipe with no evidence row is invisible (`NO_EVIDENCE_ERROR`). Do not add recipes you did not list.
+
+### 2. Keys and names
+
+- `parish_key` = filename stem, lowercase, no spaces.
+- `parish_key` must not equal the folder name (`clogher` parish → `clogherparish`).
+- `display_name` is the human name. Keep Gaeilge as Gaeilge.
+- Recipe `"diocese"` is the **folder** name (`clogher`), not `clogher_diocese`.
+
+### 3. Wire the diocese (same day, before first harvest)
+
+Add the new stem/folder in **all** of these, copying an existing diocese:
+
+- `parishes/dioceses.json`
+- `.github/workflows/harvest.yml` — workflow_dispatch list **and** the S1 matrix
+- `harvester/parish_status.py` — `_DIOCESE_LABELS` (stem) and `_RECIPE_FOLDER_DIOCESE` (folder)
+- `ocr/generate_bulletin_pages.py` — `CONTACTS_PATH_BY_DIOCESE` (and `_FALLBACK_DIOCESES` only if `dioceses.json` is not enough)
+
+Do **not** add the diocese to `LIVE_DIOCESES` / `OCR_DIOCESE_KEYS` / `EVIDENCE_DIOCESE_KEYS` in `harvester/site_builder.py` until a harvest has written `docs/dioceses/<key>/`. The public page stays a placeholder until then.
+
+`site_patterns.json` — seed a pattern only after a real trick works on this diocese. Copy an existing pattern. Do not invent one.
+
+### 4. First harvest (not on this PC)
+
+```
+python main.py --diocese <stem> --dry-run
+```
+
+Use GitHub Actions (`workflow_dispatch`, that stem). Do not run a full harvest or download mega PDFs on the 16GB laptop.
+
+`--dry-run` fetches only. It does not move files or stitch the mega PDF.
+
+### 5. Expected `parish_status.json` shape
+
+Each new key must appear under `parishes` with at least:
+
+- `display_name`, `diocese` (the label, e.g. `Clogher Diocese`)
+- `category` / `outcome`: `ok` | `stale` | `failed` | `html_only` | `disabled` | `skipped`
+- `bulletin_date` as ISO; `bulletin_date_uk` as DD/MM/YYYY
+- `actionable` true only when Problems should show the row
+- `last_tested_at` set when harvest ran
+
+`summary.total` goes up by the new parish count. `actionable_keys` is the Problems tab.
+
+### 6. Stop / proof
+
+- Stop after this one diocese. Do not start the other 22.
+- Proof for S4: folder on `main` with **≥ 10** recipes **and** a green single-diocese harvest run ID written in `GAMEPLAN.md`.
+
 ## Proof pack (every new parish)
 
 Source page · found URL · HTTP · file type · date · files changed · tests run.

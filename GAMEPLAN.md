@@ -17,21 +17,31 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 17/09/2026 — S4 diocese onboarding pack
+
+**The real goal, in one sentence:** one named diocese becomes a harvest folder in a day, after Frank picks it.
+
+**This turn:** [#240](https://github.com/Raphoe-Diocese/parish_harvester/pull/240) merged `5b470ff`. S4 checklist is in [`docs/DIOCESE_HUNT.md`](docs/DIOCESE_HUNT.md) (Onboarding pack). No new diocese folder. No harvest on this PC.
+
+**Next:** Frank names one small diocese. Then follow that pack. Do not start the other 22.
+
+**Parked:** hunt itself until he names it.
+
 ## 17/09/2026 — “Free forever” block was too sure
 
 **The real goal, in one sentence:** do not tell Frank Gemini 1,500/day or Mistral will never change.
 
-**This turn:** that list is the old cost dashboard. GitHub Actions/Pages are still free on this public repo. Gemini 15/min and 1,500/day is **not** a forever number. Mistral is **$10 / month**, not unlimited. Groq and zipfile are not the bulletin reader. Rewrote the block on [#240](https://github.com/Raphoe-Diocese/parish_harvester/pull/240). Desktop `COST_DASHBOARD.md` is the stale clone.
+**This turn:** [#240](https://github.com/Raphoe-Diocese/parish_harvester/pull/240) merged `5b470ff`. Heading is now “What does not need a card today”. Gemini 1,500 and Mistral-unlimited are gone. Desktop `COST_DASHBOARD.md` is still the stale clone.
 
-**Next:** merge #240.
+**Next:** ignore the Desktop file. Read `docs/COST_DASHBOARD.md` on main.
 
 ## 17/09/2026 — S3 OCR quota dashboard
 
 **The real goal, in one sentence:** Frank opens one file and reads three pages-this-month numbers before adding dioceses.
 
-**This turn:** [#239](https://github.com/Raphoe-Diocese/parish_harvester/pull/239) merged `2cff674`. S3 logs Mistral / Gemini / OpenAI pages. Mistral ceiling 2,500 from Free $10. Gemini and OpenAI unknown. Tesseract not counted. **Not live** until this PR merges and an OCR run writes `docs/COST_DASHBOARD.md`.
+**This turn:** [#240](https://github.com/Raphoe-Diocese/parish_harvester/pull/240) merged `5b470ff` 17/09 08:56 UTC. File on main: `docs/COST_DASHBOARD.md`. Mistral / Gemini / OpenAI pages this month are **0** until the next OCR run writes the log. **Not live** on parishpress.ie until Pages deploys that file.
 
-**Next:** merge the S3 PR. Then open `docs/COST_DASHBOARD.md` and read the three numbers.
+**Next:** after Pages, open the file and read the three numbers (they stay 0 until Sunday OCR).
 
 ## 17/09/2026 — Picture download still makes a PDF
 
