@@ -51,6 +51,10 @@ class UpdateDashboardTests(unittest.TestCase):
             self.assertIn("What could start costing money", content)
             self.assertIn("Repository storage", content)
             self.assertIn("What to do if a 🔴 appears", content)
+            self.assertIn("OCR pages this month", content)
+            self.assertIn("| Mistral |", content)
+            self.assertIn("| Gemini |", content)
+            self.assertIn("| OpenAI |", content)
 
     def test_dashboard_contains_traffic_lights(self) -> None:
         with tempfile.TemporaryDirectory() as tmp:

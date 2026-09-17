@@ -874,6 +874,13 @@ def main():
         print("All OCR providers failed — writing stub HTML.")
         write_stub_and_fail(date, "Vision OCR failed and no embedded PDF text was found.")
 
+    try:
+        from ocr.quota_log import record_convert_run
+
+        record_convert_run(provider_used, pages_text, vision_indexes)
+    except Exception as exc:  # noqa: BLE001
+        print(f"  OCR quota log skipped ({type(exc).__name__}: {exc}).")
+
     from ocr.sparse_page_ocr import fill_sparse_ocr_pages, repair_image_page_ocr
 
     print("Filling sparse / banner-only mega pages from page images ...")

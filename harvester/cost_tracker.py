@@ -141,6 +141,12 @@ def _section_repo_size(repo_root: Path) -> str:
     return "\n".join(lines)
 
 
+def _section_ocr_quota(repo_root: Path) -> str:
+    from ocr.quota_log import markdown_section
+
+    return markdown_section(repo_root)
+
+
 def _section_ai_calls(repo_root: Path) -> str:
     state = _load_ai_state(repo_root)
     lines = [
@@ -255,7 +261,8 @@ def _write_dashboard(repo_root: Path) -> None:
 
     sections = [
         f"# 💷 Cost Dashboard\n\n_Auto-generated at {generated_at} UTC._\n",
-        "_This file is rewritten on every harvest run. Do not edit manually._\n",
+        "_This file is rewritten on every harvest and OCR run. Do not edit manually._\n",
+        _section_ocr_quota(repo_root),
         _section_free_forever(),
         _section_could_cost(),
         _section_repo_size(repo_root),
