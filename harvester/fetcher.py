@@ -92,6 +92,7 @@ from .utils import (
     extract_date_from_string,
     extract_newsletter_number,
     is_valid_pdf,
+    wrap_image_file_as_pdf,
     oneweb_newsletter_download_urls,
     rewrite_clonleigh_url,
     rewrite_date_url,
@@ -422,6 +423,8 @@ def _is_real_pdf(
     accidentally captured instead of the weekly bulletin can't be reported as
     a success just because one particular code path forgot to verify it.
     """
+    if wrap_image_file_as_pdf(path):
+        print(f"  Wrapped image bulletin as PDF{(' for ' + tag) if tag else ''}")
     if not is_valid_pdf(path):
         return False
     try:

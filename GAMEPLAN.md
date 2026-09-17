@@ -17,6 +17,30 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 17/09/2026 — Picture download still makes a PDF
+
+**The real goal, in one sentence:** if harvest gets a JPEG/PNG, it wraps it into a PDF even when the recipe was never marked as picture.
+
+**This turn:** `wrap_image_file_as_pdf` runs inside `_is_real_pdf`. Download of a picture URL no longer fails just because the trainer skipped Mark as picture. Tests: `tests/test_image_wrap_pdf.py`. **Not proved** on a live parish until a harvest run ID.
+
+**Next:** PR, then Send & test on a picture parish that was not marked as picture.
+
+## 15/09/2026 (evening 14) — #238 merged; image→PDF is harvest, not Gemini
+
+**The real goal, in one sentence:** picture bulletins become a PDF at harvest, then Sunday OCR reads that PDF.
+
+**This turn:** [#238](https://github.com/Raphoe-Diocese/parish_harvester/pull/238) merged. Gemini PNG is on main. **Not live-proved** until the next Sunday OCR log. Image bulletins: trainer **Mark as picture** → harvest `image` / `image_stack` already builds a PDF. Sunday does not OCR a raw JPG. Gemini only sees pages from that PDF. Do not start a second image path.
+
+**Next:** wait for Sunday OCR. Parked: make Gemini/Mistral easier to read.
+
+## 15/09/2026 (evening 13) — 26 dioceses, Gemini “training”, Mistral polish
+
+**The real goal, in one sentence:** 26 Sunday megas on free Gemini, easy to read, no card.
+
+**This turn:** Enough API for 26 **if** text-first and only picture pages go to Gemini (~78 calls/week, ~300/month). I have **not** trained Gemini to write like Mistral. #238 only stops the PPM reject. Not live. Frank also wants Mistral (and Gemini) output easier to read — **parked** until #238 is on main and a Sunday log proves Gemini ran.
+
+**Next:** merge #238. Do not start a readability rewrite.
+
 ## 15/09/2026 (evening 12) — Fix Gemini PPM so picture pages work
 
 **The real goal, in one sentence:** Sunday picture pages go to free Gemini as PNG, not PPM.
