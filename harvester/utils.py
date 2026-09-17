@@ -3,6 +3,7 @@ utils.py — Shared helper utilities for the Parish Bulletin Harvester.
 """
 from __future__ import annotations
 
+import io
 import re
 import time
 from datetime import date, datetime, timedelta
@@ -1847,6 +1848,51 @@ def is_valid_pdf(path: Path) -> bool:
             return fh.read(4) == b"%PDF"
     except OSError:
         return False
+
+
+def looks_like_image_bytes(data: bytes) -> bool:
+    """True for JPEG / PNG / GIF / WEBP bulletin pictures (not PDF or HTML)."""
+    if not data or len(data) < 12:
+        return False
+    if data[:3] == b"\xff\xd8\xff":
+        return True
+    if data[:8] == b"\x89PNG\r\n\x1a\n":
+        return True
+    if data[:6] in (b"GIF87a", b"GIF89a"):
+        return True
+    if data[:4] == b"RIFF" and data[8:12] == b"WEBP":
+        return True
+    return False
+
+
+def write_image_bytes_as_pdf(dest: Path, data: bytes) -> None:
+    """Turn picture bytes into a one-page PDF at *dest*."""
+    from PIL import Image
+
+    dest.parent.mkdir(parents=True, exist_ok=True)
+    with Image.open(io.BytesIO(data)) as img:
+        img.convert("RGB").save(str(dest), "PDF", resolution=150)
+
+
+def wrap_image_file_as_pdf(path: Path) -> bool:
+    """If *path* is a picture saved as a bulletin file, overwrite it with a PDF.
+
+    Recipes that were never marked as picture still download a JPEG/PNG.
+    Harvest must make the PDF anyway. Returns True when a wrap ran.
+    """
+    if is_valid_pdf(path):
+        return False
+    try:
+        data = path.read_bytes()
+    except OSError:
+        return False
+    if not looks_like_image_bytes(data):
+        return False
+    try:
+        write_image_bytes_as_pdf(path, data)
+    except Exception:
+        return False
+    return is_valid_pdf(path)
 
 
 # ---------------------------------------------------------------------------

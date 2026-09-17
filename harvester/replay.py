@@ -58,6 +58,7 @@ from .utils import (
     churchmedia_slug_from_url,
     extract_mcn_church_id,
     extract_newsletter_number,
+    looks_like_image_bytes,
     looks_like_permanent_bulletin_url,
     parishpress_weekly_upload_url,
     mcn_newsletter_url_from_profile,
@@ -71,6 +72,7 @@ from .utils import (
     rewrite_date_url,
     rewrite_newsletter_number_for_target,
     wix_dated_slug_candidates,
+    write_image_bytes_as_pdf,
     yearless_slug_date,
 )
 
@@ -1016,16 +1018,9 @@ async def _download_document_url(
         dest.write_bytes(body)
         return raw_url, "pdf"
 
-    if body[:3] == b"\xff\xd8\xff" or body[:8] == b"\x89PNG\r\n\x1a\n":
+    if looks_like_image_bytes(body):
         try:
-            from PIL import Image as PILImage
-        except ImportError as exc:
-            raise RecipeReplayError(
-                "Pillow is required for image bulletin conversion. Install with: pip install Pillow"
-            ) from exc
-        try:
-            img = PILImage.open(io.BytesIO(body)).convert("RGB")
-            img.save(str(dest), "PDF")
+            write_image_bytes_as_pdf(dest, body)
             return raw_url, "image_to_pdf"
         except Exception as exc:
             raise RecipeReplayError(f"Invalid image content for bulletin conversion: {raw_url}") from exc
