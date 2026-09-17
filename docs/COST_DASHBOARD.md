@@ -1,6 +1,6 @@
 # 💷 Cost Dashboard
 
-_Auto-generated at 2026-09-17T08:41:42Z UTC._
+_Auto-generated at 2026-09-17T08:51:36Z UTC._
 
 _This file is rewritten on every harvest and OCR run. Do not edit manually._
 
@@ -16,14 +16,16 @@ _Month 2026-09. Counted from billed Mistral / Gemini / OpenAI pages only. Tesser
 
 Read the three **Pages this month** numbers. Red only if a known ceiling is set and the 26-diocese projection is over it.
 
-## ✅ What's free forever and won't change
+## What does not need a card today
 
-- **GitHub Actions** — public repos get unlimited minutes.
-- **GitHub Pages** — 100 GB/month bandwidth, no cost.
-- **Gemini API** — 1,500 free requests/day (no credit card).
-- **Groq API** — 30 free requests/min (no credit card).
-- **Mistral free tier** — ~1 request/sec (no credit card).
-- **Repository storage** — 5 GB hard cap (zip archives disabled; current-week + mega PDFs stay).
+- **GitHub Actions** — this public repo gets free minutes.
+- **GitHub Pages** — free hosting, 100 GB/month bandwidth.
+- **Gemini** — free tier, no card. The daily cap is in AI Studio. It is **not** a forever 1,500.
+- **Mistral** — Free plan is **$10 / month** API credits (about 2,500 OCR pages at $4 / 1,000). Not unlimited.
+- **Groq** — not used to read bulletins.
+- **Repository storage** — 5 GB hard cap. Zip archives stay off.
+
+_Providers can change free tiers. Read the OCR table above for this month’s pages._
 
 ## ⚠️ What could start costing money
 
