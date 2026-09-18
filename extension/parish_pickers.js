@@ -15,6 +15,7 @@
     { path: "parishes/derry_diocese_contacts.json", diocese: "derry" },
     { path: "parishes/down_and_connor_contacts.json", diocese: "down_and_connor" },
     { path: "parishes/raphoe_diocese_contacts.json", diocese: "raphoe" },
+    { path: "parishes/cork_and_ross_contacts.json", diocese: "cork_and_ross" },
   ];
 
   const BULLETIN_FILES = [
@@ -22,6 +23,7 @@
     { path: "parishes/derry_diocese_bulletin_urls.txt", diocese: "derry" },
     { path: "parishes/down_and_connor_bulletin_urls.txt", diocese: "down_and_connor" },
     { path: "parishes/raphoe_diocese_bulletin_urls.txt", diocese: "raphoe" },
+    { path: "parishes/cork_and_ross_bulletin_urls.txt", diocese: "cork_and_ross" },
   ];
 
   const registry = {
@@ -331,11 +333,18 @@
         await _indexRecipesFromGithub(repo, headers);
       }
     } catch (_e) {
-      registry.dioceses = ["clogher", "derry", "down_and_connor", "raphoe"];
+      registry.dioceses = ["clogher", "cork_and_ross", "derry", "down_and_connor", "raphoe"];
     }
 
     if (registry.dioceses.length === 0) {
-      registry.dioceses = ["clogher", "derry", "down_and_connor", "raphoe"];
+      registry.dioceses = ["clogher", "cork_and_ross", "derry", "down_and_connor", "raphoe"];
+    }
+    const known = ["clogher", "cork_and_ross", "derry", "down_and_connor", "raphoe"];
+    registry.dioceses = [...new Set([...registry.dioceses, ...known])]
+      .filter((d) => d && d !== "unknown")
+      .sort();
+    for (const dio of registry.dioceses) {
+      if (!registry.parishesByDiocese[dio]) registry.parishesByDiocese[dio] = [];
     }
 
     _pruneRegistry();

@@ -480,8 +480,9 @@ def yearless_month_name_variants(url: str) -> list[str]:
 def month_first_sunday_upload_urls(example_url: str, week: date) -> list[str]:
     """Guess Sunday-Sept-06-26.pdf from a yearless Sunday-23rd-Aug.pdf example.
 
-    Tawnawilly's 06/09/2026 listing uses Month-DD-YY. Sunday-6th-Sept.pdf 404s.
-    Only for yearless / month-first Sunday files with no /YYYY/MM/ folder.
+    Tawnawilly flips names: 06/09 was Sunday-Sept-06-26.pdf; 13/09 is
+    Sunday-13th-Sept-26.pdf. Guess both families. Sunday-6th-Sept.pdf 404s.
+    Only for Sunday files with no /YYYY/MM/ folder.
     """
     raw = (example_url or "").strip()
     if not raw:
@@ -493,12 +494,17 @@ def month_first_sunday_upload_urls(example_url: str, week: date) -> list[str]:
         return []
     if re.search(r"/\d{4}/\d{2}/", path):
         return []
-    if not (_YEARLESS_SLUG_RE.search(leaf) or _MONTH_DAY_YY_RE.search(leaf)):
+    if not (
+        _YEARLESS_SLUG_RE.search(leaf)
+        or _MONTH_DAY_YY_RE.search(leaf)
+        or _SLUG_DATE_RE.search(leaf)
+    ):
         return []
     directory = path.rsplit("/", 1)[0]
     yy = f"{week.year % 100:02d}"
     day_pad = f"{week.day:02d}"
     day_raw = str(week.day)
+    day_ord = f"{week.day}{_ordinal_suffix(week.day)}"
     names: list[str] = []
     # Listing uses Sept, not Sep / September.
     month_names = _MONTH_NAME_VARIANTS.get(week.month, ())
@@ -506,6 +512,9 @@ def month_first_sunday_upload_urls(example_url: str, week: date) -> list[str]:
         month_names = ("Sept", "Sep", "September")
     for name in month_names:
         cap = name[0].upper() + name[1:]
+        names.append(f"Sunday-{day_ord}-{cap}-{yy}.pdf")
+        names.append(f"Sunday-{day_ord}-{cap}.pdf")
+        names.append(f"Sunday-{day_ord}-{cap}-{week.year}.pdf")
         for day in (day_pad, day_raw):
             names.append(f"Sunday-{cap}-{day}-{yy}.pdf")
             names.append(f"Sunday-{cap}-{day}-{week.year}.pdf")
@@ -527,9 +536,10 @@ def yearless_slug_date(
 ) -> date | None:
     """Parse a yearless '9th-August' / '5th July' slug using *assume_year*.
 
-    If the resulting date is more than 14 days ahead of *near* (typically
+    If the resulting date is more than 7 days ahead of *near* (typically
     the harvest Sunday), try the previous year — so a 04/01 harvest still
     reads '28th-December' as last December, not next December.
+    A 14-day window treated Sunday-29th-Sept.pdf on 18/09 as 29/09/2026.
     """
     m = _YEARLESS_SLUG_RE.search(unquote(text or ""))
     if not m:
@@ -541,7 +551,7 @@ def yearless_slug_date(
         candidate = date(assume_year, month, int(m.group(1)))
     except ValueError:
         return None
-    if near is not None and (candidate - near).days > 14:
+    if near is not None and (candidate - near).days > 7:
         try:
             return date(assume_year - 1, month, int(m.group(1)))
         except ValueError:
@@ -1302,9 +1312,29 @@ def rewrite_date_url(url: str, target: date) -> str:
                     sep_pos = m.start(2) - 1
                     sep = path[sep_pos] if 0 <= sep_pos < len(path) else "-"
                     # Wix slugs use lowercase months with underscores (5_april_2026).
+                    # Tawnawilly uses Sept-26 — keep that short form, not September-2026.
                     month_raw = m.group(2)
-                    if sep == "_" or month_raw.islower():
+                    is_abbr = (not year_full) and month_raw.lower().rstrip(".") in {
+                        "jan", "feb", "mar", "apr", "jun", "jul", "aug",
+                        "sep", "sept", "oct", "nov", "dec",
+                    }
+                    if sep == "_" or (month_raw.islower() and not is_abbr):
                         month_str = _MONTH_NAMES[target.month]
+                    elif is_abbr:
+                        month_names = _MONTH_NAME_VARIANTS.get(target.month, ())
+                        if target.month == 9:
+                            month_names = ("Sept", "Sep", "September")
+                        month_str = (
+                            min(month_names, key=lambda n: abs(len(n) - len(month_raw)))
+                            if month_names
+                            else _MONTH_NAMES[target.month][:3]
+                        )
+                        if month_raw.isupper():
+                            month_str = month_str.upper()
+                        elif month_raw[0].isupper():
+                            month_str = month_str[0].upper() + month_str[1:]
+                        else:
+                            month_str = month_str.lower()
                     else:
                         month_str = _MONTH_NAMES[target.month].capitalize()
                     had_ordinal = _slug_had_ordinal(m.group(0))
@@ -1313,7 +1343,8 @@ def rewrite_date_url(url: str, target: date) -> str:
                         if had_ordinal
                         else str(target.day)
                     )
-                    return f"{day_str}{sep}{month_str}{sep}{target.year}"
+                    year_token = str(target.year) if year_full else f"{target.year % 100:02d}"
+                    return f"{day_str}{sep}{month_str}{sep}{year_token}"
             except ValueError:
                 pass
             return m.group(0)

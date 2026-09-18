@@ -241,6 +241,27 @@ class HttpScrapeScoreTests(unittest.TestCase):
             ),
             "https://tawnawillyparish.ie/wp-content/uploads/Sunday-Sept-13-26.pdf",
         )
+        self.assertIn(
+            "https://tawnawillyparish.ie/wp-content/uploads/Sunday-13th-Sept-26.pdf",
+            predicted_dated_upload_urls(
+                "https://tawnawillyparish.ie/wp-content/uploads/Sunday-Sept-06-26.pdf",
+                date(2026, 9, 13),
+            ),
+        )
+        self.assertEqual(
+            rewrite_date_url(
+                "https://tawnawillyparish.ie/wp-content/uploads/Sunday-13th-Sept-26.pdf",
+                date(2026, 9, 20),
+            ),
+            "https://tawnawillyparish.ie/wp-content/uploads/Sunday-20th-Sept-26.pdf",
+        )
+
+    def test_yearless_sept_29_is_last_year_not_a_time_machine(self) -> None:
+        url = "https://tawnawillyparish.ie/wp-content/uploads/Sunday-29th-Sept.pdf"
+        self.assertEqual(
+            yearless_slug_date(url, 2026, near=date(2026, 9, 18)),
+            date(2025, 9, 29),
+        )
 
     def test_roslea_dated_september_also_tries_sept(self) -> None:
         from harvester.utils import month_name_filename_variants
@@ -476,7 +497,7 @@ class PermanentBulletinUrlTests(unittest.TestCase):
         recipe = json.loads(
             Path("parishes/recipes/raphoe/tawnawillyparish.json").read_text()
         )
-        pdf = "https://tawnawillyparish.ie/wp-content/uploads/Sunday-Sept-06-26.pdf"
+        pdf = "https://tawnawillyparish.ie/wp-content/uploads/Sunday-13th-Sept-26.pdf"
         self.assertNotEqual(recipe["start_url"], "https://tawnawillyparish.ie/bulletin/")
         self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
         self.assertIn("sunday", recipe["href_patterns"])
@@ -484,7 +505,7 @@ class PermanentBulletinUrlTests(unittest.TestCase):
         self.assertEqual(recipe["steps"][0]["url"], pdf)
         self.assertEqual(_recipe_recorded_file_urls(recipe), [pdf])
         self.assertEqual(
-            _recipe_fresh_recorded_file_urls(recipe, date(2026, 9, 6)),
+            _recipe_fresh_recorded_file_urls(recipe, date(2026, 9, 13)),
             [pdf],
         )
 

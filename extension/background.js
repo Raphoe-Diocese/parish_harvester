@@ -1209,7 +1209,7 @@ function _harvestWorkflowDiocese(value) {
   return slug;
 }
 
-const _RECIPE_DIOCESE_FOLDERS = ["clogher", "derry", "down_and_connor", "raphoe", "unknown"];
+const _RECIPE_DIOCESE_FOLDERS = ["clogher", "cork_and_ross", "derry", "down_and_connor", "raphoe", "unknown"];
 
 async function _fetchGithubJson(url, headers, timeoutMs = 45000, init = {}) {
   const controller = new AbortController();

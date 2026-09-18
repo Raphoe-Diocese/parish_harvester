@@ -8,6 +8,7 @@
     "Derry Diocese": "parishes/derry_diocese_bulletin_urls.txt",
     "Down & Connor Diocese": "parishes/down_and_connor_bulletin_urls.txt",
     "Raphoe Diocese": "parishes/raphoe_diocese_bulletin_urls.txt",
+    "Cork and Ross Diocese": "parishes/cork_and_ross_bulletin_urls.txt",
   };
 
   function phUrlToParishKey(url, headerName = "") {

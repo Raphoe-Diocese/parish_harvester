@@ -17,21 +17,65 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 18/09/2026 — Remember clicks that worked (the gold)
+
+**The real goal, in one sentence:** the trainer lights up a click that already worked on a similar site, instead of Guess inventing a date.
+
+**This turn:** Written down. Guess is date-sorting on the page. It does not remember Frank’s successful clicks. What exists today is only a site-type catalogue (`site_memory.js` + `site_patterns.json` + Pattern hint). That is not click memory.
+
+**What to build (when unlocked):** save host + fingerprint + the click that harvested ok (selector, href shape, newest-dated vs pin). Next similar page: show that click in yellow on the toolbar before Guess. Guess stays as a last resort.
+
+**When:** Phase 4 Recipe Brain. **No date.** Locked list must finish first: OCR reader, then Problems console, then recipe success (one parish at a time). Brain is after item 3. Do not start tonight.
+
+**Parked:** full Brain / Referee. Do not replace Guess until click-memory is in the ext.
+
+## 18/09/2026 — Tawnawilly Guess time-machine + Cork on the ext
+
+**The real goal, in one sentence:** harvest this week's Tawnawilly PDF, and let the trainer see Cork.
+
+**This turn:** Picks were not ignored. Guess ranked `Sunday-29th-Sept.pdf` (2024 archive, yearless) as 29/09/2026 because the 14-day future window is too wide. Harvest never looks at `/bulletin/` (Cloudflare 403). It predicted `Sunday-Sept-13-26.pdf` from the old Sept-06 pin; the live 13/09 file is `Sunday-13th-Sept-26.pdf`. Recipe + predictor now try both names. Guess future window is 7 days. Trainer 1.61.41. Cork evidence + `parishes/recipes/cork_and_ross/` so the dropdown can see Cork after merge. Full Recipe Brain stays parked. First rule only: do not guess a date after this week's Sunday.
+
+**Next:** Cork was missing because the trainer reads recipe folders on GitHub **main**, and #241 is still open. 1.61.42 always shows Cork even if main is old. Merge #241 then Reload **1.61.42**. Parish names need the merge (contacts on main).
+
+**Parked:** full Recipe Brain / Referee. Cork Sunday matrix until recipes exist. Forms until all dioceses are finished.
+
+## 17/09/2026 — Form-fed parish mini-sites + free .ie
+
+**The real goal, in one sentence:** only parishes with no working site get a simple page. If their site has SSL and loads, leave it.
+
+**This turn:** Frank is right that **registered charities** can get .ie registry fees waived (IEDR Charity Policy 2023: Revenue CHY or NI charity number). “Nonprofit” alone may not count. Some registrars still charge an admin fee. Hosting is not in that waiver. A form password is still not unhackable. Do not register another parish’s name under Frank’s charity without their say-so. Do not start.
+
+**This turn (forms, no .ie):** Frank dropped .ie. Asked if a form can fill a parishpress.ie page from this repo after the template exists. Yes. Field “Mass times” becomes a Mass times heading. Empty fields stay off the page (do not invent times). Input is the hard bit: a form cannot write the repo by itself. $0 path is Form → JSON in the repo → Pages rebuild. Not started.
+
+**Next:** Cork hunt. Do not start mini-sites.
+
+**Parked until all dioceses are finished:** form-to-page builder, parish forms, per-parish .ie, Jotform. Frank 17/09/2026: park until we finish all the dioceses.
+
+## 17/09/2026 — S4 Cork (Cork and Ross)
+
+**The real goal, in one sentence:** Cork becomes a harvest diocese, starting from the official list, no invented bulletins.
+
+**This turn:** Count from the evidence file: **51 of 67** Cork parishes have a newsletter listing (**25** unique lists/files). **16** have no weekly bulletin proved (Facebook, empty, notices-only). Trainer was not updated before this turn. Now Parish Trainer **1.61.40** remembers the Cork family-list trick. Reload needed. No recipes yet. Cork is not on GitHub main until we push.
+
+**Next:** recipes for the listings that work. Reload 1.61.40 first.
+
+**Parked:** Sunday matrix until real bulletin URLs exist. S4 proof (≥10 recipes + green harvest run) is not done. Forms until all dioceses are finished.
+
 ## 17/09/2026 — “Free forever” block was too sure
 
 **The real goal, in one sentence:** do not tell Frank Gemini 1,500/day or Mistral will never change.
 
-**This turn:** that list is the old cost dashboard. GitHub Actions/Pages are still free on this public repo. Gemini 15/min and 1,500/day is **not** a forever number. Mistral is **$10 / month**, not unlimited. Groq and zipfile are not the bulletin reader. Rewrote the block on [#240](https://github.com/Raphoe-Diocese/parish_harvester/pull/240). Desktop `COST_DASHBOARD.md` is the stale clone.
+**This turn:** [#240](https://github.com/Raphoe-Diocese/parish_harvester/pull/240) merged `5b470ff`. Heading is now “What does not need a card today”. Gemini 1,500 and Mistral-unlimited are gone. Desktop `COST_DASHBOARD.md` is still the stale clone.
 
-**Next:** merge #240.
+**Next:** ignore the Desktop file. Read `docs/COST_DASHBOARD.md` on main.
 
 ## 17/09/2026 — S3 OCR quota dashboard
 
 **The real goal, in one sentence:** Frank opens one file and reads three pages-this-month numbers before adding dioceses.
 
-**This turn:** [#239](https://github.com/Raphoe-Diocese/parish_harvester/pull/239) merged `2cff674`. S3 logs Mistral / Gemini / OpenAI pages. Mistral ceiling 2,500 from Free $10. Gemini and OpenAI unknown. Tesseract not counted. **Not live** until this PR merges and an OCR run writes `docs/COST_DASHBOARD.md`.
+**This turn:** [#240](https://github.com/Raphoe-Diocese/parish_harvester/pull/240) merged `5b470ff` 17/09 08:56 UTC. File on main: `docs/COST_DASHBOARD.md`. Mistral / Gemini / OpenAI pages this month are **0** until the next OCR run writes the log. **Not live** on parishpress.ie until Pages deploys that file.
 
-**Next:** merge the S3 PR. Then open `docs/COST_DASHBOARD.md` and read the three numbers.
+**Next:** after Pages, open the file and read the three numbers (they stay 0 until Sunday OCR).
 
 ## 17/09/2026 — Picture download still makes a PDF
 
