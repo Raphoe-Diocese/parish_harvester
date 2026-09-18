@@ -333,11 +333,18 @@
         await _indexRecipesFromGithub(repo, headers);
       }
     } catch (_e) {
-      registry.dioceses = ["clogher", "derry", "down_and_connor", "raphoe"];
+      registry.dioceses = ["clogher", "cork_and_ross", "derry", "down_and_connor", "raphoe"];
     }
 
     if (registry.dioceses.length === 0) {
-      registry.dioceses = ["clogher", "derry", "down_and_connor", "raphoe"];
+      registry.dioceses = ["clogher", "cork_and_ross", "derry", "down_and_connor", "raphoe"];
+    }
+    const known = ["clogher", "cork_and_ross", "derry", "down_and_connor", "raphoe"];
+    registry.dioceses = [...new Set([...registry.dioceses, ...known])]
+      .filter((d) => d && d !== "unknown")
+      .sort();
+    for (const dio of registry.dioceses) {
+      if (!registry.parishesByDiocese[dio]) registry.parishesByDiocese[dio] = [];
     }
 
     _pruneRegistry();

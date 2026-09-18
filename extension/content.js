@@ -6920,12 +6920,20 @@
       const DIOCESE_CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
       const FALLBACK_DIOCESES = ["clogher", "cork_and_ross", "derry", "down_and_connor", "raphoe"];
 
+      const _mergeKnownDioceses = (list) => {
+        const merged = new Set([
+          ...FALLBACK_DIOCESES,
+          ...(Array.isArray(list) ? list : []),
+        ]);
+        return [...merged].filter(Boolean).sort();
+      };
+
       const _fetchDioceseList = async () => {
-        // Try cache first.
+        // Try cache first, but never hide a diocese the trainer already knows.
         const cached = await _storageGet([DIOCESE_CACHE_KEY]);
         const entry = cached[DIOCESE_CACHE_KEY];
         if (entry && typeof entry === "object" && Array.isArray(entry.list) && Date.now() - entry.ts < DIOCESE_CACHE_TTL_MS) {
-          return entry.list;
+          return _mergeKnownDioceses(entry.list);
         }
         // Fetch live from GitHub Contents API.
         try {
@@ -6943,8 +6951,9 @@
             .map((item) => item.name)
             .sort();
           if (list.length > 0) {
-            await _storageSet({ [DIOCESE_CACHE_KEY]: { list, ts: Date.now() } });
-            return list;
+            const merged = _mergeKnownDioceses(list);
+            await _storageSet({ [DIOCESE_CACHE_KEY]: { list: merged, ts: Date.now() } });
+            return merged;
           }
         } catch (_e) { /* fall through to hardcoded list */ }
         return FALLBACK_DIOCESES;

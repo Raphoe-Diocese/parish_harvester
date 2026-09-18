@@ -35,7 +35,7 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **This turn:** Picks were not ignored. Guess ranked `Sunday-29th-Sept.pdf` (2024 archive, yearless) as 29/09/2026 because the 14-day future window is too wide. Harvest never looks at `/bulletin/` (Cloudflare 403). It predicted `Sunday-Sept-13-26.pdf` from the old Sept-06 pin; the live 13/09 file is `Sunday-13th-Sept-26.pdf`. Recipe + predictor now try both names. Guess future window is 7 days. Trainer 1.61.41. Cork evidence + `parishes/recipes/cork_and_ross/` so the dropdown can see Cork after merge. Full Recipe Brain stays parked. First rule only: do not guess a date after this week's Sunday.
 
-**Next:** merge, Reload 1.61.41, full harvest on GitHub Actions (not this PC). Cork has no recipes yet.
+**Next:** Cork was missing because the trainer reads recipe folders on GitHub **main**, and #241 is still open. 1.61.42 always shows Cork even if main is old. Merge #241 then Reload **1.61.42**. Parish names need the merge (contacts on main).
 
 **Parked:** full Recipe Brain / Referee. Cork Sunday matrix until recipes exist. Forms until all dioceses are finished.
 
