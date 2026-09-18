@@ -261,6 +261,23 @@
       ],
       do_not: ["Do not pin a dated .rtf.", "Do not invent a PDF filename."],
     },
+    faithful_ie_family_newsletters: {
+      playbook_type: "pdf_download_list",
+      site_type: "pdf_link_list",
+      page_type: "pdf_link_list",
+      recipe_flow: "click_then_pdf",
+      label: "faithful.ie family newsletter list (Cork)",
+      operator_notes: [
+        "Cork family listing (OneFaith, West Cork, The Parishioner, OurParish, Bantry, Cathedral, Parishes Together, Kilbrittain).",
+        "Point at this week's PDF on this page. Harvest the list once.",
+        "Official /parishes/Name may 404 — stay on /newsletter, /newsletters or /notices.",
+      ],
+      do_not: [
+        "Do not pin a dated PDF filename.",
+        "Do not make a second recipe for each parish name on the same list.",
+        "Do not treat familyofparishes.ie/news as a weekly newsletter — notices only.",
+      ],
+    },
     pdf_download_list: {
       playbook_type: "pdf_download_list",
       site_type: "pdf_link_list",
@@ -347,6 +364,9 @@
     }
     if (fpId === "js_overwritten_html_newsletter") {
       return CATALOG.js_overwritten_html_newsletter;
+    }
+    if (fpId === "faithful_ie_family_newsletters") {
+      return CATALOG.faithful_ie_family_newsletters;
     }
     if (_recipeUsesDatedPdfPath(safeRecipe)) {
       return CATALOG.dated_pdf_bulletin;

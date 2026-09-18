@@ -37,6 +37,7 @@ Clogher 22/08/2026 proved why: Expand-all cards said “no website.” The Paris
 | Image on Latest Bulletin | Fintona `Sunday-Dth-Month-YYYY.jpg` in an old `/2026/01/` folder | `image_stack` the visible Sunday image. NextGEN `/wp-content/gallery/` is **not** `/uploads/` |
 | Dead official hostname | `clonesparish.ie`, `errigaltruparish.com`, `monaghan-rackwallace.ie` | Search the live twin (`.com`, `truaghparish.com`) |
 | Shared bulletin | Clontibret + Muckno; Tyholland + Monaghan & Rackwallace | Harvest once under the host parish. The other parish stays on the A-Z list as a labelled link (`bulletin with …`). Do not pin this week's PDF. |
+| `faithful_ie_family_newsletters` | Cork family hubs: OneFaith, West Cork, The Parishioner, OurParish, Bantry `/notices`, Cathedral `/notices/newsletter`, Parishes Together `/notices/newsletters`, Kilbrittain `/bulletin` | Harvest the listing once. Official `/parishes/Name` may 404. `familyofparishes.ie/news` is notices only. Do not pin dated PDFs. |
 | Expired HTTPS | Lisnaskea / Galloon | Playwright + `ignore_https_errors` — urllib scrape will fail |
 
 ## Clogher leftover after kitchen sink (do not re-hunt blindly)
@@ -56,7 +57,7 @@ Facebook / no live weekly file on 22/08/2026: Aughnamullen East, Belleek-Garriso
 
 Do **not** start until Frank names the diocese. Kitchen-sink search is the command above. This pack is how that diocese becomes a folder harvest can see.
 
-Today’s four: `clogher`, `derry`, `down_and_connor`, `raphoe`. Harvest `--diocese` uses the **evidence stem**, not the folder name: `clogher_diocese`, `derry_diocese`, `raphoe_diocese`, `down_and_connor`.
+Today’s four: `clogher`, `derry`, `down_and_connor`, `raphoe`. Frank named **Cork** (17/09/2026) — that is **Cork and Ross**, not Cloyne. Official directory: https://corkandross.org/parishes (67 cards, opened that day). Harvest `--diocese` uses the **evidence stem**, not the folder name: `clogher_diocese`, `derry_diocese`, `raphoe_diocese`, `down_and_connor`, `cork_and_ross`. Do not add Cork to the Sunday matrix until real bulletin URLs exist.
 
 ### 1. Parish list
 

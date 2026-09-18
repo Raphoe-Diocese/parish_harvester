@@ -99,7 +99,51 @@
     return candidates.length > 0;
   };
 
+  const CORK_FAMILY_HOSTS = [
+    "onefaith.ie",
+    "westcorkparishes.ie",
+    "theparishioner.ie",
+    "ourparish.ie",
+    "bantryfamilyofparishes.ie",
+    "corkcathedralfop.ie",
+    "parishestogether.ie",
+    "kilbrittainparish.ie",
+  ];
+
+  const _hostBare = (host) =>
+    String(host || "")
+      .toLowerCase()
+      .replace(/^www\./, "");
+
+  const _isCorkFamilyHost = (host) => CORK_FAMILY_HOSTS.includes(_hostBare(host));
+
   const FINGERPRINTS = [
+    {
+      id: "faithful_ie_family_newsletters",
+      label: "faithful.ie family newsletter list (Cork)",
+      pageType: "pdf_link_list",
+      captureMethod: "click_then_pdf",
+      playbookType: "pdf_links",
+      minScore: 28,
+      markers: [
+        { re: /faithful\.ie/i, weight: 14, label: "faithful.ie credit" },
+        {
+          re: /onefaith\.ie|westcorkparishes\.ie|theparishioner\.ie|ourparish\.ie|bantryfamilyofparishes\.ie|corkcathedralfop\.ie|parishestogether\.ie/i,
+          weight: 18,
+          label: "Cork family hub host in page",
+        },
+        { re: /\/newsletter|\/newsletters|\/notices\/newsletter/i, weight: 10, label: "family listing path" },
+        { re: /\.pdf/i, weight: 8, label: "PDF links" },
+      ],
+      pickDownloadUrl: () => "",
+      advice:
+        "Cork family listing. Point at this week's PDF on this page. Harvest this list once — do not make a second recipe for each parish name. Do not pin a dated filename. Official /parishes/Name may 404; stay on /newsletter, /newsletters or /notices.",
+      doNot: [
+        "Do not pin a dated PDF filename.",
+        "Do not harvest the same family file twice.",
+        "Do not treat familyofparishes.ie/news as a weekly newsletter — notices only.",
+      ],
+    },
     {
       id: "joomla_dropfiles_weekly",
       label: "Joomla Dropfiles — weekly bulletin list",
@@ -721,6 +765,10 @@
 
     for (const fp of FINGERPRINTS) {
       let { score, markersFound } = _scoreFingerprint(fp, blob);
+      if (fp.id === "faithful_ie_family_newsletters" && _isCorkFamilyHost(doc.location?.hostname)) {
+        score += 22;
+        markersFound.push("Cork family hub host");
+      }
       if (fp.domValidate) {
         let domOk = false;
         try {
@@ -774,6 +822,10 @@
       });
     } catch (_e2) {}
 
+    const familyList = matches.find((m) => m.id === "faithful_ie_family_newsletters");
+    if (familyList && _isCorkFamilyHost(doc.location?.hostname)) {
+      best = familyList;
+    }
     const wpUploadPdfCount = allDownloadUrls.filter((u) =>
       /wp-content\/uploads\/.*\.pdf/i.test(u)
     ).length;

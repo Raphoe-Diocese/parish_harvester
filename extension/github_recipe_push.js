@@ -3,7 +3,7 @@
  * Content calls this directly so pushes survive MV3 service-worker sleep.
  */
 (function initPhGithubRecipePush(global) {
-  const DIOCESE_FOLDERS = ["clogher", "derry", "down_and_connor", "raphoe", "unknown"];
+  const DIOCESE_FOLDERS = ["clogher", "cork_and_ross", "derry", "down_and_connor", "raphoe", "unknown"];
 
   /** Map recipe/slug names to harvest.yml workflow_dispatch diocese input. */
   const harvestWorkflowDiocese = (value) => {

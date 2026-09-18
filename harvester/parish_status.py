@@ -23,6 +23,7 @@ PARISH_STATUS_PATH = PARISHES_DIR / "parish_status.json"
 
 _DIOCESE_LABELS: dict[str, str] = {
     "clogher_diocese": "Clogher Diocese",
+    "cork_and_ross": "Cork and Ross Diocese",
     "derry_diocese": "Derry Diocese",
     "down_and_connor": "Down & Connor Diocese",
     "raphoe_diocese": "Raphoe Diocese",
@@ -30,6 +31,7 @@ _DIOCESE_LABELS: dict[str, str] = {
 
 _RECIPE_FOLDER_DIOCESE: dict[str, str] = {
     "clogher": "Clogher Diocese",
+    "cork_and_ross": "Cork and Ross Diocese",
     "derry": "Derry Diocese",
     "down_and_connor": "Down & Connor Diocese",
     "raphoe": "Raphoe Diocese",

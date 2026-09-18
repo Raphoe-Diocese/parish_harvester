@@ -15,6 +15,7 @@
     { path: "parishes/derry_diocese_contacts.json", diocese: "derry" },
     { path: "parishes/down_and_connor_contacts.json", diocese: "down_and_connor" },
     { path: "parishes/raphoe_diocese_contacts.json", diocese: "raphoe" },
+    { path: "parishes/cork_and_ross_contacts.json", diocese: "cork_and_ross" },
   ];
 
   const BULLETIN_FILES = [
@@ -22,6 +23,7 @@
     { path: "parishes/derry_diocese_bulletin_urls.txt", diocese: "derry" },
     { path: "parishes/down_and_connor_bulletin_urls.txt", diocese: "down_and_connor" },
     { path: "parishes/raphoe_diocese_bulletin_urls.txt", diocese: "raphoe" },
+    { path: "parishes/cork_and_ross_bulletin_urls.txt", diocese: "cork_and_ross" },
   ];
 
   const registry = {

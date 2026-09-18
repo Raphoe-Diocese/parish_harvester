@@ -1248,6 +1248,7 @@
         "parishes/derry_diocese_contacts.json",
         "parishes/down_and_connor_contacts.json",
         "parishes/raphoe_diocese_contacts.json",
+        "parishes/cork_and_ross_contacts.json",
       ];
       for (const filePath of files) {
         try {
@@ -1648,7 +1649,8 @@
     }
 
     // Yearless Sunday-16th-Aug.pdf / "Sunday 23rd August" — assume this year
-    // unless that date is more than 14 days in the future (then last year).
+    // unless that date is more than 7 days in the future (then last year).
+    // 14 days was a time machine: Sunday-29th-Sept.pdf on 18/09 became 2026.
     m = s.match(
       new RegExp(
         String.raw`(?<!\d)(\d{1,2})(?:st|nd|rd|th)?[-_\s]+(${_MONTH_NAME_ALT})(?![a-z])(?![-_\s](?:19|20)\d{2})`,
@@ -1660,8 +1662,9 @@
       if (mo) {
         const now = new Date();
         let year = now.getFullYear();
+        const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         const candidate = new Date(year, mo - 1, +m[1]);
-        if ((candidate.getTime() - now.getTime()) / 86400000 > 14) year -= 1;
+        if ((candidate.getTime() - today.getTime()) / 86400000 > 7) year -= 1;
         return { year, month: mo, day: +m[1] };
       }
     }
@@ -1865,6 +1868,14 @@
     try { decoded = decodeURIComponent((url || "") + " " + (label || "")).toLowerCase(); }
     catch (_e) { decoded = ((url || "") + " " + (label || "")).toLowerCase(); }
     let d = extractDateFromUrl(decoded);
+    if (d && d.year > 0 && d.month > 0 && d.day > 0) {
+      const now = new Date();
+      const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+      const cand = new Date(d.year, d.month - 1, d.day);
+      if ((cand.getTime() - today.getTime()) / 86400000 > 7) {
+        d = { year: d.year - 1, month: d.month, day: d.day };
+      }
+    }
     const keywordBonus = /\b(bulletin|newsletter|notice)\b/.test(decoded) ? 5 : 0;
     const sundayBonus = /\bsunday\b/.test(decoded) ? 4 : 0;
     const pdfBonus = /\.pdf(\?|$)/.test(decoded) ? 3 : 0;
@@ -6907,7 +6918,7 @@
     (() => {
       const DIOCESE_CACHE_KEY = "ph_diocese_list_cache";
       const DIOCESE_CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
-      const FALLBACK_DIOCESES = ["clogher", "derry", "down_and_connor", "raphoe"];
+      const FALLBACK_DIOCESES = ["clogher", "cork_and_ross", "derry", "down_and_connor", "raphoe"];
 
       const _fetchDioceseList = async () => {
         // Try cache first.
