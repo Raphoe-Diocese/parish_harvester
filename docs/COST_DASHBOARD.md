@@ -1,17 +1,17 @@
 # 💷 Cost Dashboard
 
-_Auto-generated at 2026-09-17T08:51:36Z UTC._
+_Auto-generated at 2026-09-18T20:23:02Z UTC._
 
 _This file is rewritten on every harvest and OCR run. Do not edit manually._
 
 ## 🟢 OCR pages this month
 
-_Month 2026-09. Counted from billed Mistral / Gemini / OpenAI pages only. Tesseract is not a bulletin reader and is not counted. Today 4 diocese(s); projection scales that to 26. Mistral ceiling is 2,500 pages from Free **$10** credits at **$4 / 1,000 pages** (mistral.ai/pricing, 15/09/2026). Gemini and OpenAI stay **unknown** unless `OCR_CEILING_GEMINI` / `OCR_CEILING_OPENAI` is set._
+_Month 2026-09. Counted from billed Mistral / Gemini / OpenAI pages only. Tesseract is not a bulletin reader and is not counted. Today 5 diocese(s); projection scales that to 26. Mistral ceiling is 2,500 pages from Free **$10** credits at **$4 / 1,000 pages** (mistral.ai/pricing, 15/09/2026). Gemini and OpenAI stay **unknown** unless `OCR_CEILING_GEMINI` / `OCR_CEILING_OPENAI` is set._
 
 | Provider | Pages this month | Free ceiling | % used | At 26 dioceses |
 |---|---:|---:|---:|---:|
 | Mistral | 0 | 2500 | 0.0% | 0 |
-| Gemini | 0 | unknown | unknown | 0 |
+| Gemini | 12 | unknown | unknown | 62 |
 | OpenAI | 0 | unknown | unknown | 0 |
 
 Read the three **Pages this month** numbers. Red only if a known ceiling is set and the 26-diocese projection is over it.
@@ -40,8 +40,8 @@ _Providers can change free tiers. Read the OCR table above for this month’s pa
 
 ## 🟢 Repository storage
 
-**Used:** 0.012 GB / 5.0 GB hard cap
-**Progress:** [░░░░░░░░░░░░░░░░░░░░] 0.2%
+**Used:** 0.226 GB / 5.0 GB hard cap
+**Progress:** [░░░░░░░░░░░░░░░░░░░░] 4.5%
 
 Plenty of space. No action needed.
 
@@ -57,7 +57,7 @@ the next provider (Gemini → Groq → Mistral). Events and summaries will degra
 ## 🟢 GitHub Actions minutes
 
 Public repositories get **unlimited free minutes**.
-_GitHub API not accessible (no GITHUB_TOKEN or GITHUB_REPOSITORY). See https://github.com/settings/billing._
+_GitHub API call failed: HTTP Error 403: Forbidden. See https://github.com/settings/billing._
 
 ## 🚨 What to do if a 🔴 appears
 
