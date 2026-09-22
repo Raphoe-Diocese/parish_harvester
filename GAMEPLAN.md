@@ -17,6 +17,16 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 22/09/2026 — Stitch merge cannot import harvester
+
+**The real goal, in one sentence:** after the four diocese jobs finish, stitch must build the mega PDFs.
+
+**This turn:** Full harvest [35755467832](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/35755467832) (after #242) got all four diocese slices, then stitch died on `ModuleNotFoundError: No module named 'harvester'`. `python scripts/merge_diocese_harvests.py` puts `scripts/` on the path, not the repo. Same sys.path fix as `push_harvest_results.py`. Not live until this merges and a full harvest is re-run.
+
+**Next:** merge, then re-run Harvest full so this week’s megas land.
+
+**Parked:** Recipe Brain. Cork recipes.
+
 ## 22/09/2026 — Sunday harvest did fire, then stitch tests threw it away
 
 **The real goal, in one sentence:** Sunday’s PDFs must land even if a trainer version pin is stale.
