@@ -1,5 +1,6 @@
 # Cork and Ross recipes
 
-Trainer folder for Cork and Ross. Empty until a parish is trained.
+First recipe: West Cork family list, harvested once as `aughadown`.
 
-Do not invent dated PDF filenames. Shared family listings (onefaith.ie, westcorkparishes.ie, and the other faithful.ie hubs) harvest once.
+Do not invent dated PDF filenames. Shared family listings harvest once.
+Do not add Castlehaven, Kilmacabea, Rath, or Skibbereen recipes for westcorkparishes.ie/newsletters.
