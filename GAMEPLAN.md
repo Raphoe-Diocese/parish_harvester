@@ -17,13 +17,33 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 22/09/2026 — First Cork recipe: West Cork family, once
+
+**The real goal, in one sentence:** harvest the shared West Cork family paper, not five copies.
+
+**This turn:** Listing https://westcorkparishes.ie/newsletters opened. This week is `FOP-26-09-20.pdf` (HTTP 200, PDF, 233190 bytes, labelled 20/09/2026). Recipe `aughadown` scrapes `FOP-` only. No recipes for Castlehaven, Kilmacabea, Rath, or Skibbereen.
+
+**Next:** Send & test `aughadown` / Cork. Then the next family when Frank says go.
+
+**Parked:** other Cork families. Cork Sunday matrix until more recipes exist.
+
+## 22/09/2026 — First Cork recipe: West Cork family, once
+
+**The real goal, in one sentence:** harvest the shared West Cork family paper, not five copies.
+
+**This turn:** Listing https://westcorkparishes.ie/newsletters opened. This week is `FOP-26-09-20.pdf` (HTTP 200, PDF, 233190 bytes, labelled 20/09/2026). Recipe `aughadown` scrapes `FOP-` only. No recipes for Castlehaven, Kilmacabea, Rath, or Skibbereen.
+
+**Next:** Send & test `aughadown` / Cork. Then the next family when Frank says go.
+
+**Parked:** other Cork families. Cork Sunday matrix until more recipes exist.
+
 ## 22/09/2026 — Sunday harvest did fire, then stitch tests threw it away
 
 **The real goal, in one sentence:** Sunday’s PDFs must land even if a trainer version pin is stale.
 
 **This turn:** Sunday 20/09/2026 run [35501588624](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/35501588624) did trigger at 09:10 UTC. All four diocese jobs succeeded. Stitch failed on `1.61.42 != 1.61.39` and skipped the commit. That is why it looks like Sunday never ran. Stitch no longer runs the full test suite. Pins updated to 1.61.42.
 
-**Next:** merge this, then a full harvest on GitHub Actions.
+**Next:** Full harvest running on the fix: [35755467832](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/35755467832). [#242](https://github.com/Raphoe-Diocese/parish_harvester/pull/242) merged `56a5aa13`.
 
 **Parked:** Recipe Brain. Cork recipes.
 
