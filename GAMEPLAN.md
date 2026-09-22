@@ -1,3 +1,11 @@
+## 03/10/2026 — Stitch still cannot import harvester (#243)
+
+**The real goal, in one sentence:** after the diocese jobs finish, stitch must build the mega PDFs.
+
+**This turn:** Full harvest stitch failed again on the same `ModuleNotFoundError: No module named 'harvester'`. PR #243 still has the sys.path fix. Rebased onto current main so it can merge. Not live until #243 merges and Harvest full is re-run.
+
+**Next:** merge #243, then re-run Harvest full.
+
 ## 03/10/2026 — Leftover skip hunt (cloud, after PR #277)
 
 - Harvest week Sunday 04/10/2026. Also accepted 27/09/2026 and 03–05/10/2026. Did not redo PR #277 keys. Did not reopen St Marys Limerick, Castlemaine, Kilcock, Abbeyleix, Ballycroy, Killannin. Meath not touched. LIVE_DIOCESES unchanged. harvest.yml not dispatched.
@@ -2869,6 +2877,15 @@ ecipe_folder_name alias (ee4e1246).
 - **Harvest push bug 2 fixed** 721a180b: untracked Bulletins/*.pdf + mega blocked git rebase ("untracked working tree files would be overwritten") — Ardagh run 36587352242 failed. Now parked + restored around the rebase; test reproduces the git refusal.
 - **Down & Connor** 35 ok (+Newtownards & Comber 27/09). St John's Falls Road: 0.5s from Ireland, 190s timeout on GitHub runners (WAF) — parked, needs Send & test from Frank PC or a proxy.
 - **Mark now ~74/100.** Next: Armagh hunt (A–Z) → then the 4 red tests → Brain 1b (picker challenge).
+## 22/09/2026 — Stitch merge cannot import harvester
+
+**The real goal, in one sentence:** after the four diocese jobs finish, stitch must build the mega PDFs.
+
+**This turn:** Full harvest [35755467832](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/35755467832) (after #242) got all four diocese slices, then stitch died on `ModuleNotFoundError: No module named 'harvester'`. `python scripts/merge_diocese_harvests.py` puts `scripts/` on the path, not the repo. Same sys.path fix as `push_harvest_results.py`. Not live until this merges and a full harvest is re-run.
+
+**Next:** merge, then re-run Harvest full so this week’s megas land.
+
+**Parked:** Recipe Brain. Cork recipes.
 
 ## 22/09/2026 — Sunday harvest did fire, then stitch tests threw it away
 
