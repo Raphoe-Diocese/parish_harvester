@@ -17,6 +17,16 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 22/09/2026 — Sunday harvest did fire, then stitch tests threw it away
+
+**The real goal, in one sentence:** Sunday’s PDFs must land even if a trainer version pin is stale.
+
+**This turn:** Sunday 20/09/2026 run [35501588624](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/35501588624) did trigger at 09:10 UTC. All four diocese jobs succeeded. Stitch failed on `1.61.42 != 1.61.39` and skipped the commit. That is why it looks like Sunday never ran. Stitch no longer runs the full test suite. Pins updated to 1.61.42.
+
+**Next:** merge this, then a full harvest on GitHub Actions.
+
+**Parked:** Recipe Brain. Cork recipes.
+
 ## 18/09/2026 — Remember clicks that worked (the gold)
 
 **The real goal, in one sentence:** the trainer lights up a click that already worked on a similar site, instead of Guess inventing a date.
