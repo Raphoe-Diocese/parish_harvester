@@ -46,10 +46,12 @@ class SendTestCommsTests(unittest.TestCase):
         self.assertIn("max-parallel: 4", yml)
         self.assertIn("HARVEST_SKIP_STATUS", yml)
         self.assertIn("merge_diocese_harvests.py", yml)
+        stitch = yml.split("\n  stitch:", 1)[-1]
+        self.assertNotIn("python -m pytest", stitch)
 
     def test_manifest_bumped_for_extension_js(self) -> None:
         text = MANIFEST.read_text(encoding="utf-8")
-        self.assertIn('"version": "1.61.39"', text)
+        self.assertIn('"version": "1.61.42"', text)
         content = (REPO / "extension" / "content.js").read_text(encoding="utf-8")
         self.assertIn("T6: a dated bulletin page is this week's post", content)
         self.assertIn("await _setToolbarHiddenForHost(false);", content)
