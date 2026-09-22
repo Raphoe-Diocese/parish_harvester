@@ -5,14 +5,19 @@ from __future__ import annotations
 import argparse
 import json
 import shutil
+import sys
 from pathlib import Path
 
 from datetime import date
 
-from harvester.fetcher import FetchResult
-from harvester.parish_status import write_parish_status
-from harvester.report import merge_diocese_reports
-from harvester.stitcher import stitch_mega_pdf
+REPO = Path(__file__).resolve().parent.parent
+if str(REPO) not in sys.path:
+    sys.path.insert(0, str(REPO))
+
+from harvester.fetcher import FetchResult  # noqa: E402
+from harvester.parish_status import write_parish_status  # noqa: E402
+from harvester.report import merge_diocese_reports  # noqa: E402
+from harvester.stitcher import stitch_mega_pdf  # noqa: E402
 
 
 def _load_json(path: Path) -> dict:

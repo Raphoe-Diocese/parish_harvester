@@ -3,6 +3,7 @@
 from __future__ import annotations
 
 import subprocess
+import sys
 import tempfile
 import unittest
 from pathlib import Path
@@ -518,3 +519,24 @@ class HarvestWorkflowMegaPushTests(unittest.TestCase):
         # S1 diocese slices skip mega; the stitch job builds it once.
         self.assertIn("merge_diocese_harvests.py --slices-dir _slices --mega", workflow)
         self.assertGreaterEqual(workflow.count('HARVEST_MEGA_PDF: "1"'), 1)
+        # `python scripts/foo.py` puts scripts/ on sys.path, not the repo root.
+        merge_script = (
+            Path(__file__).resolve().parent.parent / "scripts" / "merge_diocese_harvests.py"
+        ).read_text(encoding="utf-8")
+        self.assertIn("sys.path.insert(0, str(REPO))", merge_script)
+
+    def test_merge_script_imports_when_run_as_file(self) -> None:
+        try:
+            import playwright  # noqa: F401
+        except ImportError:
+            self.skipTest("playwright not installed")
+        repo = Path(__file__).resolve().parent.parent
+        result = subprocess.run(
+            [sys.executable, str(repo / "scripts" / "merge_diocese_harvests.py"), "--help"],
+            cwd=repo,
+            capture_output=True,
+            text=True,
+            check=False,
+        )
+        self.assertEqual(result.returncode, 0, result.stderr)
+        self.assertIn("slices-dir", result.stdout)
