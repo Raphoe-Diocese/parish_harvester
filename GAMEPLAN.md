@@ -44,11 +44,11 @@ locked harvester product order.
 
 **The real goal, in one sentence:** exhaust every workable Cork listing into a real recipe before the Cork harvest.
 
-**This turn:** Wrote and proved recipes on branch `cork-recipes-batch2`: ballincollig, bantry, Parishes Together x4, kinsale, blackrock, ballinhassig, bandon (13/09 newest), blackrockroad, kilbrittain, uppermayfield, ballinlough (post follow). Frank lock + Referee Brain first-slice requirements written into this file and Dropbox copy. Learning code today is still only site_memory/site_patterns hints — Brain not built yet.
+**This turn:** Wrote and proved recipes on branch `cork-recipes-batch2` / PR #246: ballincollig, bantry, Parishes Together x4, kinsale, blackrock, ballinhassig, bandon (13/09 newest), blackrockroad, kilbrittain, uppermayfield, ballinlough (post follow), gurranabraher, kilmichael, enniskeanedesertserges, thecathedral, curraheenroad (Latest.pdf), stjosephsmayfield (newsletter.pdf). Frank lock + Referee Brain first-slice requirements written into this file and Dropbox copy. Learning code today is still only site_memory/site_patterns hints — Brain not built yet. Cork recipe options for weekly PDFs are largely exhausted (Wilton HTML + OneFaith July-stale + Facebook/empty left).
 
-**Next:** commit/PR/merge batch2; prove remaining standalones (gurranabraher, kilmichael, enniskeane, cathedral, curraheen, stjosephsmayfield, douglas/turnerscross/ballineaspaig if not summer-dead); then Cork harvest on Actions; then Cork on parishpress.ie; then Brain first slice.
+**Next:** merge PR #246; Cork harvest on Actions (add cork_and_ross to matrix); Cork on parishpress.ie with cathedral photo; then Brain first slice.
 
-**Parked:** wilton HTML dig; OneFaith July-stale; Facebook/empty/notices-only.
+**Parked:** wilton HTML dig; OneFaith July-stale; Facebook/empty/notices-only; summer-break lists until they publish again.
 
 |---|
 | Website / OCR / `docs/` pages | [`docs/WEBSITE_OCR_BACKLOG.md`](docs/WEBSITE_OCR_BACKLOG.md) |
