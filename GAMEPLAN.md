@@ -17,13 +17,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
-## 22/09/2026 — First Cork recipe: West Cork family, once
+## 23/09/2026 — Second Cork recipe: OurParish / Harbour family, once
 
-**The real goal, in one sentence:** harvest the shared West Cork family paper, not five copies.
+**The real goal, in one sentence:** harvest the shared Harbour family paper once.
 
-**This turn:** Listing https://westcorkparishes.ie/newsletters opened. This week is `FOP-26-09-20.pdf` (HTTP 200, PDF, 233190 bytes, labelled 20/09/2026). Recipe `aughadown` scrapes `FOP-` only. No recipes for Castlehaven, Kilmacabea, Rath, or Skibbereen.
+**This turn:** West Cork `aughadown` proved **ok** (FOP-26-09-20.pdf, tested 22/09). Next family: https://ourparish.ie/newsletters opened. This week is `26.09.20_v2.pdf` (HTTP 200, PDF, 219938 bytes, labelled 20/09/2026). Recipe `carrigaline` scrapes `/images/` only. No recipes for Crosshaven, Monkstown, Passage West, or Tracton Abbey.
 
-**Next:** Send & test `aughadown` / Cork. Then the next family when Frank says go.
+**Next:** merge, Send & test `carrigaline`. Then the next Cork family when Frank says go.
 
 **Parked:** other Cork families. Cork Sunday matrix until more recipes exist.
 
@@ -31,9 +31,9 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **The real goal, in one sentence:** harvest the shared West Cork family paper, not five copies.
 
-**This turn:** Listing https://westcorkparishes.ie/newsletters opened. This week is `FOP-26-09-20.pdf` (HTTP 200, PDF, 233190 bytes, labelled 20/09/2026). Recipe `aughadown` scrapes `FOP-` only. No recipes for Castlehaven, Kilmacabea, Rath, or Skibbereen.
+**This turn:** Listing https://westcorkparishes.ie/newsletters opened. This week is `FOP-26-09-20.pdf` (HTTP 200, PDF, 233190 bytes, labelled 20/09/2026). Recipe `aughadown` scrapes `FOP-` only. No recipes for Castlehaven, Kilmacabea, Rath, or Skibbereen. Merged [#244](https://github.com/Raphoe-Diocese/parish_harvester/pull/244). Send & test [35778871690](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/35778871690) **ok**.
 
-**Next:** Send & test `aughadown` / Cork. Then the next family when Frank says go.
+**Next:** OurParish recipe (this turn above).
 
 **Parked:** other Cork families. Cork Sunday matrix until more recipes exist.
 
