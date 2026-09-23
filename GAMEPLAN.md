@@ -50,6 +50,16 @@ locked harvester product order.
 
 **Parked:** wilton HTML dig; OneFaith July-stale; Facebook/empty/notices-only; summer-break lists until they publish again.
 
+## 23/09/2026 — Cork on parishpress.ie (cathedral photo + live card)
+
+**The real goal, in one sentence:** Cork must show on the homepage like the other four, with the North Cathedral photo, full diocese viewer, OCR, mega PDF.
+
+**This turn:** Cork harvest [35857572410](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/35857572410) succeeded. Promoted `cork-and-ross` into `LIVE_DIOCESES` / `OCR_DIOCESE_KEYS` / `EVIDENCE_DIOCESE_KEYS`, added Cathedral of St Mary and St Anne hero/card photo (Wikimedia CC BY-SA 2.0), regenerated `docs/index.html` + `docs/dioceses/cork-and-ross/`, added `cork_and_ross` to Sunday harvest matrix. **Not live yet** until merge + Pages.
+
+**Next:** open/merge PR; prove https://www.parishpress.ie/ after Pages; then Referee Brain first slice.
+
+**Parked:** Brain code until Cork is live-proved.
+
 |---|
 | Website / OCR / `docs/` pages | [`docs/WEBSITE_OCR_BACKLOG.md`](docs/WEBSITE_OCR_BACKLOG.md) |
 | Harvester product order | [`AGENTS.md`](AGENTS.md) locked list |

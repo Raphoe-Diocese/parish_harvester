@@ -31,15 +31,22 @@ DOCS_DIR = REPO_ROOT / "docs"
 RECIPES_DIR = REPO_ROOT / "parishes" / "recipes"
 BULLETINS_DIR = DOCS_DIR / "bulletins"
 
-LIVE_DIOCESES = {"raphoe", "derry", "down-and-connor", "clogher"}
+LIVE_DIOCESES = {"raphoe", "derry", "down-and-connor", "clogher", "cork-and-ross"}
 # site_builder uses hyphenated diocese keys; ocr.generate_bulletin_pages /
 # ocr.parish_pages use the underscored keys from parishes/dioceses.json.
-OCR_DIOCESE_KEYS = {"raphoe": "raphoe", "derry": "derry", "down-and-connor": "down_and_connor", "clogher": "clogher"}
+OCR_DIOCESE_KEYS = {
+    "raphoe": "raphoe",
+    "derry": "derry",
+    "down-and-connor": "down_and_connor",
+    "clogher": "clogher",
+    "cork-and-ross": "cork_and_ross",
+}
 RELIABILITY_PATH = DOCS_DIR / "reliability.json"
 REPORT_PATH = REPO_ROOT / "Bulletins" / "report.json"
 GITHUB_RAW_BASE = "https://raw.githubusercontent.com/Raphoe-Diocese/parish_harvester/main/Bulletins/current"
 EVIDENCE_DIOCESE_KEYS = {
     "clogher": "clogher_diocese",
+    "cork-and-ross": "cork_and_ross",
     "derry": "derry_diocese",
     "down-and-connor": "down_and_connor",
     "raphoe": "raphoe_diocese",
@@ -133,6 +140,20 @@ HERO_SLIDES: list[HeroSlide] = [
         eyebrow="Clogher Diocese",
         title="St Macartan's Cathedral, Monaghan",
         subtitle="The mother church of Clogher.",
+    ),
+    HeroSlide(
+        diocese_key="cork-and-ross",
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/"
+            "Cathedral_of_St._Mary_and_St._Anne%2C_Cork.jpg/"
+            "1280px-Cathedral_of_St._Mary_and_St._Anne%2C_Cork.jpg"
+        ),
+        credit="Photo: William Murphy / Wikimedia Commons / CC BY-SA 2.0",
+        position="center 35%",
+        gradient="linear-gradient(135deg, #1a2a4a 0%, #2f5f8f 55%, #7aa8d4 100%)",
+        eyebrow="Cork and Ross Diocese",
+        title="Cathedral of St Mary and St Anne, Cork",
+        subtitle="This week's Cork and Ross parish bulletins.",
     ),
 ]
 
@@ -785,7 +806,7 @@ def _coming_soon_item_html(row: dict[str, str]) -> str:
 def _landing_page(rows: list[dict[str, str]]) -> str:
     """Homepage: live dioceses prominent up top, the rest collapsed.
 
-    Raphoe, Derry, Down & Connor and Clogher are in ``LIVE_DIOCESES``, so they
+    Raphoe, Derry, Down & Connor, Clogher and Cork & Ross are in ``LIVE_DIOCESES``, so they
     get full cards with one-click links to their collated (mega) bulletin and
     text bulletin. Every other diocese — still "coming soon" — collapses into
     one small expandable list instead of near-empty placeholder cards,
