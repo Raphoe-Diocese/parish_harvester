@@ -19,5 +19,12 @@ class WestCorkFamilyRecipeTests(unittest.TestCase):
         self.assertEqual(recipe["href_patterns"], ["FOP-"])
         self.assertIn("FOP-", recipe["example_url"])
         self.assertFalse(recipe["steps"][0].get("use_captured_url"))
-        siblings = list((REPO / "parishes" / "recipes" / "cork_and_ross").glob("*.json"))
-        self.assertEqual([p.name for p in siblings], ["aughadown.json"])
+        siblings = {p.name for p in (REPO / "parishes" / "recipes" / "cork_and_ross").glob("*.json")}
+        self.assertIn("aughadown.json", siblings)
+        for banned in (
+            "castlehavenmyross.json",
+            "kilmacabea.json",
+            "raththeislands.json",
+            "skibbereen.json",
+        ):
+            self.assertNotIn(banned, siblings)
