@@ -4,7 +4,53 @@ The one list for everything that is **not** a website/OCR page job and **not** t
 locked harvester product order.
 
 | Where the work lives | Which list |
-|---|---|
+|---
+
+## 23/09/2026 — Frank lock: Cork finish, then Cork on site, then Referee Brain (NO MORE DELAY)
+
+**The real goal, in one sentence:** stop serving stale bulletins; Cork must finish and go live; the harvester must learn from past wins and mistakes.
+
+**Frank 23/09/2026 (must not be memory-holed — agents MUST implement, not park forever):**
+1. Exhaust every workable Cork recipe. Then Cork harvest.
+2. After that harvest: put Cork on the main website with a photo of the main cathedral, the usual diocese page, parish pages, OCR, the lot.
+3. Too many stale bulletins are still getting into OCR (e.g. searching 12th finds many 12/09 mentions). Unacceptable.
+4. Start the Referee / Recipe Brain. Learning algorithm that remembers past clicks that worked on similar sites, teaches the trainer/ext, fingerprints sites, and makes Guess stop inventing dates.
+5. Harvester must be self-correcting: learn from mistakes, find new bulletins on the fly, pause a big harvest when it thinks a newer bulletin exists and the picker is wrong.
+6. Fingerprint + Guess-date rules that were promised must be implemented — not parked forever.
+
+**Where the learning code lives today (honest):**
+- `extension/site_memory.js` + `extension/html_fingerprint.js` + `parishes/site_patterns.json` — pattern hints only. Not a referee. Not pause-on-newer. Not self-correct.
+- Guess date is still filename date-sort with a 7-day future window. Yearless archives can still look “this week”. That is why stale still reaches OCR.
+- Full Phase 4 Recipe Brain / Referee was parked behind OCR reader → Problems → recipe success. **Frank unlocked first slice 23/09.** Do not tell him it is done until code + harvest proof exist.
+
+**Referee Brain first slice (must ship after Cork is on the site — do not skip):**
+1. **Stale harder:** refuse / demote bulletins whose best date is older than harvest-week Sunday; never promote yearless archive dates into this week.
+2. **Click memory:** when Send & test / harvest succeeds, write the winning click/href pattern into `parishes/site_patterns.json` and surface it in the trainer diag kit.
+3. **Fingerprint:** host + listing shape + filename pattern remembered so a new similar site gets a hint, not a blank Guess.
+4. **Picker challenge:** if listing scrape finds a newer dated PDF than the recipe pin / predicted name, pause that parish (or the diocese batch), re-pick, log `picker_wrong` — do not quietly download the stale pin into mega/OCR.
+5. **Guess date:** no invented future dates; fingerprint of “guess the date” must use proved patterns, not hope.
+
+**Order (locked this turn):**
+1. **Now:** finish Cork recipes (shared families once; standalones with a proved list; skip Facebook / empty / notices-only / OneFaith July-stale).
+2. **Next:** Cork diocese harvest on Actions (not this PC). Add `cork_and_ross` to Sunday matrix after recipes land on main.
+3. **Next:** Cork on parishpress.ie — cathedral photo, diocese page, parishes, OCR split from mega. Do not tick done without live URL.
+4. **Next (unlocked by Frank 23/09):** Referee Brain first slice above. Full Phase 4 product still after Problems polish, but first slice starts the turn Cork is live on the site — not “someday”.
+
+**Not done yet:** Brain first slice is not built. Guess is still date-sorting. Click-memory is only site_memory/site_patterns hints. Stale mega/OCR is still possible. Cork is not on parishpress.ie yet.
+
+**Parked until Cork site is live:** other 21 dioceses, forms/.ie, full Brain rewrite beyond the first slice.
+
+## 23/09/2026 — Cork recipes batch2 (families + standalones)
+
+**The real goal, in one sentence:** exhaust every workable Cork listing into a real recipe before the Cork harvest.
+
+**This turn:** Wrote and proved recipes on branch `cork-recipes-batch2` / PR #246: ballincollig, bantry, Parishes Together x4, kinsale, blackrock, ballinhassig, bandon (13/09 newest), blackrockroad, kilbrittain, uppermayfield, ballinlough (post follow), gurranabraher, kilmichael, enniskeanedesertserges, thecathedral, curraheenroad (Latest.pdf), stjosephsmayfield (newsletter.pdf). Frank lock + Referee Brain first-slice requirements written into this file and Dropbox copy. Learning code today is still only site_memory/site_patterns hints — Brain not built yet. Cork recipe options for weekly PDFs are largely exhausted (Wilton HTML + OneFaith July-stale + Facebook/empty left).
+
+**Next:** merge PR #246; Cork harvest on Actions (add cork_and_ross to matrix); Cork on parishpress.ie with cathedral photo; then Brain first slice.
+
+**Parked:** wilton HTML dig; OneFaith July-stale; Facebook/empty/notices-only; summer-break lists until they publish again.
+
+|---|
 | Website / OCR / `docs/` pages | [`docs/WEBSITE_OCR_BACKLOG.md`](docs/WEBSITE_OCR_BACKLOG.md) |
 | Harvester product order | [`AGENTS.md`](AGENTS.md) locked list |
 | Everything else | **this file** |
@@ -23,7 +69,7 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **This turn:** West Cork `aughadown` proved **ok** (FOP-26-09-20.pdf, tested 22/09). Next family: https://ourparish.ie/newsletters opened. This week is `26.09.20_v2.pdf` (HTTP 200, PDF, 219938 bytes, labelled 20/09/2026). Recipe `carrigaline` scrapes `/images/` only. No recipes for Crosshaven, Monkstown, Passage West, or Tracton Abbey.
 
-**Next:** merge, Send & test `carrigaline`. Then the next Cork family when Frank says go.
+**Next:** Send & test running: [35848932506](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/35848932506). Then the next Cork family when Frank says go.
 
 **Parked:** other Cork families. Cork Sunday matrix until more recipes exist.
 
