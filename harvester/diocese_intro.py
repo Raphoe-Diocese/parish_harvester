@@ -303,6 +303,7 @@ def render_diocese_intro_html(summary: DioceseWeekSummary) -> str:
     parts = [
         '<section class="diocese-intro" aria-label="This week\'s bulletin">',
         f"<p class=\"intro-welcome\">{welcome}</p>",
+        '<p class="intro-wip">This page is unfinished. We will make small improvements over the weeks and months.</p>',
         f"<p class=\"intro-count\">{_esc(count)}</p>",
     ]
     if summary.never_publish:

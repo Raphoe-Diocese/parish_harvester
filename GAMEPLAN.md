@@ -6,6 +6,14 @@ locked harvester product order.
 | Where the work lives | Which list |
 |---
 
+
+## 24/09/2026 — Cork live polish: dots off, unfinished note, fix "0 of N found"
+
+**The real goal, in one sentence:** Cork on the homepage like the other four, honest bulletin counts, no hero-dot clutter, short unfinished note on every diocese page.
+
+**This turn:** Restored report/status after Cork-only wipe; removed hero dots; unfinished note on diocese intros; single-diocese harvest patches report. PR #248.
+
+**Next:** merge + Pages live-prove; then Referee Brain first slice.
 ## 23/09/2026 — Frank lock: Cork finish, then Cork on site, then Referee Brain (NO MORE DELAY)
 
 **The real goal, in one sentence:** stop serving stale bulletins; Cork must finish and go live; the harvester must learn from past wins and mistakes.

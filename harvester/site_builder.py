@@ -176,7 +176,6 @@ def _hero_slider_html() -> str:
     if not HERO_SLIDES:
         return ""
     slides_html = []
-    dots_html = []
     for i, slide in enumerate(HERO_SLIDES):
         bg = (
             f"linear-gradient(180deg, rgba(10,20,20,0.15) 0%, rgba(10,20,20,0.72) 100%), "
@@ -194,21 +193,16 @@ def _hero_slider_html() -> str:
             f'<p class="hero-slide-subtitle">{html.escape(slide.subtitle)}</p>'
             "</div>"
         )
-        dots_html.append(
-            f'<button type="button" class="hero-dot{" is-active" if i == 0 else ""}" '
-            f'data-slide-index="{i}" aria-label="Go to slide {i + 1}"></button>'
-        )
     controls = (
         '<button type="button" class="hero-nav hero-prev" aria-label="Previous slide">&#8249;</button>'
         '<button type="button" class="hero-nav hero-next" aria-label="Next slide">&#8250;</button>'
         if len(HERO_SLIDES) > 1
         else ""
     )
-    dots = f'<div class="hero-dots">{"".join(dots_html)}</div>' if len(HERO_SLIDES) > 1 else ""
+    # No dot indicators — with ~26 dioceses they become a distraction (Frank 23/09/2026).
     return f"""<section class="hero-slider" data-hero-slider aria-roledescription="carousel" aria-label="Featured">
     <div class="hero-slider-track">{"".join(slides_html)}</div>
     {controls}
-    {dots}
   </section>"""
 
 
@@ -910,13 +904,8 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     .hero-nav:hover {{ background: rgba(10, 25, 25, 0.6); }}
     .hero-prev {{ left: 12px; }}
     .hero-next {{ right: 12px; }}
-    .hero-dots {{ position: absolute; left: 0; right: 0; bottom: 10px; z-index: 2; display: flex; justify-content: center; gap: 7px; }}
-    .hero-dot {{ width: 8px; height: 8px; padding: 0; border-radius: 999px; border: none; background: rgba(255,255,255,0.45); cursor: pointer; }}
-    .hero-dot.is-active {{ background: #fff; width: 20px; }}
-    .hero-dot {{ transition: width 200ms ease, background 200ms ease; }}
     @media (prefers-reduced-motion: reduce) {{
       .hero-slide {{ transition: none; }}
-      .hero-dot {{ transition: none; }}
     }}
 
     .intro {{ padding: 18px 16px 2px; text-align: center; }}
@@ -1010,7 +999,6 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     var slider = document.querySelector('[data-hero-slider]');
     if (!slider) return;
     var slides = Array.prototype.slice.call(slider.querySelectorAll('.hero-slide'));
-    var dots = Array.prototype.slice.call(slider.querySelectorAll('.hero-dot'));
     if (slides.length < 2) return;
 
     var current = 0;
@@ -1024,9 +1012,6 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
         var active = i === current;
         slide.classList.toggle('is-active', active);
         slide.setAttribute('aria-hidden', active ? 'false' : 'true');
-      }});
-      dots.forEach(function (dot, i) {{
-        dot.classList.toggle('is-active', i === current);
       }});
     }}
 
@@ -1046,9 +1031,6 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     var nextBtn = slider.querySelector('.hero-next');
     if (prevBtn) prevBtn.addEventListener('click', function () {{ prev(); startAuto(); }});
     if (nextBtn) nextBtn.addEventListener('click', function () {{ next(); startAuto(); }});
-    dots.forEach(function (dot, i) {{
-      dot.addEventListener('click', function () {{ show(i); startAuto(); }});
-    }});
 
     slider.addEventListener('mouseenter', stopAuto);
     slider.addEventListener('mouseleave', startAuto);
