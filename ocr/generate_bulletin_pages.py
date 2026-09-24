@@ -107,9 +107,14 @@ def ocr_reading_css(selector: str) -> str:
       margin-top: 1.5em;
     }}
     {selector} h3.b-head, {selector} .b-head {{
-      font-size: 1.12em;
-      color: #134e9c;
-      margin: 1.1em 0 0.35em;
+      font-size: 1.15em;
+      color: #0f3d3d;
+      margin: 1.35em 0 0.45em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      font-weight: 700;
+      line-height: 1.3;
+      max-width: 100%;
     }}
     {selector} h4.b-sub, {selector} .b-sub {{
       font-size: 1.04em;
@@ -122,6 +127,9 @@ def ocr_reading_css(selector: str) -> str:
       font-weight: 700;
       line-height: 1.35;
       max-width: 100%;
+    }}
+    {selector} p {{
+      margin: 0 0 0.85em;
     }}
     {selector} h3.ocr-page-heading,
     {selector} .page-label {{

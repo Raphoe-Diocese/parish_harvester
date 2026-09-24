@@ -46,6 +46,34 @@ class BulletinLayoutTests(unittest.TestCase):
         self.assertIsNone(classify_heading_line("Parish Office : 028 9066 5409"))
         self.assertIsNone(classify_heading_line("Anniversary Masses will be offered"))
         self.assertIsNone(classify_heading_line("Parochial House, Falcarragh, Co. Donegal. F92 N6Y9."))
+        self.assertIsNone(classify_heading_line("anniversaries occurs"))
+        self.assertIsNone(
+            classify_heading_line("Sunday Mass KILLYGARVAN & TULLYFERN PARISH")
+        )
+
+    def test_splits_recently_deceased_name_onto_body(self) -> None:
+        head, rest = split_heading_prefix("Recently Deceased: Kathleen Martin, Fanad,")
+        self.assertEqual(head, "Recently Deceased")
+        self.assertIn("Kathleen Martin", rest)
+        html_out = structure_ocr_html(
+            "<p>Recently Deceased: Kathleen Martin, Fanad,</p>"
+            "<p>whose Funeral Mass takes place in Fanavolty</p>"
+        )
+        self.assertIn('class="b-head">Recently Deceased</h3>', html_out)
+        self.assertIn("Kathleen Martin", html_out)
+        self.assertNotIn('b-head">Recently Deceased: Kathleen', html_out)
+
+    def test_demotes_long_spaced_markdown_heading(self) -> None:
+        html_out = structure_ocr_html(
+            "<h2>Tw e nty -fourth S unday in Ordinary Time – We e k be ginning: "
+            "13th S e pte mbe r 2026 Weekend Mass Times Sa tur da y Vigil</h2>"
+            "<p>Body note</p>"
+        )
+        self.assertNotIn("<h2>", html_out)
+        self.assertNotIn('class="b-head"', html_out)
+        self.assertIn("Twenty", html_out)
+        self.assertIn("Sunday", html_out)
+        self.assertIn("Body note", html_out)
 
     def test_skips_trailing_directory_of_parish_urls(self) -> None:
         fragment = (
