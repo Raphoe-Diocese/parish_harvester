@@ -1513,3 +1513,8 @@ still cannot stop a Sunday harvest — this only makes the warning honest.
 - The archive is not why harvest takes 70 minutes. The fetch step is.
 - Local `_tmp_*` files on the Dynabook are **not** on GitHub. Nothing to delete
   there on the remote; just bin them locally.
+
+
+## Now (24/09/2026)
+- doing: OCR spacing harden pass2 — audit all live dioceses; Ardara letter-spaced fix. Not live until merge+Pages.
+

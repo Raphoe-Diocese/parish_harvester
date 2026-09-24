@@ -122,7 +122,7 @@ class PreferEmbeddedTextTests(unittest.TestCase):
         self.assertEqual(clean_ocr_line("the 1717th of the month"), "the 17th of the month")
 
     def test_collapse_ocr_spacing_fixes_letter_spaced_titles(self) -> None:
-        from ocr.convert_bulletin import collapse_ocr_spacing
+        from ocr.convert_bulletin import collapse_ocr_spacing, clean_ocr_line
 
         self.assertEqual(
             collapse_ocr_spacing("PA R O C H IA L HO U S E"),
@@ -138,6 +138,32 @@ class PreferEmbeddedTextTests(unittest.TestCase):
             collapse_ocr_spacing("Weekend Mass Times"),
             "Weekend Mass Times",
         )
+
+    def test_collapse_ardara_style_bulletin_dump(self) -> None:
+        from ocr.convert_bulletin import clean_ocr_line
+
+        # Real letter-spaced dump from docs/bulletins/raphoe-2026-09-23.html
+        raw = (
+            "Jimmy M c Gill Aighe w ho w as burie d on We dne sday "
+            "Je ssie & C harle s C unningham, S e attle & M e e ntashask "
+            "w hose ashe s w e re in inte rre d during the w e e k. "
+            "C athle e n M c Ne lis Dublin & Tully be g w ho passe d aw ay on 7 th "
+            "S e pte mbe r. Fune ral arrange me nts late r. "
+            "Et ern a l rest gra n t u n t o t h em O Lord"
+        )
+        out = clean_ocr_line(raw)
+        self.assertIn("Jimmy McGill Aighe who was buried on Wednesday", out)
+        self.assertIn("Jessie & Charles Cunningham", out)
+        self.assertIn("Seattle", out)
+        self.assertIn("ashes were interred", out)
+        self.assertIn("Cathleen McNelis", out)
+        self.assertIn("passed away on 7th", out)
+        self.assertIn("Funeral arrangements later", out)
+        self.assertIn("Eternal rest grant unto them O Lord", out)
+        self.assertNotIn("Aighew", out)
+        self.assertNotIn("whowas", out)
+        self.assertNotIn("Tully be g", out)
+        self.assertNotIn("pmArdara", out)
 
 
 if __name__ == "__main__":
