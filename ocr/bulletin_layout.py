@@ -83,6 +83,20 @@ _BODY_AFTER_HEADING = re.compile(
     re.IGNORECASE,
 )
 
+# Rest that still belongs in the section title (not body names / parish banners).
+_HEADING_CONTINUATION = re.compile(
+    r"^(?:anniversar\w*(?:\s*/\s*intentions?)?|intentions?|and\s+intentions?|"
+    r"/\s*anniversar\w*|and\s+confessions?|schedule|for\s+the\s+week)$",
+    re.IGNORECASE,
+)
+
+_REST_IS_BODY_WORD = re.compile(
+    r"^(?:occurs?|are|is|was|were|will|every|please|open|tel|on|option|mobile)\b",
+    re.IGNORECASE,
+)
+
+_MAX_HEADING_CHARS = 72
+
 _URL_ONLY = re.compile(
     r"^(?:https?://|www\.)\S+$",
     re.IGNORECASE,
@@ -132,9 +146,14 @@ def split_heading_prefix(plain: str) -> tuple[str | None, str]:
     Restores the original wording (including Irish). Returns ``(None, plain)``
     when the line is ordinary body text.
     """
-    text = _SPACE_RE.sub(" ", (plain or "").strip())
+    from ocr.convert_bulletin import collapse_ocr_spacing
+
+    text = collapse_ocr_spacing(_SPACE_RE.sub(" ", (plain or "").strip()))
     if not text:
         return None, ""
+    if len(text) > 120:
+        # Long glued schedules / OCR dumps are never section titles.
+        return None, text
     if _IRISH_RIP_HEADING.match(text) and len(text) <= 56:
         return text, ""
     match = _HEADING_START.match(text)
@@ -152,12 +171,22 @@ def split_heading_prefix(plain: str) -> tuple[str | None, str]:
         re.IGNORECASE,
     ):
         return None, text
+    if _REST_IS_BODY_WORD.match(rest):
+        return None, text
+    # "MASS TIMES ANNIVERSARIES /INTENTIONS" — whole line is the title.
+    if _HEADING_CONTINUATION.match(rest) and len(text) <= _MAX_HEADING_CHARS:
+        return text.rstrip(".:;"), ""
     if _BODY_AFTER_HEADING.match(rest):
         return head, rest
     if re.search(r"\d", rest) or re.search(r"\bwill\b|\bevery\b|\bplease\b", rest, re.I):
         return None, text
-    if len(text) <= 80 and len(rest) <= 40:
-        return text.rstrip(".:;"), ""
+    # ALL-CAPS parish banner after "Sunday Mass …" stays body, not a heading.
+    letters = re.sub(r"[^A-Za-zÀ-ÿ]", "", rest)
+    if letters and letters.isupper() and len(rest) > 12:
+        return None, text
+    # "Recently Deceased: Kathleen Martin" → heading + name body.
+    if len(head) <= _MAX_HEADING_CHARS and len(rest) <= 80:
+        return head.rstrip(".:;"), rest
     return None, text
 
 
@@ -306,6 +335,24 @@ def _heading_html(text: str) -> str:
     return f'<h3 class="b-head">{html.escape(text)}</h3>'
 
 
+def _should_keep_existing_heading(inner: str) -> bool:
+    """Keep short real section titles; demote OCR dumps and spaced banners."""
+    from ocr.convert_bulletin import collapse_ocr_spacing
+
+    plain = collapse_ocr_spacing(_plain(inner))
+    if not plain or len(plain) > _MAX_HEADING_CHARS:
+        return False
+    # Still letter-spaced after cleanup → not a usable subheading.
+    if re.search(r"\b[A-Za-zÀ-ÿ]\s+[A-Za-zÀ-ÿ]\s+[A-Za-zÀ-ÿ]\b", plain):
+        return False
+    if classify_heading_line(plain):
+        return True
+    # Short title-case / ALL CAPS labels without a long tail.
+    if len(plain) <= 48 and plain.count(" ") <= 6:
+        return True
+    return False
+
+
 def _reset_reader_markup(fragment: str) -> str:
     """Undo a previous structure pass so we can re-apply rules safely."""
 
@@ -393,7 +440,9 @@ def structure_ocr_html(
             body = []
 
         for idx, raw in enumerate(raw_lines):
-            plain = _plain(raw)
+            from ocr.convert_bulletin import collapse_ocr_spacing
+
+            plain = collapse_ocr_spacing(_plain(raw))
             if not plain:
                 flush()
                 continue
@@ -429,7 +478,11 @@ def structure_ocr_html(
                 out.append(_heading_html(head))
                 body.append(html.escape(rest))
                 continue
-            body.append(raw.strip() if "<" in raw else html.escape(plain))
+            # Prefer cleaned plain text, but keep existing inline links/markup.
+            if re.search(r"<(?:a|strong|em)\b", raw, re.I):
+                body.append(raw.strip())
+            else:
+                body.append(html.escape(plain))
         flush()
 
     pos = 0
@@ -466,12 +519,19 @@ def structure_ocr_html(
                     if leftover:
                         out.append(f"<p>{html.escape(leftover)}</p>")
                     add_masthead(parish_hit[1], parish_hit[0])
-                elif classify_heading_line(inner) or "b-head" in (hm.group(2) or "") or "b-title" in (hm.group(2) or "") or "ocr-parish-name" in (hm.group(2) or ""):
+                elif "ocr-parish-name" in (hm.group(2) or ""):
                     out.append(token)
-                elif classify_heading_line(inner) is None and packed and parish_hit is None:
-                    out.append(token)
+                elif classify_heading_line(inner) or _should_keep_existing_heading(inner):
+                    # Re-emit as a clean b-head so spacing cleanup applies.
+                    title = classify_heading_line(inner) or _plain(inner)
+                    from ocr.convert_bulletin import collapse_ocr_spacing
+
+                    out.append(_heading_html(collapse_ocr_spacing(title)))
                 else:
-                    out.append(token)
+                    # Demote oversized / junk markdown headings to body text.
+                    from ocr.convert_bulletin import collapse_ocr_spacing
+
+                    out.append(f"<p>{html.escape(collapse_ocr_spacing(inner))}</p>")
             else:
                 out.append(token)
         elif match.group(4):
@@ -557,7 +617,8 @@ def ocr_masthead_css(selector: str) -> str:
     {selector} h3.b-head {{
       margin-top: 1.45em;
       margin-bottom: 0.5em;
-      padding-bottom: 0.12em;
+      padding-bottom: 0.2em;
       border-bottom: 1px solid #d4ddd9;
+      color: #0f3d3d;
     }}
 """

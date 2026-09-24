@@ -121,6 +121,24 @@ class PreferEmbeddedTextTests(unittest.TestCase):
         self.assertEqual(clean_ocr_line("Sunday 11th August"), "Sunday 11th August")
         self.assertEqual(clean_ocr_line("the 1717th of the month"), "the 17th of the month")
 
+    def test_collapse_ocr_spacing_fixes_letter_spaced_titles(self) -> None:
+        from ocr.convert_bulletin import collapse_ocr_spacing
+
+        self.assertEqual(
+            collapse_ocr_spacing("PA R O C H IA L HO U S E"),
+            "PAROCHIALHOUSE",
+        )
+        self.assertIn("Sunday", collapse_ocr_spacing("S unday Mass"))
+        self.assertIn("Week", collapse_ocr_spacing("We e k beginning"))
+        self.assertIn("Twenty", collapse_ocr_spacing("Tw e nty -fourth"))
+        self.assertIn("Saturday", collapse_ocr_spacing("Sa tur da y Vigil"))
+        self.assertIn("Ardara", collapse_ocr_spacing("Ar da r a 7.30pm"))
+        # Do not glue ordinary English.
+        self.assertEqual(
+            collapse_ocr_spacing("Weekend Mass Times"),
+            "Weekend Mass Times",
+        )
+
 
 if __name__ == "__main__":
     unittest.main()

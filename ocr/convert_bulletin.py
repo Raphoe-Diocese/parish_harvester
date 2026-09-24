@@ -473,11 +473,65 @@ def collapse_glued_duplicate_token(token: str) -> str:
     return token
 
 
+# Born-digital PDF extractors often emit letter-spaced titles (P A R I S H)
+# or mid-word splits (S unday, We e k). Spacing-only repairs — never change letters.
+_KNOWN_SPACE_FRAGMENTS: tuple[tuple[re.Pattern[str], str], ...] = (
+    (re.compile(r"\bS\s+unday\b", re.I), "Sunday"),
+    (re.compile(r"\bM\s+onday\b", re.I), "Monday"),
+    (re.compile(r"\bT\s+uesday\b", re.I), "Tuesday"),
+    (re.compile(r"\bW\s+ednesday\b", re.I), "Wednesday"),
+    (re.compile(r"\bT\s+hursday\b", re.I), "Thursday"),
+    (re.compile(r"\bF\s+riday\b", re.I), "Friday"),
+    (re.compile(r"\bS\s+aturday\b", re.I), "Saturday"),
+    (re.compile(r"\bSa\s+tur\s+da\s+y\b", re.I), "Saturday"),
+    (re.compile(r"\bWe\s+e\s+k\b", re.I), "Week"),
+    (re.compile(r"\bw\s+e\s+e\s+k\b", re.I), "week"),
+    (re.compile(r"\bTw\s+e\s+nty\b", re.I), "Twenty"),
+    (re.compile(r"\bS\s+e\s+pte\s+mbe\s+r\b", re.I), "September"),
+    (re.compile(r"\bM\s+ass\b", re.I), "Mass"),
+    (re.compile(r"\bO\s+rdinary\b", re.I), "Ordinary"),
+    (re.compile(r"\bbe\s+ginning\b", re.I), "beginning"),
+)
+
+
+def _alpha_len(token: str) -> int:
+    return len(re.sub(r"[^A-Za-zÀ-ÿ]", "", token or ""))
+
+
+def collapse_ocr_spacing(text: str) -> str:
+    """Fix letter-spaced / mid-split OCR without changing any letters."""
+    if not text:
+        return text
+    cleaned = str(text)
+    for pattern, repl in _KNOWN_SPACE_FRAGMENTS:
+        cleaned = pattern.sub(repl, cleaned)
+    # Twenty -fourth → Twenty-fourth (space before hyphen only)
+    cleaned = re.sub(r"(?<=\w)\s+-(?=\w)", "-", cleaned)
+
+    words = cleaned.split()
+    if not words:
+        return cleaned
+    out: list[str] = []
+    i = 0
+    while i < len(words):
+        j = i
+        while j < len(words) and 1 <= _alpha_len(words[j]) <= 2:
+            j += 1
+        if j - i >= 4:
+            # P A R I S H / PA R O C H IA L / Ar da r a → one word
+            out.append("".join(words[i:j]))
+            i = j
+            continue
+        out.append(words[i])
+        i += 1
+    return re.sub(r"[ \t]{2,}", " ", " ".join(out)).strip()
+
+
 def clean_ocr_line(text: str) -> str:
     """Remove common OCR duplication artefacts before HTML render."""
     if not text:
         return text
-    cleaned = str(text)
+    cleaned = collapse_ocr_spacing(str(text))
     # 1717th → 17th
     cleaned = _ORDINAL_DUP_RE.sub(r"\1\2", cleaned)
     # 1 7th → 17th (common OCR split)

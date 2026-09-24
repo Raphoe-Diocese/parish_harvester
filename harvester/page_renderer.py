@@ -117,10 +117,13 @@ def _build_ocr_fragment(
     normalized = (ocr_text or "").strip() or EMPTY_OCR_TEXT
     if ocr_is_html:
         from ocr.bulletin_layout import structure_ocr_html
+        from ocr.generate_bulletin_pages import tighten_ocr_paragraphs
 
         cleaned = _clean_embedded_ocr_html(normalized)
-        if "ocr-parish-masthead" in cleaned:
-            return cleaned
+        # Always re-apply spacing cleanup + heading rules. Skipping when a
+        # masthead already existed left letter-spaced OCR and bad subheads
+        # frozen on the live diocese pages (Frank 24/09/2026).
+        cleaned = tighten_ocr_paragraphs(cleaned)
         entries = [
             (str(link.get("name") or "").strip(), str(link.get("name") or "").strip())
             for link in (parish_links or [])
