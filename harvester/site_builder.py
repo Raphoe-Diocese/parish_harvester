@@ -31,15 +31,22 @@ DOCS_DIR = REPO_ROOT / "docs"
 RECIPES_DIR = REPO_ROOT / "parishes" / "recipes"
 BULLETINS_DIR = DOCS_DIR / "bulletins"
 
-LIVE_DIOCESES = {"raphoe", "derry", "down-and-connor", "clogher"}
+LIVE_DIOCESES = {"raphoe", "derry", "down-and-connor", "clogher", "cork-and-ross"}
 # site_builder uses hyphenated diocese keys; ocr.generate_bulletin_pages /
 # ocr.parish_pages use the underscored keys from parishes/dioceses.json.
-OCR_DIOCESE_KEYS = {"raphoe": "raphoe", "derry": "derry", "down-and-connor": "down_and_connor", "clogher": "clogher"}
+OCR_DIOCESE_KEYS = {
+    "raphoe": "raphoe",
+    "derry": "derry",
+    "down-and-connor": "down_and_connor",
+    "clogher": "clogher",
+    "cork-and-ross": "cork_and_ross",
+}
 RELIABILITY_PATH = DOCS_DIR / "reliability.json"
 REPORT_PATH = REPO_ROOT / "Bulletins" / "report.json"
 GITHUB_RAW_BASE = "https://raw.githubusercontent.com/Raphoe-Diocese/parish_harvester/main/Bulletins/current"
 EVIDENCE_DIOCESE_KEYS = {
     "clogher": "clogher_diocese",
+    "cork-and-ross": "cork_and_ross",
     "derry": "derry_diocese",
     "down-and-connor": "down_and_connor",
     "raphoe": "raphoe_diocese",
@@ -134,6 +141,20 @@ HERO_SLIDES: list[HeroSlide] = [
         title="St Macartan's Cathedral, Monaghan",
         subtitle="The mother church of Clogher.",
     ),
+    HeroSlide(
+        diocese_key="cork-and-ross",
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/e/ea/"
+            "Cathedral_of_St._Mary_and_St._Anne%2C_Cork.jpg/"
+            "1280px-Cathedral_of_St._Mary_and_St._Anne%2C_Cork.jpg"
+        ),
+        credit="Photo: William Murphy / Wikimedia Commons / CC BY-SA 2.0",
+        position="center 35%",
+        gradient="linear-gradient(135deg, #1a2a4a 0%, #2f5f8f 55%, #7aa8d4 100%)",
+        eyebrow="Cork and Ross Diocese",
+        title="Cathedral of St Mary and St Anne, Cork",
+        subtitle="This week's Cork and Ross parish bulletins.",
+    ),
 ]
 
 
@@ -155,7 +176,6 @@ def _hero_slider_html() -> str:
     if not HERO_SLIDES:
         return ""
     slides_html = []
-    dots_html = []
     for i, slide in enumerate(HERO_SLIDES):
         bg = (
             f"linear-gradient(180deg, rgba(10,20,20,0.15) 0%, rgba(10,20,20,0.72) 100%), "
@@ -173,21 +193,16 @@ def _hero_slider_html() -> str:
             f'<p class="hero-slide-subtitle">{html.escape(slide.subtitle)}</p>'
             "</div>"
         )
-        dots_html.append(
-            f'<button type="button" class="hero-dot{" is-active" if i == 0 else ""}" '
-            f'data-slide-index="{i}" aria-label="Go to slide {i + 1}"></button>'
-        )
     controls = (
         '<button type="button" class="hero-nav hero-prev" aria-label="Previous slide">&#8249;</button>'
         '<button type="button" class="hero-nav hero-next" aria-label="Next slide">&#8250;</button>'
         if len(HERO_SLIDES) > 1
         else ""
     )
-    dots = f'<div class="hero-dots">{"".join(dots_html)}</div>' if len(HERO_SLIDES) > 1 else ""
+    # No dot indicators — with ~26 dioceses they become a distraction (Frank 23/09/2026).
     return f"""<section class="hero-slider" data-hero-slider aria-roledescription="carousel" aria-label="Featured">
     <div class="hero-slider-track">{"".join(slides_html)}</div>
     {controls}
-    {dots}
   </section>"""
 
 
@@ -785,7 +800,7 @@ def _coming_soon_item_html(row: dict[str, str]) -> str:
 def _landing_page(rows: list[dict[str, str]]) -> str:
     """Homepage: live dioceses prominent up top, the rest collapsed.
 
-    Raphoe, Derry, Down & Connor and Clogher are in ``LIVE_DIOCESES``, so they
+    Raphoe, Derry, Down & Connor, Clogher and Cork & Ross are in ``LIVE_DIOCESES``, so they
     get full cards with one-click links to their collated (mega) bulletin and
     text bulletin. Every other diocese — still "coming soon" — collapses into
     one small expandable list instead of near-empty placeholder cards,
@@ -889,13 +904,8 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     .hero-nav:hover {{ background: rgba(10, 25, 25, 0.6); }}
     .hero-prev {{ left: 12px; }}
     .hero-next {{ right: 12px; }}
-    .hero-dots {{ position: absolute; left: 0; right: 0; bottom: 10px; z-index: 2; display: flex; justify-content: center; gap: 7px; }}
-    .hero-dot {{ width: 8px; height: 8px; padding: 0; border-radius: 999px; border: none; background: rgba(255,255,255,0.45); cursor: pointer; }}
-    .hero-dot.is-active {{ background: #fff; width: 20px; }}
-    .hero-dot {{ transition: width 200ms ease, background 200ms ease; }}
     @media (prefers-reduced-motion: reduce) {{
       .hero-slide {{ transition: none; }}
-      .hero-dot {{ transition: none; }}
     }}
 
     .intro {{ padding: 18px 16px 2px; text-align: center; }}
@@ -989,7 +999,6 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     var slider = document.querySelector('[data-hero-slider]');
     if (!slider) return;
     var slides = Array.prototype.slice.call(slider.querySelectorAll('.hero-slide'));
-    var dots = Array.prototype.slice.call(slider.querySelectorAll('.hero-dot'));
     if (slides.length < 2) return;
 
     var current = 0;
@@ -1003,9 +1012,6 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
         var active = i === current;
         slide.classList.toggle('is-active', active);
         slide.setAttribute('aria-hidden', active ? 'false' : 'true');
-      }});
-      dots.forEach(function (dot, i) {{
-        dot.classList.toggle('is-active', i === current);
       }});
     }}
 
@@ -1025,9 +1031,6 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     var nextBtn = slider.querySelector('.hero-next');
     if (prevBtn) prevBtn.addEventListener('click', function () {{ prev(); startAuto(); }});
     if (nextBtn) nextBtn.addEventListener('click', function () {{ next(); startAuto(); }});
-    dots.forEach(function (dot, i) {{
-      dot.addEventListener('click', function () {{ show(i); startAuto(); }});
-    }});
 
     slider.addEventListener('mouseenter', stopAuto);
     slider.addEventListener('mouseleave', startAuto);

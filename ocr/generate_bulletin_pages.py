@@ -1774,6 +1774,11 @@ def az_jump_css() -> str:
     }}
     .diocese-intro p {{ margin: 0 0 10px; color: {TEXT}; }}
     .diocese-intro .intro-welcome {{ font-size: 1.05rem; }}
+    .diocese-intro .intro-wip {{
+      font-size: 0.92rem;
+      color: #5a6a68;
+      font-style: italic;
+    }}
     .diocese-intro .intro-count {{ font-weight: 600; color: {DEEP_TEAL}; }}
     .diocese-intro h3 {{
       margin: 14px 0 8px;

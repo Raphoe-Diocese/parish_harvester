@@ -364,6 +364,25 @@ def main() -> int:
         )
         print(f"  📄 Report JSON : {REPORT_JSON} (patched for {target_parish_key})")
         print(f"  📄 Report TXT  : {REPORT_TXT}")
+    elif args.diocese != "all":
+        # One diocese (or a named subset) must MERGE into the existing report.
+        # A full rewrite here wiped Raphoe/Derry/etc to "0 of N found" after the
+        # Cork-only harvest (Frank 24/09/2026).
+        update_consecutive_failures(all_results)
+        prune_inactive_consecutive_failures()
+        patch_report_for_parishes(
+            all_results,
+            REPORT_JSON,
+            REPORT_TXT,
+            target,
+            current_dir=CURRENT_DIR,
+        )
+        stitch_results = all_results
+        print(
+            f"  📄 Report JSON : {REPORT_JSON} "
+            f"(patched for diocese run: {', '.join(dioceses)})"
+        )
+        print(f"  📄 Report TXT  : {REPORT_TXT}")
     else:
         generate_report(
             all_results,

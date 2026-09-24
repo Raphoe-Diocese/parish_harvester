@@ -57,7 +57,7 @@ Facebook / no live weekly file on 22/08/2026: Aughnamullen East, Belleek-Garriso
 
 Do **not** start until Frank names the diocese. Kitchen-sink search is the command above. This pack is how that diocese becomes a folder harvest can see.
 
-Today’s four: `clogher`, `derry`, `down_and_connor`, `raphoe`. Frank named **Cork** (17/09/2026) — that is **Cork and Ross**, not Cloyne. Official directory: https://corkandross.org/parishes (67 cards, opened that day). Harvest `--diocese` uses the **evidence stem**, not the folder name: `clogher_diocese`, `derry_diocese`, `raphoe_diocese`, `down_and_connor`, `cork_and_ross`. Do not add Cork to the Sunday matrix until real bulletin URLs exist.
+Today’s live matrix: `clogher`, `cork_and_ross`, `derry`, `down_and_connor`, `raphoe`. Frank named **Cork** (17/09/2026) — that is **Cork and Ross**, not Cloyne. Official directory: https://corkandross.org/parishes (67 cards, opened that day). Harvest `--diocese` uses the **evidence stem**, not the folder name: `clogher_diocese`, `derry_diocese`, `raphoe_diocese`, `down_and_connor`, `cork_and_ross`. Cork is on the Sunday matrix from 23/09/2026 after recipes + first harvest.
 
 ### 1. Parish list
 

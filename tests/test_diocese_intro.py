@@ -116,6 +116,8 @@ class DioceseIntroTests(unittest.TestCase):
             self.assertEqual([item.name for item in summary.stale], ["Stranolar"])
             html = render_diocese_intro_html(summary)
             self.assertIn("1 of 3 parish bulletins were found", html)
+            self.assertIn("This page is unfinished", html)
+            self.assertIn("intro-wip", html)
             self.assertIn("Mevagh", html)
             self.assertIn("Stranolar", html)
             self.assertIn(NEVER_PUBLISH_HEADING, html)

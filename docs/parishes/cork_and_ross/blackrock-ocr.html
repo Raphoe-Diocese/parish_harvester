@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Blackrock Text Bulletin — 23/09/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #eef1f0;
+      color: #1a1f1e;
+      line-height: 1.65;
+      font-size: 1.125rem;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
+    }
+    a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
+    .page {
+      max-width: min(72ch, 100%);
+      margin: 0 auto;
+      padding: 14px 18px 40px;
+    }
+    .top {
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+      gap: 8px 14px;
+      margin-bottom: 12px;
+    }
+    .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+    .back-link {
+      font-size: 0.9rem; font-weight: 700;
+      color: #14524f; text-decoration: none;
+    }
+    .title-line {
+      font-size: 1rem; font-weight: 700; color: #1a1f1e;
+    }
+    .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 9999;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
+    .ocr-zoom-bar {
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
+    }
+    .ocr-zoom-bar button {
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+      line-height: 1;
+    }
+    .ocr-zoom-pct {
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 4px; } }
+    
+    .ocr-body {
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    .ocr-body h1, .ocr-body h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h2.b-title, .ocr-body .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    .ocr-body h3.b-head, .ocr-body .b-head {
+      font-size: 1.12em;
+      color: #134e9c;
+      margin: 1.1em 0 0.35em;
+    }
+    .ocr-body h4.b-sub, .ocr-body .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    .ocr-body h3, .ocr-body h4 {
+      color: #1a6b6b;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    .ocr-body h3.ocr-page-heading,
+    .ocr-body .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    .ocr-body hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    .ocr-body strong { color: #0f2b5b; }
+    .ocr-body a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .ocr-body mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    .ocr-body mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    .ocr-body table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ocr-body table.b-table td, .ocr-body table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .ocr-body table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    .ocr-body table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    .ocr-body img, .ocr-body iframe, .ocr-body video {
+      max-width: 100%;
+      height: auto;
+    }
+    .ocr-body > :first-child {
+      margin-top: 0;
+    }
+    
+    .ocr-body .ocr-parish-masthead {
+      margin: 2.1em 0 1.15em;
+      padding: 0.85em 0 0.7em;
+      border-top: 3px solid #14524f;
+      border-bottom: 1px solid #c5d0c9;
+    }
+    .ocr-body .ocr-parish-masthead:first-child {
+      margin-top: 0;
+    }
+    .ocr-body h2.ocr-parish-name,
+    .ocr-body .ocr-parish-name {
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #14524f;
+      margin: 0 0 0.2em;
+      line-height: 1.25;
+      border: 0;
+      padding: 0;
+      text-transform: none;
+    }
+    .ocr-body .ocr-parish-date {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body .ocr-parish-link {
+      margin: 0.25em 0 0;
+      font-size: 0.88rem;
+    }
+    .ocr-body h3.b-head {
+      margin-top: 1.45em;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.12em;
+      border-bottom: 1px solid #d4ddd9;
+    }
+
+
+    .ocr-body {
+      padding: 4px 2px 8px;
+    }
+    .search-panel {
+      margin: 0 0 12px;
+      border: 1px solid #d4ddd9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .search-panel .ocr-search-bar { margin-bottom: 6px; }
+    .ocr-search-bar { position: relative; margin-bottom: 6px; }
+    .search-input {
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: #1a1f1e; background: #fff;
+    }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 1px solid #1a6b6b; border-radius: 6px; background: #fff; color: #1a6b6b;
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { color: #999; border-color: #d4ddd9; cursor: not-allowed; }
+    .match-count { color: #5a6a68; font-size: 0.85rem; font-weight: 600; }
+    .note-box {
+      margin-top: 18px;
+      color: #5a6a68;
+      font-weight: 400;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      padding: 0;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 8px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    body.embed-mode .top { display: none !important; }
+    body.embed-mode .page { padding-top: 8px; }
+    @media (max-width: 600px) {
+      .page { padding: 12px 14px 32px; }
+      .ocr-search-tools button { min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top" id="ocr-top">
+      <div class="top-left">
+        <a class="back-link" href="blackrock.html" target="_blank" rel="noopener noreferrer">← Viewer</a>
+        <span class="title-line">BLACKROCK Text Bulletin · 23/09/2026</span>
+      </div>
+    </div>
+    <div class="ocr-sticky-chrome">
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+      <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+      <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+      <span class="ocr-zoom-hint">or pinch to zoom</span>
+    </div>
+    <div class="search-panel" role="search">
+      <div class="ocr-search-bar">
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search text (mass, bingo, parish…)" aria-label="Search bulletin text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled>← Prev</button>
+          <button id="ocr-next" type="button" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead" id="ocr-parish-blackrock" data-parish-name="Blackrock"><h2 class="ocr-parish-name">Blackrock</h2><p class="ocr-parish-date">23/09/2026</p></header>
+<p class="page-label">Page 1</p>
+<p>St Michael&#x27;s Parish, BlackrockBAPTISMS: Please contact the parish oﬃce.<br>
+MARRIAGES: Minimum 3 months notice required by<br>
+Church and State.<br>
+Pre-marriage course required.Email : <a href="mailto:parish@stmichaelsblackrock.ie" target="_blank" rel="noopener noreferrer">parish@stmichaelsblackrock.ie</a> Website: <a href="https://www.stmichaelsblackrock.ie" target="_blank" rel="noopener noreferrer">www.stmichaelsblackrock.ie</a><br>
+Facebook: <a href="https://www.facebook.com/stmichaelsblackrock" target="_blank" rel="noopener noreferrer">www.facebook.com/stmichaelsblackrock</a> | Parish Mobile No. (086) 813 6877WEEKLY MASS LEAFLET UPDATES:<br>
+Email to : <a href="mailto:parish@stmichaelsblackrock.ie" target="_blank" rel="noopener noreferrer">parish@stmichaelsblackrock.ie</a></p>
+<h3 class="b-head">Mass Times</h3>
+<p>Sundays: 9 am &amp; 11 am<br>
+Saturday Vigil: 6.00 pm<br>
+Tuesday &amp; Friday: 9.30 am<br>
+Baptisms are held on the 2nd and 4th<br>
+Saturdays of each month at 4pm.<br>
+Fr. Michael Keohane Co-PPThought for the day<br>
+PARISH DEFIBRILLATORS<br>
+There are 2 Defibrillators located in the Parish,<br>
+one in the village &amp; one outside Murphy’s Circle K Petrol<br>
+Station. The code to operate both is 2017<br>
+BLACKROCK ST VINCENT DE PAUL<br>
+Fr. Michael has generously offered the poor box<br>
+near the exit as a collection point for SVP.<br>
+If you wish to contribute any time, it would be appreciated. Kieran O’Mahony OSA1670<br>
+A brief introduction on Sunday&#x27;s readings<br>
+Baptisms<br>
+James Kieran O’Driscoll.<br>
+Riah Jane Cummins.<br>
+Mia Marie Kearney.<br>
+Siún Maisie Killeen.<br>
+Rory John Longan.<br>
+Barra Micheál O’Leary.<br>
+Welcome to the Christian Family.<br>
+Deceased<br>
+Vincent Groarke, Blackrock<br>
+Rosemary Thornhill, Blackrock</p>
+<h3 class="b-head">Rest in Peace</h3>
+<p>Mass Cards are available in the sacristy after every mass<br>
+both at weekend and weekdays.<br>
+The Papers Say.20/09/2026 25th Sunday Ordinary Time<br>
+Gentle reminder!<br>
+For those attending with young children,<br>
+if required, there is a Family Room available at<br>
+the top left inside the church. Thanks.<br>
+Reﬂections<br>
+I JUST DON&#x27;T<br>
+LIKE THIS<br>
+STORY.The forty-two parables in the Gospels are designed to take us<br>
+up short and make us think again. Today’s parable is a good<br>
+example. The actions of the employer and the treatment of the<br>
+workers simply would not work today as a labour relations strategy<br>
+and would also not have worked in the time of Jesus. And what<br>
+is the point? Really that it doesn’t matter when we come to the<br>
+Gospel, early, middle or late, by routes direct or circuitous, in full<br>
+stride or falteringly: all that matters is that we come to the Gospel.<br>
+Achievement counts for nothing; grace is everything, thanks be to<br>
+God!<br>
+Prayer<br>
+The door of faith is always open and you welcome us, O God,<br>
+whenever our hearts are open. We are grateful for your loving<br>
+patience and generosity.<br>
+Christian Meditation Group – A group of people from our Family<br>
+of Parishes continue to meet on each Friday morning at 10.15am<br>
+in the Parish Centre. After a short introduction there is 20 minutes<br>
+of silent prayer/meditation concluding with the Our Father. We<br>
+welcome you to join us. Contact <a href="tel:+353876477841" style="color:#1d4ed8;font-weight:600;">087 6477841</a> for details.1. “I was there /f_irst” . Envy easily comes to the surface when faced<br>
+with the good fortune of others, especially when compared to<br>
+what seems less favourable treatment of ourselves. Can you recall<br>
+that feeling in yourself and what it did to you? Can you also recall<br>
+times when you were content with your lot, even though it seemed<br>
+others had greater gifts, better opportunities, etc.<br>
+2. A parent or teacher who gives a lot of time to a diﬃcult child does<br>
+not love the others less, but if we are one of those other children we<br>
+may not see that. Recall a “Jesus person’ in your life who helped you<br>
+to overcome feelings of envy and helped you appreciate that the<br>
+apparently more favourable treatment of another did not mean a<br>
+lessening of love for you.<br>
+3. Generosity can make us uncomfortable. We feel more<br>
+comfortable when we see ourselves as having done something<br>
+to deserve the generosity. But perhaps you can recall a moment<br>
+of great need, when you were at the receiving end of someone’s<br>
+generosity, a time when you recognised you had done nothing to<br>
+‘deserve’ that response, a time when all you could do was to say<br>
+“thanks”?<br>
+4. This leads us to the core message of this parable, namely, that<br>
+God’s love is a free gift and not earned. Recall moments when you<br>
+were particularly conscious of the gift that God’s love is to you.<br>
+5. “It is too late now” are words some- times uttered to justify<br>
+doing nothing about a situation. This parable tells us that where<br>
+love is involved, it is never too late. Can you recall times when you<br>
+got a positive response after taking action when you thought it was<br>
+“too late”?<br>
+PRAYER<br>
+God most high, your ways are not our ways, for your kindness is<br>
+lavished equally upon all. Teach us to welcome your mercy towards<br>
+others, even as we hope to receive mercy ourselves.<br>
+We ask this through our Lord Jesus Christ, your Son, who lives<br>
+and reigns with you in the unity of the Holy Spirit, God for ever<br>
+and ever. Amen.First Reading (Isaiah 55:6–9)<br>
+The prophet urges people to seek the Lord, reminding us that God&#x27;s<br>
+thoughts and ways are in/f_initely higher and more merciful than our<br>
+human standards.<br>
+Second Reading (Philippians 1:20c–24, 27a)<br>
+St. Paul expresses from prison that Christ is his entire life,<br>
+encouraging the community to live in a manner worthy of the<br>
+Gospel.<br>
+Gospel (Matthew 20:1–16a)<br>
+Jesus tells the Parable of the Workers in the Vineyard, where laborers<br>
+hired at the very end of the day receive the exact same daily wage<br>
+as those who toiled from dawn, illustrating that God&#x27;s grace is a gift,<br>
+not a wage earned.<br>
+ENTRANCE<br>
+Be still, for the presence of the Lord<br>
+Be still, for the presence of the Lord, the Holy One, is here.<br>
+Come, bow before him now, with reverence and fear.<br>
+In him no sin is found. We stand on holy ground.<br>
+Be still, for the presence of the Lord, the Holy One, is here.<br>
+Be still, for the glory of the Lord is shining all around;<br>
+He burns with holy /f_ire, with splendour he is crowned.<br>
+How awesome is the sight, our radiant King of Light!<br>
+Be still, for the glory of the Lord is shining all around.<br>
+Be still, for the power of the Lord is moving in this place;<br>
+He comes to cleanse and heal, to minister his grace.<br>
+No work too hard for him; in faith receive from him.<br>
+Be still, for the power of the Lord is moving in this place.<br>
+RECESSIONAL<br>
+Christ be beside me, Christ be before me,<br>
+Christ be behind me, King of my heart.<br>
+Christ be within me, Christ be below me,<br>
+Christ be above me, never to part.<br>
+Christ on my right hand, Christ on my left hand,<br>
+Christ all around me, shield in the strife.<br>
+Christ in my sleeping, Christ in my sitting,<br>
+Christ in my rising, light of my heart.<br>
+Christ be in all hearts thinking about me,<br>
+Christ be on all tongues telling of me.<br>
+Christ be the vision in eyes that see me,<br>
+In ears that hear me Christ ever be. Cork Scripture Group<br>
+AUTUMN 2026 COURSE<br>
+I, Paul … [Philemon 1:19]<br>
+The Life and Letters of St Paul<br>
+7.30 p.m. to 9.30 p.m. each evening over four Monday nights in the<br>
+Scala Centre, Blackrock [entrance across from Blackrock Castle]<br>
+For bookings, email: <a href="mailto:corkscripturegroup@gmail.com" target="_blank" rel="noopener noreferrer">corkscripturegroup@gmail.com</a><br>
+WOULD YOU RATHER<br>
+HAVE GOD&#x27;S<br>
+JUSTICE OR<br>
+GOD&#x27;S MERCY?I&#x27;M THINKING!WELL.?<br>
+Parable of the Workers in the Vineyard (Codex Aureus Eptemacensis)<br>
+SMA NATIONAL NOVENA TO ST. THÉRÉSE<br>
+Due to the ongoing repair to our Church roof on the Blackrock<br>
+Road, we will be celebrating St. Thérése’s Novena in our<br>
+SMA CHURCH IN WILTON, CORK CITY T12 KR23<br>
+The Novena will begin on Wednesday 23rd. September and<br>
+will close on Thursday lst. October. 2026. The Novena Mass will<br>
+be celebrated at 7.30pm. each evening, (except Saturday 26th.<br>
+September @ 6pm. Mass). Each evening we will have a diﬀerent SMA<br>
+priest leading the Mass and he will be joined by a guest choir/singer.<br>
+BALLINLOUGH MEN’S RETIREMENT CLUB meets every<br>
+Wednesday afternoon from 2.00pm to 4.00pm.(resuming on 2nd.<br>
+Sept after summer break) in Ballinlough Community Centre. The<br>
+members enjoy an afternoon of Short Mat Bowls (Bowls supplied by<br>
+the club) in an atmosphere of fun and camaraderie.<br>
+New members are welcome: our Membership comes from the<br>
+general Cork City area. Contact Number: <a href="tel:+353851615360" style="color:#1d4ed8;font-weight:600;">085 1615 360</a>.<br>
+SECOND COLLECTION ON WEEK ENDING 19/20 SEPTEMBER<br>
+is for PRIESTHOOD EDUCATION. COMBONI MISSIONARIES OF THE HEART OF JESUS<br>
+MISSION APPEAL.<br>
+The Society were most appreciative for the sum raised on 15/16<br>
+August in our Church which amounted to €2,095.00Holy Cross Church – on this Sunday, the 12.15pm Mass in Holy<br>
+Cross will be a celebration of the fortieth anniversary of the church.<br>
+A Redemptorist led Triduum of Prayer will take place from Monday<br>
+– Wednesday of this week with 9.30am Mass each morning in<br>
+Holy Cross Church and a celebration each evening at 7.30pm<br>
+prepared with diﬀerent groups in Mahon Parish. These events<br>
+are a celebration of the people of the parish and our community.<br>
+In celebrating this milestone for Holy Cross, we remember all<br>
+those who worked so hard to support the building of the church<br>
+especially those now gone to their eternal reward. While we<br>
+celebrate the past, we look to the future with trust and hope.<br>
+May the eternal light of Heaven shine on those who gave so<br>
+much. May God bless us all as we celebrate together and may the<br>
+strength and resilience of the Holy Cross of Jesus continue to be a<br>
+blessing in our lives and our parish community.<br>
+St. Michael, pray for us. -<br>
+Fr. Michael<br>
+First Communions 2027<br>
+Sat. 24th Apr. Scoil Ursula &amp; St. Michael’s NS<br>
+Sat. 8th May Gaelscoil Mhachan (in Holy Cross)<br>
+Sat. 15th May Beaumont BNS<br>
+Sat. 22nd May Beaumont GNS<br>
+Sat. 29th May Scoil na Croise Naofa (in Holy Cross)<br>
+Do This in Memory parish-based First Communion preparation<br>
+programme will commence on Sat. 17th October @ 6pm Mass.<br>
+Gougane Sunday will be celebrated on Sunday 27th September<br>
+next.<br>
+Holy Cross Church – Fortieth Anniversary – preparations continue<br>
+in Mahon Parish to celebrate this landmark very soon. The<br>
+Redemptorist Fathers will lead a Triduum of Prayer from Monday<br>
+21st – Wednesday 23rd September. The themes will be Hope,<br>
+Healing &amp; Community. Remembrance of those who have been<br>
+involved and supported the construction and develop ment of<br>
+the church will also be honoured. There will be a special Mass on<br>
+Sunday 20th September @ 12.15pm and all are welcome. –<br>
+Fr. Michael<br>
+<a href="tel:+353858735905" style="color:#1d4ed8;font-weight:600;">085 8735905</a> <a href="mailto:frmichael@corkandross.org" target="_blank" rel="noopener noreferrer">frmichael@corkandross.org</a> Annual Remembrance Mass - for all those who have died from<br>
+our parish over the last year will be celebrated on Monday 2nd<br>
+November @ 7pm. They have gone no further than to God and God<br>
+is very near.Irish Catholic. (1). Mary Kenny: Sporting controversies a<br>
+mirror of our times … AND What Oprah can teach the Irish. (2).<br>
+Martina Purdy: Aontu oﬀers a pro-life option for abandoned<br>
+Catholic pro-life voters. (3). Fr. Andrew Mc.Mahon: ‘We are not<br>
+here to celebrate the ending of unborn life for innocent children’.<br>
+Re/f_lections on the Belfast City Hall illumination and abortion. (4)<br>
+Pedro Esteva: : What overseas priests see in the Irish Church. (5). Fr.<br>
+Bernard Cotter: Why the Mass in Victoria was amazing.<br>
+(6) Fr.Kieran O’Mahony: Hearers of the Word. — Am I not allowed<br>
+to do what I choose with what belongs to me?<br>
+Messenger: (1). Re:Link, The resource for Junior Certi/f_icate<br>
+Religion Studies by Patrick Byrne: Halloween. (2). Andrea Hayes:<br>
+Pain changes your prayers. (3). Fr. John Cullen: The hidden power<br>
+of silence. (4). Children’s and adult crosswordsBlackrock <a href="https://www.stmichaelsblackrock.ie/" target="_blank" rel="noopener noreferrer">https://www.stmichaelsblackrock.ie/</a></p></div>
+    <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
+  </div>
+  <script>
+    (function () {
+      try {
+        if (new URLSearchParams(window.location.search).get('embed') === '1') {
+          document.body.classList.add('embed-mode');
+        }
+      } catch (e) {}
+    })();
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-text');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+    (function () {
+      const ocrRoot = document.getElementById('ocr-text');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      if (!ocrRoot || !ocrSearch) return;
+      const originalHtml = ocrRoot.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+      function escapeRegExp(text) {
+        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        ocrMatches[idx].classList.add('search-active');
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      function updateMatchUi() {
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} of ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+      function applySearch(query) {
+        ocrRoot.innerHTML = originalHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrRoot, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) nodes.push(node);
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) return;
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrRoot.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+      ocrSearch.addEventListener('input', (e) => applySearch(e.target.value.trim()));
+      clearSearch.addEventListener('click', () => { ocrSearch.value = ''; applySearch(''); ocrSearch.focus(); });
+      prevMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && ocrMatches.length) {
+          e.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+    })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      function boot() {
+        var btn = document.getElementById('scroll-top-btn');
+        if (!btn) {
+          if (!document.body) return;
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scroll-top-btn';
+          btn.id = 'scroll-top-btn';
+          btn.setAttribute('aria-label', 'Back to top');
+          btn.textContent = '↑';
+          document.body.appendChild(btn);
+        }
+        function innerBoxes() {
+          return Array.prototype.slice.call(
+            document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+          );
+        }
+        function maxInnerScroll() {
+          return innerBoxes().reduce(function (max, el) {
+            return Math.max(max, el.scrollTop || 0);
+          }, 0);
+        }
+        function shown() {
+          var y = window.scrollY || document.documentElement.scrollTop || 0;
+          btn.classList.toggle('is-visible', y > 80 || maxInnerScroll() > 16);
+        }
+        function shownSoon() {
+          shown();
+          if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+          else window.setTimeout(shown, 16);
+        }
+        function bindBox(el) {
+          if (!el || el.getAttribute('data-pp-scroll-top') === '1') return;
+          el.setAttribute('data-pp-scroll-top', '1');
+          el.addEventListener('scroll', shownSoon, { passive: true });
+        }
+        function bindBoxes() {
+          innerBoxes().forEach(bindBox);
+          shown();
+        }
+        window.parishPressBindScrollTopBoxes = bindBoxes;
+        if (btn.getAttribute('data-pp-bound') !== 'inner-2') {
+          btn.setAttribute('data-pp-bound', 'inner-2');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.addEventListener('scroll', shownSoon, { passive: true });
+          document.addEventListener('scroll', shownSoon, { capture: true, passive: true });
+          document.addEventListener('wheel', shownSoon, { capture: true, passive: true });
+          document.addEventListener('touchmove', shownSoon, { capture: true, passive: true });
+          if (window.MutationObserver && document.body) {
+            new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+          }
+          btn.addEventListener('click', function () {
+            var behavior = reduce ? 'auto' : 'smooth';
+            window.scrollTo({ top: 0, behavior: behavior });
+            innerBoxes().forEach(function (el) {
+              el.scrollTop = 0;
+              if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+            });
+            window.setTimeout(shown, reduce ? 0 : 400);
+          });
+        }
+        bindBoxes();
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
+    })();
+    
+  </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
+</body>
+</html>

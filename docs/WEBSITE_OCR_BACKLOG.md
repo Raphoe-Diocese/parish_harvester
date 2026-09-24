@@ -54,6 +54,8 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 
 ## Still open (do not pretend these are finished)
 
+- [ ] **doing** · 2026-09-23 · Cork & Ross on parishpress.ie: LIVE_DIOCESES + cathedral photo + diocese viewer + Sunday matrix. Also this turn (24/09): remove hero white dots; short unfinished note on every diocese intro; restore report/status after Cork-only harvest wiped other dioceses to “0 of N found”; single-diocese harvest now patches report. **Not live yet** until merge + Pages. · `harvester/site_builder.py`, `harvester/diocese_intro.py`, `main.py`, `docs/dioceses/`, `docs/index.html`
+
 - [ ] **doing** · 2026-09-15 · Gemini picture OCR: send PNG, not pdf2image PPM (`image/x-portable-pixmap`). Proved fail on OCR [34828244862](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34828244862). **Not live** until merge + next Sunday OCR log shows Gemini pages. · `ocr/convert_bulletin.py`
 
 - [ ] **parked** · 2026-09-15 · Frank: tesseract is a crap bulletin reader. Do not use it as the reader. Locked path stays embedded PDF text, then Mistral / Gemini / OpenAI vision on image/banner pages. Rip tesseract out of `fill_sparse_ocr_pages` / `repair_image_page_ocr` only when Frank says go. · `ocr/sparse_page_ocr.py`

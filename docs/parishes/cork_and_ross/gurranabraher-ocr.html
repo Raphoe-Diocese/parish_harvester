@@ -1,0 +1,746 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Gurranabraher Text Bulletin — 23/09/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #eef1f0;
+      color: #1a1f1e;
+      line-height: 1.65;
+      font-size: 1.125rem;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
+    }
+    a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
+    .page {
+      max-width: min(72ch, 100%);
+      margin: 0 auto;
+      padding: 14px 18px 40px;
+    }
+    .top {
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+      gap: 8px 14px;
+      margin-bottom: 12px;
+    }
+    .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+    .back-link {
+      font-size: 0.9rem; font-weight: 700;
+      color: #14524f; text-decoration: none;
+    }
+    .title-line {
+      font-size: 1rem; font-weight: 700; color: #1a1f1e;
+    }
+    .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 9999;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
+    .ocr-zoom-bar {
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
+    }
+    .ocr-zoom-bar button {
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+      line-height: 1;
+    }
+    .ocr-zoom-pct {
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 4px; } }
+    
+    .ocr-body {
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    .ocr-body h1, .ocr-body h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h2.b-title, .ocr-body .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    .ocr-body h3.b-head, .ocr-body .b-head {
+      font-size: 1.12em;
+      color: #134e9c;
+      margin: 1.1em 0 0.35em;
+    }
+    .ocr-body h4.b-sub, .ocr-body .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    .ocr-body h3, .ocr-body h4 {
+      color: #1a6b6b;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    .ocr-body h3.ocr-page-heading,
+    .ocr-body .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    .ocr-body hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    .ocr-body strong { color: #0f2b5b; }
+    .ocr-body a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .ocr-body mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    .ocr-body mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    .ocr-body table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ocr-body table.b-table td, .ocr-body table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .ocr-body table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    .ocr-body table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    .ocr-body img, .ocr-body iframe, .ocr-body video {
+      max-width: 100%;
+      height: auto;
+    }
+    .ocr-body > :first-child {
+      margin-top: 0;
+    }
+    
+    .ocr-body .ocr-parish-masthead {
+      margin: 2.1em 0 1.15em;
+      padding: 0.85em 0 0.7em;
+      border-top: 3px solid #14524f;
+      border-bottom: 1px solid #c5d0c9;
+    }
+    .ocr-body .ocr-parish-masthead:first-child {
+      margin-top: 0;
+    }
+    .ocr-body h2.ocr-parish-name,
+    .ocr-body .ocr-parish-name {
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #14524f;
+      margin: 0 0 0.2em;
+      line-height: 1.25;
+      border: 0;
+      padding: 0;
+      text-transform: none;
+    }
+    .ocr-body .ocr-parish-date {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body .ocr-parish-link {
+      margin: 0.25em 0 0;
+      font-size: 0.88rem;
+    }
+    .ocr-body h3.b-head {
+      margin-top: 1.45em;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.12em;
+      border-bottom: 1px solid #d4ddd9;
+    }
+
+
+    .ocr-body {
+      padding: 4px 2px 8px;
+    }
+    .search-panel {
+      margin: 0 0 12px;
+      border: 1px solid #d4ddd9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .search-panel .ocr-search-bar { margin-bottom: 6px; }
+    .ocr-search-bar { position: relative; margin-bottom: 6px; }
+    .search-input {
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: #1a1f1e; background: #fff;
+    }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 1px solid #1a6b6b; border-radius: 6px; background: #fff; color: #1a6b6b;
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { color: #999; border-color: #d4ddd9; cursor: not-allowed; }
+    .match-count { color: #5a6a68; font-size: 0.85rem; font-weight: 600; }
+    .note-box {
+      margin-top: 18px;
+      color: #5a6a68;
+      font-weight: 400;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      padding: 0;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 8px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    body.embed-mode .top { display: none !important; }
+    body.embed-mode .page { padding-top: 8px; }
+    @media (max-width: 600px) {
+      .page { padding: 12px 14px 32px; }
+      .ocr-search-tools button { min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top" id="ocr-top">
+      <div class="top-left">
+        <a class="back-link" href="gurranabraher.html" target="_blank" rel="noopener noreferrer">← Viewer</a>
+        <span class="title-line">GURRANABRAHER Text Bulletin · 23/09/2026</span>
+      </div>
+    </div>
+    <div class="ocr-sticky-chrome">
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+      <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+      <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+      <span class="ocr-zoom-hint">or pinch to zoom</span>
+    </div>
+    <div class="search-panel" role="search">
+      <div class="ocr-search-bar">
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search text (mass, bingo, parish…)" aria-label="Search bulletin text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled>← Prev</button>
+          <button id="ocr-next" type="button" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead" id="ocr-parish-gurranabraher" data-parish-name="Gurranabraher"><h2 class="ocr-parish-name">Gurranabraher</h2><p class="ocr-parish-date">23/09/2026</p></header>
+<p class="page-label">Page 1</p>
+<p>The Priest must live only to become a saint<br>
+A book titled: ‘The Priests we need to save the Church’ is a crie-de-cour by the author<br>
+for real priests, holy men, to lead once again the Church of God - and to offer solace<br>
+and sure support to the flock of Christ that is lost and bleeding. The writer, Kevin<br>
+Wells, demands much from the priest who will ministe r today. He says “for far too<br>
+long too many wayward churchmen have profaned, insulted, and trampled upon a<br>
+sacred heritage that generations of hardworking, sincere Catholics priests built their<br>
+lives around. “We need faithful priests - not the lazy, repressed, social justice types<br>
+with inauthentic vocations who have packed the seminaries, dominated the<br>
+headlines, and sullied the reputation of the holy priesthood over the past several<br>
+decades. Until the parish priest lives only to become a saint, there will be no healing<br>
+in the Church. Until the parish priest embraces poverty and pours himself out without<br>
+counting the cost, the Church&#x27;s sickness will worsen. Until the parish priest decides<br>
+to die for his flock, the Church will remain on life support. “We need real men today;<br>
+bold proclaimers of God&#x27;s Word who are unafraid to preach the Catholic faith as the<br>
+blazing furnace of Truth that it is. We need priests who are willing to preach tough<br>
+homilies, hear daily confessions, commit to daily Holy Hours, and remain<br>
+magnanimous of heart through long, sometimes thankless 16-hour days. We need<br>
+priests to offer up their lives now so that the laity will gain a restored sense of<br>
+fatherhood. Such priests will become the story of our time. They will bring about<br>
+massive conversions and re store our Church and our culture.”<br>
+Priests of the area:<br>
+Fr. Tomás Walsh, SMA. PP ( <a href="mailto:walshtomas@hotmail.com" target="_blank" rel="noopener noreferrer">walshtomas@hotmail.com</a> ) Tel: <a href="tel:+353214303658" style="color:#1d4ed8;font-weight:600;">021-4303 658</a>.<br>
+Fr. Aidan Vaughan, OFM, Cap . (<a href="mailto:aidan1302@gmail.com" target="_blank" rel="noopener noreferrer">aidan1302@gmail.com</a> ) Tel: <a href="tel:+353214397472" style="color:#1d4ed8;font-weight:600;">021-439 7472</a>.<br>
+Fr. Sean O’Sullivan, resident at Farranree, (<a href="tel:+353214932230" style="color:#1d4ed8;font-weight:600;">021 493 2230</a>)<br>
+Fr. Tijo &amp; Fr. Prasad, resident at Knocknaheeny, (<a href="tel:+353214392427" style="color:#1d4ed8;font-weight:600;">021 439 2427</a>)<br>
+email: <a href="mailto:ascensionparish123@gmail.com" target="_blank" rel="noopener noreferrer">ascensionparish123@gmail.com</a> Website :<br>
+OFFICE HOURS: 10:30 – 12:30 MON – FRI<br>
+–<br>
+Mass Intentions<br>
+this Week<br>
+Sat, 19th September, (5.30pm) Vigil Mass<br>
+i). Michael, Paddy &amp; Hannah Myers RIP<br>
+ii). Eileen McDonald RIP (Month’s Mind)<br>
+Sun, 20th September, (9:00am)<br>
+i). Eileen Sugrue RIP<br>
+ii).<br>
+Sun, 20th September, (11:30am)<br>
+i). Pauline O’Riordan RIP<br>
+ii).<br>
+Mon, 21st September, (10am)<br>
+i). Finbarr Galvin RIP<br>
+ii). Jerry O’Sullivan RIP (Anniv)<br>
+Tue, 22nd September, (10am)<br>
+i). Ellen Cummins RIP<br>
+ii).<br>
+Thurs, 24th September, (10am)<br>
+i). Daniel &amp; Kevin Swaine RIP<br>
+ii). Alan O’Riordan RIP (Anniv)<br>
+Sat, 26th September, (10am)<br>
+Pro populo<br>
+The Offertory collection<br>
+last weekend amounted to €935<br>
+This collection is for the ordinary day-to-day<br>
+running of the Church at Gurranabraher.<br>
+Donations for Church Renovations gratefully<br>
+accepted at the Parish Office –<br>
+or it can be lodged directly into:<br>
+Ascension Church Building Fund A/c<br>
+at any AIB Bank<br>
+IE65 AIBK 934194 32642064<br>
+Or<br>
+To our Local Credit Union<br>
+Gurranabraher Credit Union Account<br>
+Church of the Ascension Renovation Fund – A/c<br>
+No. <a href="tel:+3532255200" style="color:#1d4ed8;font-weight:600;">02255200</a>.<br>
+We thank the people of the parish who<br>
+support us tirelessly.<br>
+We pray for those recently<br>
+deceased…<br>
+Michael Fitzgerald, Mount Eden Rd (Late of)<br>
+Sheila O’Connell , Churchfield Gardens</p>
+<h3 class="b-head">Requiescat in Pace</h3>
+<p>Pope Leo’s September Intention :<br>
+For the care of water<br>
+Let us pray for a just and<br>
+sustainable management of<br>
+water, a vital resource, so that<br>
+everyone may have equal access<br>
+to it. Gurranabraher <a href="https://www.gurranabraherparish.ie/" target="_blank" rel="noopener noreferrer">https://www.gurranabraherparish.ie/</a></p>
+<hr>
+<p class="page-label">Page 2</p>
+<p>Priesthood Education Collection (19th &amp; 20th September)<br>
+The annual Priesthood Education collection takes place at all Masses this weekend.<br>
+The proceeds of the collection go to the Diocesan Education Fund which meets the<br>
+cost of seminarians’ fees at St. Patrick’s College, Maynooth, and also contributes to<br>
+post-graduate studies of priests of the diocese.<br>
+Building Fund Collection (26th &amp; 27th September)<br>
+The end-of-month building fund collection will take place at all Mass es next<br>
+weekend. The debt for the replacement of the roof is still ongoing. We ask for you r<br>
+continued support for the renovation project.<br>
+Artificial Intelligence and risk of dehumanization<br>
+The head of the Ukrainian Greek Catholic Church said in an interview that “it is<br>
+essential that artificial intelligence not replace human beings, nor be used against<br>
+human dignity.” Major Archbishop Sviatoslav Shevchuk warned that “it is imperative<br>
+that human beings not become slaves to the fruits of their own culture, to what they<br>
+themselves have created.” “What artificial intelligence will never be able to do is to<br>
+love,” he added. “We must still become ‘human’ with a capital ‘H.’ And this h appens<br>
+when we contemplate the face of God or speak with Him. For we are made in the<br>
+image of God.”<br>
+Cork Scripture Group would like to invite anyone who is interested in Scripture to<br>
+join us for the following course. Cost: €50 for the entire course including workshop<br>
+(€10 for the workshop only). Contact <a href="mailto:corkscripturegroup@gmail.com" target="_blank" rel="noopener noreferrer">corkscripturegroup@gmail.com</a>. Four Monday<br>
+nights (28th Sept, 5/12/19 Oct) on ‘I, Paul . The Life &amp; Letters of St<br>
+Paul.’ Presenters: Sean O’Sullivan, Marian &amp; Phil Mortell. Sat workshop (Oct 10th)<br>
+on ‘Two contrasting prison letters: Philemon &amp; Philippians’ read by Sr. Mary T. Brien.<br>
+Catholic Primary Schools Mass<br>
+On September 15th 2026, Bishop Fintan celebrated Mass at Cathedral of St. Mary<br>
+and St. Anne for all those connected with our Catholic Primary Schoo ls to pray for<br>
+God’s blessings for the new school year. Two videos are available on the Cork and<br>
+Ross Friends and Family in Faith Facebook page and can be located here:<br>
+<a href="https://www.facebook.com/CorkandRossDiocese/" target="_blank" rel="noopener noreferrer">https://www.facebook.com/CorkandRossDiocese/</a> or search Cork and Ross<br>
+Friends and Family in Faith (Facebook)<br>
+Tea dance in the “Hut”<br>
+Gurranabraher/Churchfield Outreach Office will be holding their tea dance on<br>
+the 20th September in the Hut in Gurranabraher, T23 HD59, from 3 p.m. to 6<br>
+p.m. entertainment, refreshments, raffle etc, this event is free, all welcome,<br>
+contact Ann or Patricia at <a href="tel:+353214301700" style="color:#1d4ed8;font-weight:600;">021-4301700</a> for more information.<br>
+Sunday Bingo at Gurranabraher Credit Union/Parochial Hall Arena<br>
+Looking for a great night out with friends and family on Sundays? Join u s every<br>
+week at Parochial Hall for a brilliant evening of fun and a chance to win cash<br>
+prizes! Doors open at 8pm, with a single book costing €7 and a doub le book<br>
+€10. With a friendly crowd and proceeds helping to keep this vital facility<br>
+running, it is the perfect way to support your local community while having fun.<br>
+Strict age limit 18+. Held under Garda permit. See you there!<br>
+Mass Cards available for all occasions<br>
+Mass Cards are available at the Parish Office for all occasion, RIP, Exams, Get<br>
+Well, Birthdays, Anniversaries, etc. – the intentions are included in Nine<br>
+Masses (Novena) celebrated each month in the parish. Each card cost €3.<br>
+Gurranabraher Meals on Wheels has been providing nutritious meals to members<br>
+of the parish for many decades. Should you know of someone (or yourself) who<br>
+would benefit from this service, contact Eliz/Brid on (021) 430 1037.<br>
+Community Garden Volunteering in St. Marys Health Campus every Wednesday<br>
+from 11 to 1pm. No experience necessary, all equipment will be provided. Contact<br>
+Ailish, Community Health Worker on <a href="tel:+353870979707" style="color:#1d4ed8;font-weight:600;">087 097 9707</a>.<br>
+Gurranabraher Website – gurranabraherparish.ie<br>
+We remind parishioners again that our parish has a live website -<br>
+gurranabraherparish.ie. It will keep you informed and up-to-date on parish<br>
+activities. Read also on the webpage the latest Parish Newsletter. and visit the<br>
+links provided for sound Catholic faith formation.</p>
+<h3 class="b-head">Daily Mass</h3>
+<p>Mon/Tues/Thurs at 10.am &amp; weekend Masses Sat 10am &amp; 5.30pm, (Vigil),<br>
+Sunday 9am &amp; 11.30am are available to view online<br>
+@ <a href="https://www.gurranabraherparish.ie" target="_blank" rel="noopener noreferrer">www.gurranabraherparish.ie</a></p></div>
+    <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
+  </div>
+  <script>
+    (function () {
+      try {
+        if (new URLSearchParams(window.location.search).get('embed') === '1') {
+          document.body.classList.add('embed-mode');
+        }
+      } catch (e) {}
+    })();
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-text');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+    (function () {
+      const ocrRoot = document.getElementById('ocr-text');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      if (!ocrRoot || !ocrSearch) return;
+      const originalHtml = ocrRoot.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+      function escapeRegExp(text) {
+        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        ocrMatches[idx].classList.add('search-active');
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      function updateMatchUi() {
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} of ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+      function applySearch(query) {
+        ocrRoot.innerHTML = originalHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrRoot, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) nodes.push(node);
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) return;
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrRoot.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+      ocrSearch.addEventListener('input', (e) => applySearch(e.target.value.trim()));
+      clearSearch.addEventListener('click', () => { ocrSearch.value = ''; applySearch(''); ocrSearch.focus(); });
+      prevMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && ocrMatches.length) {
+          e.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+    })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      function boot() {
+        var btn = document.getElementById('scroll-top-btn');
+        if (!btn) {
+          if (!document.body) return;
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scroll-top-btn';
+          btn.id = 'scroll-top-btn';
+          btn.setAttribute('aria-label', 'Back to top');
+          btn.textContent = '↑';
+          document.body.appendChild(btn);
+        }
+        function innerBoxes() {
+          return Array.prototype.slice.call(
+            document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+          );
+        }
+        function maxInnerScroll() {
+          return innerBoxes().reduce(function (max, el) {
+            return Math.max(max, el.scrollTop || 0);
+          }, 0);
+        }
+        function shown() {
+          var y = window.scrollY || document.documentElement.scrollTop || 0;
+          btn.classList.toggle('is-visible', y > 80 || maxInnerScroll() > 16);
+        }
+        function shownSoon() {
+          shown();
+          if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+          else window.setTimeout(shown, 16);
+        }
+        function bindBox(el) {
+          if (!el || el.getAttribute('data-pp-scroll-top') === '1') return;
+          el.setAttribute('data-pp-scroll-top', '1');
+          el.addEventListener('scroll', shownSoon, { passive: true });
+        }
+        function bindBoxes() {
+          innerBoxes().forEach(bindBox);
+          shown();
+        }
+        window.parishPressBindScrollTopBoxes = bindBoxes;
+        if (btn.getAttribute('data-pp-bound') !== 'inner-2') {
+          btn.setAttribute('data-pp-bound', 'inner-2');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.addEventListener('scroll', shownSoon, { passive: true });
+          document.addEventListener('scroll', shownSoon, { capture: true, passive: true });
+          document.addEventListener('wheel', shownSoon, { capture: true, passive: true });
+          document.addEventListener('touchmove', shownSoon, { capture: true, passive: true });
+          if (window.MutationObserver && document.body) {
+            new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+          }
+          btn.addEventListener('click', function () {
+            var behavior = reduce ? 'auto' : 'smooth';
+            window.scrollTo({ top: 0, behavior: behavior });
+            innerBoxes().forEach(function (el) {
+              el.scrollTop = 0;
+              if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+            });
+            window.setTimeout(shown, reduce ? 0 : 400);
+          });
+        }
+        bindBoxes();
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
+    })();
+    
+  </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
+</body>
+</html>
