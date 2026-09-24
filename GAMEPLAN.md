@@ -7,6 +7,16 @@ locked harvester product order.
 |---
 
 
+## 24/09/2026 — OCR readability: spacing, subheads, diocese re-apply
+
+**The real goal, in one sentence:** make the plain-text OCR easier to read without inventing bulletin text.
+
+**This turn:** Found letter-spaced PDF text (S unday / Tw e nty), bad subheads (anniversaries occurs; Sunday Mass + parish banner; Recently Deceased: Name as one heading), and diocese pages skipping cleanup when mastheads already existed. Fixed in generators; regenerated live diocese HTML. **Not live yet** until merge + Pages.
+
+**Next:** PR + merge + live-prove Raphoe OCR. Then Referee Brain first slice.
+
+**Parked:** inventing name corrections (e.g. GetÝgan); full re-OCR on this PC.
+
 ## 24/09/2026 — Cork live polish: dots off, unfinished note, fix "0 of N found"
 
 **The real goal, in one sentence:** Cork on the homepage like the other four, honest bulletin counts, no hero-dot clutter, short unfinished note on every diocese page.
