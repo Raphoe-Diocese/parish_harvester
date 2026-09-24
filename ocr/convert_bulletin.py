@@ -474,23 +474,145 @@ def collapse_glued_duplicate_token(token: str) -> str:
 
 
 # Born-digital PDF extractors often emit letter-spaced titles (P A R I S H)
-# or mid-word splits (S unday, We e k). Spacing-only repairs — never change letters.
+# or mid-word splits (S unday, We e k, Fune ral). Spacing-only repairs — never
+# change letters. Tuned against Ardara-style dumps (Frank 24/09/2026).
 _KNOWN_SPACE_FRAGMENTS: tuple[tuple[re.Pattern[str], str], ...] = (
     (re.compile(r"\bS\s+unday\b", re.I), "Sunday"),
+    (re.compile(r"\bS\s+undays\b", re.I), "Sundays"),
+    (re.compile(r"\bSunda\s+y\b", re.I), "Sunday"),
+    (re.compile(r"\bS\s+eptember\b", re.I), "September"),
+    (re.compile(r"\bPARIS\s+HIONE\s+R\b", re.I), "PARISHIONER"),
+    (re.compile(r"\bThe\s+PARIS\s+HIONE\s+R\b", re.I), "The PARISHIONER"),
+    (re.compile(r"\bf\s+aithf\s+ul\b", re.I), "faithful"),
+    (re.compile(r"\bWebsiteandhos\s*ting\b", re.I), "Website and hosting"),
+    (re.compile(r"\bhos\s+ting\b", re.I), "hosting"),
     (re.compile(r"\bM\s+onday\b", re.I), "Monday"),
     (re.compile(r"\bT\s+uesday\b", re.I), "Tuesday"),
     (re.compile(r"\bW\s+ednesday\b", re.I), "Wednesday"),
+    (re.compile(r"\bWe\s+dne\s+sday\b", re.I), "Wednesday"),
     (re.compile(r"\bT\s+hursday\b", re.I), "Thursday"),
     (re.compile(r"\bF\s+riday\b", re.I), "Friday"),
     (re.compile(r"\bS\s+aturday\b", re.I), "Saturday"),
     (re.compile(r"\bSa\s+tur\s+da\s+y\b", re.I), "Saturday"),
+    # Letter-spaced function words (Ardara dump): w ho w as → who was
+    (re.compile(r"\bw\s+ho\s+w\s+as\b", re.I), "who was"),
+    (re.compile(r"\bw\s+ho\b", re.I), "who"),
+    (re.compile(r"\bw\s+as\b", re.I), "was"),
+    (re.compile(r"\bw\s+e\s+re\b", re.I), "were"),
+    (re.compile(r"\bw\s+ere\b", re.I), "were"),
+    (re.compile(r"\baw\s+ay\b", re.I), "away"),
+    (re.compile(r"\be\s+v\s+e\s+ry\b", re.I), "every"),
+    (re.compile(r"\bWe\s+e\s+k\s+e\s+nding\b", re.I), "Week ending"),
+    (re.compile(r"\bWe\s+e\s+k\s+e\s+nd\b", re.I), "Weekend"),
     (re.compile(r"\bWe\s+e\s+k\b", re.I), "Week"),
     (re.compile(r"\bw\s+e\s+e\s+k\b", re.I), "week"),
+    (re.compile(r"\bWeek\s+e\s+nding\b", re.I), "Week ending"),
     (re.compile(r"\bTw\s+e\s+nty\b", re.I), "Twenty"),
     (re.compile(r"\bS\s+e\s+pte\s+mbe\s+r\b", re.I), "September"),
     (re.compile(r"\bM\s+ass\b", re.I), "Mass"),
     (re.compile(r"\bO\s+rdinary\b", re.I), "Ordinary"),
     (re.compile(r"\bbe\s+ginning\b", re.I), "beginning"),
+    (re.compile(r"\bBe\s+ginne\s+rs\b", re.I), "Beginners"),
+    (re.compile(r"\bw\s+e\s+lcome\b", re.I), "welcome"),
+    (re.compile(r"\bFune\s+ral\b", re.I), "Funeral"),
+    (re.compile(r"\barrange\s+me\s+nts\b", re.I), "arrangements"),
+    (re.compile(r"\blate\s+r\b", re.I), "later"),
+    (re.compile(r"\bEt\s+ern\s+a\s+l\b", re.I), "Eternal"),
+    (re.compile(r"\bSou\s+l\b", re.I), "Soul"),
+    (re.compile(r"\bCh\s+rist\b", re.I), "Christ"),
+    (re.compile(r"\bsa\s+n\s+ct\s+ify\b", re.I), "sanctify"),
+    (re.compile(r"\bsa\s+ve\b", re.I), "save"),
+    (re.compile(r"\bPa\s+ssion\b", re.I), "Passion"),
+    (re.compile(r"\bst\s+ren\s+gthen\b", re.I), "strengthen"),
+    (re.compile(r"\bIr\s+ish\b", re.I), "Irish"),
+    (re.compile(r"\bD\s+a\s+ncing\b", re.I), "Dancing"),
+    (re.compile(r"\bCla\s+sse\s+s\b", re.I), "Classes"),
+    (re.compile(r"\bw\s+ith\b", re.I), "with"),
+    (re.compile(r"\bC\s+e\s+ntre\b", re.I), "Centre"),
+    (re.compile(r"\bEnv\s+elope\s+s\b", re.I), "Envelopes"),
+    (re.compile(r"\bJe\s+ssie\b", re.I), "Jessie"),
+    (re.compile(r"\bC\s+harle\s+s\b", re.I), "Charles"),
+    (re.compile(r"\bC\s+unningham\b", re.I), "Cunningham"),
+    (re.compile(r"\bS\s+e\s+attle\b", re.I), "Seattle"),
+    (re.compile(r"\bw\s+hose\b", re.I), "whose"),
+    (re.compile(r"\binte\s+rre\s+d\b", re.I), "interred"),
+    (re.compile(r"\bC\s+athle\s+en\b", re.I), "Cathleen"),
+    (re.compile(r"\bC\s+athle\s+e\s+n\b", re.I), "Cathleen"),
+    (re.compile(r"\bMc\s*Ne\s+lis\b", re.I), "McNelis"),
+    (re.compile(r"\benMcNe\s+lis\b", re.I), "en McNelis"),
+    (re.compile(r"\bM\s+c\s+", re.I), "Mc"),
+    (re.compile(r"\bburie\s+d\b", re.I), "buried"),
+    (re.compile(r"\bw\s+ill\b", re.I), "will"),
+    (re.compile(r"\bw\s+ish\b", re.I), "wish"),
+    (re.compile(r"\bcov\s+e\s+r\b", re.I), "cover"),
+    (re.compile(r"\by\s+our\b", re.I), "your"),
+    (re.compile(r"\bgrav\s+e\s+s\b", re.I), "graves"),
+    (re.compile(r"\bBonne\s+r\b", re.I), "Bonner"),
+    (re.compile(r"\bC\s+annon\b", re.I), "Cannon"),
+    (re.compile(r"\bS\s+chool\b", re.I), "School"),
+    (re.compile(r"\bt\s+h\s+e\b", re.I), "the"),
+    (re.compile(r"\bashe\s+s\b", re.I), "ashes"),
+    (re.compile(r"\bashes?\s*were\s*in\b", re.I), "ashes were in"),
+    (re.compile(r"\bashe\s+swerein\b", re.I), "ashes were in"),
+    (re.compile(r"\bwere\s*in\b", re.I), "were in"),
+    (re.compile(r"\bCathle\s+en\b", re.I), "Cathleen"),
+    (re.compile(r"\bMc\s*Nelis\b", re.I), "McNelis"),
+    (re.compile(r"\bMc\s+Nelis\b", re.I), "McNelis"),
+    (re.compile(r"\bfam\s+ily\b", re.I), "family"),
+    (re.compile(r"\byou\s+r\b", re.I), "your"),
+    (re.compile(r"\bwoun\s+ds\b", re.I), "wounds"),
+    (re.compile(r"\bpra\s+ise\b", re.I), "praise"),
+    (re.compile(r"\bcome\s+t\s+o\b", re.I), "come to"),
+    (re.compile(r"\bTha\s+t\b", re.I), "That"),
+    (re.compile(r"\bAm\s+en\b", re.I), "Amen"),
+    (re.compile(r"\bevera\s+n\s+d\b", re.I), "ever and"),
+    (re.compile(r"\ben\s+emy\b", re.I), "enemy"),
+    (re.compile(r"\bF\s+rom\b", re.I), "From"),
+    (re.compile(r"\bEnv\s+e\s+lope\s+s\b", re.I), "Envelopes"),
+    (re.compile(r"\bcallmeand\b", re.I), "call me and"),
+    (re.compile(r"\bcall\s*me\s*and\b", re.I), "call me and"),
+    (re.compile(r"\brsaints\s*Imay\b", re.I), "r saints I may"),
+    (re.compile(r"\byoursaintsImay\b", re.I), "your saints I may"),
+    (re.compile(r"\bImay\b", re.I), "I may"),
+    (re.compile(r"\bpassa?\s*d\s*away\s*on\b", re.I), "passed away on"),
+    (re.compile(r"\bpasse\s+dawayon\b", re.I), "passed away on"),
+    (re.compile(r"\bwho\s*was\b", re.I), "who was"),
+    (re.compile(r"\bwhowas\b", re.I), "who was"),
+    (re.compile(r"\bbegwho\b", re.I), "beg who"),
+    (re.compile(r"\bKilcloone\s+y\b", re.I), "Kilclooney"),
+    (re.compile(r"\bTully\s+be\s+g\b", re.I), "Tullybeg"),
+    (re.compile(r"\bbe\s+g\b", re.I), "beg"),
+    (re.compile(r"\bAr\s+da\s+r\s+a\b", re.I), "Ardara"),
+    (re.compile(r"\bM\s+e\s+e\s+ntashask\b", re.I), "Meentashask"),
+    (re.compile(r"\bgra\s+nt\s+unto\s+them\b", re.I), "grant unto them"),
+    (re.compile(r"\bgra\s*ntuntothem\b", re.I), "grant unto them"),
+    (re.compile(r"\bgra\s+n\s+t\s+u\s+n\s+t\s+o\s+t\s+h\s+em\b", re.I), "grant unto them"),
+    (re.compile(r"\bntuntothem\b", re.I), "unto them"),
+    (re.compile(r"\bSchool\s+e\s+v\s+e\s+ry\b", re.I), "School every"),
+    (re.compile(r"\bSchoole\s*very\b", re.I), "School every"),
+    (re.compile(r"\bh\s+our\s+of\s+my\b", re.I), "hour of my"),
+    (re.compile(r"\btheh\s*ourofmy\b", re.I), "the hour of my"),
+    (re.compile(r"\bAt\s+theh\b", re.I), "At the"),
+    (re.compile(r"\bpassed\s*awayon\b", re.I), "passed away on"),
+    (re.compile(r"\bawayon\b", re.I), "away on"),
+    (re.compile(r"\bashesw\s*erein\b", re.I), "ashes were in"),
+    (re.compile(r"\bashes\s*w\s*erein\b", re.I), "ashes were in"),
+    (re.compile(r"\bdefen\s+d\b", re.I), "defend"),
+    (re.compile(r"\bsepa\s+ra\s+t\s+ed\b", re.I), "separated"),
+    (re.compile(r"\bSu\s+ffer\b", re.I), "Suffer"),
+    (re.compile(r"\bJ\s+esu\s+s\b", re.I), "Jesus"),
+    (re.compile(r"\bh\s+ide\b", re.I), "hide"),
+    (re.compile(r"\bWit\s+h\b", re.I), "With"),
+    (re.compile(r"\bin\s+ebria\s+teme\b", re.I), "inebriate me"),
+    (re.compile(r"\binebria\s*te\s*me\b", re.I), "inebriate me"),
+    (re.compile(r"\bwashme\b", re.I), "wash me"),
+    (re.compile(r"\bgthenme\b", re.I), "gthen me"),
+    (re.compile(r"\bstrengthenme\b", re.I), "strengthen me"),
+    (re.compile(r"\bhearme\b", re.I), "hear me"),
+    (re.compile(r"\bdefen\s*dme\b", re.I), "defend me"),
+    (re.compile(r"\bcallme\b", re.I), "call me"),
+    (re.compile(r"\bdea\s+t\s+h\b", re.I), "death"),
+    (re.compile(r"\bAmen\s*\.\b", re.I), "Amen."),
 )
 
 
@@ -498,33 +620,141 @@ def _alpha_len(token: str) -> int:
     return len(re.sub(r"[^A-Za-zÀ-ÿ]", "", token or ""))
 
 
+def _joinable_alpha_len(token: str) -> int:
+    """Alpha length for short-token joining. Digits block joining (dates/ordinals)."""
+    if not token or re.search(r"\d", token):
+        return 0
+    return _alpha_len(token)
+
+
+def _apply_known_fragments(text: str) -> str:
+    cleaned = text
+    for pattern, repl in _KNOWN_SPACE_FRAGMENTS:
+        if callable(repl):
+            cleaned = pattern.sub(repl, cleaned)
+        else:
+            cleaned = pattern.sub(repl, cleaned)
+    return cleaned
+
+
 def collapse_ocr_spacing(text: str) -> str:
     """Fix letter-spaced / mid-split OCR without changing any letters."""
     if not text:
         return text
     cleaned = str(text)
-    for pattern, repl in _KNOWN_SPACE_FRAGMENTS:
-        cleaned = pattern.sub(repl, cleaned)
+    cleaned = _apply_known_fragments(cleaned)
     # Twenty -fourth → Twenty-fourth (space before hyphen only)
     cleaned = re.sub(r"(?<=\w)\s+-(?=\w)", "-", cleaned)
+    # Letter glued to a clock time: y6.00pm / y9.30am
+    cleaned = re.sub(
+        r"([A-Za-zÀ-ÿ])(\d{1,2}[.:]\d{2}\s*(?:[ap]\.?m\.?))",
+        r"\1 \2",
+        cleaned,
+        flags=re.I,
+    )
+    # am/pm glued to the next place name: 6.00pmArdara
+    cleaned = re.sub(
+        r"((?:[ap]\.?m\.?))([A-ZÀ-ÿ])",
+        r"\1 \2",
+        cleaned,
+        flags=re.I,
+    )
+    # lowercase glued to Capital mid-sentence: themO
+    cleaned = re.sub(r"([a-zà-ÿ])([A-ZÀ-Ÿ])", r"\1 \2", cleaned)
+    # Missing space after . , ; : before a letter: me.Water / s,hearme
+    cleaned = re.sub(r"([.,:;])([A-Za-zÀ-ÿ])", r"\1 \2", cleaned)
+    # Trailing letter of a broken word: burie d / Kilcloone y / Sunda y / classe s.
+    # Only join common *suffix* letters. Never join w/a/i/o/u (start of who/was/and/…).
+    cleaned = re.sub(
+        r"\b([A-Za-zÀ-ÿ]{3,})\s+([dysge])\b",
+        r"\1\2",
+        cleaned,
+        flags=re.I,
+    )
+    # Do NOT join "A bhráithre" / "I am" — that breaks Irish and English.
+    # Mc names still spaced: M c Gill → McGill
+    cleaned = re.sub(r"\bM\s+c\s+", "Mc", cleaned, flags=re.I)
+    cleaned = re.sub(r"\bMc\s+([A-ZÀ-Ÿ][a-zà-ÿ]*)", r"Mc\1", cleaned)
+    # Spaced clock times: 7: 00 pm / 10: 30 am
+    cleaned = re.sub(r"\b(\d{1,2})\s*:\s*(\d{2})\s*([ap]\.?m\.?)\b", r"\1:\2\3", cleaned, flags=re.I)
+    cleaned = re.sub(r"\b(\d{1,2})\s*:\s*(\d{2})\b", r"\1:\2", cleaned)
+    # 7 th → ordinal
+    cleaned = re.sub(r"\b(\d{1,2})\s+(st|nd|rd|th)\b", r"\1\2", cleaned, flags=re.I)
 
     words = cleaned.split()
     if not words:
         return cleaned
+
+    # Heavily fragmented lines: join runs of short alpha tokens (len <= 3).
+    # Never join tokens that contain digits (17th, 6.00pm, etc.).
+    alpha = [w for w in words if _joinable_alpha_len(w) > 0]
+    short_ratio = (
+        (sum(1 for w in alpha if _joinable_alpha_len(w) <= 3) / len(alpha))
+        if alpha
+        else 0.0
+    )
+    max_join = 3 if short_ratio >= 0.4 else 2
+    min_run = 3 if short_ratio >= 0.4 else 4
+
     out: list[str] = []
     i = 0
     while i < len(words):
         j = i
-        while j < len(words) and 1 <= _alpha_len(words[j]) <= 2:
+        while j < len(words) and 1 <= _joinable_alpha_len(words[j]) <= max_join:
             j += 1
-        if j - i >= 4:
-            # P A R I S H / PA R O C H IA L / Ar da r a → one word
+        if j - i >= min_run:
             out.append("".join(words[i:j]))
             i = j
             continue
         out.append(words[i])
         i += 1
-    return re.sub(r"[ \t]{2,}", " ", " ".join(out)).strip()
+    cleaned = " ".join(out)
+
+    # Re-run known fragments after joining (Et ern a l → Eternal may need a second pass).
+    cleaned = _apply_known_fragments(cleaned)
+    # grantuntothem / unto themO leftovers after join
+    cleaned = re.sub(r"\bgrantuntothem\b", "grant unto them", cleaned, flags=re.I)
+    cleaned = re.sub(r"\bntuntothem\b", "unto them", cleaned, flags=re.I)
+    # camelCase split (themO) but keep McGill / MacBride together
+    cleaned = re.sub(r"([a-zà-ÿ])([A-ZÀ-Ÿ])", r"\1 \2", cleaned)
+    cleaned = re.sub(r"\b(Mc|Mac|MC)\s+([A-ZÀ-Ÿ])", r"\1\2", cleaned)
+    cleaned = re.sub(r"([.,:;])([A-Za-zÀ-ÿ])", r"\1 \2", cleaned)
+    # who was / passed away style glues still left as one token
+    cleaned = re.sub(r"\bwhowas\b", "who was", cleaned, flags=re.I)
+    cleaned = re.sub(r"\bpassedawayon\b", "passed away on", cleaned, flags=re.I)
+    cleaned = re.sub(r"\basheswerein\b", "ashes were in", cleaned, flags=re.I)
+    cleaned = re.sub(r"\bashes were in interred\b", "ashes were interred", cleaned, flags=re.I)
+    cleaned = re.sub(r"\bashesw\s*erein\b", "ashes were in", cleaned, flags=re.I)
+    cleaned = re.sub(r"\bwerein\b", "were in", cleaned, flags=re.I)
+    cleaned = re.sub(r"\bawayon\b", "away on", cleaned, flags=re.I)
+    cleaned = re.sub(r"\bpassed\s+away\s+on\b", "passed away on", cleaned, flags=re.I)
+    cleaned = re.sub(r"\bgran\s*t\s*untothem\b", "grant unto them", cleaned, flags=re.I)
+    cleaned = re.sub(r"\bgrantunto\s*them\b", "grant unto them", cleaned, flags=re.I)
+    cleaned = re.sub(r"\bSchoole\s*very\b", "School every", cleaned, flags=re.I)
+    cleaned = re.sub(r"\btheh\s*ourofmy\b", "the hour of my", cleaned, flags=re.I)
+    cleaned = re.sub(r"\bin\s+ebriat\s*eme\b", "inebriate me", cleaned, flags=re.I)
+    cleaned = re.sub(r"\bbegwho\b", "beg who", cleaned, flags=re.I)
+    cleaned = re.sub(r"\bwashme\b", "wash me", cleaned, flags=re.I)
+    cleaned = re.sub(r"\bstrengthenme\b", "strengthen me", cleaned, flags=re.I)
+    cleaned = re.sub(r"\bdefendme\b", "defend me", cleaned, flags=re.I)
+    cleaned = re.sub(r"\bhearme\b", "hear me", cleaned, flags=re.I)
+    cleaned = re.sub(r"\bcallmeand\b", "call me and", cleaned, flags=re.I)
+    cleaned = re.sub(r"\bcallme\b", "call me", cleaned, flags=re.I)
+    cleaned = re.sub(r"\binebriateme\b", "inebriate me", cleaned, flags=re.I)
+    cleaned = re.sub(r"\bAtthehourofmy\b", "At the hour of my", cleaned, flags=re.I)
+    cleaned = re.sub(r"\byoursaintsImay\b", "your saints I may", cleaned, flags=re.I)
+    cleaned = re.sub(r"\bmenottobe\b", "me not to be", cleaned, flags=re.I)
+    cleaned = re.sub(r"\bsepa\s*rated\b", "separated", cleaned, flags=re.I)
+    cleaned = re.sub(r"\bWith\s+in\b", "Within", cleaned)
+    cleaned = re.sub(r"\bF\s+or\b", "For", cleaned)
+    cleaned = re.sub(r"\bMc\s+Nelis\b", "McNelis", cleaned)
+    # Common letter-spaced function words left after fragment pass
+    cleaned = re.sub(r"\ba\s+n\s+d\b", "and", cleaned, flags=re.I)
+    cleaned = re.sub(r"\bt\s+o\b", "to", cleaned, flags=re.I)
+    cleaned = re.sub(r"\bFor\s+ever\s+and\s+ever\b", "For ever and ever", cleaned)
+
+    cleaned = re.sub(r"[ \t]{2,}", " ", cleaned).strip()
+    return cleaned
 
 
 def clean_ocr_line(text: str) -> str:
