@@ -627,6 +627,86 @@ def _joinable_alpha_len(token: str) -> int:
     return _alpha_len(token)
 
 
+# PDF / OCR glyph and mid-word splits seen across many live diocese pages (Frank 25/09/2026).
+# Spacing + known glyph maps only — do not invent names, times, or Irish wording.
+_OCR_GLYPH_MAP: tuple[tuple[str, str], ...] = (
+    ("ﬁ", "fi"),
+    ("ﬂ", "fl"),
+    ("ﬀ", "ff"),
+    ("ﬃ", "ffi"),
+    ("ﬄ", "ffl"),
+    ("Ɵ", "ti"),  # Notice / Bulletin / Sacristies
+    ("Ý", "ti"),  # committing
+)
+
+# Mid-word space splits (second half is the broken suffix).
+_MIDWORD_SPLITS: tuple[tuple[re.Pattern[str], str], ...] = (
+    (re.compile(r"\bfam\s+ilies\b", re.I), "families"),
+    (re.compile(r"\bSacram\s+ent\b", re.I), "Sacrament"),
+    (re.compile(r"\bprogram\s+me\b", re.I), "programme"),
+    (re.compile(r"\bcont\s+inue\b", re.I), "continue"),
+    (re.compile(r"\bam\s+azing\b", re.I), "amazing"),
+    (re.compile(r"\bDevelopm\s+ent\b", re.I), "Development"),
+    (re.compile(r"\bcathed\s+ral\b", re.I), "cathedral"),
+    (re.compile(r"\bCathed\s+ral\b"), "Cathedral"),
+    (re.compile(r"\bChapla\s+incy\b", re.I), "Chaplaincy"),
+    (re.compile(r"\bAlterserv\s+ers\b", re.I), "Altar servers"),
+    (re.compile(r"\bENRICHME\s+NT\b", re.I), "ENRICHMENT"),
+    (re.compile(r"\bREGISTRAT\s+ION\b", re.I), "REGISTRATION"),
+    (re.compile(r"\bRREGISTRAT\s+ION\b", re.I), "REGISTRATION"),
+    (re.compile(r"\bEGISTRAT\s+ION\b", re.I), "REGISTRATION"),
+    (re.compile(r"\bEXP\s+ENDITURE\b", re.I), "EXPENDITURE"),
+    (re.compile(r"\bSUNDAYCO\s+LLECTION\b", re.I), "SUNDAY COLLECTION"),
+    (re.compile(r"\bNE\s+WSLE\s+TTER\b", re.I), "NEWSLETTER"),
+    (re.compile(r"\bP\s+ADRE\b"), "PADRE"),
+    (re.compile(r"\bwor\s+king\b", re.I), "working"),
+    (re.compile(r"\bStream\s+ing\b", re.I), "Streaming"),
+    (re.compile(r"\bSept\s+emb\s+er\b", re.I), "September"),
+    (re.compile(r"\bFor\s+óige\b", re.I), "Foróige"),
+    (re.compile(r"\bCo\s+ffee\b", re.I), "Coffee"),
+    (re.compile(r"\bou\s+r\s+school\b", re.I), "our school"),
+    (re.compile(r"\bfo\s+r\s+ever\b", re.I), "for ever"),
+    (re.compile(r"\bJ\s+esus\b", re.I), "Jesus"),
+    (re.compile(r"\bveneraton\b", re.I), "veneration"),
+    (re.compile(r"\bcommit\s+ting\b", re.I), "committing"),
+    (re.compile(r"\bcommit\s*ti\s*ng\b", re.I), "committing"),
+    (re.compile(r"\bFi\s*fth\b", re.I), "Fifth"),
+    (re.compile(r"\bTwenty\s+Fi\s*fth\b", re.I), "Twenty Fifth"),
+    (re.compile(r"\bGodandputit\b", re.I), "God and put it"),
+    (re.compile(r"Godand", re.I), "God and"),
+    (re.compile(r"\bandallthe\b", re.I), "and all the"),
+    (re.compile(r"\bandforall\b", re.I), "and for all"),
+    (re.compile(r"\btheageof\b", re.I), "the age of"),
+    (re.compile(r"\bnameandthe\b", re.I), "name and the"),
+    (re.compile(r"\bnewly\s*marriedo\s*r\b", re.I), "newly married or"),
+    (re.compile(r"\bmarriedo\s*r\b", re.I), "married or"),
+    (re.compile(r"\bboo\s+k\s+now\b", re.I), "book now"),
+    (re.compile(r"\bholda\s+Seminar\b", re.I), "hold a Seminar"),
+    (re.compile(r"\bhostinga\b", re.I), "hosting a"),
+    (re.compile(r"\bbea\s+CLEARANCE\b", re.I), "be a CLEARANCE"),
+    (re.compile(r"\bthere\s+will\s+bea\b", re.I), "there will be a"),
+    (re.compile(r"\bgmail\.\s+com\b", re.I), "gmail.com"),
+    (re.compile(r"\boutlook\.\s+com\b", re.I), "outlook.com"),
+    (re.compile(r"\bwww\.\s+", re.I), "www."),
+    (re.compile(r"\b([A-Za-z0-9-]+)\.\s+(tv|ie|org|com|net|co\.uk)\b", re.I), r"\1.\2"),
+    (re.compile(r"\bTiny\.\s+cc\b", re.I), "tiny.cc"),
+    (re.compile(r"\btiny\.\s+cc\b", re.I), "tiny.cc"),
+)
+
+
+def _normalize_ocr_glyphs(text: str) -> str:
+    cleaned = text
+    for src, dst in _OCR_GLYPH_MAP:
+        cleaned = cleaned.replace(src, dst)
+    # Ō is a common stand-in for "ft" in Fifth / after (not Irish Ó)
+    cleaned = re.sub(r"Fi\s*Ōh", "Fifth", cleaned)
+    cleaned = re.sub(r"\ba\s*Ōer\b", "after", cleaned, flags=re.I)
+    cleaned = re.sub(r"Ō", "ft", cleaned)
+    for pattern, repl in _MIDWORD_SPLITS:
+        cleaned = pattern.sub(repl, cleaned)
+    return cleaned
+
+
 def _apply_known_fragments(text: str) -> str:
     cleaned = text
     for pattern, repl in _KNOWN_SPACE_FRAGMENTS:
@@ -638,10 +718,14 @@ def _apply_known_fragments(text: str) -> str:
 
 
 def collapse_ocr_spacing(text: str) -> str:
-    """Fix letter-spaced / mid-split OCR without changing any letters."""
+    """Fix letter-spaced / mid-split OCR and known PDF glyph maps.
+
+    Does not invent names, Mass times, or Irish wording — only rejoins splits
+    and maps known OCR/PDF glyphs (ﬁ→fi, Ɵ→ti, FiŌh→Fifth, …).
+    """
     if not text:
         return text
-    cleaned = str(text)
+    cleaned = _normalize_ocr_glyphs(str(text))
     cleaned = _apply_known_fragments(cleaned)
     # Twenty -fourth → Twenty-fourth (space before hyphen only)
     cleaned = re.sub(r"(?<=\w)\s+-(?=\w)", "-", cleaned)
@@ -652,15 +736,16 @@ def collapse_ocr_spacing(text: str) -> str:
         cleaned,
         flags=re.I,
     )
-    # am/pm glued to the next place name: 6.00pmArdara
+    # am/pm glued to the next place name: 6.00pmArdara / 6pmMass
+    # Must stay tied to a clock digit — bare "am"+"p" would smash "example".
     cleaned = re.sub(
-        r"((?:[ap]\.?m\.?))([A-ZÀ-ÿ])",
+        r"(\d{1,2}(?:[.:]\d{2})?\s*(?:[AaPp]\.?[Mm]\.?))([A-ZÀ-Ÿ])",
         r"\1 \2",
         cleaned,
-        flags=re.I,
     )
     # lowercase glued to Capital mid-sentence: themO
-    cleaned = re.sub(r"([a-zà-ÿ])([A-ZÀ-Ÿ])", r"\1 \2", cleaned)
+    # Second class is ASCII capitals + Latin capitals only (not à-ÿ via À-Ÿ range).
+    cleaned = re.sub(r"([a-zà-ÿ])([A-Z])", r"\1 \2", cleaned)
     # Missing space after . , ; : before a letter: me.Water / s,hearme
     cleaned = re.sub(r"([.,:;])([A-Za-zÀ-ÿ])", r"\1 \2", cleaned)
     # Trailing letter of a broken word: burie d / Kilcloone y / Sunda y / classe s.
@@ -716,7 +801,7 @@ def collapse_ocr_spacing(text: str) -> str:
     cleaned = re.sub(r"\bgrantuntothem\b", "grant unto them", cleaned, flags=re.I)
     cleaned = re.sub(r"\bntuntothem\b", "unto them", cleaned, flags=re.I)
     # camelCase split (themO) but keep McGill / MacBride together
-    cleaned = re.sub(r"([a-zà-ÿ])([A-ZÀ-Ÿ])", r"\1 \2", cleaned)
+    cleaned = re.sub(r"([a-zà-ÿ])([A-Z])", r"\1 \2", cleaned)
     cleaned = re.sub(r"\b(Mc|Mac|MC)\s+([A-ZÀ-Ÿ])", r"\1\2", cleaned)
     cleaned = re.sub(r"([.,:;])([A-Za-zÀ-ÿ])", r"\1 \2", cleaned)
     # who was / passed away style glues still left as one token
@@ -752,6 +837,8 @@ def collapse_ocr_spacing(text: str) -> str:
     cleaned = re.sub(r"\ba\s+n\s+d\b", "and", cleaned, flags=re.I)
     cleaned = re.sub(r"\bt\s+o\b", "to", cleaned, flags=re.I)
     cleaned = re.sub(r"\bFor\s+ever\s+and\s+ever\b", "For ever and ever", cleaned)
+    # Second glyph/mid-word pass after short-token joins
+    cleaned = _normalize_ocr_glyphs(cleaned)
 
     cleaned = re.sub(r"[ \t]{2,}", " ", cleaned).strip()
     return cleaned
