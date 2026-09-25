@@ -165,6 +165,27 @@ class PreferEmbeddedTextTests(unittest.TestCase):
         self.assertNotIn("Tully be g", out)
         self.assertNotIn("pmArdara", out)
 
+    def test_collapse_midword_splits_and_glyphs(self) -> None:
+        from ocr.convert_bulletin import clean_ocr_line
+
+        out = clean_ocr_line(
+            "Fam ilies and helpers. Sacram ent of Baptism. program me. "
+            "Twenty Fi Ōh Sunday. Safeguarding NoƟce. commit Ýng. "
+            "Godand His Church. gmail. com www. example"
+        )
+        self.assertRegex(out, r"(?i)\bfamilies\b")
+        self.assertIn("Sacrament", out)
+        self.assertIn("programme", out)
+        self.assertIn("Twenty Fifth Sunday", out)
+        self.assertIn("Notice", out)
+        self.assertIn("committing", out)
+        self.assertIn("God and His Church", out)
+        self.assertIn("gmail.com", out)
+        self.assertIn("www.example", out)
+        self.assertNotIn("exam ple", out)
+        self.assertNotIn("Ɵ", out)
+        self.assertNotIn("Ō", out)
+
 
 if __name__ == "__main__":
     unittest.main()
