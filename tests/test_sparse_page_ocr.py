@@ -172,6 +172,33 @@ class SparsePageOcrHtmlTests(unittest.TestCase):
         ]
         self.assertEqual(choose_vision_page_indexes([irish, smashed]), [1])
 
+    def test_vision_page_cap_keeps_sparse_first(self) -> None:
+        from ocr.sparse_page_ocr import MAX_VISION_PAGES_PER_PDF, choose_vision_page_indexes
+
+        banner = ["Parish of Example", "https://example.com/bulletin.pdf"]
+        irish = [
+            "POBAL CHRÍOST RÍ GORT A’ CHOIRCE AIFRINN NA SEACHTAINE",
+            "16ú Lúnasa 2026 An tAth. Donnchadh Ó Baoill paróiste",
+            "Nora O'Donnell, An Bhealtaine agus Eamon Mc Ginley Inis Bó Finne",
+            "Tógadh €1,530 an tseachtain s'chuaigh thart. Buíochas don phobal uile.",
+            "Seo mar a deir an Tiarna: Coinnígí an ceart, cleachtaígí an fhíréanacht.",
+        ]
+        smashed = [
+            "It Isour privilege and OUPae Ventere (0 GIscover IESSSourown",
+            "special light. The Candle of Remembrance STSSisa SS0a— —",
+            "Mary Dunbar for the coming week will beorfi »\\ lit in loving",
+            "memory of Ar. uii, i Holy Cross Church, Dunfanaghy ) i ~ yal",
+            "Fr. Martin Doohan | Parish Priest | Margaret | Patrick | Patsy",
+            "Charlie McConnell | j f 4 aya Tel: 074-91-36163 | Mobile | 087",
+            "Killygordan ‘dla |‘ Fr. John Joe Duffy | Creeslough | id & saiw",
+            "Masses for the Coming Weeki | eg EWMon - No Mass ) & 3 . _ Tue",
+        ]
+        pages = [irish] * 3 + [banner] + [smashed] * (MAX_VISION_PAGES_PER_PDF + 5)
+        chosen = choose_vision_page_indexes(pages)
+        self.assertIsNotNone(chosen)
+        self.assertLessEqual(len(chosen), MAX_VISION_PAGES_PER_PDF)
+        self.assertIn(3, chosen)  # sparse banner kept
+
     def test_column_gutter_finds_sidebar_not_midpage(self) -> None:
         from PIL import Image, ImageDraw
 
