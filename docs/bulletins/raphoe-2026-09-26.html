@@ -1,0 +1,1773 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Raphoe Diocese Bulletin Viewer — 26/09/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <link rel="preload" href="../mega_pdf/raphoe_mega_bulletin_p1.jpg?d=2026-09-26&amp;h=20260924T1344" as="image">
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: #f4f6f6;
+      color: #1a1a2e;
+      line-height: 1.55;
+    }
+    a { color: #1a6b6b; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .page { max-width: 960px; margin: 0 auto; padding: 20px 18px 48px; }
+    .back-link { display: inline-block; margin-bottom: 16px; font-weight: 600; color: #1a6b6b; font-size: 0.95rem; }
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+      background: #fff;
+      border: 1px solid #dde5e4;
+      padding: 28px 20px 22px;
+    }
+    .diocese-label {
+      margin: 0 0 8px;
+      color: #14524f;
+      font-size: 0.8rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    h1 {
+      margin: 0 0 8px;
+      color: #14524f;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.55rem, 3.2vw, 2.15rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      line-height: 1.25;
+    }
+    .meta { color: #6b7280; font-size: 0.92rem; margin-bottom: 10px; }
+    .stale-note {
+      color: #7a3b00;
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0.35rem 0 0.7rem;
+    }
+    .download-link-top {
+      display: inline-block;
+      margin-top: 4px;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #1a6b6b;
+    }
+
+    /* Mobile-only jump + download (hidden on desktop) */
+    .mobile-jump {
+      display: none;
+      text-align: center;
+      margin: 0 0 22px;
+    }
+    .mobile-jump-btn {
+      display: block;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto 12px;
+      padding: 12px 16px;
+      border: 1px solid #1a6b6b;
+      background: #fff;
+      color: #1a6b6b;
+      font-weight: 700;
+      font-size: 0.98rem;
+      text-decoration: none;
+      border-radius: 2px;
+    }
+    .mobile-jump-btn:hover { background: #f0f7f7; text-decoration: none; }
+    .mobile-jump-download {
+      display: inline-block;
+      font-weight: 700;
+      color: #1a6b6b;
+      font-size: 1rem;
+    }
+
+    .section-heading {
+      margin: 34px 0 14px;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      font-weight: 700;
+      font-size: 0.98rem;
+      color: #4a5560;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .viewer-block {
+      background: #fff;
+      border: 1px solid #dde5e4;
+      padding: 14px;
+      margin-bottom: 4px;
+    }
+
+    .quiet-links {
+      display: flex;
+      justify-content: flex-end;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+    .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
+
+    .pdf-frame-wrap {
+      position: relative;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      background: #3a3f42;
+    }
+    .pdf-frame-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+    .fullscreen-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 5;
+      width: 34px;
+      height: 34px;
+      border: 1px solid #1a6b6b;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.92);
+      color: #1a6b6b;
+      font-size: 1rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
+    
+    .pdf-inpage-viewer,
+    .pdf-mobile-fallback {
+      display: flex !important;
+      flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      flex: 1 1 auto;
+      background: #3a3f42;
+      color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
+    }
+    .pdf-inpage-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+      padding: 8px 10px;
+      background: #14524f;
+      color: #fff;
+      flex: 0 0 auto;
+    }
+    .pdf-inpage-backup { display: flex; gap: 8px; flex-wrap: wrap; }
+    .pdf-inpage-backup a { color: #fff; font-weight: 700; font-size: 0.85rem; }
+    .pdf-inpage-status { padding: 10px 12px; background: #1f3d3c; color: #d8f0ee; font-size: 0.9rem; }
+    .pdf-inpage-pages {
+      box-sizing: border-box;
+      flex: 0 0 auto;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+      overflow-x: hidden;
+      /* Reserve the scrollbar gutter from the first paint. Without it the
+         first page is sized to the full width, the vertical scrollbar then
+         appears, and the page is suddenly ~16px too wide — a horizontal
+         scrollbar under a strip of the bulletin. */
+      scrollbar-gutter: stable;
+      background: #525659;
+      padding: 8px 0 16px;
+    }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
+    .pdf-inpage-page-slot {
+      margin: 0 auto 10px;
+      background: #3a3f42;
+      min-height: 180px;
+      max-width: 100%;
+      position: relative;
+    }
+    .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
+    /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
+       page — one of those used to stretch the box's scrollWidth to 2988px. */
+    .pdf-link-layer {
+      position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+      overflow: hidden; pointer-events: none;
+    }
+    .pdf-annot-link {
+      position: absolute; z-index: 2; pointer-events: auto;
+      background: rgba(26, 107, 107, 0.08); border-radius: 2px;
+    }
+    .pdf-frame-wrap,
+    .pdf-standalone-shell {
+      display: flex;
+      flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
+    }
+    .pdf-frame-wrap iframe,
+    .pdf-standalone-shell iframe.pdf-frame,
+    body.is-native-pdf iframe.pdf-frame {
+      display: none !important;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+    }
+    .pdf-frame-wrap.is-native-pdf,
+    .pdf-standalone-shell.is-native-pdf,
+    body.is-native-pdf .pdf-standalone-shell {
+      display: flex;
+      flex-direction: column;
+      height: 850px !important;
+      min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
+      background: #3a3f42;
+    }
+    @media (max-width: 1024px) {
+      .pdf-frame-wrap,
+      .pdf-standalone-shell,
+      .pdf-frame-wrap.is-native-pdf,
+      .pdf-standalone-shell.is-native-pdf,
+      body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
+        min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
+        display: flex;
+        flex-direction: column;
+        background: #3a3f42;
+      }
+      .pdf-inpage-viewer,
+      .pdf-mobile-fallback {
+        height: 450px !important;
+        min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
+      }
+      .pdf-inpage-pages,
+      #ocr-panel,
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        height: 450px !important;
+        min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: auto !important;
+        overflow-y: auto !important;
+      }
+      .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        display: none !important;
+      }
+    }
+
+    @media (min-width: 701px) and (min-height: 501px) {
+      .pdf-frame-wrap,
+      .pdf-standalone-shell,
+      .pdf-frame-wrap.is-native-pdf,
+      .pdf-standalone-shell.is-native-pdf,
+      body.is-native-pdf .pdf-standalone-shell,
+      .pdf-inpage-viewer,
+      .pdf-mobile-fallback {
+        height: 850px !important;
+        min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
+      }
+      .pdf-inpage-pages,
+      #ocr-panel,
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        height: 850px !important;
+        min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: auto !important;
+        overflow-y: auto !important;
+      }
+      /* `overflow: auto` above resets both axes, so re-hide the horizontal one:
+         a single stray PDF link annotation off the right edge of a page used to
+         give the whole box a horizontal scrollbar. */
+      .pdf-inpage-pages { overflow-x: hidden !important; }
+      /* Nothing to enlarge — the box is already the locked 850px. */
+      .az-expand { display: none; }
+    }
+
+
+    /* Search comes first in the OCR block and reads like the JUMP TO bar, so
+       a reader cannot scroll past it looking for "where is the search". */
+    .ocr-search-bar {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 8px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-search-label {
+      flex: 0 0 auto;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
+    }
+    .search-input {
+      flex: 1 1 auto;
+      min-width: 0;
+      width: auto;
+      border: 1px solid #1a6b6b;
+      border-radius: 4px;
+      padding: 11px 42px 11px 14px;
+      font-size: 1rem;
+      background: #fff;
+    }
+    .search-clear {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: #6b7280;
+      font-size: 1.25rem;
+      cursor: pointer;
+    }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 0;
+      border-radius: 4px;
+      background: #1a6b6b;
+      color: white;
+      font-weight: 600;
+      padding: 7px 14px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { background: #9bbfbd; cursor: not-allowed; }
+    .match-count { color: #6b7280; font-size: 0.9rem; font-weight: 600; }
+    .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #fff;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 9999;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
+    
+    .az-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 0 0 10px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .az-row-label {
+      margin-right: 2px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
+    }
+    .az-letter {
+      min-width: 30px;
+      height: 30px;
+      padding: 0 6px;
+      background: #fff;
+      border: 1px solid #cfdedd;
+      border-radius: 4px;
+      color: #1a6b6b;
+      font-weight: 700;
+      font-size: 0.9rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .az-letter:hover,
+    .az-letter:focus-visible {
+      background: #1a6b6b;
+      border-color: #1a6b6b;
+      color: #fff;
+    }
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
+    .az-expand { display: none; }
+    /* A letter jump scrolls inside a locked box, so nothing moves on screen
+       except the text. Flag the parish the reader landed on. */
+    .az-landed {
+      background: #fff6da;
+      box-shadow: 0 0 0 3px #f0d089;
+      border-radius: 3px;
+      transition: background 400ms ease, box-shadow 400ms ease;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .az-landed { transition: none; }
+    }
+    .diocese-intro {
+      margin: 0 0 22px;
+      padding: 18px 18px 16px;
+      background: #fff;
+      border: 1px solid #dde5e4;
+    }
+    .diocese-intro p { margin: 0 0 10px; color: #1a1a2e; }
+    .diocese-intro .intro-welcome { font-size: 1.05rem; }
+    .diocese-intro .intro-wip {
+      font-size: 0.92rem;
+      color: #5a6a68;
+      font-style: italic;
+    }
+    .diocese-intro .intro-count { font-weight: 600; color: #14524f; }
+    .diocese-intro h3 {
+      margin: 14px 0 8px;
+      font-size: 0.92rem;
+      color: #14524f;
+    }
+    .diocese-intro .intro-stale-note { color: #5a6a68; font-size: 0.9rem; }
+    .diocese-intro .intro-names {
+      margin: 0;
+      padding-left: 1.15em;
+    }
+    .diocese-intro .intro-names li { margin: 0 0 4px; }
+    
+    /* Letters and text size share ONE bar, so neither hides the other and
+       neither pushes the search box off a short screen. The wrapper draws the
+       box; the letter row and zoom group go transparent inside it. */
+    .ocr-controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 12px;
+      margin: 0 0 10px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-controls-row .az-row,
+    .ocr-controls-row .ocr-zoom-bar {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      border: 0;
+    }
+    .ocr-controls-row .az-row { flex: 1 1 auto; }
+    .ocr-controls-row .ocr-zoom-bar { flex: 0 0 auto; margin-left: auto; }
+    .ocr-zoom-bar {
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-zoom-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
+    }
+    .ocr-zoom-bar button {
+      min-width: 34px; height: 30px; border: 1px solid #cfdedd; border-radius: 4px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.05rem; line-height: 1; cursor: pointer;
+    }
+    .ocr-zoom-bar button:hover { background: #1a6b6b; border-color: #1a6b6b; color: #fff; }
+    .ocr-zoom-pct {
+      min-width: 3.2rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 6px; } }
+    
+    #ocr-panel {
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    #ocr-panel h1, #ocr-panel h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    #ocr-panel h2.b-title, #ocr-panel .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    #ocr-panel h3.b-head, #ocr-panel .b-head {
+      font-size: 1.15em;
+      color: #0f3d3d;
+      margin: 1.35em 0 0.45em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      font-weight: 700;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    #ocr-panel h4.b-sub, #ocr-panel .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    #ocr-panel h3, #ocr-panel h4 {
+      color: #1a6b6b;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    #ocr-panel p {
+      margin: 0 0 0.85em;
+    }
+    #ocr-panel h3.ocr-page-heading,
+    #ocr-panel .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    #ocr-panel p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    #ocr-panel hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    #ocr-panel strong { color: #0f2b5b; }
+    #ocr-panel a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    #ocr-panel mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    #ocr-panel mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    #ocr-panel table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    #ocr-panel table.b-table td, #ocr-panel table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    #ocr-panel table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    #ocr-panel table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    #ocr-panel img, #ocr-panel iframe, #ocr-panel video {
+      max-width: 100%;
+      height: auto;
+    }
+    #ocr-panel > :first-child {
+      margin-top: 0;
+    }
+    
+    #ocr-panel .ocr-parish-masthead {
+      margin: 2.1em 0 1.15em;
+      padding: 0.85em 0 0.7em;
+      border-top: 3px solid #14524f;
+      border-bottom: 1px solid #c5d0c9;
+    }
+    #ocr-panel .ocr-parish-masthead:first-child {
+      margin-top: 0;
+    }
+    #ocr-panel h2.ocr-parish-name,
+    #ocr-panel .ocr-parish-name {
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #14524f;
+      margin: 0 0 0.2em;
+      line-height: 1.25;
+      border: 0;
+      padding: 0;
+      text-transform: none;
+    }
+    #ocr-panel .ocr-parish-date {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    #ocr-panel .ocr-parish-link {
+      margin: 0.25em 0 0;
+      font-size: 0.88rem;
+    }
+    #ocr-panel h3.b-head {
+      margin-top: 1.45em;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      color: #0f3d3d;
+    }
+
+
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+      border: 1px solid #d4ddd9;
+      padding: 22px 24px 32px;
+    }
+    .pdf-frame-wrap iframe {
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+    }
+    .note-box {
+      margin-top: 12px;
+      color: #8a3b3b;
+      font-weight: 400;
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 4px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    .empty-state[hidden],
+    #parish-empty[hidden] { display: none !important; }
+    .parish-section {
+      margin-top: 36px;
+      padding: 8px 0 0;
+      background: transparent;
+      border: 0;
+    }
+    .parish-section h2.section-heading {
+      color: #14524f;
+      font-size: 1.15rem;
+      margin-bottom: 16px;
+    }
+    .parish-filter {
+      width: 100%;
+      max-width: 420px;
+      display: block;
+      margin: 0 auto 18px;
+      border: 1px solid #d0d8d7;
+      border-radius: 4px;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+    }
+    ul.parish-grid {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px 28px;
+      padding: 0;
+      margin: 0;
+    }
+    .parish-item {
+      margin: 0;
+      padding: 2px 0 2px 1.1em;
+      position: relative;
+    }
+    .parish-item::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      top: 2px;
+      color: #1a6b6b;
+      font-weight: 700;
+    }
+    .parish-link {
+      color: #1a6b6b;
+      font-size: 0.98rem;
+      font-weight: 600;
+      text-decoration: none;
+      background: transparent;
+      border: 0;
+      padding: 0;
+      min-height: 0;
+      display: inline;
+    }
+    .parish-link:hover { text-decoration: underline; }
+    .empty-state { margin: 0 0 12px; color: #6b7280; font-size: 0.95rem; text-align: center; }
+
+    footer {
+      margin-top: 40px;
+      background: #114b4b;
+      color: white;
+      padding: 16px 20px;
+    }
+    .footer-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 0.88rem;
+    }
+    .footer-inner a { color: #d8f0ee; font-weight: 600; }
+
+    @media (max-width: 1024px) {
+      /* Harvest + OCR both call this generator — keep both panels here.
+         Desktop: locked 850px visible boxes, inner scroll.
+         Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
+      .pdf-frame-wrap,
+      .pdf-inpage-viewer {
+        height: 450px;
+        min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
+      }
+      .pdf-frame-wrap iframe,
+      .pdf-inpage-pages,
+      #ocr-panel {
+        height: 450px;
+        min-height: 450px;
+        max-height: 450px;
+        overflow: auto;
+        overflow-y: auto;
+      }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
+      /* Tap targets big enough for a thumb. */
+      .az-letter,
+      .ocr-zoom-bar button {
+        min-width: 40px;
+        height: 40px;
+        font-size: 0.95rem;
+      }
+      /* Only the panel the reader tapped grows — the other one stays 450px.
+         Scoped to that panel's id so a phone never ends up with two 850px
+         boxes stacked on one screen. */
+      #panel-pdf.az-expanded .pdf-frame-wrap,
+      #panel-pdf.az-expanded .pdf-inpage-viewer {
+        min-height: 850px !important;
+      }
+      #panel-pdf.az-expanded .pdf-frame-wrap iframe,
+      #panel-pdf.az-expanded .pdf-inpage-pages,
+      #panel-ocr.az-expanded #ocr-panel {
+        height: 850px !important;
+        min-height: 850px !important;
+        max-height: 850px !important;
+      }
+    }
+    @media (max-width: 900px) {
+      ul.parish-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 700px) {
+      .page { padding: 14px 12px 36px; }
+      .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
+      .download-link-top { display: none; }
+      .quiet-links { justify-content: center; }
+      ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
+      #ocr-panel {
+        padding: 16px 14px 28px;
+      }
+      .ocr-search-tools { flex-direction: column; }
+      .ocr-search-tools > div {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+      }
+      .ocr-search-tools button {
+        min-height: 44px;
+        width: 100%;
+      }
+      /* One column on a phone: letters, then text size. Neither covers the
+         search box above them. */
+      .ocr-controls-row { flex-direction: column; }
+      .ocr-controls-row .az-row,
+      .ocr-controls-row .ocr-zoom-bar { flex: 1 1 auto; }
+      .ocr-search-bar { flex-wrap: wrap; }
+      .ocr-search-bar .search-input { flex: 1 1 100%; }
+    }
+  </style>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260912a" defer></script>
+</head>
+<body>
+  <div class="page">
+    <a class="back-link" href="index.html" target="_blank" rel="noopener noreferrer">← Back to bulletin archive</a>
+    <header class="header">
+      <p class="diocese-label">RAPHOE</p>
+      <h1>Raphoe Collated Bulletin</h1>
+      
+      <p class="meta">Generated for 26/09/2026.</p>
+      <a class="download-link-top pdf-force-download" href="../mega_pdf/raphoe_mega_bulletin.pdf?d=2026-09-26&amp;h=20260924T1344" download="raphoe_mega_bulletin.pdf">Download PDF</a>
+    </header>
+    
+
+    <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
+      <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
+    </div>
+
+    <h2 class="section-heading">Bulletin — Original PDF Version</h2>
+    <div id="panel-pdf" class="viewer-block">
+      <nav class="az-row" aria-label="Jump to a parish in the pdf viewer"><span class="az-row-label">Jump to</span><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Annagry|Ardara" title="Annagry, Ardara" aria-label="Jump to Annagry">A</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Bruckless" title="Bruckless" aria-label="Jump to Bruckless">B</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Cathedral" title="Cathedral" aria-label="Jump to Cathedral">C</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Drumholm (Ballintra)|Dunfanaghy" title="Drumholm (Ballintra), Dunfanaghy" aria-label="Jump to Drumholm (Ballintra)">D</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Falcarragh" title="Falcarragh" aria-label="Jump to Falcarragh">F</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Gartan/Termon (Kilmacrenan)|Glenfin|Glenties|Gortahork" title="Gartan/Termon (Kilmacrenan), Glenfin, Glenties, Gortahork" aria-label="Jump to Gartan/Termon (Kilmacrenan)">G</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Inver|Irish Martyrs" title="Inver, Irish Martyrs" aria-label="Jump to Inver">I</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Kilbarron|Kilcar|Killybegs|Kincasslagh" title="Kilbarron, Kilcar, Killybegs, Kincasslagh" aria-label="Jump to Kilbarron">K</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Mevagh|Milford Kilkeel" title="Mevagh, Milford Kilkeel" aria-label="Jump to Mevagh">M</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Newtown Killea" title="Newtown Killea" aria-label="Jump to Newtown Killea">N</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Raphoe|Rathmullan" title="Raphoe, Rathmullan" aria-label="Jump to Raphoe">R</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Stranolar" title="Stranolar" aria-label="Jump to Stranolar">S</button><button type="button" class="az-letter" data-az-target="pdf" data-az-names="Tawnawilly|Templecrone" title="Tawnawilly, Templecrone" aria-label="Jump to Tawnawilly">T</button></nav>
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open. The box above shows how much has downloaded and says “PDF fully loaded” when it is ready.</p>
+      <div class="pdf-frame-wrap" id="pdf-frame-wrap">
+        <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
+        <iframe data-pdf-url="../mega_pdf/raphoe_mega_bulletin.pdf?d=2026-09-26&amp;h=20260924T1344" title="Raphoe Diocese bulletin PDF"></iframe>
+        
+        <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="../mega_pdf/raphoe_mega_bulletin.pdf?d=2026-09-26&amp;h=20260924T1344" data-pdf-preview="../mega_pdf/raphoe_mega_bulletin_p1.jpg?d=2026-09-26&amp;h=20260924T1344">
+          <div class="pdf-inpage-toolbar">
+            <div class="pdf-inpage-backup">
+              <a class="pdf-open-newtab" href="../mega_pdf/raphoe_mega_bulletin.pdf?d=2026-09-26&amp;h=20260924T1344" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="../mega_pdf/raphoe_mega_bulletin.pdf?d=2026-09-26&amp;h=20260924T1344" download="raphoe_mega_bulletin.pdf">Download</a>
+            </div>
+          </div>
+          <div class="pdf-inpage-status">Loading PDF… This file can take a few moments to open.</div>
+          <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"><div class="pdf-inpage-page-slot" data-page="1"><img class="pdf-first-preview" src="../mega_pdf/raphoe_mega_bulletin_p1.jpg?d=2026-09-26&amp;h=20260924T1344" alt="" style="display:block;width:100%;height:auto"></div></div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-heading">Bulletin — OCR Extracted Plain Text</h2>
+    <div id="panel-ocr" class="viewer-block">
+      <div class="ocr-sticky-chrome">
+      <div class="ocr-search-bar">
+        <label class="ocr-search-label" for="ocr-search">Search</label>
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search OCR text — a parish, a name, a Mass time" aria-label="Search OCR text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear OCR search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled aria-label="Previous search match">← Prev match</button>
+          <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
+        </div>
+      </div>
+      </div>
+      <div class="ocr-controls-row">
+        <nav class="az-row" aria-label="Jump to a parish in the ocr viewer"><span class="az-row-label">Jump to</span><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Annagry|Ardara" title="Annagry, Ardara" aria-label="Jump to Annagry">A</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Bruckless" title="Bruckless" aria-label="Jump to Bruckless">B</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Cathedral" title="Cathedral" aria-label="Jump to Cathedral">C</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Drumholm (Ballintra)|Dunfanaghy" title="Drumholm (Ballintra), Dunfanaghy" aria-label="Jump to Drumholm (Ballintra)">D</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Falcarragh" title="Falcarragh" aria-label="Jump to Falcarragh">F</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Gartan/Termon (Kilmacrenan)|Glenfin|Glenties|Gortahork" title="Gartan/Termon (Kilmacrenan), Glenfin, Glenties, Gortahork" aria-label="Jump to Gartan/Termon (Kilmacrenan)">G</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Inver|Irish Martyrs" title="Inver, Irish Martyrs" aria-label="Jump to Inver">I</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Kilbarron|Kilcar|Killybegs|Kincasslagh" title="Kilbarron, Kilcar, Killybegs, Kincasslagh" aria-label="Jump to Kilbarron">K</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Mevagh|Milford Kilkeel" title="Mevagh, Milford Kilkeel" aria-label="Jump to Mevagh">M</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Newtown Killea" title="Newtown Killea" aria-label="Jump to Newtown Killea">N</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Raphoe|Rathmullan" title="Raphoe, Rathmullan" aria-label="Jump to Raphoe">R</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Stranolar" title="Stranolar" aria-label="Jump to Stranolar">S</button><button type="button" class="az-letter" data-az-target="ocr" data-az-names="Tawnawilly|Templecrone" title="Tawnawilly, Templecrone" aria-label="Jump to Tawnawilly">T</button></nav>
+        <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+          <span class="ocr-zoom-label">Text size</span>
+          <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+          <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+          <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+          <span class="ocr-zoom-hint">or pinch to zoom</span>
+        </div>
+      </div>
+      <div class="quiet-links">
+        <a href="raphoe-2026-09-26-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
+      </div>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-ardara" data-parish-name="Ardara"><h2 class="ocr-parish-name">Ardara</h2><p class="ocr-parish-date">26/09/2026</p></header>
+<p class="page-label">Page 1</p>
+<p>ete Email bh Parochial House ardara@raphoediocese ie Main Street Telephone Ardara <a href="tel:+353749541135" style="color:#1d4ed8;font-weight:600;">074-9541135</a> BO: County Donegal <a href="tel:+353874758009" style="color:#1d4ed8;font-weight:600;">087-4758009</a> F F94 P5P1 Parish of Ardara Church of the Holy Family Very Rev. Aodhan Cannon PP. <a href="tel:+353749541135" style="color:#1d4ed8;font-weight:600;">074 9541135</a> / <a href="tel:+353874758009" style="color:#1d4ed8;font-weight:600;">087 4758 009</a> Rev. Philip Daly, CC Kilclooney 07495 45 114 Twenty-fourth Sunday in Ordinary Time — Week beginning: 13th September 2026 Weekend Mass Times Saturday Vigil Kilclooney 6.00pm Ardara 7.30pm Sunday Kilclooney 9.30am Ardara 11.00am Joe, Annie &amp; Pat Gallagher, Crucknagapple Saturday 7.30pm | Decesed Breslin Family, Crucknagapple Anne &amp; Peter Boyle, Tullycleave (Sunday “| 11.00am Pro Populo (For the People of the Parish) 10.00am Tuesday 10.00am Bernadette MCCloskey &amp; Maguire Family Main Street Thursday | 10.00am | Priest’s Intention I | John, Francie &amp; Teresa Gallagher, West End Saturday 7.30pm | Sarah &amp; Charlie Coyle Brigid &amp; Packie McGinley, Hill Head James &amp; Mary McGinley, Hillhead Sunday | 11.00am | Pro Populo (For the People of the Parish)</p>
+<hr>
+<p class="page-label">Page 2</p>
+<h3 class="b-head">Recent Deaths</h3>
+<p>Jimmy McGill Aighe who was buried on Wednesday<br>
+Jessie &amp; Charles Cunningham, Seattle &amp; Meentashask whose ashes were interred during the week.<br>
+Cathleen McNelis Dublin &amp; Tullybeg who passed away on 7th September. Funeral arrangements later.<br>
+Eternal rest grant unto them O Lord<br>
+Graveyard<br>
+The grass will be cut this coming week. You may wish to cover your family graves. Irish Dancing Classes with the Bonner Cannon School every Thursday in the Parish Centre Ardara at 5.00pm. Beginners welcome.<br>
+Anima Christi<br>
+Soul of Christ, sanctify me.<br>
+Body of Christ, save me.<br>
+Blood of Christ, inebriate me.<br>
+Water from the side of Christ, wash me.<br>
+Passion of Christ, strengthen me.<br>
+O Good Jesus, hear me.<br>
+hide me Within your wounds.<br>
+Suffer me not to be separated from you.<br>
+From the wicked enemy, defend me.<br>
+At the hour of my death, call me<br>
+andbidme come to you<br>
+That with your saints | may praise you<br>
+For ever and ever. Amen.<br>
+Church Collection Envelopes<br>
+Week ending Sunday 6th September 2026<br>
+Parish Envelopes: €2451.00<br>
+Thank you for your generous support</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-bruckless" data-parish-name="Bruckless"><h2 class="ocr-parish-name">Bruckless</h2><p class="ocr-parish-date">26/09/2026</p></header>
+<p class="page-label">Page 3</p>
+<h3 class="b-head">MASS TIMES ANNIVERSARIES /INTENTIONS</h3>
+<p>Saturday 12th Sept 6:30pm Holy Mass Sunday 13th September 11:00am 1:00pm 7:00pm Georgie McMullin (10th Anniversary) Baptism Cenacle Monday 14th Sept 10:00am Holy Mass Tuesday 15th Sept 10:00am Holy Mass Wednesday 16th Sept 10:00am Holy Mass Thursday 17th Sept 10:00am Holy Mass Friday 18th Sept 10:00am Holy Mass Saturday 19th Sept 6:30pm Thomas McCauley (Anniversary) Peter McMenamin (1st Anniversary) Sunday 20th September 11:00am 7:00pm Holy Mass Cenacle Church of St Joseph &amp; St Conal, Bruckless Fr Joseph Ndiraba Tel: <a href="tel:+353749737015" style="color:#1d4ed8;font-weight:600;">074 97 37015</a> E-mail: <a href="mailto:parishofficebruckless@gmail.com" target="_blank" rel="noopener noreferrer">parishofficebruckless@gmail.com</a> 24TH SUNDAY IN ORDINARY TIME Saturday 12th / Sunday 13th September 2026 - Year A Parish Newsletter available online at: - tiny.cc/PBNL Church Envelopes Ifyouarenewtothe area or would like a box please contact the Parish Office on <a href="tel:+353749737015" style="color:#1d4ed8;font-weight:600;">074 9737015</a> or email <a href="mailto:parishofficebruckless@gmail.com" target="_blank" rel="noopener noreferrer">parishofficebruckless@gmail.com</a> You may contribute by Direct Debit/Online Banking if you wish. Bank details: Bank of Ireland, Killybegs Sunday Envelopes: Killaghtee Parish Church account : IBAN: IE35 BOFI 9049 0729 4874 30 Parish Projects: Killaghtee Parish Repair Fund : IBAN IE28 BOFI 9049 0729 1660 98 Celebration Mass on 26th September : Donegal Group 173 Rise and Shine Trust (formerly The Irish Handicapped Children's Pilgrimage Trust and The Irish Pilgrimage Trust) are celebrating forty years of taking young people with special needs to Lourdes each Easter. We are celebrating with a special Mass on Saturday 26th September in the Church of the Irish Martyrs, Letterkenny at 12 noon . The Mass will be concelebrated by Bishop Niall Coll and Bishop Donal McKeowan, Bishop of Derry and many of the priests who travelled to Lourdes with us over the years. We invite all the guests and their families and all the helpers who travelled with us over the years to our Mass to celebrate the work of the Donegal Group over these forty years. CLG Naomh Ultan Sponsor a Seat - Lifetime Sponsorship initiative is still open, name or a dedication in memory of a loved one, former player, or supporter - permanently recognised on a commemorative plaque at the grounds. Visit <a href="https://www.naomhultan.com" target="_blank" rel="noopener noreferrer">www.naomhultan.com</a> to take part. Abide Women's Conference, November 20-22, the Great Northern Hotel Bundoran . Mass will be celebrated by Bishop Fintan Gavin, from Cork &amp; Ross Diocese. We would love to welcome you this weekend. For more details please visit Abide in His Love at eventbrite.ie Registration link: <a href="https://abideinhislove" target="_blank" rel="noopener noreferrer">https://abideinhislove</a>. eventbrite.com PAROCHIAL HOUSE TEL. NO’S: Killybegs: <a href="tel:+353749731013" style="color:#1d4ed8;font-weight:600;">074 97 31013</a> or <a href="tel:+353749731030" style="color:#1d4ed8;font-weight:600;">074 97 31030</a>; Inver Parish: <a href="tel:+353749736006" style="color:#1d4ed8;font-weight:600;">074 97 36006</a>; Donegal Town: <a href="tel:+353749721026" style="color:#1d4ed8;font-weight:600;">074 97 21026</a> Undertaker: John B O’Donnell <a href="tel:+353872769565" style="color:#1d4ed8;font-weight:600;">0872769565</a> Notices for newsletter: email to <a href="mailto:parishofficebruckless@gmail.com" target="_blank" rel="noopener noreferrer">parishofficebruckless@gmail.com</a> Deadline 12noon on Thursdays A Church Gate Collection for the Re-Development of Ards Friary will take place on Saturday 26th and Sunday 27th September . Your support would be greatly appreciated. Marriage Enrichment Weekend Friday 2nd – Sunday 4th October 2026, Focolare Centre, Prosperous, Co. Kildare Apply online: <a href="https://www.marriageencounter.ie" target="_blank" rel="noopener noreferrer">www.marriageencounter.ie</a> · There will be a clearance sale of gifts, bric-a-brac and lots more on Saturday, 10 October in St Mary’s Hall, Convoy from 11am to 3pm. All are welcome. All proceeds are to help Mary's Meals feed more children. Breast Cancer Awareness Month 2026 takes place Thursday, Oct 1st, 2026 – Saturday, Oct 31st, 2026. For more information, please visit breastcancerresearch. ieorwww. breastcancerireland.com . International Coffee Day 2026 takes place on Thursday, October 1st, 2026. Please see <a href="https://www.internationalcoffeeday.org" target="_blank" rel="noopener noreferrer">www.internationalcoffeeday.org</a> for further details. St Vincent De Paul Bruckless/Dunkineely: Confidential contact number <a href="tel:+353873426068" style="color:#1d4ed8;font-weight:600;">087 3426068</a> Bruckless NSAsa culmination of our Centenary Celebrations, we will be honoured with the presence of the Bishop of Raphoe, Dr Niall Coll, who will come to perform a blessing of our school on Thursday 17th September at 11.45 a. m. There will be a small ceremony with the school children taking part. Tea/Coffee and light refreshments will be served afterwards. Everyone is welcome to join us. 2 COLLECTIONS : €1400 CONFESSIONS : Available on request. ST PADRE PIO Triduum of Masses takes place at Rossnowlagh Friary to commemorate his memorial each evening from Sunday Sept 20th till Wednesday Sept 23rd inclusive . It includes Mass, homily and blessing with his relic. Preacher is Fr Pius McLaughlin who met Padre Pio. Leitir Corn Mill Kilcar F94CP7E National walking Day 2026 Sunday 27th September @12 o’clock Bruckless <a href="https://drive" target="_blank" rel="noopener noreferrer">https://drive</a>. google.com/drive/folders/1j POi4GRU22v Axe KNe5Y_do BJ3ri Ph7ZK</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-cathedral" data-parish-name="Cathedral"><h2 class="ocr-parish-name">Cathedral</h2><p class="ocr-parish-date">26/09/2026</p></header>
+<p class="page-label">Page 4</p>
+<p>SUNDAY COLLECTION ~ 7th September - €6,344 PARISH EXPENDITURE ~ €44,170.83 (includes €30,831.82 Parish Insurance) DONATIONS: 1 x €250, 1 x €50, 2 x €40, 3 x €10 and 2 x €5 SACRED VESTMENTS (LATE DONATIONS): €220 Thank you for your gift to God and His Church We deeply appreciate your continued Spiritual and Financial support . To BOOK A BAPTISM please phone the Parochial House on 9121021. Please remember: Godparents: ( 1 male and 1 female over the age of 16). BAPTISM PREPARATION ~ We have uploaded a number of videos under ‘Featured Videos ’ for Parents, in Preparation for their child ’s Baptism on our website: <a href="https://www.steunanscathedral.ie" target="_blank" rel="noopener noreferrer">www.steunanscathedral.ie</a> Parish Office Hours: Monday to Thursday: 9.30am - 4.30pm/Friday 9.30am – 1pm Phone: <a href="tel:+353749121021" style="color:#1d4ed8;font-weight:600;">074 - 9121021</a> Parish Email: <a href="mailto:office@steunanscathedral.ie" target="_blank" rel="noopener noreferrer">office@steunanscathedral.ie</a> Website: <a href="https://www.steunanscathedral.ie" target="_blank" rel="noopener noreferrer">www.steunanscathedral.ie</a> St. Eunan ’s Cathedral Live Web Streaming from the Cathedral ~ churchservices.tv/letterkenny DONEGAL GROUP 173 RISE AND SHINE TRUST (formerly The Irish Handicapped Children ’s Pilgrimage Trust/The Irish Pilgrimage Trust) are celebrating forty years of taking young people with special needs to Lourdes. A special Mass will be held on Saturday 26th September in the Church of the Irish Martyrs, Letterkenny at 12 noon with concelebrants: Bishop Niall Coll and Bishop Donal McKeown, Bishop of Derry and Priests who travelled to Lourdes over the years. Families and helpers who travelled with us over the years are very welcome. There will be a CLEARANCE SALE of gifts, bric-a-brac and lots more on Saturday 10th October in St Mary ’s Hall, Convoy from 11 am to 3 pm. Allare welcome. All proceeds are to help Mary's Meals feed more children. MARRIAGE ENRICHMENT WEEKEND ~ Take time out for just thetwoof you. Whether newly married or many years together, rediscover the love that brought you together. The weekend will take place from the 2nd - 4th October at Focolare Centre, Prosperous, Co. Kildare. Apply online: <a href="https://www.marriageencounter.ie" target="_blank" rel="noopener noreferrer">www.marriageencounter.ie</a> or Phone: <a href="tel:+353876299153" style="color:#1d4ed8;font-weight:600;">087-6299153</a>. Places are limited. NEED HELP WITH YOUR MOBILE PHONE OR DIGITAL DEVICE? Register for Age Action ’s free one-to-one digital skills tutoring in Letterkenny Central Library (Wednesday ’s 10.30 am - 12.30 pm). To register, please phone: <a href="tel:+35391527831" style="color:#1d4ed8;font-weight:600;">091 - 527831</a> or email: <a href="mailto:aaw@ageaction.ie" target="_blank" rel="noopener noreferrer">aaw@ageaction.ie</a> ABIDE WOMEN'S CONFERENCE: Will take place from the 20th - 22nd November at the Great Northern Hotel, Bundoran. Speakers include: Fr. Barry Braum, Fr. Mark Wharton, Nashville Dominicans etc, Mass will be celebrated by Bishop Fintan Gavin, from Cork &amp; Ross Diocese. please visit: Abide in His Love at eventbrite.ie Registration link: <a href="https://abideinhislove" target="_blank" rel="noopener noreferrer">https://abideinhislove</a>. eventbrite.com St. Eunan ’s cathedral Letterkenny NEWSLETTER Sunday 13th September 2026 Twenty Fourth Sunday in Ordinary MUSIC MINISTRY SEMINAR The Diocesan Church Music Group will hold a Seminar for all those involved in Music Ministry in Parishes throughout the Diocese on Saturday 10th October in the Mount Errigal Hotel beginning with registration at 10 am. The purpose of this seminar is to offer a new Mass setting which might interest you and provide some general music, with an emphasis this year on Responsorial Psalms. An additional theme of the Seminar this year, is Music for Weddings and Funerals. We will introduce and reintroduce appropriate music for these important liturgical occasions in the liturgical life of every parish. Whilst this is a specific topic, sometimes outside of the remit of parish choirs, all the music we will be offering will be suitable foruseon Sundays and other occasions throughout the year. • The Seminar is open to Choir Directors, all Choir Members, Organists and Church Musicians. • We also welcome all who sing or play an instrument at weddings and funerals butwhomaynotbe directly associated with music ministry on a regular basis. A new directory for music appropriate foruseat weddings and funerals will be launched by Bishop Niall Coll at the Seminar. It will provide suggestions for music for weddings and funerals as well as giving musicians and singers references for listening to and obtaining music. • We would ask all Choir Members, if interested in attending this Seminar, to please give your name, to your Choir Director. • For individuals, who provide music on other occasions, we ask that you</p>
+<h3 class="b-head">contact</h3>
+<hr>
+<p class="page-label">Page 5</p>
+<p>DOES YOUR CHILD NEED A SCHOOL BUS? A meeting will take place this evening, Sunday 13th September at 7 pm in Meeting Room 2, Community Centre, Pearse Road, Letterkenny. All Parents affected are invited to come along. CATHEDRAL CLEANING will take place on Tuesday 15th September from 4 pm. We encourage as many as possible to come along and lend a hand! The NSCare hosting a HEALING SERVICE from 7 pm to 8 pm on Tuesday 15th September, which can be viewed on: <a href="https://www.churchservices.tv/" target="_blank" rel="noopener noreferrer">https://www.churchservices.tv/</a> ballyfermot and also on Radio Maria. Ledby Fr. Pat Collins C. M. Prayer Petitions by email to: info. <a href="mailto:newspringtime@gmail.com" target="_blank" rel="noopener noreferrer">newspringtime@gmail.com</a> WE INVITE YOU TO COME &amp; SEE what the Encounter School of Ministry Course is all about . Join us on Thursday 17th September from 6.30pm (first half hour is prayer and worship) to 9.00pm at All Saints Church, Newtowncunningham. Participants can attend up to 3 classes without committing to payforthe course. If a participant decides to enrol before the application deadline of October 1st, tuition fees will then be applied. If a participant decides not to continue, there is no obligation. More information or register here: <a href="https://encounterschool.org/" target="_blank" rel="noopener noreferrer">https://encounterschool.org/</a> donegal/ or email <a href="mailto:donegal@encounterschool.org" target="_blank" rel="noopener noreferrer">donegal@encounterschool.org</a>. BAKE SALE in aid of Little Blue Heroes will take place on Saturday 19th September from 12 pm - 4 pm in Foróige, Spencer House, High Road, Letterkenny. Some of our amazing young people from Foróige will be baking homemade treats for this event. Your support would be appreciated. For more information or to donate baked goods, please email: sinead. <a href="mailto:mccormack@foroige.ie" target="_blank" rel="noopener noreferrer">mccormack@foroige.ie</a> A TRIDUUM in preparation for the FEAST OF ST. PADRE PIO will take place at the Franciscan Friary, Rossnowlagh from Sunday 20th September until Wednesday 23rd Wednesday . There will be Mass, Homily and Blessing with his Mitten at 7.30 pm each evening. Preacher will be Fr. Pius McLaughlin, OFM who met St. Padre Pio. Allare very welcome for these prayerful celebrations. HUMAN LIFE INTERNATIONAL IRELAND: Presents Fr. Lawrence Carney (USA), international speaker and author of “The Secret of the Holy Face ”, will be visiting Ireland in September. He will speak at the Blessed Sacrament Chapel, Knock on Friday 25th September at 6.45 pmandatthe Canal Court Hotel, Newry, on Tuesday 29th September at 6.45 pm. They will have a First Class Relic of St Thérèse for veneration. Free admission. Donations welcome. For further details, please visit: <a href="https://www.humanlife.ie" target="_blank" rel="noopener noreferrer">www.humanlife.ie</a> or phone <a href="tel:+353949375993" style="color:#1d4ed8;font-weight:600;">0949375993</a>. A CHURCH GATE COLLECTION will take place forthe RE- DEVELOPMENT OF ARDS FRIARY next weekend, 26th and 27th September . Your support would be greatly appreciated. Elusive Theatre will be hosting a ‘LIVING HISTORY PERFORMANCE’ about the building of St. Eunan's Cathedral based on a script from Kieran Kelly on Culture Night, Friday 18th September at 6.15 pm and 7.30 pm. Allare welcome. The CONWAL SINGERS will perform in St. Eunan ’s Cathedral on Friday 18th September (Culture Night) at 8 pm. Sunday 13th September ~ Twenty Fourth Sunday in Ordinary Masses: 8 am, 10 am, 12 noon and 6 pm Baptisms: 2.30 pm Monday 14th September ~ The Exaltation of the Holy Cross 8 am Mass ~ Special Intention 10 am Mass ~ Special Intention Tuesday 15th September ~ Our Lady of Sorrows 8 am Mass ~ Special Intention 10 am Mass ~ Priest ’s Intention Holy Face Prayer Group after 10 am Mass and Rosary Legion of Mary Meeting ~ 10.30 aminthe Pastoral Centre Wednesday 16th September ~ Ss. Cornelius and Cyprian 8 am Mass ~ Dariusz Kos RIP 10 am Mass ~ Peter Browne RIP 7.30 pm ~ Confessions Thursday 17th September ~ St. Robert Bellarmine 8 am Mass ~ Mick Gallagher RIP 10 am Mass ~ Priest ’s Intention 8 pm ~ Charismatic Prayer Group in the Conference Room Friday 18th September 8 am Mass ~ Living Members of the Raphoe Diocesan Society 10 am Mass ~ Hugo McNulty RIP 7 pm Mass ~ Michael Sweeney (Month ’s Mind Mass) , Agnes Geary, Art McLoone, Anne McLoone, William Devenney, James McTaggart, Edward McCauley, Carmel McCallion, Joseph Ward, Katie Ward, Maud Gormley and Colman Barrett RIP Saturday 19th September ~ St. Januarius, bishop and martyr 10 am Mass ~ Special Intention Nuptial ~ 1 pm Confessions: 12 noon - 1 pm and 7 pm Baptisms: 4 pm Vigil Mass ~ 6 pm Sunday 20th September ~ Twenty Fifth Sunday in Ordinary Time Masses: 8 am, 10 am, 12 noon and 6 pm Baptisms: 2.30 pm MASS FOR THE FEAST OF ST. EUNAN will be celebrated in St. Eunan ’s Terrace (off Convent Road) on Wednesday 23rd September at 7 pm .</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-drumholm-ballintra" data-parish-name="Drumholm (Ballintra)"><h2 class="ocr-parish-name">Drumholm (Ballintra)</h2><p class="ocr-parish-date">26/09/2026</p></header>
+<p class="page-label">Page 6</p>
+<p>24th SUNDAY In Ordinary Time. Ordinary Time. ST BRIDGET’S CHURCH Drumholm Parish, Ballintra. Fr Adrian Gavigan. <a href="tel:+353749734642" style="color:#1d4ed8;font-weight:600;">074 97 34642</a> or <a href="tel:+353876984508" style="color:#1d4ed8;font-weight:600;">087 6984508</a> EMAIL: <a href="mailto:drumholmparish@gmail.com" target="_blank" rel="noopener noreferrer">drumholmparish@gmail.com</a> FACEBOOK; DRUMHOLM RC PARISH. ST VINCENT DE PAUL ; <a href="tel:+353873433409" style="color:#1d4ed8;font-weight:600;">087 3433409</a> PARISH C OLLECTIONS A big thank you to everyone who continues to support the parish. Contributions can be made in the normal way or they can be made electronically: Bank: Bank Ireland, Donegal. Acc name: Drumholm RC Parish; Account No: 27936239; IBAN: IE50BOFI90483527936239. BIC: BOFII E2D If electronic payments please include your name and the envelope number. Collection - €1,055.00 WE PRAY FOR OUR DEAD, We Pray for MARY SWEENEY-Month’s Mind &amp; forallour Dead and for KATHLEEN DOHERTY-1st Anniv and for all those whose anniversaries occurs around this time REST IN PEACE. REST IN PEACE. 10.00am MONDAY 14TH SEPT. 10.00am TUESDAY 15TH SEPT. THURSDAY 17TH SEPT. 10.00am FRIDAY 18TH SEPT . 11.00am SUNDAY 20TH SEPT. 06.30pm SATURDAY 12TH SEPT. MARY SWEENEY-Month’s Mind. PATSY McGOLDRICK 06.30pm SATURDAY 19TH SEPT. 10.00am WEDNESDAY 16TH SEPT. KATHLEEN DOHERTY-1st Anniv. &amp; BABY LAURYN. ISOBEL CAIN. ELIZABETH TIMONEY . MASS &amp; ADORATION. MASS PRAYER Suitable for 24th SUNDAY in Ordinary Time. for 24th SUNDAY in Ordinary Time. "Look upon us, O God, Creator and ruler of all things, and, that we may feel the working of your mercy, grant that we may serve you with all our heart. Through our Lord Jesus Christ, your Son, who lives and reigns with youinthe unity of the Holy Spirit, God, for ever and ever. Amen ." MASS NO MASS REV FR PATRICK FELL &amp; DECEASED MEMBERS OF THE FELL FAMILY . MARY QUINN-Month’s Mind 11.00am. SUNDAY 13TH SEPT. MASS INTENTIONS; MASS INTENTIONS; From now on only three Anniversary Masses will be offered on Saturday &amp; Sunday Masses . Please book your Masses early. CLG NAOMH BRÍD WEEKLY NEWS. CLG NAOMH BRÍD WEEKLY NEWS. LOTTO RESULTS. LOTTO RESULTS. JACKPOT WINNER. JACKPOT WINNER. A huge congratulations to Jennifer McClay , who scooped our €6,850 Club Lotto Jackpot!. Winning numbers: 6, 16, 22, 23, 24, Well done Jennifer, thank you to everyone for continued support of CLG Naomh Bríd. QUEEN’S CATHOLIC CHAP LAINCY (Welcome Pack Attached) The Catholic Chaplaincy at Queen’s reopens forthenew academic year on Monday 14 September, with weekday Masses and our semester programme resuming. Our first Sunday Mass is 20 September atthenew, earlier time of 7.00pm. Please note the new time! New or returning student? Find out about what’s on, ways to connect andgeti nvolved, and student accommodation at Ryan Hall at qubcatholic. organdonour socials. Staff and alumni are always welcome too. Visit our newly renewed Chaplaincy at 28 Elmwood Avenue for Mass, Confessions or candlelighting — and call into Mosaic for some of the best coffee, hot lunches and home-baked treats in South Belfast! SEE POSTER INADDSEE POSTER IN ADDITIONAL NEWS. ITIONAL NEWS. KATHLEEN MONAGHAN. JOE COX. KATHLEEN &amp; PACKIE McGLINCHEY . THOMAS PATTON. CHURCH GATE COLLECTION for the Re-Development of Ards Friary will take place Sat 26th- Sun 27th Sept . Your support would be greatly appreciated. ABIDE WOMEN’S CONFERENCE , November 20-22, the Great Northern Hotel Bundoran, Co. Donegal. Speakers incl ude: Sarah Swafford, Fr Barry Braum, Fr Mark Wharton, Kimberlee Woo Ling, D anielle Noonan, Nashville Domincans &amp; more, Mass will be celebrated by Bishop Fintan Gavin, from Cork &amp; Ross Diocese. We would love to welcome you this weekend. For more details please visit Abide in His Love at eventbrite.ie Registration link: <a href="https://abideinhislove" target="_blank" rel="noopener noreferrer">https://abideinhislove</a>. eventbrite.com NEW Altar servers. NEW Altar servers. Any Boyor Girl from 3rd Class up who would like to become an Alterserver, Please contact Fr Adrian for an enrolment form A MARRIAGE ENRICHMENT WEEKEND. A Weekend Like No Other Take time out for just thetwoofyou. Whether newly married o r many years together, rediscover the love that brought you together. Friday 2nd – Sund ay 4th October 2026, Focolare Centre, Prosperous, Co. Kildare, Places limited – book now! Apply online: <a href="https://www.marriageencounter.ie" target="_blank" rel="noopener noreferrer">www.marriageencounter.ie</a> · <a href="tel:+353876299153" style="color:#1d4ed8;font-weight:600;">087 629 9153</a> WE INVITE YOU TO COME &amp; SEE, WE INVITE YOU TO COME &amp; SEE, what the Encounter School of Ministry Course is all about. Join us on Thursday 17th September from 6.30pm (first half hour is prayer and worship) to 9.00pm at All Saints Church , Newtowncunningham. Participants can attend up to 3 classes without committing topayforthe course. If a participant decides to enrol before the application deadline of October 1st, tuition fees will then be applied. If a participant decides not to continue , there is no obligation. More information or register here: <a href="https://encounterschool.org/donegal/" target="_blank" rel="noopener noreferrer">https://encounterschool.org/donegal/</a> or email <a href="mailto:donegal@encounterschool.org" target="_blank" rel="noopener noreferrer">donegal@encounterschool.org</a>. BALLINTRA--LAGH EY, FOROIGE CLUB LAGH EY, FOROIGE CLUB . . REGISTRATION NIGHT. REGISTRATION NIGHT. 2026-2027, St Bridget’s Community Centre, F94X7TD, 18th Sept 7.00-8.00pm JOIN, EXPLORE, LEARN, BELONG-Contact SUSAN <a href="tel:+353860484482" style="color:#1d4ed8;font-weight:600;">086-0484482</a>. SEE POSTER IN ADDITI SEE POSTER IN ADDITIONAL NEWS. ONAL NEWS. Drumholm (Ballintra) <a href="https://www.parishpress.net/wp-content/uploads/parish-bulletins/donegal/raphoe/drumholm-parish/bulletin" target="_blank" rel="noopener noreferrer">https://www.parishpress.net/wp-content/uploads/parish-bulletins/donegal/raphoe/drumholm-parish/bulletin</a>. pdf?t=1782303743</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-dunfanaghy" data-parish-name="Dunfanaghy"><h2 class="ocr-parish-name">Dunfanaghy</h2><p class="ocr-parish-date">26/09/2026</p></header>
+<p class="page-label">Page 7</p>
+<p>It Isour privilege and OUPae Ventére (0 GIscover IESSSourown special light. The Candle of Remembrance STSSisa SS0a— — Mary Dunbar for the coming week will beorfi »\ lit in loving memory of Ar. uii, i Holy Cross Church, Dunfanaghy ) i ~ yal Fr. Martin Doohan Parish Priest. Margaret, Patrick, Patsy &amp; &amp; a. 3 Clondahorkey. (Dunfanaghy &amp; Creeslough). Charlie McConnell j f 4 aya Tel: <a href="tel:+353749136163" style="color:#1d4ed8;font-weight:600;">074-91-36163</a> Mobile: <a href="tel:+353876132132" style="color:#1d4ed8;font-weight:600;">087-6132132</a> Killygordan ‘dla |‘ Fr. John Joe Duffy C. C. Creeslough id &amp; saiw Tel: <a href="tel:+353749138011" style="color:#1d4ed8;font-weight:600;">074-91-38011</a> Mobile: <a href="tel:+353873143532" style="color:#1d4ed8;font-weight:600;">087-3143532</a> u ! I |. 23"d Sunday in Ordinary Time — 6'" September 2026 . Mi! . Masses for the Coming Week i “ | eg EWMon - No Mass ) "&amp; 3 . _ Tue 7pm A Special Intention we, ipé “ Wed 9.30am Mass of St. Peregrine p E - ' ha Thur @ 10.00am®@ Opening Mass for The School Year (Murroe N. S.)ee ‘ on LSta Fri 9.30am —The Holy Souls AYN “ae | Sat 6.00pm Mary McAuliffe, Kill j IN ) mm ! Sun 10.00am Patrick Murphy, Belmullet | CANDOau | , ha ac) 1130am Grace Everitt, Corcreggan/London Veer INHIMSS ~~ ais Ja S Please Note change in Thursday Morning’s Mass at10am \\ w E 77 Prayers for our Dead NE Só Mary McAuliffe, Kill; Patrick Murphy, Belmullet; Grace Everitt, Corcreggan/London; Margaret, Patrick, Patsy &amp; Charlie McConnell, Killygordan; Martina Rafferty, (nee McGee), Newtown, Falcarragh; John Stewart, Rinclevin. John Parry, Hornhead. Agnes Carrol, Cresslough Eucharistic Adoration Each Tuesday in Our Lady’s Oratory from 7.30pm — 8.45pm. Concludes with Rosary at 8.30pm. All welcome. ched dy % 4 joy 1 Confession .- be en iched oyche(ord 8 i | ‘KK | Confessions each Saturday from 5pm — 5.45pm and before and after each Mass upon request. | 25 ie. | Collection Ta Last weeks” Offertory Collection came to €1107. Thank you for your gift to God and His Church. In the film adapti fthe N Anxiely n the film adaption of the Narnia: The Lion, the Witch and the Wardrobe from i novels of CS Lewis, one of most insightful and thought provoking scenes fordaat Erinn óliliill least, is when Aslan, the lion speaks to Edmund, oneofthe children about his Doéiint : transgression. Edmund has betrayed his family by following a wicked witch. When Phil acgat he does come back to his family, we see Aslan, the majestic guardian of Narnia speak Prayers of the Angel to Edmund but ata distance. Wedonot know what is being said, the matter is being “My God, Ibelá dealt with guietly as it should be, minimising the embarrassment of the offender, héag You! me : &gt; ~~ 1 hope: andwhoin this case is very much aware of his transgression and shame. i peruonsot You forall Ralg those whodonot believe, do not adore, The Gospel today puts the responsibility on the offended party, onus, togo speak de not hope anddonot love You!” to those who have wronged us, to speak to them quietly, to point out how they have sinned against us, to offer them forgiveness and hence to put them back on the path “Most Holy Trinity; Father, Son, andto God. Before we decide to do this we must be clear in our intentions and be sure —— Holy Spirit, I adore You profoundly, and of whose needs we are filling — it cannot be our goal to cause embarrassment or to offer You the most precious Body, seek revenge. God calls ustoputour needs to one side in this case and to seek Paid ighcmai redemption for our brother who has turned himself away from God’s grace. | el iú reparation eee Jesus provides steps for doing this. After quietly speaking to your brother, if he will | sacrileges and indifferences with which not listen bring witnesses who may convince him. This reminds us that ifweare He Himself is offended. And, through unsuccessful in our attempts we should not give up. Ifwe have been unsuccessful in the infinite merits of His most Sacred our attempts are there others who can help — again being mindful of whose needs Heart, and the Immaculate Heart of need to be filled. Matthew closes this passage reassuringly telling us forgiveness | Mais "begof Youthe conversion belongs to that person where it has been agreed upon by others. of poor sinners.” For where two or three are gathered i Iam there among them. Matt Noo. ~~ Be Nourished oy the Cucharist bai</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-falcarragh" data-parish-name="Falcarragh"><h2 class="ocr-parish-name">Falcarragh</h2><p class="ocr-parish-date">26/09/2026</p></header>
+<p class="page-label">Page 8</p>
+<p><a href="https://www.naomhfionan.com" target="_blank" rel="noopener noreferrer">www.naomhfionan.com</a> I Church Webcam: <a href="https://www.mcn" target="_blank" rel="noopener noreferrer">www.mcn</a>. live I Facebook: @falcarraghparish Fr. John Boyce P. P. Parochial House, Falcarragh, Co. Donegal. F92 N6Y9. <a href="tel:+353749135196" style="color:#1d4ed8;font-weight:600;">074 91 35196</a> I <a href="mailto:fionannewsletter@gmail.com" target="_blank" rel="noopener noreferrer">fionannewsletter@gmail.com</a> Please scan the QR code below to donate to either Falcarragh Church or Graveyard Collection Church Collection Graveyard Collection</p>
+<h3 class="b-head">Mass Times and Intentions for the Week</h3>
+<p>Saturday 12th 7:00pm Mass Sunday 13th 9:00am Aifreann don Phobal 10:30am Paula Grady Anniversary Monday 14th 9:30am Private Intention Tuesday 15th 9:30am Anne Marie McIvor RIP Wednesday 16th 9:30am Private Intention Thursday 17th 9:30am Private Intention Friday 18th 7:00pm Private Intention Saturday 19th 11:00am Latin Mass 7:00pm Danny McFadden Anniversary Michael Tam McFadden Anniversary Sunday 20th 9:00am Aifreann don Phobal 10:30am Eugene McGee Anniversary Confessions 6:15pm— 6:45pm Saturdays Eucharistic Adoration Wednesday: Holy Hour: 9 - 10 pm Thursday: 10:00am – 9:00pm. Thursday adoration includes the Divine Mercy @ 5:30pm and concludes with Rosary @ 8:30pm All Masses are available live on: <a href="https://www.naomhfionan.com" target="_blank" rel="noopener noreferrer">www.naomhfionan.com</a> &amp; Parish Radio @ 106.5 FM Reflection Forgiveness does not come easy to us because wearenot like our compassionate and loving Father, ‘slow to anger and rich in mercy ’. Even in small things we find it difficult to forgive. We can bear grudges for years against those we consider to have wronged us, to have let us down, or to have treated us unfairly. This can apply to family members, neigh bours, friends and colleagues at work or in school. We often nurture bad feelings towards them. We avoid people with whom we have clashed or argued. We forget – or overlook the fact – that God continues to forgive us over and over again. Why does Jesus insist so much on forgiveness? It is because without forgiveness love cannot flourish and peace cannot exist between people. When we refuse to forgive what happens? We simply close the doors of our hearts to love. Nursing anger and resentment is the surest way to keep love out. The elder brother in the parable of the Prodigal Sonisa striking example of this. He is someone who cannot f orgive because he has closed his heart to his younger brother and even to his Father. He never knew how much the father loved him too. Itisin forgiving that we are most like God, our Father, and Christ, his Son. Itisin forgiving that we bring healing to ourselves and to others, that we restore broken relationships and release the seeds ofloveinour communities. Itisin forgiving that we extend the reign of God’s love on earth.</p>
+<h3 class="b-head">Cuimhneacháin Báis</h3>
+<p>Anne Marie McIvor nee Gallagher, Falcarragh and Philadelphia.</p>
+<h3 class="b-head">Anniversaries</h3>
+<hr>
+<p class="page-label">Page 9</p>
+<p>Freagra an t Sailm: Is grámhar trócaireach é an Tiarna, foighdeach agus lán de cheansacht. HOW TO REPORT CLERICAL ABUSE If you have a concern, or complaint of child abuse, either current or historical, please contact: Designated Liaison Person, Margaret Northage on: <a href="tel:+353862183011" style="color:#1d4ed8;font-weight:600;">086 2183 011</a> or by email: <a href="mailto:safeguarding@raphoediocese.ie" target="_blank" rel="noopener noreferrer">safeguarding@raphoediocese.ie</a>. You are advised also to contact statutory authorities: Tusla (Child &amp; Family Agency) - Tel: <a href="tel:+353749102233" style="color:#1d4ed8;font-weight:600;">074 9102233</a> Gardaí National Protective Services Bureau - Tel: 01 6663430/6663435 or email: <a href="mailto:GNPSB_SCMU@garda.ie" target="_blank" rel="noopener noreferrer">GNPSB_SCMU@garda.ie</a>. Free Counselling &amp; Support is available through Towards Healing: Freephone - Ro I: 1800 303416 Freephone - N. Ireland &amp; UK: 0800 0963315 Freephone - Hearing Impaired: <a href="tel:+353858022859" style="color:#1d4ed8;font-weight:600;">085 8022859</a> Ways to donate to parish funds Youcannow make a donation to the Parish online by scanning the QR codes on the front of this newsletter, with your mobile phone camera. One QR code isforthe Sunday Collection andone QR code isforthe Graveyard Collection. You can also make donations by going to the parish website and clicking on the DONATE button. All donations are gratef ully accepted. Church Gate Collection A Church Gate Collection next weekend 19th and 20th September will be for PCC students togoon Lourdes Pilgrimage as a volunteer with Raphoe Diocese in May 2027. Any contribution would be greatly appreciated. Church Gate Collection A Church Gate Collection for the Re-Development of Ards Friary will take place on Saturday 26th and Sunday 27th September. Your support would be greatly appreciated. Celebration Mass Donegal Group 173 Rise and Shine Trust (formerly The Irish Handicapped Children's Pilgrimage Trust and The Irish Pilgrimage Trust) are celebrating forty years of taking young people with special needs to Lourdes each Easter. We are celebrating with a special Mass on Saturday 26th September in the Church of the Irish Martyrs, Letterkenny at 12 noon. The Mass will be concelebrated by Bishop Niall Coll and Bishop Donal McKeowan, Bishop of Derry and many of the priests who travelled to Lourdes with us over t he years. We invite all the guests and their families and all the helpers who travelled with us over the years to our Mass to celebrate the work ofthe Donegal Group over these forty years. Lough Derg One Day Retreats – Guided Days of Prayer and Reflection - places available September 5th, 6th, 9th, 12th, 15th, 19th and 20th. A dmission €50. Marys Meals If you have any old notes or coins that you wish to donate to Marys Me als they can be dropped offat The Cope, Falcarragh, on Friday 25th September, between 9.30am - 5.30pm. Otherwise collection can be arranged by contacting Eilis Conneely on <a href="tel:+353877060457" style="color:#1d4ed8;font-weight:600;">087 7060457</a>. Dioplóma sa Ghaeilge Beidh "An Dioplóma sa Ghaeilge / B2" ag toiseacht i g Cloich Cheann Fhaola anmhíseo. Seo cúrsa dhá bhliaind'Acadamh na h Ollscolaíochta, Ollscoil na hÉireann Gaillimh do dhaoine fásta. Is cúrsaí páirtaimseartha é, tráthnóna amháin sa tseachtain. Reáchtáladh an cúrsa seo deich mbliana ó shin i g Cloich Cheann Fhaola. Tá roinnt spásanna fágtha. Tá fearadh na fáilte roimh mhuintir na Gaeltachta iarratas a dhéanamh a bheith páirteach agus tá lascaine speisialta ann do dhaoine a chláraíonn don chúrsa a bheas sa Ghaeltacht. Tá an cúrsa céanna ar fáil anmhíseosan ATUi Leitir Ceanainn. Déan teagmháil le Caitlín Ní Bhroin, teagascóir an dá chúrsa <a href="mailto:cnibhroin39@gmail.com" target="_blank" rel="noopener noreferrer">cnibhroin39@gmail.com</a> <a href="tel:+353870517597" style="color:#1d4ed8;font-weight:600;">0870517597</a>. Ri-Oga Dance Academy Irish Dance Classes with Maureen on Mondays and Wednesdays in Aras Begley Hall. Introduce your child to the joy of dancing while also developing confidence, coordination and social skills. Alison Quigley Irish Dance Classes on Thursdays at 4.30pm in Aras Begley. Classes for all levels, new pupils welcome. For further info contact Alison on <a href="tel:+3538621535003" style="color:#1d4ed8;font-weight:600;">086 21535003</a>. Food Bank Appeal The Food Bank is in dire straits at the moment, very low on supplies, so non perishable goods are very urgently required. Food bins have been left in the 4 porches for any goods donated. If anyone needs help please cont act us on <a href="tel:+353857560177" style="color:#1d4ed8;font-weight:600;">085 7560177</a> or call on Thursday mornings between 10am and 12pm. Ionad Naomh Fionnán Congratulations to Margaret McCullough, this week ’s winner of 50/50 Draw. Hip Hop Dance Class Tuesdays at 5p. m. Over 35’s Astro every Tuesday night at 8pm. New members welcome. Gymnastics Classes Wednesdays from 4-5p. m. and 5-6p. m. Bookings can be made online or at <a href="tel:+353877063018" style="color:#1d4ed8;font-weight:600;">087-7063018</a> or by email at <a href="mailto:ionadnf@gmail.com" target="_blank" rel="noopener noreferrer">ionadnf@gmail.com</a> Interested in joining Ladies Astro? Come along Wednesdays at 7p. m. Pilates Wednesdays at 7:30p. m. The first block of Pilates class has started, if you'd like to join inyoucan speak directly with Victoria by contacting <a href="tel:+353873297169" style="color:#1d4ed8;font-weight:600;">087 3297169</a> Suitable for all levels and abilities. Children's Yoga Thursdays from 6p. m. Ballet class Fridays, beginning Friday 11th September. 3:15p. m - 4p. m. Babies &amp; Pre-Primary Ballet. 4p. m. - 4:45p. m. Primary Ballet. 4:45p. m. - 5:30p. m. Primary Ballet. 5:30p. m. - 6:15p. m. - Grade 2 Ballet. Modern Dance Class from 6:15p. m - 7p. m. For enquiries or bookings contact Deirdre at <a href="tel:+353872632486" style="color:#1d4ed8;font-weight:600;">087 263 2486</a> Cloughaneely Bowls Club every Saturday at 8p. m. If there are any classes you'd like us to hold at Ionad Naomh Fionnán o ver the Autumn/Winter months, please get in touch on our social media or drop an email to <a href="mailto:ionadnf@gmail.com" target="_blank" rel="noopener noreferrer">ionadnf@gmail.com</a> Cloughaneely Junior Band Lotto Results 3rd September Uimhreacha na seachtaine: 8-12-13-15-16-18 Match 5 winner: Shaun Sharkey €100. Jackpot €3,700. AGM Our AGM will be held on Saturday 10th October at 8pm in Ionad Naomh Fionnán. Everyone Welcome. Music Lessons begin on Tuesday 15th September. Registration €20, €5 per class. Contact Laura on <a href="tel:+353863517202" style="color:#1d4ed8;font-weight:600;">0863517202</a> for details . Pobail Le Chéile CDP Growing together at OURganic Gardens Gortahork-Over 60s-come grow with us! Fully funded 4 session Bi-weekly Intergenerational Project. Discover traditional and contemporary gardening techniques. Share, learn, grow and connect. Contact Anne at DLDC on <a href="tel:+353861938960" style="color:#1d4ed8;font-weight:600;">086 193 8960</a>. Balance Healthy &amp; affordable Cookery course. Free six-week course at Ionad Garradh Cholmcille. Learn low-cost recipes ideas, smart meal planning and Food Labels. Contact Laura at DLDC on <a href="tel:+353868339548" style="color:#1d4ed8;font-weight:600;">086 833 9548</a> Fáilte Isteach English Conversation group: The group meets at Ionad Garradh Cholmcille on Monday from 11am-12pm. Beginners welcome. Páistí Le Chéile: The Parent and Toddler Group meets at Ionad Garradh Cholm Cille every Thursday from 12.30pm-1.30pm. A fun, friendly space for little ones to play and parents to connect. Please note new start time. Breast Cancer Awareness Month 2026 takes place Thursday, Oct 1st, 2026 – Saturday, Oct 31st, 2026. For more information, please visit breastcancerresearch. ieorwww. breastcancerireland.com. International Coffee Day 2026 takes place on Thursday, October 1st, 2026 . Please see <a href="https://www.internationalcoffeeday.org" target="_blank" rel="noopener noreferrer">www.internationalcoffeeday.org</a> for further details. Fógra í St. Vincent de Paul: Local number: <a href="tel:+353871443464" style="color:#1d4ed8;font-weight:600;">087 1443464</a> Cloughaneely Food Bank: <a href="tel:+353857560177" style="color:#1d4ed8;font-weight:600;">085 7560177</a> MABS Gweedore: 0818 072650</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-gartan-termon-kilmacrenan" data-parish-name="Gartan/Termon (Kilmacrenan)"><h2 class="ocr-parish-name">Gartan/Termon (Kilmacrenan)</h2><p class="ocr-parish-date">26/09/2026</p></header>
+<p class="page-label">Page 10</p>
+<p>NEWSLETTER</p>
+<h3 class="b-head">Mass Times in St Columba ’s Church, Kilmacrenan</h3>
+<p>Date Time Intention Saturday 5th September 6:00pm Neil McDaid 1st Anniversary Mass Matthew &amp; Annie McGettigan, The Glebe, Anniversary Mass Sunday 6th September 11:00am Sunday Mass – Priest ’s Intention Monday 7th September 9:30am Priest ’s Intention Tuesday 8th September 9:30am Priest ’s Intention Thursday 10th September 9:30am Priest ’s Intention Saturday 12th September 6:00pm James Russell, Kilmacrenan, Anniversary Mass Patsy McFadden, Sawmills, Anniversary Mass Margaret McGettigan, The Glebe, Anniversary Mass Sunday 13th September 11:00am Gerald McGeever, Garyharry, Anniversary Mass</p>
+<h3 class="b-head">Mass Times in St Brigid ’s Church, Golan</h3>
+<p>Sunday 6th September 9:30am Sunday Mass – Priest ’s Intention Sunday 13th September 9:30am Sunday Mass – Priest ’s Intention</p>
+<h3 class="b-head">Mass Times in St Columba ’s Church, Termon</h3>
+<p>Saturday 5th September 6:30pm Annabella McGettigan Anniversary Mass Sunday 6th September 9:00am Pro Populo Wednesday 9th September 9:30am Priest ’s Intention Friday 11th September 9:30am Priest ’s Intention Saturday 12th September 6:30pm Freddie &amp; Mary Gallagher Birmingham, Anniversary Mass Lenord Crumlish Anniversary Mass Patrick Duffy Anniversary Mass Nora Ross, Nee Hilferty, The Gap, Anniversary Mass Sunday 13th September 9:00am Pro Populo</p>
+<h3 class="b-head">Mass Times in St Colmcille ’s Church, Glendowan</h3>
+<p>Saturday 5th September 8:00pm Vigil Mass – Priest ’s Intention Sunday 6th September 10:30am Sunday Mass – Priest ’s Intention Thursday 10th September 7:00pm Priest ’s Intention Friday 11th September 7:00pm Priest ’s Intention Saturday 12th September 8:00pm Vigil Mass – Priest ’s Intention Sunday 13th September 10:30am Sunday Mass – Priest ’s Intention St Columba ’s Church, Kilmacrenan St Columba ’s Church, Termon St Colmcille ’s Church, Glendowan The Church of The Immaculate Conception, Coole St Brigid ’s Church, Golan Fr. Michael McKeever, PP</p>
+<h3 class="b-head">Parochial House</h3>
+<p>, Church Hill <a href="tel:+353749137057" style="color:#1d4ed8;font-weight:600;">074 91 37057</a> / <a href="tel:+353872962886" style="color:#1d4ed8;font-weight:600;">087 2962886</a> Fr Martin Chambers, CC,</p>
+<h3 class="b-head">Parochial House</h3>
+<p>, Termon <a href="tel:+353749139016" style="color:#1d4ed8;font-weight:600;">074 91 39016</a> Email Addresses: <a href="mailto:gartantermon@raphoediocese.ie" target="_blank" rel="noopener noreferrer">gartantermon@raphoediocese.ie</a> <a href="mailto:kilmacrenan@raphoediocese.ie" target="_blank" rel="noopener noreferrer">kilmacrenan@raphoediocese.ie</a> Parish Website: <a href="https://www.gartantermonparish.ie" target="_blank" rel="noopener noreferrer">www.gartantermonparish.ie</a> <a href="https://www.kilmacrenanparish.ie" target="_blank" rel="noopener noreferrer">www.kilmacrenanparish.ie</a> Sunday 6th September 2026 Twenty Third Sunday in Ordinary Time Parish OfÏce in Termon Opened Monday &amp; Friday 10am – 1pm <a href="tel:+353749139016" style="color:#1d4ed8;font-weight:600;">074 9139016</a> Parish OfÏce in Kilmacrenan - <a href="tel:+353851987333" style="color:#1d4ed8;font-weight:600;">085 1987333</a> Email any notices to <a href="mailto:Kilmacrenan@raphoediocese.ie" target="_blank" rel="noopener noreferrer">Kilmacrenan@raphoediocese.ie</a> Weekly Collections: St Colmcille ’s Church Glendowan: €655 St Columba ’s Church Termon: €1,090 St Columba ’s Church Kilmacrenan: €1,020 Golan &amp; Coole: €490 Thank you for your generosity and support Please remember in your prayers:</p>
+<h3 class="b-head">Recently Deceased</h3>
+<p>Kathleen Martin, Fanad, whose Funeral Mass takes place in Fanavolty at 3pm on Sunday.</p>
+<h3 class="b-head">Anniversaries</h3>
+<p>Jeannie O ’ Donnell Extra Time Main Street, Kilmacrennan Open Weekly Tuesday-Thursday 10am to 1.30pm Saturday - 10:00am to 4:00pm Mass Cards Mass Bouquet Cards, Sympathy Mass Cards, Birthday Mass Bouquet cards are available from the sacristy ofanyofthe Churches and from the Parish OfÏce in Termon. Recommended Diocesan stipend is €10 per Mass, cards cost €1. The Sacrament of Confession is available before and after any of the Masses celebrated in both Parishes. Come to the Sacristy. Loreto Community School Milford Loreto Community School, formerly Loreto College, Milford, is delighted to announce an Afternoon of Celebration on Saturday, 26th September 2026, marking three very special milestones in our school ’s history: 60 years since the school first opened, 30 years since it became a Community School, and 20 years since we moved into our new school building. It promises tobea wonderful opportunity to celebrate our school ’s rich history, the many generations of students and staff who have been part of our journey, and the strong community links that endure. Please save the date – we look forward to celebrating with you! Marys Meals If you have any old notes or coins that you wish to donate to Marys Meals they can be dropped off at Boyce's Centra Shop, Dunfanaghy, on Friday 18th September, between 9.30am - 5.30pm. Otherwise collection can be arranged by contacting Eilis Conneely on <a href="tel:+353877060457" style="color:#1d4ed8;font-weight:600;">087 7060457</a>. The Irish Cancer Society is seeking compassionate volunteer drivers to join our pool of drivers. As a volunteer driver you would be bringing patients undergoing chemotherapy to the hospital and back home for their treatment. Gifting your time means that cancer patients will have comfortable (oneonone) transport to attend appointments for their lifesaving treatment. Ifyoucan spare 2 days per month, have a valid driving licence, and a safe, reliable vehicle, youarethe perfect candidate to make a significant difference. The Irish Cancer Society will provide you with training before you start as a driver for us. Your generosity not only eases the journey for many during a challenging time but also offers comfort and support when it's needed most. For more information and to become a volunteer driver, please contact Monica or Emily at <a href="mailto:volunteer@irishcancer.ie" target="_blank" rel="noopener noreferrer">volunteer@irishcancer.ie</a> Age Action Free Programme Need help with your mobile phone or digital device? Register for Age Action ’s free one-to-one digital skills tutoring. Letterkenny Central Library (Wednesday ’s 10.30am-12.30pm). To register call: <a href="tel:+35391527831" style="color:#1d4ed8;font-weight:600;">091-527831</a> or email: <a href="mailto:aaw@ageaction.ie" target="_blank" rel="noopener noreferrer">aaw@ageaction.ie</a> The Nativity of The Blessed Virgin Mary Tuesday 8th September Dearest Mother Mary, your conception was immaculate and your birth glorious. You were conceived without sin, born without sin, and remained sinless throughout your life. In Heaven, you radiate the beauty and splendor of God and will dosoforall eternity. Please pray for me, that I will more fully imitate your many virtues, so that Icanbea fitting instrument of your divine Son in the world. Mother Mary, pray for me. Jesus, I trust in You. Amen. Creeslough Community Employment Scheme has two places available in Kilmacrennan . To qualify you must be 18 Years + andbein receipt of Job Seekers allowance for a minimum of 12 months. Ifyouare interested in a position, please contact Seamus McBride on <a href="tel:+353868382203" style="color:#1d4ed8;font-weight:600;">0868382203</a> or at <a href="mailto:Seamus@creescom.com" target="_blank" rel="noopener noreferrer">Seamus@creescom.com</a> . Gartan/Termon (Kilmacrenan) <a href="https://drive" target="_blank" rel="noopener noreferrer">https://drive</a>. google.com/file/d/1Kn A8F6t54Nmbyeit UGgtf Wx N2Iq FMDOa/view</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-glenfin" data-parish-name="Glenfin"><h2 class="ocr-parish-name">Glenfin</h2><p class="ocr-parish-date">26/09/2026</p></header>
+<p class="page-label">Page 11</p>
+<p>Paróiste Chill Taobhóige Tithe Pobail Ghleann Fhinne agus Leitir Bric Twentieth Sunday of —Year A — 16th August 2026 Ant Ath Lorcán Ó Se arcaigh . S. P. Kiltyferrigal, Clog han, Lifford . eircode: F93 P2YA Fón: <a href="tel:+353749133007" style="color:#1d4ed8;font-weight:600;">074 9133007</a>; Fón Póca: <a href="tel:+353872836732" style="color:#1d4ed8;font-weight:600;">087 2836732</a>; ríomhphost: (email) <a href="mailto:9lorcan49@gmail.com" target="_blank" rel="noopener noreferrer">9lorcan49@gmail.com</a> Next Weekend Masses August Intentions of our Holy Father Pope Leo XIV Let us pray that in large cities, often marked by anonymity and loneliness, we find new ways to proclaim the Gospel, discovering creative paths to build community. Dé Sathairn— Saturday Glenfinn @ 6.00 p. m Dé Domhnaigh Sunday Leitir-Bric @9.45am Glenfinn @ 11.00am Confessions After Mass anydayandes- pecially after Mass on Satur- day after vigil Mass. Aifrinn na Seachtaine Masses this week Mass only on 17th Mon- day At 10 a. m. Adoration Will be on Friday night from 7 p. m. And finish- ing at 9 p. m. Please come along to the chapel at any time during those 2 hours and stay for as long or a short period as you wish . You can join in from home as well because the Blessed Sacrament can be viewed On live-streaming. Saturday August 15th 6 p. m. John &amp; Annie McGlynn</p>
+<h3 class="b-head">Anniversaries</h3>
+<p>Sunday August 16th 9.45 a. m. Anthony McGlynn 2nd Anniversary. 11 a. m. John Carlin, Ballincor 12th anniversary. Saturday 22nd August 6 p. m. John McGinty (John Dhónall Andy) 15th anniversary. Sunday 23rd 11 a. m. Maureen &amp; Jim Foy</p>
+<h3 class="b-head">Anniversaries</h3>
+<p>Thoughts on the Readings for the 19th Sunday August 16th 2026 Today in the Gospel, we have a continuation of last week’s story about the fee ding of thousands of people by Jesus in the desert. Immediately after the event, we are told that Jesus: …made the disciples get into a boat andgoon ahead totheother side, while he dismissed the crowds. Was there reluctance on their part togo?Cer- tainly there is the implication that the disciples were not too willi ng to leave the scene. They were en- joying the reflected glory of being part of Jesus’ ‘miracle’ and the enthusiasm ofthec rowds for Jesus, ‘their’ Jesus. They were basking in the reputation of being partners with Jesus. Yet, it won’t be very long before they will be hiding, even denying under oath, ever having had connection with him. Jesus himself, after having dismissed the crowds: …went up the mountain by himself to pray. In John’s ver- sion of this story he tells us that the people, after being fed by Jesus, actua lly wanted to make him their king. They, like the disciples, have totally missed the meaning of what has happened. Here indeed was a real source of temptation. Jesus could easily have convinced himself that here was a golden opportu- nity to get control of the crowds and ‘save’ them. They were so ready to follow him— it seemed. The world wasathis feet. There is an echo here ofoneofthe temptations in the desert afterhis baptism: … the devil took himtoa very high mountain and showed himallthe kingd omsofthe world and their glory, and he said tohim,“All these I will give you, ifyou will fal l down and worship me.” Are you feeling overwhelmed, have a query or simply want to discuss your caring role? Family Carers Ireland are running support clinics remotely every Tuesday for the month of August. These clinics offer you a space and time talk over the phone in the comfort of your own home. To Book Call/text <a href="tel:+353868363842" style="color:#1d4ed8;font-weight:600;">0868363842</a> or email Done- <a href="mailto:galcs@familycarers.ie" target="_blank" rel="noopener noreferrer">galcs@familycarers.ie</a> There will be a Mass for Expectant Families in the Cathedral, Letterkenny at 7 p. m. on Tuesday 8th September. Bishop Coll will be Celebrant. Heritage Week This very interesting topic on what is known as ‘A Ribbon Conspiracy in Cloghan’. Will be the subject of a talk on Local History this Sunday night, Sunday 16th at 7 .30 p. m. Inthe Day Centre. All Welcome. CLG GHLEANN FHINNE Lotto numbers for Tues- day 28th July were 7-6-2-3-5-8-1-4. Congratulations to Ryan Dorrian who wins €60. The jackpot next week is €10,000. Club App CLG Ghleann Fhinne is excited to an- nounce our new Club App is coming soon. The App will contain all our club news, weekly fixtures and updates, membership and much more. Further infor- mation to come in the coming weeks. Our annual Donegal Down Syndrome Asso- ciation Church Gate Collection is now only a few weeks away. The collection will take place outside church gates on Saturday 29th and Sunday 30th August 2026. Glenfin Area Council - Monthly Draw 2026/27 The Glenfin Area Council would like to express their sincere appreciation for your ongoing support of local initiatives. Your support is greatly valued. Proceeds from this year’s monthly draw will be dedicated to the development of I ndependent Living Accommodation for seniors adjacent to Ionad Pobail Gleann Fhinne. In the coming weeks, volunteers will be visiting homes to provide information and sell- ing lines inthenew Monthly Draw for 2026/27. The monthly prize fund totals €1,000, with a first prize of €500 and five additional prizes of €100 each. Additionally, there will be a special bonus draw in December, featuring ten €100 prizes. The Community Em- ployment Scheme is seeking a part-time Kitchen Assistant for the Cloghan Day Centre. The closing date for ap- plications is Wednesday 9th September 2026. Glenfin <a href="https://mcn" target="_blank" rel="noopener noreferrer">https://mcn</a>. live/Camera/our-lady-of-perpetual-succour-glenfinn</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-glenties" data-parish-name="Glenties"><h2 class="ocr-parish-name">Glenties</h2><p class="ocr-parish-date">26/09/2026</p></header>
+<p class="page-label">Page 12</p>
+<p>Email: <a href="mailto:parishofiniskeel@gmail.com" target="_blank" rel="noopener noreferrer">parishofiniskeel@gmail.com</a> Parish of Inisk eel/P aróiste Inís Caol Telephone: <a href="tel:+353749551117" style="color:#1d4ed8;font-weight:600;">074 9551117</a> Webpage: <a href="https://www.parishpress.net/parishofiniskeel" target="_blank" rel="noopener noreferrer">www.parishpress.net/parishofiniskeel</a> Fr Gerard Cunningham Facebook: Parish of Iniskeel Please note that Glenties and Fintown Church webcams are live at al l times. Recordings take place for all liturgies unless requested ot herwise. CCTV is operational in Glenties and Fintown chu rches. NOTICES FOR PARISH NEWSLETTER TO BE RECEIVED BY 5 PM ON THURSDAY BY EMAIL TO <a href="mailto:parishofiniskeel@gmail.com" target="_blank" rel="noopener noreferrer">parishofiniskeel@gmail.com</a> ORIN WRITING TO THE PAROCHIAL HOUSE. ITEMS FOR THE NEWSLETTER MAY BE EDITED OR OMITTED DEPENDING ON SPACE AVAIL ABLE. PLEASE KEEP NOTICES TO A MINIMUM. St Connell’s Church, Glenti es Webcam: <a href="https://www.churchservices.tv/glenties" target="_blank" rel="noopener noreferrer">www.churchservices.tv/glenties</a> Saturday 12th September NO VIGIL MASS IN GLENTIES Sunday 13th September 11:00am John &amp; Maura Gildea R. I. P. Stranaglough John McGeehan R. I. P. Derries Tuesday 15th September 7:30pm Patrick (30th Anniversary) &amp; Bridget Mary Duffy R. I. P. Derries &amp; Glasgow Wednesday 16th September 6:15pm 7:30pm Adoration (1 Hour) Thursday 17th September 9:30am Friday 18th September 7:30pm Nancy (1st Anniversary) , Martin &amp; Donal Gallagher R. I. P., Meenagrubby Saturday 19th September Margaret Mary &amp; Phonsie O’Donnell R. I. P., Ard Connell Sunday 20th September 11:00am Cormac Quinn R. I. P. Mully Teach Pobail an Teaghlaigh Nao fa, Éadan Fhionn Fraoich Sunday 13th September 9:30r. n. Bridget McDermott R. I. P. Edeninfagh Sunday 20th September 9:30r. n. Teach Pobail Cholmcille Na ofa, Baile na Finne Webcam: <a href="https://www.churchservices.tv/fintown" target="_blank" rel="noopener noreferrer">www.churchservices.tv/fintown</a> Saturday 12th September 7:30i. n. Monday 7-9i. n. Adhradh na Naomh Shracaminte Tuesday 15th September 6:00i. n. Saturday 19th September 7:30i. n. John McGinley R. I. P. Fintown &amp; Ballybofey 7th Anniversary Sunday Collection Glenties €1,980 Fintown €467 Edeninfagh € 300 Thank you Bingo every Tuesday night in the Market Hall. STARTING TIME OF 8.30PM. Snowball on 45 numbers or less, ifnotwon €200 will be paid out. We appreciate your support GLENTIES HORTICULTURAL SHOW 2026 Our Horticultural Show takes place on Sunday 13th September in The Market Hall, Glenties and there’s a category for everyone! Photography, Crafts, Flower Displays, Baking, Vegetables &amp; Farm Produce, Kids Art Showcase Awards for the best in each category! Entries: €2 per entry, Children’s entries are FREE Open for entries: Sunday 13th September | 9am –11am Judging: Sunday 11am –12pm Open to the public: Sunday 12pm –6pm Poultry and Carboot sale will be held in The Railway Inn’s car park , Fintown on Sunday 13th Sept 11am-3pm Entry Fee for Sellers is €10 Everyone is welcome Fireside Fleadh all types of music is being held in The Railway Inn, Fintown on Sunday 13th Sept 7pm. Everyone welcome Oiche Ceoil Tuesday 15th 8.30pm Musicians, dancers, singers and story tellers welcome. Donegal Dancers will also be attending on the night for a great display of Irish dancing Refreshments served on the night Pilates with Martina will starting back in the Fintown Parish hall on Friday 18th Sept 7pm. All levels welcome. Please contact Martina on <a href="tel:+353863846302" style="color:#1d4ed8;font-weight:600;">086 384 6302</a> to book your place Coiste Forbartha Éadan Fhionn Fraoich Social Dance in Edeninfagh Hall F94 HT 2X on Friday 18th September 2026 is cancelled due to unforeseen circumstances EDENINFAGH CHURCH / HALL FUNDRAISER Congratulations to Teresa Molloy, Fintown on winning €1, 110 in the August 50/50 draw. Thank youtoallwho contributed to the draw. Next draw takes place on Friday 25th September. Envelopes available in the three local churches and in local businesses or from any committee member. Entries also via Revolut: Frankie <a href="tel:+353879186261" style="color:#1d4ed8;font-weight:600;">087-9186261</a> (€10 per entry) Aged 65 or over? The free flu vaccine will be available in Glenties Primary Care Centre on Friday 25th September from 10am – 12:30pm for those aged 65 year or over ONLY. No appointment is necessary for this clinic however you must be registered with Dr Evelyn McManus or Dr Cooke to avail. Ifyouare registered with another GP Practice, please contact them directly. The Flu vaccine is available to all aged 65 and older. Ifyouare aged between 18-64yrs, please note that we will be running a separate clinic in the coming weeks foryouas stock of vaccines are made available to us. Those aged between 18-64 years are eligible for the free flu vaccine ifoneofthe following applies: You have a chronic heart condition, liver disease, chronic kidney disease, Diabetes, chronic respiratory disease including Asthma, COPD, Multiple Sclerosis, Down Syndrome or, ifyouarea carer to somebody with a condition listed above. Any queries, please ring <a href="tel:+353749551330" style="color:#1d4ed8;font-weight:600;">074 9551330</a>. Áras Sheáin Bháin Tá na ranganna seo leanas ag toiseacht in Áras Sheagháin Bháin (Leabharlann Bhaile na Finne ) gan mhoill. The following classes will be starting in Áras Sheaghain Bháin (Fintown Library ) Fidil / Fiddle Feadóg stáin /Tin whistle Giotár / Guitar Bunleibhéal agus Ardleibhéal (beginners and advanced) Damhsa Sean-nós / Sean-nós dancing Gaeilge / Irish - Bunleibhéal agus Ardleibhéal (beginners and advanced) Fáilte roimh achan nduine. Everyone Welcome Tuilleadh eolais / For more information <a href="tel:+353872431910" style="color:#1d4ed8;font-weight:600;">087 243 1910</a>. Le tacaíocht ó Phleanáil Teanga na Gaeltachta Láir. Ceardlann Chopair in Áras Sheáin Bháin, Baile na Finne F94 X77V le Niall Ó Fearraigh ar an Satharn 19ú Meán Fómhair 10.00r. n. - 2.00 i. n. Tuilleadh eolais ag <a href="tel:+353876365481" style="color:#1d4ed8;font-weight:600;">087 6365481</a>. Ta spásanna teoranta marsintásé riachtanachd'áit a chlarú riomh ré. Bí linn don lá chruthaitheach seo. Táan chúrsa seo le Cheardaíocht Chopair Dhún na n Gall arna pháirtchistiú ag Clár Tacaíochta do Oideachas Pobail de Bhord Oideachais agus Oiliúna Dhún na n Gall. There will be a clearance sale of gifts, bric-a-brac and lots more on Saturday, 10 October in St Mary’s Hall, Convoy from 11am to 3pm. All are welcome. All proceeds are to help Mary's Meals feed more children. Duetothe Harvest Fair Day falling on a Saturday this year, there will no Vigil Mass at 6pm on Saturday 12th September in St Connell’s Church, Glenties. For those wishing to avail of Vigil Mass, the Vigil Mass in Fintown, as usual, will take place at 7:30pm on that evening. A meeting of the Fintown Hall Committee will take place in Fintown Hall on Wednesday 16th September at 8:30pm. A good attendance would be appreciated. Note Re: Baptisms normally take place at 2pm on Saturday. In order to bring cohesion, should a family book a Baptism of their child on a Saturday in any particular Church then all subsequent Baptisms on that day will take place in the same Church. TO BOOK A BAPTISM PLEASE CONTACT THE PARISH OFFICE ON <a href="tel:+353749551117" style="color:#1d4ed8;font-weight:600;">074 9551117</a>. PLEASE NOTE THAT A COPY OF THE CHILD’S BIRTH CERTIFICATE IS REQUIRED TO ENSURE ACCURATE DETAILS. Important Dates for 2027 Confirmation • Saturday 13th March at 11am in St Connell’s Church, G lenties First Holy Communion • Saturday 24th April at 11am in St Connell’s Church, Glenties • Saturday 1st May at 11am in Teach Pobail Cholmcille Naofa, Baile na Finne Coiste Forbartha Éadan Fhionn Fraoich Jiving, waltzing and line - dancing classes in Edeninfagh Hall, Wednesday nights, beginning Wednesday, 9th September at 8.30 p. m. Niall Mor Community &amp; Enterprise Centre Killybegs <a href="tel:+353749741863" style="color:#1d4ed8;font-weight:600;">074 97 41863</a> <a href="mailto:info@niallmorcentre.com" target="_blank" rel="noopener noreferrer">info@niallmorcentre.com</a> Upcoming Courses in Sept/Oct: • Irish Language Classes • Adult Art Classes • Emergency First Aid Course • Driver CPC Module 1 Course • Heritage in the Hinterland Course • Beauty Therapy &amp; Skincare Course • Children's Halloween Camp Glenties <a href="https://drive" target="_blank" rel="noopener noreferrer">https://drive</a>. google.com/file/d/14a LAxt4mv7e YBv Yx2GGthps Qn Lrsysm K/view</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-gortahork" data-parish-name="Gortahork"><h2 class="ocr-parish-name">Gortahork</h2><p class="ocr-parish-date">26/09/2026</p></header>
+<p class="page-label">Page 13</p>
+<p>POBAL CHRÍOST RÍ GORT A’ CHOIRCE Ant Ath. Donnchadh Ó Baoill (086) 603 1749 / (074) 91 35214 <a href="mailto:tpcr1906@gmail.com" target="_blank" rel="noopener noreferrer">tpcr1906@gmail.com</a> 13ú Mean Fómhair 2026 <a href="https://www.pobalchriostri.ie" target="_blank" rel="noopener noreferrer">www.pobalchriostri.ie</a> / <a href="https://www.mcn" target="_blank" rel="noopener noreferrer">www.mcn</a>. live</p>
+<h3 class="b-head">AIFRINN NA SEACHTAINE</h3>
+<p>12.09 Satharn 7 i. n. Christopher McFadden, Machaire Rabhartaigh 13.09 Domhnach 9 r. n. 13.09 Domhnach 11 r. n. Padai, Nora &amp; Patrick McGee, Machaire Rabhartaigh 14.09 Luain 7 i. n. 15.09 Máirt 10 r. n. 16.06 Céadaoin 7 i. n. 17.09 Déardaoin 7 i. n. 18.09 Aoine 7 i. n. Margaret Quinn, Inis Bo Finne/Machaire Rabhartaigh 19.09 Satharn 7 i. n. Grace &amp; Micheal Harkin, Sruthan 20.09 Domhnach 9 r. n. Sarah &amp; Joe O’Brien, An Bhealtaine 20.09 Domhnach 11 r. n.</p>
+<h3 class="b-head">BÁS LE GAIRID</h3>
+<p>Eugene MacPháidín, Mín Lárach Kay McQuillan, Sandymount, Baile Atha Cliath Michael Doogan, Caoldroim Uachtarach Martina Rafferty, An Fal Carrach Bella Diver, An Fal Carrach Michael Mulhern, Felixstowe/Sasain Tógadh €1,165 an tseachtains’chuaigh thart. Buíochas don phobal. BANC BIA CHLOICH CHEANN FHAOLA <a href="tel:+353857560177" style="color:#1d4ed8;font-weight:600;">085 756 0177</a> Dé Mairt 10.30 r. n - 7.00 i. n. PAIDRIN (CHAPLET) THROCAIRE DE - Dé Mairt 7.00 i. n. PAIDRIN NA NAOMHSHACRAIMINTE Dé Domhnaigh. Beidh bailiúchán airgid ag Geaftai Tigh Phobail ar an 19ú agus 20ú Mean Fomhair le cuidiú le scoláirí PCCataagdulgo Lourdes le h-obair dheonach a dhéanamh le Deoise Rath Bhoth. Ta cupla suiochan fagtha ar oilithreacht go Lourdes ar an 28.09.26 fa choinne 5 la. Déan teagmhail le John McGinley <a href="tel:+35374913520" style="color:#1d4ed8;font-weight:600;">074913520</a> Ar fail ag cul Theach a’ Phobail achan tseachtain. Cuir €3.00 sa bhocsa bhán - tá siad ardaithe i bpraghas.<br>
+AN CEATHRÚ DOMHNACH FICHEAD A</p>
+<h3 class="b-head">AN CHÉAD LÉACHT</h3>
+<p>Sliocht as leabhar Sírach. 27:30-28:7. Faltanas is fearg, is fuath liom iad, ach bíonn siad ina chroí istigh ag an pheacach. Antéa bhaineas díoltas, bainfidh Dia díoltas as, nó coinníonn sé cuntas cruinn ar a pheacaí. Maith do chomharsa an éagóir atá déanta aige, agus nuair a dhéanfas tú urnaí, maithfear do pheacaí duit. Má choinníonn duine olc istigh ina chroí do dhuine eile, caidé mar is féidir leis bheith ag dréim le leigheas ón Tiarna? Muna ndéana sé trócaire ar dhuine eile atá cosúil leis féin, caidé mar thig leis maithiúnas a iarraidh ina pheacaí féin? Má chothaíonn sé fearg agus gan ann féin ach duine, cé a mhaithfeas a pheacaí dó? Cuimhnigh ar an chríoch atá romhat agus cuir uait an fuath; cuimhnigh ar an deireadh agus ar an bhás agus coinnigh na haitheanta go dílis. Cuimhnigh ar na haitheanta agus nábíi bhfeirg le do chomharsa. Cuimhnigh ar chonradh an Téis Airde agus déan neamhshuim de lochta do chomharsan.<br>
+Briathar an Tiarna. FR. Buíochas do Dhia. FREAGRA AN t SAILM: Is grámhar trócaireach é an Tiarna, foighdeach agus lán de cheansacht.</p>
+<h3 class="b-head">AN DARA LEACHT</h3>
+<p>Sliocht as litir Naomh Pól chuig na Rómhánaigh. A bhráithre, ní dó féin amháin a mhaireas aon duine againn, agus ní dó féin amháin a fhaigheas aon duine bás; másbeo dúinn, mairimid don Tiarna; agus másbása fhaigheann muid, faighimid bás don Tiarna. Dá bhrí sin, is cuma céacubeonó marbh sinn, is leis an Tiarna sinn. Marisfá choinne sin a fuair Críost bás agusd&#x27;éirigh arís ó mharbh, ionas go mba Tiarna na mbeo agus na marbh é. Briathar an Tiarna. FR. Buíochas do Dhia. ALLELUIA, alleluia! Labhair, a Thiarna, tá do sheirbhíseach ag éisteacht; is agatsa atá briathra na beatha síoraí. Alleluia! SOISCÉAL Sliocht as an Soiscéal naofa de réir Naomh Maitiú. 18:21-35. Sanamsin tháinig Peadar chuig Íosa agus dúirt leis: “A Thiarna, cé mhéad uair ba cheart domh pardún a thabhairt do mo bhráthair nuair a pheacaíos sé i m&#x27;éadán; go dtí seacht nuaire?” Dúirt Íosa leis: “Ní seacht n-uaire a deirim leat, ach seacht n-uaire fá sheachtó.” “Dá bhrí sin, is féidir ríocht na bhflaitheas a chur i gcosúlacht leríarb mhian leis cuntas a iarraidh ar a chuid seirbhíseach. Nuair a thosaigh séaran chuntasaíocht, tugadh fear chuige a raibh fiacha deich míle talann air. Ó tharla nach raibh glanadh na bhfiach sin aige, d&#x27;ordaigh an máistir é féin, a bhean, a chlann agus a raibh aige a dhíol agus na fiacha a ghlanadh. Thuit an seirbhíseach ar a ghlúine ag cur impí air: ‘A mháistir, bíodh foighid agat liom agus íocfaidh mé an t-iomlán leat” Le neart trua dó, lig máistir an tseirbhísigh sin ar shiúl é</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-inver" data-parish-name="Inver"><h2 class="ocr-parish-name">Inver</h2><p class="ocr-parish-date">26/09/2026</p></header>
+<p class="page-label">Page 14</p>
+<p>Date Church Time Anniversaries/Intentions Saturday 12th Sept Ardaghey 10:00am Holy Mass, Confession after Mass to 11am Mountcharles 1:00pm Baptism Ardaghey 6:00pm Marie McGinley John McHugh Jimmy Burke Drimarone 7:30pm Seamus McGinty Sunday 13th Sept Frosses 10:00am Holy Mass Mountcharles 11:30am Liam Paul and Frank McGinty Mary Friel, Glencoagh John and Ellen Gallagher Monday 14th Sept Mountcharles 10:00am Holy Mass Tuesday 15th Sept Frosses 10:00am Sean Breslin Wednesday 16th Sept Ardaghey 10:00am Holy Mass Thursday 17th Sept Drimarone 10:00am Holy Mass Friday 18th Sept Mountcharles 3:00pm Adoration, Benediction and Confession Mountcharles 7:00pm Ann Rose Saturday 19th Sept Ardaghey 10:00am Holy Mass, Confession after Mass to 11am Frosses 1:00pm Baptism Drimarone 2:00pm Baptism Ardaghey 6:00pm Denis and Sophia Meehan Drimarone 7:30pm Mary and Charles Breslin Sunday 20th Sept Frosses 10:00am Eileen Williamson Mountcharles 11:30am Holy Mass EUCHARISTIC ADORATION Tuesdays Frosses 10:30am –11:30am Thursdays Ardaghey 7:00pm – 8:00pm Confession available on request when Fr Morty is present. Fridays Mountcharles 3:00pm – 4:00pm Breast Cancer Awareness Month 2026 takes place Thursday, Oct 1st, 2026 – Saturday, Oct 31st, 2026. For more information, please visit breastcancerresearch. ieorwww. breastcancerireland.com . International Coffee Day 2026 takes place on Thursday, October 1st, 2026. For further details please see <a href="https://www.internationalcoffeeday.org" target="_blank" rel="noopener noreferrer">www.internationalcoffeeday.org</a> . Naomh Naille GAA &amp; LGFA SLOTTO . <a href="https://member" target="_blank" rel="noopener noreferrer">https://member</a>. clubspot. app/club/st-nauls- gaa/fundraisers Data; 30 Lúnasa Torthaí Slotto na seachtaine, ní raibh buaiteoir ar bith ar an Phota Óir. Isiadna h-uimhreacha: 2-1-7-4-6-5-3 Duais aitheantais €80.00 comhgairdeas le Eunan Ward Data; 06 Mean Fómhair Torthaí Slotto na seachtaine, ní raibh buaiteoir ar bith ar an Phota Óir. Isiadna h-uimhreacha: 4-1-2-3-6-5-7 Duais aitheantais €80.00 comhgairdeas le Andrew Coughlan Don’t forget to get your ticket for next week: Londis Mountcharles, Cassidy’s of Inver or from our online platform through St Naul's Club A pp. Thank you for your continued support €12,38 0 inthepot. Senior Fixtures Senior &amp; Reserve Men will play Naomh Pádraig, Muff in the Intermediate Championship Quarter finals in Killygordon on Sat 12/09. Games at 1pm &amp; 3pm. Our Senior Ladies will play An Clochan Liath in the Ladies Senior Championship quarter final on Sunday morning in Dungloe at 10.30am. We wish all our teams every success and congratulate them on their success to date. We invite all adult club members to attend an important meeting this Monday 14th September at 8.00pm in the Clubhouse. A Church Gate Collection for the Re-Development of Ards Friary will take place on Saturday 26th and Sunday 27th September . Your support would be greatly appreciated. CHURCH COLLECTIONS : Thank you for your support Ardaghey: 29th Aug €533 5th Sept €719 Additional Assumption € 10 Mountcharles : 30th Aug €1113 6th Sept € 840.88 Building Fund €315 € sept € €MARRIAGE ENCOUNTER Ireland invites married couples to a residential Weekend from Friday 2nd to Sunday 4th October 2026 <a href="https://www.marriageencounter.ie" target="_blank" rel="noopener noreferrer">www.marriageencounter.ie</a> THE ST VINCENT DE PAUL SOCIETY : Frosses and Inver Area: CONFIDENTIAL NUMBER <a href="tel:+353877020601" style="color:#1d4ed8;font-weight:600;">087 7020601</a> Mountcharles and Drimarone Area : CONFIDENTIAL NUMBER <a href="tel:+353861690524" style="color:#1d4ed8;font-weight:600;">086 1690524</a> PARISH OF INVER Saturday 12th – Sunday 13th September 2026 ~ 24TH SUNDAY IN ORDINARY TIME ~ Year A Fr Liam Boyle, PP, Parochial House, Frosses Tel: <a href="tel:+353749736006" style="color:#1d4ed8;font-weight:600;">074 9736006</a> – In case of emergency only ring <a href="tel:+353899712498" style="color:#1d4ed8;font-weight:600;">089 9712498</a> Fr Morty O’Shea SOLT, CC, Parochial House, Ardaghey Tel: <a href="tel:+353749736007" style="color:#1d4ed8;font-weight:600;">074 973 6007</a> Email: <a href="mailto:inverparish@gmail.com" target="_blank" rel="noopener noreferrer">inverparish@gmail.com</a> Website: <a href="https://www.inverparish.com" target="_blank" rel="noopener noreferrer">www.inverparish.com</a> Low-Gluten Hosts are available atallthe Masses in the Parish. If you would like to receive a low-gluten host, please feel free to come forward to the priest and cross one arm across your chest indicating your preference. They mayormaynotbe suitable depending on the various intolerances. If you have any questions please do not hesitate to contact Fr. Boyle. A Triduum in preparation for the Feast of St. Padre Pio will take place at the Franciscan Friary, Rossnowlagh, from Sunday September 20th until Wednesday September 23rd. There will be Mass, Homily and Blessing with his Mitten at 7:30 each evening. Preacher will be Fr. Pius McLaughlin, OFMwhomet Padre Pio. Allare very welcome for these prayerful celebrations <a href="https://www.rossnowlaghfriary.ie" target="_blank" rel="noopener noreferrer">www.rossnowlaghfriary.ie</a> Celebration Mass on 26th September: Donegal Group 173 Rise and Shine Trust (formerly The Irish Handicapped Children's Pilgrimage Trust and The Irish Pilgrimage Trust) are celebrating forty years of taking young people with special needs to Lourdes each Easter. We are celebrating with a special Mass on Saturday 26th September in the Church of the Irish Martyrs, Letterkenny at 12 noon. The Mass will be concelebrated by Bishop Niall Coll and Bishop Donal McKeowan, Bishop of Derry and many of the priests who travelled to Lourdes with us over the years. We invite all the guests and their families and all the helpers who travelled with us over the years to our Mass to celebrate the work of the Donegal Group over these forty years. Abide Women's Conference , November 20-22, the Great Northern Hotel Bundoran. Mass will be celebrated by Bishop Fintan Gavin, from Cork &amp; Ross Diocese. For more details please visit Abide in His Love at eventbrite.ie Registration link: <a href="https://abideinhislove" target="_blank" rel="noopener noreferrer">https://abideinhislove</a>. eventbrite.com 'WOKE ' ideology is a significant part of modern culture. A recent homily of Bishop Robert Barron examines some aspects of this way of thinking that conflicts with Catholic belief. The Annual Pilgrimage to Knock Shrine in honour of St. Pio will take place on Sunday 20th Sept. Bus departing from St. Agatha's Church, Clar at 8am, Donegal Town at 8.15am (car park atthe Old Stone cafe) and Laghey Village at 8.30am. Please book seat early. For further details and to book a seat please contact Betty Carrabin (<a href="tel:+353860812394" style="color:#1d4ed8;font-weight:600;">086 0812394</a>) or Margaret Harte (<a href="tel:+353876422197" style="color:#1d4ed8;font-weight:600;">087 6422197</a>). There will be a clearance sale of gifts, bric-a- brac and lots more on Saturday, 10 October in St Mary’s Hall, Convoy from 11am to 3pm. All are welcome. All proceeds are to help Mary's Meals feed more children. Anima Christi Soul of Christ, sanctify me. Body of Christ, save me. Blood of Christ, inebriate me. Water from the side of Christ, wash me. Passion of Christ, strengthen me. O Good Jesus, hear me. Within your wounds hide me. Permit me not to be separated from you. From the wicked foe, defend me. Atthe hour of my death, call meandbidme come to you That with your saints I may praise you for ever and ever. Amen. ( St Ignatius of Loyola .) St. Nauls G. A. A.&amp;L. G. F. A. Scor nan-Og The Club would like to invite any young people interested in representing the Club in Scor nan-Ogto contact Anne Marie on <a href="tel:+353872749158" style="color:#1d4ed8;font-weight:600;">087 2749158</a> as soon as possible as the first Semi Final takes place in Inver Community Centre on Friday 7th. Oct. The different categories are as follows Ceili Dancing, Solo Singing, Recitation, Instrumental Music, Ballad Group, Novelty Act and Quiz and the age limit is U17'S</p>
+<h3 class="b-head">NOTICES FOR NEWSLETTER</h3>
+<p>Notices of community/non-commercial nature are always welcome for our newsletter. Email <a href="mailto:inverparish@gmail.com" target="_blank" rel="noopener noreferrer">inverparish@gmail.com</a> , deadline 12noon on Thursday. PAROCHIALHOUSETEL . NO’S: Frosses: <a href="tel:+353749736006" style="color:#1d4ed8;font-weight:600;">074 9736006</a> | Ardaghey <a href="tel:+353749736007" style="color:#1d4ed8;font-weight:600;">074 9736007</a> Killymard: <a href="tel:+353749721929" style="color:#1d4ed8;font-weight:600;">074 9721929</a> | Donegal Town: <a href="tel:+353749721026" style="color:#1d4ed8;font-weight:600;">074 9721026</a> | Killybegs: <a href="tel:+353749731013" style="color:#1d4ed8;font-weight:600;">074 9731013</a> SUPPORTING YOUR CHURCH Please consider making your contributions by online banking, standing order/direct debit when supporting your Church. Please include your name as the reference . Thank you for supporting your Church. Bank details for each Church as follows: Frosses : Inver Parish Account IBAN: IE75 BOFI 9048 3556 8662 33 Frosses Development Fund Account: IBAN IE92 DTCU 9921 3010 1932 56 (Building Fund) Ardaghey : St Nauls Ardaghey IBAN: IE79 BOFI 9048 3556 8661 61 Mountcharles : Mountcharles Church Account IBAN: IE08 BOFI 9048 3556 8660 81 Drimarone : Drimarone Church Account IBAN: IE22 BOFI 9048 3556 8662 17</p>
+<h3 class="b-head">RECENTLY DECEASED</h3>
+<p>Jerry Griffin, Co. Kerry, brother of Eileen Kelly, Mullinbouys Kathleen Tierney (née Gallagher) Coventry, formerly of Thower, (Sister of Bridget Burke and Martin Gallagher) HUGG Donegal - Suicide Bereavement Pop-up Café Coffee, Cakes and Compassionate Conversations If you have lost a friend, family member, neighbour, teammate, or colleague, to suicide, recently or many years ago, andifyouare over 18, you are warmly invited to join usfora complimentary cuppa and chat with others who understand your grief. Led by trained volunteers with a lived experience of suicide loss, our pop-up café offers a safe, non-judgmental space for social connection, mutual support and shared understanding. Where : Donegal Town, Donegal, 10.30am to 12pm When: October Wednesday 7th, November Wednesday 11th, December Wednesday 9th To reserve a spot atoneor more pop-up email <a href="mailto:support@HUGG.ie" target="_blank" rel="noopener noreferrer">support@HUGG.ie</a> with your name and number, and a member of our team will be in touch to give you more information OR call 01 513 4048 (monitored answering machine). Leitir Corn Mill Kilcar F94CP7E National walking Day 2026, Sunday 27th September @12 o’clock Niall Mor Community &amp; Enterprise Centre- Killybegs <a href="tel:+353749741863" style="color:#1d4ed8;font-weight:600;">074 97 41863</a> <a href="mailto:info@niallmorcentre.com" target="_blank" rel="noopener noreferrer">info@niallmorcentre.com</a> Upcoming Courses in Sept/Oct: Irish Language Classes Adult Art Classes Emergency First Aid Course Driver CPC Module 1 Course Heritage in the Hinterland Course Beauty Therapy &amp; Skincare Course Children's Halloween Camp Poor Clares Galway, Monastic Experience Day for women 18-35. An opportunity to explore and experience Poor Clare life and spirituality from 10am to 5pm on Saturday, the 19th of September For info and registration: <a href="https://poorclaresmonasticday" target="_blank" rel="noopener noreferrer">https://poorclaresmonasticday</a>. eventbrite.ie Inver <a href="https://www.inverparish.com/parish-newsletter" target="_blank" rel="noopener noreferrer">https://www.inverparish.com/parish-newsletter</a>. html</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-irish-martyrs" data-parish-name="Irish Martyrs"><h2 class="ocr-parish-name">Irish Martyrs</h2><p class="ocr-parish-date">26/09/2026</p></header>
+<p class="page-label">Page 15</p>
+<p>WE EXTEND OUR DEEPEST SYMPATHY to the families of Willie Diver, Philip O’Donnell &amp; Mary Flannery who died recently. May they rest in peace. CONFESSIONS: 12noon - 1pm and after the 6.30pm Mass on Saturday each week. PARISH ACCOUNTS: Copies of the parish accounts are available in the porches of the church. We encourage you to take a copy. HLI IRELAND: Fr Lawrence Carney (USA), international speaker and popular author, Provincial Tour of Ireland. Join usforthe Ulster event at the Canal Court Hotel, Newry, on Tuesday 29th September at 6:45pm, with a First Class Relic of St Thérèse. Free admission. A MEETING ABOUT SCHOOL BUSES will take place in the Community Centre, Meeting Room 2 at 7.00pm today, Sunday. 13th September. If your child needs a bus to school and has not been given a ticket, come along and have your name added to the list. GAISCE PERSONAL/COMMUNITY HOURS: Students within our parish completing Gaisce awards might like to consider parish activities as part of their personal or community hours. We would be delighted to help arrange activities foryouandare happy to link in with your school-based PAL. Contact the parish office on <a href="tel:+353749127600" style="color:#1d4ed8;font-weight:600;">074 912 7600</a> or a member of the Parish Pastoral Council. COME &amp; SEE what the Encounter School of Ministry Course is all about , on Thurs 17th Sept, 6.30pm to 9.00pm at All Saints Church, Newtowncunningham. Participants can attend up to 3 classes without committing topayforthe course. If a participantd ecides to enrol before the application deadline of Oct 1st, tuition fees will then be appli ed. Ifa participant decides not to continue, there is no obligation. More info or register he re: <a href="https://encounterschool.org/donegal/" target="_blank" rel="noopener noreferrer">https://encounterschool.org/donegal/</a> or email <a href="mailto:donegal@encounterschool.org" target="_blank" rel="noopener noreferrer">donegal@encounterschool.org</a>. MARRIAGE ENRICHMENT WEEKEND : Take time out for just thetwoofyou. Whether newly married or many years together, rediscover the love that brought you together. Friday 2nd – Sunday 4th October, Focolare Centre, Prosperous, Co. Kildare. Apply online: <a href="https://www.marriageencounter.ie" target="_blank" rel="noopener noreferrer">www.marriageencounter.ie</a> · <a href="tel:+353876299153" style="color:#1d4ed8;font-weight:600;">087 629 9153</a>. Places limited – book now! CLEARANCE SALE of gifts, bric-a- brac and lots more, Sat, 10th Oct, St Mary’s Hall, Convoy,11am to 3pm. All welcome. All proceeds to help Mary's Meals feed more child ren. NOMINATIONS now open for the Lidl Family Carer of the Year &amp; Young Carer of the Year Awards. This campaign provides an opportunity to recognise the extraordinary contribution made by family &amp; young carers who support loved ones at home everyd ay. Nominations close on 9th Oct &amp; can be submitted through <a href="https://www.familycarers.ie" target="_blank" rel="noopener noreferrer">www.familycarers.ie</a> ELUSIVE THEATRE are hosting a Living History performance about the building of St Eunan's Cathedral based on a script from Kieran Kelly on Culture Night, 18th September at 6.15pm and 7.30pm. The Cathedral Quarter office at No 3 Church Lane is open to the public from 6pm to 9pm. All are welcome. COMMUNITY CONNECTIONS, a weekly facilitated group designed to support adults experiencing loneliness, social isolation, or life changes that may impact socia l connectedness is starting in Cara House Family Resource Centre this Autumn (Mond ays 12.30pm). The group provides a welcoming, informal environment where particip ants can meet others, engage in conversation, and develop meaningful social connections – no charge. Please contact Gary Doherty on <a href="tel:+353870675465" style="color:#1d4ed8;font-weight:600;">0870675465</a> or email Gary. <a href="mailto:Doherty3@hse.ie" target="_blank" rel="noopener noreferrer">Doherty3@hse.ie</a> BAKE SALE &amp; COFFEE in aid of Little Blue Heroes will take place at Foróige, Spencer House, High Road, Letterkenny on Sat 19th September from 12.00 - 4.00pm. All welco me. ONLINE HEALING SERVICE ledby Fr Pat Collins, Tuesday 15th September, 7.00pm, <a href="https://www.churchservices.tv/ballyfermot" target="_blank" rel="noopener noreferrer">https://www.churchservices.tv/ballyfermot</a> Church of the Irish Martyrs Fr Ciaran Harkin P. P./Fr Dominic Thoomkuzhy C. C. Ballyraine, Letterkenny. <a href="tel:+353749127600" style="color:#1d4ed8;font-weight:600;">074 91 27600</a>; <a href="mailto:irishmartyrschurch@gmail.com" target="_blank" rel="noopener noreferrer">irishmartyrschurch@gmail.com</a> Newsletter 13th September 2026</p>
+<h3 class="b-head">MASS TIMES</h3>
+<p>12th Sept Saturday Vigil Mass 9.30am 6.30pm Anna Peoples RIP Catherine Gordon RIP, McHugh Family RIP, Jim McCormick RIP, Jimmy &amp; Esther Kenny RIP, Ray Patton RIP, Brian Flatley RIP, Brendan Duffy RIP 13th Sept Sunday 9.30am 11.30am 5.00pm For the intentions of all parishioners Eileen Wiliamson RIP 1st anniversary , Jonathan Keating RIP Mass for Syro Malabar Community 14th Sept Monday 9.30am Forallthe sick of the Parish 15th Sept Tuesday 9.30am Billy Birch RIP 16th Sept Wednesday 9.30am Thomas Harkin RIP 17th Sept Thursday 9.30am Paddy McGinley RIP 18th Sept Friday 9.30am Private Intention 19th Sept Saturday Vigil Mass 9.30am 6.30pm Private Intention Paul Maguire RIP, Month ’s Mind , Vonnie Gallagher RIP, Month ’s Mind 20th Sept Sunday 9.30am 11.30am 5.00pm For the intentions of all parishioners Jimmy Gildea RIP Mass for Syro Malabar Community If you wish to donate to the Church online, youcandoso by scanning the QR Code to the left and following Irish Martyrs <a href="https://drive" target="_blank" rel="noopener noreferrer">https://drive</a>. google.com/file/d/1m6s OGz3d ECWvbbp XCn RGd HG77y Wi LXx R/view</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-kilcar" data-parish-name="Kilcar"><h2 class="ocr-parish-name">Kilcar</h2><p class="ocr-parish-date">26/09/2026</p></header>
+<p class="page-label">Page 16</p>
+<p>Mass Times Saturday 12th 6pm Nora Shovlin – Months Mind Peter Shovlin – Anniversary Sunday 13th 11am Noreen &amp; James McHugh – Months Mind Monday 14th NO MASS Tuesday 15th 10am Maggie &amp; Condy Lyons &amp; deceased family members – Anniversaries Wednesday 16th 10am Thursday 17th 10am Friday 18th 10am Saturday 19th 6pm Catherine &amp; Paddy McShane – Anniversaries Phonsie &amp; Kathleen McShane, Derrylaghan –</p>
+<h3 class="b-head">Anniversaries</h3>
+<p>Sally Gayton, née Campbell – Recent Death Sunday 20th 11am Mary Gallagher, Meenacannon – Anniversary John Haughey, Curris – Anniversary St Carthas Church, Kilcar Fr Willie Peoples P. P <a href="tel:+353749738007" style="color:#1d4ed8;font-weight:600;">074 9738007</a> / <a href="tel:+353877449461" style="color:#1d4ed8;font-weight:600;">087 7449461</a> <a href="mailto:stcarthaschurch@gmail.com" target="_blank" rel="noopener noreferrer">stcarthaschurch@gmail.com</a> Sunday 13th September 2026 Live Streaming: <a href="https://www.mcn" target="_blank" rel="noopener noreferrer">www.mcn</a>. live St Peregrine A blessing with the relic of St Peregrine can be obtained after Mass every Frid ay at 10am. This kindly Saint, born in Italy in 1260, is the Patron Saint of cancer patients. Niall Mor Community &amp; Enterprise Centre- Killybegs <a href="tel:+353749741863" style="color:#1d4ed8;font-weight:600;">074 97 41863</a> <a href="mailto:info@niallmorcentre.com" target="_blank" rel="noopener noreferrer">info@niallmorcentre.com</a> Upcoming Courses in Sept/Oct: Irish Language Classes Parish Collection - € 1660 Happy Birthday A very happy 107th birthday to Nabla Diver, Shannagh. Lá breithe sona duit Leitir Corn Mill National Walking Day 2026 Leitir Corn Mill Kilcar F94CP7E at 12pm. All welcome. Choir Your Choir is recruiting to continue into the future. All new members very welcome – children, young people &amp; adults. Contact Jacinta: <a href="tel:+353873310746" style="color:#1d4ed8;font-weight:600;">087 3310746</a> Niall Mor Community &amp; Enterprise Centre Killybegs <a href="tel:+353749741863" style="color:#1d4ed8;font-weight:600;">0749741863</a> <a href="mailto:info@niallmorcentre.com" target="_blank" rel="noopener noreferrer">info@niallmorcentre.com</a> Upcoming Courses in Sept/Oct: Irish Language Classes Adult Art Classes Emergency First Aid Course Driver CPC Module 1 Course Heritage in the Hinterland Course Beauty Therapy &amp; Skincare Course Children's Halloween Camp Confessions will be heard after all Masses during the week Abide Women's Conference November 20-22, the Great Northern Hotel Bundoran, Co. Donegal. Speakers include: Sarah Swafford, Fr Barry Braum, Fr Mark Wharton, Kimberlee Woo Ling, Danielle Noonan, Nashville Domincans &amp; more, Mass will be celebrated by Bishop Fintan Gavin, from Cork &amp; Ross Diocese. We would love to welcome you this weekend. For more details please visit Abide in His Love at Eventbrite.ie Registration link: <a href="https://abideinhislove" target="_blank" rel="noopener noreferrer">https://abideinhislove</a>. eventbrite.com Dementia Awareness Workshop A dementia awareness workshop is taking place at the Aislann Chill Chartha on Wednesday 16th September at 11am. All welcome Contact <a href="tel:+353876496670" style="color:#1d4ed8;font-weight:600;">087 6496670</a> to book A Church Gate Collection for the Re-Development of Ards Friary will take place on Saturday 26th and Sunday 27th September. Your support would be greatly appreciated Kilcar <a href="https://www.mcn" target="_blank" rel="noopener noreferrer">https://www.mcn</a>. live/Camera/st-carthas-church-kilcar,-f94-h2y5</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-killybegs" data-parish-name="Killybegs"><h2 class="ocr-parish-name">Killybegs</h2><p class="ocr-parish-date">26/09/2026</p></header>
+<p class="page-label">Page 17</p>
+<p> Sunday 13th September 2026: Twenty Fourth Sunday in Ordinary Time Year A  Weekday Readings: Twenty Fourth Week in Ordinary Time Weekday 2 Masses will be relayed on the webcamera: go to killybegspar ish. comfora link to Online Services or mcn. live Saturday 12th September: 07.00pm - Una Cunningham (16th Anniversary) &amp; baby Linda Sunday 13th September: 09.00am - Kathleen Boyle (19th Anniversary) 11.00am - Tommy &amp; Bridget Dorrian (Anniversaries) &amp; deceased family members Monday 14th September: 10.00am - Special Intentions Tuesday 15th September: 10.00am - Special Intentions Thursday 17th September: 10.00am - Golden Wedding Anniversary Friday 18th September: 10.00am - Special Intentions Saturday 19th September: 07.00pm - Mary Haughey, Croaghlin (4th Anniversary) Eugene McCloskey (Anniversary) Mary Frank Gallagher, Stragar (10th Anniversary) Sunday 20th September: 09.00am - Special Intentions 11.00am - Special Intentions Adoration of the Blessed Sacrament on Monday 11.00am - 7.00p m Pray for: Kathleen O’Hagan , whose funeral was in Lifford yesterday, Saturday (sister of Eva Murrin, Fintra ); Michael Cassidy, who died in Leeds recently, (brother of Mary Hamilton, Carricknagore ). Pray for: Áine Murray, baby Glenis Murray . Suaimhneas Síoraí . Home Help required for elderly gentleman for approx 2 hours daily. Opportunity to become a live-in carer available longer term. Email oneeyeddog12@yahoo.com for more info. Liturgy of the Word for Children Sunday 27th September 11am. Sunday 11th October 11am. A Triduum in preparation for the Feast of St Padre Pioatthe Franciscan Friary, Rossnolwlagh, Sunday 20th - Wed 23rd Sept. Mass, Homily and Blessing with his mitten at 7.30pm each evening. All welcome. Adoration in the Adoration Room every Wednesday evening 6-7pm. All welcome. Sunday Collection 6th September €1460.00 Maintenance Fund 6th September €1115.00 Thank you for your ongoing generosity. Irish Dancing Class resumes on Wednesdays in Foresters Hall at 4pm. Beginners welcome. Marie B/Cannon &amp; Oran McNelis On behalf of Killybegs Festival Committee, Christine Cunningham will beinthe Diamond on Sat 12th Sept after 7pm Mass until 8.30pm to collect donations for the Killybegs Canopy Áislann Chill Chartha: 0749738376 Enrolment for winter classes now being taken Golf Classic Friday 25th September Halloween Camp 27th - 30th October St. Vincent de Paul Contact No. 087 3507727 St. Mary of the Visitation Parish, Killybegs Parish Office, Killybegs, Co. Donegal, F94 CY56 Tel: +353 (0)74 9731013 Parish Secretary : Ann O’Donnell ( Office Open: Monto Fri. 9.45am to 2.45pm) Email : info@killybegsparish.com Website : killybegsparish.com Parish Priest: Fr. Colm Ó Gallchóir : Tel: 074 9731013 Masses and Services: Live streaming www.mcn . live (link on website) Traditional Prayer to Our Lady of Sorrows Memorial: Tuesday15 th September O Mother of Sorrows, most afflicted of all mothers! I look to you with confidence and love. As I meditate upon the swords of sorrow that pierced your Immaculate Heart, obtain formethe grace of true repentance and the courage to bear my own sufferings with patience. Holy Mary, stand bymeinmy trials, care formeinmy many needs, and pray formenowandatthe hour of my death. Amen . A Prayer for the Earth (from Laudato Si, 246) All-powerful God, youare present in the whole universe andinthe smallest of your creatures. You embrace with your tenderness all that exists. Pour out upon us the power of your love, that we may protect life and beauty. Fill us with peace, that we may live as brothers and sisters, harming no one. OGodofthe poor, help us to rescue the abandoned and forgotten of this earth, so precious in your eyes. Bring healing to our lives, that we may protect the world and not prey on it, that wemaysow beauty, not pollution and destruction. Touch the hearts of those who look only for gain at the expense of the poor and the earth. Teach us to discover the worth of each thing, to be filled with awe and contemplation, to recognize that we are profoundly united with every creature as we journey towards your infinite light. We thank you for being with us each day. Encourage us, we pray, in our struggle for justice, love and peace. How Great Thou Art O Lord, my God, when I in awesome wonder, Consider all the works thy hand has made, Iseethe stars, I hear the rolling thunder, Thy pow’r throughout the universe displayed. Then sings my soul, my Saviour God to Thee; How great Thou art, how great Thou art. Then sings my soul, my Saviour God to Thee: How great Thou art, how great Thou art. And when I think: that Godhis Sonnot sparing Sent himtodie - I scarce can take it in: That on the cross my burden gladly bearing, He bled and died, to take away my sin ( Chorus) Parish Choir Practice Monday 7.15pm Freely God forgave mysinin Jesus’ name I’ve been born again in Jesus’ name And in Jesus’ name I come to you To share his love as he told me to. Chorus: He said freely, freely you have received; Freely, freely give, Goinmy name and because you believe Others will know that I live. All power is given in Jesus’ name In earth and heaven in Jesus’ name, And in Jesus’ name I come to you, To share his power as he told me to. (Chorus) The Spanish and Killybegs Autumn 1588 A Reassessment by Daniel McCall in Tara Hotel Thursday 17th September 7pm. Presented by Killybegs History &amp; Heritage Committee. Culture Night Book Launch ‘Toseaornotto sea’ by Aidan Sharkey. Friday 18th September 7.30pm in Sliabh Liag Visitor Centre. Thank Y ou Christine &amp; Joe Smith would like to thank everyone for their cards, gifts and good wishes on their 60th Wedding Anniversary. Thanks also to Fr Colm . Mass will be offered for your intentions. ggg Thank you to everyone who contributed to the recent Donegal Down Syndrome Church Gate Collection. €920 was raised. Niall Mor Centre 074 97 41863 info@niallmorcentre.com Upcoming Courses in Sept/Oct: Irish Language, Adult Art , Emergency First Aid , Driver CPC Module 1 , Heritage in the Hinterland , Beauty Therapy &amp; Skincare , Children&#x27;s Halloween Camp National Walking Day 2026 on Sun 27th Sept Leitir Corn Mill, Kilcar F94CP7E 12 noon. St John’s Annual Harvest Coffee Morning Saturday 26th September 10am-1pm Church Gate Collection for the Re-Development of Ards Friary Sat 26th &amp; Sun 27th September. Gratitude needs to express itself - the greater our awareness of gratitude the greater our need to express it St Stan The meaning of life is to find your gift The purpose of life is to give it away W. Shakespeare Killybegs https://mcn . live/Camera/st-mary-of-the-visitation-church</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-kincasslagh" data-parish-name="Kincasslagh"><h2 class="ocr-parish-name">Kincasslagh</h2><p class="ocr-parish-date">26/09/2026</p></header>
+<p class="page-label">Page 18</p>
+<p>gs cara, i | S279 |) st. COLUMBA 4 PRAY FOR US sf Adl [= Kl == — St. Columba’s Chur Burtonport Parish Office Mobile <a href="tel:+353749542006" style="color:#1d4ed8;font-weight:600;">074 954 2006</a> <a href="tel:+35387703136" style="color:#1d4ed8;font-weight:600;">087 703 136</a> Mass Time Sept 12'-Sept 20 | Day __| Time_| Intentions Wed 16" St. Anthony Darren Mills, Tommy Mills Charlie &amp; Ann Sweeney, Mary O Donnell Patrick &amp; Sarah Rodgers | Day — [Time | intentions Madge McHugh (Months Mind) Pat, Mary &amp; Doalty Forker (Glenahilt) Rosaleen McShane Birthday Mass</p>
+<table class="b-table">
+<tr><td>Tues 15%</td><td>10am</td></tr>
+</table>
+<p>[thurs17® [10am | Don Breslin (Months Mind) | Day — [Time | intentions Tues 15 | 10:00 | Church 12:30 Day Centre Francie McGovern, Sheskinarone Mary O’ Donnell Arranmore</p>
+<h3 class="b-head">Anniversaries</h3>
+<p>Pat Boyle (Butcher) Pole Rd, Meenmore<br>
+—— NEWSLETTE! Rev. Vincent Finnegan | St. pine Church incasslagh Email: Website: ie Parish — Three Communities — A: ADORATION Eucharistic Adoration in St. Columba’s on Monday after 10am Mass for an hour, &amp; in St. Mary’s on Wednesday 11-12 noon. CONFESSIONS Saturday: 12:00- 12:30pm St. Columba’s. Saturday: 5:45-6:15pm (Before Vigil Mass) &amp; before St. Anthony’s Mass on Wednesday in St. Marv&#x27;s PARISH BAPTISMS on request. Please see Fr. Vincent to arrange a date and time. St Columba’s Church is now live-streamed with Church Services TV. Ifyou would like to volunteer to help in any number of ministries within our Church’s, please see Fr Vincent, and thanks to those who already do! Gunes k K . with the Relic Hmm Sí. Peregrine . - Sunday, 27% September P St. Crone’s Church, Confessions (Ga ‘ F affected by cancer and serious illness. i Tike &amp; ALL WELCOME<br>
+Éige, ST. CRONE VI. PRAY FOR US ” \RISH 2-94" a gusacamhccig a Iii | St. Crone’s Church Ss a Arranmore Island Facebook St. Vincent de Paul asslagh.ie Kincasslagh Parish <a href="tel:+353870507895" style="color:#1d4ed8;font-weight:600;">087 050 7895</a> ared Faith —— ST COLUMBA’S COMMUNITY CENTRE New Beginnings Community Shop We are having a ONEDAY ONLY EURO SALE on Monday 14th September from 9am - 1.30pm . Classes: The following classes will be taking place in the Autumn - Line Dancing, Move to the beat, Chair Aerobics, Sewing / Alterations, Homemade Baking, Christmas Decoupage and a DIY workshop . To book your place or for more information please contact the centre Facebook page or email <a href="mailto:burtonportcc@gmail.com" target="_blank" rel="noopener noreferrer">burtonportcc@gmail.com</a>. Mary's Meals would like to thank everyone who contributed to the coin and note collection held recently in Dungloe and Annagry. Your generosity is very much appreciated. A Church Gate Collection for the redevelopment of Ards Friary will take place on Saturday 26" and Sunday 27"September. Your support would be greatly appreciated. = - If you would like to donate to the Kincasslagh Parish Graveyards please use your phone camera to scan the code and follow the instructions. St Anthony Devotions Mass every Wednesday in St. Mary’s Church Kincasslagh at 7:00pm with devotions. The Relic of St Anthony will be available for veneration. Confessions available before the Mass. Individual blessing with the Relic. Please tell your friends!</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-milford-kilkeel" data-parish-name="Milford Kilkeel"><h2 class="ocr-parish-name">Milford Kilkeel</h2><p class="ocr-parish-date">26/09/2026</p></header>
+<p class="page-label">Page 19</p>
+<p>Sunday 13th September Twenty-Fourth Sunday in Ordinary Time Fr Stephen Gorman PP. Parochial House, Rathmullan <a href="tel:+353749158156" style="color:#1d4ed8;font-weight:600;">074 9158156</a>/<a href="tel:+353833552428" style="color:#1d4ed8;font-weight:600;">083 3552428</a> Email: <a href="mailto:pprathmullan@gmail.com" target="_blank" rel="noopener noreferrer">pprathmullan@gmail.com</a> Fr Raymond McQuarrie CC. Parochial House, Milford <a href="tel:+353749153236" style="color:#1d4ed8;font-weight:600;">074 9153236</a>/<a href="tel:+353873647920" style="color:#1d4ed8;font-weight:600;">087 3647920</a> Email: <a href="mailto:milfordkerrykeel@gmail.com" target="_blank" rel="noopener noreferrer">milfordkerrykeel@gmail.com</a> Parish Website: <a href="https://www.milfordrathmullanparishes.ie" target="_blank" rel="noopener noreferrer">www.milfordrathmullanparishes.ie</a> St Mary’s Church, Glenvar Saturday 12th September at 5:45pm Annie &amp; Dan Kelly Anniversary Mass Saturday 19th September at 5:45pm Vigil Mass Rathmullan, Milford, Glenvar, Oughterlin &amp; Kerrykeel Parish Deadline for Newsletter Notices: Please email or phone before 10am on Thursday. St Peter’s Church, Milford Webcam: <a href="https://www.churchservices.tv/milford" target="_blank" rel="noopener noreferrer">www.churchservices.tv/milford</a> Saturday 12th September at 6:00pm Sarah Anthony Anniversary Mass Sunday 13th September at 11:00am The McGarvey Family Anniversary Mass Tuesday 15th September at 10:00am Brid &amp; Kathleen Coyle Anniversary Mass Thursday 17th September at 10:00am Morning Mass Friday 18th September at 10:00am Nancy &amp; Jim Barrett &amp; Margaret Ward</p>
+<h3 class="b-head">Anniversary</h3>
+<p>Mass Saturday 19th September at 6:00pm Vigil Mass Sunday 20th September at 11:00am Avril Friel Anniversary Mass Our Lady of Lourdes Church, Kerrykeel Sunday 13th September at 9:30am</p>
+<h3 class="b-head">Sunday Mass</h3>
+<p>Monday 14th September at 9:30am Morning Mass Sunday 20th September at 9:30am Sunday Mass KILLYGARV AN &amp; T ULLYF ERN PARISH RATHMULLAN - MILFORD - OUGHT ERLIN - KERRYKE EL - GLENVAR F92 E772 F92 YV27 F92 A432 F92 R8P7 F92 D897 Weekly Collections Rathmullan &amp; Oughterlin: €1,705 St Mary’s Glenvar: €420 St Peter’s Milford: €1,455 Our Lady of Lourdes, Kerrykeel: €270 Thank you for your generosity and continued support. St Catherine’s Church, Oughterlin Sunday 13th September at 11:00am Missa Pro Populo Sunday 20th September at 11:00am</p>
+<h3 class="b-head">Sunday Mass</h3>
+<h3 class="b-head">Recently Deceased</h3>
+<p>Kieran Kane, Rathmullan, whose Funeral Mass took place in St Joseph’s Church, Rathmullan on Tuesday. Eamonn Boyle, Glasgow, brother of Grainne McCafferty, Milford.</p>
+<h3 class="b-head">Anniversaries</h3>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-raphoe" data-parish-name="Raphoe"><h2 class="ocr-parish-name">Raphoe</h2><p class="ocr-parish-date">26/09/2026</p></header>
+<p class="page-label">Page 20</p>
+<p>WEBSITE parishofraphoe.ie EMAIL: <a href="mailto:raphoeparish@gmail.com" target="_blank" rel="noopener noreferrer">raphoeparish@gmail.com</a> Fr Kelly: <a href="tel:+353879077985" style="color:#1d4ed8;font-weight:600;">087 9077985</a> Office Phone <a href="tel:+353873338714" style="color:#1d4ed8;font-weight:600;">0873338714</a> Sunday 13 September 2026 RAPHOE PARISH NEWSLETTER St. Eunan ’s Church, Raphoe St. Patrick ’s Church, Drumkeen St. Mary ’s Church, Convoy Monday The Exaltation of the Holy Cross Raphoe: 7.30am: Office of Readings, Morning Prayer, Rosary, Divine Mercy Chaplet and Benediction. Raphoe: 9am: Mass Raphoe: 7pm: Holy Hour Tuesday Our Lady of Sorrows Raphoe: 7.30am: Office of Readings, Morning Prayer, Rosary, Divine Mercy Chaplet and Benediction. Drumkeen: 10am: Mass Drumkeen: Adoration Noon – 9pm Wednesday 7.30am: Office of Readings, Morning Prayer, Rosary, Divine Mercy Chaplet and Benediction. Convoy: 9am: Mass Raphoe: 9.30am - 8pm: Adoration Thursday Raphoe: 7.30am: Office of Readings, Morning Prayer, Rosary, Divine Mercy Chaplet and Benediction. Raphoe: 9am: Mass Convoy: Noon – 6pm: Adoration Convoy: Parochial House: 8pm: Legion of Mary Friday: Raphoe: 7.30am: Office of Readings, Morning Prayer, Rosary, Divine Mercy Chaplet and Benediction. Convoy: 9am: Mass Saturday Raphoe: 8am: Office of Readings, Morning Prayer, Rosary, Divine Mercy Chaplet and Benediction. Convoy: 9.30am: Divine Mercy Devotions Convoy: 5pm Confessions Convoy: 6pm: Mass (Paddy Kelly MMM, Eddie Kelly, Kathleen Lester, The Kelly Family, RIP) Drumkeen: 7.30pm: Mass (Johnny, Nora and Peter McMenamin, Mairín Patton, Grace Browne RIP) After Mass: Confessions Sunday: Raphoe: 8am: Office of Readings, Morning Prayer, Rosary and Benediction. Convoy: 9.30am: Mass Raphoe: 11am: Mass (Majorie Kelly, Rosemary Martin RIP) Raphoe: Noon: Baptism Drumkeen: 1.30pm: Latin Mass Triumph of the Holy Cross Prayer Lord Jesus Christ, today we honour the Triumph of Your Holy Cross, the sign of Your great love and victory over sin and death. Thank You for embracing the Cross to save us. Help us to carry our own crosses with faith, to follow You with courage, and to find hope even in suffering. May Your Cross always remind us that love conquers all, and that through You, even death has been defeated. Amen. It's a joyful day to remember that the cross, through Jesus' love and sacrifice, is a powerful symbol of hope, victory, and new life forallofus. Let's carry this hope in our hearts. Raphoe <a href="https://drive" target="_blank" rel="noopener noreferrer">https://drive</a>. google.com/file/d/1jmslbrliw1BTtdrx Hbqp Ubh QEf6w XHy5/view</p>
+<hr>
+<p class="page-label">Page 21</p>
+<p>A little reminder tousall: as there will be no Saturday evening Mass in Raphoe or Sunday morning Mas in Drumkeen, all intentions booked for these Masses will be transferred to the nearest Mass in the particular Church.</p>
+<hr>
+<p>The Annual Legion of Mary Pilgrimage to Knock will take place on Sunday, 27 September. It will cost around €20. Confessions, Mass in Basilica, and Rosary procession. Contact either Sean Friel on <a href="tel:+353872269221" style="color:#1d4ed8;font-weight:600;">087 226 9221</a> or Bridie Boyle on <a href="tel:+353861752023" style="color:#1d4ed8;font-weight:600;">086 175 2023</a> for more information.</p>
+<hr>
+<p>A St Faustina Weekend will take place in St Mary ’s Church, Convoy Co Donegal F93FX66 on 3 and 4 October. It will consist of prayer and reflection on Divine Mercy Devotions. Ledby Fr Eamonn Kelly, the weekend will invite all to come to know the Person of Divine Mercy. You are invited to come toallor part of the weekend. Please see the notice on the notice board for further details.</p>
+<hr>
+<p>St Mary ’s Youth Choir will meet on Wednesday, 16 September from 5.30 to 6.30. We welcome new children over the age of 8 and anyone who can play an instrument would be particularly welcomed. St Mary ’s Adult Choir will meet on Thursday, 24 September at 8pm and again new members and musicians are very welcome. For any queries, contact Gerard on <a href="tel:+353868812535" style="color:#1d4ed8;font-weight:600;">086 8812535</a> oronthe members what ’s app.</p>
+<hr>
+<p>Donegal Pro Life would like to thank all those who supported the recent Church gate collection. Money raised €308.33. Please text <a href="tel:+353892469599" style="color:#1d4ed8;font-weight:600;">089 2469599</a>, if you are interested in becoming involved with Donegal Pro Life,</p>
+<hr>
+<p>A Marriage Enrichment Weekend: Take time out for just thetwoofyou. Whether newly married or many years together, rediscover the love that brought you together. The weekend will take place from 2 to 4 October at Focolare Centre, Prosperous, Co. Kildare. Apply online: <a href="https://www.marriageencounter.ie" target="_blank" rel="noopener noreferrer">www.marriageencounter.ie</a> or Phone: <a href="tel:+353876299153" style="color:#1d4ed8;font-weight:600;">0876299153</a>. Places are limited.</p>
+<hr>
+<p>There will be a clearance sale of gifts, bric-a-brac and lots more on Saturday, 10 October in St Mary ’s Hall, Convoy from 11am to 3pm. All are welcome. All proceeds are to help Mary&#x27;s Meals feed more children.</p>
+<hr>
+<p>Convoy Céilí Club: A Céilí in memory of Bill Meehan, Deceased, will be held on St. Mary&#x27;s Hall Convoy on Sunday, 20 September. Dancing is from 8pm to 11pm. Music by Martin Duggan. Admission including supper €10. Proceeds to The Friends of Letterkenny Hospital.</p>
+<hr>
+<p>Convoy Community and Environmental Committee invite everyone to their first over 60's social club meeting in St Mary's Hall on Friday, 18 September from 12pm-2pm. There will be refreshments and music. It is a free event. All are welcome. *** ABIDE WOMEN'S CONFERENCE will take place from 20 to 22 November at the Great Northern Hotel, Bundoran. Speakers include: Fr. Barry Braum, Fr. Mark Wharton, Nashville Dominicans. Mass will be celebrated by Bishop Fintan Gavin, from Cork and Ross Diocese. Please visit: Abide in His Love at eventbrite.ie Registration link: <a href="https://abideinhislove" target="_blank" rel="noopener noreferrer">https://abideinhislove</a>. eventbrite.com</p>
+<hr>
+<p>A Church Gate Collection for the Re-Development of Ards Friary will take place on Saturday 26 and Sunday 27 September. Your support would be greatly appreciated.</p>
+<hr>
+<p>WE INVITE YOU TO COME &amp; SEE what the Encounter School of Ministry Course is all about. Join us on Thursday 17th September from 6.30pm (first half hour is prayer and worship) to 9.00pm at All Saints Church, Newtowncunningham. Participants can attend up to 3 classes without committing topayforthe course. If a participant decides to enrol before the application deadline of October 1st, tuition fees will then be applied. If a participant decides not to continue, there is no obligation. More information or register here: https:// encounterschool.org/ donegal/ or email <a href="mailto:donegal@encounterschool.org" target="_blank" rel="noopener noreferrer">donegal@encounterschool.org</a>.</p>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-rathmullan" data-parish-name="Rathmullan"><h2 class="ocr-parish-name">Rathmullan</h2><p class="ocr-parish-date">26/09/2026</p></header>
+<p class="page-label">Page 22</p>
+<p>Sunday 13th September Twenty-Fourth Sunday in Ordinary Time Fr Stephen Gorman PP. Parochial House, Rathmullan <a href="tel:+353749158156" style="color:#1d4ed8;font-weight:600;">074 9158156</a>/<a href="tel:+353833552428" style="color:#1d4ed8;font-weight:600;">083 3552428</a> Email: <a href="mailto:pprathmullan@gmail.com" target="_blank" rel="noopener noreferrer">pprathmullan@gmail.com</a> Fr Raymond McQuarrie CC. Parochial House, Milford <a href="tel:+353749153236" style="color:#1d4ed8;font-weight:600;">074 9153236</a>/<a href="tel:+353873647920" style="color:#1d4ed8;font-weight:600;">087 3647920</a> Email: <a href="mailto:milfordkerrykeel@gmail.com" target="_blank" rel="noopener noreferrer">milfordkerrykeel@gmail.com</a> Parish Website: <a href="https://www.milfordrathmullanparishes.ie" target="_blank" rel="noopener noreferrer">www.milfordrathmullanparishes.ie</a> St Mary’s Church, Glenvar Saturday 12th September at 5:45pm Annie &amp; Dan Kelly Anniversary Mass Saturday 19th September at 5:45pm Vigil Mass Rathmullan, Milford, Glenvar, Oughterlin &amp; Kerrykeel Parish Deadline for Newsletter Notices: Please email or phone before 10am on Thursday. St Peter’s Church, Milford Webcam: <a href="https://www.churchservices.tv/milford" target="_blank" rel="noopener noreferrer">www.churchservices.tv/milford</a> Saturday 12th September at 6:00pm Sarah Anthony Anniversary Mass Sunday 13th September at 11:00am The McGarvey Family Anniversary Mass Tuesday 15th September at 10:00am Brid &amp; Kathleen Coyle Anniversary Mass Thursday 17th September at 10:00am Morning Mass Friday 18th September at 10:00am Nancy &amp; Jim Barrett &amp; Margaret Ward</p>
+<h3 class="b-head">Anniversary</h3>
+<p>Mass Saturday 19th September at 6:00pm Vigil Mass Sunday 20th September at 11:00am Avril Friel Anniversary Mass Our Lady of Lourdes Church, Kerrykeel Sunday 13th September at 9:30am</p>
+<h3 class="b-head">Sunday Mass</h3>
+<p>Monday 14th September at 9:30am Morning Mass Sunday 20th September at 9:30am Sunday Mass KILLYGARV AN &amp; T ULLYF ERN PARISH RATHMULLAN - MILFORD - OUGHT ERLIN - KERRYKE EL - GLENVAR F92 E772 F92 YV27 F92 A432 F92 R8P7 F92 D897 Weekly Collections Rathmullan &amp; Oughterlin: €1,705 St Mary’s Glenvar: €420 St Peter’s Milford: €1,455 Our Lady of Lourdes, Kerrykeel: €270 Thank you for your generosity and continued support. St Catherine’s Church, Oughterlin Sunday 13th September at 11:00am Missa Pro Populo Sunday 20th September at 11:00am</p>
+<h3 class="b-head">Sunday Mass</h3>
+<h3 class="b-head">Recently Deceased</h3>
+<p>Kieran Kane, Rathmullan, whose Funeral Mass took place in St Joseph’s Church, Rathmullan on Tuesday. Eamonn Boyle, Glasgow, brother of Grainne McCafferty, Milford.</p>
+<h3 class="b-head">Anniversaries</h3>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-stranolar" data-parish-name="Stranolar"><h2 class="ocr-parish-name">Stranolar</h2><p class="ocr-parish-date">26/09/2026</p></header>
+<p class="page-label">Page 23</p>
+<p>Parish of Stranorlar Church of Mary Immaculate PRIESTS: Rev. Kieran McAteer, P. P. Tel. 9131135 or <a href="tel:+353873496172" style="color:#1d4ed8;font-weight:600;">087 3496172</a> Rev. John Attoh, C. C. Tel 9131157 or <a href="tel:+353899889240" style="color:#1d4ed8;font-weight:600;">089 9889240</a> St. Mary ’s Parish Centre Tel 9175853 St. Vincent de Paul Tel <a href="tel:+353879955351" style="color:#1d4ed8;font-weight:600;">087 9955351</a> BIC: BOFIIE2D IBAN: IE69BOFI90471228947482 Bethany Bereavement Tel <a href="tel:+353894402787" style="color:#1d4ed8;font-weight:600;">089 4402787</a> Mon - Friday 10am - 6pm. Parish Website - <a href="https://www.stranorlarparish.ie" target="_blank" rel="noopener noreferrer">www.stranorlarparish.ie</a> Email - <a href="mailto:stranorlarparish@gmail.com" target="_blank" rel="noopener noreferrer">stranorlarparish@gmail.com</a> Live Streaming - churchservices.tv/stranorlar Facebook - St Mary ’s RC Parish Stranorlar 24th Sunday in Ordinary Time ~ 13th September 2026 MASSES: Saturday - 6pm (Vigil) Sunday - 9am &amp; 11am Weekdays: Monday ~ Thursday 10am Friday 10am &amp; 7.30pm Saturday 10am CONFESSIONS: Saturday 12pm - 1pm &amp; 5.15pm - 5.45pm. ADORATION: Thursday 10.30am - 10.00pm. BAPTISMS: Every Sunday-12 noon &amp; 1st Saturday of every month. To book contact the Parish Office on 9131135 on Fridays between 10am &amp; 12.30pm or by email <a href="mailto:stranorlarparish@gmail.com" target="_blank" rel="noopener noreferrer">stranorlarparish@gmail.com</a>. Please give two weeks notice</p>
+<h3 class="b-head">Recent Deaths</h3>
+<hr>
+<header class="ocr-parish-masthead" id="ocr-parish-templecrone" data-parish-name="Templecrone"><h2 class="ocr-parish-name">Templecrone</h2><p class="ocr-parish-date">26/09/2026</p></header>
+<p class="page-label">Page 24</p>
+<p>A Thirty Third Sunday in Ordinary time PARISH NOTICES: St Vincent de Paul Local Branch Tel: <a href="tel:+353860389322" style="color:#1d4ed8;font-weight:600;">086 038 9322</a> To view Masses &amp; Liturgies online please gotoour Church Services website: <a href="https://www.churchservices.tv/dungloe" target="_blank" rel="noopener noreferrer">www.churchservices.tv/dungloe</a> SUNDAY COLLECTION: €3080. Thank you! LETTERMACAWARD DEVELOPMENT GROUP would like to thank everyone sincerely for the support of the speeding protest. Thank you for coming outinbig numbers to support this very important issue. MARY'S MEALS would like to thank everyone who contributed to the coin and note collection held recently in Dungloe and Annagry. Your generosity is very much appreciated. A CHURCH GATE COLLECTION for the Re-Development of Ards Friary will take place on Saturday 26th and Sunday 27th September. Your support would be greatly appreciated. WE INVITE YOU TO COME &amp; SEE what the Encounter School of Ministry Course is all about . Join us on Thursday 17th September from 6.30pm (first half hour is prayer and worship) to 9.00pm at All Saints Church, Newtowncunningham. Participants can attend up to 3 classes without committing topayforthe course. If a participant decides to enrol before the application deadline of October 1st, tuition fees will then be applied. If a participant decides not to continue, there is no obligation. More information or register here: <a href="https://encounterschool.org/donegal/" target="_blank" rel="noopener noreferrer">https://encounterschool.org/donegal/</a> or email <a href="mailto:donegal@encounterschool.org" target="_blank" rel="noopener noreferrer">donegal@encounterschool.org</a> . MARRIAGE ENRICHMENT WEEKEND A Weekend Like No Other. Take time out for just thetwoof you. Whether newly married or many years together, rediscover the love that brought you together. Friday 2nd – Sunday 4th October 2026 Focolare Centre, Prosperous, Co. Kildare Apply online: <a href="https://www.marriageencounter.ie" target="_blank" rel="noopener noreferrer">www.marriageencounter.ie</a> · <a href="tel:+353876299153" style="color:#1d4ed8;font-weight:600;">087 629 9153</a> Places limited – book now! ABIDE WOMEN'S CONFERENCE, November 20-22, the Great Northern Hotel Bundoran, Co. Donegal. Speakers include: Sarah Swafford, Fr Barry Braum, Fr Mark Wharton, Kimberlee Woo Ling, Danielle Noonan, Nashville Domincans &amp; more, Mass will be celebrated by Bishop Fintan Gavin, from Cork &amp; Ross Diocese. We would love to welcome you this weekend. For more details please visit Abide in His Love at eventbrite.ie Registration link: <a href="https://abideinhislove" target="_blank" rel="noopener noreferrer">https://abideinhislove</a>. eventbrite.com ST. CRONA’S DUNGLOE SAT 12th SEPT. 6.30PM Charles Kennedy &amp; the Kennedy family Deceased members of the Doherty &amp; Houston family Jim Greene, Carnmore Road SUN 13th SEPT. 24th SUNDAY IN ORDINARY TIME 11AM Mary &amp; Maurice Ward MON 14th SEPT. The Exaltation of the cross 10AM Deceased members of the Carr and Friel Families Packie Gallagher(Feenabid), Caravan Rd WED 16th SEPT. Ss Cornelius, Pope &amp; Cyprian, Bishop 10AM Bridget &amp; Jimmy Doherty, St. Crone’s Tce. THU 17th SEPT. 10AM Christine von Dahl, Ashes present Prayers for an operation today FRI 18th SEPT. 10AM SAT 19th SEPT. 6.30PM Eileen, Charlie &amp; Stella Campbell, Madge &amp; Phil O'Donnell Mary Clancy Rodgers, Clare &amp; Bunawack Sheila O'Donnell, Tully &amp; Dublin SUN 20th SEPT. 25th SUNDAY IN ORDINARY TIME 11AM Edward Maloney, Cronashallog, CONFESSIONS every Saturday in St Crona’s @ 5:30pm CONFESSIONS every Saturday in Leitir @ 6.30pm CONFESSIONS every Sunday in Doochary @ 11.00am EXPOSITION OF THE BLESSED SACRAMENT every Monday in St Crona’s 10.30am – 8pm @ St Crona’s THE APOSTOLATE OF SANCTIFICATION group meets every Tuesday @ 3 pmin St Crona’s to pray for our bishops and priests. You are very welcome to join them in person for adoration and prayer or join in the live stream event on our Church services TV channel. NEWSLETTER DEADLINE – 12 NOON THURSDAY Administrator &amp; Director of Music: Lisa Philbin (087) 123 9354 Newsletter: Maureen McCahill (087) 673 7821 ……………………………………………………………………………………………………………………………………………………………. ST. CRONA’S CHURCH, CHAPEL ROAD, DUNGLOE, CO. DONEGAL, F94 W2P2 …………………….………………………………………………………………………………………………………………………………………. TWENTY-FOURTH SUNDAY IN ORDINARY TIME TEMPLECRONE PARISH DUNGLOE-MEENACROSS-LEITIR-DOOCHARY Fr. Pat Ward P. P <a href="tel:+353749521008" style="color:#1d4ed8;font-weight:600;">074 95 21008</a> <a href="tel:+353862300620" style="color:#1d4ed8;font-weight:600;">086 230 0620</a> Email: <a href="mailto:office@templecroneparish.ie" target="_blank" rel="noopener noreferrer">office@templecroneparish.ie</a> á ST. PATRICK’S MEENACROSS SUN 13th SEPT. 24th SUNDAY IN ORDINARY TIME 10AM SUN 20th SEPT 25th SUNDAY IN ORDINARY TIME 10AM ST. BRIDGET’S LEITIR SAT 12th SEPT. 7PM Danny Boyle, Meenagowan John McGinley, Renny SAT 19th SEPT 7PM Roseanne Melly, Toome M. M Tom &amp; Bridget Melly, Toome Madge Duffy, Glasgow &amp; Meenacarn Patrick Duffy, Meenacarn Helena Hanlon, Cloughwally &amp; Galway Peggy McGettigan, Toome &amp; Bristol ST. CONAL’S DOOCHARY SUN 13th SEPT. 24th SUNDAY IN ORDINARY TIME 11.30AM Connell &amp; Madge McDermott, Doochary SUN 20th SEPT. 25th SUNDAY IN ORDINARY TIME 11.30AM Deceased members of CUMANN ISCAIRACHTA GAOTH BARRA Deceased members of the McGlynn Family, Cummeen &amp; Bonner Family, Cloughercullion</p>
+<h3 class="b-head">RECENTLY DECEASED</h3>
+<p>Francie McGovern.</p>
+<h3 class="b-head">ANNIVERSARIES</h3>
+<p>Michael McCready, Meenagowan &amp; London Jamsie Boyle St Crones terrace Please feel free to contribute to the Parish via this code. Usetopayfor Candles, Masses or Parish contributions Templecrone <a href="https://drive" target="_blank" rel="noopener noreferrer">https://drive</a>. google.com/file/d/1Hh7w-Ew0v LJUFMih Fi Vz VJGhje Ypos IH/view</p></div>
+      <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
+    </div>
+
+    <section class="parish-section">
+      <h2 class="section-heading">RAPHOE Parishes with Working Bulletin Links</h2>
+      <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="annagry"><a class="parish-link" href="https://annagryparish.ie/newsletter-2/" target="_blank" rel="noopener noreferrer">Annagry</a></li><li class="parish-item" data-name="ardara"><a class="parish-link" href="http://ardara.ie/news/" target="_blank" rel="noopener noreferrer">Ardara</a></li><li class="parish-item" data-name="bruckless"><a class="parish-link" href="https://drive.google.com/drive/folders/1z9goh6DrkCUkpJMDbwfsi28Yc_t0_ltC" target="_blank" rel="noopener noreferrer">Bruckless</a></li><li class="parish-item" data-name="cathedral"><a class="parish-link" href="https://www.steunanscathedral.ie/newsletter/" target="_blank" rel="noopener noreferrer">Cathedral</a></li><li class="parish-item" data-name="drumholm (ballintra)"><a class="parish-link" href="https://www.parishpress.net/wp-content/uploads/parish-bulletins/donegal/raphoe/drumholm-parish/bulletin.pdf?t=1782303743" target="_blank" rel="noopener noreferrer">Drumholm (Ballintra)</a></li><li class="parish-item" data-name="dunfanaghy"><a class="parish-link" href="https://mcn.live/Camera/holy-cross-church" target="_blank" rel="noopener noreferrer">Dunfanaghy</a></li><li class="parish-item" data-name="falcarragh"><a class="parish-link" href="https://naomhfionan.com/nuachtlitir/" target="_blank" rel="noopener noreferrer">Falcarragh</a></li><li class="parish-item" data-name="gartan/termon (kilmacrenan)"><a class="parish-link" href="https://drive.usercontent.google.com/download?id=1KnA8F6t54NmbyeitUGgtfWxN2IqFMDOa&amp;export=download" target="_blank" rel="noopener noreferrer">Gartan/Termon (Kilmacrenan)</a></li><li class="parish-item" data-name="glenfin"><a class="parish-link" href="https://mcn.live/Camera/our-lady-of-perpetual-succour-glenfinn" target="_blank" rel="noopener noreferrer">Glenfin</a></li><li class="parish-item" data-name="glenties"><a class="parish-link" href="https://drive.usercontent.google.com/download?id=14aLAxt4mv7eYBvYx2GGthpsQnLrsysmK&amp;export=download" target="_blank" rel="noopener noreferrer">Glenties</a></li><li class="parish-item" data-name="gortahork"><a class="parish-link" href="https://www.parishpress.net/wp-content/uploads/parish-bulletins/donegal/raphoe/gort-a-choirce/bulletin.pdf?t=1771000171" target="_blank" rel="noopener noreferrer">Gortahork</a></li><li class="parish-item" data-name="inver"><a class="parish-link" href="https://www.inverparish.com/parish-newsletter.html" target="_blank" rel="noopener noreferrer">Inver</a></li><li class="parish-item" data-name="irish martyrs"><a class="parish-link" href="https://drive.usercontent.google.com/download?id=1m6sOGz3dECWvbbpXCnRGdHG77yWiLXxR&amp;export=download" target="_blank" rel="noopener noreferrer">Irish Martyrs</a></li><li class="parish-item" data-name="kilbarron"><a class="parish-link" href="https://www.kilbarron.org/bulletin" target="_blank" rel="noopener noreferrer">Kilbarron</a></li><li class="parish-item" data-name="kilcar"><a class="parish-link" href="https://www.mcn.live/Camera/st-carthas-church-kilcar,-f94-h2y5" target="_blank" rel="noopener noreferrer">Kilcar</a></li><li class="parish-item" data-name="killybegs"><a class="parish-link" href="https://mcn.live/Camera/st-mary-of-the-visitation-church-killybegs" target="_blank" rel="noopener noreferrer">Killybegs</a></li><li class="parish-item" data-name="kincasslagh"><a class="parish-link" href="https://www.kincasslagh.ie/?post_type=kbp_bulletins" target="_blank" rel="noopener noreferrer">Kincasslagh</a></li><li class="parish-item" data-name="mevagh"><a class="parish-link" href="https://www.facebook.com/profile.php?id=100079250566866" target="_blank" rel="noopener noreferrer">Mevagh</a></li><li class="parish-item" data-name="milford kilkeel"><a class="parish-link" href="https://milfordrathmullanparishes.ie/bulletins/" target="_blank" rel="noopener noreferrer">Milford Kilkeel</a></li><li class="parish-item" data-name="newtown killea"><a class="parish-link" href="https://newtownkilleaparish.ie/bulletin/raphoe/newtown-killea/" target="_blank" rel="noopener noreferrer">Newtown Killea</a></li><li class="parish-item" data-name="raphoe"><a class="parish-link" href="https://drive.usercontent.google.com/download?id=1jmslbrliw1BTtdrxHbqpUbhQEf6wXHy5&amp;export=download" target="_blank" rel="noopener noreferrer">Raphoe</a></li><li class="parish-item" data-name="rathmullan"><a class="parish-link" href="https://milfordrathmullanparishes.ie/bulletins/" target="_blank" rel="noopener noreferrer">Rathmullan</a></li><li class="parish-item" data-name="stranolar"><a class="parish-link" href="https://www.stranorlarparish.ie/newsletter/" target="_blank" rel="noopener noreferrer">Stranolar</a></li><li class="parish-item" data-name="tawnawilly"><a class="parish-link" href="https://tawnawillyparish.ie/bulletin/" target="_blank" rel="noopener noreferrer">Tawnawilly</a></li><li class="parish-item" data-name="templecrone"><a class="parish-link" href="https://drive.usercontent.google.com/download?id=1Hh7w-Ew0vLJUFMihFiVzVJGhjeYposIH&amp;export=download" target="_blank" rel="noopener noreferrer">Templecrone</a></li></ul>
+    </section>
+  </div>
+  <footer>
+    <div class="footer-inner">
+      <span>© 2026 Parish Press</span>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;">
+        <a href="https://github.com/Frankytyrone/parish_harvester" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://buymeacoffee.com/frankytyrone" target="_blank" rel="noopener noreferrer">Donate</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // PDF fullscreen shortcut (the browser's own PDF viewer already
+    // supplies page number / zoom / print controls inside the iframe).
+    (function () {
+      var wrap = document.getElementById('pdf-frame-wrap');
+      var btn = document.getElementById('pdf-fullscreen-btn');
+      if (!wrap || !btn) return;
+      btn.addEventListener('click', function () {
+        try {
+          if (wrap.requestFullscreen) {
+            wrap.requestFullscreen();
+          } else if (wrap.webkitRequestFullscreen) {
+            wrap.webkitRequestFullscreen();
+          }
+        } catch (e) {}
+      });
+    })();
+
+    
+    (function () {
+      function activateWrap(wrap) {
+        if (!wrap) return;
+        wrap.classList.add('is-native-pdf');
+        var iframe = wrap.querySelector('iframe');
+        if (iframe) {
+          iframe.setAttribute('hidden', '');
+          try { iframe.removeAttribute('src'); } catch (e) {}
+        }
+      }
+
+      document.querySelectorAll('.pdf-frame-wrap').forEach(activateWrap);
+
+      var standalone = document.querySelector('iframe.pdf-frame');
+      if (standalone && !standalone.closest('.pdf-frame-wrap')) {
+        document.body.classList.add('is-native-pdf');
+        standalone.setAttribute('hidden', '');
+        try { standalone.removeAttribute('src'); } catch (e) {}
+      }
+
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260912a"]')) {
+        var s = document.createElement('script');
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260912a';
+        s.defer = true;
+        document.head.appendChild(s);
+      }
+    })();
+
+
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-panel');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+
+    (function () {
+      const ocrPanel = document.getElementById('ocr-panel');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      const parishFilter = document.getElementById('parish-filter');
+      const parishItems = Array.from(document.querySelectorAll('.parish-item'));
+      const parishEmpty = document.getElementById('parish-empty');
+      if (!ocrPanel || !ocrSearch) return;
+      const originalOcrHtml = ocrPanel.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+
+      function escapeRegExp(text) {
+        const specials = new Set(['\\', '^', '$', '.', '|', '?', '*', '+', '(', ')', '[', ']', '{', '}']);
+        return Array.from(text).map((ch) => specials.has(ch) ? `\\${ch}` : ch).join('');
+      }
+
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        const target = ocrMatches[idx];
+        target.classList.add('search-active');
+        const details = target.closest('details.parish-block');
+        if (details) details.open = true;
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      function updateMatchUi() {
+        if (!matchCount || !prevMatchBtn || !nextMatchBtn) return;
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} / ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+
+      function applyOcrSearch(query) {
+        ocrPanel.innerHTML = originalOcrHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrPanel, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) {
+            nodes.push(node);
+          }
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) {
+            return;
+          }
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match = null;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) {
+              fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            }
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) {
+            fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          }
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrPanel.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+
+      ocrSearch.addEventListener('input', function (event) {
+        applyOcrSearch(event.target.value.trim());
+      });
+      clearSearch.addEventListener('click', function () {
+        ocrSearch.value = '';
+        applyOcrSearch('');
+        ocrSearch.focus();
+      });
+      prevMatchBtn.addEventListener('click', function () {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', function () {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' && ocrMatches.length) {
+          event.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+
+      if (parishFilter) {
+        parishFilter.addEventListener('input', function (event) {
+          const term = event.target.value.trim().toLowerCase();
+          let visibleCount = 0;
+          parishItems.forEach((item) => {
+            const name = (item.dataset.name || '').toLowerCase();
+            const matches = !term || name.includes(term);
+            item.hidden = !matches;
+            if (matches) {
+              visibleCount += 1;
+            }
+          });
+          if (parishEmpty) {
+            parishEmpty.hidden = visibleCount !== 0;
+          }
+        });
+      }
+      if (parishEmpty) {
+        parishEmpty.hidden = parishItems.length === 0 ? false : true;
+      }
+
+      updateMatchUi();
+    })();
+
+    // ── View Counter (localStorage) ──────────────────────────────────
+    (function() {
+      var key = 'ph_views_' + location.pathname;
+      var weekKey = 'ph_views_week';
+      var now = new Date();
+      var weekId = now.getFullYear() + '-W' + String(Math.ceil((now - new Date(now.getFullYear(),0,1)) / 86400000 / 7)).padStart(2,'0');
+      try {
+        var views = JSON.parse(localStorage.getItem(key) || '{}'  );
+        if (views.week !== weekId) { views = { week: weekId, count: 0 }; }
+        views.count += 1;
+        localStorage.setItem(key, JSON.stringify(views));
+        // Update total weekly views across all pages
+        var total = JSON.parse(localStorage.getItem(weekKey) || '{}'  );
+        if (total.week !== weekId) { total = { week: weekId, count: 0 }; }
+        total.count += 1;
+        localStorage.setItem(weekKey, JSON.stringify(total));
+        var el = document.getElementById('view-count');
+        if (el) el.textContent = total.count;
+      } catch(e) {}
+    })();
+
+    // ── Self-Check: Is this week's bulletin available? ───────────────
+    (function() {
+      var generated = document.querySelector('.meta');
+      if (!generated) return;
+      var text = generated.textContent || '';
+      var match = text.match(/(\d{4})-(\d{2})-(\d{2})/);
+      if (!match) {
+        match = text.match(/(\d{2})[/](\d{2})[/](\d{4})/);
+        if (match) match = [null, match[3], match[2], match[1]];
+      }
+      if (!match) return;
+      var bulletinDate = new Date(match[1] + '-' + match[2] + '-' + match[3]);
+      var now = new Date();
+      var daysSince = Math.floor((now - bulletinDate) / 86400000);
+      if (daysSince > 8) {
+        var banner = document.createElement('div');
+        banner.style.cssText = 'max-width:1100px;margin:12px auto;padding:0 16px;';
+        banner.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px 16px;color:#991b1b;font-weight:600;text-align:center;">⚠️ This bulletin is ' + daysSince + ' days old. A newer version may be available — check back after Sunday\'s harvest run.</div>';
+        var page = document.querySelector('.page');
+        if (page) page.insertBefore(banner, page.firstChild);
+      }
+    })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      function boot() {
+        var btn = document.getElementById('scroll-top-btn');
+        if (!btn) {
+          if (!document.body) return;
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scroll-top-btn';
+          btn.id = 'scroll-top-btn';
+          btn.setAttribute('aria-label', 'Back to top');
+          btn.textContent = '↑';
+          document.body.appendChild(btn);
+        }
+        function innerBoxes() {
+          return Array.prototype.slice.call(
+            document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+          );
+        }
+        function maxInnerScroll() {
+          return innerBoxes().reduce(function (max, el) {
+            return Math.max(max, el.scrollTop || 0);
+          }, 0);
+        }
+        function shown() {
+          var y = window.scrollY || document.documentElement.scrollTop || 0;
+          btn.classList.toggle('is-visible', y > 80 || maxInnerScroll() > 16);
+        }
+        function shownSoon() {
+          shown();
+          if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+          else window.setTimeout(shown, 16);
+        }
+        function bindBox(el) {
+          if (!el || el.getAttribute('data-pp-scroll-top') === '1') return;
+          el.setAttribute('data-pp-scroll-top', '1');
+          el.addEventListener('scroll', shownSoon, { passive: true });
+        }
+        function bindBoxes() {
+          innerBoxes().forEach(bindBox);
+          shown();
+        }
+        window.parishPressBindScrollTopBoxes = bindBoxes;
+        if (btn.getAttribute('data-pp-bound') !== 'inner-2') {
+          btn.setAttribute('data-pp-bound', 'inner-2');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.addEventListener('scroll', shownSoon, { passive: true });
+          document.addEventListener('scroll', shownSoon, { capture: true, passive: true });
+          document.addEventListener('wheel', shownSoon, { capture: true, passive: true });
+          document.addEventListener('touchmove', shownSoon, { capture: true, passive: true });
+          if (window.MutationObserver && document.body) {
+            new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+          }
+          btn.addEventListener('click', function () {
+            var behavior = reduce ? 'auto' : 'smooth';
+            window.scrollTo({ top: 0, behavior: behavior });
+            innerBoxes().forEach(function (el) {
+              el.scrollTop = 0;
+              if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+            });
+            window.setTimeout(shown, reduce ? 0 : 400);
+          });
+        }
+        bindBoxes();
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
+    })();
+    
+    
+    (function () {
+      // Read the page index lazily: this script runs before the
+      // #parish-page-index JSON later in the body exists, so reading it now
+      // would leave every PDF jump with an empty index.
+      var index = null;
+      function pageIndex() {
+        if (index) return index;
+        index = {};
+        var node = document.getElementById('parish-page-index');
+        if (node) {
+          try { index = JSON.parse(node.textContent || '{}') || {}; } catch (e) {}
+        }
+        return index;
+      }
+      function reduceMotion() {
+        return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      }
+      function norm(s) {
+        return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+      }
+      function coreName(s) {
+        return String(s || '').replace(/\s*\([^)]*\)\s*/g, ' ').trim();
+      }
+      function scrollBoxTo(box, el) {
+        if (!box || !el) return false;
+        var br = box.getBoundingClientRect();
+        var er = el.getBoundingClientRect();
+        var top = box.scrollTop + (er.top - br.top) - 8;
+        if (box.scrollTo) {
+          box.scrollTo({ top: Math.max(0, top), behavior: reduceMotion() ? 'auto' : 'smooth' });
+        } else {
+          box.scrollTop = Math.max(0, top);
+        }
+        return true;
+      }
+      function slugOf(s) {
+        return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      }
+      function findOcr(box, name) {
+        if (!box) return null;
+        var wanted = [norm(name), norm(coreName(name))];
+        var nodes = box.querySelectorAll('.ocr-parish-masthead, [id^="ocr-parish-"]');
+        for (var i = 0; i < nodes.length; i++) {
+          var el = nodes[i];
+          var label = el.getAttribute('data-parish-name') || ((el.querySelector('.ocr-parish-name') || el).textContent || '');
+          var got = norm(label);
+          if (wanted.indexOf(got) >= 0 || wanted.indexOf(norm(coreName(label))) >= 0) return el;
+        }
+        // The search box rebuilds #ocr-panel innerHTML, so fall back to the
+        // masthead id the layout writes (ocr-parish-<slug>).
+        var byId = box.querySelector('#ocr-parish-' + slugOf(name))
+          || box.querySelector('#ocr-parish-' + slugOf(coreName(name)));
+        return byId || null;
+      }
+      function flashLanding(el) {
+        if (!el || !el.classList) return;
+        el.classList.remove('az-landed');
+        void el.offsetWidth;
+        el.classList.add('az-landed');
+        window.setTimeout(function () { el.classList.remove('az-landed'); }, 1800);
+      }
+      function landInBox(box, el) {
+        // Move the box instantly (one smooth animation only — a second one on
+        // the same scroll chain used to be cancelled halfway, which left the
+        // reader in the middle of another parish), then bring the box itself
+        // on screen, then re-check because zoom/fonts can reflow the text.
+        var br = box.getBoundingClientRect();
+        var er = el.getBoundingClientRect();
+        box.scrollTop = Math.max(0, box.scrollTop + (er.top - br.top) - 8);
+        showBox(box);
+        var tries = 0;
+        (function settle() {
+          if (tries++ > 6) return;
+          var b2 = box.getBoundingClientRect();
+          var e2 = el.getBoundingClientRect();
+          var off = Math.round(e2.top - b2.top - 8);
+          if (Math.abs(off) > 3) box.scrollTop = Math.max(0, box.scrollTop + off);
+          window.setTimeout(settle, 150);
+        })();
+        flashLanding(el);
+      }
+      function pageFor(name) {
+        var map = pageIndex();
+        if (map[name]) return map[name];
+        var n = norm(name);
+        var keys = Object.keys(map);
+        for (var i = 0; i < keys.length; i++) {
+          if (norm(keys[i]) === n || norm(coreName(keys[i])) === n || n === norm(coreName(keys[i]))) {
+            var val = map[keys[i]];
+            if (typeof val === 'number') return val;
+          }
+        }
+        return 0;
+      }
+      function showBox(box) {
+        // The jump happens inside the locked box, so make sure the box itself
+        // is on screen first or a phone reader sees nothing move. Leave room
+        // for the sticky search bar when a term is typed, otherwise it covers
+        // the parish header the reader just asked for.
+        if (!box || !box.getBoundingClientRect) return;
+        var r = box.getBoundingClientRect();
+        var h = window.innerHeight || document.documentElement.clientHeight || 0;
+        var sticky = document.querySelector('.ocr-sticky-chrome.is-searching');
+        var pad = sticky ? Math.round(sticky.getBoundingClientRect().height) + 8 : 0;
+        if (r.top < pad || r.top > h - 120) {
+          window.scrollTo({
+            top: Math.max(0, (window.scrollY || window.pageYOffset || 0) + r.top - pad),
+            behavior: reduceMotion() ? 'auto' : 'smooth',
+          });
+        }
+      }
+      function jumpPdf(names) {
+        var pages = document.querySelector('.pdf-inpage-pages');
+        if (!pages) return false;
+        for (var i = 0; i < names.length; i++) {
+          var page = pageFor(names[i]);
+          if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
+          var slot = pages.querySelector('[data-page="' + page + '"]');
+          if (!slot) continue;
+          scrollBoxTo(pages, slot);
+          return true;
+        }
+        return false;
+      }
+      function jumpOcr(names) {
+        var ocr = document.getElementById('ocr-panel') || document.getElementById('ocr-text');
+        if (!ocr) return false;
+        for (var i = 0; i < names.length; i++) {
+          var hit = findOcr(ocr, names[i]);
+          if (!hit) continue;
+          landInBox(ocr, hit);
+          return true;
+        }
+        return false;
+      }
+      function jump(target, names, tries) {
+        var done = target === 'pdf' ? jumpPdf(names) : jumpOcr(names);
+        // PDF.js paints page slots as it streams, so the slot may not exist
+        // for a second or two after load; the OCR panel is rebuilt whenever a
+        // search is cleared. Retry briefly instead of failing silently.
+        if (!done && (tries || 0) < 12) {
+          window.setTimeout(function () { jump(target, names, (tries || 0) + 1); }, 400);
+        }
+      }
+      function namesOf(btn) {
+        var raw = btn.getAttribute('data-az-names') || btn.getAttribute('data-parish-name') || '';
+        var out = [];
+        raw.split('|').forEach(function (part) {
+          var name = String(part || '').trim();
+          if (name) out.push(name);
+        });
+        return out;
+      }
+      document.addEventListener('click', function (ev) {
+        if (!ev.target || !ev.target.closest) return;
+        var btn = ev.target.closest('.az-letter');
+        if (!btn) return;
+        ev.preventDefault();
+        jump(btn.getAttribute('data-az-target') || 'ocr', namesOf(btn), 0);
+      });
+    })();
+    
+  </script>
+  <script type="application/json" id="parish-page-index">{}</script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
+</body>
+</html>
