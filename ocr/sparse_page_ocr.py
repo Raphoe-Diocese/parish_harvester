@@ -92,13 +92,14 @@ def ocr_lines_look_smashed(lines: list[str] | None) -> bool:
         return False
     if _SMASH_FRAG_RE.search(text):
         return True
-    if text.count("|") >= 4:
-        return True
-    if len(_BROKEN_ORDINAL_RE.findall(text)) >= 3:
-        return True
     short = sum(1 for tok in words if len(tok) <= 2)
     singles = sum(1 for tok in words if len(tok) == 1 and tok.isalpha())
     avg = sum(len(tok) for tok in words) / len(words)
+    # Pipes alone are common in clean tables — need short-token smash too.
+    if text.count("|") >= 4 and short / len(words) >= 0.22:
+        return True
+    if len(_BROKEN_ORDINAL_RE.findall(text)) >= 3:
+        return True
     if short / len(words) >= 0.38 and avg < 3.6:
         return True
     if singles / len(words) >= 0.16 and short / len(words) >= 0.30:
@@ -636,25 +637,40 @@ def polish_ocr_html_from_pdf(fragment: str, pdf_path: str | Path) -> str:
     return repair_image_pages_in_ocr_html(polished, pdf_path)
 
 
+# Cap vision calls per mega PDF — Gemini free tier is tiny (Frank 26/09/2026 OCR
+# burned quota on Cork's false-positive smash hits and Dunfanaghy never got a pass).
+MAX_VISION_PAGES_PER_PDF = 10
+
+
 def choose_vision_page_indexes(native_pages: list[list[str]] | None) -> list[int] | None:
     """Which 0-based pages need vision.
 
     ``[]`` — every page has usable embedded text; send none.
-    A list — mixed mega; send only sparse / column-smashed image pages.
+    A list — mixed mega; send sparse pages first, then worst smashed pages,
+    capped at :data:`MAX_VISION_PAGES_PER_PDF`.
     ``None`` — no usable native text (or every page needs vision); send the whole PDF.
     """
     pages = list(native_pages or [])
     if not pages:
         return None
-    need = [
+    sparse = [i for i, lines in enumerate(pages) if page_is_sparse(lines)]
+    smashed = [
         i
         for i, lines in enumerate(pages)
-        if page_is_sparse(lines) or ocr_lines_look_smashed(lines)
+        if i not in sparse and ocr_lines_look_smashed(lines)
     ]
+    smashed.sort(key=lambda i: column_smash_score(pages[i]), reverse=True)
+    need = sparse + smashed
     if not need:
         return []
-    if len(need) == len(pages):
+    if len(need) == len(pages) and len(pages) <= MAX_VISION_PAGES_PER_PDF:
         return None
+    if len(need) > MAX_VISION_PAGES_PER_PDF:
+        need = need[:MAX_VISION_PAGES_PER_PDF]
+        print(
+            f"  Vision page cap: sending {len(need)}/{len(sparse) + len(smashed)} "
+            f"worst pages (sparse first, then smash score)."
+        )
     return need
 
 
