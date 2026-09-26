@@ -152,7 +152,13 @@ def page_ocr_needs_image_repair(
     vision_lines: list[str] | None,
     embedded_lines: list[str] | None,
 ) -> bool:
-    """Image/banner pages whose current OCR is empty or column-smashed."""
+    """Image/banner pages whose current OCR is empty, sparse, or column-smashed.
+
+    Dunfanaghy-style image PDFs often embed *lots* of junk characters, so they
+    are not ``page_is_sparse`` — still send them for vision/column repair.
+    """
+    if embedded_lines and ocr_lines_look_smashed(embedded_lines):
+        return True
     if embedded_lines and not page_is_sparse(embedded_lines):
         return False
     if page_is_sparse(vision_lines):
@@ -560,7 +566,12 @@ def prefer_embedded_pages_in_ocr_html(fragment: str, pdf_path: str | Path) -> st
     for num, body in pages:
         idx = num - 1
         native_lines = native[idx] if 0 <= idx < len(native) else None
-        if native_lines and not page_is_sparse(native_lines):
+        # Do not prefer column-smashed native text (Dunfanaghy image PDFs).
+        if (
+            native_lines
+            and not page_is_sparse(native_lines)
+            and not ocr_lines_look_smashed(native_lines)
+        ):
             rendered = "\n".join(render_markdown_lines(native_lines))
             out.append((num, rendered))
             preferred += 1
@@ -628,19 +639,23 @@ def polish_ocr_html_from_pdf(fragment: str, pdf_path: str | Path) -> str:
 def choose_vision_page_indexes(native_pages: list[list[str]] | None) -> list[int] | None:
     """Which 0-based pages need vision.
 
-    ``[]`` — every page has embedded text; send none.
-    A list — mixed mega; send only those sparse/image pages.
-    ``None`` — no usable native text (or every page is sparse); send the whole PDF.
+    ``[]`` — every page has usable embedded text; send none.
+    A list — mixed mega; send only sparse / column-smashed image pages.
+    ``None`` — no usable native text (or every page needs vision); send the whole PDF.
     """
     pages = list(native_pages or [])
     if not pages:
         return None
-    sparse = [i for i, lines in enumerate(pages) if page_is_sparse(lines)]
-    if not sparse:
+    need = [
+        i
+        for i, lines in enumerate(pages)
+        if page_is_sparse(lines) or ocr_lines_look_smashed(lines)
+    ]
+    if not need:
         return []
-    if len(sparse) == len(pages):
+    if len(need) == len(pages):
         return None
-    return sparse
+    return need
 
 
 def merge_vision_into_pages(
