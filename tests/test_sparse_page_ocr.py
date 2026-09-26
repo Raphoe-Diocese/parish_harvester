@@ -24,6 +24,7 @@ from ocr.sparse_page_ocr import (
     replacement_is_better,
     split_ocr_html_pages,
 )
+from ocr.text_extract import page_is_sparse
 
 _ANNAGRY_SMASH = [
     "i gi Teach = 9 ? at i Réalt n; ii haite | We An thth Ma Sat 22™Aug 6.30pm",
@@ -143,6 +144,33 @@ class SparsePageOcrHtmlTests(unittest.TestCase):
                 irish + ["Weekend Mass Times Saturday Vigil Kilclooney 6.00pm extra body text"],
             )
         )
+
+    def test_smashed_embedded_text_is_sent_to_vision(self) -> None:
+        """Dunfanaghy-style: lots of junk chars, not sparse, still needs vision."""
+        from ocr.sparse_page_ocr import choose_vision_page_indexes
+
+        smashed = [
+            "It Isour privilege and OUPae Ventere (0 GIscover IESSSourown",
+            "special light. The Candle of Remembrance STSSisa SS0a— —",
+            "Mary Dunbar for the coming week will beorfi »\\ lit in loving",
+            "memory of Ar. uii, i Holy Cross Church, Dunfanaghy ) i ~ yal",
+            "Fr. Martin Doohan | Parish Priest | Margaret | Patrick | Patsy",
+            "Charlie McConnell | j f 4 aya Tel: 074-91-36163 | Mobile | 087",
+            "Killygordan ‘dla |‘ Fr. John Joe Duffy | Creeslough | id & saiw",
+            "Masses for the Coming Weeki | eg EWMon - No Mass ) & 3 . _ Tue",
+        ]
+        self.assertTrue(ocr_lines_look_smashed(smashed))
+        self.assertFalse(page_is_sparse(smashed))
+        self.assertTrue(page_ocr_needs_image_repair(["placeholder"], smashed))
+
+        irish = [
+            "POBAL CHRÍOST RÍ GORT A’ CHOIRCE AIFRINN NA SEACHTAINE",
+            "16ú Lúnasa 2026 An tAth. Donnchadh Ó Baoill paróiste",
+            "Nora O'Donnell, An Bhealtaine agus Eamon Mc Ginley Inis Bó Finne",
+            "Tógadh €1,530 an tseachtain s'chuaigh thart. Buíochas don phobal uile.",
+            "Seo mar a deir an Tiarna: Coinnígí an ceart, cleachtaígí an fhíréanacht.",
+        ]
+        self.assertEqual(choose_vision_page_indexes([irish, smashed]), [1])
 
     def test_column_gutter_finds_sidebar_not_midpage(self) -> None:
         from PIL import Image, ImageDraw
