@@ -15,7 +15,9 @@ locked harvester product order.
 
 **This turn:** Official Achonry list from https://achonrydiocese.org/parishes/ (23) + joint directory https://achonryelphin.ie/find-your-parish/. Elphin left for next. Wired `achonry` folder + `achonry_diocese` stem. **10 recipes** (9 harvestable + Bohola shared→Straide). Proved this-week files: Attymass latest PDF, Gurteen 27 Sept PDF, Foxford 27 Sept PDF, Keash .doc, Straide/Bohola shared PDF, Tubbercurry 27 Sept PDF, Kiltimagh SEPT-27th PDF; Kilmovee 20 Sept (stale-but-real); Tourlestrane HTML print.
 
-**Next:** green Actions harvest `achonry_diocese` run ID; kitchen-sink remaining Achonry cards without proved files; then stop Achonry and start Ardagh and Clonmacnoise.
+**Done harvest:** Actions [36340861120](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/36340861120) green; `docs/mega_pdf/achonry_mega_bulletin.pages.json` written. Placeholder `docs/dioceses/achonry/` exists (not full OCR live yet).
+
+**Next:** kitchen-sink remaining Achonry cards without proved files; prove status outcomes for the 10 recipes; then stop Achonry and start Ardagh and Clonmacnoise.
 
 **Parked:** Elphin (same joint site, separate diocese letter E); Dunfanaghy OCR; Problems console.
 
