@@ -57,7 +57,7 @@ Facebook / no live weekly file on 22/08/2026: Aughnamullen East, Belleek-Garriso
 
 Do **not** start until Frank names the diocese. Kitchen-sink search is the command above. This pack is how that diocese becomes a folder harvest can see.
 
-Today’s live matrix: `clogher`, `cork_and_ross`, `derry`, `down_and_connor`, `raphoe`. Frank named **Cork** (17/09/2026) — that is **Cork and Ross**, not Cloyne. Official directory: https://corkandross.org/parishes (67 cards, opened that day). Harvest `--diocese` uses the **evidence stem**, not the folder name: `clogher_diocese`, `derry_diocese`, `raphoe_diocese`, `down_and_connor`, `cork_and_ross`. Cork is on the Sunday matrix from 23/09/2026 after recipes + first harvest.
+Today’s live matrix: `clogher`, `cork_and_ross`, `derry`, `down_and_connor`, `raphoe`. **Achonry** onboarding started 27/09/2026 (folder `achonry`, stem `achonry_diocese`) — not live on the public site until first harvest writes `docs/dioceses/achonry/`. Official Achonry cards: https://achonrydiocese.org/parishes/ (23). Joint Achonry+Elphin A–Z: https://achonryelphin.ie/find-your-parish/ — Elphin is a separate diocese letter, do not mix into Achonry evidence. Frank named **Cork** (17/09/2026) — that is **Cork and Ross**, not Cloyne. Harvest `--diocese` uses the **evidence stem**, not the folder name: `achonry_diocese`, `clogher_diocese`, `derry_diocese`, `raphoe_diocese`, `down_and_connor`, `cork_and_ross`.
 
 ### 1. Parish list
 

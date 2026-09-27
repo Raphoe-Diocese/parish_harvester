@@ -29,6 +29,7 @@ BULLETINS_DATA_DIR = REPO_ROOT / "Bulletins"
 SUMMARIES_DIR = BULLETINS_DATA_DIR / "summaries"
 DIFFS_DIR = BULLETINS_DATA_DIR / "diffs"
 CONTACTS_PATH_BY_DIOCESE = {
+    "achonry": REPO_ROOT / "parishes" / "achonry_diocese_contacts.json",
     "clogher": REPO_ROOT / "parishes" / "clogher_diocese_contacts.json",
     "cork_and_ross": REPO_ROOT / "parishes" / "cork_and_ross_contacts.json",
     "derry": REPO_ROOT / "parishes" / "derry_diocese_contacts.json",
