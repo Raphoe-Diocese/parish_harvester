@@ -672,6 +672,41 @@ class UrlDateParsingAndScoringTests(unittest.TestCase):
         self.assertEqual(extract_date_from_slug("1st-January-2026"), _date(2026, 1, 1))
         self.assertEqual(extract_date_from_slug("22nd-November-2026"), _date(2026, 11, 22))
 
+    def test_extract_date_slug_month_abbrev_trailing_dot(self) -> None:
+        # Gurteen ChurchTV: 27-Sept.-2026.pdf under stale /uploads/2021/02/
+        from harvester.utils import extract_date_from_slug, extract_date_from_string
+        from harvester.bulletin_freshness import extract_bulletin_date
+        from datetime import date as _date
+
+        name = "Gurteen-Parish-Newsletter-27-Sept.-2026.pdf"
+        url = (
+            "https://www.churchtv.ie/wp-content/uploads/2021/02/"
+            "Gurteen-Parish-Newsletter-27-Sept.-2026.pdf"
+        )
+        self.assertEqual(extract_date_from_slug(name), _date(2026, 9, 27))
+        self.assertEqual(extract_date_from_string(name), _date(2026, 9, 27))
+        self.assertEqual(extract_bulletin_date(url), _date(2026, 9, 27))
+
+    def test_extract_date_year_monthname_day_glued(self) -> None:
+        # Kilvarnet (Collooney): 2026Sept27RCB.pdf on GoDaddy wsimg CDN
+        from harvester.utils import extract_date_from_string
+        from harvester.bulletin_freshness import extract_bulletin_date
+        from datetime import date as _date
+
+        name = "2026Sept27RCB.pdf"
+        url = (
+            "https://img1.wsimg.com/blobby/go/feef6feb-5174-4089-b09e-a49e1802623a/"
+            "downloads/1407acee-409a-4b68-8109-8ca794d908f3/2026Sept27RCB.pdf"
+        )
+        self.assertEqual(extract_date_from_string(name), _date(2026, 9, 27))
+        self.assertEqual(extract_date_from_string("2026Aug30RCB.pdf"), _date(2026, 8, 30))
+        self.assertEqual(extract_date_from_string("2026July14RCB.pdf"), _date(2026, 7, 14))
+        self.assertEqual(extract_bulletin_date(url), _date(2026, 9, 27))
+        self.assertEqual(
+            extract_date_from_string("2026-August-16-Twentieth-Sunday.pdf"),
+            _date(2026, 8, 16),
+        )
+
     def test_extract_date_wix_split_year(self) -> None:
         from harvester.utils import extract_date_from_string
         from datetime import date as _date

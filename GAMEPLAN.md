@@ -1,4 +1,4 @@
-# GAMEPLAN
+﻿# GAMEPLAN
 
 The one list for everything that is **not** a website/OCR page job and **not** the
 locked harvester product order.
@@ -8,6 +8,7 @@ locked harvester product order.
 
 
 ## 27/09/2026 evening — Diocese hunt A–Z: Achonry (doing)
+- Achonry 27/09 evening: Sept. trailing-dot slug fix; Tourlestrane goto; Kilmovee 27 Sept example; Ballymote image recipe + Collooney/Kilvarnet PDF recipe — re-harvest next.
 
 **The real goal, in one sentence:** onboard every remaining Irish diocese A–Z, find real bulletins (PDF / HTML / Word / image), one diocese at a time per `docs/DIOCESE_HUNT.md`.
 

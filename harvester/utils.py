@@ -99,19 +99,21 @@ _MONTH_ALT = "|".join(sorted(_MONTH_MAP.keys(), key=len, reverse=True))
 # Year may be 2026 or '26 (Ardara "sun-30th-august-26"). Month names only —
 # [a-z]+ used to eat "sun" + the "30" of "30th" and hide the real date.
 # (?<!\d) stops "2026-August-16" being read as 26 August 2016.
+# Optional "." after month abbrev: Gurteen "27-Sept.-2026.pdf" on ChurchTV
+# (folder /2021/02/ is upload month, not the bulletin — found 27/09/2026).
 _SLUG_DATE_RE = re.compile(
-    rf"(?<!\d)(\d{{1,2}})(?:st|nd|rd|th)?[_\-\s+]+({_MONTH_ALT})[_\-\s+]+(20\d{{2}}|\d{{2}})",
+    rf"(?<!\d)(\d{{1,2}})(?:st|nd|rd|th)?[_\-\s+]+({_MONTH_ALT})\.?[_\-\s+]+(20\d{{2}}|\d{{2}})",
     re.IGNORECASE,
 )
 _YEARLESS_SLUG_RE = re.compile(
-    rf"(?<!\d)(\d{{1,2}})(?:st|nd|rd|th)?[_\-\s+]({_MONTH_ALT})"
+    rf"(?<!\d)(\d{{1,2}})(?:st|nd|rd|th)?[_\-\s+]({_MONTH_ALT})\.?"
     rf"(?![a-z])(?![_\-\s+]\d{{2,4}})",
     re.IGNORECASE,
 )
 
-# Glenavy: 2026-August-16-Twentieth-Sunday-in-Ordinary-Time.pdf
+# Glenavy: 2026-August-16-... ; Kilvarnet/Collooney: 2026Sept27RCB.pdf (no separators).
 _YEAR_MONTHNAME_DAY_RE = re.compile(
-    rf"(20\d{{2}})[_\-\s]({_MONTH_ALT})[_\-\s](\d{{1,2}})(?:st|nd|rd|th)?(?!\d)",
+    rf"(20\d{{2}})[_\-\s]?({_MONTH_ALT})[_\-\s]?(\d{{1,2}})(?:st|nd|rd|th)?(?!\d)",
     re.IGNORECASE,
 )
 
