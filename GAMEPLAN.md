@@ -11,9 +11,9 @@ locked harvester product order.
 
 **The real goal, in one sentence:** stop leaving Tawnawilly on the 06/09 PDF when Sunday-27th-Sept-26.pdf is already on the site.
 
-**Done (proved):** Recipe pointed at `Sunday-27th-Sept-26.pdf` (HTTP 200; `Sunday-Sept-27-26.pdf` 404s). Single-parish harvest run [36323552620](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/36323552620) → `parish_status` outcome **ok**, URL that file, bulletin date **27/09/2026**, `last_tested_at` 2026-09-27. Commit `c7f0a51b` + harvest commit `d0970ab4`.
+**Done (proved):** Recipe pointed at `Sunday-27th-Sept-26.pdf`. Single-parish [36323552620](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/36323552620) → status **ok**. Raphoe harvest [36323993190](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/36323993190) + OCR [36324246175](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/36324246175) + Pages [36325243392](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/36325243392). **Live** https://www.parishpress.ie/dioceses/raphoe/ title 27/09/2026; Tawnawilly OCR header 27/09/2026 (Sunday 27th Sept Mass times).
 
-**Next:** full Raphoe harvest / mega OCR when Frank wants the diocese viewer updated (single-parish skips mega). Dunfanaghy OCR still needs Gemini quota.
+**Next:** Dunfanaghy OCR when Gemini quota allows. Locked list: Problems console.
 
 **Parked:** nothing new.
 
