@@ -56,6 +56,11 @@ _LEADING_ORDINAL_RE = re.compile(
     re.I,
 )
 
+# Ballymote Page-01-3.jpg / page-04-3.jpg — digits are page numbers, not day
+# (found 27/09/2026: page-04 dated as 04/09 and rejected as stale).
+_PAGE_SCAN_BASENAME_RE = re.compile(r"^page[-_]?\d+", re.IGNORECASE)
+
+
 
 FreshnessStatus = Literal["fresh", "stale", "unknown"]
 
@@ -183,6 +188,9 @@ def extract_bulletin_date(url_or_text: str) -> date | None:
             # "19th Sunday in Ordinary Time", which is genuinely correct for
             # 09/08/2026, but the filename's leading "19" isn't a date at
             # all). Skip slug_day when it matched that same leading ordinal.
+            # Page-01 / page-04 scans: page index, not calendar day.
+            if _PAGE_SCAN_BASENAME_RE.match(basename):
+                return _safe_date(folder_year, folder_month, 1)
             ordinal_match = _LEADING_ORDINAL_RE.match(basename)
             slug_day = re.search(r"(?<!\d)(0?[1-9]|[12]\d|3[01])(?!\d)", basename)
             if slug_day and not (
@@ -366,7 +374,10 @@ def check_bulletin_freshness(url: str, target: date) -> FreshnessVerdict:
         extracted.day == 1
         and extracted.year == target.year
         and extracted.month == target.month
-        and _opaque_hash_spans(basename)
+        and (
+            _opaque_hash_spans(basename)
+            or _PAGE_SCAN_BASENAME_RE.match(basename)
+        )
     ):
         return FreshnessVerdict(
             status="fresh",

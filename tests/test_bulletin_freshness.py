@@ -179,6 +179,20 @@ class BulletinFreshnessTests(unittest.TestCase):
         self.assertEqual(later.status, "stale")
         self.assertEqual(later.reason, "date_behind_of_target")
 
+    def test_page_scan_basename_is_not_day_of_month(self) -> None:
+        # Ballymote Page-01-3.jpg / page-04-3.jpg under /uploads/2026/09/ —
+        # "04" is page 4, not 4 September (found 27/09/2026).
+        url = (
+            "https://ballymoteparish.org/wp-content/uploads/2026/09/"
+            "page-04-3.jpg"
+        )
+        extracted = extract_bulletin_date(url)
+        self.assertNotEqual(extracted, date(2026, 9, 4))
+        self.assertEqual(extracted, date(2026, 9, 1))
+        verdict = check_bulletin_freshness(url, date(2026, 9, 27))
+        self.assertEqual(verdict.status, "fresh")
+        self.assertEqual(verdict.reason, "upload_folder_matches_target_month")
+
     def test_21st_suday_filename_is_23_august_2026(self) -> None:
         url = (
             "https://derriaghycatholicparish.com/wp-content/uploads/2026/08/"

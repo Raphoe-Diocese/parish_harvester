@@ -4,28 +4,33 @@
   "display_name": "Tourlestrane",
   "diocese": "achonry",
   "start_url": "https://www.kilmactigueparish.com/pages/newsletter.php",
-  "site_type": "print_to_pdf",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    "dlc.php"
+  ],
   "timeout_ms": 45000,
   "total_timeout_s": 180,
   "recorded_date": "2026-09-27",
+  "example_url": "https://www.kilmactigueparish.com/modules/download_gallery/dlc.php?file=247&id=1790354086&sid=140",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://www.kilmactigueparish.com/pages/newsletter.php"
-    },
-    {
-      "action": "print_to_pdf",
-      "skip_listing_nav": true
+      "action": "download",
+      "url": "https://www.kilmactigueparish.com/modules/download_gallery/dlc.php?file=247&id=1790354086&sid=140"
     }
   ],
   "operator_notes": [
-    "27/09/2026: http://www.kilmactigueparish.com/pages/newsletter.php is the newsletter page (HTTP 200). No dated PDF link in HTML scrape — print_to_pdf the live page. Prove date from page text on harvest.",
+    "27/09/2026: listing pages/newsletter.php — Joomla download_gallery dlc.php links; label 27th September 2026 returns PDF (HTTP 200).",
     "Official card Tourlestrane; site brand Kilmactigue.",
-    "Harvest 27/09 failed with Unsupported recipe action: navigate — use goto, not navigate."
+    "site_type:http_scrape_newest_pdf href_patterns dlc.php — score by anchor label date.",
+    "Earlier print_to_pdf failed: Too many pages 8 (max 4)."
   ],
   "do_not": [
     "Do not download Privacy Statement PDF as the bulletin.",
-    "Do not open /bulletin/ on achonryelphin.",
-    "Do not use action navigate — harvest only knows goto."
-  ]
+    "Do not print_to_pdf the whole newsletter.php page (8 pages).",
+    "Do not pin file=247 — ids change each week."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }
