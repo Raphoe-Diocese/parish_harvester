@@ -22,7 +22,10 @@ REPO = Path(__file__).resolve().parent.parent
 if str(REPO) not in sys.path:
     sys.path.insert(0, str(REPO))
 
-from harvester.mega_pdf_git import push_with_mega_conflict_retry  # noqa: E402
+from harvester.mega_pdf_git import (  # noqa: E402
+    diocese_parish_keys,
+    push_with_mega_conflict_retry,
+)
 
 
 def main() -> None:
@@ -35,13 +38,25 @@ def main() -> None:
         default=os.environ.get("TARGET_PARISH", ""),
         help="Single-parish test key: merge only this parish's status row.",
     )
+    parser.add_argument(
+        "--diocese",
+        default=os.environ.get("HARVEST_DIOCESE", ""),
+        help="One-diocese run: merge only that diocese's status rows ('all' = whole file).",
+    )
     args = parser.parse_args()
+    target_parish = (args.target_parish or "").strip().lower() or None
+    parish_keys = None
+    if not target_parish:
+        parish_keys = diocese_parish_keys(args.diocese) or None
+        if parish_keys:
+            print(f"Row-merge status files for diocese {args.diocese}: {len(parish_keys)} parish keys")
     push_with_mega_conflict_retry(
         REPO,
         remote=args.remote,
         branch=args.branch,
         attempts=args.attempts,
-        target_parish=(args.target_parish or "").strip().lower() or None,
+        target_parish=target_parish,
+        parish_keys=parish_keys,
     )
 
 

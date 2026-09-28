@@ -167,23 +167,57 @@ def _load_json_file(path: Path) -> dict:
 
 def merge_single_parish_row_file(rel_path: str, upstream: dict, mine: dict, parish_key: str) -> dict:
     """Merge one status file so only *parish_key* changes relative to *upstream*."""
+    key = str(parish_key or "").strip()
+    return merge_parish_rows_file(rel_path, upstream, mine, {key} if key else set())
+
+
+def merge_parish_rows_file(rel_path: str, upstream: dict, mine: dict, parish_keys) -> dict:
+    """Merge one status file so only *parish_keys* change relative to *upstream*.
+
+    Used for single-parish tests (one key) and one-diocese runs (that
+    diocese's keys). Everything else on main is kept — a Clogher run must
+    never put Derry back to ``no_evidence`` (28/09/2026).
+    """
+    keys = {str(k or "").strip() for k in (parish_keys or ())} - {""}
     normalized = _normalize_repo_path(rel_path)
     if normalized == "parishes/parish_status.json":
-        from harvester.parish_status import merge_single_parish_status
+        from harvester.parish_status import merge_parish_status_rows
 
-        return merge_single_parish_status(upstream, mine, parish_key)
+        return merge_parish_status_rows(upstream, mine, keys)
     if normalized == "Bulletins/report.json":
-        from harvester.report import merge_single_parish_report
+        from harvester.report import merge_parish_report_rows
 
-        return merge_single_parish_report(upstream, mine, parish_key)
+        return merge_parish_report_rows(upstream, mine, keys)
     out = dict(upstream) if isinstance(upstream, dict) else {}
-    key = str(parish_key or "").strip()
-    if key:
+    for key in sorted(keys):
         if key in mine:
             out[key] = mine[key]
         else:
             out.pop(key, None)
     return out
+
+
+def diocese_parish_keys(diocese: str, parishes_dir: Path | None = None) -> set[str]:
+    """Every parish key a one-diocese harvest can write: evidence rows + recipes."""
+    stem = str(diocese or "").strip().lower()
+    if not stem or stem == "all":
+        return set()
+    from harvester.config import PARISHES_DIR
+
+    root = Path(parishes_dir) if parishes_dir is not None else PARISHES_DIR
+    keys: set[str] = set()
+    try:
+        from harvester.fetcher import parse_evidence_file
+
+        keys.update(e.key for e in parse_evidence_file(stem, root))
+    except Exception:
+        pass
+    folder = root / "recipes" / stem.removesuffix("_diocese")
+    if folder.is_dir():
+        for path in folder.glob("*.json"):
+            data = _load_json_file(path)
+            keys.add(str(data.get("parish_key") or path.stem).strip())
+    return {k for k in keys if k}
 
 
 def unmerged_paths(repo: Path) -> list[str]:
@@ -275,6 +309,7 @@ def _resolve_conflicts_for(
     snapshot: Path | None,
     keep: Callable[[str], bool],
     target_parish: str | None = None,
+    parish_keys=None,
 ) -> tuple[list[str], list[str]]:
     unresolved = unmerged_paths(repo)
     matched = [path for path in unresolved if keep(path)]
@@ -284,17 +319,19 @@ def _resolve_conflicts_for(
 
     flag = harvest_side_flag(repo)
     parish = str(target_parish or "").strip().lower()
+    row_keys = {parish} if parish else {str(k).strip().lower() for k in (parish_keys or ()) if str(k).strip()}
     for path in matched:
         dest = repo / path
         snap_file = (snapshot / path) if snapshot is not None else None
-        if parish and _normalize_repo_path(path) in SINGLE_PARISH_ROW_FILES:
-            # Single-parish test: keep everything already on main and move
-            # only this parish's row. Whole-file copies erased other tests.
+        if row_keys and _normalize_repo_path(path) in SINGLE_PARISH_ROW_FILES:
+            # Single-parish test or one-diocese run: keep everything already
+            # on main and move only the rows this run harvested. Whole-file
+            # copies erased other tests (14/09) and other dioceses (28/09).
             _run_git(repo, ["checkout", upstream_side_flag(repo), "--", path])
             upstream = _load_json_file(dest)
             mine_path = snap_file if (snap_file is not None and snap_file.is_file()) else None
             mine = _load_json_file(mine_path) if mine_path else {}
-            merged = merge_single_parish_row_file(path, upstream, mine, parish)
+            merged = merge_parish_rows_file(path, upstream, mine, row_keys)
             dest.parent.mkdir(parents=True, exist_ok=True)
             dest.write_text(json.dumps(merged, indent=2), encoding="utf-8")
         elif snap_file is not None and snap_file.is_file():
@@ -322,17 +359,20 @@ def resolve_harvest_output_conflicts(
     snapshot: Path | None = None,
     *,
     target_parish: str | None = None,
+    parish_keys=None,
 ) -> tuple[list[str], list[str]]:
     """Resolve generated harvest-output conflicts so this job's files win.
 
     Recipes, harvester code, and other source files stay in leftover. With
-    *target_parish*, status JSON is merged row-by-row instead of copied.
+    *target_parish* or *parish_keys*, status JSON is merged row-by-row
+    instead of copied.
     """
     return _resolve_conflicts_for(
         repo,
         snapshot=snapshot,
         keep=is_generated_harvest_output,
         target_parish=target_parish,
+        parish_keys=parish_keys,
     )
 
 
@@ -366,6 +406,7 @@ def rebase_keeping_harvest_megas(
     remote_ref: str = "origin/main",
     *,
     target_parish: str | None = None,
+    parish_keys=None,
 ) -> None:
     """Rebase onto ``remote_ref``, keeping this harvest's generated outputs."""
     snapshot_dir = Path(tempfile.mkdtemp(prefix="harvest-outputs-"))
@@ -383,7 +424,7 @@ def rebase_keeping_harvest_megas(
         if result.stderr:
             print(result.stderr, end="")
         resolved, leftover = resolve_harvest_output_conflicts(
-            repo, snapshot_dir, target_parish=target_parish
+            repo, snapshot_dir, target_parish=target_parish, parish_keys=parish_keys
         )
         if leftover:
             abort_git_integration(repo)
@@ -412,11 +453,13 @@ def push_with_mega_conflict_retry(
     branch: str = "main",
     attempts: int = 5,
     target_parish: str | None = None,
+    parish_keys=None,
 ) -> None:
     """Push HEAD to ``remote/branch``, rebasing and keeping this harvest's files.
 
-    *target_parish* (single-parish Send & test) merges status JSON row-by-row
-    so overlapping tests never erase each other's result.
+    *target_parish* (single-parish Send & test) and *parish_keys* (one-diocese
+    run) merge status JSON row-by-row so overlapping runs never erase each
+    other's result.
     """
     for attempt in range(1, attempts + 1):
         push = _run_git(repo, ["push", remote, f"HEAD:{branch}"], check=False)
@@ -434,7 +477,10 @@ def push_with_mega_conflict_retry(
             raise SystemExit(1)
         try:
             rebase_keeping_harvest_megas(
-                repo, f"{remote}/{branch}", target_parish=target_parish
+                repo,
+                f"{remote}/{branch}",
+                target_parish=target_parish,
+                parish_keys=parish_keys,
             )
         except Exception as exc:
             print(f"❌ Rebase failed; aborting. {exc}")

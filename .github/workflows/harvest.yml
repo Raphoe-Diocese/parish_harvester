@@ -399,6 +399,7 @@ jobs:
         id: commit_harvest
         env:
           TARGET_PARISH: ${{ github.event.inputs.target_parish }}
+          HARVEST_DIOCESE: ${{ github.event.inputs.diocese || 'all' }}
         run: |
           set -euo pipefail
           if [ ! -f Bulletins/report.json ]; then
@@ -422,7 +423,9 @@ jobs:
           # keep the files this harvest just generated and continue.
           # Single-parish tests overlap (per-parish concurrency groups): merge
           # only TARGET_PARISH's row so one Send & test never erases another.
-          python scripts/push_harvest_results.py --remote origin --branch main --target-parish "${TARGET_PARISH}"
+          # One-diocese runs merge only that diocese's rows — a Clogher run
+          # must not put Derry / Down & Connor back to "0 of N found" (28/09).
+          python scripts/push_harvest_results.py --remote origin --branch main --target-parish "${TARGET_PARISH}" --diocese "${HARVEST_DIOCESE}"
 
       - name: Publish week bulletin Release
         if: steps.harvest_run.outcome == 'success' && github.event.inputs.target_parish == ''

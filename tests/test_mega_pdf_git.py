@@ -260,6 +260,68 @@ class MegaPdfGitConflictTests(unittest.TestCase):
         self.assertEqual(failures, {"stpatricksbelfast": 0, "parishofbright": 1})
         self.assertEqual(_git(self.root, "status", "--porcelain").stdout.strip(), "")
 
+    def test_diocese_run_rebase_keeps_other_diocese_rows(self) -> None:
+        """28/09/2026: a Clogher-only run rebased over Derry's push and copied
+        its whole report/status over it. Derry went back to no_evidence and
+        the live page said 0 of 40 found. Diocese runs must merge by key."""
+        import json
+
+        old = "2026-09-20T09:00:00+00:00"
+        self._commit_status(
+            {"enniskillen": ("failed", old), "iskaheenparish": ("failed", old)},
+            "shared",
+            patched_at=old,
+        )
+        _git(self.root, "checkout", "-b", "clogher")
+        self._commit_status(
+            {
+                "enniskillen": ("ok", "2026-09-28T11:19:00+00:00"),
+                "iskaheenparish": ("failed", old),
+            },
+            "clogher run",
+            patched_at="2026-09-28T11:19:00+00:00",
+        )
+        _git(self.root, "checkout", "main")
+        self._commit_status(
+            {
+                "enniskillen": ("failed", old),
+                "iskaheenparish": ("ok", "2026-09-28T11:05:00+00:00"),
+            },
+            "derry run",
+            patched_at="2026-09-28T11:05:00+00:00",
+        )
+        _git(self.root, "checkout", "clogher")
+        rebase_keeping_harvest_megas(self.root, "main", parish_keys={"enniskillen"})
+
+        status = json.loads(
+            (self.root / "parishes" / "parish_status.json").read_text(encoding="utf-8")
+        )
+        rows = status["parishes"]
+        self.assertEqual(rows["iskaheenparish"]["outcome"], "ok")
+        self.assertEqual(rows["iskaheenparish"]["last_tested_at"], "2026-09-28T11:05:00+00:00")
+        self.assertEqual(rows["enniskillen"]["outcome"], "ok")
+        self.assertEqual(status["summary"]["ok"], 2)
+        report = json.loads(
+            (self.root / "Bulletins" / "report.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(
+            sorted(i["parish"] for i in report["downloaded"]),
+            ["enniskillen", "iskaheenparish"],
+        )
+        self.assertEqual(report["failed"], [])
+        failures = json.loads(
+            (self.root / "parishes" / "consecutive_failures.json").read_text(encoding="utf-8")
+        )
+        self.assertEqual(failures, {"enniskillen": 0, "iskaheenparish": 0})
+
+    def test_diocese_parish_keys_covers_evidence_and_recipes(self) -> None:
+        from harvester.mega_pdf_git import diocese_parish_keys
+
+        keys = diocese_parish_keys("clogher_diocese")
+        self.assertIn("enniskillen", keys)
+        self.assertNotIn("iskaheenparish", keys)
+        self.assertEqual(diocese_parish_keys("all"), set())
+
     def test_full_harvest_rebase_still_keeps_whole_file(self) -> None:
         old = "2026-09-10T12:53:56+00:00"
         self._commit_status({"a": ("failed", old)}, "shared", patched_at=old)

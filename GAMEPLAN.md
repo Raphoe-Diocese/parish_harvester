@@ -7,6 +7,40 @@ locked harvester product order.
 |---
 
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 27/09/2026 evening — Diocese hunt A–Z: Achonry (doing)
 - Achonry 27/09 evening: Sept. trailing-dot slug fix; Tourlestrane goto; Kilmovee 27 Sept example; Ballymote image recipe + Collooney/Kilvarnet PDF recipe — re-harvest next.
 
@@ -22,6 +56,40 @@ locked harvester product order.
 
 **Parked:** Elphin (same joint site, separate diocese letter E); Dunfanaghy OCR; Problems console.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 27/09/2026 — Tawnawilly this-week bulletin (done)
 
 **The real goal, in one sentence:** stop leaving Tawnawilly on the 06/09 PDF when Sunday-27th-Sept-26.pdf is already on the site.
@@ -31,6 +99,40 @@ locked harvester product order.
 **Next:** Dunfanaghy OCR when Gemini quota allows. Locked list: Problems console.
 
 **Parked:** nothing new.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 24/09/2026 — OCR readability: spacing, subheads, diocese re-apply
 
@@ -42,6 +144,40 @@ locked harvester product order.
 
 **Parked:** inventing name corrections (e.g. GetÝgan); full re-OCR on this PC.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 24/09/2026 — Cork live polish: dots off, unfinished note, fix "0 of N found"
 
 **The real goal, in one sentence:** Cork on the homepage like the other four, honest bulletin counts, no hero-dot clutter, short unfinished note on every diocese page.
@@ -49,6 +185,40 @@ locked harvester product order.
 **This turn:** Restored report/status after Cork-only wipe; removed hero dots; unfinished note on diocese intros; single-diocese harvest patches report. PR #248.
 
 **Next:** merge + Pages live-prove; then Referee Brain first slice.
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 23/09/2026 — Frank lock: Cork finish, then Cork on site, then Referee Brain (NO MORE DELAY)
 
 **The real goal, in one sentence:** stop serving stale bulletins; Cork must finish and go live; the harvester must learn from past wins and mistakes.
@@ -83,6 +253,40 @@ locked harvester product order.
 
 **Parked until Cork site is live:** other 21 dioceses, forms/.ie, full Brain rewrite beyond the first slice.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 23/09/2026 — Cork recipes batch2 (families + standalones)
 
 **The real goal, in one sentence:** exhaust every workable Cork listing into a real recipe before the Cork harvest.
@@ -92,6 +296,40 @@ locked harvester product order.
 **Next:** merge PR #246; Cork harvest on Actions (add cork_and_ross to matrix); Cork on parishpress.ie with cathedral photo; then Brain first slice.
 
 **Parked:** wilton HTML dig; OneFaith July-stale; Facebook/empty/notices-only; summer-break lists until they publish again.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 23/09/2026 — Cork on parishpress.ie (cathedral photo + live card)
 
@@ -116,6 +354,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 23/09/2026 — Second Cork recipe: OurParish / Harbour family, once
 
 **The real goal, in one sentence:** harvest the shared Harbour family paper once.
@@ -125,6 +397,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Next:** Send & test running: [35848932506](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/35848932506). Then the next Cork family when Frank says go.
 
 **Parked:** other Cork families. Cork Sunday matrix until more recipes exist.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 22/09/2026 — First Cork recipe: West Cork family, once
 
@@ -136,6 +442,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Parked:** other Cork families. Cork Sunday matrix until more recipes exist.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 22/09/2026 — Sunday harvest did fire, then stitch tests threw it away
 
 **The real goal, in one sentence:** Sunday’s PDFs must land even if a trainer version pin is stale.
@@ -145,6 +485,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Next:** Full harvest running on the fix: [35755467832](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/35755467832). [#242](https://github.com/Raphoe-Diocese/parish_harvester/pull/242) merged `56a5aa13`.
 
 **Parked:** Recipe Brain. Cork recipes.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 18/09/2026 — Remember clicks that worked (the gold)
 
@@ -158,6 +532,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Parked:** full Brain / Referee. Do not replace Guess until click-memory is in the ext.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 18/09/2026 — Tawnawilly Guess time-machine + Cork on the ext
 
 **The real goal, in one sentence:** harvest this week's Tawnawilly PDF, and let the trainer see Cork.
@@ -167,6 +575,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Next:** Cork was missing because the trainer reads recipe folders on GitHub **main**, and #241 is still open. 1.61.42 always shows Cork even if main is old. Merge #241 then Reload **1.61.42**. Parish names need the merge (contacts on main).
 
 **Parked:** full Recipe Brain / Referee. Cork Sunday matrix until recipes exist. Forms until all dioceses are finished.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 17/09/2026 — Form-fed parish mini-sites + free .ie
 
@@ -180,6 +622,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Parked until all dioceses are finished:** form-to-page builder, parish forms, per-parish .ie, Jotform. Frank 17/09/2026: park until we finish all the dioceses.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 17/09/2026 — S4 Cork (Cork and Ross)
 
 **The real goal, in one sentence:** Cork becomes a harvest diocese, starting from the official list, no invented bulletins.
@@ -190,6 +666,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Parked:** Sunday matrix until real bulletin URLs exist. S4 proof (≥10 recipes + green harvest run) is not done. Forms until all dioceses are finished.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 17/09/2026 — “Free forever” block was too sure
 
 **The real goal, in one sentence:** do not tell Frank Gemini 1,500/day or Mistral will never change.
@@ -197,6 +707,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **This turn:** [#240](https://github.com/Raphoe-Diocese/parish_harvester/pull/240) merged `5b470ff`. Heading is now “What does not need a card today”. Gemini 1,500 and Mistral-unlimited are gone. Desktop `COST_DASHBOARD.md` is still the stale clone.
 
 **Next:** ignore the Desktop file. Read `docs/COST_DASHBOARD.md` on main.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 17/09/2026 — S3 OCR quota dashboard
 
@@ -206,6 +750,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** after Pages, open the file and read the three numbers (they stay 0 until Sunday OCR).
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 17/09/2026 — Picture download still makes a PDF
 
 **The real goal, in one sentence:** if harvest gets a JPEG/PNG, it wraps it into a PDF even when the recipe was never marked as picture.
@@ -213,6 +791,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **This turn:** `wrap_image_file_as_pdf` runs inside `_is_real_pdf`. Download of a picture URL no longer fails just because the trainer skipped Mark as picture. Tests: `tests/test_image_wrap_pdf.py`. **Not proved** on a live parish until a harvest run ID.
 
 **Next:** PR, then Send & test on a picture parish that was not marked as picture.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 15/09/2026 (evening 14) — #238 merged; image→PDF is harvest, not Gemini
 
@@ -222,6 +834,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** wait for Sunday OCR. Parked: make Gemini/Mistral easier to read.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 15/09/2026 (evening 13) — 26 dioceses, Gemini “training”, Mistral polish
 
 **The real goal, in one sentence:** 26 Sunday megas on free Gemini, easy to read, no card.
@@ -229,6 +875,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **This turn:** Enough API for 26 **if** text-first and only picture pages go to Gemini (~78 calls/week, ~300/month). I have **not** trained Gemini to write like Mistral. #238 only stops the PPM reject. Not live. Frank also wants Mistral (and Gemini) output easier to read — **parked** until #238 is on main and a Sunday log proves Gemini ran.
 
 **Next:** merge #238. Do not start a readability rewrite.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 15/09/2026 (evening 12) — Fix Gemini PPM so picture pages work
 
@@ -238,6 +918,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** merge, then next Sunday OCR must show Gemini pages, not that MIME error.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 15/09/2026 (evening 11) — If Gemini is fixed, is the free API enough?
 
 **The real goal, in one sentence:** $0 Sunday OCR that still fits Gemini’s free pot.
@@ -245,6 +959,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **This turn:** Yes for the real Sunday path. Last week only **12 picture pages** needed vision (2+3+4+3). That is 12 Gemini calls for 4 dioceses, about **78 a week / 300 a month** at 26 dioceses. Google does not publish one public free daily number (look in AI Studio). Any normal free pot covers that. Not a sure yes if we send every mega page as an image (26 dioceses ≈ 1,430 calls on one Sunday). Keep text-first. Gemini fix still not started.
 
 **Next:** say go to fix Gemini MIME.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 15/09/2026 (evening 10) — Totally free OCR APIs vs Mistral
 
@@ -254,6 +1002,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** say go to fix Gemini so picture pages work. Do not start a new OCR vendor.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 15/09/2026 (evening 9) — Would a second Mistral key suffice?
 
 **The real goal, in one sentence:** 26 Sunday megas on a community project, no one taking money.
@@ -261,6 +1043,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **This turn:** two Free pots = $20 ≈ **5,000 pages / month**. Last week’s size scaled to 26 = **5,720 pages / month**. So a second key is **close, not a sure yes** if every mega page is sent to Mistral. A five-Sunday month is about 7,150 — two keys are short. If Sunday stays text-first (last week 12 picture pages), one key is already enough and a second is spare. Dual-key wire still parked until Frank says go.
 
 **Next:** S3 or wire key 2 only if Frank says go.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 15/09/2026 (evening 8) — Free Mistral per month, then the sums
 
@@ -278,6 +1094,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** one Free key is enough for the current 4. For 26 full megas, one $10 pot is not enough. Say go for S3 to print 2,500 as the working ceiling with that source.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 15/09/2026 (evening 7) — Is the current Mistral key enough?
 
 **The real goal, in one sentence:** know if Sunday OCR will run out of Mistral, or if something else is broken.
@@ -289,6 +1139,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** Frank opens Mistral Limits if he wants the leftover number. Say go to fix the Mistral client so Sunday actually uses the key.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 15/09/2026 (evening 6) — Second Mistral account for extra free quota
 
 **The real goal, in one sentence:** if Mistral runs out, keep Sunday OCR going.
@@ -298,6 +1182,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Next:** finish S3 when Frank says go.
 
 **Parked:** second Mistral GitHub secret as fallback. One warning only: Mistral can still shut keys that look like stacked free accounts. His choice.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 15/09/2026 (evening 5) — Free OCR ceilings vs 26 diocese runs
 
@@ -316,6 +1234,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Parked:** rip tesseract. Do not start 22 dioceses until S3 exists.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 15/09/2026 (evening 4) — Free OCR APIs; tesseract is not a reader
 
 **The real goal, in one sentence:** read bulletins with the free vision APIs we already have, not tesseract.
@@ -326,6 +1278,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Parked:** rip tesseract out of `fill_sparse` / column repair. Do not start until Frank says go.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 15/09/2026 (evening 3) — S2 no PDF commits
 
 **The real goal, in one sentence:** Sunday still makes mega PDFs, but git stops growing by 70 MB.
@@ -333,6 +1319,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **This turn:** [#237](https://github.com/Raphoe-Diocese/parish_harvester/pull/237) merged `173e5a6` 15/09 18:21 UTC. Mega generation stays on. History rewrite still parked. **Not live-proved** until the next Sunday harvest: repo grow small, mega still opens on parishpress.ie.
 
 **Next:** S3 OCR quota dashboard.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 15/09/2026 (evening 2) — S1 diocese matrix
 
@@ -342,6 +1362,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** merge [#236](https://github.com/Raphoe-Diocese/parish_harvester/pull/236) when CI is green. Proof is the next full harvest run.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 15/09/2026 (evening) — T6 + T7 + T8 on one PR
 
 **The real goal, in one sentence:** dated pages stay listings, the kit tells one truth, Open site always shows the toolbar.
@@ -349,6 +1403,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **This turn:** one PR only — [#235](https://github.com/Raphoe-Diocese/parish_harvester/pull/235), Trainer **1.61.39**. No more split PRs. T6 dated `start_url`, T7 kit “Do this” + no WAF false errors, T8 Open site unhides the toolbar. **Not live** until Reload (card **1.61.39**).
 
 **Next:** I merge #235 when green. Then Reload.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 15/09/2026 (afternoon) — T4 version banner
 
@@ -358,6 +1446,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** Reload → card **1.61.38**. Then T6 (don’t push a dated post as start_url). T5 is already in 1.61.37.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 15/09/2026 — Confetti cannon in the agent must-read
 
 **The real goal, in one sentence:** agents celebrate hard wins, not every click.
@@ -365,6 +1487,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **This turn:** wrote **Confetti cannon (hard wins only)** into [`AGENTS.md`](AGENTS.md). Once per milestone. Not on GitHub until the next commit/PR.
 
 **Next:** merge [#233](https://github.com/Raphoe-Diocese/parish_harvester/pull/233) when CI is green (St Gerard test no longer pins one example URL).
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 14/09/2026 (evening 5) — Send & test red line was a watcher lie
 
@@ -376,6 +1532,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** Frank merges [#233](https://github.com/Raphoe-Diocese/parish_harvester/pull/233) → Problems → Refresh. Do not Send & test again unless he wants — GitHub already has 13/09.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 14/09/2026 (evening 4) — Why it looked unsaved
 
 **The real goal, in one sentence:** when Frank taps Yes, he can see the save.
@@ -383,6 +1573,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Why the screenshot looked empty:** card was still **1.61.34** (HTML/PDF is 1.61.35+). Yes saved the page URL but Recipe Preview still said **0 steps**.
 
 **This turn:** Trainer **1.61.36** — Preview says “this week's page saved” and shows the URL. Reload until the card says **1.61.36**. Folder: Desktop **latest ext**.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 14/09/2026 (evening 3) — Picture, HTML, or PDF
 
@@ -392,6 +1616,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** Reload → pick the Sunday Message → tap the matching one (picture / HTML / PDF).
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 14/09/2026 (evening 2) — Open any post, then mark the picture (any site)
 
 **The real goal, in one sentence:** on every parish website, Frank can open the bulletin page and mark the picture — not only St Gerard’s.
@@ -399,6 +1657,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **This turn:** Trainer **1.61.34**. Any page-link (not a PDF file) offers **Open this post — then mark the picture**. After it opens, **Mark as picture on this page** is always on the toolbar. Not St Gerard-only. **Not live** until Reload — card must say 1.61.34. Not on GitHub until Frank says PR.
 
 **Next:** Reload → on St Gerard (or any other problem site) Pick newest → Open this post — bulletin is a picture → click the picture → Yes.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 14/09/2026 (evening) — T1+T2+T3 built; Frank’s new asks written down
 
@@ -420,6 +1712,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Parked:** UI rejig of trainer + backend (card **U1**, needs Frank’s screenshots and a 30-min “what confuses me” list first), Recipe Brain, 22 dioceses hunt, history rewrite.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 14/09/2026 — Trainer audit: why Frank’s fixes “vanish” (proved on GitHub)
 
 **The real goal, in one sentence:** when Frank fixes a parish in the trainer, the fix and its result stay on GitHub.
@@ -429,6 +1755,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Written:** Grok cards **T1–T8** in [`docs/GROK_PLAN_2026-09-12.md`](docs/GROK_PLAN_2026-09-12.md) §7. Order: T1 (rows must not overwrite each other) → T2 (push keeps engine fields + restore St Patrick/Holywood) → T3 (land 1.61.32 + #232) → T4 version banner → T5 honest Check result → T6 no dated start_url → T7 kit one-line → T8 toolbar.
 
 **Next:** Frank pastes T1 to Grok and says go. Nothing on GitHub from this turn yet.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 14/09/2026 — Trainer: Yes must reach GitHub
 
@@ -442,6 +1802,40 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Parked:** me fixing every problem parish by hand; Recipe Brain; 22 dioceses; rewriting the whole trainer.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 14/09/2026 — St Gerard’s (Sunday Message image)
 
 **The real goal, in one sentence:** harvest this week’s Sunday Message scan, without training a new-tab image click.
@@ -451,6 +1845,40 @@ Live post (opened 14/09/2026): https://stgerardsparish.org/sunday-message-13th-s
 **This turn:** diagnosis saved. Recipe keeps `waf_retry_wordpress` and listing start_url. Added `sunday-message-` to slug patterns and `example_post_url` (shape only). Do not Send & test the click.
 
 **Next:** say **PR** if this should go to GitHub. Do not re-hunt weekly. GitHub harvest can still WAF-fail.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 14/09/2026 — St Michael the Archangel (GoDaddy date)
 
@@ -462,6 +1890,40 @@ Live page (opened 14/09/2026): newest row is **Parish Bulletin 13th September 2 
 
 **Next:** Frank Reloads 1.61.31, Find bulletin, confirm 13 Sept, Send & test. Or say merge then GitHub harvest `saintmichaelthearchangel`.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 14/09/2026 — Toolbar ✕ stays closed
 
 **The real goal, in one sentence:** when Frank hits ✕ on the recipe toolbar, it does not pop back.
@@ -469,6 +1931,40 @@ Live page (opened 14/09/2026): newest row is **Parish Bulletin 13th September 2 
 **This turn:** ✕ clears the recording session and cancels the Open-site “keep showing” timers (they used to fire for 45s). Trainer **1.61.30**. Reload at chrome://extensions.
 
 **Next:** Frank Reloads and X’s the toolbar once. It must stay gone until he taps Show toolbar or Open site.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 14/09/2026 — Problems console (fewer buttons)
 
@@ -484,6 +1980,40 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 
 **Parked:** recipe success (item 3); M1; Recipe Brain; 22 dioceses.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 14/09/2026 — #214 closed; H2 + B4 proved on GitHub
 
 **#214 closed** 14/09/2026 13:57 UTC (superseded by [PR #228](https://github.com/Raphoe-Diocese/parish_harvester/pull/228) `bf5d072`). Do not merge #214 if it reappears.
@@ -498,9 +2028,77 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 
 **Parked:** M1, Recipe Brain, 22 dioceses, archive-nav delete.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 14/09/2026 — Full harvest finished
 
 **Harvest finished:** [Harvest full 34822202023](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34822202023) **success**. OCR [34828244862](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34828244862) + Pages [34828802964](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34828802964). Week **13/09/2026**.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 13/09/2026 — C5 executable JS test
 
@@ -508,9 +2106,77 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 
 **F2/F3 merged:** [PR #224](https://github.com/Raphoe-Diocese/parish_harvester/pull/224) `ea70713`. Docs only.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 13/09/2026 — F2/F3 backlog pages
 
 **F2/F3 merged:** [PR #224](https://github.com/Raphoe-Diocese/parish_harvester/pull/224) `ea70713`. Docs only.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 13/09/2026 — E2 OCR stub must not look like success
 
@@ -518,17 +2184,119 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 
 **Now — E2:** stub HTML has `ocr-failed-banner`, prints `::error::`, exits 1 so the workflow does not commit a silent stub. **Not live** until the next OCR run is green, or red with a visible `::error`.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 13/09/2026 — E1 vision only on sparse OCR pages
 
 **D2 merged:** [PR #221](https://github.com/Raphoe-Diocese/parish_harvester/pull/221) `586446b`. Docs only.
 
 **E1 merged:** [PR #222](https://github.com/Raphoe-Diocese/parish_harvester/pull/222) `25eaa6a`. **Not live** until next OCR.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 13/09/2026 — D2 README and WHAT_IS_THIS
 
 **D1 merged:** [PR #220](https://github.com/Raphoe-Diocese/parish_harvester/pull/220) `2411a2f`. Markdown count 20. Docs only.
 
 **D2 merged:** [PR #221](https://github.com/Raphoe-Diocese/parish_harvester/pull/221) `586446b`.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 13/09/2026 — D1 one truth in markdown
 
@@ -540,11 +2308,79 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 
 **Closed leftover PRs:** H2 [#211](https://github.com/Raphoe-Diocese/parish_harvester/pull/211) superseded by [#227](https://github.com/Raphoe-Diocese/parish_harvester/pull/227); B4 [#214](https://github.com/Raphoe-Diocese/parish_harvester/pull/214) superseded by [#228](https://github.com/Raphoe-Diocese/parish_harvester/pull/228).
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 13/09/2026 — S3 stop publishing search/calendars
 
 **S2 live 14/09/2026:** [PR #218](https://github.com/Raphoe-Diocese/parish_harvester/pull/218) `d2aca0f`. https://www.parishpress.ie/dioceses/derry/ has 0 × `greencastleparish.com`.
 
 **S3 live:** [PR #219](https://github.com/Raphoe-Diocese/parish_harvester/pull/219) `e58ed97`. https://www.parishpress.ie/search/ is 404. Homepage has no inbound search link.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 13/09/2026 — S2 disabled A-Z links
 
@@ -552,11 +2388,79 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 
 **S2 live 14/09/2026:** [PR #218](https://github.com/Raphoe-Diocese/parish_harvester/pull/218) `d2aca0f`.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 13/09/2026 — S1 slice_missing (this turn)
 
 **C4 merged:** [PR #216](https://github.com/Raphoe-Diocese/parish_harvester/pull/216) `31a0ac9`. Trainer **1.61.28**. Not live until Pages + `scripts/refresh_local_trainer.ps1` + Reload.
 
 **S1 merged:** [PR #217](https://github.com/Raphoe-Diocese/parish_harvester/pull/217). **Not live** until next OCR.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 13/09/2026 — C4 dead Trainer code (this turn)
 
@@ -566,6 +2470,40 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 
 **Closed leftover PRs:** H2 is [#227](https://github.com/Raphoe-Diocese/parish_harvester/pull/227); B4 is [#228](https://github.com/Raphoe-Diocese/parish_harvester/pull/228). #211 and #214 stay closed.
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 13/09/2026 — C2 remove Trainer auto-update (this turn)
 
 **H3 done:** #212 merged. Harvest [34758064936](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34758064936) — Stranorlar **ok**, 13/09/2026.
@@ -573,6 +2511,40 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **H2:** [PR #211](https://github.com/Raphoe-Diocese/parish_harvester/pull/211) still open.
 
 **Now — C2:** drop `update_url`, CRX, `updates.xml`, context-menu Update. Zip + `key` stay. Trainer **1.61.26**. Not live until merge + Pages. Then `scripts/refresh_local_trainer.ps1` and Reload at chrome://extensions.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 12/09/2026 night — P1 done; A5 (#204) next
 
@@ -585,6 +2557,40 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Grok plan:** [`docs/GROK_PLAN_2026-09-12.md`](docs/GROK_PLAN_2026-09-12.md). Agents use `C:\Users\Digital Admin\repos\parish_harvester`.
 
 ---
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 11/09/2026 — Full harvest last night (check)
 
@@ -600,6 +2606,40 @@ Run [34536265400](https://github.com/Raphoe-Diocese/parish_harvester/actions/run
 
 ---
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 11/09/2026 — Phone cache + blurry mega
 
 Frank: parishpress.ie on the PC is last night’s harvest; the phone is the previous one after refresh. Also still low-res (Annagry 06/09 screenshot).
@@ -608,6 +2648,40 @@ Frank: parishpress.ie on the PC is last night’s harvest; the phone is the prev
 - Sharpness: still waiting on PR #203 merge + a later harvest. Last night is 100 dpi.
 
 ---
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 10/09/2026 — Audit and finish plan (read this first)
 
@@ -661,6 +2735,40 @@ Frank 10/09/2026 **fix**: Ghostscript `/ebook` 100 dpi made diocese megas unread
 
 ---
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 09/09/2026 night — Full harvest 34293288559 then recipe hunt
 
 Harvest run [34293288559](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34293288559) **completed** and committed `6e71e06a`. Truth: `parishes/parish_status.json` `generated_at` 2026-09-09T01:07:23Z, `target_date` **2026-09-06**, **ok 104**, **actionable 23**. Do not Full harvest again.
@@ -676,6 +2784,40 @@ Harvest run [34293288559](https://github.com/Raphoe-Diocese/parish_harvester/act
 
 ---
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 09/09/2026 night — Trainer Errors: Service worker status 15
 
 Brave loaded Parish Trainer, then showed **Service worker registration failed. Status code: 15**. That is a script crash, not a wrong folder.
@@ -686,6 +2828,40 @@ Brave loaded Parish Trainer, then showed **Service worker registration failed. S
 
 ---
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 09/09/2026 night — Update from Load unpacked does not work
 
 I was wrong: **Update does not fetch parishpress.ie while Parish Trainer is Load unpacked.** Frank stayed on 1.61.21/22. Live zip was newer; Brave never applied it.
@@ -694,11 +2870,79 @@ I was wrong: **Update does not fetch parishpress.ie while Parish Trainer is Load
 
 ---
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 09/09/2026 night — Prove Update from 1.61.21
 
 Frank is on **1.61.21**. That build’s `update_url` is parishpress.ie (no 301). Bump live feed to **1.61.22** so he can click Update and prove the wire. Not proved until his card says 1.61.22.
 
 ---
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 09/09/2026 night — Trainer still 1.61.20 after #185
 
@@ -711,6 +2955,40 @@ Frank is on **1.61.21**. That build’s `update_url` is parishpress.ie (no 301).
 **Parked:** Load unpacked from an old folder still ignores the website until that folder is replaced.
 
 ---
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 09/09/2026 — Merge the useful leftover drafts
 
@@ -726,6 +3004,40 @@ Frank is on **1.61.21**. That build’s `update_url` is parishpress.ie (no 301).
 **Parked:** installing the Uploader zip on newtownkilleaparish.ie (Frank does that).
 
 ---
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 08/09/2026 night — View bulletin was downloading; Raphoe list is last harvest
 
@@ -744,6 +3056,40 @@ Frank’s Back room (Raphoe, 14/46, week 06/09): Annagry too old 26/07, Ardara t
 **Parked:** sites with no 06/09 file (Ardara, Inver, Gortahork, Stranorlar, Drive July/30-08).
 
 ---
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 08/09/2026 — Do not run another full harvest until this miss-fix is merged
 
@@ -764,6 +3110,40 @@ Frank is right. He already ran Full harvest 07/09 19:31 UTC. ok went **93 → 81
 **Parked:** Donagh / Ederney HTML 403 (no PDF). Roslea StackProtect 403 from this IP (Sept/September both). WAF listings.
 
 ---
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 06/09/2026 — Open PDF looks like last week; harvest missed this week
 
@@ -789,6 +3169,40 @@ Harvest **did run** 06/09 (target 2026-09-06, `generated_at` 10:05 UTC). Live me
 
 ---
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 07/09/2026 — Newtown Killea is up; harvest still 403s /bulletin/
 
 **The real goal, in one sentence:** pick this week’s Newtown Killea PDF without opening the Cloudflare listing.
@@ -801,6 +3215,40 @@ Browser (07/09): site works. Weekly file is `…/parish-bulletins/unassigned/rap
 
 ---
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 07/09/2026 afternoon — Newtown permanent link + Tawnawilly is not blocked
 
 **The real goal, in one sentence:** Newtown uses Frank’s weekly link; Tawnawilly harvest must fetch the PDF, not call `/bulletin/` “blocked”.
@@ -812,6 +3260,40 @@ Tawnawilly Send & test 13:32 UTC failed: `HTTP 403` on `/bulletin/` → category
 **Next:** ▶ Test parish on both (not trainer Send & test if the tab is `/bulletin/`).
 
 ---
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 03/09/2026 — Problems console (work-queue polish)
 
@@ -831,6 +3313,40 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 
 ---
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 28/08/2026 — Ardstraw East harvested the parishioner form
 
 **The real goal, in one sentence:** stop treating `DataEntryFormPdf.pdf` as this week's bulletin.
@@ -840,6 +3356,40 @@ Kitchen sink 28/08/2026 (harvest Sunday 23/08/2026): no August file. Newest real
 **This turn:** recipe clicks only `templates/?a=` newsletter links, `href_skip_patterns` for DataEntry / New Parishioner / GDPR / privacy, `skip_listing_nav`, `disable_stale_rescrape_fallback`. Skip-name + July heading freshness tests. Not harvested this turn. Do not say ok / this week.
 
 ---
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 26/08/2026 — Pages must publish committed mega PDFs
 
@@ -852,6 +3402,40 @@ PR #139 merged (`f939336b`) and Pages deploy 33021078771 succeeded, but the live
 **Live-proved 26/08/2026** after PR [#140](https://github.com/Raphoe-Diocese/parish_harvester/pull/140) squash-merge `a1682ec4` + Pages run [33021470980](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/33021470980) success. HEAD https://www.parishpress.ie/mega_pdf/raphoe_mega_bulletin.pdf is **6,383,586** bytes (`Last-Modified: Wed, 26 Aug 2026 22:57:50 GMT`). Before this deploy it was 17,525,750.
 
 ---
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 26/08/2026 — Phone Open PDF + gentle mega compress
 
@@ -866,6 +3450,40 @@ Harvest still builds the mega PDF (`HARVEST_MEGA_PDF=1`). Ghostscript `/ebook` r
 **Parked:** none from this job.
 
 ---
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 25/08/2026 — Heading checker: date on the line next to newsletter
 
@@ -891,6 +3509,40 @@ on the live site until the next harvest. Do not say Raphoe is fixed on
 parishpress.
 
 ---
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 25/08/2026 — Hunt this-week files for older Problems-tab parishes
 
@@ -919,6 +3571,40 @@ Harvest truth is `origin/main` `parishes/parish_status.json` `generated_at` 2026
 **Parked:** none from this hunt.
 
 ---
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 25/08/2026 — This-week recipe hunt (Claudy / Lisnaskea / Newtownbutler / …)
 
@@ -950,6 +3636,40 @@ content-gaps until the parish posts 23/08.
 
 ---
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 25/08/2026 — HTTP fetch: IPv4 first + expired-cert fallback
 
 **The real goal, in one sentence:** get Limavady’s already-known
@@ -974,6 +3694,40 @@ certs. H1 and H3 not reverted. No harvest. No `parish_status.json` edit.
 
 ---
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 25/08/2026 — H1 safety-net hole (undated URL still `ok`)
 
 **The real goal, in one sentence:** old Drive / hashed / `bulletin.pdf` files
@@ -996,6 +3750,40 @@ the heading is provably old. This-week heading stays not-stale. Memorial-only
 `parish_status.json` edit. Not live until the next harvest.
 
 ---
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 24/08/2026 — Limavady recipe pin (this week’s file)
 
@@ -1028,6 +3816,40 @@ harvest. No `parish_status.json` edit. Not live / not harvested until the
 next harvest — do not tick this done as live. Merged as PR
 [#132](https://github.com/Raphoe-Diocese/parish_harvester/pull/132).
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 24/08/2026 — Problems-tab recipes (Malin / Bangor / Malachy / Kilmore / Anthony / Derriaghy)
 
 **The real goal, in one sentence:** only fix a recipe when a **23/08/2026** bulletin URL is on the live parish site.
@@ -1048,6 +3870,40 @@ Harvest truth is `parishes/parish_status.json` on `origin/main` (`last_tested_at
 **Parked:** none from this hunt.
 
 ---
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
 
 ## 23/08/2026 — Brittleness audit (what can lie to us)
 
@@ -1345,6 +4201,40 @@ intended. Do not list those 8 as already stale. H4 not started.
 
 ---
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## 23/08/2026 — Repo slick / this-week site
 
 **The real goal, in one sentence:** the public site should show **this week only**,
@@ -1540,6 +4430,42 @@ still cannot stop a Sunday harvest — this only makes the warning honest.
   there on the remote; just bin them locally.
 
 
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 28/09/2026 — Achonry then restore wiped dioceses
+- Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
+- NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
+
+## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
+
+**Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
+
+**Root cause of "0 of N found" (Cork 24/09, Derry/Down/Clogher 28/09):** harvester/mega_pdf_git.py push_with_mega_conflict_retry resolves rebase conflicts on Bulletins/report.json + parishes/parish_status.json "in favor of this harvest" — a one-diocese run overwrites every other diocese's rows that landed on main since its checkout. The 24/09 patch_report_for_parishes fix only stopped the in-process rewrite; the git path still wipes. Proof: run 36414332781 (Clogher) log "Resolved harvest output conflicts in favor of this harvest: … report.json … parish_status.json" → Down & Connor rows gone, live page "0 of 56". Also: concurrency: harvest-full cancels a *pending* diocese run when another is queued (Down 36414317875 cancelled after 15s → Down never harvested today).
+**Fix 1 (small, ~3 files):** on conflict for report.json / parish_status.json / consecutive_failures / stale_bulletins, MERGE by parish key (use existing merge_diocese_reports / merge_single_parish_status) instead of taking ours; keep "ours" only for binaries/HTML. Add a test. Then re-run Down & Connor alone.
+
+**Tests:** 5 failing locally on main (589 pass): test_bulletin_layout trailing-directory masthead count; tawnawilly recipe test (27th Sept pin); image_pdf_pipeline two-page; live gortahork AIFRINN (live-fetch test); send_test_comms expects max-parallel: 4 (now 5). CI still runs with run_tests=false on dispatch; Sunday 	est.yml skipped on [skip ci] harvest commits.
+
+**Still promised, not delivered:** Referee Brain first slice (locked 23/09) — nothing built; stale-harder / picker-challenge / click-memory / guess-date are unchanged. Extension: 1.61.24; "Recorded on GitHub" still writes nothing (content.js ~7529); Trainer Guess Save-link, GitHub SHA sync, View-bulletin tab still doing since 21/08. Sunday matrix lacks chonry_diocese → Achonry will not harvest next Sunday. Kilmovee real stale. Down & Connor not harvested today.
+
+**Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
+
+**Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
 ## Now (24/09/2026)
+- Achonry 28/09: 10 ok (inc Tourlestrane dlc + Ballymote page-scan + Collooney). Kilmovee stale (20 Sept only on site). Facebook-only cards left.
+- NEXT: Derry / Down & Connor / Clogher show 0 found — same class as Cork wipe (single-diocese Achonry harvest emptied their report rows / this-week pages). Re-harvest those three; check single-diocese guard still holds.
 - doing: OCR spacing harden pass2 — audit all live dioceses; Ardara letter-spaced fix. Not live until merge+Pages.
 

@@ -499,16 +499,27 @@ def merge_single_parish_report(base: dict, mine: dict, parish_key: str) -> dict:
     bucket entry.
     """
     key = str(parish_key or "").strip()
+    return merge_parish_report_rows(base, mine, {key} if key else set())
+
+
+def merge_parish_report_rows(base: dict, mine: dict, parish_keys) -> dict:
+    """Return *base* report with only *parish_keys* entries taken from *mine*.
+
+    One-diocese harvest runs rebase onto main and must not erase the rows
+    other dioceses pushed in the meantime (Derry/Down wiped 28/09/2026).
+    """
+    keys = {str(k or "").strip() for k in (parish_keys or ())} - {""}
     out = json.loads(json.dumps(base)) if isinstance(base, dict) else {}
     src = mine if isinstance(mine, dict) else {}
     for section in ("downloaded", "html_links", "skipped", "failed", "stale_rejected"):
         if not isinstance(out.get(section), list):
             out[section] = []
-    if key:
+    for key in sorted(keys):
         _remove_parish_from_sections(out, key)
+    if keys:
         for section in ("downloaded", "html_links", "skipped", "failed", "stale_rejected"):
             for item in src.get(section) or []:
-                if isinstance(item, dict) and item.get("parish") == key:
+                if isinstance(item, dict) and item.get("parish") in keys:
                     out[section].append(item)
     if src.get("target_date"):
         out["target_date"] = src["target_date"]

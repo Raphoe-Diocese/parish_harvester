@@ -460,6 +460,17 @@ def merge_single_parish_status(base: dict, mine: dict, parish_key: str) -> dict:
     own row.
     """
     key = str(parish_key or "").strip()
+    return merge_parish_status_rows(base, mine, {key} if key else set())
+
+
+def merge_parish_status_rows(base: dict, mine: dict, parish_keys) -> dict:
+    """Return *base* (origin/main) with only *parish_keys* rows taken from *mine*.
+
+    A one-diocese run (Clogher 28/09/2026) used to copy its whole file over
+    main and put Derry / Down & Connor back to ``no_evidence`` — the public
+    pages then said "0 of N found". Move only the rows this run harvested.
+    """
+    keys = {str(k or "").strip() for k in (parish_keys or ())} - {""}
     out = json.loads(json.dumps(base)) if isinstance(base, dict) else {}
     src = mine if isinstance(mine, dict) else {}
     parishes = out.setdefault("parishes", {})
@@ -467,7 +478,7 @@ def merge_single_parish_status(base: dict, mine: dict, parish_key: str) -> dict:
         parishes = {}
         out["parishes"] = parishes
     mine_rows = src.get("parishes") if isinstance(src.get("parishes"), dict) else {}
-    if key:
+    for key in sorted(keys):
         if key in mine_rows:
             parishes[key] = mine_rows[key]
         else:
