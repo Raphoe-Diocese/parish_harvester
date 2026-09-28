@@ -2,18 +2,58 @@
   "generated_at": "2026-09-28",
   "target_date": "2026-09-27",
   "summary": {
-    "downloaded": 127,
+    "downloaded": 89,
     "html_links": 0,
-    "skipped": 20,
-    "failed": 43,
-    "stale_rejected": 8
+    "skipped": 17,
+    "failed": 39,
+    "stale_rejected": 7
   },
   "action_counts": {
-    "ok": 155,
+    "ok": 157,
     "skip": 35,
-    "investigate": 9
+    "investigate": 6,
+    "retrain": 1
   },
   "parishes": [
+    {
+      "parish_key": "donaghmoyne",
+      "display_name": "Donaghmoyne",
+      "diocese": "clogher",
+      "recipe_file": "parishes/recipes/clogher/donaghmoyne.json",
+      "recipe": {
+        "start_url": "https://donaghmoyne.com/category/parish-bulletin/",
+        "site_type": "pdf_link_list",
+        "playbook_type": "pdf_download_list",
+        "status": "",
+        "skip": false,
+        "placeholder": false,
+        "step_count": 4,
+        "click_count": 3,
+        "has_terminal": true,
+        "operator_notes": [
+          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
+          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
+          "Do not worry if the filename or date in the link text changes every week."
+        ],
+        "do_not": [
+          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
+          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
+        ],
+        "recorded_date": "2026-09-14"
+      },
+      "bulletin_format": "download",
+      "learned_pattern": "News page with PDF links",
+      "host_profile": {
+        "total_timeout_s": 490,
+        "navigation_timeout_ms": 55000,
+        "notes": "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom. Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday. Do not worry if the filename or date in the link text chan"
+      },
+      "has_extension_diagnosis": true,
+      "harvest_status": "failed",
+      "last_error": "Recipe for Donaghmoyne is outdated \u2014 the website may have changed. Re-train with: python main.py --train \"Donaghmoyne\" (detail: Recipe outdated \u2014 re-train with --train (all selectors failed: article#post-3143 > header > h2 > a: Locator.get_",
+      "suggested_action": "retrain",
+      "suggested_reason": "outdated selectors"
+    },
     {
       "parish_key": "aghagallonandballinderryparish",
       "display_name": "Aghagallon and Ballinderry",
@@ -1616,10 +1656,10 @@
         "notes": "Many docs.google.com/viewer iframes load slowly (2\u20134 min) \u2014 ignore previews. Bulletin is a Word file at onewebmedia/NEWSLETTER D-M-YY.docx \u2014 download directly. Iframe src URLs are in the HTML immediately; no need to wait for previews. Harvester rewrites the date each Sunday and t"
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Too many pages: 5 pages (max 4)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Too many pages: 5 pages (max 4)"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "cleenish",
@@ -1747,10 +1787,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "unknown",
-      "last_error": "",
-      "suggested_action": "ok",
-      "suggested_reason": "downloaded or not in failure list"
+      "harvest_status": "failed",
+      "last_error": "Recipe replay failed: HTTP-scrape listing https://www.clonesparish.com/ \u2014 no dated bulletin PDF matching ['uploads/downloads'] (not a selector problem; parish may not have posted)",
+      "suggested_action": "investigate",
+      "suggested_reason": "Recipe replay failed: HTTP-scrape listing https://www.clonesparish.com/ \u2014 no dated bulletin PDF matching ['uploads/downloads'] (not a selector problem; parish m"
     },
     {
       "parish_key": "clonleighparish",
@@ -1885,7 +1925,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Website DNS no longer resolves (parishofstjohncoleraine.com)."
@@ -2221,7 +2261,7 @@
         "max_retries": 3
       },
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Amalgamated with Ballinascreen \u2014 weekly bulletin is one HTML page at parishofballinascreen.com (see parishofballinascreen). desertmartinparish.com no longer carries the bulletin."
@@ -2303,45 +2343,6 @@
       "last_error": "",
       "suggested_action": "ok",
       "suggested_reason": "downloaded or not in failure list"
-    },
-    {
-      "parish_key": "donaghmoyne",
-      "display_name": "Donaghmoyne",
-      "diocese": "clogher",
-      "recipe_file": "parishes/recipes/clogher/donaghmoyne.json",
-      "recipe": {
-        "start_url": "https://donaghmoyne.com/category/parish-bulletin/",
-        "site_type": "pdf_link_list",
-        "playbook_type": "pdf_download_list",
-        "status": "",
-        "skip": false,
-        "placeholder": false,
-        "step_count": 4,
-        "click_count": 3,
-        "has_terminal": true,
-        "operator_notes": [
-          "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom.",
-          "Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday.",
-          "Do not worry if the filename or date in the link text changes every week."
-        ],
-        "do_not": [
-          "Do not pin a dated filename in the selector (e.g. 14th_june_2026.pdf) \u2014 it breaks next week.",
-          "Do not pick GDPR, Gift Aid, or financial statement PDFs."
-        ],
-        "recorded_date": "2026-09-14"
-      },
-      "bulletin_format": "download",
-      "learned_pattern": "News page with PDF links",
-      "host_profile": {
-        "total_timeout_s": 490,
-        "navigation_timeout_ms": 55000,
-        "notes": "This page lists bulletin PDFs \u2014 the newest is usually at the top, but some parishes put it at the bottom. Point at this week's bulletin link (Download File / Parish News). Harvester picks the newest dated PDF each Sunday. Do not worry if the filename or date in the link text chan"
-      },
-      "has_extension_diagnosis": true,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP 403 for https://donaghmoyne.com/category/parish-bulletin/ \u2014 site may be blocking automated access (not a recipe/selector problem); headful fallback: Recipe replay failed: HTTP 403 for https://donaghmoyne.com/categ",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP 403 for https://donaghmoyne.com/category/parish-bulletin/ \u2014 site may be blocking automated access (not a recipe/selector problem); he"
     },
     {
       "parish_key": "dromore",
@@ -3911,10 +3912,10 @@
       "learned_pattern": "Stacked JPEG bulletin images (top N each week)",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: Page.goto: net::ERR_TIMED_OUT at https://www.iskaheenparish.com/bulletin\nCall log:\n  - navigating to \"https://www.iskaheenparish.com/bulletin\", waiting until \"commit\"\n",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: Page.goto: net::ERR_TIMED_OUT at https://www.iskaheenparish.com/bulletin\nCall log:\n  - navigating to \"https://www.iskaheenparish.com/bulle"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "keash",
@@ -4868,10 +4869,10 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "failed",
-      "last_error": "Recipe replay failed: HTTP-scrape listing https://malinparish.ie/index.php/bulletin/ \u2014 no dated bulletin PDF matching ['bulletin-'] (not a selector problem; parish may not have posted)",
-      "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: HTTP-scrape listing https://malinparish.ie/index.php/bulletin/ \u2014 no dated bulletin PDF matching ['bulletin-'] (not a selector problem; par"
+      "harvest_status": "unknown",
+      "last_error": "",
+      "suggested_action": "ok",
+      "suggested_reason": "downloaded or not in failure list"
     },
     {
       "parish_key": "melmountparish",
@@ -6873,7 +6874,7 @@
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
-      "harvest_status": "skipped",
+      "harvest_status": "unknown",
       "last_error": "",
       "suggested_action": "skip",
       "suggested_reason": "Website DNS no longer resolves (urneyandcastlefinparish.com)."
