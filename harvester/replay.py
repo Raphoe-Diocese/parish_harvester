@@ -15,6 +15,7 @@ from datetime import date, timedelta
 from http.client import HTTPConnection, HTTPSConnection
 from pathlib import Path
 from urllib.error import HTTPError
+from html import unescape
 from urllib.parse import parse_qs, unquote, urljoin, urlparse
 from urllib.request import HTTPHandler, HTTPSHandler, Request, build_opener, urlopen
 
@@ -1819,6 +1820,7 @@ def _extract_matching_href_texts(
         return any(pat in blob for pat in patterns)
 
     for href, inner in _A_HREF_WITH_TEXT_RE.findall(html or ""):
+        href = unescape(href or "")
         if not _want(href):
             continue
         absolute = urljoin(base_url, href)
@@ -1827,6 +1829,7 @@ def _extract_matching_href_texts(
         seen.add(absolute)
         out.append((absolute, _anchor_inner_text(inner)))
     for href in re.findall(r"""href=["']([^"']+)["']""", html or "", re.IGNORECASE):
+        href = unescape(href or "")
         if not _want(href):
             continue
         absolute = urljoin(base_url, href)
@@ -1915,7 +1918,11 @@ def _score_http_scrape_pdf_hrefs(
             continue
         path = urlparse(href).path.lower()
         # Cappagh /b/13 is a PDF with no .pdf suffix (GET application/pdf).
-        extensionless_ok = bool(re.search(r"/b/\d+/?$", path))
+        # Joomla download_gallery dlc.php (Tourlestrane / Kilmactigue) also
+        # returns application/pdf with no .pdf in the path (found 28/09/2026).
+        extensionless_ok = bool(
+            re.search(r"/b/\d+/?$", path) or path.endswith("dlc.php")
+        )
         if not path.endswith((".pdf", ".docx", ".doc", ".rtf")) and not extensionless_ok:
             continue
         found = _http_scrape_item_date(href, target_date)
