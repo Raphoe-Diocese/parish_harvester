@@ -1,12 +1,12 @@
 {
-  "generated_at": "2026-09-27",
+  "generated_at": "2026-09-28",
   "target_date": "2026-09-27",
   "summary": {
-    "downloaded": 71,
+    "downloaded": 72,
     "html_links": 0,
     "skipped": 3,
     "failed": 34,
-    "stale_rejected": 7
+    "stale_rejected": 6
   },
   "action_counts": {
     "ok": 162,
@@ -684,7 +684,8 @@
         "operator_notes": [
           "27/09/2026: official card links https://ballymoteparish.org/. Newsletter at /newsletter/ shows stacked page images Page-01-3.jpg \u2026 page-04-3.jpg under /uploads/2026/09/ (HTTP 200).",
           "site_type:http_scrape_newest_images count=4. Filenames have no day \u2014 freshness uses upload month.",
-          "Site returns 406 without a normal browser User-Agent."
+          "Site returns 406 without a normal browser User-Agent.",
+          "27/09/2026 harvest: page-04-3.jpg was misdated as 04/09 via slug_day \u2014 fixed in bulletin_freshness (page-scan same-month rule)."
         ],
         "do_not": [
           "Do not pin Page-01-3.jpg \u2014 the -3 suffix changes each week.",
@@ -4278,7 +4279,8 @@
         "has_terminal": true,
         "operator_notes": [
           "27/09/2026: listing https://kilmoveeparish.org/newsletter/ \u2014 this week is 27-September-2026-Parish-Newsletter.pdf (HTTP 200). Archive at /newsletter/2026-2/.",
-          "site_type:http_scrape_newest_pdf. First harvest briefly kept 20-September from the old example pin."
+          "site_type:http_scrape_newest_pdf. First harvest briefly kept 20-September from the old example pin.",
+          "27/09/2026 evening: 27-September-2026-Parish-Newsletter.pdf is HTTP 404; listing only has 20-September \u2014 real parish lag, not a parser bug."
         ],
         "do_not": [
           "Do not pin 27-September-2026.",
@@ -5030,7 +5032,7 @@
         "has_terminal": false,
         "operator_notes": [],
         "do_not": [],
-        "recorded_date": "2026-09-27"
+        "recorded_date": "2026-09-28"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -5703,7 +5705,7 @@
         "has_terminal": false,
         "operator_notes": [],
         "do_not": [],
-        "recorded_date": "2026-09-27"
+        "recorded_date": "2026-09-28"
       },
       "bulletin_format": "pdf_download",
       "learned_pattern": "",
@@ -6653,34 +6655,35 @@
       "recipe_file": "parishes/recipes/achonry/tourlestrane.json",
       "recipe": {
         "start_url": "https://www.kilmactigueparish.com/pages/newsletter.php",
-        "site_type": "print_to_pdf",
+        "site_type": "http_scrape_newest_pdf",
         "playbook_type": "",
         "status": "",
         "skip": false,
         "placeholder": false,
-        "step_count": 2,
+        "step_count": 1,
         "click_count": 0,
         "has_terminal": true,
         "operator_notes": [
-          "27/09/2026: http://www.kilmactigueparish.com/pages/newsletter.php is the newsletter page (HTTP 200). No dated PDF link in HTML scrape \u2014 print_to_pdf the live page. Prove date from page text on harvest.",
+          "27/09/2026: listing pages/newsletter.php \u2014 Joomla download_gallery dlc.php links; label 27th September 2026 returns PDF (HTTP 200).",
           "Official card Tourlestrane; site brand Kilmactigue.",
-          "Harvest 27/09 failed with Unsupported recipe action: navigate \u2014 use goto, not navigate."
+          "site_type:http_scrape_newest_pdf href_patterns dlc.php \u2014 score by anchor label date.",
+          "Earlier print_to_pdf failed: Too many pages 8 (max 4)."
         ],
         "do_not": [
           "Do not download Privacy Statement PDF as the bulletin.",
-          "Do not open /bulletin/ on achonryelphin.",
-          "Do not use action navigate \u2014 harvest only knows goto."
+          "Do not print_to_pdf the whole newsletter.php page (8 pages).",
+          "Do not pin file=247 \u2014 ids change each week."
         ],
         "recorded_date": "2026-09-27"
       },
-      "bulletin_format": "print_to_pdf",
+      "bulletin_format": "download",
       "learned_pattern": "",
       "host_profile": null,
       "has_extension_diagnosis": false,
       "harvest_status": "failed",
-      "last_error": "Recipe replay failed: \u274c Too many pages: 8 pages (max 4)",
+      "last_error": "Recipe replay failed: HTTP-scrape listing https://www.kilmactigueparish.com/pages/newsletter.php \u2014 no dated bulletin PDF matching ['dlc.php'] (not a selector problem; parish may not have posted)",
       "suggested_action": "investigate",
-      "suggested_reason": "Recipe replay failed: \u274c Too many pages: 8 pages (max 4)"
+      "suggested_reason": "Recipe replay failed: HTTP-scrape listing https://www.kilmactigueparish.com/pages/newsletter.php \u2014 no dated bulletin PDF matching ['dlc.php'] (not a selector pr"
     },
     {
       "parish_key": "trillick",
