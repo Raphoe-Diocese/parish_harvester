@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 import html
@@ -11,6 +11,7 @@ from harvester.diocese_intro import (
     DioceseWeekSummary,
     build_diocese_week_summary,
     load_mega_page_index,
+    recipe_folder_name,
     render_diocese_intro_html,
 )
 from harvester.fetcher import parse_evidence_file
@@ -289,7 +290,11 @@ def _recipe_dirs(diocese_key: str) -> list[Path]:
     candidates = {
         RECIPES_DIR / diocese_key,
         RECIPES_DIR / diocese_key.replace("-", "_"),
+        RECIPES_DIR / recipe_folder_name(diocese_key),
     }
+    ocr_key = OCR_DIOCESE_KEYS.get(diocese_key)
+    if ocr_key:
+        candidates.add(RECIPES_DIR / ocr_key)
     return [path for path in candidates if path.is_dir()]
 
 

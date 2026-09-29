@@ -35,8 +35,20 @@ class DioceseWeekSummary:
     stale: list[NamedLink] = field(default_factory=list)
 
 
+# Site keys that do not map to their recipe/evidence stem by a plain
+# hyphen→underscore swap. Ardagh & Clonmacnoise (29/09/2026) harvests as
+# ``ardagh_diocese`` with ``recipes/ardagh`` while the public URL is
+# /dioceses/ardagh-and-clonmacnoise/ — without this the page stayed a
+# placeholder with no "N of M found" line.
+_RECIPE_FOLDER_ALIASES = {
+    "ardagh-and-clonmacnoise": "ardagh",
+    "ardagh_and_clonmacnoise": "ardagh",
+}
+
+
 def recipe_folder_name(diocese_key: str) -> str:
-    return (diocese_key or "").strip().replace("-", "_")
+    key = (diocese_key or "").strip()
+    return _RECIPE_FOLDER_ALIASES.get(key) or key.replace("-", "_")
 
 
 def welcome_line(diocese_display_name: str) -> str:
