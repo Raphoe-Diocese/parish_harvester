@@ -1,8 +1,8 @@
 """Known same-parish recipe aliases. Do not invent extras.
 
-Frank (23/08/2026): Ballintra is Drumholm. Kilmacrenan is the same
-Google Drive file as Gartan/Termon (id ``1KnA8F6t54…`` / recipe
-``drive-1kna8f6t54``). Only those two aliases are recorded here.
+Proved only: shared bulletin / official host / Frank (Ballycastle).
+Directory leftovers with no recipe key (Kircubbin, Newcastle, Crossgar,
+Loughshore churches) are not listed here.
 """
 
 from __future__ import annotations
@@ -13,6 +13,14 @@ import re
 ALIAS_TO_CANONICAL: dict[str, str] = {
     "ballintra": "drumholm-parish",
     "kilmacrenan": "drive-1kna8f6t54",
+    "armoy": "ballycastleparish",
+    "ballintoy": "ballycastleparish",
+    "clontibret": "castleblayney",
+    "tyholland": "monaghanrackwallace",
+    "desertmartinparish": "parishofballinascreen",
+    "galloonparish": "newtownbutler",
+    "lisnaskeamaguiresbridgeparish": "lisnaskeamaguiresbridge",
+    "rathmullan": "milfordrathmullanparishes",
 }
 
 # Harvest / workflow input names that are not skip-aliases. Bruckless is the
@@ -25,6 +33,13 @@ HARVEST_INPUT_ALIASES: dict[str, str] = {
 COMBINED_DISPLAY_NAMES: dict[str, str] = {
     "drumholm-parish": "Drumholm (Ballintra)",
     "drive-1kna8f6t54": "Gartan/Termon (Kilmacrenan)",
+    "ballycastleparish": "Ballycastle (Armoy & Ballintoy)",
+    "castleblayney": "Castleblayney / Muckno (Clontibret)",
+    "monaghanrackwallace": "Monaghan & Rackwallace (Tyholland)",
+    "parishofballinascreen": "Ballinascreen (Desertmartin)",
+    "newtownbutler": "Newtownbutler (Galloon)",
+    "lisnaskeamaguiresbridge": "Lisnaskea-Maguiresbridge (Aghalurcher)",
+    "milfordrathmullanparishes": "Milford & Rathmullan",
 }
 
 # Display-name spellings that must collapse to the same grid / jump row.
@@ -37,6 +52,34 @@ _NAME_TO_CANONICAL: dict[str, str] = {
     "gartan/termon": "drive-1kna8f6t54",
     "gartan / termon": "drive-1kna8f6t54",
     "gartan/termon (kilmacrenan)": "drive-1kna8f6t54",
+    "armoy": "ballycastleparish",
+    "ballintoy": "ballycastleparish",
+    "ballycastle": "ballycastleparish",
+    "ballycastle (ramoan)": "ballycastleparish",
+    "ballycastle (armoy & ballintoy)": "ballycastleparish",
+    "clontibret": "castleblayney",
+    "clontibret (bulletin with castleblayney / muckno)": "castleblayney",
+    "castleblayney": "castleblayney",
+    "castleblayney / muckno (clontibret)": "castleblayney",
+    "tyholland": "monaghanrackwallace",
+    "tyholland (bulletin with monaghan & rackwallace)": "monaghanrackwallace",
+    "monaghan & rackwallace (tyholland)": "monaghanrackwallace",
+    "desertmartin": "parishofballinascreen",
+    "desertmartinparish": "parishofballinascreen",
+    "ballinascreen": "parishofballinascreen",
+    "ballinascreen (desertmartin)": "parishofballinascreen",
+    "ballinascreen (& desertmartin amalgamated)": "parishofballinascreen",
+    "galloon": "newtownbutler",
+    "galloonparish": "newtownbutler",
+    "newtownbutler": "newtownbutler",
+    "newtownbutler (galloon)": "newtownbutler",
+    "lisnaskea-maguiresbridge": "lisnaskeamaguiresbridge",
+    "lisnaskea-maguiresbridge (aghalurcher)": "lisnaskeamaguiresbridge",
+    "lisnaskeamaguiresbridgeparish": "lisnaskeamaguiresbridge",
+    "rathmullan": "milfordrathmullanparishes",
+    "milford": "milfordrathmullanparishes",
+    "milford kilkeel": "milfordrathmullanparishes",
+    "milford & rathmullan": "milfordrathmullanparishes",
 }
 _NAME_TO_CANONICAL_NORM: dict[str, str] = {
     re.sub(r"[^a-z0-9]+", "", key): value for key, value in _NAME_TO_CANONICAL.items()

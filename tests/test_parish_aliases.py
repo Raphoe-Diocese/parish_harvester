@@ -23,12 +23,20 @@ REPO_ROOT = Path(__file__).resolve().parent.parent
 
 
 class ParishAliasTests(unittest.TestCase):
-    def test_only_the_two_verified_aliases(self) -> None:
+    def test_only_proved_aliases(self) -> None:
         self.assertEqual(
             ALIAS_TO_CANONICAL,
             {
                 "ballintra": "drumholm-parish",
                 "kilmacrenan": "drive-1kna8f6t54",
+                "armoy": "ballycastleparish",
+                "ballintoy": "ballycastleparish",
+                "clontibret": "castleblayney",
+                "tyholland": "monaghanrackwallace",
+                "desertmartinparish": "parishofballinascreen",
+                "galloonparish": "newtownbutler",
+                "lisnaskeamaguiresbridgeparish": "lisnaskeamaguiresbridge",
+                "rathmullan": "milfordrathmullanparishes",
             },
         )
 
@@ -107,6 +115,95 @@ class ParishAliasTests(unittest.TestCase):
         self.assertTrue(ballintra.get("skip"))
         self.assertIn("drumholm-parish/bulletin.pdf", drumholm.get("start_url", ""))
         self.assertNotEqual(drumholm.get("skip"), True)
+
+    def test_armoy_and_ballintoy_are_ballycastle(self) -> None:
+        self.assertTrue(is_alias_key("armoy"))
+        self.assertTrue(is_alias_key("ballintoy"))
+        self.assertEqual(canonical_key("armoy"), "ballycastleparish")
+        self.assertEqual(canonical_key("ballintoy"), "ballycastleparish")
+        self.assertEqual(
+            combined_display_name("ballycastleparish"),
+            "Ballycastle (Armoy & Ballintoy)",
+        )
+        armoy = json.loads(
+            (REPO_ROOT / "parishes" / "recipes" / "down_and_connor" / "armoy.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        ballintoy = json.loads(
+            (REPO_ROOT / "parishes" / "recipes" / "down_and_connor" / "ballintoy.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        host = json.loads(
+            (
+                REPO_ROOT / "parishes" / "recipes" / "down_and_connor" / "ballycastleparish.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertEqual(armoy.get("alias_of"), "ballycastleparish")
+        self.assertEqual(ballintoy.get("alias_of"), "ballycastleparish")
+        self.assertTrue(armoy.get("skip"))
+        self.assertTrue(ballintoy.get("skip"))
+        self.assertEqual(host.get("display_name"), "Ballycastle (Armoy & Ballintoy)")
+        self.assertNotEqual(host.get("skip"), True)
+
+    def test_proved_clogher_and_derry_shared_bulletins(self) -> None:
+        self.assertEqual(canonical_key("clontibret"), "castleblayney")
+        self.assertEqual(canonical_key("tyholland"), "monaghanrackwallace")
+        self.assertEqual(canonical_key("desertmartinparish"), "parishofballinascreen")
+        clontibret = json.loads(
+            (REPO_ROOT / "parishes" / "recipes" / "clogher" / "clontibret.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        tyholland = json.loads(
+            (REPO_ROOT / "parishes" / "recipes" / "clogher" / "tyholland.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        desertmartin = json.loads(
+            (REPO_ROOT / "parishes" / "recipes" / "derry" / "desertmartinparish.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        self.assertEqual(clontibret.get("alias_of"), "castleblayney")
+        self.assertEqual(tyholland.get("alias_of"), "monaghanrackwallace")
+        self.assertEqual(desertmartin.get("alias_of"), "parishofballinascreen")
+        self.assertTrue(clontibret.get("skip"))
+        self.assertTrue(tyholland.get("skip"))
+        self.assertTrue(desertmartin.get("skip"))
+
+    def test_shared_url_doubles_collapse(self) -> None:
+        self.assertEqual(canonical_key("galloonparish"), "newtownbutler")
+        self.assertEqual(canonical_key("rathmullan"), "milfordrathmullanparishes")
+        self.assertEqual(
+            canonical_key("lisnaskeamaguiresbridgeparish"), "lisnaskeamaguiresbridge"
+        )
+        self.assertEqual(combined_display_name("newtownbutler"), "Newtownbutler (Galloon)")
+        self.assertEqual(
+            combined_display_name("milfordrathmullanparishes"), "Milford & Rathmullan"
+        )
+        galloon = json.loads(
+            (REPO_ROOT / "parishes" / "recipes" / "clogher" / "galloonparish.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        rathmullan = json.loads(
+            (REPO_ROOT / "parishes" / "recipes" / "raphoe" / "rathmullan.json").read_text(
+                encoding="utf-8"
+            )
+        )
+        milford = json.loads(
+            (
+                REPO_ROOT / "parishes" / "recipes" / "raphoe" / "milfordrathmullanparishes.json"
+            ).read_text(encoding="utf-8")
+        )
+        self.assertEqual(galloon.get("alias_of"), "newtownbutler")
+        self.assertEqual(rathmullan.get("alias_of"), "milfordrathmullanparishes")
+        self.assertTrue(galloon.get("skip"))
+        self.assertTrue(rathmullan.get("skip"))
+        self.assertEqual(milford.get("display_name"), "Milford & Rathmullan")
+        self.assertNotEqual(milford.get("skip"), True)
 
     def test_bruckless_harvest_input_is_not_a_skip_alias(self) -> None:
         self.assertEqual(HARVEST_INPUT_ALIASES["bruckless"], "drive-1rjeey-ayy")
