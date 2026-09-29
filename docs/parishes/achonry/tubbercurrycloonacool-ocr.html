@@ -1,0 +1,624 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Tubbercurry-Cloonacool Text Bulletin — 29/09/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #eef1f0;
+      color: #1a1f1e;
+      line-height: 1.65;
+      font-size: 1.125rem;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
+    }
+    a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
+    .page {
+      max-width: min(72ch, 100%);
+      margin: 0 auto;
+      padding: 14px 18px 40px;
+    }
+    .top {
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+      gap: 8px 14px;
+      margin-bottom: 12px;
+    }
+    .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+    .back-link {
+      font-size: 0.9rem; font-weight: 700;
+      color: #14524f; text-decoration: none;
+    }
+    .title-line {
+      font-size: 1rem; font-weight: 700; color: #1a1f1e;
+    }
+    .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 9999;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
+    .ocr-zoom-bar {
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
+    }
+    .ocr-zoom-bar button {
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+      line-height: 1;
+    }
+    .ocr-zoom-pct {
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 4px; } }
+    
+    .ocr-body {
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    .ocr-body h1, .ocr-body h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h2.b-title, .ocr-body .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    .ocr-body h3.b-head, .ocr-body .b-head {
+      font-size: 1.15em;
+      color: #0f3d3d;
+      margin: 1.35em 0 0.45em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      font-weight: 700;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h4.b-sub, .ocr-body .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    .ocr-body h3, .ocr-body h4 {
+      color: #1a6b6b;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    .ocr-body p {
+      margin: 0 0 0.85em;
+    }
+    .ocr-body h3.ocr-page-heading,
+    .ocr-body .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    .ocr-body hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    .ocr-body strong { color: #0f2b5b; }
+    .ocr-body a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .ocr-body mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    .ocr-body mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    .ocr-body table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ocr-body table.b-table td, .ocr-body table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .ocr-body table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    .ocr-body table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    .ocr-body img, .ocr-body iframe, .ocr-body video {
+      max-width: 100%;
+      height: auto;
+    }
+    .ocr-body > :first-child {
+      margin-top: 0;
+    }
+    
+    .ocr-body .ocr-parish-masthead {
+      margin: 2.1em 0 1.15em;
+      padding: 0.85em 0 0.7em;
+      border-top: 3px solid #14524f;
+      border-bottom: 1px solid #c5d0c9;
+    }
+    .ocr-body .ocr-parish-masthead:first-child {
+      margin-top: 0;
+    }
+    .ocr-body h2.ocr-parish-name,
+    .ocr-body .ocr-parish-name {
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #14524f;
+      margin: 0 0 0.2em;
+      line-height: 1.25;
+      border: 0;
+      padding: 0;
+      text-transform: none;
+    }
+    .ocr-body .ocr-parish-date {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body .ocr-parish-link {
+      margin: 0.25em 0 0;
+      font-size: 0.88rem;
+    }
+    .ocr-body h3.b-head {
+      margin-top: 1.45em;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      color: #0f3d3d;
+    }
+
+
+    .ocr-body {
+      padding: 4px 2px 8px;
+    }
+    .search-panel {
+      margin: 0 0 12px;
+      border: 1px solid #d4ddd9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .search-panel .ocr-search-bar { margin-bottom: 6px; }
+    .ocr-search-bar { position: relative; margin-bottom: 6px; }
+    .search-input {
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: #1a1f1e; background: #fff;
+    }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 1px solid #1a6b6b; border-radius: 6px; background: #fff; color: #1a6b6b;
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { color: #999; border-color: #d4ddd9; cursor: not-allowed; }
+    .match-count { color: #5a6a68; font-size: 0.85rem; font-weight: 600; }
+    .note-box {
+      margin-top: 18px;
+      color: #5a6a68;
+      font-weight: 400;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      padding: 0;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 8px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    body.embed-mode .top { display: none !important; }
+    body.embed-mode .page { padding-top: 8px; }
+    @media (max-width: 600px) {
+      .page { padding: 12px 14px 32px; }
+      .ocr-search-tools button { min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top" id="ocr-top">
+      <div class="top-left">
+        <a class="back-link" href="tubbercurrycloonacool.html" target="_blank" rel="noopener noreferrer">← Viewer</a>
+        <span class="title-line">TUBBERCURRY-CLOONACOOL Text Bulletin · 29/09/2026</span>
+      </div>
+    </div>
+    <div class="ocr-sticky-chrome">
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+      <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+      <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+      <span class="ocr-zoom-hint">or pinch to zoom</span>
+    </div>
+    <div class="search-panel" role="search">
+      <div class="ocr-search-bar">
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search text (mass, bingo, parish…)" aria-label="Search bulletin text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled>← Prev</button>
+          <button id="ocr-next" type="button" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead" id="ocr-parish-tubbercurry-cloonacool" data-parish-name="Tubbercurry-Cloonacool"><h2 class="ocr-parish-name">Tubbercurry-Cloonacool</h2><p class="ocr-parish-date">29/09/2026</p></header>
+<p class="page-label">Page 1</p>
+<p>CHURCH DATE TIME INTENTION TUBBERCURRY Sat 26th 7.00pm Paddy and Margaret Molloy, son Dermot and daughter Kathleen CLOONACOOL Sun 27th 10.00am Roger McNulty and deceased family members Kathleen O’Dowd (nee Henry), Anniversary Frank McIntyre (Anniversary) TUBBERCURRY Sun 27th 11.30am Sharon Walsh McCann (Anniversary) TUBBERCURRY Mon 28th ---- No Mass CLOONACOOL Tue 29th ---- No Mass TUBBERCURRY Wed 30th ---- No Mass CLOONACOOL Thurs 1st Oct ---- No Mass TUBBERCURRY Fri 2nd 9.30am Mark Armstrong (10th Anniversary) TUBBERCURRY Sat 3rd 7.00pm Michael James and Bridie Kirrane, Mary Scanlon and deceased of the Kirrane and Scanlon families Michael McSorley and his father James CLOONACOOL Sun 4th 10.00am Michael Rowley (1st Anniversary) Maurice Conboy (Anniversary) Patrick and Celia Gallagher (Anniversary) TUBBERCURRY Sun 4th 11.30am Margaret Mulkeen (Anniversary)</p>
+<h3 class="b-head">MASS TIMES</h3>
+<p>AND INTENTIONS This week …. Masses from our churches are livestreamed via webcam on the parish website. tubbercurrycloonacool.com/webcam Weekend 3rd / 4th October Cloonacool: (10am) Bill Carty Tubbercurry (Vigil 7pm) Martina Doyle Tubbercurry: (11.30am) Noreen Gallagher &amp; Joe Stenson Tubbercurry Cloonacool Paris h Bulletin 26th Sunday in Ordinary Time - 27th September 2026</p>
+<h3 class="b-head">PARISH CONTACTS</h3>
+<p>PRIEST Fr Vincent Sherlock. Tel. <a href="tel:+353719185049" style="color:#1d4ed8;font-weight:600;">071-918 5049</a> or <a href="tel:+353872424253" style="color:#1d4ed8;font-weight:600;">087-242 4253</a> Email <a href="mailto:vsherlock@achonrydiocese.org" target="_blank" rel="noopener noreferrer">vsherlock@achonrydiocese.org</a></p>
+<h3 class="b-head">PARISH OFFICE</h3>
+<h3 class="b-head">Parochial House</h3>
+<p>, Emmet Street, Tubbercurry, Co. Sligo. Tel. 071– 918 5049 Email <a href="mailto:tubbercurryparish@achonrydiocese.org" target="_blank" rel="noopener noreferrer">tubbercurryparish@achonrydiocese.org</a> PARISH SOCIAL MEDIA WEBSITE <a href="https://tubbercurrycloonacool.com" target="_blank" rel="noopener noreferrer">https://tubbercurrycloonacool.com</a> FACEBOOK.com/tubbercurrycloonacool TWITTER @tubbercloona A PRAYER FOR OUR PARISH Lord, watch over our parish, encouraging us to watch with one another as we seek to know your will. Make us gentle in word, kind in spirit, strong in hope and guide us, ever gently along that road of peace that leads to your door; a door that will always open to the knock of faithful people. Amen. Tubbercurry-Cloonacool <a href="https://tubbercurrycloonacool.com" target="_blank" rel="noopener noreferrer">https://tubbercurrycloonacool.com</a></p>
+<hr>
+<p class="page-label">Page 2</p>
+<p>You may support the parish through online donations via our Diocesan Website achonrydiocese.org/donateonline or by scanning the QR CODE tubbercurrycloonacool.com NIGHT PRAYER - Each night at 10pm (approx.) Join us on facebook.com/uinsionno EUCHARISTIC ADORATION There will be Adoration in Tubbercurry Church each Wednesday from 10.00a m until 7.00pm until theendof September. There will not be adoration in Cloonacool during these weeks. Thank you for your commitment.</p>
+<h3 class="b-head">PLEASE PRAY FOR</h3>
+<p>Your prayers are asked for the late Richard Holohan , New York and formerly Tubbercurry whose cremains were interred in Rhue Cemetery last weekend. We remember all whose anniversaries occur at this time. May they rest in peace. HONDA, TRACTOR &amp; VINTAGE CAR RUN St. Brigid’s Hall are thrilled to hold a Honda, Tractor and Vintage Car Run today (Sunday) at 1pm, Registration from 11am. Whether you’re driving or viewing, come along to enjoy the run - all while supporting St. Brigid’s Hall and remembering Sean Johnston. Raffle and refreshments ontheday. Sean spent endless hours in St. Brigid’s Hall through drama and what better place to honour him. Thank you for your support. SATURDAY CRAFTS FOR CHILDREN Aged 5-7 years with Tubbercurry FRC and Tubbercurry Library for the month of October. Classes will include crafts, clay work and more. Further details and booking to the Library <a href="tel:+353719111705" style="color:#1d4ed8;font-weight:600;">071 9111705</a>. CAR PARK DISRUPTION For the next couple of weeks there will be some disruption in the carpark of Tubbercurry FRC duetothenew Childcare building nearing completion and the installation of fencing and a new footpath from the Mountain Road to the Church. People are asked to follow the new temporary layout and to expect disruptions. CLOONACOOL PLAYERS Watch this space as the Cloonacool Players, our stars of comedy, arenowin rehearsals and will soon announce their staging of two hilarious farces. Mighty surprises and laughs galore on the horizon – and yes, before Christmas! FAMILY CARER OF THE YEAR Awards 2026, these honours award Ireland’s hidden frontline , the extraordinary people who provide care at home. Ifyou, or someone you know, would like to nominate a family carer visit <a href="https://familycarers" target="_blank" rel="noopener noreferrer">https://familycarers</a>. ieforthe nomination form. Nominations close Friday. 9th October. GUIDED PRAYER AFTERNOON Inthe Fr. Peyton Centre, Attymass on Thursday, 9th October 2pm-4.30pm. Afternoon includes Rosary, meditation, silent time, Mass. Contact Fina on <a href="tel:+3539645374" style="color:#1d4ed8;font-weight:600;">096 45374</a> or <a href="tel:+353876816821" style="color:#1d4ed8;font-weight:600;">087 6816821</a> ONE DAY ROSARY RETREAT On Saturday, 17th October inthe Fr. Peyton Centre, Attymass. The Rosary: A Gift That Keeps On Giving beginning at 11am and concluding at 4.30pm. Day includes spiritual talks, silent time, reflection, rosary and Mass. Cost €25 which includes tea/coffee on arrival and light lunch. Booking is essential. Contact Fina <a href="tel:+3539645374" style="color:#1d4ed8;font-weight:600;">096 45374</a> or <a href="tel:+353876816821" style="color:#1d4ed8;font-weight:600;">087 6816821</a>. HOLY HILL HERMITAGE Saturday, 17th October 10am-4pm. To book email <a href="mailto:friendsofcarmel@gmail.com" target="_blank" rel="noopener noreferrer">friendsofcarmel@gmail.com</a> SLEEP OUT AGAINST HOMELESSNESS Talking place on 9th October across Ireland. Schools, sports clubs, workplaces, parishes are gathering together for Shine A Light . If you would like to become involved see <a href="https://www.focusireland" target="_blank" rel="noopener noreferrer">www.focusireland</a>. ieandgoto Get Involved tab and sign up for Shine A Light BEREAVEMENT SUPPORT GROUP Meets at the Family Centre, Knock Shrine each Wednesday morning at 11am. Trained facilitators conduct the meetings, which provide guidance and support toallwho find loss difficult. All are welcome. Further details phone Monica <a href="tel:+353949375320" style="color:#1d4ed8;font-weight:600;">094 9375320</a>. WELLBEING WORKSHOPS In Tubbercurry FRC starting Thursday 10am- 11.30am. This is a free event. To book your place phone <a href="tel:+353719186926" style="color:#1d4ed8;font-weight:600;">071 9186926</a>. INTRODUCTION TO JOURNALLING Journaling is a simple, private and free tool for mental and emotional well-being. By writing down your thoughts and feelings you can clear your mind, reduce stress, and better understand yourself. Want to give itago? Join Tubbercurry FRC for this programme starting on Monday and gain simple tips and techniques to get your started. No experience needed, weekly prompts will help you to think about what you want to journal and what that feels like. Cost €15. Enquiries or bookings <a href="tel:+353719186926" style="color:#1d4ed8;font-weight:600;">071 9186926</a>. SCRIPTURE INITIATIVE Dioceses of Achonry and Elphin 2026/2027 Scripture Initiative: New groups and facilitators are being sought. Please consider. Enquiries are welcome. See <a href="https://www.achonryelphin.ie/scripture" target="_blank" rel="noopener noreferrer">www.achonryelphin.ie/scripture</a> AFTERNOON TEA On Sunday 18th October at 3pm in the Moylough Heritage Centre. Tickets €10 and the overall winner of the Moylough Heritage Centre Raffle Draw and winner of €1,500 cash or the Centre Parcs Voucher will be announced at the event. Your support would be very much appreciated. Raffle tickets can be purchased in local businesses oronthedayatthe event. ATLANTIC CARE NORTH WEST Are currently recruiting. Ifyouare available for part-time work and want to help make a big difference to the most vulnerable in the society give them a call. They are working closely with the HSEto provide much needed care to Seniors. Phone <a href="tel:+353719100209" style="color:#1d4ed8;font-weight:600;">071 9100209</a> or email chloe. <a href="mailto:mccabe@atlanticcare.ie" target="_blank" rel="noopener noreferrer">mccabe@atlanticcare.ie</a> FIRST AID TRAINING Family Carers Ireland First Aid Training, free of charge on Tuesday, 13th October 10am-3pm in Soco Lab, Airport Road, Strandhill F91 FE8N. A valuable skill for every family carer, knowing what todoinan emergency can save lives. To register email Michelle <a href="mailto:training@familycarers.ie" target="_blank" rel="noopener noreferrer">training@familycarers.ie</a> 5 STEP SU PPPORT SERVICE Are you affected by the misuse of drugs or alcohol or drugs by another individual? 5 Step Support can help you. Itis free, non- judgmental and one- to-one service. If you would like further information or an appointment please contact <a href="tel:+353719150578" style="color:#1d4ed8;font-weight:600;">071 9150578</a>, <a href="tel:+353858759319" style="color:#1d4ed8;font-weight:600;">085 8759319</a> or <a href="mailto:sligoleitrim@alcoholforum.com" target="_blank" rel="noopener noreferrer">sligoleitrim@alcoholforum.com</a> DAILY MASSES IN NEIGHBOURING PARISHES ACHONRY/MULLINABREENA Monday, Tuesday and Thursday – Mullinabreena 10.00 am Wednesday and Friday – Achonry 10.00 am CURRY Monday to Friday 10.00 am TOURLESTRANE Tuesday and Wednesday 9.30am, Friday 8.00pm – Tourlestrane Church Monday and Thursday – Kilmactigue 9.30am Ifyouare travelling to another parish for daily Mass, you might consider offering a lift to another parishioner who might like to attend.</p></div>
+    <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
+  </div>
+  <script>
+    (function () {
+      try {
+        if (new URLSearchParams(window.location.search).get('embed') === '1') {
+          document.body.classList.add('embed-mode');
+        }
+      } catch (e) {}
+    })();
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-text');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+    (function () {
+      const ocrRoot = document.getElementById('ocr-text');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      if (!ocrRoot || !ocrSearch) return;
+      const originalHtml = ocrRoot.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+      function escapeRegExp(text) {
+        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        ocrMatches[idx].classList.add('search-active');
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      function updateMatchUi() {
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} of ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+      function applySearch(query) {
+        ocrRoot.innerHTML = originalHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrRoot, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) nodes.push(node);
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) return;
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrRoot.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+      ocrSearch.addEventListener('input', (e) => applySearch(e.target.value.trim()));
+      clearSearch.addEventListener('click', () => { ocrSearch.value = ''; applySearch(''); ocrSearch.focus(); });
+      prevMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && ocrMatches.length) {
+          e.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+    })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      function boot() {
+        var btn = document.getElementById('scroll-top-btn');
+        if (!btn) {
+          if (!document.body) return;
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scroll-top-btn';
+          btn.id = 'scroll-top-btn';
+          btn.setAttribute('aria-label', 'Back to top');
+          btn.textContent = '↑';
+          document.body.appendChild(btn);
+        }
+        function innerBoxes() {
+          return Array.prototype.slice.call(
+            document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+          );
+        }
+        function maxInnerScroll() {
+          return innerBoxes().reduce(function (max, el) {
+            return Math.max(max, el.scrollTop || 0);
+          }, 0);
+        }
+        function shown() {
+          var y = window.scrollY || document.documentElement.scrollTop || 0;
+          btn.classList.toggle('is-visible', y > 80 || maxInnerScroll() > 16);
+        }
+        function shownSoon() {
+          shown();
+          if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+          else window.setTimeout(shown, 16);
+        }
+        function bindBox(el) {
+          if (!el || el.getAttribute('data-pp-scroll-top') === '1') return;
+          el.setAttribute('data-pp-scroll-top', '1');
+          el.addEventListener('scroll', shownSoon, { passive: true });
+        }
+        function bindBoxes() {
+          innerBoxes().forEach(bindBox);
+          shown();
+        }
+        window.parishPressBindScrollTopBoxes = bindBoxes;
+        if (btn.getAttribute('data-pp-bound') !== 'inner-2') {
+          btn.setAttribute('data-pp-bound', 'inner-2');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.addEventListener('scroll', shownSoon, { passive: true });
+          document.addEventListener('scroll', shownSoon, { capture: true, passive: true });
+          document.addEventListener('wheel', shownSoon, { capture: true, passive: true });
+          document.addEventListener('touchmove', shownSoon, { capture: true, passive: true });
+          if (window.MutationObserver && document.body) {
+            new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+          }
+          btn.addEventListener('click', function () {
+            var behavior = reduce ? 'auto' : 'smooth';
+            window.scrollTo({ top: 0, behavior: behavior });
+            innerBoxes().forEach(function (el) {
+              el.scrollTop = 0;
+              if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+            });
+            window.setTimeout(shown, reduce ? 0 : 400);
+          });
+        }
+        bindBoxes();
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
+    })();
+    
+  </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
+</body>
+</html>

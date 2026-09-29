@@ -1,0 +1,1578 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Foxford Bulletin — 29/09/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; }
+    body {
+      font-family: "Segoe UI", system-ui, sans-serif;
+      background: #f4f6f6;
+      color: #1a1a2e;
+      line-height: 1.55;
+    }
+    a { color: #1a6b6b; text-decoration: none; }
+    a:hover { text-decoration: underline; }
+    .page { max-width: 960px; margin: 0 auto; padding: 20px 18px 48px; }
+    .back-link { display: inline-block; margin-bottom: 16px; font-weight: 600; color: #1a6b6b; font-size: 0.95rem; }
+    .header {
+      text-align: center;
+      margin-bottom: 28px;
+      background: #fff;
+      border: 1px solid #dde5e4;
+      padding: 28px 20px 22px;
+    }
+    .diocese-label {
+      margin: 0 0 8px;
+      color: #14524f;
+      font-size: 0.8rem;
+      letter-spacing: 0.14em;
+      text-transform: uppercase;
+      font-weight: 700;
+    }
+    h1 {
+      margin: 0 0 8px;
+      color: #14524f;
+      font-family: Georgia, "Times New Roman", serif;
+      font-size: clamp(1.55rem, 3.2vw, 2.15rem);
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      text-transform: uppercase;
+      line-height: 1.25;
+    }
+    .meta { color: #6b7280; font-size: 0.92rem; margin-bottom: 10px; }
+    .stale-note {
+      color: #7a3b00;
+      font-size: 1rem;
+      font-weight: 600;
+      margin: 0.35rem 0 0.7rem;
+    }
+    .download-link-top {
+      display: inline-block;
+      margin-top: 4px;
+      font-weight: 700;
+      font-size: 1rem;
+      color: #1a6b6b;
+    }
+
+    /* Mobile-only jump + download (hidden on desktop) */
+    .mobile-jump {
+      display: none;
+      text-align: center;
+      margin: 0 0 22px;
+    }
+    .mobile-jump-btn {
+      display: block;
+      width: 100%;
+      max-width: 420px;
+      margin: 0 auto 12px;
+      padding: 12px 16px;
+      border: 1px solid #1a6b6b;
+      background: #fff;
+      color: #1a6b6b;
+      font-weight: 700;
+      font-size: 0.98rem;
+      text-decoration: none;
+      border-radius: 2px;
+    }
+    .mobile-jump-btn:hover { background: #f0f7f7; text-decoration: none; }
+    .mobile-jump-download {
+      display: inline-block;
+      font-weight: 700;
+      color: #1a6b6b;
+      font-size: 1rem;
+    }
+
+    .section-heading {
+      margin: 34px 0 14px;
+      text-align: center;
+      text-transform: uppercase;
+      letter-spacing: 0.07em;
+      font-weight: 700;
+      font-size: 0.98rem;
+      color: #4a5560;
+      font-family: Georgia, "Times New Roman", serif;
+    }
+
+    .viewer-block {
+      background: #fff;
+      border: 1px solid #dde5e4;
+      padding: 14px;
+      margin-bottom: 4px;
+    }
+
+    .quiet-links {
+      display: flex;
+      justify-content: flex-end;
+      gap: 14px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+      font-size: 0.88rem;
+      font-weight: 600;
+    }
+    .quiet-links a { color: #1a6b6b; }
+    .pdf-wait-note {
+      display: none;
+      margin: 0 0 10px;
+      font-size: 0.88rem;
+      color: #5a6a68;
+      line-height: 1.45;
+    }
+
+    .pdf-frame-wrap {
+      position: relative;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      background: #3a3f42;
+    }
+    .pdf-frame-wrap iframe {
+      width: 100%;
+      height: 100%;
+      border: 0;
+      display: block;
+    }
+    .fullscreen-btn {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 5;
+      width: 34px;
+      height: 34px;
+      border: 1px solid #1a6b6b;
+      border-radius: 4px;
+      background: rgba(255, 255, 255, 0.92);
+      color: #1a6b6b;
+      font-size: 1rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .fullscreen-btn:hover { background: #fff; }
+    .pdf-frame-wrap .fullscreen-btn { display: none !important; }
+    
+    .pdf-inpage-viewer,
+    .pdf-mobile-fallback {
+      display: flex !important;
+      flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      flex: 1 1 auto;
+      background: #3a3f42;
+      color: #e8eeed;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
+    }
+    .pdf-inpage-toolbar {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-start;
+      gap: 8px;
+      padding: 8px 10px;
+      background: #14524f;
+      color: #fff;
+      flex: 0 0 auto;
+    }
+    .pdf-inpage-backup { display: flex; gap: 8px; flex-wrap: wrap; }
+    .pdf-inpage-backup a { color: #fff; font-weight: 700; font-size: 0.85rem; }
+    .pdf-inpage-status { padding: 10px 12px; background: #1f3d3c; color: #d8f0ee; font-size: 0.9rem; }
+    .pdf-inpage-pages {
+      box-sizing: border-box;
+      flex: 0 0 auto;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+      overflow-x: hidden;
+      /* Reserve the scrollbar gutter from the first paint. Without it the
+         first page is sized to the full width, the vertical scrollbar then
+         appears, and the page is suddenly ~16px too wide — a horizontal
+         scrollbar under a strip of the bulletin. */
+      scrollbar-gutter: stable;
+      background: #525659;
+      padding: 8px 0 16px;
+    }
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+    }
+    .pdf-inpage-page-slot {
+      margin: 0 auto 10px;
+      background: #3a3f42;
+      min-height: 180px;
+      max-width: 100%;
+      position: relative;
+    }
+    .pdf-inpage-page-slot canvas { display: block; width: 100%; height: auto; background: #fff; }
+    .pdf-first-preview { display: block; width: 100%; height: auto; background: #fff; }
+    /* `overflow: hidden` clips a link annotation whose PDF rect lands off the
+       page — one of those used to stretch the box's scrollWidth to 2988px. */
+    .pdf-link-layer {
+      position: absolute; left: 0; top: 0; width: 100%; height: 100%;
+      overflow: hidden; pointer-events: none;
+    }
+    .pdf-annot-link {
+      position: absolute; z-index: 2; pointer-events: auto;
+      background: rgba(26, 107, 107, 0.08); border-radius: 2px;
+    }
+    .pdf-frame-wrap,
+    .pdf-standalone-shell {
+      display: flex;
+      flex-direction: column;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: hidden;
+      border: 1px solid #c9d4d3;
+      box-sizing: border-box;
+    }
+    .pdf-frame-wrap iframe,
+    .pdf-standalone-shell iframe.pdf-frame,
+    body.is-native-pdf iframe.pdf-frame {
+      display: none !important;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+    }
+    .pdf-frame-wrap.is-native-pdf,
+    .pdf-standalone-shell.is-native-pdf,
+    body.is-native-pdf .pdf-standalone-shell {
+      display: flex;
+      flex-direction: column;
+      height: 850px !important;
+      min-height: 850px !important;
+      max-height: 850px !important;
+      overflow: hidden !important;
+      background: #3a3f42;
+    }
+    @media (max-width: 1024px) {
+      .pdf-frame-wrap,
+      .pdf-standalone-shell,
+      .pdf-frame-wrap.is-native-pdf,
+      .pdf-standalone-shell.is-native-pdf,
+      body.is-native-pdf .pdf-standalone-shell {
+        height: 450px !important;
+        min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
+        display: flex;
+        flex-direction: column;
+        background: #3a3f42;
+      }
+      .pdf-inpage-viewer,
+      .pdf-mobile-fallback {
+        height: 450px !important;
+        min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: hidden !important;
+      }
+      .pdf-inpage-pages,
+      #ocr-panel,
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        height: 450px !important;
+        min-height: 450px !important;
+        max-height: 450px !important;
+        overflow: auto !important;
+        overflow-y: auto !important;
+      }
+      .pdf-inpage-pages { overflow-x: hidden !important; }
+      .pdf-inpage-page-slot { max-width: 100%; }
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        display: none !important;
+      }
+    }
+
+    @media (min-width: 701px) and (min-height: 501px) {
+      .pdf-frame-wrap,
+      .pdf-standalone-shell,
+      .pdf-frame-wrap.is-native-pdf,
+      .pdf-standalone-shell.is-native-pdf,
+      body.is-native-pdf .pdf-standalone-shell,
+      .pdf-inpage-viewer,
+      .pdf-mobile-fallback {
+        height: 850px !important;
+        min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: hidden !important;
+      }
+      .pdf-inpage-pages,
+      #ocr-panel,
+      .pdf-frame-wrap iframe,
+      .pdf-standalone-shell iframe.pdf-frame {
+        height: 850px !important;
+        min-height: 850px !important;
+        max-height: 850px !important;
+        overflow: auto !important;
+        overflow-y: auto !important;
+      }
+      /* `overflow: auto` above resets both axes, so re-hide the horizontal one:
+         a single stray PDF link annotation off the right edge of a page used to
+         give the whole box a horizontal scrollbar. */
+      .pdf-inpage-pages { overflow-x: hidden !important; }
+      /* Nothing to enlarge — the box is already the locked 850px. */
+      .az-expand { display: none; }
+    }
+
+
+    /* Search comes first in the OCR block and reads like the JUMP TO bar, so
+       a reader cannot scroll past it looking for "where is the search". */
+    .ocr-search-bar {
+      position: relative;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      margin: 0 0 8px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-search-label {
+      flex: 0 0 auto;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
+    }
+    .search-input {
+      flex: 1 1 auto;
+      min-width: 0;
+      width: auto;
+      border: 1px solid #1a6b6b;
+      border-radius: 4px;
+      padding: 11px 42px 11px 14px;
+      font-size: 1rem;
+      background: #fff;
+    }
+    .search-clear {
+      position: absolute;
+      right: 16px;
+      top: 50%;
+      transform: translateY(-50%);
+      width: 32px;
+      height: 32px;
+      border: 0;
+      border-radius: 50%;
+      background: transparent;
+      color: #6b7280;
+      font-size: 1.25rem;
+      cursor: pointer;
+    }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      margin-bottom: 12px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 0;
+      border-radius: 4px;
+      background: #1a6b6b;
+      color: white;
+      font-weight: 600;
+      padding: 7px 14px;
+      cursor: pointer;
+      font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { background: #9bbfbd; cursor: not-allowed; }
+    .match-count { color: #6b7280; font-size: 0.9rem; font-weight: 600; }
+    .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #fff;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 9999;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
+    
+    .az-row {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 6px;
+      margin: 0 0 10px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .az-row-label {
+      margin-right: 2px;
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
+    }
+    .az-letter {
+      min-width: 30px;
+      height: 30px;
+      padding: 0 6px;
+      background: #fff;
+      border: 1px solid #cfdedd;
+      border-radius: 4px;
+      color: #1a6b6b;
+      font-weight: 700;
+      font-size: 0.9rem;
+      line-height: 1;
+      cursor: pointer;
+    }
+    .az-letter:hover,
+    .az-letter:focus-visible {
+      background: #1a6b6b;
+      border-color: #1a6b6b;
+      color: #fff;
+    }
+    /* Enlarge control removed. Hide any leftover .az-expand in old HTML. */
+    .az-expand { display: none; }
+    /* A letter jump scrolls inside a locked box, so nothing moves on screen
+       except the text. Flag the parish the reader landed on. */
+    .az-landed {
+      background: #fff6da;
+      box-shadow: 0 0 0 3px #f0d089;
+      border-radius: 3px;
+      transition: background 400ms ease, box-shadow 400ms ease;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .az-landed { transition: none; }
+    }
+    .diocese-intro {
+      margin: 0 0 22px;
+      padding: 18px 18px 16px;
+      background: #fff;
+      border: 1px solid #dde5e4;
+    }
+    .diocese-intro p { margin: 0 0 10px; color: #1a1a2e; }
+    .diocese-intro .intro-welcome { font-size: 1.05rem; }
+    .diocese-intro .intro-wip {
+      font-size: 0.92rem;
+      color: #5a6a68;
+      font-style: italic;
+    }
+    .diocese-intro .intro-count { font-weight: 600; color: #14524f; }
+    .diocese-intro h3 {
+      margin: 14px 0 8px;
+      font-size: 0.92rem;
+      color: #14524f;
+    }
+    .diocese-intro .intro-stale-note { color: #5a6a68; font-size: 0.9rem; }
+    .diocese-intro .intro-names {
+      margin: 0;
+      padding-left: 1.15em;
+    }
+    .diocese-intro .intro-names li { margin: 0 0 4px; }
+    
+    /* Letters and text size share ONE bar, so neither hides the other and
+       neither pushes the search box off a short screen. The wrapper draws the
+       box; the letter row and zoom group go transparent inside it. */
+    .ocr-controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      gap: 6px 12px;
+      margin: 0 0 10px;
+      padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-controls-row .az-row,
+    .ocr-controls-row .ocr-zoom-bar {
+      margin: 0;
+      padding: 0;
+      background: transparent;
+      border: 0;
+    }
+    .ocr-controls-row .az-row { flex: 1 1 auto; }
+    .ocr-controls-row .ocr-zoom-bar { flex: 0 0 auto; margin-left: auto; }
+    .ocr-zoom-bar {
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 8px 10px;
+      background: #f7fafa;
+      border: 1px solid #dde5e4;
+    }
+    .ocr-zoom-label {
+      font-size: 0.72rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      color: #14524f;
+    }
+    .ocr-zoom-bar button {
+      min-width: 34px; height: 30px; border: 1px solid #cfdedd; border-radius: 4px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.05rem; line-height: 1; cursor: pointer;
+    }
+    .ocr-zoom-bar button:hover { background: #1a6b6b; border-color: #1a6b6b; color: #fff; }
+    .ocr-zoom-pct {
+      min-width: 3.2rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 6px; } }
+    
+    #ocr-panel {
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    #ocr-panel h1, #ocr-panel h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    #ocr-panel h2.b-title, #ocr-panel .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    #ocr-panel h3.b-head, #ocr-panel .b-head {
+      font-size: 1.15em;
+      color: #0f3d3d;
+      margin: 1.35em 0 0.45em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      font-weight: 700;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    #ocr-panel h4.b-sub, #ocr-panel .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    #ocr-panel h3, #ocr-panel h4 {
+      color: #1a6b6b;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    #ocr-panel p {
+      margin: 0 0 0.85em;
+    }
+    #ocr-panel h3.ocr-page-heading,
+    #ocr-panel .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    #ocr-panel p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    #ocr-panel hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    #ocr-panel strong { color: #0f2b5b; }
+    #ocr-panel a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    #ocr-panel mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    #ocr-panel mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    #ocr-panel table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    #ocr-panel table.b-table td, #ocr-panel table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    #ocr-panel table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    #ocr-panel table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    #ocr-panel img, #ocr-panel iframe, #ocr-panel video {
+      max-width: 100%;
+      height: auto;
+    }
+    #ocr-panel > :first-child {
+      margin-top: 0;
+    }
+    
+    #ocr-panel .ocr-parish-masthead {
+      margin: 2.1em 0 1.15em;
+      padding: 0.85em 0 0.7em;
+      border-top: 3px solid #14524f;
+      border-bottom: 1px solid #c5d0c9;
+    }
+    #ocr-panel .ocr-parish-masthead:first-child {
+      margin-top: 0;
+    }
+    #ocr-panel h2.ocr-parish-name,
+    #ocr-panel .ocr-parish-name {
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #14524f;
+      margin: 0 0 0.2em;
+      line-height: 1.25;
+      border: 0;
+      padding: 0;
+      text-transform: none;
+    }
+    #ocr-panel .ocr-parish-date {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    #ocr-panel .ocr-parish-link {
+      margin: 0.25em 0 0;
+      font-size: 0.88rem;
+    }
+    #ocr-panel h3.b-head {
+      margin-top: 1.45em;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      color: #0f3d3d;
+    }
+
+
+    #ocr-panel {
+      box-sizing: border-box;
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+      overflow: auto;
+      overflow-y: auto;
+      border: 1px solid #d4ddd9;
+      padding: 22px 24px 32px;
+    }
+    .pdf-frame-wrap iframe {
+      height: 850px;
+      min-height: 850px;
+      max-height: 850px;
+    }
+    .note-box {
+      margin-top: 12px;
+      color: #8a3b3b;
+      font-weight: 400;
+      font-size: 0.82rem;
+      line-height: 1.5;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 4px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    .empty-state[hidden],
+    #parish-empty[hidden] { display: none !important; }
+    .parish-section {
+      margin-top: 36px;
+      padding: 8px 0 0;
+      background: transparent;
+      border: 0;
+    }
+    .parish-section h2.section-heading {
+      color: #14524f;
+      font-size: 1.15rem;
+      margin-bottom: 16px;
+    }
+    .parish-filter {
+      width: 100%;
+      max-width: 420px;
+      display: block;
+      margin: 0 auto 18px;
+      border: 1px solid #d0d8d7;
+      border-radius: 4px;
+      padding: 10px 12px;
+      font-size: 0.95rem;
+    }
+    ul.parish-grid {
+      list-style: none;
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 8px 28px;
+      padding: 0;
+      margin: 0;
+    }
+    .parish-item {
+      margin: 0;
+      padding: 2px 0 2px 1.1em;
+      position: relative;
+    }
+    .parish-item::before {
+      content: "•";
+      position: absolute;
+      left: 0;
+      top: 2px;
+      color: #1a6b6b;
+      font-weight: 700;
+    }
+    .parish-link {
+      color: #1a6b6b;
+      font-size: 0.98rem;
+      font-weight: 600;
+      text-decoration: none;
+      background: transparent;
+      border: 0;
+      padding: 0;
+      min-height: 0;
+      display: inline;
+    }
+    .parish-link:hover { text-decoration: underline; }
+    .empty-state { margin: 0 0 12px; color: #6b7280; font-size: 0.95rem; text-align: center; }
+
+    footer {
+      margin-top: 40px;
+      background: #114b4b;
+      color: white;
+      padding: 16px 20px;
+    }
+    .footer-inner {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      justify-content: space-between;
+      gap: 12px;
+      flex-wrap: wrap;
+      font-size: 0.88rem;
+    }
+    .footer-inner a { color: #d8f0ee; font-weight: 600; }
+
+    @media (max-width: 1024px) {
+      /* Harvest + OCR both call this generator — keep both panels here.
+         Desktop: locked 850px visible boxes, inner scroll.
+         Tablet/phone (max-width 1024px): locked 450px. Never grow with the document. */
+      .pdf-frame-wrap,
+      .pdf-inpage-viewer {
+        height: 450px;
+        min-height: 450px;
+        max-height: 450px;
+        overflow: hidden;
+      }
+      .pdf-frame-wrap iframe,
+      .pdf-inpage-pages,
+      #ocr-panel {
+        height: 450px;
+        min-height: 450px;
+        max-height: 450px;
+        overflow: auto;
+        overflow-y: auto;
+      }
+      /* Enlarge control removed — never show a leftover button. */
+      .az-expand { display: none !important; }
+      /* Tap targets big enough for a thumb. */
+      .az-letter,
+      .ocr-zoom-bar button {
+        min-width: 40px;
+        height: 40px;
+        font-size: 0.95rem;
+      }
+      /* Only the panel the reader tapped grows — the other one stays 450px.
+         Scoped to that panel's id so a phone never ends up with two 850px
+         boxes stacked on one screen. */
+      #panel-pdf.az-expanded .pdf-frame-wrap,
+      #panel-pdf.az-expanded .pdf-inpage-viewer {
+        min-height: 850px !important;
+      }
+      #panel-pdf.az-expanded .pdf-frame-wrap iframe,
+      #panel-pdf.az-expanded .pdf-inpage-pages,
+      #panel-ocr.az-expanded #ocr-panel {
+        height: 850px !important;
+        min-height: 850px !important;
+        max-height: 850px !important;
+      }
+    }
+    @media (max-width: 900px) {
+      ul.parish-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+    }
+    @media (max-width: 700px) {
+      .page { padding: 14px 12px 36px; }
+      .mobile-jump { display: block; }
+      .pdf-wait-note { display: block; }
+      .download-link-top { display: none; }
+      .quiet-links { justify-content: center; }
+      ul.parish-grid { grid-template-columns: 1fr; gap: 6px 0; max-width: 320px; margin: 0 auto; }
+      #ocr-panel {
+        padding: 16px 14px 28px;
+      }
+      .ocr-search-tools { flex-direction: column; }
+      .ocr-search-tools > div {
+        display: flex;
+        flex-direction: column;
+        gap: 8px;
+        width: 100%;
+      }
+      .ocr-search-tools button {
+        min-height: 44px;
+        width: 100%;
+      }
+      /* One column on a phone: letters, then text size. Neither covers the
+         search box above them. */
+      .ocr-controls-row { flex-direction: column; }
+      .ocr-controls-row .az-row,
+      .ocr-controls-row .ocr-zoom-bar { flex: 1 1 auto; }
+      .ocr-search-bar { flex-wrap: wrap; }
+      .ocr-search-bar .search-input { flex: 1 1 100%; }
+    }
+  </style>
+  <script src="/assets/pdf-inpage-viewer.js?v=20260912a" defer></script>
+</head>
+<body>
+  <div class="page">
+    <a class="back-link" href="../../dioceses/achonry/index.html" target="_blank" rel="noopener noreferrer">← Back to Achonry Diocese bulletin</a>
+    <header class="header">
+      <p class="diocese-label">ACHONRY</p>
+      <h1>Foxford Parish Bulletin</h1>
+      
+      <p class="meta">This week&#x27;s bulletin for Foxford — 29/09/2026. Part of the Achonry Diocese collated bulletin.</p>
+      <a class="download-link-top pdf-force-download" href="foxford.pdf" download="foxford.pdf">Download PDF</a>
+    </header>
+    
+
+    <div class="mobile-jump" aria-label="Mobile bulletin shortcuts">
+      <a class="mobile-jump-btn" href="#panel-ocr">Tap to go to plain text bulletin ↓</a>
+    </div>
+
+    <h2 class="section-heading">Bulletin — Original PDF Version</h2>
+    <div id="panel-pdf" class="viewer-block">
+      
+      <p class="pdf-wait-note">This collated bulletin is a large file. On a phone it can take a few moments to open. The box above shows how much has downloaded and says “PDF fully loaded” when it is ready.</p>
+      <div class="pdf-frame-wrap" id="pdf-frame-wrap">
+        <button type="button" class="fullscreen-btn" id="pdf-fullscreen-btn" aria-label="View PDF fullscreen" title="View fullscreen">⛶</button>
+        <iframe data-pdf-url="foxford.pdf" title="Foxford bulletin PDF"></iframe>
+        
+        <div class="pdf-inpage-viewer pdf-mobile-fallback" id="pdf-inpage-viewer" data-pdf-src="foxford.pdf">
+          <div class="pdf-inpage-toolbar">
+            <div class="pdf-inpage-backup">
+              <a class="pdf-open-newtab" href="foxford.pdf" target="_blank" rel="noopener noreferrer">Open PDF</a>
+              <a class="pdf-force-download" href="foxford.pdf" download="foxford.pdf">Download</a>
+            </div>
+          </div>
+          <div class="pdf-inpage-status">Loading PDF… This file can take a few moments to open.</div>
+          <div class="pdf-inpage-pages" role="document" aria-label="Bulletin PDF pages"></div>
+        </div>
+      </div>
+    </div>
+
+    <h2 class="section-heading">Bulletin — OCR Extracted Plain Text</h2>
+    <div id="panel-ocr" class="viewer-block">
+      <div class="ocr-sticky-chrome">
+      <div class="ocr-search-bar">
+        <label class="ocr-search-label" for="ocr-search">Search</label>
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search OCR text — a parish, a name, a Mass time" aria-label="Search OCR text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear OCR search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled aria-label="Previous search match">← Prev match</button>
+          <button id="ocr-next" type="button" disabled aria-label="Next search match">Next match →</button>
+        </div>
+      </div>
+      </div>
+      <div class="ocr-controls-row">
+        
+        <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+          <span class="ocr-zoom-label">Text size</span>
+          <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+          <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+          <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+          <span class="ocr-zoom-hint">or pinch to zoom</span>
+        </div>
+      </div>
+      <div class="quiet-links">
+        <a href="foxford-ocr.html" target="_blank" rel="noopener noreferrer">Open text in new tab</a>
+      </div>
+      <div id="ocr-panel"><header class="ocr-parish-masthead" id="ocr-parish-foxford" data-parish-name="Foxford"><h2 class="ocr-parish-name">Foxford</h2><p class="ocr-parish-date">29/09/2026</p></header>
+<p class="page-label">Page 1</p>
+<p>Tune into 108 FM for all Church Services. View online on <a href="https://www.churchtv.ie/foxford" target="_blank" rel="noopener noreferrer">www.churchtv.ie/foxford</a> Parish St Michael’s Foxford Toomore Church Attymachugh Church ✟  Chapel Road, Foxford, Co Mayo  Very Rev Padraig Costello P . P . <a href="tel:+353872422273" style="color:#1d4ed8;font-weight:600;">087 242 2273</a> Parish Office <a href="tel:+353949257843" style="color:#1d4ed8;font-weight:600;">094 9257843</a> / <a href="tel:+353949256131" style="color:#1d4ed8;font-weight:600;">094 9256131</a>  Parish Email: <a href="mailto:stmichaelsfoxford@gmail.com" target="_blank" rel="noopener noreferrer">stmichaelsfoxford@gmail.com</a> Newsletter Items: <a href="mailto:foxfordparishnewsletter@gmail.com" target="_blank" rel="noopener noreferrer">foxfordparishnewsletter@gmail.com</a> /g103Parish Website: <a href="https://www.foxfordparish.com" target="_blank" rel="noopener noreferrer">www.foxfordparish.com</a> Diocesan Website: <a href="https://www.achonrydiocese.org" target="_blank" rel="noopener noreferrer">www.achonrydiocese.org</a> Sunday 27th September 2026 - 26th Sunday in Ordin ary Time Season of Creation: 1st September - 4th October Sat 26th Sept 6pm Toomore For the Community Sat 26th Sept 7.30pm Foxford 1. Kathleen Clarke &amp; deceased of the Clarke &amp; Gorman families R. I. P. 2. Mary Cosgrave (6th Anniv) Belass R. I. P. 3. Aine Cosgrave (5th Anniv) Belass &amp; Meelick R. I. P. 4. Michael Cosgrave (1st Anniv), Belass R. I. P. Sun 27th Sept 9am Attymachugh John, Mary, Sean &amp; Michael Ruane &amp; deceased of the Ruane &amp; Conno r families R. I. P . Sun 27th Sept 11am Foxford For the Community Mon 28th Sept 10am Foxford John McDonnell (13th Anniv) Charlestown R. I. P . Tues 29th Sept 10am Foxford Agnes (1st Anniv) &amp; Tom McHale , &amp; Annie &amp; Martin Farrell Castlebar Rd. &amp; Mary McDonagh , Castlebar R. I. P. Wed 30th Sept 8am Convent Wed 30th Sept 7pm Foxford Thurs 1st Oct 10am Foxford Mary Kate McDonnel l &amp; deceased family members R. I. P . Fri 2nd Oct 10am Foxford Sat 3rd Oct 6pm Toomore Sat 3rd Oct 7.30pm Foxford Tom &amp; Teresa Clarke, their son, Tommy &amp; daughter, Marian Boyle, Ballina Rd. R. I. P. Sun 4th Oct 9am Attymachugh Thomas (Anniv) &amp; Ellen Quinn , their daughters, Ann Brosnihan &amp; Patricia Whitlow &amp; deceased of the Quinn &amp; Gallagher families R. I. P . Sun 4th Oct 11am Foxford For the Community THIS WEEKEND: READERS MINISTERS OF THE EUCHARIST ALTAR SERVERS Toomore Sat 26th Sept 6pm Anna Marie Walsh Mary Doherty Foxford Sat 26th Sept 7.30pm Martin McDonagh Seamus Coleman / Maureen Noone Bernadette Reape Zoe Corcoran / Grainne McLoughlin Sean Lally / Keith McDermott /William Moore/Ronan Hughes Attymachugh Sun 27th Sept 9am Chris Sheerin Lily Ruddy Foxford Sun 27th Sept 11am Aoife Burke Bernie Flynn / Geraldine Brett / Helena Murphy / Anna Marie Walsh Isla Boland / Esme Boland / Roisin Walsh/ Zara Bolton / Aine Healy NEXT WEEKEND: Toomore Sat 3rd Oct 6pm Helen Halligan Mary Geraghty Foxford Sat 3rd Oct 7.30pm Frances Gilmore John Horgan / Bridie Howley / Finnian Kirwan / Ronan Gilroy / Robert Anders/Emma Jane Burke /Culainn Burke-Gallagher/Gemma Neary Attymachugh Sun 4th Oct 9am Margaret McHale Chris Sheerin Foxford Sun 4th Oct 11am Margaret Reilly Stephen Giblin / Paula Ruane / Willie O'Hara / Maureen Lavin / Martha Guiry Alex Domagala / James Sugrue / Saorflaith Burke /Dianaimh Burke/Jayden Wynne WEEKDAY READERS: Monday/Tuesday : Deirdre Hardy Thursday/ Friday: Margaret Kelly Hospital Visits: If you wish the priest to visit relatives or friends in hospital or at home leave a message at the priest’s house. Family Deaths: To put a notice of family deaths or general notices in the newsletter please email <a href="mailto:foxfordparishnewsletter@gmail.com" target="_blank" rel="noopener noreferrer">foxfordparishnewsletter@gmail.com</a> OFFERTORY COLLECTORS September Vigil: Sunday: Bridie Howley / Sean Lavin / John Horgan Brian Doherty / Willie O’Hara / Kieran Staunton October Vigil: Sunday: Michael McDonagh / Martin Brogan / Gina Stenson Joe Davitt/ Anthony Ruane / Gerry Moran Recent Deaths: Please pray for: Dylan Guiry, Clonmel, nephew of Pat Guiry . May he Rest in Peace Visitation of the sick and housebound during the coming week. Dioceses of Achonry &amp; Elphin 2026/2027 Scripture Initiative: New groups and facilitators being sought. Please consider. Enquiries welcome. More information @ <a href="https://www.achonryelphin.ie/scripture" target="_blank" rel="noopener noreferrer">www.achonryelphin.ie/scripture</a> Foxford <a href="https://foxfordparish.com/" target="_blank" rel="noopener noreferrer">https://foxfordparish.com/</a></p>
+<hr>
+<p class="page-label">Page 2</p>
+<p>St. Vincent de Paul Helpline: <a href="tel:+353838887777" style="color:#1d4ed8;font-weight:600;">083 8887777</a> Additional newsletter notices can be found on <a href="https://foxfordparish.com/newsletter" target="_blank" rel="noopener noreferrer">https://foxfordparish.com/newsletter</a> Ifyouarea newcomer to the parish/community and would like aboxof offertory envelopes please contact Fr Padraig on <a href="tel:+353872422273" style="color:#1d4ed8;font-weight:600;">087 242 2273</a> Annual Blessing of Children: F oxford Parish Pastoral Council invites parents of children who were baptised in 2023 to bring your child to St. Michael’s Church on Sunday 11th October at 3 pm for a short Prayer Service and Blessing. Other family members will also be very welcome. Refreshments will be served afterwards in the Admiral Brown Hall . Looking forward to seeing you! Invitation to Get Involved: At the recent meeting of the Parish Pastoral Council, the desire for greater lay participation in our weekend parish Masses was discussed . We would love to see more families and parishioners getting involved. There are a number of ways you can participate, including: reading at Mass , Leading the Prayers of the Faithful or bringing up the gifts of bread and wine . This can be especially meaningful at Month’s Mind or Anniversary Masses, when family members may wish to take part in remembering and praying for a loved one. We warmly invite you to consider getting involved. It would be wonderful to see more people taking an active part in our weekend Masses. If you would like to participate, please</p>
+<h3 class="b-head">contact</h3>
+<p>Fr. Padraig or any member of the Parish Pastoral Council. Jubilee of Marriages : Couples celebrating their Silver, Ruby, Golden, Diamond, Platinum or other wedding anniversaries are invited to attend one of two Jubilee Masses, along with their families and friends. Sunday 4th October at 2.30pm in Ballaghaderreen Cathedral F45 FW27 or Sunday 11th October at 2.30pm in Kiltoom Church N37 NY36 . Bishop Kevin will celebrate both Masses and light refreshments will be served afterwards for all in attendance. As each couple celebrating an Anniversary will receive a certificate from Bishop Kevin, they are asked to register their details by clicking on the button on the Achonry/Elphin website. achonrydiocese.org Adoration of the Blessed Sacrament in St. Michael’s church on Tuesdays after 10 am Mass until 11.30 am. Tax Rebate Scheme : This is a great source of revenue to our parish each year. A very sincere word of thanks toallwhousethe system. Any taxpayer who contributes €250 or more to the parish collections in the year is eligible. The Forms for signing up are available at the church porches. All, regulars and newcomers , are invited to take a form and sign it and drop itin, inthe next few weeks. Áirc Damhsa will be returning to Foxford Sports Centre this September: Set Dancing Classes, Mondays, starting 28th September, contact: <a href="tel:+353874469624" style="color:#1d4ed8;font-weight:600;">087 446 9624</a>. Children’s Sean Nós Dance Classes Fridays, starting 25th September Contact: <a href="tel:+353877034584" style="color:#1d4ed8;font-weight:600;">087 703 4584</a> We Can Quit – Stop Smoking Group Ballina – The HSE under the Sláintecare Healthy Communities initiative are offering a FREE stop smoking programme in The Newman Institute Ballina starting on October 7th for 7 weeks from 7-8.30pm. We Can Quit is a FREE Group Based Stop Smoking Programme. FREE nicotine replacement medication, group support andonetoone Support will be offered to all participants. For more information or to book a place please contact Brenda McNicholas on <a href="tel:+353874484711" style="color:#1d4ed8;font-weight:600;">087 4484711</a> or email brenda. <a href="mailto:mcnicholas1@hse.ie" target="_blank" rel="noopener noreferrer">mcnicholas1@hse.ie</a> Supporting Children (8 - 11 years) grow in faith and friendship: New and emerging Faith &amp; Fun Clubs in the Achonry and Elphin Dioceses now enrolling for 2026/2027 school year. For more info please visit: <a href="https://achonryelphin.ie/fafc/" target="_blank" rel="noopener noreferrer">https://achonryelphin.ie/fafc/</a> Bereavement Support Group: A Bereavement Support Group meets at the Family Centre, Knock Shrine each Wednesday morning at 11am . Trained facilitators conduct the meetings, which provide guidance and support to all who find loss difficult. All are welcome. Further information from Monica Morley on <a href="tel:+353949375320" style="color:#1d4ed8;font-weight:600;">094-9375320</a>. "Remembrance by Candlelight" St. Michael's Church Foxford, Friday 20th November @ 7pm . Join Opera singer Sean Ruane , alongside the Cill Aodái n Choral Socie ty, Maria Lynn, John McHugh, The Doherty's and The Doocey's for a candlelight evening of amazing performances. The proceeds from this year's event are in aid of Hugh’s House (in memory of baby Cian McHale), along with the Foxford Enhancement Group, Foxford Christmas Lights and St. Michael's Church, Foxford. Advance booking is advisable as we cannot guarantee tickets will be available on the night. Tickets €20 From Sarah <a href="tel:+353877965520" style="color:#1d4ed8;font-weight:600;">087 7965520</a> / Irene <a href="tel:+353872795242" style="color:#1d4ed8;font-weight:600;">087 2795242</a> . Moy Davitts 50/50 draw : Congratulations to Martin Jordan , Bohola, whowona jackpot of €639 inthe Moy Davitts 50/50 draw last Saturday. A huge thank you to everyone who supported last week's draw, it is greatly appreciated. Tickets are available in the usual retail outlets and by playing on the club app (Moy Davitts GAA) Temporary Closure : Please note that the Fr Peyton Centre will be closed from Monday 28th September to Tuesday 6th October for renovation works. We look forward to welcoming you back from Tuesday 6th October. Thank you for your understanding and continued support. Would you like to become a member of the Admiral Brown Branch of Comhaltas which is based in Foxford? Wearenow accepting Comhaltas membership for the year ahead. Email <a href="mailto:cceadmiralbrown@gmail.com" target="_blank" rel="noopener noreferrer">cceadmiralbrown@gmail.com</a> . Everyone welcome. Annual Comhaltas Membership Fees: Junior Member (Under 18) - €6 | Adult - €12 | Family - €20 Western Alzheimers urgently need Volunteer Befrienders in your area. Do you have one to two hours per week to spare ? Contact Lucy at <a href="tel:+353949364900" style="color:#1d4ed8;font-weight:600;">094-9364900</a> or <a href="tel:+353873694477" style="color:#1d4ed8;font-weight:600;">087-3694477</a> . St. Joseph's Secondary School Reunion for Class 1981 - 1986 will take place on Sunday 25th October 2026 @ 8.30pm in Moy Hotel, Foxford . If you are interested in attending please contact : Noeline Ruane <a href="tel:+353872506762" style="color:#1d4ed8;font-weight:600;">087 2506 762</a>, Majella Molloy <a href="tel:+353861562760" style="color:#1d4ed8;font-weight:600;">086 1562 760</a>, Majella Ruane <a href="tel:+353868896961" style="color:#1d4ed8;font-weight:600;">086 8896 961</a> or Agnes Burke <a href="tel:+353879492785" style="color:#1d4ed8;font-weight:600;">087 9492 785</a>. Looking forward to seeing as many as possible for a catch up. Visit of First-Class Relic of St Carlo Acutis to St Nathys Cathedral: We are privileged to welcome a First-Class Relic of St Carlo Acutis to St Nathy's Cathedral. The relic will be available for veneration after the 10am Mass on Sunday, This is a wonderful opportunity to come together in prayer and to seek the intercession of St Carlo Acutis , a young saint whose deep love forthe Eucharist continues to inspire people throughout the world. All are very welcome. Is your anger hurting you or others? Knock Counselling Centre will run an Anger Management Programme on Fri 9th &amp; Sat 10th October . Contact: Peter Devers, <a href="tel:+353949375032" style="color:#1d4ed8;font-weight:600;">094 93 75032</a> or log onto <a href="https://www.knockshrine.ie/counselling" target="_blank" rel="noopener noreferrer">www.knockshrine.ie/counselling</a> Looking for a fresh start, new opportunities, or su pport on your journey towards work? Erris Workability offers a range of supports tailo red to you, including Weekly Workspace, Life Lab, Studio to Stall and one-to-one support to help build confidence, develop skills, explore employment or self-employment, and achieve your goa ls. The programme is available to people who meet the eligibility criteria , and if you’re unsure whether you qualify, we’re h appy to have a chat and talk you through it. Take the first step and find out what’s possible wi th Erris Workability. Contact Siobhan on <a href="tel:+35387499660" style="color:#1d4ed8;font-weight:600;">087 499 660</a> 5. Grow Meetings: A self-help group helping people suffering from st ress, anxiety, depression, panic attacks, loneliness etc meet every Tuesday night at 7.30 pm in Ballina Community Centre . Foxford Meals on Wheels Service : We can provide meals from Monday to Saturday at a cost of €7 per meal. To avail of this service please contact Geraldine on <a href="tel:+353879040463" style="color:#1d4ed8;font-weight:600;">087 904 0463</a> or Carmel on <a href="tel:+353866064670" style="color:#1d4ed8;font-weight:600;">086 606 4670</a> . Friends of Carmel Gathering at Holy Hill Hermitage F91 CA24 on Saturday 17 Octob er 2026 from 10am to 4pm. To book email <a href="mailto:friendsofcarmel@gmail.com" target="_blank" rel="noopener noreferrer">friendsofcarmel@gmail.com</a> . PADRE PIO HEALING MASS Friday, 9 October 7pm, St. Cuan’s Church, Ahascragh, Co. Galway.</p>
+<hr>
+<p class="page-label">Page 3</p>
+<p>Hospital Visits: If you wish the priest to visit relatives or friends in hospital or at home leave a message at the priest’s house. Family Deaths: To put a notice of family deaths or general notices in the newsletter please email <a href="mailto:foxfordparishnewsletter@gmail.com" target="_blank" rel="noopener noreferrer">foxfordparishnewsletter@gmail.com</a> Season of Creation: Each year, from 1 September to 4 October, Christians around the world unite in this special season of prayer and action to care for our common home. Itisa time to celebrate God as Creator and to reflect on our shared vocation to protect and cherish all of creation. This year's theme, "Living Water," is inspired by Ezekiel 47:9, 12 - a powerful biblical vision of hope and ecological renewal. Set against the backdrop of exile and loss, the prophet's image of living water flowing from God's sanctuary reveals God's healing presence, bringing new life to rivers, land, biodiversity and communities, while calling us to renewed care for the whole Earth community. Saint Faustina Weekend on 3rd and 4th October in St Mary's Church, Convoy, Co Donegal F93FX66. Prayer and reflection on Divine Mercy Devotions. All welcome to come toallor part of the weekend. For details, phone <a href="tel:+353879077985" style="color:#1d4ed8;font-weight:600;">087 9077985</a> or email <a href="mailto:raphoeparish@gmail.com" target="_blank" rel="noopener noreferrer">raphoeparish@gmail.com</a> . "Keyboard/piano lessons for kids aged 4-12 available in the Foxford area. Group lessons and 1-1 lessons available. Beginners welcome. Contact Amy on <a href="tel:+353876234946" style="color:#1d4ed8;font-weight:600;">087 6234946</a>" Join Our Caring Team! Dementia Support Worker (Care in the Community) Looking for meaningful, flexible work? We’re seeking compassionate, honest, reliable people to support individuals living with dementia in their own homes in Co. Mayo Locations: Crossmolina, Ballina, Foxford, Co. Mayo What You'll Do: •Offer companionship and social connection •Assist with daily living activities •Support meaningful activities •Give primary carers a well-deserved break Flexible hours – work around your schedule! Make a real difference, one visit at a time. Essential : Previous experience in caring Desirable: QQI Level 5 modules in Care Skills &amp; Care of the Older Person Interested? Get in touch today! Email Helen, Client Care Coordinator <a href="mailto:clientcarecoordinator@westernalzheimers.ie" target="_blank" rel="noopener noreferrer">clientcarecoordinator@westernalzheimers.ie</a> Parking on Church Grounds : As you may have noticed, two new parking spaces have recently been marked for wheelchair users only . We kindly ask that these spaces are kept clear for those who need them. Please also ensure that clear access is maintained around the church at all times for cars and, most importantly, for emergency vehicles such as an ambulance. Thank you for your cooperation and consideration. Lighting Votive Candles: In the interests of safety, please ensure that lighted votive candles remain on the candelabra at all times andarenot carried elsewhere in the church. Thank you for your cooperation. Minister of the Word: Would you like to read at Mass inanyofour Churches? Please contact Fr. Costello on (087) 242 2273 The Irish Catholic weekly newspaper. Have you ever thought of getting a copy each week? Many interesting articles each week about our faith etc. Let me know if you wish me to keep a copy for you each week. Also extra copies are available in the church porch each week. "Free Training: Wondering what to do next? Interested in expanding your skills? National Learning Network Castlebar can help you gain QQI Certification and assist with finding employment. Your Social Welfare payment will remain protected. Ring/Message Sharon on <a href="tel:+353872909064" style="color:#1d4ed8;font-weight:600;">087 290 9064</a> to discuss" St Joseph's Secondary School Lotto €2.50 per line ( €5 for 3). Lines can be purchased online at <a href="https://www.ourfundraiser.ie/org/stjosephsfoxford/" target="_blank" rel="noopener noreferrer">https://www.ourfundraiser.ie/org/stjosephsfoxford/</a> All support gratefully accepted. Please contact <a href="tel:+353949256145" style="color:#1d4ed8;font-weight:600;">094 9256145</a> for more details. Fr. Peyton Centre Opening Hours: Opening Hours: Monday to Friday 9.30am to 5.30pm. Tel: <a href="tel:+3539645374" style="color:#1d4ed8;font-weight:600;">096-45374</a>. Foxford Brass &amp; Reed Band are celebrating 130 years in existence this year. A committee has been formed to write a book on the Band's history. We are appealing to the public to help us with this publication by furnishing us (or any band member) with photographs, newspaper articles, your family ties and memories. Every photograph will be copied and returned to you immediately. We appreciate your help. Please contact Seamus Burke (Chairperson) <a href="tel:+353868582726" style="color:#1d4ed8;font-weight:600;">086 858 2726</a> FACT Social Club: We are an independent community-based service here in Foxford, Co Mayo, and we support people living with Dementia or in rural isolation. We are open Mondays to Friday and provide social interaction, activities and much more in a safe and supported environment. If you would like more information on the services we offer, please contact us at: <a href="mailto:factsocialclub1@gmail.com" target="_blank" rel="noopener noreferrer">factsocialclub1@gmail.com</a> or telephone <a href="tel:+353949256662" style="color:#1d4ed8;font-weight:600;">094 925 6662</a>. Western Care Home Share Service are looking for people, single/couples/families, to provide short respite breaks to children and adults across County Mayo, in your own home. Training and support is provided and a non-taxable allowance is payable for each home share arrangement. If you are interested and/or would like further information about Home Sharing, please contact Ruth Kneafsey, Home share Co-ordinator, <a href="tel:+353949029148" style="color:#1d4ed8;font-weight:600;">0949029148</a> or <a href="tel:+353876811261" style="color:#1d4ed8;font-weight:600;">0876811261</a>. The Sacrament of Marriage Course - online programme from Maryvale Institute offering theological formation, open to anyone, no prior study required, from September 2026 to April 2027. For more information see <a href="https://www.maryvale" target="_blank" rel="noopener noreferrer">https://www.maryvale</a>. ac. uk/marriage. html . Considering a Postgraduate Programme in 2026? For those interested in Parish and Community work, St Patrick's Pontifical University, Maynooth offers Diploma , Higher Diploma and Master's programmes specialising in education and formation in the fields of Theological Studies, Pastoral Ministry, Healthcare Chaplaincy, Youth Ministry, Liturgy, and Liturgical Music. For more visit <a href="https://www.sppu.ie" target="_blank" rel="noopener noreferrer">www.sppu.ie</a> Fully Escorted Trip to Medjugorje with Marian Pilgrimages-Led by Sharon O Leary. Direct flights from Knock to Mostar. October 21st- 28th. Spiritual Director Fr Séan Sheehy (native of Listowel) and accompanied by Fr Nelson Joseph (Louisburgh, Co Mayo) Contact Sharon <a href="tel:+353860523014" style="color:#1d4ed8;font-weight:600;">086 0523014</a> . Foster Care: Have you ever thought about fostering? Change a ch ild’s life by becoming a Tusla Foster Carer. Talk to Tusla Fostering today by freephone 1800 226 771 or visit <a href="https://www.fostering.ie" target="_blank" rel="noopener noreferrer">www.fostering.ie</a> to learn more. Accord Ballaghaderreen offers a confidential counselling service where couples can explore family relationships. Accord counsellors can help if relationships are under stress. For online counselling please visit <a href="https://www.accord.ie" target="_blank" rel="noopener noreferrer">www.accord.ie</a> . Alternatively to book a face to face counselling session call Accord Ballaghaderreen on <a href="tel:+353879972503" style="color:#1d4ed8;font-weight:600;">0879972503</a> . The Adoration Chapel at St. Muredach's Cathedral, Ballina is open: Mon - Fri 2 - 8 pm. Sat - Sun 2 - 7pm. All are welcome. Come tome, allyouwho labour and are overburdened, and I will give you rest. Shine Peer Support Groups - Peer support groups for individuals experiencing mental health difficulties and individuals supporting people living with mental health challenges. We offer regular groups in Ballina, Ballinrobe and Castlebar. Email <a href="mailto:support@shine.ie" target="_blank" rel="noopener noreferrer">support@shine.ie</a> or call <a href="tel:+353860407701" style="color:#1d4ed8;font-weight:600;">086 040 7701</a> for information Alone Volunteers : Would you be willing to provide companionship to an older person locally? ALONE are seeking volunteers in your area. Full training and support provided. If interested, please apply via the ALONE website at <a href="https://www.alone" target="_blank" rel="noopener noreferrer">www.alone</a>. ieorfor further information please contact us on <a href="mailto:volunteer@alone.ie" target="_blank" rel="noopener noreferrer">volunteer@alone.ie</a> or call 0818 222 024. Ifyouare over 60 and would like to know more about the services ALONE can offer you, please call 0818 222 024 .</p>
+<hr>
+<p class="page-label">Page 4</p>
+<p>St. Vincent de Paul Helpline: <a href="tel:+353838887777" style="color:#1d4ed8;font-weight:600;">083 8887777</a> Additional newsletter notices can be found on <a href="https://foxfordparish.com/newsletter" target="_blank" rel="noopener noreferrer">https://foxfordparish.com/newsletter</a> Ifyouarea newcomer to the parish/community and would like aboxof offertory envelopes please contact Fr Padraig on <a href="tel:+353872422273" style="color:#1d4ed8;font-weight:600;">087 242 2273</a> Would you like someone to talk to? Senior Line is Ireland's national telephone service for older people open every day of the year 10am-10pm, Freephone 1800 80 45 91 . You may feel isolated, alone, bereaved or far from family. Senior Line's older volunteers are trained to listen, to support and refer to other helpful services if necessary. So don't be alone, and lift the phone. Phone Senior Line 1800 80 45 91 , No problem toobigortoo small. Bereavement Support Meeting in the Family Centre, Knock on Wednesdays at 11 am . No appointment is needed andallare welcome. Further information from Monica Morley on <a href="tel:+353949375320" style="color:#1d4ed8;font-weight:600;">094 9375320</a> Experienced a cardiac event? 'It's Cardiac Rehab! ' A podcast series for you developed by the Irish Association of Cardiac Rehabilitation and Irish Heart Foundation to support your recovery. It's all about getting you better than before. <a href="https://irishheart.ie/services-for-you/its-cardiac-rehab-podcast/" target="_blank" rel="noopener noreferrer">https://irishheart.ie/services-for-you/its-cardiac-rehab-podcast/</a> My Mind provides mental health professional therapy with Free appointments for homeowners in Mayo affected by Defective Concrete Blocks: <a href="https://www.mymind.org/free-counselling/" target="_blank" rel="noopener noreferrer">https://www.mymind.org/free-counselling/</a>. Location in Mayo North East (MNE) Office, Kevin St, Ballina and Tacu Ballinrobe. Registration and appointment: <a href="https://www.mymind.org" target="_blank" rel="noopener noreferrer">www.mymind.org</a> or call 0818 500 800. Westcare Homecare are currently recruiting staff in your local area and would love to hear from interested applicants. To apply or find out more, please contact <a href="mailto:recruitment@westcarehomecare.ie" target="_blank" rel="noopener noreferrer">recruitment@westcarehomecare.ie</a> or call <a href="tel:+353719300034" style="color:#1d4ed8;font-weight:600;">071 9300034</a>. 'Experience enjoyable movement with Nia. Gentle on joints, for fitness and well-being. Classes are barefoot to music. Mondays 10am at Swinford Cultural Centre &amp; Wednesdays 10:30am at Ballina Arts Centre . Contact Siobhan at <a href="tel:+353894182740" style="color:#1d4ed8;font-weight:600;">089 4182740</a>.' Set Dancing Classes on Wednesday nights at 7pm in the Brown Memorial Hall . New Beginners Welcome! Line Dancing Classes for Beginners on Thursday nights at 8pm in the Brown Memorial Hall , Modern and Country Line Dances. €10 per class. Enjoy a night offunand exercise. All Welcome! Christopher Beirne (tutor) <a href="tel:+353868474744" style="color:#1d4ed8;font-weight:600;">086-8474744</a> Studio to Stall in Ballina: Are you interested in a weekly workshop creating a range of arts and crafts to sell at Christmas Markets attheendof 2026? This is a unique initiative by Workability (Mayo North East). Eligibility criteria applies. Contact us to find out more now! Email: <a href="mailto:carolynohara@mayonortheastldc.com" target="_blank" rel="noopener noreferrer">carolynohara@mayonortheastldc.com</a> Text: <a href="tel:+353874996606" style="color:#1d4ed8;font-weight:600;">087 499 6606</a> or Call: <a href="tel:+353873980575" style="color:#1d4ed8;font-weight:600;">087 398 0575</a> SUPPORT HELPLINES St. Vincent de Paul: <a href="tel:+353838887777" style="color:#1d4ed8;font-weight:600;">083 8887777</a> <a href="https://www.svp.ie" target="_blank" rel="noopener noreferrer">www.svp.ie</a> Samaritans: 116 123 <a href="https://www.samaritans.ie" target="_blank" rel="noopener noreferrer">www.samaritans.ie</a> Womens Aid: 1800 341 900 <a href="https://www.womensaid.ie" target="_blank" rel="noopener noreferrer">www.womensaid.ie</a> Pieta House: 1800 247 <a href="https://www.pieta.ie" target="_blank" rel="noopener noreferrer">www.pieta.ie</a> Childline: 1800 66 <a href="https://www.childline.ie" target="_blank" rel="noopener noreferrer">www.childline.ie</a> Senior Line: 1800 80 45 91 <a href="https://www.thirdageireland.ie" target="_blank" rel="noopener noreferrer">www.thirdageireland.ie</a></p></div>
+      <div class="note-box">Note: The plain text OCR version is auto-generated and may contain errors so it is always best to double-check with the original PDF.</div>
+    </div>
+
+    <section class="parish-section">
+      <h2 class="section-heading">Other ACHONRY Parishes</h2>
+      <input id="parish-filter" class="parish-filter" type="search" placeholder="Filter parishes..." aria-label="Filter parishes" />
+      <div id="parish-empty" class="empty-state" hidden>No matching parishes found.</div><ul id="parish-grid" class="parish-grid"><li class="parish-item" data-name="attymass"><a class="parish-link" href="attymass.html" target="_blank" rel="noopener noreferrer">Attymass</a></li><li class="parish-item" data-name="ballymote"><a class="parish-link" href="ballymote.html" target="_blank" rel="noopener noreferrer">Ballymote</a></li><li class="parish-item" data-name="collooney"><a class="parish-link" href="collooney.html" target="_blank" rel="noopener noreferrer">Collooney</a></li><li class="parish-item" data-name="gurteen"><a class="parish-link" href="gurteen.html" target="_blank" rel="noopener noreferrer">Gurteen</a></li><li class="parish-item" data-name="keash"><a class="parish-link" href="keash.html" target="_blank" rel="noopener noreferrer">Keash</a></li><li class="parish-item" data-name="kiltimagh"><a class="parish-link" href="kiltimagh.html" target="_blank" rel="noopener noreferrer">Kiltimagh</a></li><li class="parish-item" data-name="straide"><a class="parish-link" href="straide.html" target="_blank" rel="noopener noreferrer">Straide</a></li><li class="parish-item" data-name="tourlestrane"><a class="parish-link" href="tourlestrane.html" target="_blank" rel="noopener noreferrer">Tourlestrane</a></li><li class="parish-item" data-name="tubbercurry-cloonacool"><a class="parish-link" href="tubbercurrycloonacool.html" target="_blank" rel="noopener noreferrer">Tubbercurry-Cloonacool</a></li></ul>
+    </section>
+  </div>
+  <footer>
+    <div class="footer-inner">
+      <span>© 2026 Parish Press</span>
+      <div style="display:flex;gap:14px;flex-wrap:wrap;">
+        <a href="https://github.com/Frankytyrone/parish_harvester" target="_blank" rel="noopener noreferrer">GitHub</a>
+        <a href="https://buymeacoffee.com/frankytyrone" target="_blank" rel="noopener noreferrer">Donate</a>
+      </div>
+    </div>
+  </footer>
+
+  <script>
+    // PDF fullscreen shortcut (the browser's own PDF viewer already
+    // supplies page number / zoom / print controls inside the iframe).
+    (function () {
+      var wrap = document.getElementById('pdf-frame-wrap');
+      var btn = document.getElementById('pdf-fullscreen-btn');
+      if (!wrap || !btn) return;
+      btn.addEventListener('click', function () {
+        try {
+          if (wrap.requestFullscreen) {
+            wrap.requestFullscreen();
+          } else if (wrap.webkitRequestFullscreen) {
+            wrap.webkitRequestFullscreen();
+          }
+        } catch (e) {}
+      });
+    })();
+
+    
+    (function () {
+      function activateWrap(wrap) {
+        if (!wrap) return;
+        wrap.classList.add('is-native-pdf');
+        var iframe = wrap.querySelector('iframe');
+        if (iframe) {
+          iframe.setAttribute('hidden', '');
+          try { iframe.removeAttribute('src'); } catch (e) {}
+        }
+      }
+
+      document.querySelectorAll('.pdf-frame-wrap').forEach(activateWrap);
+
+      var standalone = document.querySelector('iframe.pdf-frame');
+      if (standalone && !standalone.closest('.pdf-frame-wrap')) {
+        document.body.classList.add('is-native-pdf');
+        standalone.setAttribute('hidden', '');
+        try { standalone.removeAttribute('src'); } catch (e) {}
+      }
+
+      if (!document.querySelector('script[src="/assets/pdf-inpage-viewer.js?v=20260912a"]')) {
+        var s = document.createElement('script');
+        s.src = '/assets/pdf-inpage-viewer.js?v=20260912a';
+        s.defer = true;
+        document.head.appendChild(s);
+      }
+    })();
+
+
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-panel');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+
+    (function () {
+      const ocrPanel = document.getElementById('ocr-panel');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      const parishFilter = document.getElementById('parish-filter');
+      const parishItems = Array.from(document.querySelectorAll('.parish-item'));
+      const parishEmpty = document.getElementById('parish-empty');
+      if (!ocrPanel || !ocrSearch) return;
+      const originalOcrHtml = ocrPanel.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+
+      function escapeRegExp(text) {
+        const specials = new Set(['\\', '^', '$', '.', '|', '?', '*', '+', '(', ')', '[', ']', '{', '}']);
+        return Array.from(text).map((ch) => specials.has(ch) ? `\\${ch}` : ch).join('');
+      }
+
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        const target = ocrMatches[idx];
+        target.classList.add('search-active');
+        const details = target.closest('details.parish-block');
+        if (details) details.open = true;
+        target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+
+      function updateMatchUi() {
+        if (!matchCount || !prevMatchBtn || !nextMatchBtn) return;
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} / ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+
+      function applyOcrSearch(query) {
+        ocrPanel.innerHTML = originalOcrHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrPanel, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) {
+            nodes.push(node);
+          }
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) {
+            return;
+          }
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match = null;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) {
+              fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            }
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) {
+            fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          }
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrPanel.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+
+      ocrSearch.addEventListener('input', function (event) {
+        applyOcrSearch(event.target.value.trim());
+      });
+      clearSearch.addEventListener('click', function () {
+        ocrSearch.value = '';
+        applyOcrSearch('');
+        ocrSearch.focus();
+      });
+      prevMatchBtn.addEventListener('click', function () {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', function () {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', function (event) {
+        if (event.key === 'Enter' && ocrMatches.length) {
+          event.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+
+      if (parishFilter) {
+        parishFilter.addEventListener('input', function (event) {
+          const term = event.target.value.trim().toLowerCase();
+          let visibleCount = 0;
+          parishItems.forEach((item) => {
+            const name = (item.dataset.name || '').toLowerCase();
+            const matches = !term || name.includes(term);
+            item.hidden = !matches;
+            if (matches) {
+              visibleCount += 1;
+            }
+          });
+          if (parishEmpty) {
+            parishEmpty.hidden = visibleCount !== 0;
+          }
+        });
+      }
+      if (parishEmpty) {
+        parishEmpty.hidden = parishItems.length === 0 ? false : true;
+      }
+
+      updateMatchUi();
+    })();
+
+    // ── View Counter (localStorage) ──────────────────────────────────
+    (function() {
+      var key = 'ph_views_' + location.pathname;
+      var weekKey = 'ph_views_week';
+      var now = new Date();
+      var weekId = now.getFullYear() + '-W' + String(Math.ceil((now - new Date(now.getFullYear(),0,1)) / 86400000 / 7)).padStart(2,'0');
+      try {
+        var views = JSON.parse(localStorage.getItem(key) || '{}'  );
+        if (views.week !== weekId) { views = { week: weekId, count: 0 }; }
+        views.count += 1;
+        localStorage.setItem(key, JSON.stringify(views));
+        // Update total weekly views across all pages
+        var total = JSON.parse(localStorage.getItem(weekKey) || '{}'  );
+        if (total.week !== weekId) { total = { week: weekId, count: 0 }; }
+        total.count += 1;
+        localStorage.setItem(weekKey, JSON.stringify(total));
+        var el = document.getElementById('view-count');
+        if (el) el.textContent = total.count;
+      } catch(e) {}
+    })();
+
+    // ── Self-Check: Is this week's bulletin available? ───────────────
+    (function() {
+      var generated = document.querySelector('.meta');
+      if (!generated) return;
+      var text = generated.textContent || '';
+      var match = text.match(/(\d{4})-(\d{2})-(\d{2})/);
+      if (!match) {
+        match = text.match(/(\d{2})[/](\d{2})[/](\d{4})/);
+        if (match) match = [null, match[3], match[2], match[1]];
+      }
+      if (!match) return;
+      var bulletinDate = new Date(match[1] + '-' + match[2] + '-' + match[3]);
+      var now = new Date();
+      var daysSince = Math.floor((now - bulletinDate) / 86400000);
+      if (daysSince > 8) {
+        var banner = document.createElement('div');
+        banner.style.cssText = 'max-width:1100px;margin:12px auto;padding:0 16px;';
+        banner.innerHTML = '<div style="background:#fef2f2;border:1px solid #fca5a5;border-radius:10px;padding:12px 16px;color:#991b1b;font-weight:600;text-align:center;">⚠️ This bulletin is ' + daysSince + ' days old. A newer version may be available — check back after Sunday\'s harvest run.</div>';
+        var page = document.querySelector('.page');
+        if (page) page.insertBefore(banner, page.firstChild);
+      }
+    })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      function boot() {
+        var btn = document.getElementById('scroll-top-btn');
+        if (!btn) {
+          if (!document.body) return;
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scroll-top-btn';
+          btn.id = 'scroll-top-btn';
+          btn.setAttribute('aria-label', 'Back to top');
+          btn.textContent = '↑';
+          document.body.appendChild(btn);
+        }
+        function innerBoxes() {
+          return Array.prototype.slice.call(
+            document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+          );
+        }
+        function maxInnerScroll() {
+          return innerBoxes().reduce(function (max, el) {
+            return Math.max(max, el.scrollTop || 0);
+          }, 0);
+        }
+        function shown() {
+          var y = window.scrollY || document.documentElement.scrollTop || 0;
+          btn.classList.toggle('is-visible', y > 80 || maxInnerScroll() > 16);
+        }
+        function shownSoon() {
+          shown();
+          if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+          else window.setTimeout(shown, 16);
+        }
+        function bindBox(el) {
+          if (!el || el.getAttribute('data-pp-scroll-top') === '1') return;
+          el.setAttribute('data-pp-scroll-top', '1');
+          el.addEventListener('scroll', shownSoon, { passive: true });
+        }
+        function bindBoxes() {
+          innerBoxes().forEach(bindBox);
+          shown();
+        }
+        window.parishPressBindScrollTopBoxes = bindBoxes;
+        if (btn.getAttribute('data-pp-bound') !== 'inner-2') {
+          btn.setAttribute('data-pp-bound', 'inner-2');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.addEventListener('scroll', shownSoon, { passive: true });
+          document.addEventListener('scroll', shownSoon, { capture: true, passive: true });
+          document.addEventListener('wheel', shownSoon, { capture: true, passive: true });
+          document.addEventListener('touchmove', shownSoon, { capture: true, passive: true });
+          if (window.MutationObserver && document.body) {
+            new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+          }
+          btn.addEventListener('click', function () {
+            var behavior = reduce ? 'auto' : 'smooth';
+            window.scrollTo({ top: 0, behavior: behavior });
+            innerBoxes().forEach(function (el) {
+              el.scrollTop = 0;
+              if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+            });
+            window.setTimeout(shown, reduce ? 0 : 400);
+          });
+        }
+        bindBoxes();
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
+    })();
+    
+    
+    (function () {
+      // Read the page index lazily: this script runs before the
+      // #parish-page-index JSON later in the body exists, so reading it now
+      // would leave every PDF jump with an empty index.
+      var index = null;
+      function pageIndex() {
+        if (index) return index;
+        index = {};
+        var node = document.getElementById('parish-page-index');
+        if (node) {
+          try { index = JSON.parse(node.textContent || '{}') || {}; } catch (e) {}
+        }
+        return index;
+      }
+      function reduceMotion() {
+        return window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+      }
+      function norm(s) {
+        return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '');
+      }
+      function coreName(s) {
+        return String(s || '').replace(/\s*\([^)]*\)\s*/g, ' ').trim();
+      }
+      function scrollBoxTo(box, el) {
+        if (!box || !el) return false;
+        var br = box.getBoundingClientRect();
+        var er = el.getBoundingClientRect();
+        var top = box.scrollTop + (er.top - br.top) - 8;
+        if (box.scrollTo) {
+          box.scrollTo({ top: Math.max(0, top), behavior: reduceMotion() ? 'auto' : 'smooth' });
+        } else {
+          box.scrollTop = Math.max(0, top);
+        }
+        return true;
+      }
+      function slugOf(s) {
+        return String(s || '').toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      }
+      function findOcr(box, name) {
+        if (!box) return null;
+        var wanted = [norm(name), norm(coreName(name))];
+        var nodes = box.querySelectorAll('.ocr-parish-masthead, [id^="ocr-parish-"]');
+        for (var i = 0; i < nodes.length; i++) {
+          var el = nodes[i];
+          var label = el.getAttribute('data-parish-name') || ((el.querySelector('.ocr-parish-name') || el).textContent || '');
+          var got = norm(label);
+          if (wanted.indexOf(got) >= 0 || wanted.indexOf(norm(coreName(label))) >= 0) return el;
+        }
+        // The search box rebuilds #ocr-panel innerHTML, so fall back to the
+        // masthead id the layout writes (ocr-parish-<slug>).
+        var byId = box.querySelector('#ocr-parish-' + slugOf(name))
+          || box.querySelector('#ocr-parish-' + slugOf(coreName(name)));
+        return byId || null;
+      }
+      function flashLanding(el) {
+        if (!el || !el.classList) return;
+        el.classList.remove('az-landed');
+        void el.offsetWidth;
+        el.classList.add('az-landed');
+        window.setTimeout(function () { el.classList.remove('az-landed'); }, 1800);
+      }
+      function landInBox(box, el) {
+        // Move the box instantly (one smooth animation only — a second one on
+        // the same scroll chain used to be cancelled halfway, which left the
+        // reader in the middle of another parish), then bring the box itself
+        // on screen, then re-check because zoom/fonts can reflow the text.
+        var br = box.getBoundingClientRect();
+        var er = el.getBoundingClientRect();
+        box.scrollTop = Math.max(0, box.scrollTop + (er.top - br.top) - 8);
+        showBox(box);
+        var tries = 0;
+        (function settle() {
+          if (tries++ > 6) return;
+          var b2 = box.getBoundingClientRect();
+          var e2 = el.getBoundingClientRect();
+          var off = Math.round(e2.top - b2.top - 8);
+          if (Math.abs(off) > 3) box.scrollTop = Math.max(0, box.scrollTop + off);
+          window.setTimeout(settle, 150);
+        })();
+        flashLanding(el);
+      }
+      function pageFor(name) {
+        var map = pageIndex();
+        if (map[name]) return map[name];
+        var n = norm(name);
+        var keys = Object.keys(map);
+        for (var i = 0; i < keys.length; i++) {
+          if (norm(keys[i]) === n || norm(coreName(keys[i])) === n || n === norm(coreName(keys[i]))) {
+            var val = map[keys[i]];
+            if (typeof val === 'number') return val;
+          }
+        }
+        return 0;
+      }
+      function showBox(box) {
+        // The jump happens inside the locked box, so make sure the box itself
+        // is on screen first or a phone reader sees nothing move. Leave room
+        // for the sticky search bar when a term is typed, otherwise it covers
+        // the parish header the reader just asked for.
+        if (!box || !box.getBoundingClientRect) return;
+        var r = box.getBoundingClientRect();
+        var h = window.innerHeight || document.documentElement.clientHeight || 0;
+        var sticky = document.querySelector('.ocr-sticky-chrome.is-searching');
+        var pad = sticky ? Math.round(sticky.getBoundingClientRect().height) + 8 : 0;
+        if (r.top < pad || r.top > h - 120) {
+          window.scrollTo({
+            top: Math.max(0, (window.scrollY || window.pageYOffset || 0) + r.top - pad),
+            behavior: reduceMotion() ? 'auto' : 'smooth',
+          });
+        }
+      }
+      function jumpPdf(names) {
+        var pages = document.querySelector('.pdf-inpage-pages');
+        if (!pages) return false;
+        for (var i = 0; i < names.length; i++) {
+          var page = pageFor(names[i]);
+          if (!page) continue;
+          showBox(pages);
+          /* Lazy mega: slots after page 1 do not exist yet. Still start the
+             jump — the viewer loads the mega and scrolls when the slot lands. */
+          if (window.parishPressScrollPdfToPage) {
+            window.parishPressScrollPdfToPage(page);
+            return true;
+          }
+          var slot = pages.querySelector('[data-page="' + page + '"]');
+          if (!slot) continue;
+          scrollBoxTo(pages, slot);
+          return true;
+        }
+        return false;
+      }
+      function jumpOcr(names) {
+        var ocr = document.getElementById('ocr-panel') || document.getElementById('ocr-text');
+        if (!ocr) return false;
+        for (var i = 0; i < names.length; i++) {
+          var hit = findOcr(ocr, names[i]);
+          if (!hit) continue;
+          landInBox(ocr, hit);
+          return true;
+        }
+        return false;
+      }
+      function jump(target, names, tries) {
+        var done = target === 'pdf' ? jumpPdf(names) : jumpOcr(names);
+        // PDF.js paints page slots as it streams, so the slot may not exist
+        // for a second or two after load; the OCR panel is rebuilt whenever a
+        // search is cleared. Retry briefly instead of failing silently.
+        if (!done && (tries || 0) < 12) {
+          window.setTimeout(function () { jump(target, names, (tries || 0) + 1); }, 400);
+        }
+      }
+      function namesOf(btn) {
+        var raw = btn.getAttribute('data-az-names') || btn.getAttribute('data-parish-name') || '';
+        var out = [];
+        raw.split('|').forEach(function (part) {
+          var name = String(part || '').trim();
+          if (name) out.push(name);
+        });
+        return out;
+      }
+      document.addEventListener('click', function (ev) {
+        if (!ev.target || !ev.target.closest) return;
+        var btn = ev.target.closest('.az-letter');
+        if (!btn) return;
+        ev.preventDefault();
+        jump(btn.getAttribute('data-az-target') || 'ocr', namesOf(btn), 0);
+      });
+    })();
+    
+  </script>
+  <script type="application/json" id="parish-page-index">{}</script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
+</body>
+</html>
