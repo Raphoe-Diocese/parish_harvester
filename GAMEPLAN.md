@@ -1,3 +1,9 @@
+## 29/09/2026 night — Armagh onboarding pack (wired, not harvested)
+- Official directory 61 cards + kitchen-sink hosts. **10 harvest recipes** with this-week PDFs proved: armaghparish, clogherhead, carlingfordandomeath (Wix), saintpetersdrogheda, holyredeemer (verify date), monasterboice, termonmaguirc, whitecross, middlekilleavy, cooley (kitchen-sink site, not on card).
+- 51 link_only / skip (Facebook-only or no PDF proved). Evidence + contacts + recipes/armagh + dioceses.json + parish_status labels + harvest.yml choice + OCR contacts map. Stem ``armagh_diocese``. **Not on LIVE_DIOCESES / homepage until first harvest.**
+- Brain 1b committed ``0164350e`` (local ahead of origin until push).
+- **Next:** ``gh workflow run harvest.yml -f diocese=armagh_diocese`` (not on this PC) → then keep kitchen-sinking the Facebook-only 51.
+
 ## 29/09/2026 night — Brain 1b (picker challenge) shipped
 - **Referee Brain slice 1b DONE (code + unit tests):** if a recipe pin / predicted dated URL is older than a dated PDF on the listing, harvest re-picks the listing file and logs `picker_wrong` — does not quietly put the stale pin into mega/OCR. Equal dates keep the pin. Far-ahead / empty listing keep the pin. Cloudflare listing miss keeps the pin (predicted_dated_pdf still works).
 - Files: `harvester/picker_challenge.py`, wired in `harvester/replay.py` (predicted_dated_pdf path + recipe document fallbacks), `tests/test_picker_challenge.py` (5/5 green with freshness suite).
