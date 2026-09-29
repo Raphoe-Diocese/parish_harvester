@@ -43,7 +43,7 @@ class SendTestCommsTests(unittest.TestCase):
             yml,
         )
         self.assertIn("Cache Playwright browsers", yml)
-        self.assertIn("max-parallel: 4", yml)
+        self.assertIn("max-parallel: 5", yml)
         self.assertIn("HARVEST_SKIP_STATUS", yml)
         self.assertIn("merge_diocese_harvests.py", yml)
         stitch = yml.split("\n  stitch:", 1)[-1]

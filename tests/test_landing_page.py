@@ -1,4 +1,4 @@
-from __future__ import annotations
+﻿from __future__ import annotations
 
 import json
 import re
@@ -100,13 +100,14 @@ class LandingPageTests(unittest.TestCase):
             # one-click link to its collated (mega) bulletin and its text
             # bulletin — not a full-size "coming soon" card.
             self.assertIn("Live dioceses", index_html)
-            self.assertEqual(index_html.count("live-card\""), 5)
+            self.assertEqual(index_html.count("live-card\""), 6)
             self.assertIn("Clogher Diocese", index_html)
             self.assertIn("Derry Diocese", index_html)
             self.assertIn("Down &amp; Connor Diocese", index_html)
             self.assertNotIn("Down and Connor Diocese", index_html)
             self.assertIn("Raphoe Diocese", index_html)
             self.assertIn("Cork and Ross Diocese", index_html)
+            self.assertIn("Achonry Diocese", index_html)
             self.assertIn('class="is-long"', index_html)
             self.assertIn("white-space: nowrap", index_html)
             self.assertIn("Bulletins ready @ 16:00", index_html)
@@ -149,7 +150,7 @@ class LandingPageTests(unittest.TestCase):
             self.assertFalse((docs / "subscribe" / "index.html").exists())
 
             # The other dioceses collapse into one small expandable list.
-            self.assertIn("More dioceses — coming soon (21)", index_html)
+            self.assertIn("More dioceses — coming soon (20)", index_html)
             self.assertNotIn("Parish of Raphoe", index_html)
 
             links = re.findall(r'href="dioceses/([a-z0-9-]+)/"', index_html)
@@ -335,7 +336,7 @@ class HeroSliderRenderTests(unittest.TestCase):
         self.assertNotIn("Jane Doe", markup)
 
     def test_default_hero_slides_are_real_cathedral_photos_with_cc_credit(self) -> None:
-        self.assertEqual(len(site_builder.HERO_SLIDES), 5)
+        self.assertEqual(len(site_builder.HERO_SLIDES), 6)
         for slide in site_builder.HERO_SLIDES:
             self.assertTrue(slide.image and slide.image.startswith("https://upload.wikimedia.org/"))
             self.assertTrue(slide.credit and "Wikimedia Commons" in slide.credit)
@@ -348,6 +349,7 @@ class HeroSliderRenderTests(unittest.TestCase):
         self.assertIn("St Eugene's Cathedral, Derry", titles)
         self.assertIn("St Peter's Cathedral, Belfast", titles)
         self.assertIn("Cathedral of St Mary and St Anne, Cork", titles)
+        self.assertIn("Cathedral of the Annunciation and St Nathy, Ballaghaderreen", titles)
 
         eyebrows = {slide.eyebrow for slide in site_builder.HERO_SLIDES}
         self.assertEqual(
@@ -358,6 +360,7 @@ class HeroSliderRenderTests(unittest.TestCase):
                 "Derry Diocese",
                 "Down & Connor Diocese",
                 "Cork and Ross Diocese",
+                "Achonry Diocese",
             },
         )
 

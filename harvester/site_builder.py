@@ -31,7 +31,7 @@ DOCS_DIR = REPO_ROOT / "docs"
 RECIPES_DIR = REPO_ROOT / "parishes" / "recipes"
 BULLETINS_DIR = DOCS_DIR / "bulletins"
 
-LIVE_DIOCESES = {"raphoe", "derry", "down-and-connor", "clogher", "cork-and-ross"}
+LIVE_DIOCESES = {"raphoe", "derry", "down-and-connor", "clogher", "cork-and-ross", "achonry"}
 # site_builder uses hyphenated diocese keys; ocr.generate_bulletin_pages /
 # ocr.parish_pages use the underscored keys from parishes/dioceses.json.
 OCR_DIOCESE_KEYS = {
@@ -40,11 +40,13 @@ OCR_DIOCESE_KEYS = {
     "down-and-connor": "down_and_connor",
     "clogher": "clogher",
     "cork-and-ross": "cork_and_ross",
+    "achonry": "achonry",
 }
 RELIABILITY_PATH = DOCS_DIR / "reliability.json"
 REPORT_PATH = REPO_ROOT / "Bulletins" / "report.json"
 GITHUB_RAW_BASE = "https://raw.githubusercontent.com/Raphoe-Diocese/parish_harvester/main/Bulletins/current"
 EVIDENCE_DIOCESE_KEYS = {
+    "achonry": "achonry_diocese",
     "clogher": "clogher_diocese",
     "cork-and-ross": "cork_and_ross",
     "derry": "derry_diocese",
@@ -154,6 +156,19 @@ HERO_SLIDES: list[HeroSlide] = [
         eyebrow="Cork and Ross Diocese",
         title="Cathedral of St Mary and St Anne, Cork",
         subtitle="This week's Cork and Ross parish bulletins.",
+    ),
+    HeroSlide(
+        diocese_key="achonry",
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/1/1f/"
+            "BallaghaderreenCathedral.jpg/1280px-BallaghaderreenCathedral.jpg"
+        ),
+        credit="Photo: JohnArmagh / Wikimedia Commons / CC BY-SA 3.0",
+        position="center 40%",
+        gradient="linear-gradient(135deg, #2a1f2e 0%, #5a4a6b 55%, #b39bc8 100%)",
+        eyebrow="Achonry Diocese",
+        title="Cathedral of the Annunciation and St Nathy, Ballaghaderreen",
+        subtitle="This week's Achonry parish bulletins.",
     ),
 ]
 
