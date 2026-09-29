@@ -31,7 +31,7 @@ DOCS_DIR = REPO_ROOT / "docs"
 RECIPES_DIR = REPO_ROOT / "parishes" / "recipes"
 BULLETINS_DIR = DOCS_DIR / "bulletins"
 
-LIVE_DIOCESES = {"raphoe", "derry", "down-and-connor", "clogher", "cork-and-ross", "achonry"}
+LIVE_DIOCESES = {"raphoe", "derry", "down-and-connor", "clogher", "cork-and-ross", "achonry", "ardagh-and-clonmacnoise"}
 # site_builder uses hyphenated diocese keys; ocr.generate_bulletin_pages /
 # ocr.parish_pages use the underscored keys from parishes/dioceses.json.
 OCR_DIOCESE_KEYS = {
@@ -41,12 +41,14 @@ OCR_DIOCESE_KEYS = {
     "clogher": "clogher",
     "cork-and-ross": "cork_and_ross",
     "achonry": "achonry",
+    "ardagh-and-clonmacnoise": "ardagh",
 }
 RELIABILITY_PATH = DOCS_DIR / "reliability.json"
 REPORT_PATH = REPO_ROOT / "Bulletins" / "report.json"
 GITHUB_RAW_BASE = "https://raw.githubusercontent.com/Raphoe-Diocese/parish_harvester/main/Bulletins/current"
 EVIDENCE_DIOCESE_KEYS = {
     "achonry": "achonry_diocese",
+    "ardagh-and-clonmacnoise": "ardagh_diocese",
     "clogher": "clogher_diocese",
     "cork-and-ross": "cork_and_ross",
     "derry": "derry_diocese",
@@ -169,6 +171,20 @@ HERO_SLIDES: list[HeroSlide] = [
         eyebrow="Achonry Diocese",
         title="Cathedral of the Annunciation and St Nathy, Ballaghaderreen",
         subtitle="This week's Achonry parish bulletins.",
+    ),
+    HeroSlide(
+        diocese_key="ardagh-and-clonmacnoise",
+        image=(
+            "https://upload.wikimedia.org/wikipedia/commons/thumb/c/c7/"
+            "St_Mel%27s_Cathedral%2C_Longford_%2816168208807%29.jpg/"
+            "1280px-St_Mel%27s_Cathedral%2C_Longford_%2816168208807%29.jpg"
+        ),
+        credit="Photo: J.W Photographic Collection / Wikimedia Commons / CC BY 2.0",
+        position="center 45%",
+        gradient="linear-gradient(135deg, #1f2a1f 0%, #3f6b4a 55%, #9ccf9f 100%)",
+        eyebrow="Ardagh and Clonmacnoise Diocese",
+        title="St Mel's Cathedral, Longford",
+        subtitle="This week's Ardagh and Clonmacnoise parish bulletins.",
     ),
 ]
 

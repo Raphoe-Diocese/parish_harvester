@@ -291,6 +291,22 @@ def _parse_short_adjacent_date_line(line: str) -> date | None:
     return extract_date_from_string(line)
 
 
+# Referee Brain slice 1 (stale harder, 29/09/2026): a masthead line that names
+# the Sunday liturgically ("16TH SUNDAY OF ORDINARY TIME", "3rd Sunday of
+# Advent") is a bulletin heading even when the word bulletin/newsletter is
+# missing. Aughavas & Cloone NL1773.pdf ("19th July 2026 16TH SUNDAY OF
+# ORDINARY TIME") reached the 27/09/2026 mega as "ok" because only the
+# bulletin/newsletter word was accepted. Memorial lines ("died on 9th July
+# 2023") carry no liturgical marker, so they still stay None.
+_LITURGICAL_MASTHEAD_RE = re.compile(
+    r"(?i)\b(?:\d{1,2}(?:st|nd|rd|th)?\s+sunday\s+(?:of|in)\b"
+    r"|sunday\s+of\s+(?:advent|lent|easter|the\s+year)"
+    r"|ordinary\s+time|palm\s+sunday|pentecost\s+sunday|trinity\s+sunday"
+    r"|corpus\s+christi|christ\s+the\s+king|holy\s+family|baptism\s+of\s+the\s+lord)"
+)
+_FULL_YEAR_RE = re.compile(r"\b20\d{2}\b")
+
+
 def extract_bulletin_date_from_text(text: str) -> date | None:
     """Parse a date from bulletin/newsletter heading lines in PDF text.
 
@@ -299,6 +315,10 @@ def extract_bulletin_date_from_text(text: str) -> date | None:
     1–2 non-empty lines only when they are short date/liturgical lines.
     Does not scan the whole page, so a memorial such as ``died on 9th July
     2023`` with no nearby bulletin/newsletter word stays ``None``.
+
+    Second pass: a liturgical masthead line ("16TH SUNDAY OF ORDINARY TIME")
+    with a full dated (year-bearing) date on the same or an adjacent short
+    line also counts. Yearless dates are never promoted here.
     """
     lines = _nonempty_text_lines(text)
     for index, line in enumerate(lines):
@@ -311,6 +331,24 @@ def extract_bulletin_date_from_text(text: str) -> date | None:
             neighbour_index = index + offset
             if 0 <= neighbour_index < len(lines):
                 parsed = _parse_short_adjacent_date_line(lines[neighbour_index])
+                if parsed:
+                    return parsed
+    for index, line in enumerate(lines):
+        if not _LITURGICAL_MASTHEAD_RE.search(line):
+            continue
+        if _ADJACENT_BODY_PARAGRAPH_RE.search(line):
+            continue
+        if _FULL_YEAR_RE.search(line):
+            parsed = extract_date_from_string(line)
+            if parsed:
+                return parsed
+        for offset in _ADJACENT_DATE_LINE_OFFSETS:
+            neighbour_index = index + offset
+            if 0 <= neighbour_index < len(lines):
+                neighbour = lines[neighbour_index]
+                if not _FULL_YEAR_RE.search(neighbour):
+                    continue
+                parsed = _parse_short_adjacent_date_line(neighbour)
                 if parsed:
                     return parsed
     return None

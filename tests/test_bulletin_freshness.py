@@ -156,6 +156,30 @@ class BulletinFreshnessTests(unittest.TestCase):
         verdict = check_bulletin_freshness(stale_url, date(2026, 8, 9))
         self.assertEqual(verdict.status, "stale")
 
+    def test_liturgical_masthead_with_full_date_counts_as_heading(self) -> None:
+        # Aughavas & Cloone NL1773.pdf, harvested 29/09/2026 as "ok" with no date:
+        # the masthead has no bulletin/newsletter word, only the liturgical Sunday.
+        text = (
+            "Fr. Peter Tiernan: 071 -9636016 Mobile: 086 3500114\n"
+            "Web Page aughavascloone.ie E-mail: aughavascloone1 @gmail.com\n"
+            "19th July 2026 16TH SUNDAY OF ORDINARY TIME\n"
+            "Your prayers are requested for the happy repose of the soul of Mamie Duignan\n"
+        )
+        self.assertEqual(extract_bulletin_date_from_text(text), date(2026, 7, 19))
+        verdict = verdict_for_extracted_date(date(2026, 7, 19), date(2026, 9, 27))
+        self.assertEqual(verdict.status, "stale")
+        # Yearless masthead (Drumlish "Sun 20th Sept 11.00") is not promoted.
+        self.assertIsNone(
+            extract_bulletin_date_from_text(
+                "Mass Intentions Drumlish Sat 19th Sept 8.00: Teresa McGee\n"
+                "Sun 20th Sept 11.00: Missa Pro Popolo 25th Sunday in Ordinary Time\n"
+            )
+        )
+        # Memorial line with a year but no liturgical marker stays None.
+        self.assertIsNone(
+            extract_bulletin_date_from_text("Anniversaries: John Smith died on 9th July 2023 RIP\n")
+        )
+
     def test_ordinal_sunday_count_in_wp_filename_is_not_a_day(self) -> None:
         # derriaghycatholicparish.com names its weekly image
         # "19th-Suday-in-ordinary-time-724x1024.png" — the leading "19" is
