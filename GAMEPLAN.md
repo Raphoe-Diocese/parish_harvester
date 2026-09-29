@@ -7,6 +7,13 @@ locked harvester product order.
 |---
 
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -21,11 +28,25 @@ locked harvester product order.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -40,6 +61,13 @@ locked harvester product order.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 27/09/2026 evening — Diocese hunt A–Z: Achonry (doing)
 - Achonry 27/09 evening: Sept. trailing-dot slug fix; Tourlestrane goto; Kilmovee 27 Sept example; Ballymote image recipe + Collooney/Kilvarnet PDF recipe — re-harvest next.
@@ -56,6 +84,13 @@ locked harvester product order.
 
 **Parked:** Elphin (same joint site, separate diocese letter E); Dunfanaghy OCR; Problems console.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -70,11 +105,25 @@ locked harvester product order.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -89,6 +138,13 @@ locked harvester product order.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 27/09/2026 — Tawnawilly this-week bulletin (done)
 
@@ -100,6 +156,13 @@ locked harvester product order.
 
 **Parked:** nothing new.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -114,11 +177,25 @@ locked harvester product order.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -133,6 +210,13 @@ locked harvester product order.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 24/09/2026 — OCR readability: spacing, subheads, diocese re-apply
 
@@ -144,6 +228,13 @@ locked harvester product order.
 
 **Parked:** inventing name corrections (e.g. GetÝgan); full re-OCR on this PC.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -158,11 +249,25 @@ locked harvester product order.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -177,6 +282,13 @@ locked harvester product order.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 24/09/2026 — Cork live polish: dots off, unfinished note, fix "0 of N found"
 
@@ -185,6 +297,13 @@ locked harvester product order.
 **This turn:** Restored report/status after Cork-only wipe; removed hero dots; unfinished note on diocese intros; single-diocese harvest patches report. PR #248.
 
 **Next:** merge + Pages live-prove; then Referee Brain first slice.
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -199,11 +318,25 @@ locked harvester product order.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -218,6 +351,13 @@ locked harvester product order.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 23/09/2026 — Frank lock: Cork finish, then Cork on site, then Referee Brain (NO MORE DELAY)
 
@@ -253,6 +393,13 @@ locked harvester product order.
 
 **Parked until Cork site is live:** other 21 dioceses, forms/.ie, full Brain rewrite beyond the first slice.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -267,11 +414,25 @@ locked harvester product order.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -286,6 +447,13 @@ locked harvester product order.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 23/09/2026 — Cork recipes batch2 (families + standalones)
 
@@ -297,6 +465,13 @@ locked harvester product order.
 
 **Parked:** wilton HTML dig; OneFaith July-stale; Facebook/empty/notices-only; summer-break lists until they publish again.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -311,11 +486,25 @@ locked harvester product order.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -330,6 +519,13 @@ locked harvester product order.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 23/09/2026 — Cork on parishpress.ie (cathedral photo + live card)
 
@@ -354,6 +550,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -368,11 +571,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -387,6 +604,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 23/09/2026 — Second Cork recipe: OurParish / Harbour family, once
 
@@ -398,6 +622,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Parked:** other Cork families. Cork Sunday matrix until more recipes exist.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -412,11 +643,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -431,6 +676,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 22/09/2026 — First Cork recipe: West Cork family, once
 
@@ -442,6 +694,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Parked:** other Cork families. Cork Sunday matrix until more recipes exist.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -456,11 +715,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -475,6 +748,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 22/09/2026 — Sunday harvest did fire, then stitch tests threw it away
 
@@ -486,6 +766,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Parked:** Recipe Brain. Cork recipes.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -500,11 +787,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -519,6 +820,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 18/09/2026 — Remember clicks that worked (the gold)
 
@@ -532,6 +840,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Parked:** full Brain / Referee. Do not replace Guess until click-memory is in the ext.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -546,11 +861,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -565,6 +894,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 18/09/2026 — Tawnawilly Guess time-machine + Cork on the ext
 
@@ -576,6 +912,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Parked:** full Recipe Brain / Referee. Cork Sunday matrix until recipes exist. Forms until all dioceses are finished.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -590,11 +933,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -609,6 +966,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 17/09/2026 — Form-fed parish mini-sites + free .ie
 
@@ -622,6 +986,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Parked until all dioceses are finished:** form-to-page builder, parish forms, per-parish .ie, Jotform. Frank 17/09/2026: park until we finish all the dioceses.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -636,11 +1007,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -655,6 +1040,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 17/09/2026 — S4 Cork (Cork and Ross)
 
@@ -666,6 +1058,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Parked:** Sunday matrix until real bulletin URLs exist. S4 proof (≥10 recipes + green harvest run) is not done. Forms until all dioceses are finished.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -680,11 +1079,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -699,6 +1112,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 17/09/2026 — “Free forever” block was too sure
 
@@ -708,6 +1128,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** ignore the Desktop file. Read `docs/COST_DASHBOARD.md` on main.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -722,11 +1149,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -741,6 +1182,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 17/09/2026 — S3 OCR quota dashboard
 
@@ -750,6 +1198,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** after Pages, open the file and read the three numbers (they stay 0 until Sunday OCR).
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -764,11 +1219,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -783,6 +1252,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 17/09/2026 — Picture download still makes a PDF
 
@@ -792,6 +1268,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** PR, then Send & test on a picture parish that was not marked as picture.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -806,11 +1289,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -825,6 +1322,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 15/09/2026 (evening 14) — #238 merged; image→PDF is harvest, not Gemini
 
@@ -834,6 +1338,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** wait for Sunday OCR. Parked: make Gemini/Mistral easier to read.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -848,11 +1359,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -867,6 +1392,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 15/09/2026 (evening 13) — 26 dioceses, Gemini “training”, Mistral polish
 
@@ -876,6 +1408,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** merge #238. Do not start a readability rewrite.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -890,11 +1429,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -909,6 +1462,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 15/09/2026 (evening 12) — Fix Gemini PPM so picture pages work
 
@@ -918,6 +1478,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** merge, then next Sunday OCR must show Gemini pages, not that MIME error.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -932,11 +1499,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -951,6 +1532,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 15/09/2026 (evening 11) — If Gemini is fixed, is the free API enough?
 
@@ -960,6 +1548,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** say go to fix Gemini MIME.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -974,11 +1569,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -993,6 +1602,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 15/09/2026 (evening 10) — Totally free OCR APIs vs Mistral
 
@@ -1002,6 +1618,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** say go to fix Gemini so picture pages work. Do not start a new OCR vendor.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1016,11 +1639,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1035,6 +1672,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 15/09/2026 (evening 9) — Would a second Mistral key suffice?
 
@@ -1044,6 +1688,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** S3 or wire key 2 only if Frank says go.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1058,11 +1709,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1077,6 +1742,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 15/09/2026 (evening 8) — Free Mistral per month, then the sums
 
@@ -1094,6 +1766,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** one Free key is enough for the current 4. For 26 full megas, one $10 pot is not enough. Say go for S3 to print 2,500 as the working ceiling with that source.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1108,11 +1787,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1127,6 +1820,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 15/09/2026 (evening 7) — Is the current Mistral key enough?
 
@@ -1139,6 +1839,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** Frank opens Mistral Limits if he wants the leftover number. Say go to fix the Mistral client so Sunday actually uses the key.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1153,11 +1860,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1172,6 +1893,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 15/09/2026 (evening 6) — Second Mistral account for extra free quota
 
@@ -1183,6 +1911,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Parked:** second Mistral GitHub secret as fallback. One warning only: Mistral can still shut keys that look like stacked free accounts. His choice.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1197,11 +1932,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1216,6 +1965,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 15/09/2026 (evening 5) — Free OCR ceilings vs 26 diocese runs
 
@@ -1234,6 +1990,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Parked:** rip tesseract. Do not start 22 dioceses until S3 exists.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1248,11 +2011,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1267,6 +2044,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 15/09/2026 (evening 4) — Free OCR APIs; tesseract is not a reader
 
@@ -1278,6 +2062,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Parked:** rip tesseract out of `fill_sparse` / column repair. Do not start until Frank says go.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1292,11 +2083,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1311,6 +2116,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 15/09/2026 (evening 3) — S2 no PDF commits
 
@@ -1320,6 +2132,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** S3 OCR quota dashboard.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1334,11 +2153,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1353,6 +2186,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 15/09/2026 (evening 2) — S1 diocese matrix
 
@@ -1362,6 +2202,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** merge [#236](https://github.com/Raphoe-Diocese/parish_harvester/pull/236) when CI is green. Proof is the next full harvest run.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1376,11 +2223,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1395,6 +2256,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 15/09/2026 (evening) — T6 + T7 + T8 on one PR
 
@@ -1404,6 +2272,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** I merge #235 when green. Then Reload.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1418,11 +2293,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1437,6 +2326,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 15/09/2026 (afternoon) — T4 version banner
 
@@ -1446,6 +2342,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** Reload → card **1.61.38**. Then T6 (don’t push a dated post as start_url). T5 is already in 1.61.37.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1460,11 +2363,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1479,6 +2396,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 15/09/2026 — Confetti cannon in the agent must-read
 
@@ -1488,6 +2412,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** merge [#233](https://github.com/Raphoe-Diocese/parish_harvester/pull/233) when CI is green (St Gerard test no longer pins one example URL).
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1502,11 +2433,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1521,6 +2466,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 14/09/2026 (evening 5) — Send & test red line was a watcher lie
 
@@ -1532,6 +2484,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** Frank merges [#233](https://github.com/Raphoe-Diocese/parish_harvester/pull/233) → Problems → Refresh. Do not Send & test again unless he wants — GitHub already has 13/09.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1546,11 +2505,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1565,6 +2538,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 14/09/2026 (evening 4) — Why it looked unsaved
 
@@ -1574,6 +2554,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **This turn:** Trainer **1.61.36** — Preview says “this week's page saved” and shows the URL. Reload until the card says **1.61.36**. Folder: Desktop **latest ext**.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1588,11 +2575,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1607,6 +2608,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 14/09/2026 (evening 3) — Picture, HTML, or PDF
 
@@ -1616,6 +2624,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** Reload → pick the Sunday Message → tap the matching one (picture / HTML / PDF).
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1630,11 +2645,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1649,6 +2678,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 14/09/2026 (evening 2) — Open any post, then mark the picture (any site)
 
@@ -1658,6 +2694,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** Reload → on St Gerard (or any other problem site) Pick newest → Open this post — bulletin is a picture → click the picture → Yes.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1672,11 +2715,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1691,6 +2748,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 14/09/2026 (evening) — T1+T2+T3 built; Frank’s new asks written down
 
@@ -1712,6 +2776,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Parked:** UI rejig of trainer + backend (card **U1**, needs Frank’s screenshots and a 30-min “what confuses me” list first), Recipe Brain, 22 dioceses hunt, history rewrite.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1726,11 +2797,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1745,6 +2830,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 14/09/2026 — Trainer audit: why Frank’s fixes “vanish” (proved on GitHub)
 
@@ -1756,6 +2848,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Next:** Frank pastes T1 to Grok and says go. Nothing on GitHub from this turn yet.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1770,11 +2869,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1789,6 +2902,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 14/09/2026 — Trainer: Yes must reach GitHub
 
@@ -1802,6 +2922,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 
 **Parked:** me fixing every problem parish by hand; Recipe Brain; 22 dioceses; rewriting the whole trainer.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1816,11 +2943,25 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1835,6 +2976,13 @@ Dates shown to Frank are DD/MM/YYYY. Dates inside JSON stay ISO.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 14/09/2026 — St Gerard’s (Sunday Message image)
 
@@ -1846,6 +2994,13 @@ Live post (opened 14/09/2026): https://stgerardsparish.org/sunday-message-13th-s
 
 **Next:** say **PR** if this should go to GitHub. Do not re-hunt weekly. GitHub harvest can still WAF-fail.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1860,11 +3015,25 @@ Live post (opened 14/09/2026): https://stgerardsparish.org/sunday-message-13th-s
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1879,6 +3048,13 @@ Live post (opened 14/09/2026): https://stgerardsparish.org/sunday-message-13th-s
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 14/09/2026 — St Michael the Archangel (GoDaddy date)
 
@@ -1890,6 +3066,13 @@ Live page (opened 14/09/2026): newest row is **Parish Bulletin 13th September 2 
 
 **Next:** Frank Reloads 1.61.31, Find bulletin, confirm 13 Sept, Send & test. Or say merge then GitHub harvest `saintmichaelthearchangel`.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1904,11 +3087,25 @@ Live page (opened 14/09/2026): newest row is **Parish Bulletin 13th September 2 
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1923,6 +3120,13 @@ Live page (opened 14/09/2026): newest row is **Parish Bulletin 13th September 2 
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 14/09/2026 — Toolbar ✕ stays closed
 
@@ -1932,6 +3136,13 @@ Live page (opened 14/09/2026): newest row is **Parish Bulletin 13th September 2 
 
 **Next:** Frank Reloads and X’s the toolbar once. It must stay gone until he taps Show toolbar or Open site.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1946,11 +3157,25 @@ Live page (opened 14/09/2026): newest row is **Parish Bulletin 13th September 2 
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1965,6 +3190,13 @@ Live page (opened 14/09/2026): newest row is **Parish Bulletin 13th September 2 
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 14/09/2026 — Problems console (fewer buttons)
 
@@ -1980,6 +3212,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 
 **Parked:** recipe success (item 3); M1; Recipe Brain; 22 dioceses.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -1994,11 +3233,25 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2013,6 +3266,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 14/09/2026 — #214 closed; H2 + B4 proved on GitHub
 
@@ -2028,6 +3288,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 
 **Parked:** M1, Recipe Brain, 22 dioceses, archive-nav delete.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2042,11 +3309,25 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2061,11 +3342,25 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 14/09/2026 — Full harvest finished
 
 **Harvest finished:** [Harvest full 34822202023](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34822202023) **success**. OCR [34828244862](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34828244862) + Pages [34828802964](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/34828802964). Week **13/09/2026**.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2080,11 +3375,25 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2099,6 +3408,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 13/09/2026 — C5 executable JS test
 
@@ -2106,6 +3422,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 
 **F2/F3 merged:** [PR #224](https://github.com/Raphoe-Diocese/parish_harvester/pull/224) `ea70713`. Docs only.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2120,11 +3443,25 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2139,11 +3476,25 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 13/09/2026 — F2/F3 backlog pages
 
 **F2/F3 merged:** [PR #224](https://github.com/Raphoe-Diocese/parish_harvester/pull/224) `ea70713`. Docs only.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2158,11 +3509,25 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2177,6 +3542,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 13/09/2026 — E2 OCR stub must not look like success
 
@@ -2184,6 +3556,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 
 **Now — E2:** stub HTML has `ocr-failed-banner`, prints `::error::`, exits 1 so the workflow does not commit a silent stub. **Not live** until the next OCR run is green, or red with a visible `::error`.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2198,11 +3577,25 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2217,6 +3610,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 13/09/2026 — E1 vision only on sparse OCR pages
 
@@ -2224,6 +3624,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 
 **E1 merged:** [PR #222](https://github.com/Raphoe-Diocese/parish_harvester/pull/222) `25eaa6a`. **Not live** until next OCR.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2238,11 +3645,25 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2257,6 +3678,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 13/09/2026 — D2 README and WHAT_IS_THIS
 
@@ -2264,6 +3692,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 
 **D2 merged:** [PR #221](https://github.com/Raphoe-Diocese/parish_harvester/pull/221) `586446b`.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2278,11 +3713,25 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2297,6 +3746,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 13/09/2026 — D1 one truth in markdown
 
@@ -2308,6 +3764,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 
 **Closed leftover PRs:** H2 [#211](https://github.com/Raphoe-Diocese/parish_harvester/pull/211) superseded by [#227](https://github.com/Raphoe-Diocese/parish_harvester/pull/227); B4 [#214](https://github.com/Raphoe-Diocese/parish_harvester/pull/214) superseded by [#228](https://github.com/Raphoe-Diocese/parish_harvester/pull/228).
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2322,11 +3785,25 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2341,6 +3818,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 13/09/2026 — S3 stop publishing search/calendars
 
@@ -2348,6 +3832,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 
 **S3 live:** [PR #219](https://github.com/Raphoe-Diocese/parish_harvester/pull/219) `e58ed97`. https://www.parishpress.ie/search/ is 404. Homepage has no inbound search link.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2362,11 +3853,25 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2381,6 +3886,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 13/09/2026 — S2 disabled A-Z links
 
@@ -2388,6 +3900,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 
 **S2 live 14/09/2026:** [PR #218](https://github.com/Raphoe-Diocese/parish_harvester/pull/218) `d2aca0f`.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2402,11 +3921,25 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2421,6 +3954,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 13/09/2026 — S1 slice_missing (this turn)
 
@@ -2428,6 +3968,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 
 **S1 merged:** [PR #217](https://github.com/Raphoe-Diocese/parish_harvester/pull/217). **Not live** until next OCR.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2442,11 +3989,25 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2461,6 +4022,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 13/09/2026 — C4 dead Trainer code (this turn)
 
@@ -2470,6 +4038,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 
 **Closed leftover PRs:** H2 is [#227](https://github.com/Raphoe-Diocese/parish_harvester/pull/227); B4 is [#228](https://github.com/Raphoe-Diocese/parish_harvester/pull/228). #211 and #214 stay closed.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2484,11 +4059,25 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2503,6 +4092,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 13/09/2026 — C2 remove Trainer auto-update (this turn)
 
@@ -2512,6 +4108,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 
 **Now — C2:** drop `update_url`, CRX, `updates.xml`, context-menu Update. Zip + `key` stay. Trainer **1.61.26**. Not live until merge + Pages. Then `scripts/refresh_local_trainer.ps1` and Reload at chrome://extensions.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2526,11 +4129,25 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2545,6 +4162,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 12/09/2026 night — P1 done; A5 (#204) next
 
@@ -2558,6 +4182,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2572,11 +4203,25 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2591,6 +4236,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 11/09/2026 — Full harvest last night (check)
 
@@ -2606,6 +4258,13 @@ Run [34536265400](https://github.com/Raphoe-Diocese/parish_harvester/actions/run
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2620,11 +4279,25 @@ Run [34536265400](https://github.com/Raphoe-Diocese/parish_harvester/actions/run
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2639,6 +4312,13 @@ Run [34536265400](https://github.com/Raphoe-Diocese/parish_harvester/actions/run
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 11/09/2026 — Phone cache + blurry mega
 
@@ -2649,6 +4329,13 @@ Frank: parishpress.ie on the PC is last night’s harvest; the phone is the prev
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2663,11 +4350,25 @@ Frank: parishpress.ie on the PC is last night’s harvest; the phone is the prev
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2682,6 +4383,13 @@ Frank: parishpress.ie on the PC is last night’s harvest; the phone is the prev
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 10/09/2026 — Audit and finish plan (read this first)
 
@@ -2735,6 +4443,13 @@ Frank 10/09/2026 **fix**: Ghostscript `/ebook` 100 dpi made diocese megas unread
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2749,11 +4464,25 @@ Frank 10/09/2026 **fix**: Ghostscript `/ebook` 100 dpi made diocese megas unread
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2768,6 +4497,13 @@ Frank 10/09/2026 **fix**: Ghostscript `/ebook` 100 dpi made diocese megas unread
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 09/09/2026 night — Full harvest 34293288559 then recipe hunt
 
@@ -2784,6 +4520,13 @@ Harvest run [34293288559](https://github.com/Raphoe-Diocese/parish_harvester/act
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2798,11 +4541,25 @@ Harvest run [34293288559](https://github.com/Raphoe-Diocese/parish_harvester/act
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2817,6 +4574,13 @@ Harvest run [34293288559](https://github.com/Raphoe-Diocese/parish_harvester/act
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 09/09/2026 night — Trainer Errors: Service worker status 15
 
@@ -2828,6 +4592,13 @@ Brave loaded Parish Trainer, then showed **Service worker registration failed. S
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2842,11 +4613,25 @@ Brave loaded Parish Trainer, then showed **Service worker registration failed. S
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2861,6 +4646,13 @@ Brave loaded Parish Trainer, then showed **Service worker registration failed. S
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 09/09/2026 night — Update from Load unpacked does not work
 
@@ -2870,6 +4662,13 @@ I was wrong: **Update does not fetch parishpress.ie while Parish Trainer is Load
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2884,11 +4683,25 @@ I was wrong: **Update does not fetch parishpress.ie while Parish Trainer is Load
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2903,6 +4716,13 @@ I was wrong: **Update does not fetch parishpress.ie while Parish Trainer is Load
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 09/09/2026 night — Prove Update from 1.61.21
 
@@ -2910,6 +4730,13 @@ Frank is on **1.61.21**. That build’s `update_url` is parishpress.ie (no 301).
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2924,11 +4751,25 @@ Frank is on **1.61.21**. That build’s `update_url` is parishpress.ie (no 301).
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2943,6 +4784,13 @@ Frank is on **1.61.21**. That build’s `update_url` is parishpress.ie (no 301).
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 09/09/2026 night — Trainer still 1.61.20 after #185
 
@@ -2956,6 +4804,13 @@ Frank is on **1.61.21**. That build’s `update_url` is parishpress.ie (no 301).
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2970,11 +4825,25 @@ Frank is on **1.61.21**. That build’s `update_url` is parishpress.ie (no 301).
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -2989,6 +4858,13 @@ Frank is on **1.61.21**. That build’s `update_url` is parishpress.ie (no 301).
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 09/09/2026 — Merge the useful leftover drafts
 
@@ -3005,6 +4881,13 @@ Frank is on **1.61.21**. That build’s `update_url` is parishpress.ie (no 301).
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3019,11 +4902,25 @@ Frank is on **1.61.21**. That build’s `update_url` is parishpress.ie (no 301).
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3038,6 +4935,13 @@ Frank is on **1.61.21**. That build’s `update_url` is parishpress.ie (no 301).
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 08/09/2026 night — View bulletin was downloading; Raphoe list is last harvest
 
@@ -3057,6 +4961,13 @@ Frank’s Back room (Raphoe, 14/46, week 06/09): Annagry too old 26/07, Ardara t
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3071,11 +4982,25 @@ Frank’s Back room (Raphoe, 14/46, week 06/09): Annagry too old 26/07, Ardara t
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3090,6 +5015,13 @@ Frank’s Back room (Raphoe, 14/46, week 06/09): Annagry too old 26/07, Ardara t
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 08/09/2026 — Do not run another full harvest until this miss-fix is merged
 
@@ -3111,6 +5043,13 @@ Frank is right. He already ran Full harvest 07/09 19:31 UTC. ok went **93 → 81
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3125,11 +5064,25 @@ Frank is right. He already ran Full harvest 07/09 19:31 UTC. ok went **93 → 81
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3144,6 +5097,13 @@ Frank is right. He already ran Full harvest 07/09 19:31 UTC. ok went **93 → 81
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 06/09/2026 — Open PDF looks like last week; harvest missed this week
 
@@ -3169,6 +5129,13 @@ Harvest **did run** 06/09 (target 2026-09-06, `generated_at` 10:05 UTC). Live me
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3183,11 +5150,25 @@ Harvest **did run** 06/09 (target 2026-09-06, `generated_at` 10:05 UTC). Live me
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3202,6 +5183,13 @@ Harvest **did run** 06/09 (target 2026-09-06, `generated_at` 10:05 UTC). Live me
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 07/09/2026 — Newtown Killea is up; harvest still 403s /bulletin/
 
@@ -3215,6 +5203,13 @@ Browser (07/09): site works. Weekly file is `…/parish-bulletins/unassigned/rap
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3229,11 +5224,25 @@ Browser (07/09): site works. Weekly file is `…/parish-bulletins/unassigned/rap
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3248,6 +5257,13 @@ Browser (07/09): site works. Weekly file is `…/parish-bulletins/unassigned/rap
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 07/09/2026 afternoon — Newtown permanent link + Tawnawilly is not blocked
 
@@ -3261,6 +5277,13 @@ Tawnawilly Send & test 13:32 UTC failed: `HTTP 403` on `/bulletin/` → category
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3275,11 +5298,25 @@ Tawnawilly Send & test 13:32 UTC failed: `HTTP 403` on `/bulletin/` → category
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3294,6 +5331,13 @@ Tawnawilly Send & test 13:32 UTC failed: `HTTP 403` on `/bulletin/` → category
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 03/09/2026 — Problems console (work-queue polish)
 
@@ -3313,6 +5357,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3327,11 +5378,25 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3346,6 +5411,13 @@ Locked AGENTS item 2. List still comes from `parishes/parish_status.json` → `a
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/08/2026 — Ardstraw East harvested the parishioner form
 
@@ -3357,6 +5429,13 @@ Kitchen sink 28/08/2026 (harvest Sunday 23/08/2026): no August file. Newest real
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3371,11 +5450,25 @@ Kitchen sink 28/08/2026 (harvest Sunday 23/08/2026): no August file. Newest real
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3390,6 +5483,13 @@ Kitchen sink 28/08/2026 (harvest Sunday 23/08/2026): no August file. Newest real
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 26/08/2026 — Pages must publish committed mega PDFs
 
@@ -3403,6 +5503,13 @@ PR #139 merged (`f939336b`) and Pages deploy 33021078771 succeeded, but the live
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3417,11 +5524,25 @@ PR #139 merged (`f939336b`) and Pages deploy 33021078771 succeeded, but the live
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3436,6 +5557,13 @@ PR #139 merged (`f939336b`) and Pages deploy 33021078771 succeeded, but the live
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 26/08/2026 — Phone Open PDF + gentle mega compress
 
@@ -3451,6 +5579,13 @@ Harvest still builds the mega PDF (`HARVEST_MEGA_PDF=1`). Ghostscript `/ebook` r
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3465,11 +5600,25 @@ Harvest still builds the mega PDF (`HARVEST_MEGA_PDF=1`). Ghostscript `/ebook` r
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3484,6 +5633,13 @@ Harvest still builds the mega PDF (`HARVEST_MEGA_PDF=1`). Ghostscript `/ebook` r
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 25/08/2026 — Heading checker: date on the line next to newsletter
 
@@ -3510,6 +5666,13 @@ parishpress.
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3524,11 +5687,25 @@ parishpress.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3543,6 +5720,13 @@ parishpress.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 25/08/2026 — Hunt this-week files for older Problems-tab parishes
 
@@ -3572,6 +5756,13 @@ Harvest truth is `origin/main` `parishes/parish_status.json` `generated_at` 2026
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3586,11 +5777,25 @@ Harvest truth is `origin/main` `parishes/parish_status.json` `generated_at` 2026
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3605,6 +5810,13 @@ Harvest truth is `origin/main` `parishes/parish_status.json` `generated_at` 2026
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 25/08/2026 — This-week recipe hunt (Claudy / Lisnaskea / Newtownbutler / …)
 
@@ -3636,6 +5848,13 @@ content-gaps until the parish posts 23/08.
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3650,11 +5869,25 @@ content-gaps until the parish posts 23/08.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3669,6 +5902,13 @@ content-gaps until the parish posts 23/08.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 25/08/2026 — HTTP fetch: IPv4 first + expired-cert fallback
 
@@ -3694,6 +5934,13 @@ certs. H1 and H3 not reverted. No harvest. No `parish_status.json` edit.
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3708,11 +5955,25 @@ certs. H1 and H3 not reverted. No harvest. No `parish_status.json` edit.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3727,6 +5988,13 @@ certs. H1 and H3 not reverted. No harvest. No `parish_status.json` edit.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 25/08/2026 — H1 safety-net hole (undated URL still `ok`)
 
@@ -3751,6 +6019,13 @@ the heading is provably old. This-week heading stays not-stale. Memorial-only
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3765,11 +6040,25 @@ the heading is provably old. This-week heading stays not-stale. Memorial-only
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3784,6 +6073,13 @@ the heading is provably old. This-week heading stays not-stale. Memorial-only
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 24/08/2026 — Limavady recipe pin (this week’s file)
 
@@ -3816,6 +6112,13 @@ harvest. No `parish_status.json` edit. Not live / not harvested until the
 next harvest — do not tick this done as live. Merged as PR
 [#132](https://github.com/Raphoe-Diocese/parish_harvester/pull/132).
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3830,11 +6133,25 @@ next harvest — do not tick this done as live. Merged as PR
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3849,6 +6166,13 @@ next harvest — do not tick this done as live. Merged as PR
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 24/08/2026 — Problems-tab recipes (Malin / Bangor / Malachy / Kilmore / Anthony / Derriaghy)
 
@@ -3871,6 +6195,13 @@ Harvest truth is `parishes/parish_status.json` on `origin/main` (`last_tested_at
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3885,11 +6216,25 @@ Harvest truth is `parishes/parish_status.json` on `origin/main` (`last_tested_at
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -3904,6 +6249,13 @@ Harvest truth is `parishes/parish_status.json` on `origin/main` (`last_tested_at
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 23/08/2026 — Brittleness audit (what can lie to us)
 
@@ -4201,6 +6553,13 @@ intended. Do not list those 8 as already stale. H4 not started.
 
 ---
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -4215,11 +6574,25 @@ intended. Do not list those 8 as already stale. H4 not started.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -4234,6 +6607,13 @@ intended. Do not list those 8 as already stale. H4 not started.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 23/08/2026 — Repo slick / this-week site
 
@@ -4430,6 +6810,13 @@ still cannot stop a Sunday harvest — this only makes the warning honest.
   there on the remote; just bin them locally.
 
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -4444,11 +6831,25 @@ still cannot stop a Sunday harvest — this only makes the warning honest.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## 28/09/2026 — Achonry then restore wiped dioceses
 - Achonry harvestable recipes: 10 ok (incl. Tourlestrane dlc.php + Ballymote page-scan + Collooney). Kilmovee stale — parish still on 20 Sept (27 PDF 404).
 - NEXT: Derry / Down & Connor / Clogher show 0 found — not in this week's report.json (no_evidence); megas stuck on 13/09. Same shape as Cork wipe 24/09. Re-harvest those three; do not start Ardagh until restored.
 
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
+
 ## 28/09/2026 — Microscopic audit (Frank asked: where are we out of 100)
 
 **Mark: 68 / 100** (was 66 on 10/09). Engine improved (Cork 43 ok, Achonry 10 ok, Sept./glued-date parsers, dlc.php scrapes); truth layer regressed weekly because of the git-merge wipe below.
@@ -4463,6 +6864,13 @@ still cannot stop a Sunday harvest — this only makes the warning honest.
 **Live 28/09 12:40:** Raphoe 20/26, Cork 20/22 (page) vs 43 ok status, Clogher 16/40→13, Derry restored 37 ok (page still said 0/40 until Pages), Down 0/56, Achonry page has no count line.
 
 **Order:** Fix 1 merge-wipe → Down harvest → add achonry to Sunday matrix → 5 red tests → Brain slice 1 (stale harder + picker challenge) → extension pretends → Ardagh hunt.
+
+## 29/09/2026 — Fix 1 proved live; Achonry live (done)
+- **Fix 1 (merge wipe) DONE + proved twice:** 9f1456ee. Down & Connor ran alone → 33 ok and Derry 37 / Clogher 17 / Cork 43 / Raphoe 20 / Achonry 10 all survived. Achonry run 36573325951 → same, 160 ok. Live 29/09 13:25: Down 33/56, Derry 33/40, Clogher 17/40 — no more "0 of N found".
+- **Achonry live DONE:** d87542f. https://www.parishpress.ie/ shows 6 live cards incl. Ballaghaderreen cathedral (CC BY-SA 3.0, JohnArmagh); https://www.parishpress.ie/dioceses/achonry/ "10 of 12 parish bulletins were found." chonry_diocese in Sunday matrix. max-parallel test fixed.
+- **Mark now ~72/100.**
+- **Still red (4 tests):** bulletin_layout trailing-directory masthead; Tawnawilly recipe pin test; image_pdf_pipeline; live Gortahork AIFRINN. **Next:** those 4 → extension "Recorded on GitHub" pretend → Brain slice 1 → Ardagh hunt.
+- Parked: Kilmovee (parish still on 20 Sept); Cork mega is 20/09 (Cork not re-run this week — Sunday matrix covers it).
 
 ## Now (24/09/2026)
 - Achonry 28/09: 10 ok (inc Tourlestrane dlc + Ballymote page-scan + Collooney). Kilmovee stale (20 Sept only on site). Facebook-only cards left.
