@@ -1249,6 +1249,7 @@
         "parishes/down_and_connor_contacts.json",
         "parishes/raphoe_diocese_contacts.json",
         "parishes/cork_and_ross_contacts.json",
+        "parishes/achonry_diocese_contacts.json",
       ];
       for (const filePath of files) {
         try {
@@ -6918,7 +6919,7 @@
     (() => {
       const DIOCESE_CACHE_KEY = "ph_diocese_list_cache";
       const DIOCESE_CACHE_TTL_MS = 10 * 60 * 1000; // 10 minutes
-      const FALLBACK_DIOCESES = ["clogher", "cork_and_ross", "derry", "down_and_connor", "raphoe"];
+      const FALLBACK_DIOCESES = ["achonry", "clogher", "cork_and_ross", "derry", "down_and_connor", "raphoe"];
 
       const _mergeKnownDioceses = (list) => {
         const merged = new Set([
