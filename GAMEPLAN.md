@@ -1,3 +1,9 @@
+## 29/09/2026 night — Homepage A–Z + honest N/M (skip not in denominator)
+- **Homepage live cards + more-dioceses:** sorted A–Z by short name (was metropolitan / discovery order — Clogher then Cork… Achonry/Ardagh last). ``_CANONICAL_DIOCESES`` list also A–Z.
+- **N/M count:** ``build_diocese_week_summary`` no longer counts ``skip`` / Facebook / link-only recipes in *total*. They stay on the "share on Facebook or website" list. Proved locally: Ardagh **2/4** (was 2/40), Down & Connor **35/48** (was 35/83), Achonry 10/11, Raphoe 20/23. Tests: diocese_intro + landing (incl. live-card A–Z assert) green.
+- **Not live yet** until commit + push + Pages / site_builder run.
+- Armagh harvest still running/queued separately.
+
 ## 29/09/2026 night — Armagh onboarding pack (wired, not harvested)
 - Official directory 61 cards + kitchen-sink hosts. **10 harvest recipes** with this-week PDFs proved: armaghparish, clogherhead, carlingfordandomeath (Wix), saintpetersdrogheda, holyredeemer (verify date), monasterboice, termonmaguirc, whitecross, middlekilleavy, cooley (kitchen-sink site, not on card).
 - 51 link_only / skip (Facebook-only or no PDF proved). Evidence + contacts + recipes/armagh + dioceses.json + parish_status labels + harvest.yml choice + OCR contacts map. Stem ``armagh_diocese``. **Not on LIVE_DIOCESES / homepage until first harvest.**

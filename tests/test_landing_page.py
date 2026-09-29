@@ -1,5 +1,6 @@
 ﻿from __future__ import annotations
 
+import html
 import json
 import re
 import tempfile
@@ -109,6 +110,15 @@ class LandingPageTests(unittest.TestCase):
             self.assertIn("Cork and Ross Diocese", index_html)
             self.assertIn("Achonry Diocese", index_html)
             self.assertIn("Ardagh and Clonmacnoise Diocese", index_html)
+            # Live cards must be A–Z by short name (not discovery order).
+            live_headings = re.findall(
+                r'<article class="live-card">.*?<h2[^>]*>(.*?)</h2>',
+                index_html,
+                flags=re.S,
+            )
+            live_names = [html.unescape(re.sub(r"<[^>]+>", "", h)).strip() for h in live_headings]
+            self.assertEqual(live_names, sorted(live_names, key=str.casefold))
+            self.assertEqual(live_names[0], "Achonry Diocese")
             self.assertIn('class="is-long"', index_html)
             self.assertIn("white-space: nowrap", index_html)
             self.assertIn("Bulletins ready @ 16:00", index_html)

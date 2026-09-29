@@ -238,33 +238,34 @@ def _hero_slider_html() -> str:
   </section>"""
 
 
+# A–Z by short display name (Frank 29/09/2026: homepage must not be higgledy-piggledy).
 _CANONICAL_DIOCESES = [
+    "Achonry",
+    "Ardagh and Clonmacnoise",
     "Armagh",
-    "Dublin",
     "Cashel and Emly",
-    "Tuam",
     "Clogher",
     "Cloyne",
     "Cork and Ross",
     "Derry",
     "Down and Connor",
     "Dromore",
+    "Dublin",
     "Elphin",
     "Ferns",
     "Galway Kilmacduagh and Kilfenora",
     "Kerry",
     "Kildare and Leighlin",
+    "Kilfenora-and-Kilmacduagh",
     "Killala",
     "Killaloe",
+    "Kilmore",
     "Limerick",
     "Meath",
     "Ossory",
     "Raphoe",
+    "Tuam",
     "Waterford and Lismore",
-    "Achonry",
-    "Ardagh and Clonmacnoise",
-    "Kilmore",
-    "Kilfenora-and-Kilmacduagh",
 ]
 
 
@@ -843,10 +844,18 @@ def _landing_page(rows: list[dict[str, str]]) -> str:
     entirely driven by the same per-diocese rows (dot/status/updated)
     computed in :func:`run`.
     """
-    live_rows = [row for row in rows if row["key"] in LIVE_DIOCESES]
+    # Always A–Z by short diocese name — never leave live cards in metropolitan
+    # / discovery order (Frank 29/09/2026: "not higgle de piggledy").
+    def _az_name(row: dict[str, str]) -> str:
+        return _short_diocese_name(row.get("name") or "").casefold()
+
+    live_rows = sorted(
+        (row for row in rows if row["key"] in LIVE_DIOCESES),
+        key=_az_name,
+    )
     other_rows = sorted(
         (row for row in rows if row["key"] not in LIVE_DIOCESES),
-        key=lambda row: row["name"],
+        key=_az_name,
     )
 
     def _live_card(row: dict[str, str]) -> str:

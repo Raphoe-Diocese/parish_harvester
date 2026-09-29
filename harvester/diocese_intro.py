@@ -206,8 +206,11 @@ def build_diocese_week_summary(
 ) -> DioceseWeekSummary:
     """Count this week's bulletins from recipes + parish_status.
 
-    *total* is distinct parishes after alias collapse. *found* is
-    ``outcome == ok`` only — never a made-up fraction.
+    *total* is distinct harvestable parishes after alias collapse — skip /
+    Facebook / link-only recipes are listed under never_publish but do **not**
+    inflate the "N of M" denominator (Frank 29/09/2026: Down & Connor and
+    Ardagh must not look like 80+ or "2 of 40" when most rows are not PDF
+    targets). *found* is ``outcome == ok`` only — never a made-up fraction.
     """
     display = (diocese_display_name or "").strip() or (
         diocese_key.replace("_", " ").replace("-", " ").title() + " Diocese"
@@ -234,6 +237,21 @@ def build_diocese_week_summary(
         url = _http_url(str((row or {}).get("url") or recipe.get("start_url") or ""))
         outcome = str((row or {}).get("outcome") or "").strip().lower()
         skipped = bool(recipe.get("skip")) or outcome == "skipped"
+        if skipped:
+            # Link-only / Facebook — still named on the page, not part of M.
+            contact = contacts.get(key) if isinstance(contacts.get(key), dict) else {}
+            summary.never_publish.append(
+                NamedLink(
+                    name=name,
+                    url=share_url(
+                        row or {},
+                        recipe,
+                        contact_facebook=str((contact or {}).get("facebook") or ""),
+                        contact_website=str((contact or {}).get("website") or ""),
+                    ),
+                )
+            )
+            continue
         summary.total += 1
         if outcome == "ok":
             summary.found += 1
@@ -253,19 +271,6 @@ def build_diocese_week_summary(
                 )
             )
             continue
-        if skipped:
-            contact = contacts.get(key) if isinstance(contacts.get(key), dict) else {}
-            summary.never_publish.append(
-                NamedLink(
-                    name=name,
-                    url=share_url(
-                        row or {},
-                        recipe,
-                        contact_facebook=str((contact or {}).get("facebook") or ""),
-                        contact_website=str((contact or {}).get("website") or ""),
-                    ),
-                )
-            )
 
     summary.never_publish.sort(key=lambda item: item.name.lower())
     summary.stale.sort(key=lambda item: item.name.lower())
