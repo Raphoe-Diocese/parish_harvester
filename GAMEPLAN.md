@@ -1,3 +1,7 @@
+## 29/09/2026 night — Homepage 5 cards per row
+- Frank: main parishpress.ie live grid should be **5** across, not 4. Changed ``.live-grid`` in generator + ``docs/index.html``. Tablet 2 / phone 1 unchanged.
+- **Not live yet** until commit + push + Pages.
+
 ## 29/09/2026 night — Ardagh N/M back to diocese size (not 2/4)
 - Frank: Ardagh has far more than 4 parishes. Reverted skip-out-of-denominator.
 - ``build_diocese_week_summary`` *total* again includes skip / Facebook / link-only rows (still never_publish; *found* = ok only).

@@ -54,7 +54,11 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 
 ## Still open (do not pretend these are finished)
 
-- [ ] **todo** · 2026-09-29 · Homepage live cards even height (stretch + buttons at bottom). Generator + `docs/index.html` edited. **Not live yet** until commit + push + Pages. · `harvester/site_builder.py`, `docs/index.html`
+- [ ] **doing** · 2026-09-29 · Homepage live grid **5 cards per row** (was 4). Generator + `docs/index.html`. Tablet still 2 / phone 1. **Not live yet** until push + Pages. · `harvester/site_builder.py`, `docs/index.html`
+
+- [x] **done** · 2026-09-29 · Homepage N/M: skip rows back in denominator (Frank: Ardagh is not 2/4). Local **2/40**. Commit `5dddbb8c`. **Not live-proved** until Pages after that push. · `harvester/diocese_intro.py`, `docs/index.html`
+
+- [x] **done** · 2026-09-29 · Homepage live cards even height (stretch + buttons at bottom). Live-proved 29/09 on https://www.parishpress.ie/ after `9245037e` + Pages [36626163716](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/36626163716). Cards A–Z (Achonry first). N/M later corrected to include skip in M (see row above). · `harvester/site_builder.py`, `docs/index.html`
 
 - [x] **done** · 2026-09-23 · Cork & Ross on parishpress.ie: LIVE_DIOCESES + cathedral photo + diocese viewer + Sunday matrix. Also 24/09: removed hero white dots; short unfinished note on every diocese intro; restored report/status after Cork-only harvest wiped other dioceses to “0 of N found”; single-diocese harvest now patches report. PR [#248](https://github.com/Raphoe-Diocese/parish_harvester/pull/248) merge `55b98e5` + Pages [36015882661](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/36015882661). Live-proved 24/09: homepage has Cork card + Cork cathedral hero slide, no `hero-dots`; Raphoe shows **21 of 26** found + unfinished note. · `harvester/site_builder.py`, `harvester/diocese_intro.py`, `main.py`, `docs/dioceses/`, `docs/index.html`
 
