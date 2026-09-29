@@ -746,8 +746,11 @@ def collapse_ocr_spacing(text: str) -> str:
     # lowercase glued to Capital mid-sentence: themO
     # Second class is ASCII capitals + Latin capitals only (not à-ÿ via À-Ÿ range).
     cleaned = re.sub(r"([a-zà-ÿ])([A-Z])", r"\1 \2", cleaned)
-    # Missing space after . , ; : before a letter: me.Water / s,hearme
-    cleaned = re.sub(r"([.,:;])([A-Za-zÀ-ÿ])", r"\1 \2", cleaned)
+    # Missing space after , ; : before a letter: s,hearme
+    cleaned = re.sub(r"([,;:])([A-Za-zÀ-ÿ])", r"\1 \2", cleaned)
+    # Period before a Capital only (sentence end). Do NOT split domain TLDs
+    # like parish.website / stmarysonthehill.online (Frank harvest gate 29/09).
+    cleaned = re.sub(r"\.([A-ZÀ-Ÿ])", r". \1", cleaned)
     # Trailing letter of a broken word: burie d / Kilcloone y / Sunda y / classe s.
     # Only join common *suffix* letters. Never join w/a/i/o/u (start of who/was/and/…).
     cleaned = re.sub(
@@ -803,7 +806,8 @@ def collapse_ocr_spacing(text: str) -> str:
     # camelCase split (themO) but keep McGill / MacBride together
     cleaned = re.sub(r"([a-zà-ÿ])([A-Z])", r"\1 \2", cleaned)
     cleaned = re.sub(r"\b(Mc|Mac|MC)\s+([A-ZÀ-Ÿ])", r"\1\2", cleaned)
-    cleaned = re.sub(r"([.,:;])([A-Za-zÀ-ÿ])", r"\1 \2", cleaned)
+    cleaned = re.sub(r"([,;:])([A-Za-zÀ-ÿ])", r"\1 \2", cleaned)
+    cleaned = re.sub(r"\.([A-ZÀ-Ÿ])", r". \1", cleaned)
     # who was / passed away style glues still left as one token
     cleaned = re.sub(r"\bwhowas\b", "who was", cleaned, flags=re.I)
     cleaned = re.sub(r"\bpassedawayon\b", "passed away on", cleaned, flags=re.I)

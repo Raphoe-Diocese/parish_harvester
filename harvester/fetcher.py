@@ -19,7 +19,7 @@ from datetime import date, timedelta
 from pathlib import Path
 from typing import Optional
 from urllib.parse import parse_qs, unquote, urljoin, urlparse
-from urllib.request import Request, urlopen
+from urllib.request import Request, url2pathname, urlopen
 
 from playwright.async_api import (
     Browser,
@@ -954,7 +954,8 @@ async def _download_image_bytes(url: str, page: Page | None = None) -> bytes:
         # Local JPEGs (image-stack unit test) are file:// or a bare path.
         # The shared HTTP helper does IPv4 DNS/connect and is http/https only.
         if scheme == "file":
-            return Path(unquote(parsed.path)).read_bytes()
+            # Windows file:///C:/… needs url2pathname (bare Path keeps a leading /).
+            return Path(url2pathname(unquote(parsed.path))).read_bytes()
         if not scheme:
             return Path(url).read_bytes()
         if scheme in {"http", "https"}:

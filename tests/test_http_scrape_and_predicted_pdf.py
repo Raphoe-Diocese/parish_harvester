@@ -497,15 +497,19 @@ class PermanentBulletinUrlTests(unittest.TestCase):
         recipe = json.loads(
             Path("parishes/recipes/raphoe/tawnawillyparish.json").read_text()
         )
-        pdf = "https://tawnawillyparish.ie/wp-content/uploads/Sunday-13th-Sept-26.pdf"
+        pdf = str(recipe.get("example_url") or "")
+        self.assertTrue(pdf.endswith(".pdf"))
+        self.assertIn("/Sunday-", pdf)
         self.assertNotEqual(recipe["start_url"], "https://tawnawillyparish.ie/bulletin/")
         self.assertEqual(recipe["site_type"], "predicted_dated_pdf")
         self.assertIn("sunday", recipe["href_patterns"])
         self.assertEqual(recipe["example_url"], pdf)
         self.assertEqual(recipe["steps"][0]["url"], pdf)
         self.assertEqual(_recipe_recorded_file_urls(recipe), [pdf])
+        # Freshness uses the recipe's recorded Sunday — do not pin last week's URL in the test.
+        recorded = date.fromisoformat(str(recipe.get("recorded_date") or "2026-09-27"))
         self.assertEqual(
-            _recipe_fresh_recorded_file_urls(recipe, date(2026, 9, 13)),
+            _recipe_fresh_recorded_file_urls(recipe, recorded),
             [pdf],
         )
 

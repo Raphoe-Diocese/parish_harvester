@@ -316,6 +316,10 @@ def _is_url_only_line(plain: str) -> bool:
     text = (plain or "").strip().rstrip("/")
     if not text:
         return False
+    # Spacing cleanup may leave "parish. website" — glue dotted TLDs for the check.
+    text = re.sub(r"\.\s+([A-Za-z]{2,})\b", r".\1", text)
+    if text.lower().startswith(("http://", "https://", "www.")):
+        text = re.sub(r"\s+", "", text)
     if _URL_ONLY.match(text):
         return True
     compact = text.lower().replace("https://", "").replace("http://", "").rstrip(".")
