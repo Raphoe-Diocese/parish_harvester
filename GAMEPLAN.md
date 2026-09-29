@@ -1,4 +1,10 @@
-﻿# GAMEPLAN
+## 29/09/2026 night — Brain 1b (picker challenge) shipped
+- **Referee Brain slice 1b DONE (code + unit tests):** if a recipe pin / predicted dated URL is older than a dated PDF on the listing, harvest re-picks the listing file and logs `picker_wrong` — does not quietly put the stale pin into mega/OCR. Equal dates keep the pin. Far-ahead / empty listing keep the pin. Cloudflare listing miss keeps the pin (predicted_dated_pdf still works).
+- Files: `harvester/picker_challenge.py`, wired in `harvester/replay.py` (predicted_dated_pdf path + recipe document fallbacks), `tests/test_picker_challenge.py` (5/5 green with freshness suite).
+- **Not live-proved on a harvest yet** — needs a pin-vs-listing miss on Actions. Click-memory + Guess-date still later.
+- **Next:** Armagh kitchen-sink (not directory cards alone) → then 4 red tests. Mark ~75/100.
+
+# GAMEPLAN
 
 The one list for everything that is **not** a website/OCR page job and **not** the
 locked harvester product order.

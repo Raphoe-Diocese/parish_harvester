@@ -2117,6 +2117,77 @@ async def _try_predicted_dated_pdf(
     return None
 
 
+async def _challenge_pin_against_listing(
+    pin_url: str,
+    pin_kind: str,
+    dest: Path,
+    *,
+    listing_url: str,
+    target_date: date,
+    href_patterns: list[str] | None = None,
+) -> tuple[str, str]:
+    """Referee Brain 1b: if listing has a newer dated PDF than *pin_url*, re-pick it.
+
+    Pin bytes are already on *dest*. On challenge success, *dest* is overwritten
+    with the listing winner. Listing fetch failures keep the pin (Cloudflare /
+    dead listing must not break predicted_dated_pdf).
+    """
+    listing = (listing_url or "").strip()
+    if not listing or not pin_url:
+        return pin_url, pin_kind
+
+    patterns = [
+        str(p).strip().lower()
+        for p in (href_patterns or [])
+        if str(p).strip()
+    ] or ["bulletin", "newsletter", ".pdf"]
+
+    listing_html = ""
+    listing_fetched_from = listing
+    for candidate in _mdocs_listing_url_candidates(listing):
+        listing_result = await asyncio.to_thread(
+            _fetch_bytes_with_retries,
+            candidate,
+            max_attempts=2,
+            per_attempt_timeout_s=8.0,
+            total_budget_s=12.0,
+        )
+        if not listing_result:
+            continue
+        listing_body, listing_headers = listing_result
+        if "text/html" not in (listing_headers.get("content-type") or "").lower():
+            continue
+        listing_html = listing_body.decode("utf-8", errors="ignore")
+        listing_fetched_from = candidate
+        break
+    if not listing_html:
+        return pin_url, pin_kind
+
+    listing_pairs = _extract_matching_href_texts(
+        listing_html, listing_fetched_from, patterns
+    )
+    hrefs = [href for href, _text in listing_pairs]
+    labels = {href: text for href, text in listing_pairs if text}
+    scored = _score_http_scrape_pdf_hrefs(hrefs, target_date, labels=labels)
+
+    from .picker_challenge import challenge_pin_against_listing
+
+    verdict = challenge_pin_against_listing(pin_url, scored, target_date)
+    if not verdict.challenged:
+        return pin_url, pin_kind
+
+    print(f"  ⚖️  {verdict.reason}")
+    replaced = await _try_http_document_url(verdict.chosen_url, dest)
+    if not replaced:
+        # Listing pointed at a newer URL we could not download — keep pin.
+        print(
+            f"  ↩️  picker_wrong download failed for {verdict.chosen_url}; "
+            "keeping recipe pin"
+        )
+        return pin_url, pin_kind
+    return replaced
+
+
 async def _try_http_recipe_document_fallbacks(
     recipe: dict,
     dest: Path,
@@ -2126,7 +2197,33 @@ async def _try_http_recipe_document_fallbacks(
 
     Harvest 07/09/2026 raised on Tawnawilly wp-json and never fetched
     Sunday-Sept-06-26.pdf which was already on the recipe.
+
+    Referee Brain 1b: before accepting a pin, challenge the listing for a
+    newer dated PDF (do not quietly harvest last month's pin into mega/OCR).
     """
+    listing_url = _recipe_start_url(recipe)
+    href_patterns = [
+        str(p).strip().lower()
+        for p in (recipe.get("href_patterns") or [])
+        if str(p).strip()
+    ]
+
+    async def _accept_pin(found: tuple[str, str]) -> tuple[str, str]:
+        pin_url, pin_kind = found
+        if target_date is None or not listing_url:
+            return found
+        # Do not challenge a pin against itself when start_url *is* the PDF.
+        if _looks_like_direct_document_url(listing_url):
+            return found
+        return await _challenge_pin_against_listing(
+            pin_url,
+            pin_kind,
+            dest,
+            listing_url=listing_url,
+            target_date=target_date,
+            href_patterns=href_patterns or None,
+        )
+
     if target_date is not None:
         example_url = _recipe_example_document_url(recipe)
         if example_url:
@@ -2138,11 +2235,11 @@ async def _try_http_recipe_document_fallbacks(
                 weeks_ahead=int(recipe.get("weeks_ahead") or 0),
             )
             if predicted:
-                return predicted
+                return await _accept_pin(predicted)
     for url in _recipe_fresh_recorded_file_urls(recipe, target_date):
         found = await _try_http_document_url(url, dest)
         if found:
-            return found
+            return await _accept_pin(found)
     return None
 
 
@@ -4204,6 +4301,8 @@ async def replay_recipe(
     # Listing/index is Cloudflare-challenged; dated wp-content/uploads files
     # are not. Predict this Sunday and a few previous Sundays and fetch
     # directly. Never navigate to the challenged HTML page.
+    # Referee Brain 1b: when start_url is a *listing* (not the PDF itself),
+    # challenge the pin against whatever the listing currently shows.
     if (
         site_type in {"predicted_dated_pdf", "dated_pdf_path"}
         and target_date is not None
@@ -4219,7 +4318,26 @@ async def replay_recipe(
             weeks_ahead=weeks_ahead,
         )
         if found:
-            return dest, found[1], found[0]
+            pin_url, pin_kind = found
+            href_patterns = [
+                str(p).strip().lower()
+                for p in (recipe.get("href_patterns") or [])
+                if str(p).strip()
+            ]
+            listing_for_challenge = start_url
+            if (
+                listing_for_challenge
+                and not _looks_like_direct_document_url(listing_for_challenge)
+            ):
+                pin_url, pin_kind = await _challenge_pin_against_listing(
+                    pin_url,
+                    pin_kind,
+                    dest,
+                    listing_url=listing_for_challenge,
+                    target_date=target_date,
+                    href_patterns=href_patterns or None,
+                )
+            return dest, pin_kind, pin_url
         fallback = await _try_http_recipe_document_fallbacks(recipe, dest, target_date)
         if fallback:
             return dest, fallback[1], fallback[0]
