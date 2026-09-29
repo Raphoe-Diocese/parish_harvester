@@ -8,6 +8,7 @@ import unittest
 from pathlib import Path
 
 from harvester.mega_pdf_git import (
+    in_rebase,
     continue_git_integration,
     harvest_side_flag,
     is_generated_harvest_output,
@@ -321,6 +322,41 @@ class MegaPdfGitConflictTests(unittest.TestCase):
         self.assertIn("enniskillen", keys)
         self.assertNotIn("iskaheenparish", keys)
         self.assertEqual(diocese_parish_keys("all"), set())
+
+    def test_untracked_generated_pdf_does_not_block_rebase(self) -> None:
+        """29/09/2026 Ardagh run 36587352242: main already tracked
+        docs/mega_pdf/ardagh_mega_bulletin.pdf; the harvest had the same path
+        untracked, so `git rebase` aborted with "untracked working tree files
+        would be overwritten by checkout" and the run failed."""
+        _git(self.root, "checkout", "-b", "harvest")
+        (self.root / "parishes").mkdir(exist_ok=True)
+        (self.root / "parishes" / "parish_status.json").write_text("{}", encoding="utf-8")
+        _git(self.root, "add", "-A")
+        _git(self.root, "commit", "-m", "harvest status")
+        # Untracked mega the harvest just wrote (S2: PDFs are not committed).
+        _write_pdf(self.root / "docs" / "mega_pdf" / "ardagh_mega_bulletin.pdf", b"HARVEST-NEW")
+
+        # main gains a tracked copy of the same path (committed from a temp
+        # branch so the harvest worktree's untracked file never moves).
+        (self.root / "docs" / "mega_pdf" / "ardagh_mega_bulletin.pdf").unlink()
+        _git(self.root, "checkout", "main")
+        _write_pdf(self.root / "docs" / "mega_pdf" / "ardagh_mega_bulletin.pdf", b"MAIN-TRACKED")
+        _git(self.root, "add", "-A")
+        _git(self.root, "commit", "-m", "main tracks the mega")
+        _git(self.root, "checkout", "harvest")
+        # Harvest worktree: the same path exists but is untracked here.
+        _write_pdf(self.root / "docs" / "mega_pdf" / "ardagh_mega_bulletin.pdf", b"HARVEST-NEW")
+        plain = _git(self.root, "rebase", "main", check=False)
+        self.assertNotEqual(plain.returncode, 0)
+        self.assertIn("untracked working tree files", plain.stdout + plain.stderr)
+        _git(self.root, "rebase", "--abort", check=False)
+
+        rebase_keeping_harvest_megas(self.root, "main")
+
+        log = _git(self.root, "log", "--oneline").stdout
+        self.assertIn("harvest status", log)
+        self.assertIn("main tracks the mega", log)
+        self.assertFalse(in_rebase(self.root))
 
     def test_full_harvest_rebase_still_keeps_whole_file(self) -> None:
         old = "2026-09-10T12:53:56+00:00"

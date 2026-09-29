@@ -303,6 +303,48 @@ def snapshot_harvest_outputs(repo: Path, dest: Path) -> list[str]:
     return copied
 
 
+def untracked_generated_outputs(repo: Path) -> list[str]:
+    """Untracked worktree files that are generated harvest outputs."""
+    out = _run_git(repo, ["ls-files", "--others", "--exclude-standard"]).stdout
+    paths = [line.strip().replace("\\", "/") for line in out.splitlines() if line.strip()]
+    return [path for path in paths if is_generated_harvest_output(path)]
+
+
+def park_untracked_generated_outputs(repo: Path) -> list[str]:
+    """Delete untracked generated outputs so a rebase checkout cannot trip on them.
+
+    Callers must have snapshotted first; ``restore_parked_outputs`` puts the
+    files back once the rebase is finished.
+    """
+    parked = untracked_generated_outputs(repo)
+    for rel in parked:
+        try:
+            (repo / rel).unlink()
+        except OSError:
+            pass
+    if parked:
+        print("Parked untracked harvest outputs for rebase: " + ", ".join(parked))
+    return parked
+
+
+def restore_parked_outputs(repo: Path, snapshot: Path, parked: list[str]) -> list[str]:
+    """Copy parked generated outputs back from the snapshot (skip tracked paths)."""
+    restored: list[str] = []
+    if not parked:
+        return restored
+    tracked = set(
+        line.strip().replace("\\", "/")
+        for line in _run_git(repo, ["ls-files"]).stdout.splitlines()
+        if line.strip()
+    )
+    for rel in parked:
+        if rel in tracked:
+            continue
+        if _copy_repo_file(snapshot, repo, rel):
+            restored.append(rel)
+    return restored
+
+
 def _resolve_conflicts_for(
     repo: Path,
     *,
@@ -412,12 +454,19 @@ def rebase_keeping_harvest_megas(
     snapshot_dir = Path(tempfile.mkdtemp(prefix="harvest-outputs-"))
     try:
         snapshot_harvest_outputs(repo, snapshot_dir)
+        # Untracked generated files (Bulletins/<key>.pdf, mega PDFs) that
+        # origin/main now tracks make `git rebase` refuse with "untracked
+        # working tree files would be overwritten by checkout" (Ardagh
+        # 29/09/2026 run 36587352242). They are in the snapshot; clear them
+        # so the rebase can run, then put this harvest's copies back.
+        parked = park_untracked_generated_outputs(repo)
         result = _run_git(
             repo,
             ["rebase", "--autostash", remote_ref],
             check=False,
         )
         if result.returncode == 0:
+            restore_parked_outputs(repo, snapshot_dir, parked)
             return
         if result.stdout:
             print(result.stdout, end="")
@@ -442,6 +491,7 @@ def rebase_keeping_harvest_megas(
             + ", ".join(resolved)
         )
         continue_git_integration(repo)
+        restore_parked_outputs(repo, snapshot_dir, parked)
     finally:
         shutil.rmtree(snapshot_dir, ignore_errors=True)
 
