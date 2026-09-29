@@ -1,3 +1,21 @@
+## 29/09/2026 night — Ardagh N/M back to diocese size (not 2/4)
+- Frank: Ardagh has far more than 4 parishes. Reverted skip-out-of-denominator.
+- ``build_diocese_week_summary`` *total* again includes skip / Facebook / link-only rows (still never_publish; *found* = ok only).
+- Local proved: Ardagh **2/40**, Down **35/81**, Achonry 10/12. Regenerated ``docs/index.html`` only. Tests green.
+- **Not live yet** until this commit + push + Pages.
+
+## 29/09/2026 night — 4 red tests fixed (Armagh harvest unblocked)
+- **Trailing directory masthead:** `collapse_ocr_spacing` was splitting `parish.website` → `parish. website`, so Portstewart stayed as a fake masthead. Period-before-Capital only; `_is_url_only_line` glues dotted TLDs.
+- **Image PDF test:** Windows `file://` needs `url2pathname` in `_download_image_bytes`.
+- **Tawnawilly test:** assert against recipe `example_url` / `recorded_date` (was stuck on 13 Sept).
+- **Gortahork live OCR test:** case-insensitive Aifrinn; drop Donnchadh pin (slice text moves).
+- Pushed + re-dispatched ``armagh_diocese`` harvest. **Not live-proved** until that run finishes.
+
+## 29/09/2026 night — Homepage regenerate (A–Z + honest N/M actually in HTML)
+- Proved live still Clogher-first and Down **35/83** / Ardagh **2/40** after even-cards push — CSS stretch was in `docs/index.html` but card order/counts were never rewritten.
+- Regenerated **only** `docs/index.html` (not all diocese pages). **Live-proved** 29/09 after `9245037e` + Pages [36626163716](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/36626163716): Achonry → Ardagh → Clogher → Cork → Derry → Down & Connor → Raphoe; Ardagh **2/4**, Down **35/48**.
+- **Next (A–Z hunt):** Armagh harvest failed on the 4 red tests gate — fix those or re-dispatch after. Then Cashel & Emly.
+
 ## 29/09/2026 night — Shared-URL doubles (scan follow-up)
 - Recipe scan found two active pairs on the same bulletin URL. Fixed:
   - **Galloon** → alias of **Newtownbutler (Galloon)** (galloonparish.com)

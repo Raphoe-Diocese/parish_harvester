@@ -110,12 +110,12 @@ class DioceseIntroTests(unittest.TestCase):
                 recipes_root=Path(tmp),
                 parish_status=status,
             )
-            self.assertEqual(summary.total, 2)
+            self.assertEqual(summary.total, 3)
             self.assertEqual(summary.found, 1)
             self.assertEqual([item.name for item in summary.never_publish], ["Mevagh"])
             self.assertEqual([item.name for item in summary.stale], ["Stranolar"])
             html = render_diocese_intro_html(summary)
-            self.assertIn("1 of 2 parish bulletins were found", html)
+            self.assertIn("1 of 3 parish bulletins were found", html)
             self.assertIn("This page is unfinished", html)
             self.assertIn("intro-wip", html)
             self.assertIn("Mevagh", html)

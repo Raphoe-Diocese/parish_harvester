@@ -206,11 +206,11 @@ def build_diocese_week_summary(
 ) -> DioceseWeekSummary:
     """Count this week's bulletins from recipes + parish_status.
 
-    *total* is distinct harvestable parishes after alias collapse — skip /
-    Facebook / link-only recipes are listed under never_publish but do **not**
-    inflate the "N of M" denominator (Frank 29/09/2026: Down & Connor and
-    Ardagh must not look like 80+ or "2 of 40" when most rows are not PDF
-    targets). *found* is ``outcome == ok`` only — never a made-up fraction.
+    *total* is every distinct parish after alias collapse (including
+    Facebook / link-only skip rows). Frank 29/09/2026 night: Ardagh is not
+    "2/4" — the diocese has ~40 parishes; skip rows still belong in M.
+    *found* is ``outcome == ok`` only — never a made-up fraction. Skip rows
+    still list under never_publish for the Facebook/website note.
     """
     display = (diocese_display_name or "").strip() or (
         diocese_key.replace("_", " ").replace("-", " ").title() + " Diocese"
@@ -237,8 +237,8 @@ def build_diocese_week_summary(
         url = _http_url(str((row or {}).get("url") or recipe.get("start_url") or ""))
         outcome = str((row or {}).get("outcome") or "").strip().lower()
         skipped = bool(recipe.get("skip")) or outcome == "skipped"
+        summary.total += 1
         if skipped:
-            # Link-only / Facebook — still named on the page, not part of M.
             contact = contacts.get(key) if isinstance(contacts.get(key), dict) else {}
             summary.never_publish.append(
                 NamedLink(
@@ -252,7 +252,6 @@ def build_diocese_week_summary(
                 )
             )
             continue
-        summary.total += 1
         if outcome == "ok":
             summary.found += 1
             continue
