@@ -1,3 +1,8 @@
+## 30/09/2026 night — Armagh go (harvest gate)
+- Armagh harvest died on the **test gate**, not on recipes: Tyholland/Galloon alias collapse left two asserts expecting them still harvestable.
+- Fixed: ``test_clogher_diocese`` (tyholland inactive + ``alias_of`` monaghanrackwallace) and ``test_seven_orphan…`` (galloon skip + alias of newtownbutler).
+- Re-dispatch ``armagh_diocese`` harvest after push. **Not on homepage / LIVE_DIOCESES until that run succeeds** (mega + status).
+
 ## 30/09/2026 evening — Homepage back to 4 across; Armagh / Ardagh truth
 - Frank: put live cards back to **4** across (undo 5). Done in generator + ``docs/index.html``. **Not live yet** until push + Pages.
 - **Armagh:** still not on homepage — not in ``LIVE_DIOCESES``. Last ``armagh_diocese`` harvest run failed (36627724573). No live card until a successful harvest + LIVE list.

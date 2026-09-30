@@ -142,9 +142,9 @@ https://www.antrimparish.com
                 / "lisnaskeamaguiresbridgeparish.json"
             ).read_text(encoding="utf-8")
         )
-        # Frank retrained Galloon in the Trainer 12/09/2026 (push_recipe):
-        # it is a live recipe on galloonparish.com, no longer a skipped alias.
-        self.assertFalse(galloon.get("skip"))
+        # Galloon shares Newtownbutler bulletin — harvest once under newtownbutler.
+        self.assertTrue(galloon.get("skip"))
+        self.assertEqual(galloon.get("alias_of"), "newtownbutler")
         self.assertIn("galloonparish.com", galloon.get("start_url", ""))
         self.assertTrue(lisnaskea.get("skip"))
         self.assertEqual(lisnaskea.get("alias_of"), "lisnaskeamaguiresbridge")
