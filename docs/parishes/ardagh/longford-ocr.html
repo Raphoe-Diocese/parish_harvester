@@ -1,0 +1,642 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=5" />
+  <title>Longford (Templemichael) Text Bulletin — 30/09/2026</title>
+  <link rel="icon" type="image/png" href="/favicon.png" />
+  <link rel="apple-touch-icon" href="/apple-touch-icon.png" />
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+      background: #eef1f0;
+      color: #1a1f1e;
+      line-height: 1.65;
+      font-size: 1.125rem;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      overflow-x: hidden;
+    }
+    a { color: #1a6b6b; text-decoration: underline; font-weight: 600; }
+    .page {
+      max-width: min(72ch, 100%);
+      margin: 0 auto;
+      padding: 14px 18px 40px;
+    }
+    .top {
+      display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between;
+      gap: 8px 14px;
+      margin-bottom: 12px;
+    }
+    .top-left { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 14px; }
+    .back-link {
+      font-size: 0.9rem; font-weight: 700;
+      color: #14524f; text-decoration: none;
+    }
+    .title-line {
+      font-size: 1rem; font-weight: 700; color: #1a1f1e;
+    }
+    .font-size-controls { display: none; }
+    
+    .ocr-sticky-chrome {
+      position: relative;
+      top: auto;
+      z-index: 8;
+      background: #eef1f0;
+      padding: 8px 0 10px;
+      margin: 0 0 8px;
+    }
+    .ocr-sticky-chrome.is-searching {
+      position: sticky;
+      top: 0;
+    }
+    .ocr-sticky-chrome .ocr-zoom-bar {
+      position: relative;
+      top: auto;
+    }
+    html.is-ocr-searching { scroll-padding-top: 10rem; }
+    mark.search-active { scroll-margin-top: 10rem; }
+    
+    
+    .scroll-top-btn {
+      position: fixed;
+      right: 16px;
+      bottom: 20px;
+      z-index: 9999;
+      width: 46px;
+      height: 46px;
+      border: 0;
+      border-radius: 999px;
+      background: #1a6b6b;
+      color: #fff;
+      font-size: 1.35rem;
+      line-height: 1;
+      cursor: pointer;
+      box-shadow: 0 4px 14px rgba(17, 75, 75, 0.28);
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(8px);
+      transition: opacity 160ms ease, transform 160ms ease;
+    }
+    .scroll-top-btn.is-visible {
+      opacity: 1;
+      pointer-events: auto;
+      transform: none;
+    }
+    .scroll-top-btn:focus-visible {
+      outline: 3px solid #14524f;
+      outline-offset: 2px;
+    }
+    @media (prefers-reduced-motion: reduce) {
+      .scroll-top-btn { transition: none; }
+    }
+    
+    .ocr-zoom-bar {
+      display: flex; justify-content: center; align-items: center; gap: 8px;
+      margin: 0 0 10px; padding: 6px 10px;
+      background: rgba(255, 255, 255, 0.92);
+      border: 1px solid #d4ddd9; border-radius: 8px;
+    }
+    .ocr-zoom-bar button {
+      min-width: 40px; min-height: 40px; border: 1px solid #1a6b6b; border-radius: 6px;
+      background: #fff; color: #1a6b6b; font-weight: 700; font-size: 1.1rem; cursor: pointer;
+      line-height: 1;
+    }
+    .ocr-zoom-pct {
+      min-width: 3.25rem; text-align: center; font-weight: 700; font-size: 0.9rem; color: #14524f;
+    }
+    .ocr-zoom-hint { display: none; font-size: 0.75rem; color: #5a6a68; }
+    @media (pointer: coarse) { .ocr-zoom-hint { display: inline; margin-left: 4px; } }
+    
+    .ocr-body {
+      background: #eef1f0;
+      color: #1a1f1e;
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: calc(1.125rem * var(--ocr-scale, 1));
+      line-height: 1.65;
+      max-width: min(72ch, 100%);
+      margin-left: auto;
+      margin-right: auto;
+      overflow-x: hidden;
+      overflow-wrap: anywhere;
+      word-wrap: break-word;
+      hyphens: auto;
+      -webkit-text-size-adjust: 100%;
+      text-size-adjust: 100%;
+      touch-action: pan-x pan-y pinch-zoom;
+    }
+    .ocr-body h1, .ocr-body h2 {
+      color: #14524f;
+      margin: 1.35em 0 0.45em;
+      font-weight: 700;
+      font-size: 1.22em;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h2.b-title, .ocr-body .b-title {
+      font-size: 1.28em;
+      color: #0f2b5b;
+      border-bottom: 2px solid #c5d0c9;
+      padding-bottom: 0.18em;
+      margin-top: 1.5em;
+    }
+    .ocr-body h3.b-head, .ocr-body .b-head {
+      font-size: 1.15em;
+      color: #0f3d3d;
+      margin: 1.35em 0 0.45em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      font-weight: 700;
+      line-height: 1.3;
+      max-width: 100%;
+    }
+    .ocr-body h4.b-sub, .ocr-body .b-sub {
+      font-size: 1.04em;
+      color: #1f6f4a;
+      margin: 0.95em 0 0.3em;
+    }
+    .ocr-body h3, .ocr-body h4 {
+      color: #1a6b6b;
+      margin: 1.1em 0 0.35em;
+      font-weight: 700;
+      line-height: 1.35;
+      max-width: 100%;
+    }
+    .ocr-body p {
+      margin: 0 0 0.85em;
+    }
+    .ocr-body h3.ocr-page-heading,
+    .ocr-body .page-label {
+      font-size: 0.78rem;
+      font-weight: 700;
+      letter-spacing: 0.06em;
+      text-transform: uppercase;
+      margin: 1.6em 0 0.55em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body p {
+      margin: 0 0 0.9em;
+      max-width: 100%;
+    }
+    .ocr-body hr {
+      border: 0;
+      border-top: 1px solid #d4ddd9;
+      margin: 1.35em 0;
+    }
+    .ocr-body strong { color: #0f2b5b; }
+    .ocr-body a {
+      color: #1a6b6b;
+      font-weight: 600;
+      overflow-wrap: anywhere;
+    }
+    .ocr-body mark {
+      background: #fef08a;
+      padding: 1px 3px;
+      border-radius: 2px;
+    }
+    .ocr-body mark.search-active {
+      background: #fde047;
+      outline: 2px solid #0f5e5e;
+    }
+    .ocr-body table.b-table {
+      border-collapse: collapse;
+      width: 100%;
+      max-width: 100%;
+      margin: 0.55em 0 1em;
+      font-size: 0.95em;
+      display: block;
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+    }
+    .ocr-body table.b-table td, .ocr-body table.b-table th {
+      border: 1px solid #c9d4cf;
+      padding: 6px 10px;
+      text-align: left;
+      vertical-align: top;
+    }
+    .ocr-body table.b-table th {
+      background: #e4ebe8;
+      color: #0f2b5b;
+    }
+    .ocr-body table.b-table tr:nth-child(even) td {
+      background: #f7f9f8;
+    }
+    .ocr-body img, .ocr-body iframe, .ocr-body video {
+      max-width: 100%;
+      height: auto;
+    }
+    .ocr-body > :first-child {
+      margin-top: 0;
+    }
+    
+    .ocr-body .ocr-parish-masthead {
+      margin: 2.1em 0 1.15em;
+      padding: 0.85em 0 0.7em;
+      border-top: 3px solid #14524f;
+      border-bottom: 1px solid #c5d0c9;
+    }
+    .ocr-body .ocr-parish-masthead:first-child {
+      margin-top: 0;
+    }
+    .ocr-body h2.ocr-parish-name,
+    .ocr-body .ocr-parish-name {
+      font-family: Georgia, "Iowan Old Style", "Palatino Linotype", Palatino, "Times New Roman", Times, serif;
+      font-size: 1.45em;
+      font-weight: 700;
+      letter-spacing: 0.02em;
+      color: #14524f;
+      margin: 0 0 0.2em;
+      line-height: 1.25;
+      border: 0;
+      padding: 0;
+      text-transform: none;
+    }
+    .ocr-body .ocr-parish-date {
+      margin: 0;
+      font-size: 0.88rem;
+      font-weight: 600;
+      letter-spacing: 0.04em;
+      color: #5a6a68;
+      font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+    }
+    .ocr-body .ocr-parish-link {
+      margin: 0.25em 0 0;
+      font-size: 0.88rem;
+    }
+    .ocr-body h3.b-head {
+      margin-top: 1.45em;
+      margin-bottom: 0.5em;
+      padding-bottom: 0.2em;
+      border-bottom: 1px solid #d4ddd9;
+      color: #0f3d3d;
+    }
+
+
+    .ocr-body {
+      padding: 4px 2px 8px;
+    }
+    .search-panel {
+      margin: 0 0 12px;
+      border: 1px solid #d4ddd9;
+      border-radius: 8px;
+      padding: 10px 12px;
+      background: rgba(255, 255, 255, 0.85);
+    }
+    .search-panel .ocr-search-bar { margin-bottom: 6px; }
+    .ocr-search-bar { position: relative; margin-bottom: 6px; }
+    .search-input {
+      width: 100%; min-height: 44px; border: 1px solid #c9d4cf; border-radius: 8px;
+      padding: 8px 36px 8px 12px; font-size: 1rem;
+      color: #1a1f1e; background: #fff;
+    }
+    .search-clear { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 32px; height: 32px; border: 0; background: transparent; color: #5a6a68; font-size: 1.1rem; cursor: pointer; }
+    .search-clear[hidden] { display: none; }
+    .ocr-search-tools {
+      display: flex; align-items: center; justify-content: space-between; gap: 8px;
+      flex-wrap: wrap;
+    }
+    .ocr-search-tools button {
+      border: 1px solid #1a6b6b; border-radius: 6px; background: #fff; color: #1a6b6b;
+      font-weight: 600; min-height: 40px; padding: 6px 12px; cursor: pointer; font-size: 0.9rem;
+    }
+    .ocr-search-tools button:disabled { color: #999; border-color: #d4ddd9; cursor: not-allowed; }
+    .match-count { color: #5a6a68; font-size: 0.85rem; font-weight: 600; }
+    .note-box {
+      margin-top: 18px;
+      color: #5a6a68;
+      font-weight: 400;
+      font-size: 0.85rem;
+      line-height: 1.5;
+      padding: 0;
+    }
+    .ocr-failed-banner {
+      margin: 12px 0;
+      padding: 12px 14px;
+      background: #fff4df;
+      border: 1px solid #f5d08d;
+      border-radius: 8px;
+      color: #713f12;
+      font-weight: 600;
+      font-size: 0.9rem;
+      line-height: 1.45;
+    }
+    body.embed-mode .top { display: none !important; }
+    body.embed-mode .page { padding-top: 8px; }
+    @media (max-width: 600px) {
+      .page { padding: 12px 14px 32px; }
+      .ocr-search-tools button { min-height: 48px; }
+    }
+  </style>
+</head>
+<body>
+  <div class="page">
+    <div class="top" id="ocr-top">
+      <div class="top-left">
+        <a class="back-link" href="longford.html" target="_blank" rel="noopener noreferrer">← Viewer</a>
+        <span class="title-line">LONGFORD (TEMPLEMICHAEL) Text Bulletin · 30/09/2026</span>
+      </div>
+    </div>
+    <div class="ocr-sticky-chrome">
+    <div class="ocr-zoom-bar" role="group" aria-label="Text zoom">
+      <button type="button" data-ocr-zoom="-1" aria-label="Zoom out">−</button>
+      <span class="ocr-zoom-pct" id="ocr-zoom-pct">100%</span>
+      <button type="button" data-ocr-zoom="1" aria-label="Zoom in">+</button>
+      <span class="ocr-zoom-hint">or pinch to zoom</span>
+    </div>
+    <div class="search-panel" role="search">
+      <div class="ocr-search-bar">
+        <input id="ocr-search" class="search-input" type="search" placeholder="Search text (mass, bingo, parish…)" aria-label="Search bulletin text" />
+        <button id="clear-search" class="search-clear" type="button" aria-label="Clear search" hidden>×</button>
+      </div>
+      <div class="ocr-search-tools">
+        <span id="ocr-match-count" class="match-count">0 matches</span>
+        <div>
+          <button id="ocr-prev" type="button" disabled>← Prev</button>
+          <button id="ocr-next" type="button" disabled>Next →</button>
+        </div>
+      </div>
+    </div>
+    </div>
+    <div class="ocr-body" id="ocr-text"><header class="ocr-parish-masthead" id="ocr-parish-longford-templemichael" data-parish-name="Longford (Templemichael)"><h2 class="ocr-parish-name">Longford (Templemichael)</h2><p class="ocr-parish-date">30/09/2026</p></header>
+<hr>
+<p class="page-label">Page 4</p>
+<p>Response : Remember your mercy, Lord. GOSPEL READING: Matthew 21:28-32 Jesus said to the chief priests and the elders of the people: ‘What is your opinion? Amanhadtwo sons. He went and said to the first, “Myboy, yougoand work in the vineyard today”. He answered, “I will notgo”, but afterwards thought better ofitand went. The man then went and said the same thing to the second who answered, “Certainly, sir”, butdidnot go. Which ofthetwodidthe father’s will?’ ‘The first ’ they said. Jesus said to them, ‘I tell you solemnly, tax collectors and prostitutes are making their way into the kingdom of God before you. For John came toyou, a pattern of true righteousness, butyoudidnot believe him, andyetthetax collectors and prostitutes did. Even after seeing that, you refused to think better ofitand believe in him’. * * * For this 112th World Day for Migrants and Refugees, the theme, “ Even just one of these children ,” draws our attention to the minors directly involved in the experience of migration and flight, to the care owed to them, andtothe Lord’s promise that “ whoever receives one such child in my name receives me ” (Mk 9:37). Minors are the most vulnerable group within theglobal movements of migration. They are concrete faces, who have unique stories, and call on our conscience. Every year, millions of children and adolescents are forced to leave th eir homeland because of war, poverty, violence, environmental disasters and other tragedies. Sadly, their number continues to grow. The economic, political and military consequences of this disaster are immense. The suffering of migrant children does not end with their relocation. There are very young children who have lost parents, brothers, sisters and friends, and who have witnessed unspeakable acts of violence . Others, separated from their families for long periods, try to reunite with the m while enduring the anguish of separation. There are also minors who make the journey together with their parents, yet are exposed to ext reme and traumatic conditions. Finally, we cannot forget the tragic situation of those separated from their pa rents because of repatriation. To this already appalling situation are added further tragedies: deaths along migration routes, trafficking and exploitation, the recruitment of minors for use in armed conflicts, sexual violence, forced ma rriages, and the atrocities they have suffered or witnessed during their travels. The ir dignity is trampled upon in countless ways. In his message to mark World Day of Migrants and Refugees for 2017, Pope Francis recalled that migrant children “ in a threefold way are defenceless: they are children, they are foreigners, and they have no means to protect themselves. I ask everyone to help those who, for various reasons, are forced to live far from their homeland and are separated from their families. ” Continued overleaf /…. SUNDAY REFLECTION ON THE READINGS (Ezekiel 18:25-28; Philipians 2:1-11; Matthew 21:28-32). Today’s readings bring us face to face with oneofthe most important truths in the spiritual life: Godisnot impressed by empty words, but by convert ed lives . In the first reading, through the prophet Ezekiel, God speaks clearly: if the wicked person turns away from sin and does what is right, he will live; butifthe righteous person turns away from righteousness and does evil, he will die. The message is simple: what matters most is not where we started, but where we are going now . God is always ready to forgive, always ready to restore, always ready to give a new beginning. Nooneistoofar gone for mercy, andnoonecan boast as though they are already safe without perseverance. St. Paul in the second reading gives us the beautiful model of this new life: Je sus Christ Himself. The road of Christian greatness must include humility, se lf- emptying, and obedience. In a world where people want to be seen, promoted, praised, and admired, Christ shows us another way - thewayof service. The Gospel then drives the lesson home with the parable ofthetwo sons. One son said “No,” but later changed his mind and went. The other said “Yes,” but never went. Jesus asks the chief priests and elders a piercing question: ‘ Which one did the will of the father ?’ The answer is obvious: nottheonewho spoke nicely, but theonewho actually obeyed. This is a word forallofus. Itisnot enough tosay “Lord, Lord.” Itisnot enough to make promises in prayer, at Mass, or in public. God wants action. He wants conversion. He wants obedience that shows up in daily life - in our homes, our work, our relationships, and our moral choices. Peace be with you. Longford (Templemichael) <a href="https://longfordparish.com/parishnews.htm" target="_blank" rel="noopener noreferrer">https://longfordparish.com/parishnews.htm</a></p>
+<hr>
+<p class="page-label">Page 5</p>
+<p>Monday, 28th September - St Wenceslaus 8.00am: Anna Devine (A) 10.00am: Alice Burke (B’day Rem) Tuesday, 29th September - Ss Michael, Gabriel &amp; Raphael, Archangels 8.00am: Angela Rea (9th A) 10.00am: Juan Goncalves (A) Wednesday, 30th September - St Jerome 8.00am : Manuel &amp; Celira Cardoso (Thanksgiving) 10.00am: John Ward (A) Thursday, 1st October - St Thérèse of the Child Jesus 8.00am : No Intention 10.00am : Rose Flaherty (A) 7.30pm Curry : No Intention Friday, 2nd October - The Guardian Angels - First Friday 8.00am : No Intention 10.00am : Conor Molloy (Deceased) 7.30pm : No Intention Saturday, 3rd October - Bl. Columba Marmion 8.00am: No Intention 10.00am: Daniel Dennigan (A) &amp; DFM Sunday, 4th October - Twenty Seventh Sunday in Ordinary Time 7.30pm Vigil : Annie Monks (A) Mary &amp; George Dowd &amp; their sons Michael, Jimmy &amp; Francie (A) 8.00am: Mass for People of the Parish (Missa Pro Populo) 10.00am: Mary Henry (A) Molly Lynch (A) Mary Morgan (MM) &amp; her son Brendan (A) 11.30am: Teresa Brady (A) John &amp; Cecelia Nevin (A) Brian &amp; Catherine Grant (A) 1.00pm: Dermott Gray, Marian Gray &amp; Bridget Tyrell (A) Martin Lowry (A) Vincent &amp; Sheila Crossan (A) 6.00pm: No Intention OFFERTORY COLLECTION: We thank you most sincerely for your gen- erous contribution to our collection last week which amounted to €4,240. We also thank you for the HARVEST DUES donations which totalled €9,500. BAPTISM: It is with great joy we welcomed Darla-Mae Elizabeth O’Leary – Maguire into the Christian community last weekend. CONGRATULATIONS to Ciana Brady and Cathal Burke who gave them- selves to each other in holy matrimony during the week. † RECENTLY DECEASED We remember in our prayers Frank Kenny (Cloncoose) whose funeral took place during the week. May his soul, andthe souls ofallthe faithful departed, rest in peace. REMINDER: Introduction to PARISH FUNERAL MINISTRY commences this Wednesday 30th September for 3 consecutive Wednesday nights - tea/ coffee at 7pm, workshop at 7.30pm. CONFESSIONS will be heard on Thursday 1st October - 10.30am-11.30am and 7.00pm-7.30pm. FIRST FRIDAY calls will take place on Thursday and Friday . Please con- tact the Parish Office <a href="tel:+353433346465" style="color:#1d4ed8;font-weight:600;">043 33 46465</a> before Thursday if you would like a pr iest to call with Holy Communion. BAPTISM MEETING will take place on Friday evening, 2nd October at 8pm for those who have a child for Baptism in the coming months. ANOINTING OF THE SICK will be administered to those who may desire to receive it during the 10am mass on Saturday 3rd October . BLESSING OF FAMILY PETS You are warmly invited to bring along your family pets for a special blessing on Sunday 4th October at 3pm in the Portico of the Cathedral. Please pass on this invitation parish to your ne ighbours, friends and family. We look forward to seeing all creatures - great and small – and ask that owners are careful to keep their pets and others safe and secure ontheday . LONGFORD ALZHEIMER CAFÉ hold their next monthly meeting on Wednesday 30th September @ 7pm in their office on Earl Street. ————————————— Continued from back page/ Yet, amid so much darkness, the light of solidarity is not lacking . Individuals, families, civil institutions and ecclesial communities choose ‘not to pass by on the other side ’ (cf. Lk 10:29-37). We think of the families who open the doors of their homes in order to restore to these children the warmth of a family heart h; the educators who serve in reception centres; the volunteers and aid workers who each day devote themselves to healing the invisible wounds ofthese little ones along migration routes and in our cities. They bear witness throug h their commitment that love can overcome indifference .</p>
+<hr>
+<p class="page-label">Page 6</p>
+<p>a a MENU Wevalueyourpri vacy Weusecookiestoenhanceyourbrowsingexperience, servepersonalizedcontent, andanalyzeourtrac. By clicking " Accep t All " , youconsenttoouruseofcookies. Customize Reject All Accep t All Mohill (Fenagh &amp; Gortletteragh) <a href="https://mohillparish.ie/newsletter/" target="_blank" rel="noopener noreferrer">https://mohillparish.ie/newsletter/</a></p>
+<hr>
+<p class="page-label">Page 7</p>
+<p>We pray fo! We value your privacy We use cookies to enhance your brow serve personalized content, and analyz clicking &quot;Accept All&quot;, you consent to ov Mass Intentions - Mohill Sat 3 19.30 Sean, Christina &amp; Charles O&#x27;Beirne Sean Rehill &amp; DFM Sun 4 10.00 Fran McGuinness &amp; DFM Eslin 9.00 Jim &amp; Rosaleen Foley, Thomas Conlon Sick and housebound will be visited at the usual times this Friday hanna Gilbert, Bridie Duignan, Coolebawn, Bridie Casey, Springfield and Noel Butler Corafora, Eslin whose funerals took place during the week. May they rest in peace, Mass Times 3rd &amp; 4th October Sat Oct 3rd Fenagh 6.00pm Mohill 7.30pm. Sun Oct 4th Eslin 9.00am Mohill 10.00am Gortletteragh 11.30am</p>
+<h3 class="b-head">Weekday Masses</h3>
+<p>Monto Fri 10am g experience, Rosary after 10am Mass our traffic. By Ise of cookies. afession—Sat evening 7pm in Mohill. at—Mass at 10am &amp; Confessions after Mass Eucharistic Adoration</p>
+<hr>
+<p class="page-label">Page 8</p>
+<p>We value you We use cookies tc serve personalize! clicking &quot;Accept A\ Frid; Sick an Fenagh Altar Society Eucharistic Minister Reader Collector privacy nhance your browsing experience, ontent, and analyze our traffic. By you consent toouruseof cookies. pun 1 1.9u Thurs after 10am Mass until 6pm Benediction first Thurs of the month at 6pm Offertory Collection Mohill . €1,510 Mass Intentions - Fenagh Sat 27 18.00 Pat, Roseann &amp; Bernadette Wrynne &amp; DM Wrynne &amp; Ouinn Families Tomas Flynn &amp; DFM Sat4 18.00 DM Doherty Family Drumany Frank Guckian &amp; DFM Adoration of the Blessed Sacrament evening from 6 to 8pm in St Marys Church, Foxfield Offertory Collection Fenagh Sept 19 .€695 Jousebound will be visited at the usual times on Thurs October 2026 Margaret Walpole Patricia Dolan Doreen Honeyman Sean O&#x27;Rourke Noel McLoughlin Mass Intentions Gortletteragh ond &amp; Ann Reynolds &amp; DM Reynolds &amp; Murphy Families</p>
+<hr>
+<p class="page-label">Page 9</p>
+<p>We value you We use cookies tc serve personalize! clicking "Accept A\ Offertory Collection Gortletteragh .€625 Fr. John Quinn will say Mass at 12 noon in Gortletteragh Church this week on Monday, Wednesday, Thursday and Friday. No Mass on Tuesday, Those usually attended on the First Friday will again have Holy Communion brought to them at the usual times. Counters for Oct Geraldine McGowan, Mary Duffy &amp; Patricia Boham, collection counted after 11.30am Mass Holidays | will be on holidays from Mon Oct 5 to Fri Oct 23. During this time for funerals and sick calls contact Fr Sean Burke <a href="tel:+353863679681" style="color:#1d4ed8;font-weight:600;">086 3679681</a> or Fr Livinus <a href="tel:+353874685121" style="color:#1d4ed8;font-weight:600;">087 4685121</a> “Gortletteragh Community Childcare Kids Tractor Run will take place this Sunday 27th of September at 12.30 in Gorletteragh GAA Pitch. Tractors scooters, ride ons, bikes or walking/ running. Entry is € 10 per child with vehicle or €20 per family. Refreshments served and a Raffle. All support greatly appreciated! All proceeds go towards Gorletteragh Community Childcare. Ministries for October 2026 Altar Society Helen Faughnan Lourda McGowan Eucharistic Ministers Saturday Rose Keegan Eucharistic Ministers Sunday Kathleen Cashin Readers: Saturday Denis McGeoghan Readers: Sunday Regina O'Carolan Collectors: Saturday Gerry McHugh, Gerry Beirne Francis McGowan, Patrick Beirne privacy nhance your browsing experience, ontent, and analyze our traffic. By you consent toouruseof cookies.</p>
+<hr>
+<p class="page-label">Page 10</p>
+<p>. ” . ” . ” Wevalueyourpri vacy Weusecookiestoenhanceyourbrowsingexperience, servepersonalizedcontent, andanalyzeourtrac. By clicking &quot; Accep t All &quot; , youconsenttoouruseofcookies.</p>
+<hr>
+<p class="page-label">Page 11</p>
+<p>) . . ” Wevalueyourpri vacy Weusecookiestoenhanceyourbrowsingexperience, servepersonalizedcontent, andanalyzeourtrac. By clicking &quot; Accep t All &quot; , youconsenttoouruseofcookies.</p>
+<hr>
+<p class="page-label">Page 12</p>
+<p>weste PARISH OF MOHILL Paróiste Maothail QUICK LINKS GET INTOUCH Donate ADDRESS MAIN STREET, 9 MOHILL, Watch Live N41 YR86 History PHONE <a href="tel:+353719631024" style="color:#1d4ed8;font-weight:600;">+353 71 963 1024</a> Newsletter EMAIL Schools <a href="mailto:info@mohillparish.ie" target="_blank" rel="noopener noreferrer">info@mohillparish.ie</a> © Parish of Mohill | Site by Daly Com We value your privacy We use cookies to enhance your browsing experience, serve personalized content, and analyze our traffic. By clicking "Accept All", you consent toouruseof cookies.</p>
+<hr>
+<p class="page-label">Page 13</p>
+<p>ST. MARY'S CHURCH, BOHEROUILL “Tí “misi AN INN T3 email: <a href="mailto:mcdcoath@gmail.com" target="_blank" rel="noopener noreferrer">mcdcoath@gmail.com</a> \ ia. Ty IN WEEKDAY MASSES WEEKEND MASSES 26th/27th Tuesday, Sat 26th: No intention Boherquill — 9.30 am Sun 27th: Josephine McNamara M/M. Patarica Moran Wednesday, Ann Grimes. Rathowen — 9.30am WEEKEND MASSES 3rd/4th | Thursday, Sat 3rd: No intention Rathowen — 9.30am. Adoration 10-10.30am Sun 4th: Marcella Farrell, Fairyhall. Ambrose/ Rosemarie Friday, Ma Guire Boherquill — 8pm. Adoration 7 — 8pm. NEWS HEADLINES &amp; LITTLE THEOLOGY ‘AGNOSTISM’ A: Pope Leo in france will find a secular country at odds | Agnostism, defined as “the belief that nothing can be known with catholic teaching on life. B: Urgent need to address | about the existence of Godorthe supernatural”. The church dangers: American bishops meet AI representatives. C: | views this view as an error that limits human reason's capacity to New convert and author says French catholics have now | know God through both natural logic and divine revelation. learnt from Islam to be proud of their faith. D: Catholic | According to the Catechism of the Catholic Church agnostism university works to preserve Lebanon’s christian past, | can take many forms firstly some agnostics make no judgement for the future. E: 600,000 sign up for pope Leo’s Paris | about God, declaring it is impossible to prove, affirm, or deny. mass, as organisers expand route. F: UK bill proposes to | Secondly, others accept a vague transcendent being, entirely lift historic restrictions on Catholic and Jewish Prime | hidden and incapable of being known or of revealing itself, lastly Ministers. G: 800 years after St Francis death, new | agnosticism that stems from an indifferences, a sluggish digital project preserves his basilica for years to come. | consciences, or an active avoidances of life’s ultimate question’s. H: Vatican children’s hospital: Noonein Europe, No 4 | The church maintains that human reason can know God with in the world according to new ranking. I: A muslim | certainty through creation, divine revelation &amp; above all in Jesus father tried to burn his daughters alive for becoming | Christ. We may experience doubt while inthepew , but this is christians. J: Catholic church in Germany contributes | not the same as agnosticism. €595 million in international aid in 2025. MEDJUJORJE PILGRIMAGE. LEGION OF MARY. The annual pilgrimage to Medjugorje will take place from the annual Legion of Mary pilgrimage to Knock takes |14th to the 21st of October, cost of the pilgrimage is €915, which this weekend, Sunday 27th. Devotion begins with the jincludes flights from Knock airport, accommodation, breakfast anointing of the sick at 2.30pm, followed by mass and |and dinner taxes and transfers. The price is based on Per Person the rosary procession at 3pm. A bus will leave Sunday {sharing Fr’s PJ Huges and Jorom will accompany the group as morning from the Bay Horse Granard at 8am and the |spiritual directors. For more information or to reserve a place you Parkhouse Edgesworthtown at 8.15am. To reserve a seat |can call Jerry on <a href="tel:+353874309096" style="color:#1d4ed8;font-weight:600;">087-4309096</a>. call Kitty on <a href="tel:+353860405621" style="color:#1d4ed8;font-weight:600;">086-0405621</a> or Peter <a href="tel:+353876613510" style="color:#1d4ed8;font-weight:600;">087-6613510</a>. MAGNIFICA HUMANITAS. SAINTLY WISDOM ‘HOPE’ One topic that seems to be becoming more and more of a matter “Hope always draws the soul from the beauty that is seen to [of concern forallof humanity is the rapid development of Al, a what is beyond, always kindles the desire for the hidden |tool which will be of immense benefit to humanity, but one that through what is perceived”. . St Gregory of Nyssa. requires enlightened controls and a clear set of goals that ensure “The most hopeful people in the world are the young and |that it will be an instrument of peace and universal benefit. Pope the drunk: the first because they have little experiences of |Leo has written an encyclical letter entitled ‘Magnifica failure, and the second because they have succeeded in |humanitas’ meaning the magnificent human, which set the person drowning theirs “. St Thomas Aquinas at the center of any development, the encyclical has been warmly Hide yourself in Jesus crucified, and hope for nothing received by many involved in AJ research, and seen as a road map except that allmenbe thoroughly converted to his will. That |for ongoing progress. With just 100 pages it is accessible to allmaybe truly free”. St Paul of the cross. everyone who is concerned and seeks guidance. Available form REST IN PEACE: The prayers of the church are asked for bookstation Ireland or from the vatican website <a href="https://www.vatican.va" target="_blank" rel="noopener noreferrer">www.vatican.va</a>. the repose of the soul of Diana Reilly (née Riggs) England 3 and Rathowen, Daughter of Frank and Eithna Riggs, who oe. ules eee lant oieaba LO died during the week. May she rest in peace. JOSEPH? TO RECENVE FROM THY BOUNTY. Ws Me BLESSING OF THE GRAVES 2027. Russagh and Rathaspic Sat June 12th, ( mass in Russagh) § é i Streete, Coolamber, Boherquill, Sat June 26th. : re _ : OFFERTORY COLLECTION 19th/20th Sept . re bá ” ba faire, eds Pe Lie — —— I f _ —</p></div>
+    <p class="note-box">Auto-generated from the bulletin PDF. Irish (Gaeilge) and English preserved as printed. Check mass times and names against the original PDF.</p>
+  </div>
+  <script>
+    (function () {
+      try {
+        if (new URLSearchParams(window.location.search).get('embed') === '1') {
+          document.body.classList.add('embed-mode');
+        }
+      } catch (e) {}
+    })();
+    (function () {
+      var KEY = 'ph_ocr_scale';
+      var percents = [75, 85, 100, 115, 130, 150, 175, 200];
+      var root = document.getElementById('ocr-text');
+      var label = document.getElementById('ocr-zoom-pct');
+      if (!root) return;
+      function apply(pct) {
+        root.style.setProperty('--ocr-scale', String(pct / 100));
+        if (label) label.textContent = pct + '%';
+        try { localStorage.setItem(KEY, String(pct)); } catch (e) {}
+      }
+      var saved = 100;
+      try {
+        var raw = localStorage.getItem(KEY);
+        if (raw) {
+          var n = parseFloat(raw);
+          if (n > 0 && n < 3) saved = Math.round(n * 100);
+          else if (n >= 50 && n <= 250) saved = Math.round(n);
+        }
+      } catch (e) {}
+      if (percents.indexOf(saved) < 0) {
+        saved = percents.reduce(function (best, p) {
+          return Math.abs(p - saved) < Math.abs(best - saved) ? p : best;
+        }, 100);
+      }
+      apply(saved);
+      document.querySelectorAll('[data-ocr-zoom]').forEach(function (btn) {
+        btn.addEventListener('click', function () {
+          var dir = parseInt(btn.getAttribute('data-ocr-zoom'), 10) || 0;
+          var idx = percents.indexOf(saved);
+          if (idx < 0) idx = percents.indexOf(100);
+          idx = Math.max(0, Math.min(percents.length - 1, idx + dir));
+          saved = percents[idx];
+          apply(saved);
+        });
+      });
+    })();
+    (function () {
+      const ocrRoot = document.getElementById('ocr-text');
+      const ocrSearch = document.getElementById('ocr-search');
+      const clearSearch = document.getElementById('clear-search');
+      const matchCount = document.getElementById('ocr-match-count');
+      const prevMatchBtn = document.getElementById('ocr-prev');
+      const nextMatchBtn = document.getElementById('ocr-next');
+      if (!ocrRoot || !ocrSearch) return;
+      const originalHtml = ocrRoot.innerHTML;
+      let ocrMatches = [];
+      let currentMatchIndex = -1;
+      function escapeRegExp(text) {
+        return text.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+      }
+      function scrollToMatch(idx) {
+        if (!ocrMatches.length || idx < 0 || idx >= ocrMatches.length) return;
+        ocrMatches.forEach((mark) => mark.classList.remove('search-active'));
+        ocrMatches[idx].classList.add('search-active');
+        ocrMatches[idx].scrollIntoView({ behavior: 'smooth', block: 'start' });
+      }
+      function updateMatchUi() {
+        const total = ocrMatches.length;
+        if (!total) {
+          matchCount.textContent = '0 matches';
+          prevMatchBtn.disabled = true;
+          nextMatchBtn.disabled = true;
+          return;
+        }
+        matchCount.textContent = `${currentMatchIndex + 1} of ${total} matches`;
+        prevMatchBtn.disabled = false;
+        nextMatchBtn.disabled = false;
+      }
+      function applySearch(query) {
+        ocrRoot.innerHTML = originalHtml;
+        ocrMatches = [];
+        currentMatchIndex = -1;
+        if (!query) {
+          clearSearch.hidden = true;
+          updateMatchUi();
+          return;
+        }
+        clearSearch.hidden = false;
+        const regex = new RegExp(escapeRegExp(query), 'gi');
+        const walker = document.createTreeWalker(ocrRoot, NodeFilter.SHOW_TEXT, null);
+        const nodes = [];
+        while (walker.nextNode()) {
+          const node = walker.currentNode;
+          if (node.parentElement && node.parentElement.tagName !== 'MARK' && node.nodeValue.trim()) nodes.push(node);
+        }
+        nodes.forEach((node) => {
+          const text = node.nodeValue;
+          regex.lastIndex = 0;
+          if (!regex.test(text)) return;
+          regex.lastIndex = 0;
+          const fragment = document.createDocumentFragment();
+          let lastIndex = 0;
+          let match;
+          while ((match = regex.exec(text)) !== null) {
+            if (match.index > lastIndex) fragment.appendChild(document.createTextNode(text.slice(lastIndex, match.index)));
+            const mark = document.createElement('mark');
+            mark.textContent = match[0];
+            fragment.appendChild(mark);
+            ocrMatches.push(mark);
+            lastIndex = match.index + match[0].length;
+          }
+          if (lastIndex < text.length) fragment.appendChild(document.createTextNode(text.slice(lastIndex)));
+          node.parentNode.replaceChild(fragment, node);
+        });
+        ocrRoot.querySelectorAll('details.parish-block').forEach((details) => {
+          details.open = Boolean(details.querySelector('mark'));
+        });
+        if (ocrMatches.length) {
+          currentMatchIndex = 0;
+          scrollToMatch(currentMatchIndex);
+        }
+        updateMatchUi();
+      }
+      ocrSearch.addEventListener('input', (e) => applySearch(e.target.value.trim()));
+      clearSearch.addEventListener('click', () => { ocrSearch.value = ''; applySearch(''); ocrSearch.focus(); });
+      prevMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex - 1 + ocrMatches.length) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      nextMatchBtn.addEventListener('click', () => {
+        if (!ocrMatches.length) return;
+        currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+        updateMatchUi();
+        scrollToMatch(currentMatchIndex);
+      });
+      ocrSearch.addEventListener('keydown', (e) => {
+        if (e.key === 'Enter' && ocrMatches.length) {
+          e.preventDefault();
+          currentMatchIndex = (currentMatchIndex + 1) % ocrMatches.length;
+          updateMatchUi();
+          scrollToMatch(currentMatchIndex);
+        }
+      });
+    })();
+    
+    (function () {
+      function syncOcrSearchSticky() {
+        var chrome = document.querySelector('.ocr-sticky-chrome');
+        var input = document.getElementById('ocr-search');
+        if (!chrome || !input) return;
+        var active = Boolean((input.value || '').trim());
+        chrome.classList.toggle('is-searching', active);
+        document.documentElement.classList.toggle('is-ocr-searching', active);
+      }
+      document.addEventListener('input', function (event) {
+        if (event.target && event.target.id === 'ocr-search') syncOcrSearchSticky();
+      }, true);
+      document.addEventListener('click', function (event) {
+        if (event.target && event.target.id === 'clear-search') {
+          window.setTimeout(syncOcrSearchSticky, 0);
+        }
+      }, true);
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', syncOcrSearchSticky);
+      } else {
+        syncOcrSearchSticky();
+      }
+    })();
+    
+    
+    (function () {
+      function boot() {
+        var btn = document.getElementById('scroll-top-btn');
+        if (!btn) {
+          if (!document.body) return;
+          btn = document.createElement('button');
+          btn.type = 'button';
+          btn.className = 'scroll-top-btn';
+          btn.id = 'scroll-top-btn';
+          btn.setAttribute('aria-label', 'Back to top');
+          btn.textContent = '↑';
+          document.body.appendChild(btn);
+        }
+        function innerBoxes() {
+          return Array.prototype.slice.call(
+            document.querySelectorAll('.pdf-inpage-pages, #ocr-panel')
+          );
+        }
+        function maxInnerScroll() {
+          return innerBoxes().reduce(function (max, el) {
+            return Math.max(max, el.scrollTop || 0);
+          }, 0);
+        }
+        function shown() {
+          var y = window.scrollY || document.documentElement.scrollTop || 0;
+          btn.classList.toggle('is-visible', y > 80 || maxInnerScroll() > 16);
+        }
+        function shownSoon() {
+          shown();
+          if (window.requestAnimationFrame) window.requestAnimationFrame(shown);
+          else window.setTimeout(shown, 16);
+        }
+        function bindBox(el) {
+          if (!el || el.getAttribute('data-pp-scroll-top') === '1') return;
+          el.setAttribute('data-pp-scroll-top', '1');
+          el.addEventListener('scroll', shownSoon, { passive: true });
+        }
+        function bindBoxes() {
+          innerBoxes().forEach(bindBox);
+          shown();
+        }
+        window.parishPressBindScrollTopBoxes = bindBoxes;
+        if (btn.getAttribute('data-pp-bound') !== 'inner-2') {
+          btn.setAttribute('data-pp-bound', 'inner-2');
+          var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+          window.addEventListener('scroll', shownSoon, { passive: true });
+          document.addEventListener('scroll', shownSoon, { capture: true, passive: true });
+          document.addEventListener('wheel', shownSoon, { capture: true, passive: true });
+          document.addEventListener('touchmove', shownSoon, { capture: true, passive: true });
+          if (window.MutationObserver && document.body) {
+            new MutationObserver(bindBoxes).observe(document.body, { childList: true, subtree: true });
+          }
+          btn.addEventListener('click', function () {
+            var behavior = reduce ? 'auto' : 'smooth';
+            window.scrollTo({ top: 0, behavior: behavior });
+            innerBoxes().forEach(function (el) {
+              el.scrollTop = 0;
+              if (el.scrollTo) el.scrollTo({ top: 0, behavior: behavior });
+            });
+            window.setTimeout(shown, reduce ? 0 : 400);
+          });
+        }
+        bindBoxes();
+      }
+      if (document.readyState === 'loading') {
+        document.addEventListener('DOMContentLoaded', boot);
+      } else {
+        boot();
+      }
+    })();
+    
+  </script>
+  <button type="button" class="scroll-top-btn" id="scroll-top-btn" aria-label="Back to top">↑</button>
+</body>
+</html>
