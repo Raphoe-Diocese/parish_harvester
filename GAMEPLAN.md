@@ -1,3 +1,9 @@
+## 30/09/2026 evening — Homepage back to 4 across; Armagh / Ardagh truth
+- Frank: put live cards back to **4** across (undo 5). Done in generator + ``docs/index.html``. **Not live yet** until push + Pages.
+- **Armagh:** still not on homepage — not in ``LIVE_DIOCESES``. Last ``armagh_diocese`` harvest run failed (36627724573). No live card until a successful harvest + LIVE list.
+- **Ardagh 2/40** is harvest truth: 2 ok (Cloghan & Banagher, Ferbane), 2 stale, 36 skipped/link-only. More found needs more proved this-week PDFs / recipes — not a card-count bug.
+- **Next (when Frank says go):** fix Armagh harvest fail, or kitchen-sink more Ardagh sites. One job at a time.
+
 ## 29/09/2026 night — Homepage 5 cards per row
 - Frank: main parishpress.ie live grid should be **5** across, not 4. Changed ``.live-grid`` in generator + ``docs/index.html``. Tablet 2 / phone 1 unchanged.
 - **Live-proved** 29/09 on https://www.parishpress.ie/ (`repeat(5,…)`).

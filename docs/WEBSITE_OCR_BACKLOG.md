@@ -54,7 +54,9 @@ Status values: `todo` · `doing` · `done` · `locked` (must not be undone) · `
 
 ## Still open (do not pretend these are finished)
 
-- [x] **done** · 2026-09-29 · Homepage live grid **5 cards per row** (was 4). Live-proved 29/09 on https://www.parishpress.ie/ (`repeat(5,…)`). · `harvester/site_builder.py`, `docs/index.html`
+- [ ] **doing** · 2026-09-30 · Homepage live grid back to **4 cards per row** (Frank undid 5). Generator + `docs/index.html`. **Not live yet** until push + Pages. · `harvester/site_builder.py`, `docs/index.html`
+
+- [x] **done** · 2026-09-29 · Homepage live grid briefly **5** across — Frank asked to revert 30/09. Was live-proved then undone. · `harvester/site_builder.py`, `docs/index.html`
 
 - [x] **done** · 2026-09-29 · Homepage N/M: skip rows back in denominator (Frank: Ardagh is not 2/4). Live-proved 29/09: Ardagh **2/40** on https://www.parishpress.ie/ after `5dddbb8c`. · `harvester/diocese_intro.py`, `docs/index.html`
 
