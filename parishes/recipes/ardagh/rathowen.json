@@ -1,19 +1,37 @@
 {
+  "version": 2,
   "parish_key": "rathowen",
-  "display_name": "Rathowen (Rathaspic & Russagh)",
+  "display_name": "Rathowen & Streete",
   "diocese": "ardagh",
-  "recorded_date": "2026-09-29",
-  "start_url": "https://ardaghdiocese.org/parish-details/?page=ddb_parish_details&parishID=20",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No parish website on the official directory — diocese card link only",
+  "start_url": "https://edgeworthstownparish.ie/community-notes-rathowen/parish-newsletter/",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    "rathowenstreete_compressed.pdf",
+    "rathowenstreete"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-09-30",
+  "example_url": "https://edgeworthstownparish.ie/wp-content/uploads/2026/09/sunday-newsletter-27-09-2026-rathowenstreete_compressed.pdf",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://ardaghdiocese.org/parish-details/?page=ddb_parish_details&parishID=20"
+      "action": "download",
+      "url": "https://edgeworthstownparish.ie/wp-content/uploads/2026/09/sunday-newsletter-27-09-2026-rathowenstreete_compressed.pdf"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "30/09/2026 hunt: Rathowen and Streete share one PDF on the Edgeworthstown parish site.",
+    "Proved sunday-newsletter-27-09-2026-rathowenstreete_compressed.pdf GET 200 application/pdf 320,110 bytes.",
+    "Streete is alias_of rathowen — harvest once.",
+    "site_type:http_scrape_newest_pdf — score filename date; do not pin."
+  ],
+  "do_not": [
+    "Do not download edgeworthstown_compressed.pdf under this key.",
+    "Do not harvest Streete separately.",
+    "Do not pin 27-09-2026."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }

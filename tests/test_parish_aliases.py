@@ -37,6 +37,9 @@ class ParishAliasTests(unittest.TestCase):
                 "galloonparish": "newtownbutler",
                 "lisnaskeamaguiresbridgeparish": "lisnaskeamaguiresbridge",
                 "rathmullan": "milfordrathmullanparishes",
+                "streete": "rathowen",
+                "fenagh": "mohill",
+                "gortletteragh": "mohill",
             },
         )
 

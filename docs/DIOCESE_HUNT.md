@@ -39,6 +39,9 @@ Clogher 22/08/2026 proved why: Expand-all cards said “no website.” The Paris
 | Shared bulletin | Clontibret + Muckno; Tyholland + Monaghan & Rackwallace | Harvest once under the host parish. The other parish stays on the A-Z list as a labelled link (`bulletin with …`). Do not pin this week's PDF. |
 | `faithful_ie_family_newsletters` | Cork family hubs: OneFaith, West Cork, The Parishioner, OurParish, Bantry `/notices`, Cathedral `/notices/newsletter`, Parishes Together `/notices/newsletters`, Kilbrittain `/bulletin` | Harvest the listing once. Official `/parishes/Name` may 404. `familyofparishes.ie/news` is notices only. Do not pin dated PDFs. |
 | Expired HTTPS | Lisnaskea / Galloon | Playwright + `ignore_https_errors` — urllib scrape will fail |
+| Ardagh Longford `/pdf/DDMMYY.pdf` | St Mel's — `parishnews.htm` looks yearless/stale; real files are `https://longfordparish.com/pdf/270926.pdf` | `predicted_dated_pdf` (same Tempo pattern). Prove from PDF text dates, not the HTML list. |
+| Ardagh Edgeworthstown WP compressed | `edgeworthstownparish.ie/.../parish-newsletter/` — `sunday-newsletter-DD-MM-YYYY-edgeworthstown_compressed.pdf` (+ separate `rathowenstreete_compressed`) | `http_scrape_newest_pdf` with href_patterns. Official directory had no site — kitchen-sink. Streete → alias of Rathowen. |
+| Ardagh Mohill WP **pages** | Newsletter is a WP *page* slug `newsletter-27th-september-2026`, not a post. Listing thumbnails lag. Fenagh + Gortletteragh text is inside the Mohill page. | `print_to_pdf` newest Newsletter page (discover via `/wp-json/wp/v2/pages?search=Newsletter&orderby=date`). Alias Fenagh + Gortletteragh → mohill. |
 
 ## Clogher leftover after kitchen sink (do not re-hunt blindly)
 

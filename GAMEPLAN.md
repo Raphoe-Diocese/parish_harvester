@@ -1,3 +1,14 @@
+## 30/09/2026 night — Ardagh hunt (Frank go)
+- Goal: find more this-week Ardagh PDFs beyond Cloghan & Banagher + Ferbane (was 2/40).
+- **Proved this week (27/09/2026) and wired:**
+  - **Longford** `predicted_dated_pdf` `/pdf/270926.pdf` (page-2 Mon 28 Sept / Sun 4 Oct).
+  - **Edgeworthstown** `http_scrape_newest_pdf` `sunday-newsletter-27-09-2026-edgeworthstown_compressed.pdf`.
+  - **Rathowen & Streete** shared `…rathowenstreete_compressed.pdf` — Streete alias of Rathowen.
+  - **Mohill** WP page `newsletter-27th-september-2026` print_to_pdf — Fenagh + Gortletteragh alias of Mohill (same HTML).
+- Still skipped / no this-week file: Facebook-only cards, dead hosts, Abbeylara (2025), Carrick (2021 archive), Drumlish newest listing 22-Sep (still stale vs 27/09), Aughavas NL1773 July.
+- Tricks written into ``docs/DIOCESE_HUNT.md``. **Not live counts until** ``ardagh_diocese`` harvest.
+- Do not invent amalgamations. No mega on this PC.
+
 ## 30/09/2026 night — Armagh go (harvest gate)
 - Armagh harvest died on the **test gate**, not on recipes: Tyholland/Galloon alias collapse left two asserts expecting them still harvestable.
 - Fixed: ``test_clogher_diocese`` (tyholland inactive + ``alias_of`` monaghanrackwallace) and ``test_seven_orphan…`` (galloon skip + alias of newtownbutler).

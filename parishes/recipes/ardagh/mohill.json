@@ -1,19 +1,34 @@
 {
+  "version": 2,
   "parish_key": "mohill",
-  "display_name": "Mohill",
+  "display_name": "Mohill (includes Fenagh & Gortletteragh)",
   "diocese": "ardagh",
-  "recorded_date": "2026-09-29",
-  "start_url": "http://www.mohillparish.ie",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "newsletter page is JS-rendered — no file href in HTML. Trainer job.",
+  "start_url": "https://mohillparish.ie/newsletter-27th-september-2026/",
+  "site_type": "html_text_bulletin",
+  "playbook_type": "html_text_bulletin",
+  "timeout_ms": 60000,
+  "total_timeout_s": 180,
+  "max_bulletin_pages": 8,
+  "recorded_date": "2026-09-30",
+  "example_url": "https://mohillparish.ie/newsletter-27th-september-2026/",
   "steps": [
     {
       "action": "goto",
-      "url": "http://www.mohillparish.ie"
+      "url": "https://mohillparish.ie/newsletter-27th-september-2026/"
+    },
+    {
+      "action": "print_to_pdf",
+      "skip_listing_nav": true
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "30/09/2026 hunt: weekly bulletin is a WordPress PAGE (not post). Newest Newsletter page via /wp-json/wp/v2/pages?search=Newsletter&orderby=date&order=desc — proved newsletter-27th-september-2026 published 28/09/2026.",
+    "Page text includes Mohill + Fenagh + Gortletteragh Mass intentions — harvest once here; fenagh and gortletteragh are aliases.",
+    "print_to_pdf with skip_listing_nav. Next week: open the newest Newsletter page from WP pages API (listing thumbnails lag)."
+  ],
+  "do_not": [
+    "Do not harvest Fenagh or Gortletteragh separately from this file.",
+    "Do not trust /newsletter/ thumbnail order alone — use WP pages API date order.",
+    "Do not remove skip_listing_nav."
+  ]
 }
