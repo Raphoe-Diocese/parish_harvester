@@ -1,4 +1,9 @@
-﻿## 01/10/2026 night — Newtowncashel Squarespace newsletter (Frank go)
+﻿## 01/10/2026 night — Kiltubrid HTML news (Frank keep going)
+- Kitchen-sink found `kiltubridparish.com/news/` (official card had no site).
+- Proved top heading **Sunday, 27th September 2026** with Mass Times & Intentions (Rantogue/Drumcong).
+- Wired `html_text_bulletin` print_to_pdf + skip_listing_nav. Harvest next.
+## 01/10/2026 night — Newtowncashel Squarespace newsletter (Frank go)
+- Harvest [36929312875](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/36929312875) success: `newtowncashel` **ok** (27/09/2026 Newsletter PNG→PDF). Ardagh ok now **13** in parish_status. Live card not re-proved this turn.
 - Proved this-week Church Newsletter image `Newsletter_20260927.png` on newtowncashel.ie (Squarespace CDN).
 - Wired `http_scrape_newest_images` against `?format=json`; engine now accepts JSON bodies and scores `Newsletter_YYYYMMDD` CDN URLs.
 - Contacts host updated to newtowncashel.ie. Harvest dispatch next; live count still **12/37** until ok + Pages.
@@ -22121,5 +22126,7 @@ ecipe_folder_name alias (ee4e1246).
 - Achonry 28/09: 10 ok (inc Tourlestrane dlc + Ballymote page-scan + Collooney). Kilmovee stale (20 Sept only on site). Facebook-only cards left.
 - NEXT: Derry / Down & Connor / Clogher show 0 found — same class as Cork wipe (single-diocese Achonry harvest emptied their report rows / this-week pages). Re-harvest those three; check single-diocese guard still holds.
 - doing: OCR spacing harden pass2 — audit all live dioceses; Ardara letter-spaced fix. Not live until merge+Pages.
+
+
 
 

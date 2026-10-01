@@ -44,6 +44,7 @@ Clogher 22/08/2026 proved why: Expand-all cards said “no website.” The Paris
 | Ardagh Mohill WP **pages** | Newsletter is a WP *page* slug `newsletter-27th-september-2026`, not a post. Listing thumbnails lag. Fenagh + Gortletteragh text is inside the Mohill page. | `print_to_pdf` newest Newsletter page (discover via `/wp-json/wp/v2/pages?search=Newsletter&orderby=date`). Alias Fenagh + Gortletteragh → mohill. |
 | Ardagh Clonguish / Newtownforbes Docdownloads | Official card had no site. Kitchen-sink: `clonguishparish.ie` same CMS as Drumlish/Aughavas. Newest file `Clonguish Newsletter 27.09.2026#####.pdf` (dated in filename; archive row may show Fri before Sunday). | `http_scrape_newest_pdf` on Docdownloads; score **filename** date. |
 | Ardagh Kilronan live twin | Official `kilronanparish.ie` dead. Live: `parishofkilronan.ie/newsletter/` with `/wp-content/uploads/DD.MM.YYYY.pdf`. | `http_scrape_newest_pdf`; score filename. |
+| Ardagh Kiltubrid overwritten /news/ | Official card no site. Live `kiltubridparish.com/news/` stacks Sunday HTML (Mass Times & Intentions). | `html_text_bulletin` print_to_pdf + skip_listing_nav. |
 | Ardagh Moydow + Legan shared PDF | Official `parishardaghmoydow.com` dead. Live: `ardaghmoydow.com/pdf/DDMMYY.pdf`. Same file covers Ardagh, Moydow, Legan, Ballycloghan. | Harvest under `ardaghandmoydow`; alias `leganballycloghan`. |
 
 ## Clogher leftover after kitchen sink (do not re-hunt blindly)
