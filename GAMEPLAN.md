@@ -1,6 +1,13 @@
-## 01/10/2026 — Armagh live (this turn)
-- Frank: Armagh live. Added ``armagh`` to ``LIVE_DIOCESES`` + hero slide (St Patrick's RC cathedral) + OCR/evidence maps. Regenerated ``docs/index.html`` (8 live cards, coming soon 18) and ``docs/dioceses/armagh/index.html`` (7 of 61). Tests updated. **Not live yet** until push + Pages prove.
-- **Ardagh:** harvest truth after hunt wiring is **6 ok** (Cloghan & Banagher, Ferbane, Longford, Edgeworthstown, Mohill, Rathowen) of ~40 — most leftovers are Facebook-only / no this-week PDF. Deeper kitchen-sink is **Next** when Frank says go. Do not invent bulletins.
+## 01/10/2026 — Ardagh deeper hunt (Frank next)
+- Goal: more this-week Ardagh PDFs beyond 6 ok.
+- **Proved + wired:** **Newtownforbes (Clonguish)** — `clonguishparish.ie` Docdownloads; PDF `Clonguish Newsletter 27.09.202611719.pdf` (27th September 2026 text). Official card had no site.
+- Re-checked leftovers: Drumlish still max 22-Sep (stale); Aughavas still NL1773 July; Abbeylara stops July 2025; Carrick archive 2021; Moate newsletter index is 2015 files; Athlone St Mary's archive dead; Drumshanbo host up but empty; most other leftovers no hostname.
+- **Not live count until** ``ardagh_diocese`` harvest after push. Do not invent Facebook bulletins.
+
+## 01/10/2026 — Armagh live (LIVE-PROVED)
+- Frank: Armagh live. ``armagh`` in ``LIVE_DIOCESES`` + St Patrick's cathedral hero + regenerated viewer/index. Push ``98136bf4`` + Pages [36796997185](https://github.com/Raphoe-Diocese/parish_harvester/actions/runs/36796997185).
+- **Live-proved** 01/10: https://www.parishpress.ie/ has **Armagh Diocese** card **7/61**; coming soon (18); no Armagh in coming-soon list. Viewer https://www.parishpress.ie/dioceses/armagh/ live.
+- **Ardagh:** card shows **6/37** (honest after hunt). Deeper kitchen-sink for more this-week PDFs is **Next** when Frank says go. Most leftovers Facebook / no site — do not invent.
 
 ## 30/09/2026 night — Ardagh hunt (Frank go)
 - Goal: find more this-week Ardagh PDFs beyond Cloghan & Banagher + Ferbane (was 2/40).

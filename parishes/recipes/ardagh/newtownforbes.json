@@ -1,19 +1,37 @@
 {
+  "version": 2,
   "parish_key": "newtownforbes",
   "display_name": "Newtownforbes (Clonguish)",
   "diocese": "ardagh",
-  "recorded_date": "2026-09-29",
-  "start_url": "https://ardaghdiocese.org/parish-details/?page=ddb_parish_details&parishID=37",
-  "site_type": "link_only",
-  "playbook_type": "link_only",
-  "status": "inactive",
-  "skip": true,
-  "reason": "No parish website on the official directory — diocese card link only",
+  "start_url": "http://clonguishparish.ie/Docdownloads.aspx?ContentId=0&par=3",
+  "site_type": "http_scrape_newest_pdf",
+  "href_patterns": [
+    "/uploads/",
+    "newsletter"
+  ],
+  "timeout_ms": 45000,
+  "total_timeout_s": 180,
+  "recorded_date": "2026-10-01",
+  "example_url": "http://clonguishparish.ie/uploads/Clonguish%20Newsletter%2027.09.202611719.pdf",
   "steps": [
     {
-      "action": "goto",
-      "url": "https://ardaghdiocese.org/parish-details/?page=ddb_parish_details&parishID=37"
+      "action": "download",
+      "url": "http://clonguishparish.ie/uploads/Clonguish%20Newsletter%2027.09.202611719.pdf"
     }
   ],
-  "version": 1
+  "operator_notes": [
+    "01/10/2026 hunt: official directory had no website — kitchen-sink found clonguishparish.ie (same Docdownloads CMS as Drumlish / Aughavas).",
+    "Proved PDF Clonguish Newsletter 27.09.202611719.pdf GET 200 application/pdf 469,409 bytes; page text '27th September 2026' / St Mary's Clonguish Newtownforbes.",
+    "Archive label row may say 25-Sep while filename has 27.09.2026 — score the filename date.",
+    "site_type:http_scrape_newest_pdf — do not pin the sequence suffix 11719."
+  ],
+  "do_not": [
+    "Do not pin 27.09.2026 or the 11719 suffix.",
+    "Do not use the diocese card URL as start_url.",
+    "Do not invent a Facebook bulletin."
+  ],
+  "bulletin_layout": {
+    "strategy": "newest_dated",
+    "position": "top"
+  }
 }

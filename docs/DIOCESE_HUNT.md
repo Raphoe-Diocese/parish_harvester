@@ -42,6 +42,7 @@ Clogher 22/08/2026 proved why: Expand-all cards said “no website.” The Paris
 | Ardagh Longford `/pdf/DDMMYY.pdf` | St Mel's — `parishnews.htm` looks yearless/stale; real files are `https://longfordparish.com/pdf/270926.pdf` | `predicted_dated_pdf` (same Tempo pattern). Prove from PDF text dates, not the HTML list. |
 | Ardagh Edgeworthstown WP compressed | `edgeworthstownparish.ie/.../parish-newsletter/` — `sunday-newsletter-DD-MM-YYYY-edgeworthstown_compressed.pdf` (+ separate `rathowenstreete_compressed`) | `http_scrape_newest_pdf` with href_patterns. Official directory had no site — kitchen-sink. Streete → alias of Rathowen. |
 | Ardagh Mohill WP **pages** | Newsletter is a WP *page* slug `newsletter-27th-september-2026`, not a post. Listing thumbnails lag. Fenagh + Gortletteragh text is inside the Mohill page. | `print_to_pdf` newest Newsletter page (discover via `/wp-json/wp/v2/pages?search=Newsletter&orderby=date`). Alias Fenagh + Gortletteragh → mohill. |
+| Ardagh Clonguish / Newtownforbes Docdownloads | Official card had no site. Kitchen-sink: `clonguishparish.ie` same CMS as Drumlish/Aughavas. Newest file `Clonguish Newsletter 27.09.2026#####.pdf` (dated in filename; archive row may show Fri before Sunday). | `http_scrape_newest_pdf` on Docdownloads; score **filename** date. |
 
 ## Clogher leftover after kitchen sink (do not re-hunt blindly)
 
